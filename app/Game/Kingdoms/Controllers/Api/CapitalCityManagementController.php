@@ -106,7 +106,7 @@ class CapitalCityManagementController extends Controller
 
     public function cancelUnitRecruitOrders(RecruitUnitCancellationRequest $request, Character $character, Kingdom $kingdom)
     {
-        $result = $this->cancelUnitRequestService->handleCancelRequest($character, $kingdom, $request->all()['request_data']);
+        $result = $this->cancelUnitRequestService->handleCancelRequest($character, $kingdom, $request->all());
 
         $status = $result['status'];
         unset($result['status']);

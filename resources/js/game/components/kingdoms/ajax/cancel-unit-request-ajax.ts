@@ -6,6 +6,7 @@ import BuildingsToUpgradeSection from "../capital-city/buildings-to-upgrade-sect
 import BuildingsInQueue from "../capital-city/buildings-in-queue";
 import SendBuildingUpgradeCancellationRequestModal from "../capital-city/modals/send-building-upgrade-cancellation-request-modal";
 import SendUnitRequestCancellationRequestModal from "../capital-city/modals/send-unit-request-cancellation-request-modal";
+import { CancellationType } from "../capital-city/enums/cancellation-type";
 
 @injectable()
 export default class CancelUnitRequestAjax {
@@ -16,8 +17,7 @@ export default class CancelUnitRequestAjax {
         characterId: number,
         kingdomId: number,
         queueId: number,
-        deleteWholeQueue: boolean,
-        unitId?: number,
+        unitName: string | null,
     ): void {
         this.ajax
             .setRoute(
@@ -27,11 +27,8 @@ export default class CancelUnitRequestAjax {
                     kingdomId,
             )
             .setParameters({
-                request_data: {
-                    delete_queue: deleteWholeQueue,
-                    unit_id: unitId,
-                    capital_city_unit_queue_id: queueId,
-                },
+                queue_id: queueId,
+                unit_name: unitName,
             })
             .doAjaxCall(
                 "post",

@@ -12,7 +12,7 @@ import Pagination from "./components/pagination";
 import PrimaryOutlineButton from "../../ui/buttons/primary-outline-button";
 import DangerOutlineButton from "../../ui/buttons/danger-outline-button";
 import SuccessOutlineButton from "../../ui/buttons/success-outline-button";
-import Kingdom from "./deffinitions/kingdom";
+import Kingdom from "./deffinitions/kingdom-with-buildings";
 import BuildingToUpgradeService from "./services/building-to-upgrade-service";
 import OpenKingdomCardForBuildingManagement from "./partials/building-management/open-kingdom-card-for-building-management";
 import PrimaryButton from "../../ui/buttons/primary-button";

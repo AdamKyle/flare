@@ -13,6 +13,7 @@ import { watchForDarkMode } from "../../ui/helpers/watch-for-dark-mode";
 import clsx from "clsx";
 import TimerProgressBar from "../../ui/progress-bars/timer-progress-bar";
 import { capitalize } from "lodash";
+import DangerOutlineButton from "../../ui/buttons/danger-outline-button";
 
 export default class BuildingsInQueue extends React.Component<any, any> {
     private fetchBuildingQueueAjax: FetchBuildingQueuesAjax;
@@ -255,19 +256,17 @@ export default class BuildingsInQueue extends React.Component<any, any> {
                                             Status:{" "}
                                             {capitalize(queue.secondary_status)}
                                         </p>
-                                        <button
-                                            onClick={() =>
+                                        <DangerOutlineButton
+                                            on_click={() =>
                                                 this.manageCancelModal(
                                                     queue.building_id,
                                                 )
                                             }
-                                            className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+                                            button_label={"Cancel Upgrade"}
                                             disabled={
                                                 queueGroup.total_time < 60
                                             }
-                                        >
-                                            Cancel Upgrade
-                                        </button>
+                                        />
                                     </div>
                                 ))}
                             </div>

@@ -15,7 +15,6 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
-use App\Flare\Models\UnitInQueue;
 use App\Flare\Transformers\KingdomBuildingTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
@@ -143,17 +142,19 @@ class CapitalCityManagementService
                 $queueTimeLeftInSeconds = 0;
             }
 
-            $unitRequests = collect($queue->unit_request_data)->map(function ($request) use ($kingdom, $queue) {
+            $unitRequests = collect($queue->unit_request_data)->map(function ($request) {
 
                 return [
-                    'building_name' => $request['name'],
+                    'unit_name' => $request['name'],
                     'secondary_status' => $request['secondary_status'],
                     'amount_to_recruit' => $request['amount'],
-                    'queue_id' => $queue->id,
                 ];
-            });
+            })->toArray();
+
+            $unitRequests = $this->reorderUnitRequests($unitRequests);
 
             return [
+                'queue_id' => $queue->id,
                 'kingdom_id' => $kingdom->id,
                 'kingdom_name' => $kingdom->name,
                 'map_name' => $kingdom->gameMap->name,
@@ -164,6 +165,29 @@ class CapitalCityManagementService
         });
 
         return array_values($unitQueueData->toArray());
+    }
+
+    /**
+     * Reorder the unit requests
+     *
+     * @param array $requestData
+     * @return array
+     */
+    private function reorderUnitRequests(array $requestData): array
+    {
+        $statusOrder = [
+            CapitalCityQueueStatus::FINISHED => 1,
+            CapitalCityQueueStatus::TRAVELING => 2,
+            CapitalCityQueueStatus::RECRUITING => 3,
+            CapitalCityQueueStatus::CANCELLED => 4,
+            CapitalCityQueueStatus::REJECTED => 5,
+        ];
+
+        usort($requestData, function ($a, $b) use ($statusOrder) {
+            return $statusOrder[$a['secondary_status']] <=> $statusOrder[$b['secondary_status']];
+        });
+
+        return $requestData;
     }
 
     /**

@@ -149,8 +149,8 @@ class CapitalCityKingdomLogHandler
         }
 
         $statusOrder = [
-            CapitalCityQueueStatus::REJECTED => 1,
-            CapitalCityQueueStatus::CANCELLED => 2,
+            CapitalCityQueueStatus::CANCELLED => 1,
+            CapitalCityQueueStatus::REJECTED => 2,
             CapitalCityQueueStatus::FINISHED => 3,
         ];
 

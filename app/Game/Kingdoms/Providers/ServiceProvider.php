@@ -33,6 +33,7 @@ use App\Game\Kingdoms\Middleware\DoesKingdomBelongToAuthorizedUser;
 use App\Game\Kingdoms\Service\AbandonKingdomService;
 use App\Game\Kingdoms\Service\AttackWithItemsService;
 use App\Game\Kingdoms\Service\CancelBuildingRequestService;
+use App\Game\Kingdoms\Service\CancelUnitRequestService;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Service\CapitalCityManagementService;
 use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
@@ -172,6 +173,12 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(CancelBuildingRequestService::class, function ($app) {
             return new CancelBuildingRequestService(
                 $app->make(UnitMovementService::class)
+            );
+        });
+
+        $this->app->bind(CancelUnitRequestService::class, function ($app) {
+            return new CancelUnitRequestService(
+                $app->make(CapitalCityKingdomLogHandler::class)
             );
         });
 

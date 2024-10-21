@@ -13,7 +13,6 @@ use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest as CapitalCityResourceRequ
 use App\Game\Kingdoms\Service\KingdomMovementTimeCalculationService;
 use App\Game\Kingdoms\Service\ResourceTransferService;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
-use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
 
 class CapitalCityRequestResourcesHandler
 {
@@ -107,6 +106,16 @@ class CapitalCityRequestResourcesHandler
 
     private function updateQueueData(CapitalCityBuildingQueue | CapitalCityUnitQueue $queue, array $requestData): CapitalCityBuildingQueue | CapitalCityUnitQueue
     {
+
+        $requestData = collect($requestData)
+            ->map(function ($item) {
+                if (!in_array($item['secondary_status'], [CapitalCityQueueStatus::REJECTED, CapitalCityQueueStatus::CANCELLED])) {
+                    return array_merge($item, ['secondary_status' => CapitalCityQueueStatus::REQUESTING]);
+                }
+                return $item;
+            })
+            ->toArray();
+
         $queue->update([
             'building_request_data' => $requestData,
             'messages' => $this->messages,

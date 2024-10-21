@@ -111,13 +111,17 @@ class CapitalCityProcessUnitRequestHandler
             $gameBuildingRelation = GameBuildingUnit::where('game_unit_id', $gameUnit->id)->first();
             $building = $kingdom->buildings()->where('game_building_id', $gameBuildingRelation->game_building_id)->first();
 
-            if ($this->isBuildingLocked($building, $kingdom)) {
+            if ($unitRequest['secondary_status'] === CapitalCityQueueStatus::CANCELLED) {
+                continue;
+            }
+
+            if ($this->isBuildingLocked($building, $kingdom, $unitRequest['name'])) {
                 $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
 
                 continue;
             }
 
-            if ($this->isBuildingUnderLeveled($building, $gameBuildingRelation, $kingdom)) {
+            if ($this->isBuildingUnderLeveled($building, $gameBuildingRelation, $kingdom, $unitRequest['name'])) {
                 $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
 
                 continue;
@@ -144,11 +148,11 @@ class CapitalCityProcessUnitRequestHandler
      * @param Kingdom $kingdom
      * @return boolean
      */
-    private function isBuildingLocked(KingdomBuilding $building, Kingdom $kingdom): bool
+    private function isBuildingLocked(KingdomBuilding $building, Kingdom $kingdom, string $unitName): bool
     {
         if ($building->is_locked) {
 
-            $this->messages[] = 'Building is locked in ' . $kingdom->name . '. You need to unlock the building: ' . $building->name . ' first by leveling a passive of the same name to level 1.';
+            $this->messages[] = $unitName . ' rejected because: Building is locked in ' . $kingdom->name . '. You need to unlock the building: ' . $building->name . ' first by leveling a passive of the same name to level 1.';
 
             return true;
         }
@@ -164,11 +168,11 @@ class CapitalCityProcessUnitRequestHandler
      * @param Kingdom $kingdom
      * @return boolean
      */
-    private function isBuildingUnderLeveled(KingdomBuilding $building, GameBuildingUnit $gameBuildingRelation, Kingdom $kingdom): bool
+    private function isBuildingUnderLeveled(KingdomBuilding $building, GameBuildingUnit $gameBuildingRelation, Kingdom $kingdom, string $unitName): bool
     {
         if ($building->level < $gameBuildingRelation->required_level) {
 
-            $this->messages[] = 'Building is under level in ' . $kingdom->name . '. You need to level the building: ' . $building->name . ' to level: ' . $gameBuildingRelation->required_level . ' first.';
+            $this->messages[] = $unitName . ' rejected because: Building is under level in ' . $kingdom->name . '. You need to level the building: ' . $building->name . ' to level: ' . $gameBuildingRelation->required_level . ' first.';
 
             return true;
         }
@@ -263,16 +267,9 @@ class CapitalCityProcessUnitRequestHandler
 
             $totalTimeInSeconds = 0;
 
-
-            dump('Before we filter for recruiting:');
-            dump($requestData);
-
             $filteredRequestData = collect($requestData)->filter(fn($item) => in_array($item['secondary_status'], [
                 CapitalCityQueueStatus::RECRUITING,
             ]))->toArray();
-
-            dump('Filtered data for recruitment');
-            dump($filteredRequestData);
 
             foreach ($filteredRequestData as $data) {
                 $gameUnit = GameUnit::where('name', $data['name'])->first();
@@ -344,15 +341,13 @@ class CapitalCityProcessUnitRequestHandler
                 $totalTimeInSeconds = 60;
             }
 
-            dump('Before we merge');
-            dump($capitalCityUnitQueue->unit_request_data);
-            dump($requestData);
+            $messages = $capitalCityUnitQueue->messages ?? [];
 
             $capitalCityUnitQueue->update([
                 'status' => CapitalCityQueueStatus::RECRUITING,
                 'started_at' => now(),
                 'completed_at' => now()->addSeconds($totalTimeInSeconds),
-                'messages' => $this->messages,
+                'messages' => array_merge($messages, $this->messages),
                 'unit_request_data' => array_merge(
                     $capitalCityUnitQueue->unit_request_data,
                     $requestData
@@ -360,9 +355,6 @@ class CapitalCityProcessUnitRequestHandler
             ]);
 
             $capitalCityUnitQueue = $capitalCityUnitQueue->refresh();
-
-            dump('What is the recruitment queue now?');
-            dump($capitalCityUnitQueue->unit_request_data);
 
             if ($totalTimeInSeconds >= 900) {
                 CapitalCityUnitRequest::dispatch($capitalCityUnitQueue->id, $totalCosts)->delay(
@@ -406,9 +398,11 @@ class CapitalCityProcessUnitRequestHandler
      */
     private function createLogAndTriggerEvents(CapitalCityUnitQueue $capitalCityUnitQueue): void
     {
+        $messages = $capitalCityUnitQueue->messages ?? [];
+
         $capitalCityUnitQueue->update([
             'building_request_data' => $capitalCityUnitQueue->building_request_data,
-            'messages' => $this->messages,
+            'messages' => array_merge($messages, $this->messages),
         ]);
 
         $capitalCityBuildingQueue = $capitalCityUnitQueue->refresh();

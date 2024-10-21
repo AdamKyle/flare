@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { serviceContainer } from "../../../../../lib/containers/core-container";
 import FetchUnitQueuesAjax from "../../../ajax/fetch-unit-queues-ajax";
 import SuccessAlert from "../../../../ui/alerts/simple-alerts/success-alert";
@@ -10,12 +10,24 @@ import debounce from "lodash/debounce";
 import clsx from "clsx";
 import { capitalize } from "lodash";
 import TimerProgressBar from "../../../../ui/progress-bars/timer-progress-bar";
+import DangerOutlineButton from "../../../../ui/buttons/danger-outline-button";
+import { QueueStatus } from "../../enums/queue-status";
+import InfoAlert from "../../../../ui/alerts/simple-alerts/info-alert";
+import OrangeButton from "../../../../ui/buttons/orange-button";
+import { CancellationType } from "../../enums/cancellation-type";
+import SendUnitRequestCancellationRequestModal from "../../modals/send-unit-request-cancellation-request-modal";
+import { UnitRecruitmentProps } from "../../types/unit-recruitment-props";
+import UnitRecruitmentState from "../../types/unit-recruitment-state";
+import Unit from "../../deffinitions/unit";
 
-export default class UnitQueue extends React.Component<any, any> {
+export default class UnitQueue extends React.Component<
+    UnitRecruitmentProps,
+    UnitRecruitmentState
+> {
     private fetchUnitQueueAjax: FetchUnitQueuesAjax;
     private unitQueueListener: CapitalCityUnitQueueTableEventDefinition;
 
-    constructor(props: any) {
+    constructor(props: UnitRecruitmentProps) {
         super(props);
 
         this.fetchUnitQueueAjax = serviceContainer().fetch(FetchUnitQueuesAjax);
@@ -36,6 +48,13 @@ export default class UnitQueue extends React.Component<any, any> {
             error_message: "",
             success_message: "",
             open_kingdom_ids: new Set<number>(),
+            cancellation_modal: {
+                open: false,
+                type: null,
+                unit_details: null,
+                kingdom_id: null,
+                queue_id: null,
+            },
         };
     }
 
@@ -60,7 +79,7 @@ export default class UnitQueue extends React.Component<any, any> {
     }, 300);
 
     toggleDetails(kingdomId: number): void {
-        this.setState((prevState: any) => {
+        this.setState((prevState: UnitRecruitmentState) => {
             const newOpenKingdomIds = new Set(prevState.open_kingdom_ids);
             if (newOpenKingdomIds.has(kingdomId)) {
                 newOpenKingdomIds.delete(kingdomId);
@@ -73,9 +92,9 @@ export default class UnitQueue extends React.Component<any, any> {
 
     updateFilteredUnitData(): void {
         const searchTerm = this.state.search_query.toLowerCase().trim();
-        const openKingdomIds = new Set<number>();
+        let openKingdomIds = new Set<number>();
 
-        let filteredUnitData = this.state.unit_queues.filter((kingdom: any) => {
+        let filteredUnitData = this.state.unit_queues.filter((kingdom) => {
             return (
                 (kingdom.kingdom_name.toLowerCase().includes(searchTerm) ||
                     kingdom.map_name.toLowerCase().includes(searchTerm)) &&
@@ -85,29 +104,50 @@ export default class UnitQueue extends React.Component<any, any> {
 
         if (filteredUnitData.length <= 0 && searchTerm.length > 0) {
             filteredUnitData = this.state.unit_queues
-                .map((kingdom: any) => {
-                    const matchingUnits = kingdom.unit_requests.filter(
-                        (unit: any) =>
-                            unit.building_name
-                                .toLowerCase()
-                                .includes(searchTerm),
+                .map((kingdom) => {
+                    const matchingUnits = kingdom.unit_requests.filter((unit) =>
+                        unit.unit_name.toLowerCase().includes(searchTerm),
                     );
 
                     if (matchingUnits.length > 0) {
                         openKingdomIds.add(kingdom.kingdom_id);
-                        return {
-                            ...kingdom,
-                            unit_requests: matchingUnits,
-                        };
+                        return { ...kingdom, unit_requests: matchingUnits };
                     }
+                    return null;
                 })
-                .filter((kingdom: any) => kingdom !== null);
+                .filter((kingdom) => kingdom !== null);
         }
+
+        openKingdomIds = this.resolveOpenKingdomIds(openKingdomIds);
 
         this.setState({
             filtered_unit_queues: filteredUnitData,
             open_kingdom_ids: openKingdomIds,
         });
+    }
+
+    resolveOpenKingdomIds(newOpenKingdomIds: Set<number>): Set<number> {
+        const oldOpenKingdomIds = this.state.open_kingdom_ids;
+
+        if (newOpenKingdomIds.size === 0 && oldOpenKingdomIds.size > 0) {
+            oldOpenKingdomIds.forEach((id) => {
+                const kingdomExists = this.state.unit_queues.some(
+                    (kingdom) => kingdom.kingdom_id === id,
+                );
+                if (!kingdomExists) {
+                    oldOpenKingdomIds.delete(id);
+                }
+            });
+            return oldOpenKingdomIds;
+        }
+
+        if (newOpenKingdomIds.size === oldOpenKingdomIds.size) {
+            return oldOpenKingdomIds;
+        }
+
+        return newOpenKingdomIds.size > oldOpenKingdomIds.size
+            ? newOpenKingdomIds
+            : oldOpenKingdomIds;
     }
 
     handleSearchChange(event: React.ChangeEvent<HTMLInputElement>): void {
@@ -116,10 +156,44 @@ export default class UnitQueue extends React.Component<any, any> {
         this.debouncedUpdateFilteredData();
     }
 
+    renderUnitStatus(unit: any): string {
+        return capitalize(unit.secondary_status);
+    }
+
+    openCancellationModal(
+        kingdom: any,
+        unit: any | null,
+        type: CancellationType,
+    ) {
+        this.setState({
+            cancellation_modal: {
+                open: true,
+                type: type,
+                unit_details: unit,
+                kingdom_id: kingdom.kingdom_id,
+                queue_id: kingdom.queue_id,
+            },
+        });
+    }
+
+    closeCancellationModal() {
+        this.setState({
+            cancellation_modal: {
+                open: false,
+                type: null,
+                unit_details: null,
+                kingdom_id: null,
+                queue_id: null,
+            },
+        });
+    }
+
     render() {
         if (this.state.loading) {
             return <LoadingProgressBar />;
         }
+
+        console.log(this.state.cancellation_modal);
 
         return (
             <div className="md:p-4">
@@ -170,7 +244,27 @@ export default class UnitQueue extends React.Component<any, any> {
                                         {kingdom.kingdom_name}
                                     </h2>
                                     <p className="text-gray-700 dark:text-gray-300">
-                                        Status: {capitalize(kingdom.status)}
+                                        Status:{" "}
+                                        <span
+                                            className={clsx({
+                                                "text-green-700 dark:text-green-500":
+                                                    [
+                                                        QueueStatus.TRAVELING,
+                                                        QueueStatus.RECRUITING,
+                                                        QueueStatus.FINISHED,
+                                                    ].includes(kingdom.status),
+                                                "text-red-700 dark:text-red-500":
+                                                    [
+                                                        QueueStatus.REJECTED,
+                                                        QueueStatus.CANCELLED,
+                                                    ].includes(kingdom.status),
+                                                "text-blue-700 dark:text-500": [
+                                                    QueueStatus.REQUESTING,
+                                                ].includes(kingdom.status),
+                                            })}
+                                        >
+                                            {capitalize(kingdom.status)}
+                                        </span>
                                     </p>
                                 </div>
                                 <i
@@ -187,18 +281,95 @@ export default class UnitQueue extends React.Component<any, any> {
                             kingdom.kingdom_id,
                         ) && (
                             <div className="bg-gray-300 dark:bg-gray-600 p-4">
-                                {kingdom.unit_requests.map((unit: any) => (
+                                <InfoAlert additional_css="my-2">
+                                    <p className="mb-2">
+                                        You may only cancel unit recruitment
+                                        when the order is traveling and has at
+                                        least more then 1 minute in time left.
+                                        Trying to do so at any other time such
+                                        as requesting resources or recruiting
+                                        can throw the kingdom into chaos.
+                                    </p>
+                                    <p>
+                                        Unit that are canceled or rejected will
+                                        be at the bottom of the list. Once the
+                                        entire process is finished, the log will
+                                        indicate why some were rejected or that
+                                        you canceled some unit requests.
+                                    </p>
+                                </InfoAlert>
+
+                                <OrangeButton
+                                    on_click={() => {
+                                        this.openCancellationModal(
+                                            kingdom,
+                                            null,
+                                            CancellationType.CANCEL_ALL,
+                                        );
+                                    }}
+                                    button_label={"Cancel All Requests"}
+                                    additional_css="my-4 w-full"
+                                    disabled={
+                                        kingdom.total_time <= 60 ||
+                                        kingdom.status !== QueueStatus.TRAVELING
+                                    }
+                                />
+                                {kingdom.unit_requests.map((unit: Unit) => (
                                     <div
                                         key={unit.queue_id}
                                         className="mb-4 p-4 bg-white dark:bg-gray-800 shadow-sm rounded-lg"
                                     >
                                         <h3 className="text-lg font-semibold dark:text-white">
-                                            {unit.building_name}
+                                            {unit.unit_name}
                                         </h3>
-                                        <p className="text-gray-700 dark:text-gray-300">
+                                        <p className="text-gray-700 dark:text-gray-300 mb-2">
                                             Amount to Recruit:{" "}
                                             {unit.amount_to_recruit}
                                         </p>
+                                        <p className="text-gray-700 dark:text-gray-300 mb-2">
+                                            Status:{" "}
+                                            <span
+                                                className={clsx({
+                                                    "text-green-700 dark:text-green-500":
+                                                        [
+                                                            QueueStatus.TRAVELING,
+                                                            QueueStatus.RECRUITING,
+                                                        ].includes(
+                                                            unit.secondary_status,
+                                                        ),
+                                                    "text-red-700 dark:text-red-500":
+                                                        [
+                                                            QueueStatus.REJECTED,
+                                                            QueueStatus.CANCELLED,
+                                                        ].includes(
+                                                            unit.secondary_status,
+                                                        ),
+                                                    "text-blue-700 dark:text-500":
+                                                        [
+                                                            QueueStatus.REQUESTING,
+                                                        ].includes(
+                                                            unit.secondary_status,
+                                                        ),
+                                                })}
+                                            >
+                                                {this.renderUnitStatus(unit)}
+                                            </span>
+                                        </p>
+                                        <DangerOutlineButton
+                                            on_click={() => {
+                                                this.openCancellationModal(
+                                                    kingdom,
+                                                    unit,
+                                                    CancellationType.SINGLE_CANCEL,
+                                                );
+                                            }}
+                                            button_label={"Cancel Request"}
+                                            disabled={
+                                                kingdom.total_time <= 60 ||
+                                                unit.secondary_status !==
+                                                    QueueStatus.TRAVELING
+                                            }
+                                        />
                                     </div>
                                 ))}
                             </div>
@@ -209,6 +380,20 @@ export default class UnitQueue extends React.Component<any, any> {
                 {this.state.filtered_unit_queues.length <= 0 && (
                     <p>There are no units in queue</p>
                 )}
+
+                {this.state.cancellation_modal.open ? (
+                    <SendUnitRequestCancellationRequestModal
+                        kingdom_id={this.state.cancellation_modal.kingdom_id}
+                        character_id={this.props.character_id}
+                        is_open={this.state.cancellation_modal.open}
+                        manage_modal={this.closeCancellationModal.bind(this)}
+                        cancellation_type={this.state.cancellation_modal.type}
+                        queue_id={this.state.cancellation_modal.queue_id}
+                        unit_details={
+                            this.state.cancellation_modal.unit_details
+                        }
+                    />
+                ) : null}
             </div>
         );
     }

@@ -57,9 +57,6 @@ class CapitalCityUnitRequest implements ShouldQueue
 
         $requestData = $queueData->unit_request_data;
 
-        dump('inside the job');
-        dump($requestData);
-
         $updatedRequestData = $this->handleRecruitment($kingdom, $requestData);
 
         $queueData->update([
@@ -79,7 +76,7 @@ class CapitalCityUnitRequest implements ShouldQueue
 
         foreach ($requestData as $index => $data) {
 
-            if ($data['secondary_status'] === CapitalCityQueueStatus::REJECTED) {
+            if (in_array($data['secondary_status'], [CapitalCityQueueStatus::REJECTED, CapitalCityQueueStatus::CANCELLED])) {
                 continue;
             }
 

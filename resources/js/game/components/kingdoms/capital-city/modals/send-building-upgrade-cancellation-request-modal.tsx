@@ -5,7 +5,6 @@ import Dialogue from "../../../ui/dialogue/dialogue";
 import { serviceContainer } from "../../../../lib/containers/core-container";
 import SuccessAlert from "../../../ui/alerts/simple-alerts/success-alert";
 import PrimaryOutlineButton from "../../../ui/buttons/primary-outline-button";
-import BuildingCancellationSection from "./partials/building-cancellation-section";
 import CancelBuildingRequestAjax from "../../ajax/cancel-building-request-ajax";
 
 export default class SendBuildingUpgradeCancellationRequestModal extends React.Component<
@@ -68,10 +67,6 @@ export default class SendBuildingUpgradeCancellationRequestModal extends React.C
                 }}
             >
                 <div className="overflow-y-auto max-h-[450px]">
-                    <BuildingCancellationSection
-                        queue_data={this.props.queue_data}
-                    />
-
                     <div className="my-4 text-center">
                         <PrimaryOutlineButton
                             button_label={

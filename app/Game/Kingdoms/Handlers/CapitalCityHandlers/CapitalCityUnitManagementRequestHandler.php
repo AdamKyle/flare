@@ -47,8 +47,6 @@ class CapitalCityUnitManagementRequestHandler
             $queueData = $this->prepareQueueData($character, $kingdom, $data, $time);
             $unitRequests = $this->prepareUnitRequests($data['unit_requests'], $toKingdom);
 
-            dump('createUnitRequests', $unitRequests);
-
             $queueData['unit_request_data'] = $unitRequests;
 
             $queue = CapitalCityUnitQueue::create($queueData);
@@ -133,7 +131,7 @@ class CapitalCityUnitManagementRequestHandler
             return [
                 'name' => $unitRequest['unit_name'],
                 'amount' => $unitRequest['unit_amount'],
-                'secondary_status' => null,
+                'secondary_status' => CapitalCityQueueStatus::TRAVELING,
                 'costs' => $this->kingdomUnitResourceValidation->getCostsRequired($toKingdom, $unit, $unitRequest['unit_amount']),
             ];
         })->toArray();

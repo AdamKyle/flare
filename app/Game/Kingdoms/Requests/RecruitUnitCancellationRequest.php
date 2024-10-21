@@ -24,7 +24,8 @@ class RecruitUnitCancellationRequest extends FormRequest
     public function rules()
     {
         return [
-            'request_data' => 'required|array',
+            'unit_name' => 'string|nullable',
+            'queue_id' => 'required|integer',
         ];
     }
 

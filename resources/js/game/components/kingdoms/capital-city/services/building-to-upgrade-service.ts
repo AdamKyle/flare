@@ -1,6 +1,6 @@
 import BuildingsToUpgradeSection from "../buildings-to-upgrade-section";
 import BuildingsToUpgradeSectionState from "../types/buildings-to-upgrade-section-state";
-import Kingdom from "../deffinitions/kingdom";
+import Kingdom from "../deffinitions/kingdom-with-buildings";
 import Building from "../deffinitions/building";
 import { BuildingQueue } from "../../deffinitions/building-queue";
 import debounce from "lodash/debounce";

@@ -1,4 +1,4 @@
-import Kingdom from "../../../deffinitions/kingdom";
+import Kingdom from "../../../deffinitions/kingdom-with-buildings";
 import { BuildingQueue } from "../../../../deffinitions/building-queue";
 import Building from "../../../deffinitions/building";
 
