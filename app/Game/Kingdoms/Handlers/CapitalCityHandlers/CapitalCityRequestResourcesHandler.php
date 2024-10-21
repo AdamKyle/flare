@@ -57,7 +57,7 @@ class CapitalCityRequestResourcesHandler
             $requestData = $this->markRequestsAsRejected($requestData);
             $this->messages[] = 'Resource Request Rejected: No kingdom could be found to request the resources for these buildings.';
 
-            $queue = $this->updateQueueData($queue, $requestData);
+            $queue = $this->updateQueueData($queue, $requestData, CapitalCityQueueStatus::REJECTED);
 
             $this->logAndTriggerEvents($queue);
 
@@ -68,7 +68,7 @@ class CapitalCityRequestResourcesHandler
             $requestData = $this->markRequestsAsRejected($requestData);
             $this->messages[] = 'Resource Request Rejected: Your kingdoms: ' . $kingdom->name . ' and ' . $kingdomWhoCanAfford->name . ' both must have a Market Place at level 5 or higher.';
 
-            $queue = $this->updateQueueData($queue, $requestData);
+            $queue = $this->updateQueueData($queue, $requestData, CapitalCityQueueStatus::REJECTED);
 
             $this->logAndTriggerEvents($queue);
 
@@ -79,7 +79,7 @@ class CapitalCityRequestResourcesHandler
             $requestData = $this->markRequestsAsRejected($requestData);
             $this->messages[] = 'Resource Request Rejected: When asking ' . $kingdomWhoCanAfford->name . ' For the resources to fulfill each request, the kingdom told us they do not have the population (need 50) to send a caravan of resources.';
 
-            $queue = $this->updateQueueData($queue, $requestData);
+            $queue = $this->updateQueueData($queue, $requestData, CapitalCityQueueStatus::REJECTED);
 
             $this->logAndTriggerEvents($queue);
 
@@ -88,36 +88,38 @@ class CapitalCityRequestResourcesHandler
 
         if (!$this->resourceTransferService->hasRequiredSpearmen($kingdomWhoCanAfford)) {
             $requestData = $this->markRequestsAsRejected($requestData);
+
             $this->messages[] = 'Resource Request Rejected: When asking ' . $kingdomWhoCanAfford->name . ' For the resources to fulfill each request, the kingdom told us they do not have enough spearmen (need 75) to go with the caravan and guard them.';
 
-            $queue = $this->updateQueueData($queue, $requestData);
+            $queue = $this->updateQueueData($queue, $requestData, CapitalCityQueueStatus::REJECTED);
 
             $this->logAndTriggerEvents($queue);
 
             return;
         }
 
-        $queue = $this->updateQueueData($queue, $requestData);
+        $queue = $this->updateQueueData($queue, $requestData, CapitalCityQueueStatus::REQUESTING);
 
         $this->createResourceRequest($queue, $kingdom, $kingdomWhoCanAfford, $summedMissingCosts, $type);
 
         $this->logAndTriggerEvents($queue);
     }
 
-    private function updateQueueData(CapitalCityBuildingQueue | CapitalCityUnitQueue $queue, array $requestData): CapitalCityBuildingQueue | CapitalCityUnitQueue
+    private function updateQueueData(CapitalCityBuildingQueue | CapitalCityUnitQueue $queue, array $requestData, string $type): CapitalCityBuildingQueue | CapitalCityUnitQueue
     {
 
         $requestData = collect($requestData)
-            ->map(function ($item) {
+            ->map(function ($item) use ($type) {
                 if (!in_array($item['secondary_status'], [CapitalCityQueueStatus::REJECTED, CapitalCityQueueStatus::CANCELLED])) {
-                    return array_merge($item, ['secondary_status' => CapitalCityQueueStatus::REQUESTING]);
+                    return array_merge($item, ['secondary_status' => $type]);
                 }
+
                 return $item;
             })
             ->toArray();
 
         $queue->update([
-            'building_request_data' => $requestData,
+            'unit_request_data' => $requestData,
             'messages' => $this->messages,
         ]);
 

@@ -207,6 +207,7 @@ class CapitalCityProcessUnitRequestHandler
             $unitRequest['secondary_status'] = CapitalCityQueueStatus::REQUESTING;
         } else {
             $unitRequest['secondary_status'] = CapitalCityQueueStatus::RECRUITING;
+            $unitRequest['missing_costs'] = [];
         }
 
         return $unitRequest;

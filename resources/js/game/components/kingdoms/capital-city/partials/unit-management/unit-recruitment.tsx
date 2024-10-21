@@ -74,6 +74,10 @@ export default class UnitRecruitment extends React.Component<any, any> {
         ) {
             this.updateFilteredUnitData();
         }
+
+        if (prevState.filtered_unit_recruitment_data.length != this.state.filtered_unit_recruitment_data.length) {
+            this.setState({ current_page: 1 });
+        }
     }
 
     updateFilteredUnitData() {

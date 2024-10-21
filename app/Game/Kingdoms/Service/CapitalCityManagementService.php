@@ -183,9 +183,10 @@ class CapitalCityManagementService
         $statusOrder = [
             CapitalCityQueueStatus::FINISHED => 1,
             CapitalCityQueueStatus::TRAVELING => 2,
-            CapitalCityQueueStatus::RECRUITING => 3,
-            CapitalCityQueueStatus::CANCELLED => 4,
-            CapitalCityQueueStatus::REJECTED => 5,
+            CapitalCityQueueStatus::REQUESTING => 3,
+            CapitalCityQueueStatus::RECRUITING => 4,
+            CapitalCityQueueStatus::CANCELLED => 5,
+            CapitalCityQueueStatus::REJECTED => 6,
         ];
 
         usort($requestData, function ($a, $b) use ($statusOrder) {
