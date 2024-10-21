@@ -4,10 +4,3 @@
 yarn cleanup
 
 git add -A
-
-if ! git diff --cached --quiet; then
-  echo "Changes detected. Committing formatted code..."
-  git commit --no-verify -m "chore: auto-format code with Prettier"
-else
-  echo "No changes to commit."
-fi
