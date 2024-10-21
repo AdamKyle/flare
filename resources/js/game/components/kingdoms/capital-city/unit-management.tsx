@@ -27,6 +27,7 @@ export default class UnitManagement extends React.Component<UnitManagementProps>
         return (
             <Tabs tabs={this.tabs}>
                 <TabPanel key={"unit-recruitment"}>
+                    <div>adadasd</div>
                     <UnitRecruitment
                         user_id={this.props.user_id}
                         kingdom={this.props.kingdom}
