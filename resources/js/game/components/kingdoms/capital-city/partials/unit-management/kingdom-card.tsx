@@ -50,7 +50,7 @@ export default class KingdomCard extends React.Component<KingdomCardProps> {
                         </div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">
                             Time from Capital City: {kingdom.time_to_kingdom}{" "}
-                            (Minutes)
+                            Minute(s)
                         </div>
                         {this.showUnitsInQueue(kingdom.id)}
                     </div>

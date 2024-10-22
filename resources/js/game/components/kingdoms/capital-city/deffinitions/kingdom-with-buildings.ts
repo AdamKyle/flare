@@ -7,4 +7,5 @@ export default interface KingdomWithBuildings {
     map_name: string;
     kingdom_id: number;
     buildings: Building[];
+    total_travel_time: number;
 }

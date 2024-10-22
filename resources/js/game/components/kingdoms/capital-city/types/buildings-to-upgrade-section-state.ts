@@ -12,6 +12,6 @@ export default interface BuildingsToUpgradeSectionState {
     sort_direction: "asc" | "desc";
     search_query: string;
     building_queue: BuildingQueue[];
-    currentPage: number;
+    current_page: number;
     itemsPerPage: number;
 }

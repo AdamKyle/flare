@@ -41,7 +41,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
             sort_direction: "asc",
             search_query: "",
             building_queue: [],
-            currentPage: 1,
+            current_page: 1,
             itemsPerPage: MAX_ITEMS_PER_PAGE,
         };
 
@@ -77,6 +77,15 @@ export default class BuildingsToUpgradeSection extends React.Component<
     ) {
         if (prevState.building_data !== this.state.building_data) {
             this.buildingToUpgradeService.updateFilteredBuildingData();
+        }
+
+        if (
+            prevState.filtered_building_data !==
+            this.state.filtered_building_data
+        ) {
+            this.setState({
+                current_page: 1,
+            });
         }
     }
 
@@ -206,6 +215,10 @@ export default class BuildingsToUpgradeSection extends React.Component<
                                     <p className="text-gray-500 dark:text-gray-400">
                                         {kingdom.map_name}
                                     </p>
+                                    <p className="text-gray-500 dark:text-gray-400">
+                                        Time from capital city:{" "}
+                                        {kingdom.total_travel_time} Minute(s)
+                                    </p>
 
                                     {kingdom.buildings.some((building) =>
                                         this.buildingToUpgradeService.hasBuildingInQueue(
@@ -259,7 +272,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
                     on_page_change={this.buildingToUpgradeService.handlePageChange.bind(
                         this.buildingToUpgradeService,
                     )}
-                    current_page={this.state.currentPage}
+                    current_page={this.state.current_page}
                     items_per_page={MAX_ITEMS_PER_PAGE}
                     total_items={this.state.filtered_building_data.length}
                 />

@@ -33,11 +33,14 @@ export default class FetchUpgradableKingdomsAjax {
                                     map_name: any;
                                     kingdom_name: any;
                                     kingdom_id: number;
+                                    total_travel_time: number;
                                     buildings: any[];
                                 }) => ({
                                     kingdom_name: kingdom.kingdom_name,
                                     kingdom_id: kingdom.kingdom_id,
                                     map_name: kingdom.map_name,
+                                    total_travel_time:
+                                        kingdom.total_travel_time,
                                     buildings: kingdom.buildings
                                         .filter(
                                             (building) =>
@@ -56,11 +59,13 @@ export default class FetchUpgradableKingdomsAjax {
                                 map_name: any;
                                 kingdom_name: any;
                                 kingdom_id: number;
+                                total_travel_time: number;
                                 buildings: any[];
                             }) => ({
                                 kingdom_name: kingdom.kingdom_name,
                                 map_name: kingdom.map_name,
                                 kingdom_id: kingdom.kingdom_id,
+                                total_travel_time: kingdom.total_travel_time,
                                 buildings: kingdom.buildings
                                     .filter(
                                         (building) =>

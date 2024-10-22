@@ -48,7 +48,7 @@ class CapitalCityManagementService
     public function fetchBuildingsForUpgradesOrRepairs(Character $character, Kingdom $kingdom, bool $returnArray = false): array
     {
         $kingdoms = $this->getOtherKingdoms($character, $kingdom);
-        $kingdomBuildingData = $this->fetchBuildingsData($kingdoms);
+        $kingdomBuildingData = $this->fetchBuildingsData($kingdom, $kingdoms);
 
         return $returnArray ? $kingdomBuildingData : $this->successResult($kingdomBuildingData);
     }
@@ -260,11 +260,21 @@ class CapitalCityManagementService
     }
 
     /**
-     * Retrieve other kingdoms owned by the character.
+     * Retrieve valid kingdoms.
+     *
+     * - Where isnt the capital city
+     * - Where does have capital city queue
+     *
+     * @param Character $character
+     * @param Kingdom $kingdom
+     * @return EloquentCollection
      */
     private function getOtherKingdoms(Character $character, Kingdom $kingdom): EloquentCollection
     {
-        return $character->kingdoms()->where('id', '!=', $kingdom->id)->where('game_map_id', $kingdom->game_map_id)->get();
+        return $character->kingdoms()
+            ->whereDoesntHave('buildingsQueue')
+            ->where('id', '!=', $kingdom->id)
+            ->where('game_map_id', $kingdom->game_map_id)->get();
     }
 
     /**
@@ -272,13 +282,13 @@ class CapitalCityManagementService
      *
      * @param  EloquentCollection  $kingdoms
      */
-    private function fetchBuildingsData($kingdoms): array
+    private function fetchBuildingsData(Kingdom $kingdom, SupportCollection $kingdoms): array
     {
         $kingdomBuildingData = [];
 
         foreach ($kingdoms as $otherKingdom) {
             $buildings = $this->fetchBuildings($otherKingdom);
-            $kingdomBuildingData[] = $this->formatKingdomBuildingData($otherKingdom, $buildings);
+            $kingdomBuildingData[] = $this->formatKingdomBuildingData($kingdom, $otherKingdom, $buildings);
         }
 
         return $kingdomBuildingData;
@@ -291,7 +301,6 @@ class CapitalCityManagementService
      *
      * - Not locked
      * - Not currently in queue from manual upgrade
-     * - Not currently i the capital city queue.
      *
      * @param Kingdom $kingdom
      * @return SupportCollection
@@ -304,11 +313,6 @@ class CapitalCityManagementService
             ->whereNotIn('kingdom_buildings.id', function ($query) use ($kingdom) {
                 $query->select('building_id')
                     ->from('buildings_in_queue')
-                    ->where('kingdom_id', $kingdom->id);
-            })
-            ->whereNotIn('kingdom_buildings.id', function ($query) use ($kingdom) {
-                $query->select(DB::raw('JSON_UNQUOTE(JSON_EXTRACT(building_request_data, "$[0].building_id"))'))
-                    ->from('capital_city_building_queues')
                     ->where('kingdom_id', $kingdom->id);
             })
             ->whereColumn('game_buildings.max_level', '>', 'kingdom_buildings.level')
@@ -341,18 +345,21 @@ class CapitalCityManagementService
     /**
      * Format kingdom and buildings data.
      */
-    private function formatKingdomBuildingData(Kingdom $kingdom, SupportCollection $buildings): array
+    private function formatKingdomBuildingData(Kingdom $capitalCityKingdom, Kingdom $kingdomForRequest, SupportCollection $buildings): array
     {
         $buildings = new Collection($buildings, $this->kingdomBuildingTransformer);
         $buildings = $this->manager->createData($buildings)->toArray();
 
+        $character = $capitalCityKingdom->character;
+
         return [
-            'kingdom_id' => $kingdom->id,
-            'kingdom_name' => $kingdom->name,
-            'x_position' => $kingdom->x_position,
-            'y_position' => $kingdom->y_position,
-            'map_name' => $kingdom->gameMap->name,
+            'kingdom_id' => $kingdomForRequest->id,
+            'kingdom_name' => $kingdomForRequest->name,
+            'x_position' => $kingdomForRequest->x_position,
+            'y_position' => $kingdomForRequest->y_position,
+            'map_name' => $kingdomForRequest->gameMap->name,
             'buildings' => $buildings,
+            'total_travel_time' => $this->unitMovementService->getDistanceTime($character, $kingdomForRequest, $capitalCityKingdom, PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_BUILD_TRAVEL_TIME_REDUCTION),
         ];
     }
 
