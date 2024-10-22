@@ -48,6 +48,8 @@ class CapitalCityBuildingRequestHandler
         $timeTillFinished = 0;
         $timeToStart = now();
 
+        $upgrading = true;
+
         foreach ($buildingsToUpgradeOrRepair as $index => $buildingRequest) {
             if ($this->shouldRejectBuildingRequest($buildingRequest, $kingdom, $index, $buildingsToUpgradeOrRepair)) {
                 continue;
@@ -59,6 +61,7 @@ class CapitalCityBuildingRequestHandler
             $timeTillFinished += $minutesToRebuild;
 
             if ($buildingRequest['secondary_status'] === CapitalCityQueueStatus::REPAIRING) {
+                $upgrading = false;
                 $this->kingdomBuildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
             } else {
                 $this->kingdomBuildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
@@ -74,6 +77,7 @@ class CapitalCityBuildingRequestHandler
             'messages' => $this->messages,
             'started_at' => $timeToStart,
             'completed_at' => $timeToStart->clone()->addMinutes($timeTillFinished),
+            'status' => $upgrading ? CapitalCityQueueStatus::BUILDING : CapitalCityQueueStatus::REPAIRING
         ]);
 
         $capitalCityBuildingQueue = $capitalCityBuildingQueue->refresh();

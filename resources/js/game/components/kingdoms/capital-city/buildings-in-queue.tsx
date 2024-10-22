@@ -14,6 +14,10 @@ import clsx from "clsx";
 import TimerProgressBar from "../../ui/progress-bars/timer-progress-bar";
 import { capitalize } from "lodash";
 import DangerOutlineButton from "../../ui/buttons/danger-outline-button";
+import { QueueStatus } from "./enums/queue-status";
+import OrangeButton from "../../ui/buttons/orange-button";
+import { classNames } from "../../../lib/ui/css-class-helper";
+import InfoAlert from "../../ui/alerts/simple-alerts/info-alert";
 
 export default class BuildingsInQueue extends React.Component<any, any> {
     private fetchBuildingQueueAjax: FetchBuildingQueuesAjax;
@@ -83,7 +87,7 @@ export default class BuildingsInQueue extends React.Component<any, any> {
     updateFilteredBuildingData() {
         const searchTerm = this.state.search_query.toLowerCase().trim();
 
-        const openKingdomIds = new Set<number>();
+        let openKingdomIds = new Set<number>();
 
         let filteredBuildingData = this.state.building_queues.filter(
             (kingdom: any) => {
@@ -122,10 +126,36 @@ export default class BuildingsInQueue extends React.Component<any, any> {
                 .filter((kingdom: any) => kingdom !== null);
         }
 
+        openKingdomIds = this.resolveOpenKingdomIds(openKingdomIds);
+
         this.setState({
             filtered_building_queues: filteredBuildingData,
             open_kingdom_ids: openKingdomIds,
         });
+    }
+
+    resolveOpenKingdomIds(newOpenKingdomIds: Set<number>): Set<number> {
+        const oldOpenKingdomIds = this.state.open_kingdom_ids;
+
+        if (newOpenKingdomIds.size === 0 && oldOpenKingdomIds.size > 0) {
+            oldOpenKingdomIds.forEach((id: number) => {
+                const kingdomExists = this.state.building_queues.some(
+                    (kingdom: any) => kingdom.kingdom_id === id,
+                );
+                if (!kingdomExists) {
+                    oldOpenKingdomIds.delete(id);
+                }
+            });
+            return oldOpenKingdomIds;
+        }
+
+        if (newOpenKingdomIds.size === oldOpenKingdomIds.size) {
+            return oldOpenKingdomIds;
+        }
+
+        return newOpenKingdomIds.size > oldOpenKingdomIds.size
+            ? newOpenKingdomIds
+            : oldOpenKingdomIds;
     }
 
     handleSearchChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -222,7 +252,31 @@ export default class BuildingsInQueue extends React.Component<any, any> {
                                         {queueGroup.kingdom_name}
                                     </h2>
                                     <p className="text-gray-700 dark:text-gray-300">
-                                        Status: {capitalize(queueGroup.status)}
+                                        Status:{" "}
+                                        <span
+                                            className={clsx({
+                                                "text-green-700 dark:text-green-500":
+                                                    [
+                                                        QueueStatus.TRAVELING,
+                                                        QueueStatus.BUILDING,
+                                                        QueueStatus.FINISHED,
+                                                    ].includes(
+                                                        queueGroup.status,
+                                                    ),
+                                                "text-red-700 dark:text-red-500":
+                                                    [
+                                                        QueueStatus.REJECTED,
+                                                        QueueStatus.CANCELLED,
+                                                    ].includes(
+                                                        queueGroup.status,
+                                                    ),
+                                                "text-blue-700 dark:text-500": [
+                                                    QueueStatus.REQUESTING,
+                                                ].includes(queueGroup.status),
+                                            })}
+                                        >
+                                            {capitalize(queueGroup.status)}
+                                        </span>
                                     </p>
                                 </div>
                                 <i
@@ -244,6 +298,35 @@ export default class BuildingsInQueue extends React.Component<any, any> {
                             queueGroup.kingdom_id,
                         ) && (
                             <div className="bg-gray-300 dark:bg-gray-600 p-4">
+                                <InfoAlert additional_css="my-2">
+                                    <p className="mb-2">
+                                        You may only cancel building
+                                        upgrade/repair requests when the order
+                                        is traveling and has at least more then
+                                        1 minute in time left. Trying to do so
+                                        at any other time such as requesting
+                                        resources or recruiting can throw the
+                                        kingdom into chaos.
+                                    </p>
+                                    <p>
+                                        Buldings that are canceled or rejected
+                                        will be at the bottom of the list. Once
+                                        the entire process is finished, the log
+                                        will indicate why some were rejected or
+                                        that you canceled some building
+                                        requests.
+                                    </p>
+                                </InfoAlert>
+                                <OrangeButton
+                                    button_label={"Cancel All Buildings"}
+                                    on_click={() => {}}
+                                    additional_css="my-4 w-full"
+                                    disabled={
+                                        queueGroup.total_time < 60 ||
+                                        queueGroup.status !==
+                                            QueueStatus.TRAVELING
+                                    }
+                                ></OrangeButton>
                                 {queueGroup.building_queue.map((queue: any) => (
                                     <div
                                         key={queue.queue_id}
@@ -252,9 +335,37 @@ export default class BuildingsInQueue extends React.Component<any, any> {
                                         <h3 className="text-lg font-semibold dark:text-white">
                                             {queue.building_name}
                                         </h3>
-                                        <p className="text-gray-700 dark:text-gray-300">
+                                        <p className="text-gray-700 dark:text-gray-300 my-2">
                                             Status:{" "}
-                                            {capitalize(queue.secondary_status)}
+                                            <span
+                                                className={clsx({
+                                                    "text-green-700 dark:text-green-500":
+                                                        [
+                                                            QueueStatus.TRAVELING,
+                                                            QueueStatus.BUILDING,
+                                                            QueueStatus.FINISHED,
+                                                        ].includes(
+                                                            queue.secondary_status,
+                                                        ),
+                                                    "text-red-700 dark:text-red-500":
+                                                        [
+                                                            QueueStatus.REJECTED,
+                                                            QueueStatus.CANCELLED,
+                                                        ].includes(
+                                                            queue.secondary_status,
+                                                        ),
+                                                    "text-blue-700 dark:text-500":
+                                                        [
+                                                            QueueStatus.REQUESTING,
+                                                        ].includes(
+                                                            queue.secondary_status,
+                                                        ),
+                                                })}
+                                            >
+                                                {capitalize(
+                                                    queue.secondary_status,
+                                                )}
+                                            </span>
                                         </p>
                                         <DangerOutlineButton
                                             on_click={() =>
@@ -264,7 +375,9 @@ export default class BuildingsInQueue extends React.Component<any, any> {
                                             }
                                             button_label={"Cancel Upgrade"}
                                             disabled={
-                                                queueGroup.total_time < 60
+                                                queueGroup.total_time < 60 ||
+                                                queueGroup.status !==
+                                                    QueueStatus.TRAVELING
                                             }
                                         />
                                     </div>

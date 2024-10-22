@@ -20,6 +20,7 @@ export const BuildUnitsColumns = (
     currentUnits: CurrentUnitDetails[] | [],
     buildings: BuildingDetails[] | [],
 ) => {
+    console.log(unitsInQueue);
     return [
         {
             name: "Name",

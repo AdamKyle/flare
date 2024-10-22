@@ -40,8 +40,7 @@ export default class ProcessUpgradeBuildingsAjax {
                             success_message: result.data.message,
                         },
                         () => {
-                            component.resetFilters();
-                            component.resetQueue();
+                            component.reset();
                         },
                     );
                 },

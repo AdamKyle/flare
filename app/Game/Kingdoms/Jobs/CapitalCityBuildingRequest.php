@@ -4,11 +4,7 @@ namespace App\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\KingdomBuilding;
-use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityKingdomLogHandler;
-use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
-use App\Game\Kingdoms\Service\UpdateKingdom;
-use App\Game\Kingdoms\Values\BuildingQueueType;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -95,7 +91,8 @@ class CapitalCityBuildingRequest implements ShouldQueue
         }
 
         $queueData->update([
-            'building_request_data' => $buildingRequestData
+            'building_request_data' => $buildingRequestData,
+            'status' => CapitalCityQueueStatus::FINISHED
         ]);
 
         $queueData = $queueData->refresh();

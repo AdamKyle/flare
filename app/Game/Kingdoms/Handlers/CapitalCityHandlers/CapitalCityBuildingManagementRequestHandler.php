@@ -137,7 +137,7 @@ class CapitalCityBuildingManagementRequestHandler
                 'costs' => $this->kingdomBuildingService->getBuildingCosts($building),
                 'type' => $type,
                 'missing_costs' => [],
-                'secondary_status' => null,
+                'secondary_status' => CapitalCityQueueStatus::TRAVELING,
                 'from_level' => $fromLevel,
                 'to_level' => $toLevel,
             ];

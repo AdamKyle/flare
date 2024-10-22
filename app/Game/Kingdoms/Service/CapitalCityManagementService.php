@@ -272,7 +272,7 @@ class CapitalCityManagementService
     private function getOtherKingdoms(Character $character, Kingdom $kingdom): EloquentCollection
     {
         return $character->kingdoms()
-            ->whereDoesntHave('buildingsQueue')
+            ->whereDoesntHave('capitalCityBuildingQueue')
             ->where('id', '!=', $kingdom->id)
             ->where('game_map_id', $kingdom->game_map_id)->get();
     }

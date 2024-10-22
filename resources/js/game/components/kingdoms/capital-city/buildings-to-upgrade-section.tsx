@@ -89,20 +89,17 @@ export default class BuildingsToUpgradeSection extends React.Component<
         }
     }
 
-    resetFilters() {
+    reset() {
         this.setState(
             {
                 search_query: "",
                 sort_direction: "asc",
+                building_queue: [],
             },
             () => {
                 this.buildingToUpgradeService.updateFilteredBuildingData();
             },
         );
-    }
-
-    resetQueue() {
-        this.setState({ building_queue: [] });
     }
 
     render() {
@@ -150,26 +147,19 @@ export default class BuildingsToUpgradeSection extends React.Component<
                     />
 
                     <DangerOutlineButton
-                        on_click={() => this.resetFilters()}
-                        button_label="Reset Form"
+                        on_click={this.reset.bind(this)}
+                        button_label={"Reset"}
                         disabled={this.state.processing_request}
                     />
 
                     {this.state.building_queue.length > 0 && (
-                        <>
-                            <DangerOutlineButton
-                                on_click={() => this.resetQueue()}
-                                button_label={"Reset Queue"}
-                                disabled={this.state.processing_request}
-                            />
-                            <SuccessOutlineButton
-                                on_click={() =>
-                                    this.buildingToUpgradeService.sendOrders()
-                                }
-                                button_label="Send Orders"
-                                disabled={this.state.processing_request}
-                            />
-                        </>
+                        <SuccessOutlineButton
+                            on_click={() =>
+                                this.buildingToUpgradeService.sendOrders()
+                            }
+                            button_label="Send Orders"
+                            disabled={this.state.processing_request}
+                        />
                     )}
                 </div>
 

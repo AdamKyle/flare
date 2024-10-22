@@ -81,6 +81,7 @@ export default class FetchUpgradableKingdomsAjax {
                     component.setState({
                         loading: false,
                         building_data: data,
+                        filtered_building_data: data,
                     });
                 },
                 (error: AxiosError) => {

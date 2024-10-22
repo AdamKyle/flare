@@ -260,7 +260,7 @@ export default class BuildingToUpgradeService {
             return;
         }
 
-        this.component.setState({ currentPage: pageNumber });
+        this.component.setState({ current_page: pageNumber });
     }
 
     getPaginatedData() {
@@ -268,10 +268,12 @@ export default class BuildingToUpgradeService {
             return [];
         }
 
-        const { currentPage, itemsPerPage, filtered_building_data } =
+        const { current_page, itemsPerPage, filtered_building_data } =
             this.component.state;
-        const startIndex = (currentPage - 1) * itemsPerPage;
+        const startIndex = (current_page - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
+
+        console.log(filtered_building_data, startIndex, endIndex);
 
         return filtered_building_data.slice(startIndex, endIndex);
     }
