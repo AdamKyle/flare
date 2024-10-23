@@ -4,7 +4,7 @@ namespace App\Game\Kingdoms\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RecruitUnitCancellationRequest extends FormRequest
+class CapitalCityCancelBuildingRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,7 @@ class RecruitUnitCancellationRequest extends FormRequest
     public function rules()
     {
         return [
-            'unit_name' => 'string|nullable',
+            'building_id' => 'integer|nullable',
             'queue_id' => 'required|integer',
         ];
     }
@@ -32,8 +32,9 @@ class RecruitUnitCancellationRequest extends FormRequest
     public function messages()
     {
         return [
-            'queue_id.required' => 'Which request are you trying to cancel?',
-            'queue_id.integer' => 'The queue id should be an integer.',
+            'queue_id.required' => 'Queue id is missing',
+            'queue_id.integer' => 'Queue id must be an intger',
+            'building_id.integer' => 'Building id must be an integer',
         ];
     }
 }

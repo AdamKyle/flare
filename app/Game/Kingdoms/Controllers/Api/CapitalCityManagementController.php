@@ -5,7 +5,7 @@ namespace App\Game\Kingdoms\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Game\Kingdoms\Requests\BuildingUpgradeRequestsRequest;
-use App\Game\Kingdoms\Requests\CancelUnitRequestRequest;
+use App\Game\Kingdoms\Requests\CapitalCityCancelBuildingRequest;
 use App\Game\Kingdoms\Requests\PurchaseGoldBarsRequest;
 use App\Game\Kingdoms\Requests\RecruitUnitCancellationRequest;
 use App\Game\Kingdoms\Requests\RecruitUnitRequestsRequest;
@@ -114,9 +114,14 @@ class CapitalCityManagementController extends Controller
         return response()->json($result, $status);
     }
 
-    public function cancelBuildingOrdersOrders(CancelUnitRequestRequest $request, Character $character, Kingdom $kingdom)
+    public function cancelBuildingOrdersOrders(CapitalCityCancelBuildingRequest $request, Character $character, Kingdom $kingdom)
     {
-        return response()->json(['message' => 'see dump message']);
+        $result = $this->cancelBuildingRequestService->handleCancelRequest($character, $kingdom, $request->all());
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
     }
 
     public function fetchGoldBarData(Character $character, Kingdom $kingdom)

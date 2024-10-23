@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Providers;
 
+use App\Flare\Transformers\CapitalCityKingdomBuildingTransformer;
 use App\Flare\Transformers\KingdomAttackLogsTransformer;
 use App\Flare\Transformers\KingdomBuildingTransformer;
 use App\Flare\Transformers\KingdomTransformer;
@@ -98,7 +99,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(UpdateKingdom::class),
                 $app->make(CapitalCityBuildingManagement::class),
                 $app->make(CapitalCityUnitManagement::class),
-                $app->make(KingdomBuildingTransformer::class),
+                $app->make(CapitalCityKingdomBuildingTransformer::class),
                 $app->make(UnitMovementService::class),
                 $app->make(Manager::class)
             );
@@ -172,7 +173,8 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CancelBuildingRequestService::class, function ($app) {
             return new CancelBuildingRequestService(
-                $app->make(UnitMovementService::class)
+                $app->make(UnitMovementService::class),
+                $app->make(CapitalCityKingdomLogHandler::class)
             );
         });
 

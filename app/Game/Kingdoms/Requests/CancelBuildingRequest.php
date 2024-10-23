@@ -31,7 +31,7 @@ class CancelBuildingRequest extends FormRequest
     public function messages()
     {
         return [
-            'queue_id.required' => 'Missing queue information.',
+            'queue_id.required' => 'Missing queue information 3.',
         ];
     }
 }

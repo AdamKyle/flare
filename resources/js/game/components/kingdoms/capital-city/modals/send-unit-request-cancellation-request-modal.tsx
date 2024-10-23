@@ -4,10 +4,8 @@ import LoadingProgressBar from "../../../ui/progress-bars/loading-progress-bar";
 import Dialogue from "../../../ui/dialogue/dialogue";
 import { serviceContainer } from "../../../../lib/containers/core-container";
 import SuccessAlert from "../../../ui/alerts/simple-alerts/success-alert";
-import PrimaryOutlineButton from "../../../ui/buttons/primary-outline-button";
 import CancelUnitRequestAjax from "../../ajax/cancel-unit-request-ajax";
 import { CancellationType } from "../enums/cancellation-type";
-import UnitDetails from "../../deffinitions/unit-details";
 
 export default class SendUnitRequestCancellationRequestModal extends React.Component<
     any,

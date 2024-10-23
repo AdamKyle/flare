@@ -19,6 +19,7 @@ import SendUnitRequestCancellationRequestModal from "../../modals/send-unit-requ
 import { UnitRecruitmentProps } from "../../types/unit-recruitment-props";
 import UnitRecruitmentState from "../../types/unit-recruitment-state";
 import Unit from "../../deffinitions/unit";
+import { KingdomWithUnitRequests } from "../../deffinitions/kingdom-with-unit-requests";
 
 export default class UnitQueue extends React.Component<
     UnitRecruitmentProps,
@@ -188,6 +189,17 @@ export default class UnitQueue extends React.Component<
         });
     }
 
+    disableCancelation(
+        kingdom: KingdomWithUnitRequests,
+        status: QueueStatus,
+    ): boolean {
+        if (kingdom.total_time <= 60) {
+            return true;
+        }
+
+        return status !== QueueStatus.TRAVELING;
+    }
+
     render() {
         if (this.state.loading) {
             return <LoadingProgressBar />;
@@ -216,115 +228,33 @@ export default class UnitQueue extends React.Component<
                     aria-label="Search by kingdom or unit name"
                 />
 
-                {this.state.filtered_unit_queues.map((kingdom: any) => (
-                    <div key={kingdom.kingdom_id} className="mb-4">
-                        <div
-                            className={clsx(
-                                "p-4 bg-gray-100 dark:bg-gray-700 shadow-md cursor-pointer",
-                                {
-                                    "rounded-lg":
-                                        !this.state.open_kingdom_ids.has(
-                                            kingdom.kingdom_id,
-                                        ),
-                                    "rounded-t-lg":
-                                        this.state.open_kingdom_ids.has(
-                                            kingdom.kingdom_id,
-                                        ),
-                                },
-                            )}
-                            onClick={() =>
-                                this.toggleDetails(kingdom.kingdom_id)
-                            }
-                        >
-                            <div className="flex justify-between items-center">
-                                <div>
-                                    <h2 className="text-xl font-bold dark:text-white">
-                                        {kingdom.kingdom_name}
-                                    </h2>
-                                    <p className="text-gray-700 dark:text-gray-300">
-                                        Status:{" "}
-                                        <span
-                                            className={clsx({
-                                                "text-green-700 dark:text-green-500":
-                                                    [
-                                                        QueueStatus.TRAVELING,
-                                                        QueueStatus.RECRUITING,
-                                                        QueueStatus.FINISHED,
-                                                    ].includes(kingdom.status),
-                                                "text-red-700 dark:text-red-500":
-                                                    [
-                                                        QueueStatus.REJECTED,
-                                                        QueueStatus.CANCELLED,
-                                                    ].includes(kingdom.status),
-                                                "text-blue-700 dark:text-500": [
-                                                    QueueStatus.REQUESTING,
-                                                ].includes(kingdom.status),
-                                            })}
-                                        >
-                                            {capitalize(kingdom.status)}
-                                        </span>
-                                    </p>
-                                </div>
-                                <i
-                                    className={`fas fa-chevron-${this.state.open_kingdom_ids.has(kingdom.kingdom_id) ? "down" : "up"} text-gray-500 dark:text-gray-400`}
-                                />
-                            </div>
-                            <TimerProgressBar
-                                time_remaining={kingdom.total_time}
-                                time_out_label={"Total Time Left"}
-                            />
-                        </div>
-
-                        {this.state.open_kingdom_ids.has(
-                            kingdom.kingdom_id,
-                        ) && (
-                            <div className="bg-gray-300 dark:bg-gray-600 p-4">
-                                <InfoAlert additional_css="my-2">
-                                    <p className="mb-2">
-                                        You may only cancel unit recruitment
-                                        when the order is traveling and has at
-                                        least more then 1 minute in time left.
-                                        Trying to do so at any other time such
-                                        as requesting resources or recruiting
-                                        can throw the kingdom into chaos.
-                                    </p>
-                                    <p>
-                                        Unit that are canceled or rejected will
-                                        be at the bottom of the list. Once the
-                                        entire process is finished, the log will
-                                        indicate why some were rejected or that
-                                        you canceled some unit requests.
-                                    </p>
-                                </InfoAlert>
-
-                                <OrangeButton
-                                    on_click={() => {
-                                        this.openCancellationModal(
-                                            kingdom,
-                                            null,
-                                            CancellationType.CANCEL_ALL,
-                                        );
-                                    }}
-                                    button_label={"Cancel All Requests"}
-                                    additional_css="my-4 w-full"
-                                    disabled={
-                                        kingdom.total_time <= 60 ||
-                                        kingdom.status !== QueueStatus.TRAVELING
-                                    }
-                                />
-                                {kingdom.unit_requests.map((unit: Unit) => (
-                                    <div
-                                        key={unit.queue_id}
-                                        className="mb-4 p-4 bg-white dark:bg-gray-800 shadow-sm rounded-lg"
-                                    >
-                                        <h3 className="text-lg font-semibold dark:text-white">
-                                            {unit.unit_name}
-                                        </h3>
-                                        <p className="text-gray-700 dark:text-gray-300 mb-2">
-                                            Amount to Recruit:{" "}
-                                            {unit.amount_to_recruit}
-                                        </p>
-                                        <p className="text-gray-700 dark:text-gray-300 mb-2">
+                {this.state.filtered_unit_queues.map(
+                    (kingdom: KingdomWithUnitRequests) => (
+                        <div key={kingdom.kingdom_id} className="mb-4">
+                            <div
+                                className={clsx(
+                                    "p-4 bg-gray-100 dark:bg-gray-700 shadow-md cursor-pointer",
+                                    {
+                                        "rounded-lg":
+                                            !this.state.open_kingdom_ids.has(
+                                                kingdom.kingdom_id,
+                                            ),
+                                        "rounded-t-lg":
+                                            this.state.open_kingdom_ids.has(
+                                                kingdom.kingdom_id,
+                                            ),
+                                    },
+                                )}
+                                onClick={() =>
+                                    this.toggleDetails(kingdom.kingdom_id)
+                                }
+                            >
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <h2 className="text-xl font-bold dark:text-white">
+                                            {kingdom.kingdom_name}
+                                        </h2>
+                                        <p className="text-gray-700 dark:text-gray-300">
                                             Status:{" "}
                                             <span
                                                 className={clsx({
@@ -332,48 +262,143 @@ export default class UnitQueue extends React.Component<
                                                         [
                                                             QueueStatus.TRAVELING,
                                                             QueueStatus.RECRUITING,
+                                                            QueueStatus.FINISHED,
                                                         ].includes(
-                                                            unit.secondary_status,
+                                                            kingdom.status,
                                                         ),
                                                     "text-red-700 dark:text-red-500":
                                                         [
                                                             QueueStatus.REJECTED,
                                                             QueueStatus.CANCELLED,
                                                         ].includes(
-                                                            unit.secondary_status,
+                                                            kingdom.status,
                                                         ),
                                                     "text-blue-700 dark:text-500":
                                                         [
                                                             QueueStatus.REQUESTING,
                                                         ].includes(
-                                                            unit.secondary_status,
+                                                            kingdom.status,
                                                         ),
                                                 })}
                                             >
-                                                {this.renderUnitStatus(unit)}
+                                                {capitalize(kingdom.status)}
                                             </span>
                                         </p>
-                                        <DangerOutlineButton
-                                            on_click={() => {
-                                                this.openCancellationModal(
-                                                    kingdom,
-                                                    unit,
-                                                    CancellationType.SINGLE_CANCEL,
-                                                );
-                                            }}
-                                            button_label={"Cancel Request"}
-                                            disabled={
-                                                kingdom.total_time <= 60 ||
-                                                unit.secondary_status !==
-                                                    QueueStatus.TRAVELING
-                                            }
-                                        />
                                     </div>
-                                ))}
+                                    <i
+                                        className={`fas fa-chevron-${this.state.open_kingdom_ids.has(kingdom.kingdom_id) ? "down" : "up"} text-gray-500 dark:text-gray-400`}
+                                    />
+                                </div>
+                                <TimerProgressBar
+                                    time_remaining={kingdom.total_time}
+                                    time_out_label={"Total Time Left"}
+                                />
                             </div>
-                        )}
-                    </div>
-                ))}
+
+                            {this.state.open_kingdom_ids.has(
+                                kingdom.kingdom_id,
+                            ) && (
+                                <div className="bg-gray-300 dark:bg-gray-600 p-4">
+                                    <InfoAlert additional_css="my-2">
+                                        <p className="mb-2">
+                                            You may only cancel unit recruitment
+                                            when the order is traveling and has
+                                            at least more then 1 minute in time
+                                            left. Trying to do so at any other
+                                            time such as requesting resources or
+                                            recruiting can throw the kingdom
+                                            into chaos.
+                                        </p>
+                                        <p>
+                                            Unit that are canceled or rejected
+                                            will be at the bottom of the list.
+                                            Once the entire process is finished,
+                                            the log will indicate why some were
+                                            rejected or that you canceled some
+                                            unit requests.
+                                        </p>
+                                    </InfoAlert>
+
+                                    <OrangeButton
+                                        on_click={() => {
+                                            this.openCancellationModal(
+                                                kingdom,
+                                                null,
+                                                CancellationType.CANCEL_ALL,
+                                            );
+                                        }}
+                                        button_label={"Cancel All Requests"}
+                                        additional_css="my-4 w-full"
+                                        disabled={
+                                            kingdom.total_time <= 60 ||
+                                            kingdom.status !==
+                                                QueueStatus.TRAVELING
+                                        }
+                                    />
+                                    {kingdom.unit_requests.map((unit: Unit) => (
+                                        <div
+                                            key={unit.queue_id}
+                                            className="mb-4 p-4 bg-white dark:bg-gray-800 shadow-sm rounded-lg"
+                                        >
+                                            <h3 className="text-lg font-semibold dark:text-white">
+                                                {unit.unit_name}
+                                            </h3>
+                                            <p className="text-gray-700 dark:text-gray-300 mb-2">
+                                                Amount to Recruit:{" "}
+                                                {unit.amount_to_recruit}
+                                            </p>
+                                            <p className="text-gray-700 dark:text-gray-300 mb-2">
+                                                Status:{" "}
+                                                <span
+                                                    className={clsx({
+                                                        "text-green-700 dark:text-green-500":
+                                                            [
+                                                                QueueStatus.TRAVELING,
+                                                                QueueStatus.RECRUITING,
+                                                            ].includes(
+                                                                unit.secondary_status,
+                                                            ),
+                                                        "text-red-700 dark:text-red-500":
+                                                            [
+                                                                QueueStatus.REJECTED,
+                                                                QueueStatus.CANCELLED,
+                                                            ].includes(
+                                                                unit.secondary_status,
+                                                            ),
+                                                        "text-blue-700 dark:text-500":
+                                                            [
+                                                                QueueStatus.REQUESTING,
+                                                            ].includes(
+                                                                unit.secondary_status,
+                                                            ),
+                                                    })}
+                                                >
+                                                    {this.renderUnitStatus(
+                                                        unit,
+                                                    )}
+                                                </span>
+                                            </p>
+                                            <DangerOutlineButton
+                                                on_click={() => {
+                                                    this.openCancellationModal(
+                                                        kingdom,
+                                                        unit,
+                                                        CancellationType.SINGLE_CANCEL,
+                                                    );
+                                                }}
+                                                button_label={"Cancel Request"}
+                                                disabled={this.disableCancelation(
+                                                    kingdom,
+                                                    unit.secondary_status,
+                                                )}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    ),
+                )}
 
                 {this.state.filtered_unit_queues.length <= 0 && (
                     <p>There are no units in queue</p>

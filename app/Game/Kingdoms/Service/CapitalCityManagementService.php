@@ -15,7 +15,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
-use App\Flare\Transformers\KingdomBuildingTransformer;
+use App\Flare\Transformers\CapitalCityKingdomBuildingTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
@@ -28,7 +28,7 @@ class CapitalCityManagementService
         private readonly UpdateKingdom $updateKingdom,
         private readonly CapitalCityBuildingManagement $capitalCityBuildingManagement,
         private readonly CapitalCityUnitManagement $capitalCityUnitManagement,
-        private readonly KingdomBuildingTransformer $kingdomBuildingTransformer,
+        private readonly CapitalCityKingdomBuildingTransformer $capitalCityKingdomBuildingTransformer,
         private readonly UnitMovementService $unitMovementService,
         private readonly Manager $manager
     ) {}
@@ -100,7 +100,7 @@ class CapitalCityManagementService
                 $queueTimeLeftInSeconds = 0;
             }
 
-            $buildingRequests = collect($queue->building_request_data)->map(function ($request) use ($kingdom, $queue) {
+            $buildingRequests = collect($queue->building_request_data)->map(function ($request) use ($kingdom) {
 
                 $building = KingdomBuilding::where('kingdom_id', $kingdom->id)
                     ->where('id', $request['building_id'])
@@ -110,10 +110,12 @@ class CapitalCityManagementService
                     'building_name' => $building->name,
                     'secondary_status' => $request['secondary_status'],
                     'building_id' => $building->id,
-                    'queue_id' => $queue->id,
-                    'is_cancel_request' => false,
+                    'from_level' => $request['from_level'],
+                    'to_level' => $request['to_level'],
                 ];
-            });
+            })->toArray();
+
+            $buildingRequests = $this->reorderBuildingRequests($buildingRequests);
 
             return [
                 'kingdom_id' => $kingdom->id,
@@ -122,6 +124,7 @@ class CapitalCityManagementService
                 'status' => $queue->status,
                 'building_queue' => $buildingRequests,
                 'total_time' => $queueTimeLeftInSeconds,
+                'queue_id' => $queue->id,
             ];
         });
 
@@ -170,6 +173,31 @@ class CapitalCityManagementService
         });
 
         return array_values($unitQueueData->toArray());
+    }
+
+
+    /**
+     * Reorder the unit requests
+     *
+     * @param array $requestData
+     * @return array
+     */
+    private function reorderBuildingRequests(array $requestData): array
+    {
+        $statusOrder = [
+            CapitalCityQueueStatus::FINISHED => 1,
+            CapitalCityQueueStatus::TRAVELING => 2,
+            CapitalCityQueueStatus::REQUESTING => 3,
+            CapitalCityQueueStatus::BUILDING => 4,
+            CapitalCityQueueStatus::CANCELLED => 5,
+            CapitalCityQueueStatus::REJECTED => 6,
+        ];
+
+        usort($requestData, function ($a, $b) use ($statusOrder) {
+            return $statusOrder[$a['secondary_status']] <=> $statusOrder[$b['secondary_status']];
+        });
+
+        return $requestData;
     }
 
     /**
@@ -347,7 +375,7 @@ class CapitalCityManagementService
      */
     private function formatKingdomBuildingData(Kingdom $capitalCityKingdom, Kingdom $kingdomForRequest, SupportCollection $buildings): array
     {
-        $buildings = new Collection($buildings, $this->kingdomBuildingTransformer);
+        $buildings = new Collection($buildings, $this->capitalCityKingdomBuildingTransformer);
         $buildings = $this->manager->createData($buildings)->toArray();
 
         $character = $capitalCityKingdom->character;
@@ -360,6 +388,7 @@ class CapitalCityManagementService
             'map_name' => $kingdomForRequest->gameMap->name,
             'buildings' => $buildings,
             'total_travel_time' => $this->unitMovementService->getDistanceTime($character, $kingdomForRequest, $capitalCityKingdom, PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_BUILD_TRAVEL_TIME_REDUCTION),
+
         ];
     }
 

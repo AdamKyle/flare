@@ -2,8 +2,6 @@ import { inject, injectable } from "tsyringe";
 import Ajax from "../../../lib/ajax/ajax";
 import AjaxInterface from "../../../lib/ajax/ajax-interface";
 import { AxiosError, AxiosResponse } from "axios";
-import BuildingsToUpgradeSection from "../capital-city/buildings-to-upgrade-section";
-import BuildingsInQueue from "../capital-city/buildings-in-queue";
 import SendBuildingUpgradeCancellationRequestModal from "../capital-city/modals/send-building-upgrade-cancellation-request-modal";
 
 @injectable()
@@ -15,7 +13,6 @@ export default class CancelBuildingRequestAjax {
         characterId: number,
         kingdomId: number,
         queueId: number,
-        deleteWholeQueue: boolean,
         buildingId?: number,
     ): void {
         this.ajax
@@ -26,11 +23,8 @@ export default class CancelBuildingRequestAjax {
                     kingdomId,
             )
             .setParameters({
-                request_data: {
-                    delete_queue: deleteWholeQueue,
-                    building_id: buildingId,
-                    capital_city_building_queue_id: queueId,
-                },
+                queue_id: queueId,
+                building_id: buildingId ?? null,
             })
             .doAjaxCall(
                 "post",

@@ -19,7 +19,6 @@ export const buildBuildingsColumns = (
     buildingsInQueue: BuildingInQueueDetails[] | [],
     viewPort: number,
 ) => {
-    console.log(buildingsInQueue);
     return [
         {
             name: "Name",

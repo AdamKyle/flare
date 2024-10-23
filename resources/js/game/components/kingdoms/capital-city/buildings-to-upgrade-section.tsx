@@ -92,6 +92,8 @@ export default class BuildingsToUpgradeSection extends React.Component<
     reset() {
         this.setState(
             {
+                error_message: null,
+                success_message: null,
                 search_query: "",
                 sort_direction: "asc",
                 building_queue: [],

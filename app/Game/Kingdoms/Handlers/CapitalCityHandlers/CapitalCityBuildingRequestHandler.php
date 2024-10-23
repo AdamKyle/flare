@@ -51,6 +51,11 @@ class CapitalCityBuildingRequestHandler
         $upgrading = true;
 
         foreach ($buildingsToUpgradeOrRepair as $index => $buildingRequest) {
+
+            if ($buildingRequest['secondary_status'] === CapitalCityQueueStatus::CANCELLED) {
+                continue;
+            }
+
             if ($this->shouldRejectBuildingRequest($buildingRequest, $kingdom, $index, $buildingsToUpgradeOrRepair)) {
                 continue;
             }
@@ -72,9 +77,14 @@ class CapitalCityBuildingRequestHandler
             $timeTillFinished = 1;
         }
 
+        $messages = $capitalCityBuildingQueue->messages ?? [];
+
+        dump('createUpgradeOrRepairRequest');
+        dump($messages, $buildingsToUpgradeOrRepair);
+
         $capitalCityBuildingQueue->update([
             'building_request_data' => $buildingsToUpgradeOrRepair,
-            'messages' => $this->messages,
+            'messages' => array_merge($messages, $this->messages),
             'started_at' => $timeToStart,
             'completed_at' => $timeToStart->clone()->addMinutes($timeTillFinished),
             'status' => $upgrading ? CapitalCityQueueStatus::BUILDING : CapitalCityQueueStatus::REPAIRING
@@ -166,6 +176,9 @@ class CapitalCityBuildingRequestHandler
             CapitalCityQueueStatus::BUILDING,
             CapitalCityQueueStatus::REPAIRING
         ]))->values()->toArray();
+
+        dump('dispatchOrLogBuildingRequest');
+        dump($filteredRequestData);
 
         if (!empty($filteredRequestData)) {
 

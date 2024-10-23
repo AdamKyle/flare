@@ -134,6 +134,7 @@ class CapitalCityBuildingManagementRequestHandler
 
             return [
                 'building_id' => $building->id,
+                'building_name' => $building->name,
                 'costs' => $this->kingdomBuildingService->getBuildingCosts($building),
                 'type' => $type,
                 'missing_costs' => [],

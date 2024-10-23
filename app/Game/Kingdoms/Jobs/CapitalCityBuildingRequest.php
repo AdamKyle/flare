@@ -64,7 +64,8 @@ class CapitalCityBuildingRequest implements ShouldQueue
 
         $invalidSecondaryTypes = [
             CapitalCityQueueStatus::REJECTED,
-            CapitalCityQueueStatus::REQUESTING
+            CapitalCityQueueStatus::REQUESTING,
+            CapitalCityQueueStatus::CANCELLED,
         ];
 
         foreach ($buildingRequestData as $index => $requestData) {
@@ -89,6 +90,9 @@ class CapitalCityBuildingRequest implements ShouldQueue
                 $buildingRequestData[$index]['secondary_status'] = CapitalCityQueueStatus::FINISHED;
             }
         }
+
+        dump('Finishing the upgrade:');
+        dump($buildingRequestData);
 
         $queueData->update([
             'building_request_data' => $buildingRequestData,

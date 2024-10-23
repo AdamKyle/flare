@@ -109,12 +109,11 @@ class CapitalCityKingdomLogHandler
         $buildingData = [];
 
         foreach ($requestData as $data) {
-            if (
-                $data['secondary_status'] === CapitalCityQueueStatus::REJECTED ||
-                $data['secondary_status'] === CapitalCityQueueStatus::FINISHED ||
-                $data['secondary_status'] === CapitalCityQueueStatus::CANCELLED
-            ) {
-
+            if (in_array($data['secondary_status'], [
+                CapitalCityQueueStatus::REJECTED,
+                CapitalCityQueueStatus::CANCELLED,
+                CapitalCityQueueStatus::FINISHED
+            ])) {
                 $building = KingdomBuilding::where('kingdom_id', $kingdom->id)->where('id', $data['building_id'])->first();
 
                 $buildingData[] = [
@@ -126,6 +125,16 @@ class CapitalCityKingdomLogHandler
                 ];
             }
         }
+
+        $statusOrder = [
+            CapitalCityQueueStatus::REJECTED => 1,
+            CapitalCityQueueStatus::CANCELLED => 2,
+            CapitalCityQueueStatus::FINISHED => 3,
+        ];
+
+        usort($buildingData, function ($a, $b) use ($statusOrder) {
+            return $statusOrder[$a['status']] <=> $statusOrder[$b['status']];
+        });
 
         return $buildingData;
     }

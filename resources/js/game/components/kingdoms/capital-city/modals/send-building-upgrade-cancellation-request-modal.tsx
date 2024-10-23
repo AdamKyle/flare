@@ -4,8 +4,8 @@ import LoadingProgressBar from "../../../ui/progress-bars/loading-progress-bar";
 import Dialogue from "../../../ui/dialogue/dialogue";
 import { serviceContainer } from "../../../../lib/containers/core-container";
 import SuccessAlert from "../../../ui/alerts/simple-alerts/success-alert";
-import PrimaryOutlineButton from "../../../ui/buttons/primary-outline-button";
 import CancelBuildingRequestAjax from "../../ajax/cancel-building-request-ajax";
+import { CancellationType } from "../enums/cancellation-type";
 
 export default class SendBuildingUpgradeCancellationRequestModal extends React.Component<
     any,
@@ -27,7 +27,7 @@ export default class SendBuildingUpgradeCancellationRequestModal extends React.C
         );
     }
 
-    sendRequest(deleteQueue: boolean, buildingId?: number) {
+    sendRequest() {
         this.setState(
             {
                 loading: true,
@@ -38,10 +38,9 @@ export default class SendBuildingUpgradeCancellationRequestModal extends React.C
                 this.processBuildingCancellationRequest.cancelBuildingRequest(
                     this,
                     this.props.character_id,
-                    this.props.queue_data.kingdom_id,
-                    this.props.queue_data.queue_id,
-                    deleteQueue,
-                    buildingId,
+                    this.props.kingdom_id,
+                    this.props.queue_id,
+                    this.props.building_details?.building_id,
                 );
             },
         );
@@ -58,24 +57,11 @@ export default class SendBuildingUpgradeCancellationRequestModal extends React.C
                     secondary_button_disabled:
                         this.state.loading ||
                         this.state.success_message !== null,
-                    secondary_button_label: "Cancel just this building",
-                    handle_action: () =>
-                        this.sendRequest(
-                            false,
-                            this.props.queue_data.building_id,
-                        ),
+                    secondary_button_label: "Yes, that is correct",
+                    handle_action: () => this.sendRequest(),
                 }}
             >
-                <div className="overflow-y-auto max-h-[450px]">
-                    <div className="my-4 text-center">
-                        <PrimaryOutlineButton
-                            button_label={
-                                "Cancel Entire Queue For This Kingdom"
-                            }
-                            on_click={() => this.sendRequest(true)}
-                        />
-                    </div>
-
+                <div>
                     {this.state.error_message !== null ? (
                         <DangerAlert additional_css={"my-4"}>
                             {this.state.error_message}
@@ -87,6 +73,20 @@ export default class SendBuildingUpgradeCancellationRequestModal extends React.C
                             {this.state.success_message}
                         </SuccessAlert>
                     ) : null}
+
+                    <p className="my-4">
+                        <strong>Are you sure you want to this?</strong> This
+                        action cannot be undone.
+                    </p>
+
+                    <p>
+                        {this.props.cancellation_type ===
+                        CancellationType.SINGLE_CANCEL
+                            ? "You are saying you want to cancel: " +
+                              this.props.building_details.building_name +
+                              " Is that correct?"
+                            : "You are saying to cancel all building requests in this request. Is that correct?"}
+                    </p>
 
                     {this.state.loading ? <LoadingProgressBar /> : null}
                 </div>

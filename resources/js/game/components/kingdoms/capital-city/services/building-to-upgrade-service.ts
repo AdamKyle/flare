@@ -131,7 +131,7 @@ export default class BuildingToUpgradeService {
         }
 
         const searchTerm = event.target.value;
-        this.component.setState({ search_query: searchTerm, currentPage: 1 });
+        this.component.setState({ search_query: searchTerm, current_page: 1 });
         this.debouncedUpdateFilteredData();
     }
 
@@ -170,8 +170,13 @@ export default class BuildingToUpgradeService {
             return;
         }
 
+        if (!this.canToggleBuildingForQueue(kingdomId, buildingId)) {
+            return;
+        }
+
         this.component.setState((prevState: BuildingsToUpgradeSectionState) => {
             const queue = [...prevState.building_queue];
+
             const kingdomQueue = queue.find(
                 (item: BuildingQueue) => item.kingdomId === kingdomId,
             );
@@ -204,6 +209,16 @@ export default class BuildingToUpgradeService {
             return;
         }
 
+        const queue = [...this.component.state.building_queue];
+
+        if (queue.length > 0) {
+            this.component.setState({
+                building_queue: [],
+            });
+
+            return;
+        }
+
         const allKingdoms = this.component.state.building_data || [];
 
         allKingdoms.forEach((kingdom: Kingdom) => {
@@ -225,6 +240,7 @@ export default class BuildingToUpgradeService {
             const kingdomQueue = queue.find(
                 (item: BuildingQueue) => item.kingdomId === kingdomId,
             );
+
             const buildings =
                 (
                     this.component.state.filtered_building_data.find(
@@ -236,23 +252,61 @@ export default class BuildingToUpgradeService {
                 return prevState;
             }
 
+            const validBuildingIds = buildings
+                .filter((b: Building) =>
+                    this.canToggleBuildingForQueue(kingdomId, b.id),
+                )
+                .map((b: Building) => b.id);
+
+            if (validBuildingIds.length <= 0) {
+                return {
+                    ...prevState,
+                    error_message:
+                        "You have no buildings to queue. Check out some of the kingdoms below to see why? Chances are you have not trained the appropriate passive skill. Expanding the kingdom to see the buildings will tell you why they cannot be queued.",
+                };
+            }
+
             if (kingdomQueue) {
-                if (kingdomQueue.buildingIds.length === buildings.length) {
+                if (
+                    kingdomQueue.buildingIds.length === validBuildingIds.length
+                ) {
                     queue.splice(queue.indexOf(kingdomQueue), 1);
                 } else {
-                    kingdomQueue.buildingIds = buildings.map(
-                        (b: Building) => b.id,
-                    );
+                    kingdomQueue.buildingIds = validBuildingIds;
                 }
             } else {
                 queue.push({
                     kingdomId,
-                    buildingIds: buildings.map((b: Building) => b.id),
+                    buildingIds: validBuildingIds,
                 });
             }
 
-            return { building_queue: queue };
+            return { building_queue: queue, error_message: null };
         });
+    }
+
+    canToggleBuildingForQueue(kingdomId: number, buildingId: number): bool {
+        if (!this.component) {
+            return false;
+        }
+
+        const foundKingdom = this.component.state.building_data.find(
+            (buildingData: Kingdom) => buildingData.kingdom_id === kingdomId,
+        );
+
+        const foundBuilding = foundKingdom?.buildings.find(
+            (building: Building) => building.id === buildingId,
+        );
+
+        if (
+            !foundBuilding ||
+            (foundBuilding.passive_required_for_building &&
+                !foundBuilding.passive_required_for_building.is_trained)
+        ) {
+            return false;
+        }
+
+        return true;
     }
 
     handlePageChange(pageNumber: number) {
@@ -272,8 +326,6 @@ export default class BuildingToUpgradeService {
             this.component.state;
         const startIndex = (current_page - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
-
-        console.log(filtered_building_data, startIndex, endIndex);
 
         return filtered_building_data.slice(startIndex, endIndex);
     }

@@ -1,11 +1,12 @@
 import { QueueStatus } from "../enums/queue-status";
-import Unit from "./unit";
+import BuildingInQueue from "./building-in-queue";
 
-export interface KingdomWithUnitRequests {
+export default interface KingddomBuildingQueue {
     kingdom_id: number;
     kingdom_name: string;
     map_name: string;
-    unit_requests: Unit[];
     status: QueueStatus;
+    building_queue: BuildingInQueue[];
     total_time: number;
+    queue_id: number;
 }

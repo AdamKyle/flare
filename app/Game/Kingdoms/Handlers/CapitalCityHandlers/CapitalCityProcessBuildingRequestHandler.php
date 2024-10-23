@@ -51,7 +51,14 @@ class CapitalCityProcessBuildingRequestHandler
         $kingdom = $capitalCityBuildingQueue->kingdom;
         $character = $capitalCityBuildingQueue->character;
 
+        dump('handleBuildingRequests');
+        dump($requestData);
+        dump($capitalCityBuildingQueue->messages);
+
         $requestData = $this->processBuildingRequests($kingdom, $requestData);
+
+        dump('After we process the rwquests');
+        dump($requestData);
 
         $summedMissingCosts = $this->calculateSummedMissingCosts($requestData);
 
@@ -94,6 +101,12 @@ class CapitalCityProcessBuildingRequestHandler
         array $requestData
     ): array {
         foreach ($requestData as $index => $buildingUpgradeRequest) {
+            if ($buildingUpgradeRequest['secondary_status'] === CapitalCityQueueStatus::CANCELLED) {
+                $request[$index] = $buildingUpgradeRequest;
+
+                continue;
+            }
+
             $building = $kingdom->buildings()->where('id', $buildingUpgradeRequest['building_id'])->first();
             $buildingUpgradeRequest = $this->processPotentialResourceRequests(
                 $kingdom,
