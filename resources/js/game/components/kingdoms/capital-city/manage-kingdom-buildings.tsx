@@ -1,10 +1,8 @@
 import React from "react";
-import PrimaryOutlineButton from "../../ui/buttons/primary-outline-button";
 import SuccessOutlineButton from "../../ui/buttons/success-outline-button";
 import BuildingsToUpgradeSection from "./buildings-to-upgrade-section";
 import BuildingsInQueue from "./buildings-in-queue";
 import ClickableIconCard from "../../ui/cards/clickable-icon-card";
-import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
 
 export default class ManageKingdomBuildings extends React.Component<any, any> {
     constructor(props: any) {
@@ -83,7 +81,7 @@ export default class ManageKingdomBuildings extends React.Component<any, any> {
         return (
             <div>
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
-                <div className="relative flex flex-col md:flex-row items-start md:items-center">
+                <div className="relative flex justify-between items-center w-full">
                     <h3 className="mb-2 sm:mb-0 sm:mr-4">
                         Oversee your kingdoms buildings
                     </h3>

@@ -6,7 +6,6 @@ import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
 import SuccessAlert from "../../ui/alerts/simple-alerts/success-alert";
 import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
 import ManageKingdomBuildings from "./manage-kingdom-buildings";
-import UnitRecruitment from "./partials/unit-management/unit-recruitment";
 import WarningAlert from "../../ui/alerts/simple-alerts/warning-alert";
 import GoldBarManagement from "./gold-bar-management";
 import UnitManagement from "./unit-management";
