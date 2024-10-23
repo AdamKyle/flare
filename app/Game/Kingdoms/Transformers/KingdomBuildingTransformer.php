@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Flare\Transformers;
+namespace App\Game\Kingdoms\Transformers;
 
 use App\Flare\Models\KingdomBuilding;
 use App\Game\Kingdoms\Values\BuildingCosts;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Flare\Transformers;
+namespace App\Game\Kingdoms\Transformers;
 
 use App\Flare\Models\GameBuildingUnit;
 use App\Flare\Models\GameUnit;
@@ -51,7 +51,7 @@ class UnitTransformer extends TransformerAbstract
         $gameBuilding = GameBuildingUnit::where('game_unit_id', $unit->id)->first();
 
         if (is_null($gameBuilding)) {
-            throw new Exception('Missing Game Building for unit: '.$unit->name);
+            throw new Exception('Missing Game Building for unit: ' . $unit->name);
         }
 
         return $gameBuilding->required_level;

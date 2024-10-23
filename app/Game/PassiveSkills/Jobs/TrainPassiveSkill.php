@@ -5,7 +5,7 @@ namespace App\Game\PassiveSkills\Jobs;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterPassiveSkill;
 use App\Flare\Models\GameBuilding;
-use App\Flare\Transformers\KingdomTransformer;
+use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\PassiveSkills\Events\UpdatePassiveTree;
@@ -147,7 +147,7 @@ class TrainPassiveSkill implements ShouldQueue
 
         $character = $this->character->Refresh();
 
-        event(new ServerMessageEvent($character->user, $newPassive->passiveSkill->name.' skill has gained a new level! Check your character sheet!'));
+        event(new ServerMessageEvent($character->user, $newPassive->passiveSkill->name . ' skill has gained a new level! Check your character sheet!'));
 
         event(new UpdatePassiveTree($character->user, $character->passiveSkills));
     }

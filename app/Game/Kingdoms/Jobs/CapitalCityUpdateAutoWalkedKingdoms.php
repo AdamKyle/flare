@@ -3,7 +3,7 @@
 namespace App\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\Kingdom;
-use App\Flare\Transformers\KingdomTransformer;
+use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Events\UpdateKingdom;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

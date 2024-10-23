@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Flare\Transformers;
+namespace App\Game\Kingdoms\Transformers;
 
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;

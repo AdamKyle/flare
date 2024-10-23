@@ -3,10 +3,10 @@
 namespace App\Game\Kingdoms\Providers;
 
 use App\Flare\Transformers\CapitalCityKingdomBuildingTransformer;
-use App\Flare\Transformers\KingdomAttackLogsTransformer;
-use App\Flare\Transformers\KingdomBuildingTransformer;
-use App\Flare\Transformers\KingdomTransformer;
-use App\Flare\Transformers\UnitMovementTransformer;
+use App\Game\Kingdoms\Transformers\KingdomAttackLogsTransformer;
+use App\Game\Kingdoms\Transformers\KingdomBuildingTransformer;
+use App\Game\Kingdoms\Transformers\KingdomTransformer;
+use App\Game\Kingdoms\Transformers\UnitMovementTransformer;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
 use App\Game\Kingdoms\Console\Commands\DeleteKingdomLogs;
 use App\Game\Kingdoms\Console\Commands\ResetCapitalCityWalkingStatus;

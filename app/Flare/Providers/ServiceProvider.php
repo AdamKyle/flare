@@ -68,13 +68,13 @@ use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\ItemTransformer;
-use App\Flare\Transformers\KingdomAttackLogsTransformer;
-use App\Flare\Transformers\KingdomBuildingTransformer;
-use App\Flare\Transformers\KingdomTransformer;
+use App\Game\Kingdoms\Transformers\KingdomAttackLogsTransformer;
+use App\Game\Kingdoms\Transformers\KingdomBuildingTransformer;
+use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use App\Flare\Transformers\MarketItemsTransformer;
 use App\Flare\Transformers\MonsterTransformer;
-use App\Flare\Transformers\OtherKingdomTransformer;
-use App\Flare\Transformers\UnitTransformer;
+use App\Game\Kingdoms\Transformers\OtherKingdomTransformer;
+use App\Game\Kingdoms\Transformers\UnitTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Flare\Values\BaseSkillValue;
 use App\Flare\Values\BaseStatValue;
@@ -468,7 +468,7 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(SiteAccessStatisticService::class, function() {
+        $this->app->bind(SiteAccessStatisticService::class, function () {
             return new SiteAccessStatisticService();
         });
     }
