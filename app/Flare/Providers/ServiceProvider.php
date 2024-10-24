@@ -290,8 +290,6 @@ class ServiceProvider extends ApplicationServiceProvider
             return new AttackAndCast(
                 $app->make(CharacterCacheData::class),
                 $app->make(Entrance::class),
-                $app->make(CanHit::class),
-                $app->make(SecondaryAttacks::class),
                 $app->make(WeaponType::class),
                 $app->make(CastType::class),
             );
@@ -301,8 +299,6 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CastAndAttack(
                 $app->make(CharacterCacheData::class),
                 $app->make(Entrance::class),
-                $app->make(CanHit::class),
-                $app->make(SecondaryAttacks::class),
                 $app->make(WeaponType::class),
                 $app->make(CastType::class),
             );

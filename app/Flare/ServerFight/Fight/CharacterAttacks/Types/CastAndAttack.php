@@ -3,8 +3,7 @@
 namespace App\Flare\ServerFight\Fight\CharacterAttacks\Types;
 
 use App\Flare\Models\Character;
-use App\Flare\ServerFight\Fight\CanHit;
-use App\Flare\ServerFight\Fight\CharacterAttacks\SecondaryAttacks;
+
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
@@ -14,12 +13,10 @@ class CastAndAttack extends AttackAndCast
     public function __construct(
         CharacterCacheData $characterCacheData,
         Entrance $entrance,
-        CanHit $canHit,
-        SecondaryAttacks $secondaryAttacks,
         WeaponType $weaponType,
         CastType $castType
     ) {
-        parent::__construct($characterCacheData, $entrance, $canHit, $secondaryAttacks, $weaponType, $castType);
+        parent::__construct($characterCacheData, $entrance, $weaponType, $castType);
     }
 
     public function setCharacterCastAndAttackkData(Character $character, bool $isVoided): AttackAndCast

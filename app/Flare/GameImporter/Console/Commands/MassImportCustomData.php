@@ -8,6 +8,7 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
 use App\Flare\Models\Item;
 use App\Flare\Models\Survey;
+use App\Flare\Models\SurveySnapshot;
 use App\Flare\Models\User;
 use App\Flare\Values\MapNameValue;
 use Illuminate\Console\Command;
@@ -40,7 +41,11 @@ class MassImportCustomData extends Command
 
         CapitalCityUnitQueue::truncate();
         CapitalCityBuildingQueue::truncate();
+        Survey::truncate();
+        SurveySnapshot::truncate();
         User::where('is_showing_survey', true)->update('is_showing_survey', false);
+
+        Artisan::call('fix:event-types-on-events');
 
         $this->importInformationSection();
 
@@ -51,7 +56,12 @@ class MassImportCustomData extends Command
         $this->importSurveys();
     }
 
-    protected function importInformationSection(): void
+    /**
+     * Import the information section
+     *
+     * @return void
+     */
+    private function importInformationSection(): void
     {
         $data = Storage::disk('data-imports')->get('Admin Section/information.json');
 
@@ -79,7 +89,7 @@ class MassImportCustomData extends Command
      *
      * @return void
      */
-    protected function importSurveys(): void
+    private function importSurveys(): void
     {
         $data = Storage::disk('data-imports')->get('Admin Section/surveys.json');
 
@@ -92,7 +102,12 @@ class MassImportCustomData extends Command
         $this->line('Surveys have been imported!');
     }
 
-    protected function importGameMaps(): void
+    /**
+     * Import the game maps
+     *
+     * @return void
+     */
+    private function importGameMaps(): void
     {
         $files = Storage::disk('data-maps')->allFiles();
 

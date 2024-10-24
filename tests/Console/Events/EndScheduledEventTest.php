@@ -56,6 +56,48 @@ class EndScheduledEventTest extends TestCase
         parent::tearDown();
     }
 
+    public function testSetScheduledEventCurrentlyRunningAsFalseWhenNoEventExistsForIt()
+    {
+        $this->deleteOtherGameMaps();
+
+        $monster = $this->createMonster();
+        $item = $this->createItem();
+
+        $gameMap = $this->createGameMap();
+
+        $location = $this->createLocation();
+
+        $raid = $this->createRaid([
+            'raid_boss_id' => $monster->id,
+            'raid_monster_ids' => [$monster->id],
+            'raid_boss_location_id' => $location->id,
+            'corrupted_location_ids' => [$location->id],
+            'artifact_item_id' => $item->id,
+        ]);
+
+        $scheduledEvent = $this->createScheduledEvent([
+            'event_type' => EventType::RAID_EVENT,
+            'start_date' => now()->addMinutes(5),
+            'raid_id' => $raid,
+            'currently_running' => true,
+        ]);
+
+        (new CharacterFactory)->createBaseCharacter()->givePlayerLocation(
+            $location->x,
+            $location->y
+        );
+
+        Cache::put('monsters', [
+            $gameMap->name => [],
+        ]);
+
+        $this->artisan('end:scheduled-event');
+
+        $this->assertEquals(0, Event::count());
+        $this->assertEquals(0, Announcement::count());
+        $this->assertFalse($scheduledEvent->refresh()->currently_running);
+    }
+
     public function testEndRaidEvent()
     {
         $this->deleteOtherGameMaps();
