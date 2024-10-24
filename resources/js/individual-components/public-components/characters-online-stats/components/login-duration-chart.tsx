@@ -86,7 +86,7 @@ export default class LoginDurationChart extends React.Component<
         ];
 
         return (
-            <ResizableBox height={550} small_height={850}>
+            <ResizableBox height={560} small_height={850}>
                 <div>
                     <DropDown
                         menu_items={this.dropDownOptions()}

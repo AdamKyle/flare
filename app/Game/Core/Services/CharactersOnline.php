@@ -10,19 +10,22 @@ use Illuminate\Database\Eloquent\Collection;
 use Carbon\Carbon;
 
 
-class CharactersOnline {
+class CharactersOnline
+{
 
     use ResponseBuilder;
 
     private int $filterType = 0;
 
-    public function setFilterType(int $filterType):CharactersOnline {
+    public function setFilterType(int $filterType): CharactersOnline
+    {
         $this->filterType = $filterType;
 
         return $this;
     }
 
-    public function getCharacterOnlineData(): array {
+    public function getCharacterOnlineData(): array
+    {
 
         $onlineLogins = $this->buildBaseQuery();
         $onlineLogins = $this->applyFilterToQuery($onlineLogins);
@@ -34,12 +37,13 @@ class CharactersOnline {
         ]);
     }
 
-    private function buildBaseQuery(): EloquentBuilder {
+    private function buildBaseQuery(): EloquentBuilder
+    {
         if ($this->filterType > 0) {
             $onlineLogins = UserLoginDuration::where('duration_in_seconds', '>', 0);
 
             $onlineLogins = $onlineLogins->selectRaw('user_id, SUM(duration_in_seconds) as total_duration')
-                                         ->groupBy('user_id');
+                ->groupBy('user_id');
         } else {
             $onlineLogins = UserLoginDuration::whereNull('duration_in_seconds');
         }
@@ -47,7 +51,8 @@ class CharactersOnline {
         return $onlineLogins;
     }
 
-    private function applyFilterToQuery(Builder $onlineLogins): Collection {
+    private function applyFilterToQuery(Builder $onlineLogins): Collection
+    {
         $onlineLogins = match ($this->filterType) {
             0 => $onlineLogins->whereDate('logged_in_at', Carbon::today()),
             7 => $onlineLogins->whereBetween('logged_in_at', [Carbon::now()->subDays(7), Carbon::now()]),
@@ -59,7 +64,8 @@ class CharactersOnline {
         return $onlineLogins->get();
     }
 
-    private function formatCharacterData(Collection $onlineLogins): array {
+    private function formatCharacterData(Collection $onlineLogins): array
+    {
         $onlineCharacters = [];
 
         foreach ($onlineLogins as $login) {
@@ -69,6 +75,10 @@ class CharactersOnline {
                 $lastActivity = $login->last_activity;
                 $lastHeartbeat = $login->last_heart_beat;
                 $timeLoggedIn = $lastActivity->gt($lastHeartbeat) ? $lastActivity->diffInSeconds($login->logged_in_at) : $lastHeartbeat->diffInSeconds($login->logged_in_at);
+            }
+
+            if (is_null($login->user)) {
+                continue;
             }
 
             $character = $login->user->character;
@@ -84,5 +94,4 @@ class CharactersOnline {
 
         return $onlineCharacters;
     }
-
 }

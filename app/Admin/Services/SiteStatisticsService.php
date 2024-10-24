@@ -7,31 +7,36 @@ use App\Flare\Models\GuideQuest;
 use App\Flare\Models\Quest;
 use App\Flare\Models\UserLoginDuration;
 use Carbon\Carbon;
+use DB;
 use Exception;
 
-class SiteStatisticsService {
+class SiteStatisticsService
+{
 
     private array $data = [];
 
     private array $labels = [];
 
-    public function data(): array {
+    public function data(): array
+    {
         return $this->data;
     }
 
-    public function labels(): array {
+    public function labels(): array
+    {
         return $this->labels;
     }
 
-    public function fetchCompletedQuestsStatistics(string $type, string $filter, int $limit): void {
+    public function fetchCompletedQuestsStatistics(string $type, string $filter, int $limit): void
+    {
         $totalCount = $type === 'guide_quest' ? GuideQuest::count() : Quest::count();
 
         $query = Character::query()
             ->whereHas('questsCompleted', function ($query) use ($type) {
-                $query->whereNotNull($type.'_id');
+                $query->whereNotNull($type . '_id');
             })
             ->withCount(['questsCompleted as quests_count' => function ($query) use ($type) {
-                $query->whereNotNull($type.'_id');
+                $query->whereNotNull($type . '_id');
             }]);
 
         if ($filter === 'most') {
@@ -52,8 +57,9 @@ class SiteStatisticsService {
         $this->labels = $charactersWithQuests->pluck('name')->toArray();
     }
 
-    public function getLogInDurationStatistics(int $filter): void {
-        switch($filter) {
+    public function getLogInDurationStatistics(int $filter): void
+    {
+        switch ($filter) {
             case '0':
                 $this->getTodayLoginDurationStats();
                 break;
@@ -67,12 +73,14 @@ class SiteStatisticsService {
         }
     }
 
-    private function getTodayLoginDurationStats(): void {
+    private function getTodayLoginDurationStats(): void
+    {
         $today = Carbon::today();
         $this->getDurationsForDay($today);
     }
 
-    private function getDurationsForDay(Carbon $day): void {
+    private function getDurationsForDay(Carbon $day): void
+    {
         $durations = UserLoginDuration::whereDate('logged_in_at', $day)
             ->whereNotNull('duration_in_seconds')
             ->where('duration_in_seconds', '>', 0)
@@ -102,7 +110,8 @@ class SiteStatisticsService {
         $this->data = array_values($totalDurationsInHours);
     }
 
-    private function getRange(int $days): void {
+    private function getRange(int $days): void
+    {
         $endDate = Carbon::today();
 
         if ($days >= 30) {
@@ -114,6 +123,12 @@ class SiteStatisticsService {
         $durations = UserLoginDuration::whereBetween('logged_in_at', [$startDate, $endDate])
             ->whereNotNull('duration_in_seconds')
             ->where('duration_in_seconds', '>', 0)
+            ->select(
+                'user_id',
+                DB::raw('AVG(duration_in_seconds) as average_duration'),
+                DB::raw('MAX(logged_in_at) as first_login_at') // or MAX() for latest
+            )
+            ->groupBy('user_id')
             ->get();
 
         $dailyDurations = [];
@@ -126,15 +141,13 @@ class SiteStatisticsService {
         }
 
         foreach ($durations as $duration) {
-            $dateKey = Carbon::parse($duration->logged_in_at)->format('Y-m-d');
+            $dateKey = Carbon::parse($duration->first_login_at)->format('Y-m-d');
             if (isset($dailyDurations[$dateKey])) {
-                $dailyDurations[$dateKey] += $duration->duration_in_seconds / 60;
+                $dailyDurations[$dateKey] += $duration->average_duration / 60;
             }
         }
 
         $this->labels = $daysLabels;
         $this->data = array_values($dailyDurations);
     }
-
-
 }

@@ -82,7 +82,7 @@ export default class LoginStatistics extends React.Component<any, any> {
         ];
 
         return (
-            <ResizableBox height={550} small_height={850}>
+            <ResizableBox height={560} small_height={850}>
                 <div>
                     <InfoAlert additional_css={"my-4"}>
                         This chart is not real time and shows the amount of

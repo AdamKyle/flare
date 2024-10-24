@@ -43,7 +43,7 @@ class MassImportCustomData extends Command
         CapitalCityBuildingQueue::truncate();
         Survey::truncate();
         SurveySnapshot::truncate();
-        User::where('is_showing_survey', true)->update('is_showing_survey', false);
+        User::where('is_showing_survey', true)->update(['is_showing_survey' => false]);
 
         Artisan::call('fix:event-types-on-events');
 
@@ -63,6 +63,9 @@ class MassImportCustomData extends Command
      */
     private function importInformationSection(): void
     {
+
+        InfoPage::truncate();
+
         $data = Storage::disk('data-imports')->get('Admin Section/information.json');
 
         $data = json_decode(trim($data), true);
@@ -74,13 +77,22 @@ class MassImportCustomData extends Command
         $sourceDirectory = resource_path('backup/info-sections-images');
         $destinationDirectory = storage_path('app/public');
 
+        $deleteCommand = 'rm -rf ' . escapeshellarg($destinationDirectory) . './info-sections-images';
+        exec($deleteCommand, $output, $exitCode);
+
+        if ($exitCode !== 0) {
+            $this->error('Could not delete the info-section-images directory');
+
+            return;
+        }
+
         $command = 'cp -R ' . escapeshellarg($sourceDirectory) . ' ' . escapeshellarg($destinationDirectory);
         exec($command, $output, $exitCode);
 
         if ($exitCode === 0) {
             $this->line('Information section images directory copied to public successfully. Information section is now set up.');
         } else {
-            $this->line('Failed to copy the information images directory over. You can do this manually from the resources/backup/information-sections-images. Copy the entire directory to app/public');
+            $this->error('Failed to copy the information images directory over. You can do this manually from the resources/backup/information-sections-images. Copy the entire directory to app/public');
         }
     }
 

@@ -162,10 +162,6 @@
                 <span class="ra ra-muscle-fat"></span>
                 Ambush and Counter
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'player-vs-player']) }}">
-                <span class="ra ra-helmet"></span>
-                Player vs Player
-            </a>
             <a href="{{ route('info.page', ['pageName' => 'automation']) }}">
                 <span class="fas fa-user-clock"></span>
                 Automation

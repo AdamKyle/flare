@@ -289,11 +289,11 @@
                 <x-slot:title>
                     <a
                         href="{{ route('info.page', [
-                            'pageName' => 'player-vs-player',
-                        ]) }}">Pvp</a>
+                            'pageName' => 'weekly-fights',
+                        ]) }}">Weekely Fights</a>
                 </x-slot:title>
 
-                <p>Fight other players for a chance to earn a Mythic Unique. Participate in monthly pvp tournaments.</p>
+                <p>Participate in Weekly Fights to unlock new content, earn epic items such as Mythics and Legandry items as well as Cosmic Items during specific events!</p>
             </x-core.cards.feature-card>
             <x-core.cards.feature-card>
                 <x-slot:icon>
