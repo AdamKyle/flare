@@ -2,10 +2,13 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
+use App\Flare\Models\CapitalCityBuildingQueue;
+use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
 use App\Flare\Models\Item;
 use App\Flare\Models\Survey;
+use App\Flare\Models\User;
 use App\Flare\Values\MapNameValue;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
@@ -34,6 +37,10 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
+
+        CapitalCityUnitQueue::truncate();
+        CapitalCityBuildingQueue::truncate();
+        User::where('is_showing_survey', true)->update('is_showing_survey', false);
 
         $this->importInformationSection();
 
