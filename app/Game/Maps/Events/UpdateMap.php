@@ -22,10 +22,10 @@ class UpdateMap implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      */
-    public function __construct(User $user, bool $pvpMapUpdate = false)
+    public function __construct(User $user)
     {
         $character = $user->character->refresh();
-        $this->mapDetails = resolve(LocationService::class)->setIsEventBasedUpdate($pvpMapUpdate)->getLocationData($character);
+        $this->mapDetails = resolve(LocationService::class)->getLocationData($character);
         $this->user = $user;
     }
 

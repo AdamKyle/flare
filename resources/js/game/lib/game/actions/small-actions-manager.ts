@@ -2,7 +2,6 @@ import SmallerActions from "../../../sections/game-actions-section/smaller-actio
 import { capitalize } from "lodash";
 import Ajax from "../../ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
-import PvpCharactersType from "../types/pvp-characters-type";
 import { DateTime } from "luxon";
 
 type SelectedData = {
@@ -58,42 +57,6 @@ export default class SmallActionsManager {
     }
 
     /**
-     * Set the characters for dueling.
-     *
-     * @param eventCharactersForDueling
-     */
-    public setCharactersForDueling(
-        eventCharactersForDueling: PvpCharactersType[],
-    ) {
-        let charactersForDueling: PvpCharactersType[] | [] = [];
-        const props = this.component.props;
-
-        if (eventCharactersForDueling.length === 0) {
-            return;
-        }
-
-        if (props.character_position !== null) {
-            charactersForDueling = eventCharactersForDueling.filter(
-                (character: PvpCharactersType) => {
-                    if (props.character_position !== null) {
-                        if (character.id !== props.character.id) {
-                            return character;
-                        }
-                    }
-                },
-            );
-
-            if (charactersForDueling.length === 0) {
-                return;
-            }
-
-            this.component.setState({
-                characters_for_dueling: charactersForDueling,
-            });
-        }
-    }
-
-    /**
      * Calculate the time left based on the can_x_again_at
      *
      * @param timeLeft
@@ -124,12 +87,6 @@ export default class SmallActionsManager {
                 selected_action: data.value,
             },
             () => {
-                if (data.value === "pvp-fight") {
-                    this.component.setState({
-                        show_duel_fight: true,
-                    });
-                }
-
                 if (data.value === "map-movement") {
                     this.component.props.update_show_map_mobile(true);
                 }
@@ -201,16 +158,6 @@ export default class SmallActionsManager {
         });
 
         if (
-            state.characters_for_dueling.length > 0 &&
-            !props.character.killed_in_pvp
-        ) {
-            options.push({
-                label: "Pvp Fight",
-                value: "pvp-fight",
-            });
-        }
-
-        if (
             props.celestial_id !== 0 &&
             props.celestial_id !== null &&
             props.character.can_engage_celestials
@@ -218,13 +165,6 @@ export default class SmallActionsManager {
             options.push({
                 label: "Celestial Fight",
                 value: "celestial-fight",
-            });
-        }
-
-        if (props.character.can_register_for_pvp) {
-            options.push({
-                label: "Join Monthly PVP",
-                value: "join-monthly-pvp",
             });
         }
 

@@ -23,7 +23,7 @@ class ScheduledEventFactory extends Factory
     public function definition()
     {
         return [
-            'event_type' => EventType::MONTHLY_PVP,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'raid_id' => null,
             'start_date' => now(),
             'end_date' => now(),

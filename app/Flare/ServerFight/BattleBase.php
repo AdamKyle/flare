@@ -79,18 +79,6 @@ class BattleBase extends BattleMessages
         $this->defenderId = $defenderId;
     }
 
-    protected function doPvpEntrance(Character $attacker, Entrance $entrance)
-    {
-        $entrance->attackerEntrancesDefender($attacker, $this->attackData, $this->isVoided);
-
-        $this->mergeAttackerMessages($entrance->getAttackerMessages());
-        $this->mergeDefenderMessages($entrance->getDefenderMessages());
-
-        if ($entrance->isEnemyEntranced()) {
-            $this->isEnemyEntranced = true;
-        }
-    }
-
     protected function doEnemyEntrance(Character $character, ServerMonster $monster, Entrance $entrance)
     {
         $entrance->playerEntrance($character, $monster, $this->attackData);
@@ -102,7 +90,7 @@ class BattleBase extends BattleMessages
         }
     }
 
-    protected function secondaryAttack(Character $character, ?ServerMonster $monster = null, float $affixReduction = 0.0, bool $isPvp = false)
+    protected function secondaryAttack(Character $character, ?ServerMonster $monster = null, float $affixReduction = 0.0)
     {
         $secondaryAttacks = resolve(SecondaryAttacks::class);
 
@@ -113,17 +101,12 @@ class BattleBase extends BattleMessages
         $secondaryAttacks->setIsEnemyEntranced($this->isEnemyEntranced);
         $secondaryAttacks->setDefenderId(is_null($this->defenderId) ? $monster->getId() : $this->defenderId);
 
-        $secondaryAttacks->doSecondaryAttack($character, $monster, $affixReduction, $isPvp);
+        $secondaryAttacks->doSecondaryAttack($character, $monster, $affixReduction);
 
         $this->monsterHealth = $secondaryAttacks->getMonsterHealth();
         $this->characterHealth = $secondaryAttacks->getCharacterHealth();
 
-        if ($isPvp) {
-            $this->mergeAttackerMessages($secondaryAttacks->getAttackerMessages());
-            $this->mergeDefenderMessages($secondaryAttacks->getDefenderMessages());
-        } else {
-            $this->mergeMessages($secondaryAttacks->getMessages());
-        }
+        $this->mergeMessages($secondaryAttacks->getMessages());
 
         $secondaryAttacks->clearMessages();
     }
@@ -154,25 +137,6 @@ class BattleBase extends BattleMessages
         $this->monsterHealth = $elementalAttack->getMonsterHealth();
 
         $elementalAttack->clearMessages();
-    }
-
-    protected function pvpCounter(Character $attacker, Character $defender)
-    {
-        $counter = resolve(Counter::class);
-
-        $counter->setCharacterHealth($this->characterHealth);
-        $counter->setMonsterHealth($this->monsterHealth);
-        $counter->setIsEnemyVoided($this->isEnemyVoided);
-        $counter->setIsAttackerVoided($this->isVoided);
-        $counter->pvpCounter($attacker, $defender);
-
-        $this->mergeAttackerMessages($counter->getAttackerMessages());
-        $this->mergeDefenderMessages($counter->getDefenderMessages());
-
-        $this->characterHealth = $counter->getCharacterHealth();
-        $this->monsterHealth = $counter->getMonsterHealth();
-
-        $counter->clearMessages();
     }
 
     protected function doMonsterCounter(Character $character, ServerMonster $monster)
@@ -212,17 +176,6 @@ class BattleBase extends BattleMessages
         $this->monsterHealth = $counter->getMonsterHealth();
 
         $counter->clearMessages();
-    }
-
-    protected function getPvpCharacterAc(Character $defender)
-    {
-        $defence = $this->characterCacheData->getCharacterDefenceAc($defender);
-
-        if (! is_null($defence)) {
-            return $defence;
-        }
-
-        return $this->characterCacheData->getCachedCharacterData($defender, 'ac');
     }
 
     protected function canBlock(int $damage, int $ac)

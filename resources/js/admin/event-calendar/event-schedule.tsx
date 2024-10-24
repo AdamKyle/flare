@@ -139,10 +139,6 @@ export default class EventSchedule extends React.Component<
             return "#E11D48";
         }
 
-        if (name === "Monthly PVP") {
-            return "#2563EB";
-        }
-
         return "#1976d2";
     }
 

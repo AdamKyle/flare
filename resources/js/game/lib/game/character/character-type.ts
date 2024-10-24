@@ -81,8 +81,6 @@ export interface CharacterType {
 
     is_automation_running: boolean;
 
-    can_register_for_pvp: boolean;
-
     race: string;
 
     class: string;
@@ -192,8 +190,6 @@ export interface CharacterType {
     healing_amount: number;
 
     voided_healing_amount: number;
-
-    killed_in_pvp: boolean;
 
     base_position: PositionType;
 

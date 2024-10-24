@@ -15,7 +15,6 @@ use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
 use App\Game\Exploration\Events\ExplorationTimeOut;
 use App\Game\GuideQuests\Services\GuideQuestService;
-use App\Game\Maps\Events\UpdateDuelAtPosition;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -54,9 +53,7 @@ class Exploration implements ShouldQueue
         if ($this->shouldBail($automation)) {
             $this->endAutomation($automation, $characterCacheData);
 
-            event(new UpdateDuelAtPosition($this->character->user));
-
-            Cache::delete('can-character-survive-'.$this->character->id);
+            Cache::delete('can-character-survive-' . $this->character->id);
 
             return;
         }
@@ -81,8 +78,6 @@ class Exploration implements ShouldQueue
                 if ($delay === 0) {
                     $this->endAutomation($automation, $characterCacheData);
 
-                    event(new UpdateDuelAtPosition($this->character->user));
-
                     return;
                 }
 
@@ -95,8 +90,6 @@ class Exploration implements ShouldQueue
         }
 
         $automation->delete();
-
-        event(new UpdateDuelAtPosition($this->character->user));
 
         $this->sendOutEventLogUpdate('Something went wrong with automation. Could not process fight. Automation Canceled.');
 
@@ -126,7 +119,7 @@ class Exploration implements ShouldQueue
 
             $enemies = rand(10, 25);
 
-            $this->sendOutEventLogUpdate('"Chirst, child there are: '.$enemies.' of them ..."
+            $this->sendOutEventLogUpdate('"Chirst, child there are: ' . $enemies . ' of them ..."
             The Guide hisses at you from the shadows. You ignore his words and prepare for battle. One right after the other ...', true);
 
             for ($i = 1; $i <= $enemies; $i++) {
@@ -135,7 +128,7 @@ class Exploration implements ShouldQueue
 
             $this->sendOutEventLogUpdate('The last of the enemies fall. Covered in blood, exhausted, you look around for any signs of more of their friends. The area is silent. "Another day, another battle.
             We managed to survive." The Guide states as he walks from the shadows. The pair of you set off in search of the next adventure ...
-            (Exploration will begin again in '.$timeDelay.' minutes)', true);
+            (Exploration will begin again in ' . $timeDelay . ' minutes)', true);
 
             return true;
         }
@@ -146,7 +139,7 @@ class Exploration implements ShouldQueue
     protected function canSurviveFight(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool
     {
 
-        if (Cache::has('can-character-survive-'.$this->character->id)) {
+        if (Cache::has('can-character-survive-' . $this->character->id)) {
             return true;
         }
 
@@ -158,7 +151,7 @@ class Exploration implements ShouldQueue
             }
         }
 
-        Cache::put('can-character-survive-'.$this->character->id, true);
+        Cache::put('can-character-survive-' . $this->character->id, true);
 
         return true;
     }

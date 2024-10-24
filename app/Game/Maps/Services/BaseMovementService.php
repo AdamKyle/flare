@@ -196,12 +196,6 @@ class BaseMovementService
      */
     protected function canPlayerEnterLocation(Character $character, Location $location): bool
     {
-        if (! $location->can_players_enter) {
-            event(new ServerMessageEvent($character->user, 'You cannot enter this location. This is the PVP arena that is only open once per month.'));
-
-            return false;
-        }
-
         if (! is_null($location->enemy_strength_type) && $character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty()) {
 
             if (! is_null($location->type)) {

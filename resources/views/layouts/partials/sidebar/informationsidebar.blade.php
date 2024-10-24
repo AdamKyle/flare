@@ -166,10 +166,6 @@
                 <span class="ra ra-helmet"></span>
                 Player vs Player
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'monthly-pvp-event']) }}">
-                <span class="ra ra-helmet"></span>
-                Monthly Pvp Event
-            </a>
             <a href="{{ route('info.page', ['pageName' => 'automation']) }}">
                 <span class="fas fa-user-clock"></span>
                 Automation

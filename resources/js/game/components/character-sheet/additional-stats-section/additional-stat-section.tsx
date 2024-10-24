@@ -87,8 +87,7 @@ export default class AdditionalStatSection extends React.Component<any, any> {
                                         equipping Healing Spells. Having two
                                         healing spells increases the chance for
                                         a character to be resurrected when they
-                                        die in battle, with the exception of
-                                        PVP.
+                                        die in battle.
                                     </p>
                                     <ResurrectionChance
                                         character={this.props.character}

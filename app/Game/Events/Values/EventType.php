@@ -49,7 +49,6 @@ class EventType
 
     protected static array $selection = [
         0 => 'Weekly Celestials',
-        1 => 'Monthly PVP',
         2 => 'Weekly Currency Drops',
         3 => 'Raid Event',
         4 => 'Winter Event',
@@ -69,7 +68,7 @@ class EventType
     public function __construct(int $value)
     {
         if (! in_array($value, self::$values)) {
-            throw new Exception($value.' does not exist.');
+            throw new Exception($value . ' does not exist.');
         }
 
         $this->value = $value;
@@ -97,14 +96,6 @@ class EventType
     public function isWeeklyCelestials(): bool
     {
         return $this->value === self::WEEKLY_CELESTIALS;
-    }
-
-    /**
-     * Is monthly pvp?
-     */
-    public function isMonthlyPVP(): bool
-    {
-        return $this->value === self::MONTHLY_PVP;
     }
 
     /**

@@ -17,12 +17,10 @@ class PublicMessage
     {
         $user = auth()->user();
 
-        $killedInPVP = $this->wasKilledInPVP($user);
-
         $newMessage = $user->messages()->create([
             'message' => $message,
-            'x_position' => $killedInPVP ? 0 : $this->getXPosition($user),
-            'y_position' => $killedInPVP ? 0 : $this->getYPosition($user),
+            'x_position' => $this->getXPosition($user),
+            'y_position' => $this->getYPosition($user),
             'color' => $this->getColor($user),
             'hide_location' => $this->hideLocation($user),
         ]);
@@ -71,19 +69,6 @@ class PublicMessage
         }
 
         return 0;
-    }
-
-    /**
-     * Was the user killed in PVP?
-     */
-    protected function wasKilledInPVP(User $user): bool
-    {
-
-        if (! $user->hasRole('Admin')) {
-            return $user->character->killed_in_pvp;
-        }
-
-        return false;
     }
 
     /**

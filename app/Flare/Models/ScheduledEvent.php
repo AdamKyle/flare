@@ -58,10 +58,6 @@ class ScheduledEvent extends Model
             return 'Weekly Faction Loyalty Event';
         }
 
-        if ($type->isMonthlyPVP()) {
-            return 'Monthly PVP';
-        }
-
         if ($type->isWinterEvent()) {
             return 'The Ice Queen\'s Realm';
         }

@@ -66,7 +66,6 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'shards' => number_format($character->shards),
             'copper_coins' => number_format($character->copper_coins),
             'is_dead' => $character->is_dead,
-            'killed_in_pvp' => $character->killed_in_pvp,
             'can_craft' => $character->can_craft,
             'can_attack' => $character->can_attack,
             'can_spin' => $character->can_spin,

@@ -230,33 +230,6 @@ class EndScheduledEventTest extends TestCase
         $this->assertNotNull($surveyResponse);
     }
 
-    public function testEndIsMonthlyPvpEvent()
-    {
-        $this->deleteOtherGameMaps();
-
-        $scheduledEvent = $this->createScheduledEvent([
-            'event_type' => EventType::MONTHLY_PVP,
-            'start_date' => now()->addMinutes(5),
-            'currently_running' => true,
-        ]);
-
-        $event = $this->createEvent([
-            'type' => EventType::MONTHLY_PVP,
-            'started_at' => now(),
-            'ends_at' => now()->subMinutes(10),
-        ]);
-
-        $this->createAnnouncement([
-            'event_id' => $event->id,
-        ]);
-
-        $this->artisan('end:scheduled-event');
-
-        $this->assertEquals(0, Event::count());
-        $this->assertEquals(0, Announcement::count());
-        $this->assertFalse($scheduledEvent->refresh()->currently_running);
-    }
-
     public function testEndsEventsRunningWhenNoScheduledEventsAreRunning()
     {
         $this->deleteOtherGameMaps();
@@ -282,21 +255,6 @@ class EndScheduledEventTest extends TestCase
 
         $this->assertEquals(0, Event::count());
         $this->assertEquals(0, Announcement::count());
-    }
-
-    public function testEndPVPMonthlyEvent()
-    {
-        $this->deleteOtherGameMaps();
-
-        $scheduledEvent = $this->createScheduledEvent([
-            'event_type' => EventType::MONTHLY_PVP,
-            'start_date' => now()->addMinutes(5),
-            'currently_running' => true,
-        ]);
-
-        $this->artisan('end:scheduled-event');
-
-        $this->assertFalse($scheduledEvent->refresh()->currently_running);
     }
 
     public function testEndWinterEvent()

@@ -87,6 +87,6 @@ class GlobalEventForEventTypeValueTest extends TestCase
 
     public function testGetNothingForGlobalEventGoals()
     {
-        $this->assertEmpty(GlobalEventForEventTypeValue::returnGlobalEventInfoForSeasonalEvents(EventType::MONTHLY_PVP));
+        $this->assertEmpty(GlobalEventForEventTypeValue::returnGlobalEventInfoForSeasonalEvents(EventType::WEEKLY_CELESTIALS));
     }
 }

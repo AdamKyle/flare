@@ -331,29 +331,6 @@ class PublicMessageTest extends TestCase
         $this->assertGreaterThan(0, Message::count());
     }
 
-    public function testSendPublicMessageWhenKilledInPvp()
-    {
-        Event::fake();
-
-        $character = $this->character->getCharacter();
-
-        $character->update([
-            'killed_in_pvp' => true,
-        ]);
-
-        $character = $character->refresh();
-
-        Auth::login($character->user);
-
-        $this->publicMessage->postPublicMessage('Test');
-
-        Event::assertDispatched(MessageSentEvent::class);
-
-        $this->assertGreaterThan(0, Message::count());
-        $this->assertEquals(0, Message::first()->x_position);
-        $this->assertEquals(0, Message::first()->y_position);
-    }
-
     public function testSendPublicMessageWithLocationHidden()
     {
         Event::fake();

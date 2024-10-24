@@ -5,13 +5,10 @@ import ActionsTimers from "../../components/timers/actions-timers";
 import MapTimer from "../../components/timers/map-timer";
 import { updateTimers } from "../../lib/ajax/update-timers";
 import SmallActionsManager from "../../lib/game/actions/small-actions-manager";
-import { removeCommas } from "../../lib/game/format-number";
-import { GameActionState } from "../../lib/game/types/game-state";
 import CelestialFight from "./components/celestial-fight";
 import DuelPlayer from "./components/duel-player";
 import Revive from "./components/fight-section/revive";
 import GamblingSection from "./components/gambling-section";
-import JoinPvp from "./components/join-pvp";
 import RaidSection from "./components/raid-section";
 import MonsterActions from "./components/small-actions/monster-actions";
 import SmallExplorationSection from "./components/small-actions/small-exploration-section";
@@ -30,10 +27,6 @@ export default class SmallerActions extends React.Component<
 
     private mapTimeOut: any;
 
-    private pvpUpdate: any;
-
-    private duelOptions: any;
-
     private explorationTimeOut: any;
 
     private smallActionsManager: SmallActionsManager;
@@ -47,20 +40,15 @@ export default class SmallerActions extends React.Component<
             selected_action: null,
             monsters: [],
             raid_monsters: [],
-            characters_for_dueling: [],
-            pvp_characters_on_map: [],
             attack_time_out: 0,
             crafting_time_out: 0,
             automation_time_out: 0,
             celestial_time_out: 0,
             movement_time_left: 0,
             crafting_type: null,
-            duel_fight_info: null,
             loading: true,
             show_exploration: false,
             show_celestial_fight: false,
-            show_duel_fight: false,
-            show_join_pvp: false,
             show_hell_forged_section: false,
             show_purgatory_chains_section: false,
             show_gambling_section: false,
@@ -88,18 +76,10 @@ export default class SmallerActions extends React.Component<
         );
 
         // @ts-ignore
-        this.pvpUpdate = Echo.private(
-            "update-pvp-attack-" + this.props.character.user_id,
-        );
-
-        // @ts-ignore
         this.celestialTimeout = Echo.private(
             "update-character-celestial-timeout-" +
                 this.props.character.user_id,
         );
-
-        // @ts-ignore
-        this.duelOptions = Echo.join("update-duel");
 
         this.smallActionsManager = new SmallActionsManager(this);
     }
@@ -154,41 +134,6 @@ export default class SmallerActions extends React.Component<
             (event: any) => {
                 this.setState({
                     celestial_time_out: event.timeOut,
-                });
-            },
-        );
-
-        // // @ts-ignore
-        this.duelOptions.listen(
-            "Game.Maps.Events.UpdateDuelAtPosition",
-            (event: any) => {
-                this.setState(
-                    {
-                        pvp_characters_on_map: event.characters,
-                        characters_for_dueling: [],
-                    },
-                    () => {
-                        const characterLevel = removeCommas(
-                            this.props.character.level,
-                        );
-
-                        if (characterLevel >= 301) {
-                            this.smallActionsManager.setCharactersForDueling(
-                                event.characters,
-                            );
-                        }
-                    },
-                );
-            },
-        );
-
-        // @ts-ignore
-        this.pvpUpdate.listen(
-            "Game.Battle.Events.UpdateCharacterPvpAttack",
-            (event: any) => {
-                this.setState({
-                    show_duel_fight: true,
-                    duel_fight_info: event.data,
                 });
             },
         );
@@ -291,20 +236,6 @@ export default class SmallerActions extends React.Component<
         });
     }
 
-    manageDuel() {
-        this.setState({
-            selected_action: null,
-            show_duel_fight: !this.state.show_duel_fight,
-        });
-    }
-
-    manageJoinPvp() {
-        this.setState({
-            selected_action: null,
-            show_join_pvp: !this.state.show_join_pvp,
-        });
-    }
-
     manageHellForgedShop() {
         this.setState({
             selected_action: null,
@@ -326,12 +257,6 @@ export default class SmallerActions extends React.Component<
     removeSlots() {
         this.setState({
             selected_action: null,
-        });
-    }
-
-    resetDuelData() {
-        this.setState({
-            duel_fight_info: null,
         });
     }
 
@@ -413,34 +338,12 @@ export default class SmallerActions extends React.Component<
         );
     }
 
-    showDuelFight() {
-        return (
-            <DuelPlayer
-                characters={this.state.characters_for_dueling}
-                duel_data={this.state.duel_fight_info}
-                character={this.props.character}
-                manage_pvp={this.manageDuel.bind(this)}
-                reset_duel_data={this.resetDuelData.bind(this)}
-                is_small={true}
-            />
-        );
-    }
-
     showSlots() {
         return (
             <GamblingSection
                 character={this.props.character}
                 close_gambling_section={this.removeSlots.bind(this)}
                 is_small={true}
-            />
-        );
-    }
-
-    showJoinPVP() {
-        return (
-            <JoinPvp
-                manage_section={this.manageJoinPvp.bind(this)}
-                character_id={this.props.character.id}
             />
         );
     }
@@ -475,10 +378,6 @@ export default class SmallerActions extends React.Component<
                 return this.showMapMovement();
             case "celestial-fight":
                 return this.showCelestialFight();
-            case "pvp-fight":
-                return this.showDuelFight();
-            case "join-monthly-pvp":
-                return this.showJoinPVP();
             case "hell-forged-gear":
                 return this.showSpecialtyShop("hell-forged-gear");
             case "purgatory-chains-gear":

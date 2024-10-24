@@ -2,19 +2,16 @@ import React from "react";
 import CraftingSection from "../../components/crafting/base-components/crafting-section";
 import { CraftingOptions } from "../../components/crafting/base-components/types/crafting-type-options";
 import ActionsTimers from "../../components/timers/actions-timers";
-import SkyOutlineButton from "../../components/ui/buttons/sky-outline-button";
 import SuccessOutlineButton from "../../components/ui/buttons/success-outline-button";
 import DropDown from "../../components/ui/drop-down/drop-down";
 import ComponentLoading from "../../components/ui/loading/component-loading";
 import { updateTimers } from "../../lib/ajax/update-timers";
 import ActionsManager from "../../lib/game/actions/actions-manager";
-import { removeCommas } from "../../lib/game/format-number";
 import { GameActionState } from "../../lib/game/types/game-state";
 import CelestialFight from "./components/celestial-fight";
 import DuelPlayer from "./components/duel-player";
 import ExplorationSection from "./components/exploration-section";
 import GamblingSection from "./components/gambling-section";
-import JoinPvp from "./components/join-pvp";
 import RaidSection from "./components/raid-section";
 import MonsterActions from "./components/small-actions/monster-actions";
 import Shop from "./components/specialty-shops/shop";
@@ -27,10 +24,6 @@ export default class Actions extends React.Component<
 > {
     private actionsManager: ActionsManager;
 
-    private pvpUpdate: any;
-
-    private duelOptions: any;
-
     private traverseUpdate: any;
 
     constructor(props: ActionsProps) {
@@ -39,8 +32,6 @@ export default class Actions extends React.Component<
         this.state = {
             monsters: [],
             raid_monsters: [],
-            characters_for_dueling: [],
-            pvp_characters_on_map: [],
             attack_time_out: 0,
             crafting_time_out: 0,
             crafting_type: null,
@@ -48,8 +39,6 @@ export default class Actions extends React.Component<
             loading: true,
             show_exploration: false,
             show_celestial_fight: false,
-            show_duel_fight: false,
-            show_join_pvp: false,
             show_hell_forged_section: false,
             show_purgatory_chains_section: false,
             show_twisted_earth_section: false,
@@ -59,58 +48,15 @@ export default class Actions extends React.Component<
         this.actionsManager = new ActionsManager(this);
 
         // @ts-ignore
-        this.pvpUpdate = Echo.private(
-            "update-pvp-attack-" + this.props.character.user_id,
-        );
-
-        // @ts-ignore
         this.traverseUpdate = Echo.private(
             "update-plane-" + this.props.character.user_id,
         );
-
-        // @ts-ignore
-        this.duelOptions = Echo.join("update-duel");
     }
 
     componentDidMount() {
         this.setUpState();
 
         this.props.update_show_map_mobile(true);
-
-        // @ts-ignore
-        this.duelOptions.listen(
-            "Game.Maps.Events.UpdateDuelAtPosition",
-            (event: any) => {
-                this.setState(
-                    {
-                        pvp_characters_on_map: event.characters,
-                        characters_for_dueling: [],
-                    },
-                    () => {
-                        const characterLevel = removeCommas(
-                            this.props.character.level,
-                        );
-
-                        if (characterLevel >= 301) {
-                            this.actionsManager.setCharactersForDueling(
-                                event.characters,
-                            );
-                        }
-                    },
-                );
-            },
-        );
-
-        // @ts-ignore
-        this.pvpUpdate.listen(
-            "Game.Battle.Events.UpdateCharacterPvpAttack",
-            (event: any) => {
-                this.setState({
-                    show_duel_fight: true,
-                    duel_fight_info: event.data,
-                });
-            },
-        );
 
         // @ts-ignore
         this.traverseUpdate.listen(
@@ -245,8 +191,6 @@ export default class Actions extends React.Component<
         this.setState({
             crafting_type: null,
             show_exploration: false,
-            show_join_pvp: false,
-            show_duel_fight: false,
             show_celestial_fight: false,
             show_twisted_earth_section: false,
             show_hell_forged_section: !this.state.show_hell_forged_section,
@@ -257,8 +201,6 @@ export default class Actions extends React.Component<
         this.setState({
             crafting_type: null,
             show_exploration: false,
-            show_join_pvp: false,
-            show_duel_fight: false,
             show_celestial_fight: false,
             show_twisted_earth_section: false,
             show_purgatory_chains_section:
@@ -270,23 +212,9 @@ export default class Actions extends React.Component<
         this.setState({
             crafting_type: null,
             show_exploration: false,
-            show_join_pvp: false,
-            show_duel_fight: false,
             show_celestial_fight: false,
             show_purgatory_chains_section: false,
             show_twisted_earth_section: !this.state.show_twisted_earth_section,
-        });
-    }
-
-    manageDuel() {
-        this.setState({
-            show_duel_fight: !this.state.show_duel_fight,
-        });
-    }
-
-    manageJoinPvp() {
-        this.setState({
-            show_join_pvp: !this.state.show_join_pvp,
         });
     }
 
@@ -342,8 +270,6 @@ export default class Actions extends React.Component<
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="md:col-span-1 space-y-4">
                         {!this.state.show_exploration &&
-                            !this.state.show_duel_fight &&
-                            !this.state.show_join_pvp &&
                             !this.state.show_celestial_fight &&
                             this.props.character !== null && (
                                 <div className="w-full">
@@ -358,20 +284,16 @@ export default class Actions extends React.Component<
                                 </div>
                             )}
 
-                        {!this.state.show_duel_fight &&
-                            !this.state.show_join_pvp &&
-                            !this.state.show_celestial_fight && (
-                                <div className="w-full">
-                                    <SuccessOutlineButton
-                                        button_label={"Exploration"}
-                                        on_click={this.manageExploration.bind(
-                                            this,
-                                        )}
-                                        additional_css={"w-full"}
-                                        disabled={this.props.character.is_dead}
-                                    />
-                                </div>
-                            )}
+                        {!this.state.show_celestial_fight && (
+                            <div className="w-full">
+                                <SuccessOutlineButton
+                                    button_label={"Exploration"}
+                                    on_click={this.manageExploration.bind(this)}
+                                    additional_css={"w-full"}
+                                    disabled={this.props.character.is_dead}
+                                />
+                            </div>
+                        )}
 
                         {this.props.character.can_access_hell_forged && (
                             <div className="w-full">
@@ -423,8 +345,6 @@ export default class Actions extends React.Component<
 
                         {this.props.celestial_id !== 0 &&
                             !this.state.show_exploration &&
-                            !this.state.show_duel_fight &&
-                            !this.state.show_join_pvp &&
                             this.props.can_engage_celestial && (
                                 <div className="w-full">
                                     <SuccessOutlineButton
@@ -442,44 +362,9 @@ export default class Actions extends React.Component<
                                     />
                                 </div>
                             )}
-
-                        {this.state.characters_for_dueling.length > 0 &&
-                            !this.state.show_exploration &&
-                            !this.state.show_join_pvp &&
-                            !this.state.show_celestial_fight && (
-                                <div className="w-full">
-                                    <SuccessOutlineButton
-                                        button_label={"Duel!"}
-                                        on_click={this.manageDuel.bind(this)}
-                                        additional_css={"w-full"}
-                                        disabled={
-                                            this.props.character.is_dead ||
-                                            this.props.character
-                                                .is_automation_running ||
-                                            this.props.character.killed_in_pvp
-                                        }
-                                    />
-                                </div>
-                            )}
-
-                        {this.props.character.can_register_for_pvp &&
-                            !this.state.show_duel_fight &&
-                            !this.state.show_exploration &&
-                            !this.state.show_celestial_fight && (
-                                <div className="w-full">
-                                    <SkyOutlineButton
-                                        button_label={"Join PVP"}
-                                        on_click={this.manageJoinPvp.bind(this)}
-                                        additional_css={"w-full"}
-                                        disabled={this.props.character.is_dead}
-                                    />
-                                </div>
-                            )}
                     </div>
                     <div className="md:col-span-3 mt-4">
                         {!this.state.show_exploration &&
-                            !this.state.show_duel_fight &&
-                            !this.state.show_join_pvp &&
                             !this.state.show_celestial_fight &&
                             this.state.raid_monsters.length === 0 && (
                                 <MonsterActions
@@ -533,8 +418,6 @@ export default class Actions extends React.Component<
                             )}
 
                         {!this.state.show_exploration &&
-                            !this.state.show_duel_fight &&
-                            !this.state.show_join_pvp &&
                             !this.state.show_celestial_fight &&
                             this.state.raid_monsters.length > 0 && (
                                 <RaidSection
@@ -590,17 +473,6 @@ export default class Actions extends React.Component<
                                 </RaidSection>
                             )}
 
-                        {this.state.show_duel_fight && (
-                            <DuelPlayer
-                                characters={this.state.characters_for_dueling}
-                                duel_data={this.state.duel_fight_info}
-                                character={this.props.character}
-                                manage_pvp={this.manageDuel.bind(this)}
-                                reset_duel_data={this.resetDuelData.bind(this)}
-                                is_small={false}
-                            />
-                        )}
-
                         {this.state.show_exploration && (
                             <ExplorationSection
                                 character={this.props.character}
@@ -619,13 +491,6 @@ export default class Actions extends React.Component<
                                 )}
                                 celestial_id={this.props.celestial_id}
                                 update_celestial={this.props.update_celestial}
-                            />
-                        )}
-
-                        {this.state.show_join_pvp && (
-                            <JoinPvp
-                                manage_section={this.manageJoinPvp.bind(this)}
-                                character_id={this.props.character.id}
                             />
                         )}
 

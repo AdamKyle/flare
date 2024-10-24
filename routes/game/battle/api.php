@@ -15,11 +15,6 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:150,2
             Route::post('/conjure/{character}', ['uses' => 'Api\CelestialBattleController@conjure']);
             Route::post('/attack-celestial/{character}/{celestialFight}', ['uses' => 'Api\CelestialBattleController@attack']);
 
-            Route::get('/attack-player/get-health/{character}', ['uses' => 'Api\PvpBattleController@getHealth']);
-            Route::post('/attack-player/{character}', ['uses' => 'Api\PvpBattleController@fightCharacter']);
-
-            Route::post('/join-monthly-pvp/{character}', ['uses' => 'Api\MonthlyPvpParticipantsController@join']);
-
             Route::get('/raid-fight-participation/{character}/{monster}', ['uses' => 'Api\RaidBattleController@fetchRaidMonster']);
             Route::post('/raid-fight/{character}/{monster}', ['uses' => 'Api\RaidBattleController@fightMonster']);
 
@@ -29,8 +24,6 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:150,2
         Route::get('/celestial-beings/{character}', ['uses' => 'Api\CelestialBattleController@celestialMonsters']);
 
         Route::post('/celestial-revive/{character}', ['uses' => 'Api\CelestialBattleController@revive']);
-
-        Route::post('/pvp/revive/{character}', ['uses' => 'Api\PvpBattleController@revive']);
     });
 
     Route::middleware(['throttle:fighting', 'is.globally.timed.out', 'is.character.exploring'])->group(function () {

@@ -89,30 +89,26 @@ class SpecialAttacks extends BattleMessages
      *
      * @throws Exception
      */
-    public function doWeaponSpecials(Character $character, array $attackData, bool $isPvp = false)
+    public function doWeaponSpecials(Character $character, array $attackData)
     {
         if ($character->classType()->isBlacksmith()) {
-            return $this->hammerSmash($character, $attackData, $isPvp);
+            return $this->hammerSmash($character, $attackData);
         }
 
         if ($character->classType()->isArcaneAlchemist()) {
-            return $this->alchemistsRavenousRage($character, $attackData, $isPvp);
+            return $this->alchemistsRavenousRage($character, $attackData);
         }
 
         if ($character->classType()->isRanger()) {
-            return $this->tripleAttack($character, $attackData, $isPvp);
+            return $this->tripleAttack($character, $attackData);
         }
 
         if ($character->classType()->isFighter()) {
-            return $this->doubleDamage($character, $attackData, $isPvp);
+            return $this->doubleDamage($character, $attackData);
         }
 
         if ($character->classType()->isVampire()) {
-            return $this->vampireThirst($character, $attackData, $isPvp);
-        }
-
-        if ($character->classType()->isThief()) {
-            return $this->thiefBackStab($character, $attackData);
+            return $this->vampireThirst($character, $attackData);
         }
 
         if ($character->classType()->isPrisoner()) {
@@ -128,23 +124,23 @@ class SpecialAttacks extends BattleMessages
         }
 
         if ($character->classType()->isVampire()) {
-            return $this->vampireThirst($character, $attackData, $isPvp);
+            return $this->vampireThirst($character, $attackData);
         }
 
         if ($character->classType()->isGunslinger()) {
-            return $this->gunslingersAssassination($character, $attackData, $isPvp);
+            return $this->gunslingersAssassination($character, $attackData);
         }
 
         if ($character->classType()->isDancer()) {
-            return $this->sensualDance($character, $attackData, $isPvp);
+            return $this->sensualDance($character, $attackData);
         }
 
         if ($character->classType()->isBookBinder()) {
-            return $this->bookBindersFear($character, $attackData, $isPvp);
+            return $this->bookBindersFear($character, $attackData);
         }
 
         if ($character->classType()->isCleric()) {
-            return $this->holySmite($character, $attackData, $isPvp);
+            return $this->holySmite($character, $attackData);
         }
 
         return null;
@@ -157,10 +153,10 @@ class SpecialAttacks extends BattleMessages
      *
      * @throws Exception
      */
-    public function doCastDamageSpecials(Character $character, array $attackData, bool $isPvp = false)
+    public function doCastDamageSpecials(Character $character, array $attackData)
     {
         if ($character->classType()->isHeretic()) {
-            $this->doubleCast($character, $attackData, $isPvp);
+            $this->doubleCast($character, $attackData);
         }
     }
 
@@ -169,36 +165,13 @@ class SpecialAttacks extends BattleMessages
      *
      * @throws Exception
      */
-    public function doCastHealSpecials(Character $character, array $attackData, bool $isPvp = false): SpecialAttacks
+    public function doCastHealSpecials(Character $character, array $attackData): SpecialAttacks
     {
         if ($character->classType()->isProphet()) {
-            $this->healFor += $this->doubleHeal($character, $attackData, $isPvp);
+            $this->healFor += $this->doubleHeal($character, $attackData);
         }
 
         return $this;
-    }
-
-    /**
-     * This attack can only be fired during pvp.
-     *
-     * This replaces the thieves shadow dance special for pvp.
-     *
-     * @return void
-     */
-    public function thiefBackStab(Character $character, array $attackData)
-    {
-        $thievesBackStab = resolve(ThiefBackStab::class);
-
-        $thievesBackStab->setCharacterHealth($this->characterHealth);
-        $thievesBackStab->setMonsterHealth($this->monsterHealth);
-        $thievesBackStab->backstab($character, $attackData);
-
-        $this->mergeMessages($thievesBackStab->getMessages());
-
-        $this->characterHealth = $thievesBackStab->getCharacterHealth();
-        $this->monsterHealth = $thievesBackStab->getMonsterHealth();
-
-        $thievesBackStab->clearMessages();
     }
 
     /**
@@ -206,20 +179,15 @@ class SpecialAttacks extends BattleMessages
      *
      * @return void
      */
-    public function hammerSmash(Character $character, array $attackData, bool $isPvp = false)
+    public function hammerSmash(Character $character, array $attackData)
     {
         $hammerSmash = resolve(HammerSmash::class);
 
         $hammerSmash->setCharacterHealth($this->characterHealth);
         $hammerSmash->setMonsterHealth($this->monsterHealth);
-        $hammerSmash->handleHammerSmash($character, $attackData, $isPvp);
+        $hammerSmash->handleHammerSmash($character, $attackData);
 
-        if (! $isPvp) {
-            $this->mergeMessages($hammerSmash->getMessages());
-        } else {
-            $this->mergeAttackerMessages($hammerSmash->getAttackerMessages());
-            $this->mergeDefenderMessages($hammerSmash->getDefenderMessages());
-        }
+        $this->mergeMessages($hammerSmash->getMessages());
 
         $this->characterHealth = $hammerSmash->getCharacterHealth();
         $this->monsterHealth = $hammerSmash->getMonsterHealth();
@@ -232,20 +200,15 @@ class SpecialAttacks extends BattleMessages
      *
      * @return void
      */
-    public function alchemistsRavenousRage(Character $character, array $attackData, bool $isPvp = false)
+    public function alchemistsRavenousRage(Character $character, array $attackData)
     {
         $alchemistsRavenousDream = resolve(AlchemistsRavenousDream::class);
 
         $alchemistsRavenousDream->setCharacterHealth($this->characterHealth);
         $alchemistsRavenousDream->setMonsterHealth($this->monsterHealth);
-        $alchemistsRavenousDream->handleAttack($character, $attackData, $isPvp);
+        $alchemistsRavenousDream->handleAttack($character, $attackData);
 
-        if (! $isPvp) {
-            $this->mergeMessages($alchemistsRavenousDream->getMessages());
-        } else {
-            $this->mergeAttackerMessages($alchemistsRavenousDream->getAttackerMessages());
-            $this->mergeDefenderMessages($alchemistsRavenousDream->getDefenderMessages());
-        }
+        $this->mergeMessages($alchemistsRavenousDream->getMessages());
 
         $this->characterHealth = $alchemistsRavenousDream->getCharacterHealth();
         $this->monsterHealth = $alchemistsRavenousDream->getMonsterHealth();
@@ -258,20 +221,15 @@ class SpecialAttacks extends BattleMessages
      *
      * @return void
      */
-    public function tripleAttack(Character $character, array $attackData, $isPvp = false)
+    public function tripleAttack(Character $character, array $attackData)
     {
         $tripleAttack = resolve(TripleAttack::class);
 
         $tripleAttack->setCharacterHealth($this->characterHealth);
         $tripleAttack->setMonsterHealth($this->monsterHealth);
-        $tripleAttack->handleAttack($character, $attackData, $isPvp);
+        $tripleAttack->handleAttack($character, $attackData);
 
-        if (! $isPvp) {
-            $this->mergeMessages($tripleAttack->getMessages());
-        } else {
-            $this->mergeAttackerMessages($tripleAttack->getAttackerMessages());
-            $this->mergeDefenderMessages($tripleAttack->getDefenderMessages());
-        }
+        $this->mergeMessages($tripleAttack->getMessages());
 
         $this->characterHealth = $tripleAttack->getCharacterHealth();
         $this->monsterHealth = $tripleAttack->getMonsterHealth();
@@ -284,20 +242,15 @@ class SpecialAttacks extends BattleMessages
      *
      * @return void
      */
-    public function doubleDamage(Character $character, array $attackData, bool $isPvp = false)
+    public function doubleDamage(Character $character, array $attackData)
     {
         $doubleAttack = resolve(DoubleAttack::class);
 
         $doubleAttack->setCharacterHealth($this->characterHealth);
         $doubleAttack->setMonsterHealth($this->monsterHealth);
-        $doubleAttack->handleAttack($character, $attackData, $isPvp);
+        $doubleAttack->handleAttack($character, $attackData);
 
-        if (! $isPvp) {
-            $this->mergeMessages($doubleAttack->getMessages());
-        } else {
-            $this->mergeAttackerMessages($doubleAttack->getAttackerMessages());
-            $this->mergeDefenderMessages($doubleAttack->getDefenderMessages());
-        }
+        $this->mergeMessages($doubleAttack->getMessages());
 
         $this->characterHealth = $doubleAttack->getCharacterHealth();
         $this->monsterHealth = $doubleAttack->getMonsterHealth();
@@ -310,20 +263,15 @@ class SpecialAttacks extends BattleMessages
      *
      * @return void
      */
-    public function doubleCast(Character $character, array $attackData, bool $isPvp = false)
+    public function doubleCast(Character $character, array $attackData)
     {
         $doubleCast = resolve(DoubleCast::class);
 
         $doubleCast->setCharacterHealth($this->characterHealth);
         $doubleCast->setMonsterHealth($this->monsterHealth);
-        $doubleCast->handleAttack($character, $attackData, $isPvp);
+        $doubleCast->handleAttack($character, $attackData);
 
-        if (! $isPvp) {
-            $this->mergeMessages($doubleCast->getMessages());
-        } else {
-            $this->mergeAttackerMessages($doubleCast->getAttackerMessages());
-            $this->mergeDefenderMessages($doubleCast->getDefenderMessages());
-        }
+        $this->mergeMessages($doubleCast->getMessages());
 
         $this->characterHealth = $doubleCast->getCharacterHealth();
         $this->monsterHealth = $doubleCast->getMonsterHealth();
@@ -334,20 +282,16 @@ class SpecialAttacks extends BattleMessages
     /**
      * Double heal.
      *
-     * @return void
+     * @return int
      */
-    public function doubleHeal(Character $character, array $attackData, bool $isPvp = false): int
+    public function doubleHeal(Character $character, array $attackData): int
     {
         $doubleCast = resolve(DoubleHeal::class);
 
         $doubleCast->setCharacterHealth($this->characterHealth);
-        $healForAmount = $doubleCast->handleHeal($character, $attackData, $isPvp);
+        $healForAmount = $doubleCast->handleHeal($character, $attackData);
 
-        if (! $isPvp) {
-            $this->mergeMessages($doubleCast->getMessages());
-        } else {
-            $this->mergeAttackerMessages($doubleCast->getAttackerMessages());
-        }
+        $this->mergeMessages($doubleCast->getMessages());
 
         $doubleCast->clearMessages();
 
@@ -359,13 +303,13 @@ class SpecialAttacks extends BattleMessages
      *
      * @return void
      */
-    public function vampireThirst(Character $character, array $attackData, bool $isPvp = false)
+    public function vampireThirst(Character $character, array $attackData)
     {
         $thirst = resolve(VampireThirst::class);
 
         $thirst->setCharacterHealth($this->characterHealth);
         $thirst->setMonsterHealth($this->monsterHealth);
-        $thirst->handleAttack($character, $attackData, $isPvp);
+        $thirst->handleAttack($character, $attackData);
 
         $this->mergeMessages($thirst->getMessages());
 
@@ -380,13 +324,13 @@ class SpecialAttacks extends BattleMessages
      *
      * @return void
      */
-    public function prisonersRage(Character $character, array $attackData, bool $isPvp = false)
+    public function prisonersRage(Character $character, array $attackData)
     {
         $prisonersRage = resolve(PrisonerRage::class);
 
         $prisonersRage->setCharacterHealth($this->characterHealth);
         $prisonersRage->setMonsterHealth($this->monsterHealth);
-        $prisonersRage->handleAttack($character, $attackData, $isPvp);
+        $prisonersRage->handleAttack($character, $attackData);
 
         $this->mergeMessages($prisonersRage->getMessages());
 
@@ -401,13 +345,13 @@ class SpecialAttacks extends BattleMessages
      *
      * @return void
      */
-    public function alcoholicsBloodyVomit(Character $character, array $attackData, bool $isPvp = false)
+    public function alcoholicsBloodyVomit(Character $character, array $attackData)
     {
         $alcoholicsBloodyVomit = resolve(BloodyPuke::class);
 
         $alcoholicsBloodyVomit->setCharacterHealth($this->characterHealth);
         $alcoholicsBloodyVomit->setMonsterHealth($this->monsterHealth);
-        $alcoholicsBloodyVomit->handleAttack($character, $attackData, $isPvp);
+        $alcoholicsBloodyVomit->handleAttack($character, $attackData);
 
         $this->mergeMessages($alcoholicsBloodyVomit->getMessages());
 
@@ -422,13 +366,13 @@ class SpecialAttacks extends BattleMessages
      *
      * @return void
      */
-    public function merchantsSupply(Character $character, array $attackData, bool $isPvp = false)
+    public function merchantsSupply(Character $character, array $attackData)
     {
         $merchantsSupply = resolve(MerchantSupply::class);
 
         $merchantsSupply->setCharacterHealth($this->characterHealth);
         $merchantsSupply->setMonsterHealth($this->monsterHealth);
-        $merchantsSupply->handleAttack($character, $attackData, $isPvp);
+        $merchantsSupply->handleAttack($character, $attackData);
 
         $this->mergeMessages($merchantsSupply->getMessages());
 
@@ -443,13 +387,13 @@ class SpecialAttacks extends BattleMessages
      *
      * @return void
      */
-    public function gunslingersAssassination(Character $character, array $attackData, bool $isPvp = false)
+    public function gunslingersAssassination(Character $character, array $attackData)
     {
         $gunslingersAssassination = resolve(GunslingersAssassination::class);
 
         $gunslingersAssassination->setCharacterHealth($this->characterHealth);
         $gunslingersAssassination->setMonsterHealth($this->monsterHealth);
-        $gunslingersAssassination->handleAttack($character, $attackData, $isPvp);
+        $gunslingersAssassination->handleAttack($character, $attackData);
 
         $this->mergeMessages($gunslingersAssassination->getMessages());
 
@@ -464,13 +408,13 @@ class SpecialAttacks extends BattleMessages
      *
      * @return void
      */
-    public function sensualDance(Character $character, array $attackData, bool $isPvp = false)
+    public function sensualDance(Character $character, array $attackData)
     {
         $sensualDance = resolve(SensualDance::class);
 
         $sensualDance->setCharacterHealth($this->characterHealth);
         $sensualDance->setMonsterHealth($this->monsterHealth);
-        $sensualDance->handleAttack($character, $attackData, $isPvp);
+        $sensualDance->handleAttack($character, $attackData);
 
         $this->mergeMessages($sensualDance->getMessages());
 
@@ -485,13 +429,13 @@ class SpecialAttacks extends BattleMessages
      *
      * @return void
      */
-    public function bookBindersFear(Character $character, array $attackData, bool $isPvp = false)
+    public function bookBindersFear(Character $character, array $attackData)
     {
         $bookBindersFear = resolve(BookBindersFear::class);
 
         $bookBindersFear->setCharacterHealth($this->characterHealth);
         $bookBindersFear->setMonsterHealth($this->monsterHealth);
-        $bookBindersFear->handleAttack($character, $attackData, $isPvp);
+        $bookBindersFear->handleAttack($character, $attackData);
 
         $this->mergeMessages($bookBindersFear->getMessages());
 
@@ -506,13 +450,13 @@ class SpecialAttacks extends BattleMessages
      *
      * @return void
      */
-    public function holySmite(Character $character, array $attackData, bool $isPvp = false)
+    public function holySmite(Character $character, array $attackData)
     {
         $holySmite = resolve(HolySmite::class);
 
         $holySmite->setCharacterHealth($this->characterHealth);
         $holySmite->setMonsterHealth($this->monsterHealth);
-        $holySmite->handleAttack($character, $attackData, $isPvp);
+        $holySmite->handleAttack($character, $attackData);
 
         $this->mergeMessages($holySmite->getMessages());
 

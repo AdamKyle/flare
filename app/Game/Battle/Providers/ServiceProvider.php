@@ -6,7 +6,6 @@ use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\ServerFight\MonsterPlayerFight;
-use App\Flare\ServerFight\Pvp\PvpAttack;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Game\Battle\Console\Commands\ClearCelestials;
 use App\Game\Battle\Handlers\BattleEventHandler;
@@ -14,9 +13,6 @@ use App\Game\Battle\Services\BattleDrop;
 use App\Game\Battle\Services\CelestialFightService;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Battle\Services\FactionLoyaltyFightService;
-use App\Game\Battle\Services\MonthlyPvpFightService;
-use App\Game\Battle\Services\MonthlyPvpService;
-use App\Game\Battle\Services\PvpService;
 use App\Game\Battle\Services\RaidBattleService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
@@ -62,27 +58,6 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(MonsterPlayerFight::class),
                 $app->make(MapTileValue::class),
             );
-        });
-
-        $this->app->bind(PvpService::class, function ($app) {
-            return new PvpService(
-                $app->make(PvpAttack::class),
-                $app->make(BattleEventHandler::class),
-                $app->make(MapTileValue::class),
-                $app->make(BuildMythicItem::class)
-            );
-        });
-
-        $this->app->bind(MonthlyPvpFightService::class, function ($app) {
-            return new MonthlyPvpFightService(
-                $app->make(PvpService::class),
-                $app->make(ConjureService::class),
-                $app->make(BuildMythicItem::class)
-            );
-        });
-
-        $this->app->bind(MonthlyPvpService::class, function ($app) {
-            return new MonthlyPvpService;
         });
 
         $this->app->bind(RaidBattleService::class, function ($app) {

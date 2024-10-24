@@ -163,14 +163,6 @@ class EndScheduledEvent extends Command
                 event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
             }
 
-            if ($eventType->isMonthlyPVP()) {
-                $event->update([
-                    'currently_running' => false,
-                ]);
-
-                event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
-            }
-
             if ($eventType->isWinterEvent()) {
                 $this->endWinterEvent($kingdomEventService, $traverseService, $explorationAutomationService, $factionLoyaltyService, $currentEvent);
 

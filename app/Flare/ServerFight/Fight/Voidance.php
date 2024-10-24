@@ -32,53 +32,6 @@ class Voidance extends BattleMessages
         }
     }
 
-    public function pvpVoid(Character $attacker, Character $defender, CharacterCacheData $characterCacheData)
-    {
-        $isAttackerDevoided = false;
-        $isDefenderVoided = false;
-        $isDefenderDevoided = false;
-
-        $attackerDevouringDarkness = $characterCacheData->getCachedCharacterData($attacker, 'devouring_darkness');
-        $attackerDevouringLight = $characterCacheData->getCachedCharacterData($attacker, 'devouring_light');
-        $attackerDarknessResistance = $characterCacheData->getCachedCharacterData($attacker, 'devouring_darkness_res');
-        $attackerLightResistance = $characterCacheData->getCachedCharacterData($attacker, 'devouring_light_res');
-
-        $defenderDevouringDarkness = $characterCacheData->getCachedCharacterData($defender, 'devouring_darkness');
-        $defenderDevouringLight = $characterCacheData->getCachedCharacterData($defender, 'devouring_light');
-        $defenderDarknessResistance = $characterCacheData->getCachedCharacterData($defender, 'devouring_darkness_res');
-        $defenderLightResistance = $characterCacheData->getCachedCharacterData($defender, 'devouring_light_res');
-
-        if ($this->canPlayerDeVoidEnemy($attackerDevouringDarkness, $defenderDarknessResistance)) {
-            $this->addAttackerMessage('Darkness creeps over your enemy, their voidance is useless.', 'player-action');
-            $this->addDefenderMessage($attacker->name.' has managed to devoid you! Your feel much weaker!', 'enemy-action');
-
-            $isDefenderDevoided = true;
-        }
-
-        if ($this->canPlayerDeVoidEnemy($defenderDevouringDarkness, $attackerDarknessResistance) && ! $isDefenderDevoided) {
-            $this->addAttackerMessage($defender->name.' has managed to devoid you! Your feel much weaker!', 'enemy-action');
-            $this->addDefenderMessage('Darkness creeps over your enemy, their voidance is useless.', 'player-action');
-
-            $isAttackerDevoided = true;
-        }
-
-        if ($this->canPlayerVoidEnemy($attackerDevouringLight, $defenderLightResistance) && ! $isAttackerDevoided) {
-            $this->addAttackerMessage('You managed to void the enemy! They are weak and pathetic in front of you!', 'player-action');
-            $this->addDefenderMessage($attacker->name.' has managed to void you! Your feel much weaker!', 'enemy-action');
-
-            $isDefenderVoided = true;
-
-            $this->enemyIsVoided = true;
-        }
-
-        if ($this->canPlayerVoidEnemy($defenderDevouringLight, $attackerLightResistance) && ! $isDefenderVoided && ! $isDefenderDevoided) {
-            $this->addAttackerMessage($defender->name.' has managed to void you! Your feel much weaker!', 'enemy-action');
-            $this->addDefenderMessage('You managed to devoid the enemy! They are weak and pathetic in front of you!', 'player-action');
-
-            $this->characterIsVoided = true;
-        }
-    }
-
     public function isPlayerVoided(): bool
     {
         return $this->characterIsVoided;
@@ -102,7 +55,7 @@ class Voidance extends BattleMessages
         }
 
         if ($monster->canMonsterDevoidPlayer($characterCacheData->getCachedCharacterData($character, 'devouring_darkness_res')) && ! $monsterDevoided) {
-            $this->addMessage($monster->getName().' has devoided your voidance! You feel fear start to build.', 'enemy-action');
+            $this->addMessage($monster->getName() . ' has devoided your voidance! You feel fear start to build.', 'enemy-action');
 
             $playerDevoided = true;
         }
@@ -116,7 +69,7 @@ class Voidance extends BattleMessages
         }
 
         if ($monster->canMonsterVoidPlayer($characterCacheData->getCachedCharacterData($character, 'devouring_light_res')) && (! $monsterVoided || ! $monsterDevoided)) {
-            $this->addMessage($monster->getName().' has voided your enchantments! You feel much weaker!', 'enemy-action');
+            $this->addMessage($monster->getName() . ' has voided your enchantments! You feel much weaker!', 'enemy-action');
 
             $this->characterIsVoided = true;
         }
@@ -128,7 +81,7 @@ class Voidance extends BattleMessages
         $playerDevoided = false;
 
         if ($monster->canMonsterDevoidPlayer($characterCacheData->getCachedCharacterData($character, 'devouring_darkness_res'))) {
-            $this->addMessage($monster->getName().' has devoided your voidance! You feel fear start to build.', 'enemy-action');
+            $this->addMessage($monster->getName() . ' has devoided your voidance! You feel fear start to build.', 'enemy-action');
 
             $playerDevoided = true;
         }
@@ -140,7 +93,7 @@ class Voidance extends BattleMessages
         }
 
         if ($monster->canMonsterVoidPlayer($characterCacheData->getCachedCharacterData($character, 'devouring_light_res')) && ! $monsterDevoided) {
-            $this->addMessage($monster->getName().' has voided your enchantments! You feel much weaker!', 'enemy-action');
+            $this->addMessage($monster->getName() . ' has voided your enchantments! You feel much weaker!', 'enemy-action');
 
             $this->characterIsVoided = true;
         }

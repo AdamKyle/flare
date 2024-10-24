@@ -19,7 +19,6 @@ class EventTypeTest extends TestCase
     {
         $expected = [
             EventType::WEEKLY_CELESTIALS => 'Weekly Celestials',
-            EventType::MONTHLY_PVP => 'Monthly PVP',
             EventType::WEEKLY_CURRENCY_DROPS => 'Weekly Currency Drops',
             EventType::RAID_EVENT => 'Raid Event',
             EventType::WINTER_EVENT => 'Winter Event',
@@ -38,11 +37,6 @@ class EventTypeTest extends TestCase
     public function testIsWeeklyCelestials()
     {
         $this->assertTrue((new EventType(EventType::WEEKLY_CELESTIALS))->isWeeklyCelestials());
-    }
-
-    public function testIsMonthlyPVP()
-    {
-        $this->assertTrue((new EventType(EventType::MONTHLY_PVP))->isMonthlyPVP());
     }
 
     public function testIsWeeklyCurrencies()

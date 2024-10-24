@@ -2,9 +2,7 @@
 
 namespace App\Flare\ServerFight;
 
-use App\Flare\ServerFight\Pvp\PvpMessages;
-
-class BattleMessages extends PvpMessages
+class BattleMessages
 {
     private array $battleMessages;
 
@@ -13,14 +11,8 @@ class BattleMessages extends PvpMessages
         $this->battleMessages = [];
     }
 
-    public function addMessage(string $message, string $type, bool $addToAttackerPvp = false)
+    public function addMessage(string $message, string $type)
     {
-
-        if ($addToAttackerPvp) {
-            $this->addAttackerMessage($message, $type);
-
-            return;
-        }
 
         $this->battleMessages[] = [
             'message' => $message,
@@ -41,7 +33,5 @@ class BattleMessages extends PvpMessages
     public function clearMessages()
     {
         $this->battleMessages = [];
-
-        $this->clearPvpMessage();
     }
 }

@@ -15,7 +15,6 @@ use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Core\Traits\KingdomCache;
-use App\Game\Maps\Events\UpdateDuelAtPosition;
 use App\Game\Maps\Events\UpdateLocationBasedCraftingOptions;
 use App\Game\Maps\Events\UpdateLocationBasedEventGoals;
 use App\Game\Maps\Events\UpdateLocationBasedSpecialShops;
@@ -101,9 +100,6 @@ class LocationService
         // In case automation is running, this way the timer updates.
         event(new UpdateCharacterStatus($character));
 
-        // Update duel positions.
-        event(new UpdateDuelAtPosition($character->user));
-
         // Update location based crafting options:
         event(new UpdateLocationBasedCraftingOptions($character->user));
 
@@ -113,12 +109,10 @@ class LocationService
         // Update location based event goals
         event(new UpdateLocationBasedEventGoals($character->user));
 
-        // Remove character from pvp cache
-        $this->characterCacheData->removeFromPvpCache($character);
-
         // Update monsters for a possible raid at a possible location
         $this->updateMonstersForRaid($character, $this->location);
 
+        // Update monsters for a specific location type
         $this->updateMonsterForLocationType($character, $this->location);
     }
 

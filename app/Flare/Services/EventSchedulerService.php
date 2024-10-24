@@ -164,7 +164,7 @@ class EventSchedulerService
         $eventData['start_date'] = $date;
 
         // If we are monthly pbp, then it always ends at 6pm regardless of when you set the start date.
-        $eventData['end_date'] = $eventType->isMonthlyPVP() ? $date->copy()->setHour(18) : $date->copy()->addDay();
+        $eventData['end_date'] = $date->copy()->addDay();
 
         $eventData['description'] = $this->eventDescriptionForEventType($eventType);
 
@@ -181,14 +181,8 @@ class EventSchedulerService
         }
 
         if ($type->isWeeklyCurrencyDrops()) {
-            return 'For the next 24 hours you just have to kill creatures for Gold Dust,'.
+            return 'For the next 24 hours you just have to kill creatures for Gold Dust,' .
                 'Shards and Copper Coins (provided you have the quest item) will drop at a rate of 1-50 per kill! How fun!';
-        }
-
-        if ($type->isMonthlyPVP()) {
-            return 'Once per month, the gates will open to the Colosseum and players can choose to participate in monthly pvp where players
-            Compete against each other and the last person standing wins a mythic! Afterwords the Celestial Kings will spawn and they even have a chance
-            to drop mythics! Players can enrol in PVP from the action section roughly 8 hours before the actual event.';
         }
 
         if ($type->isWeeklyFactionLoyaltyEvent()) {

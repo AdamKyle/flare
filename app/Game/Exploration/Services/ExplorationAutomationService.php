@@ -4,38 +4,24 @@ namespace App\Game\Exploration\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
-use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
 use App\Game\Exploration\Events\ExplorationStatus;
 use App\Game\Exploration\Events\ExplorationTimeOut;
 use App\Game\Exploration\Jobs\Exploration;
-use App\Game\Maps\Events\UpdateDuelAtPosition;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Support\Facades\Cache;
 
 class ExplorationAutomationService
 {
-    private MonsterPlayerFight $monsterPlayerFight;
-
-    private BattleEventHandler $battleEventHandler;
-
-    private CharacterCacheData $characterCacheData;
 
     private int $timeDelay = 0;
 
-    public function __construct(MonsterPlayerFight $monsterPlayerFight,
-        BattleEventHandler $battleEventHandler,
-        CharacterCacheData $characterCacheData)
-    {
-
-        $this->monsterPlayerFight = $monsterPlayerFight;
-        $this->battleEventHandler = $battleEventHandler;
-        $this->characterCacheData = $characterCacheData;
-    }
+    public function __construct(
+        private readonly CharacterCacheData $characterCacheData
+    ) {}
 
     public function beginAutomation(Character $character, array $params)
     {
@@ -56,11 +42,9 @@ class ExplorationAutomationService
 
         event(new UpdateCharacterStatus($character));
 
-        event(new ExplorationLogUpdate($character->user->id, 'The exploration will begin in '.$this->timeDelay.' minutes. Every '.$this->timeDelay.' minutes you will encounter the enemy up to a maximum of 50 times in a single "encounter"'));
+        event(new ExplorationLogUpdate($character->user->id, 'The exploration will begin in ' . $this->timeDelay . ' minutes. Every ' . $this->timeDelay . ' minutes you will encounter the enemy up to a maximum of 50 times in a single "encounter"'));
 
         event(new ExplorationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
-
-        event(new UpdateDuelAtPosition($character->refresh()->user));
 
         $this->startAutomation($character, $automation->id, $params['attack_type']);
     }
@@ -81,12 +65,11 @@ class ExplorationAutomationService
 
         $character = $character->refresh();
 
-        Cache::delete('can-character-survive-'.$character->id);
+        Cache::delete('can-character-survive-' . $character->id);
 
         event(new ExplorationTimeOut($character->user, 0));
         event(new ExplorationStatus($character->user, false));
         event(new UpdateCharacterStatus($character));
-
         event(new ExplorationLogUpdate($character->user->id, 'Exploration has been stopped at player request.'));
     }
 
