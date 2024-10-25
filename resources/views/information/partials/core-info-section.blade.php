@@ -36,9 +36,9 @@
                         </x-core.cards.card>
                     </div>
 
-                    <div>
+                    <div class="mb-4">
                         <img src="{{Storage::disk('info-sections-images')->url($section['content_image_path'])}}" class="rounded-sm p-1 bg-white border max-w-full md:max-w-[475px] cursor-pointer glightbox md:mt-[30px]" alt="image"/>
-                        <div class="relative top-[10px] text-gray-700 dark:text-white italic">
+                        <div class="relative top-[10px] text-gray-700 dark:text-white italic w-1/2">
                             Click/Tap me to make me larger.
                         </div>
                     </div>

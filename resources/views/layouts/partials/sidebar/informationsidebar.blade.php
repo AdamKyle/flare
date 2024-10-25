@@ -251,9 +251,15 @@
                 <span class="fas fa-people-carry"></span>
                 Kingdom Resource Requests
             </a>
+            <hr />
+            <h6>Capital Cities</h6>
             <a href="{{ route('info.page', ['pageName' => 'capital-cities']) }}">
                 <span class="fas fa-university"></span>
                 Capital Cities
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'managing-buildings-with-capital-cities']) }}">
+                <span class="fas fa-university"></span>
+                Manageing Buildings
             </a>
         </div>
     </div>
