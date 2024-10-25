@@ -259,7 +259,7 @@ export default class GoldBarManagement extends React.Component<
                     <TabPanel key={"deposit"}>
                         <InfoAlert>
                             <p>
-                                Cost to buy is 2 Billion Gold per Rune. You may
+                                Cost to buy is two billion gold per bar. You may
                                 have a total of 1000 Gold Bars per kingdom.
                                 Depositing Gold Bars will deposit across all
                                 your kingdoms on this plane.

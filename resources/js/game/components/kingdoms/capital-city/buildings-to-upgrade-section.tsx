@@ -145,7 +145,10 @@ export default class BuildingsToUpgradeSection extends React.Component<
                                 />
                             </>
                         }
-                        disabled={this.state.processing_request}
+                        disabled={
+                            this.state.processing_request ||
+                            this.state.filtered_building_data.length <= 0
+                        }
                     />
 
                     <DangerOutlineButton
@@ -181,9 +184,19 @@ export default class BuildingsToUpgradeSection extends React.Component<
                             this.buildingToUpgradeService,
                         )}
                         additional_css={"w-full"}
-                        disabled={this.state.processing_request}
+                        disabled={
+                            this.state.processing_request ||
+                            this.state.filtered_building_data.length <= 0
+                        }
                     />
                 </div>
+
+                {this.state.filtered_building_data.length <= 0 ? (
+                    <p>
+                        There is nothing to do here. Go settle somemore kingdoms
+                        child.
+                    </p>
+                ) : null}
 
                 {this.buildingToUpgradeService
                     .getPaginatedData()

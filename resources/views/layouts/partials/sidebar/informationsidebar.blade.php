@@ -255,11 +255,19 @@
             <h6>Capital Cities</h6>
             <a href="{{ route('info.page', ['pageName' => 'capital-cities']) }}">
                 <span class="fas fa-university"></span>
-                Capital Cities
+                What are Capital Cities
             </a>
             <a href="{{ route('info.page', ['pageName' => 'managing-buildings-with-capital-cities']) }}">
                 <span class="fas fa-university"></span>
                 Manageing Buildings
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'managing-units-through-capital-cities']) }}">
+                <span class="fas fa-university"></span>
+                Manageing Units
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'managing-gold-bars-through-capital-cities']) }}">
+                <span class="fas fa-university"></span>
+                Manageing Gold Bars
             </a>
         </div>
     </div>

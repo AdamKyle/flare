@@ -400,23 +400,34 @@ export default class UnitRecruitment extends React.Component<any, any> {
                     unit_queue={this.state.unit_queue}
                 />
 
-                <div className="my-4">
-                    <label
-                        htmlFor="global-bulk-recruitment"
-                        className="block text-gray-700 dark:text-gray-300 font-bold"
-                    >
-                        Global Bulk Recruitment for All Kingdoms:
-                    </label>
-                    <input
-                        type="number"
-                        id="global-bulk-recruitment"
-                        value={this.state.global_bulk_value}
-                        onChange={this.handleGlobalBulkAmountChang.bind(this)}
-                        className="w-full mt-2 px-4 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        aria-label="Global bulk recruitment for all kingdoms"
-                        disabled={this.state.processing_request}
-                    />
-                </div>
+                {this.state.filtered_unit_recruitment_data.length > 0 ? (
+                    <div className="my-4">
+                        <label
+                            htmlFor="global-bulk-recruitment"
+                            className="block text-gray-700 dark:text-gray-300 font-bold"
+                        >
+                            Global Bulk Recruitment for All Kingdoms:
+                        </label>
+                        <input
+                            type="number"
+                            id="global-bulk-recruitment"
+                            value={this.state.global_bulk_value}
+                            onChange={this.handleGlobalBulkAmountChang.bind(
+                                this,
+                            )}
+                            className="w-full mt-2 px-4 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            aria-label="Global bulk recruitment for all kingdoms"
+                            disabled={this.state.processing_request}
+                        />
+                    </div>
+                ) : null}
+
+                {this.state.filtered_unit_recruitment_data <= 0 ? (
+                    <p>
+                        There is nothing to do here. Go settle somemore kingdoms
+                        child.
+                    </p>
+                ) : null}
 
                 <div className="mb-4">
                     {this.getPaginatedData().map((kingdom: any) => (
