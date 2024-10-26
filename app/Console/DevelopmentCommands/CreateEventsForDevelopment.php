@@ -28,24 +28,46 @@ class CreateEventsForDevelopment extends Command
      */
     public function handle()
     {
+        $options = EventType::getOptionsForSelect();
+        $options['all'] = 'All Events';
 
-        foreach (EventType::getOptionsForSelect() as $eventType => $eventName) {
+        $selectedEvent = $this->choice(
+            'Which event do you want to create?',
+            array_values($options)
+        );
 
-            if ($eventType === EventType::RAID_EVENT) {
-                $raid = Raid::first();
+        if ($selectedEvent === 'All Events') {
+            $this->createAllEvents($options);
+        } else {
+            $eventType = array_search($selectedEvent, $options);
 
-                ScheduledEvent::create([
-                    'event_type' => $eventType,
-                    'raid_id' => $raid->id,
-                    'start_date' => now()->addMinutes(5),
-                    'end_date' => now()->addMinutes(10),
-                    'description' => $eventName,
-                    'currently_running' => false,
-                ]);
-
-                continue;
+            if ($eventType !== false) {
+                $this->createEvent($eventType, $selectedEvent);
+            } else {
+                $this->error('Invalid event type selected.');
             }
+        }
+    }
 
+    /**
+     * Create a specific event.
+     */
+    private function createEvent(string $eventType, string $eventName): void
+    {
+        if ($eventType === EventType::RAID_EVENT) {
+            $raid = Raid::first();
+
+            ScheduledEvent::create([
+                'event_type' => $eventType,
+                'raid_id' => $raid->id,
+                'start_date' => now()->addMinutes(5),
+                'end_date' => now()->addMinutes(10),
+                'description' => $eventName,
+                'currently_running' => false,
+            ]);
+
+            $this->info("Created RAID event: {$eventName}");
+        } else {
             ScheduledEvent::create([
                 'event_type' => $eventType,
                 'raid_id' => null,
@@ -54,6 +76,24 @@ class CreateEventsForDevelopment extends Command
                 'description' => $eventName,
                 'currently_running' => false,
             ]);
+
+            $this->info("Created event: {$eventName}");
         }
+    }
+
+    /**
+     * Create all available events.
+     */
+    private function createAllEvents(array $options): void
+    {
+        foreach ($options as $eventType => $eventName) {
+            if ($eventName === 'All Events') {
+                continue;
+            }
+
+            $this->createEvent($eventType, $eventName);
+        }
+
+        $this->info('All events have been created successfully.');
     }
 }
