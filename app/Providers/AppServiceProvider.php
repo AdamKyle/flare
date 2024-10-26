@@ -13,6 +13,7 @@ use App\Console\AfterDeployment\UpdateCharactersForClassRanks;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
 use App\Console\DevelopmentCommands\CompleteGuideQuestForCharacter;
 use App\Console\DevelopmentCommands\CreateCharacter;
+use App\Console\DevelopmentCommands\CreateEventsForDevelopment;
 use App\Console\DevelopmentCommands\CreateTestCharacters;
 use App\Console\DevelopmentCommands\GivePlayerAncenstorItem;
 use App\Console\DevelopmentCommands\GivePlayerMythicItem;
@@ -63,6 +64,7 @@ class AppServiceProvider extends ServiceProvider
             TestExploration::class,
             CompleteGuideQuestForCharacter::class,
             MaxOutCharactersPassiveSkills::class,
+            CreateEventsForDevelopment::class,
         ]);
     }
 
