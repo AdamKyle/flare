@@ -95,34 +95,6 @@ export default class SmallActionsManager {
     }
 
     /**
-     * Set the characters to duel
-     */
-    setDuelCharacters() {
-        const state = this.component.state;
-        const props = this.component.props;
-
-        if (typeof state.characters_for_dueling !== "undefined") {
-            const characters = state.characters_for_dueling.filter(
-                (character) => {
-                    return (
-                        character.character_position_x ===
-                            props.character_position?.x &&
-                        character.character_position_y ===
-                            props.character_position?.y &&
-                        character.game_map_id ===
-                            props.character_position?.game_map_id &&
-                        character.name !== props.character.name
-                    );
-                },
-            );
-
-            this.component.setState({
-                characters_for_dueling: characters,
-            });
-        }
-    }
-
-    /**
      * Build Selectable options.
      */
     buildOptions(): SelectedData[] {

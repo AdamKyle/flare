@@ -6,7 +6,6 @@ import MapTimer from "../../components/timers/map-timer";
 import { updateTimers } from "../../lib/ajax/update-timers";
 import SmallActionsManager from "../../lib/game/actions/small-actions-manager";
 import CelestialFight from "./components/celestial-fight";
-import DuelPlayer from "./components/duel-player";
 import Revive from "./components/fight-section/revive";
 import GamblingSection from "./components/gambling-section";
 import RaidSection from "./components/raid-section";

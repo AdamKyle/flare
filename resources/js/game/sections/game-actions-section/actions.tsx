@@ -9,7 +9,6 @@ import { updateTimers } from "../../lib/ajax/update-timers";
 import ActionsManager from "../../lib/game/actions/actions-manager";
 import { GameActionState } from "../../lib/game/types/game-state";
 import CelestialFight from "./components/celestial-fight";
-import DuelPlayer from "./components/duel-player";
 import ExplorationSection from "./components/exploration-section";
 import GamblingSection from "./components/gambling-section";
 import RaidSection from "./components/raid-section";
@@ -35,7 +34,6 @@ export default class Actions extends React.Component<
             attack_time_out: 0,
             crafting_time_out: 0,
             crafting_type: null,
-            duel_fight_info: null,
             loading: true,
             show_exploration: false,
             show_celestial_fight: false,
@@ -236,12 +234,6 @@ export default class Actions extends React.Component<
 
     removeCraftingType() {
         this.actionsManager.removeCraftingSection();
-    }
-
-    resetDuelData() {
-        this.setState({
-            duel_fight_info: null,
-        });
     }
 
     getTypeOfSpecialtyGear() {

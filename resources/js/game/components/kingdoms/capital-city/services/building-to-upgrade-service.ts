@@ -285,7 +285,7 @@ export default class BuildingToUpgradeService {
         });
     }
 
-    canToggleBuildingForQueue(kingdomId: number, buildingId: number): bool {
+    canToggleBuildingForQueue(kingdomId: number, buildingId: number): boolean {
         if (!this.component) {
             return false;
         }
