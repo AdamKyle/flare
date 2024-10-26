@@ -79,9 +79,6 @@ class CapitalCityBuildingRequestHandler
 
         $messages = $capitalCityBuildingQueue->messages ?? [];
 
-        dump('createUpgradeOrRepairRequest');
-        dump($messages, $buildingsToUpgradeOrRepair);
-
         $capitalCityBuildingQueue->update([
             'building_request_data' => $buildingsToUpgradeOrRepair,
             'messages' => array_merge($messages, $this->messages),
@@ -176,9 +173,6 @@ class CapitalCityBuildingRequestHandler
             CapitalCityQueueStatus::BUILDING,
             CapitalCityQueueStatus::REPAIRING
         ]))->values()->toArray();
-
-        dump('dispatchOrLogBuildingRequest');
-        dump($filteredRequestData);
 
         if (!empty($filteredRequestData)) {
 

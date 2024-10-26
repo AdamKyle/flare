@@ -140,8 +140,6 @@ export default class BuildingsInQueue extends React.Component<
                 .filter((kingdom: any) => kingdom !== null);
         }
 
-        console.log(filteredBuildingData);
-
         if (filteredBuildingData.length === 0) {
             filteredBuildingData = this.state.building_queues;
             openKingdomIds = new Set<number>();

@@ -91,9 +91,6 @@ class CapitalCityBuildingRequest implements ShouldQueue
             }
         }
 
-        dump('Finishing the upgrade:');
-        dump($buildingRequestData);
-
         $queueData->update([
             'building_request_data' => $buildingRequestData,
             'status' => CapitalCityQueueStatus::FINISHED

@@ -51,14 +51,7 @@ class CapitalCityProcessBuildingRequestHandler
         $kingdom = $capitalCityBuildingQueue->kingdom;
         $character = $capitalCityBuildingQueue->character;
 
-        dump('handleBuildingRequests');
-        dump($requestData);
-        dump($capitalCityBuildingQueue->messages);
-
         $requestData = $this->processBuildingRequests($kingdom, $requestData);
-
-        dump('After we process the rwquests');
-        dump($requestData);
 
         $summedMissingCosts = $this->calculateSummedMissingCosts($requestData);
 
