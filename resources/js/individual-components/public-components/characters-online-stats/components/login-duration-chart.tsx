@@ -86,7 +86,7 @@ export default class LoginDurationChart extends React.Component<
         ];
 
         return (
-            <ResizableBox height={550}>
+            <ResizableBox height={560} small_height={850}>
                 <div>
                     <DropDown
                         menu_items={this.dropDownOptions()}
@@ -95,7 +95,7 @@ export default class LoginDurationChart extends React.Component<
                     <InfoAlert additional_css="my-3">
                         <p>
                             <strong>Please note:</strong> This is an average of
-                            playrs login time in <strong>minutes</strong> over
+                            players login time in <strong>minutes</strong> over
                             the period of a day, a week, two weeks or a month
                             based on the drop down. This is not real time and
                             only counts those who did log in at one time and
@@ -108,7 +108,7 @@ export default class LoginDurationChart extends React.Component<
                             {this.state.error_message}
                         </DangerAlert>
                     ) : null}
-                    <ResizableBox height={350}>
+                    <ResizableBox height={350} small_height={550}>
                         <Chart
                             options={{
                                 data: dataForChart,

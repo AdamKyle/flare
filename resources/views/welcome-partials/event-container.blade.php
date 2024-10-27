@@ -22,36 +22,28 @@ function calculateGridCols(int $numItems) {
     </div>
 
     <div class="relative">
-        <!-- Background gradient with softening effect -->
         <div class="absolute inset-0 bg-gradient-to-br from-orange-500 via-red-500 to-pink-500 opacity-50 blur-lg pulse"></div>
 
-        <!-- Content container -->
         <div class="relative z-10 py-4">
-            @if(count($scheduledEventsRunning) === 1)
-                <div class="w-full md:w-2/5 mr-auto ml-auto">
-                   <div class="my-4">
-                       @include('./welcome-partials/event-card', [
-                           'eventRunning' => $scheduledEventsRunning[0]
-                       ])
-                   </div>
+            @if (count($scheduledEventsRunning) === 1)
+                <div class="w-full md:w-2/5 mx-auto">
+                    <div class="my-4 h-full">
+                        @include('./welcome-partials/event-card', ['eventRunning' => $scheduledEventsRunning[0]])
+                    </div>
                 </div>
             @elseif (count($scheduledEventsRunning) === 2)
-                <div class="w-full md:w-4/5 mr-auto ml-auto grid md:grid-cols-2 gap-2">
+                <div class="w-full md:w-4/5 mx-auto grid md:grid-cols-2 gap-2 items-stretch">
                     @foreach ($scheduledEventsRunning as $runningEvent)
-                        <div class="my-4">
-                            @include('./welcome-partials/event-card', [
-                                'eventRunning' => $runningEvent
-                            ])
+                        <div class="my-4 h-full">
+                            @include('./welcome-partials/event-card', ['eventRunning' => $runningEvent])
                         </div>
                     @endforeach
                 </div>
             @else
-                <div class="grid md:grid-cols-{{ calculateGridCols(count($scheduledEventsRunning)) }} gap-2">
+                <div class="grid md:grid-cols-{{ calculateGridCols(count($scheduledEventsRunning)) }} gap-2 items-stretch">
                     @foreach ($scheduledEventsRunning as $runningEvent)
-                        <div class="my-4">
-                            @include('./welcome-partials/event-card', [
-                                'eventRunning' => $runningEvent
-                            ])
+                        <div class="my-4 h-full">
+                            @include('./welcome-partials/event-card', ['eventRunning' => $runningEvent])
                         </div>
                     @endforeach
                 </div>

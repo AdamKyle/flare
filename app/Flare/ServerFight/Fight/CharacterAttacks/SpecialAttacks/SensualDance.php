@@ -7,7 +7,7 @@ use App\Flare\ServerFight\BattleBase;
 
 class SensualDance extends BattleBase
 {
-    public function handleAttack(Character $character, array $attackData, bool $isPvp = false)
+    public function handleAttack(Character $character, array $attackData)
     {
         $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 
@@ -26,10 +26,10 @@ class SensualDance extends BattleBase
         if ($extraActionData['amount'] > 1) {
             $damage = $weaponDamage * 0.30;
 
-            $this->addMessage('You dance around the enemy, enticing it with your body. The dance of love. The dance of death!', 'regular', $isPvp);
+            $this->addMessage('You dance around the enemy, enticing it with your body. The dance of love. The dance of death!', 'regular');
 
             if ($attackData['damage_deduction'] > 0.0) {
-                $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action', $isPvp);
+                $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
 
                 $damage = $damage - $damage * $attackData['damage_deduction'];
             }
@@ -43,10 +43,10 @@ class SensualDance extends BattleBase
 
         $damage = $weaponDamage * 0.15;
 
-        $this->addMessage('Your dance becomes more aggressive, the cuts on the enemy are small nicks of devastating wounds!', 'regular', $isPvp);
+        $this->addMessage('Your dance becomes more aggressive, the cuts on the enemy are small nicks of devastating wounds!', 'regular');
 
         if ($attackData['damage_deduction'] > 0.0) {
-            $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action', $isPvp);
+            $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
 
             $damage = $damage - $damage * $attackData['damage_deduction'];
         }
@@ -56,7 +56,7 @@ class SensualDance extends BattleBase
         }
     }
 
-    protected function doBaseAttack(Character $character, int $damage, bool $isPvp = false)
+    protected function doBaseAttack(Character $character, int $damage)
     {
         $this->monsterHealth -= $damage;
         $this->characterHealth += $damage;
@@ -67,10 +67,6 @@ class SensualDance extends BattleBase
             $this->characterHealth = $maxHealth;
         }
 
-        $this->addMessage('You hit for (Sensual Dance) '.number_format($damage), 'player-action', $isPvp);
-
-        if ($isPvp) {
-            $this->addDefenderMessage('The enemy entices you. Causes you to become weak at the knees from their dancing skills!'.number_format($damage), 'enemy-action');
-        }
+        $this->addMessage('You hit for (Sensual Dance) ' . number_format($damage), 'player-action');
     }
 }

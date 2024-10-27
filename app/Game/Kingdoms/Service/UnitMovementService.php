@@ -28,7 +28,8 @@ class UnitMovementService
 
     private UpdateKingdom $updateKingdom;
 
-    public function __construct(DistanceCalculation $distanceCalculation,
+    public function __construct(
+        DistanceCalculation $distanceCalculation,
         MoveUnitsValidator $moveUnitsValidator,
         UpdateKingdom $updateKingdom
     ) {
@@ -64,8 +65,12 @@ class UnitMovementService
                 continue;
             }
 
-            $pixelDistance = $this->distanceCalculation->calculatePixel($kingdom->x_position, $kingdom->y_position,
-                $playerKingdom->x_position, $playerKingdom->y_position);
+            $pixelDistance = $this->distanceCalculation->calculatePixel(
+                $kingdom->x_position,
+                $kingdom->y_position,
+                $playerKingdom->x_position,
+                $playerKingdom->y_position
+            );
 
             $timeToKingdom = $this->distanceCalculation->calculateMinutes($pixelDistance);
 
@@ -107,7 +112,7 @@ class UnitMovementService
 
         $this->updateKingdom->updateKingdomAllKingdoms($character->refresh());
 
-        event(new ServerMessageEvent($character->user, 'You have requested units to be sent to: '.$kingdom->name.' they are aon their way!'));
+        event(new ServerMessageEvent($character->user, 'You have requested units to be sent to: ' . $kingdom->name . ' they are aon their way!'));
 
         return $this->successResult(['message' => 'Units are on their way!']);
     }
@@ -156,7 +161,7 @@ class UnitMovementService
         event(new UpdateKingdomQueues($kingdom));
 
         return $this->successResult([
-            'message' => 'Units have been recalled to: '.$kingdom->name,
+            'message' => 'Units have been recalled to: ' . $kingdom->name,
         ]);
     }
 

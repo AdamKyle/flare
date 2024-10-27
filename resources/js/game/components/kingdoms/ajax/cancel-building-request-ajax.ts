@@ -13,7 +13,6 @@ export default class CancelBuildingRequestAjax {
         characterId: number,
         kingdomId: number,
         queueId: number,
-        deleteWholeQueue: boolean,
         buildingId?: number,
     ): void {
         this.ajax
@@ -24,11 +23,8 @@ export default class CancelBuildingRequestAjax {
                     kingdomId,
             )
             .setParameters({
-                request_data: {
-                    delete_queue: deleteWholeQueue,
-                    building_id: buildingId,
-                    capital_city_building_queue_id: queueId,
-                },
+                queue_id: queueId,
+                building_id: buildingId ?? null,
             })
             .doAjaxCall(
                 "post",

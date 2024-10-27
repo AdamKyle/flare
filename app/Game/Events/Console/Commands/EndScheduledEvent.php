@@ -163,14 +163,6 @@ class EndScheduledEvent extends Command
                 event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
             }
 
-            if ($eventType->isMonthlyPVP()) {
-                $event->update([
-                    'currently_running' => false,
-                ]);
-
-                event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
-            }
-
             if ($eventType->isWinterEvent()) {
                 $this->endWinterEvent($kingdomEventService, $traverseService, $explorationAutomationService, $factionLoyaltyService, $currentEvent);
 
@@ -237,7 +229,7 @@ class EndScheduledEvent extends Command
 
         $raid = $event->raid;
 
-        event(new GlobalMessageEvent('The Raid: '.$raid->name.' is now ending! Don\'t worry, the raid will be back soon. Check the event calendar for the next time!'));
+        event(new GlobalMessageEvent('The Raid: ' . $raid->name . ' is now ending! Don\'t worry, the raid will be back soon. Check the event calendar for the next time!'));
 
         $this->unCorruptLocations($raid, $locationService);
 
@@ -272,11 +264,9 @@ class EndScheduledEvent extends Command
 
         $announcement = Announcement::where('event_id', $event->id)->first();
 
-        if (! is_null($announcement)) {
-            event(new DeleteAnnouncementEvent($announcement->id));
+        event(new DeleteAnnouncementEvent($announcement->id));
 
-            $announcement->delete();
-        }
+        $announcement->delete();
 
         $event->delete();
     }
@@ -317,12 +307,13 @@ class EndScheduledEvent extends Command
     /**
      * End the winter event.
      */
-    protected function endWinterEvent(KingdomEventService $kingdomEventService,
+    protected function endWinterEvent(
+        KingdomEventService $kingdomEventService,
         TraverseService $traverseService,
         ExplorationAutomationService $explorationAutomationService,
         FactionLoyaltyService $factionLoyaltyService,
-        Event $event): void
-    {
+        Event $event
+    ): void {
 
         $kingdomEventService->handleKingdomRewardsForEvent(MapNameValue::ICE_PLANE);
 
@@ -376,12 +367,13 @@ class EndScheduledEvent extends Command
     /**
      * End the delusional memories' event.
      */
-    protected function endDelusionalEvent(KingdomEventService $kingdomEventService,
+    protected function endDelusionalEvent(
+        KingdomEventService $kingdomEventService,
         TraverseService $traverseService,
         ExplorationAutomationService $explorationAutomationService,
         FactionLoyaltyService $factionLoyaltyService,
-        Event $event): void
-    {
+        Event $event
+    ): void {
 
         $kingdomEventService->handleKingdomRewardsForEvent(MapNameValue::DELUSIONAL_MEMORIES);
 
@@ -432,14 +424,15 @@ class EndScheduledEvent extends Command
         $this->updateAllCharacterStatuses();
     }
 
-    protected function endFeedBackEvent(CreateSurveySnapshot $createSurveySnapshot): void {
+    protected function endFeedBackEvent(CreateSurveySnapshot $createSurveySnapshot): void
+    {
         event(new GlobalMessageEvent('The Creator thanks all his players for their valuable feedback. At this time the survey has closed! Feedback is being gathered as we speak'));
 
         $createSurveySnapshot->createSnapShop();
 
         SubmittedSurvey::truncate();
 
-        Character::chunkById(250, function($characters) {
+        Character::chunkById(250, function ($characters) {
             foreach ($characters as $character) {
                 $character->user()->update([
                     'is_showing_survey' => false,
@@ -455,7 +448,6 @@ class EndScheduledEvent extends Command
         refreshing and clicking the left side bar, there will be a new menu option for the survey stats. Once The Creator has a chance to look
         at them, you will find a button at the bottom called The Creators Response, this will be a detailed post about how the stats impact the
         direction Tlessa goes in, in order for it be the best PBBG out there!'));
-
     }
 
     private function updateAllCharacterStatuses(): void

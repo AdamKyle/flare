@@ -162,14 +162,6 @@
                 <span class="ra ra-muscle-fat"></span>
                 Ambush and Counter
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'player-vs-player']) }}">
-                <span class="ra ra-helmet"></span>
-                Player vs Player
-            </a>
-            <a href="{{ route('info.page', ['pageName' => 'monthly-pvp-event']) }}">
-                <span class="ra ra-helmet"></span>
-                Monthly Pvp Event
-            </a>
             <a href="{{ route('info.page', ['pageName' => 'automation']) }}">
                 <span class="fas fa-user-clock"></span>
                 Automation
@@ -259,9 +251,23 @@
                 <span class="fas fa-people-carry"></span>
                 Kingdom Resource Requests
             </a>
+            <hr />
+            <h6>Capital Cities</h6>
             <a href="{{ route('info.page', ['pageName' => 'capital-cities']) }}">
                 <span class="fas fa-university"></span>
-                Capital Cities
+                What are Capital Cities
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'managing-buildings-with-capital-cities']) }}">
+                <span class="fas fa-university"></span>
+                Manageing Buildings
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'managing-units-through-capital-cities']) }}">
+                <span class="fas fa-university"></span>
+                Manageing Units
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'managing-gold-bars-through-capital-cities']) }}">
+                <span class="fas fa-university"></span>
+                Manageing Gold Bars
             </a>
         </div>
     </div>
@@ -326,6 +332,10 @@
                 <span class="fas fa-campground"></span>
                 Seer Camp
             </a>
+            <a href="{{ route('info.page', ['pageName' => 'labyrinth-oracle']) }}">
+                <span class="ra ra-eye-monster"></span>
+                Labyrinth Oracle
+            </a>
             <hr />
             <h6>Misc. Lists</h6>
             <a href="{{ route('info.page', ['pageName' => 'monsters']) }}">
@@ -378,6 +388,10 @@
             <a href="{{ route('info.page', ['pageName' => 'delusional-silver']) }}">
                 <span class="ra ra-kaleidoscope"></span>
                 Delusional Silver
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'faithless-plate']) }}">
+                <span class="ra ra-kaleidoscope"></span>
+                Faithless Plate
             </a>
             <a href="{{ route('info.page', ['pageName' => 'ancestral-items']) }}">
                 <span class="ra ra-crowned-heart"></span>

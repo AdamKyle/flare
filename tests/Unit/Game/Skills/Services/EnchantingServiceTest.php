@@ -24,14 +24,26 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateEvent;
+use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameSkill;
+use Tests\Traits\CreateGlobalCraftingInventory;
+use Tests\Traits\CreateGlobalCraftingInventorySlot;
 use Tests\Traits\CreateGlobalEventGoal;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
 class EnchantingServiceTest extends TestCase
 {
-    use CreateClass, CreateEvent, CreateGameSkill, CreateGlobalEventGoal, CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateClass,
+        CreateEvent,
+        CreateGameSkill,
+        CreateGlobalEventGoal,
+        CreateItem,
+        CreateItemAffix,
+        CreateGlobalCraftingInventory,
+        CreateGlobalCraftingInventorySlot,
+        CreateGameMap,
+        RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -106,6 +118,52 @@ class EnchantingServiceTest extends TestCase
 
         $this->assertNotEmpty($result['affixes']);
         $this->assertNotEmpty($result['character_inventory']);
+    }
+
+    public function testFetchAffixesAndItemsThatCanBeEnchantedForGlobalEvent()
+    {
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
+
+        $this->createEvent([
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'current_event_goal_step' => GlobalEventSteps::ENCHANT,
+        ]);
+
+        $globalEventGoal = $this->createGlobalEventGoal([
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'max_enchants' => 100,
+            'reward_every' => 10,
+            'next_reward_at' => 10,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'should_be_unique' => false,
+            'should_be_mythic' => true,
+        ]);
+
+        $character = $this->character->getCharacter();
+
+        $inventory = $this->createGlobalCraftingInventory([
+            'global_event_id' => $globalEventGoal->id,
+            'character_id' => $character->id,
+        ]);
+
+        $this->createGlobalCraftingInventorySlot([
+            'global_event_crafting_inventory_id' => $inventory->id,
+            'item_id' => $this->createItem(),
+        ]);
+
+        $gameMap = $this->createGameMap([
+            'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+        ]);
+
+        $character->map()->update([
+            'game_map_id' => $gameMap->id
+        ]);
+
+        $character = $character->refresh();
+
+        $result = $this->enchantingService->fetchAffixes($character, true);
+
+        $this->assertNotEmpty($result['items_for_event']);
     }
 
     public function testFetchAffixesAsMerhcant()
@@ -338,6 +396,7 @@ class EnchantingServiceTest extends TestCase
         });
     }
 
+
     public function testEnchantingSucceeds()
     {
 
@@ -370,7 +429,7 @@ class EnchantingServiceTest extends TestCase
         $this->assertEquals(0, $character->gold);
 
         Event::assertDispatched(function (ServerMessageEvent $event) use ($slot) {
-            return $event->message === 'Applied enchantment: '.$this->prefix->name.' to: '.$slot->item->refresh()->affix_name;
+            return $event->message === 'Applied enchantment: ' . $this->prefix->name . ' to: ' . $slot->item->refresh()->affix_name;
         });
     }
 
@@ -464,7 +523,7 @@ class EnchantingServiceTest extends TestCase
         $this->assertEquals(0, $character->gold);
 
         Event::assertDispatched(function (ServerMessageEvent $event) use ($itemName) {
-            return $event->message === 'You failed to apply '.$this->prefix->name.' to: '.$itemName.'. The item shatters before you. You lost the investment.';
+            return $event->message === 'You failed to apply ' . $this->prefix->name . ' to: ' . $itemName . '. The item shatters before you. You lost the investment.';
         });
     }
 
@@ -519,5 +578,35 @@ class EnchantingServiceTest extends TestCase
         $enchantingSkill = $character->skills()->where('game_skill_id', $this->enchantingSkill->id)->first();
 
         $this->assertEquals($weaponCraftingXpData['skill_name'], $enchantingSkill->baseSkill->name);
+    }
+
+    public function testGetItemForGlobalEvent()
+    {
+
+        $globalEventGoal = $this->createGlobalEventGoal([
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'max_enchants' => 100,
+            'reward_every' => 10,
+            'next_reward_at' => 10,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'should_be_unique' => false,
+            'should_be_mythic' => true,
+        ]);
+
+        $character = $this->character->getCharacter();
+
+        $inventory = $this->createGlobalCraftingInventory([
+            'global_event_id' => $globalEventGoal->id,
+            'character_id' => $character->id,
+        ]);
+
+        $slot = $this->createGlobalCraftingInventorySlot([
+            'global_event_crafting_inventory_id' => $inventory->id,
+            'item_id' => $this->createItem(),
+        ]);
+
+        $foundSlot = $this->enchantingService->getSlotFromInventory($character, $slot->id);
+
+        $this->assertEquals($foundSlot->id, $slot->id);
     }
 }

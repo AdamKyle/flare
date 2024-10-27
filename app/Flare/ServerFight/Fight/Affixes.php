@@ -14,7 +14,7 @@ class Affixes extends BattleBase
         parent::__construct($characterCacheData);
     }
 
-    public function getCharacterAffixDamage(array $attackData, bool $isPvp, float $monsterResistance = 0.0): int
+    public function getCharacterAffixDamage(array $attackData, float $monsterResistance = 0.0): int
     {
 
         if ($attackData['attack_type'] === AttackTypeValue::DEFEND) {
@@ -33,13 +33,9 @@ class Affixes extends BattleBase
         if ($totalDamage > 0 || $nonStackingDamage > 0) {
 
             if ($cantBeResisted) {
-                $this->addMessage('The enemy cannot resist your enchantments! They are so glowy!', 'regular', $isPvp);
+                $this->addMessage('The enemy cannot resist your enchantments! They are so glowy!', 'regular');
 
-                $this->addMessage('Your enchantments glow with rage. Your enemy cowers. (non resisted dmg): '.number_format($weaponDamage), 'player-action', $isPvp);
-
-                if ($isPvp) {
-                    $this->addDefenderMessage('The enemy lashes out with fury. Their enchantments wash over you for: '.number_format($weaponDamage), 'enemy-action');
-                }
+                $this->addMessage('Your enchantments glow with rage. Your enemy cowers. (non resisted dmg): ' . number_format($weaponDamage), 'player-action');
 
                 return $weaponDamage;
             } else {
@@ -47,11 +43,7 @@ class Affixes extends BattleBase
                 if ($nonStackingWeaponDamage > 0) {
                     return $this->doAffixDamage($nonStackingWeaponDamage, $weaponDamage, $monsterResistance);
                 } else {
-                    $this->addMessage('Your (non resistible) enchantments glow with rage. Your enemy cowers: '.number_format($weaponDamage), 'player-action', $isPvp);
-
-                    if ($isPvp) {
-                        $this->addDefenderMessage('The enemy lashes out with rage (non resistible damage). Their enchantments bathe you in hate doing: '.number_format($weaponDamage), 'enemy-action');
-                    }
+                    $this->addMessage('Your (non resistible) enchantments glow with rage. Your enemy cowers: ' . number_format($weaponDamage), 'player-action');
 
                     return $weaponDamage;
                 }
@@ -61,7 +53,7 @@ class Affixes extends BattleBase
         return 0;
     }
 
-    public function getAffixLifeSteal(Character $character, array $attackData, int $monsterHealth, float $resistance = 0.0, bool $isPvp = false): int
+    public function getAffixLifeSteal(Character $character, array $attackData, int $monsterHealth, float $resistance = 0.0): int
     {
         if (! $monsterHealth > 0) {
             return 0;
@@ -79,20 +71,16 @@ class Affixes extends BattleBase
         }
 
         if (! $character->classType()->isVampire()) {
-            $this->addMessage('One of your life stealing enchantments causes the enemy to fall to their knees in agony!', 'player-action', $isPvp);
+            $this->addMessage('One of your life stealing enchantments causes the enemy to fall to their knees in agony!', 'player-action');
         } else {
-            $this->addMessage('The enemy screams in pain as you siphon large amounts of their health towards you!', 'player-action', $isPvp);
+            $this->addMessage('The enemy screams in pain as you siphon large amounts of their health towards you!', 'player-action');
         }
 
         $damage = $monsterHealth * $affixLifeStealing;
 
         if ($cantBeResisted || $this->isEnemyEntranced) {
 
-            $this->addMessage('The enemy\'s blood flows through the air and gives you life: '.number_format($damage), 'player-action', $isPvp);
-
-            if ($isPvp) {
-                $this->addDefenderMessage('Your blood seeps from the pores in your flesh, you scream in agony taking (enemy life stealing): '.number_format($damage).' damage.', 'enemy-action');
-            }
+            $this->addMessage('The enemy\'s blood flows through the air and gives you life: ' . number_format($damage), 'player-action');
 
             return $damage;
         }
@@ -103,11 +91,7 @@ class Affixes extends BattleBase
         if ($roll < $dc) {
             $this->addMessage('The enemy resists your attempt to steal it\'s life.', 'enemy-action');
         } else {
-            $this->addMessage('The enemy\'s blood flows through the air and gives you life: '.number_format($damage), 'player-action', $isPvp);
-
-            if ($isPvp) {
-                $this->addDefenderMessage('Your blood seeps from the pores in your flesh, you scream in agony taking: '.number_format($damage).' damage.', 'enemy-action');
-            }
+            $this->addMessage('The enemy\'s blood flows through the air and gives you life: ' . number_format($damage), 'player-action');
 
             return $damage;
         }
@@ -115,27 +99,19 @@ class Affixes extends BattleBase
         return 0;
     }
 
-    protected function doAffixDamage(int $totalDamage, int $nonStackingDamage, float $resistance = 0.0, bool $isPvp = false)
+    protected function doAffixDamage(int $totalDamage, int $nonStackingDamage, float $resistance = 0.0)
     {
         $dc = 100 - 100 * $resistance;
 
         if ($dc <= 0 || rand(1, 100) > $dc) {
-            $this->addMessage('Your damaging enchantments (resistible) have been resisted. However ...', 'enemy-action', $isPvp);
+            $this->addMessage('Your damaging enchantments (resistible) have been resisted. However ...', 'enemy-action');
 
-            $this->addMessage('Your (non resistible) enchantments glow with rage. Your enemy cowers: '.number_format($totalDamage), 'player-action', $isPvp);
-
-            if ($isPvp) {
-                $this->addDefenderMessage('The enemies (non resistant) enchantments fly towards you doing: '.number_format($totalDamage), 'player-action');
-            }
+            $this->addMessage('Your (non resistible) enchantments glow with rage. Your enemy cowers: ' . number_format($totalDamage), 'player-action');
 
             return $totalDamage;
         } else {
 
-            $this->addMessage('Your enchantments glow with rage. Your enemy cowers: '.number_format($nonStackingDamage), 'player-action', $isPvp);
-
-            if ($isPvp) {
-                $this->addDefenderMessage('You cower in awe of the enemies artifacts taking: '.number_format($nonStackingDamage).' damage.', 'player-action');
-            }
+            $this->addMessage('Your enchantments glow with rage. Your enemy cowers: ' . number_format($nonStackingDamage), 'player-action');
 
             return $nonStackingDamage;
         }

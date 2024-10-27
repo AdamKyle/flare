@@ -10,4 +10,6 @@ export default interface ResizableBoxProps {
     additional_css?: string;
 
     children?: React.ReactNode;
+
+    small_height?: number;
 }

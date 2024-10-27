@@ -350,7 +350,7 @@
                     </x-slot:title>
 
                     <p>
-                       The most powerful of enchantments is the Mythic! Dwelve deep into the depths of purgatory dungeons or even participate in monthly PVP
+                       One of the most powerful of enchantments is the Mythic! Dwelve deep into the depths of Purgatory Dungeons or even participate and weekly fights
                        to have a chance to win one of these!
                     </p>
                 </x-core.cards.feature-card>

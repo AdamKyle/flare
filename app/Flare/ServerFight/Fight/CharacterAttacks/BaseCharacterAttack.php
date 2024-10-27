@@ -64,33 +64,6 @@ class BaseCharacterAttack
         return $response;
     }
 
-    public function doPvpAttack(Character $character, Character $defender, array $healthObject, bool $isPlayerVoided, bool $isEnemyVoided, string $attackType): mixed
-    {
-        $response = null;
-
-        switch ($attackType) {
-            case 'attack':
-                $response = $this->characterAttack->pvpAttack($character, $defender, $isPlayerVoided, $isEnemyVoided, $healthObject);
-                break;
-            case 'cast':
-                $response = $this->characterAttack->pvpCast($character, $defender, $isPlayerVoided, $isEnemyVoided, $healthObject);
-                break;
-            case 'attack_and_cast':
-                $response = $this->characterAttack->pvpAttackAndCast($character, $defender, $isPlayerVoided, $isEnemyVoided, $healthObject);
-                break;
-            case 'cast_and_attack':
-                $response = $this->characterAttack->pvpCastAndAttack($character, $defender, $isPlayerVoided, $isEnemyVoided, $healthObject);
-                break;
-            case 'defend':
-                $response = $this->characterAttack->pvpDefend($character, $defender, $isPlayerVoided, $isEnemyVoided, $healthObject);
-                break;
-            default:
-                $this->battleMessages[] = ['message' => 'No Attack Type Supplied. Attack Failed for character.', 'event-action'];
-        }
-
-        return $response;
-    }
-
     public function getMessages(): array
     {
         return $this->battleMessages;

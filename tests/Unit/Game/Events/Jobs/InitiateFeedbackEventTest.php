@@ -4,8 +4,6 @@ namespace Tests\Unit\Game\Events\Jobs;
 
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Event as ModelsEvent;
-use App\Flare\Models\GlobalEventGoal;
-use App\Flare\Values\MapNameValue;
 use App\Game\Events\Jobs\InitiateDelusionalMemoriesEvent;
 use App\Game\Events\Jobs\InitiateFeedbackEvent;
 use App\Game\Events\Values\EventType;
@@ -34,14 +32,14 @@ class InitiateFeedbackEventTest extends TestCase
     {
         Event::fake();
 
-        InitiateDelusionalMemoriesEvent::dispatch(rand(10000, 99999));
+        InitiateFeedbackEvent::dispatch(rand(10000, 99999));
 
         Event::assertNotDispatched(GlobalMessageEvent::class);
         $this->assertEmpty(Announcement::all());
         $this->assertEmpty(ModelsEvent::all());
     }
 
-    public function testFeedbackEventDoeTrigger()
+    public function testFeedbackEventDoseTrigger()
     {
 
         Event::fake();

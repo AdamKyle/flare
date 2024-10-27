@@ -99,8 +99,6 @@ export default class CharactersOnlineList extends React.Component<
             return <LoadingProgressBar />;
         }
 
-        console.log(this.state.characters_online_data);
-
         return (
             <div className="flex flex-col gap-2 pt-0 pb-4 pl-4 pr-4">
                 <DropDown

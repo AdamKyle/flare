@@ -18,7 +18,6 @@ Looking to contribute to Tlessa? A completely open-source, MIT-licensed game? Ch
 - Sockets/Gems
 - Diablo-esque Gear
 - Raids
-- PvP
 - Kingdoms
 - Quests
 - 7 Planes to traverse

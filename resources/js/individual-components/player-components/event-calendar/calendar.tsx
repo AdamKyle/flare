@@ -35,10 +35,6 @@ export default class Calendar extends React.Component<{}, CalendarState> {
             return "#E11D48";
         }
 
-        if (name === "Monthly PVP") {
-            return "#2563EB";
-        }
-
         return "#1976d2";
     }
 
@@ -52,7 +48,7 @@ export default class Calendar extends React.Component<{}, CalendarState> {
                         event.end = new Date(event.end);
                         event.color = event.currently_running
                             ? "#16a34a"
-                            : this.color(event.title);
+                            : this.color(event.title as string);
 
                         return event;
                     }),
@@ -81,7 +77,7 @@ export default class Calendar extends React.Component<{}, CalendarState> {
                                     event.end = new Date(event.end);
                                     event.color = event.currently_running
                                         ? "#16a34a"
-                                        : this.color(event.title);
+                                        : this.color(event.title as string);
 
                                     return event;
                                 },

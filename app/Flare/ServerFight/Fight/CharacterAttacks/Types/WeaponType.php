@@ -43,7 +43,7 @@ class WeaponType extends BattleBase
         ];
 
         if ($isVoided && !in_array($type, $voidedTypes)) {
-            $attackType = 'voided_'.$type;
+            $attackType = 'voided_' . $type;
         } else {
             $attackType = $type;
         }
@@ -57,48 +57,6 @@ class WeaponType extends BattleBase
     public function setAllowEntrancing(bool $allowEntrance): WeaponType
     {
         $this->canEntrance = $allowEntrance;
-
-        return $this;
-    }
-
-    public function doPvpWeaponAttack(Character $attacker, Character $defender): WeaponType
-    {
-        $weaponDamage = $this->attackData['weapon_damage'];
-
-        if (! $this->isEnemyEntranced) {
-            $this->doPvpEntrance($attacker, $this->entrance);
-
-            if ($this->isEnemyEntranced) {
-                $this->pvpWeaponAttack($attacker, $defender, $weaponDamage);
-
-                return $this;
-            }
-        } elseif ($this->isEnemyEntranced) {
-            $this->pvpWeaponAttack($attacker, $defender, $weaponDamage);
-
-            return $this;
-        }
-
-        if ($this->canHit->canPlayerHitPlayer($attacker, $defender, $this->isVoided)) {
-            if ($this->canBlock($weaponDamage, $this->getPvpCharacterAc($defender))) {
-                $this->addAttackerMessage('Your attack was blocked', 'enemy-action');
-                $this->addDefenderMessage('You managed to block the enemies attack', 'player-action');
-
-                if ($this->allowSecondaryAttacks) {
-                    $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($attacker, 'affix_damage_reduction'));
-                }
-
-                return $this;
-            }
-
-            $this->pvpWeaponAttack($attacker, $defender, $weaponDamage);
-        } else {
-            $this->addAttackerMessage('Your attack missed!', 'enemy-action');
-
-            if ($this->allowSecondaryAttacks) {
-                $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($attacker, 'affix_damage_reduction'));
-            }
-        }
 
         return $this;
     }
@@ -156,15 +114,6 @@ class WeaponType extends BattleBase
         $this->entrance->clearMessages();
     }
 
-    public function pvpWeaponAttack(Character $attacker, Character $defender, int $weaponDamage)
-    {
-        $this->pvpWeaponDamage($attacker, $defender, $weaponDamage);
-
-        if ($this->allowSecondaryAttacks && ! $this->abortCharacterIsDead) {
-            $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
-        }
-    }
-
     public function weaponAttack(Character $character, ServerMonster $monster, int $weaponDamage)
     {
         $this->weaponDamage($character, $monster->getName(), $weaponDamage);
@@ -182,41 +131,6 @@ class WeaponType extends BattleBase
         $this->dealSecondaryAttackDamage($character, $monster);
     }
 
-    public function pvpWeaponDamage(Character $attacker, Character $defender, int $weaponDamage)
-    {
-        $weaponDamage = $this->getCriticalityDamage($attacker, $weaponDamage);
-
-        $totalDamage = $weaponDamage - $weaponDamage * $this->attackData['damage_deduction'];
-
-        $this->monsterHealth -= $totalDamage;
-
-        $this->addAttackerMessage('Your weapon slices at the enemies flesh for: '.number_format($totalDamage), 'player-action');
-        $this->addDefenderMessage($attacker->name.' strikes you with their weapon for: '.number_format($totalDamage), 'enemy-action');
-
-        $this->pvpCounter($attacker, $defender);
-
-        if ($this->characterHealth <= 0) {
-            $this->addAttackerMessage('You manage to kill the enemy in your counter Attack!', 'player-action');
-            $this->addDefenderMessage('You were slaughtered by the counter attack!', 'enemy-action');
-
-            $this->abortCharacterIsDead = true;
-
-            return;
-        }
-
-        $this->specialAttacks->setCharacterHealth($this->characterHealth)
-            ->setMonsterHealth($this->monsterHealth)
-            ->doWeaponSpecials($attacker, $this->attackData, true);
-
-        $this->mergeAttackerMessages($this->specialAttacks->getAttackerMessages());
-        $this->mergeDefenderMessages($this->specialAttacks->getDefenderMessages());
-
-        $this->characterHealth = $this->specialAttacks->getCharacterHealth();
-        $this->monsterHealth = $this->specialAttacks->getMonsterHealth();
-
-        $this->specialAttacks->clearMessages();
-    }
-
     public function weaponDamage(Character $character, string $monsterName, int $weaponDamage)
     {
 
@@ -226,7 +140,7 @@ class WeaponType extends BattleBase
 
         $this->monsterHealth -= $totalDamage;
 
-        $this->addMessage('Your weapon hits '.$monsterName.' for: '.number_format($totalDamage), 'player-action');
+        $this->addMessage('Your weapon hits ' . $monsterName . ' for: ' . number_format($totalDamage), 'player-action');
 
         $this->specialAttacks->setCharacterHealth($this->characterHealth)
             ->setMonsterHealth($this->monsterHealth)

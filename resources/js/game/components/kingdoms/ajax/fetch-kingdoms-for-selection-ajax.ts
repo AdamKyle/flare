@@ -2,7 +2,7 @@ import { inject, injectable } from "tsyringe";
 import Ajax from "../../../lib/ajax/ajax";
 import AjaxInterface from "../../../lib/ajax/ajax-interface";
 import { AxiosError, AxiosResponse } from "axios";
-import UnitRecruitment from "../capital-city/unit-recruitment";
+import UnitRecruitment from "../capital-city/partials/unit-management/unit-recruitment";
 
 @injectable()
 export default class FetchKingdomsForSelectionAjax {
@@ -27,7 +27,8 @@ export default class FetchKingdomsForSelectionAjax {
 
                     component.setState({
                         loading: false,
-                        kingdoms_for_selection: data.kingdoms,
+                        unit_recruitment_data: data.kingdoms,
+                        filtered_unit_recruitment_data: data.kingdoms,
                     });
                 },
                 (error: AxiosError) => {

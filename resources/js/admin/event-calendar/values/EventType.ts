@@ -3,10 +3,6 @@ export default class EventType {
         return "Weekly Celestials";
     }
 
-    static get MONTHLY_PVP(): string {
-        return "Monthly PVP";
-    }
-
     static get WEEKLY_CURRENCY_DROPS(): string {
         return "Weekly Currency Drops";
     }

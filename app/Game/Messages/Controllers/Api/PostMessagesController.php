@@ -11,16 +11,17 @@ use Illuminate\Http\JsonResponse;
 
 class PostMessagesController extends Controller
 {
-    private PublicMessage $publicMessage;
 
-    private PrivateMessage $privateMessage;
-
-    public function __construct(PublicMessage $publicMessage, PrivateMessage $privateMessage)
+    public function __construct(private PublicMessage $publicMessage, private PrivateMessage $privateMessage)
     {
         $this->publicMessage = $publicMessage;
         $this->privateMessage = $privateMessage;
     }
 
+    /**
+     * @param PublicMessageRequest $request
+     * @return JsonResponse
+     */
     public function postPublicMessage(PublicMessageRequest $request): JsonResponse
     {
 
@@ -29,6 +30,10 @@ class PostMessagesController extends Controller
         return response()->json();
     }
 
+    /**
+     * @param PrivateMessageRequest $request
+     * @return JsonResponse
+     */
     public function sendPrivateMessage(PrivateMessageRequest $request): JsonResponse
     {
 

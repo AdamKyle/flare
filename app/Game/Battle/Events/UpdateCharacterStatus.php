@@ -48,8 +48,6 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
             'is_silenced' => $character->is_silenced,
             'can_move' => $character->can_move,
-            'can_register_for_pvp' => ! is_null(Event::where('type', EventType::MONTHLY_PVP)->first()) && $character->level >= 301,
-            'killed_in_pvp' => $character->killed_in_pvp,
             'is_alchemy_locked' => $this->isAlchemyLocked($character),
             'show_craft_for_event' => $this->shouldShowCraftingEventButton($character),
             'show_enchanting_for_event' => $this->shouldShowEnchantingEventButton($character),
@@ -92,6 +90,6 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('update-character-status-'.$this->user->id);
+        return new PrivateChannel('update-character-status-' . $this->user->id);
     }
 }

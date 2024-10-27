@@ -117,10 +117,6 @@ class RestartGlobalEventGoal extends Command
      */
     private function handleRegularGlobalEvent(GlobalEventGoal $globalEventGoal): void
     {
-        if ($globalEventGoal->total_kills < $globalEventGoal->max_kills) {
-            return;
-        }
-
         $globalEventGoal->update([
             'next_reward_at' => $globalEventGoal->reward_every,
         ]);
@@ -131,7 +127,7 @@ class RestartGlobalEventGoal extends Command
         $globalEvent->globalEventKills()->truncate();
 
         event(new GlobalMessageEvent(
-            'Global Event Goal for: '.$globalEvent->eventType()->getNameForEvent().' Players can now participate again and earn
+            'Global Event Goal for: ' . $globalEvent->eventType()->getNameForEvent() . ' Players can now participate again and earn
             Rewards for meeting the various phases! How exciting!'
         ));
     }
@@ -189,12 +185,11 @@ class RestartGlobalEventGoal extends Command
 
         $gameMap = GameMap::where('only_during_event_type', $event->type)->first();
 
-        event(new GlobalMessageEvent('Global Event Goal for: '.$globalEventGoal->eventType()->getNameForEvent().
-            ' Players can now participate in the new step: '.strtoupper($newStep).'! How exciting!'));
-        event(new GlobalMessageEvent('Players can participate by going to the map: '.$gameMap->name.
-            ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile)'.' '.
-        'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items.'.
+        event(new GlobalMessageEvent('Global Event Goal for: ' . $globalEventGoal->eventType()->getNameForEvent() .
+            ' Players can now participate in the new step: ' . strtoupper($newStep) . '! How exciting!'));
+        event(new GlobalMessageEvent('Players can participate by going to the map: ' . $gameMap->name .
+            ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile)' . ' ' .
+            'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items.' .
             ' You can see the event goal for the map specified by being on the map and clicking the Event Goal tab from the map.'));
-
     }
 }

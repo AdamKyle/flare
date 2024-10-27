@@ -1,10 +1,8 @@
 import React from "react";
-import PrimaryOutlineButton from "../../ui/buttons/primary-outline-button";
 import SuccessOutlineButton from "../../ui/buttons/success-outline-button";
 import BuildingsToUpgradeSection from "./buildings-to-upgrade-section";
-import BuildingQueuesTable from "./building-queues-table";
+import BuildingsInQueue from "./buildings-in-queue";
 import ClickableIconCard from "../../ui/cards/clickable-icon-card";
-import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
 
 export default class ManageKingdomBuildings extends React.Component<any, any> {
     constructor(props: any) {
@@ -53,11 +51,11 @@ export default class ManageKingdomBuildings extends React.Component<any, any> {
                     on_click={this.manageShowRepairList.bind(this)}
                 >
                     Clicking this card will let you repair broken buildings
-                    across your kingdoms on this plane.Resources will auto be
+                    across your kingdoms on this plane. Resources will auto be
                     requested, population is purchased from the kingdom
                     treasury. All automatically. Below will be a table of the
                     request queues. Each kingdom will get a log stating what was
-                    or wasn't upgraded.
+                    or wasn't repaired.
                 </ClickableIconCard>
             </div>
         );
@@ -83,8 +81,10 @@ export default class ManageKingdomBuildings extends React.Component<any, any> {
         return (
             <div>
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
-                <div className="flex items-center relative">
-                    <h3>Oversee your kingdoms buildings</h3>
+                <div className="relative flex justify-between items-center w-full">
+                    <h3 className="mb-2 sm:mb-0 sm:mr-4">
+                        Oversee your kingdoms buildings
+                    </h3>
                     <SuccessOutlineButton
                         button_label={
                             this.state.show_upgrade_buildings_list ||
@@ -93,9 +93,10 @@ export default class ManageKingdomBuildings extends React.Component<any, any> {
                                 : "Back to council"
                         }
                         on_click={this.manageView.bind(this)}
-                        additional_css={"absolute right-0"}
+                        additional_css="w-full sm:w-auto"
                     />
                 </div>
+
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
 
                 {this.state.show_upgrade_buildings_list ? (
@@ -115,7 +116,7 @@ export default class ManageKingdomBuildings extends React.Component<any, any> {
                         {this.renderActionButtons()}
                         <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
                         <h3 className={"my-2"}>Queue Info</h3>
-                        <BuildingQueuesTable
+                        <BuildingsInQueue
                             user_id={this.props.user_id}
                             kingdom_id={this.props.kingdom.id}
                             character_id={this.props.kingdom.character_id}

@@ -223,6 +223,87 @@ class PublicMessageTest extends TestCase
         $this->assertGreaterThan(0, Message::count());
     }
 
+    public function testSendPublicMessageForTwistedMemoriesColor()
+    {
+        Event::fake();
+
+        $character = $this->character->getCharacter();
+
+        $gameMap = $this->createGameMap([
+            'name' => 'Twisted Memories',
+        ]);
+
+        $character->map()->update([
+            'game_map_id' => $gameMap->id,
+        ]);
+
+        $character = $character->refresh();
+
+        Auth::login($character->user);
+
+        $this->publicMessage->postPublicMessage('Test');
+
+        Event::assertDispatched(function (MessageSentEvent $event) {
+            return $event->message->map_name === 'TWM';
+        });
+
+        $this->assertGreaterThan(0, Message::count());
+    }
+
+    public function testSendPublicMessageForDelusionalMemoriesColor()
+    {
+        Event::fake();
+
+        $character = $this->character->getCharacter();
+
+        $gameMap = $this->createGameMap([
+            'name' => 'Delusional Memories',
+        ]);
+
+        $character->map()->update([
+            'game_map_id' => $gameMap->id,
+        ]);
+
+        $character = $character->refresh();
+
+        Auth::login($character->user);
+
+        $this->publicMessage->postPublicMessage('Test');
+
+        Event::assertDispatched(function (MessageSentEvent $event) {
+            return $event->message->map_name === 'DM';
+        });
+
+        $this->assertGreaterThan(0, Message::count());
+    }
+
+    public function testSendPublicMessageForIcePlaneColor()
+    {
+        Event::fake();
+
+        $character = $this->character->getCharacter();
+
+        $gameMap = $this->createGameMap([
+            'name' => 'The Ice Plane',
+        ]);
+
+        $character->map()->update([
+            'game_map_id' => $gameMap->id,
+        ]);
+
+        $character = $character->refresh();
+
+        Auth::login($character->user);
+
+        $this->publicMessage->postPublicMessage('Test');
+
+        Event::assertDispatched(function (MessageSentEvent $event) {
+            return $event->message->map_name === 'ICE';
+        });
+
+        $this->assertGreaterThan(0, Message::count());
+    }
+
     public function testSendPublicMessageDefaultToSurfaceColor()
     {
         Event::fake();
@@ -248,29 +329,6 @@ class PublicMessageTest extends TestCase
         });
 
         $this->assertGreaterThan(0, Message::count());
-    }
-
-    public function testSendPublicMessageWhenKilledInPvp()
-    {
-        Event::fake();
-
-        $character = $this->character->getCharacter();
-
-        $character->update([
-            'killed_in_pvp' => true,
-        ]);
-
-        $character = $character->refresh();
-
-        Auth::login($character->user);
-
-        $this->publicMessage->postPublicMessage('Test');
-
-        Event::assertDispatched(MessageSentEvent::class);
-
-        $this->assertGreaterThan(0, Message::count());
-        $this->assertEquals(0, Message::first()->x_position);
-        $this->assertEquals(0, Message::first()->y_position);
     }
 
     public function testSendPublicMessageWithLocationHidden()

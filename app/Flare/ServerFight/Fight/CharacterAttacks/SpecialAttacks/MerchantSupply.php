@@ -10,7 +10,7 @@ class MerchantSupply extends BattleBase
     /**
      * Handle the merchant supply attack
      */
-    public function handleAttack(Character $character, array $attackData, bool $isPvp = false): void
+    public function handleAttack(Character $character, array $attackData): void
     {
         $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 
@@ -25,29 +25,20 @@ class MerchantSupply extends BattleBase
             $damage = $attackData['weapon_damage'];
             $chance = rand(1, 100);
 
-            $this->addMessage('You stare the enemy down as pull a coin out of your pocket to flip ...', 'regular', $isPvp);
-
-            if ($isPvp) {
-                $this->addDefenderMessage('You watch the enemy produce a small coin that they flip in the air!', 'enemy-action');
-            }
+            $this->addMessage('You stare the enemy down as pull a coin out of your pocket to flip ...', 'regular');
 
             if ($chance > 50) {
                 $damage = $damage * 4;
 
-                $damage = $this->damageDeduction($damage, $attackData['damage_deduction'], $isPvp);
+                $damage = $this->damageDeduction($damage, $attackData['damage_deduction']);
 
-                $this->addMessage('You flip the coin: Heads! You do 4x the damage for a total of: '.number_format($damage), 'player-action', $isPvp);
-
+                $this->addMessage('You flip the coin: Heads! You do 4x the damage for a total of: ' . number_format($damage), 'player-action');
             } else {
                 $damage = $damage * 2;
 
-                $damage = $this->damageDeduction($damage, $attackData['damage_deduction'], $isPvp);
+                $damage = $this->damageDeduction($damage, $attackData['damage_deduction']);
 
-                $this->addMessage('You flip the coin: Tails! You do 2x the damage for a total of: '.number_format($damage), 'player-action', $isPvp);
-            }
-
-            if ($isPvp) {
-                $this->addDefenderMessage('The coin lands, they smile. You take: '.number_format($damage).' damage.', 'enemy-action');
+                $this->addMessage('You flip the coin: Tails! You do 2x the damage for a total of: ' . number_format($damage), 'player-action');
             }
 
             $this->monsterHealth -= $damage;
@@ -57,11 +48,11 @@ class MerchantSupply extends BattleBase
     /**
      * Apply damage deduction.
      */
-    protected function damageDeduction(int $damage, float $deduction, bool $isPvp = false): int
+    protected function damageDeduction(int $damage, float $deduction): int
     {
 
         if ($deduction > 0.0) {
-            $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action', $isPvp);
+            $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
 
             return intval(floor($damage - $damage * $deduction));
         }

@@ -9,42 +9,32 @@ use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 
-class CharacterCacheData extends CharacterPvpCacheData
+class CharacterCacheData
 {
-    private CharacterAttackDataTransformer $characterSheetBaseInfoTransformer;
 
-    private Manager $manager;
-
-    private CharacterStatBuilder $characterStatBuilder;
-
-    public function __construct(Manager $manager, CharacterAttackDataTransformer $characterInformationBuilder, CharacterStatBuilder $characterStatBuilder)
-    {
-        $this->manager = $manager;
-        $this->characterSheetBaseInfoTransformer = $characterInformationBuilder;
-        $this->characterStatBuilder = $characterStatBuilder;
-    }
+    public function __construct(private Manager $manager, private CharacterAttackDataTransformer $characterAttackDataTransformer, private CharacterStatBuilder $characterStatBuilder) {}
 
     public function setCharacterDefendAc(Character $character, int $defence)
     {
-        Cache::put('character-defence-'.$character->id, $defence);
+        Cache::put('character-defence-' . $character->id, $defence);
     }
 
     public function getCharacterDefenceAc(Character $character)
     {
-        return Cache::get('character-defence-'.$character->id);
+        return Cache::get('character-defence-' . $character->id);
     }
 
     public function getDataFromAttackCache(Character $character, string $attackType): array
     {
-        $characterAttackData = Cache::get('character-attack-data-'.$character->id);
+        $characterAttackData = Cache::get('character-attack-data-' . $character->id);
 
         return $characterAttackData['attack_types'][$attackType];
     }
 
     public function getCachedCharacterData(Character $character, string $key): mixed
     {
-        if (Cache::has('character-sheet-'.$character->id)) {
-            $cache = Cache::get('character-sheet-'.$character->id);
+        if (Cache::has('character-sheet-' . $character->id)) {
+            $cache = Cache::get('character-sheet-' . $character->id);
             $cacheLevel = (int) str_replace(',', '', $cache['level']);
 
             if ($cacheLevel != $character->level) {
@@ -60,17 +50,17 @@ class CharacterCacheData extends CharacterPvpCacheData
 
     public function deleteCharacterSheet(Character $character)
     {
-        Cache::delete('character-defence-'.$character->id);
+        Cache::delete('character-defence-' . $character->id);
 
-        if (Cache::has('character-sheet-'.$character->id)) {
-            Cache::delete('character-sheet-'.$character->id);
+        if (Cache::has('character-sheet-' . $character->id)) {
+            Cache::delete('character-sheet-' . $character->id);
         }
     }
 
     public function getCharacterSheetCache(Character $character): array
     {
-        if (Cache::has('character-sheet-'.$character->id)) {
-            return Cache::get('character-sheet-'.$character->id);
+        if (Cache::has('character-sheet-' . $character->id)) {
+            return Cache::get('character-sheet-' . $character->id);
         }
 
         return $this->characterSheetCache($character);
@@ -78,8 +68,8 @@ class CharacterCacheData extends CharacterPvpCacheData
 
     public function updateCharacterSheetCache(Character $character, array $data)
     {
-        if (Cache::has('character-sheet-'.$character->id)) {
-            return Cache::put('character-sheet-'.$character->id, $data);
+        if (Cache::has('character-sheet-' . $character->id)) {
+            return Cache::put('character-sheet-' . $character->id, $data);
         }
 
         // If the cache doesn't exist, create it, set it.
@@ -94,9 +84,9 @@ class CharacterCacheData extends CharacterPvpCacheData
 
         $characterId = $character->id;
 
-        $this->characterSheetBaseInfoTransformer->setIgnoreReductions($ignoreReductions);
+        $this->characterAttackDataTransformer->setIgnoreReductions($ignoreReductions);
 
-        $characterSheet = new Item($character, $this->characterSheetBaseInfoTransformer);
+        $characterSheet = new Item($character, $this->characterAttackDataTransformer);
         $characterSheet = $this->manager->createData($characterSheet)->toArray();
 
         $characterStatBuilder = $this->characterStatBuilder->setCharacter($character);
@@ -122,7 +112,7 @@ class CharacterCacheData extends CharacterPvpCacheData
         $characterSheet['spell_attack'] = $this->characterStatBuilder->buildDamage('spell-damage');
         $characterSheet['heal_for'] = $this->characterStatBuilder->buildHealing();
 
-        Cache::put('character-sheet-'.$characterId, $characterSheet);
+        Cache::put('character-sheet-' . $characterId, $characterSheet);
 
         return $characterSheet;
     }

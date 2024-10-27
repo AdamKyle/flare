@@ -76,7 +76,6 @@ export default class GuideQuestAjax {
                     });
                 },
                 (error: AxiosError) => {
-                    console.log(error);
                     component.setState({
                         loading: false,
                     });

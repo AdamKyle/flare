@@ -125,31 +125,31 @@ class UpdateSkillListener
         $skill->update(['xp' => $newXp]);
     }
 
-
+    /**
+     * Check to see if we should update the skill based on prefined skill properties.
+     *
+     * @param GameSkill $skill
+     * @return boolean
+     */
     protected function shouldUpdateCharacterAttackData(GameSkill $skill): bool
     {
-        if (! is_null($skill->base_damage_mod_bonus_per_level)) {
-            return false;
+        $properties = [
+            'base_damage_mod_bonus_per_level',
+            'base_healing_mod_bonus_per_level',
+            'base_ac_mod_bonus_per_level',
+            'fight_time_out_mod_bonus_per_level',
+            'move_time_out_mod_bonus_per_level',
+        ];
+
+        foreach ($properties as $property) {
+            if ($skill->{$property} > 0) {
+                return true;
+            }
         }
 
-        if (! is_null($skill->base_healing_mod_bonus_per_level)) {
-            return false;
-        }
-
-        if (! is_null($skill->base_ac_mod_bonus_per_level)) {
-            return false;
-        }
-
-        if (! is_null($skill->fight_time_out_mod_bonus_per_level)) {
-            return false;
-        }
-
-        if (! is_null($skill->move_time_out_mod_bonus_per_level)) {
-            return false;
-        }
-
-        return true;
+        return false;
     }
+
 
     protected function updateCharacterAttackDataCache(Character $character)
     {

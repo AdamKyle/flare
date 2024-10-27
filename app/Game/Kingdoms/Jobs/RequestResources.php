@@ -103,48 +103,6 @@ class RequestResources implements ShouldQueue
             $this->buildUnitMovementQueue($requestedKingdom, $requestingFromKingdom, $timeToKingdom)
         );
 
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::where('id', $this->capitalCityQueueId)->where('kingdom_id', $requestedKingdom->kingdom_id)->first();
-        $capitalCityUnitQueue = CapitalCityUnitQueue::where('id', $this->capitalCityQueueId)->where('kingdom_id', $requestingFromKingdom->id)->first();
-
-        if (! is_null($capitalCityBuildingQueue) && ! is_null($this->buildingId)) {
-
-            $buildingRequestQueue = $capitalCityBuildingQueue->building_request_data;
-
-            $building = $requestingFromKingdom->buildings()->find($this->buildingId);
-
-            foreach ($buildingRequestQueue as $index => $requestData) {
-                if ($requestData['building_id'] === $this->buildingId) {
-                    $buildingRequestQueue[$index]['secondary_status'] = CapitalCityQueueStatus::BUILDING;
-                }
-            }
-
-            $capitalCityBuildingQueue->update([
-                'building_request_data' => $buildingRequestQueue,
-            ]);
-
-            $capitalCityBuildingQueue = $capitalCityBuildingManagement->refresh();
-
-            event(new UpdateCapitalCityBuildingQueueTable($capitalCityBuildingQueue->character, $capitalCityBuildingQueue->requestingKingdom));
-
-            $capitalCityBuildingManagement->handleBuildingRequest($capitalCityBuildingQueue->refresh(), $building, $requestingFromKingdom->character);
-        }
-
-        if (! is_null($capitalCityUnitQueue) && ! is_null($this->unitId)) {
-            $buildingRequestQueue = $capitalCityBuildingQueue->building_request_data;
-
-            foreach ($buildingRequestQueue as $index => $requestData) {
-                if ($requestData['unit_id'] === $this->unitId) {
-                    $buildingRequestQueue[$index]['secondary_status'] = CapitalCityQueueStatus::RECRUITING;
-                }
-            }
-
-            $capitalCityUnitQueue->update([
-                'unit_request_data' => $buildingRequestQueue,
-            ]);
-
-            $capitalCityUnitManagement->recruitUnits($capitalCityUnitQueue->refresh());
-        }
-
         $this->sendOffEvents($requestedKingdom, $requestingFromKingdom, $unitMovementQueue);
     }
 

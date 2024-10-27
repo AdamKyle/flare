@@ -2,6 +2,7 @@
 
 namespace App\Flare\Providers;
 
+use App\Admin\Services\SiteStatisticsService;
 use App\Flare\Builders\AffixAttributeBuilder;
 use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Builders\RandomAffixGenerator;
@@ -50,9 +51,6 @@ use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\ServerFight\Monster\MonsterSpecialAttack;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\ServerFight\MonsterPlayerFight;
-use App\Flare\ServerFight\Pvp\PvpAttack;
-use App\Flare\ServerFight\Pvp\PvpHealing;
-use App\Flare\ServerFight\Pvp\SetUpFight;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Services\CanUserEnterSiteService;
 use App\Flare\Services\CharacterDeletion;
@@ -61,18 +59,19 @@ use App\Flare\Services\CharacterXPService;
 use App\Flare\Services\CreateSurveySnapshot;
 use App\Flare\Services\DailyGoldDustService;
 use App\Flare\Services\EventSchedulerService;
+use App\Flare\Services\SiteAccessStatisticService;
 use App\Flare\Transformers\BasicKingdomTransformer;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\ItemTransformer;
-use App\Flare\Transformers\KingdomAttackLogsTransformer;
-use App\Flare\Transformers\KingdomBuildingTransformer;
-use App\Flare\Transformers\KingdomTransformer;
+use App\Game\Kingdoms\Transformers\KingdomAttackLogsTransformer;
+use App\Game\Kingdoms\Transformers\KingdomBuildingTransformer;
+use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use App\Flare\Transformers\MarketItemsTransformer;
 use App\Flare\Transformers\MonsterTransformer;
-use App\Flare\Transformers\OtherKingdomTransformer;
-use App\Flare\Transformers\UnitTransformer;
+use App\Game\Kingdoms\Transformers\OtherKingdomTransformer;
+use App\Game\Kingdoms\Transformers\UnitTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Flare\Values\BaseSkillValue;
 use App\Flare\Values\BaseStatValue;
@@ -291,8 +290,6 @@ class ServiceProvider extends ApplicationServiceProvider
             return new AttackAndCast(
                 $app->make(CharacterCacheData::class),
                 $app->make(Entrance::class),
-                $app->make(CanHit::class),
-                $app->make(SecondaryAttacks::class),
                 $app->make(WeaponType::class),
                 $app->make(CastType::class),
             );
@@ -302,8 +299,6 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CastAndAttack(
                 $app->make(CharacterCacheData::class),
                 $app->make(Entrance::class),
-                $app->make(CanHit::class),
-                $app->make(SecondaryAttacks::class),
                 $app->make(WeaponType::class),
                 $app->make(CastType::class),
             );
@@ -430,23 +425,6 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(SetUpFight::class, function ($app) {
-            return new SetUpFight(
-                $app->make(CharacterCacheData::class),
-                $app->make(Voidance::class),
-                $app->make(Ambush::class)
-            );
-        });
-
-        $this->app->bind(PvpAttack::class, function ($app) {
-            return new PvpAttack(
-                $app->make(CharacterCacheData::class),
-                $app->make(SetUpFight::class),
-                $app->make(PvpHealing::class),
-                $app->make(BaseCharacterAttack::class)
-            );
-        });
-
         $this->app->bind(BuildMythicItem::class, function ($app) {
             return new BuildMythicItem($app->make(RandomAffixGenerator::class));
         });
@@ -464,6 +442,10 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(QuestTransformer::class),
                 $app->make(Manager::class),
             );
+        });
+
+        $this->app->bind(SiteAccessStatisticService::class, function () {
+            return new SiteAccessStatisticService();
         });
     }
 

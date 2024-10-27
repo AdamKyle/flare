@@ -299,7 +299,8 @@ class DamageBuilder extends BaseAttribute
             return 0;
         }
 
-        $lifeStealAmounts = $lifeStealAmounts >= 1 ? .99 : $lifeStealAmounts;
+        // Merge in the default smallest value as doing min(x, 0.5) gives unexpected results, this way we always take the smallest amount.
+        $lifeStealAmounts = min(array_merge($lifeStealAmounts, [0.5]));
 
         $lifeStealAmount = $this->getLifeStealAfterPlaneReductions($gameMap, $lifeStealAmounts);
 

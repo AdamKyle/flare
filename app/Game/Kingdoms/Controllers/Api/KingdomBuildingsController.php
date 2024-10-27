@@ -58,7 +58,7 @@ class KingdomBuildingsController extends Controller
             ], 422);
         }
 
-        $kingdom = $this->kingdomBuildingService->updateKingdomResourcesForRebuildKingdomBuilding($building);
+        $kingdom = $this->kingdomBuildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
 
         $this->kingdomBuildingService->rebuildKingdomBuilding($building, $character);
 

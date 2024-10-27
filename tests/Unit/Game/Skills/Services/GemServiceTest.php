@@ -4,9 +4,9 @@ namespace Tests\Unit\Game\Skills\Services;
 
 use App\Flare\Models\GameSkill;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Gems\Builders\GemBuilder;
 use App\Game\Gems\Values\GemTypeValue;
 use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\Skills\Builders\GemBuilder;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Services\GemService;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -184,6 +184,35 @@ class GemServiceTest extends TestCase
         $this->assertEquals(200, $result['status']);
 
         Event::assertDispatched(UpdateSkillEvent::class);
+        Event::assertDispatched(ServerMessageEvent::class);
+    }
+
+    public function testCraftTheGemWhenSkillLevelIsMaxed()
+    {
+        Event::fake();
+
+
+        $character = $this->character->getCharacter();
+
+        $character->skills()->where('game_skill_id', GameSkill::where('name', 'Gem Crafting')->first()->id)->update([
+            'level' => 400
+        ]);
+
+        $character->update([
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+        ]);
+
+        $result = resolve(GemService::class)->generateGem($character, 1);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(1, $character->gemBag->gemSlots->first()->amount);
+
+        $this->assertEquals(200, $result['status']);
+
+        Event::assertNotDispatched(UpdateSkillEvent::class);
         Event::assertDispatched(ServerMessageEvent::class);
     }
 

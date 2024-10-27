@@ -7,7 +7,7 @@ use App\Flare\ServerFight\BattleBase;
 
 class PrisonerRage extends BattleBase
 {
-    public function handleAttack(Character $character, array $attackData, bool $isPvp = false)
+    public function handleAttack(Character $character, array $attackData)
     {
         $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 
@@ -19,7 +19,7 @@ class PrisonerRage extends BattleBase
                 }
             }
 
-            $this->addMessage('You cannot let them keep you prisoner! Lash out and kill!', 'regular', $isPvp);
+            $this->addMessage('You cannot let them keep you prisoner! Lash out and kill!', 'regular');
 
             $damage = $attackData['weapon_damage'];
 
@@ -28,7 +28,7 @@ class PrisonerRage extends BattleBase
             $damage = $damage + $strToAdd;
 
             if ($attackData['damage_deduction'] > 0.0) {
-                $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action', $isPvp);
+                $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
 
                 $damage = $damage - $damage * $attackData['damage_deduction'];
             }
@@ -36,19 +36,15 @@ class PrisonerRage extends BattleBase
             $times = rand(1, 4);
 
             for ($i = 0; $i <= $times; $i++) {
-                $this->doBaseAttack($damage, $isPvp);
+                $this->doBaseAttack($damage);
             }
         }
     }
 
-    protected function doBaseAttack(int $damage, bool $isPvp = false)
+    protected function doBaseAttack(int $damage)
     {
         $this->monsterHealth -= $damage;
 
-        $this->addMessage('You slash, you thrash, you bash and you crash your way through! (You dealt: '.number_format($damage).')', 'player-action', $isPvp);
-
-        if ($isPvp) {
-            $this->addDefenderMessage('The enemy has refused to allow you to make them your prisoner. Death is coming! Damage dealt: '.number_format($damage), 'enemy-action');
-        }
+        $this->addMessage('You slash, you thrash, you bash and you crash your way through! (You dealt: ' . number_format($damage) . ')', 'player-action');
     }
 }

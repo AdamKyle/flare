@@ -13,7 +13,7 @@ export default class PrimaryLinkButton extends React.Component<
         return (
             <button
                 className={
-                    "hover:text-blue-500 text-blue-700 dark:text-blue-500 dark:hover:text-blue-400 " +
+                    "hover:text-blue-500 text-blue-700 dark:text-blue-500 dark:hover:text-blue-400 underline " +
                     "disabled:text-blue-400 dark:disabled:bg-blue-400 disabled:line-through " +
                     "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-200 dark:focus-visible:ring-white " +
                     "focus-visible:ring-opacity-75 " +

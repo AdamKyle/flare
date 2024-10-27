@@ -100,8 +100,8 @@
                         Players are suggested to start slowly, gaining <a href="/information/currencies">Copper
                             Coins</a> which they can use along side <a href="/information/currencies">Gold Dust</a>
                         to train a new crafting skill: <a href="/information/trinketry">Trinketry</a>. These new items
-                        have Ambush and Counter Chance/Resistance which is
-                        vital for further down the list as well as for PVp (optional).
+                        have Ambush and Counter Chance/Resistance which is vital for much harder creatures nearing end
+                        game and special event maps.
                     </p>
                     <p class="my-2">
                         Further complicating things, vampires life stealing percentage is reduced by 20% down here.

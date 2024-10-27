@@ -4,10 +4,12 @@ namespace App\Game\Character\CharacterInventory\Services;
 
 use App\Flare\Models\Character;
 use App\Game\Character\CharacterInventory\Builders\EquipManyBuilder;
+use App\Game\Character\CharacterInventory\Jobs\DisenchantMany;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\DisenchantService;
 use Exception;
+use Illuminate\Support\Facades\Cache;
 
 class MultiInventoryActionService
 {
@@ -110,26 +112,15 @@ class MultiInventoryActionService
 
     public function disenchantManyItems(Character $character, array $slotIds): array
     {
-        $result = $this->errorResult('Nothing happened when trying to disenchant many items. Did you select anything?');
 
-        foreach ($slotIds as $slotId) {
+        Cache::put('character-slots-to-disenchant-' . $character->id, $slotIds);
 
-            $foundItem = $character->inventory->slots()->find($slotId);
-
-            if (is_null($foundItem)) {
-                return $this->errorResult('Failed to find an item for the selected slots. One of those items is missing.');
-            }
-
-            $result = $this->disenchantService->disenchantItem($character, $foundItem->item);
-
-            if ($result['status'] === 422) {
-                return $result;
-            }
-        }
+        DisenchantMany::dispatch($character, $slotIds);
 
         return $this->successResult([
-            'message' => 'Disenchanted all selected items. Check server messages for gold dust awards as well as any skill levels in Disenchanting and/or Enchanting. Mobile players can access Server Messages by tapping Chat Tabs and selecting Server Messages.',
-            'inventory' => $result['inventory'],
+            'message' => 'Items are queued for disenchanting. Check Server Messages
+            (Scroll down for desktop, click Serve Messages tab). If on mobile scroll down,
+            selected Server Messages from the Orange Chat Dropdown.'
         ]);
     }
 

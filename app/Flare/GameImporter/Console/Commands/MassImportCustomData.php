@@ -2,13 +2,19 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
+use App\Flare\Models\CapitalCityBuildingQueue;
+use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
+use App\Flare\Models\Item;
 use App\Flare\Models\Survey;
+use App\Flare\Models\SurveySnapshot;
+use App\Flare\Models\User;
 use App\Flare\Values\MapNameValue;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class MassImportCustomData extends Command
@@ -31,13 +37,27 @@ class MassImportCustomData extends Command
      * Execute the console command.
      */
 
-    public function handle() {
+    public function handle()
+    {
 
         Artisan::call('import:game-data Items');
         Artisan::call('import:game-data "Kingdom Passive Skills"');
         Artisan::call('import:game-data Quests');
 
+        CapitalCityUnitQueue::truncate();
+        CapitalCityBuildingQueue::truncate();
+        Survey::truncate();
+        SurveySnapshot::truncate();
+        User::where('is_showing_survey', true)->update(['is_showing_survey' => false]);
+
+        Artisan::call('fix:event-types-on-events');
+
         $this->importInformationSection();
+
+        if (config('app.env') !== 'production') {
+            $this->importGameMaps();
+        }
+
         $this->importSurveys();
 
         if (config('app.env') !== 'production') {
@@ -49,8 +69,16 @@ class MassImportCustomData extends Command
         Artisan::call('create:character-attack-data');
     }
 
-    protected function importInformationSection(): void
+    /**
+     * Import the information section
+     *
+     * @return void
+     */
+    private function importInformationSection(): void
     {
+
+        InfoPage::truncate();
+
         $data = Storage::disk('data-imports')->get('Admin Section/information.json');
 
         $data = json_decode(trim($data), true);
@@ -62,15 +90,23 @@ class MassImportCustomData extends Command
         $sourceDirectory = resource_path('backup/info-sections-images');
         $destinationDirectory = storage_path('app/public');
 
-        $command = 'cp -R '.escapeshellarg($sourceDirectory).' '.escapeshellarg($destinationDirectory);
+        $deleteCommand = 'rm -rf ' . escapeshellarg($destinationDirectory) . './info-sections-images';
+        exec($deleteCommand, $output, $exitCode);
+
+        if ($exitCode !== 0) {
+            $this->error('Could not delete the info-section-images directory');
+
+            return;
+        }
+
+        $command = 'cp -R ' . escapeshellarg($sourceDirectory) . ' ' . escapeshellarg($destinationDirectory);
         exec($command, $output, $exitCode);
 
         if ($exitCode === 0) {
             $this->line('Information section images directory copied to public successfully. Information section is now set up.');
         } else {
-            $this->line('Failed to copy the information images directory over. You can do this manually from the resources/backup/information-sections-images. Copy the entire directory to app/public');
+            $this->error('Failed to copy the information images directory over. You can do this manually from the resources/backup/information-sections-images. Copy the entire directory to app/public');
         }
-
     }
 
     /**
@@ -78,7 +114,7 @@ class MassImportCustomData extends Command
      *
      * @return void
      */
-    protected function importSurveys(): void
+    private function importSurveys(): void
     {
         $data = Storage::disk('data-imports')->get('Admin Section/surveys.json');
 
@@ -91,7 +127,12 @@ class MassImportCustomData extends Command
         $this->line('Surveys have been imported!');
     }
 
-    protected function importGameMaps(): void
+    /**
+     * Import the game maps
+     *
+     * @return void
+     */
+    private function importGameMaps(): void
     {
         $files = Storage::disk('data-maps')->allFiles();
 
@@ -118,7 +159,7 @@ class MassImportCustomData extends Command
         foreach ($files as $file) {
             $fileName = pathinfo($file, PATHINFO_FILENAME);
 
-            $path = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps').'/'.$file));
+            $path = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps') . '/' . $file));
 
             $mapValue = new MapNameValue($fileName);
 

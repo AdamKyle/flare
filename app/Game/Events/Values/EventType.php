@@ -8,25 +8,23 @@ class EventType
 {
     const WEEKLY_CELESTIALS = 0;
 
-    const MONTHLY_PVP = 1;
+    const WEEKLY_CURRENCY_DROPS = 1;
 
-    const WEEKLY_CURRENCY_DROPS = 2;
+    const RAID_EVENT = 2;
 
-    const RAID_EVENT = 3;
+    const WINTER_EVENT = 3;
 
-    const WINTER_EVENT = 4;
+    const PURGATORY_SMITH_HOUSE = 4;
 
-    const PURGATORY_SMITH_HOUSE = 5;
+    const GOLD_MINES = 5;
 
-    const GOLD_MINES = 6;
+    const THE_OLD_CHURCH = 6;
 
-    const THE_OLD_CHURCH = 7;
+    const DELUSIONAL_MEMORIES_EVENT = 7;
 
-    const DELUSIONAL_MEMORIES_EVENT = 8;
+    const WEEKLY_FACTION_LOYALTY_EVENT = 8;
 
-    const WEEKLY_FACTION_LOYALTY_EVENT = 9;
-
-    const FEEDBACK_EVENT = 10;
+    const FEEDBACK_EVENT = 9;
 
     private int $value;
 
@@ -35,30 +33,28 @@ class EventType
      */
     protected static array $values = [
         0 => self::WEEKLY_CELESTIALS,
-        1 => self::MONTHLY_PVP,
-        2 => self::WEEKLY_CURRENCY_DROPS,
-        3 => self::RAID_EVENT,
-        4 => self::WINTER_EVENT,
-        5 => self::PURGATORY_SMITH_HOUSE,
-        6 => self::GOLD_MINES,
-        7 => self::THE_OLD_CHURCH,
-        8 => self::DELUSIONAL_MEMORIES_EVENT,
-        9 => self::WEEKLY_FACTION_LOYALTY_EVENT,
-        10 => self::FEEDBACK_EVENT,
+        1 => self::WEEKLY_CURRENCY_DROPS,
+        2 => self::RAID_EVENT,
+        3 => self::WINTER_EVENT,
+        4 => self::PURGATORY_SMITH_HOUSE,
+        5 => self::GOLD_MINES,
+        6 => self::THE_OLD_CHURCH,
+        7 => self::DELUSIONAL_MEMORIES_EVENT,
+        8 => self::WEEKLY_FACTION_LOYALTY_EVENT,
+        9 => self::FEEDBACK_EVENT,
     ];
 
     protected static array $selection = [
         0 => 'Weekly Celestials',
-        1 => 'Monthly PVP',
-        2 => 'Weekly Currency Drops',
-        3 => 'Raid Event',
-        4 => 'Winter Event',
-        5 => 'Purgatory Smith House',
-        6 => 'Gold Mines',
-        7 => 'The Old Church',
-        8 => 'Delusional Memories Event',
-        9 => 'Weekly Faction Loyalty Event',
-        10 => 'Tlessa\'s Feedback Event'
+        1 => 'Weekly Currency Drops',
+        2 => 'Raid Event',
+        3 => 'Winter Event',
+        4 => 'Purgatory Smith House',
+        5 => 'Gold Mines',
+        6 => 'The Old Church',
+        7 => 'Delusional Memories Event',
+        8 => 'Weekly Faction Loyalty Event',
+        9 => 'Tlessa\'s Feedback Event'
     ];
 
     /**
@@ -69,7 +65,7 @@ class EventType
     public function __construct(int $value)
     {
         if (! in_array($value, self::$values)) {
-            throw new Exception($value.' does not exist.');
+            throw new Exception($value . ' does not exist.');
         }
 
         $this->value = $value;
@@ -97,14 +93,6 @@ class EventType
     public function isWeeklyCelestials(): bool
     {
         return $this->value === self::WEEKLY_CELESTIALS;
-    }
-
-    /**
-     * Is monthly pvp?
-     */
-    public function isMonthlyPVP(): bool
-    {
-        return $this->value === self::MONTHLY_PVP;
     }
 
     /**

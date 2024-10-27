@@ -29,7 +29,8 @@ class SkillService
 
     private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
 
-    public function __construct(Manager $manager,
+    public function __construct(
+        Manager $manager,
         BasicSkillsTransformer $basicSkillsTransformer,
         SkillsTransformer $skillsTransformer,
         UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
@@ -97,19 +98,20 @@ class SkillService
         ]);
 
         return $this->successResult([
-            'message' => 'You are now training '.$skill->name,
+            'message' => 'You are now training: ' . $skill->name,
         ]);
     }
 
     /**
-     * Assign XP to a training skill.
+     * Assign XP to a training skill.trainSkill
      *
-     * @param Character $character
+     * @param Character $charactertrainSkill
      * @param int $xp
      * @return void
      * @throws Exception
      */
-    public function assignXPToTrainingSkill(Character $character, int $xp): void {
+    public function assignXPToTrainingSkill(Character $character, int $xp): void
+    {
         $skillInTraining = $character->skills->where('currently_training', true)->first();
         $event = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
 
@@ -189,6 +191,7 @@ class SkillService
     public function assignXpToCraftingSkill(GameMap $gameMap, Skill $skill): void
     {
         if ($skill->level >= 400) {
+            $skill->update(['xp' => 0]);
             return;
         }
 
@@ -197,10 +200,11 @@ class SkillService
 
         $newXp = $skill->xp + $xp;
 
-        $event = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
+        $event = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)
+            ->where('currently_running', true)
+            ->first();
 
         if (!is_null($event)) {
-
             if ($skill->type()->isEnchanting() || $skill->type()->isCrafting() || $skill->type()->isAlchemy() || $skill->type()->isGemCrafting()) {
                 $newXp += 175;
             } else {
@@ -209,27 +213,22 @@ class SkillService
         }
 
         while ($newXp >= $skill->xp_max) {
+            $skill->update(['xp' => $skill->xp_max]);
+
+            $newXp -= $skill->xp_max;
+            $skill = $skill->refresh();
+
+            $skill = $this->levelUpSkill($skill);
 
             if ($skill->level >= 400) {
                 $newXp = 0;
                 break;
             }
-
-            $skill->update([
-                'xp' => $newXp,
-            ]);
-
-            $newXp -= $skill->xp_max;
-
-            $skill = $skill->refresh();
-
-            $skill = $this->levelUpSkill($skill);
         }
 
-        if ($newXp > 0) {
-            $skill->update(['xp' => $newXp]);
-        }
+        $skill->update(['xp' => $newXp]);
     }
+
 
     /**
      * Level a skill.

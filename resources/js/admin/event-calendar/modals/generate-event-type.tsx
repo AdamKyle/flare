@@ -40,10 +40,6 @@ export default class GenerateEventType extends React.Component<
                 value: "0",
             },
             {
-                label: "Monthly PVP",
-                value: "1",
-            },
-            {
                 label: "Weekly Currency Drops",
                 value: "2",
             },

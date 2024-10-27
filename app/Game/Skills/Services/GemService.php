@@ -9,8 +9,8 @@ use App\Flare\Models\Skill;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Gems\Builders\GemBuilder;
 use App\Game\Gems\Values\GemTierValue;
-use App\Game\Skills\Builders\GemBuilder;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Values\SkillTypeValue;
 use Exception;
@@ -20,12 +20,7 @@ class GemService
 {
     use ResponseBuilder;
 
-    private GemBuilder $gemBuilder;
-
-    public function __construct(GemBuilder $gemBuilder)
-    {
-        $this->gemBuilder = $gemBuilder;
-    }
+    public function __construct(private GemBuilder $gemBuilder) {}
 
     /**
      * Generate the gem.
@@ -57,7 +52,6 @@ class GemService
         }
 
         if (!$this->canCraft($characterSkill, (new GemTierValue($tier))->maxForTier()['chance'])) {
-
             ServerMessageHandler::sendBasicMessage($character->user, 'You failed to craft the gem, the item explodes before you into a pile of wasted effort and time.');
 
             return $this->successResult();
@@ -65,7 +59,7 @@ class GemService
 
         $gemBagEntry = $this->giveGem($character, $tier);
 
-        if (! $characterSkill->level <= (new GemTierValue($tier))->maxForTier()['max_level']) {
+        if ($characterSkill->level <= (new GemTierValue($tier))->maxForTier()['max_level']) {
             event(new UpdateSkillEvent($characterSkill));
         }
 
@@ -232,7 +226,7 @@ class GemService
         $skill = $character->skills()->where('game_skill_id', $gameSkill->id)->first();
 
         if (is_null($skill)) {
-            throw new Exception('Character is missing required game skill: '.$name);
+            throw new Exception('Character is missing required game skill: ' . $name);
         }
 
         return $skill;

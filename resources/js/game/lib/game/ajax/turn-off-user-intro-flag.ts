@@ -18,7 +18,7 @@ export default class TurnOffUserIntroFlag {
                     if (typeof error.response !== "undefined") {
                         const response: AxiosResponse = error.response;
 
-                        console.log(response.data);
+                        console.error(response.data);
                     }
                 },
             );

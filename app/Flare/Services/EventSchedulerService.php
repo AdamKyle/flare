@@ -3,8 +3,12 @@
 namespace App\Flare\Services;
 
 use App\Flare\Events\UpdateScheduledEvents;
+use App\Flare\Models\Announcement;
+use App\Flare\Models\Event;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Models\ScheduledEventConfiguration;
+use App\Game\Messages\Events\DeleteAnnouncementEvent;
+use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Events\Values\EventType;
 use Carbon\Carbon;
@@ -57,6 +61,28 @@ class EventSchedulerService
             'end_date' => $params['selected_end_date'],
             'description' => $params['event_description'],
         ]);
+
+        $scheduledEvent = $scheduledEvent->refresh();
+
+        if ($scheduledEvent->currently_running) {
+            $event = Event::where('type', $params['selected_event_type'])->first();
+
+            if (!is_null($event)) {
+                $event->update([
+                    'ends_at' => $params['selected_end_date']
+                ]);
+
+                $announcement = Announcement::where('event_id', $event->id)->first();
+
+                event(new DeleteAnnouncementEvent($announcement->id));
+
+                $announcement->delete();
+
+                $name = AnnouncementHandler::getNameForType($params['selected_event_type']);
+
+                AnnouncementHandler::createAnnouncement($name);
+            }
+        }
 
         event(new UpdateScheduledEvents($this->fetchEvents()));
 
@@ -138,7 +164,7 @@ class EventSchedulerService
         $eventData['start_date'] = $date;
 
         // If we are monthly pbp, then it always ends at 6pm regardless of when you set the start date.
-        $eventData['end_date'] = $eventType->isMonthlyPVP() ? $date->copy()->setHour(18) : $date->copy()->addDay();
+        $eventData['end_date'] = $date->copy()->addDay();
 
         $eventData['description'] = $this->eventDescriptionForEventType($eventType);
 
@@ -155,14 +181,8 @@ class EventSchedulerService
         }
 
         if ($type->isWeeklyCurrencyDrops()) {
-            return 'For the next 24 hours you just have to kill creatures for Gold Dust,'.
+            return 'For the next 24 hours you just have to kill creatures for Gold Dust,' .
                 'Shards and Copper Coins (provided you have the quest item) will drop at a rate of 1-50 per kill! How fun!';
-        }
-
-        if ($type->isMonthlyPVP()) {
-            return 'Once per month, the gates will open to the Colosseum and players can choose to participate in monthly pvp where players
-            Compete against each other and the last person standing wins a mythic! Afterwords the Celestial Kings will spawn and they even have a chance
-            to drop mythics! Players can enrol in PVP from the action section roughly 8 hours before the actual event.';
         }
 
         if ($type->isWeeklyFactionLoyaltyEvent()) {

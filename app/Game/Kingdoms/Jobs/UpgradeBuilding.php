@@ -183,20 +183,13 @@ class UpgradeBuilding implements ShouldQueue
 
             event(new UpdateCapitalCityBuildingQueueTable($capitalCityQueue->character));
 
-            $capitalCityBuildingManagement->possiblyCreateLogForQueue($capitalCityQueue);
+            $capitalCityBuildingManagement->possiblyCreateLogForBuildingQueue($capitalCityQueue);
         }
     }
 
     protected function getResourceType()
     {
-        foreach ($this->resourceTypes as $type) {
-            if ($this->building->{'increase_in_'.$type} !== 0.0) {
-                return $type;
-            }
-        }
-
-        // @codeCoverageIgnoreStart
-        return null;
-        // @codeCoverageIgnoreEnd
+        return collect($this->resourceTypes)->first(fn($type) => $this->building->{'increase_in_' . $type} !== 0.0);
     }
+
 }

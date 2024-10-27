@@ -52,23 +52,23 @@ class ResourceTransferService
         }
 
         if (! $this->onTheSameMapAsTheCharacter($requestingKingdom, $requestingFromKingdom)) {
-            return $this->errorResult('Your kingdoms ('.$requestingKingdom->name.' and '.$requestingFromKingdom->name.') must both be on the same map.');
+            return $this->errorResult('Your kingdoms (' . $requestingKingdom->name . ' and ' . $requestingFromKingdom->name . ') must both be on the same map.');
         }
 
         if (! $this->hasRequestedResourceAmount($requestingFromKingdom, $params['amount_of_resources'], $params['type_of_resource'])) {
-            return $this->errorResult($requestingFromKingdom->name.' does not have: '.number_format($params['amount_of_resources']).' of type: '.$params['type_of_resource']);
+            return $this->errorResult($requestingFromKingdom->name . ' does not have: ' . number_format($params['amount_of_resources']) . ' of type: ' . $params['type_of_resource']);
         }
 
         if (! $this->bothKingdomsHaveAMarketPlace($requestingKingdom, $requestingFromKingdom)) {
-            return $this->errorResult('You need: '.number_format($params['amount_of_resources']).' of resource type: '.$params['type_of_resource'].' however, both the requesting kingdom ('.$requestingKingdom->name.') and the kingdom ('.$requestingFromKingdom->name.') need to build a Market Place which can be researched on the passive tree and then built to level 5 in order to request resources. It is ideal all your kingdoms have a maxed out Market Place.');
+            return $this->errorResult('You need: ' . number_format($params['amount_of_resources']) . ' of resource type: ' . $params['type_of_resource'] . ' however, both the requesting kingdom (' . $requestingKingdom->name . ') and the kingdom (' . $requestingFromKingdom->name . ') need to build a Market Place which can be researched on the passive tree and then built to level 5 in order to request resources. It is ideal all your kingdoms have a maxed out Market Place.');
         }
 
         if (! $this->canAffordPopulationCost($requestingFromKingdom)) {
-            return $this->errorResult('The kingdom: '.$requestingFromKingdom->name.' you are requesting resources from does not have enough population to move this amount of resources. You need at least 50 people in: '.$requestingFromKingdom->name);
+            return $this->errorResult('The kingdom: ' . $requestingFromKingdom->name . ' you are requesting resources from does not have enough population to move this amount of resources. You need at least 50 people in: ' . $requestingFromKingdom->name);
         }
 
         if (! $this->hasRequiredSpearmen($requestingFromKingdom)) {
-            return $this->errorResult('The kingdom: '.$requestingFromKingdom->name.' you are requesting resources from does not have enough spearmen (you need 75) to guard to the transportation');
+            return $this->errorResult('The kingdom: ' . $requestingFromKingdom->name . ' you are requesting resources from does not have enough spearmen (you need 75) to guard to the transportation');
         }
 
         $useAirShip = $params['use_air_ship'];
@@ -82,10 +82,10 @@ class ResourceTransferService
         $this->sendOffRequestForResources($requestingKingdom, $requestingFromKingdom, $amountOfResources, $params['type_of_resource'], $useAirShip, $capitalCityQueueId, $buildingId, $unitId);
 
         return $this->successResult([
-            'message' => 'You have requested: '.number_format($amountOfResources).' of type: '.$params['type_of_resource'].' from: '.
-                $requestingFromKingdom->name.' to be transported to: '.$requestingKingdom->name.
-                '. The resources are on the way, check your queues to see the movement. A log will be delivered once the resources arrive.'.
-            ' (Should the resources you request be more then whats being delivered, the log will also explain why.)',
+            'message' => 'You have requested: ' . number_format($amountOfResources) . ' of type: ' . $params['type_of_resource'] . ' from: ' .
+                $requestingFromKingdom->name . ' to be transported to: ' . $requestingKingdom->name .
+                '. The resources are on the way, check your queues to see the movement. A log will be delivered once the resources arrive.' .
+                ' (Should the resources you request be more then whats being delivered, the log will also explain why.)',
             'kingdoms' => $this->fetchKingdomsForResourceRequests($requestingKingdom->character, $requestingKingdom),
         ]);
     }
@@ -96,7 +96,7 @@ class ResourceTransferService
         if ($useAirShip) {
             if ($amountOfResources > self::MAX_WITH_AIR_SHIP) {
 
-                $this->additionalMessagesForLog[] = 'Amount of requested resources: '.$amountOfResources.' is greater then: '.self::MAX_WITH_AIR_SHIP.'. Reductions have been made.';
+                $this->additionalMessagesForLog[] = 'Amount of requested resources: ' . $amountOfResources . ' is greater then: ' . self::MAX_WITH_AIR_SHIP . '. Reductions have been made.';
 
                 return self::MAX_WITH_AIR_SHIP;
             }
@@ -104,7 +104,7 @@ class ResourceTransferService
 
         if ($amountOfResources > self::MAX_WITHOUT_AIR_SHIP) {
 
-            $this->additionalMessagesForLog[] = 'Amount of requested resources: '.$amountOfResources.' is greater then: '.self::MAX_WITHOUT_AIR_SHIP.'. Reductions have been made.';
+            $this->additionalMessagesForLog[] = 'Amount of requested resources: ' . $amountOfResources . ' is greater then: ' . self::MAX_WITHOUT_AIR_SHIP . '. Reductions have been made.';
 
             return self::MAX_WITHOUT_AIR_SHIP;
         }
@@ -118,8 +118,12 @@ class ResourceTransferService
 
         return $kingdoms->map(function ($otherKingdom) use ($kingdom) {
 
-            $pixelDistance = $this->distanceCalculation->calculatePixel($kingdom->x_position, $kingdom->y_position,
-                $otherKingdom->x_position, $otherKingdom->y_position);
+            $pixelDistance = $this->distanceCalculation->calculatePixel(
+                $kingdom->x_position,
+                $kingdom->y_position,
+                $otherKingdom->x_position,
+                $otherKingdom->y_position
+            );
 
             $timeToKingdom = $this->distanceCalculation->calculateMinutes($pixelDistance);
 
@@ -163,22 +167,22 @@ class ResourceTransferService
             return true;
         }
 
-        $currentAmountFromKingdom = $requestFromKingdom->{'current_'.$type};
+        $currentAmountFromKingdom = $requestFromKingdom->{'current_' . $type};
 
         return $amount <= $currentAmountFromKingdom;
     }
 
-    private function canAffordPopulationCost(Kingdom $requestFromKingdom): bool
+    public function canAffordPopulationCost(Kingdom $requestFromKingdom): bool
     {
         return $requestFromKingdom->current_population >= self::POPULATION_COST;
     }
 
-    private function hasAirShip(Kingdom $requestFromKingdom): bool
+    public function hasAirShip(Kingdom $requestFromKingdom): bool
     {
         return $requestFromKingdom->units->where('gameUnit.name', '=', UnitNames::AIRSHIP)->count() > 0;
     }
 
-    private function hasRequiredSpearmen(Kingdom $requestFromKingdom): bool
+    public function hasRequiredSpearmen(Kingdom $requestFromKingdom): bool
     {
 
         $spearmen = $requestFromKingdom->units->where('gameUnit.name', '=', UnitNames::SPEARMEN)->first();
@@ -190,13 +194,31 @@ class ResourceTransferService
         return $spearmen->amount >= self::SPEARMEN_COST;
     }
 
-    private function bothKingdomsHaveAMarketPlace(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom): bool
+    public function bothKingdomsHaveAMarketPlace(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom): bool
     {
 
         $requestingMarketPlace = $requestingKingdom->buildings->where('gameBuilding.name', '=', BuildingCosts::MARKET_PLACE)->where('level', '>=', 5)->first();
         $requestingFromMarketPlace = $requestingFromKingdom->buildings->where('gameBuilding.name', '=', BuildingCosts::MARKET_PLACE)->where('level', '>=', 5)->first();
 
         return ! is_null($requestingMarketPlace) && ! is_null($requestingFromMarketPlace);
+    }
+
+    public function sendOffBasicUnitMovement(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom, array $resourceRequest)
+    {
+        $pixelDistance = $this->distanceCalculation->calculatePixel(
+            $requestingKingdom->x_position,
+            $requestingKingdom->y_position,
+            $requestingFromKingdom->x_position,
+            $requestingFromKingdom->y_position
+        );
+
+        $timeToKingdom = $this->distanceCalculation->calculateMinutes($pixelDistance);
+
+        $unitMovementQueue = UnitMovementQueue::create(
+            $this->buildUnitDataForMovement($requestingKingdom, $requestingFromKingdom, $timeToKingdom)
+        );
+
+        $this->sendOffEvents($requestingKingdom, $requestingFromKingdom, $unitMovementQueue, $resourceRequest);
     }
 
     private function sendOffRequestForResources(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom, int $amount, string $type, bool $useAirShip, ?int $capitalCityQueueId = null, ?int $buildingId = null, ?int $unitId = null): void
@@ -209,26 +231,26 @@ class ResourceTransferService
         if ($type === 'all') {
             foreach ($resources as $resource) {
 
-                if ($requestingFromKingdom->{'current_'.$resource} >= $amount) {
+                if ($requestingFromKingdom->{'current_' . $resource} >= $amount) {
                     $resourcesToRequest[$resource] = $amount;
 
-                    $requestingFromKingdom->{'current_'.$resource} -= $amount;
+                    $requestingFromKingdom->{'current_' . $resource} -= $amount;
                 } else {
 
-                    $amount = $requestingFromKingdom->{'current_'.$resource};
+                    $amount = $requestingFromKingdom->{'current_' . $resource};
 
-                    $resourcesToRequest[$resource] = $requestingFromKingdom->{'current_'.$resource};
+                    $resourcesToRequest[$resource] = $requestingFromKingdom->{'current_' . $resource};
 
-                    $requestingFromKingdom->{'current_'.$resource} = 0;
+                    $requestingFromKingdom->{'current_' . $resource} = 0;
 
-                    $this->additionalMessagesForLog[] = 'only took: '.number_format($amount).' For type: '.$resource.' as you do not have enough for (request amount): '.number_format($amount);
+                    $this->additionalMessagesForLog[] = 'only took: ' . number_format($amount) . ' For type: ' . $resource . ' as you do not have enough for (request amount): ' . number_format($amount);
                 }
             }
         } else {
-            if ($requestingFromKingdom->{'current_'.$type} >= $amount) {
+            if ($requestingFromKingdom->{'current_' . $type} >= $amount) {
                 $resourcesToRequest[$type] = $amount;
 
-                $requestingFromKingdom->{'current_'.$type} -= $amount;
+                $requestingFromKingdom->{'current_' . $type} -= $amount;
             }
         }
 
@@ -246,8 +268,12 @@ class ResourceTransferService
 
         $requestingFromKingdom = $requestingFromKingdom->refresh();
 
-        $pixelDistance = $this->distanceCalculation->calculatePixel($requestingKingdom->x_position, $requestingKingdom->y_position,
-            $requestingFromKingdom->x_position, $requestingFromKingdom->y_position);
+        $pixelDistance = $this->distanceCalculation->calculatePixel(
+            $requestingKingdom->x_position,
+            $requestingKingdom->y_position,
+            $requestingFromKingdom->x_position,
+            $requestingFromKingdom->y_position
+        );
 
         $timeToKingdom = $this->distanceCalculation->calculateMinutes($pixelDistance);
 

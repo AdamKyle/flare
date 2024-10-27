@@ -2,12 +2,10 @@
 
 namespace App\Game\Exploration\Providers;
 
-use App\Flare\ServerFight\MonsterPlayerFight;
-use App\Game\Battle\Handlers\BattleEventHandler;
+use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Exploration\Middleware\IsCharacterExploring;
 use App\Game\Exploration\Services\ExplorationAutomationService;
-use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -21,8 +19,6 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(ExplorationAutomationService::class, function ($app) {
             return new ExplorationAutomationService(
-                $app->make(MonsterPlayerFight::class),
-                $app->make(BattleEventHandler::class),
                 $app->make(CharacterCacheData::class)
             );
         });

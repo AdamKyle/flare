@@ -38,6 +38,11 @@ class CharacterPassiveSkill extends Model
 
     protected $appends = [
         'name',
+        'is_max_level',
+        'current_bonus',
+        'resource_request_time_reduction',
+        'capital_city_building_request_travel_time_reduction',
+        'capital_city_unit_request_travel_time_reduction'
     ];
 
     public function character()
@@ -55,7 +60,7 @@ class CharacterPassiveSkill extends Model
         return $this->hasMany($this, 'parent_skill_id')->with('children');
     }
 
-    public function getIsMaxedLevelAttribute()
+    public function getIsMaxLevelAttribute()
     {
         return $this->current_level === $this->passiveSkill->max_level;
     }
@@ -68,5 +73,20 @@ class CharacterPassiveSkill extends Model
     public function getNameAttribute()
     {
         return $this->passiveSkill->name;
+    }
+
+    public function getResourceRequestTimeReductionAttribute()
+    {
+        return $this->current_level * $this->passiveSkill->resource_request_time_reduction;
+    }
+
+    public function getCapitalCityBuildingRequestTravelTimeReductionAttribute()
+    {
+        return $this->current_level * $this->passiveSkill->capital_city_building_request_travel_time_reduction;
+    }
+
+    public function getCapitalCityUnitRequestTravelTimeReductionAttribute()
+    {
+        return $this->level * $this->passiveSkill->capital_city_unit_request_travel_time_reduction;
     }
 }

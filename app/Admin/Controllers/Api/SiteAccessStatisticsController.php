@@ -9,7 +9,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\User;
 use App\Flare\Models\UserLoginDuration;
-use App\Flare\Values\SiteAccessStatisticValue;
+use App\Flare\Services\SiteAccessStatisticService;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -18,17 +18,21 @@ use Illuminate\Support\Facades\DB;
 class SiteAccessStatisticsController extends Controller
 {
 
-    public function __construct(private readonly SiteStatisticsService $siteStatisticsService) {
+    public function __construct(private readonly SiteStatisticsService $siteStatisticsService, private readonly SiteAccessStatisticService $siteAccessStatisticValue) {
     }
 
     public function fetchLoggedInAllTime(SiteAccessStatisticsRequest $request)
     {
-        return response()->json(['stats' => SiteAccessStatisticValue::getSignedIn($request->daysPast)], 200);
+
+        $loginDetails = $this->siteAccessStatisticValue->setAttribute('amount_signed_in')->setDaysPast($request->daysPast ?? 0);
+
+        return response()->json(['stats' => $loginDetails->getSignedIn()], 200);
     }
 
     public function fetchRegisteredAllTime(SiteAccessStatisticsRequest $request)
     {
-        return response()->json(['stats' => SiteAccessStatisticValue::getRegistered($request->daysPast)], 200);
+        $registrationDetails = $this->siteAccessStatisticValue->setAttribute('amount_registered')->setDaysPast($request->daysPast ?? 0);
+        return response()->json(['stats' => $registrationDetails->getRegistered()], 200);
     }
 
     public function fetchCompletedQuests(CompletedQuestsStatisticsRequest $request)

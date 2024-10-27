@@ -8,6 +8,7 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Character\CharacterInventory\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -51,7 +52,7 @@ class DisenchantService
         return $this;
     }
 
-    public function disenchantItem(Character $character, Item $item): array
+    public function disenchantItem(Character $character, Item $item, bool $doNotSendResponse = false): array
     {
 
         $inventory = Inventory::where('character_id', $character->id)->first();
@@ -59,18 +60,15 @@ class DisenchantService
         $foundItem = InventorySlot::where('equipped', false)->where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
 
         if (is_null($foundItem)) {
-
-            return $this->errorResult($item->affix_name.' Cannot be disenchanted. Not found in inventory.');
+            return $this->errorResult($item->affix_name . ' Cannot be disenchanted. Not found in inventory.');
         }
 
         if (is_null($foundItem->item->item_suffix_id) && is_null($foundItem->item->item_prefix_id)) {
-
-            return $this->errorResult($item->affix_name.' Cannot be disenchanted. Has no enchantments attached.');
+            return $this->errorResult($item->affix_name . ' Cannot be disenchanted. Has no enchantments attached.');
         }
 
         if (! is_null($foundItem)) {
             if ($foundItem->item->type === 'quest') {
-
                 return $this->errorResult('Quest items cannot be disenchanted.');
             }
 
@@ -79,12 +77,14 @@ class DisenchantService
             event(new UpdateTopBarEvent($character->refresh()));
         }
 
-        $inventory = $this->characterInventoryService->setCharacter($character->refresh());
+        if ($doNotSendResponse) {
+            return $this->successResult();
+        }
 
         return $this->successResult([
-            'message' => 'Disenchanted item '.$item->affix_name.' Check server message tab for Gold Dust output.',
+            'message' => 'Disenchanted item ' . $item->affix_name . ' Check server message tab for Gold Dust output.',
             'inventory' => [
-                'inventory' => $inventory->getInventoryForType('inventory'),
+                'inventory' => $this->characterInventoryService->setCharacter($character)->getInventoryForType('inventory'),
             ],
         ]);
     }
@@ -98,6 +98,8 @@ class DisenchantService
             $slot->delete();
 
             $affixData = resolve(EnchantingService::class)->fetchAffixes($this->character->refresh());
+
+            event(new UpdateSkillEvent($this->disenchantingSkill));
 
             event(new UpdateCharacterEnchantingList(
                 $this->character->user,
@@ -117,7 +119,6 @@ class DisenchantService
             ServerMessageHandler::handleMessage($this->character->user, 'disenchanted', number_format($goldDust));
 
             event(new UpdateSkillEvent($this->disenchantingSkill));
-
         } else {
             $this->updateGoldDust($this->character, true);
 
@@ -160,7 +161,6 @@ class DisenchantService
             ServerMessageHandler::handleMessage($this->character->user, 'disenchanted', number_format($goldDust));
 
             event(new UpdateSkillEvent($this->disenchantingSkill));
-
         } else {
             $this->updateGoldDust($this->character, true);
 
@@ -192,7 +192,7 @@ class DisenchantService
 
                     event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. You are now capped!'));
                 } else {
-                    event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. Your new total is: '.number_format($characterTotalGoldDust)));
+                    event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. Your new total is: ' . number_format($characterTotalGoldDust)));
                 }
             }
         }

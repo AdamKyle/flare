@@ -5,6 +5,7 @@ namespace Tests\Console\Events;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
+use App\Flare\Models\SurveySnapshot;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\MapNameValue;
 use App\Flare\Values\WeaponTypes;
@@ -26,6 +27,8 @@ use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateNpc;
 use Tests\Traits\CreateRaid;
 use Tests\Traits\CreateScheduledEvent;
+use Tests\Traits\CreateSubmittedSurvey;
+use Tests\Traits\CreateSurvey;
 
 class EndScheduledEventTest extends TestCase
 {
@@ -39,6 +42,8 @@ class EndScheduledEventTest extends TestCase
         CreateNpc,
         CreateRaid,
         CreateScheduledEvent,
+        CreateSurvey,
+        CreateSubmittedSurvey,
         RefreshDatabase;
 
     public function setUp(): void
@@ -49,6 +54,48 @@ class EndScheduledEventTest extends TestCase
     public function tearDown(): void
     {
         parent::tearDown();
+    }
+
+    public function testSetScheduledEventCurrentlyRunningAsFalseWhenNoEventExistsForIt()
+    {
+        $this->deleteOtherGameMaps();
+
+        $monster = $this->createMonster();
+        $item = $this->createItem();
+
+        $gameMap = $this->createGameMap();
+
+        $location = $this->createLocation();
+
+        $raid = $this->createRaid([
+            'raid_boss_id' => $monster->id,
+            'raid_monster_ids' => [$monster->id],
+            'raid_boss_location_id' => $location->id,
+            'corrupted_location_ids' => [$location->id],
+            'artifact_item_id' => $item->id,
+        ]);
+
+        $scheduledEvent = $this->createScheduledEvent([
+            'event_type' => EventType::RAID_EVENT,
+            'start_date' => now()->addMinutes(5),
+            'raid_id' => $raid,
+            'currently_running' => true,
+        ]);
+
+        (new CharacterFactory)->createBaseCharacter()->givePlayerLocation(
+            $location->x,
+            $location->y
+        );
+
+        Cache::put('monsters', [
+            $gameMap->name => [],
+        ]);
+
+        $this->artisan('end:scheduled-event');
+
+        $this->assertEquals(0, Event::count());
+        $this->assertEquals(0, Announcement::count());
+        $this->assertFalse($scheduledEvent->refresh()->currently_running);
     }
 
     public function testEndRaidEvent()
@@ -158,18 +205,18 @@ class EndScheduledEventTest extends TestCase
         $this->assertFalse($scheduledEvent->refresh()->currently_running);
     }
 
-    public function testEndIsMonthlyPvpEvent()
+    public function testEndWeeklyFactionLoyaltyEvent()
     {
         $this->deleteOtherGameMaps();
 
         $scheduledEvent = $this->createScheduledEvent([
-            'event_type' => EventType::MONTHLY_PVP,
+            'event_type' => EventType::WEEKLY_FACTION_LOYALTY_EVENT,
             'start_date' => now()->addMinutes(5),
             'currently_running' => true,
         ]);
 
         $event = $this->createEvent([
-            'type' => EventType::MONTHLY_PVP,
+            'type' => EventType::WEEKLY_FACTION_LOYALTY_EVENT,
             'started_at' => now(),
             'ends_at' => now()->subMinutes(10),
         ]);
@@ -183,6 +230,46 @@ class EndScheduledEventTest extends TestCase
         $this->assertEquals(0, Event::count());
         $this->assertEquals(0, Announcement::count());
         $this->assertFalse($scheduledEvent->refresh()->currently_running);
+    }
+
+    public function testEndFeedbackEventWithSubmittedSurveys()
+    {
+        $this->deleteOtherGameMaps();
+
+        $scheduledEvent = $this->createScheduledEvent([
+            'event_type' => EventType::FEEDBACK_EVENT,
+            'start_date' => now()->addMinutes(5),
+            'currently_running' => true,
+        ]);
+
+        $event = $this->createEvent([
+            'type' => EventType::FEEDBACK_EVENT,
+            'started_at' => now(),
+            'ends_at' => now()->subMinutes(10),
+        ]);
+
+        $this->createAnnouncement([
+            'event_id' => $event->id,
+        ]);
+
+        $survey = $this->createSurvey();
+
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $this->createSubmittedSurvey([
+            'character_id' => $character->id,
+            'survey_id' => $survey->id,
+        ]);
+
+        $this->artisan('end:scheduled-event');
+
+        $this->assertEquals(0, Event::count());
+        $this->assertEquals(0, Announcement::count());
+        $this->assertFalse($scheduledEvent->refresh()->currently_running);
+
+        $surveyResponse = SurveySnapshot::first();
+
+        $this->assertNotNull($surveyResponse);
     }
 
     public function testEndsEventsRunningWhenNoScheduledEventsAreRunning()
@@ -210,21 +297,6 @@ class EndScheduledEventTest extends TestCase
 
         $this->assertEquals(0, Event::count());
         $this->assertEquals(0, Announcement::count());
-    }
-
-    public function testEndPVPMonthlyEvent()
-    {
-        $this->deleteOtherGameMaps();
-
-        $scheduledEvent = $this->createScheduledEvent([
-            'event_type' => EventType::MONTHLY_PVP,
-            'start_date' => now()->addMinutes(5),
-            'currently_running' => true,
-        ]);
-
-        $this->artisan('end:scheduled-event');
-
-        $this->assertFalse($scheduledEvent->refresh()->currently_running);
     }
 
     public function testEndWinterEvent()
@@ -463,7 +535,84 @@ class EndScheduledEventTest extends TestCase
         $this->assertFalse($scheduledEvent->refresh()->currently_running);
         $this->assertEmpty(Event::all());
         $this->assertEmpty(Announcement::all());
+    }
 
+    public function testEndWinterEventWhileNFactionLoayltyExists()
+    {
+        $this->deleteOtherGameMaps();
+
+        // We go back to this map when the event ends.
+        $this->createGameMap([
+            'name' => MapNameValue::SURFACE,
+        ]);
+
+        $icePlane = $this->createGameMap([
+            'name' => MapNameValue::ICE_PLANE,
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->assignFactionSystem()
+            ->givePlayerLocation(16, 16, $icePlane)
+            ->kingdomManagement()
+            ->assignKingdom([
+                'game_map_id' => $icePlane->id,
+            ])
+            ->assignBuilding()
+            ->assignUnits()
+            ->getCharacter();
+
+        $monsterCache = [
+            MapNameValue::SURFACE => [$this->createMonster()],
+        ];
+
+        Cache::put('monsters', $monsterCache);
+
+        $this->instance(
+            MapTileValue::class,
+            Mockery::mock(MapTileValue::class, function (MockInterface $mock) {
+                $mock->shouldReceive('canWalkOnWater')->andReturn(true);
+                $mock->shouldReceive('canWalkOnDeathWater')->andReturn(true);
+                $mock->shouldReceive('canWalkOnMagma')->andReturn(true);
+                $mock->shouldReceive('isPurgatoryWater')->andReturn(false);
+                $mock->shouldReceive('isTwistedMemoriesWater')->andReturn(false);
+                $mock->shouldReceive('isDelusionalMemoriesWater')->andReturn(false);
+                $mock->shouldReceive('getTileColor')->andReturn('000');
+            })
+        );
+
+        $scheduledEvent = $this->createScheduledEvent([
+            'event_type' => EventType::WINTER_EVENT,
+            'start_date' => now()->addMinutes(5),
+            'currently_running' => true,
+        ]);
+
+        $event = $this->createEvent([
+            'type' => EventType::WINTER_EVENT,
+            'started_at' => now(),
+            'ends_at' => now()->subMinute(10),
+        ]);
+
+        $this->createAnnouncement([
+            'event_id' => $event->id,
+        ]);
+
+        $this->createItem(['specialty_type' => ItemSpecialtyType::CORRUPTED_ICE, 'type' => WeaponTypes::HAMMER]);
+
+        $character = $character->refresh();
+
+        $this->artisan('end:scheduled-event');
+
+        $character = $character->refresh();
+
+        $this->assertNotEmpty($character->inventory->slots->where('item.specialty_type', ItemSpecialtyType::CORRUPTED_ICE)->all());
+        $this->assertEmpty($character->kingdoms);
+        $this->assertEquals(GameMap::where('name', MapNameValue::SURFACE)->first()->id, $character->map->game_map_id);
+
+        $this->assertEmpty($character->factionLoyalties()->where('is_pledged', true)->get());
+
+        $this->assertFalse($scheduledEvent->refresh()->currently_running);
+        $this->assertEmpty(Event::all());
+        $this->assertEmpty(Announcement::all());
     }
 
     protected function deleteOtherGameMaps(): void

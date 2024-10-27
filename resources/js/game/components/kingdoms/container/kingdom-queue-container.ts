@@ -17,6 +17,7 @@ import kingdomQueueContainer from "../queues/container/kingdom-queue-container";
 import kingdomEventContainer from "./kingdom-event-container";
 import GetCapitalCityGoldBarData from "../ajax/get-capital-city-gold-bar-data";
 import CapitalCityManageGoldBarsAjax from "../ajax/capital-city-manage-gold-bars-ajax";
+import BuildingToUpgradeService from "../capital-city/services/building-to-upgrade-service";
 
 /**
  * Register core dependencies here.
@@ -95,6 +96,10 @@ function kingdomContainer(container: CoreContainer) {
 
     container.register("capital-cit-manage-gold-bars-ajax", {
         useClass: CapitalCityManageGoldBarsAjax,
+    });
+
+    container.register("building-to-upgrade-service", {
+        useClass: BuildingToUpgradeService,
     });
 }
 

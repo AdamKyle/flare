@@ -6,17 +6,21 @@ use App\Flare\Models\Character;
 use App\Game\Skills\Requests\AlchemyValidation;
 use App\Game\Skills\Services\AlchemyService;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 
 class AlchemyController extends Controller
 {
-    private $alchemyService;
 
-    public function __construct(AlchemyService $alchemyService)
-    {
-        $this->alchemyService = $alchemyService;
-    }
+    /**
+     * @param AlchemyService $alchemyService
+     */
+    public function __construct(private AlchemyService $alchemyService) {}
 
-    public function alchemyItems(Character $character)
+    /**
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function alchemyItems(Character $character): JsonResponse
     {
         return response()->json([
             'items' => $this->alchemyService->fetchAlchemistItems($character),
@@ -24,7 +28,12 @@ class AlchemyController extends Controller
         ]);
     }
 
-    public function transmute(AlchemyValidation $request, Character $character)
+    /**
+     * @param AlchemyValidation $request
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function transmute(AlchemyValidation $request, Character $character): JsonResponse
     {
         if (! $character->can_craft) {
             return response()->json(['message' => 'You must wait to craft again.'], 422);

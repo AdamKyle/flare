@@ -13,7 +13,7 @@ class CreateCharacterAttackDataCache extends Command
      *
      * @var string
      */
-    protected $signature = 'create:character-attack-data';
+    protected $signature = 'create:character-attack-data {characterId?}';
 
     /**
      * The console command description.
@@ -41,6 +41,18 @@ class CreateCharacterAttackDataCache extends Command
     {
 
         $this->line('Creating Character Attack Data Jobs...');
+
+        $character = Character::find($this->argument('characterId'));
+
+        if (!is_null($character)) {
+            $this->line('Creating attack data for character: ' . $character->name);
+
+            CreateCharacterAttackData::dispatch($character->id)->onConnection('long_running');
+
+            $this->line('Created attack data for character: ' . $character->name);
+
+            return;
+        }
 
         Character::chunkById(100, function ($characters) {
             foreach ($characters as $character) {

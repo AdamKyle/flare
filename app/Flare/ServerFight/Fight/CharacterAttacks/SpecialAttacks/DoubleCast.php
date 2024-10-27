@@ -7,7 +7,7 @@ use App\Flare\ServerFight\BattleBase;
 
 class DoubleCast extends BattleBase
 {
-    public function handleAttack(Character $character, array $attackData, bool $isPvp = false)
+    public function handleAttack(Character $character, array $attackData)
     {
         $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 
@@ -19,30 +19,26 @@ class DoubleCast extends BattleBase
                 }
             }
 
-            $this->addMessage('Magic crackles through the air as you cast again!', 'regular', $isPvp);
+            $this->addMessage('Magic crackles through the air as you cast again!', 'regular');
 
             $damage = $attackData['spell_damage'];
 
             $damage = $damage + $damage * 0.15;
 
             if ($attackData['damage_deduction'] > 0.0) {
-                $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action', $isPvp);
+                $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
 
                 $damage = $damage - $damage * $attackData['damage_deduction'];
             }
 
-            $this->doBaseAttack($damage, $isPvp);
+            $this->doBaseAttack($damage);
         }
     }
 
-    protected function doBaseAttack(int $damage, bool $isPvp = false)
+    protected function doBaseAttack(int $damage)
     {
         $this->monsterHealth -= $damage;
 
-        $this->addMessage('Your spell(s) hits for: '.number_format($damage), 'player-action', $isPvp);
-
-        if ($isPvp) {
-            $this->addDefenderMessage('The enemies spells fly at you, the energy in the air is electrifyingly terrifying: '.number_format($damage), 'enemy-action');
-        }
+        $this->addMessage('Your spell(s) hits for: ' . number_format($damage), 'player-action');
     }
 }

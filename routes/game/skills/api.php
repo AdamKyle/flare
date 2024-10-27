@@ -45,20 +45,14 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.a
             Route::post('/gem-crafting/craft/{character}', ['uses' => 'Api\GemCraftingController@craftGem']);
         });
 
-        Route::group(['middleware' => 'throttle:crafting'], function () {
-            // Craft Item
-            Route::post('/trinket-crafting/craft/{character}/{item}', ['uses' => 'Api\TrinketCraftingController@craftTrinket']);
-        });
-
         Route::group(['middleware' => 'throttle:enchanting'], function () {
             // Enchant Item
             Route::post('/enchant/{character}', ['uses' => 'Api\EnchantingController@enchant']);
         });
 
         Route::group(['middleware' => 'throttle:25,1'], function () {
-            // Enchant Item
+            // Disenchant Item
             Route::post('/disenchant/{item}', ['uses' => 'Api\DisenchantingController@disenchant']);
-            Route::post('/destroy/{item}', ['uses' => 'Api\DisenchantingController@destroy']);
         });
 
         Route::group(['middleware' => 'throttle:25,1'], function () {
@@ -71,5 +65,4 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.a
             Route::post('/trinket-craft/{character}', ['uses' => 'Api\TrinketCraftingController@craftTrinket']);
         });
     });
-
 });

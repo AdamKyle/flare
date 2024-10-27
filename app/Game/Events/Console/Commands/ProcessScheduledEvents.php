@@ -5,7 +5,6 @@ namespace App\Game\Events\Console\Commands;
 use App\Flare\Models\ScheduledEvent;
 use App\Game\Events\Jobs\InitiateDelusionalMemoriesEvent;
 use App\Game\Events\Jobs\InitiateFeedbackEvent;
-use App\Game\Events\Jobs\InitiateMonthlyPVPEvent;
 use App\Game\Events\Jobs\InitiateWeeklyCelestialSpawnEvent;
 use App\Game\Events\Jobs\InitiateWeeklyCurrencyDropEvent;
 use App\Game\Events\Jobs\InitiateWeeklyFactionLoyaltyEvent;
@@ -54,10 +53,6 @@ class ProcessScheduledEvents extends Command
 
             if ($eventType->isWeeklyCurrencyDrops()) {
                 InitiateWeeklyCurrencyDropEvent::dispatch($event->id)->delay(now()->addMinutes(5));
-            }
-
-            if ($eventType->isMonthlyPVP()) {
-                InitiateMonthlyPVPEvent::dispatch($event->id)->delay(now()->addMinutes(5));
             }
 
             if ($eventType->isWinterEvent()) {

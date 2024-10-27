@@ -19,6 +19,7 @@ use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Quests\Handlers\NpcQuestsHandler;
 use App\Game\Quests\Traits\QuestDetails;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class QuestHandlerService
 {
@@ -141,17 +142,22 @@ class QuestHandlerService
 
     public function moveCharacter(Character $character, Npc $npc): array|Character
     {
+
+        $oldMapDetails = $character->map;
+
         if ($npc->game_map_id !== $character->map->game_map_id) {
             if (! $this->canTravelToMap->canTravel($npc->game_map_id, $character)) {
                 return $this->errorResult('You are missing the required quest item to travel to this NPC. Check NPC Access Requirements Section above.');
             }
+
+            $character->map()->update(['game_map_id' => $npc->game_map_id]);
+
+            $character = $character->refresh();
+
+            event(new UpdateMap($character->user));
+
+            CharacterAttackTypesCacheBuilder::dispatch($character);
         }
-
-        $oldMapDetails = $character->map;
-
-        $character->map()->update(['game_map_id' => $npc->game_map_id]);
-
-        $character = $character->refresh();
 
         if (! $this->mapTileValue->canWalk($character, $npc->x_position, $npc->y_position)) {
             $character->map->update(['game_map_id' => $oldMapDetails->game_map_id]);
@@ -167,10 +173,8 @@ class QuestHandlerService
 
         $character = $character->refresh();
 
-        CharacterAttackTypesCacheBuilder::dispatch($character);
-
         if ($oldMapDetails->gameMap->id !== $character->map->gameMap->id) {
-            event(new ServerMessageEvent($character->user, 'You were moved (at no gold cost or time out) from: '.$oldMapDetails->gameMap->name.' to: '.$character->map->gameMap->name.' in order to hand in the quest.'));
+            event(new ServerMessageEvent($character->user, 'You were moved (at no gold cost or time out) from: ' . $oldMapDetails->gameMap->name . ' to: ' . $character->map->gameMap->name . ' in order to hand in the quest.'));
         }
 
         $this->updateMapDetails($character);
@@ -180,11 +184,10 @@ class QuestHandlerService
 
     protected function updateMapDetails(Character $character): void
     {
-        event(new UpdateMap($character->user));
-
         $monsters = Cache::get('monsters')[$character->map->gameMap->name];
 
         event(new UpdateMonsterList($monsters, $character->user));
+
         event(new UpdateRaidMonsters([], $character->user));
     }
 
@@ -193,7 +196,7 @@ class QuestHandlerService
 
         HandInQuest::dispatch($character, $quest);
 
-        event(new GlobalMessageEvent($character->name.' Has completed a quest ('.$quest->name.') for: '.$quest->npc->real_name.' and been rewarded with a godly gift!'));
+        event(new GlobalMessageEvent($character->name . ' Has completed a quest (' . $quest->name . ') for: ' . $quest->npc->real_name . ' and been rewarded with a godly gift!'));
 
         $this->npcQuestsHandler()->questRewardHandler()->createquestQuestLog($character, $quest);
 

@@ -57,9 +57,9 @@ export default class GemDetails extends React.Component<GemDetailsProps, {}> {
                 <div>
                     <p className="mb-2 mt-2">
                         Atonement refers to the elemental resistance against
-                        Raid and PVP battles. It can also refer to the amount of
-                        elemental damage you do per hit, which is a % of your
-                        damage.
+                        Raid battles and stonger end game battles. It can also
+                        refer to the amount of elemental damage you do per hit,
+                        which is a % of your damage.
                     </p>
                     <p className="mb-2 mt-2">
                         When determining the elemental damage %, we take the

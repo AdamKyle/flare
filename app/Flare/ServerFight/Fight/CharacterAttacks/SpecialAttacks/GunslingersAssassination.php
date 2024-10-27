@@ -7,7 +7,7 @@ use App\Flare\ServerFight\BattleBase;
 
 class GunslingersAssassination extends BattleBase
 {
-    public function handleAttack(Character $character, array $attackData, bool $isPvp = false)
+    public function handleAttack(Character $character, array $attackData)
     {
         $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 
@@ -26,10 +26,10 @@ class GunslingersAssassination extends BattleBase
         if ($extraActionData['amount'] > 1) {
             $damage = $weaponDamage * 0.4;
 
-            $this->addMessage('you fire off your guns in rapid succession praying you kill the enemy or at least hit it!', 'regular', $isPvp);
+            $this->addMessage('you fire off your guns in rapid succession praying you kill the enemy or at least hit it!', 'regular');
 
             if ($attackData['damage_deduction'] > 0.0) {
-                $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action', $isPvp);
+                $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
 
                 $damage = $damage - $damage * $attackData['damage_deduction'];
             }
@@ -41,10 +41,10 @@ class GunslingersAssassination extends BattleBase
 
         $damage = $weaponDamage * 0.6;
 
-        $this->addMessage('You take careful aim at the enemy and fire a single shot!', 'regular', $isPvp);
+        $this->addMessage('You take careful aim at the enemy and fire a single shot!', 'regular');
 
         if ($attackData['damage_deduction'] > 0.0) {
-            $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action', $isPvp);
+            $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
 
             $damage = $damage - $damage * $attackData['damage_deduction'];
         }
@@ -52,7 +52,7 @@ class GunslingersAssassination extends BattleBase
         $this->doBaseAttack($character, $damage);
     }
 
-    protected function doBaseAttack(Character $character, int $damage, bool $isPvp = false)
+    protected function doBaseAttack(Character $character, int $damage)
     {
         $this->monsterHealth -= $damage;
         $this->characterHealth += $damage;
@@ -63,10 +63,6 @@ class GunslingersAssassination extends BattleBase
             $this->characterHealth = $maxHealth;
         }
 
-        $this->addMessage('You hit for (Gunslingers Assassination!) '.number_format($damage), 'player-action', $isPvp);
-
-        if ($isPvp) {
-            $this->addDefenderMessage('Bullets come flying your way. They peirce the skin and cause you to bleed out!'.number_format($damage), 'enemy-action');
-        }
+        $this->addMessage('You hit for (Gunslingers Assassination!) ' . number_format($damage), 'player-action');
     }
 }

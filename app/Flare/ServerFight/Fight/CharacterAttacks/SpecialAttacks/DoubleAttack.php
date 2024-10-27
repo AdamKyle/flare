@@ -7,7 +7,7 @@ use App\Flare\ServerFight\BattleBase;
 
 class DoubleAttack extends BattleBase
 {
-    public function handleAttack(Character $character, array $attackData, bool $isPvp = false)
+    public function handleAttack(Character $character, array $attackData)
     {
         $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 
@@ -19,32 +19,28 @@ class DoubleAttack extends BattleBase
                 }
             }
 
-            $this->addMessage('The strength of your rage courses through your veins!', 'regular', $isPvp);
+            $this->addMessage('The strength of your rage courses through your veins!', 'regular');
 
             $damage = $attackData['weapon_damage'];
 
             $damage = $damage + $damage * 0.15;
 
             if ($attackData['damage_deduction'] > 0.0) {
-                $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action', $isPvp);
+                $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
 
                 $damage = $damage - $damage * $attackData['damage_deduction'];
             }
 
             for ($i = 2; $i > 0; $i--) {
-                $this->doBaseAttack($damage, $isPvp);
+                $this->doBaseAttack($damage);
             }
         }
     }
 
-    protected function doBaseAttack(int $damage, bool $isPvp = false)
+    protected function doBaseAttack(int $damage)
     {
         $this->monsterHealth -= $damage;
 
-        $this->addMessage('You hit for (weapon - double attack) '.number_format($damage), 'player-action', $isPvp);
-
-        if ($isPvp) {
-            $this->addDefenderMessage('The enemies courage and strength lashes at you as a double attack doing: '.number_format($damage), 'enemy-action');
-        }
+        $this->addMessage('You hit for (weapon - double attack) ' . number_format($damage), 'player-action');
     }
 }

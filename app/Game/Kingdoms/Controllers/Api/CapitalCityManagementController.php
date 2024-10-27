@@ -5,7 +5,7 @@ namespace App\Game\Kingdoms\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Game\Kingdoms\Requests\BuildingUpgradeRequestsRequest;
-use App\Game\Kingdoms\Requests\CancelUnitRequestRequest;
+use App\Game\Kingdoms\Requests\CapitalCityCancelBuildingRequest;
 use App\Game\Kingdoms\Requests\PurchaseGoldBarsRequest;
 use App\Game\Kingdoms\Requests\RecruitUnitCancellationRequest;
 use App\Game\Kingdoms\Requests\RecruitUnitRequestsRequest;
@@ -19,7 +19,8 @@ use Illuminate\Http\JsonResponse;
 
 class CapitalCityManagementController extends Controller
 {
-    public function __construct(private readonly CapitalCityManagementService $capitalCityManagementService,
+    public function __construct(
+        private readonly CapitalCityManagementService $capitalCityManagementService,
         private readonly CancelBuildingRequestService $cancelBuildingRequestService,
         private readonly CancelUnitRequestService $cancelUnitRequestService,
         private readonly CapitalCityGoldBarManagementService $capitalCityGoldBarManagementService,
@@ -105,7 +106,7 @@ class CapitalCityManagementController extends Controller
 
     public function cancelUnitRecruitOrders(RecruitUnitCancellationRequest $request, Character $character, Kingdom $kingdom)
     {
-        $result = $this->cancelUnitRequestService->handleCancelRequest($character, $kingdom, $request->all()['request_data']);
+        $result = $this->cancelUnitRequestService->handleCancelRequest($character, $kingdom, $request->all());
 
         $status = $result['status'];
         unset($result['status']);
@@ -113,9 +114,9 @@ class CapitalCityManagementController extends Controller
         return response()->json($result, $status);
     }
 
-    public function cancelBuildingOrdersOrders(CancelUnitRequestRequest $request, Character $character, Kingdom $kingdom)
+    public function cancelBuildingOrdersOrders(CapitalCityCancelBuildingRequest $request, Character $character, Kingdom $kingdom)
     {
-        $result = $this->cancelBuildingRequestService->handleCancelRequest($character, $kingdom, $request->all()['request_data']);
+        $result = $this->cancelBuildingRequestService->handleCancelRequest($character, $kingdom, $request->all());
 
         $status = $result['status'];
         unset($result['status']);

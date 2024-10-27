@@ -169,14 +169,7 @@ export default class LocationDetails extends React.Component<
                             Mythic Items{" "}
                             <i className="fas fa-external-link-alt"></i>
                         </a>
-                        , aside from Celestial Kings who spawn after{" "}
-                        <a
-                            href="/information/monthly-pvp-event"
-                            target="_blank"
-                        >
-                            Monthly PVP{" "}
-                            <i className="fas fa-external-link-alt"></i>
-                        </a>
+                        .
                     </p>
                 </Fragment>
             );

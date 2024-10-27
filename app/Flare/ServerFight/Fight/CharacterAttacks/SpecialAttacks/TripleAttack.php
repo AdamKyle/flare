@@ -7,7 +7,7 @@ use App\Flare\ServerFight\BattleBase;
 
 class TripleAttack extends BattleBase
 {
-    public function handleAttack(Character $character, array $attackData, bool $isPvp = false)
+    public function handleAttack(Character $character, array $attackData)
     {
         $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 
@@ -19,32 +19,28 @@ class TripleAttack extends BattleBase
                 }
             }
 
-            $this->addMessage('A fury takes over you. You notch the arrows thrice at the enemy\'s direction', 'regular', $isPvp);
+            $this->addMessage('A fury takes over you. You notch the arrows thrice at the enemy\'s direction', 'regular');
 
             $damage = $attackData['weapon_damage'];
 
             $damage = $damage + $damage * 0.15;
 
             if ($attackData['damage_deduction'] > 0.0) {
-                $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action', $isPvp);
+                $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
 
                 $damage = $damage - $damage * $attackData['damage_deduction'];
             }
 
             for ($i = 3; $i > 0; $i--) {
-                $this->doBaseAttack($damage, $isPvp);
+                $this->doBaseAttack($damage);
             }
         }
     }
 
-    protected function doBaseAttack(int $damage, bool $isPvp = false)
+    protected function doBaseAttack(int $damage)
     {
         $this->monsterHealth -= $damage;
 
-        $this->addMessage('You hit for (weapon - triple attack) '.number_format($damage), 'player-action', $isPvp);
-
-        if ($isPvp) {
-            $this->addDefenderMessage('The enemies arrows fly at you in a fury, doing: '.number_format($damage), 'enemy-action');
-        }
+        $this->addMessage('You hit for (weapon - triple attack) '.number_format($damage), 'player-action');
     }
 }

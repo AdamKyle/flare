@@ -58,7 +58,7 @@ class KingdomUnitsController extends Controller
         $this->updateKingdom->updateKingdom($kingdom->refresh());
 
         return response()->json([
-            'message' => 'Your units are being trained by the best of the best!',
+            'message' => 'Your units are being trained by the best of the best! Check the queue tab to see how long until a unit is done.',
         ]);
     }
 

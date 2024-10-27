@@ -50,9 +50,7 @@ class HandleUpdatingCraftingGlobalEventGoal extends BaseGlobalEventGoalParticipa
         }
 
         if ($globalEventGoal->total_crafts >= $globalEventGoal->max_crafts) {
-
             ServerMessageHandler::sendBasicMessage($character->user, '"Child, We need no more of these." The Red Hawk Soldier states, looking at the item. The event has been finished. The next stage will start soon. Use Craft to craft your own items.');
-
             return;
         }
 

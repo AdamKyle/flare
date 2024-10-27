@@ -424,4 +424,77 @@ class DisenchantServiceTest extends TestCase
             return $event->message === resolve(ServerMessageBuilder::class)->build('failed_to_disenchant');
         });
     }
+
+    public function testCannotDisentchantItemThatDoesNotExist()
+    {
+        $character = $this->character->getCharacter();
+
+        $disenchantingService = $this->app->make(DisenchantService::class);
+
+        $item = $this->createItem();
+
+        $result = $disenchantingService->disenchantItem($character, $item);
+
+        $this->assertEquals($item->affix_name . ' Cannot be disenchanted. Not found in inventory.', $result['message']);
+        $this->assertEquals(422, $result['status']);
+    }
+
+    public function testCannotDisentchantItemThatIsNotEnchanted()
+    {
+        $item = $this->createItem();
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $disenchantingService = $this->app->make(DisenchantService::class);
+
+        $result = $disenchantingService->disenchantItem($character, $item);
+
+        $this->assertEquals($item->affix_name . ' Cannot be disenchanted. Has no enchantments attached.', $result['message']);
+        $this->assertEquals(422, $result['status']);
+    }
+
+    public function testCannotDisentchantItemIsAQuestItem()
+    {
+        $item = $this->createItem([
+            'item_prefix_id' => $this->createItemAffix([
+                'type' => 'prefix',
+            ]),
+            'item_suffix_id' => $this->createItemAffix([
+                'type' => 'prefix',
+            ]),
+            'type' => 'quest',
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $disenchantingService = $this->app->make(DisenchantService::class);
+
+        $result = $disenchantingService->disenchantItem($character, $item);
+
+        $this->assertEquals('Quest items cannot be disenchanted.', $result['message']);
+        $this->assertEquals(422, $result['status']);
+    }
+
+    public function testDisenchantItemAndDoNotReturnResponse()
+    {
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->getCharacter();
+
+        $disenchantingService = $this->app->make(DisenchantService::class);
+
+        $result = $disenchantingService->disenchantItem($character, $this->itemToDisenchant, true);
+        $this->assertEquals(200, $result['status']);
+    }
+
+    public function testDisenchantItemAndReturnResponse()
+    {
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->getCharacter();
+
+        $disenchantingService = $this->app->make(DisenchantService::class);
+
+        $result = $disenchantingService->disenchantItem($character, $this->itemToDisenchant);
+
+        $this->assertEquals('Disenchanted item ' . $this->itemToDisenchant->affix_name . ' Check server message tab for Gold Dust output.', $result['message']);
+        $this->assertEmpty($result['inventory']['inventory']);
+        $this->assertEquals(200, $result['status']);
+    }
 }

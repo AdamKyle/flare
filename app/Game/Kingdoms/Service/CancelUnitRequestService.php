@@ -2,211 +2,162 @@
 
 namespace App\Game\Kingdoms\Service;
 
-use App\Flare\Models\CapitalCityUnitCancellation;
 use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Character;
-use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
-use App\Game\Kingdoms\Jobs\CapitalCityUnitRequestCancellationMovement;
+use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityKingdomLogHandler;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
-use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
-use Carbon\Carbon;
 
 class CancelUnitRequestService
 {
     use ResponseBuilder;
 
-    public function __construct(private readonly UnitMovementService $unitMovementService) {}
+    /**
+     * @param CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler
+     */
+    public function __construct(private readonly CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler) {}
 
     /**
-     * Handle the unit request cancellation.
+     * Handle the cancelation of a unit recruitment request.
+     *
+     * @param Character $character
+     * @param Kingdom $kingdom
+     * @param array $requestData
+     * @return array
      */
     public function handleCancelRequest(Character $character, Kingdom $kingdom, array $requestData): array
     {
-        $queue = $this->getUnitQueue($character, $kingdom, $requestData['capital_city_unit_queue_id']);
+
+        $queueId = $requestData['queue_id'];
+        $queue = CapitalCityUnitQueue::where('kingdom_id', $kingdom->id)
+            ->where('character_id', $character->id)
+            ->where('id', $queueId)
+            ->first();
 
         if (is_null($queue)) {
             return $this->errorResult('What are you trying to cancel child?');
         }
 
-        $deleteQueue = $requestData['delete_queue'];
-        $unitToDelete = $requestData['unit_id'] ?? null;
-        $time = $this->calculateTime($character, $queue);
+        if ($queue->completed_at->diffInSeconds(now()) <= 60) {
+            return $this->errorResult('You cannot cancel this request because it is on the doorstep of: ' . $queue->kingdom->name);
+        }
+
+        $unitToDelete = $requestData['unit_name'] ?? null;
 
         if ($queue->status === CapitalCityQueueStatus::TRAVELING) {
-            return $this->handleTravelingQueue($queue, $deleteQueue, $unitToDelete, $character, $kingdom);
+
+            if (!is_null($unitToDelete)) {
+                return $this->cancelUnitRequest($queue, $unitToDelete);
+            }
+
+            return $this->cancelAllUnits($queue);
         }
 
-        if ($deleteQueue) {
-            return $this->handleDeleteQueue($queue, $character, $kingdom, $time);
-        }
-
-        if (! is_null($unitToDelete)) {
-            return $this->handleSingleUnitCancel($queue, $character, $kingdom, $unitToDelete, $time);
-        }
-
-        return $this->errorResult('Something is wrong. Nothing was done.');
+        return $this->errorResult('Your request is no longer traveling. As a result, you are not allowed to cancel the request because that could throw the kingdom into chaos.');
     }
 
     /**
-     * Get the unit queue.
-     */
-    private function getUnitQueue(Character $character, Kingdom $kingdom, int $queueId): ?CapitalCityUnitQueue
-    {
-        return CapitalCityUnitQueue::where('id', $queueId)
-            ->where('character_id', $character->id)
-            ->where('kingdom_id', $kingdom->id)
-            ->first();
-    }
-
-    /**
-     * Calculate the time required to travel to the kingdom.
-     */
-    private function calculateTime(Character $character, CapitalCityUnitQueue $queue): Carbon
-    {
-        $time = $this->unitMovementService->determineTimeRequired(
-            $character,
-            $queue->kingdom,
-            $queue->requested_kingdom,
-            PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION
-        );
-
-        return now()->addMinutes($time);
-    }
-
-    /**
-     * Handle deleting a queue or multiple queues.
-     */
-    private function handleTravelingQueue(CapitalCityUnitQueue $queue, bool $deleteQueue, ?int $unitToDelete, Character $character, Kingdom $kingdom): array
-    {
-        if ($deleteQueue) {
-            $queue->delete();
-
-            event(new UpdateCapitalCityUnitQueueTable($character));
-
-            return $this->successResult(['message' => 'All orders have been canceled.']);
-        }
-
-        $this->updateUnitRequestData($queue, $unitToDelete);
-        $deleted = $this->possiblyDeleteUnitQueue($queue->refresh());
-        event(new UpdateCapitalCityUnitQueueTable($character));
-
-        $message = $deleted ? 'The last of your orders has been canceled.' : 'The selected unit has been stricken from the request.';
-
-        return $this->successResult(['message' => $message]);
-    }
-
-    /**
-     * Handle deleting the queue.
+     * Cancel a single unit.
      *
-     * @return array|string[]
+     * @param CapitalCityUnitQueue $capitalCityUnitQueue
+     * @param string $unitName
+     * @return array
      */
-    private function handleDeleteQueue(CapitalCityUnitQueue $queue, Character $character, Kingdom $kingdom, Carbon $time): array
+    private function cancelUnitRequest(CapitalCityUnitQueue $capitalCityUnitQueue, string $unitName): array
     {
-        $unitIds = $this->getUnitIdsForCancellation($queue);
 
-        if (empty($unitIds)) {
-            return $this->errorResult('Nothing to cancel for this queue. Maybe it\'s done or are we currently requesting resources?');
-        }
+        $requestData = $capitalCityUnitQueue->unit_request_data;
 
-        $this->storeCancellationData($unitIds, $kingdom, $character, $queue, $time);
+        foreach ($requestData as $index => $unitData) {
+            if ($unitData['name'] === $unitName) {
 
-        return $this->successResult(['message' => 'Request cancellation for all units has been sent off. You can see this in the unit queue table.']);
-    }
+                if ($unitData['secondary_status'] !== CapitalCityQueueStatus::TRAVELING) {
+                    return $this->errorResult('Cannot cancel: ' . $unitName . ' for kingdom: ' . $capitalCityUnitQueue->kingdom->name . ' because it is no longer Traveling.');
+                }
 
-    /**
-     * Handle a single unit request.
-     */
-    private function handleSingleUnitCancel(CapitalCityUnitQueue $queue, Character $character, Kingdom $kingdom, int $unitToDelete, Carbon $time): array
-    {
-        $capitalCityUnitCancellation = CapitalCityUnitCancellation::create([
-            'unit_id' => $unitToDelete,
-            'kingdom_id' => $kingdom->id,
-            'character_id' => $character->id,
-            'capital_city_unit_queue_id' => $queue->id,
-            'status' => CapitalCityQueueStatus::TRAVELING,
-            'request_kingdom_id' => $queue->requested_kingdom,
-            'travel_time_completed_at' => $time,
-        ]);
-
-        CapitalCityUnitRequestCancellationMovement::dispatch($capitalCityUnitCancellation->id, $queue->id, $queue->character_id, ['unit_ids' => [$unitToDelete]])->delay($time);
-
-        event(new UpdateCapitalCityUnitQueueTable($character));
-
-        return $this->successResult(['message' => 'Request cancellation for the specified unit has been sent off. You can see this in the unit queue table.']);
-    }
-
-    /**
-     * Update the unit queue data.
-     */
-    private function updateUnitRequestData(CapitalCityUnitQueue $queue, ?int $unitToDelete): void
-    {
-        $unitRequestData = $queue->unit_request_data;
-
-        foreach ($unitRequestData as $index => $data) {
-            $gameUnit = GameUnit::where('name', $data['name'])->first();
-
-            if ($gameUnit->id === $unitToDelete) {
-                $unitRequestData[$index]['secondary_status'] = CapitalCityQueueStatus::CANCELLED;
-                break;
+                $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::CANCELLED;
             }
         }
-        $queue->update(['unit_request_data' => $unitRequestData]);
+
+        $messages = $capitalCityUnitQueue->messages ?? [];
+
+
+        $capitalCityUnitQueue->update([
+            'unit_request_data' => $requestData,
+            'messages' => array_merge(
+                $messages,
+                [
+                    $unitName . ' Has been canceled at your request while the orders were still traveling.'
+                ]
+            ),
+        ]);
+
+        $capitalCityUnitQueue = $capitalCityUnitQueue->refresh();
+
+        $this->capitalCityKingdomLogHandler->possiblyCreateLogForUnitQueue($capitalCityUnitQueue);
+
+        event(new UpdateCapitalCityUnitQueueTable($capitalCityUnitQueue->character));
+
+        return $this->successResult([
+            'message' => 'Successfully canceled the '
+                . $unitName
+                . '. This will appear as canceled in your queue - assumign you have anything left for this kingdom: '
+                . $capitalCityUnitQueue->kingdom->name
+                .  ' If there is nothing left for this kingdom, check your log.'
+        ]);
     }
 
     /**
-     * Possibly delete the actual queue if everything is "cancelled"
+     * Cancel all valid units in a request queue.
+     *
+     * @param CapitalCityUnitQueue $capitalCityUnitQueue
+     * @return array
      */
-    private function possiblyDeleteUnitQueue(CapitalCityUnitQueue $queue): bool
+    private function cancelAllUnits(CapitalCityUnitQueue $capitalCityUnitQueue): array
     {
-        $unitRequestData = $queue->unit_request_data;
-        $canceledData = array_filter($unitRequestData, fn ($data) => $data['secondary_status'] === CapitalCityQueueStatus::CANCELLED);
+        $requestData = $capitalCityUnitQueue->unit_request_data;
 
-        if (count($canceledData) === count($unitRequestData)) {
-            $queue->delete();
+        $hasUnitsTraveling = collect($requestData)
+            ->contains(fn($item) => $item['secondary_status'] === CapitalCityQueueStatus::TRAVELING);
 
-            return true;
+        if (!$hasUnitsTraveling) {
+            return $this->errorResult(
+                'Cannot cancel unit request(s) for kingdom: ' . $capitalCityUnitQueue->kingdom->name . ' because none of them are traveling. Are you trying to throw the kingdom into chaos?'
+            );
         }
 
-        return false;
-    }
+        $requestData = collect($requestData)
+            ->map(function ($item) {
+                if ($item['secondary_status'] === CapitalCityQueueStatus::TRAVELING) {
+                    return array_merge($item, ['secondary_status' => CapitalCityQueueStatus::CANCELLED]);
+                }
+                return $item;
+            })
+            ->toArray();
 
-    /**
-     * Get the unit ids for cancellation.
-     */
-    private function getUnitIdsForCancellation(CapitalCityUnitQueue $queue): array
-    {
-        $names = array_column(array_filter($queue->unit_request_data, fn ($data) => $data['secondary_status'] === CapitalCityQueueStatus::RECRUITING), 'name');
+        $messages = $capitalCityUnitQueue->messages ?? [];
 
-        $gameUnitIds = GameUnit::whereIn('name', $names)->pluck('id')->toarray();
+        $capitalCityUnitQueue->update([
+            'unit_request_data' => $requestData,
+            'messages' => array_merge(
+                $messages,
+                [
+                    'All valid requests (those that were still taveling) for this order have been canceled.'
+                ]
+            ),
+        ]);
 
-        return $gameUnitIds;
-    }
+        $capitalCityUnitQueue = $capitalCityUnitQueue->refresh();
 
-    /**
-     * Store cancellation Data.
-     */
-    private function storeCancellationData(array $unitIds, Kingdom $kingdom, Character $character, CapitalCityUnitQueue $queue, Carbon $time): void
-    {
-        $cancellationData = array_map(fn ($id) => [
-            'unit_id' => $id,
-            'kingdom_id' => $kingdom->id,
-            'character_id' => $character->id,
-            'capital_city_unit_queue_id' => $queue->id,
-            'status' => CapitalCityQueueStatus::TRAVELING,
-            'request_kingdom_id' => $queue->requested_kingdom,
-            'travel_time_completed_at' => $time,
-        ], $unitIds);
+        $this->capitalCityKingdomLogHandler->possiblyCreateLogForUnitQueue($capitalCityUnitQueue);
 
-        foreach ($cancellationData as $data) {
+        event(new UpdateCapitalCityUnitQueueTable($capitalCityUnitQueue->character));
 
-            $capitalCityUnitCancellation = CapitalCityUnitCancellation::create($data);
-
-            CapitalCityUnitRequestCancellationMovement::dispatch($capitalCityUnitCancellation->id, $queue->id, $queue->character_id, ['unit_ids' => $unitIds])->delay($time);
-
-            event(new UpdateCapitalCityUnitQueueTable($character));
-        }
+        return $this->successResult([
+            'message' => 'Successfully canceled the valid requests for: '
+                . $capitalCityUnitQueue->kingdom->name . '.'
+        ]);
     }
 }

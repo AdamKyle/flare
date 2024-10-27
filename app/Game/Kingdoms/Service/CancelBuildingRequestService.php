@@ -2,203 +2,169 @@
 
 namespace App\Game\Kingdoms\Service;
 
-use App\Flare\Models\CapitalCityBuildingCancellation;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
-use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequestCancellationMovement;
+use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityKingdomLogHandler;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
-use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
-use Carbon\Carbon;
 
 class CancelBuildingRequestService
 {
     use ResponseBuilder;
 
-    public function __construct(private readonly UnitMovementService $unitMovementService) {}
+    /**
+     * @param UnitMovementService $unitMovementService
+     * @param CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler
+     */
+    public function __construct(
+        private readonly UnitMovementService $unitMovementService,
+        private readonly CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler
+    ) {}
 
     /**
-     * Handle the building request cancellation.
+     * Handle the cancelation request
+     *
+     * @param Character $character
+     * @param Kingdom $kingdom
+     * @param array $requestData
+     * @return array
      */
     public function handleCancelRequest(Character $character, Kingdom $kingdom, array $requestData): array
     {
-        $queue = $this->getBuildingQueue($character, $kingdom, $requestData['capital_city_building_queue_id']);
+
+        $queueId = $requestData['queue_id'];
+        $queue = CapitalCityBuildingQueue::where('kingdom_id', $kingdom->id)
+            ->where('character_id', $character->id)
+            ->where('id', $queueId)
+            ->first();
 
         if (is_null($queue)) {
             return $this->errorResult('What are you trying to cancel child?');
         }
 
-        $deleteQueue = $requestData['delete_queue'];
+        if ($queue->completed_at->diffInSeconds(now()) <= 60) {
+            return $this->errorResult('You cannot cancel this request because it is on the doorstep of: ' . $queue->kingdom->name);
+        }
+
         $buildingToDelete = $requestData['building_id'] ?? null;
-        $time = $this->calculateTime($character, $queue);
 
         if ($queue->status === CapitalCityQueueStatus::TRAVELING) {
-            return $this->handleTravelingQueue($queue, $deleteQueue, $buildingToDelete, $character, $kingdom);
+
+            if (!is_null($buildingToDelete)) {
+                return $this->cancelBuildingRequest($queue, $buildingToDelete);
+            }
+
+            return $this->cancelAllBuildings($queue);
         }
 
-        if ($deleteQueue) {
-            return $this->handleDeleteQueue($queue, $character, $kingdom, $time);
-        }
-
-        if (! is_null($buildingToDelete)) {
-            return $this->handleSingleBuildingCancel($queue, $character, $kingdom, $buildingToDelete, $time);
-        }
-
-        return $this->errorResult('Something is wrong. Nothing was done.');
+        return $this->errorResult('Your request is no longer traveling. As a result, you are not allowed to cancel the request because that could throw the kingdom into chaos.');
     }
 
     /**
-     * Get the building queue.
-     */
-    private function getBuildingQueue(Character $character, Kingdom $kingdom, int $queueId): ?CapitalCityBuildingQueue
-    {
-        return CapitalCityBuildingQueue::where('id', $queueId)
-            ->where('character_id', $character->id)
-            ->where('kingdom_id', $kingdom->id)
-            ->first();
-    }
-
-    /**
-     * Calculate the time required to travel to the kingdom.
-     */
-    private function calculateTime(Character $character, CapitalCityBuildingQueue $queue): Carbon
-    {
-        $time = $this->unitMovementService->determineTimeRequired(
-            $character,
-            $queue->kingdom,
-            $queue->requested_kingdom,
-            PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_BUILD_TRAVEL_TIME_REDUCTION
-        );
-
-        return now()->addMinutes($time);
-    }
-
-    /**
-     * Handle deleting a queue or multiple queues.
-     */
-    private function handleTravelingQueue(CapitalCityBuildingQueue $queue, bool $deleteQueue, ?int $buildingToDelete, Character $character, Kingdom $kingdom): array
-    {
-        if ($deleteQueue) {
-            $queue->delete();
-
-            event(new UpdateCapitalCityBuildingQueueTable($character));
-
-            return $this->successResult(['message' => 'All orders have been canceled.']);
-        }
-
-        $this->updateBuildingRequestData($queue, $buildingToDelete);
-        $deleted = $this->possiblyDeleteBuildingQueue($queue->refresh());
-        event(new UpdateCapitalCityBuildingQueueTable($character));
-
-        $message = $deleted ? 'The last of your orders has been canceled.' : 'The selected building has been stricken from the request.';
-
-        return $this->successResult(['message' => $message]);
-    }
-
-    /**
-     * Handle deleting the queue.
+     * Cancel a single building request
      *
-     * @return array|string[]
+     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
+     * @param integer $buildingId
+     * @return array
      */
-    private function handleDeleteQueue(CapitalCityBuildingQueue $queue, Character $character, Kingdom $kingdom, Carbon $time): array
+    private function cancelBuildingRequest(CapitalCityBuildingQueue $capitalCityBuildingQueue, int $buildingId): array
     {
-        $buildingIds = $this->getBuildingIdsForCancellation($queue);
 
-        if (empty($buildingIds)) {
-            return $this->errorResult('Nothing to cancel for this queue. Maybe it\'s done or are we currently requesting resources?');
-        }
+        $requestData = $capitalCityBuildingQueue->building_request_data;
 
-        $this->storeCancellationData($buildingIds, $kingdom, $character, $queue, $time);
+        $buildingNameToCancel = null;
 
-        return $this->successResult(['message' => 'Request cancellation for all buildings has been sent off. You can see this in the building queue table.']);
-    }
+        foreach ($requestData as $index => $buildingRequest) {
+            if ($buildingRequest['building_id'] === $buildingId) {
 
-    /**
-     * Handle a single building request.
-     */
-    private function handleSingleBuildingCancel(CapitalCityBuildingQueue $queue, Character $character, Kingdom $kingdom, int $buildingToDelete, Carbon $time): array
-    {
-        $capitalCityBuildingCancellation = CapitalCityBuildingCancellation::create([
-            'building_id' => $buildingToDelete,
-            'kingdom_id' => $kingdom->id,
-            'character_id' => $character->id,
-            'capital_city_building_queue_id' => $queue->id,
-            'status' => CapitalCityQueueStatus::TRAVELING,
-            'request_kingdom_id' => $queue->requested_kingdom,
-            'travel_time_completed_at' => $time,
-        ]);
+                $buildingNameToCancel = $buildingRequest['building_name'];
 
-        CapitalCityBuildingRequestCancellationMovement::dispatch($capitalCityBuildingCancellation->id, $queue->id, $queue->character_id, ['building_ids' => [$buildingToDelete]])->delay($time);
+                if ($buildingRequest['secondary_status'] !== CapitalCityQueueStatus::TRAVELING) {
+                    return $this->errorResult('Cannot cancel: ' . $buildingRequest['name'] . ' for kingdom: ' . $capitalCityBuildingQueue->kingdom->name . ' because it is no longer Traveling.');
+                }
 
-        event(new UpdateCapitalCityBuildingQueueTable($character));
-
-        return $this->successResult(['message' => 'Request cancellation for the specified building has been sent off. You can see this in the building queue table.']);
-    }
-
-    /**
-     * Update the building queue data.
-     */
-    private function updateBuildingRequestData(CapitalCityBuildingQueue $queue, ?int $buildingToDelete): void
-    {
-        $buildingRequestData = $queue->building_request_data;
-        foreach ($buildingRequestData as $index => $data) {
-            if ($data['building_id'] === $buildingToDelete) {
-                $buildingRequestData[$index]['secondary_status'] = CapitalCityQueueStatus::CANCELLED;
-                break;
+                $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::CANCELLED;
             }
         }
-        $queue->update(['building_request_data' => $buildingRequestData]);
+
+        $messages = $capitalCityBuildingQueue->messages ?? [];
+
+        $capitalCityBuildingQueue->update([
+            'building_request_data' => $requestData,
+            'messages' => array_merge(
+                $messages,
+                [
+                    $buildingNameToCancel . ' Has been canceled at your request while the orders were still traveling.'
+                ]
+            ),
+        ]);
+
+        $capitalCityBuildingQueue = $capitalCityBuildingQueue->refresh();
+
+        $this->capitalCityKingdomLogHandler->possiblyCreateLogForBuildingQueue($capitalCityBuildingQueue);
+
+        event(new UpdateCapitalCityBuildingQueueTable($capitalCityBuildingQueue->character));
+
+        return $this->successResult([
+            'message' => 'Successfully canceled the '
+                . $buildingNameToCancel
+                . '. This will appear as canceled in your queue - assumign you have anything left for this kingdom: '
+                . $capitalCityBuildingQueue->kingdom->name
+                .  ' If there is nothing left for this kingdom, check your log.'
+        ]);
     }
 
     /**
-     * Possibly delete the actual queue if everything is "cancelled"
+     * Cancel all buildings in a request
+     *
+     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
+     * @return array
      */
-    private function possiblyDeleteBuildingQueue(CapitalCityBuildingQueue $queue): bool
+    private function cancelAllBuildings(CapitalCityBuildingQueue $capitalCityBuildingQueue): array
     {
-        $buildingRequestData = $queue->building_request_data;
-        $canceledData = array_filter($buildingRequestData, fn ($data) => $data['secondary_status'] === CapitalCityQueueStatus::CANCELLED);
+        $requestData = $capitalCityBuildingQueue->building_request_data;
 
-        if (count($canceledData) === count($buildingRequestData)) {
-            $queue->delete();
+        $hasBuildingsTraveling = collect($requestData)
+            ->contains(fn($item) => $item['secondary_status'] === CapitalCityQueueStatus::TRAVELING);
 
-            return true;
+        if (!$hasBuildingsTraveling) {
+            return $this->errorResult(
+                'Cannot cancel unit request(s) for kingdom: ' . $capitalCityBuildingQueue->kingdom->name . ' because none of them are traveling. Are you trying to throw the kingdom into chaos?'
+            );
         }
 
-        return false;
-    }
+        $requestData = collect($requestData)
+            ->map(function ($item) {
+                if ($item['secondary_status'] === CapitalCityQueueStatus::TRAVELING) {
+                    return array_merge($item, ['secondary_status' => CapitalCityQueueStatus::CANCELLED]);
+                }
+                return $item;
+            })
+            ->toArray();
 
-    /**
-     * Get the building ids for cancellation.
-     */
-    private function getBuildingIdsForCancellation(CapitalCityBuildingQueue $queue): array
-    {
-        return array_column(array_filter($queue->building_request_data, fn ($data) => $data['secondary_status'] === CapitalCityQueueStatus::BUILDING || $data['secondary_status'] === CapitalCityQueueStatus::REPAIRING), 'building_id');
-    }
+        $messages = $capitalCityUnitQueue->messages ?? [];
 
-    /**
-     * Store cancellation Data.
-     */
-    private function storeCancellationData(array $buildingIds, Kingdom $kingdom, Character $character, CapitalCityBuildingQueue $queue, Carbon $time): void
-    {
-        $cancellationData = array_map(fn ($id) => [
-            'building_id' => $id,
-            'kingdom_id' => $kingdom->id,
-            'character_id' => $character->id,
-            'capital_city_building_queue_id' => $queue->id,
-            'status' => CapitalCityQueueStatus::TRAVELING,
-            'request_kingdom_id' => $queue->requested_kingdom,
-            'travel_time_completed_at' => $time,
-        ], $buildingIds);
+        $capitalCityBuildingQueue->update([
+            'building_request_data' => $requestData,
+            'messages' => array_merge(
+                $messages,
+                [
+                    'All valid requests (those that were still taveling) for this order have been canceled.'
+                ]
+            ),
+        ]);
 
-        foreach ($cancellationData as $data) {
+        $capitalCityBuildingQueue = $capitalCityBuildingQueue->refresh();
 
-            $capitalCityBuildingCancellation = CapitalCityBuildingCancellation::create($data);
+        $this->capitalCityKingdomLogHandler->possiblyCreateLogForBuildingQueue($capitalCityBuildingQueue);
 
-            CapitalCityBuildingRequestCancellationMovement::dispatch($capitalCityBuildingCancellation->id, $queue->id, $queue->character_id, ['building_ids' => $buildingIds])->delay($time);
+        event(new UpdateCapitalCityBuildingQueueTable($capitalCityBuildingQueue->character));
 
-            event(new UpdateCapitalCityBuildingQueueTable($character));
-        }
+        return $this->successResult([
+            'message' => 'Successfully canceled the valid requests for: '
+                . $capitalCityBuildingQueue->kingdom->name . '.'
+        ]);
     }
 }

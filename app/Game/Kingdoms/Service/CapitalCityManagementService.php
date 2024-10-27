@@ -2,8 +2,12 @@
 
 namespace App\Game\Kingdoms\Service;
 
-use App\Flare\Models\BuildingInQueue;
-use App\Flare\Models\CapitalCityBuildingCancellation;
+use DB;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection as SupportCollection;
+use Carbon\Carbon;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityUnitCancellation;
 use App\Flare\Models\CapitalCityUnitQueue;
@@ -11,15 +15,10 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
-use App\Flare\Models\UnitInQueue;
-use App\Flare\Transformers\KingdomBuildingTransformer;
+use App\Flare\Transformers\CapitalCityKingdomBuildingTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Support\Collection as SupportCollection;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
+use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 
 class CapitalCityManagementService
 {
@@ -29,14 +28,11 @@ class CapitalCityManagementService
         private readonly UpdateKingdom $updateKingdom,
         private readonly CapitalCityBuildingManagement $capitalCityBuildingManagement,
         private readonly CapitalCityUnitManagement $capitalCityUnitManagement,
-        private readonly KingdomBuildingTransformer $kingdomBuildingTransformer,
+        private readonly CapitalCityKingdomBuildingTransformer $capitalCityKingdomBuildingTransformer,
         private readonly UnitMovementService $unitMovementService,
         private readonly Manager $manager
     ) {}
 
-    /**
-     * Make the current kingdom a capital city.
-     */
     public function makeCapitalCity(Kingdom $kingdom): array
     {
         $this->validateOneCapitalCityPerPlane($kingdom);
@@ -49,30 +45,25 @@ class CapitalCityManagementService
         ]);
     }
 
-    /**
-     * Fetch buildings from other kingdoms for upgrades or repairs.
-     */
     public function fetchBuildingsForUpgradesOrRepairs(Character $character, Kingdom $kingdom, bool $returnArray = false): array
     {
         $kingdoms = $this->getOtherKingdoms($character, $kingdom);
-        $kingdomBuildingData = $this->fetchBuildingsData($kingdoms);
+        $kingdomBuildingData = $this->fetchBuildingsData($kingdom, $kingdoms);
 
         return $returnArray ? $kingdomBuildingData : $this->successResult($kingdomBuildingData);
     }
 
-    /**
-     * Fetch kingdoms for selection.
-     */
-    public function fetchKingdomsForSelection(Kingdom $kingdom): array
+    public function fetchKingdomsForSelection(Kingdom $kingdom, bool $returnArray = false): array
     {
         $kingdoms = $this->getSelectableKingdoms($kingdom);
+
+        if ($returnArray) {
+            return $kingdoms;
+        }
 
         return $this->successResult(['kingdoms' => $kingdoms]);
     }
 
-    /**
-     * Walk all kingdoms for the character.
-     */
     public function walkAllKingdoms(Character $character, Kingdom $kingdom): array
     {
         $this->updateWalkedKingdoms($character, $kingdom);
@@ -81,9 +72,6 @@ class CapitalCityManagementService
         return $this->successResult(['message' => 'All kingdoms walked!']);
     }
 
-    /**
-     * Send off building upgrade or repair requests.
-     */
     public function sendoffBuildingRequests(Character $character, Kingdom $kingdom, array $params, string $type): array
     {
         return $this->capitalCityBuildingManagement->createBuildingUpgradeRequestQueue($character, $kingdom, $params, $type);
@@ -94,147 +82,146 @@ class CapitalCityManagementService
         return $this->capitalCityUnitManagement->createUnitRequests($character, $kingdom, $requestData);
     }
 
-    /**
-     * Fetch the building queue data.
-     */
     public function fetchBuildingQueueData(Character $character, ?Kingdom $kingdom = null): array
     {
+        $queues = CapitalCityBuildingQueue::where('character_id', $character->id)
+            ->when($kingdom, function ($query) use ($kingdom) {
+                return $query->whereHas('kingdom', function ($query) use ($kingdom) {
+                    $query->where('game_map_id', $kingdom->game_map_id);
+                })->where('kingdom_id', '!=', $kingdom->id);
+            })
+            ->get();
 
-        $queues = CapitalCityBuildingQueue::where('character_id', $character->id);
-
-        if (! is_null($kingdom)) {
-            $queues = $queues->whereHas('kingdom', function ($query) use ($kingdom) {
-                $query->where('game_map_id', $kingdom->game_map_id);
-            })->where('kingdom_id', '!=', $kingdom->id);
-        }
-
-        $queues = $queues->get();
-
-        $data = [];
-
-        foreach ($queues as $queue) {
+        $buildingQueueData = $queues->map(function ($queue) {
             $kingdom = $queue->kingdom;
+            $queueTimeLeftInSeconds = now()->diffInSeconds($queue->completed_at);
 
-            $end = Carbon::parse($queue->completed_at)->timestamp;
-            $current = Carbon::now()->timestamp;
-
-            $timeLeftInSeconds = 0;
-
-            if (! now()->gt($queue->completed_at)) {
-                $timeLeftInSeconds = $end - $current;
+            if ($queue->completed_at->lte(now())) {
+                $queueTimeLeftInSeconds = 0;
             }
 
-            $buildingRequestData = $queue->building_request_data;
+            $buildingRequests = collect($queue->building_request_data)->map(function ($request) use ($kingdom) {
 
-            foreach ($buildingRequestData as $buildingRequest) {
+                $building = KingdomBuilding::where('kingdom_id', $kingdom->id)
+                    ->where('id', $request['building_id'])
+                    ->first();
 
-                $building = KingdomBuilding::where('kingdom_id', $kingdom->id)->where('id', $buildingRequest['building_id'])->first();
-
-                if ($buildingRequest['secondary_status'] === CapitalCityQueueStatus::BUILDING || $buildingRequest['secondary_status'] === CapitalCityQueueStatus::REPAIRING) {
-                    $buildingQueue = BuildingInQueue::where('building_id', $buildingRequest['building_id'])->where('kingdom_id', $kingdom->id)->first();
-
-                    if (! is_null($buildingQueue)) {
-                        $end = Carbon::parse($buildingQueue->completed_at)->timestamp;
-                        $current = Carbon::now()->timestamp;
-
-                        $timeLeftInSeconds = $end - $current;
-                    }
-                }
-
-                $queueData = [
-                    'kingdom_name' => $kingdom->name.'(X/Y: '.$kingdom->x_position.'/'.$kingdom->y_position.')',
-                    'status' => $queue->status,
-                    'messages' => $queue->messages,
-                    'time_left_seconds' => $timeLeftInSeconds > 0 ? $timeLeftInSeconds : 0,
+                return [
                     'building_name' => $building->name,
-                    'secondary_status' => $buildingRequest['secondary_status'],
-                    'kingdom_id' => $kingdom->id,
+                    'secondary_status' => $request['secondary_status'],
                     'building_id' => $building->id,
-                    'queue_id' => $queue->id,
-                    'is_cancel_request' => false,
+                    'from_level' => $request['from_level'],
+                    'to_level' => $request['to_level'],
                 ];
+            })->toArray();
 
-                $data[] = $queueData;
-            }
-        }
+            $buildingRequests = $this->reorderBuildingRequests($buildingRequests);
 
-        return array_values(collect(array_merge($this->fetchBuildingCancellationQueueData($character), $data))->sortByDesc('time_left_seconds')->sortByDesc('is_cancel_request')->toArray());
+            return [
+                'kingdom_id' => $kingdom->id,
+                'kingdom_name' => $kingdom->name,
+                'map_name' => $kingdom->gameMap->name,
+                'status' => $queue->status,
+                'building_queue' => $buildingRequests,
+                'total_time' => $queueTimeLeftInSeconds,
+                'queue_id' => $queue->id,
+            ];
+        });
+
+        return array_values($buildingQueueData->toArray());
     }
 
-    /**
-     * Fetch Unit Queue Data.
-     */
     public function fetchUnitQueueData(Character $character, ?Kingdom $kingdom = null): array
     {
 
-        $queues = CapitalCityUnitQueue::where('character_id', $character->id);
+        $queues = CapitalCityUnitQueue::where('character_id', $character->id)
+            ->when($kingdom, function ($query) use ($kingdom) {
+                return $query->whereHas('kingdom', function ($query) use ($kingdom) {
+                    $query->where('game_map_id', $kingdom->game_map_id);
+                })->where('kingdom_id', '!=', $kingdom->id);
+            })
+            ->get();
 
-        if (! is_null($kingdom)) {
-            $queues = $queues->where('kingdom_id', '!=', $kingdom->id);
-        }
-
-        $queues = $queues->get();
-
-        $data = [];
-
-        foreach ($queues as $queue) {
+        $unitQueueData = $queues->map(function ($queue) {
             $kingdom = $queue->kingdom;
+            $queueTimeLeftInSeconds = now()->diffInSeconds($queue->completed_at);
 
-            $end = Carbon::parse($queue->completed_at)->timestamp;
-            $current = Carbon::now()->timestamp;
-
-            $timeLeftInSeconds = 0;
-
-            if (! now()->gt($queue->completed_at)) {
-                $timeLeftInSeconds = $end - $current;
+            if ($queue->completed_at->lte(now())) {
+                $queueTimeLeftInSeconds = 0;
             }
 
-            $unitRequestData = $queue->unit_request_data;
+            $unitRequests = collect($queue->unit_request_data)->map(function ($request) {
 
-            foreach ($unitRequestData as $unitRequest) {
-
-                if ($unitRequest['secondary_status'] === CapitalCityQueueStatus::RECRUITING) {
-                    $gameUnit = GameUnit::where('name', $unitRequest['name'])->first();
-
-                    $unitInQueue = UnitInQueue::where('game_unit_id', $gameUnit->id)->where('kingdom_id', $kingdom->id)->first();
-
-                    if (is_null($unitInQueue)) {
-                        continue;
-                    }
-
-                    $end = Carbon::parse($unitInQueue->completed_at)->timestamp;
-                    $current = Carbon::now()->timestamp;
-
-                    $timeLeftInSeconds = $end - $current;
-                }
-
-                if ($unitRequest['secondary_status'] === CapitalCityQueueStatus::REJECTED ||
-                    $unitRequest['secondary_status'] === CapitalCityQueueStatus::FINISHED ||
-                    $unitRequest['secondary_status'] === CapitalCityQueueStatus::CANCELLED
-                ) {
-                    $timeLeftInSeconds = 0;
-                }
-
-                $gameUnit = GameUnit::where('name', $unitRequest['name'])->first();
-
-                $queueData = [
-                    'kingdom_name' => $kingdom->name.'(X/Y: '.$kingdom->x_position.'/'.$kingdom->y_position.')',
-                    'status' => $queue->status,
-                    'time_left_seconds' => $timeLeftInSeconds > 0 ? $timeLeftInSeconds : 0,
-                    'unit_name' => $unitRequest['name'],
-                    'secondary_status' => $unitRequest['secondary_status'],
-                    'amount' => $unitRequest['amount'],
-                    'kingdom_id' => $kingdom->id,
-                    'unit_id' => $gameUnit->id,
-                    'queue_id' => $queue->id,
-                    'is_cancel_request' => false,
+                return [
+                    'unit_name' => $request['name'],
+                    'secondary_status' => $request['secondary_status'],
+                    'amount_to_recruit' => $request['amount'],
                 ];
+            })->toArray();
 
-                $data[] = $queueData;
-            }
-        }
+            $unitRequests = $this->reorderUnitRequests($unitRequests);
 
-        return array_values(collect(array_merge($this->fetchUnitCancellationQueueData($character), $data))->sortByDesc('time_left_seconds')->sortByDesc('is_cancel_request')->toArray());
+            return [
+                'queue_id' => $queue->id,
+                'kingdom_id' => $kingdom->id,
+                'kingdom_name' => $kingdom->name,
+                'map_name' => $kingdom->gameMap->name,
+                'unit_requests' => $unitRequests,
+                'status' => $queue->status,
+                'total_time' => $queueTimeLeftInSeconds,
+            ];
+        });
+
+        return array_values($unitQueueData->toArray());
+    }
+
+
+    /**
+     * Reorder the unit requests
+     *
+     * @param array $requestData
+     * @return array
+     */
+    private function reorderBuildingRequests(array $requestData): array
+    {
+        $statusOrder = [
+            CapitalCityQueueStatus::FINISHED => 1,
+            CapitalCityQueueStatus::TRAVELING => 2,
+            CapitalCityQueueStatus::REQUESTING => 3,
+            CapitalCityQueueStatus::BUILDING => 4,
+            CapitalCityQueueStatus::CANCELLED => 5,
+            CapitalCityQueueStatus::REJECTED => 6,
+        ];
+
+        usort($requestData, function ($a, $b) use ($statusOrder) {
+            return $statusOrder[$a['secondary_status']] <=> $statusOrder[$b['secondary_status']];
+        });
+
+        return $requestData;
+    }
+
+    /**
+     * Reorder the unit requests
+     *
+     * @param array $requestData
+     * @return array
+     */
+    private function reorderUnitRequests(array $requestData): array
+    {
+        $statusOrder = [
+            CapitalCityQueueStatus::FINISHED => 1,
+            CapitalCityQueueStatus::TRAVELING => 2,
+            CapitalCityQueueStatus::REQUESTING => 3,
+            CapitalCityQueueStatus::RECRUITING => 4,
+            CapitalCityQueueStatus::CANCELLED => 5,
+            CapitalCityQueueStatus::REJECTED => 6,
+        ];
+
+        usort($requestData, function ($a, $b) use ($statusOrder) {
+            return $statusOrder[$a['secondary_status']] <=> $statusOrder[$b['secondary_status']];
+        });
+
+        return $requestData;
     }
 
     /**
@@ -259,49 +246,12 @@ class CapitalCityManagementService
             }
 
             $data[] = [
-                'kingdom_name' => $queue->kingdom->name.'(X/Y: '.$queue->kingdom->x_position.'/'.$queue->kingdom->y_position.')',
+                'kingdom_name' => $queue->kingdom->name . '(X/Y: ' . $queue->kingdom->x_position . '/' . $queue->kingdom->y_position . ')',
                 'status' => $queue->status,
                 'unit_name' => $unit->name,
                 'secondary_status' => $queue->status === CapitalCityQueueStatus::CANCELLATION_REJECTED ? 'Cancellation was rejected. Building is either close to or has already finished.' : 'Cancellation request',
                 'kingdom_id' => $queue->kingdom_id,
                 'unit_id' => $unit->id,
-                'queue_id' => $queue->id,
-                'time_left_seconds' => max($timeLeftInSeconds, 0),
-                'is_cancel_request' => true,
-            ];
-        }
-
-        return $data;
-    }
-
-    /**
-     * Fetch building cancellation queue data.
-     */
-    private function fetchBuildingCancellationQueueData(Character $character): array
-    {
-        $queues = CapitalCityBuildingCancellation::where('character_id', $character->id)->whereNotNull('travel_time_completed_at')->get();
-
-        $data = [];
-
-        foreach ($queues as $queue) {
-            $building = KingdomBuilding::where('kingdom_id', $queue->kingdom_id)->where('id', $queue->building_id)->first();
-
-            $end = Carbon::parse($queue->travel_time_completed_at)->timestamp;
-            $current = Carbon::now()->timestamp;
-
-            $timeLeftInSeconds = 0;
-
-            if (! now()->gt($queue->completed_at)) {
-                $timeLeftInSeconds = $end - $current;
-            }
-
-            $data[] = [
-                'kingdom_name' => $queue->kingdom->name.'(X/Y: '.$queue->kingdom->x_position.'/'.$queue->kingdom->y_position.')',
-                'status' => $queue->status,
-                'building_name' => $building->name,
-                'secondary_status' => $queue->status === CapitalCityQueueStatus::CANCELLATION_REJECTED ? 'Cancellation was rejected. Building is either close to or has already finished.' : 'Cancellation request',
-                'kingdom_id' => $queue->kingdom_id,
-                'building_id' => $building->id,
                 'queue_id' => $queue->id,
                 'time_left_seconds' => max($timeLeftInSeconds, 0),
                 'is_cancel_request' => true,
@@ -321,7 +271,7 @@ class CapitalCityManagementService
             ->count();
 
         if ($otherCapitalCitiesCount > 0) {
-            $this->errorResult('Cannot have more than one Capital city on plane: '.$kingdom->gameMap->name);
+            $this->errorResult('Cannot have more than one Capital city on plane: ' . $kingdom->gameMap->name);
         }
     }
 
@@ -338,11 +288,21 @@ class CapitalCityManagementService
     }
 
     /**
-     * Retrieve other kingdoms owned by the character.
+     * Retrieve valid kingdoms.
+     *
+     * - Where isnt the capital city
+     * - Where does have capital city queue
+     *
+     * @param Character $character
+     * @param Kingdom $kingdom
+     * @return EloquentCollection
      */
     private function getOtherKingdoms(Character $character, Kingdom $kingdom): EloquentCollection
     {
-        return $character->kingdoms()->where('id', '!=', $kingdom->id)->where('game_map_id', $kingdom->game_map_id)->get();
+        return $character->kingdoms()
+            ->whereDoesntHave('capitalCityBuildingQueue')
+            ->where('id', '!=', $kingdom->id)
+            ->where('game_map_id', $kingdom->game_map_id)->get();
     }
 
     /**
@@ -350,20 +310,28 @@ class CapitalCityManagementService
      *
      * @param  EloquentCollection  $kingdoms
      */
-    private function fetchBuildingsData($kingdoms): array
+    private function fetchBuildingsData(Kingdom $kingdom, SupportCollection $kingdoms): array
     {
         $kingdomBuildingData = [];
 
         foreach ($kingdoms as $otherKingdom) {
             $buildings = $this->fetchBuildings($otherKingdom);
-            $kingdomBuildingData[] = $this->formatKingdomBuildingData($otherKingdom, $buildings);
+            $kingdomBuildingData[] = $this->formatKingdomBuildingData($kingdom, $otherKingdom, $buildings);
         }
 
         return $kingdomBuildingData;
     }
 
     /**
-     * Fetch buildings from a specific kingdom for upgrades or repairs.
+     * Fetch valid buildings.
+     *
+     * Fetch buildings who are:
+     *
+     * - Not locked
+     * - Not currently in queue from manual upgrade
+     *
+     * @param Kingdom $kingdom
+     * @return SupportCollection
      */
     private function fetchBuildings(Kingdom $kingdom): SupportCollection
     {
@@ -380,8 +348,8 @@ class CapitalCityManagementService
             ->get();
 
         return $this->filterOutCapitalCityBuildingsInQueue($buildings);
-
     }
+
 
     /**
      * Filters out buildings who are currently in the Capital City Building Queue.
@@ -405,18 +373,22 @@ class CapitalCityManagementService
     /**
      * Format kingdom and buildings data.
      */
-    private function formatKingdomBuildingData(Kingdom $kingdom, SupportCollection $buildings): array
+    private function formatKingdomBuildingData(Kingdom $capitalCityKingdom, Kingdom $kingdomForRequest, SupportCollection $buildings): array
     {
-        $buildings = new Collection($buildings, $this->kingdomBuildingTransformer);
+        $buildings = new Collection($buildings, $this->capitalCityKingdomBuildingTransformer);
         $buildings = $this->manager->createData($buildings)->toArray();
 
+        $character = $capitalCityKingdom->character;
+
         return [
-            'kingdom_id' => $kingdom->id,
-            'kingdom_name' => $kingdom->name,
-            'x_position' => $kingdom->x_position,
-            'y_position' => $kingdom->y_position,
-            'map_name' => $kingdom->gameMap->name,
+            'kingdom_id' => $kingdomForRequest->id,
+            'kingdom_name' => $kingdomForRequest->name,
+            'x_position' => $kingdomForRequest->x_position,
+            'y_position' => $kingdomForRequest->y_position,
+            'map_name' => $kingdomForRequest->gameMap->name,
             'buildings' => $buildings,
+            'total_travel_time' => $this->unitMovementService->getDistanceTime($character, $kingdomForRequest, $capitalCityKingdom, PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_BUILD_TRAVEL_TIME_REDUCTION),
+
         ];
     }
 
@@ -425,12 +397,20 @@ class CapitalCityManagementService
      */
     private function getSelectableKingdoms(Kingdom $kingdom): array
     {
+        $character = $kingdom->character;
+
         $kingdoms = Kingdom::where('id', '!=', $kingdom->id)
             ->where('character_id', $kingdom->character_id)
             ->where('game_map_id', $kingdom->game_map_id)
             ->whereDoesntHave('unitsQueue')
-            ->select('name', 'id')
-            ->get();
+            ->with('gameMap:id,name')
+            ->select('name', 'id', 'game_map_id', 'x_position', 'y_position')
+            ->get()
+            ->each(function ($selectableKingdom) use ($character, $kingdom) {
+                $selectableKingdom->game_map_name = $kingdom->gameMap->name;
+                $selectableKingdom->time_to_kingdom = $this->unitMovementService->getDistanceTime($character, $selectableKingdom, $kingdom, PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION);
+                $selectableKingdom->makeHidden(['gameMap', 'x_position', 'y_position']);
+            });
 
         return $this->filterOutCapitalCityUnitsInQueue($kingdoms)->toArray();
     }
@@ -470,8 +450,8 @@ class CapitalCityManagementService
      */
     private function getCapitalCityMessage(Kingdom $kingdom): string
     {
-        return 'Your kingdom: '.$kingdom->name.' on plane: '.$kingdom->gameMap->name.' is now a capital city. '.
-            'You can manage all your cities on this plane from this kingdom. This kingdom will also appear at the top '.
+        return 'Your kingdom: ' . $kingdom->name . ' on plane: ' . $kingdom->gameMap->name . ' is now a capital city. ' .
+            'You can manage all your cities on this plane from this kingdom. This kingdom will also appear at the top ' .
             'of your kingdom list with a special icon.';
     }
 }

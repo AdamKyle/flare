@@ -41,10 +41,12 @@ class InitiateWeeklyCurrencyDropEvent implements ShouldQueue
             'currently_running' => true,
         ]);
 
+        $event = $event->refresh();
+
         Event::create([
             'type' => EventType::WEEKLY_CURRENCY_DROPS,
-            'started_at' => now(),
-            'ends_at' => now()->addDay(),
+            'started_at' => $event->start_date,
+            'ends_at' => $event->end_date,
         ]);
 
         event(new GlobalMessageEvent('Currencies are dropping like crazy! Shards, Copper Coins (for those with the quest item) and

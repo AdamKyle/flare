@@ -51,7 +51,8 @@ export default class InventoryTabSection extends React.Component<
     componentDidUpdate() {
         if (
             !isEqual(this.state.data, this.props.inventory) &&
-            this.state.search_string.length === 0
+            this.state.search_string.length === 0 &&
+            this.state.selected_items.length <= 0
         ) {
             this.setState({
                 data: this.props.inventory,
@@ -116,12 +117,6 @@ export default class InventoryTabSection extends React.Component<
         }
     }
 
-    manageDisenchantAll() {
-        this.setState({
-            show_disenchant_all: !this.state.show_disenchant_all,
-        });
-    }
-
     manageConfirmationModal(type?: InventoryActionConfirmationType) {
         let actionConfirmationType = null;
 
@@ -129,22 +124,27 @@ export default class InventoryTabSection extends React.Component<
             actionConfirmationType = type;
         }
 
+        let currentInventory = this.state.data;
+
+        if (
+            actionConfirmationType ===
+            InventoryActionConfirmationType.DISENCHANT_SELECTED
+        ) {
+            currentInventory = currentInventory.filter(
+                (inventory: InventoryDetails) => {
+                    return !this.state.selected_items.some(
+                        (selectedItem: SelectItems) =>
+                            selectedItem.slot_id === inventory.slot_id,
+                    );
+                },
+            );
+        }
+
         this.setState({
             show_action_confirmation_modal:
                 !this.state.show_action_confirmation_modal,
             action_confirmation_type: actionConfirmationType,
-        });
-    }
-
-    manageDestroyAllAlchemy() {
-        this.setState({
-            show_destroy_all_alchemy: !this.state.show_destroy_all_alchemy,
-        });
-    }
-
-    manageSellAll() {
-        this.setState({
-            show_sell_all: !this.state.show_sell_all,
+            data: currentInventory,
         });
     }
 

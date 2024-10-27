@@ -7,7 +7,7 @@ use App\Flare\ServerFight\BattleBase;
 
 class BookBindersFear extends BattleBase
 {
-    public function handleAttack(Character $character, array $attackData, bool $isPvp = false)
+    public function handleAttack(Character $character, array $attackData)
     {
         $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 
@@ -26,10 +26,10 @@ class BookBindersFear extends BattleBase
         if ($extraActionData['amount'] > 1) {
             $damage = $weaponDamage + $weaponDamage * 0.55;
 
-            $this->addMessage('You lunge at the enemy with both scratch awls and aim for the eyes!', 'regular', $isPvp);
+            $this->addMessage('You lunge at the enemy with both scratch awls and aim for the eyes!', 'regular');
 
             if ($attackData['damage_deduction'] > 0.0) {
-                $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action', $isPvp);
+                $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
 
                 $damage = $damage - $damage * $attackData['damage_deduction'];
             }
@@ -43,10 +43,10 @@ class BookBindersFear extends BattleBase
 
         $damage = $weaponDamage * 0.22;
 
-        $this->addMessage('Your fear beings to mount and you start rapidly stabbing the enemy!', 'regular', $isPvp);
+        $this->addMessage('Your fear beings to mount and you start rapidly stabbing the enemy!', 'regular');
 
         if ($attackData['damage_deduction'] > 0.0) {
-            $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action', $isPvp);
+            $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
 
             $damage = $damage - $damage * $attackData['damage_deduction'];
         }
@@ -56,7 +56,7 @@ class BookBindersFear extends BattleBase
         }
     }
 
-    protected function doBaseAttack(Character $character, int $damage, bool $isPvp = false)
+    protected function doBaseAttack(Character $character, int $damage)
     {
         $this->monsterHealth -= $damage;
         $this->characterHealth += $damage;
@@ -67,10 +67,6 @@ class BookBindersFear extends BattleBase
             $this->characterHealth = $maxHealth;
         }
 
-        $this->addMessage('You hit for (Book Binders Fear) '.number_format($damage), 'player-action', $isPvp);
-
-        if ($isPvp) {
-            $this->addDefenderMessage('The enemy violently stabs you repeatedly hoping and screaming that you die!'.number_format($damage), 'enemy-action');
-        }
+        $this->addMessage('You hit for (Book Binders Fear) ' . number_format($damage), 'player-action');
     }
 }

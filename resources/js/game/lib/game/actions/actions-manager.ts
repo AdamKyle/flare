@@ -1,9 +1,6 @@
-import Ajax from "../../ajax/ajax";
-import { AxiosError, AxiosResponse } from "axios";
 import { capitalize } from "lodash";
 import { CraftingOptions } from "../../../components/crafting/base-components/types/crafting-type-options";
 import Actions from "../../../sections/game-actions-section/actions";
-import PvpCharactersType from "../types/pvp-characters-type";
 import { DateTime } from "luxon";
 
 export default class ActionsManager {
@@ -27,46 +24,6 @@ export default class ActionsManager {
      */
     public updateStateOnComponentUpdate() {
         this.setCraftingTypeOnUpdate();
-        this.setDuelingStateOnUpdate();
-    }
-
-    /**
-     * Set the characters for dueling based on the characters position.
-     *
-     * @param eventCharactersForDueling
-     */
-    public setCharactersForDueling(
-        eventCharactersForDueling: PvpCharactersType[],
-    ) {
-        let charactersForDueling: PvpCharactersType[] | [] = [];
-        const props = this.component.props;
-
-        if (
-            props.character_position !== null &&
-            typeof props.character.base_position !== "undefined"
-        ) {
-            charactersForDueling = eventCharactersForDueling.filter(
-                (character: PvpCharactersType) => {
-                    if (
-                        character.id !== props.character.id &&
-                        character.character_position_x ===
-                            props.character.base_position.x &&
-                        character.character_position_y ===
-                            props.character.base_position.y
-                    ) {
-                        return character;
-                    }
-                },
-            );
-
-            if (charactersForDueling.length === 0) {
-                return;
-            }
-
-            this.component.setState({
-                characters_for_dueling: charactersForDueling,
-            });
-        }
     }
 
     /**
@@ -117,47 +74,6 @@ export default class ActionsManager {
             ) {
                 this.component.setState({ crafting_type: null });
             }
-        }
-    }
-
-    /**
-     * Set the dueling state upon component update.
-     *
-     * @private
-     */
-    private setDuelingStateOnUpdate() {
-        const props = this.component.props;
-        const state = this.component.state;
-
-        if (
-            props.character_position !== null &&
-            state.characters_for_dueling.length > 0 &&
-            state.characters_for_dueling.length == 0
-        ) {
-            if (typeof props.character_position.game_map_id === "undefined") {
-                return;
-            }
-
-            const characters = state.characters_for_dueling.filter(
-                (character: any) => {
-                    return (
-                        character.character_position_x ===
-                            props.character_position?.x &&
-                        character.character_position_y ===
-                            props.character_position?.y &&
-                        character.game_map_id ===
-                            props.character_position?.game_map_id
-                    );
-                },
-            );
-
-            if (characters.length === 0) {
-                return;
-            }
-
-            this.component.setState({
-                characters_for_dueling: characters,
-            });
         }
     }
 

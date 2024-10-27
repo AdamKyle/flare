@@ -86,7 +86,6 @@ class ItemAffixType
         self::STAT_REDUCTION => 'Stat Reduction',
         self::SKILL_REDUCTION => 'Skill/Res Reduction + Devouring Light',
         self::LIFE_STEALING => 'Life stealing',
-        self::ENTRANCING => 'Entrancing',
         self::DAMAGE_STACKING => 'Stacking Damage',
         self::DAMAGE_IRRESISTIBLE => 'Irresistible Damage',
         self::ACCURACY => 'Accuracy',
@@ -99,6 +98,7 @@ class ItemAffixType
         self::RING_CRAFTING => 'Ring Crafting',
         self::SPELL_CRAFTING => 'Spell Crafting',
         self::ENCHANTMENT_CRAFTING => 'Enchantment Crafting',
+        self::ENTRANCING => 'Entrancing',
     ];
 
     /**

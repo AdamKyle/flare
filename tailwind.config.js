@@ -7,6 +7,7 @@ export default {
     mode: 'jit',
     content: [
         './resources/**/*.{js,vue,blade.php,jsx,tsx}',
+        './vendor/rappasoft/laravel-livewire-tables/resources/views/**/*.blade.php'
     ],
     darkMode: "class",
     theme: {

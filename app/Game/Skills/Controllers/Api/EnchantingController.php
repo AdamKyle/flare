@@ -12,20 +12,16 @@ use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 class EnchantingController extends Controller
 {
     /**
-     * @var EnchantingService
-     */
-    private $enchantingService;
-
-    /**
      * Constructor
      *
      * @return void
      */
-    public function __construct(EnchantingService $enchantingService)
-    {
-        $this->enchantingService = $enchantingService;
-    }
+    public function __construct(private EnchantingService $enchantingService) {}
 
+    /**
+     * @param Character $character
+     * @return void
+     */
     public function fetchAffixes(Character $character)
     {
         return response()->json([
@@ -34,10 +30,15 @@ class EnchantingController extends Controller
         ]);
     }
 
+    /**
+     * @param EnchantingValidation $request
+     * @param Character $character
+     * @return void
+     */
     public function enchant(EnchantingValidation $request, Character $character)
     {
-        if (! $character->can_craft) {
-            return response()->json(['message' => 'Cannot Craft.'], 429);
+        if (!$character->can_craft) {
+            return response()->json(['message' => 'You must wait to enchant again.'], 422);
         }
 
         $slot = $this->enchantingService->getSlotFromInventory($character, $request->slot_id);
@@ -47,15 +48,18 @@ class EnchantingController extends Controller
         }
 
         if ($slot->item->type === 'quest') {
-            return response()->json(['message' => 'Invalid Type.'], 422);
+            return response()->json(['message' => 'You cannot enchant quest items.'], 422);
         }
 
         $cost = $this->enchantingService->getCostOfEnchantment($character, $request->affix_ids, $slot->item->id);
 
-        if ($cost > $character->gold || $cost === 0) {
+        if ($cost > $character->gold) {
             ServerMessageHandler::handleMessage($character->user, 'enchantment_failed', 'Not enough gold to enchant that.');
 
-            return response()->json($this->enchantingService->fetchAffixes($character->refresh()));
+            return response()->json([
+                'affixes' => $this->enchantingService->fetchAffixes($character->refresh(), true, false),
+                'skill_xp' => $this->enchantingService->getEnchantingXP($character),
+            ]);
         }
 
         $timeOut = $this->enchantingService->timeForEnchanting($slot->item);

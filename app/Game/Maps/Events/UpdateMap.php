@@ -3,7 +3,6 @@
 namespace App\Game\Maps\Events;
 
 use App\Flare\Models\User;
-use App\Game\Core\Traits\KingdomCache;
 use App\Game\Maps\Services\LocationService;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -14,7 +13,7 @@ use Illuminate\Queue\SerializesModels;
 
 class UpdateMap implements ShouldBroadcastNow
 {
-    use Dispatchable, InteractsWithSockets, KingdomCache, SerializesModels;
+    use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public array $mapDetails;
 
@@ -23,10 +22,10 @@ class UpdateMap implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      */
-    public function __construct(User $user, bool $pvpMapUpdate = false)
+    public function __construct(User $user)
     {
         $character = $user->character->refresh();
-        $this->mapDetails = resolve(LocationService::class)->setIsEventBasedUpdate($pvpMapUpdate)->getLocationData($character);
+        $this->mapDetails = resolve(LocationService::class)->getLocationData($character);
         $this->user = $user;
     }
 
@@ -35,6 +34,6 @@ class UpdateMap implements ShouldBroadcastNow
      */
     public function broadcastOn(): Channel|array
     {
-        return new PrivateChannel('update-plane-'.$this->user->id);
+        return new PrivateChannel('update-plane-' . $this->user->id);
     }
 }

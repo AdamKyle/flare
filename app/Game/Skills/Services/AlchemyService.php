@@ -172,7 +172,7 @@ class AlchemyService
                 'inventory_id' => $character->inventory->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You manage to create: '.$item->name.' from gold dust!', $slot->id, $slot->item->type));
+            event(new ServerMessageEvent($character->user, 'You manage to create: ' . $item->name . ' from gold dust!', $slot->id, $slot->item->type));
 
             return true;
         }

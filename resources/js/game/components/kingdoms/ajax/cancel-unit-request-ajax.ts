@@ -13,8 +13,7 @@ export default class CancelUnitRequestAjax {
         characterId: number,
         kingdomId: number,
         queueId: number,
-        deleteWholeQueue: boolean,
-        unitId?: number,
+        unitName: string | null,
     ): void {
         this.ajax
             .setRoute(
@@ -24,11 +23,8 @@ export default class CancelUnitRequestAjax {
                     kingdomId,
             )
             .setParameters({
-                request_data: {
-                    delete_queue: deleteWholeQueue,
-                    unit_id: unitId,
-                    capital_city_unit_queue_id: queueId,
-                },
+                queue_id: queueId,
+                unit_name: unitName,
             })
             .doAjaxCall(
                 "post",

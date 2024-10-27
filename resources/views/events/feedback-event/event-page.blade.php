@@ -27,7 +27,7 @@
         <div class="text-center w-full lg:w-2/4 mx-auto my-20">
             <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
                 <i class="ra ra-feather-wing"></i>
-                For one month, players new and old can come together to help Tlessa become the best!
+                For two months, players new and old can come together to help Tlessa become the best!
             </h2>
             <p class="mb-10 dark:text-gray-300 text-gray-800">
                 Gain valuable XP and Skill XP at a rate that will have you flying through levels in no time.

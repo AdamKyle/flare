@@ -31,7 +31,7 @@ class AffixesTable extends DataTableComponent
                         return $builder->where('randomly_generated', false);
                     }
 
-                    return (new ItemAffixType(intval($value) - 1))->query($builder);
+                    return (new ItemAffixType(intval($value)))->query($builder);
                 }),
         ];
     }

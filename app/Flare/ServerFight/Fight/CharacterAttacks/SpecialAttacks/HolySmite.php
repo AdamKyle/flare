@@ -7,7 +7,7 @@ use App\Flare\ServerFight\BattleBase;
 
 class HolySmite extends BattleBase
 {
-    public function handleAttack(Character $character, array $attackData, bool $isPvp = false)
+    public function handleAttack(Character $character, array $attackData)
     {
         $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 
@@ -25,10 +25,10 @@ class HolySmite extends BattleBase
 
         $damage = $damage + $damage * .60;
 
-        $this->addMessage('You pray, you prepare - you smite your enemy!', 'regular', $isPvp);
+        $this->addMessage('You pray, you prepare - you smite your enemy!', 'regular');
 
         if ($attackData['damage_deduction'] > 0.0) {
-            $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action', $isPvp);
+            $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
 
             $damage = $damage - $damage * $attackData['damage_deduction'];
         }
@@ -36,7 +36,7 @@ class HolySmite extends BattleBase
         $this->doBaseAttack($character, $damage);
     }
 
-    protected function doBaseAttack(Character $character, int $damage, bool $isPvp = false)
+    protected function doBaseAttack(Character $character, int $damage)
     {
         $this->monsterHealth -= $damage;
         $this->characterHealth += $damage;
@@ -47,10 +47,6 @@ class HolySmite extends BattleBase
             $this->characterHealth = $maxHealth;
         }
 
-        $this->addMessage('You hit for (Holy Smite) '.number_format($damage), 'player-action', $isPvp);
-
-        if ($isPvp) {
-            $this->addDefenderMessage('The enemy calls upon the one true God to smite you with their prayers and holy devotion!'.number_format($damage), 'enemy-action');
-        }
+        $this->addMessage('You hit for (Holy Smite) ' . number_format($damage), 'player-action');
     }
 }

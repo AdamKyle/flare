@@ -19,6 +19,7 @@ use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection as LeagueCollection;
 
@@ -196,14 +197,14 @@ class CharacterInventoryService
 
         $this->updateCharacterSkillsService->updateCharacterCraftingSkills($character->refresh());
 
-        $message = 'Disenchanted all items and gained: '.($maxedOutGoldDust ? 0 .' (You are capped ) ' : number_format($totalGoldDust)).' Gold Dust (with gold dust rushes)';
+        $message = 'Disenchanted all items and gained: ' . ($maxedOutGoldDust ? 0 . ' (You are capped ) ' : number_format($totalGoldDust)) . ' Gold Dust (with gold dust rushes)';
 
         if ($totalDisenchantingLevels > 0) {
-            $message .= ' You also gained: '.$totalDisenchantingLevels.' Skill Levels in Disenchanting.';
+            $message .= ' You also gained: ' . $totalDisenchantingLevels . ' Skill Levels in Disenchanting.';
         }
 
         if ($totalEnchantingLevels > 0) {
-            $message .= ' You also gained: '.$totalEnchantingLevels.' Skill Levels in Enchanting.';
+            $message .= ' You also gained: ' . $totalEnchantingLevels . ' Skill Levels in Enchanting.';
         }
 
         return $this->successResult([
@@ -223,7 +224,7 @@ class CharacterInventoryService
             $slots = new LeagueCollection($inventorySet->slots, $this->inventoryTransformer);
 
             if (is_null($inventorySet->name)) {
-                $sets['Set '.$index + 1] = [
+                $sets['Set ' . $index + 1] = [
                     'items' => array_reverse($this->manager->createData($slots)->toArray()),
                     'equippable' => $inventorySet->can_be_equipped,
                     'set_id' => $inventorySet->id,
@@ -261,7 +262,7 @@ class CharacterInventoryService
             return $equippedSet->name;
         }
 
-        return 'Set '.$this->character->inventorySets->search(function ($set) use ($equippedSet) {
+        return 'Set ' . $this->character->inventorySets->search(function ($set) use ($equippedSet) {
             return $set->id === $equippedSet->id;
         }) + 1;
     }
@@ -321,7 +322,7 @@ class CharacterInventoryService
                 $indexes[] = [
                     'index' => array_search($id, $setIds) + 1,
                     'id' => $id,
-                    'name' => is_null($inventorySet->name) ? 'Set '.array_search($id, $setIds) + 1 : $inventorySet->name,
+                    'name' => is_null($inventorySet->name) ? 'Set ' . array_search($id, $setIds) + 1 : $inventorySet->name,
                     'equipped' => $inventorySet->is_equipped,
                 ];
             }
@@ -335,14 +336,22 @@ class CharacterInventoryService
      *
      *  - Does not include equipped, usable or quest items.
      *  - Only comes from inventory, does not include sets.
+     *  - If the character is currently disenchanting selected items, do not get those items.
      */
     public function getInventoryCollection(): Collection
     {
+
+        $slotsToIgnore = Cache::get('character-slots-to-disenchant-' . $this->character->id);
+
+        if (is_null($slotsToIgnore)) {
+            $slotsToIgnore = [];
+        }
 
         return $this->character
             ->inventory
             ->slots
             ->whereNotIn('item.type', ['quest', 'alchemy'])
+            ->whereNotIn('id', $slotsToIgnore)
             ->where('equipped', false);
     }
 
@@ -413,7 +422,7 @@ class CharacterInventoryService
             });
 
             if ($index !== false) {
-                $this->inventorySetEquippedName = 'Set '.$index + 1;
+                $this->inventorySetEquippedName = 'Set ' . $index + 1;
             }
         }
 
@@ -513,7 +522,7 @@ class CharacterInventoryService
         $this->character = $this->character->refresh();
 
         return $this->successResult([
-            'message' => 'Destroyed '.$name.'.',
+            'message' => 'Destroyed ' . $name . '.',
             'inventory' => [
                 'inventory' => $this->getInventoryForType('inventory'),
             ],
@@ -601,7 +610,7 @@ class CharacterInventoryService
         event(new UpdateTopBarEvent($character->refresh()));
 
         return $this->successResult([
-            'message' => 'Unequipped item: '.$foundItem->item->affix_name,
+            'message' => 'Unequipped item: ' . $foundItem->item->affix_name,
             'inventory' => [
                 'inventory' => $this->getInventoryForType('inventory'),
                 'equipped' => $this->getInventoryForType('equipped'),
@@ -671,7 +680,7 @@ class CharacterInventoryService
         event(new UpdateTopBarEvent($character));
 
         return $this->successResult([
-            'message' => 'Destroyed Alchemy Item: '.$name.'.',
+            'message' => 'Destroyed Alchemy Item: ' . $name . '.',
             'inventory' => [
                 'usable_items' => $this->getInventoryForType('usable_items'),
             ],
@@ -726,8 +735,22 @@ class CharacterInventoryService
         }
 
         $acceptedTypes = [
-            'weapon', 'ring', 'shield', 'artifact', 'spell', 'armour',
-            'trinket', 'stave', 'hammer', 'bow', 'fan', 'scratch-awl', 'gun', 'mace', 'alchemy', 'quest',
+            'weapon',
+            'ring',
+            'shield',
+            'artifact',
+            'spell',
+            'armour',
+            'trinket',
+            'stave',
+            'hammer',
+            'bow',
+            'fan',
+            'scratch-awl',
+            'gun',
+            'mace',
+            'alchemy',
+            'quest',
         ];
 
         // Spells do not have the tye spell - they are differentiated by damage or healing suffix.
@@ -735,6 +758,10 @@ class CharacterInventoryService
             $type = 'spell';
         }
 
-        return !in_array($type, $acceptedTypes) ? throw new Exception('Unknown Item type: '. $type) : $type;
+        if (!in_array($type, $acceptedTypes)) {
+            throw new Exception('Unknown Item type: ' . $type);
+        }
+
+        return $type;
     }
 }

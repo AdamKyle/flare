@@ -6,9 +6,9 @@ import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
 import SuccessAlert from "../../ui/alerts/simple-alerts/success-alert";
 import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
 import ManageKingdomBuildings from "./manage-kingdom-buildings";
-import UnitRecruitment from "./unit-recruitment";
 import WarningAlert from "../../ui/alerts/simple-alerts/warning-alert";
 import GoldBarManagement from "./gold-bar-management";
+import UnitManagement from "./unit-management";
 
 export default class SmallCouncil extends React.Component<any, any> {
     private walkAllKingdomsAjax: WalkAllKingdomsAjax;
@@ -112,10 +112,10 @@ export default class SmallCouncil extends React.Component<any, any> {
 
         if (this.state.show_unit_recruitment) {
             return (
-                <UnitRecruitment
+                <UnitManagement
                     user_id={this.props.user_id}
                     kingdom={this.props.kingdom}
-                    manage_unit_section={this.manageShowUnitRecruitment.bind(
+                    manage_show_unit_recruitment={this.manageShowUnitRecruitment.bind(
                         this,
                     )}
                 />

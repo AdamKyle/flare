@@ -8,9 +8,6 @@
     </div>
 
     <div class="container px-4 pb-10 mx-auto mb-5">
-        <x-core.alerts.info-alert title="Just and FYI">
-            The chart and list are not real time, but can give you an idea of the activity of Tlessa.
-        </x-core.alerts.info-alert>
         <div id="characters-online"></div>
     </div>
 @endsection

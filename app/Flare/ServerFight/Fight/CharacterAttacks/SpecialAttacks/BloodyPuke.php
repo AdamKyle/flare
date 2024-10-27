@@ -7,7 +7,7 @@ use App\Flare\ServerFight\BattleBase;
 
 class BloodyPuke extends BattleBase
 {
-    public function handleAttack(Character $character, array $attackData, bool $isPvp = false)
+    public function handleAttack(Character $character, array $attackData)
     {
         $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 
@@ -19,7 +19,7 @@ class BloodyPuke extends BattleBase
                 }
             }
 
-            $this->addMessage('You drink and you drink and you drink ...', 'regular', $isPvp);
+            $this->addMessage('You drink and you drink and you drink ...', 'regular');
 
             $durModded = $character->getInformation()->statMod('dur');
 
@@ -27,26 +27,22 @@ class BloodyPuke extends BattleBase
             $damageToSuffer = $durModded * 0.15;
 
             if ($attackData['damage_deduction'] > 0.0) {
-                $this->addMessage('The Plane weakens your ability to do full damage! You will still suffer the 15% damage for vomiting blood.', 'enemy-action', $isPvp);
+                $this->addMessage('The Plane weakens your ability to do full damage! You will still suffer the 15% damage for vomiting blood.', 'enemy-action');
 
                 $damage = $damage - $damage * $attackData['damage_deduction'];
             }
 
-            $this->doBaseAttack($damage, $damageToSuffer, $isPvp);
+            $this->doBaseAttack($damage, $damageToSuffer);
 
             $this->characterHealth -= $damageToSuffer;
         }
     }
 
-    protected function doBaseAttack(int $damage, int $damageToSuffer, bool $isPvp = false)
+    protected function doBaseAttack(int $damage, int $damageToSuffer)
     {
         $this->monsterHealth -= $damage;
 
-        $this->addMessage('You cannot hold it in, you vomit blood and bile so acidic your enemy cannot handle it! (You dealt: '.number_format($damage).')', 'player-action', $isPvp);
-        $this->addMessage('You lost a lot of blood in your attack. (You took: '.number_format($damageToSuffer).')', 'enemy-action');
-
-        if ($isPvp) {
-            $this->addDefenderMessage('The enemy has vomited their bloody acidic bile all over you! The smell alone makes you vomit. Damage dealt: '.number_format($damage), 'enemy-action');
-        }
+        $this->addMessage('You cannot hold it in, you vomit blood and bile so acidic your enemy cannot handle it! (You dealt: ' . number_format($damage) . ')', 'player-action');
+        $this->addMessage('You lost a lot of blood in your attack. (You took: ' . number_format($damageToSuffer) . ')', 'enemy-action');
     }
 }

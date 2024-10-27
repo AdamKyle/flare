@@ -1,74 +1,64 @@
-import React, { Fragment } from "react";
+import React, { ChangeEvent } from "react";
 import FetchUpgradableKingdomsAjax from "../ajax/fetch-upgradable-kingdoms-ajax";
 import { serviceContainer } from "../../../lib/containers/core-container";
 import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
-import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
-import PrimaryOutlineButton from "../../ui/buttons/primary-outline-button";
-import SuccessOutlineButton from "../../ui/buttons/success-outline-button";
-import OrangeOutlineButton from "../../ui/buttons/orange-outline-button";
-import DangerOutlineButton from "../../ui/buttons/danger-outline-button";
-import Table from "../../ui/data-tables/table";
-import { buildSmallCouncilBuildingsTableColumns } from "../table-columns/build-small-council-buildings-table-columns";
-import SendRequestConfirmationModal from "./modals/send-request-confirmation-modal";
-import {
-    addAllBuildingsToQueue,
-    removeAllFromQueue,
-} from "./helpers/queue_management";
-import {
-    sortByBuildingLevel,
-    sortByBuildingName,
-    sortByKingdomName,
-} from "./helpers/sort_helpers";
-import {
-    Building,
-    CompressedData,
-    Kingdom,
-} from "./deffinitions/kingdom_building_data";
 import CapitalCityBuildingUpgradeRepairTableEventDefinition from "../event-listeners/capital-city-building-upgrade-repair-table-event-definition";
 import CapitalCityBuildingUpgradeRepairTableEvent from "../event-listeners/capital-city-building-upgrade-repair-table-event";
-import clsx from "clsx";
+import SuccessAlert from "../../ui/alerts/simple-alerts/success-alert";
+import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
+import BuildingsToUpgradeSectionProps from "./types/buildings-to-upgrade-section-props";
+import BuildingsToUpgradeSectionState from "./types/buildings-to-upgrade-section-state";
+import Pagination from "./components/pagination";
+import PrimaryOutlineButton from "../../ui/buttons/primary-outline-button";
+import DangerOutlineButton from "../../ui/buttons/danger-outline-button";
+import SuccessOutlineButton from "../../ui/buttons/success-outline-button";
+import Kingdom from "./deffinitions/kingdom-with-buildings";
+import BuildingToUpgradeService from "./services/building-to-upgrade-service";
+import OpenKingdomCardForBuildingManagement from "./partials/building-management/open-kingdom-card-for-building-management";
+import PrimaryButton from "../../ui/buttons/primary-button";
 
-enum SortType {
-    KINGDOM_NAME = "kingdom-name",
-    BUILDING_NAME = "building-name",
-    BUILDING_LEVEL = "building-level",
-}
+const MAX_ITEMS_PER_PAGE = 10;
 
 export default class BuildingsToUpgradeSection extends React.Component<
-    any,
-    any
+    BuildingsToUpgradeSectionProps,
+    BuildingsToUpgradeSectionState
 > {
     private fetchUpgradableKingdomsAjax: FetchUpgradableKingdomsAjax;
-
     private updateBuildingTable: CapitalCityBuildingUpgradeRepairTableEventDefinition;
+    private readonly buildingToUpgradeService: BuildingToUpgradeService;
 
     constructor(props: any) {
         super(props);
 
         this.state = {
             loading: true,
+            processing_request: false,
             success_message: null,
             error_message: null,
             building_data: [],
-            table_data: [],
-            sort_type: null,
-            order_type: null,
-            upgrade_queue: [],
-            show_review_modal: false,
-            kingdom_search: "",
+            filtered_building_data: [],
+            open_kingdom_ids: new Set(),
+            sort_direction: "asc",
+            search_query: "",
+            building_queue: [],
+            current_page: 1,
+            itemsPerPage: MAX_ITEMS_PER_PAGE,
         };
 
         this.fetchUpgradableKingdomsAjax = serviceContainer().fetch(
             FetchUpgradableKingdomsAjax,
         );
-
         this.updateBuildingTable =
             serviceContainer().fetch<CapitalCityBuildingUpgradeRepairTableEventDefinition>(
                 CapitalCityBuildingUpgradeRepairTableEvent,
             );
+        this.buildingToUpgradeService = serviceContainer().fetch(
+            BuildingToUpgradeService,
+        );
+
+        this.buildingToUpgradeService.setComponent(this);
 
         this.updateBuildingTable.initialize(this, this.props.user_id);
-
         this.updateBuildingTable.register();
     }
 
@@ -78,137 +68,40 @@ export default class BuildingsToUpgradeSection extends React.Component<
             this.props.kingdom.character_id,
             this.props.kingdom.id,
         );
-
         this.updateBuildingTable.listen();
     }
 
-    resetTableForms() {
-        this.setState({
-            sort_type: null,
-            order_type: null,
-            upgrade_queue: [],
-            kingdom_search: "",
-        });
-    }
+    componentDidUpdate(
+        prevProps: BuildingsToUpgradeSectionProps,
+        prevState: BuildingsToUpgradeSectionState,
+    ) {
+        if (prevState.building_data !== this.state.building_data) {
+            this.buildingToUpgradeService.updateFilteredBuildingData();
+        }
 
-    compressArray(sortedData: Kingdom[], returnData: boolean) {
-        const compressed: CompressedData[] = [];
-
-        sortedData.forEach((kingdom) => {
-            kingdom.buildings.forEach((building: Building) => {
-                compressed.push({
-                    kingdom_name: kingdom.kingdom_name,
-                    building_name: building.name,
-                    building_id: building.id,
-                    kingdom_id: kingdom.kingdom_id,
-                    level: building.level,
-                    max_level: building.max_level,
-                    current_durability: building.current_durability,
-                    max_durability: building.max_durability,
-                });
+        if (
+            prevState.filtered_building_data !==
+            this.state.filtered_building_data
+        ) {
+            this.setState({
+                current_page: 1,
             });
-        });
-
-        if (returnData) {
-            return compressed;
         }
-
-        this.setState({
-            table_data: compressed,
-        });
     }
 
-    showRemoveButton(buildingId: number): boolean {
-        return (
-            this.state.upgrade_queue.filter((queue: any) => {
-                return queue.buildingIds.includes(buildingId);
-            }).length > 0
-        );
-    }
-
-    sortTable(type: SortType, order: string) {
-        let sortedData = JSON.parse(JSON.stringify(this.state.building_data));
-
-        sortedData = this.compressArray(sortedData, true);
-
-        let orderType =
-            this.state.order_type === null
-                ? order
-                : this.state.order_type === "asc"
-                  ? "desc"
-                  : "asc";
-
-        switch (type) {
-            case SortType.KINGDOM_NAME:
-                sortedData = sortByKingdomName(sortedData, orderType);
-                break;
-            case SortType.BUILDING_NAME:
-                sortedData = sortByBuildingName(sortedData, orderType);
-                break;
-            case SortType.BUILDING_LEVEL:
-                sortedData = sortByBuildingLevel(sortedData, orderType);
-                break;
-            default:
-                sortedData = sortByKingdomName(sortedData, orderType);
-        }
-
-        this.setState({
-            table_data: sortedData,
-            order_type: orderType,
-            sort_type: type,
-        });
-    }
-
-    resetSort() {
+    reset() {
         this.setState(
             {
-                sort_type: null,
-                order_type: null,
-                kingdom_search: "",
+                error_message: null,
+                success_message: null,
+                search_query: "",
+                sort_direction: "asc",
+                building_queue: [],
             },
             () => {
-                this.compressArray(this.state.building_data, false);
+                this.buildingToUpgradeService.updateFilteredBuildingData();
             },
         );
-    }
-
-    manageReviewModal() {
-        this.setState({
-            show_review_modal: !this.state.show_review_modal,
-        });
-    }
-
-    filterKingdomsTable(event: React.ChangeEvent<HTMLInputElement>): void {
-        const value = event.target.value;
-
-        let sortedData = JSON.parse(JSON.stringify(this.state.building_data));
-
-        sortedData = this.compressArray(sortedData, true);
-
-        if (value === "") {
-            this.setState({
-                sort_type: null,
-                order_type: null,
-                kingdom_search: "",
-                table_data: sortedData,
-            });
-
-            return;
-        }
-
-        sortedData = sortedData.filter((tableData: any) => {
-            return (
-                tableData.kingdom_name.includes(value) ||
-                tableData.building_name.includes(value)
-            );
-        });
-
-        this.setState({
-            sort_type: null,
-            order_type: null,
-            kingdom_search: value,
-            table_data: sortedData,
-        });
     }
 
     render() {
@@ -217,155 +110,177 @@ export default class BuildingsToUpgradeSection extends React.Component<
         }
 
         return (
-            <div>
-                {this.state.error_message !== null ? (
-                    <DangerAlert additional_css={"my-2"}>
-                        {this.state.error_message}
-                    </DangerAlert>
-                ) : null}
+            <div className="md:p-4">
+                {this.state.processing_request ? <LoadingProgressBar /> : null}
 
                 {this.state.success_message !== null ? (
-                    <DangerAlert additional_css={"my-2"}>
-                        {this.state.success_message}
-                    </DangerAlert>
+                    <SuccessAlert>{this.state.success_message}</SuccessAlert>
                 ) : null}
 
-                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
+                {this.state.error_message !== null ? (
+                    <DangerAlert>{this.state.error_message}</DangerAlert>
+                ) : null}
 
-                <h4>
-                    {this.props.repair ? "Repair orders" : "Upgrade Orders"}
-                </h4>
-
-                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
-
-                <div className="flex items-center flex-wrap">
-                    <PrimaryOutlineButton
-                        button_label={
-                            "Queue All Buildings (" +
-                            (this.props.repair ? "Repair" : "Upgrade") +
-                            ")"
-                        }
-                        on_click={() => {
-                            addAllBuildingsToQueue(this);
-                        }}
-                        additional_css={"flex-1 py-2 px-4 min-w-[120px]"}
-                        disabled={
-                            this.state.table_data.length <= 0 &&
-                            this.state.kingdom_search === ""
-                        }
-                    />
-
-                    {this.state.upgrade_queue.length > 0 ? (
-                        <Fragment>
-                            <SuccessOutlineButton
-                                button_label={"Review/Send Orders"}
-                                on_click={this.manageReviewModal.bind(this)}
-                                additional_css={
-                                    "flex-1 py-2 px-3 ml-2 min-w-[120px]"
-                                }
-                                disabled={
-                                    this.state.table_data.length <= 0 &&
-                                    this.state.kingdom_search === ""
-                                }
-                            />
-                            <DangerOutlineButton
-                                button_label={"Remove All From Queue"}
-                                on_click={() => removeAllFromQueue(this)}
-                                additional_css={
-                                    "flex-1 py-2 px-3 ml-2 min-w-[120px]"
-                                }
-                                disabled={
-                                    this.state.table_data.length <= 0 &&
-                                    this.state.kingdom_search === ""
-                                }
-                            />
-                        </Fragment>
-                    ) : null}
-                </div>
-
-                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
-
-                <div
-                    className={clsx(
-                        "flex space-x-2 items-center flex-wrap my-2",
-                    )}
-                >
-                    <PrimaryOutlineButton
-                        button_label={"Sort by Kingdom Name"}
-                        on_click={() =>
-                            this.sortTable(SortType.KINGDOM_NAME, "asc")
-                        }
-                        additional_css={"py-2 px-3 flex-shrink-0 min-w-[120px]"}
-                        disabled={
-                            this.state.table_data.length <= 0 &&
-                            this.state.kingdom_search === ""
-                        }
-                    />
-                    <SuccessOutlineButton
-                        button_label={"Sort by Building Name"}
-                        on_click={() =>
-                            this.sortTable(SortType.BUILDING_NAME, "asc")
-                        }
-                        additional_css={"py-2 px-3 flex-shrink-0 min-w-[120px]"}
-                        disabled={
-                            this.state.table_data.length <= 0 &&
-                            this.state.kingdom_search === ""
-                        }
-                    />
-                    <OrangeOutlineButton
-                        button_label={"Sort by Building Level"}
-                        on_click={() =>
-                            this.sortTable(SortType.BUILDING_LEVEL, "asc")
-                        }
-                        additional_css={"py-2 px-3 flex-shrink-0 min-w-[120px]"}
-                        disabled={
-                            this.state.table_data.length <= 0 &&
-                            this.state.kingdom_search === ""
-                        }
-                    />
-                    <DangerOutlineButton
-                        button_label={"Reset Filters/Search"}
-                        on_click={() => this.resetSort()}
-                        additional_css={"py-2 px-3 flex-shrink-0 min-w-[120px]"}
-                        disabled={
-                            this.state.table_data.length <= 0 &&
-                            this.state.kingdom_search === ""
-                        }
-                    />
-                </div>
-
-                <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4 my-4">
-                    <label className="block text-gray-700 w-32 md:w-20 dark:text-gray-100">
-                        Search
-                    </label>
-                    <input
-                        type="text"
-                        value={this.state.kingdom_search}
-                        className="block border border-gray-500 dark:border-gray-200 rounded p-2 w-full md:w-80 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-600"
-                        onChange={this.filterKingdomsTable.bind(this)}
-                        placeholder="Enter Kingdom/Building Name"
-                    />
-                </div>
-
-                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
-
-                <Table
-                    data={this.state.table_data}
-                    columns={buildSmallCouncilBuildingsTableColumns(this)}
-                    dark_table={false}
+                <input
+                    type="text"
+                    value={this.state.search_query}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        this.buildingToUpgradeService.handleSearchChange(e)
+                    }
+                    placeholder="Search by kingdom name, map name, or building name"
+                    className="w-full my-4 px-4 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-700 dark:placeholder-gray-300"
+                    aria-label="Search by kingdom name, map name, or building name"
                 />
 
-                {this.state.show_review_modal ? (
-                    <SendRequestConfirmationModal
-                        is_open={this.state.show_review_modal}
-                        manage_modal={this.manageReviewModal.bind(this)}
-                        character_id={this.props.kingdom.character_id}
-                        kingdom_id={this.props.kingdom.id}
-                        params={this.state.upgrade_queue}
-                        repair={this.props.repair}
-                        reset_table_forms={this.resetTableForms.bind(this)}
+                <div className="flex space-x-4 mb-4">
+                    <PrimaryOutlineButton
+                        on_click={() =>
+                            this.buildingToUpgradeService.sortBuildings()
+                        }
+                        button_label={
+                            <>
+                                Sort by Building Level
+                                <i
+                                    className={`fas fa-arrow-${this.state.sort_direction === "asc" ? "up" : "down"} ml-2`}
+                                />
+                            </>
+                        }
+                        disabled={
+                            this.state.processing_request ||
+                            this.state.filtered_building_data.length <= 0
+                        }
                     />
+
+                    <DangerOutlineButton
+                        on_click={this.reset.bind(this)}
+                        button_label={"Reset"}
+                        disabled={this.state.processing_request}
+                    />
+
+                    {this.state.building_queue.length > 0 && (
+                        <SuccessOutlineButton
+                            on_click={() =>
+                                this.buildingToUpgradeService.sendOrders()
+                            }
+                            button_label="Send Orders"
+                            disabled={this.state.processing_request}
+                        />
+                    )}
+                </div>
+
+                <div className="mb-4 text-gray-700 dark:text-gray-300">
+                    Kingdom Count: {this.state.filtered_building_data.length} /{" "}
+                    {this.state.building_data.length}
+                </div>
+
+                <div className="mb-4 text-center">
+                    <PrimaryButton
+                        button_label={
+                            this.state.building_queue.length > 0
+                                ? "Remove all from queue"
+                                : "Queue All"
+                        }
+                        on_click={this.buildingToUpgradeService.toggleQueueAllBuildingsForAllKingdoms.bind(
+                            this.buildingToUpgradeService,
+                        )}
+                        additional_css={"w-full"}
+                        disabled={
+                            this.state.processing_request ||
+                            this.state.filtered_building_data.length <= 0
+                        }
+                    />
+                </div>
+
+                {this.state.filtered_building_data.length <= 0 ? (
+                    <p>
+                        There is nothing to do here. Go settle somemore kingdoms
+                        child.
+                    </p>
                 ) : null}
+
+                {this.buildingToUpgradeService
+                    .getPaginatedData()
+                    .map((kingdom: Kingdom) => (
+                        <div
+                            key={kingdom.kingdom_id}
+                            className="bg-gray-100 dark:bg-gray-700 shadow-md rounded-lg overflow-hidden mb-4"
+                        >
+                            <div
+                                className="p-4 flex justify-between items-center cursor-pointer"
+                                onClick={() =>
+                                    this.buildingToUpgradeService.toggleDetails(
+                                        kingdom.kingdom_id,
+                                    )
+                                }
+                            >
+                                <div>
+                                    <h2 className="text-xl font-bold dark:text-white">
+                                        {kingdom.kingdom_name}
+                                    </h2>
+                                    <p className="text-gray-500 dark:text-gray-400">
+                                        {kingdom.map_name}
+                                    </p>
+                                    <p className="text-gray-500 dark:text-gray-400">
+                                        Time from capital city:{" "}
+                                        {kingdom.total_travel_time} Minute(s)
+                                    </p>
+
+                                    {kingdom.buildings.some((building) =>
+                                        this.buildingToUpgradeService.hasBuildingInQueue(
+                                            kingdom,
+                                            building,
+                                        ),
+                                    ) && (
+                                        <p className="text-gray-600 dark:text-gray-500 mt-2">
+                                            <strong>Buildings in Queue</strong>:{" "}
+                                            {kingdom.buildings
+                                                .filter((building) =>
+                                                    this.buildingToUpgradeService.hasBuildingInQueue(
+                                                        kingdom,
+                                                        building,
+                                                    ),
+                                                )
+                                                .map((building) =>
+                                                    this.props.repair
+                                                        ? `${building.name} (to be repaired)`
+                                                        : `${building.name} (to level: ${building.level + 1})`,
+                                                )
+                                                .join(", ")}
+                                        </p>
+                                    )}
+                                </div>
+                                <i
+                                    className={`fas fa-chevron-${this.state.open_kingdom_ids.has(kingdom.kingdom_id) ? "down" : "up"} text-gray-500 dark:text-gray-400`}
+                                ></i>
+                            </div>
+
+                            {this.state.open_kingdom_ids.has(
+                                kingdom.kingdom_id,
+                            ) && (
+                                <OpenKingdomCardForBuildingManagement
+                                    building_queue={this.state.building_queue}
+                                    has_building_in_queue={this.buildingToUpgradeService.hasBuildingInQueue.bind(
+                                        this.buildingToUpgradeService,
+                                    )}
+                                    kingdom={kingdom}
+                                    toggle_queue_all_buildings={this.buildingToUpgradeService.toggleQueueAllBuildings.bind(
+                                        this.buildingToUpgradeService,
+                                    )}
+                                    toggle_building_queue={this.buildingToUpgradeService.toggleBuildingQueue.bind(
+                                        this.buildingToUpgradeService,
+                                    )}
+                                />
+                            )}
+                        </div>
+                    ))}
+                <Pagination
+                    on_page_change={this.buildingToUpgradeService.handlePageChange.bind(
+                        this.buildingToUpgradeService,
+                    )}
+                    current_page={this.state.current_page}
+                    items_per_page={MAX_ITEMS_PER_PAGE}
+                    total_items={this.state.filtered_building_data.length}
+                />
             </div>
         );
     }

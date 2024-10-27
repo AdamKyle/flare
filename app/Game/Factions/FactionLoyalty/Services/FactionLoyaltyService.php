@@ -79,7 +79,7 @@ class FactionLoyaltyService
             ]);
 
             return $this->successResult([
-                'message' => 'No longer pledged to: '.$faction->gameMap->name.'.',
+                'message' => 'No longer pledged to: ' . $faction->gameMap->name . '.',
                 'factions' => $character->refresh()->factions->transform(function ($faction) {
                     $faction->map_name = $faction->gameMap->name;
                     $faction->is_pledged = $faction->character->factionLoyalties()->where('is_pledged', true)->exists();
@@ -114,7 +114,7 @@ class FactionLoyaltyService
         $result = $this->getLoyaltyInfoForPlane($character->refresh());
 
         return $this->successResult([
-            'message' => 'You are now assisting '.$factionLoyaltyNpc->npc->real_name.' with their tasks!',
+            'message' => 'You are now assisting ' . $factionLoyaltyNpc->npc->real_name . ' with their tasks!',
             'faction_loyalty' => $result['faction_loyalty'],
         ]);
     }
@@ -135,7 +135,7 @@ class FactionLoyaltyService
         $result = $this->getLoyaltyInfoForPlane($character->refresh());
 
         return $this->successResult([
-            'message' => 'You stopped assisting '.$factionLoyaltyNpc->npc->real_name.' with their tasks. They are sad but understand.',
+            'message' => 'You stopped assisting ' . $factionLoyaltyNpc->npc->real_name . ' with their tasks. They are sad but understand.',
             'faction_loyalty' => $result['faction_loyalty'],
         ]);
     }
@@ -197,7 +197,7 @@ class FactionLoyaltyService
         }
 
         return $this->successResult([
-            'message' => 'Pledged to: '.$factionLoyalty->faction->gameMap->name.'.',
+            'message' => 'Pledged to: ' . $factionLoyalty->faction->gameMap->name . '.',
             'factions' => $character->refresh()->factions->transform(function ($faction) {
                 $faction->map_name = $faction->gameMap->name;
                 $faction->is_pledged = $faction->character->factionloyalties()->where('is_pledged', true)->exists();
@@ -296,10 +296,6 @@ class FactionLoyaltyService
                 $amount = ceil($amount / 2);
             }
 
-            if ($amount <= 0) {
-                $amount = 5;
-            }
-
             $tasks[] = [
                 'type' => $item->type,
                 'item_name' => $item->affix_name,
@@ -353,10 +349,6 @@ class FactionLoyaltyService
 
             if (! is_null($event)) {
                 $amount = ceil($amount / 2);
-            }
-
-            if ($amount <= 0) {
-                $amount = 5;
             }
 
             $tasks[] = [

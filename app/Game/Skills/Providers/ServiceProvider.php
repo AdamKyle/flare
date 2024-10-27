@@ -10,8 +10,8 @@ use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Events\Services\EventGoalsService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
+use App\Game\Gems\Builders\GemBuilder;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
-use App\Game\Skills\Builders\GemBuilder;
 use App\Game\Skills\Handlers\HandleUpdatingCraftingGlobalEventGoal;
 use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
 use App\Game\Skills\Handlers\UpdateCraftingTasksForFactionLoyalty;
@@ -137,9 +137,7 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(GemBuilder::class, function () {
-            return new GemBuilder;
-        });
+
 
         $this->app->bind(DisenchantService::class, function ($app) {
             return new DisenchantService($app->make(SkillCheckService::class), $app->make(CharacterInventoryService::class));

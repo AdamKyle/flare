@@ -71,9 +71,6 @@ class Kernel extends ConsoleKernel
         // Reset every day at 11:59 pm.
         $schedule->command('reset:capital-city-walking-status')->dailyAt('23:59')->timezone(config('app.timezone'));
 
-        // Start the monthly pvp event.
-        $schedule->command('start:pvp-monthly-event')->lastDayOfMonth('18:30')->timezone(config('app.timezone'));
-
         // Give people a chance to win daily lottery for gold dust
         $schedule->command('daily:gold-dust')->dailyAt('12:00')->timezone(config('app.timezone'));
 
@@ -110,7 +107,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }

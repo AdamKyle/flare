@@ -57,6 +57,8 @@ class ItemEffectsValue
 
     const TWISTED_TREE_BRANCH = 'access-twisted-memories';
 
+    const TWISTED_DUNGEONS = 'twisted-dungeons';
+
     /**
      * @var string[]
      */
@@ -85,6 +87,7 @@ class ItemEffectsValue
         self::MERCENARY_SLOT_BONUS => 'mercenary-slot-bonus',
         self::WALK_ON_DELUSIONAL_MEMORIES_WATER => 'walk-on-delusional-memories-water',
         self::TWISTED_TREE_BRANCH => 'access-twisted-memories',
+        self::TWISTED_DUNGEONS => 'twisted-dungeons',
     ];
 
     /**
@@ -281,10 +284,19 @@ class ItemEffectsValue
     }
 
     /**
-     * Is an item that allows us to walk on the delusional memories water?
+     * Is an item that allows us to access the twisted memories?
      */
     public function accessTwistedMemories(): bool
     {
         return $this->value === self::TWISTED_TREE_BRANCH;
+    }
+
+    /**
+     * Is an item that allows one to access the twisted dungeons?
+     *
+     * @return boolean
+     */
+    public function accessTwistedDungeons(): bool {
+        return $this->value === self::TWISTED_DUNGEONS;
     }
 }

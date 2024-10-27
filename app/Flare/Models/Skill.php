@@ -70,7 +70,8 @@ class Skill extends Model
         return $this->belongsTo(Character::class);
     }
 
-    public function getItemSkillBreakdown(string $skillAttribute = 'skill_bonus'): array {
+    public function getItemSkillBreakdown(string $skillAttribute = 'skill_bonus'): array
+    {
         return $this->getItemBonusBreakDown($this->baseSkill, $skillAttribute);
     }
 
@@ -311,8 +312,8 @@ class Skill extends Model
 
     protected function getCharacterSkillBonus(Character $character, string $name): float
     {
-        $raceSkillBonusValue = $character->race->{Str::snake($name.'_mod')};
-        $classSkillBonusValue = $character->class->{Str::snake($name.'_mod')};
+        $raceSkillBonusValue = $character->race->{Str::snake($name . '_mod')};
+        $classSkillBonusValue = $character->class->{Str::snake($name . '_mod')};
 
         return $raceSkillBonusValue + $classSkillBonusValue;
     }
@@ -354,7 +355,8 @@ class Skill extends Model
         return empty($bonuses) ? 0.0 : array_sum($bonuses);
     }
 
-    protected function getItemBonusBreakDown(GameSkill $skill, string $skillAttribute = 'skill_bonus'): array {
+    protected function getItemBonusBreakDown(GameSkill $skill, string $skillAttribute = 'skill_bonus'): array
+    {
         $itemsThatEffectBonus = [];
 
         $equippedSlots = $this->fetchSlotsWithEquipment();
@@ -411,7 +413,7 @@ class Skill extends Model
         $boons = CharacterBoon::where('character_id', $this->character->id)->get();
 
         if ($boons->isNotEmpty()) {
-            $newBonus += $boons->sum('itemUsed.'.$skillBonusAttribute);
+            $newBonus += $boons->sum('itemUsed.' . $skillBonusAttribute);
         }
 
         return $newBonus;

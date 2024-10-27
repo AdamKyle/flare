@@ -1,14 +1,14 @@
 import { Channel } from "laravel-echo";
 import { inject, injectable } from "tsyringe";
 import CoreEventListener from "../../../lib/game/event-listeners/core-event-listener";
-import BuildingQueuesTable from "../capital-city/building-queues-table";
+import BuildingsInQueue from "../capital-city/buildings-in-queue";
 import CapitalCityBuildingQueueTableEventDefinition from "./capital-city-building-queue-table-event-definition";
 
 @injectable()
 export default class CapitalCityBuildingQueuesTableEvent
     implements CapitalCityBuildingQueueTableEventDefinition
 {
-    private component?: BuildingQueuesTable;
+    private component?: BuildingsInQueue;
 
     private userId?: number;
 
@@ -18,7 +18,7 @@ export default class CapitalCityBuildingQueuesTableEvent
         @inject(CoreEventListener) private coreEventListener: CoreEventListener,
     ) {}
 
-    public initialize(component: BuildingQueuesTable, userId: number): void {
+    public initialize(component: BuildingsInQueue, userId: number): void {
         this.component = component;
         this.userId = userId;
     }

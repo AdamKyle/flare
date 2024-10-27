@@ -152,13 +152,13 @@ export default class ItemTable extends React.Component<ItemTableProps, any> {
                                 about it's stats.
                             </p>
                         </InfoAlert>
-                        <div className="md:w-3/5 w-full my-4">
-                            <div className="grid md:grid-cols-3 gap-4 my-4">
+                        <div className="w-full my-4 md:w-3/5">
+                            <div className="grid gap-4 my-4 md:grid-cols-3">
                                 <div className="flex items-center">
                                     <div className="mr-2">Search:</div>
                                     <input
                                         type="text"
-                                        className="w-full h-9 text-gray-800 dark:text-white border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-gray-200 dark:bg-gray-700 px-4"
+                                        className="w-full px-4 text-gray-800 bg-gray-200 border-gray-300 rounded-md shadow-sm h-9 dark:text-white focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700"
                                         value={this.state.search_term}
                                         onChange={this.handleSearchInputChange.bind(
                                             this,

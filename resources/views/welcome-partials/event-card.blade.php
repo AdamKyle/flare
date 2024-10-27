@@ -19,10 +19,6 @@
         $href = route('event.type', ['event_type' => 'weekly-faction-loyalty']);
     }
 
-    if ($eventRunning->getTitleOfEvent() === 'Monthly PVP') {
-        $icon = 'ra-lightning-sword';
-    }
-
     if ($eventRunning->getTitleOfEvent() === 'The Ice Queen\'s Realm' ||
         $eventRunning->getTitleOfEvent() === 'Delusional Memories Event') {
         $icon = 'ra-hourglass';
@@ -77,11 +73,6 @@
         @if ($eventRunning->getTitleOfEvent() === 'Weekly Faction Loyalty Event')
             Get a boost to working on your Faction Loyalties. Gain 2 points instead of one. When the fame levels up, the
             requirements for the next level are halved!
-        @endif
-
-        @if ($eventRunning->getTitleOfEvent() === 'Monthly PVP')
-            Monthly PVP is ongoing. Opt in now! Winner gets a mythical item, while participants get 2 billion gold and a
-            medium unique!
         @endif
 
         @if ($eventRunning->getTitleOfEvent() === 'The Ice Queen\'s Realm')

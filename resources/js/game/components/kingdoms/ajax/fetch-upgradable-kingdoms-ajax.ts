@@ -25,29 +25,63 @@ export default class FetchUpgradableKingdomsAjax {
                 (result: AxiosResponse) => {
                     let data = result.data;
 
+                    // Filter based on repair status
                     if (component.props.repair) {
-                        data = result.data.map(
+                        data = data
+                            .map(
+                                (kingdom: {
+                                    map_name: any;
+                                    kingdom_name: any;
+                                    kingdom_id: number;
+                                    total_travel_time: number;
+                                    buildings: any[];
+                                }) => ({
+                                    kingdom_name: kingdom.kingdom_name,
+                                    kingdom_id: kingdom.kingdom_id,
+                                    map_name: kingdom.map_name,
+                                    total_travel_time:
+                                        kingdom.total_travel_time,
+                                    buildings: kingdom.buildings
+                                        .filter(
+                                            (building) =>
+                                                building.current_durability <
+                                                building.max_durability,
+                                        )
+                                        .sort((a, b) => a.level - b.level), // Sort buildings by level (lowest to highest)
+                                }),
+                            )
+                            .filter(
+                                (kingdom: any) => kingdom.buildings.length > 0, // Keep only kingdoms with buildings needing repair
+                            );
+                    } else {
+                        data = data.map(
                             (kingdom: {
+                                map_name: any;
                                 kingdom_name: any;
                                 kingdom_id: number;
+                                total_travel_time: number;
                                 buildings: any[];
                             }) => ({
                                 kingdom_name: kingdom.kingdom_name,
+                                map_name: kingdom.map_name,
                                 kingdom_id: kingdom.kingdom_id,
-                                buildings: kingdom.buildings.filter(
-                                    (building) =>
-                                        building.current_durability <
-                                        building.max_durability,
-                                ),
+                                total_travel_time: kingdom.total_travel_time,
+                                buildings: kingdom.buildings
+                                    .filter(
+                                        (building) =>
+                                            building.current_durability >=
+                                            building.max_durability,
+                                    )
+                                    .sort((a, b) => a.level - b.level), // Sort buildings by level (lowest to highest)
                             }),
                         );
                     }
 
-                    component.compressArray(data, false);
-
+                    // Set the state with the filtered and sorted data
                     component.setState({
                         loading: false,
                         building_data: data,
+                        filtered_building_data: data,
                     });
                 },
                 (error: AxiosError) => {

@@ -5,8 +5,8 @@ namespace App\Game\Kingdoms\Service;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
-use App\Flare\Transformers\KingdomAttackLogsTransformer;
-use App\Flare\Transformers\KingdomTransformer;
+use App\Game\Kingdoms\Transformers\KingdomAttackLogsTransformer;
+use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Events\UpdateKingdom as UpdateKingdomDetails;
 use App\Game\Kingdoms\Events\UpdateKingdomLogs;
 use App\Game\Kingdoms\Events\UpdateKingdomQueues;
@@ -26,7 +26,8 @@ class UpdateKingdom
 
     private Manager $manager;
 
-    public function __construct(KingdomTransformer $kingdomTransformer,
+    public function __construct(
+        KingdomTransformer $kingdomTransformer,
         KingdomTableTransformer $kingdomTableTransformer,
         KingdomAttackLogsTransformer $kingdomAttackLogsTransformer,
         Manager $manager

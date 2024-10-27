@@ -2,16 +2,14 @@ import { inject, injectable } from "tsyringe";
 import Ajax from "../../../lib/ajax/ajax";
 import AjaxInterface from "../../../lib/ajax/ajax-interface";
 import { AxiosError, AxiosResponse } from "axios";
-import BuildingsToUpgradeSection from "../capital-city/buildings-to-upgrade-section";
-import SendRequestConfirmationModal from "../capital-city/modals/send-request-confirmation-modal";
-import SendUnitRecruitmentRequestModal from "../capital-city/modals/send-unit-recruitment-request-modal";
+import UnitRecruitment from "../capital-city/partials/unit-management/unit-recruitment";
 
 @injectable()
 export default class ProcessUnitRequestAjax {
     constructor(@inject(Ajax) private ajax: AjaxInterface) {}
 
     public processRequest(
-        component: SendUnitRecruitmentRequestModal,
+        component: UnitRecruitment,
         characterId: number,
         kingdomId: number,
         params: any,
@@ -29,19 +27,16 @@ export default class ProcessUnitRequestAjax {
             .doAjaxCall(
                 "post",
                 (result: AxiosResponse) => {
-                    component.setState(
-                        {
-                            loading: false,
-                            success_message: result.data.message,
-                        },
-                        () => {
-                            component.props.reset_request_form();
-                        },
-                    );
+                    component.setState({
+                        processing_request: false,
+                        success_message: result.data.message,
+                        unit_queue: [],
+                        bulk_input_values: {},
+                    });
                 },
                 (error: AxiosError) => {
                     component.setState({
-                        loading: false,
+                        processing_request: false,
                     });
 
                     if (typeof error.response !== "undefined") {

@@ -24,14 +24,17 @@ class CancelUnitRequestRequest extends FormRequest
     public function rules()
     {
         return [
-            'request_data' => 'required|array',
+            'unit_name' => 'string|nullable',
+            'queue_id' => 'required|integer',
         ];
     }
 
     public function messages()
     {
         return [
-            'request_data.required' => 'Missing request data',
+            'queue_id.required' => 'Queue id is missing',
+            'queue_id.integer' => 'Queue id must be an intger',
+            'unit_name.string' => 'Unit name must be a string',
         ];
     }
 }

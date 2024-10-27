@@ -4,9 +4,8 @@ import LoadingProgressBar from "../../../ui/progress-bars/loading-progress-bar";
 import Dialogue from "../../../ui/dialogue/dialogue";
 import { serviceContainer } from "../../../../lib/containers/core-container";
 import SuccessAlert from "../../../ui/alerts/simple-alerts/success-alert";
-import PrimaryOutlineButton from "../../../ui/buttons/primary-outline-button";
-import UnitCancellationSection from "./partials/unit-cancellation-section";
 import CancelUnitRequestAjax from "../../ajax/cancel-unit-request-ajax";
+import { CancellationType } from "../enums/cancellation-type";
 
 export default class SendUnitRequestCancellationRequestModal extends React.Component<
     any,
@@ -28,7 +27,7 @@ export default class SendUnitRequestCancellationRequestModal extends React.Compo
         );
     }
 
-    sendRequest(deleteQueue: boolean, unitId?: number) {
+    sendRequest() {
         this.setState(
             {
                 loading: true,
@@ -39,13 +38,20 @@ export default class SendUnitRequestCancellationRequestModal extends React.Compo
                 this.processBuildingCancellationRequest.cancelUnitRequest(
                     this,
                     this.props.character_id,
-                    this.props.queue_data.kingdom_id,
-                    this.props.queue_data.queue_id,
-                    deleteQueue,
-                    unitId,
+                    this.props.kingdom_id,
+                    this.props.queue_id,
+                    this.props.unit_details?.unit_name,
                 );
             },
         );
+    }
+
+    modalDialogueTitle(): string {
+        if (this.props.unit_details === null) {
+            return "Cancel All Requests";
+        }
+
+        return "Cancel " + this.props.unit_details.unit_name;
     }
 
     render() {
@@ -53,31 +59,17 @@ export default class SendUnitRequestCancellationRequestModal extends React.Compo
             <Dialogue
                 is_open={this.props.is_open}
                 handle_close={this.props.manage_modal}
-                title={"Send Unit Recruitment Request"}
+                title={this.modalDialogueTitle()}
                 primary_button_disabled={this.state.loading}
                 secondary_actions={{
                     secondary_button_disabled:
                         this.state.loading ||
                         this.state.success_message !== null,
-                    secondary_button_label: "Cancel just this unit",
-                    handle_action: () =>
-                        this.sendRequest(false, this.props.queue_data.unit_id),
+                    secondary_button_label: "Yes, that is correct",
+                    handle_action: () => this.sendRequest(),
                 }}
             >
-                <div className="overflow-y-auto max-h-[450px]">
-                    <UnitCancellationSection
-                        queue_data={this.props.queue_data}
-                    />
-
-                    <div className="my-4 text-center">
-                        <PrimaryOutlineButton
-                            button_label={
-                                "Cancel Entire Queue For This Kingdom"
-                            }
-                            on_click={() => this.sendRequest(true)}
-                        />
-                    </div>
-
+                <div>
                     {this.state.error_message !== null ? (
                         <DangerAlert additional_css={"my-4"}>
                             {this.state.error_message}
@@ -89,6 +81,20 @@ export default class SendUnitRequestCancellationRequestModal extends React.Compo
                             {this.state.success_message}
                         </SuccessAlert>
                     ) : null}
+
+                    <p className="my-4">
+                        <strong>Are you sure you want to this?</strong> This
+                        action cannot be undone.
+                    </p>
+
+                    <p>
+                        {this.props.cancellation_type ===
+                        CancellationType.SINGLE_CANCEL
+                            ? "You are saying you want to cancel: " +
+                              this.props.unit_details.unit_name +
+                              " Is that correct?"
+                            : "You are saying to cancel all unit requests in this request. Is that correct?"}
+                    </p>
 
                     {this.state.loading ? <LoadingProgressBar /> : null}
                 </div>

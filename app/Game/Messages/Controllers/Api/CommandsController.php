@@ -2,7 +2,7 @@
 
 namespace App\Game\Messages\Controllers\Api;
 
-use App\Game\Messages\Handlers\ServerMessageHandler;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Game\Messages\Request\PublicEntityRequest;
 use App\Game\Messages\Services\PublicEntityCommand;
 use App\Http\Controllers\Controller;
@@ -10,13 +10,15 @@ use Illuminate\Http\JsonResponse;
 
 class CommandsController extends Controller
 {
-    private PublicEntityCommand $publicEntityCommand;
-
-    public function __construct(PublicEntityCommand $publicEntityCommand)
+    public function __construct(private PublicEntityCommand $publicEntityCommand)
     {
         $this->publicEntityCommand = $publicEntityCommand;
     }
 
+    /**
+     * @param PublicEntityRequest $request
+     * @return JsonResponse
+     */
     public function publicEntity(PublicEntityRequest $request): JsonResponse
     {
 

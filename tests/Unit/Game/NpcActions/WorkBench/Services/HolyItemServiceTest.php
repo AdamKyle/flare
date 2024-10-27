@@ -161,6 +161,35 @@ class HolyItemServiceTest extends TestCase
         $this->assertEquals(422, $result['status']);
     }
 
+    public function testCannotApplyHolyOilWhenNoOilsInInventory()
+    {
+        $character = $this->character->inventoryManagement()->giveItem(
+            $this->createItem([
+                'type' => 'weapon',
+                'holy_stacks' => 20,
+            ])
+        )->getCharacter();
+
+        $character->update([
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+        ]);
+
+        $character = $character->refresh();
+
+        $slot = $character->inventory->slots->filter(function ($slot) {
+            return $slot->item->type === 'weapon';
+        })->first();
+
+        $result = $this->holyItemService->applyOil($character, [
+            'item_id' => $slot->item_id,
+            'alchemy_item_id' => 0,
+        ]);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(422, $result['status']);
+    }
+
     public function testApplyHolyOilToItem()
     {
         $character = $this->character->inventoryManagement()->giveItem(

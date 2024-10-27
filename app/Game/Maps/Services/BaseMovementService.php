@@ -103,7 +103,7 @@ class BaseMovementService
             $gameMap = GameMap::where('name', MapNameValue::TWISTED_MEMORIES)->first();
 
             if (is_null($gameMap)) {
-                throw new Exception('Could not teleport to Twisted Gate.');
+                throw new Exception('Could not traverse to Twisted Gate.');
             }
 
             $this->traverseService->travel($gameMap->id, $character);
@@ -196,12 +196,6 @@ class BaseMovementService
      */
     protected function canPlayerEnterLocation(Character $character, Location $location): bool
     {
-        if (! $location->can_players_enter) {
-            event(new ServerMessageEvent($character->user, 'You cannot enter this location. This is the PVP arena that is only open once per month.'));
-
-            return false;
-        }
-
         if (! is_null($location->enemy_strength_type) && $character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty()) {
 
             if (! is_null($location->type)) {
@@ -223,7 +217,7 @@ class BaseMovementService
             $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
 
             if (is_null($slot)) {
-                event(new ServerMessageEvent($character->user, 'Cannot enter this location without a '.$item->name));
+                event(new ServerMessageEvent($character->user, 'Cannot enter this location without a ' . $item->name));
 
                 return false;
             }
@@ -258,7 +252,6 @@ class BaseMovementService
         }
 
         if ($gameMap->mapType()->isTheIcePlane()) {
-
         }
 
         if ($gameMap->mapType()->isPurgatory()) {
