@@ -29,8 +29,7 @@
         "pusher/pusher-php-server": "^7.2",
         "rappasoft/laravel-livewire-tables": "^3.2",
         "spatie/laravel-collection-macros": "^7.12.3",
-        "spatie/laravel-permission": "^6.9.0",
-        "spatie/laravel-short-schedule": "^1.5"
+        "spatie/laravel-permission": "^6.9.0"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.1.0",

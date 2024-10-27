@@ -57,7 +57,8 @@ class StartSurvey extends Command
      */
     protected $description = 'Starts the survey for those eligible.';
 
-    public function handle(): void {
+    public function handle(): void
+    {
 
         $scheduledEvent = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
 
@@ -67,7 +68,23 @@ class StartSurvey extends Command
 
         $overrideCharacterId = $this->argument('overrideCharacterId');
 
-        Character::chunk(250, function($characters) use($overrideCharacterId) {
+        $overrideCharacter = Character::find($overrideCharacterId);
+
+        if (!is_null($overrideCharacter)) {
+            $overrideCharacter->user()->update([
+                'is_showing_survey' => true,
+            ]);
+
+            $character = $overrideCharacter->refresh();
+
+            $surveyToComplete = Survey::latest()->first();
+
+            event(new ShowSurvey($character->user, $surveyToComplete->id));
+
+            return;
+        }
+
+        Character::chunk(250, function ($characters) {
             foreach ($characters as $character) {
 
                 if ($character->user->is_showing_survey) {
@@ -86,10 +103,8 @@ class StartSurvey extends Command
 
                 $totalHoursLoggedIn = $totalLoginDuration / 3600;
 
-                $overrideCharacter = Character::find($overrideCharacterId);
 
-                if (($hoursSinceLastActivity < 1 && $hoursSinceLastHeartBeat < 1 && $totalHoursLoggedIn < 1) && is_null($overrideCharacter)) {
-
+                if (($hoursSinceLastActivity < 1 && $hoursSinceLastHeartBeat < 1 && $totalHoursLoggedIn < 1)) {
                     continue;
                 }
 
@@ -102,6 +117,8 @@ class StartSurvey extends Command
                 $character->user()->update([
                     'is_showing_survey' => true,
                 ]);
+
+                $character = $character->refresh();
 
                 $surveyToComplete = Survey::latest()->first();
 
