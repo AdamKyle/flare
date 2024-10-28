@@ -1,12 +1,6 @@
 import React from "react";
 
-interface CharacterSheetProps {}
-
-export default class CharacterSheet extends React.Component<CharacterSheetProps> {
-    constructor(props: CharacterSheetProps) {
-        super(props);
-    }
-
+export default class CharacterSheet extends React.Component {
     render() {
         return "Character Sheet Content ...";
     }

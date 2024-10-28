@@ -8,6 +8,7 @@
         "build:dev": "NODE_ENV=development vite build",
         "prepare": "husky",
         "lint": "yarn eslint resources/js/admin/**/*.{ts,tsx} resources/js/game/**/*.{ts,tsx} resources/js/individual-components/**/*.{ts,tsx}",
+        "lint-phoniex": "yarn eslint resources/js/phoniex/**/*.{ts,tsx}",
         "type-check": "tsc --noEmit --skipLibCheck"
     },
     "devDependencies": {
@@ -47,7 +48,7 @@
         "tippy.js": "^6.3.1",
         "ts-loader": "9.5.1",
         "typescript": "^5.5.3",
-        "typescript-eslint": "^7.16.1",
+        "typescript-eslint": "^8.12.0",
         "vite": "^5.1.3"
     },
     "dependencies": {
@@ -85,7 +86,8 @@
         "rpg-awesome": "^0.2.0",
         "styled-components": "^6.1.8",
         "tailwindcss-classnames": "^3.0.2",
-        "tsyringe": "^4.8.0"
+        "tsyringe": "^4.8.0",
+        "uuid": "^11.0.2"
     },
     "type": "module"
 }

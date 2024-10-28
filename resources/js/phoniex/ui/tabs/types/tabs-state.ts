@@ -1,3 +1,3 @@
 export default interface TabsState {
-    selectedIndex: number;
+    selected_index: number;
 }

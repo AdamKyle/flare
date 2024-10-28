@@ -22249,11 +22249,6 @@ namespace  {
     }
 
 
-namespace Facades\App\Game\Kingdoms\Validation {
-    /**
-     * @mixin \App\Game\Kingdoms\Validation\ResourceValidation     */
-    class ResourceValidation extends \App\Game\Kingdoms\Validation\ResourceValidation {}
-}
 namespace Facades\Livewire\Features\SupportFileUploads {
     /**
      * @mixin \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl     */

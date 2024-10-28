@@ -1,20 +1,17 @@
 import React from "react";
-import Fight from "./fighting/fight";
 import Tabs from "../ui/tabs/tabs";
 import CharacterSheet from "./character-sheet/character-sheet";
-import Map from "./map/map";
-import GameCardProps from "./types/game-card-props";
+import Actions from "./actions/actions";
 
-export default class GameCard extends React.Component<GameCardProps> {
+export default class GameCard extends React.Component {
     render() {
         return (
             <Tabs
-                tabs={["Fight", "Character Sheet", "Map"]}
-                icons={["ra ra-sword", "ra ra-player", "fas fa-map-signs"]}
+                tabs={["Game", "Character Sheet"]}
+                icons={["fas fa-dice-d20", "ra ra-player"]}
             >
-                <Fight />
+                <Actions />
                 <CharacterSheet />
-                <Map />
             </Tabs>
         );
     }

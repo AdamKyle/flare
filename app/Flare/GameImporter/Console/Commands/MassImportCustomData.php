@@ -44,14 +44,6 @@ class MassImportCustomData extends Command
         Artisan::call('import:game-data "Kingdom Passive Skills"');
         Artisan::call('import:game-data Quests');
 
-        CapitalCityUnitQueue::truncate();
-        CapitalCityBuildingQueue::truncate();
-        Survey::truncate();
-        SurveySnapshot::truncate();
-        User::where('is_showing_survey', true)->update(['is_showing_survey' => false]);
-
-        Artisan::call('fix:event-types-on-events');
-
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
