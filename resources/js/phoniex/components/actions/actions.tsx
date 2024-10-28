@@ -1,7 +1,8 @@
 import React from "react";
+import Card from "../../ui/cards/card";
 
 export default class Actions extends React.Component {
     render() {
-        return <p>Nothing implemented yet ....</p>;
+        return <Card>Content here ...</Card>;
     }
 }
