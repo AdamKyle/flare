@@ -48,12 +48,10 @@ export default class IconButton extends React.Component<IconButtonProps> {
                     this.variantStyles(),
                     this.props.additional_css,
                 )}
-                aria-label={
-                    this.props.aria_lebel
-                        ? this.props.aria_lebel
-                        : "Icon Button"
-                }
+                aria-label={this.props.aria_lebel || "Icon Button"}
                 disabled={this.props.disabled}
+                role="button"
+                type="button"
             >
                 {this.props.icon}
             </button>
