@@ -13,7 +13,7 @@ export default class IconButton extends React.Component<IconButtonProps> {
         return (
             "px-4 py-2 text-white rounded-lg shadow focus:outline-none " +
             "focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 " +
-            "disabled:opacity-75 disabled:cursor-not-allowed"
+            "disabled:opacity-75 disabled:cursor-not-allowed flex flex-col items-center"
         );
     }
 
@@ -53,7 +53,14 @@ export default class IconButton extends React.Component<IconButtonProps> {
                 role="button"
                 type="button"
             >
-                {this.props.icon}
+                <div className="flex flex-col items-center">
+                    {this.props.icon}
+                    {this.props.label && (
+                        <span className="text-sm mt-1 text-center">
+                            {this.props.label}
+                        </span>
+                    )}
+                </div>
             </button>
         );
     }
