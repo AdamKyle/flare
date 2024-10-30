@@ -14,7 +14,7 @@ export default class Actions extends React.Component {
             <Card>
                 <div className="w-full flex flex-col lg:flex-row">
                     {/* Icon Container */}
-                    <div className="flex lg:flex-col items-center mx-auto w-2/3 lg:w-10 justify-between lg:items-start lg:mr-4 lg:justify-start lg:mt-10 mt-4 space-y-0 lg:space-y-2">
+                    <div className="flex lg:flex-col items-center mx-auto w-2/3 lg:w-10 justify-between lg:items-start lg:mr-4 lg:justify-start lg:mt-3 mt-4 space-y-0 lg:space-y-2">
                         <div className="flex lg:flex-col w-full lg:w-auto lg:space-y-2 space-x-2 lg:space-x-0 ">
                             <IconButton
                                 label="Character"
@@ -52,6 +52,32 @@ export default class Actions extends React.Component {
                                 on_click={() => {}}
                                 additional_css="w-full lg:w-auto"
                             />
+
+                            <div className="hidden lg:block absolute top-8 left-36 ml-4 shadow-lg rounded-sm border border-gray-500 dark:border-gray-700 w-[28rem] z-10 max-w-none text-black dark:text-gray-300">
+                                <div className="bg-gray-400 dark:bg-gray-700 border-b-2 border-b-gray-500 dark:border-b-gray-600 px-4 py-3 flex items-center justify-between">
+                                    <h3 className="text-lg font-semibold mb-0">
+                                        Basic Card
+                                    </h3>
+                                    <button
+                                        className="p-0 bg-transparent border-none cursor-pointer"
+                                        onClick={() => {
+                                            console.log("Close button clicked");
+                                        }}
+                                        aria-label="Close"
+                                    >
+                                        <i
+                                            className="fas fa-times-circle text-rose-600 dark:text-rose-500 rounded-full text-lg p-1"
+                                            aria-hidden="true"
+                                        ></i>
+                                    </button>
+                                </div>
+                                <div className="p-4 bg-gray-200 dark:bg-gray-600">
+                                    <p>
+                                        This is a simple card content area. It
+                                        will grow as needed.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
