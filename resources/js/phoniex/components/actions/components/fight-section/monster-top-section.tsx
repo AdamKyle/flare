@@ -25,7 +25,7 @@ export default class MonsterTopSection extends React.Component<MonsterTopSection
                     "
                 >
                     <button
-                        className="text-xl"
+                        className="text-xl transition-all duration-300 ease-in-out transform hover:scale-105 hover:text-gray-700 dark:hover:text-gray-500"
                         aria-label="Previous"
                         onClick={() => this.props.next_action(1)}
                     >
@@ -38,7 +38,7 @@ export default class MonsterTopSection extends React.Component<MonsterTopSection
                         {this.props.monster_name}
                     </span>
                     <button
-                        className="text-xl"
+                        className="text-xl transition-all duration-300 ease-in-out transform hover:scale-105 hover:text-gray-700 dark:hover:text-gray-500"
                         aria-label="Next"
                         onClick={() => this.props.prev_action(1)}
                     >

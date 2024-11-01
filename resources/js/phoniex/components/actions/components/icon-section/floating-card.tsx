@@ -10,7 +10,7 @@ export default class FloatingCard extends React.Component<FloatingCardProps> {
                         {this.props.title}
                     </h3>
                     <button
-                        className="p-0 bg-transparent border-none cursor-pointer"
+                        className="p-0 bg-transparent border-none cursor-pointer transition-all duration-300 ease-in-out transform hover:scale-105"
                         onClick={this.props.close_action}
                         aria-label="Close"
                     >

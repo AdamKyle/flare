@@ -13,7 +13,6 @@ export default class HealthBar extends React.Component<HealthBarProps> {
     }
 
     fetchColor(): string {
-        console.log(this.props.health_bar_type);
         return match(this.props.health_bar_type)
             .with(HealthBarType.ENEMY, () => "bg-rose-600 dark:bg-rose-500")
             .with(
