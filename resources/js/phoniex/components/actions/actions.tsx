@@ -225,7 +225,6 @@ export default class Actions extends React.Component {
                                 variant={ButtonVariant.PRIMARY}
                                 additional_css="w-full lg:w-1/3"
                                 on_click={() => {}}
-                                you
                             />
                         </div>
 
