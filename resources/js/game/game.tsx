@@ -40,7 +40,7 @@ import IntroSlides from "./components/intro-section/intro-slides";
 import TurnOffUserIntroFlag from "./lib/game/ajax/turn-off-user-intro-flag";
 import SurveyComponent from "./components/survey/survey-component";
 import PrimaryButton from "./components/ui/buttons/primary-button";
-import GameCard from "../phoniex/components/game-card";
+import { Phoniex } from "../phoniex/phoniex";
 
 export default class Game extends React.Component<GameProps, GameState> {
     private gameEventListener?: GameEventListeners;
@@ -430,7 +430,7 @@ export default class Game extends React.Component<GameProps, GameState> {
         }
 
         if (this.state.show_new_ui) {
-            return <GameCard />;
+            return <Phoniex />;
         }
 
         return (

@@ -1,53 +1,45 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import HealthBarProps from "./types/health-bar-props";
-import { match } from "ts-pattern";
-import { HealthBarType } from "./enums/health-bar-type";
 import clsx from "clsx";
+import { fetchHealthBarColorForType } from "./helpers/fetch-health-bar-color-for-type";
+import { healthBarPercentage } from "./helpers/fetch-health-bar-percentage";
 
-export default class HealthBar extends React.Component<HealthBarProps> {
-    healthBarPercentage() {
-        return (
-            (this.props.current_health / this.props.max_health) *
-            100
-        ).toFixed(0);
-    }
-
-    fetchColor(): string {
-        return match(this.props.health_bar_type)
-            .with(HealthBarType.ENEMY, () => "bg-rose-600 dark:bg-rose-500")
-            .with(
-                HealthBarType.PLAYER,
-                () => "bg-emerald-600 dark:bg-emerald-500",
-            )
-            .otherwise(() => "");
-    }
-
-    render() {
-        return (
-            <div className="space-y-2 mb-4">
-                <div className="flex justify-between text-sm font-medium text-gray-800 dark:text-gray-200">
-                    <span id="character-name" className="sr-only">
-                        {this.props.name}
-                    </span>
-                    <span>{this.props.name}</span>
-                    <span aria-labelledby="character-name" aria-live="polite">
-                        {this.props.current_health}/{this.props.max_health}
-                    </span>
-                </div>
-                <div className="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2">
-                    <div
-                        className={clsx(
-                            this.fetchColor(),
-                            "rounded-full h-full",
-                        )}
-                        style={{ width: this.healthBarPercentage() + "%" }}
-                        role="progressbar"
-                        aria-valuenow={this.props.current_health}
-                        aria-valuemin={0}
-                        aria-valuemax={this.props.max_health}
-                    ></div>
-                </div>
+const HealthBar = (props: HealthBarProps): ReactNode => {
+    return (
+        <div className="space-y-2 mb-4">
+            <div className="flex justify-between text-sm font-medium text-gray-800 dark:text-gray-200">
+                <span id={props.name + "-health-bar"} className="sr-only">
+                    {props.name}
+                </span>
+                <span>{props.name}</span>
+                <span
+                    aria-labelledby={props.name + "-health-bar"}
+                    aria-live="polite"
+                >
+                    {props.current_health}/{props.max_health}
+                </span>
             </div>
-        );
-    }
-}
+            <div className="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2">
+                <div
+                    className={clsx(
+                        fetchHealthBarColorForType(props.health_bar_type),
+                        "rounded-full h-full",
+                    )}
+                    style={{
+                        width:
+                            healthBarPercentage(
+                                props.current_health,
+                                props.max_health,
+                            ) + "%",
+                    }}
+                    role="progressbar"
+                    aria-valuenow={props.current_health}
+                    aria-valuemin={0}
+                    aria-valuemax={props.max_health}
+                ></div>
+            </div>
+        </div>
+    );
+};
+
+export default HealthBar;

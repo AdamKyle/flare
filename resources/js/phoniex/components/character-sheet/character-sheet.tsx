@@ -1,7 +1,7 @@
-import React from "react";
+import React, { ReactNode } from "react";
 
-export default class CharacterSheet extends React.Component {
-    render() {
-        return "Character Sheet Content ...";
-    }
-}
+const CharacterSheet = (): ReactNode => {
+    return "Character Sheet Content ...";
+};
+
+export default CharacterSheet;
