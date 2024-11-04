@@ -3,7 +3,7 @@ import FloatingCard from "../../../components/icon-section/floating-card";
 import CharacterCardDetails from "./character-card-details";
 import { serviceContainer } from "../../../../../service-container/core-container";
 import EventSystemDeffintion from "../../../../../event-system/deffintions/event-system-deffintion";
-import { CharacterCardEvents } from "./EventTypes/CharacterCardEvents";
+import { ActionCardEvents } from "./EventTypes/action-cards";
 
 const CharacterCard = (): ReactNode => {
     const eventSystem =
@@ -11,10 +11,10 @@ const CharacterCard = (): ReactNode => {
 
     const handleCloseCard = () => {
         const event = eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-            CharacterCardEvents.CLOSE_EVENT,
+            ActionCardEvents.CLOSE_CHARACTER_CARD_EVENT,
         );
 
-        event.emit(CharacterCardEvents.CLOSE_EVENT, true);
+        event.emit(ActionCardEvents.CLOSE_CHARACTER_CARD_EVENT, true);
     };
 
     return (
