@@ -7,6 +7,10 @@ import { serviceContainer } from "../../../../service-container/core-container";
 import EventSystemDeffintion from "../../../../event-system/deffintions/event-system-deffintion";
 import { useManageCharacterCardVisibility } from "../floating-cards/character-details/hooks/use-manage-character-card-visibility";
 import { AnimatePresence, motion } from "framer-motion";
+import { useManageCraftingCardVisibility } from "../floating-cards/crafting-section/hooks/use-manage-crafting-card-visibility";
+import CraftingCard from "../floating-cards/crafting-section/crafting-card";
+import { useManageChatCardVisibility } from "../floating-cards/chat-section/hooks/use-manage-chat-card-visibility";
+import ChatCard from "../floating-cards/chat-section/chat-card";
 
 const IconSection = (): ReactNode => {
     const eventSystem =
@@ -14,6 +18,12 @@ const IconSection = (): ReactNode => {
 
     const { showCharacterCard, openCharacterCard } =
         useManageCharacterCardVisibility(eventSystem);
+
+    const { showCraftingCard, openCraftingCard } =
+        useManageCraftingCardVisibility(eventSystem);
+
+    const { showChatCard, openChatCard } =
+        useManageChatCardVisibility(eventSystem);
 
     return (
         <IconContainer>
@@ -32,16 +42,7 @@ const IconSection = (): ReactNode => {
                     <i className="ra ra-anvil text-sm" aria-hidden="true"></i>
                 }
                 variant={ButtonVariant.PRIMARY}
-                on_click={() => {}}
-                additional_css="w-full lg:w-auto"
-            />
-            <IconButton
-                label="Map"
-                icon={
-                    <i className="ra ra-compass text-sm" aria-hidden="true"></i>
-                }
-                variant={ButtonVariant.PRIMARY}
-                on_click={() => {}}
+                on_click={openCraftingCard}
                 additional_css="w-full lg:w-auto"
             />
             <IconButton
@@ -51,6 +52,15 @@ const IconSection = (): ReactNode => {
                         className="far fa-comments text-sm"
                         aria-hidden="true"
                     ></i>
+                }
+                variant={ButtonVariant.PRIMARY}
+                on_click={openChatCard}
+                additional_css="w-full lg:w-auto"
+            />
+            <IconButton
+                label="Map"
+                icon={
+                    <i className="ra ra-compass text-sm" aria-hidden="true"></i>
                 }
                 variant={ButtonVariant.PRIMARY}
                 on_click={() => {}}
@@ -72,6 +82,40 @@ const IconSection = (): ReactNode => {
                         }}
                     >
                         <CharacterCard />
+                    </motion.div>
+                )}
+
+                {showCraftingCard && (
+                    <motion.div
+                        initial={{ x: -100, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: -100, opacity: 0 }}
+                        transition={{ duration: 0.5 }}
+                        style={{
+                            position: "absolute",
+                            top: "0",
+                            left: "-1rem",
+                            zIndex: 10,
+                        }}
+                    >
+                        <CraftingCard />
+                    </motion.div>
+                )}
+
+                {showChatCard && (
+                    <motion.div
+                        initial={{ x: -100, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: -100, opacity: 0 }}
+                        transition={{ duration: 0.5 }}
+                        style={{
+                            position: "absolute",
+                            top: "0",
+                            left: "-1rem",
+                            zIndex: 10,
+                        }}
+                    >
+                        <ChatCard />
                     </motion.div>
                 )}
             </AnimatePresence>
