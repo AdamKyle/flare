@@ -24,6 +24,6 @@ export default interface CoreContainerDeffinition {
      */
     registerSingleton<T>(
         key: string,
-        service: { new (...args: any[]): T },
+        service: { new (...args: unknown[]): T },
     ): void;
 }

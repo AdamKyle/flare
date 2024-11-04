@@ -50,7 +50,7 @@ export default class CoreContainer implements CoreContainerDeffinition {
      */
     public registerSingleton<T>(
         key: string,
-        service: { new (...args: any[]): T },
+        service: { new (...args: unknown[]): T },
     ): void {
         container.registerSingleton(key, service);
     }
