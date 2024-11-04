@@ -11,6 +11,7 @@ import { AnimatePresence, motion } from "framer-motion";
 const IconSection = (): ReactNode => {
     const eventSystem =
         serviceContainer().fetch<EventSystemDeffintion>("EventSystem");
+
     const { showCharacterCard, openCharacterCard } =
         useManageCharacterCardVisibility(eventSystem);
 
