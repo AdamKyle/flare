@@ -55,7 +55,7 @@ class GlobalEventForEventTypeValueTest extends TestCase
             'should_be_mythic' => false,
         ];
 
-        $this->assertEquals($expected, GlobalEventForEventTypeValue::returnCraftingEventGoal());
+        $this->assertEquals($expected, GlobalEventForEventTypeValue::returnDelusionalMemoriesCraftingEventGoal());
     }
 
     public function testGetEnchantingEventGoalData()
@@ -71,7 +71,7 @@ class GlobalEventForEventTypeValueTest extends TestCase
             'should_be_mythic' => false,
         ];
 
-        $this->assertEquals($expected, GlobalEventForEventTypeValue::returnEnchantingEventGoal());
+        $this->assertEquals($expected, GlobalEventForEventTypeValue::returnDelusionalMemoriesEnchantingEventGoal());
     }
 
     public function testGetDelusionalMemoriesGlobalEventSteps()

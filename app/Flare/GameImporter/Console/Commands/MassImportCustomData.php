@@ -38,14 +38,8 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
-
-        CapitalCityUnitQueue::truncate();
-        CapitalCityBuildingQueue::truncate();
-        Survey::truncate();
-        SurveySnapshot::truncate();
-        User::where('is_showing_survey', true)->update(['is_showing_survey' => false]);
-
-        Artisan::call('fix:event-types-on-events');
+        Artisan::call('import:game-data Quests');
+        Artisan::call('create:quest-cache');
 
         $this->importInformationSection();
 

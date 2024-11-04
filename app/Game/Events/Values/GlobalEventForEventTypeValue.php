@@ -14,9 +14,9 @@ class GlobalEventForEventTypeValue
 
         if ($event->isWinterEvent()) {
             return [
-                'max_kills' => 190000,
-                'reward_every' => 10000,
-                'next_reward_at' => 10000,
+                'max_kills' => 20000,
+                'reward_every' => 2000,
+                'next_reward_at' => 2000,
                 'event_type' => EventType::WINTER_EVENT,
                 'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
                 'should_be_unique' => true,
@@ -27,9 +27,9 @@ class GlobalEventForEventTypeValue
 
         if ($event->isDelusionalMemoriesEvent()) {
             return [
-                'max_kills' => 400000,
-                'reward_every' => 20000,
-                'next_reward_at' => 20000,
+                'max_kills' => 20000,
+                'reward_every' => 2000,
+                'next_reward_at' => 2000,
                 'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
                 'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
                 'should_be_unique' => false,
@@ -50,7 +50,7 @@ class GlobalEventForEventTypeValue
         ];
     }
 
-    public static function returnCraftingEventGoal(): array
+    public static function returnDelusionalMemoriesCraftingEventGoal(): array
     {
         return [
             'max_crafts' => 500,
@@ -64,7 +64,7 @@ class GlobalEventForEventTypeValue
         ];
     }
 
-    public static function returnEnchantingEventGoal(): array
+    public static function returnDelusionalMemoriesEnchantingEventGoal(): array
     {
         return [
             'max_enchants' => 500,

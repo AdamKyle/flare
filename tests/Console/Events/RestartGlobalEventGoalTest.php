@@ -481,7 +481,7 @@ class RestartGlobalEventGoalTest extends TestCase
 
         $this->assertEquals(GlobalEventSteps::ENCHANT, $event->current_event_goal_step);
 
-        $expectedAttributes = GlobalEventForEventTypeValue::returnEnchantingEventGoal($event->type);
+        $expectedAttributes = GlobalEventForEventTypeValue::returnDelusionalMemoriesEnchantingEventGoal($event->type);
         $actualAttributes = $newGlobalEventGoal->toArray();
         $actualAttributes = array_intersect_key($actualAttributes, $expectedAttributes);
 
@@ -533,7 +533,7 @@ class RestartGlobalEventGoalTest extends TestCase
 
         $this->assertEquals(GlobalEventSteps::CRAFT, $event->current_event_goal_step);
 
-        $expectedAttributes = GlobalEventForEventTypeValue::returnCraftingEventGoal($event->type);
+        $expectedAttributes = GlobalEventForEventTypeValue::returnDelusionalMemoriesCraftingEventGoal($event->type);
         $actualAttributes = $newGlobalEventGoal->toArray();
         $actualAttributes = array_intersect_key($actualAttributes, $expectedAttributes);
 

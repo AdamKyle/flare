@@ -19,7 +19,10 @@
                 <x-core.forms.collection-select :model="$gameMap" label="Required Location:" modelKey="required_location_id" name="required_location_id" value="id" key="name" :options="$locations" />
                 <x-core.forms.check-box :model="$gameMap" label="Can Traverse" modelKey="can_traverse"
                                         name="can_traverse" />
+                <x-core.forms.key-value-select :model="$gameMap" label="Only For Event Type:"
+                            modelKey="only_during_event_type" name="only_during_event_type" :options="$eventTypes" />
                 <x-core.forms.file-upload :model="$gameMap" label="Update Map (Optional):" modelKey="map" name="map" />
+
                 <x-core.buttons.primary-button type="submit">
                     Submit
                 </x-core.buttons.primary-button>
