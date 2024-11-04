@@ -12,6 +12,13 @@ export default interface EventSystemDeffintion {
     ): EventEmitterDeffintion<T>;
 
     /**
+     * Is the event already registered?
+     *
+     * @param name
+     */
+    isEventRegistered(name: string): boolean;
+
+    /**
      * Get the registered event emitter.
      *
      * @param name

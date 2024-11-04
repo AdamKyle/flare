@@ -63,6 +63,7 @@
         "@types/react-resizable": "^3.0.7",
         "chart.js": "^4.4.2",
         "clsx": "^2.1.1",
+        "framer-motion": "^11.11.11",
         "laravel-echo": "^1.16.1",
         "localforage": "^1.10.0",
         "luxon": "^3.4.4",

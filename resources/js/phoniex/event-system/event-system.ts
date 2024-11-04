@@ -10,11 +10,16 @@ export default class EventSystem implements EventSystemDeffintion {
         [key: string]: EventEmitterDeffintion<EventMapDeffinition>;
     } = {};
 
+    isEventRegistered(name: string): boolean {
+        return !!this.emitters[name];
+    }
+
     registerEvent<T extends EventMapDeffinition>(
         name: string,
     ): EventEmitterDeffintion<T> {
+        console.log(this.emitters);
         if (this.emitters[name]) {
-            throw new Error("Emitter name: ${name} is already registered.");
+            throw new Error(`Emitter name: ${name} is already registered.`);
         }
 
         const emitter = new EventEmitter<T>() as EventEmitterDeffintion<T>;
@@ -28,7 +33,7 @@ export default class EventSystem implements EventSystemDeffintion {
         const emitter = this.emitters[name];
 
         if (!emitter) {
-            throw new Error("${name} is not registered.");
+            throw new Error(`${name} is not registered.`);
         }
 
         return emitter as EventEmitterDeffintion<T>;
