@@ -15,7 +15,7 @@ export const useManageCharacterCardVisibility = (
               CharacterCardEvents.CLOSE_EVENT,
           );
 
-    const [showCharacterCard, setShowCharacterCard] = useState(true);
+    const [showCharacterCard, setShowCharacterCard] = useState(false);
 
     useEffect(() => {
         const closeCardListener = () => setShowCharacterCard(false);
