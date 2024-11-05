@@ -60,6 +60,11 @@ Broadcast::channel('update-currencies-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;
 });
 
+// When the player's inventory count updates.
+Broadcast::channel('update-inventory-count-{userId}', function ($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
 // When the characters factions update.
 Broadcast::channel('update-factions-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;

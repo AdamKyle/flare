@@ -13,6 +13,7 @@ use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackType
 use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
 use App\Game\Core\Comparison\ItemComparison;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
@@ -155,7 +156,7 @@ class EquipItemService
 
         $character = $this->character->refresh();
 
-        event(new UpdateCharacterCurrenciesEvent($character));
+        event(new UpdateCharacterInventoryCountEvent($character));
 
         return $characterSlot->item;
     }

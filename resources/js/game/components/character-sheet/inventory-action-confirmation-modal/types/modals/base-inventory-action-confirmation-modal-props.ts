@@ -17,6 +17,8 @@ export default interface BaseInventoryActionConfirmationModalProps {
 
     set_success_message: (message: string) => void;
 
+    reset_selected_items: () => void;
+
     data: {
         url: string;
         params?: {};

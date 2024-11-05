@@ -10,14 +10,14 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class CharacterBoonsUpdateBroadcastEvent implements ShouldBroadcastNow
+class CharacterInventoryCountUpdateBroadcaseEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * @var array
      */
-    public $boons;
+    public $characterInventoryCount;
 
     /**
      * @var User
@@ -27,10 +27,11 @@ class CharacterBoonsUpdateBroadcastEvent implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      */
-    public function __construct(User $user, array $boons)
+    public function __construct(array $characterInventoryCount, User $user)
     {
         $this->user = $user;
-        $this->boons = $boons;
+
+        $this->characterInventoryCount = $characterInventoryCount;
     }
 
     /**
@@ -40,6 +41,6 @@ class CharacterBoonsUpdateBroadcastEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('update-boons-' . $this->user->id);
+        return new PrivateChannel('update-inventory-count-' . $this->user->id);
     }
 }

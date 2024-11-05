@@ -14,6 +14,8 @@ import Ajax from "../../lib/ajax/ajax";
 import ReincarnationCheckModal from "./components/modals/reincarnation-check-modal";
 import AdditionalStatSection from "../../components/character-sheet/additional-stats-section/additional-stat-section";
 import DangerButton from "../../components/ui/buttons/danger-button";
+import OrangeButton from "../../components/ui/buttons/orange-button";
+import InventoryCountBreakdownModal from "./components/modals/inventory-count-breakdown-modal";
 
 export default class CharacterSheet extends React.Component<
     CharacterSheetProps,
@@ -31,6 +33,7 @@ export default class CharacterSheet extends React.Component<
             success_message: null,
             error_message: null,
             reincarnation_check: false,
+            show_inventory_breakdown: false,
         };
     }
 
@@ -89,6 +92,12 @@ export default class CharacterSheet extends React.Component<
     manageSkillsManagement() {
         this.setState({
             show_skills_section: !this.state.show_skills_section,
+        });
+    }
+
+    manageShowInventoryBreakdown() {
+        this.setState({
+            show_inventory_breakdown: !this.state.show_inventory_breakdown,
         });
     }
 
@@ -298,6 +307,7 @@ export default class CharacterSheet extends React.Component<
                                             <dd>
                                                 {
                                                     this.props.character
+                                                        .inventory_count
                                                         .inventory_max
                                                 }
                                             </dd>
@@ -306,16 +316,18 @@ export default class CharacterSheet extends React.Component<
                                                 {
                                                     this.props.character
                                                         .inventory_count
+                                                        .inventory_count
                                                 }
                                             </dd>
                                         </dl>
-                                        <p className="my-4">
-                                            Inventory count consists of both
-                                            Usable Items, Items in your
-                                            inventory as well as your Gem Bag.
-                                            Equipment, Quest items and Sets do
-                                            not count towards inventory count.
-                                        </p>
+                                        <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
+                                        <OrangeButton
+                                            button_label="inventory count break down"
+                                            on_click={this.manageShowInventoryBreakdown.bind(
+                                                this,
+                                            )}
+                                            additional_css="mx-auto"
+                                        />
                                         <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
                                         <dl>
                                             <dt>Damage Stat:</dt>
@@ -480,6 +492,19 @@ export default class CharacterSheet extends React.Component<
                         handle_reincarnate={this.reincarnateCharacter.bind(
                             this,
                         )}
+                    />
+                ) : null}
+
+                {this.state.show_inventory_breakdown ? (
+                    <InventoryCountBreakdownModal
+                        manage_modal={this.manageShowInventoryBreakdown.bind(
+                            this,
+                        )}
+                        is_open={this.state.show_inventory_breakdown}
+                        title="Inventory count breakdown"
+                        inventory_breakdown={
+                            this.props.character.inventory_count
+                        }
                     />
                 ) : null}
             </div>

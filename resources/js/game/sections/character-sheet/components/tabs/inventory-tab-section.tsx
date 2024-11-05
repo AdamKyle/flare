@@ -18,6 +18,8 @@ import { InventoryActionConfirmationType } from "../../../../components/characte
 import BaseInventoryActionConfirmationModal from "../../../../components/character-sheet/inventory-action-confirmation-modal/modals/base-inventory-action-confirmation-modal";
 import ModalPropsBuilder from "../../../../components/character-sheet/inventory-action-confirmation-modal/helpers/modal-props-builder";
 import { serviceContainer } from "../../../../lib/containers/core-container";
+import PrimaryButton from "../../../../components/ui/buttons/primary-button";
+import DangerButton from "../../../../components/ui/buttons/danger-button";
 
 export default class InventoryTabSection extends React.Component<
     InventoryTabSectionProps,
@@ -30,8 +32,8 @@ export default class InventoryTabSection extends React.Component<
 
         this.state = {
             table: "inventory",
-            data: this.props.inventory,
-            usable_items: this.props.usable_items,
+            data: [],
+            usable_items: [],
             show_action_confirmation_modal: false,
             action_confirmation_type: null,
             show_destroy_all: false,
@@ -46,6 +48,13 @@ export default class InventoryTabSection extends React.Component<
         };
 
         this.modalPropsBuilder = serviceContainer().fetch(ModalPropsBuilder);
+    }
+
+    componentDidMount(): void {
+        this.setState({
+            data: this.props.inventory,
+            usable_items: this.props.usable_items,
+        });
     }
 
     componentDidUpdate() {
@@ -260,6 +269,10 @@ export default class InventoryTabSection extends React.Component<
         }
     }
 
+    isSelectAllHidden() {
+        return this.state.data.length === 0;
+    }
+
     isSelectedDropDownHidden() {
         return this.state.selected_items.length <= 0;
     }
@@ -273,6 +286,19 @@ export default class InventoryTabSection extends React.Component<
                 this.props.update_inventory(inventory);
             },
         );
+    }
+
+    selectAllItems() {
+        const selectedItems = this.state.data.map((slot: InventoryDetails) => {
+            return {
+                slot_id: slot.id,
+                item_name: slot.item_name,
+            };
+        });
+
+        this.setState({
+            selected_items: selectedItems,
+        });
     }
 
     setSelectedItems(selectedItems: number[] | []) {
@@ -307,6 +333,12 @@ export default class InventoryTabSection extends React.Component<
         });
     }
 
+    resetSelectedItems() {
+        this.setState({
+            selected_items: [],
+        });
+    }
+
     renderTables(): JSX.Element | null {
         switch (this.state.table) {
             case "inventory":
@@ -322,6 +354,7 @@ export default class InventoryTabSection extends React.Component<
                         is_automation_running={this.props.is_automation_running}
                         manage_skills={this.props.manage_skills}
                         manage_selected_items={this.setSelectedItems.bind(this)}
+                        selected_items={this.state.selected_items}
                         view_port={this.props.view_port}
                     />
                 );
@@ -378,7 +411,7 @@ export default class InventoryTabSection extends React.Component<
                 ) : null}
 
                 <div className="flex flex-row flex-wrap items-center">
-                    <div>
+                    <div className="w-full md:w-auto mb-[-10px] md:mb-0">
                         <DropDown
                             menu_items={[
                                 {
@@ -405,7 +438,7 @@ export default class InventoryTabSection extends React.Component<
                         />
                     </div>
                     <div
-                        className={clsx("ml-2", {
+                        className={clsx("w-full md:w-auto md:ml-2", {
                             hidden: this.isDropDownHidden(),
                         })}
                     >
@@ -417,7 +450,26 @@ export default class InventoryTabSection extends React.Component<
                         />
                     </div>
                     <div
-                        className={clsx("ml-2", {
+                        className={clsx("w-full md:w-auto md:ml-2", {
+                            hidden: this.isSelectAllHidden(),
+                        })}
+                    >
+                        {this.state.selected_items.length > 0 ? (
+                            <DangerButton
+                                button_label={"Deselect all items"}
+                                on_click={this.resetSelectedItems.bind(this)}
+                                additional_css="w-full md:w-auto"
+                            />
+                        ) : (
+                            <PrimaryButton
+                                button_label={"Select all items"}
+                                on_click={this.selectAllItems.bind(this)}
+                                additional_css="w-full md:w-auto"
+                            />
+                        )}
+                    </div>
+                    <div
+                        className={clsx("w-full md:w-auto md:ml-2", {
                             hidden: this.isSelectedDropDownHidden(),
                         })}
                     >
@@ -429,7 +481,7 @@ export default class InventoryTabSection extends React.Component<
                             greenButton={true}
                         />
                     </div>
-                    <div className="sm:ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-[10px]">
+                    <div className="w-full md:w-auto sm:ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-[10px]">
                         <input
                             type="text"
                             name="search"
@@ -455,6 +507,9 @@ export default class InventoryTabSection extends React.Component<
                         set_success_message={this.setSuccessMessage.bind(this)}
                         selected_item_names={this.state.selected_items.map(
                             (selectedItem) => selectedItem.item_name,
+                        )}
+                        reset_selected_items={this.resetSelectedItems.bind(
+                            this,
                         )}
                         data={{
                             url: modalPropsBuilder.fetchActionUrl(

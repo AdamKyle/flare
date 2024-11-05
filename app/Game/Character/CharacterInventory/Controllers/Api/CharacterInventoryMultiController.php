@@ -15,6 +15,7 @@ class CharacterInventoryMultiController extends Controller
 
     public function equipSelected(InventoryMultiRequest $request, Character $character)
     {
+
         $result = $this->multiInventoryActionService->equipManyItems($character, $request->slot_ids);
 
         $status = $result['status'];

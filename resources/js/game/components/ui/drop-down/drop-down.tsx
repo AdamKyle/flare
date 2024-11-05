@@ -101,9 +101,9 @@ export default class DropDown extends React.Component<DropDownProps, any> {
 
     render() {
         return (
-            <div className="my-4 lg:text-left grid">
+            <div className="my-2 md:my-4 lg:text-left grid">
                 <Menu as="div" className="relative inline-block text-left">
-                    <div className="my-4">
+                    <div className="my-2 md:my-4">
                         <Menu.Button
                             className={clsx(
                                 "inline-flex justify-center w-full px-4 py-2 text-sm font-medium rounded-small focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-200 dark:focus-visible:ring-white focus-visible:ring-opacity-75 hover:bg-blue-700 hover:drop-shadow-md dark:text-white hover:text-gray-300 bg-blue-600 dark:bg-blue-700 text-white dark:hover:bg-blue-600 dark:hover:text-white font-semibold py-2 px-4 rounded-sm drop-shadow-sm disabled:bg-blue-400 dark:disabled:bg-blue-400",
@@ -135,9 +135,9 @@ export default class DropDown extends React.Component<DropDownProps, any> {
                     >
                         <Menu.Items
                             className={clsx(
-                                "absolute right-0 left-[5px] z-50 w-56 mt-2 origin-top-right dark:bg-gray-700 " +
+                                "absolute right-0 z-50 w-56 mt-2 origin-top-right dark:bg-gray-700 " +
                                     "bg-white divide-y dark:divide-gray-600 divide-gray-300 rounded-md shadow-lg ring-1 " +
-                                    "ring-black ring-opacity-5 focus:outline-none",
+                                    "ring-black ring-opacity-5 focus:outline-none md:left-[-5px] w-full md:w-48",
                                 {
                                     absolute: !this.props.use_relative,
                                     relative: this.props.use_relative,

@@ -8,12 +8,14 @@ use App\Game\Core\Events\DropsCheckEvent;
 use App\Game\Core\Events\GoldRushCheckEvent;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateCharacterEvent;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Listeners\CharacterLevelUpListener;
 use App\Game\Core\Listeners\CraftedItemTimeOutListener;
 use App\Game\Core\Listeners\DropsCheckListener;
 use App\Game\Core\Listeners\GoldRushCheckListener;
 use App\Game\Core\Listeners\UpdateCharacterCurrenciesListener;
+use App\Game\Core\Listeners\UpdateCharacterInventoryCountListener;
 use App\Game\Core\Listeners\UpdateCharacterListener;
 use App\Game\Core\Listeners\UpdateTopBarListener;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -22,14 +24,19 @@ class EventsProvider extends ServiceProvider
 {
     protected $listen = [
 
-        // When the character levels up, update the top bar:
+        // When the character levels up, update the top bar.
         UpdateTopBarEvent::class => [
             UpdateTopBarListener::class,
         ],
 
-        // When the character currencies update:
+        // When the character currencies updates.
         UpdateCharacterCurrenciesEvent::class => [
             UpdateCharacterCurrenciesListener::class,
+        ],
+
+        // When the count of the inventory updates.
+        UpdateCharacterInventoryCountEvent::class => [
+            UpdateCharacterInventoryCountListener::class,
         ],
 
         // When you craft an item.

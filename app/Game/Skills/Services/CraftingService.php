@@ -10,6 +10,7 @@ use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
@@ -407,6 +408,8 @@ class CraftingService
                 'item_id' => $item->id,
                 'inventory_id' => $character->inventory->id,
             ]);
+
+            event(new UpdateCharacterInventoryCountEvent($character));
 
             ServerMessageHandler::handleMessage($character->user, 'crafted', $item->name, $slot->id);
 

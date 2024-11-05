@@ -30,4 +30,6 @@ export default interface InventoryTabProps {
     view_port: number;
 
     manage_selected_items: (selectedItems: number[] | []) => void;
+
+    selected_items: { item_name: string; slot_id: number }[] | [];
 }

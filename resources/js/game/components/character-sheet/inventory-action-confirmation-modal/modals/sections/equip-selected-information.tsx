@@ -37,12 +37,14 @@ export default class EquipSelectedInformation extends React.Component<
                     equip.
                 </p>
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
-                <span className="mb-3">
-                    <strong>Items to Equip</strong>
-                </span>
-                <ul className="my-3 pl-4 list-disc ml-4">
-                    {this.renderSelectedItemNames()}
-                </ul>
+                <div className="max-h-[250px] overflow-y-auto">
+                    <span className="mb-3">
+                        <strong>Items to Equip</strong>
+                    </span>
+                    <ul className="my-3 pl-4 list-disc ml-4">
+                        {this.renderSelectedItemNames()}
+                    </ul>
+                </div>
             </>
         );
     }

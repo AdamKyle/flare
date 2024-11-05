@@ -8,6 +8,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Events\UpdateSkillEvent;
@@ -121,7 +122,10 @@ class AlchemyService
 
             $this->pickUpItem($character, $item, $skill, true);
 
-            event(new UpdateCharacterCurrenciesEvent($character->refresh()));
+            $character = $character->refresh();
+
+            event(new UpdateCharacterCurrenciesEvent($character));
+            event(new UpdateCharacterInventoryCountEvent($character));
 
             return;
         }
@@ -132,7 +136,10 @@ class AlchemyService
 
             $this->pickUpItem($character, $item, $skill, true);
 
-            event(new UpdateCharacterCurrenciesEvent($character->refresh()));
+            $character = $character->refresh();
+
+            event(new UpdateCharacterCurrenciesEvent($character));
+            event(new UpdateCharacterInventoryCountEvent($character));
 
             return;
         }
@@ -143,14 +150,20 @@ class AlchemyService
         if ($dcCheck < $characterRoll) {
             $this->pickUpItem($character, $item, $skill);
 
-            event(new UpdateCharacterCurrenciesEvent($character->refresh()));
+            $character = $character->refresh();
+
+            event(new UpdateCharacterCurrenciesEvent($character));
+            event(new UpdateCharacterInventoryCountEvent($character));
 
             return;
         }
 
         ServerMessageHandler::handleMessage($character->user, 'failed_to_transmute');
 
-        event(new UpdateCharacterCurrenciesEvent($character->refresh()));
+        $character = $character->refresh();
+
+        event(new UpdateCharacterCurrenciesEvent($character));
+        event(new UpdateCharacterInventoryCountEvent($character));
     }
 
     private function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false)

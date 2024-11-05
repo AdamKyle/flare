@@ -13,6 +13,7 @@ use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackType
 use App\Game\Character\CharacterInventory\Events\CharacterBoonsUpdateBroadcastEvent;
 use App\Game\Character\CharacterInventory\Jobs\CharacterBoonJob;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -36,7 +37,8 @@ class UseItemService
 
     private CharacterInventoryService $characterInventoryService;
 
-    public function __construct(Manager $manager,
+    public function __construct(
+        Manager $manager,
         CharacterSheetBaseInfoTransformer $characterAttackTransformer,
         UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
         CharacterInventoryService $characterInventoryService,
@@ -83,10 +85,12 @@ class UseItemService
 
         event(new UpdateTopBarEvent($character));
 
+        event(new UpdateCharacterInventoryCountEvent($character));
+
         $inventory = $this->characterInventoryService->setCharacter($character);
 
         return $this->successResult([
-            'message' => 'Used selected items.'.($removedSomeItems ? ' Some items were not able to be used because of the amount of boons you have. You can check your usable items section to see which ones are left.' : ''),
+            'message' => 'Used selected items.' . ($removedSomeItems ? ' Some items were not able to be used because of the amount of boons you have. You can check your usable items section to see which ones are left.' : ''),
             'inventory' => [
                 'usable_items' => $inventory->getInventoryForType('usable_items'),
             ],
@@ -122,6 +126,8 @@ class UseItemService
         $character = $character->refresh();
 
         event(new UpdateTopBarEvent($character));
+
+        event(new UpdateCharacterInventoryCountEvent($character));
 
         $inventory = $this->characterInventoryService->setCharacter($character);
 
@@ -214,7 +220,7 @@ class UseItemService
         event(new UpdateTopBarEvent($character));
 
         if (! is_null($item)) {
-            event(new ServerMessageEvent($character->user, 'You used: '.$item->name));
+            event(new ServerMessageEvent($character->user, 'You used: ' . $item->name));
         }
 
         $boons = $character->boons->toArray();

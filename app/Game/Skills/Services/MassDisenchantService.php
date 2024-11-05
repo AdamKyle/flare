@@ -8,6 +8,7 @@ use App\Flare\Models\Skill;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\CharacterInventory\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use Illuminate\Support\Collection;
 
@@ -22,8 +23,6 @@ class MassDisenchantService
     private int $enchantingLevelTimes = 0;
 
     private float|int $baseSkillXP = 0;
-
-    private EnchantingService $enchantingService;
 
     private Character $character;
 
@@ -124,6 +123,8 @@ class MassDisenchantService
         event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
         event(new UpdateTopBarEvent($character));
+
+        event(new UpdateCharacterInventoryCountEvent($character));
     }
 
     /**

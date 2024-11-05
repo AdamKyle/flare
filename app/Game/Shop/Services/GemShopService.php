@@ -7,6 +7,7 @@ use App\Flare\Models\GemBagSlot;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\CharacterInventory\Services\CharacterGemBagService;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Gems\Values\GemTierValue;
 
@@ -53,12 +54,15 @@ class GemShopService
             'copper_coins' => $newCopperCoins,
         ]);
 
-        event(new UpdateCharacterCurrenciesEvent($character->refresh()));
+        $character = $character->refresh();
+
+        event(new UpdateCharacterCurrenciesEvent($character));
+        event(new UpdateCharacterInventoryCountEvent($character));
 
         $gemBagSlot->delete();
 
-        $message = 'You sold the gem for: '.number_format($cost['gold_dust']).' Gold Dust, '.
-            number_format($cost['shards']).' Shards and '.number_format($cost['copper_coins']).' Copper Coins.';
+        $message = 'You sold the gem for: ' . number_format($cost['gold_dust']) . ' Gold Dust, ' .
+            number_format($cost['shards']) . ' Shards and ' . number_format($cost['copper_coins']) . ' Copper Coins.';
 
         return $this->successResult([
             'gems' => $this->characterGemBagService->getGems($character->refresh())['gem_slots'],
@@ -83,8 +87,8 @@ class GemShopService
             $slot->delete();
         }
 
-        $message = 'You sold the gems for: '.number_format($newGoldDust).' Gold Dust, '.
-            number_format($newShards).' Shards and '.number_format($newCopperCoins).' Copper Coins.';
+        $message = 'You sold the gems for: ' . number_format($newGoldDust) . ' Gold Dust, ' .
+            number_format($newShards) . ' Shards and ' . number_format($newCopperCoins) . ' Copper Coins.';
 
         $newGoldDust += $character->gold_dust;
         $newShards += $character->shards;
@@ -108,7 +112,10 @@ class GemShopService
             'copper_coins' => $newCopperCoins,
         ]);
 
-        event(new UpdateCharacterCurrenciesEvent($character->refresh()));
+        $character = $character->refresh();
+
+        event(new UpdateCharacterCurrenciesEvent($character));
+        event(new UpdateCharacterInventoryCountEvent($character));
 
         return $this->successResult([
             'gems' => $this->characterGemBagService->getGems($character->refresh())['gem_slots'],

@@ -5,6 +5,7 @@ namespace App\Game\Character\CharacterInventory\Services;
 use App\Flare\Models\Character;
 use App\Game\Character\CharacterInventory\Builders\EquipManyBuilder;
 use App\Game\Character\CharacterInventory\Jobs\DisenchantMany;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\DisenchantService;
@@ -51,7 +52,7 @@ class MultiInventoryActionService
         }
 
         return $this->successResult([
-            'message' => 'Moved all selected items to: '.$result['moved_to_set_name'].'.',
+            'message' => 'Moved all selected items to: ' . $result['moved_to_set_name'] . '.',
             'inventory' => $result['inventory'],
         ]);
     }
@@ -80,6 +81,10 @@ class MultiInventoryActionService
             }
         }
 
+        $character = $character->refresh();
+
+        event(new UpdateCharacterInventoryCountEvent($character));
+
         return $result;
     }
 
@@ -104,8 +109,10 @@ class MultiInventoryActionService
 
         $names = implode(', ', $itemNames); // Convert array of item names to a string
 
+        event(new UpdateCharacterInventoryCountEvent($character));
+
         return $this->successResult([
-            'message' => 'Sold the following items: '.$names.' for a total of: '.number_format($soldFor).' Gold. (After 5% tax is taken)',
+            'message' => 'Sold the following items: ' . $names . ' for a total of: ' . number_format($soldFor) . ' Gold. (After 5% tax is taken)',
             'inventory' => $result['inventory'],
         ]);
     }
@@ -138,6 +145,8 @@ class MultiInventoryActionService
                 return $result;
             }
         }
+
+        event(new UpdateCharacterInventoryCountEvent($character));
 
         return $this->successResult([
             'message' => 'Destroyed all selected items.',

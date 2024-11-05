@@ -7,6 +7,7 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
@@ -41,10 +42,10 @@ class SpecialtyShop
             $specialtyType = new ItemSpecialtyType($type);
 
             if ($specialtyType->isPurgatoryChains()) {
-                return $this->errorResult('You are missing an item of type: '.$item->type.' which must be of specialty type: '.ItemSpecialtyType::HELL_FORGED.'. Item must be in your inventory.');
+                return $this->errorResult('You are missing an item of type: ' . $item->type . ' which must be of specialty type: ' . ItemSpecialtyType::HELL_FORGED . '. Item must be in your inventory.');
             }
 
-            return $this->errorResult('You are missing an item of type: '.$item->type.' with a crafting level of 400. Item must be in your inventory.');
+            return $this->errorResult('You are missing an item of type: ' . $item->type . ' with a crafting level of 400. Item must be in your inventory.');
         }
 
         $slotToTrade = $this->getItemToTrade($character, $type, $item->type);
@@ -63,11 +64,15 @@ class SpecialtyShop
             'inventory_id' => $character->inventory->id,
         ]);
 
-        $this->updateCharacterCurrencies($character->refresh(), $item);
+        $character = $character->refresh();
+
+        $this->updateCharacterCurrencies($character, $item);
+
+        event(new UpdateCharacterInventoryCountEvent($character));
 
         $slotToTrade->delete();
 
-        event(new ServerMessageEvent($character->user, 'You bought a new: '.$item->name.' ('.$item->type.') from the '.$item->specialty_type.' shop.', $newItemToBuy->id));
+        event(new ServerMessageEvent($character->user, 'You bought a new: ' . $item->name . ' (' . $item->type . ') from the ' . $item->specialty_type . ' shop.', $newItemToBuy->id));
 
         return $this->successResult();
     }
@@ -145,10 +150,12 @@ class SpecialtyShop
             $copperCoinsCost = $copperCoinsCost - $copperCoinsCost * 0.05;
         }
 
-        if ($character->gold < $goldCost ||
+        if (
+            $character->gold < $goldCost ||
             $character->gold_dust < $goldDustCost ||
             $character->shards < $shardsCost ||
-            $character->copper_coins < $copperCoinsCost) {
+            $character->copper_coins < $copperCoinsCost
+        ) {
             return false;
         }
 

@@ -51,6 +51,8 @@ export default class InventoryActionConfirmationModal extends React.Component<
                                 );
 
                                 this.props.manage_modal();
+
+                                this.props.reset_selected_items();
                             },
                         );
                     },

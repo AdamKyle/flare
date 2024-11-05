@@ -13,6 +13,7 @@ use App\Flare\Transformers\UsableItemTransformer;
 use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Services\MassDisenchantService;
@@ -521,6 +522,8 @@ class CharacterInventoryService
 
         $this->character = $this->character->refresh();
 
+        event(new UpdateCharacterInventoryCountEvent($this->character));
+
         return $this->successResult([
             'message' => 'Destroyed ' . $name . '.',
             'inventory' => [
@@ -552,6 +555,10 @@ class CharacterInventoryService
                 $item->delete();
             }
         }
+
+        $character = $this->character->refresh();
+
+        event(new UpdateCharacterInventoryCountEvent($character));
 
         return $this->successResult([
             'message' => 'Destroyed all items.',
@@ -678,6 +685,8 @@ class CharacterInventoryService
         $character = $this->character->refresh();
 
         event(new UpdateTopBarEvent($character));
+
+        event(new UpdateCharacterInventoryCountEvent($character));
 
         return $this->successResult([
             'message' => 'Destroyed Alchemy Item: ' . $name . '.',

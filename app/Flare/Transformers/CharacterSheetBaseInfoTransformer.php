@@ -5,18 +5,19 @@ namespace App\Flare\Transformers;
 use App\Flare\Models\Character;
 use App\Flare\Models\FactionLoyalty;
 use App\Flare\Models\GameClass;
-use App\Flare\Models\GameSkill;
-use App\Flare\Models\Skill;
 use App\Flare\Models\Survey;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\ClassAttackValue;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
-use App\Game\Skills\Values\SkillTypeValue;
 use Exception;
 
 class CharacterSheetBaseInfoTransformer extends BaseTransformer
 {
     private bool $ignoreReductions = false;
+
+    protected array $defaultIncludes = [
+        'inventory_count',
+    ];
 
     public function setIgnoreReductions(bool $ignoreReductions): void
     {
@@ -44,8 +45,6 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'race_id' => $character->race->id,
             'to_hit_stat' => $character->class->to_hit_stat,
             'damage_stat' => $character->class->damage_stat,
-            'inventory_max' => $character->inventory_max,
-            'inventory_count' => $character->getInventoryCount(),
             'level' => number_format($character->level),
             'max_level' => number_format($this->getMaxLevel($character)),
             'xp' => (int) $character->xp,
@@ -98,12 +97,13 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         ];
     }
 
-    public function isAlchemyLocked(Character $character): bool
+    public function includeInventoryCount(Character $character)
     {
-        return Skill::where('character_id', $character->id)->where('game_skill_id', GameSkill::where('type', SkillTypeValue::ALCHEMY)->first()->id)->first()->is_locked;
+        return $this->item($character, new CharacterInventoryCountTransformer);
     }
 
-    protected function getFactionTasks(?FactionLoyalty $factionLoyalty = null): ?array
+
+    private function getFactionTasks(?FactionLoyalty $factionLoyalty = null): ?array
     {
 
         if (is_null($factionLoyalty)) {
@@ -121,7 +121,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         })->toArray());
     }
 
-    protected function getTimeLeftOnAutomation(Character $character)
+    private function getTimeLeftOnAutomation(Character $character)
     {
         $automation = $character->currentAutomations()->where('type', AutomationType::EXPLORING)->first();
 

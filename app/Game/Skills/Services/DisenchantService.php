@@ -10,6 +10,7 @@ use App\Flare\Models\Skill;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\CharacterInventory\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -107,6 +108,8 @@ class DisenchantService
                 $affixData['character_inventory'],
             ));
 
+            event(new UpdateCharacterInventoryCountEvent($this->character));
+
             return;
         }
 
@@ -134,6 +137,8 @@ class DisenchantService
             $affixData['affixes'],
             $affixData['character_inventory'],
         ));
+
+        event(new UpdateCharacterInventoryCountEvent($this->character));
     }
 
     /**
@@ -152,6 +157,8 @@ class DisenchantService
         if ($characterCurrentGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST && $canDisenchant) {
             event(new UpdateSkillEvent($this->disenchantingSkill));
 
+            event(new UpdateCharacterInventoryCountEvent($this->character));
+
             return;
         }
 
@@ -161,6 +168,8 @@ class DisenchantService
             ServerMessageHandler::handleMessage($this->character->user, 'disenchanted', number_format($goldDust));
 
             event(new UpdateSkillEvent($this->disenchantingSkill));
+
+            event(new UpdateCharacterInventoryCountEvent($this->character));
         } else {
             $this->updateGoldDust($this->character, true);
 

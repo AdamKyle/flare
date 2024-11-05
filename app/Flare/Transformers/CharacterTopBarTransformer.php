@@ -7,6 +7,11 @@ use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 
 class CharacterTopBarTransformer extends BaseTransformer
 {
+
+    protected array $defaultIncludes = [
+        'inventory_count',
+    ];
+
     /**
      * Gets the response data for the character sheet
      */
@@ -30,8 +35,6 @@ class CharacterTopBarTransformer extends BaseTransformer
             'int_modded' => $characterStatBuilder->statMod('int'),
             'agi_modded' => $characterStatBuilder->statMod('agi'),
             'focus_modded' => $characterStatBuilder->statMod('focus'),
-            'inventory_max' => $character->inventory_max,
-            'inventory_count' => $character->getInventoryCount(),
             'gold' => number_format($character->gold),
             'gold_dust' => number_format($character->gold_dust),
             'shards' => number_format($character->shards),
@@ -41,5 +44,10 @@ class CharacterTopBarTransformer extends BaseTransformer
             'force_name_change' => $character->force_name_change,
             'is_banned' => $character->user->is_banned,
         ];
+    }
+
+    public function includeInventoryCount(Character $character)
+    {
+        return $this->item($character, new CharacterInventoryCountTransformer);
     }
 }

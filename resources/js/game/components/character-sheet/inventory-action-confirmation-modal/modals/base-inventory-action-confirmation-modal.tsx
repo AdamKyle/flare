@@ -32,6 +32,7 @@ export default class BaseInventoryActionConfirmationModal extends React.Componen
                 ajax_params={this.state.params}
                 update_inventory={this.props.update_inventory}
                 set_success_message={this.props.set_success_message}
+                reset_selected_items={this.props.reset_selected_items}
                 is_large_modal={
                     this.props.type ===
                     InventoryActionConfirmationType.MOVE_SELECTED
