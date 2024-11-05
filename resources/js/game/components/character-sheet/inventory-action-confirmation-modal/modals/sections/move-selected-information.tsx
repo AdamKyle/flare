@@ -106,9 +106,11 @@ export default class MoveSelectedInformation extends React.Component<
                         <span className="mb-3">
                             <strong>Items to Move</strong>
                         </span>
-                        <ul className="my-3 pl-4 list-disc ml-4">
-                            {this.renderSelectedItemNames()}
-                        </ul>
+                        <div className="max-h-[250px] overflow-y-auto">
+                            <ul className="my-3 pl-4 list-disc ml-4">
+                                {this.renderSelectedItemNames()}
+                            </ul>
+                        </div>
                         <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
                     </div>
                     <div>

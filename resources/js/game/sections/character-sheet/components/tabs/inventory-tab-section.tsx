@@ -133,27 +133,10 @@ export default class InventoryTabSection extends React.Component<
             actionConfirmationType = type;
         }
 
-        let currentInventory = this.state.data;
-
-        if (
-            actionConfirmationType ===
-            InventoryActionConfirmationType.DISENCHANT_SELECTED
-        ) {
-            currentInventory = currentInventory.filter(
-                (inventory: InventoryDetails) => {
-                    return !this.state.selected_items.some(
-                        (selectedItem: SelectItems) =>
-                            selectedItem.slot_id === inventory.slot_id,
-                    );
-                },
-            );
-        }
-
         this.setState({
             show_action_confirmation_modal:
                 !this.state.show_action_confirmation_modal,
             action_confirmation_type: actionConfirmationType,
-            data: currentInventory,
         });
     }
 
