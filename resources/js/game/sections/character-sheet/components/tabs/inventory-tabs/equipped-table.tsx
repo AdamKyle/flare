@@ -296,27 +296,11 @@ export default class EquippedTable
                     </DangerAlert>
                 ) : null}
                 <div className="mb-5">
-                    <div className="flex flex-row flex-wrap items-center">
-                        <div>
-                            <label
-                                className="label block mb-2 mr-3"
-                                htmlFor="search"
-                            >
-                                Search
-                            </label>
-                        </div>
-                        <div>
-                            <input
-                                type="text"
-                                name="search"
-                                className="form-control"
-                                onChange={this.search.bind(this)}
-                                placeholder={"search"}
-                            />
-                        </div>
-                        <div className="mt-2 sm:mt-0 sm:ml-2">
+                    <div className="flex flex-col md:flex-row flex-wrap items-center md:space-x-4 w-full">
+                        <div className="mt-2 md:mt-0 md:ml-2 w-full md:w-auto">
                             <DangerButton
-                                button_label={"Unequip All"}
+                                button_label="Unequip All"
+                                additional_css="w-full md:w-auto"
                                 on_click={this.unequipAll.bind(this)}
                                 disabled={
                                     this.props.is_dead ||
@@ -326,11 +310,12 @@ export default class EquippedTable
                                 }
                             />
                         </div>
-                        {this.hasEmptySet() ? (
-                            <div className="ml-2 md:mt-0 mt-2">
+
+                        {this.hasEmptySet() && (
+                            <div className="md:ml-2 w-full md:w-auto">
                                 <DropDown
                                     menu_items={this.buildMenuItems()}
-                                    button_title={"Assign to Set"}
+                                    button_title="Assign to Set"
                                     disabled={
                                         this.props.is_dead ||
                                         this.props.is_automation_running ||
@@ -338,14 +323,25 @@ export default class EquippedTable
                                     }
                                 />
                             </div>
-                        ) : null}
+                        )}
 
-                        {this.props.is_set_equipped ? (
-                            <div className="ml-2 text-green-700 dark:text-green-500">
+                        {this.props.is_set_equipped && (
+                            <div className="mt-2 md:mt-0 md:ml-2 text-green-700 dark:text-green-500 w-full md:w-auto">
                                 Set Equipped.
                             </div>
-                        ) : null}
+                        )}
+
+                        <div className="w-full md:w-auto sm:ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-[10px]">
+                            <input
+                                type="text"
+                                name="search"
+                                className="form-control w-full md:w-auto"
+                                onChange={this.search.bind(this)}
+                                placeholder="search"
+                            />
+                        </div>
                     </div>
+
                     {this.state.loading ? (
                         <LoadingProgressBar
                             show_label={true}
