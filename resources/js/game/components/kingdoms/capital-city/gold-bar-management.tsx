@@ -9,7 +9,6 @@ import TabPanel from "../../ui/tabs/tab-panel";
 import InfoAlert from "../../ui/alerts/simple-alerts/info-alert";
 import PrimaryButton from "../../ui/buttons/primary-button";
 import Tabs from "../../ui/tabs/tabs";
-import { parseInt } from "lodash";
 import WarningAlert from "../../ui/alerts/simple-alerts/warning-alert";
 import SuccessOutlineButton from "../../ui/buttons/success-outline-button";
 import CapitalCityManageGoldBarsAjax from "../ajax/capital-city-manage-gold-bars-ajax";
@@ -111,17 +110,28 @@ export default class GoldBarManagement extends React.Component<
     }
 
     setAmountToDeposit(e: React.ChangeEvent<HTMLInputElement>) {
-        let value = parseInt(e.target.value, 10) || 0;
+        let value = parseInt(e.target.value, 10) || "";
 
         this.setAmount(value);
     }
 
-    setAmount(value: number) {
-        if (value === 0) {
+    setAmount(value: number | string) {
+        const numericValue =
+            typeof value === "string" ? parseFloat(value) : value;
+
+        if (typeof value === "string") {
+            this.setState({
+                amount_of_gold_bars_to_buy: "",
+            });
+
+            return;
+        }
+
+        if (numericValue === 0) {
             return this.setState({
                 success_message: null,
                 error_message: null,
-                amount_of_gold_bars_to_buy: 0,
+                amount_of_gold_bars_to_buy: "",
             });
         }
 
@@ -129,17 +139,18 @@ export default class GoldBarManagement extends React.Component<
             return this.setState({
                 success_message: null,
                 error_message: null,
-                amount_of_gold_bars_to_sell: 0,
+                amount_of_gold_bars_to_sell: "",
             });
         }
 
         const allowedGoldBars = this.state.gold_bar_data.total_kingdoms * 1000;
 
-        if (value > allowedGoldBars) {
+        if (numericValue > allowedGoldBars) {
             value = allowedGoldBars;
         }
 
-        const newTotal = this.state.gold_bar_data.total_gold_bars + value;
+        const newTotal =
+            this.state.gold_bar_data.total_gold_bars + numericValue;
 
         if (newTotal > allowedGoldBars) {
             value = allowedGoldBars - this.state.gold_bar_data.total_gold_bars;
@@ -148,7 +159,7 @@ export default class GoldBarManagement extends React.Component<
         this.setState({
             success_message: null,
             error_message: null,
-            amount_of_gold_bars_to_buy: value,
+            amount_of_gold_bars_to_buy: numericValue,
         });
     }
 

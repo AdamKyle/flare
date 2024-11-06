@@ -391,6 +391,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
                         {this.state.error_message}
                     </DangerAlert>
                 ) : null}
+
                 <UnitTopLevelActions
                     search_term={this.state.search_term}
                     send_orders={this.sendOrders.bind(this)}
@@ -399,6 +400,12 @@ export default class UnitRecruitment extends React.Component<any, any> {
                     actions_disabled={this.state.processing_request}
                     unit_queue={this.state.unit_queue}
                 />
+
+                <div className="mb-4 text-gray-700 dark:text-gray-300">
+                    Kingdom Count:{" "}
+                    {this.state.filtered_unit_recruitment_data.length} /{" "}
+                    {this.state.unit_recruitment_data.length}
+                </div>
 
                 {this.state.filtered_unit_recruitment_data.length > 0 ? (
                     <div className="my-4">
