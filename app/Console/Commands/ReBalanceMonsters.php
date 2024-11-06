@@ -10,6 +10,7 @@ use App\Flare\Values\LocationType;
 use App\Flare\Values\MapNameValue;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection as SupportCollection;
 
 class ReBalanceMonsters extends Command
 {
@@ -35,50 +36,26 @@ class ReBalanceMonsters extends Command
         MapNameValue::HELL,
     ];
 
+    private array $endGameMaps = [
+        MapNameValue::PURGATORY,
+        MapNameValue::TWISTED_MEMORIES
+    ];
+
+    private array $eventMaps = [
+        MapNameValue::ICE_PLANE,
+        MapNameValue::DELUSIONAL_MEMORIES,
+    ];
+
     /**
      * Execute the console command.
      */
     public function handle(ExponentialAttributeCurve $exponentialAttributeCurve)
     {
 
-        foreach ($this->regularMaps as $mapName) {
-            $gameMap = GameMap::where('name', $mapName)->first();
-            $monsters = Monster::where('game_map_id', $gameMap->id)
-                ->where('is_raid_monster', false)
-                ->where('is_raid_boss', false)
-                ->where('is_celestial_entity', false)
-                ->whereNull('only_for_location_type')
-                ->get();
+        $this->rebalanceRegularmaps($exponentialAttributeCurve);
 
-            $this->manageMonsters($monsters, $exponentialAttributeCurve, 2, 2000000000, 100000, 500, $mapName);
+        $this->rebalanceWeeklyFights($exponentialAttributeCurve);
 
-            $celestials = Monster::where('game_map_id', $gameMap->id)
-                ->where('is_raid_monster', false)
-                ->where('is_raid_boss', false)
-                ->where('is_celestial_entity', true)
-                ->whereNull('only_for_location_type')
-                ->get();
-
-            $this->manageMonsters($celestials, $exponentialAttributeCurve, 50000000, 300000000, 1000000, 5000, $mapName);
-        }
-
-        $locations = Location::whereNotNull('type')->get();
-
-        foreach ($locations as $location) {
-            if ($location->type === LocationType::ALCHEMY_CHURCH) {
-
-                $gameMap = GameMap::find($location->game_map_id);
-
-                $monsters = Monster::where('game_map_id', $gameMap->id)
-                    ->where('is_raid_monster', false)
-                    ->where('is_raid_boss', false)
-                    ->where('is_celestial_entity', false)
-                    ->where('only_for_location_type', $location->type)
-                    ->get();
-
-                $this->manageMonsters($monsters, $exponentialAttributeCurve, 100000000000, 400000000000, 1000000000, 500, $mapName);
-            }
-        }
 
         // Purgatory Monsters:
 
@@ -247,7 +224,106 @@ class ReBalanceMonsters extends Command
         $this->manageMonsters($monsters, $exponentialAttributeCurve, 30000000000000000, 60000000000000000, 10000000000000, 50000000000000, $gameMap->name, true);
     }
 
-    protected function manageMonsters(Collection $monsters, ExponentialAttributeCurve $exponentialAttributeCurve, int $min, int $max, int $increase, int $range, string $mapName, bool $isSpecialMonster = false): void
+    /**
+     * Rebalance Regular monsters
+     *
+     * - This exludes event maps
+     * - This excludes Purgatory and Twisted Memories
+     *
+     * @param ExponentialAttributeCurve $exponentialAttributeCurve
+     * @return void
+     */
+    private function rebalanceRegularmaps(ExponentialAttributeCurve $exponentialAttributeCurve): void
+    {
+        foreach ($this->regularMaps as $mapName) {
+            $gameMap = GameMap::where('name', $mapName)->first();
+            $monsters = Monster::where('game_map_id', $gameMap->id)
+                ->where('is_raid_monster', false)
+                ->where('is_raid_boss', false)
+                ->where('is_celestial_entity', false)
+                ->whereNull('only_for_location_type')
+                ->get();
+
+            $this->manageMonsters($monsters, $exponentialAttributeCurve, 2, 2_000_000_000, 100_000, 500, $mapName);
+
+            $celestials = Monster::where('game_map_id', $gameMap->id)
+                ->where('is_raid_monster', false)
+                ->where('is_raid_boss', false)
+                ->where('is_celestial_entity', true)
+                ->whereNull('only_for_location_type')
+                ->get();
+
+            $this->manageMonsters($celestials, $exponentialAttributeCurve, 50_000_000, 300_000_000, 1_000_000, 5000, $mapName);
+        }
+    }
+
+    /**
+     * Rebalance Weekly fights
+     *
+     * @param ExponentialAttributeCurve $exponentialAttributeCurve
+     * @return void
+     */
+    private function rebalanceWeeklyFights(ExponentialAttributeCurve $exponentialAttributeCurve): void
+    {
+        $locations = Location::whereNotNull('type')->get();
+
+        foreach ($locations as $location) {
+            $gameMap = GameMap::find($location->game_map_id);
+
+            $locationType = new LocationType($location->type);
+
+            $statRangeData = $this->fetchMonsterStatRange($locationType);
+            $statRangeData = (object) $statRangeData->toArray();
+
+            $monsters = Monster::where('game_map_id', $gameMap->id)
+                ->where('is_raid_monster', false)
+                ->where('is_raid_boss', false)
+                ->where('is_celestial_entity', false)
+                ->where('only_for_location_type', $location->type)
+                ->get();
+
+            $this->manageMonsters($monsters, $exponentialAttributeCurve, $statRangeData->min, $statRangeData->max, $statRangeData->increase, $statRangeData->max, $gameMap->name);
+        }
+    }
+
+    private function fetchMonsterStatRange(LocationType $locationType): SupportCollection
+    {
+        return match ($locationType) {
+            $locationType->isLordsStrongHold() => collect([
+                'min' => 10_000_000,
+                'max' => 30_000_000,
+                'increase' => 10_000_000,
+                'range' => 1_000_000,
+            ]),
+            $locationType->isHellsBrokenAnvil() => collect([
+                'min' => 50_000_000,
+                'max' => 100_000_000,
+                'increase' => 12_000_000,
+                'range' => 2_000_000,
+            ]),
+            $locationType->isAlchemyChurch() => collect([
+                'min' => 100_000_000_000,
+                'max' => 400_000_000_000,
+                'increase' => 24_000_000,
+                'range' => 4_000_000,
+            ]),
+            $locationType->isTwistedMaidensDungeons() => collect([
+                'min' => 500_000_000_000,
+                'max' => 2_000_000_000_000,
+                'increase' => 100_000_000_000,
+                'range' => 10_000_000,
+            ]),
+            default => collect([
+                'min' => 10_000_000,
+                'max' => 30_000_000,
+                'increase' => 10_000_000,
+                'range' => 1_000_000,
+            ])
+        };
+    }
+
+
+    private function manageMonsters(Collection $monsters, ExponentialAttributeCurve $exponentialAttributeCurve, int $min, int $max, int $increase, int $range, string $mapName, bool $isSpecialMonster = false): void
     {
         $floats = $this->generateFloats($exponentialAttributeCurve, $monsters->count());
         $integers = $this->generateIntegers($exponentialAttributeCurve, $monsters->count(), $min, $max, $increase, $range);
@@ -270,7 +346,7 @@ class ReBalanceMonsters extends Command
         }
     }
 
-    protected function fetchElementalAtonements(ExponentialAttributeCurve $exponentialAttributeCurve, string $mapName, int $monsterCount, bool $isRaidMonster): array
+    private function fetchElementalAtonements(ExponentialAttributeCurve $exponentialAttributeCurve, string $mapName, int $monsterCount, bool $isRaidMonster): array
     {
         $primaryAtonement = null;
         $startingValue = 0;
@@ -315,7 +391,7 @@ class ReBalanceMonsters extends Command
         return $this->fetchAtonementDataForMonsters($exponentialAttributeCurve, $monsterCount, $primaryAtonement, $startingValue, $maxValue);
     }
 
-    protected function getXPIntegers(ExponentialAttributeCurve $exponentialAttributeCurve, int $size, ?string $mapName = null): array
+    private function getXPIntegers(ExponentialAttributeCurve $exponentialAttributeCurve, int $size, ?string $mapName = null): array
     {
         if (in_array($mapName, $this->regularMaps)) {
 
@@ -338,7 +414,6 @@ class ReBalanceMonsters extends Command
             if ($mapName === MapNameValue::HELL) {
                 return $this->generateIntegers($exponentialAttributeCurve, $size, 2, 1000, 2, 10);
             }
-
         }
 
         if ($mapName === MapNameValue::PURGATORY) {
@@ -361,7 +436,7 @@ class ReBalanceMonsters extends Command
         return $this->generateIntegers($exponentialAttributeCurve, $size, 100, 4500, 100, 50);
     }
 
-    protected function fetchAtonementDataForMonsters(ExponentialAttributeCurve $exponentialAttributeCurve, int $monsterCount, string $primaryAtonement, float $startingValue, float $maxValue): array
+    private function fetchAtonementDataForMonsters(ExponentialAttributeCurve $exponentialAttributeCurve, int $monsterCount, string $primaryAtonement, float $startingValue, float $maxValue): array
     {
         $floats = $this->generateFloats($exponentialAttributeCurve, $monsterCount, $startingValue, $maxValue);
         $atonements = [];
@@ -379,7 +454,7 @@ class ReBalanceMonsters extends Command
         return $atonements;
     }
 
-    protected function generateFloats(ExponentialAttributeCurve $exponentialAttributeCurve, int $size, float $min = 0.001, float $max = 1.0, float $increase = 0.08, float $range = 0.01): array
+    private function generateFloats(ExponentialAttributeCurve $exponentialAttributeCurve, int $size, float $min = 0.001, float $max = 1.0, float $increase = 0.08, float $range = 0.01): array
     {
         $curve = $exponentialAttributeCurve->setMin($min)
             ->setMax($max)
@@ -389,7 +464,7 @@ class ReBalanceMonsters extends Command
         return $curve->generateValues($size);
     }
 
-    protected function generateIntegers(ExponentialAttributeCurve $exponentialAttributeCurve, int $size, int $min, int $max, int $increase, int $range): array
+    private function generateIntegers(ExponentialAttributeCurve $exponentialAttributeCurve, int $size, int $min, int $max, int $increase, int $range): array
     {
         $curve = $exponentialAttributeCurve->setMin($min)
             ->setMax($max)
@@ -424,8 +499,8 @@ class ReBalanceMonsters extends Command
             'criticality' => $floats[$index],
             'drop_check' => $floats[$index],
             'gold' => ceil($integers[$index] / 2),
-            'health_range' => ceil($integers[$index] / 2).'-'.$integers[$index],
-            'attack_range' => ceil($integers[$index] / 2).'-'.$integers[$index],
+            'health_range' => ceil($integers[$index] / 2) . '-' . $integers[$index],
+            'attack_range' => ceil($integers[$index] / 2) . '-' . $integers[$index],
             'max_spell_damage' => $integers[$index],
             'max_affix_damage' => $integers[$index],
             'healing_percentage' => $floatValue,
