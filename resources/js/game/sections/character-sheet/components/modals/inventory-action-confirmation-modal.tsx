@@ -52,7 +52,9 @@ export default class InventoryActionConfirmationModal extends React.Component<
 
                                 this.props.manage_modal();
 
-                                this.props.reset_selected_items();
+                                if (this.props.reset_selected_items) {
+                                    this.props.reset_selected_items();
+                                }
                             },
                         );
                     },
@@ -61,6 +63,10 @@ export default class InventoryActionConfirmationModal extends React.Component<
 
                         if (typeof error.response !== "undefined") {
                             const response: AxiosResponse = error.response;
+
+                            if (this.props.reset_selected_items) {
+                                this.props.reset_selected_items();
+                            }
 
                             this.setState({
                                 error_message: response.data.message,
