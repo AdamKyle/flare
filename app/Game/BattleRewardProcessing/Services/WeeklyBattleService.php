@@ -17,6 +17,7 @@ class WeeklyBattleService
         LocationType::ALCHEMY_CHURCH,
         LocationType::LORDS_STRONG_HOLD,
         LocationType::BROKEN_ANVIL,
+        LocationType::TWSITED_MAIDENS_DUNGEONS
     ];
 
     public function __construct(LocationSpecialtyHandler $locationSpecialtyHandler)

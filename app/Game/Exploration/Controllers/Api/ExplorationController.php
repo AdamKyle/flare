@@ -39,12 +39,18 @@ class ExplorationController extends Controller
         $location = Location::where('x', $character->map->character_position_x)
             ->where('y', $character->map->character_position_y)
             ->where('game_map_id', $character->map->game_map_id)
-            ->where('type', LocationType::UNDERWATER_CAVES)
+            ->whereIn('type', [
+                LocationType::UNDERWATER_CAVES,
+                LocationType::ALCHEMY_CHURCH,
+                LocationType::LORDS_STRONG_HOLD,
+                LocationType::BROKEN_ANVIL,
+                LocationType::TWSITED_MAIDENS_DUNGEONS,
+            ])
             ->first();
 
         if (! is_null($location)) {
             return response()->json([
-                'message' => 'Nope. You cannot explore here.',
+                'message' => 'This place is far too special for you to be able to explore. Manual fighting is only allowed here child.',
             ], 422);
         }
 
@@ -53,7 +59,7 @@ class ExplorationController extends Controller
         $timeDelay = $this->explorationAutomationService->getTimeDelay();
 
         return response()->json([
-            'message' => 'Exploration has started. Check the exploration tab (beside server messages) for update. The tab will every '.$timeDelay.' minutes, rewards are handed to you or disenchanted automatically.',
+            'message' => 'Exploration has started. Check the exploration tab (beside server messages) for update. The tab will every ' . $timeDelay . ' minutes, rewards are handed to you or disenchanted automatically.',
         ]);
     }
 
