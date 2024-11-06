@@ -384,7 +384,7 @@ class CharacterInventoryService
         return $this->character
             ->inventory
             ->slots
-            ->whereNotIn('item.type', ['quest', 'alchemy'])
+            ->whereNotIn('item.type', ['quest', 'alchemy', 'artifact'])
             ->where('equipped', false)
             ->sortBy('id')
             ->pluck('id')
@@ -537,24 +537,13 @@ class CharacterInventoryService
      *
      * - Will not destroy sets or items in sets.
      * - Will not destroy quest items or usable items.
+     * - Will not destroy artifact items either.
      */
     public function destroyAllItemsInInventory(): array
     {
         $slotIds = $this->findCharacterInventorySlotIds();
 
-        $items = $this->character->inventory->slots->where('item.type', 'artifact')->whereNotNull('item.itemSkillProgressions')->pluck('item.id')->toArray();
-
         $this->character->inventory->slots()->whereIn('id', $slotIds)->delete();
-
-        if (! empty($items)) {
-            $items = Item::whereIn('id', $items)->get();
-
-            foreach ($items as $item) {
-                $item->itemSkillProgressions()->delete();
-
-                $item->delete();
-            }
-        }
 
         $character = $this->character->refresh();
 

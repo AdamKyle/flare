@@ -280,7 +280,6 @@ class CharacterInventoryServiceTest extends TestCase
 
         $this->assertEquals(422, $result['status']);
         $this->assertEquals('Cannot destroy equipped item.', $result['message']);
-
     }
 
     public function testCanDeleteItemFromInventory()
@@ -292,7 +291,7 @@ class CharacterInventoryServiceTest extends TestCase
         $result = $this->characterInventoryService->setCharacter($character)->deleteItem($character->inventory->slots->first()->id);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('Destroyed '.$item->affix_name.'.', $result['message']);
+        $this->assertEquals('Destroyed ' . $item->affix_name . '.', $result['message']);
     }
 
     public function testCanDeleteArtifactWithItemSkillProgressionFromInventory()
@@ -320,12 +319,12 @@ class CharacterInventoryServiceTest extends TestCase
         $result = $this->characterInventoryService->setCharacter($character)->deleteItem($character->inventory->slots->first()->id);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('Destroyed '.$item->affix_name.'.', $result['message']);
+        $this->assertEquals('Destroyed ' . $item->affix_name . '.', $result['message']);
     }
 
-    public function testDeleteAllItemsInInventoryWithOutDestroyingUsableOrQuestItems()
+    public function testDeleteAllItemsInInventoryWithOutDestroyingUsableOrQuestItemsAllArtifacts()
     {
-        $item = $this->createItem(['type' => 'artifact']);
+        $artifact = $this->createItem(['type' => 'artifact']);
 
         $itemSkill = ItemSkill::create([
             'name' => 'parent',
@@ -335,8 +334,8 @@ class CharacterInventoryServiceTest extends TestCase
             'total_kills_needed' => 100,
         ]);
 
-        $item->itemSkillProgressions()->create([
-            'item_id' => $item->id,
+        $artifact->itemSkillProgressions()->create([
+            'item_id' => $artifact->id,
             'item_skill_id' => $itemSkill->id,
             'current_level' => 0,
             'current_kill' => 0,
@@ -348,7 +347,7 @@ class CharacterInventoryServiceTest extends TestCase
         $alchemy = $this->createItem(['type' => 'alchemy']);
 
         $character = $this->character->inventoryManagement()
-            ->giveItem($item)
+            ->giveItem($artifact)
             ->giveItem($regularItem)
             ->giveItem($questItem)
             ->giveItem($alchemy)
@@ -356,9 +355,12 @@ class CharacterInventoryServiceTest extends TestCase
 
         $result = $this->characterInventoryService->setCharacter($character)->destroyAllItemsInInventory();
 
+        $character = $character->refresh();
+
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Destroyed all items.', $result['message']);
-        $this->assertCount(2, $result['inventory']['inventory']);
+        $this->assertCount(1, $result['inventory']['inventory']);
+        $this->assertCount(1, $character->inventory->slots->where('item.type', 'alchemy'));
     }
 
     public function testDisenchantAllItemsHasNothingToDisenchant()
@@ -421,7 +423,7 @@ class CharacterInventoryServiceTest extends TestCase
         $result = $this->characterInventoryService->setCharacter($character)->unequipItem($slot->id);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('Unequipped item: '.$slot->item->affix_name, $result['message']);
+        $this->assertEquals('Unequipped item: ' . $slot->item->affix_name, $result['message']);
 
         $this->assertFalse($slot->refresh()->equipped);
     }
@@ -479,7 +481,7 @@ class CharacterInventoryServiceTest extends TestCase
         $result = $this->characterInventoryService->setCharacter($character)->destroyAlchemyItem($character->inventory->slots->where('item.type', '=', 'alchemy')->first()->id);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('Destroyed Alchemy Item: '.$alchemyItem->name.'.', $result['message']);
+        $this->assertEquals('Destroyed Alchemy Item: ' . $alchemyItem->name . '.', $result['message']);
 
         $character = $character->refresh();
 
