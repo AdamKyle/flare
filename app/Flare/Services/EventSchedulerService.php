@@ -108,11 +108,9 @@ class EventSchedulerService
     {
         $eventData = $this->createBaseScheduledEvent($params);
 
-        $eventType = new EventType($params['selected_event_type']);
-
         ScheduledEvent::create($eventData);
 
-        $date = $this->createEvents($eventType, $eventData, self::GENERATE_EVENT_AMOUNT, $params['generate_every']);
+        $date = $this->createEvents($eventData, self::GENERATE_EVENT_AMOUNT, $params['generate_every']);
 
         ScheduledEventConfiguration::create([
             'event_type' => $params['selected_event_type'],
@@ -137,11 +135,9 @@ class EventSchedulerService
             'selected_start_date' => $event->start_date,
         ];
 
-        $eventType = new EventType($scheduledEventConfiguration->event_type);
-
         $eventData = $this->createBaseScheduledEvent($params);
 
-        $date = $this->createEvents($eventType, $eventData, self::GENERATE_EVENT_AMOUNT, $scheduledEventConfiguration->generate_every);
+        $date = $this->createEvents($eventData, self::GENERATE_EVENT_AMOUNT, $scheduledEventConfiguration->generate_every);
 
         $scheduledEventConfiguration->update([
             'start_date' => $date,
@@ -191,13 +187,13 @@ class EventSchedulerService
         }
     }
 
-    protected function createEvents(EventType $eventType, array $eventData, int $amount, string $type): Carbon
+    protected function createEvents(array $eventData, int $amount, string $type): Carbon
     {
         $date = new Carbon($eventData['start_date'], config('app.timezone'));
 
         for ($i = 1; $i <= $amount; $i++) {
-
             if ($type === 'weekly') {
+
                 $startDate = $date->copy()->addWeek();
 
                 $endDate = $startDate->copy()->addDay();
