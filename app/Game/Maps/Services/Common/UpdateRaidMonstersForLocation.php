@@ -56,7 +56,6 @@ trait UpdateRaidMonstersForLocation
                         items will drop by clicking or tapping View Location Details. Click or tap the help link and then click or tap special locations with in the help modal. Find this
                         location in the list on the help docs and open it to see the quest items.'
                     ));
-
                 } else {
                     $monsters = $locationMonsters;
 
@@ -101,7 +100,6 @@ trait UpdateRaidMonstersForLocation
 
                 return true;
             }
-
         }
 
         return false;
@@ -118,11 +116,11 @@ trait UpdateRaidMonstersForLocation
 
         $cache = Cache::get('special-location-monsters');
 
-        if (! isset($cache['location-type-'.$location->type])) {
+        if (! isset($cache['location-type-' . $location->type])) {
             return false;
         }
 
-        $monsters = $cache['location-type-'.$location->type];
+        $monsters = $cache['location-type-' . $location->type];
 
         event(new UpdateMonsterList($monsters, $character->user));
         event(new UpdateRaidMonsters([], $character->user));
