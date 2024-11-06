@@ -2,16 +2,19 @@
 
 namespace App\Console\Commands;
 
-use App\Flare\Models\Event;
-use App\Flare\Models\ScheduledEvent;
-use App\Game\Events\Values\EventType;
+use App\Flare\Models\Character;
+use App\Flare\Models\GameMap;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
+use App\Flare\Models\ScheduledEvent;
+use App\Flare\Models\ScheduledEventConfiguration;
+use App\Flare\Values\MapNameValue;
+use App\Game\Events\Values\EventType;
+use App\Game\Exploration\Services\ExplorationAutomationService;
+use App\Game\Maps\Services\TraverseService;
 
 class FixEventTypesOnEvents extends Command
 {
-
-    const MONTHLY_PVP = 1;
-
     /**
      * The name and signature of the console command.
      *
@@ -29,107 +32,42 @@ class FixEventTypesOnEvents extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(TraverseService $traverseService, ExplorationAutomationService $explorationAutomationService)
     {
-        $eventTypes = [
-            EventType::WEEKLY_CELESTIALS => 0,
-            EventType::WEEKLY_CURRENCY_DROPS => 2,
-            EventType::RAID_EVENT => 3,
-            EventType::WINTER_EVENT => 4,
-            EventType::PURGATORY_SMITH_HOUSE => 5,
-            EventType::GOLD_MINES => 6,
-            EventType::THE_OLD_CHURCH => 7,
-            EventType::DELUSIONAL_MEMORIES_EVENT => 8,
-            EventType::WEEKLY_FACTION_LOYALTY_EVENT => 9,
-            EventType::FEEDBACK_EVENT => 10,
-        ];
 
-        foreach ($eventTypes as $eventType => $originalValue) {
-            if ($eventType === self::MONTHLY_PVP) {
-                ScheduledEvent::where('event_type', self::MONTHLY_PVP)->delete();
-                Event::where('type', self::MONTHLY_PVP)->delete();
-            }
+        ScheduledEventConfiguration::truncate();
 
-            if ($eventType === EventType::WEEKLY_CURRENCY_DROPS) {
-                ScheduledEvent::where('event_type', $originalValue)->update([
-                    'event_type' => $originalValue - 1
-                ]);
-                Event::where('type', EventType::WEEKLY_CURRENCY_DROPS)->update([
-                    'type' => $originalValue - 1
-                ]);
-            }
+        ScheduledEvent::where('start_date', '>', Carbon::now()->addWeeks(2))->delete();
 
-            if ($eventType === EventType::RAID_EVENT) {
-                ScheduledEvent::where('event_type', $originalValue)->update([
-                    'event_type' => $originalValue - 1
-                ]);
-                Event::where('type', EventType::RAID_EVENT)->update([
-                    'type' => $originalValue - 1
-                ]);
-            }
+        $scheduledEvents = ScheduledEvent::where('start_date', '>=', Carbon::now())->orderBy('start_date', 'desc')->get()->groupBy('event_type')->map(fn($events) => $events->first());
 
-            if ($eventType === EventType::WINTER_EVENT) {
-                ScheduledEvent::where('event_type', $originalValue)->update([
-                    'event_type' => EventType::WINTER_EVENT - 1
-                ]);
-                Event::where('type', EventType::WINTER_EVENT)->update([
-                    'type' => EventType::WINTER_EVENT - 1
-                ]);
-            }
-
-            if ($eventType === EventType::PURGATORY_SMITH_HOUSE) {
-                ScheduledEvent::where('event_type', $originalValue)->update([
-                    'event_type' => $originalValue - 1
-                ]);
-                Event::where('type', $originalValue)->update([
-                    'type' => $originalValue - 1
-                ]);
-            }
-
-            if ($eventType === EventType::GOLD_MINES) {
-                ScheduledEvent::where('event_type', $originalValue)->update([
-                    'event_type' => $originalValue - 1
-                ]);
-                Event::where('type', $originalValue)->update([
-                    'type' => $originalValue - 1
-                ]);
-            }
-
-            if ($eventType === EventType::THE_OLD_CHURCH) {
-                ScheduledEvent::where('event_type', $originalValue)->update([
-                    'event_type' => $originalValue - 1
-                ]);
-                Event::where('type', $originalValue)->update([
-                    'type' => $originalValue - 1
-                ]);
-            }
-
-            if ($eventType === EventType::DELUSIONAL_MEMORIES_EVENT) {
-                ScheduledEvent::where('event_type', $originalValue)->update([
-                    'event_type' => $originalValue - 1
-                ]);
-                Event::where('type', $originalValue)->update([
-                    'type' => $originalValue - 1
-                ]);
-            }
-
-            if ($eventType === EventType::WEEKLY_FACTION_LOYALTY_EVENT) {
-                ScheduledEvent::where('event_type', $originalValue)->update([
-                    'event_type' => $originalValue - 1
-                ]);
-                Event::where('type', $originalValue)->update([
-                    'type' => $originalValue - 1
-                ]);
-            }
-
-            if ($eventType === EventType::FEEDBACK_EVENT) {
-                ScheduledEvent::where('event_type', $originalValue)->update([
-                    'event_type' => $originalValue - 1
-                ]);
-                Event::where('type', $originalValue)->update([
-                    'type' => $originalValue - 1
-                ]);
-            }
+        foreach ($scheduledEvents as $event) {
+            ScheduledEventConfiguration::create([
+                'event_type' => $event->event_type,
+                'start_date' => $event->start_date,
+                'generate_every' => 'weekly',
+                'last_time_generated' => now()->subWeeks(2),
+            ]);
         }
+
+        GameMap::where('only_during_event_type', 8)->update(['only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT]);
+
+        $gameMap = GameMap::where('name', MapNameValue::DELUSIONAL_MEMORIES)->first();
+        $surfaceMap = GameMap::where('name', MapNameValue::SURFACE)->first();
+
+        Character::select('characters.*')
+            ->join('maps', 'maps.character_id', '=', 'characters.id')
+            ->where('maps.game_map_id', $gameMap->id)
+            ->chunk(100, function ($characters) use (
+                $traverseService,
+                $surfaceMap,
+                $explorationAutomationService,
+            ) {
+                foreach ($characters as $character) {
+                    $explorationAutomationService->stopExploration($character);
+
+                    $traverseService->travel($surfaceMap->id, $character);
+                }
+            });
     }
 }

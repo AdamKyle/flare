@@ -39,19 +39,13 @@ class MassImportCustomData extends Command
     public function handle()
     {
 
-        CapitalCityUnitQueue::truncate();
-        CapitalCityBuildingQueue::truncate();
-        Survey::truncate();
-        SurveySnapshot::truncate();
-        User::where('is_showing_survey', true)->update(['is_showing_survey' => false]);
-
-        Artisan::call('fix:event-types-on-events');
-
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
             $this->importGameMaps();
         }
+
+        Artisan::call('fix:event-types-on-events');
 
         $this->importSurveys();
     }
