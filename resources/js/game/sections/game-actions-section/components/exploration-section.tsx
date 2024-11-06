@@ -371,11 +371,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                             </div>
                         </div>
 
-                        <div
-                            className={
-                                "lg:text-center lg:ml-[-100px] mt-3 mb-3"
-                            }
-                        >
+                        <div className={"lg:text-center mt-3 mb-3"}>
                             <PrimaryButton
                                 button_label={"Explore"}
                                 on_click={this.startExploration.bind(this)}

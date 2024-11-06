@@ -167,7 +167,7 @@ export default class Trinketry extends React.Component<any, any> {
                         ) : null}
                     </div>
                 </div>
-                <div className={"text-center md:ml-[-100px] mt-3 mb-3"}>
+                <div className={"text-center mt-3 mb-3"}>
                     <PrimaryButton
                         button_label={"Craft"}
                         on_click={this.craft.bind(this)}

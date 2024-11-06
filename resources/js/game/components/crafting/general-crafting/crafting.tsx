@@ -354,7 +354,7 @@ export default class Crafting extends React.Component<any, any> {
                         />
                     </div>
                 ) : (
-                    <div className={"text-center lg:ml-[-100px] mt-3 mb-3"}>
+                    <div className={"text-center mt-3 mb-3"}>
                         <CraftingActionButtons
                             can_craft={this.canCraft()}
                             can_close={this.canClose()}

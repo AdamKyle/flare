@@ -303,7 +303,7 @@ export default class SeerCamp extends React.Component<
                     </div>
                 </div>
                 <div>
-                    <div className="text-center lg:ml-[-100px] mt-3 mb-3">
+                    <div className="text-center mt-3 mb-3">
                         {this.state.selected_seer_action ===
                         "manage-sockets" ? (
                             <Fragment>

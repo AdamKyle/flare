@@ -235,7 +235,7 @@ export default class GemCrafting extends React.Component<any, any> {
                         </div>
                     </div>
                 ) : null}
-                <div className="text-center lg:ml-[-100px] mt-3 mb-3">
+                <div className="text-center mt-3 mb-3">
                     <PrimaryButton
                         button_label={"Craft"}
                         on_click={this.craft.bind(this)}

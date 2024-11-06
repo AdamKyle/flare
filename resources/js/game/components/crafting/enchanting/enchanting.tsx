@@ -622,8 +622,8 @@ export default class Enchanting extends React.Component<
                         item.
                     </InfoAlert>
                 ) : null}
-                <div className={"text-center md:ml-[-100px] mt-3 mb-3"}>
-                    <div className="flex flex-col md:flex-row justify-center items-center gap-2">
+                <div className={"text-center mt-3 mb-3"}>
+                    <div className="flex flex-col md:flex-row justify-center items-center">
                         <PrimaryButton
                             button_label={"Enchant"}
                             on_click={() => this.enchant(false)}
@@ -647,14 +647,27 @@ export default class Enchanting extends React.Component<
                                 this.state.loading || this.props.cannot_craft
                             }
                         />
+
+                        {!this.state.show_enchanting_for_event ? (
+                            <a
+                                href="/information/enchanting"
+                                target="_blank"
+                                className="block mt-2 md:ml-2"
+                            >
+                                Help{" "}
+                                <i className="fas fa-external-link-alt"></i>
+                            </a>
+                        ) : null}
                     </div>
-                    <a
-                        href="/information/enchanting"
-                        target="_blank"
-                        className="block mt-2 md:ml-2"
-                    >
-                        Help <i className="fas fa-external-link-alt"></i>
-                    </a>
+                    {this.state.show_enchanting_for_event ? (
+                        <a
+                            href="/information/enchanting"
+                            target="_blank"
+                            className="block mt-2 md:ml-2"
+                        >
+                            Help <i className="fas fa-external-link-alt"></i>
+                        </a>
+                    ) : null}
                 </div>
             </Fragment>
         );

@@ -889,7 +889,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
                     </div>
                 </div>
 
-                <div className={"text-center lg:ml-[-100px] mt-3 mb-3"}>
+                <div className={"text-center mt-3 mb-3"}>
                     {this.state.initial_action === "buy-item" ? (
                         <PrimaryButton
                             button_label={"Purchase"}
