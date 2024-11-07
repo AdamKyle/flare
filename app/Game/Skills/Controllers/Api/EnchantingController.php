@@ -5,6 +5,7 @@ namespace App\Game\Skills\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Skills\Requests\EnchantingValidation;
+use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\EnchantingService;
 use App\Http\Controllers\Controller;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -16,7 +17,7 @@ class EnchantingController extends Controller
      *
      * @return void
      */
-    public function __construct(private EnchantingService $enchantingService) {}
+    public function __construct(private EnchantingService $enchantingService, private CraftingService $craftingService) {}
 
     /**
      * @param Character $character
@@ -27,6 +28,7 @@ class EnchantingController extends Controller
         return response()->json([
             'affixes' => $this->enchantingService->fetchAffixes($character, true),
             'skill_xp' => $this->enchantingService->getEnchantingXP($character),
+            'inventory_count' => $this->craftingService->getInventoryCount($character),
         ]);
     }
 
@@ -71,6 +73,7 @@ class EnchantingController extends Controller
         return response()->json([
             'affixes' => $this->enchantingService->fetchAffixes($character->refresh(), true, false),
             'skill_xp' => $this->enchantingService->getEnchantingXP($character),
+            'inventory_count' => $this->craftingService->getInventoryCount($character),
         ]);
     }
 }

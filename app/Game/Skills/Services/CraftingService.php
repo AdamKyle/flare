@@ -117,6 +117,14 @@ class CraftingService
         ];
     }
 
+    public function getInventoryCount(Character $character): array
+    {
+        return [
+            'current_count' => $character->getInventoryCount(),
+            'max_inventory' => $character->inventory_max,
+        ];
+    }
+
     /**
      * Attempts to craft the item.
      *

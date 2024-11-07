@@ -29,6 +29,7 @@ class CraftingController extends Controller
             'xp' => $this->craftingService->getCraftingXP($character, $request->crafting_type),
             'show_craft_for_npc' => $this->showCraftForNpcButton($character, $request->crafting_type),
             'show_craft_for_event' => $this->shouldShowCraftingEventButton($character),
+            'inventory_count' => $this->craftingService->getInventoryCount($character)
         ]);
     }
 
@@ -51,6 +52,7 @@ class CraftingController extends Controller
             'xp' => $this->craftingService->getCraftingXP($character, $request->type),
             'show_craft_for_event' => $this->shouldShowCraftingEventButton($character),
             'show_craft_for_npc' => $this->showCraftForNpcButton($character, $request->type),
+            'inventory_count' => $this->craftingService->getInventoryCount($character),
             'crafted_item' => $crafted,
         ], 200);
     }

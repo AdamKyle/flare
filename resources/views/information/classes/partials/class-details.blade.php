@@ -82,6 +82,14 @@
                     <dd>{{ $classBonus['requires'] }}</dd>
                 </dl>
 
+                <div class='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3'></div>
+                <h5 class="mb-2 mt-2">Prefered Weapons</h5>
+                <p class="my-2">
+                Below you will find information about the weapons that are best for this class.
+                </p>
+                @include('information.classes.partials.prefered-weapons')
+                <div class='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3'></div>
+
                 @if ($class->type()->isArcaneAlchemist())
                     @include('information.classes.partials.crafting.arcane-alchemist')
                 @endif

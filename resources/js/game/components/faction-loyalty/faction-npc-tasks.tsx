@@ -14,6 +14,8 @@ import DangerAlert from "../ui/alerts/simple-alerts/danger-alert";
 import HandleCraftingAjax from "./ajax/handle-crafting-ajax";
 import { ItemType } from "../items/enums/item-type";
 import InfoAlert from "../ui/alerts/simple-alerts/info-alert";
+import DropDown from "../ui/drop-down/drop-down";
+import { startCase, toLower } from "lodash";
 
 export default class FactionNpcTasks extends React.Component<
     FactionNpcSectionProps,
@@ -32,6 +34,7 @@ export default class FactionNpcTasks extends React.Component<
             success_message: null,
             error_message: null,
             must_revive: false,
+            attack_type_selected: "attack",
         };
 
         this.fightAjax = serviceContainer().fetch(BountyFightAjax);
@@ -60,6 +63,7 @@ export default class FactionNpcTasks extends React.Component<
                     {
                         monster_id: monsterId,
                         npc_id: this.props.faction_loyalty_npc.npc_id,
+                        attack_type: this.state.attack_type_selected,
                     },
                     this.props.character_id,
                 );
@@ -208,6 +212,48 @@ export default class FactionNpcTasks extends React.Component<
         });
     }
 
+    setAttackType(attackType: string) {
+        this.setState({
+            attack_type_selected: attackType,
+        });
+    }
+
+    createTypeFilterDropDown() {
+        return [
+            {
+                name: "Attack",
+                icon_class: "ra ra-sword",
+                on_click: () => this.setAttackType("attack"),
+            },
+            {
+                name: "Cast",
+                icon_class: "ra ra-burning-book",
+                on_click: () => this.setAttackType("cast"),
+            },
+            {
+                name: "Attack and Cast",
+                icon_class: "ra ra-lightning-sword",
+                on_click: () => this.setAttackType("attack_and_cast"),
+            },
+            {
+                name: "Cast and Attack",
+                icon_class: "ra ra-lightning-sword",
+                on_click: () => this.setAttackType("cast_and_attack"),
+            },
+            {
+                name: "Defend",
+                icon_class: "ra ra-round-shield",
+                on_click: () => this.setAttackType("defend"),
+            },
+        ];
+    }
+
+    buildDropDownTitle(): string {
+        const attackType = startCase(toLower(this.state.attack_type_selected));
+
+        return "Current Attack Type: " + attackType;
+    }
+
     renderTaskSection(): ReactNode {
         return (
             <div>
@@ -220,10 +266,17 @@ export default class FactionNpcTasks extends React.Component<
                             cannot take part in the bounty tasks.
                         </WarningAlert>
                     ) : null}
-                    <InfoAlert additional_css={"my-2"}>
-                        You attack type, when doing bounties via this tab, will
-                        be: <strong>{this.props.attack_type}</strong>
+                    <InfoAlert additional_css="my-2">
+                        <p>
+                            By default we will use <strong>Attack</strong> as
+                            your default attack type unless you select one of
+                            the attack types below.
+                        </p>
                     </InfoAlert>
+                    <DropDown
+                        menu_items={this.createTypeFilterDropDown()}
+                        button_title={this.buildDropDownTitle()}
+                    />
                     <dl>
                         {this.renderTasks(
                             this.props.faction_loyalty_npc

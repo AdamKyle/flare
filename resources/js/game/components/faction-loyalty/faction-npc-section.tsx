@@ -13,9 +13,11 @@ export default class FactionNpcSection extends React.Component<
     render() {
         return (
             <>
-                <h4>Rewards (when fame levels up)</h4>
-                <dl className="my-2">
-                    <dt>XP</dt>
+                <h4 className="text-lg font-semibold mb-2">
+                    Rewards (when fame levels up)
+                </h4>
+                <dl className="my-2 grid grid-cols-2 gap-x-2 gap-y-1 text-sm sm:text-base w-1/2 md:w-auto">
+                    <dt className="font-medium">XP</dt>
                     <dd>
                         {formatNumber(
                             this.props.faction_loyalty_npc.current_level > 0
@@ -24,7 +26,7 @@ export default class FactionNpcSection extends React.Component<
                                 : 1000,
                         )}
                     </dd>
-                    <dt>Gold</dt>
+                    <dt className="font-medium">Gold</dt>
                     <dd>
                         {formatNumber(
                             this.props.faction_loyalty_npc.current_level > 0
@@ -33,7 +35,7 @@ export default class FactionNpcSection extends React.Component<
                                 : 1000000,
                         )}
                     </dd>
-                    <dt>Gold Dust</dt>
+                    <dt className="font-medium">Gold Dust</dt>
                     <dd>
                         {formatNumber(
                             this.props.faction_loyalty_npc.current_level > 0
@@ -42,7 +44,7 @@ export default class FactionNpcSection extends React.Component<
                                 : 1000,
                         )}
                     </dd>
-                    <dt>Shards</dt>
+                    <dt className="font-medium">Shards</dt>
                     <dd>
                         {formatNumber(
                             this.props.faction_loyalty_npc.current_level > 0
@@ -51,22 +53,28 @@ export default class FactionNpcSection extends React.Component<
                                 : 1000,
                         )}
                     </dd>
-                    <dt>Item Reward</dt>
+                    <dt className="font-medium">Item Reward</dt>
                     <dd>
-                        <a href="/information/random-enchants" target="_blank">
+                        <a
+                            href="/information/random-enchants"
+                            target="_blank"
+                            className="text-blue-500 underline"
+                        >
                             Medium Unique Item{" "}
                             <i className="fas fa-external-link-alt"></i>
                         </a>
                     </dd>
                 </dl>
 
-                <h4>Kingdom Item Defence Bonus</h4>
-                <p className="my-4">
+                <h4 className="text-lg font-semibold mt-4 mb-2">
+                    Kingdom Item Defence Bonus
+                </h4>
+                <p className="my-4 text-sm sm:text-base w-1/2 md:w-auto">
                     Slowly accumulates as you level this NPC's fame. Stacks with
                     other NPCs on the same plane to a max of 95%.
                 </p>
-                <dl>
-                    <dt>Defence Bonus per level</dt>
+                <dl className="grid grid-cols-2 gap-x-2 gap-y-1 text-sm sm:text-base w-1/2 md:w-auto">
+                    <dt className="font-medium">Defence Bonus per level</dt>
                     <dd>
                         {(
                             this.props.faction_loyalty_npc
@@ -74,7 +82,7 @@ export default class FactionNpcSection extends React.Component<
                         ).toFixed(2)}
                         %
                     </dd>
-                    <dt>Current Defence Bonus</dt>
+                    <dt className="font-medium">Current Defence Bonus</dt>
                     <dd>
                         {(
                             this.props.faction_loyalty_npc
