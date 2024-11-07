@@ -11,7 +11,7 @@ export default class InventoryCount extends React.Component<InventoryCountprops>
         const maxInventory = this.props.inventory_count.max_inventory;
         const currentCount = this.props.inventory_count.current_count;
 
-        return ((currentCount / maxInventory) * 100).toFixed(0);
+        return parseInt(((currentCount / maxInventory) * 100).toFixed(0)) || 0;
     }
 
     render() {
