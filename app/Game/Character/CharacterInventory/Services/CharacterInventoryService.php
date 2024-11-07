@@ -341,11 +341,7 @@ class CharacterInventoryService
     public function getInventoryCollection(): Collection
     {
 
-        $slotsToIgnore = Cache::get('character-slots-to-disenchant-' . $this->character->id);
-
-        if (is_null($slotsToIgnore)) {
-            $slotsToIgnore = [];
-        }
+        $slotsToIgnore = Cache::get('character-slots-to-disenchant-' . $this->character->id, []);
 
         return $this->character
             ->inventory
