@@ -11,6 +11,7 @@ use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Raid;
 use App\Flare\Values\ItemSpecialtyType;
+use App\Game\Raids\Values\RaidType;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -46,6 +47,7 @@ class RaidsController extends Controller
                 ItemSpecialtyType::CORRUPTED_ICE,
                 ItemSpecialtyType::DELUSIONAL_SILVER,
             ],
+            'raidTypes' => RaidType::$selectionOptions,
             'artifacts' => Item::where('type', 'artifact')->whereDoesntHave('itemSkill')->get(),
         ]);
     }
@@ -62,6 +64,7 @@ class RaidsController extends Controller
                 ItemSpecialtyType::CORRUPTED_ICE,
                 ItemSpecialtyType::DELUSIONAL_SILVER,
             ],
+            'raidTypes' => RaidType::$selectionOptions,
             'artifacts' => Item::where('type', 'artifact')->doesntHave('itemSkillProgressions')->get(),
         ]);
     }
@@ -113,6 +116,6 @@ class RaidsController extends Controller
 
         $raid = $raid->refresh();
 
-        return response()->redirectToRoute('admin.raids.show', ['raid' => $raid->id])->with('success', 'Saved raid: '.$raid->name);
+        return response()->redirectToRoute('admin.raids.show', ['raid' => $raid->id])->with('success', 'Saved raid: ' . $raid->name);
     }
 }

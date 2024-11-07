@@ -8,6 +8,7 @@ use App\Console\AfterDeployment\AssignNewBuildingsToExistingKingdoms;
 use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
 use App\Console\AfterDeployment\ChangeFeatureTypesOnQuests;
 use App\Console\AfterDeployment\CreateMonsterCache;
+use App\Console\AfterDeployment\ReBalanceMonsters;
 use App\Console\AfterDeployment\RemoveInvalidQuestItems;
 use App\Console\AfterDeployment\UpdateCharactersForClassRanks;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
@@ -49,6 +50,7 @@ class AppServiceProvider extends ServiceProvider
             AssignNewBuildingsToExistingKingdoms::class,
             AssignNewNpcsToFactionLoyalty::class,
             ManageKingdomResources::class,
+            ReBalanceMonsters::class,
 
             // Development Commands:
             CreateCharacter::class,

@@ -53,6 +53,12 @@ class AssignNewNpcsToFactionLoyalty extends Command
         });
     }
 
+    /**
+     * Update NPC's for faction loyalty
+     *
+     * @param FactionLoyalty $factionLoyalty
+     * @return void
+     */
     private function updateNpcsForFactionLOyalty(FactionLoyalty $factionLoyalty)
     {
 
@@ -99,11 +105,12 @@ class AssignNewNpcsToFactionLoyalty extends Command
     }
 
     /**
-     * Create three crafting tasks.
+     * Create the crafting tasks
      *
-     * @throws Exception
+     * @param string $gameMapName
+     * @return array
      */
-    protected function createCraftingTasks(string $gameMapName): array
+    private function createCraftingTasks(string $gameMapName): array
     {
         $tasks = [];
 
@@ -142,9 +149,13 @@ class AssignNewNpcsToFactionLoyalty extends Command
     }
 
     /**
-     * Create three bounty tasks.
+     * Create bounty tasks
+     *
+     * @param Character $character
+     * @param GameMap $gameMap
+     * @return array
      */
-    protected function createBountyTasks(Character $character, GameMap $gameMap): array
+    private function createBountyTasks(Character $character, GameMap $gameMap): array
     {
 
         $tasks = [];
@@ -200,6 +211,14 @@ class AssignNewNpcsToFactionLoyalty extends Command
         return $tasks;
     }
 
+    /**
+     * Check if this task already exists
+     *
+     * @param array $tasks
+     * @param string $key
+     * @param integer $id
+     * @return boolean
+     */
     private function hasTaskAlready(array $tasks, string $key, int $id): bool
     {
         foreach ($tasks as $task) {
@@ -212,11 +231,11 @@ class AssignNewNpcsToFactionLoyalty extends Command
     }
 
     /**
-     * Get items for crafting.
+     * Get item for the crafting task.
      *
-     * - Make sure its level appropriate for the plane.
-     *
-     * @throws Exception
+     * @param string $type
+     * @param string $gamMapName
+     * @return Item
      */
     private function getItemForCraftingTask(string $type, string $gamMapName): Item
     {
@@ -228,7 +247,7 @@ class AssignNewNpcsToFactionLoyalty extends Command
             ->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
             ->whereNull('specialty_type');
 
-        if ($gameMapValue->isSurface()) {
+        if ($gameMapValue->isSurface() || $gameMapValue->isTheIcePlane()) {
             $item->where('skill_level_required', '<=', 50);
         }
 

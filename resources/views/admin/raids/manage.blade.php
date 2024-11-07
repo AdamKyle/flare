@@ -18,6 +18,8 @@
                         <x-core.forms.text-area :model="$raid" label="Story:" modelKey="story" name="story" />
                         <x-core.forms.collection-select :model="$raid" label="Raid Boss:" modelKey="raid_boss_id" name="raid_boss_id" value="id" key="name" :options="$raidBosses" />
                         <x-core.forms.collection-select :model="$raid" label="Raid Boss Location:" modelKey="raid_boss_location_id" name="raid_boss_location_id" value="id" key="name" :options="$locations" />
+                        <x-core.forms.key-value-select :model="$raid" label="Raid Type:"
+                            modelKey="raid_type" name="raid_type" :options="$raidTypes" />
                         <x-core.forms.collection-select-no-model label="Raid Monsters"
                                                                  name="raid_monster_ids[]"
                                                                  key="name"
