@@ -23,6 +23,7 @@ import CraftingXp from "../base-components/skill-xp/crafting-xp";
 import OrangeButton from "../../ui/buttons/orange-button";
 import InfoAlert from "../../ui/alerts/simple-alerts/info-alert";
 import clsx from "clsx";
+import InventoryCount from "../base-components/inventory-count/inventory_count";
 
 export default class Enchanting extends React.Component<
     EnchantingProps,
@@ -49,6 +50,10 @@ export default class Enchanting extends React.Component<
                 next_level_xp: 0,
                 skill_name: "Unknown",
                 level: 1,
+            },
+            inventory_count: {
+                current_count: 0,
+                max_inventory: 75,
             },
             hide_enchanting_help: false,
         };
@@ -77,6 +82,7 @@ export default class Enchanting extends React.Component<
                     result.data.affixes.show_enchanting_for_event,
                 enchantments: result.data.affixes.affixes,
                 skill_xp: result.data.skill_xp,
+                inventory_count: result.data.inventory_count,
             });
         });
 
@@ -136,6 +142,8 @@ export default class Enchanting extends React.Component<
                                             .show_enchanting_for_event,
                                     enchantments: result.data.affixes.affixes,
                                     skill_xp: result.data.skill_xp,
+                                    inventory_count:
+                                        result.data.inventory_count,
                                 },
                                 () => {
                                     if (
@@ -606,6 +614,9 @@ export default class Enchanting extends React.Component<
                     {this.state.enchantments.length > 0 ? (
                         <div className="ml-[25px] lg:ml-0 mb-2 lg:mb-0">
                             <CraftingXp skill_xp={this.state.skill_xp} />
+                            <InventoryCount
+                                inventory_count={this.state.inventory_count}
+                            />
                         </div>
                     ) : null}
                 </div>

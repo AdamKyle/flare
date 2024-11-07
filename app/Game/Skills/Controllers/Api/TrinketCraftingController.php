@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Skills\Requests\TrinketCraftingValidation;
+use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\TrinketCraftingService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
@@ -13,7 +14,7 @@ use Illuminate\Http\JsonResponse;
 class TrinketCraftingController extends Controller
 {
 
-    public function __construct(private TrinketCraftingService $trinketCraftingService) {}
+    public function __construct(private TrinketCraftingService $trinketCraftingService, private CraftingService $craftingService) {}
 
     /**
      * @param Character $character
@@ -25,6 +26,7 @@ class TrinketCraftingController extends Controller
         return response()->json([
             'items' => $this->trinketCraftingService->fetchItemsToCraft($character),
             'skill_xp' => $this->trinketCraftingService->fetchSkillXP($character),
+            'inventory_count' => $this->craftingService->getInventoryCount($character),
         ]);
     }
 
@@ -42,6 +44,7 @@ class TrinketCraftingController extends Controller
         return response()->json([
             'items' => $this->trinketCraftingService->craft($character, $item),
             'skill_xp' => $this->trinketCraftingService->fetchSkillXP($character),
+            'inventory_count' => $this->craftingService->getInventoryCount($character),
         ]);
     }
 }

@@ -38,7 +38,7 @@ class CraftableItemsTable extends DataTableComponent
     {
         $options = [
             '' => 'Please Select',
-            'weapon' => 'Weapons',
+            'weapon' => 'General Weapons',
             'bow' => 'Bows',
             'gun' => 'Guns',
             'fan' => 'Fans',
@@ -67,7 +67,7 @@ class CraftableItemsTable extends DataTableComponent
             Column::make('Name')->searchable()->format(function ($value, $row) {
                 $itemId = Item::where('name', $value)->first()->id;
 
-                return '<a href="/items/'.$itemId.'" >'.$row->name.'</a>';
+                return '<a href="/items/' . $itemId . '" >' . $row->name . '</a>';
             })->html(),
             Column::make('Type')->searchable()->format(function ($value) {
                 return ucfirst(str_replace('-', ' ', $value));

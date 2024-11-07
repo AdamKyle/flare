@@ -58,6 +58,13 @@ class LocationSpecialtyHandler
 
     private function handOverAward(Character $character, bool $isCosmic = true, bool $secondaryIsLegendary = false): Character
     {
+
+        if ($character->isInventoryFull()) {
+            event(new ServerMessageEvent($character->user, 'Your inventory is full, you could not get this reward. Child you need to make some room.'));
+
+            return $character;
+        }
+
         $item = $this->giveCharacterRandomItem($character, $isCosmic, $secondaryIsLegendary);
 
         $character->inventory->slots()->create([

@@ -16,6 +16,7 @@ import CraftingActionButtons from "./crafting-partials/crafting-action-buttons";
 import ArmourTypeSelection from "./crafting-partials/armour-type-selection";
 import SelectItemToCraft from "./crafting-partials/select-item-to-craft";
 import { FameTasks } from "../../faction-loyalty/deffinitions/faction-loaylaty";
+import InventoryCount from "../base-components/inventory-count/inventory_count";
 
 export default class Crafting extends React.Component<any, any> {
     private characterStatus: any;
@@ -37,6 +38,10 @@ export default class Crafting extends React.Component<any, any> {
                 next_level_xp: 0,
                 skill_name: "Unknown",
                 level: 1,
+            },
+            inventory_count: {
+                current_count: 0,
+                max_inventory: 75,
             },
         };
 
@@ -118,6 +123,8 @@ export default class Crafting extends React.Component<any, any> {
                                     loading: false,
                                     craftable_items: result.data.items,
                                     skill_xp: result.data.xp,
+                                    inventory_count:
+                                        result.data.inventory_count,
                                     show_craft_for_event:
                                         result.data.show_craft_for_event,
                                 });
@@ -221,6 +228,8 @@ export default class Crafting extends React.Component<any, any> {
                                     loading: false,
                                     craftable_items: result.data.items,
                                     skill_xp: result.data.xp,
+                                    inventory_count:
+                                        result.data.inventory_count,
                                     show_craft_for_event:
                                         result.data.show_craft_for_event,
                                 },
@@ -334,7 +343,12 @@ export default class Crafting extends React.Component<any, any> {
                         {this.state.loading ? <LoadingProgressBar /> : null}
 
                         {this.state.craftable_items.length > 0 ? (
-                            <CraftingXp skill_xp={this.state.skill_xp} />
+                            <>
+                                <CraftingXp skill_xp={this.state.skill_xp} />
+                                <InventoryCount
+                                    inventory_count={this.state.inventory_count}
+                                />
+                            </>
                         ) : null}
                     </div>
                 </div>
