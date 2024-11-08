@@ -54,17 +54,31 @@ class ReBalanceMonsters extends Command
     public function handle(ExponentialAttributeCurve $exponentialAttributeCurve)
     {
 
+        $this->line('Rebalancing regular monsters ...');
+
         $this->rebalanceRegularmaps($exponentialAttributeCurve);
+
+        $this->line('Rebalancing end game monsters ...');
 
         $this->rebalanceEndGameMonsters($exponentialAttributeCurve);
 
+        $this->line('Rebalancing weekly fight monsters ...');
+
         $this->rebalanceWeeklyFights($exponentialAttributeCurve);
+
+        $this->line('Rebalancing special event map monsters ...');
 
         $this->rebalanceSpecialEventMaps($exponentialAttributeCurve);
 
+        $this->line('Rebalancing raid monsters ...');
+
         $this->rebalanceRaidMonsters($exponentialAttributeCurve);
 
+        $this->line('Rebalancing raid bosses ...');
+
         $this->rebalanceRaidBosses($exponentialAttributeCurve);
+
+        $this->line('All done :)');
     }
 
     /**
@@ -148,7 +162,7 @@ class ReBalanceMonsters extends Command
                 ->where('is_raid_monster', false)
                 ->where('is_raid_boss', false)
                 ->where('is_celestial_entity', false)
-                ->whereNotNull('only_for_location_type')
+                ->whereNull('only_for_location_type')
                 ->get();
 
             $mapNameValue = new MapNameValue($mapName);
@@ -203,41 +217,14 @@ class ReBalanceMonsters extends Command
      * @param ExponentialAttributeCurve $exponentialAttributeCurve
      * @return void
      */
-    private function rebalanceRaidBosses(ExponentialAttributeCurve $exponentialAttributeCurve): void
-    {
-        $raids = Raid::all();
-
-        foreach ($raids as $raid) {
-            $monsterIds = $raid->monster_ids;
-
-            $raidType = new RaidType($raid->raid_type);
-
-            $statRangeData = $this->fetchRaidBossStats($raidType);
-            $statRangeData = (object) $statRangeData->toArray();
-
-            $monsters = Monster::where('is_raid_monster', false)
-                ->whereIn('id', $monsterIds)
-                ->where('is_raid_boss', true)
-                ->where('is_celestial_entity', false)
-                ->whereNotNull('only_for_location_type')
-                ->get();
-
-            $this->manageMonsters($monsters, $exponentialAttributeCurve, $statRangeData->min, $statRangeData->max, $statRangeData->increase, $statRangeData->range, $mapName);
-        }
-    }
-
-    /**
-     * Rebalance the raid monsters based on the raid type.
-     *
-     * @param ExponentialAttributeCurve $exponentialAttributeCurve
-     * @return void
-     */
     private function rebalanceRaidMonsters(ExponentialAttributeCurve $exponentialAttributeCurve): void
     {
         $raids = Raid::all();
 
         foreach ($raids as $raid) {
-            $monsterIds = $raid->monster_ids;
+            $monsterIds = $raid->raid_monster_ids;
+
+            $mapName = Monster::whereIn('id', $monsterIds)->first()->gameMap->name;
 
             $raidType = new RaidType($raid->raid_type);
 
@@ -248,10 +235,41 @@ class ReBalanceMonsters extends Command
                 ->whereIn('id', $monsterIds)
                 ->where('is_raid_boss', false)
                 ->where('is_celestial_entity', false)
-                ->whereNotNull('only_for_location_type')
+                ->whereNull('only_for_location_type')
                 ->get();
 
-            $this->manageMonsters($monsters, $exponentialAttributeCurve, $statRangeData->min, $statRangeData->max, $statRangeData->increase, $statRangeData->range, $mapName);
+            $this->manageMonsters($monsters, $exponentialAttributeCurve, $statRangeData->min, $statRangeData->max, $statRangeData->increase, $statRangeData->range, $mapName, true);
+        }
+    }
+
+    /**
+     * Rebalance the raid monsters based on the raid type.
+     *
+     * @param ExponentialAttributeCurve $exponentialAttributeCurve
+     * @return void
+     */
+    private function rebalanceRaidBosses(ExponentialAttributeCurve $exponentialAttributeCurve): void
+    {
+        $raids = Raid::all();
+
+        foreach ($raids as $raid) {
+            $raidBossId = $raid->raid_boss_id;
+
+            $mapName = Monster::find($raidBossId)->gameMap->name;
+
+            $raidType = new RaidType($raid->raid_type);
+
+            $statRangeData = $this->fetchRaidBossStats($raidType);
+            $statRangeData = (object) $statRangeData->toArray();
+
+            $monsters = Monster::where('is_raid_monster', false)
+                ->where('id', $raidBossId)
+                ->where('is_raid_boss', true)
+                ->where('is_celestial_entity', false)
+                ->whereNull('only_for_location_type')
+                ->get();
+
+            $this->manageMonsters($monsters, $exponentialAttributeCurve, $statRangeData->min, $statRangeData->max, $statRangeData->increase, $statRangeData->range, $mapName, false, true);
         }
     }
 
@@ -263,7 +281,7 @@ class ReBalanceMonsters extends Command
      */
     private function fetchWeeklyMonsterStatRange(LocationType $locationType): SupportCollection
     {
-        return match ($locationType) {
+        return match (true) {
             $locationType->isLordsStrongHold() => collect([
                 'min' => 10_000_000,
                 'max' => 30_000_000,
@@ -305,7 +323,7 @@ class ReBalanceMonsters extends Command
      */
     private function fetchGameMapMonsterStatRange(MapNameValue $mapNameValue): SupportCollection
     {
-        return match ($mapNameValue) {
+        return match (true) {
             $mapNameValue->isPurgatory() => collect([
                 'min' => 1_000_000_000,
                 'max' => 4_000_000_000,
@@ -342,7 +360,7 @@ class ReBalanceMonsters extends Command
      */
     private function fetchRaidMonsterStats(RaidType $raidType): SupportCollection
     {
-        return match ($raidType) {
+        return match (true) {
             $raidType->isPirateLordRaid() => collect([
                 'min' => 1_000_000_000,
                 'max' => 4_000_000_000,
@@ -378,7 +396,7 @@ class ReBalanceMonsters extends Command
      */
     private function fetchRaidBossStats(RaidType $raidType): SupportCollection
     {
-        return match ($raidType) {
+        return match (true) {
             $raidType->isPirateLordRaid() => collect([
                 'min' => 100_000_000_000,
                 'max' => 400_000_000_000,
@@ -420,17 +438,25 @@ class ReBalanceMonsters extends Command
      * @param boolean $isSpecialMonster
      * @return void
      */
-    private function manageMonsters(Collection $monsters, ExponentialAttributeCurve $exponentialAttributeCurve, int $min, int $max, int $increase, int $range, string $mapName, bool $isSpecialMonster = false): void
+    private function manageMonsters(Collection $monsters, ExponentialAttributeCurve $exponentialAttributeCurve, int $min, int $max, int $increase, int $range, string $mapName, bool $isRaidMonster = false, bool $isRaidBoss = false): void
     {
         $floats = $this->generateFloats($exponentialAttributeCurve, $monsters->count());
         $integers = $this->generateIntegers($exponentialAttributeCurve, $monsters->count(), $min, $max, $increase, $range);
         $xpIntegers = [];
 
-        if (! $isSpecialMonster) {
+        if (!$isRaidMonster && !$isRaidBoss) {
             $xpIntegers = $this->getXPIntegers($exponentialAttributeCurve, $monsters->count(), $mapName);
         }
 
-        $atonements = $this->fetchElementalAtonements($exponentialAttributeCurve, $mapName, $monsters->count(), $isSpecialMonster);
+        if ($isRaidMonster) {
+            $xpIntegers = $this->getRaidMonsterXpIntegers($exponentialAttributeCurve, $monsters->count(), $mapName);
+        }
+
+        if ($isRaidBoss) {
+            $xpIntegers = [$this->getRaidBossXpIntegers($mapName)];
+        }
+
+        $atonements = $this->fetchElementalAtonements($exponentialAttributeCurve, $mapName, $monsters->count(), $isRaidMonster);
 
         foreach ($monsters as $index => $monster) {
             $monsterStats = $this->setMonsterStats($floats, $integers, $xpIntegers, $index);
@@ -497,6 +523,26 @@ class ReBalanceMonsters extends Command
         return $this->fetchAtonementDataForMonsters($exponentialAttributeCurve, $monsterCount, $primaryAtonement, $startingValue, $maxValue);
     }
 
+    private function getRaidMonsterXpIntegers(ExponentialAttributeCurve $exponentialAttributeCurve, int $size, string $mapName): array
+    {
+        return match ($mapName) {
+            MapNameValue::SURFACE => $this->generateIntegers($exponentialAttributeCurve, $size, 500, 1_000, 50, 25),
+            MapNameValue::ICE_PLANE,
+            MapNameValue::DELUSIONAL_MEMORIES => $this->generateIntegers($exponentialAttributeCurve, $size, 1_000, 5_000, 500, 250),
+            default => $this->generateIntegers($exponentialAttributeCurve, $size, 500, 1_000, 50, 25)
+        };
+    }
+
+    private function getRaidBossXpIntegers(string $mapName): int
+    {
+        return match ($mapName) {
+            MapNameValue::SURFACE => 5_000,
+            MapNameValue::ICE_PLANE,
+            MapNameValue::DELUSIONAL_MEMORIES => 8_000,
+            default => 5_000
+        };
+    }
+
     /**
      * Get XP Data for the monsters
      *
@@ -505,7 +551,7 @@ class ReBalanceMonsters extends Command
      * @param string|null $mapName
      * @return array
      */
-    private function getXPIntegers(ExponentialAttributeCurve $exponentialAttributeCurve, int $size, ?string $mapName = null): array
+    private function getXPIntegers(ExponentialAttributeCurve $exponentialAttributeCurve, int $size, string $mapName): array
     {
         if (in_array($mapName, $this->regularMaps)) {
 
@@ -544,9 +590,6 @@ class ReBalanceMonsters extends Command
         ) {
             return $this->generateIntegers($exponentialAttributeCurve, $size, 70, 5000, 20, 25);
         }
-
-        // Raid Monsters
-        return $this->generateIntegers($exponentialAttributeCurve, $size, 100, 4500, 100, 50);
     }
 
     /**
