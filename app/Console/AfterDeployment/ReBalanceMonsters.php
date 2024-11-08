@@ -461,6 +461,17 @@ class ReBalanceMonsters extends Command
         foreach ($monsters as $index => $monster) {
             $monsterStats = $this->setMonsterStats($floats, $integers, $xpIntegers, $index);
 
+            if (in_array($mapName, $this->regularMaps)) {
+                $monsterStats = [
+                    ...$monsterStats,
+                    'ambush_chance' => 0,
+                    'ambush_resistance' => 0,
+                    'counter_chance' => 0,
+                    'counter_resistance' => 0,
+                    'life_stealing_resistance' => 0,
+                ];
+            }
+
             if (isset($atonements[$index])) {
                 $monsterStats = array_merge($monsterStats, $atonements[$index]);
             }
@@ -705,10 +716,11 @@ class ReBalanceMonsters extends Command
             'affix_resistance' => $floatValue,
             'entrancing_chance' => $floatValue,
             'devouring_light_chance' => $floatValue,
-            'ambush_chance' => $floatValue >= 1 ? .95 : $floatValue,
-            'ambush_resistance' => $floatValue >= 1 ? .85 : $floatValue,
-            'counter_chance' => $floatValue >= 1 ? .95 : $floatValue,
-            'counter_resistance' => $floatValue >= 1 ? .85 : $floatValue,
+            'ambush_chance' => $floatValue >= 1 ? .90 : $floatValue,
+            'ambush_resistance' => $floatValue >= 1 ? .80 : $floatValue,
+            'counter_chance' => $floatValue >= 1 ? .90 : $floatValue,
+            'counter_resistance' => $floatValue >= 1 ? .80 : $floatValue,
+            'life_stealing_resistance' => $floatValue >= 1 ? .45 : $floatValue,
         ], $xpDetails);
     }
 }
