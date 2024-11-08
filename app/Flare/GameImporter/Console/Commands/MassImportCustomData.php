@@ -42,6 +42,7 @@ class MassImportCustomData extends Command
         Artisan::call('import:game-data Quests');
         Artisan::call('create:quest-cache');
         Artisan::call('balance:monsters');
+        Artisan::call('generate:monster-cache');
 
         $this->importInformationSection();
 
