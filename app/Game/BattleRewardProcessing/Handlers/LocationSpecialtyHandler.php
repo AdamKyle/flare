@@ -144,16 +144,19 @@ class LocationSpecialtyHandler
 
         $equippedItems = $this->fetchEquipped($character) ?? collect();
         $equippedChance = 0.01;
+        $totalEquippedChance = 0;
 
-        $chance += match ($character->map->gameMap->mapType()) {
+        $totalEquippedChance = match ($character->map->gameMap->name) {
             MapNameValue::HELL => $equippedChance * $equippedItems->whereNull('item.specialty_type')->where('item.skill_level_required', 400)->sum(),
             MapNameValue::DELUSIONAL_MEMORIES => $equippedChance * $equippedItems->where('item.specialty_type', ItemSpecialtyType::PURGATORY_CHAINS)->sum(),
             MapNameValue::TWISTED_MEMORIES => $equippedChance * $equippedItems->where('item.specialty_type', ItemSpecialtyType::TWISTED_EARTH)->sum(),
             default => 0.0
         };
 
+        $chance += $totalEquippedChance;
+
         if ($chance >= 80) {
-            $typeOfItem = match ($character->map->gameMap->mapType()) {
+            $typeOfItem = match ($character->map->gameMap->name) {
                 MapNameValue::HELL => ItemSpecialtyType::HELL_FORGED,
                 MapNameValue::DELUSIONAL_MEMORIES => ItemSpecialtyType::DELUSIONAL_SILVER,
                 MapNameValue::TWISTED_MEMORIES => ItemSpecialtyType::FAITHLESS_PLATE,
