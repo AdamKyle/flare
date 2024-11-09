@@ -38,6 +38,7 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
+        Artisan::call('import:game-data Npcs');
         Artisan::call('import:game-data Raids');
         Artisan::call('import:game-data Quests');
         Artisan::call('create:quest-cache');
