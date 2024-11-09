@@ -45,8 +45,6 @@ class MassImportCustomData extends Command
             $this->importGameMaps();
         }
 
-        Artisan::call('fix:event-types-on-events');
-
         $this->importSurveys();
     }
 
