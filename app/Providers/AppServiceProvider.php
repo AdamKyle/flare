@@ -9,8 +9,11 @@ use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
 use App\Console\AfterDeployment\ChangeFeatureTypesOnQuests;
 use App\Console\AfterDeployment\CreateMonsterCache;
 use App\Console\AfterDeployment\ReBalanceMonsters;
+use App\Console\AfterDeployment\RebalanceStatBasedAffixes;
 use App\Console\AfterDeployment\RemoveInvalidQuestItems;
 use App\Console\AfterDeployment\UpdateCharactersForClassRanks;
+use App\Console\AfterDeployment\RebalanceBaseModifierAffixes;
+use App\Console\AfterDeployment\ReduceCharacterBaseModifiersForReincarnation;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
 use App\Console\DevelopmentCommands\CompleteGuideQuestForCharacter;
 use App\Console\DevelopmentCommands\CreateCharacter;
@@ -51,6 +54,9 @@ class AppServiceProvider extends ServiceProvider
             AssignNewNpcsToFactionLoyalty::class,
             ManageKingdomResources::class,
             ReBalanceMonsters::class,
+            RebalanceStatBasedAffixes::class,
+            RebalanceBaseModifierAffixes::class,
+            ReduceCharacterBaseModifiersForReincarnation::class,
 
             // Development Commands:
             CreateCharacter::class,

@@ -84,11 +84,10 @@ class DamageBuilder extends BaseAttribute
         $details = [];
 
         if ($this->character->class->type()->isFighter()) {
-            $baseDamage = $damageStat * 0.15;
+            $baseDamage = $damageStat * 0.08;
 
             $details['base_damage'] = number_format($baseDamage);
-            $details['percentage_of_stat_used'] = 0.15;
-
+            $details['percentage_of_stat_used'] = 0.08;
         } elseif ($this->character->class->type()->isArcaneAlchemist()) {
             $hasStaveEquipped = $this->inventory->filter(function ($slot) {
                 return $slot->item->type === WeaponTypes::STAVE;

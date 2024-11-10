@@ -2,19 +2,13 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
-use App\Flare\Models\CapitalCityBuildingQueue;
-use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
-use App\Flare\Models\Item;
 use App\Flare\Models\Survey;
-use App\Flare\Models\SurveySnapshot;
-use App\Flare\Models\User;
 use App\Flare\Values\MapNameValue;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class MassImportCustomData extends Command
@@ -38,6 +32,8 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
+        Artisan::call('import:game-data Affixes');
+        Artisan::call('import:game-data Skills');
         Artisan::call('import:game-data Npcs');
         Artisan::call('import:game-data Raids');
         Artisan::call('import:game-data Quests');
