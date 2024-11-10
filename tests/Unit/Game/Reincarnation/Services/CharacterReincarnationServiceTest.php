@@ -6,6 +6,7 @@ use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Values\FeatureTypes;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Reincarnate\Services\CharacterReincarnateService;
+use App\Game\Reincarnate\Values\MaxReincarnationStats;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -29,7 +30,8 @@ class CharacterReincarnationServiceTest extends TestCase
         $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(
             $this->createGameSkill([
                 'class_bonus' => 0.01,
-            ]), 5
+            ]),
+            5
         )->givePlayerLocation();
         $this->reincarnationService = resolve(CharacterReincarnateService::class);
 
@@ -153,7 +155,7 @@ class CharacterReincarnationServiceTest extends TestCase
         $character = $character->refresh();
 
         $this->assertEquals(50000, $character->copper_coins);
-        $this->assertEquals(0.05, $character->xp_penalty);
+        $this->assertEquals(0.10, $character->xp_penalty);
         $this->assertEquals(1, $character->level);
         $this->assertEquals(1, $character->times_reincarnated);
         $this->assertGreaterThan(0, $character->reincarnated_stat_increase);
@@ -202,7 +204,7 @@ class CharacterReincarnationServiceTest extends TestCase
         $this->assertEquals(1, $character->level);
         $this->assertEquals(10, $character->times_reincarnated);
         $this->assertGreaterThan(0, $character->reincarnated_stat_increase);
-        $this->assertEquals(0.08, $character->xp_penalty);
+        $this->assertEquals(0.15, $character->xp_penalty);
     }
 
     public function testCanReincarnateMoreThenTwentyFiveTimesAndXpPenaltyShouldBeHigher()
@@ -248,7 +250,7 @@ class CharacterReincarnationServiceTest extends TestCase
         $this->assertEquals(1, $character->level);
         $this->assertEquals(25, $character->times_reincarnated);
         $this->assertGreaterThan(0, $character->reincarnated_stat_increase);
-        $this->assertEquals(0.10, $character->xp_penalty);
+        $this->assertEquals(0.20, $character->xp_penalty);
     }
 
     public function testCanReincarnateMoreThenFiftyTimesAndXpPenaltyShouldBeHigher()
@@ -294,7 +296,7 @@ class CharacterReincarnationServiceTest extends TestCase
         $this->assertEquals(1, $character->level);
         $this->assertEquals(50, $character->times_reincarnated);
         $this->assertGreaterThan(0, $character->reincarnated_stat_increase);
-        $this->assertEquals(0.12, $character->xp_penalty);
+        $this->assertEquals(0.25, $character->xp_penalty);
     }
 
     public function testReincarnationWillNotGoAboveMaxValue()
@@ -338,7 +340,7 @@ class CharacterReincarnationServiceTest extends TestCase
         $character = $character->refresh();
 
         $this->assertEquals(50000, $character->copper_coins);
-        $this->assertEquals(0.05, $character->xp_penalty);
+        $this->assertEquals(0.10, $character->xp_penalty);
         $this->assertEquals(1, $character->level);
         $this->assertEquals(1, $character->times_reincarnated);
         $this->assertEquals(9999999999, $character->str);
@@ -366,14 +368,14 @@ class CharacterReincarnationServiceTest extends TestCase
         $character = $character->refresh();
 
         $character->update([
-            'level' => 9999999999,
-            'str' => 9999999999,
-            'dur' => 9999999999,
-            'dex' => 9999999999,
-            'chr' => 9999999999,
-            'int' => 9999999999,
-            'agi' => 9999999999,
-            'focus' => 9999999999,
+            'level' => MaxReincarnationStats::MAX_STATS,
+            'str' => MaxReincarnationStats::MAX_STATS,
+            'dur' => MaxReincarnationStats::MAX_STATS,
+            'dex' => MaxReincarnationStats::MAX_STATS,
+            'chr' => MaxReincarnationStats::MAX_STATS,
+            'int' => MaxReincarnationStats::MAX_STATS,
+            'agi' => MaxReincarnationStats::MAX_STATS,
+            'focus' => MaxReincarnationStats::MAX_STATS,
             'copper_coins' => 100000,
         ]);
 
