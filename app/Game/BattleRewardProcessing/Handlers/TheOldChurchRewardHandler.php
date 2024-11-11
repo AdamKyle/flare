@@ -183,7 +183,7 @@ class TheOldChurchRewardHandler
         }
 
         if (! $isMythic) {
-            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixDetails::MEDIUM);
+            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixDetails::LEGENDARY);
 
             $newItem = $item->duplicate();
 
@@ -197,7 +197,7 @@ class TheOldChurchRewardHandler
                 'item_id' => $newItem->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You found something MEDIUM but still unique, in The Old Church child: '.$item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You found something MEDIUM but still unique, in The Old Church child: ' . $item->affix_name, $slot->id));
         }
     }
 

@@ -25,20 +25,6 @@ class QueenOfHeartsController extends Controller
         return response()->json($randomEnchantmentService->fetchDataForApi($character));
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function purchase(PurchaseRandomEnchantment $request, Character $character): JsonResponse
-    {
-
-        $result = $this->queenOfHeartsService->purchaseUnique($character, $request->type);
-
-        $status = $result['status'];
-        unset($result['status']);
-
-        return response()->json($result, $status);
-    }
-
     public function reRoll(ReRollRandomEnchantment $request, Character $character): JsonResponse
     {
         $result = $this->queenOfHeartsService->reRollUnique($character, $request->selected_slot_id, $request->selected_reroll_type, $request->selected_affix);

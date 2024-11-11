@@ -32,6 +32,8 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
+        Artisan::call('change:legendary-items');
+        Artisan::call('reduce:character-base-modifiers-for-reincarnation');
         Artisan::call('import:game-data Affixes');
         Artisan::call('import:game-data Skills');
         Artisan::call('import:game-data Npcs');
@@ -40,6 +42,7 @@ class MassImportCustomData extends Command
         Artisan::call('create:quest-cache');
         Artisan::call('balance:monsters');
         Artisan::call('generate:monster-cache');
+        Artisan::call('create:character-attack-data');
 
         $this->importInformationSection();
 

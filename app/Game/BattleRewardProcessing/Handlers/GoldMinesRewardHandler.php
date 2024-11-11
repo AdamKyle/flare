@@ -171,7 +171,7 @@ class GoldMinesRewardHandler
         }
 
         if (! $isMythic) {
-            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixDetails::MEDIUM);
+            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixDetails::LEGENDARY);
 
             $newItem = $item->duplicate();
 
@@ -185,7 +185,7 @@ class GoldMinesRewardHandler
                 'item_id' => $newItem->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You found something MEDIUM but still unique, in the mines child: '.$item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You found something MEDIUM but still unique, in the mines child: ' . $item->affix_name, $slot->id));
         }
     }
 

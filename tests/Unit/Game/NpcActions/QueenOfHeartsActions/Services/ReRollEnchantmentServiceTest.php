@@ -62,7 +62,7 @@ class ReRollEnchantmentServiceTest extends TestCase
             'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
                 'randomly_generated' => true,
-                'cost' => RandomAffixDetails::BASIC,
+                'cost' => RandomAffixDetails::LEGENDARY,
             ])->id,
             'is_mythic' => false,
         ]);
@@ -104,11 +104,11 @@ class ReRollEnchantmentServiceTest extends TestCase
             'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
                 'randomly_generated' => true,
-                'cost' => RandomAffixDetails::BASIC,
+                'cost' => RandomAffixDetails::LEGENDARY,
             ])->id,
             'item_suffix_id' => $this->createItemAffix([
                 'randomly_generated' => true,
-                'cost' => RandomAffixDetails::BASIC,
+                'cost' => RandomAffixDetails::LEGENDARY,
             ])->id,
             'is_mythic' => false,
         ]);
@@ -129,11 +129,11 @@ class ReRollEnchantmentServiceTest extends TestCase
             'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
                 'randomly_generated' => true,
-                'cost' => RandomAffixDetails::BASIC,
+                'cost' => RandomAffixDetails::LEGENDARY,
             ])->id,
             'item_suffix_id' => $this->createItemAffix([
                 'randomly_generated' => true,
-                'cost' => RandomAffixDetails::BASIC,
+                'cost' => RandomAffixDetails::LEGENDARY,
             ])->id,
             'is_mythic' => false,
         ]);
@@ -154,11 +154,11 @@ class ReRollEnchantmentServiceTest extends TestCase
             'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
                 'randomly_generated' => true,
-                'cost' => RandomAffixDetails::BASIC,
+                'cost' => RandomAffixDetails::LEGENDARY,
             ])->id,
             'item_suffix_id' => $this->createItemAffix([
                 'randomly_generated' => true,
-                'cost' => RandomAffixDetails::BASIC,
+                'cost' => RandomAffixDetails::LEGENDARY,
             ])->id,
             'is_mythic' => false,
         ]);
@@ -203,9 +203,9 @@ class ReRollEnchantmentServiceTest extends TestCase
             'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
                 'randomly_generated' => true,
-                'cost' => RandomAffixDetails::BASIC,
+                'cost' => RandomAffixDetails::LEGENDARY,
             ])->id,
-            'cost' => RandomAffixDetails::BASIC,
+            'cost' => RandomAffixDetails::LEGENDARY,
         ]);
 
         $result = $this->reRollEnchantmentService->getMovementCosts($item->id, 'all-enchantments');
@@ -220,9 +220,9 @@ class ReRollEnchantmentServiceTest extends TestCase
             'type' => 'weapon',
             'item_prefix_id' => $this->createItemAffix([
                 'randomly_generated' => true,
-                'cost' => RandomAffixDetails::BASIC,
+                'cost' => RandomAffixDetails::LEGENDARY,
             ])->id,
-            'cost' => RandomAffixDetails::BASIC,
+            'cost' => RandomAffixDetails::LEGENDARY,
         ]);
 
         $result = $this->reRollEnchantmentService->getMovementCosts($item->id, 'prefix');
@@ -427,7 +427,7 @@ class ReRollEnchantmentServiceTest extends TestCase
             'item_prefix_id' => $this->createItemAffix([
                 'type' => 'prefix',
                 'randomly_generated' => true,
-                'cost' => RandomAffixDetails::BASIC,
+                'cost' => RandomAffixDetails::LEGENDARY,
             ])->id,
         ]);
 

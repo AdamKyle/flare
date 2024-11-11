@@ -72,9 +72,9 @@ class FactionLoyaltyBountyHandler
 
             $matchingTask = $this->getMatchingTask($helpingNpc, 'monster_id', $monster->id);
 
-            ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name.
-                ' is happy that you slaughtered another one of the enemies on their hit list. "Only: '.
-                ($matchingTask['required_amount'] - $matchingTask['current_amount']).' to go child!"');
+            ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name .
+                ' is happy that you slaughtered another one of the enemies on their hit list. "Only: ' .
+                ($matchingTask['required_amount'] - $matchingTask['current_amount']) . ' to go child!"');
         }
 
         if ($this->canLevelUpFame($helpingNpc) && $helpingNpc->current_level !== $helpingNpc->max_level) {
@@ -138,7 +138,7 @@ class FactionLoyaltyBountyHandler
 
         event(new UpdateTopBarEvent($character->refresh()));
 
-        ServerMessageHandler::sendBasicMessage($character->user, 'Your fame with: '.$factionLoyaltyNpc->npc->real_name.' on Plane: '.$factionLoyaltyNpc->npc->gameMap->name.' is now level: '.$factionLoyaltyNpc->current_level.' out of: '.$factionLoyaltyNpc->max_level);
+        ServerMessageHandler::sendBasicMessage($character->user, 'Your fame with: ' . $factionLoyaltyNpc->npc->real_name . ' on Plane: ' . $factionLoyaltyNpc->npc->gameMap->name . ' is now level: ' . $factionLoyaltyNpc->current_level . ' out of: ' . $factionLoyaltyNpc->max_level);
     }
 
     protected function handOutXp(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc): void
@@ -160,7 +160,7 @@ class FactionLoyaltyBountyHandler
 
         $this->handlePossibleLevelUp($character);
 
-        ServerMessageHandler::sendBasicMessage($character->user, 'Rewarded with: '.number_format($newXp).' XP.');
+        ServerMessageHandler::sendBasicMessage($character->user, 'Rewarded with: ' . number_format($newXp) . ' XP.');
     }
 
     protected function rewardTheUniqueItem(Character $character)
@@ -174,7 +174,7 @@ class FactionLoyaltyBountyHandler
             ->first();
 
         $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)
-            ->setPaidAmount(RandomAffixDetails::MEDIUM);
+            ->setPaidAmount(RandomAffixDetails::LEGENDARY);
 
         $newItem = $item->duplicate();
 
@@ -188,7 +188,7 @@ class FactionLoyaltyBountyHandler
             'item_id' => $newItem->id,
         ]);
 
-        event(new ServerMessageEvent($character->user, 'You found something of MEDIUM value child. A simple reward: '.$item->affix_name, $slot->id));
+        event(new ServerMessageEvent($character->user, 'You found something of MEDIUM value child. A simple reward: ' . $item->affix_name, $slot->id));
     }
 
     protected function canLevelUpFame(FactionLoyaltyNpc $factionLoyaltyNpc): bool

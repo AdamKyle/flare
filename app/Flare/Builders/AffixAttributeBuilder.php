@@ -228,7 +228,14 @@ class AffixAttributeBuilder
     public function setSkillBonuses(): array
     {
         $allowedTypes = [
-            1, 2, 3, 4, 5, 6, 7, 13, // The match to the SkillTypeValue const's
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            13, // The match to the SkillTypeValue const's
         ];
 
         return [

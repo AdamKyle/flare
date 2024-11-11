@@ -14,6 +14,8 @@ class RandomEnchantmentService
 {
     private RandomAffixGenerator $randomAffixGenerator;
 
+    const ITEM_COST = 2_000_000_000;
+
     public function __construct(RandomAffixGenerator $randomAffixGenerator)
     {
         $this->randomAffixGenerator = $randomAffixGenerator;
@@ -24,33 +26,17 @@ class RandomEnchantmentService
      *
      * @throws Exception
      */
-    public function generateForType(Character $character, string $type): Item
+    public function generateForType(Character $character): Item
     {
-        switch ($type) {
-            case 'medium':
-                return $this->generateRandomAffixForRandom($character, RandomAffixDetails::MEDIUM);
-            case 'legendary':
-                return $this->generateRandomAffixForRandom($character, RandomAffixDetails::LEGENDARY);
-            case 'basic':
-            default:
-                return $this->generateRandomAffixForRandom($character, RandomAffixDetails::BASIC);
-        }
+        return $this->generateRandomAffixForRandom($character, RandomAffixDetails::LEGENDARY);
     }
 
     /**
      * Get cost of unique.
      */
-    public function getCost(string $type): int
+    public function getCost(): int
     {
-        switch ($type) {
-            case 'medium':
-                return RandomAffixDetails::MEDIUM;
-            case 'legendary':
-                return RandomAffixDetails::LEGENDARY;
-            case 'basic':
-            default:
-                return RandomAffixDetails::BASIC;
-        }
+        return RandomAffixDetails::LEGENDARY;
     }
 
     /**
@@ -148,7 +134,7 @@ class RandomEnchantmentService
         $item = Item::whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
             ->whereNotIn('type', ['alchemy', 'quest', 'trinket', 'artifact'])
-            ->where('cost', '<=', 2000000000)
+            ->where('cost', '<=', self::ITEM_COST)
             ->inRandomOrder()
             ->first();
 

@@ -38,13 +38,15 @@ class GivePlayerUniqueItem extends Command
         }
 
         $type = $this->choice('Which Type', [
-            'basic', 'medium', 'legendary',
+            'legendary',
+            'mythic',
+            'cosmic',
         ]);
 
         $cost = match ($type) {
-            'basic' => RandomAffixDetails::BASIC,
-            'medium' => RandomAffixDetails::MEDIUM,
             'legendary' => RandomAffixDetails::LEGENDARY,
+            'mythic' => RandomAffixDetails::MYTHIC,
+            'cosmic' => RandomAffixDetails::COSMIC,
             default => throw new Exception('undefined type for unique')
         };
 
@@ -55,7 +57,7 @@ class GivePlayerUniqueItem extends Command
             'item_id' => $item->id,
         ]);
 
-        return $this->line('Gave: '.$item->affix_name.' To character.');
+        return $this->line('Gave: ' . $item->affix_name . ' To character.');
     }
 
     protected function getUniqueForPlayer(RandomAffixGenerator $randomAffixGenerator, Character $character, int $paidAmount): Item

@@ -7,6 +7,7 @@ use App\Console\AfterDeployment\AllowTraverseForMaps;
 use App\Console\AfterDeployment\AssignNewBuildingsToExistingKingdoms;
 use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
 use App\Console\AfterDeployment\ChangeFeatureTypesOnQuests;
+use App\Console\AfterDeployment\ChangeLegendaryItems;
 use App\Console\AfterDeployment\CreateMonsterCache;
 use App\Console\AfterDeployment\ReBalanceMonsters;
 use App\Console\AfterDeployment\RebalanceStatBasedAffixes;
@@ -57,6 +58,7 @@ class AppServiceProvider extends ServiceProvider
             RebalanceStatBasedAffixes::class,
             RebalanceBaseModifierAffixes::class,
             ReduceCharacterBaseModifiersForReincarnation::class,
+            ChangeLegendaryItems::class,
 
             // Development Commands:
             CreateCharacter::class,
