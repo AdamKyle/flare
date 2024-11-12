@@ -185,7 +185,7 @@ class GoldMinesRewardHandler
                 'item_id' => $newItem->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You found something MEDIUM but still unique, in the mines child: ' . $item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You found something unique, in the mines child: ' . $item->affix_name, $slot->id));
         }
     }
 

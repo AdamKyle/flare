@@ -32,7 +32,7 @@ class WelcomeController extends Controller
 
         $eventType = $request->event_type;
         $raids = ['jester-of-time', 'the-smugglers-are-back-raid', 'ice-queen-raid'];
-        $events = ['delusional-memories', 'weekly-celestials', 'weekly-currency-drops', 'weekly-faction-loyalty', 'tlessas-feedback-event'];
+        $events = ['delusional-memories', 'weekly-celestials', 'weekly-currency-drops', 'weekly-faction-loyalty', 'tlessas-feedback-event',];
 
         if (in_array($eventType, $raids)) {
 
@@ -56,7 +56,6 @@ class WelcomeController extends Controller
                         return redirect()->to(route('welcome'));
                 }
             }
-
         }
 
         if (in_array($eventType, $events)) {
