@@ -36,6 +36,7 @@ class MassImportCustomData extends Command
         Artisan::call('rebalance:mythical-items');
         Artisan::call('reduce:character-base-modifiers-for-reincarnation');
         Artisan::call('import:game-data "Core Imports"');
+        Artisan::call('import:game-data Items');
         Artisan::call('import:game-data Affixes');
         Artisan::call('import:game-data Skills');
         Artisan::call('import:game-data Npcs');

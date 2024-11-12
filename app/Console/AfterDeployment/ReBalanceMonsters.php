@@ -398,26 +398,26 @@ class ReBalanceMonsters extends Command
     {
         return match (true) {
             $raidType->isPirateLordRaid() => collect([
-                'min' => 100_000_000_000,
-                'max' => 400_000_000_000,
+                'min' => 10_000_000_000_000,
+                'max' => 40_000_000_000_000,
                 'increase' => 500_000,
                 'range' => 5_000,
             ]),
             $raidType->isIceQueenRaid(), => collect([
-                'min' => 250_000_000_000,
-                'max' => 500_000_000_000,
+                'min' => 50_000_000_000_000,
+                'max' => 100_000_000_000_000,
                 'increase' => 5_000_000,
                 'range' => 500_000,
             ]),
             $raidType->isJesterOfTime() => collect([
-                'min' => 750_000_000_000,
-                'max' => 1_000_000_000_000,
+                'min' => 75_000_000_000_000,
+                'max' => 100_000_000_000_000,
                 'increase' => 10_000_000,
                 'range' => 5_000_000,
             ]),
             default => collect([
-                'min' => 100_000_000_000,
-                'max' => 400_000_000_000,
+                'min' => 10_000_000_000_000,
+                'max' => 40_000_000_000_000,
                 'increase' => 500_000,
                 'range' => 5_000,
             ])
