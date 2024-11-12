@@ -75,38 +75,12 @@ class DamageBuilder extends BaseAttribute
             return $damage - ($damage * 0.25);
         }
 
+        if ($damage < 5) {
+            return 8;
+        }
+
         return $damage;
     }
-
-    private function buildBonusDamageForClassBasedOnWeaponTypeEquipped(int $damageStat, string $weaponType, int $amount = 1, ?string $orWeaponType = null): int
-    {
-        $duelHanded = [
-            WeaponTypes::STAVE,
-            WeaponTypes::HAMMER,
-            WeaponTypes::BOW,
-        ];
-
-        $matchingItems = $this->inventory->filter(function ($slot) use ($weaponType, $orWeaponType) {
-            return $slot->item->type === $weaponType || ($orWeaponType !== null && $slot->item->type === $orWeaponType);
-        });
-
-        $isDualHandedEquipped = $matchingItems->contains(function ($slot) use ($duelHanded) {
-            return in_array($slot->item->type, $duelHanded);
-        });
-
-        if ($isDualHandedEquipped) {
-            $amount = 1;
-        }
-
-        $hasEquipped = $amount === 1 ? $matchingItems->isNotEmpty() : $matchingItems->count() >= $amount;
-
-        if ($hasEquipped) {
-            return $damageStat * 0.15;
-        }
-
-        return $damageStat * 0.05;
-    }
-
 
 
     public function buildWeaponDamageBreakDown(float $damageStat, bool $voided): array
@@ -336,7 +310,7 @@ class DamageBuilder extends BaseAttribute
         return max($lifeStealAmount, 0);
     }
 
-    protected function getLifeStealAfterPlaneReductions(GameMap $gameMap, float $lifeSteal): float
+    private function getLifeStealAfterPlaneReductions(GameMap $gameMap, float $lifeSteal): float
     {
 
         if ($gameMap->mapType()->isHell()) {
@@ -366,5 +340,34 @@ class DamageBuilder extends BaseAttribute
         }
 
         return $lifeSteal;
+    }
+
+    private function buildBonusDamageForClassBasedOnWeaponTypeEquipped(int $damageStat, string $weaponType, int $amount = 1, ?string $orWeaponType = null): int
+    {
+        $duelHanded = [
+            WeaponTypes::STAVE,
+            WeaponTypes::HAMMER,
+            WeaponTypes::BOW,
+        ];
+
+        $matchingItems = $this->inventory->filter(function ($slot) use ($weaponType, $orWeaponType) {
+            return $slot->item->type === $weaponType || ($orWeaponType !== null && $slot->item->type === $orWeaponType);
+        });
+
+        $isDualHandedEquipped = $matchingItems->contains(function ($slot) use ($duelHanded) {
+            return in_array($slot->item->type, $duelHanded);
+        });
+
+        if ($isDualHandedEquipped) {
+            $amount = 1;
+        }
+
+        $hasEquipped = $amount === 1 ? $matchingItems->isNotEmpty() : $matchingItems->count() >= $amount;
+
+        if ($hasEquipped) {
+            return $damageStat * 0.15;
+        }
+
+        return $damageStat * 0.05;
     }
 }

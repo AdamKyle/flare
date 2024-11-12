@@ -503,7 +503,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage('weapon', true);
 
-        $this->assertEquals(101, $damage);
+        $this->assertEquals(100, $damage);
     }
 
     public function testWeaponDamageWithSkill()

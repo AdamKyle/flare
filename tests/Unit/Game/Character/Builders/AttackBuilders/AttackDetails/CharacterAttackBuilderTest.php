@@ -83,6 +83,8 @@ class CharacterAttackBuilderTest extends TestCase
 
         $attack = $this->characterAttackBuilder->setCharacter($character)->buildCastAndAttack();
 
+        dump($character->class->name, $attack);
+
         $this->assertGreaterThan(0, $attack['spell_damage']);
         $this->assertGreaterThan(0, $attack['weapon_damage']);
         $this->assertEquals(0, $attack['heal_for']);
