@@ -5,6 +5,10 @@
         <dd>
             Bows or General Weapons (Duel Weilded)
         </dd>
+        <dt>
+            Bonus Weapon Damage
+        </dt>
+        <dd>+15% of your damage stat when you have Two Weapons (General - non specialized) OR a Bow equipped.</dd>
     </dl>
     <p class="my-2">
         Thieves will dance through the shadows and slughter their enemies if you equip two General Weapons. You can filter for these in shops and crafting.

@@ -5,6 +5,10 @@
         <dd>
             Hammers
         </dd>
+        <dt>
+            Bonus Weapon Damage
+        </dt>
+        <dd>+15% of your damage stat when you have a Hammer equipped.</dd>
     </dl>
     <p class="my-2">
         Smash your enemies skulls in with hammers. Hammers are heavy, duel handed weapons that smash and bash!

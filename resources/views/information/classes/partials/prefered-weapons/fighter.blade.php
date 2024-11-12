@@ -5,6 +5,10 @@
         <dd>
             General Weapons (non specialized)
         </dd>
+        <dt>
+            Bonus Weapon Damage
+        </dt>
+        <dd>+15% of your damage stat when you have two Weapons (General - non specialized) equipped.</dd>
     </dl>
     <p class="my-2">
         General weapons are those that that are not: Staves, Bows, Guns, Hammers, Fans, Maces or Scratch Awls.

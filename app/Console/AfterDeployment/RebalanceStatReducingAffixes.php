@@ -8,44 +8,30 @@ use App\Flare\Values\ItemAffixType;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
 
-class RebalanceStatBasedAffixes extends Command
+class RebalanceStatReducingAffixes extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'rebalance:stat-based-affixes';
+    protected $signature = 'rebalance:stat-reducing-affixes';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Rebalance all affixes that affect stats';
-
-    private array $affixTypesToRebalance = [
-        ItemAffixType::STAT_MODIFIERS,
-        ItemAffixType::WEAPON_CRAFTING,
-        ItemAffixType::ARMOUR_CRAFTING,
-        ItemAffixType::SPELL_CRAFTING,
-        ItemAffixType::RING_CRAFTING,
-        ItemAffixType::ENCHANTMENT_CRAFTING,
-        ItemAffixType::ACCURACY,
-        ItemAffixType::DODGE,
-        ItemAffixType::LOOTING,
-        ItemAffixType::CASTING_ACCURACY,
-        ItemAffixType::CRITICALITY
-    ];
+    protected $description = 'Rebalance all affixes that reduce enemy stats';
 
     private array $statsToModifiy = [
-        'str_mod',
-        'dex_mod',
-        'int_mod',
-        'dur_mod',
-        'chr_mod',
-        'agi_mod',
-        'focus_mod',
+        'str_reduction',
+        'dur_reduction',
+        'dex_reduction',
+        'chr_reduction',
+        'int_reduction',
+        'agi_reduction',
+        'focus_reduction',
     ];
 
     /**
@@ -53,20 +39,18 @@ class RebalanceStatBasedAffixes extends Command
      */
     public function handle(LinearAttributeCurve $linearAttributeCurve)
     {
-        foreach ($this->affixTypesToRebalance as $typeToRebalance) {
-            $itemAffixes = ItemAffix::where('affix_type', $typeToRebalance)->where('randomly_generated', false)->get();
-            $count = $itemAffixes->count();
+        $itemAffixes = ItemAffix::where('affix_type', ItemAffixType::STAT_REDUCTION)->where('randomly_generated', false)->get();
+        $count = $itemAffixes->count();
 
-            $statCurveData = $this->generateCurveDataForAffixes($linearAttributeCurve, $count);
+        $statCurveData = $this->generateCurveDataForAffixes($linearAttributeCurve, $count);
 
-            $this->setStatDetailsForAffixes($itemAffixes, $statCurveData);
-        }
+        $this->setStatDetailsForAffixes($itemAffixes, $statCurveData);
     }
 
     private function generateCurveDataForAffixes(LinearAttributeCurve $linearAttributeCurve, int $size): array
     {
 
-        return $linearAttributeCurve->setMin(0.01)->setMax(.75)->setIncrease(0.002)->generateValues($size);
+        return $linearAttributeCurve->setMin(0.01)->setMax(.65)->setIncrease(0.002)->generateValues($size);
     }
 
     private function setStatDetailsForAffixes(Collection $affixes, array $statCurve): void

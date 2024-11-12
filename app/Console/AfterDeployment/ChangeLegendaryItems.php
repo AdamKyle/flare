@@ -75,11 +75,13 @@ class ChangeLegendaryItems extends Command
 
     private function handleBasicLegendaryAffixes(): void
     {
-        $itemAffizes = ItemAffix::where('randomly_generated', true)
+        $itemAffixes = ItemAffix::where('randomly_generated', true)
+            ->where('is_mythic', false)
+            ->where('is_cosmic', false)
             ->where('cost', self::BASIC_LEGENDARY_COST)
             ->get();
 
-        foreach ($itemAffizes as $affix) {
+        foreach ($itemAffixes as $affix) {
             $itemAffix = $this->changeStatsOnAffix($affix);
 
             if ($itemAffix->cost > self::BASIC_LEGENDARY_COST) {
@@ -92,11 +94,13 @@ class ChangeLegendaryItems extends Command
 
     private function handleMediumLegendaryAffixes(): void
     {
-        $itemAffizes = ItemAffix::where('randomly_generated', true)
+        $itemAffixes = ItemAffix::where('randomly_generated', true)
+            ->where('is_mythic', false)
+            ->where('is_cosmic', false)
             ->where('cost', self::MEDIUM_LEGENARY_COST)
             ->get();
 
-        foreach ($itemAffizes as $affix) {
+        foreach ($itemAffixes as $affix) {
             $itemAffix = $this->changeStatsOnAffix($affix);
 
             if ($itemAffix->cost > self::MEDIUM_LEGENARY_COST) {
@@ -109,11 +113,13 @@ class ChangeLegendaryItems extends Command
 
     private function handleLegendaryLegendaryAffixes(): void
     {
-        $itemAffizes = ItemAffix::where('randomly_generated', true)
+        $itemAffixes = ItemAffix::where('randomly_generated', true)
+            ->where('is_mythic', false)
+            ->where('is_cosmic', false)
             ->where('cost', self::LEGENDARY_LEGENDARY_COST)
             ->get();
 
-        foreach ($itemAffizes as $affix) {
+        foreach ($itemAffixes as $affix) {
             $itemAffix = $this->changeStatsOnAffix($affix);
 
             if ($itemAffix->cost > self::LEGENDARY_LEGENDARY_COST) {

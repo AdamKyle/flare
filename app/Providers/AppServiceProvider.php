@@ -14,6 +14,10 @@ use App\Console\AfterDeployment\RebalanceStatBasedAffixes;
 use App\Console\AfterDeployment\RemoveInvalidQuestItems;
 use App\Console\AfterDeployment\UpdateCharactersForClassRanks;
 use App\Console\AfterDeployment\RebalanceBaseModifierAffixes;
+use App\Console\AfterDeployment\RebalanceIrresistableDamageAffixes;
+use App\Console\AfterDeployment\RebalanceMythicalItems;
+use App\Console\AfterDeployment\RebalanceSkillReductionAffixes;
+use App\Console\AfterDeployment\RebalanceStatReducingAffixes;
 use App\Console\AfterDeployment\ReduceCharacterBaseModifiersForReincarnation;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
 use App\Console\DevelopmentCommands\CompleteGuideQuestForCharacter;
@@ -59,6 +63,10 @@ class AppServiceProvider extends ServiceProvider
             RebalanceBaseModifierAffixes::class,
             ReduceCharacterBaseModifiersForReincarnation::class,
             ChangeLegendaryItems::class,
+            RebalanceMythicalItems::class,
+            RebalanceStatReducingAffixes::class,
+            RebalanceSkillReductionAffixes::class,
+            RebalanceIrresistableDamageAffixes::class,
 
             // Development Commands:
             CreateCharacter::class,

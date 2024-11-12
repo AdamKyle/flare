@@ -5,6 +5,10 @@
         <dd>
             Scratch Awl
         </dd>
+        <dt>
+            Bonus Weapon Damage
+        </dt>
+        <dd>+15% of your damage stat when you have a Scratch Awl equipped.</dd>
     </dl>
     <p class="my-2">
         Sometimes, when you craft your books and log your historical records, comes a long a monster who needs it's eyes stabbed out.

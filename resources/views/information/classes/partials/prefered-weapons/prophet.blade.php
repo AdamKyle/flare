@@ -5,6 +5,10 @@
         <dd>
             Healing Spells and Maces
         </dd>
+        <dt>
+            Bonus Weapon Damage
+        </dt>
+        <dd>+15% of your damage stat when you have a Mace equipped.</dd>
     </dl>
     <p class="my-2">
         Prophets are healers who have to survive in a world of darkness. Using healing spells will heal your character and ressurect you when death comes close, but also bludgeoning your enemies to death is always fun!

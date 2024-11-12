@@ -2,7 +2,6 @@
 
 namespace App\Console\AfterDeployment;
 
-use App\Flare\ExponentialCurve\Curve\ExponentialAttributeCurve;
 use App\Flare\ExponentialCurve\Curve\LinearAttributeCurve;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Values\ItemAffixType;

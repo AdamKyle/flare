@@ -5,6 +5,10 @@
         <dd>
             Healing Spells and Bows
         </dd>
+        <dt>
+            Bonus Weapon Damage
+        </dt>
+        <dd>+15% of your damage stat when you have a Bow equipped.</dd>
     </dl>
     <p class="my-2">
         Rangers like to attack from a distance, they like to hide in the shadows of nature and heal their wounds with herbs and potions. They are not as good of healers like prophets are, but can survive.
