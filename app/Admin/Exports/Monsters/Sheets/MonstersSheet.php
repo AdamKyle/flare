@@ -47,21 +47,7 @@ class MonstersSheet implements FromView, ShouldAutoSize, WithTitle
                     ->whereNull('only_for_location_type')
                     ->get();
                 break;
-            case 'special-locations':
-                $monsters = Monster::orderBy('game_map_id')
-                    ->where('is_celestial_entity', false)
-                    ->where('is_raid_monster', false)
-                    ->where('is_raid_boss', false)
-                    ->whereNotNull('only_for_location_type')
-                    ->whereNotIn('only_for_location_type', [
-                        LocationType::LORDS_STRONG_HOLD,
-                        LocationType::BROKEN_ANVIL,
-                        LocationType::ALCHEMY_CHURCH,
-                        LocationType::TWSITED_MAIDENS_DUNGEONS,
-                    ])
-                    ->get();
-                break;
-            case 'weekly-fights':
+            case 'weekly-monsters':
                 $monsters = Monster::orderBy('game_map_id')
                     ->where('is_celestial_entity', false)
                     ->where('is_raid_monster', false)

@@ -42,14 +42,6 @@
 
                 <form method="POST" action="{{ route('monsters.export-data') }}" class="text-center">
                     @csrf
-                    <input type="hidden" value="special-locations-monsters" name="monster_type" />
-                    <x-core.buttons.primary-button type="submit">
-                        Special Location Monsters
-                    </x-core.buttons.primary-button>
-                </form>
-
-                <form method="POST" action="{{ route('monsters.export-data') }}" class="text-center">
-                    @csrf
                     <input type="hidden" value="weekly-monsters" name="monster_type" />
                     <x-core.buttons.primary-button type="submit">
                         Weekly Fight Monsters
