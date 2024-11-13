@@ -110,7 +110,7 @@ class ReBalanceMonsters extends Command
                 ->whereNull('only_for_location_type')
                 ->get();
 
-            $this->manageMonsters($celestials, $exponentialAttributeCurve, 50_000_000, 300_000_000, 1_000_000, 5_000, $mapName);
+            $this->manageMonsters($celestials, $exponentialAttributeCurve, 50_000, 500_000, 10_000, 5_000, $mapName);
         }
     }
 
@@ -144,7 +144,7 @@ class ReBalanceMonsters extends Command
                 ->whereNull('only_for_location_type')
                 ->get();
 
-            $this->manageMonsters($celestials, $exponentialAttributeCurve, 750_000_000, 3_500_000_000, 10_000_000, 50_000, $mapName);
+            $this->manageMonsters($celestials, $exponentialAttributeCurve, 1_000_000, 5_000_000, 100_000, 50_000, $mapName);
         }
     }
 
@@ -178,7 +178,7 @@ class ReBalanceMonsters extends Command
                 ->whereNull('only_for_location_type')
                 ->get();
 
-            $this->manageMonsters($celestials, $exponentialAttributeCurve, 5_000_000_000, 15_500_000_000, 100_000_000, 500_000, $mapName);
+            $this->manageMonsters($celestials, $exponentialAttributeCurve, 8_000_000, 20_000_000, 1_000_000, 500_000, $mapName);
         }
     }
 
