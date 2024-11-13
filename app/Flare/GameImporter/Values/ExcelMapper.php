@@ -26,6 +26,7 @@ class ExcelMapper
         'Raids' => RaidsImport::class,
         'Affixes' => AffixesImport::class,
         'Core Imports' => [
+            ClassSpecialsImport::class,
             ClassImport::class,
             RacesImport::class,
         ],
@@ -41,9 +42,6 @@ class ExcelMapper
         'Locations Give Items' => LocationsImport::class,
         'Locations' => LocationsImport::class,
         'Npcs' => NpcsImport::class,
-        '.' => [
-            ClassSpecialsImport::class,
-        ],
     ];
 
     /**

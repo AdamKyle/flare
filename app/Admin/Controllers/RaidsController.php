@@ -48,7 +48,7 @@ class RaidsController extends Controller
                 ItemSpecialtyType::DELUSIONAL_SILVER,
             ],
             'raidTypes' => RaidType::$selectionOptions,
-            'artifacts' => Item::where('type', 'artifact')->whereDoesntHave('itemSkill')->get(),
+            'artifacts' => Item::where('type', 'artifact')->whereDoesntHave('itemSkillProgressions')->get(),
         ]);
     }
 

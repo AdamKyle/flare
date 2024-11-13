@@ -26,6 +26,7 @@ class Raid extends Model
         'item_specialty_reward_type',
         'artifact_item_id',
         'raid_type',
+        'scheduled_event_description',
     ];
 
     protected $casts = [

@@ -10,4 +10,6 @@ export default interface EventSchedulerFormProps {
     raids: Raid[] | [];
 
     event_types: string[] | [];
+
+    start_date: Date;
 }

@@ -8,6 +8,14 @@
         <h3 class="my-4">Story</h3>
         <div class="mb-4"> {!! nl2br($raid->story) !!} </div>
 
+        @if (auth()->user())
+            @if (auth()->user()->hasRole('Admin'))
+                <div class='block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                <h3 class="my-4">Scheduled Event Description</h3>
+                <div class="mb-4"> {!! nl2br($raid->scheduled_event_description) !!} </div>
+            @endif
+        @endif
+
         <div class='block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
         <strong class="my-4">Raid Boss</strong>
         <p class="my-4">

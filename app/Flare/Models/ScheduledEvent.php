@@ -23,6 +23,7 @@ class ScheduledEvent extends Model
         'end_date',
         'description',
         'currently_running',
+        'raids_for_event',
     ];
 
     protected $casts = [
@@ -31,6 +32,7 @@ class ScheduledEvent extends Model
         'start_date' => 'datetime',
         'end_date' => 'datetime',
         'currently_running' => 'boolean',
+        'raids_for_event' => 'array',
     ];
 
     public function raid()
@@ -59,7 +61,7 @@ class ScheduledEvent extends Model
         }
 
         if ($type->isWinterEvent()) {
-            return 'The Ice Queen\'s Realm';
+            return 'The Winter Event';
         }
 
         if ($type->isDelusionalMemoriesEvent()) {

@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, ReactNode } from "react";
 import DateTimePicker from "react-datetime-picker";
 import Select from "react-select";
 import { setHours, setMinutes } from "date-fns";
@@ -11,6 +11,8 @@ import { Value } from "react-datetime-picker/src/shared/types";
 import "react-datetime-picker/dist/DateTimePicker.css";
 import "react-calendar/dist/Calendar.css";
 import "react-clock/dist/Clock.css";
+import InfoAlert from "../../../game/components/ui/alerts/simple-alerts/info-alert";
+import clsx from "clsx";
 
 export default class EventSchedulerForm extends React.Component<
     EventSchedulerFormProps,
@@ -25,10 +27,22 @@ export default class EventSchedulerForm extends React.Component<
             selected_raid: null,
             selected_start_date: setHours(setMinutes(new Date(), 0), 9),
             selected_end_date: null,
+            raids_for_event: [],
+            error_message: null,
         };
     }
 
     componentDidMount() {
+        this.setState(
+            {
+                selected_start_date: new Date(this.props.start_date),
+                selected_end_date: new Date(this.props.start_date),
+            },
+            () => {
+                this.props.update_parent(this.state);
+            },
+        );
+
         if (typeof this.props.event_data !== "undefined") {
             this.setState({
                 selected_event_type: this.props.event_data.event_type,
@@ -40,14 +54,6 @@ export default class EventSchedulerForm extends React.Component<
 
             return;
         }
-
-        let endDate = setHours(setMinutes(new Date(), 0), 9);
-
-        endDate = new Date(endDate.setDate(endDate.getDate() + 1));
-
-        this.setState({
-            selected_end_date: endDate,
-        });
     }
 
     setEventType(data: any) {
@@ -60,6 +66,18 @@ export default class EventSchedulerForm extends React.Component<
                 selected_event_type: data.value,
             },
             () => {
+                if (
+                    EventType.isEventOfYearlyTypes(
+                        this.getSelectedEventTypeName(),
+                    )
+                ) {
+                    const newDate = new Date(this.props.start_date);
+
+                    newDate.setMonth(newDate.getMonth() + 3);
+
+                    this.setEndDate(newDate);
+                }
+
                 this.props.update_parent(this.state);
             },
         );
@@ -80,6 +98,66 @@ export default class EventSchedulerForm extends React.Component<
         this.setState(
             {
                 selected_start_date: value as Date,
+                error_message: null,
+            },
+            () => {
+                if (
+                    EventType.isEventOfYearlyTypes(
+                        this.getSelectedEventTypeName(),
+                    )
+                ) {
+                    const newDate = new Date(value as Date);
+
+                    newDate.setMonth(newDate.getMonth() + 3);
+
+                    this.setEndDate(newDate);
+
+                    if (this.state.raids_for_event.length < 2) {
+                        this.setState({
+                            error_message:
+                                "You need to select two raids for this type of event. If you do not have two RaidSection, go make another one.",
+                        });
+
+                        this.props.update_parent(this.state);
+
+                        return;
+                    }
+
+                    this.updateYearlyRaidStartAndEndDates(value as Date);
+                }
+
+                this.props.update_parent(this.state);
+            },
+        );
+    }
+
+    updateYearlyRaidStartAndEndDates(startDate: Date) {
+        const updatedRaids = [...this.state.raids_for_event];
+
+        updatedRaids.forEach((raid, index) => {
+            let start, end;
+
+            if (index === 0) {
+                start = new Date(startDate);
+                start.setDate(start.getDate() + 14);
+                end = new Date(start);
+                end.setMonth(end.getMonth() + 1);
+            } else if (index === 1) {
+                start = new Date(updatedRaids[index - 1].end_date!);
+                start.setDate(start.getDate() + 7);
+                end = new Date(start);
+                end.setMonth(end.getMonth() + 1);
+            }
+
+            raid.start_date = start;
+            raid.end_date = end;
+        });
+
+        console.log(updatedRaids);
+
+        this.setState(
+            {
+                raids_for_event: updatedRaids,
             },
             () => {
                 this.props.update_parent(this.state);
@@ -218,6 +296,97 @@ export default class EventSchedulerForm extends React.Component<
         return date > this.state.selected_start_date;
     }
 
+    setYearlyRaidSelectedData(data: any, index: number) {
+        const updatedRaids = [...this.state.raids_for_event];
+
+        if (updatedRaids[index] === undefined) {
+            updatedRaids[index] = { selected_raid: 0 };
+        }
+
+        updatedRaids[index] = {
+            selected_raid: data.value,
+        };
+
+        this.setState(
+            {
+                raids_for_event: updatedRaids.filter((raidForEvent) => {
+                    return (
+                        raidForEvent !== null || raidForEvent !== "undefined"
+                    );
+                }),
+            },
+            () => {
+                this.updateYearlyRaidStartAndEndDates(
+                    this.state.selected_start_date as Date,
+                );
+
+                this.props.update_parent(this.state);
+            },
+        );
+    }
+
+    getSelectedYearlyRaidEvent(index: number) {
+        const raidsForYearlyEvent = this.state.raids_for_event;
+
+        if (raidsForYearlyEvent[index]) {
+            const foundRaid = this.props.raids.find(
+                (raid: any) =>
+                    raid.id === raidsForYearlyEvent[index].selected_raid,
+            );
+
+            if (foundRaid) {
+                return [
+                    {
+                        label: foundRaid.name,
+                        value: foundRaid.id,
+                    },
+                ];
+            }
+        }
+
+        return [
+            {
+                label: "Please select a raid",
+                value: 0,
+            },
+        ];
+    }
+
+    renderYearlyRaidSelectionElements(): ReactNode {
+        const elements: ReactNode[] = [];
+
+        for (var i = 0; i <= 1; i++) {
+            elements.push(
+                <div
+                    className={clsx("mt-4", {
+                        "mb-4": i === 1,
+                    })}
+                >
+                    <Select
+                        onChange={(selectedOption: any) =>
+                            this.setYearlyRaidSelectedData(selectedOption, i)
+                        }
+                        options={this.optionsForRaids()}
+                        menuPosition={"absolute"}
+                        menuPlacement={"bottom"}
+                        styles={{
+                            menuPortal: (base) => ({
+                                ...base,
+                                zIndex: 9999,
+                                color: "#000000",
+                            }),
+                        }}
+                        menuPortalTarget={document.body}
+                        value={this.getSelectedYearlyRaidEvent(i)}
+                        key={i + "-raid-selection-for-yearly-event"}
+                    />
+                </div>,
+            );
+        }
+
+        return elements;
+    }
+
     render() {
         return (
             <Fragment>
@@ -237,8 +406,30 @@ export default class EventSchedulerForm extends React.Component<
                     value={this.getSelectedEventType()}
                 />
 
+                {EventType.isEventOfYearlyTypes(
+                    this.getSelectedEventTypeName(),
+                ) ? (
+                    <div className="my-4">
+                        <h4 className="mb-4">Yealry Event Raids</h4>
+                        <p className="my-2">
+                            All yearly events will last three months.
+                        </p>
+                        <p>
+                            There are two raids for every yearly event. The
+                            first raid will start automatically after 4 weeks of
+                            the event, while the second raid will start 2 weeks
+                            after the first raid ends. All raids will last 1
+                            month in length.
+                        </p>
+                        {this.renderYearlyRaidSelectionElements()}
+                    </div>
+                ) : null}
+
                 {EventType.is(
                     EventType.RAID_EVENT,
+                    this.getSelectedEventTypeName(),
+                ) &&
+                !EventType.isEventOfYearlyTypes(
                     this.getSelectedEventTypeName(),
                 ) ? (
                     <div className="my-4">
@@ -260,26 +451,38 @@ export default class EventSchedulerForm extends React.Component<
                     </div>
                 ) : null}
 
-                <div className="grid md:grid-cols-2 gap-2">
-                    <div className="my-4">
-                        <div className="my-3 dark:text-gray-300">
-                            <strong>Start Date (and time)</strong>
-                        </div>
-                        <DateTimePicker
-                            onChange={this.setStartDate.bind(this)}
-                            value={this.state.selected_start_date}
-                        />
+                <div className="my-4">
+                    <div className="my-3 dark:text-gray-300">
+                        <strong>Start Date (and time)</strong>
                     </div>
+                    <DateTimePicker
+                        onChange={this.setStartDate.bind(this)}
+                        value={this.state.selected_start_date}
+                        className="w-full"
+                    />
+                </div>
 
-                    <div className="my-4">
-                        <div className="my-3 dark:text-gray-300">
-                            <strong>End Date (and time)</strong>
-                        </div>
-                        <DateTimePicker
-                            onChange={this.setEndDate.bind(this)}
-                            value={this.state.selected_end_date}
-                        />
+                <div className="my-4">
+                    <div className="my-3 dark:text-gray-300">
+                        <strong>End Date (and time)</strong>
                     </div>
+                    {EventType.isEventOfYearlyTypes(
+                        this.getSelectedEventTypeName(),
+                    ) ? (
+                        <InfoAlert additional_css="my-4">
+                            A yearly event is selected, the start date will add
+                            three months to it, and end on that date at the same
+                            time.
+                        </InfoAlert>
+                    ) : null}
+                    <DateTimePicker
+                        onChange={this.setEndDate.bind(this)}
+                        value={this.state.selected_end_date}
+                        className="w-full"
+                        disabled={EventType.isEventOfYearlyTypes(
+                            this.getSelectedEventTypeName(),
+                        )}
+                    />
                 </div>
 
                 <div className="mt-4 mb-8">

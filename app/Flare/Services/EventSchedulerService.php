@@ -5,6 +5,7 @@ namespace App\Flare\Services;
 use App\Flare\Events\UpdateScheduledEvents;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Event;
+use App\Flare\Models\Raid;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Models\ScheduledEventConfiguration;
 use App\Game\Messages\Events\DeleteAnnouncementEvent;
@@ -39,17 +40,38 @@ class EventSchedulerService
             return $this->errorResult('You have an event type selected but not what kind of event (raid or general event).');
         }
 
-        ScheduledEvent::create([
+        $scheduledEvent = ScheduledEvent::create([
             'event_type' => $params['selected_event_type'],
             'raid_id' => $params['selected_raid'],
             'start_date' => $params['selected_start_date'],
             'end_date' => $params['selected_end_date'],
             'description' => $params['event_description'],
+            'raids_for_event' => $params['raids_for_event'],
         ]);
+
+        $this->createRaidEventsForScheduledEventWith($scheduledEvent);
 
         event(new UpdateScheduledEvents($this->fetchEvents()));
 
         return $this->successResult();
+    }
+
+    private function createRaidEventsForScheduledEventWith(ScheduledEvent $scheduledEvent): void
+    {
+        $raidsForEvent = $scheduledEvent->raids_for_event;
+
+        foreach ($raidsForEvent as $raidForEvent) {
+
+            $raid = Raid::find($raidForEvent['selected_raid']);
+
+            $scheduledEvent = ScheduledEvent::create([
+                'event_type' => EventType::RAID_EVENT,
+                'raid_id' => $raidForEvent['selected_raid'],
+                'start_date' => $raidForEvent['start_date'],
+                'end_date' => $raidForEvent['end_date'],
+                'description' => $raid->scheduled_event_description,
+            ]);
+        }
     }
 
     public function updateEvent(array $params, ScheduledEvent $scheduledEvent): array
@@ -147,7 +169,7 @@ class EventSchedulerService
         event(new UpdateScheduledEvents($this->fetchEvents()));
     }
 
-    protected function createBaseScheduledEvent(array $params): array
+    private function createBaseScheduledEvent(array $params): array
     {
         $eventData = [
             'event_type' => $params['selected_event_type'],
@@ -167,7 +189,7 @@ class EventSchedulerService
         return $eventData;
     }
 
-    protected function eventDescriptionForEventType(EventType $type): string
+    private function eventDescriptionForEventType(EventType $type): string
     {
 
         if ($type->isWeeklyCelestials()) {
@@ -187,7 +209,7 @@ class EventSchedulerService
         }
     }
 
-    protected function createEvents(array $eventData, int $amount, string $type): Carbon
+    private function createEvents(array $eventData, int $amount, string $type): Carbon
     {
         $date = new Carbon($eventData['start_date'], config('app.timezone'));
 

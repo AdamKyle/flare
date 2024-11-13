@@ -147,7 +147,7 @@ class PurgatorySmithHouseRewardHandler
     protected function handleItemReward(Character $character, bool $isMythic, ?Event $event = null): Character
     {
         $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->first()->skill_bonus;
-        $maxRoll = $isMythic ? 10000000 : 1000000;
+        $maxRoll = $isMythic ? 1_000 : 5_00;
 
         if ($lootingChance > 0.15) {
             $lootingChance = 0.15;
@@ -206,7 +206,7 @@ class PurgatorySmithHouseRewardHandler
                 'item_id' => $newItem->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You found something LEGENDARY in the basement child: '.$item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You found something LEGENDARY in the basement child: ' . $item->affix_name, $slot->id));
         }
 
         if ($isMythic) {
@@ -224,7 +224,7 @@ class PurgatorySmithHouseRewardHandler
                 'item_id' => $newItem->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You found something MYTHICAL in the basement child: '.$item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You found something MYTHICAL in the basement child: ' . $item->affix_name, $slot->id));
         }
     }
 
@@ -250,9 +250,9 @@ class PurgatorySmithHouseRewardHandler
             AnnouncementHandler::createAnnouncement('purgatory_house');
 
             event(new GlobalMessageEvent(
-                'The floor boards creak and the cries of the children trapped in their own misery wale across the lands. '.
-                '"Children of Tlessa, hear me as I lay bare my treasures for you to find in the depths of my own memories." echoes a familiar voice. '.
-                'You recognise it. The Creator ...'
+                'The floor boards creak and the cries of the children trapped in their own misery wale across the lands. ' .
+                    '"Children of Tlessa, hear me as I lay bare my treasures for you to find in the depths of my own memories." echoes a familiar voice. ' .
+                    'You recognise it. The Creator ...'
             ));
         }
     }

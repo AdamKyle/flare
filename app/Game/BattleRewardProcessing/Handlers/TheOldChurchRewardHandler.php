@@ -139,7 +139,7 @@ class TheOldChurchRewardHandler
     protected function handleItemReward(Character $character, ?Event $event = null): Character
     {
         $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->first()->skill_bonus;
-        $maxRoll = 1000000;
+        $maxRoll = 1_000;
 
         if ($lootingChance > 0.15) {
             $lootingChance = 0.15;

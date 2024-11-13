@@ -4,12 +4,13 @@ import { DialogActions } from "@mui/material";
 import DangerButton from "../../../game/components/ui/buttons/danger-button";
 import LoadingProgressBar from "../../../game/components/ui/progress-bars/loading-progress-bar";
 import EventSchedulerForm from "./event-scheduler-form";
-import { AxiosError, AxiosResponse } from "axios";
-import Ajax from "../../../game/lib/ajax/ajax";
 import EventForm from "../types/deffinitions/components/event-form";
 import EventSchedulerEditorProps from "../types/components/event-scheduler-editor-props";
 import EventSchedulerEditorState from "../types/components/event-scheduler-editor-state";
 import { format } from "date-fns";
+import DangerAlert from "../../../game/components/ui/alerts/simple-alerts/danger-alert";
+import { AxiosError, AxiosResponse } from "axios";
+import Ajax from "../../../game/lib/ajax/ajax";
 
 export default class EventSchedulerEditor extends React.Component<
     EventSchedulerEditorProps,
@@ -66,6 +67,22 @@ export default class EventSchedulerEditor extends React.Component<
             route = "admin/update-event/" + this.props.scheduler.edited.id;
         }
 
+        const raidForYearlyEvent = this.state.form_data.raids_for_event.map(
+            (raidForEvent) => {
+                return {
+                    selected_raid: raidForEvent.selected_raid,
+                    start_date: format(
+                        raidForEvent.start_date as Date,
+                        "yyyy/MM/dd HH:mm:ss",
+                    ).toString(),
+                    end_date: format(
+                        raidForEvent.end_date as Date,
+                        "yyyy/MM/dd HH:mm:ss",
+                    ).toString(),
+                };
+            },
+        );
+
         const postData = {
             selected_event_type: this.state.form_data.selected_event_type,
             event_description: this.state.form_data.event_description,
@@ -81,6 +98,7 @@ export default class EventSchedulerEditor extends React.Component<
                           "yyyy/MM/dd HH:mm:ss",
                       ).toString()
                     : null,
+            raids_for_event: raidForYearlyEvent,
         };
 
         new Ajax()
@@ -128,12 +146,24 @@ export default class EventSchedulerEditor extends React.Component<
                         <LoadingProgressBar />
                     </div>
                 ) : (
-                    <EventSchedulerForm
-                        raids={this.props.raids}
-                        event_data={this.props.scheduler.edited}
-                        update_parent={this.updateParentData.bind(this)}
-                        event_types={this.props.event_types}
-                    />
+                    <>
+                        {this.state.form_data !== null &&
+                        this.state.form_data?.error_message !== null ? (
+                            <DangerAlert additional_css="my-4">
+                                {this.state.form_data?.error_message}
+                            </DangerAlert>
+                        ) : null}
+
+                        <EventSchedulerForm
+                            raids={this.props.raids}
+                            event_data={this.props.scheduler.edited}
+                            update_parent={this.updateParentData.bind(this)}
+                            event_types={this.props.event_types}
+                            start_date={
+                                this.props.scheduler.state.start.value as Date
+                            }
+                        />
+                    </>
                 )}
 
                 <div className="absolute bottom-0 right-0">
@@ -149,7 +179,11 @@ export default class EventSchedulerEditor extends React.Component<
                             button_label={"Save Event"}
                             on_click={this.saveEvent.bind(this)}
                             disabled={
-                                this.props.is_loading || this.state.is_saving
+                                this.props.is_loading ||
+                                this.state.is_saving ||
+                                (this.state.form_data !== null &&
+                                    this.state.form_data?.error_message !==
+                                        null)
                             }
                         />
                     </DialogActions>

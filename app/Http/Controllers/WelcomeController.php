@@ -63,23 +63,23 @@ class WelcomeController extends Controller
             switch ($eventType) {
                 case 'delusional-memories':
                     return view('events.delusional-memories-event.event-page', [
-                        'event' => ScheduledEvent::where('event_type', EventType::DELUSIONAL_MEMORIES_EVENT)->where('currently_running', true)->first(),
+                        'event' => $this->findScheduledEventForEventType($eventType),
                     ]);
                 case 'weekly-celestials':
                     return view('events.weekly-celestials-event.event-page', [
-                        'event' => ScheduledEvent::where('event_type', EventType::WEEKLY_CELESTIALS)->where('currently_running', true)->first(),
+                        'event' => $this->findScheduledEventForEventType($eventType),
                     ]);
                 case 'weekly-currency-drops':
                     return view('events.weekly-currency-drops-event.event-page', [
-                        'event' => ScheduledEvent::where('event_type', EventType::WEEKLY_CURRENCY_DROPS)->where('currently_running', true)->first(),
+                        'event' => $this->findScheduledEventForEventType($eventType),
                     ]);
                 case 'weekly-faction-loyalty':
                     return view('events.weekly-faction-loyalty-event.event-page', [
-                        'event' => ScheduledEvent::where('event_type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->where('currently_running', true)->first(),
+                        'event' => $this->findScheduledEventForEventType($eventType),
                     ]);
                 case 'tlessas-feedback-event':
                     return view('events.feedback-event.event-page', [
-                        'event' => ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first(),
+                        'event' => $this->findScheduledEventForEventType($eventType),
                     ]);
                 default:
                     return redirect()->to(route('welcome'));
@@ -87,5 +87,34 @@ class WelcomeController extends Controller
         }
 
         return redirect()->to(route('welcome'));
+    }
+
+    private function findScheduledEventForEventType(string $eventType): ?ScheduledEvent
+    {
+        switch ($eventType) {
+            case 'delusional-memories':
+                return $this->findScheduledEvent(EventType::DELUSIONAL_MEMORIES_EVENT);
+            case 'weekly-celestials':
+                return $this->findScheduledEvent(EventType::WEEKLY_CELESTIALS);
+            case 'weekly-currency-drops':
+                return $this->findScheduledEvent(EventType::WEEKLY_CURRENCY_DROPS);
+            case 'weekly-faction-loyalty':
+                return $this->findScheduledEvent(EventType::WEEKLY_FACTION_LOYALTY_EVENT);
+            case 'tlessas-feedback-event':
+                return $this->findScheduledEvent(EventType::FEEDBACK_EVENT);
+            default:
+                return null;
+        }
+    }
+
+    private function findScheduledEvent(int $eventType): ?ScheduledEvent
+    {
+        $scheduleEvent = ScheduledEvent::where('event_type', $eventType)->where('currently_running', true)->first();
+
+        if (is_null($scheduleEvent)) {
+            return ScheduledEvent::where('event_type', $eventType)->where('start_date', '>=', now())->orderBy('id')->first();
+        }
+
+        return $scheduleEvent;
     }
 }
