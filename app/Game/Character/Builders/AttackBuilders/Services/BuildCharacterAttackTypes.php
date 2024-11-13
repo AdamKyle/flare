@@ -25,7 +25,7 @@ class BuildCharacterAttackTypes
 
         $characterAttack = $this->characterAttackBuilder->setCharacter($character, $ignoreReductions);
 
-        Cache::put('character-attack-data-'.$character->id, [
+        Cache::put('character-attack-data-' . $character->id, [
             'attack_types' => [
                 'attack' => $characterAttack->buildAttack(),
                 'voided_attack' => $characterAttack->buildAttack(true),
@@ -45,6 +45,6 @@ class BuildCharacterAttackTypes
 
         $this->characterCacheData->deleteCharacterSheet($character);
 
-        return Cache::get('character-attack-data-'.$character->id);
+        return Cache::get('character-attack-data-' . $character->id);
     }
 }

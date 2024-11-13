@@ -31,6 +31,7 @@ class CastAndAttack extends AttackAndCast
     public function handleAttack(Character $character, ServerMonster $monster)
     {
 
+        $this->setWhichCastType('cast_and_attack');
         $this->handleCastAttack($character, $monster, false);
 
         if ($this->characterHealth <= 0) {
