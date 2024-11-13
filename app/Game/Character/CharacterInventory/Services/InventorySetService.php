@@ -441,6 +441,7 @@ class InventorySetService
                 'inventory' => $inventory->getInventoryForType('inventory'),
                 'equipped' => $inventory->getInventoryForType('equipped'),
                 'sets' => $inventory->getInventoryForType('sets')['sets'],
+                'savable_sets' => $inventory->getUsableSets(),
                 'set_is_equipped' => false,
                 'set_name_equipped' => $inventory->getEquippedInventorySetName(),
                 'usable_sets' => $inventory->getUsableSets(),
@@ -487,6 +488,8 @@ class InventorySetService
             'inventory' => [
                 'equipped' => $characterInventoryService->getInventoryForType('equipped'),
                 'sets' => $characterInventoryService->getInventoryForType('sets')['sets'],
+                'usable_sets' => $characterInventoryService->getUsableSets(),
+                'savable_sets' => $characterInventoryService->getUsableSets(),
                 'set_is_equipped' => true,
                 'set_name_equipped' => $characterInventoryService->getEquippedInventorySetName(),
             ],

@@ -70,7 +70,7 @@ class Affixes extends BattleBase
             return 0;
         }
 
-        if (! $character->classType()->isVampire()) {
+        if (!$character->classType()->isVampire()) {
             $this->addMessage('One of your life stealing enchantments causes the enemy to fall to their knees in agony!', 'player-action');
         } else {
             $this->addMessage('The enemy screams in pain as you siphon large amounts of their health towards you!', 'player-action');

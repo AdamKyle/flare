@@ -91,6 +91,7 @@ class DamageBuilder extends BaseAttribute
             $baseDamage = $damageStat * 0.08;
 
             $details['base_damage'] = number_format($baseDamage);
+
             $details['percentage_of_stat_used'] = 0.08;
         } elseif ($this->character->class->type()->isArcaneAlchemist()) {
             $hasStaveEquipped = $this->inventory->filter(function ($slot) {
@@ -335,7 +336,7 @@ class DamageBuilder extends BaseAttribute
             }
 
             if ($gameMap->mapType()->isDelusionalMemories()) {
-                return $lifeSteal - ($lifeSteal * .30);
+                return $lifeSteal - ($lifeSteal * .25);
             }
         }
 

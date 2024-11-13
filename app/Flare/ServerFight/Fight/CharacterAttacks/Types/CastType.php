@@ -50,6 +50,15 @@ class CastType extends BattleBase
         return $this;
     }
 
+    public function setCharacterAttackAndCast(Character $character, bool $isVoided): CastType
+    {
+
+        $this->attackData = $this->characterCacheData->getDataFromAttackCache($character, $isVoided ? 'voided_attack_and_cast' : 'attack_and_cast');
+        $this->isVoided = $isVoided;
+
+        return $this;
+    }
+
     public function setAllowEntrancing(bool $allow): CastType
     {
 
