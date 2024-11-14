@@ -24,6 +24,13 @@ class Counter extends BattleBase
         $characterAc = $this->characterCacheData->getCachedCharacterData($character, 'ac');
 
         $characterCounterResistance = $this->characterCacheData->getCachedCharacterData($character, 'counter_resistance_chance');
+
+        if ($monster->isRaidBossMonster() && $characterCounterResistance <= 0 && $character->getInformation()->buildTotalAttack() < self::MINIMUM_DAMAGE_FOR_A_PLAYER) {
+            $this->addMessage('The enemy raises their weapon to counter your attack, alas they laugh outloud. "What a waste of of a fight you child. Come at me!"', 'enemy-action');
+
+            return;
+        }
+
         $monsterCounterChance = $monster->getMonsterStat('counter_chance');
 
         $monsterCounterChance -= $characterCounterResistance;

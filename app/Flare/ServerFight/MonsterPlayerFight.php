@@ -303,8 +303,6 @@ class MonsterPlayerFight
             ->onlyAttackOnce($onlyOnce)
             ->attack($this->character, $monster, $this->attackType, 'character');
 
-        dump($this->attack->getCharacterHealth());
-
         $this->mergeMessages($this->attack->getMessages());
 
         $this->attack->resetBattleMessages();

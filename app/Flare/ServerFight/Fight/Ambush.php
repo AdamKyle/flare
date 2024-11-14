@@ -58,6 +58,14 @@ class Ambush extends BattleBase
 
             $this->addMessage('You strike the enemy in an ambush doing: ' . number_format($damage) . ' damage!', 'player-action');
         } elseif ($this->canMonsterAmbushPlayer($serverMonster->getMonsterStat('ambush_chance'), $characterAmbushResistance)) {
+
+
+            if ($serverMonster->isRaidBossMonster() && $characterAmbushChance <= 0 && $character->getInformation()->buildTotalAttack() < self::MINIMUM_DAMAGE_FOR_A_PLAYER) {
+                $this->addMessage('The enemy spots you from the shadows. They contemplate their ambush and then laugh to them selves as they walk from the shadows. "Child, I could have ambushed you, alas lets see what you have to offer!"', 'enemy-action');
+
+                return;
+            }
+
             $this->addMessage('The enemies plotting and scheming comes to fruition!', 'enemy-action');
 
             $damage = $serverMonster->buildAttack() * 2;
@@ -74,6 +82,14 @@ class Ambush extends BattleBase
         $characterAmbushChance = $this->characterCacheData->getCachedCharacterData($character, 'ambush_chance');
 
         if ($this->canMonsterAmbushPlayer($serverMonster->getMonsterStat('ambush_chance'), $characterAmbushResistance)) {
+
+
+            if ($serverMonster->isRaidBossMonster() && $characterAmbushChance <= 0) {
+                $this->addMessage('The enemy spots you from the shadows. They contemplate their ambush and then laugh to them selves as they walk from the shadows. "Child, I could have ambushed you, alas lets see what you have to offer!"', 'enemy-action');
+
+                return;
+            }
+
             $this->addMessage('The enemies plotting and scheming comes to fruition!', 'enemy-action');
 
             $damageStat = $serverMonster->getMonsterStat('damage_stat');
@@ -83,6 +99,7 @@ class Ambush extends BattleBase
 
             $this->addMessage($serverMonster->getName() . ' strikes you in an ambush doing: ' . number_format($damage) . ' damage!', 'enemy-action');
         } elseif ($this->canPlayerAmbushMonster($characterAmbushChance, $serverMonster->getMonsterStat('ambush_resistance_chance'))) {
+
             $this->addMessage('You spot the enemy! Now is the time to ambush!', 'player-action');
 
             $baseStat = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? 'voided_base_stat' : 'base_stat');

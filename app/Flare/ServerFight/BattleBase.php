@@ -36,6 +36,8 @@ class BattleBase extends BattleMessages
 
     const MAX_DAMAGE_FOR_RAID_BOSSES = 2_000_000_000_000;
 
+    const MINIMUM_DAMAGE_FOR_A_PLAYER = 500_000_000;
+
     public function __construct(CharacterCacheData $characterCacheData)
     {
         parent::__construct();
