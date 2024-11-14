@@ -83,11 +83,11 @@ class GoldMinesRewardHandler
     public function currencyReward(Character $character, ?Event $event = null): Character
     {
         $maximumAmount = 500;
-        $maximumGold = 10000;
+        $maximumGold = 1000;
 
         if (! is_null($event)) {
-            $maximumAmount = 2000;
-            $maximumGold = 20000;
+            $maximumAmount = 1000;
+            $maximumGold = 5000;
         }
 
         $goldDust = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);

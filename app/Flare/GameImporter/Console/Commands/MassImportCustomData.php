@@ -4,6 +4,7 @@ namespace App\Flare\GameImporter\Console\Commands;
 
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
+use App\Flare\Models\ItemSkill;
 use App\Flare\Models\Survey;
 use App\Flare\Values\MapNameValue;
 use Illuminate\Console\Command;
@@ -36,18 +37,22 @@ class MassImportCustomData extends Command
         Artisan::call('rebalance:mythical-items');
         Artisan::call('reduce:character-base-modifiers-for-reincarnation');
         Artisan::call('import:game-data "Core Imports"');
+        Artisan::call('import:game-data Skills');
         Artisan::call('import:game-data Items');
         Artisan::call('import:game-data Affixes');
-        Artisan::call('import:game-data Skills');
         Artisan::call('import:game-data Npcs');
+        Artisan::call('import:game-data Locations');
         Artisan::call('import:game-data Monsters');
         Artisan::call('import:game-data Raids');
         Artisan::call('import:game-data Quests');
-        Artisan::call('import:game-data Locations');
         Artisan::call('create:quest-cache');
         Artisan::call('balance:monsters');
         Artisan::call('generate:monster-cache');
         Artisan::call('create:character-attack-data');
+
+        ItemSkill::where('name', 'Blindign Arrow of Fate')->update([
+            'name' => 'Blinding Arrow of Fate'
+        ]);
 
         $this->importInformationSection();
 

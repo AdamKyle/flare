@@ -98,10 +98,10 @@ class PurgatorySmithHouseRewardHandler
      */
     public function currencyReward(Character $character, ?Event $event = null): Character
     {
-        $maximumAmount = 1000;
+        $maximumAmount = 1_000;
 
         if (! is_null($event)) {
-            $maximumAmount = 50000;
+            $maximumAmount = 5_000;
         }
 
         $goldDust = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);

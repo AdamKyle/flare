@@ -65,6 +65,10 @@ class WelcomeController extends Controller
                     return view('events.delusional-memories-event.event-page', [
                         'event' => $this->findScheduledEventForEventType($eventType),
                     ]);
+                case 'the-winter-event':
+                    return view('events.the-winter-event.event-page', [
+                        'event' => $this->findScheduledEventForEventType($eventType),
+                    ]);
                 case 'weekly-celestials':
                     return view('events.weekly-celestials-event.event-page', [
                         'event' => $this->findScheduledEventForEventType($eventType),
@@ -94,6 +98,8 @@ class WelcomeController extends Controller
         switch ($eventType) {
             case 'delusional-memories':
                 return $this->findScheduledEvent(EventType::DELUSIONAL_MEMORIES_EVENT);
+            case 'the-winter-event':
+                return $this->findScheduledEvent(EventType::WINTER_EVENT);
             case 'weekly-celestials':
                 return $this->findScheduledEvent(EventType::WEEKLY_CELESTIALS);
             case 'weekly-currency-drops':

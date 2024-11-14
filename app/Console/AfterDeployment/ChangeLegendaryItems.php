@@ -76,8 +76,6 @@ class ChangeLegendaryItems extends Command
     private function handleBasicLegendaryAffixes(): void
     {
         $itemAffixes = ItemAffix::where('randomly_generated', true)
-            ->where('is_mythic', false)
-            ->where('is_cosmic', false)
             ->where('cost', self::BASIC_LEGENDARY_COST)
             ->get();
 
@@ -95,8 +93,6 @@ class ChangeLegendaryItems extends Command
     private function handleMediumLegendaryAffixes(): void
     {
         $itemAffixes = ItemAffix::where('randomly_generated', true)
-            ->where('is_mythic', false)
-            ->where('is_cosmic', false)
             ->where('cost', self::MEDIUM_LEGENARY_COST)
             ->get();
 
@@ -114,8 +110,6 @@ class ChangeLegendaryItems extends Command
     private function handleLegendaryLegendaryAffixes(): void
     {
         $itemAffixes = ItemAffix::where('randomly_generated', true)
-            ->where('is_mythic', false)
-            ->where('is_cosmic', false)
             ->where('cost', self::LEGENDARY_LEGENDARY_COST)
             ->get();
 

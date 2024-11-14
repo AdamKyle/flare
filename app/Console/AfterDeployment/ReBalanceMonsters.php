@@ -374,10 +374,16 @@ class ReBalanceMonsters extends Command
                 'range' => 500_000,
             ]),
             $raidType->isJesterOfTime() => collect([
-                'min' => 75_000_000_000,
-                'max' => 100_000_000_000,
+                'min' => 40_000_000_000,
+                'max' => 52_000_000_000,
                 'increase' => 10_000_000,
                 'range' => 5_000_000,
+            ]),
+            $raidType->isFrozenKing() => collect([
+                'min' => 30_000_000_000,
+                'max' => 50_000_000_000,
+                'increase' => 5_000_000,
+                'range' => 500_000,
             ]),
             default => collect([
                 'min' => 1_000_000_000,
@@ -414,6 +420,12 @@ class ReBalanceMonsters extends Command
                 'max' => 100_000_000_000_000,
                 'increase' => 10_000_000,
                 'range' => 5_000_000,
+            ]),
+            $raidType->isFrozenKing() => collect([
+                'min' => 75_000_000_000_000,
+                'max' => 125_000_000_000_000,
+                'increase' => 5_000_000,
+                'range' => 500_000,
             ]),
             default => collect([
                 'min' => 10_000_000_000_000,

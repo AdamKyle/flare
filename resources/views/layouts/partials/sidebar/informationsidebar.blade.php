@@ -16,6 +16,11 @@
             <span class="icon ra ra-muscle-fat"></span>
             <span class="title">Character Information</span>
         </a>
+        <a href="#no-link" class="link" data-target="[data-menu=events]" data-toggle="tooltip-menu"
+            data-tippy-content="Events">
+            <span class="icon fas fa-calendar"></span>
+            <span class="title">Events</span>
+        </a>
         <a href="#no-link" class="link" data-target="[data-menu=map]" data-toggle="tooltip-menu"
             data-tippy-content="Map">
             <span class="icon ra ra-scroll-unfurled"></span>
@@ -58,10 +63,6 @@
             <a href="{{ route('info.page', ['pageName' => 'chat-commands']) }}">
                 <span class="text-sm far fa-comment-dots"></span>
                 Chat Commands
-            </a>
-            <a href="{{ route('info.page', ['pageName' => 'events']) }}">
-                <span class="text-sm fas fa-calendar"></span>
-                Events
             </a>
             <a href="{{ route('info.page', ['pageName' => 'raids']) }}">
                 <span class="text-sm ra ra-monster-skull"></span>
@@ -169,6 +170,32 @@
             <a href="{{ route('info.page', ['pageName' => 'voidance']) }}">
                 <span class="ra ra-burning-book"></span>
                 Voidance/Devoidance
+            </a>
+        </div>
+    </div>
+
+    <div class="menu-detail" data-menu="events">
+        <div class="menu-detail-wrapper">
+            <h6 class="uppercase">Events</h6>
+            <a href="{{ route('info.page', ['pageName' => 'events']) }}">
+                <span class="text-sm fas fa-calendar"></span>
+                Events
+            </a>
+        </div>
+        <hr />
+        <div class="menu-detail-wrapper">
+            <h6 class="uppercase">Location Based Events</h6>
+            <a href="{{ route('info.page', ['pageName' => 'the-gold-mines-event']) }}">
+                <span class="text-sm ra ra-broken-skull"></span>
+                The Gold Mines Event
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'the-purgatory-smiths-house-event']) }}">
+                <span class="text-sm ra ra-broken-skull"></span>
+                Purgatory Smith's House Event
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'the-old-church-event']) }}">
+                <span class="text-sm ra ra-broken-skull"></span>
+                The Old Church Event
             </a>
         </div>
     </div>
