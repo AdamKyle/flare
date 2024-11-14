@@ -10,12 +10,7 @@ import DirectionalMovement from "./actions/directional-movement";
 import MapActions from "./actions/map-actions";
 import MovePlayer from "./lib/ajax/move-player";
 import { getStyle, playerIconPosition } from "./lib/map-management";
-import {
-    dragMap,
-    fetchLeftBounds,
-    getNewXPosition,
-    getNewYPosition,
-} from "./lib/map-position";
+import { dragMap, fetchLeftBounds } from "./lib/map-position";
 import MapData from "./lib/request-types/MapData";
 import MapStateManager from "./lib/state/map-state-manager";
 import MapState from "./types/map-state";
@@ -241,6 +236,12 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             return <ComponentLoading />;
         }
 
+        console.log(
+            fetchLeftBounds(this),
+            this.state.right_bounds,
+            this.state.bottom_bounds,
+        );
+
         return (
             <Fragment>
                 <div className="overflow-hidden max-h-[315px] max-w-[514px] sm:border-2 lg:border-0 sm:mr-auto sm:ml-auto lg:max-w-full lg:mr-0 lg:ml-0">
@@ -264,7 +265,15 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                                 style={getStyle(this)}
                             >
                                 {this.state.map_name === "The Ice Plane" ? (
-                                    <Snowfall />
+                                    <Snowfall
+                                        style={{
+                                            position: "absolute", // Changed from 'fixed' to 'absolute'
+                                            width: 2500,
+                                            height: 2500,
+                                            top: 0, // Adjust to align properly within the container
+                                            left: 0,
+                                        }}
+                                    />
                                 ) : null}
 
                                 <Location

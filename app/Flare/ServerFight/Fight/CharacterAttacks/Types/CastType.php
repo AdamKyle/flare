@@ -197,12 +197,17 @@ class CastType extends BattleBase
 
         $totalDamage = $spellDamage - $spellDamage * $this->attackData['damage_deduction'];
 
+        if ($this->isRaidBoss && $totalDamage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {
+            $totalDamage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
+        }
+
         $this->monsterHealth -= $totalDamage;
 
         $this->addMessage('Your damage spell(s) hits ' . $monster->getName() . ' for: ' . number_format($totalDamage), 'player-action');
 
         $this->specialAttacks->setCharacterHealth($this->characterHealth)
             ->setMonsterHealth($this->monsterHealth)
+            ->setIsRaidBoss($this->isRaidBoss)
             ->doCastDamageSpecials($character, $this->attackData);
 
         $this->characterHealth = $this->specialAttacks->getCharacterHealth();

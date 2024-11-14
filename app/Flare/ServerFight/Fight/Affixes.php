@@ -30,6 +30,10 @@ class Affixes extends BattleBase
         $weaponDamage = $attackData[$attribute] + ($attackData[$attribute] * $totalDamage);
         $nonStackingWeaponDamage = $attackData[$attribute] + ($attackData[$attribute] * $nonStackingDamage);
 
+        if ($this->isRaidBoss && $weaponDamage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {
+            $weaponDamage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
+        }
+
         if ($totalDamage > 0 || $nonStackingDamage > 0) {
 
             if ($cantBeResisted) {
@@ -77,6 +81,10 @@ class Affixes extends BattleBase
         }
 
         $damage = $monsterHealth * $affixLifeStealing;
+
+        if ($this->isRaidBoss && $damage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {
+            $damage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
+        }
 
         if ($cantBeResisted || $this->isEnemyEntranced) {
 

@@ -43,7 +43,8 @@ class MonsterPlayerFight
 
     private Attack $attack;
 
-    public function __construct(BuildMonster $buildMonster,
+    public function __construct(
+        BuildMonster $buildMonster,
         CharacterCacheData $characterCacheData,
         Voidance $voidance,
         Ambush $ambush,
@@ -183,7 +184,7 @@ class MonsterPlayerFight
     /**
      * Base Fight Setup.
      */
-    public function fightSetUp(int $rank = 0, bool $isRankFight = false): array
+    public function fightSetUp(): array
     {
         $characterStatReductionAffixes = $this->characterCacheData->getCachedCharacterData($this->character, 'stat_affixes');
         $skillReduction = $this->characterCacheData->getCachedCharacterData($this->character, 'skill_reduction');
@@ -191,7 +192,7 @@ class MonsterPlayerFight
 
         $monster = $this->buildMonster->buildMonster($this->monster, $characterStatReductionAffixes, $skillReduction, $resistanceReduction);
 
-        $this->voidance->void($this->character, $this->characterCacheData, $monster, $isRankFight);
+        $this->voidance->void($this->character, $this->characterCacheData, $monster);
 
         $this->mergeMessages($this->voidance->getMessages());
 
@@ -200,7 +201,7 @@ class MonsterPlayerFight
         $isPlayerVoided = $this->voidance->isPlayerVoided();
         $isEnemyVoided = $this->voidance->isEnemyVoided();
 
-        $ambush = $this->ambush->handleAmbush($this->character, $monster, $isPlayerVoided, $isRankFight);
+        $ambush = $this->ambush->handleAmbush($this->character, $monster, $isPlayerVoided);
 
         $health = $ambush->getHealthObject();
 
@@ -227,7 +228,6 @@ class MonsterPlayerFight
             'enemy_voided' => $isEnemyVoided,
             'monster' => $monster,
             'opening_messages' => $this->getBattleMessages(),
-            'rank' => $rank,
         ];
     }
 
@@ -246,8 +246,8 @@ class MonsterPlayerFight
             $this->attackType = $attackType;
         }
 
-        if (Cache::has('monster-fight-'.$this->character->id)) {
-            $data = Cache::get('monster-fight-'.$this->character->id);
+        if (Cache::has('monster-fight-' . $this->character->id)) {
+            $data = Cache::get('monster-fight-' . $this->character->id);
 
             $this->monster = $data['monster'];
         } else {
@@ -302,6 +302,8 @@ class MonsterPlayerFight
             ->setIsEnemyVoided($isEnemyVoided)
             ->onlyAttackOnce($onlyOnce)
             ->attack($this->character, $monster, $this->attackType, 'character');
+
+        dump($this->attack->getCharacterHealth());
 
         $this->mergeMessages($this->attack->getMessages());
 
@@ -434,8 +436,8 @@ class MonsterPlayerFight
 
         $monstersForLocation = Cache::get('special-location-monsters');
 
-        if (isset($monstersForLocation['location-type-'.$locationWithType->type])) {
-            $monsters = $monstersForLocation['location-type-'.$locationWithType->type];
+        if (isset($monstersForLocation['location-type-' . $locationWithType->type])) {
+            $monsters = $monstersForLocation['location-type-' . $locationWithType->type];
 
             foreach ($monsters as $monster) {
                 if ($monster['id'] === $monsterId) {

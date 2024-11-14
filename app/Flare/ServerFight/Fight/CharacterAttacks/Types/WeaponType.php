@@ -138,12 +138,17 @@ class WeaponType extends BattleBase
 
         $totalDamage = $weaponDamage - $weaponDamage * $this->attackData['damage_deduction'];
 
+        if ($this->isRaidBoss && $totalDamage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {
+            $totalDamage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
+        }
+
         $this->monsterHealth -= $totalDamage;
 
         $this->addMessage('Your weapon hits ' . $monsterName . ' for: ' . number_format($totalDamage), 'player-action');
 
         $this->specialAttacks->setCharacterHealth($this->characterHealth)
             ->setMonsterHealth($this->monsterHealth)
+            ->setIsRaidBoss($this->isRaidBoss)
             ->doWeaponSpecials($character, $this->attackData);
 
         $this->mergeMessages($this->specialAttacks->getMessages());

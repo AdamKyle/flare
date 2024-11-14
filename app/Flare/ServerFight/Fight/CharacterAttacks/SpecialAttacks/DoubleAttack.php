@@ -25,6 +25,10 @@ class DoubleAttack extends BattleBase
 
             $damage = $damage + $damage * 0.15;
 
+            if ($this->isRaidBoss && $damage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {
+                $damage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
+            }
+
             if ($attackData['damage_deduction'] > 0.0) {
                 $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
 

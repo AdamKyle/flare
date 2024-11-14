@@ -16,7 +16,6 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\HolySmite;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\MerchantSupply;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\PrisonerRage;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\SensualDance;
-use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\ThiefBackStab;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\TripleAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\VampireThirst;
 use Exception;
@@ -29,9 +28,24 @@ class SpecialAttacks extends BattleMessages
 
     private int $healFor = 0;
 
+    private bool $isRaidBoss = false;
+
     public function __construct()
     {
         parent::__construct();
+    }
+
+    /**
+     * set is raid boss
+     *
+     * @param boolean $isRaidBoss
+     * @return SpecialAttacks
+     */
+    public function setIsRaidBoss(bool $isRaidBoss): SpecialAttacks
+    {
+        $this->isRaidBoss = $isRaidBoss;
+
+        return $this;
     }
 
     /**
@@ -183,6 +197,7 @@ class SpecialAttacks extends BattleMessages
     {
         $hammerSmash = resolve(HammerSmash::class);
 
+        $hammerSmash->setIsRaidBoss($this->isRaidBoss);
         $hammerSmash->setCharacterHealth($this->characterHealth);
         $hammerSmash->setMonsterHealth($this->monsterHealth);
         $hammerSmash->handleHammerSmash($character, $attackData);
@@ -204,6 +219,7 @@ class SpecialAttacks extends BattleMessages
     {
         $alchemistsRavenousDream = resolve(AlchemistsRavenousDream::class);
 
+        $alchemistsRavenousDream->setIsRaidBoss($this->isRaidBoss);
         $alchemistsRavenousDream->setCharacterHealth($this->characterHealth);
         $alchemistsRavenousDream->setMonsterHealth($this->monsterHealth);
         $alchemistsRavenousDream->handleAttack($character, $attackData);
@@ -225,6 +241,7 @@ class SpecialAttacks extends BattleMessages
     {
         $tripleAttack = resolve(TripleAttack::class);
 
+        $tripleAttack->setIsRaidBoss($this->isRaidBoss);
         $tripleAttack->setCharacterHealth($this->characterHealth);
         $tripleAttack->setMonsterHealth($this->monsterHealth);
         $tripleAttack->handleAttack($character, $attackData);
@@ -246,6 +263,7 @@ class SpecialAttacks extends BattleMessages
     {
         $doubleAttack = resolve(DoubleAttack::class);
 
+        $doubleAttack->setIsRaidBoss($this->isRaidBoss);
         $doubleAttack->setCharacterHealth($this->characterHealth);
         $doubleAttack->setMonsterHealth($this->monsterHealth);
         $doubleAttack->handleAttack($character, $attackData);
@@ -267,6 +285,7 @@ class SpecialAttacks extends BattleMessages
     {
         $doubleCast = resolve(DoubleCast::class);
 
+        $doubleCast->setIsRaidBoss($this->isRaidBoss);
         $doubleCast->setCharacterHealth($this->characterHealth);
         $doubleCast->setMonsterHealth($this->monsterHealth);
         $doubleCast->handleAttack($character, $attackData);
@@ -307,6 +326,7 @@ class SpecialAttacks extends BattleMessages
     {
         $thirst = resolve(VampireThirst::class);
 
+        $thirst->setIsRaidBoss($this->isRaidBoss);
         $thirst->setCharacterHealth($this->characterHealth);
         $thirst->setMonsterHealth($this->monsterHealth);
         $thirst->handleAttack($character, $attackData);
@@ -328,6 +348,7 @@ class SpecialAttacks extends BattleMessages
     {
         $prisonersRage = resolve(PrisonerRage::class);
 
+        $prisonersRage->setIsRaidBoss($this->isRaidBoss);
         $prisonersRage->setCharacterHealth($this->characterHealth);
         $prisonersRage->setMonsterHealth($this->monsterHealth);
         $prisonersRage->handleAttack($character, $attackData);
@@ -349,6 +370,7 @@ class SpecialAttacks extends BattleMessages
     {
         $alcoholicsBloodyVomit = resolve(BloodyPuke::class);
 
+        $alcoholicsBloodyVomit->setIsRaidBoss($this->isRaidBoss);
         $alcoholicsBloodyVomit->setCharacterHealth($this->characterHealth);
         $alcoholicsBloodyVomit->setMonsterHealth($this->monsterHealth);
         $alcoholicsBloodyVomit->handleAttack($character, $attackData);
@@ -370,6 +392,7 @@ class SpecialAttacks extends BattleMessages
     {
         $merchantsSupply = resolve(MerchantSupply::class);
 
+        $merchantsSupply->setIsRaidBoss($this->isRaidBoss);
         $merchantsSupply->setCharacterHealth($this->characterHealth);
         $merchantsSupply->setMonsterHealth($this->monsterHealth);
         $merchantsSupply->handleAttack($character, $attackData);
@@ -391,6 +414,7 @@ class SpecialAttacks extends BattleMessages
     {
         $gunslingersAssassination = resolve(GunslingersAssassination::class);
 
+        $gunslingersAssassination->setIsRaidBoss($this->isRaidBoss);
         $gunslingersAssassination->setCharacterHealth($this->characterHealth);
         $gunslingersAssassination->setMonsterHealth($this->monsterHealth);
         $gunslingersAssassination->handleAttack($character, $attackData);
@@ -412,6 +436,7 @@ class SpecialAttacks extends BattleMessages
     {
         $sensualDance = resolve(SensualDance::class);
 
+        $sensualDance->setIsRaidBoss($this->isRaidBoss);
         $sensualDance->setCharacterHealth($this->characterHealth);
         $sensualDance->setMonsterHealth($this->monsterHealth);
         $sensualDance->handleAttack($character, $attackData);
@@ -433,6 +458,7 @@ class SpecialAttacks extends BattleMessages
     {
         $bookBindersFear = resolve(BookBindersFear::class);
 
+        $bookBindersFear->setIsRaidBoss($this->isRaidBoss);
         $bookBindersFear->setCharacterHealth($this->characterHealth);
         $bookBindersFear->setMonsterHealth($this->monsterHealth);
         $bookBindersFear->handleAttack($character, $attackData);
@@ -454,6 +480,7 @@ class SpecialAttacks extends BattleMessages
     {
         $holySmite = resolve(HolySmite::class);
 
+        $holySmite->setIsRaidBoss($this->isRaidBoss);
         $holySmite->setCharacterHealth($this->characterHealth);
         $holySmite->setMonsterHealth($this->monsterHealth);
         $holySmite->handleAttack($character, $attackData);

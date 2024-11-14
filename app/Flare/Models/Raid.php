@@ -57,6 +57,14 @@ class Raid extends Model
                 continue;
             }
 
+            if ($this->raid_boss_id !== $monster['id'] && $monster['is_raid_boss']) {
+                continue;
+            }
+
+            if (!in_array($monster['id'], $this->raid_monster_ids) && !$monster['is_raid_boss']) {
+                continue;
+            }
+
             if ($monster['is_raid_boss']) {
                 $monster['name'] = $monster['name'] . ' (RAID BOSS)';
             }

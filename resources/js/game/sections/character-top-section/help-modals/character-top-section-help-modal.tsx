@@ -32,8 +32,7 @@ export default class CharacterTopSectionHelpModal extends React.Component<
                 <p className="my-2 text-gray-700 dark:text-gray-200">
                     Armour Class, or AC, is calculated by taking all items that
                     give a Base AC, like Body, Helmet and so on and adding them
-                    together and then dividing by the amount of items that give
-                    a base AC. We then apply any{" "}
+                    together. We then apply any{" "}
                     <a href="/information/enchanting" target="_blank">
                         enchantments{" "}
                         <i className="fas fa-external-link-alt"></i>

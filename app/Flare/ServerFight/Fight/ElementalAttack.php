@@ -77,6 +77,12 @@ class ElementalAttack extends BattleBase
     {
         $damage = floor($damage * $highestElement);
 
+        if (!$isMonster) {
+            if ($this->isRaidBoss && $damage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {
+                $damage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
+            }
+        }
+
         $newDamage = $this->applyResistanceToDamage($highestDefendingElement, $damage, $isMonster);
 
         switch ($type) {
@@ -91,9 +97,10 @@ class ElementalAttack extends BattleBase
                 $this->regularAttackMessages($isMonster, $damage);
         }
 
-        $this->addMessage($isMonster ?
-            'You manage to resist: '.number_format($damage - $newDamage).' ('.number_format($highestDefendingElement * 100, 2).'%) damage from the enemies bloody gems!' :
-            'The enemy resists: '.number_format($damage - $newDamage).' ('.number_format($highestDefendingElement * 100, 2).'%) damage from your gems!',
+        $this->addMessage(
+            $isMonster ?
+                'You manage to resist: ' . number_format($damage - $newDamage) . ' (' . number_format($highestDefendingElement * 100, 2) . '%) damage from the enemies bloody gems!' :
+                'The enemy resists: ' . number_format($damage - $newDamage) . ' (' . number_format($highestDefendingElement * 100, 2) . '%) damage from your gems!',
             ($isMonster ? 'regular' : 'enemy-action')
         );
 
@@ -127,13 +134,13 @@ class ElementalAttack extends BattleBase
 
         if (! $isMonster) {
             $this->addMessage('The sockets on your gear glow with the radiance of the gems attached.', 'player-action');
-            $this->addMessage('The enemies element is stonger then yours, you only do half damage for: '.number_format($damage), 'player-action');
+            $this->addMessage('The enemies element is stonger then yours, you only do half damage for: ' . number_format($damage), 'player-action');
 
             return;
         }
 
         $this->addMessage('The enemies grip tightens around the gems they carry, dripping in blood.', 'enemy-action');
-        $this->addMessage('Your gems are stronger the enemies, the enemy only does half damage for: '.number_format($damage), 'enemy-action');
+        $this->addMessage('Your gems are stronger the enemies, the enemy only does half damage for: ' . number_format($damage), 'enemy-action');
     }
 
     /**
@@ -143,13 +150,13 @@ class ElementalAttack extends BattleBase
     {
         if (! $isMonster) {
             $this->addMessage('The sockets on your gear glow with the radiance of the gems attached.', 'player-action');
-            $this->addMessage('The enemies element is weaker then yours, you do double damage for: '.number_format($damage), 'player-action');
+            $this->addMessage('The enemies element is weaker then yours, you do double damage for: ' . number_format($damage), 'player-action');
 
             return;
         }
 
         $this->addMessage('The enemies grip tightens around the gems they carry, dripping in blood.', 'enemy-action');
-        $this->addMessage('Your gems are weaker the enemies, the enemy does double damage for: '.number_format($damage), 'enemy-action');
+        $this->addMessage('Your gems are weaker the enemies, the enemy does double damage for: ' . number_format($damage), 'enemy-action');
     }
 
     /**
@@ -159,12 +166,12 @@ class ElementalAttack extends BattleBase
     {
         if (! $isMonster) {
             $this->addMessage('The sockets on your gear glow with the radiance of the gems attached.', 'player-action');
-            $this->addMessage('The gems lash out towards the enemy dealing: '.number_format($damage), 'player-action');
+            $this->addMessage('The gems lash out towards the enemy dealing: ' . number_format($damage), 'player-action');
 
             return;
         }
 
         $this->addMessage('The enemies grip tightens around the gems they carry, dripping in blood.', 'enemy-action');
-        $this->addMessage('The enemies gems rage towards you dealing: '.number_format($damage), 'enemy-action');
+        $this->addMessage('The enemies gems rage towards you dealing: ' . number_format($damage), 'enemy-action');
     }
 }

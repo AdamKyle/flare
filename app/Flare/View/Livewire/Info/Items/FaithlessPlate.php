@@ -19,8 +19,6 @@ class FaithlessPlate extends DataTableComponent
     {
         return Item::whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
-            ->doesntHave('inventorySlots')
-            ->doesntHave('inventorySetSlots')
             ->doesntHave('appliedHolyStacks')
             ->doesnthave('sockets')
             ->where('specialty_type', ItemSpecialtyType::FAITHLESS_PLATE);

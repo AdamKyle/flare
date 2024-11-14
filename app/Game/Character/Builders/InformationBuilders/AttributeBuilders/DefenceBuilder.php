@@ -65,7 +65,7 @@ class DefenceBuilder extends BaseAttribute
 
         $ac = $slots->sum('item.base_ac');
 
-        return intval($ac / $slots->count());
+        return $ac;
     }
 
     /**

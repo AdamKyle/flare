@@ -32,6 +32,10 @@ class BloodyPuke extends BattleBase
                 $damage = $damage - $damage * $attackData['damage_deduction'];
             }
 
+            if ($this->isRaidBoss && $damage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {
+                $damage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
+            }
+
             $this->doBaseAttack($damage, $damageToSuffer);
 
             $this->characterHealth -= $damageToSuffer;

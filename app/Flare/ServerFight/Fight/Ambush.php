@@ -50,6 +50,10 @@ class Ambush extends BattleBase
             $baseStat = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? 'voided_base_stat' : 'base_stat');
             $damage = $baseStat * 2;
 
+            if ($serverMonster->isRaidBossMonster() && $damage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {
+                $damage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
+            }
+
             $this->healthObject['current_monster_health'] -= $damage;
 
             $this->addMessage('You strike the enemy in an ambush doing: ' . number_format($damage) . ' damage!', 'player-action');

@@ -36,7 +36,7 @@ class ResetDailyRaidAttackLimits extends Command
             return;
         }
 
-        $isRaidBossDead = is_null(RaidBossParticipation::where('killed_boss', true)->first());
+        $isRaidBossDead = !is_null(RaidBossParticipation::where('killed_boss', true)->first());
 
         if ($isRaidBossDead) {
             return;

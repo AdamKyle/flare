@@ -30,7 +30,11 @@ class BattleBase extends BattleMessages
 
     protected bool $abortCharacterIsDead = false;
 
+    protected bool $isRaidBoss = false;
+
     protected CharacterCacheData $characterCacheData;
+
+    const MAX_DAMAGE_FOR_RAID_BOSSES = 2_000_000_000_000;
 
     public function __construct(CharacterCacheData $characterCacheData)
     {
@@ -79,6 +83,11 @@ class BattleBase extends BattleMessages
         $this->defenderId = $defenderId;
     }
 
+    public function setIsRaidBoss(bool $isRaidBoss)
+    {
+        $this->isRaidBoss = $isRaidBoss;
+    }
+
     protected function doEnemyEntrance(Character $character, ServerMonster $monster, Entrance $entrance)
     {
         $entrance->playerEntrance($character, $monster, $this->attackData);
@@ -94,6 +103,7 @@ class BattleBase extends BattleMessages
     {
         $secondaryAttacks = resolve(SecondaryAttacks::class);
 
+        $secondaryAttacks->setIsRaidBoss($this->isRaidBoss);
         $secondaryAttacks->setMonsterHealth($this->monsterHealth);
         $secondaryAttacks->setCharacterHealth($this->characterHealth);
         $secondaryAttacks->setAttackData($this->attackData);
@@ -118,6 +128,7 @@ class BattleBase extends BattleMessages
 
         $elementalAttack->setMonsterHealth($this->monsterHealth);
         $elementalAttack->setCharacterHealth($this->characterHealth);
+        $elementalAttack->setIsRaidBoss($this->isRaidBoss);
 
         $characterElementalData = $this->characterCacheData->getCachedCharacterData($character, 'elemental_atonement');
 

@@ -30,6 +30,16 @@ class ReBalanceMonsters extends Command
      */
     protected $description = 'Balances Monsters';
 
+    const MAX_STAT_AMOUNT = 100_000_000_000;
+
+    const MAX_AC_AMOUNT = 4_000_000_000;
+
+    const MAX_DAMAGE_AMOUNT = 100_000_000_000;
+
+    const MAX_SPELL_DAMAGE = 50_000_000_000;
+
+    const MAX_AFFIX_DAMAGE = 25_000_000_000;
+
     private array $regularMaps = [
         MapNameValue::SURFACE,
         MapNameValue::LABYRINTH,
@@ -704,15 +714,41 @@ class ReBalanceMonsters extends Command
             $xpDetails['xp'] = $xpIntegers[$index];
         }
 
+        $statAmount = $integers[$index];
+        $armourClass = $integers[$index];
+        $damage = $integers[$index];
+        $spellDamage = $integers[$index];
+        $affixDamage = $integers[$index];
+
+        if ($statAmount > self::MAX_STAT_AMOUNT) {
+            $statAmount = self::MAX_STAT_AMOUNT;
+        }
+
+        if ($armourClass > self::MAX_AC_AMOUNT) {
+            $armourClass = self::MAX_AC_AMOUNT;
+        }
+
+        if ($damage > self::MAX_DAMAGE_AMOUNT) {
+            $damage = self::MAX_DAMAGE_AMOUNT;
+        }
+
+        if ($spellDamage > self::MAX_SPELL_DAMAGE) {
+            $spellDamage = self::MAX_SPELL_DAMAGE;
+        }
+
+        if ($affixDamage > self::MAX_AFFIX_DAMAGE) {
+            $affixDamage = self::MAX_AFFIX_DAMAGE;
+        }
+
         return array_merge([
-            'str' => $integers[$index],
-            'dur' => $integers[$index],
-            'dex' => $integers[$index],
-            'chr' => $integers[$index],
-            'agi' => $integers[$index],
-            'int' => $integers[$index],
-            'focus' => $integers[$index],
-            'ac' => $integers[$index],
+            'str' => $statAmount,
+            'dur' => $statAmount,
+            'dex' => $statAmount,
+            'chr' => $statAmount,
+            'agi' => $statAmount,
+            'int' => $statAmount,
+            'focus' => $statAmount,
+            'ac' => $armourClass,
             'accuracy' => $floats[$index],
             'casting_accuracy' => $floats[$index],
             'dodge' => $floats[$index],
@@ -720,9 +756,9 @@ class ReBalanceMonsters extends Command
             'drop_check' => $floats[$index],
             'gold' => ceil($integers[$index] / 2),
             'health_range' => ceil($integers[$index] / 2) . '-' . $integers[$index],
-            'attack_range' => ceil($integers[$index] / 2) . '-' . $integers[$index],
-            'max_spell_damage' => $integers[$index],
-            'max_affix_damage' => $integers[$index],
+            'attack_range' => ceil($damage / 2) . '-' . $damage,
+            'max_spell_damage' => $spellDamage,
+            'max_affix_damage' => $affixDamage,
             'healing_percentage' => $floatValue,
             'spell_evasion' => $floatValue,
             'affix_resistance' => $floatValue,
