@@ -75,8 +75,6 @@ class ElementalAttack extends BattleBase
      */
     protected function dealDamage(int $damage, float $highestDefendingElement, float $highestElement, bool $isMonster, string $type)
     {
-        $damage = floor($damage * $highestElement);
-
         if (!$isMonster) {
             if ($this->isRaidBoss && $damage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {
                 $damage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
@@ -102,6 +100,13 @@ class ElementalAttack extends BattleBase
                 'You manage to resist: ' . number_format($damage - $newDamage) . ' (' . number_format($highestDefendingElement * 100, 2) . '%) damage from the enemies bloody gems!' :
                 'The enemy resists: ' . number_format($damage - $newDamage) . ' (' . number_format($highestDefendingElement * 100, 2) . '%) damage from your gems!',
             ($isMonster ? 'regular' : 'enemy-action')
+        );
+
+        $this->addMessage(
+            $isMonster ?
+                'You take: ' . number_format($newDamage) . ' in damage from the enemies bloody gems!' :
+                'The enemy takes: ' . number_format($newDamage) . ' in damage from your gems!',
+            ($isMonster ? 'enemy-action' : 'player-action')
         );
 
         if ($isMonster) {

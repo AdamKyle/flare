@@ -14,22 +14,26 @@ class RaidAttackTypesValue
 
     const DELUSIONAL_MEMORIES_ATTACK = 2;
 
+    const BANSHEE_SCREAM_ATTACK = 3;
+
     protected static array $values = [
         self::PHYSICAL_ATTACK => self::PHYSICAL_ATTACK,
         self::MAGICAL_ICE_ATTACK => self::MAGICAL_ICE_ATTACK,
         self::DELUSIONAL_MEMORIES_ATTACK => self::DELUSIONAL_MEMORIES_ATTACK,
+        self::BANSHEE_SCREAM_ATTACK => self::BANSHEE_SCREAM_ATTACK,
     ];
 
     public static $attackTypeNames = [
         self::PHYSICAL_ATTACK => 'Physical Attack',
         self::MAGICAL_ICE_ATTACK => 'Magical Ice Attack',
         self::DELUSIONAL_MEMORIES_ATTACK => 'Delusional Memories Attack',
+        self::BANSHEE_SCREAM_ATTACK => 'Banshee Scream Attack',
     ];
 
     public function __construct(int $value)
     {
         if (! in_array($value, self::$values)) {
-            throw new Exception($value.' does not exist.');
+            throw new Exception($value . ' does not exist.');
         }
 
         $this->value = $value;
@@ -48,5 +52,10 @@ class RaidAttackTypesValue
     public function isDelusionalMemoriesAttack(): bool
     {
         return $this->value === self::DELUSIONAL_MEMORIES_ATTACK;
+    }
+
+    public function isBansheeScreamAttack(): bool
+    {
+        return $this->value === self::BANSHEE_SCREAM_ATTACK;
     }
 }

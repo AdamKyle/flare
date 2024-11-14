@@ -40,15 +40,15 @@ class ItemSkillsTable extends DataTableComponent
 
                 if (! is_null(auth()->user())) {
                     if (auth()->user()->hasRole('Admin')) {
-                        return '<a href="/admin/item-skills/'.$skillId.'">'.$row->name.'</a>';
+                        return '<a href="/admin/item-skills/' . $skillId . '">' . $row->name . '</a>';
                     }
                 }
 
-                return '<a href="/information/item-skills/skill/'.$skillId.'" >'.$row->name.'</a>';
+                return '<a href="/information/item-skills/skill/' . $skillId . '" >' . $row->name . '</a>';
             })->html(),
             Column::make('Description')->searchable()->format(function ($value) {
-                return nl2br($value);
-            }),
+                return '<p class="w-full text-wrap">' . nl2br($value) . '</p>';
+            })->html(),
 
             Column::make('Max level', 'max_level')->sortable()->format(function ($value) {
                 return $value;

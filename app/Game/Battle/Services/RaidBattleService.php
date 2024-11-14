@@ -95,7 +95,7 @@ class RaidBattleService
         ]);
     }
 
-    /**
+    /**doAttack
      * Set the current health for the raid battle service.
      */
     public function setRaidBossHealth(int $raidBossCurrentHealth): RaidBattleService
@@ -169,42 +169,69 @@ class RaidBattleService
             }
         }
 
-        $result = $this->monsterPlayerFight->processAttack($fightData, true);
+        $this->monsterPlayerFight->processAttack($fightData, true);
 
         $resultData = $this->buildBaseResultData();
 
-        if (! $result && $this->monsterPlayerFight->getCharacterHealth() <= 0) {
-
-            $this->handleRaidBossHealth($character, $monsterId, $isRaidBoss);
-
-            $this->battleEventHandler->processDeadCharacter($character);
-
-            $resultData['character_current_health'] = 0;
-
-            $this->setCachedHealth($serverMonster, $fightData, $character->id, $monsterId, $resultData['monster_current_health']);
-
-            return $this->successResult($resultData);
+        if ($this->monsterPlayerFight->getCharacterHealth() <= 0) {
+            return $this->handleCharacterDeath(
+                $character,
+                $serverMonster,
+                $fightData,
+            );
         }
 
         if ($this->monsterPlayerFight->getMonsterHealth() <= 0) {
-            $this->handleRaidBossHealth($character, $monsterId, $isRaidBoss);
-
-            $raid = Raid::where('raid_boss_id', $monsterId)->first();
-
-            RaidBossRewardHandler::dispatch($character->id, $monsterId, is_null($raid) ? null : $raid->id);
-
-            $resultData['monster_current_health'] = 0;
-
-            $this->deleteMonsterCacheHealth($character->id, $monsterId);
-
-            BattleAttackHandler::dispatch($character->id, $monsterId);
-
-            return $this->successResult($resultData);
+            return $this->handleMonsterDeath($character, $serverMonster);
         }
 
         $this->setCachedHealth($serverMonster, $fightData, $character->id, $monsterId, $resultData['monster_current_health']);
 
         $this->handleRaidBossHealth($character, $monsterId, $isRaidBoss);
+
+        return $this->successResult($resultData);
+    }
+
+    private function handleCharacterDeath(Character $character, ServerMonster $serverMonster, array $fightData): array
+    {
+        $resultData = $this->buildBaseResultData();
+
+        $monsterId = $serverMonster->getId();
+
+        $isRaidBoss = $serverMonster->isRaidBossMonster();
+
+        $this->handleRaidBossHealth($character, $monsterId, $isRaidBoss);
+
+        $this->battleEventHandler->processDeadCharacter($character);
+
+        $resultData['character_current_health'] = 0;
+
+        $this->setCachedHealth($serverMonster, $fightData, $character->id, $monsterId, $resultData['monster_current_health']);
+
+        return $this->successResult($resultData);
+    }
+
+    private function handleMonsterDeath(Character $character, ServerMonster $serverMonster): array
+    {
+        $resultData = $this->buildBaseResultData();
+
+        $monsterId = $serverMonster->getId();
+
+        $isRaidBoss = $serverMonster->isRaidBossMonster();
+
+        $this->handleRaidBossHealth($character, $monsterId, $isRaidBoss);
+
+        $raid = Raid::where('raid_boss_id', $monsterId)->first();
+
+        if (!is_null($raid)) {
+            RaidBossRewardHandler::dispatch($character->id, $monsterId, is_null($raid) ? null : $raid->id);
+        }
+
+        $resultData['monster_current_health'] = 0;
+
+        $this->deleteMonsterCacheHealth($character->id, $monsterId);
+
+        BattleAttackHandler::dispatch($character->id, $monsterId);
 
         return $this->successResult($resultData);
     }
