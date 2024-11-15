@@ -16,6 +16,26 @@ class ItemSkillsTable extends DataTableComponent
     public function configure(): void
     {
         $this->setPrimaryKey('id');
+
+        $this->setTdAttributes(function (Column $column) {
+            if ($column->isField('description')) {
+                return [
+                    'class' => 'hidden md:block',
+                ];
+            }
+
+            return [];
+        });
+
+        $this->setThAttributes(function (Column $column) {
+            if ($column->isField('description')) {
+                return [
+                    'class' => 'hidden md:block',
+                ];
+            }
+
+            return [];
+        });
     }
 
     public function builder(): Builder
@@ -35,7 +55,7 @@ class ItemSkillsTable extends DataTableComponent
     public function columns(): array
     {
         return [
-            Column::make('Name')->searchable()->format(function ($value, $row) {
+            Column::make('Name', 'name')->searchable()->format(function ($value, $row) {
                 $skillId = ItemSkill::where('name', $value)->first()->id;
 
                 if (! is_null(auth()->user())) {
@@ -46,8 +66,8 @@ class ItemSkillsTable extends DataTableComponent
 
                 return '<a href="/information/item-skills/skill/' . $skillId . '" >' . $row->name . '</a>';
             })->html(),
-            Column::make('Description')->searchable()->format(function ($value) {
-                return '<p class="w-full text-wrap">' . nl2br($value) . '</p>';
+            Column::make('Description', 'description')->searchable()->format(function ($value) {
+                return '<p class="md:w-full md:text-wrap">' . nl2br($value) . '</p>';
             })->html(),
 
             Column::make('Max level', 'max_level')->sortable()->format(function ($value) {
