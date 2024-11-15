@@ -109,6 +109,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(ShopService::class),
                 $app->make(DisenchantService::class),
                 $app->make(CharacterInventoryService::class),
+                $app->make(UpdateCharacterAttackTypesHandler::class),
             );
         });
     }

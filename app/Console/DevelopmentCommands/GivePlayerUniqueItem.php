@@ -37,27 +37,40 @@ class GivePlayerUniqueItem extends Command
             return $this->line('No character for that name found.');
         }
 
-        $type = $this->choice('Which Type', [
-            'legendary',
+        $type = $this->choice('Which type?', [
+            'unique',
             'mythic',
             'cosmic',
         ]);
 
+        $amountOfItemsToGive = $this->choice('How many?', [
+            5,
+            10,
+            15,
+            20,
+            50,
+            75
+        ]);
+
         $cost = match ($type) {
-            'legendary' => RandomAffixDetails::LEGENDARY,
+            'unique' => RandomAffixDetails::LEGENDARY,
             'mythic' => RandomAffixDetails::MYTHIC,
             'cosmic' => RandomAffixDetails::COSMIC,
             default => throw new Exception('undefined type for unique')
         };
 
-        $item = $this->getUniqueForPlayer($randomAffixGenerator, $character, $cost);
+        for ($i = 1; $i <= $amountOfItemsToGive; $i++) {
+            $item = $this->getUniqueForPlayer($randomAffixGenerator, $character, $cost);
 
-        $character->inventory->slots()->create([
-            'inventory_id' => $character->inventory->id,
-            'item_id' => $item->id,
-        ]);
+            $character->inventory->slots()->create([
+                'inventory_id' => $character->inventory->id,
+                'item_id' => $item->id,
+            ]);
 
-        return $this->line('Gave: ' . $item->affix_name . ' To character.');
+            $this->line('Gave: ' . $item->affix_name . ' To character.');
+        }
+
+        return;
     }
 
     protected function getUniqueForPlayer(RandomAffixGenerator $randomAffixGenerator, Character $character, int $paidAmount): Item
@@ -68,6 +81,7 @@ class GivePlayerUniqueItem extends Command
             ->whereNull('specialty_type')
             ->whereNotIn('type', ['alchemy', 'quest', 'trinket', 'artifact'])
             ->whereDoesntHave('appliedHolyStacks')
+            ->whereDoesntHave('sockets')
             ->inRandomOrder()
             ->first();
 
@@ -87,6 +101,12 @@ class GivePlayerUniqueItem extends Command
             ]);
         }
 
-        return $duplicateItem;
+        match ($paidAmount) {
+            RandomAffixDetails::MYTHIC => $duplicateItem->update(['is_mythic' => true]),
+            RandomAffixDetails::COSMIC => $duplicateItem->update(['is_cosmic' => true]),
+            default => null
+        };
+
+        return $duplicateItem->refresh();
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Game\Character\CharacterInventory\Services;
 
 use App\Flare\Models\Character;
+use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Builders\EquipManyBuilder;
 use App\Game\Character\CharacterInventory\Jobs\DisenchantMany;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
@@ -23,6 +24,7 @@ class MultiInventoryActionService
         private readonly ShopService $shopService,
         private readonly DisenchantService $disenchantService,
         private readonly CharacterInventoryService $characterInventoryService,
+        private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler,
     ) {}
 
     public function moveManyItemsToSelectedSet(Character $character, int $setId, array $slotIds): array
@@ -66,26 +68,22 @@ class MultiInventoryActionService
             return $this->errorResult($e->getMessage());
         }
 
-        $result = $this->successResult();
-
-        // Equip items
         foreach ($itemsToEquip as $toEquipItem) {
-            $result = $this->equipItemService->equipItem($character, [
-                'position' => $toEquipItem['position'],
-                'slot_id' => $toEquipItem['slot_id'],
-                'equip_type' => $toEquipItem['type'],
-            ]);
-
-            if ($result['status'] === 422) {
-                return $result;
-            }
+            $this->equipItem($character, $toEquipItem);
         }
 
         $character = $character->refresh();
 
+        $this->updateCharacterAttackTypesHandler->updateCache($character);
+
         event(new UpdateCharacterInventoryCountEvent($character));
 
-        return $result;
+        $characterInventoryService = $this->characterInventoryService->setCharacter($character);
+
+        return $this->successResult([
+            'message' => 'Equipped valid items to your character.',
+            'inventory' => $characterInventoryService->getInventoryForApi()
+        ]);
     }
 
     public function sellManyItems(Character $character, array $slotIds): array
@@ -103,11 +101,11 @@ class MultiInventoryActionService
                 return $result;
             }
 
-            $itemNames[] = $result['item_name']; // Collect item names into an array
+            $itemNames[] = $result['item_name'];
             $soldFor += $result['sold_for'];
         }
 
-        $names = implode(', ', $itemNames); // Convert array of item names to a string
+        $names = implode(', ', $itemNames);
 
         event(new UpdateCharacterInventoryCountEvent($character));
 
@@ -119,15 +117,28 @@ class MultiInventoryActionService
 
     public function disenchantManyItems(Character $character, array $slotIds): array
     {
+        $filteredSlots = $character->inventory->slots
+            ->whereIn('id', $slotIds)
+            ->whereNotIn('item.type', ['alchemy', 'quest', 'trinket', 'artifact'])
+            ->where('equipped', false)
+            ->filter(function ($slot) {
+                return !is_null($slot->item->item_prefix_id) || !is_null($slot->item->item_suffix_id);
+            });
 
-        Cache::put('character-slots-to-disenchant-' . $character->id, $slotIds);
+        $itemIdsToDisenchant = $filteredSlots->pluck('item_id')->toArray();
+        $filteredSlotIds = $filteredSlots->pluck('id')->toArray();
 
-        DisenchantMany::dispatch($character, $slotIds);
+        $character->inventory->slots()->whereIn('id', $filteredSlotIds)->delete();
+
+        $character = $character->refresh();
+
+        DisenchantMany::dispatch($character, $itemIdsToDisenchant);
 
         return $this->successResult([
             'message' => 'Items are queued for disenchanting. Check Server Messages
             (Scroll down for desktop, click Serve Messages tab). If on mobile scroll down,
-            selected Server Messages from the Orange Chat Dropdown.'
+            selected Server Messages from the Orange Chat Dropdown.',
+            'inventory' => $this->characterInventoryService->setCharacter($character)->getInventoryForApi(),
         ]);
     }
 
@@ -152,5 +163,12 @@ class MultiInventoryActionService
             'message' => 'Destroyed all selected items.',
             'inventory' => $result['inventory'],
         ]);
+    }
+
+    private function equipItem(Character $character, array $equipParams): void
+    {
+        $this->equipItemService->setRequest($equipParams)
+            ->setCharacter($character)
+            ->replaceItem();
     }
 }

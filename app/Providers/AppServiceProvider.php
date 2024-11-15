@@ -26,7 +26,6 @@ use App\Console\DevelopmentCommands\CreateCharacter;
 use App\Console\DevelopmentCommands\CreateEventsForDevelopment;
 use App\Console\DevelopmentCommands\CreateTestCharacters;
 use App\Console\DevelopmentCommands\GivePlayerAncenstorItem;
-use App\Console\DevelopmentCommands\GivePlayerMythicItem;
 use App\Console\DevelopmentCommands\GivePlayerUniqueItem;
 use App\Console\DevelopmentCommands\LevelCharacter;
 use App\Console\DevelopmentCommands\ManageKingdomResources;
@@ -80,7 +79,6 @@ class AppServiceProvider extends ServiceProvider
             ReincarnateCharacter::class,
             GivePlayerUniqueItem::class,
             GivePlayerAncenstorItem::class,
-            GivePlayerMythicItem::class,
             TestExploration::class,
             CompleteGuideQuestForCharacter::class,
             MaxOutCharactersPassiveSkills::class,

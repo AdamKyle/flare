@@ -76,6 +76,7 @@ class EquipManyBuilder
             }
 
             $position = $this->findAvailablePosition($equippableItems, $type);
+
             if (!$position) {
                 continue;
             }
@@ -85,7 +86,7 @@ class EquipManyBuilder
             }
 
             $equippableItems[] = [
-                'type' => $type,
+                'equip_type' => $type,
                 'position' => $position,
                 'slot_id' => $slot->id,
             ];
