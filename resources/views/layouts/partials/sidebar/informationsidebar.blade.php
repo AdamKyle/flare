@@ -181,6 +181,10 @@
                 <span class="text-sm fas fa-calendar"></span>
                 Events
             </a>
+            <a href="{{ route('info.page', ['pageName' => 'global-event-goals']) }}">
+                <span class="text-sm fas fa-bars"></span>
+                Global Event Goals
+            </a>
         </div>
         <hr />
         <div class="menu-detail-wrapper">
@@ -384,6 +388,10 @@
     <!-- Gear Sets -->
     <div class="menu-detail" data-menu="gear-sets">
         <div class="menu-detail-wrapper">
+            <a href="{{ route('info.page', ['pageName' => 'unique-items']) }}">
+                <span class="ra ra-chain"></span>
+                Uniques (AKA Legendaries)
+            </a>
             <a href="{{ route('info.page', ['pageName' => 'mythical-items']) }}">
                 <span class="ra ra-chain"></span>
                 Mythics

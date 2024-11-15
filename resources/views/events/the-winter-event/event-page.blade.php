@@ -29,7 +29,7 @@
         </div>
 
         <div>
-            <img src="{{ asset('promotion/delusional-memories-event/delusional-event.png') }}"
+            <img src="{{ asset('promotion/winter-event/the-winter-event.png') }}"
                  class="shadow rounded max-w-full h-auto align-middle border-none img-fluid lg:max-w-[60%] my-4 m-auto glightbox cursor-pointer" />
             <div class="text-sm text-center">
                 Click to make larger.
@@ -42,7 +42,7 @@
                 A temporary place to explore full of riches and wonders
             </h2>
             <p class="mb-10 dark:text-gray-300 text-gray-800">
-                During the The Winter event, players of all levels and equipment can venture down - through traversing - to the new
+                During the The Winter event, players of all levels and equipment can venture down - through <a href="/information/traverse">traversing</a> - to the new
                 plane where they can participate in global events to earn mid game gear to help your progression through Tlessa!
             </p>
 
@@ -54,7 +54,7 @@
 
         <div class="grid md:grid-cols-2 gap-6 mt-5 w-full mt-10 mx-auto lg:w-3/4 md:mt-20">
             <div class="mt-4 lg:mt-0">
-                <img src="{{ asset('promotion/delusional-memories-event/delusional-memories-map.png') }}"
+                <img src="{{ asset('promotion/winter-event/winter-event-map.png') }}"
                      class="shadow rounded max-w-full h-auto align-middle border-none img-fluid glightbox w-100 mb-5 cursor-pointer" />
                 <div class="text-center text-sm">
                     Click to make larger.
@@ -79,7 +79,7 @@
             </h2>
             <p class="mb-10 dark:text-gray-300 text-gray-800">
                Returning player who has Access to end game content like Purgatory? Prepare your self for a challenge as the monsters down here are much stronger
-                then what you might use to! new player who wants to participate? Do not worry your monster list will be that of basic monsters allowing you to participate
+                then what you might use to! New player who wants to participate? Do not worry your monster list will be that of basic monsters allowing you to participate
                 in all aspects!
             </p>
         </div>
@@ -89,14 +89,13 @@
                 <div>
                     <h2 class="mb-5 font-thin md:text-4xl lg:text-5xl dark:text-gray-300 text-gray-800">Global Events!</h2>
                     <p class="mb-10 dark:text-gray-300 text-gray-800">
-                        Join together with other players and complete phases of global events, be they Battling, Crafting or Enchanting!
-                        Players who participate can be rewarded with mythical items for the battle phase and Legendary Uniques for
-                        participating in the crafting and enchanting phase.
+                        Join together with other players and complete phases of the <a href="/information/global-event-goals">global event</a>.
+                        Players who participate can be rewarded with <a href="/information/unique-items">unique</a> items for the battle phase!
                     </p>
                 </div>
             </div>
             <div class="mt-4 lg:mt-0">
-                <img src="{{ asset('promotion/delusional-memories-event/delusional-memories-events.png') }}"
+                <img src="{{ asset('promotion/winter-event/winter-event-global-goals.png') }}"
                      class="shadow rounded max-w-full h-auto align-middle border-none img-fluid glightbox w-100 mb-5 cursor-pointer" />
                 <div class="text-center text-sm">
                     Click to make larger.
@@ -111,8 +110,8 @@
                 New <a href="/information/quests">Quests</a> and new story!
             </h2>
             <p class="mb-10 dark:text-gray-300 text-gray-800">
-                With this event we dive into the delusional machinations of a mad Jester ever on the search for his brother.
-                His own delusional fantasies play out before you! What's real and whats not?!
+                With this event we dive deep into the exploration of a mother driven mad by the death of her son and the wailing despair of his father as we explore more about wjho The Creator is
+                and how he came to this mysterious world of Tlessa! This story is a continuation of the main story of the game, however, it is done in such a way that you dont have to have played through all the previous quests to participate!
             </p>
         </div>
 
@@ -123,12 +122,10 @@
                     <i class="ra ra-player text-primary-600 relative top-[10px] right-[10px]"></i>
                 </x-slot:icon>
                 <x-slot:title>
-                    <a
-                        href="/information/monsters?table-filters[maps]=Delusional+Memories">New Monsters To Fight</a>
+                    <a href="/information/monsters?table-filters[maps]=Delusional+Memories">New Monsters To Fight</a>
                 </x-slot:title>
-
                 <p>
-                    If you have access to <a href="/information/planes">Purgatory</a>, fight powerful new monsters that test your might and courage!
+                    If you have access to <a href="/information/planes">Purgatory</a> to face powerful monsters that test your might. New players will encounter easier fights to join the event!
                 </p>
             </x-core.cards.feature-card>
             <x-core.cards.feature-card>
@@ -136,14 +133,10 @@
                     <i class="ra ra-player-king text-primary-600 relative top-[10px] right-[10px]"></i>
                 </x-slot:icon>
                 <x-slot:title>
-                    <a
-                        href="{{ route('info.page', [
-                            'pageName' => 'weekly-fights',
-                        ]) }}">Cosmic Gear & Weekly Fights</a>
+                    <a href="/game-event-info?event_type=ice-queen-raid">The Ice Queen Raid</a>
                 </x-slot:title>
-
                 <p>
-                    Looking for more of a challenge for high level players? Take on weekly fights and earn <a href="/information/cosmic-items">Cosmic gear</a>!
+                    Fight the Ice Queen for powerful <a href="/information/corrupted-ice">Corrupted Ice Gear</a> and complete raid quests to unlock a new cosmetic item: <a href="#">Name Tags</a>. Players of all levels can join!
                 </p>
             </x-core.cards.feature-card>
             <x-core.cards.feature-card>
@@ -151,17 +144,14 @@
                     <i class="ra ra-trail text-primary-600 relative top-[10px] right-[10px]"></i>
                 </x-slot:icon>
                 <x-slot:title>
-                    <a
-                        href="{{ route('info.page', [
-                            'pageName' => 'exploration',
-                        ]) }}">Brand new raid: Jester of Time</a>
+                    <a href="/game-event-info?event_type=the-frozen-king-raid">The Frozen King Raid</a>
                 </x-slot:title>
-
                 <p>
-                    Fight the Jester of Time and his minions for a chance at wining the new tier of gear: <a href="/information/delusional-silver">Delusional Silver</a>!
+                    Battle the Frozen King for <a href="/information/corrupted-ice">Corrupted Ice Gear</a> and complete raid quests to unlock <a href="#">Race Change</a>. Join in no matter your level or gear!
                 </p>
             </x-core.cards.feature-card>
         </div>
+
 
         <div class="w-full lg:w-2/4 mx-auto mt-10 lg:mt-20 mb-10 mt-4 lg:mt-0">
             <h2 class="mb-5 font-thin text-center text-5xl dark:text-gray-300 text-gray-800">

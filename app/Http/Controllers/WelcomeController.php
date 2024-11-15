@@ -31,30 +31,40 @@ class WelcomeController extends Controller
     {
 
         $eventType = $request->event_type;
-        $raids = ['jester-of-time', 'the-smugglers-are-back-raid', 'ice-queen-raid'];
-        $events = ['delusional-memories', 'weekly-celestials', 'weekly-currency-drops', 'weekly-faction-loyalty', 'tlessas-feedback-event',];
+        $raids = ['jester-of-time', 'the-smugglers-are-back-raid', 'ice-queen-raid', 'the-frozen-king-raid'];
+        $events = ['delusional-memories', 'weekly-celestials', 'weekly-currency-drops', 'weekly-faction-loyalty', 'tlessas-feedback-event', 'the-winter-event'];
 
         if (in_array($eventType, $raids)) {
 
-            $events = ScheduledEvent::where('event_type', EventType::RAID_EVENT)->where('currently_running', true)->get();
+            $event = ScheduledEvent::where('event_type', EventType::RAID_EVENT)->where('currently_running', true)->first();
 
-            foreach ($events as $event) {
-                switch ($eventType) {
-                    case 'jester-of-time':
-                        return view('events.jester-of-time-raid.event-page', [
-                            'event' => $event,
-                        ]);
-                    case 'the-smugglers-are-back-raid':
-                        return view('events.the-smugglers-are-back-raid.event-page', [
-                            'event' => $event,
-                        ]);
-                    case 'ice-queen-raid':
-                        return view('events.ice-queen-raid.event-page', [
-                            'event' => $event,
-                        ]);
-                    default:
-                        return redirect()->to(route('welcome'));
-                }
+            if (is_null($event)) {
+                $event = ScheduledEvent::where('event_type', EventType::RAID_EVENT)->where('start_date', '>=', now())->orderBy('id')->first();
+            }
+
+            switch ($eventType) {
+                case 'jester-of-time':
+                    return view('events.jester-of-time-raid.event-page', [
+                        'event' => $event,
+                    ]);
+                case 'the-smugglers-are-back-raid':
+                    return view('events.the-smugglers-are-back-raid.event-page', [
+                        'event' => $event,
+                    ]);
+                case 'ice-queen-raid':
+                    return view('events.ice-queen-raid.event-page', [
+                        'event' => $event,
+                    ]);
+                case 'frozen-king-raid':
+                    return view('events.frozen-king-raid.event-page', [
+                        'event' => $event,
+                    ]);
+                case 'the-frozen-king-raid':
+                    return view('events.ice-queen-raid.event-page', [
+                        'event' => $event,
+                    ]);
+                default:
+                    return redirect()->to(route('welcome'));
             }
         }
 

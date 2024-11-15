@@ -8,8 +8,8 @@
 @section('content')
     <div class="container mx-auto lg:px-4 mb-5">
         <div class="text-center mb-10 lg:mt-10">
-            <h3 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800 text-4xl md:text-7xl">A mother trapped in her own pain</h3>
-            <p class="mb-5 dark:text-gray-300 text-gray-800 italic">Her pain keeps her trapped in her own memories. Time to put down this grieving mother!</p>
+            <h3 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800 text-4xl md:text-7xl">A father who wails in the icey cold wind!</h3>
+            <p class="mb-5 dark:text-gray-300 text-gray-800 italic">He grieves his wife, he grieves his son. His cries are a scream on the wind in the middle of the night!</p>
             <p class="mb-10 text-orange-600 dark:text-orange-300 my-2">
                 <strong>Runs from</strong>: {{$event->start_date->format('l, j \of F, Y \a\t g:iA')}}
                 <strong>until</strong>: {{$event->end_date->format('l, j \of F, Y \a\t g:iA')}}
@@ -31,7 +31,7 @@
         <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
             <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
                 <i class="ra ra-death-skull"></i>
-                Icy Death Awaits!
+                A Fathers Rage Awaits!
             </h2>
             <p class="mb-10 dark:text-gray-300 text-gray-800">
                 During this <a href="/information/raids">raid</a> players have a chance to participate in raid quests that flush out more of the story from <a href="/game-event-info?event_type=the-winter-event">The Winter Event</a>.
@@ -73,7 +73,7 @@
             </h2>
             <p class="mb-10 dark:text-gray-300 text-gray-800">
                Participate in two branches of quests! One will tell the story of The Jester and requires your ability to kill raid monsters to get the quest items,
-                and the other quest line will lead to a cosmetic <a href="#">Name Tag</a> unlock. In this case players get the ability to select a name tag that will show up when they use the public chat!
+                and the other quest line will lead to a cosmetic <a href="#">Race Change</a> unlock. In this case characters can freely switch their race through their settings!
             </p>
         </div>
 
@@ -150,11 +150,11 @@
                 </x-slot:icon>
                 <x-slot:title>
                     <a
-                        href="/information/monsters?table-filters[maps]=The+Ice+Plane+Raid+Bosses#no-link">Band together to take down The Ice Queen!</a>
+                        href="/information/monsters?table-filters[maps]=The+Ice+Plane+Raid+Bosses#no-link">Band together to take down The Frozen King!</a>
                 </x-slot:title>
 
                 <p>
-                    Band together with other players and take down the raid boss: The Ice Queen
+                    Band together with other players and take down the raid boss: The Frozen King
                 </p>
             </x-core.cards.feature-card>
         </div>
