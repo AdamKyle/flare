@@ -39,7 +39,7 @@ class SettingsController extends Controller
                 ->pluck('name', 'id'),
             'cosmeticText' => $canUseCosmeticText,
             'cosmeticNameTag' => $canUseNameTags,
-            'cosmeticRaceChanger' => true, //$canUseCosmeticRaceChanger,
+            'cosmeticRaceChanger' => $canUseCosmeticRaceChanger,
             'nameTags' => NameTags::$valueNames,
         ]);
     }
@@ -149,9 +149,9 @@ class SettingsController extends Controller
     public function cosmeticRaceChanger(RaceChangerRequest $request, User $user)
     {
 
-        // if ($user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::COSMETIC_RACE_CHANGER)->count() <= 0) {
-        //     return redirect()->back()->with('error', 'Missing required quest completion for that action.');
-        // }
+        if ($user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::COSMETIC_RACE_CHANGER)->count() <= 0) {
+            return redirect()->back()->with('error', 'Missing required quest completion for that action.');
+        }
 
         $character = $user->character;
 
