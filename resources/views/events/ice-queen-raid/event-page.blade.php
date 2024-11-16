@@ -73,7 +73,7 @@
             </h2>
             <p class="mb-10 dark:text-gray-300 text-gray-800">
                Participate in two branches of quests! One will tell the story of The Jester and requires your ability to kill raid monsters to get the quest items,
-                and the other quest line will lead to a cosmetic <a href="#">Name Tag</a> unlock. In this case players get the ability to select a name tag that will show up when they use the public chat!
+                and the other quest line will lead to a <a href="/information/cosmetic-name-tags">Cosmetic Name Tag</a> unlock. In this case players get the ability to select a name tag that will show up when they use the public chat!
             </p>
         </div>
 

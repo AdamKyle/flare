@@ -7,9 +7,11 @@ use App\Flare\Models\GameRace;
 use App\Flare\Models\User;
 use App\Flare\Values\FeatureTypes;
 use App\Flare\Values\NameTags;
+use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
 use App\Game\Core\Requests\CosmeticTextRequest;
 use App\Game\Core\Requests\NameTagRequest;
+use App\Game\Core\Requests\RaceChangerRequest;
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\Request;
@@ -17,7 +19,7 @@ use Illuminate\Support\Facades\Cache;
 
 class SettingsController extends Controller
 {
-    public function __construct()
+    public function __construct(private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler,)
     {
         $this->middleware('auth');
     }
@@ -26,7 +28,8 @@ class SettingsController extends Controller
     {
 
         $canUseCosmeticText = $user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::COSMETIC_TEXT)->count() > 0;
-        $canUseNameTags = $user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::NAME_TAGS)->count() > 0;
+        $canUseNameTags = $user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::COSMETIC_NAME_TAGS)->count() > 0;
+        $canUseCosmeticRaceChanger = $user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::COSMETIC_RACE_CHANGER)->count() > 0;
 
         return view('game.core.settings.settings', [
             'user' => $user,
@@ -36,6 +39,7 @@ class SettingsController extends Controller
                 ->pluck('name', 'id'),
             'cosmeticText' => $canUseCosmeticText,
             'cosmeticNameTag' => $canUseNameTags,
+            'cosmeticRaceChanger' => true, //$canUseCosmeticRaceChanger,
             'nameTags' => NameTags::$valueNames,
         ]);
     }
@@ -104,7 +108,7 @@ class SettingsController extends Controller
                 'guide_enabled' => $request->guide_enabled,
             ]);
 
-            Cache::put('user-show-guide-initial-message-'.$user->id, 'true');
+            Cache::put('user-show-guide-initial-message-' . $user->id, 'true');
         }
 
         return redirect()->back()->with('success', 'Updated character guide setting.');
@@ -125,7 +129,7 @@ class SettingsController extends Controller
     public function cosmeticNametag(NameTagRequest $request, User $user)
     {
 
-        if ($user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::NAME_TAGS)->count() <= 0) {
+        if ($user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::COSMETIC_NAME_TAGS)->count() <= 0) {
             return redirect()->back()->with('error', 'Missing required quest completion for that action.');
         }
 
@@ -140,5 +144,45 @@ class SettingsController extends Controller
         $user->update($request->all());
 
         return redirect()->back()->with('success', 'Updated Name Tag options');
+    }
+
+    public function cosmeticRaceChanger(RaceChangerRequest $request, User $user)
+    {
+
+        // if ($user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::COSMETIC_RACE_CHANGER)->count() <= 0) {
+        //     return redirect()->back()->with('error', 'Missing required quest completion for that action.');
+        // }
+
+        $character = $user->character;
+
+        $stats = ['str', 'dex', 'chr', 'int', 'agi', 'dur', 'focus'];
+
+        foreach ($stats as $stat) {
+            if ($character->race->{$stat . '_mod'} > 0) {
+                $character->{$stat} -= $character->race->{$stat . '_mod'};
+            }
+        }
+
+        $character->save();
+
+        $character = $character->refresh();
+
+        $gameRace = GameRace::find($request->race_id);
+
+        foreach ($stats as $stat) {
+            if ($gameRace->{$stat . '_mod'} > 0) {
+                $character->{$stat} += $gameRace->{$stat . '_mod'};
+            }
+        }
+
+        $character->game_race_id = $gameRace->id;
+
+        $character->save();
+
+        $character = $character->refresh();
+
+        $this->updateCharacterAttackTypesHandler->updateCache($character);
+
+        return redirect()->back()->with('success', 'Your race has been changed!');
     }
 }

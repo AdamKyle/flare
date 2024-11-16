@@ -326,9 +326,9 @@ class CharacterBuilderService
     protected function getDefaultLevel(CharacterClassRank $classRank, int $type)
     {
         if (($classRank->gameClass->type()->isFighter() ||
-                $classRank->gameClass->type()->isThief() ||
-                $classRank->gameClass->type()->isVampire() ||
-                $classRank->gameClass->type()->isBlackSmith()) && (new WeaponMasteryValue($type))->isWeapon()) {
+            $classRank->gameClass->type()->isThief() ||
+            $classRank->gameClass->type()->isVampire() ||
+            $classRank->gameClass->type()->isBlackSmith()) && (new WeaponMasteryValue($type))->isWeapon()) {
             return 5;
         }
 

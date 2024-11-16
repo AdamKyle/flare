@@ -96,6 +96,10 @@
                 <span class="text-sm icon far fa-keyboard"></span>
                 Cosmetic Text
             </a>
+            <a href="{{ route('info.page', ['pageName' => 'cosmetic-name-tags']) }}">
+                <span class="text-sm icon fas fa-tag"></span>
+                Cosmetic Name Tags
+            </a>
         </div>
     </div>
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Flare\Models\ScheduledEvent;
 use App\Game\Events\Values\EventType;
+use App\Game\Raids\Values\RaidType;
 use App\Http\Request\EventPageRequest;
 use Auth;
 
@@ -36,10 +37,21 @@ class WelcomeController extends Controller
 
         if (in_array($eventType, $raids)) {
 
-            $event = ScheduledEvent::where('event_type', EventType::RAID_EVENT)->where('currently_running', true)->first();
+            $raidType = match ($eventType) {
+                'jester-of-time' => RaidType::JESTER_OF_TIME,
+                'the-smugglers-are-back-raid' => RaidType::PIRATE_LORD,
+                'ice-queen-raid' => RaidType::ICE_QUEEN,
+                'the-frozen-king-raid' => RaidType::FROZEN_KING,
+            };
+
+            $event = ScheduledEvent::where('event_type', EventType::RAID_EVENT)->where('currently_running', true)->whereHas('raid', function ($query) use ($raidType) {
+                return $query->where('raid_type', $raidType);
+            })->first();
 
             if (is_null($event)) {
-                $event = ScheduledEvent::where('event_type', EventType::RAID_EVENT)->where('start_date', '>=', now())->orderBy('id')->first();
+                $event = ScheduledEvent::where('event_type', EventType::RAID_EVENT)->where('start_date', '>=', now())->whereHas('raid', function ($query) use ($raidType) {
+                    return $query->where('raid_type', $raidType);
+                })->orderBy('id')->first();
             }
 
             switch ($eventType) {

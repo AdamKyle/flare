@@ -57,7 +57,7 @@ class NameTags
         self::DERANGED_LUNITIC_OF_HELL => 'A Deranged Lunitic From Hell',
         self::HELPER_OF_MR_WHISKERS => 'Special helper to Mr. Whiskers',
         self::ALL_YOUR_BASES_BELONG_TO_US => 'All your bases belong to us',
-        self::FEARSOME_MAGI_OF_THE_MEMORY => 'The most feared magi in all of recent memory',
+        self::FEARSOME_MAGI_OF_THE_MEMORY => 'Most feared magi in all of recent memory',
     ];
 
     /**
