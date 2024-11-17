@@ -103,17 +103,36 @@ class InitiateWinterEvent implements ShouldQueue
     {
         $raidsForEvent = $scheduledEvent->raids_for_event;
 
+        if (is_null($raidsForEvent)) {
+            return;
+        }
+
+        $newRaidForEventData = [];
+
         foreach ($raidsForEvent as $raidForEvent) {
 
             $raid = Raid::find($raidForEvent['selected_raid']);
 
+            $startDate = Carbon::parse($raidForEvent['start_date'])->addYear()->format('Y-m-d\TH:i:s.u\Z');
+            $endDate = Carbon::parse($raidForEvent['end_date'])->addYear()->format('Y-m-d\TH:i:s.u\Z');
+
             $scheduledEvent = ScheduledEvent::create([
                 'event_type' => EventType::RAID_EVENT,
                 'raid_id' => $raidForEvent['selected_raid'],
-                'start_date' => Carbon::parse($raidForEvent['start_date'])->addYear(),
-                'end_date' => Carbon::parse($raidForEvent['end_date'])->addYear(),
+                'start_date' => $startDate,
+                'end_date' => $endDate,
                 'description' => $raid->scheduled_event_description,
             ]);
+
+            $newRaidForEventData[] = [
+                ...$raidForEvent,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+            ];
         }
+
+        $scheduledEvent->update([
+            'raids_for_event' => $newRaidForEventData
+        ]);
     }
 }
