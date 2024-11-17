@@ -10,6 +10,7 @@ use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
+use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Services\DisenchantService;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -318,9 +319,17 @@ class DisenchantServiceTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testGivePlayerGoldDustRushWhenGoldDustCapped()
+    public function testDoNotGivePlayerGoldDustRushWhenGoldDustCapped()
     {
         Event::fake();
+
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('getDCCheck')->once()->andReturn(1);
+                $mock->shouldReceive('characterRoll')->once()->andReturn(100);
+            })
+        );
 
         $disenchantingService = resolve(DisenchantService::class);
 
@@ -345,6 +354,7 @@ class DisenchantServiceTest extends TestCase
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
 
         Event::assertDispatched(UpdateCharacterEnchantingList::class);
+        Event::assertDispatched(UpdateSkillEvent::class);
     }
 
     public function testCallDisenchantItemAndSucceed()

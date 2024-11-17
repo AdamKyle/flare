@@ -102,7 +102,6 @@ class DisenchantService
 
         if ($this->character->gold_dust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
 
-
             $affixData = resolve(EnchantingService::class)->fetchAffixes($this->character->refresh());
 
             if ($disenchanted) {
