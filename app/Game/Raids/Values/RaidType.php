@@ -10,6 +10,7 @@ class RaidType
     const ICE_QUEEN = 'ice-queen';
     const JESTER_OF_TIME = 'jester-of-time';
     const FROZEN_KING = 'frozen-king';
+    const CORRUPTED_BISHOP = 'corrupted-bishop';
 
     private string $value;
 
@@ -21,6 +22,7 @@ class RaidType
         self::ICE_QUEEN => self::ICE_QUEEN,
         self::JESTER_OF_TIME => self::JESTER_OF_TIME,
         self::FROZEN_KING => self::FROZEN_KING,
+        self::CORRUPTED_BISHOP => self::CORRUPTED_BISHOP,
     ];
 
     public static array $selectionOptions = [
@@ -28,6 +30,7 @@ class RaidType
         self::ICE_QUEEN => 'Ice Queen Raid',
         self::JESTER_OF_TIME => 'Jester of Time Raid',
         self::FROZEN_KING => 'Frozen King',
+        self::CORRUPTED_BISHOP => 'Corrupted Bishop',
     ];
 
     /**
@@ -62,5 +65,10 @@ class RaidType
     public function isFrozenKing(): bool
     {
         return $this->value === self::FROZEN_KING;;
+    }
+
+    public function isCorruptedBishop(): bool
+    {
+        return $this->value === self::CORRUPTED_BISHOP;
     }
 }

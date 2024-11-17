@@ -7,14 +7,24 @@
 
 @section('content')
     <div class="container mx-auto lg:px-4 mb-5">
-        <div class="text-center mb-10 lg:mt-10">
-            <h3 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800 text-4xl md:text-7xl">A mother trapped in her own pain</h3>
-            <p class="mb-5 dark:text-gray-300 text-gray-800 italic">Her pain keeps her trapped in her own memories. Time to put down this grieving mother!</p>
-            <p class="mb-10 text-orange-600 dark:text-orange-300 my-2">
-                <strong>Runs from</strong>: {{$event->start_date->format('l, j \of F, Y \a\t g:iA')}}
-                <strong>until</strong>: {{$event->end_date->format('l, j \of F, Y \a\t g:iA')}}
-            </p>
-            <div class="grid md:grid-cols-3 gap-2 md:w-2/3 w-full mr-auto ml-auto">
+        <div class="mb-10 lg:mt-10">
+            <div class="text-center">
+                <h3 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800 text-4xl md:text-7xl">A mother trapped in her own pain</h3>
+                <p class="mb-5 dark:text-gray-300 text-gray-800 italic">Her pain keeps her trapped in her own memories. Time to put down this grieving mother!</p>
+            </div>
+            @if (!is_null($event))
+                <p class="mb-10 text-orange-600 dark:text-orange-300 my-2 text-center">
+                    <strong>Runs from</strong>: {{$event->start_date->format('l, j \of F, Y \a\t g:iA')}}
+                    <strong>until</strong>: {{$event->end_date->format('l, j \of F, Y \a\t g:iA')}}
+                </p>
+            @else
+                <div class="w-1/3 mx-auto">
+                <x-core.alerts.info-alert title="Not yet scheduled">
+                    This event hasn't been scheduled yet. Don't worry The Creator will schedule it soon! Below you can learn more about it for when it is scheduled!
+                </x-core.alerts.info-alert>
+                </div>
+            @endif
+            <div class="text-center grid md:grid-cols-3 gap-2 md:w-2/3 w-full mr-auto ml-auto">
                 <x-core.buttons.link-buttons.primary-button css="mr-2" href="{{ route('register') }}">
                     Join Today!
                 </x-core.buttons.link-buttons.primary-button>
@@ -86,7 +96,7 @@
                         put your gear to the test. Just take a look for your self. The raid boss is open for all players regardless of skill level to take down!
                     </p>
                     <p class="mb-10 dark:text-gray-300 text-gray-800">
-                        <strong>Are you new?</strong> The raid boss fight for you wont sluaghter you on the first hit! instead the raid boss will laugh at you and you can keep hittin them until you reach a specific damage range, which is when the damage boss starts fighting back!
+                        <strong>Are you new?</strong> The raid boss fight for you wont sluaghter you on the first hit! instead the raid boss will laugh at you and you can keep hitting them until you reach a specific damage range, which is when the damage boss starts fighting back!
                         If your character has an attack of 500 billion  or higher, the raid boss will attack you, if you do not, she will just laugh at you and thank you for tickeling her. All damage counts!
                     </p>
                 </div>
@@ -171,7 +181,7 @@
                 </dd>
                 <dt>What level should I be?</dt>
                 <dd>
-                    If you want to take on raid critters I would suggest you reincarnate your character at least once and have a full set of Purgatory chain gear. But if you are loking at fighting the raid boss, any level will do!
+                    If you want to take on raid critters I would suggest you <a href="/information/reincarnation">reincarnate</a> your character at least once and level up to max leve again as well as having a full set of <a href="">Purgatory chain</a> gear. But if you are loking at fighting the raid boss, any level will do!
                 </dd>
             </dl>
         </div>

@@ -7,10 +7,17 @@ import EventView from "../../../game/components/ui/scheduler/event-view";
 import EventCalendar from "../../../game/components/ui/scheduler/calendar";
 import CalendarState from "./types/calendar-state";
 
-export default class Calendar extends React.Component<{}, CalendarState> {
+interface CalendarProps {
+    in_game: boolean;
+}
+
+export default class Calendar extends React.Component<
+    CalendarProps,
+    CalendarState
+> {
     private updateScheduledEvents: any;
 
-    constructor(props: {}) {
+    constructor(props: CalendarProps) {
         super(props);
 
         this.state = {
@@ -18,8 +25,10 @@ export default class Calendar extends React.Component<{}, CalendarState> {
             loading: true,
         };
 
-        // @ts-ignore
-        this.updateScheduledEvents = Echo.join("update-event-schedule");
+        if (this.props.in_game) {
+            // @ts-ignore
+            this.updateScheduledEvents = Echo.join("update-event-schedule");
+        }
     }
 
     color(name: string): string {
@@ -35,7 +44,15 @@ export default class Calendar extends React.Component<{}, CalendarState> {
     }
 
     componentDidMount() {
-        new Ajax().setRoute("calendar/events").doAjaxCall(
+        let route = "calendar/events";
+
+        if (!this.props.in_game) {
+            route = "calendar/fetch-upcoming-events";
+        }
+
+        console.log(route);
+
+        new Ajax().setRoute(route).doAjaxCall(
             "get",
             (result: AxiosResponse) => {
                 this.setState({
@@ -55,6 +72,10 @@ export default class Calendar extends React.Component<{}, CalendarState> {
                 console.error(error);
             },
         );
+
+        if (!this.props.in_game) {
+            return;
+        }
 
         this.updateScheduledEvents.listen(
             "Flare.Events.UpdateScheduledEvents",

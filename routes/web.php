@@ -2,6 +2,7 @@
 
 Route::get('/', ['as' => 'welcome', 'uses' => 'WelcomeController@welcome']);
 Route::get('/game-event-info', ['as' => 'event.type', 'uses' => 'WelcomeController@showEventPage']);
+Route::get('/game-event-calendar', ['as' => 'event.calendar', 'uses' => 'WelcomeController@showEventCalendar']);
 
 Route::get('/un-ban-request', ['as' => 'un.ban.request', 'uses' => 'UnbanRequestController@unbanRequest']);
 Route::get('/un-ban/request-form/{user}', ['as' => 'un.ban.request.form', 'uses' => 'UnbanRequestController@requestForm']);

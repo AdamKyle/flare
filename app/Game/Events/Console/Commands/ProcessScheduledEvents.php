@@ -40,6 +40,8 @@ class ProcessScheduledEvents extends Command
             ->where('start_date', '<=', $targetEventStart)
             ->get();
 
+        dump($scheduledEvents);
+
         foreach ($scheduledEvents as $event) {
             $eventType = new EventType($event->event_type);
 

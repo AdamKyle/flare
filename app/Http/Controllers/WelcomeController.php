@@ -28,20 +28,26 @@ class WelcomeController extends Controller
         return redirect()->route('game');
     }
 
+    public function showEventCalendar()
+    {
+        return view('event-calendar');
+    }
+
     public function showEventPage(EventPageRequest $request)
     {
 
         $eventType = $request->event_type;
-        $raids = ['jester-of-time', 'the-smugglers-are-back-raid', 'ice-queen-raid', 'the-frozen-king-raid'];
+        $raids = ['jester-of-time-raid', 'the-smugglers-are-back-raid', 'ice-queen-raid', 'the-frozen-king-raid', 'corrupted-bishop-raid'];
         $events = ['delusional-memories', 'weekly-celestials', 'weekly-currency-drops', 'weekly-faction-loyalty', 'tlessas-feedback-event', 'the-winter-event'];
 
         if (in_array($eventType, $raids)) {
 
             $raidType = match ($eventType) {
-                'jester-of-time' => RaidType::JESTER_OF_TIME,
+                'jester-of-time-raid' => RaidType::JESTER_OF_TIME,
                 'the-smugglers-are-back-raid' => RaidType::PIRATE_LORD,
                 'ice-queen-raid' => RaidType::ICE_QUEEN,
                 'the-frozen-king-raid' => RaidType::FROZEN_KING,
+                'corrupted-bishop-raid' => RaidType::CORRUPTED_BISHOP,
             };
 
             $event = ScheduledEvent::where('event_type', EventType::RAID_EVENT)->where('currently_running', true)->whereHas('raid', function ($query) use ($raidType) {
@@ -55,7 +61,7 @@ class WelcomeController extends Controller
             }
 
             switch ($eventType) {
-                case 'jester-of-time':
+                case 'jester-of-time-raid':
                     return view('events.jester-of-time-raid.event-page', [
                         'event' => $event,
                     ]);
@@ -67,12 +73,12 @@ class WelcomeController extends Controller
                     return view('events.ice-queen-raid.event-page', [
                         'event' => $event,
                     ]);
-                case 'frozen-king-raid':
+                case 'the-frozen-king-raid':
                     return view('events.frozen-king-raid.event-page', [
                         'event' => $event,
                     ]);
-                case 'the-frozen-king-raid':
-                    return view('events.ice-queen-raid.event-page', [
+                case 'corrupted-bishop-raid':
+                    return view('events.corrupted-bishop-raid.event-page', [
                         'event' => $event,
                     ]);
                 default:

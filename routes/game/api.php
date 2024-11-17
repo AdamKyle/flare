@@ -15,4 +15,3 @@ Route::group(['middleware' => ['is.character.who.they.say.they.are', 'update.pla
 Route::group(['middleware' => ['auth', 'session.time.tracking']], function () {
     Route::post('/game-heart-beat', ['uses' => 'Api\GameHeartBeatController@heartBeat']);
 });
-

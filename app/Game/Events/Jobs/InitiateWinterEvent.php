@@ -5,12 +5,14 @@ namespace App\Game\Events\Jobs;
 use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GlobalEventGoal;
+use App\Flare\Models\Raid;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Values\MapNameValue;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventForEventTypeValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Quests\Services\BuildQuestCacheService;
+use Carbon\Carbon;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -63,6 +65,8 @@ class InitiateWinterEvent implements ShouldQueue
         event(new GlobalMessageEvent('Players who have Guide Quests enabled will also see a set of new quests to introduce them to the Winter Event. These are geared at new and existing players.'));
 
         $buildQuestCacheService->buildQuestCache(true);
+
+        $this->scheduleNextYearsEvent($event);
     }
 
     public function kickOffGlobalEventGoal(): void
@@ -75,9 +79,41 @@ class InitiateWinterEvent implements ShouldQueue
 
         event(new GlobalMessageEvent('While on the The Ice Plane, characters who kill: ANY CREATURE in either manual or exploration, will increase the new: Global Event Goal. Players will be rewarded with random Corrupted Ice Gear when specific milestones are reached.'));
 
-        event(new GlobalMessageEvent('Players can participate by going to the map: '.$gameMap->name.
-            ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile)'.' '.
-            'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items.'.
+        event(new GlobalMessageEvent('Players can participate by going to the map: ' . $gameMap->name .
+            ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile)' . ' ' .
+            'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items.' .
             ' You can see the event goal for the map specified by being on the map and clicking the Event Goal tab from the map.'));
+    }
+
+    private function scheduleNextYearsEvent(ScheduledEvent $scheduledEvent): void
+    {
+        $scheduledEvent = ScheduledEvent::create([
+            'event_type' => $scheduledEvent->event_type,
+            'raid_id' => $scheduledEvent->raid_id,
+            'start_date' => $scheduledEvent->start_date->addYear(),
+            'end_date' => $scheduledEvent->end_date->addYear(),
+            'description' => $scheduledEvent->description,
+            'raids_for_event' => $scheduledEvent->raids_for_event,
+        ]);
+
+        $this->createRaidEventsForScheduledEventWith($scheduledEvent);
+    }
+
+    private function createRaidEventsForScheduledEventWith(ScheduledEvent $scheduledEvent): void
+    {
+        $raidsForEvent = $scheduledEvent->raids_for_event;
+
+        foreach ($raidsForEvent as $raidForEvent) {
+
+            $raid = Raid::find($raidForEvent['selected_raid']);
+
+            $scheduledEvent = ScheduledEvent::create([
+                'event_type' => EventType::RAID_EVENT,
+                'raid_id' => $raidForEvent['selected_raid'],
+                'start_date' => Carbon::parse($raidForEvent['start_date'])->addYear(),
+                'end_date' => Carbon::parse($raidForEvent['end_date'])->addYear(),
+                'description' => $raid->scheduled_event_description,
+            ]);
+        }
     }
 }

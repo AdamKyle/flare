@@ -50,11 +50,47 @@
             </div>
         </div>
 
+        <div class="w-full mx-auto mt-20 text-center lg:w-2/4">
+            <h2 class="mb-5 text-2xl font-thin text-gray-800 lg:text-5xl dark:text-gray-300">
+                <i class="fas fa-globe-americas"></i>
+                A World of Possibilities
+            </h2>
+            <p class="mb-10 text-gray-800 dark:text-gray-300">
+                Tlessa offers a lot for the average player to do, from crafting, enchanting, gear progression, quests,
+                monsters, kingdoms to manage and to take. There is more to do here
+                including but not limited to: Reach level 4000+, Fight epic Celestials, Get Faction Points for Uniques,
+                Complete over 60 quests and so much more.
+            </p>
+
+            <p class="mb-10 text-gray-800 dark:text-gray-300">
+                <strong>Best part?</strong> it's all free! Just requires time investment, as little or as much as you want!
+            </p>
+            <div class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
+        </div>
+
         @if (count($scheduledEventsRunning) > 0)
             @include('./welcome-partials/event-container', [
                 'scheduledEventsRunning' => $scheduledEventsRunning
             ])
         @endif
+
+        <div class="w-full mx-auto mt-20 text-center lg:w-2/4">
+            <h2 class="mb-5 text-2xl font-thin text-gray-800 lg:text-5xl dark:text-gray-300">
+                <i class="fas fa-calendar"></i>
+                Tlessa's Events
+            </h2>
+            <p class="mb-10 text-gray-800 dark:text-gray-300">
+                Tlessa has a lot of events that keep players engaged! You can check out our event calendar and see what events are coming up.
+                All event all intended for all players regardless of level or power to participate in!
+            </p>
+
+            <p class="mb-10 text-gray-800 dark:text-gray-300">
+                <x-core.buttons.link-buttons.success-button href="{{route('event.calendar')}}">
+                    View the upcoming events!
+                </x-core.buttons.link-buttons.success-button>
+            </p>
+            <div class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
+        </div>
 
         @if (SurveyStats::canShowSurveyMenuOption())
             <div class="w-full mx-auto mt-20 text-center lg:w-2/4">
@@ -75,24 +111,7 @@
             </div>
         @endif
 
-        <div class="w-full mx-auto mt-20 text-center lg:w-2/4">
-            <h2 class="mb-5 text-2xl font-thin text-gray-800 lg:text-5xl dark:text-gray-300">
-                <i class="fas fa-globe-americas"></i>
-                A World of Possibilities
-            </h2>
-            <p class="mb-10 text-gray-800 dark:text-gray-300">
-                Tlessa offers a lot for the average player to do, from crafting, enchanting, gear progression, quests,
-                monsters, kingdoms to manage and to take. There is more to do here
-                including but not limited to: Reach level 4000+, Fight epic Celestials, Get Faction Points for Uniques,
-                Complete over 60 quests and so much more.
-            </p>
-
-            <p class="mb-10 text-gray-800 dark:text-gray-300">
-                <strong>Best part?</strong> it's all free! Just requires time investment, as little or as much as you want!
-            </p>
-        </div>
-
-        <div class="grid w-full gap-3 m-auto lg:grid-cols-3 md:w-2/3">
+        <div class="grid w-full gap-3 m-auto lg:grid-cols-3 md:w-2/3 mt-20">
             <x-core.cards.feature-card>
                 <x-slot:icon>
                     <i class="ra ra-player text-primary-600 relative top-[10px] right-[10px]"></i>

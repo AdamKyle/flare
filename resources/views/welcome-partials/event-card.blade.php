@@ -19,9 +19,14 @@
         $href = route('event.type', ['event_type' => 'weekly-faction-loyalty']);
     }
 
-    if ($eventRunning->getTitleOfEvent() === 'The Ice Queen\'s Realm' ||
-        $eventRunning->getTitleOfEvent() === 'Delusional Memories Event') {
+    if ($eventRunning->getTitleOfEvent() === 'The Winter Event') {
         $icon = 'ra-hourglass';
+        $href = route('event.type', ['event_type' => 'the-winter-event']);
+    }
+
+    if ($eventRunning->getTitleOfEvent() === 'Delusional Memories Event') {
+        $icon = 'ra-hourglass';
+        $href = route('event.type', ['event_type' => 'delusional-memories']);
     }
 
     if ($eventRunning->getTitleOfEvent() === 'Delusional Memories Event') {
@@ -38,6 +43,10 @@
 
     if ($eventRunning->getTitleOfEvent() === 'The Ice Queens Reign') {
         $href = route('event.type', ['event_type' => 'ice-queen-raid']);
+    }
+
+    if ($eventRunning->getTitleOfEvent() === 'The Frozen King') {
+        $href = route('event.type', ['event_type' => 'the-frozen-king-raid']);
     }
 
     if ($eventRunning->getTitleOfEvent() === 'Tlessa\'s Feedback Event') {
@@ -75,7 +84,7 @@
             requirements for the next level are halved!
         @endif
 
-        @if ($eventRunning->getTitleOfEvent() === 'The Ice Queen\'s Realm')
+        @if ($eventRunning->getTitleOfEvent() === 'The Winter Event')
             Winter event is here! Enter the temporary map for powerful loot and epic adventures. Settle kingdoms to win
             a full set of Corrupted Ice Gear!
         @endif
@@ -87,17 +96,22 @@
 
         @if ($eventRunning->getTitleOfEvent() === 'The Jester of Time')
             Join the Jester of Time raid! Head to Southren Port in Delusional Memories and band together! The player who
-            kills him gets a new ancestral item!
+            kills him gets a new Ancestral item!
         @endif
 
         @if ($eventRunning->getTitleOfEvent() === 'The Smugglers Are Back!')
             Join the Smugglers are Back raid! Head to Smugglers Port on Surface and band together! The player who kills
-            him gets a new ancestral item!
+            him gets a new Ancestral item!
         @endif
 
         @if ($eventRunning->getTitleOfEvent() === 'The Ice Queens Reign')
             Join the The Ice Queens Reign raid! Head to The Fathers Tomb on The Ice Plane and band together! The player
-            who kills him gets a new ancestral item!
+            who kills her gets a new Ancestral item!
+        @endif
+
+        @if ($eventRunning->getTitleOfEvent() === 'The Frozen King')
+            Join The Frozen King raid! head to The Frozen Christmas Tree Lot on The Ice Plane and band together! The player
+            who kills him gets a new Ancestral item!
         @endif
 
         @if ($eventRunning->getTitleOfEvent() === 'Tlessa\'s Feedback Event')

@@ -7,14 +7,24 @@
 
 @section('content')
     <div class="container mx-auto lg:px-4 mb-5">
-        <div class="text-center mb-10 lg:mt-10">
-            <h3 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800 text-4xl md:text-7xl">Jester of Time</h3>
-            <p class="mb-5 dark:text-gray-300 text-gray-800 italic">A mad man with a corrupted sense of cruelty! Will he ever find his lover?</p>
-            <p class="mb-10 text-orange-600 dark:text-orange-300 my-2">
-                <strong>Runs from</strong>: {{$event->start_date->format('l, j \of F, Y \a\t g:iA')}}
-                <strong>until</strong>: {{$event->end_date->format('l, j \of F, Y \a\t g:iA')}}
-            </p>
-            <div class="grid md:grid-cols-3 gap-2 md:w-2/3 w-full mr-auto ml-auto">
+        <div class="mb-10 lg:mt-10">
+            <div class="text-center">
+                <h3 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800 text-4xl md:text-7xl">Jester of Time</h3>
+                <p class="mb-5 dark:text-gray-300 text-gray-800 italic">A mad man with a corrupted sense of cruelty! Will he ever find his lover?</p>
+            </div>
+            @if (!is_null($event))
+                <p class="mb-10 text-orange-600 dark:text-orange-300 my-2 text-center">
+                    <strong>Runs from</strong>: {{$event->start_date->format('l, j \of F, Y \a\t g:iA')}}
+                    <strong>until</strong>: {{$event->end_date->format('l, j \of F, Y \a\t g:iA')}}
+                </p>
+            @else
+                <div class="w-1/3 mx-auto">
+                <x-core.alerts.info-alert title="Not yet scheduled">
+                    This event hasn't been scheduled yet. Don't worry The Creator will schedule it soon! Below you can learn more about it for when it is scheduled!
+                </x-core.alerts.info-alert>
+                </div>
+            @endif
+            <div class="text-center grid md:grid-cols-3 gap-2 md:w-2/3 w-full mr-auto ml-auto">
                 <x-core.buttons.link-buttons.primary-button css="mr-2" href="{{ route('register') }}">
                     Join Today!
                 </x-core.buttons.link-buttons.primary-button>
@@ -80,10 +90,12 @@
             <div class="md:flex md:items-center text-center md:text-left">
                 <div>
                     <h2 class="mb-5 font-thin md:text-4xl lg:text-5xl dark:text-gray-300 text-gray-800">Put your skill to the test!</h2>
-                    <p class="mb-10 dark:text-gray-300 text-gray-800">
+                    <p class="mb-4 dark:text-gray-300 text-gray-800">
                         <a href="/information/monsters?table-filters[maps]=Delusional+Memories+Raid+Monsters#no-link">Raid Critters</a> are much stronger then you might be use to. While the <a href="/information/monsters?table-filters[maps]=Delusional+Memories+Raid+Bosses">Raid Boss</a> needs players to take it down, the raid critters will
                         put your gear to the test. Just take a look for your self.
                     </p>
+                    <p class="mb-10 dark:text-gray-300 text-gray-800"><strong>Are you new?</strong> Don't fret, you can even participate in the Raid Boss fight, while the raid critters might be
+                    too strong for you, the raid boss can be participated in by all players of all skill and level. Highend players are imited in their damage output to make things fun and balanced!</p>
                 </div>
             </div>
             <div class="mt-4 lg:mt-0">
@@ -105,7 +117,7 @@
                 Gain 10 new Sets
             </h2>
             <p class="mb-10 dark:text-gray-300 text-gray-800">
-                Complete the Raid Quests on Delusional Memories Plane and gain an additional ten sets for additional gear sets or extra storage.
+                Complete the Raid Quests on Delusional Memories Plane and gain an additional ten <a href="/information/equipment-sets">sets</a> for additional gear sets.
                 This will give you a total of 20 Sets!
             </p>
         </div>
@@ -136,7 +148,7 @@
                 </x-slot:title>
 
                 <p>
-                    gain the next piece of your gear progression: Delusional Silver. This gear comes with no enchantments allowing you to make it your own!
+                    gain the next piece of your gear progression: <a href="/information/delusional-silver">Delusional Silver</a>. This gear comes with no enchantments allowing you to make it your own!
                 </p>
             </x-core.cards.feature-card>
             <x-core.cards.feature-card>
@@ -154,6 +166,10 @@
                     Band together with other players and take down the raid boss: Jester of Time
                 </p>
             </x-core.cards.feature-card>
+        </div>
+
+        <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
+            <div class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
         </div>
 
         <div class="text-center w-full lg:w-2/4 mx-auto mt-20 mb-20">
@@ -181,7 +197,7 @@
                 </dd>
                 <dt>What level should I be?</dt>
                 <dd>
-                    You should have reincarnated your character at least twice to make any meaningful damage as well as made use of a few class specialties.
+                    If you want to take on raid critters I would suggest you <a href="/information/reincarnation">reincarnate</a> your character at least once and level up to max leve again as well as having a full set of <a href="/information/twisted-earth">Twisted Earth</a> gear. But if you are loking at fighting the raid boss, any level will do!
                 </dd>
             </dl>
         </div>

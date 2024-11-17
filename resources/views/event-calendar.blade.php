@@ -4,11 +4,12 @@
     <x-core.cards.card-with-title
         title="Upcoming events!"
         buttons="true"
-        backUrl="{{route('game')}}"
+        backUrl="{{route('welcome')}}"
     >
-        <div id="player-event-calendar" data-in-game="true"></div>
+        <div id="player-event-calendar" data-in-game="false"></div>
     </x-core.cards.card-with-title>
-@endSection
+@endsection
+
 
 @push('scripts')
     @vite('resources/js/player-event-calendar-component.ts')

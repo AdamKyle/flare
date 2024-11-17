@@ -7,14 +7,26 @@
 
 @section('content')
     <div class="container mx-auto lg:px-4 mb-5">
-        <div class="text-center mb-10 lg:mt-10">
-            <h3 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800 text-4xl md:text-7xl">The Winter Event</h3>
-            <p class="mb-5 dark:text-gray-300 text-gray-800 italic">Covered in ice and ruled by the wailing queen of ice. Help Mr. Whiskers find the truth of this cold and desolate place!</p>
-            <p class="mb-10 text-orange-600 dark:text-orange-300 my-2">
-                <strong>Runs from</strong>: {{$event->start_date->format('l, j \of F, Y \a\t g:iA')}}
-                <strong>until</strong>: {{$event->end_date->format('l, j \of F, Y \a\t g:iA')}}
-            </p>
-            <div class="grid md:grid-cols-3 gap-2 md:w-2/3 w-full mr-auto ml-auto">
+        <div class="mb-10 lg:mt-10">
+            <div class="text-center">
+                <h3 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800 text-4xl md:text-7xl">The Winter Event</h3>
+                <p class="mb-5 dark:text-gray-300 text-gray-800 italic">Covered in ice and ruled by the wailing queen of ice. Help Mr. Whiskers find the truth of this cold and desolate place!</p>
+            </div>
+
+            @if (!is_null($event))
+                <p class="mb-10 text-orange-600 dark:text-orange-300 my-2 text-center">
+                    <strong>Runs from</strong>: {{$event->start_date->format('l, j \of F, Y \a\t g:iA')}}
+                    <strong>until</strong>: {{$event->end_date->format('l, j \of F, Y \a\t g:iA')}}
+                </p>
+            @else
+                <div class="w-1/3 mx-auto">
+                <x-core.alerts.info-alert title="Not yet scheduled">
+                    This event hasn't been scheduled yet. Don't worry The Creator will schedule it soon! Below you can learn more about it for when it is scheduled!
+                </x-core.alerts.info-alert>
+                </div>
+            @endif
+
+            <div class="text-center grid md:grid-cols-3 gap-2 md:w-2/3 w-full mr-auto ml-auto">
                 <x-core.buttons.link-buttons.primary-button css="mr-2" href="{{ route('register') }}">
                     Join Today!
                 </x-core.buttons.link-buttons.primary-button>
@@ -161,14 +173,14 @@
             <dl class="mt-3">
                 <dt>How do I access the event?</dt>
                 <dd>
-                    Simply log in or create a new character and once you are in, click Traverse under the map. If you are on mobile, select Map Movement
+                    Simply log in or create a new character and once you are in, click <a href="/information/traverse">Traverse</a> under the map. If you are on mobile, select Map Movement
                     from the drop down of actions. From here - under the map - is a traverse button, click that to then select The Ice Plane and enter the
                     event.
                 </dd>
                 <dt>What happens when the event is over?</dt>
                 <dd>
                     When the event ends players wil be moved to Surface - the starting map. All kingdoms settled on The Ice Plane will fall to the ground and
-                    the player with the most kingdoms gets a full set of end game gear: Corrupted Ice.
+                    the player with the most kingdoms gets a full set of end game gear: <a href="/information/corrupted-ice">Corrupted Ice</a>.
                 </dd>
                 <dt>Unique and End Game Gear - Seems Easy!</dt>
                 <dd>
@@ -178,7 +190,7 @@
                 <dt>Lots of this sounds like high level content, what can new players do?</dt>
                 <dd>
                     New players can join in on the quests and the new story line, they can also participate in the global events. As stated before those with out access to end game content, will
-                    face early game monsters to make it fair and inviting to all. Players, even new players, can get Mythical and Legendary gear down here by participating in the global events,
+                    face early game monsters to make it fair and inviting to all. Players, even new players, can get <a href="/information/unique-items">Unique</a> <a href="/information/corrupted-ice">Corrupted Ice</a>. gear down here by participating in the global events,
                     this will take them a long way until they understand more systems in the game.
                 </dd>
             </dl>
