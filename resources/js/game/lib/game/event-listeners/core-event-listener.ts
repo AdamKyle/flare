@@ -1,7 +1,7 @@
 import Echo from "laravel-echo";
 
 export default class CoreEventListener {
-    private echo?: Echo;
+    private echo?: Echo<"pusher">;
 
     /**
      * Initialize Laravel Echo
@@ -38,7 +38,7 @@ export default class CoreEventListener {
      *
      * @throws Error - if echo is not initialized.
      */
-    public getEcho(): Echo {
+    public getEcho(): Echo<"pusher"> {
         if (this.echo) {
             return this.echo;
         }
