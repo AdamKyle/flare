@@ -51,9 +51,11 @@ class MassImportCustomData extends Command
         Artisan::call('import:game-data Raids');
         Artisan::call('import:game-data Quests');
         Artisan::call('create:quest-cache');
+        Artisan::call('assign:new-npcs-to-faction-loyalty');
         Artisan::call('balance:monsters');
         Artisan::call('generate:monster-cache');
         Artisan::call('create:character-attack-data');
+
 
         $this->importInformationSection();
 
