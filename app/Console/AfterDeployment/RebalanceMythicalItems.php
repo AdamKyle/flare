@@ -55,7 +55,7 @@ class RebalanceMythicalItems extends Command
 
     const NEW_MYTHICAL_PRICE = 10_000_000_000;
 
-    const MAX_PERCENTAGE = .80;
+    const MAX_PERCENTAGE = .90;
 
     const MAX_DAMAGE = .60;
 

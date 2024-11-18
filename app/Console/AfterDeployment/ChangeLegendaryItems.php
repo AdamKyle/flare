@@ -14,7 +14,7 @@ class ChangeLegendaryItems extends Command
 
     const LEGENDARY_LEGENDARY_COST = 80_000_000_000;
 
-    const MAX_PERCENTAGE = 0.50;
+    const MAX_PERCENTAGE = 0.65;
 
     const MAX_DAMAGE = 0.25;
 

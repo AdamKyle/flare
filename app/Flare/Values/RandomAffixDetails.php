@@ -44,12 +44,12 @@ class RandomAffixDetails
     {
         switch ($this->value) {
             case self::MYTHIC:
-                return [55, 80];
+                return [65, 90];
             case self::COSMIC:
-                return [95, 110];
+                return [95, 125];
             case self::LEGENDARY:
             default:
-                return [10, 50];
+                return [10, 65];
         }
     }
 
