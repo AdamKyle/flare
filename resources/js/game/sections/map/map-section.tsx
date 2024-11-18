@@ -267,10 +267,10 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                                 {this.state.map_name === "The Ice Plane" ? (
                                     <Snowfall
                                         style={{
-                                            position: "absolute", // Changed from 'fixed' to 'absolute'
+                                            position: "absolute",
                                             width: 2500,
                                             height: 2500,
-                                            top: 0, // Adjust to align properly within the container
+                                            top: 0,
                                             left: 0,
                                         }}
                                     />

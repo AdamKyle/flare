@@ -52,8 +52,9 @@ class CreateEventsForDevelopment extends Command
     /**
      * Create a specific event.
      */
-    private function createEvent(string $eventType, string $eventName): void
+    private function createEvent(int $eventType, string $eventName): void
     {
+
         if ($eventType === EventType::RAID_EVENT) {
 
             $selectedRaid = $this->choice(

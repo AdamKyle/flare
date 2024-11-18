@@ -7,6 +7,7 @@ import ToolTipHandler from "./grid/tool-tip-handler";
 import MoveLocationDialogue from "./modals/move-location-dialogue";
 import GridOverlayProps from "./types/grid-overlay-props";
 import GridOverlayState from "./types/grid-overlay-state";
+import NpcDetails from "./types/deffinitions/npc-details";
 
 export default class GridOverlay extends Component<
     GridOverlayProps,
@@ -80,6 +81,29 @@ export default class GridOverlay extends Component<
         }
 
         return <div className="grid-overlay">{gridCells}</div>;
+    }
+
+    renderNpcs(): ReactNode {
+        return this.props.npcs.map((npc: NpcDetails) => {
+            return (
+                <button
+                    key={npc.id}
+                    data-npc-id={npc.id}
+                    className={"map-x-pin"}
+                    style={{
+                        top: npc.y_position,
+                        left: npc.x_position,
+                    }}
+                    onMouseEnter={() => {
+                        this.mouseHandlers.handleLocationMouseEnter(
+                            npc.x_position,
+                            npc.y_position,
+                        );
+                    }}
+                    onMouseLeave={this.mouseHandlers.handleLocationMouseLeave}
+                ></button>
+            );
+        });
     }
 
     renderLocationPins(): ReactNode {
@@ -167,6 +191,7 @@ export default class GridOverlay extends Component<
                 />
                 {this.renderGrid()}
                 {this.renderLocationPins()}
+                {this.renderNpcs()}
                 <div style={toolTipStyle}>
                     Coordinates: ({Math.floor(coordinates.x)},{" "}
                     {Math.floor(coordinates.y)})
@@ -191,7 +216,11 @@ export default class GridOverlay extends Component<
                         closeModal={this.manageModal.bind(this)}
                         coordinates={coordinates}
                         locations={this.props.locations}
-                        updateLocations={this.props.updateLocations}
+                        npcs={this.props.npcs}
+                        updateLocationsAndNpcs={
+                            this.props.updateLocationsAndNpcs
+                        }
+                        map_id={this.props.map_id}
                     />
                 ) : null}
             </div>

@@ -44,7 +44,7 @@ class LocationsController extends Controller
     {
         Location::updateOrCreate(['id' => $request->id], $request->all());
 
-        return response()->redirectToRoute('locations.list')->with('success', 'Saved Location Details for: '.$request->name);
+        return response()->redirectToRoute('locations.list')->with('success', 'Saved Location Details for: ' . $request->name);
     }
 
     public function show(Location $location)
@@ -71,7 +71,6 @@ class LocationsController extends Controller
             if (is_null($usedInQuest)) {
                 $usedInQuest = Quest::where('secondary_required_item', $location->quest_reward_item_id)->first();
             }
-
         }
 
         return view('admin.locations.location', [
@@ -107,7 +106,7 @@ class LocationsController extends Controller
     /**
      * @codeCoverageIgnore
      */
-    public function import(LocationsImportRequest $request)
+    public function importData(LocationsImportRequest $request)
     {
         Excel::import(new LocationsImport, $request->locations_import);
 

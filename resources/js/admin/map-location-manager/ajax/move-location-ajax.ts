@@ -11,12 +11,16 @@ export default class MoveLocationAjax {
 
     public moveLocation(
         component: MoveLocationDialogue,
+        mapId: number,
         locationId: number,
+        npcId: number,
         coordinates: { x: number; y: number },
     ) {
         this.ajax
-            .setRoute("admin/map-manager/move-location/" + locationId)
+            .setRoute("admin/map-manager/move/" + mapId)
             .setParameters({
+                location_id: locationId,
+                npc_id: npcId,
                 x: coordinates.x,
                 y: coordinates.y,
             })
@@ -33,8 +37,9 @@ export default class MoveLocationAjax {
                             processing: false,
                         },
                         () => {
-                            component.props.updateLocations(
+                            component.props.updateLocationsAndNpcs(
                                 result.data.locations,
+                                result.data.npcs,
                             );
                             component.props.closeModal();
                         },

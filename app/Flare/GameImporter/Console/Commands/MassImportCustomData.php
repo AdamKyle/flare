@@ -33,6 +33,11 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
+
+        ItemSkill::where('name', 'Blindign Arrow of Fate')->update([
+            'name' => 'Blinding Arrow of Fate'
+        ]);
+
         Artisan::call('change:legendary-items');
         Artisan::call('rebalance:mythical-items');
         Artisan::call('reduce:character-base-modifiers-for-reincarnation');
@@ -49,10 +54,6 @@ class MassImportCustomData extends Command
         Artisan::call('balance:monsters');
         Artisan::call('generate:monster-cache');
         Artisan::call('create:character-attack-data');
-
-        ItemSkill::where('name', 'Blindign Arrow of Fate')->update([
-            'name' => 'Blinding Arrow of Fate'
-        ]);
 
         $this->importInformationSection();
 

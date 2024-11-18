@@ -7,6 +7,7 @@ import { gridOverLayContainer } from "./container/grid-overlay-container";
 import GridOverlay from "./grid-overlay";
 import MapManagerProps from "./types/map-manager-props";
 import MapManagerState from "./types/map-manager-state";
+import NpcDetails from "./types/deffinitions/npc-details";
 
 export default class MapManager extends Component<
     MapManagerProps,
@@ -22,6 +23,7 @@ export default class MapManager extends Component<
             imgSrc: null,
             coordinates: { x: [], y: [] },
             locations: [],
+            npcs: [],
             error_message: null,
         };
 
@@ -32,9 +34,13 @@ export default class MapManager extends Component<
         this.initializeMap.initializeMap(this, this.props.mapId);
     }
 
-    updateLocations(locations: LocationDetails[] | []) {
+    updateLocationsAndNpcs(
+        locations: LocationDetails[] | [],
+        npcs: NpcDetails[] | [],
+    ) {
         this.setState({
             locations: locations,
+            npcs: npcs,
         });
     }
 
@@ -52,8 +58,12 @@ export default class MapManager extends Component<
                 <GridOverlay
                     coordinates={this.state.coordinates}
                     mapSrc={this.state.imgSrc}
+                    map_id={this.props.mapId}
                     locations={this.state.locations}
-                    updateLocations={this.updateLocations.bind(this)}
+                    npcs={this.state.npcs}
+                    updateLocationsAndNpcs={this.updateLocationsAndNpcs.bind(
+                        this,
+                    )}
                 />
             </div>
         );

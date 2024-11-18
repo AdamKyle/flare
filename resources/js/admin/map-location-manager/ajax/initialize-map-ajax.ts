@@ -22,6 +22,7 @@ export default class InitializeMapAjax {
                     imgSrc: result.data.path,
                     coordinates: coordinates,
                     locations: result.data.locations,
+                    npcs: result.data.npcs,
                 });
             },
             (error: AxiosError) => {
