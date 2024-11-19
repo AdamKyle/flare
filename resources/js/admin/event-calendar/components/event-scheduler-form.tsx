@@ -153,8 +153,6 @@ export default class EventSchedulerForm extends React.Component<
             raid.end_date = end;
         });
 
-        console.log(updatedRaids);
-
         this.setState(
             {
                 raids_for_event: updatedRaids,

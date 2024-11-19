@@ -20,7 +20,7 @@ export default class HelpDialogue extends React.Component<any, any> {
             >
                 <div
                     className={clsx({
-                        "max-h-[450px] overflow-x-auto":
+                        "max-h-[550px] overflow-x-auto md:overflow-x-hidden":
                             typeof this.props.no_scrolling === "undefined",
                     })}
                 >

@@ -83,8 +83,6 @@ class RaidBattleService
 
         $elementData = $serverMonster->getElementData();
 
-        dump($raidBossParticipation);
-
         return $this->successResult([
             'character_max_health' => $characterHealth,
             'character_current_health' => $characterHealth,

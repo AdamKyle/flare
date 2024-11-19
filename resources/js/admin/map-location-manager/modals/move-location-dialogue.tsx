@@ -88,7 +88,6 @@ export default class MoveLocationDialogue extends React.Component<
     getDefaultLocationOption() {
         const filteredLocation = this.props.locations.filter(
             (location: LocationDetails) => {
-                console.log(this.props.coordinates, location);
                 return (
                     location.id === this.state.selected_location_id ||
                     (location.x === this.props.coordinates.x &&

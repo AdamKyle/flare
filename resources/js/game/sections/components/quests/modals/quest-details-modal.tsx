@@ -348,7 +348,9 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                     {item.required_quest !== null ? (
                         <Fragment>
                             <dt>Obtained by completing</dt>
-                            <dd>{item.required_quest.name}</dd>
+                            <dd>
+                                {item.required_quest.name} <sup>*</sup>
+                            </dd>
                             <dt>Which belongs to (NPC)</dt>
                             <dd>{item.required_quest.npc.real_name}</dd>
                             <dt>Who is on the plane of</dt>
@@ -382,6 +384,13 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                         </Fragment>
                     ) : null}
                 </dl>
+                {item.required_quest !== null ? (
+                    <p className="my-4">
+                        <sup>*</sup> This quest belongs to this map. The NPC may
+                        live on a different map, but the required quest you get
+                        the iem from belongs to this map.
+                    </p>
+                ) : null}
                 {item.locations.length > 0 ? (
                     <Fragment>
                         <hr />

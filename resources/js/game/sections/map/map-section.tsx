@@ -236,12 +236,6 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             return <ComponentLoading />;
         }
 
-        console.log(
-            fetchLeftBounds(this),
-            this.state.right_bounds,
-            this.state.bottom_bounds,
-        );
-
         return (
             <Fragment>
                 <div className="overflow-hidden max-h-[315px] max-w-[514px] sm:border-2 lg:border-0 sm:mr-auto sm:ml-auto lg:max-w-full lg:mr-0 lg:ml-0">

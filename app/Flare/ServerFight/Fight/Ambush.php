@@ -136,6 +136,7 @@ class Ambush extends BattleBase
 
     public function canMonsterAmbushPlayer(float $ambushChance, float $playerAmbushResistance): bool
     {
+
         if ($playerAmbushResistance >= 1) {
             return false;
         }

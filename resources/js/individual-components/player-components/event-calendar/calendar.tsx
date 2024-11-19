@@ -50,8 +50,6 @@ export default class Calendar extends React.Component<
             route = "calendar/fetch-upcoming-events";
         }
 
-        console.log(route);
-
         new Ajax().setRoute(route).doAjaxCall(
             "get",
             (result: AxiosResponse) => {
