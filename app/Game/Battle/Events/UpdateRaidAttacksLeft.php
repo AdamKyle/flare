@@ -15,20 +15,29 @@ class UpdateRaidAttacksLeft implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * @var array
+     * @var integer $attacksLeft
      */
     public int $attacksLeft;
 
+    /**
+     * @var integer $damageDealt
+     */
+    public int $damageDealt;
+
+    /**
+     * @var integer $userId
+     */
     private int $userId;
 
     /**
      * @param  int  $raidBossHealth
      * @param  User  $user
      */
-    public function __construct(int $userId, int $attacksLeft)
+    public function __construct(int $userId, int $attacksLeft, int $damageDealt)
     {
         $this->userId = $userId;
         $this->attacksLeft = $attacksLeft;
+        $this->damageDealt = $damageDealt;
     }
 
     /**
@@ -38,6 +47,6 @@ class UpdateRaidAttacksLeft implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('update-raid-attacks-left-'.$this->userId);
+        return new PrivateChannel('update-raid-attacks-left-' . $this->userId);
     }
 }

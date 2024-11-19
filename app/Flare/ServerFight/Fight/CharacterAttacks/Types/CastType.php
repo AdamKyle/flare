@@ -115,6 +115,18 @@ class CastType extends BattleBase
         }
 
         if ($this->canHit->canPlayerCastSpell($character, $monster, $this->isVoided)) {
+
+            if ($spellDamage < self::MINIMUM_DAMAGE_FOR_A_PLAYER && $monster->isRaidBossMonster()) {
+                $this->addMessage(
+                    'The enemy laughs at you. "Child your spells mean nothing to me. Go on, give it your best shot!"',
+                    'enemy-action'
+                );
+
+                $this->doSpellDamage($character, $monster, $spellDamage);
+
+                return $this;
+            }
+
             if ($monster->getMonsterStat('ac') > $spellDamage) {
                 $this->addMessage('Your damage spell was blocked!', 'enemy-action');
 

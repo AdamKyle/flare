@@ -32,6 +32,7 @@ export default class RaidSection extends React.Component<
             monster_name: "",
             revived: false,
             raid_boss_attacks_left: 0,
+            raid_boss_damage_dealt: 0,
             is_raid_boss: false,
             open_elemental_atonement: false,
             elemental_atonement: {},
@@ -191,6 +192,8 @@ export default class RaidSection extends React.Component<
                                 monster_name: self.fetchRaidMonsterName(),
                                 raid_boss_attacks_left:
                                     result.data.attacks_left,
+                                raid_boss_damage_dealt:
+                                    result.data.damage_dealt,
                                 is_raid_boss: result.data.is_raid_boss,
                                 elemental_atonement:
                                     result.data.elemental_atonemnt,
@@ -336,6 +339,7 @@ export default class RaidSection extends React.Component<
                         reset_revived={this.resetRevived.bind(this)}
                         revived={this.state.revived}
                         initial_attacks_left={this.state.raid_boss_attacks_left}
+                        initial_damage_dealt={this.state.raid_boss_damage_dealt}
                         is_raid_boss={this.state.is_raid_boss}
                         manage_elemental_atonement_modal={this.manageAtonementModal.bind(
                             this,

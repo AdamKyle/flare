@@ -152,7 +152,7 @@ class Attack
 
             if ($serverMonster->isRaidBossMonster() && $character->getInformation()->buildTotalAttack() < self::TOTAL_CHARACTER_ATTACK) {
                 $this->monsterAttack->addMessage(
-                    'Oh silly child, you tickle with me your feeble attempts. I dare say, try again! You won\'t even be able to touch me!',
+                    'Oh silly child, you tickle with me your feeble attempts. "I dare say, try again! You won\'t even be able to touch me!"',
                     'enemy-action'
                 );
             } else {

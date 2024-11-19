@@ -85,7 +85,7 @@ class WeaponType extends BattleBase
 
         if ($this->canHit->canPlayerHitMonster($character, $serverMonster, $this->isVoided)) {
 
-            if ($this->canBlock($weaponDamage, $serverMonster->getMonsterStat('ac'))) {
+            if ($this->canBlock($weaponDamage, $serverMonster)) {
                 $this->addMessage('Your weapon was blocked!', 'enemy-action');
 
                 $this->dealSecondaryAttackDamage($character, $serverMonster);

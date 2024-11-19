@@ -102,7 +102,7 @@
                 </div>
             </div>
             <div class="mt-4 lg:mt-0">
-                <img src="{{ asset('promotion/ice-queen-raid-event/ice-queen-attack.png') }}"
+                <img src="{{ asset('promotion/frozen-king-raid/frozen-king-raid-fight.png') }}"
                      class="shadow rounded max-w-full h-auto align-middle border-none img-fluid glightbox w-100 mb-5 cursor-pointer" />
                 <div class="text-center text-sm">
                     Click to make larger.

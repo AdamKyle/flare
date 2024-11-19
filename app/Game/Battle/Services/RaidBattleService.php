@@ -83,12 +83,15 @@ class RaidBattleService
 
         $elementData = $serverMonster->getElementData();
 
+        dump($raidBossParticipation);
+
         return $this->successResult([
             'character_max_health' => $characterHealth,
             'character_current_health' => $characterHealth,
             'monster_max_health' => $raidBoss->boss_max_hp,
             'monster_current_health' => $raidBoss->boss_current_hp,
             'attacks_left' => ! is_null($raidBossParticipation) ? $raidBossParticipation->attacks_left : 5,
+            'damage_dealt' => ! is_null($raidBossParticipation) ? $raidBossParticipation->damage_dealt : 0,
             'is_raid_boss' => true,
             'elemental_atonemnt' => $elementData,
             'highest_element' => $serverMonster->getHighestElementName($elementData, $serverMonster->getHighestElementDamage($elementData)),
@@ -390,18 +393,20 @@ class RaidBattleService
                 'killed_boss' => $killedRaidBoss,
             ]);
 
+            $raidBossParticipation = $raidBossParticipation->refresh();
+
             if (! is_null($raidBossParticipation)) {
-                event(new UpdateRaidAttacksLeft($character->user_id, ($attacksLeft <= 0 ? 0 : $attacksLeft)));
+                event(new UpdateRaidAttacksLeft($character->user_id, ($attacksLeft <= 0 ? 0 : $attacksLeft), $raidBossParticipation->damage_dealt));
             }
 
             if ($killedRaidBoss) {
-                event(new UpdateRaidAttacksLeft($character->user_id, 0));
+                event(new UpdateRaidAttacksLeft($character->user_id, 0, $raidBossParticipation->damage_dealt));
             }
 
             return;
         }
 
-        RaidBossParticipation::create([
+        $raidBossParticipation = RaidBossParticipation::create([
             'character_id' => $character->id,
             'raid_id' => $raidBoss->raid->id,
             'attacks_left' => 4,
@@ -409,13 +414,15 @@ class RaidBattleService
             'killed_boss' => $killedRaidBoss,
         ]);
 
+
+
         if ($killedRaidBoss) {
-            event(new UpdateRaidAttacksLeft($character->user_id, 0));
+            event(new UpdateRaidAttacksLeft($character->user_id, 0, $raidBossParticipation->damage_dealt));
 
             return;
         }
 
-        event(new UpdateRaidAttacksLeft($character->user_id, 4));
+        event(new UpdateRaidAttacksLeft($character->user_id, 4, $raidBossParticipation->damage_dealt));
     }
 
     /**

@@ -191,8 +191,18 @@ class BattleBase extends BattleMessages
         $counter->clearMessages();
     }
 
-    protected function canBlock(int $damage, int $ac)
+    protected function canBlock(int $damage, ServerMonster $serverMonster)
     {
-        return $ac > $damage;
+
+        if ($serverMonster->isRaidBossMonster() && $damage < self::MINIMUM_DAMAGE_FOR_A_PLAYER) {
+            $this->addMessage(
+                'The enemy laughs at you. "Child your attacks mean nothing to me. Go on, give it your best shot!"',
+                'enemy-action'
+            );
+
+            return false;
+        }
+
+        return $serverMonster->getMonsterStat('ac') > $damage;
     }
 }

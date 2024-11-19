@@ -69,7 +69,7 @@ class RaidBossRewardHandler implements ShouldQueue
      */
     private function handleWhenRaidBossIsKilled(Character $charater, Monster $raidBoss): void
     {
-        event(new GlobalMessageEvent($charater->name.' Has slaughted: '.$raidBoss->name.' and has recieved a special Ancient gift from The Poet him self!'));
+        event(new GlobalMessageEvent($charater->name . ' Has slaughted: ' . $raidBoss->name . ' and has recieved a special Ancient gift from The Poet him self!'));
 
         $raid = Raid::find($this->raidId);
 
@@ -83,7 +83,9 @@ class RaidBossRewardHandler implements ShouldQueue
                     'attacks_left' => 0,
                 ]);
 
-                event(new UpdateRaidAttacksLeft($record->character->user_id, 0));
+                $record = $record->refresh();
+
+                event(new UpdateRaidAttacksLeft($record->character->user_id, 0, $record->damage_dealt));
             }
         });
     }
@@ -104,7 +106,13 @@ class RaidBossRewardHandler implements ShouldQueue
 
             if (! is_null($item)) {
                 $validSocketTypes = [
-                    'weapon', 'sleeves', 'gloves', 'feet', 'body', 'shield', 'helmet',
+                    'weapon',
+                    'sleeves',
+                    'gloves',
+                    'feet',
+                    'body',
+                    'shield',
+                    'helmet',
                 ];
 
                 $duplicatedItem = $item->duplicate();
@@ -129,9 +137,9 @@ class RaidBossRewardHandler implements ShouldQueue
                     'item_id' => $duplicatedItem->id,
                 ]);
 
-                event(new ServerMessageEvent($participator->character->user, 'You were given: '.$slot->item->name, $slot->id));
+                event(new ServerMessageEvent($participator->character->user, 'You were given: ' . $slot->item->name, $slot->id));
 
-                event(new GlobalMessageEvent('Congratulations to: '.$participator->character->name.' for doing: '.number_format($participator->damage_dealt).' total Damage to the raid boss! They have recieved a godly gift!'));
+                event(new GlobalMessageEvent('Congratulations to: ' . $participator->character->name . ' for doing: ' . number_format($participator->damage_dealt) . ' total Damage to the raid boss! They have recieved a godly gift!'));
             }
         }
     }
