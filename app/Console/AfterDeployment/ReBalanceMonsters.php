@@ -372,34 +372,34 @@ class ReBalanceMonsters extends Command
     {
         return match (true) {
             $raidType->isPirateLordRaid() => collect([
-                'min' => 1_000_000_000,
-                'max' => 4_000_000_000,
-                'increase' => 500_000,
-                'range' => 5_000,
+                'min' => 10_000,
+                'max' => 50_000,
+                'increase' => 5_000,
+                'range' => 2_500,
             ]),
             $raidType->isIceQueenRaid(), => collect([
-                'min' => 25_000_000_000,
-                'max' => 50_000_000_000,
-                'increase' => 5_000_000,
-                'range' => 500_000,
+                'min' => 15_000,
+                'max' => 150_000,
+                'increase' => 5_000,
+                'range' => 3_000,
             ]),
             $raidType->isJesterOfTime() => collect([
-                'min' => 40_000_000_000,
-                'max' => 52_000_000_000,
-                'increase' => 10_000_000,
-                'range' => 5_000_000,
+                'min' => 25_000,
+                'max' => 175_000,
+                'increase' => 8_000,
+                'range' => 5_000,
             ]),
             $raidType->isFrozenKing() => collect([
-                'min' => 30_000_000_000,
-                'max' => 50_000_000_000,
-                'increase' => 5_000_000,
-                'range' => 500_000,
+                'min' => 30_000,
+                'max' => 200_000,
+                'increase' => 7_000,
+                'range' => 5_000,
             ]),
             default => collect([
-                'min' => 1_000_000_000,
-                'max' => 4_000_000_000,
-                'increase' => 500_000,
-                'range' => 5_000,
+                'min' => 10_000,
+                'max' => 50_000,
+                'increase' => 5_000,
+                'range' => 2_500,
             ])
         };
     }
