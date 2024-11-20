@@ -8,7 +8,6 @@ import QuestType from "../../types/quests/quest-type";
 @injectable()
 export default class QuestListeners implements GameListener {
     private component?: Game;
-    private userId?: number;
 
     private questUpdate?: Channel;
     private raidQuestUpdate?: Channel;
@@ -17,7 +16,7 @@ export default class QuestListeners implements GameListener {
         @inject(CoreEventListener) private coreEventListener: CoreEventListener,
     ) {}
 
-    initialize(component: Game, userId: number): void {
+    initialize(component: Game): void {
         this.component = component;
     }
 

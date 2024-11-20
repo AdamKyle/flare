@@ -56,7 +56,7 @@
 
         <div class="grid md:grid-cols-2 gap-6 mt-5 w-full mt-10 mx-auto lg:w-3/4 md:mt-20">
             <div class="mt-4 lg:mt-0">
-                <img src="{{ asset('promotion/jester-of-time-raid/raid-locations.png') }}"
+                <img src="{{ asset('promotion/corrupted-bishop-raid/raid-locations.png') }}"
                      class="shadow rounded max-w-full h-auto align-middle border-none img-fluid glightbox w-100 mb-5 cursor-pointer" />
                 <div class="text-center text-sm">
                     Click to make larger.
@@ -99,7 +99,7 @@
                 </div>
             </div>
             <div class="mt-4 lg:mt-0">
-                <img src="{{ asset('promotion/jester-of-time-raid/jester-of-time-raid.png') }}"
+                <img src="{{ asset('promotion/corrupted-bishop-raid/corrupted-bishop-raid.png') }}"
                      class="shadow rounded max-w-full h-auto align-middle border-none img-fluid glightbox w-100 mb-5 cursor-pointer" />
                 <div class="text-center text-sm">
                     Click to make larger.

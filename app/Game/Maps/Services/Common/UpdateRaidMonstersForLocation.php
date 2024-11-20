@@ -80,7 +80,6 @@ trait UpdateRaidMonstersForLocation
     protected function updateMonstersForRaid(Character $character, ?Location $location = null): bool
     {
         $raidEvent = Event::whereNotNull('raid_id')->first();
-
         if (! is_null($raidEvent) && ! is_null($location)) {
             $locationIds = array_map('intval', $raidEvent->raid->corrupted_location_ids);
             $raidBossLocationId = $raidEvent->raid->raid_boss_location_id;

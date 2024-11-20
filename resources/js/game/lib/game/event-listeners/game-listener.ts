@@ -9,5 +9,5 @@ export default interface GameListener extends Listener {
      * @param component
      * @param usrrId
      */
-    initialize: (component: Game, userId: number) => void;
+    initialize: (component: Game, userId?: number) => void;
 }

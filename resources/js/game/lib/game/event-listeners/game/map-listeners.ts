@@ -28,7 +28,7 @@ export default class MapListeners implements GameListener {
         @inject(CoreEventListener) private coreEventListener: CoreEventListener,
     ) {}
 
-    public initialize(component: Game, userId: number): void {
+    public initialize(component: Game, userId?: number): void {
         this.component = component;
         this.userId = userId;
     }

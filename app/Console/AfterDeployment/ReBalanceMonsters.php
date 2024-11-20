@@ -395,6 +395,12 @@ class ReBalanceMonsters extends Command
                 'increase' => 10_000,
                 'range' => 8_000,
             ]),
+            $raidType->isCorruptedBishop() => collect([
+                'min' => 350_000,
+                'max' => 2_000_000,
+                'increase' => 10_000,
+                'range' => 18_000,
+            ]),
             default => collect([
                 'min' => 10_000,
                 'max' => 50_000,
@@ -436,6 +442,12 @@ class ReBalanceMonsters extends Command
                 'max' => 125_000_000_000_000,
                 'increase' => 5_000_000,
                 'range' => 500_000,
+            ]),
+            $raidType->isCorruptedBishop() => collect([
+                'min' => 80_000_000_000_000,
+                'max' => 150_000_000_000_000,
+                'increase' => 25_000_000,
+                'range' => 6_000_000,
             ]),
             default => collect([
                 'min' => 10_000_000_000_000,

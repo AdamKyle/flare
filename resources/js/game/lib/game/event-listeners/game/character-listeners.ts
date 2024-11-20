@@ -23,7 +23,7 @@ export default class CharacterListeners implements GameListener {
         @inject(CoreEventListener) private coreEventListener: CoreEventListener,
     ) {}
 
-    initialize(component: Game, userId: number): void {
+    initialize(component: Game, userId?: number): void {
         this.component = component;
         this.userId = userId;
     }

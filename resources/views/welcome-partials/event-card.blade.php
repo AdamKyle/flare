@@ -49,6 +49,10 @@
         $href = route('event.type', ['event_type' => 'the-frozen-king-raid']);
     }
 
+    if ($eventRunning->getTitleOfEvent() === 'Corrupted Bishop') {
+        $href = route('event.type', ['event_type' => 'corrupted-bishop-raid']);
+    }
+
     if ($eventRunning->getTitleOfEvent() === 'Tlessa\'s Feedback Event') {
         $href = route('event.type', ['event_type' => 'tlessas-feedback-event']);
         $icon = 'ra-campfire';
@@ -105,13 +109,18 @@
         @endif
 
         @if ($eventRunning->getTitleOfEvent() === 'The Ice Queens Reign')
-            Join the The Ice Queens Reign raid! Head to The Fathers Tomb on The Ice Plane and band together! The player
+            Join The Ice Queens Reign raid! Head to The Fathers Tomb on The Ice Plane and band together! The player
             who kills her gets a new Ancestral item!
         @endif
 
         @if ($eventRunning->getTitleOfEvent() === 'The Frozen King')
             Join The Frozen King raid! head to The Frozen Christmas Tree Lot on The Ice Plane and band together! The player
             who kills him gets a new Ancestral item!
+        @endif
+
+        @if ($eventRunning->getTitleOfEvent() === 'Corrupted Bishop')
+            Join the Corrupted Bishop raid! head down to the Delusional Memories Federation Controlled Town to band together!
+            The Player who kills him gets a new Ancestral item!
         @endif
 
         @if ($eventRunning->getTitleOfEvent() === 'Tlessa\'s Feedback Event')

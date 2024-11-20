@@ -84,16 +84,9 @@ class BuildQuestCacheService
 
         if ($sendOffEvent) {
 
-            $winterEvent = Event::where('type', EventType::WINTER_EVENT)->first();
-            $delusionalEvent = Event::where('type', EventType::DELUSIONAL_MEMORIES_EVENT)->first();
+            $event = Event::whereNotNull('raid_id')->first();
 
-            if (! is_null($winterEvent)) {
-                $quests = $this->fetchQuestsForRaid($winterEvent);
-            } elseif (! is_null($delusionalEvent)) {
-                $quests = $this->fetchQuestsForRaid($delusionalEvent);
-            } else {
-                $quests = $this->fetchQuestsForRaid();
-            }
+            $quests = $this->fetchQuestsForRaid($event);
 
             event(new UpdateRaidQuests($quests));
         }
@@ -117,7 +110,6 @@ class BuildQuestCacheService
             $raidQuests = $this->getRaidQuests();
 
             if (! is_null($raidQuests)) {
-
                 if (isset($raidQuests[$eventWithRaid->raid_id])) {
                     $eventQuests = $raidQuests[$eventWithRaid->raid_id];
                 }
