@@ -65,6 +65,8 @@ class WeaponType extends BattleBase
     {
         $weaponDamage = $this->attackData['weapon_damage'];
 
+        $weaponDamage = $this->getCriticalityDamage($character, $weaponDamage);
+
         if (! $this->isEnemyEntranced && $this->canEntrance) {
             $this->doEnemyEntrance($character, $serverMonster, $this->entrance);
         }
@@ -133,9 +135,6 @@ class WeaponType extends BattleBase
 
     public function weaponDamage(Character $character, string $monsterName, int $weaponDamage)
     {
-
-        $weaponDamage = $this->getCriticalityDamage($character, $weaponDamage);
-
         $totalDamage = $weaponDamage - $weaponDamage * $this->attackData['damage_deduction'];
 
         if ($this->isRaidBoss && $totalDamage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {

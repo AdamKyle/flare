@@ -4,12 +4,12 @@ namespace App\Flare\GameImporter\Console\Commands;
 
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
-use App\Flare\Models\ItemSkill;
+use App\Flare\Models\Item;
 use App\Flare\Models\Survey;
 use App\Flare\Values\MapNameValue;
+use Artisan;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 
 class MassImportCustomData extends Command
@@ -34,28 +34,70 @@ class MassImportCustomData extends Command
     public function handle()
     {
 
-        ItemSkill::where('name', 'Blindign Arrow of Fate')->update([
-            'name' => 'Blinding Arrow of Fate'
-        ]);
+        Item::where('type', 'alchemy')->where('name', 'like', '%Oil')->where('holy_level', '>', 5)->delete();
 
-        Artisan::call('change:legendary-items');
-        Artisan::call('rebalance:mythical-items');
-        Artisan::call('reduce:character-base-modifiers-for-reincarnation');
-        Artisan::call('import:game-data "Core Imports"');
-        Artisan::call('import:game-data Skills');
+        $gameMaps = GameMap::all();
+
+        foreach ($gameMaps as $gameMap) {
+            if ($gameMap->mapType()->isShadowPlane()) {
+                $gameMap->update([
+                    'xp_bonus' => 0.05,
+                    'skill_training_bonus' => 0.05,
+                    'drop_chance_bonus' => 0.08,
+                    'enemy_stat_bonus' => 0.03,
+                    'character_attack_reduction' => 0.05,
+                ]);
+            }
+
+            if ($gameMap->mapType()->isHell()) {
+                $gameMap->update([
+                    'xp_bonus' => 0.1,
+                    'skill_training_bonus' => 0.1,
+                    'drop_chance_bonus' => 0.1,
+                    'enemy_stat_bonus' => 0.05,
+                    'character_attack_reduction' => 0.08,
+                ]);
+            }
+
+            if ($gameMap->mapType()->isPurgatory()) {
+                $gameMap->update([
+                    'xp_bonus' => 0.15,
+                    'skill_training_bonus' => 0.15,
+                    'drop_chance_bonus' => 0.12,
+                    'enemy_stat_bonus' => 0.12,
+                    'character_attack_reduction' => 0.10,
+                ]);
+            }
+
+            if (
+                $gameMap->mapType()->isTheIcePlane() ||
+                $gameMap->mapType()->isDelusionalMemories()
+            ) {
+                $gameMap->update([
+                    'xp_bonus' => 0.25,
+                    'skill_training_bonus' => 0.20,
+                    'drop_chance_bonus' => 0.20,
+                    'enemy_stat_bonus' => 0.06,
+                    'character_attack_reduction' => 0.03,
+                ]);
+            }
+
+            if ($gameMap->mapType()->isTwistedMemories()) {
+                $gameMap->update([
+                    'xp_bonus' => 0.20,
+                    'skill_training_bonus' => 0.20,
+                    'drop_chance_bonus' => 0.15,
+                    'enemy_stat_bonus' => 0.15,
+                    'character_attack_reduction' => 0.13,
+                ]);
+            }
+        }
+
         Artisan::call('import:game-data Items');
-        Artisan::call('import:game-data Affixes');
-        Artisan::call('import:game-data Npcs');
-        Artisan::call('import:game-data Locations');
-        Artisan::call('import:game-data Monsters');
-        Artisan::call('import:game-data Raids');
         Artisan::call('import:game-data Quests');
-        Artisan::call('create:quest-cache');
-        Artisan::call('assign:new-npcs-to-faction-loyalty');
         Artisan::call('balance:monsters');
         Artisan::call('generate:monster-cache');
         Artisan::call('create:character-attack-data');
-
 
         $this->importInformationSection();
 
@@ -67,7 +109,7 @@ class MassImportCustomData extends Command
     }
 
     /**
-     * Import the information section
+     * Import the information sectionbalance:monsters
      *
      * @return void
      */

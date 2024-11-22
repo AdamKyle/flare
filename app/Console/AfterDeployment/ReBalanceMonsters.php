@@ -111,7 +111,7 @@ class ReBalanceMonsters extends Command
                 ->whereNull('only_for_location_type')
                 ->get();
 
-            $this->manageMonsters($monsters, $exponentialAttributeCurve, 2, 2_000_000_000, 100_000, 500, $mapName);
+            $this->manageMonsters($monsters, $exponentialAttributeCurve, 2, 500_000, 100, 50, $mapName);
 
             $celestials = Monster::where('game_map_id', $gameMap->id)
                 ->where('is_raid_monster', false)
@@ -120,7 +120,7 @@ class ReBalanceMonsters extends Command
                 ->whereNull('only_for_location_type')
                 ->get();
 
-            $this->manageMonsters($celestials, $exponentialAttributeCurve, 50_000, 500_000, 10_000, 5_000, $mapName);
+            $this->manageMonsters($celestials, $exponentialAttributeCurve, 10_000, 30_000, 2_000, 750, $mapName);
         }
     }
 
@@ -154,7 +154,7 @@ class ReBalanceMonsters extends Command
                 ->whereNull('only_for_location_type')
                 ->get();
 
-            $this->manageMonsters($celestials, $exponentialAttributeCurve, 1_000_000, 5_000_000, 100_000, 50_000, $mapName);
+            $this->manageMonsters($celestials, $exponentialAttributeCurve, 150_000, 300_000, 10_000, 5_000, $mapName);
         }
     }
 
@@ -188,7 +188,7 @@ class ReBalanceMonsters extends Command
                 ->whereNull('only_for_location_type')
                 ->get();
 
-            $this->manageMonsters($celestials, $exponentialAttributeCurve, 8_000_000, 20_000_000, 1_000_000, 500_000, $mapName);
+            $this->manageMonsters($celestials, $exponentialAttributeCurve, 180_000, 600_000, 10_000, 50_000, $mapName);
         }
     }
 
@@ -293,22 +293,22 @@ class ReBalanceMonsters extends Command
     {
         return match (true) {
             $locationType->isLordsStrongHold() => collect([
-                'min' => 10_000_000,
-                'max' => 30_000_000,
-                'increase' => 10_000_000,
-                'range' => 1_000_000,
+                'min' => 10_000,
+                'max' => 50_000,
+                'increase' => 1_000,
+                'range' => 500,
             ]),
             $locationType->isHellsBrokenAnvil() => collect([
-                'min' => 50_000_000,
-                'max' => 100_000_000,
-                'increase' => 12_000_000,
-                'range' => 2_000_000,
+                'min' => 25_000,
+                'max' => 75_000,
+                'increase' => 5_000,
+                'range' => 750,
             ]),
             $locationType->isAlchemyChurch() => collect([
-                'min' => 100_000_000_000,
-                'max' => 400_000_000_000,
-                'increase' => 24_000_000,
-                'range' => 4_000_000,
+                'min' => 1_000_000,
+                'max' => 8_000_000,
+                'increase' => 250_000,
+                'range' => 75_000,
             ]),
             $locationType->isTwistedMaidensDungeons() => collect([
                 'min' => 500_000_000_000,
@@ -317,10 +317,10 @@ class ReBalanceMonsters extends Command
                 'range' => 10_000_000,
             ]),
             default => collect([
-                'min' => 10_000_000,
-                'max' => 30_000_000,
-                'increase' => 10_000_000,
-                'range' => 1_000_000,
+                'min' => 10_000,
+                'max' => 50_000,
+                'increase' => 1_000,
+                'range' => 500,
             ])
         };
     }
@@ -335,28 +335,28 @@ class ReBalanceMonsters extends Command
     {
         return match (true) {
             $mapNameValue->isPurgatory() => collect([
-                'min' => 1_000_000_000,
-                'max' => 4_000_000_000,
-                'increase' => 500_000,
+                'min' => 300_000,
+                'max' => 8_000_000,
+                'increase' => 10_000,
                 'range' => 5_000,
             ]),
             $mapNameValue->isTwistedMemories() => collect([
-                'min' => 2_000_000_000,
-                'max' => 5_500_000_000,
-                'increase' => 500_000,
-                'range' => 5_000,
+                'min' => 18_000_000,
+                'max' => 250_000_000_000,
+                'increase' => 3_000_000,
+                'range' => 1_500_000,
             ]),
             $mapNameValue->isTheIcePlane(),
             $mapNameValue->isDelusionalMemories() => collect([
-                'min' => 10_000_000_000,
-                'max' => 20_000_000_000,
-                'increase' => 1_000_000,
-                'range' => 500_000,
+                'min' => 7_000_000,
+                'max' => 45_000_000,
+                'increase' => 250_000,
+                'range' => 50_000,
             ]),
             default => collect([
-                'min' => 1_000_000_000,
-                'max' => 4_000_000_000,
-                'increase' => 500_000,
+                'min' => 300_000,
+                'max' => 8_000_000,
+                'increase' => 10_000,
                 'range' => 5_000,
             ])
         };
@@ -385,9 +385,9 @@ class ReBalanceMonsters extends Command
             ]),
             $raidType->isJesterOfTime() => collect([
                 'min' => 250_000,
-                'max' => 1_750_000,
+                'max' => 10_750_000,
                 'increase' => 80_000,
-                'range' => 50_000,
+                'range' => 30_000,
             ]),
             $raidType->isFrozenKing() => collect([
                 'min' => 175_000,
@@ -397,8 +397,8 @@ class ReBalanceMonsters extends Command
             ]),
             $raidType->isCorruptedBishop() => collect([
                 'min' => 350_000,
-                'max' => 2_000_000,
-                'increase' => 10_000,
+                'max' => 20_000_000,
+                'increase' => 80_000,
                 'range' => 18_000,
             ]),
             default => collect([
@@ -727,10 +727,14 @@ class ReBalanceMonsters extends Command
         }
 
         $statAmount = $integers[$index];
-        $armourClass = $integers[$index];
+        $armourClass = $integers[$index] / 10;
         $damage = $integers[$index];
         $spellDamage = $integers[$index];
         $affixDamage = $integers[$index];
+
+        if ($armourClass < 1) {
+            $armourClass = 1;
+        }
 
         if ($statAmount > self::MAX_STAT_AMOUNT) {
             $statAmount = self::MAX_STAT_AMOUNT;

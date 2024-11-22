@@ -38,18 +38,18 @@ class AssignTopEndGearToPlayer extends Command
         $character = Character::where('name', $characterName)->first();
 
         if (is_null($character)) {
-            $this->error('No character found for name: '.$characterName);
+            $this->error('No character found for name: ' . $characterName);
 
             return;
         }
 
-        $purgatoryGear = Item::doesntHave('appliedHolyStacks')
+        $topEndGear = Item::doesntHave('appliedHolyStacks')
             ->where('item_prefix_id', null)
             ->where('item_suffix_id', null)
-            ->where('specialty_type', ItemSpecialtyType::DELUSIONAL_SILVER)
+            ->where('specialty_type', ItemSpecialtyType::PURGATORY_CHAINS)
             ->get();
 
-        if (empty($purgatoryGear)) {
+        if (empty($topEndGear)) {
             $this->error('There are no purgatory items.');
 
             return;
@@ -57,29 +57,31 @@ class AssignTopEndGearToPlayer extends Command
 
         $prefix = ItemAffix::where('type', 'prefix')
             ->where('randomly_generated', false)
-            ->where($character->damage_stat.'_mod', '>', 0)
+            ->where($character->damage_stat . '_mod', '>', 0)
             ->orderBy('skill_level_required', 'desc')
             ->first();
 
         $suffix = ItemAffix::where('type', 'suffix')
             ->where('randomly_generated', false)
-            ->where($character->damage_stat.'_mod', '>', 0)
+            ->where($character->damage_stat . '_mod', '>', 0)
             ->orderBy('skill_level_required', 'desc')
             ->first();
 
-        $bar = $this->output->createProgressBar(count($purgatoryGear));
+        $bar = $this->output->createProgressBar(count($topEndGear));
 
-        foreach ($purgatoryGear as $purgItem) {
-            if ($purgItem->type === ArmourTypes::SHIELD ||
-                $purgItem->type === WeaponTypes::WEAPON ||
-                $purgItem->type === SpellTypes::DAMAGE ||
-                $purgItem->type === SpellTypes::HEALING ||
-                $purgItem->type === WeaponTypes::RING) {
+        foreach ($topEndGear as $topEndItem) {
+            if (
+                $topEndItem->type === ArmourTypes::SHIELD ||
+                $topEndItem->type === WeaponTypes::WEAPON ||
+                $topEndItem->type === SpellTypes::DAMAGE ||
+                $topEndItem->type === SpellTypes::HEALING ||
+                $topEndItem->type === WeaponTypes::RING
+            ) {
 
                 for ($i = 1; $i <= 2; $i++) {
                     $character->inventory->slots()->create([
                         'inventory_id' => $character->inventory->id,
-                        'item_id' => $this->modifyItem($purgItem, $prefix, $suffix)->id,
+                        'item_id' => $this->modifyItem($topEndItem, $prefix, $suffix)->id,
                     ]);
 
                     $character = $character->refresh();
@@ -92,7 +94,7 @@ class AssignTopEndGearToPlayer extends Command
 
             $character->inventory->slots()->create([
                 'inventory_id' => $character->inventory->id,
-                'item_id' => $this->modifyItem($purgItem, $prefix, $suffix)->id,
+                'item_id' => $this->modifyItem($topEndItem, $prefix, $suffix)->id,
             ]);
 
             $character = $character->refresh();

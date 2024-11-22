@@ -17,7 +17,6 @@ use App\Admin\Import\Quests\QuestsImport;
 use App\Admin\Import\Races\RacesImport;
 use App\Admin\Import\Raids\RaidsImport;
 use App\Admin\Import\Skills\SkillsImport;
-use App\Admin\Requests\GuideQuestsImport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ExcelMapper
@@ -40,7 +39,7 @@ class ExcelMapper
         'Kingdoms' => KingdomsImport::class,
         'Kingdom Passive Skills' => PassiveSkillsImport::class,
         'Quests' => [
-            GuideQuestsImport::class,
+            GuideQuests::class,
             QuestsImport::class
         ],
         'Locations Give Items' => LocationsImport::class,

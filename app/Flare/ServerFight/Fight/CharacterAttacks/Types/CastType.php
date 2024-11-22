@@ -77,6 +77,9 @@ class CastType extends BattleBase
     {
 
         $spellDamage = $this->attackData['spell_damage'];
+
+        $spellDamage = $this->getTotalSpellDamage($character, $spellDamage);
+
         $healFor = $this->attackData['heal_for'];
 
         if ($spellDamage <= 0) {
@@ -199,23 +202,13 @@ class CastType extends BattleBase
             }
         }
 
-        $criticality = $this->characterCacheData->getCachedCharacterData($character, 'skills')['criticality'];
-
-        if (rand(1, 100) > (100 - 100 * $criticality)) {
-            $this->addMessage('Your magic radiates across the plane. Even The Creator is terrified! (Critical strike!)', 'player-action');
-
-            $spellDamage *= 2;
+        if ($this->isRaidBoss && $spellDamage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {
+            $spellDamage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
         }
 
-        $totalDamage = $spellDamage - $spellDamage * $this->attackData['damage_deduction'];
+        $this->monsterHealth -= $spellDamage;
 
-        if ($this->isRaidBoss && $totalDamage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {
-            $totalDamage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
-        }
-
-        $this->monsterHealth -= $totalDamage;
-
-        $this->addMessage('Your damage spell(s) hits ' . $monster->getName() . ' for: ' . number_format($totalDamage), 'player-action');
+        $this->addMessage('Your damage spell(s) hits ' . $monster->getName() . ' for: ' . number_format($spellDamage), 'player-action');
 
         $this->specialAttacks->setCharacterHealth($this->characterHealth)
             ->setMonsterHealth($this->monsterHealth)
@@ -228,6 +221,21 @@ class CastType extends BattleBase
         $this->mergeMessages($this->specialAttacks->getMessages());
 
         $this->specialAttacks->clearMessages();
+    }
+
+    private function getTotalSpellDamage(Character $character, int $spellDamage): int
+    {
+        $criticality = $this->characterCacheData->getCachedCharacterData($character, 'skills')['criticality'];
+
+        if (rand(1, 100) > (100 - 100 * $criticality)) {
+            $this->addMessage('Your magic radiates across the plane. Even The Creator is terrified! (Critical strike!)', 'player-action');
+
+            $spellDamage *= 2;
+        }
+
+        $totalDamage = $spellDamage - $spellDamage * $this->attackData['damage_deduction'];
+
+        return $totalDamage;
     }
 
     public function heal(Character $character)
