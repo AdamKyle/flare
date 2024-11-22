@@ -34,70 +34,8 @@ class MassImportCustomData extends Command
     public function handle()
     {
 
-        Item::where('type', 'alchemy')->where('name', 'like', '%Oil')->where('holy_level', '>', 5)->delete();
-
-        $gameMaps = GameMap::all();
-
-        foreach ($gameMaps as $gameMap) {
-            if ($gameMap->mapType()->isShadowPlane()) {
-                $gameMap->update([
-                    'xp_bonus' => 0.05,
-                    'skill_training_bonus' => 0.05,
-                    'drop_chance_bonus' => 0.08,
-                    'enemy_stat_bonus' => 0.03,
-                    'character_attack_reduction' => 0.05,
-                ]);
-            }
-
-            if ($gameMap->mapType()->isHell()) {
-                $gameMap->update([
-                    'xp_bonus' => 0.1,
-                    'skill_training_bonus' => 0.1,
-                    'drop_chance_bonus' => 0.1,
-                    'enemy_stat_bonus' => 0.05,
-                    'character_attack_reduction' => 0.08,
-                ]);
-            }
-
-            if ($gameMap->mapType()->isPurgatory()) {
-                $gameMap->update([
-                    'xp_bonus' => 0.15,
-                    'skill_training_bonus' => 0.15,
-                    'drop_chance_bonus' => 0.12,
-                    'enemy_stat_bonus' => 0.12,
-                    'character_attack_reduction' => 0.10,
-                ]);
-            }
-
-            if (
-                $gameMap->mapType()->isTheIcePlane() ||
-                $gameMap->mapType()->isDelusionalMemories()
-            ) {
-                $gameMap->update([
-                    'xp_bonus' => 0.25,
-                    'skill_training_bonus' => 0.20,
-                    'drop_chance_bonus' => 0.20,
-                    'enemy_stat_bonus' => 0.06,
-                    'character_attack_reduction' => 0.03,
-                ]);
-            }
-
-            if ($gameMap->mapType()->isTwistedMemories()) {
-                $gameMap->update([
-                    'xp_bonus' => 0.20,
-                    'skill_training_bonus' => 0.20,
-                    'drop_chance_bonus' => 0.15,
-                    'enemy_stat_bonus' => 0.15,
-                    'character_attack_reduction' => 0.13,
-                ]);
-            }
-        }
-
-        Artisan::call('import:game-data Items');
-        Artisan::call('import:game-data Quests');
         Artisan::call('balance:monsters');
         Artisan::call('generate:monster-cache');
-        Artisan::call('create:character-attack-data');
 
         $this->importInformationSection();
 
