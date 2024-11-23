@@ -217,7 +217,10 @@ class PurgatorySmithHouseRewardHandler
             $newItem->update([
                 'item_prefix_id' => $randomAffixGenerator->generateAffix('prefix')->id,
                 'item_suffix_id' => $randomAffixGenerator->generateAffix('suffix')->id,
+                'is_mythic' => true,
             ]);
+
+            $newItem = $newItem->refresh();
 
             $slot = $character->inventory->slots()->create([
                 'inventory_id' => $character->inventory->id,

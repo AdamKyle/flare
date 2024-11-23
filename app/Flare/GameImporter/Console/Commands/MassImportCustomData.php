@@ -34,8 +34,7 @@ class MassImportCustomData extends Command
     public function handle()
     {
 
-        Artisan::call('balance:monsters');
-        Artisan::call('generate:monster-cache');
+        Artisan::call('change:legendary-items');
 
         $this->importInformationSection();
 

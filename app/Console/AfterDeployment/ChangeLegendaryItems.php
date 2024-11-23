@@ -2,6 +2,7 @@
 
 namespace App\Console\AfterDeployment;
 
+use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use Illuminate\Console\Command;
 
@@ -68,9 +69,41 @@ class ChangeLegendaryItems extends Command
      */
     public function handle()
     {
+        $this->fixInvalidLegendariesTreatedAsMythics();
         $this->handleBasicLegendaryAffixes();
         $this->handleMediumLegendaryAffixes();
         $this->handleLegendaryLegendaryAffixes();
+    }
+
+    private function fixInvalidLegendariesTreatedAsMythics(): void
+    {
+        Item::where('is_mythic', false)->where('is_cosmic', false)->chunkById(100, function ($items) {
+            foreach ($items as $item) {
+                if (!is_null($item->item_suffix_id)) {
+                    $affix = $item->itemSuffix;
+
+                    $itemAffix = $this->changeStatsOnAffix($affix);
+
+                    if ($itemAffix->cost > self::MAX_LEGENDARY_AFFIX_COST) {
+                        $itemAffix->cost = self::MAX_LEGENDARY_AFFIX_COST;
+                    }
+
+                    $itemAffix->save();
+                }
+
+                if (!is_null($item->item_prefix_id)) {
+                    $affix = $item->itemPrefix;
+
+                    $itemAffix = $this->changeStatsOnAffix($affix);
+
+                    if ($itemAffix->cost > self::MAX_LEGENDARY_AFFIX_COST) {
+                        $itemAffix->cost = self::MAX_LEGENDARY_AFFIX_COST;
+                    }
+
+                    $itemAffix->save();
+                }
+            }
+        });
     }
 
     private function handleBasicLegendaryAffixes(): void
