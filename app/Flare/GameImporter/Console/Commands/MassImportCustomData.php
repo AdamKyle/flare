@@ -33,9 +33,6 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
-
-        Artisan::call('change:legendary-items');
-
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
