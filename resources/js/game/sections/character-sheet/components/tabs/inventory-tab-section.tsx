@@ -3,7 +3,6 @@ import DropDown from "../../../../components/ui/drop-down/drop-down";
 import InventoryTable from "./inventory-tabs/inventory-table";
 import UsableItemsTable from "./inventory-tabs/usable-items-table";
 import InventoryDetails from "../../../../lib/game/character-sheet/types/inventory/inventory-details";
-import InventoryActionConfirmationModal from "../modals/inventory-action-confirmation-modal";
 import { isEqual } from "lodash";
 import SuccessAlert from "../../../../components/ui/alerts/simple-alerts/success-alert";
 import InventoryTabSectionProps from "../../../../lib/game/character-sheet/types/tabs/inventory-tab-section-props";
@@ -93,7 +92,7 @@ export default class InventoryTabSection extends React.Component<
     search(e: React.ChangeEvent<HTMLInputElement>) {
         const value: string = e.target.value;
 
-        if (this.state.table === "Inventory") {
+        if (this.state.table === "inventory") {
             this.setState({
                 data: this.props.inventory
                     .filter((item: InventoryDetails) => {
@@ -253,7 +252,7 @@ export default class InventoryTabSection extends React.Component<
     }
 
     isSelectAllHidden() {
-        return this.state.data.length === 0;
+        return this.state.data.length === 0 || this.state.table !== "inventory";
     }
 
     isSelectedDropDownHidden() {
