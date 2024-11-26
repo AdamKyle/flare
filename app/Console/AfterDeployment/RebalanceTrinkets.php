@@ -27,7 +27,8 @@ class RebalanceTrinkets extends Command
      */
     public function handle(LinearAttributeCurve $linearAttributeCurve)
     {
-        $trinkets = Item::where('type', 'trinket')->get();
+        $trinkets = Item::where('type', 'trinket')->orderBy('skill_level_required')->get();
+
         $trinketCount = $trinkets->count();
 
         $curveDataForTrinkets = $this->generateCurveDataForTrinkets($linearAttributeCurve, $trinketCount);
