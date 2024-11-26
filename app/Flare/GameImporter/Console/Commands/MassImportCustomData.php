@@ -33,6 +33,9 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
+
+        Artisan::call('rebalance:trinkets');
+
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {

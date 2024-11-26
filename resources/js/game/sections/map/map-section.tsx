@@ -10,7 +10,7 @@ import DirectionalMovement from "./actions/directional-movement";
 import MapActions from "./actions/map-actions";
 import MovePlayer from "./lib/ajax/move-player";
 import { getStyle, playerIconPosition } from "./lib/map-management";
-import { dragMap, fetchLeftBounds } from "./lib/map-position";
+import { dragMap, fetchLeftBounds, getNewXPosition } from "./lib/map-position";
 import MapData from "./lib/request-types/MapData";
 import MapStateManager from "./lib/state/map-state-manager";
 import MapState from "./types/map-state";
@@ -29,6 +29,8 @@ export default class MapSection extends React.Component<MapProps, MapState> {
     private explorationTimeOut: any;
 
     private celestialTimeout: any;
+
+    private pctCommand: any;
 
     constructor(props: MapProps) {
         super(props);
@@ -78,6 +80,9 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         this.celestialTimeout = Echo.private(
             "update-character-celestial-timeout-" + this.props.user_id,
         );
+
+        // @ts-ignore
+        this.pctCommand = Echo.private("update-map-" + this.props.user_id);
     }
 
     componentDidMount() {
@@ -123,6 +128,29 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             (event: any) => {
                 this.setState({
                     celestial_time_out: event.timeLeft,
+                });
+            },
+        );
+
+        this.pctCommand.listen(
+            "Game.Maps.Events.UpdateMapDetailsBroadcast",
+            (event: any) => {
+                this.setState({
+                    ...event.map_data,
+                    character_position: {
+                        x: event.map_data.character_map.character_position_x,
+                        y: event.map_data.character_map.character_position_y,
+                    },
+                    map_position: {
+                        x: getNewXPosition(
+                            event.map_data.character_map.character_position_x,
+                            event.map_data.character_map.position_x,
+                        ),
+                        y: getNewXPosition(
+                            event.map_data.character_map.character_position_y,
+                            event.map_data.character_map.position_y,
+                        ),
+                    },
                 });
             },
         );
