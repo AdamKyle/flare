@@ -35,7 +35,7 @@ class RebalanceSkillReductionAffixes extends Command
      */
     public function handle(LinearAttributeCurve $linearAttributeCurve)
     {
-        $itemAffixes = ItemAffix::where('affix_type', ItemAffixType::SKILL_REDUCTION)->where('randomly_generated', false)->get();
+        $itemAffixes = ItemAffix::where('affix_type', ItemAffixType::SKILL_REDUCTION)->where('randomly_generated', false)->orderBy('skill_level_required')->get();
         $count = $itemAffixes->count();
 
         $statCurveData = $this->generateCurveDataForAffixes($linearAttributeCurve, $count);

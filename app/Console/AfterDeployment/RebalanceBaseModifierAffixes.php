@@ -35,7 +35,7 @@ class RebalanceBaseModifierAffixes extends Command
 
     private function rebalanceAttackBasedModifiers(LinearAttributeCurve $linearAttributeCurve)
     {
-        $itemAffixes = ItemAffix::where('affix_type', ItemAffixType::BASE_MODIFIERS)->where('randomly_generated', false)->get();
+        $itemAffixes = ItemAffix::where('affix_type', ItemAffixType::BASE_MODIFIERS)->where('randomly_generated', false)->orderBy('skill_level_required')->get();
         $itemAffixSize = $itemAffixes->count();
 
         $statCurve = $this->generateCurveDataForAffixes($linearAttributeCurve, $itemAffixSize, 0.55);
@@ -48,7 +48,7 @@ class RebalanceBaseModifierAffixes extends Command
 
     private function rebalanceArmourBaseModifiers(LinearAttributeCurve $linearAttributeCurve)
     {
-        $itemAffixes = ItemAffix::where('affix_type', ItemAffixType::BASE_MODIFIERS)->where('randomly_generated', false)->get();
+        $itemAffixes = ItemAffix::where('affix_type', ItemAffixType::BASE_MODIFIERS)->where('randomly_generated', false)->orderBy('skill_level_required')->get();
         $itemAffixSize = $itemAffixes->count();
 
         $statCurve = $this->generateCurveDataForAffixes($linearAttributeCurve, $itemAffixSize, 1.0);
@@ -61,7 +61,7 @@ class RebalanceBaseModifierAffixes extends Command
 
     private function rebalanceHealingBaseModifiers(LinearAttributeCurve $linearAttributeCurve)
     {
-        $itemAffixes = ItemAffix::where('affix_type', ItemAffixType::BASE_MODIFIERS)->where('randomly_generated', false)->get();
+        $itemAffixes = ItemAffix::where('affix_type', ItemAffixType::BASE_MODIFIERS)->where('randomly_generated', false)->orderBy('skill_level_required')->get();
         $itemAffixSize = $itemAffixes->count();
 
         $statCurve = $this->generateCurveDataForAffixes($linearAttributeCurve, $itemAffixSize, 0.65);

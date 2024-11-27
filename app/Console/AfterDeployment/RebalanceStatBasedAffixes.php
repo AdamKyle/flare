@@ -54,7 +54,7 @@ class RebalanceStatBasedAffixes extends Command
     public function handle(LinearAttributeCurve $linearAttributeCurve)
     {
         foreach ($this->affixTypesToRebalance as $typeToRebalance) {
-            $itemAffixes = ItemAffix::where('affix_type', $typeToRebalance)->where('randomly_generated', false)->get();
+            $itemAffixes = ItemAffix::where('affix_type', $typeToRebalance)->where('randomly_generated', false)->orderBy('skill_level_required')->get();
             $count = $itemAffixes->count();
 
             $statCurveData = $this->generateCurveDataForAffixes($linearAttributeCurve, $count);

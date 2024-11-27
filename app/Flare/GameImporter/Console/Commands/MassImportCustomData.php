@@ -2,15 +2,14 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
-use App\Flare\Models\GameMap;
-use App\Flare\Models\InfoPage;
-use App\Flare\Models\Item;
-use App\Flare\Models\Survey;
-use App\Flare\Values\MapNameValue;
 use Artisan;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
+use App\Flare\Models\GameMap;
+use App\Flare\Models\InfoPage;
+use App\Flare\Models\Survey;
+use App\Flare\Values\MapNameValue;
 
 class MassImportCustomData extends Command
 {
@@ -35,6 +34,11 @@ class MassImportCustomData extends Command
     {
 
         Artisan::call('rebalance:trinkets');
+        Artisan::call('rebalance:skill-reducing-affixes');
+        Artisan::call('rebalance:stat-based-affixes');
+        Artisan::call('rebalance:stat-reducing-affixes');
+        Artisan::call('rebalance:irresistable-damage-based-affixes');
+        Artisan::call('rebalance:base-modifier-affixes');
 
         $this->importInformationSection();
 
