@@ -52,6 +52,7 @@ export default class ActionTimerListeners implements ActionTimerListener {
         this.attackTimeout.listen(
             "Game.Core.Events.ShowTimeOutEvent",
             (event: any) => {
+                console.log(event);
                 if (!this.component) {
                     return;
                 }
