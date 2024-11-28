@@ -20,6 +20,7 @@ use App\Console\AfterDeployment\RebalanceSkillReductionAffixes;
 use App\Console\AfterDeployment\RebalanceStatReducingAffixes;
 use App\Console\AfterDeployment\RebalanceTrinkets;
 use App\Console\AfterDeployment\ReduceCharacterBaseModifiersForReincarnation;
+use App\Console\Commands\ClearPlayersJobs;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
 use App\Console\DevelopmentCommands\CompleteGuideQuestForCharacter;
 use App\Console\DevelopmentCommands\CreateCharacter;
@@ -68,6 +69,7 @@ class AppServiceProvider extends ServiceProvider
             RebalanceSkillReductionAffixes::class,
             RebalanceIrresistableDamageAffixes::class,
             RebalanceTrinkets::class,
+            ClearPlayersJobs::class,
 
             // Development Commands:
             CreateCharacter::class,
