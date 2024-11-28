@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\AfterDeployment;
 
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityResourceRequest;
