@@ -34,6 +34,8 @@ export default class ActionTimerListeners implements ActionTimerListener {
             this.craftingTimeout = echo.private(
                 "show-crafting-timeout-bar-" + this.userId,
             );
+
+            console.log(this.attackTimeout, this.craftingTimeout);
         } catch (e: any | unknown) {
             throw new Error(e);
         }
@@ -52,7 +54,6 @@ export default class ActionTimerListeners implements ActionTimerListener {
         this.attackTimeout.listen(
             "Game.Core.Events.ShowTimeOutEvent",
             (event: any) => {
-                console.log(event);
                 if (!this.component) {
                     return;
                 }
