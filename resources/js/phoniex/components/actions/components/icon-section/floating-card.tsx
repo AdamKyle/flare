@@ -3,7 +3,7 @@ import FloatingCardProps from "./types/floating-card-props";
 
 const FloatingCard = (props: FloatingCardProps): ReactNode => {
     return (
-        <div className="hidden lg:block absolute top-8 left-36 ml-4 shadow-lg rounded-sm border border-gray-500 dark:border-gray-700 w-[28rem] z-10 max-w-none text-black dark:text-gray-300">
+        <div className="absolute top-8 left-36 ml-4 shadow-lg rounded-sm border border-gray-500 dark:border-gray-700 w-[25rem] md:w-[28rem] z-10 max-w-none text-black dark:text-gray-300">
             <div className="bg-gray-400 dark:bg-gray-700 border-b-2 border-b-gray-500 dark:border-b-gray-600 px-4 py-3 flex items-center justify-between">
                 <h3 className="text-lg font-semibold mb-0">{props.title}</h3>
                 <button

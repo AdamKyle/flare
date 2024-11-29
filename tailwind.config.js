@@ -6,7 +6,7 @@ import tailwindcssDir from "tailwindcss-dir";
 export default {
     mode: 'jit',
     content: [
-        './resources/**/*.{js,vue,blade.php,jsx,tsx}',
+        './resources/**/*.{js,vue,blade.php,jsx,tsx,ts}',
         './app/Flare/View/Livewire/**/*.php',
         './vendor/rappasoft/laravel-livewire-tables/resources/views/**/*.blade.php'
     ],
@@ -138,11 +138,13 @@ export default {
                 DEFAULT: "1px 1px 5px 0 rgba(0, 0, 0, 0.16)",
             },
             screens: {
-                'sm': '640px',
+                'sm': '0px',
 
-                'md': '1024px',
+                'md': '667px',
 
-                'lg': '1600px',
+                'lg': '1024px',
+
+                'xl': '1366px'
             },
             colors: {
                 orange: {

@@ -70,14 +70,26 @@ const IconSection = (): ReactNode => {
             <AnimatePresence>
                 {showCharacterCard && (
                     <motion.div
-                        initial={{ x: -100, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        exit={{ x: -100, opacity: 0 }}
+                        initial={{
+                            x: window.innerWidth <= 768 ? 0 : -100,
+                            y: window.innerWidth <= 768 ? -50 : 0,
+                            opacity: 0,
+                        }}
+                        animate={{
+                            x: 0,
+                            y: 0,
+                            opacity: 1,
+                        }}
+                        exit={{
+                            x: window.innerWidth <= 768 ? 0 : -100,
+                            y: window.innerWidth <= 768 ? 0 : 0,
+                            opacity: 0,
+                        }}
                         transition={{ duration: 0.5 }}
                         style={{
                             position: "absolute",
-                            top: "0",
-                            left: "-1rem",
+                            top: window.innerWidth <= 768 ? "5rem" : "0",
+                            left: window.innerWidth <= 768 ? "-195px" : "-1rem",
                             zIndex: 10,
                         }}
                     >
@@ -87,14 +99,26 @@ const IconSection = (): ReactNode => {
 
                 {showCraftingCard && (
                     <motion.div
-                        initial={{ x: -100, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        exit={{ x: -100, opacity: 0 }}
+                        initial={{
+                            x: window.innerWidth <= 768 ? 0 : -100,
+                            y: window.innerWidth <= 768 ? -50 : 0,
+                            opacity: 0,
+                        }}
+                        animate={{
+                            x: 0,
+                            y: 0,
+                            opacity: 1,
+                        }}
+                        exit={{
+                            x: window.innerWidth <= 768 ? 0 : -100,
+                            y: window.innerWidth <= 768 ? 0 : 0,
+                            opacity: 0,
+                        }}
                         transition={{ duration: 0.5 }}
                         style={{
                             position: "absolute",
-                            top: "0",
-                            left: "-1rem",
+                            top: window.innerWidth <= 768 ? "5rem" : "0",
+                            left: window.innerWidth <= 768 ? "-195px" : "-1rem",
                             zIndex: 10,
                         }}
                     >
@@ -104,14 +128,26 @@ const IconSection = (): ReactNode => {
 
                 {showChatCard && (
                     <motion.div
-                        initial={{ x: -100, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        exit={{ x: -100, opacity: 0 }}
+                        initial={{
+                            x: window.innerWidth <= 768 ? 0 : -100,
+                            y: window.innerWidth <= 768 ? -50 : 0,
+                            opacity: 0,
+                        }}
+                        animate={{
+                            x: 0,
+                            y: 0,
+                            opacity: 1,
+                        }}
+                        exit={{
+                            x: window.innerWidth <= 768 ? 0 : -100,
+                            y: window.innerWidth <= 768 ? 0 : 0,
+                            opacity: 0,
+                        }}
                         transition={{ duration: 0.5 }}
                         style={{
                             position: "absolute",
-                            top: "0",
-                            left: "-1rem",
+                            top: window.innerWidth <= 768 ? "5rem" : "0",
+                            left: window.innerWidth <= 768 ? "-195px" : "-1rem",
                             zIndex: 10,
                         }}
                     >
