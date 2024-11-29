@@ -7,7 +7,10 @@ const calendarElement: HTMLElement | null = document.getElementById(
 );
 
 if (calendarElement !== null) {
+    const inGameAttribute = calendarElement.getAttribute("data-in-game");
+    const isInGame = inGameAttribute === "true";
+
     const root: Root = createRoot(calendarElement);
 
-    root.render(<Calendar />);
+    root.render(<Calendar in_game={isInGame} />);
 }

@@ -10,6 +10,7 @@ use App\Flare\Values\MapNameValue;
 use App\Game\Battle\Values\CelestialConjureType;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Maps\Events\UpdateMap;
+use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Foundation\Bus\PendingDispatch;
@@ -71,6 +72,8 @@ class PctService
 
             $this->handleNewPlaneUpdate($character, $celestialFight, $oldMapId);
         }
+
+        event(new UpdateMapDetailsBroadcast($character->user, resolve(LocationService::class)));
 
         return true;
     }

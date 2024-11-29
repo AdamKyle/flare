@@ -2,19 +2,21 @@
 
 namespace App\Game\Character\CharacterInventory\Jobs;
 
-use App\Flare\Models\Character;
-use App\Flare\Models\CharacterBoon;
-use App\Game\Character\CharacterInventory\Events\CharacterInventoryUpdateBroadCastEvent;
-use App\Game\Character\CharacterInventory\Services\UseItemService;
-use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\Skills\Services\DisenchantService;
+
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Cache;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use App\Flare\Models\Character;
+use App\Flare\Models\Item;
+use App\Flare\Models\Skill;
+use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Skills\Events\UpdateSkillEvent;
+use App\Game\Skills\Services\DisenchantService;
+use App\Game\Skills\Services\SkillCheckService;
 
 class DisenchantMany implements ShouldQueue
 {
@@ -26,8 +28,7 @@ class DisenchantMany implements ShouldQueue
      * @param Character $character
      * @param array $slotIds
      */
-    public function __construct(protected readonly Character $character, protected readonly array $slotIds) {
-    }
+    public function __construct(protected readonly Character $character, protected readonly array $itemIds) {}
 
     /**
      * Execute the job.
@@ -35,38 +36,63 @@ class DisenchantMany implements ShouldQueue
      * @return void
      * @throws Exception
      */
-    public function handle(DisenchantService $disenchantService) {
+    public function handle(DisenchantService $disenchantService, SkillCheckService $skillCheckService)
+    {
         $character = $this->character;
 
-        foreach ($this->slotIds as $slotId) {
+        $disenchantingSkill = $character->skills->filter(function ($skill) {
+            return $skill->type()->isDisenchanting();
+        })->first();
 
-            $foundItem = $this->character->inventory->slots()->find($slotId);
+        $characterRoll = $skillCheckService->characterRoll($disenchantingSkill);
+        $dcCheck = $skillCheckService->getDCCheck($disenchantingSkill);
 
-            if (is_null($foundItem)) {
-                event(new ServerMessageEvent($this->character->user, 'Not all items you selected could be disenchanted. Something went wrong. We could not find one of the items in your inventory. File a bug report.'));
+        $disenchanted = $characterRoll >= $dcCheck;
 
-                Cache::delete('character-slots-to-disenchant-' . $this->character->id);
+        foreach ($this->itemIds as $itemId) {
+            $item = Item::find($itemId);
 
-                throw new Exception($this->character->name . ' does not have an inventory slot to disenchant for: ' . $slotId);
+            if ($character->gold_dust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
+                $this->processCappedGoldDust($character, $item, $disenchanted);
+
+                $character = $character->refresh();
+
+                continue;
             }
 
-            $result = $disenchantService->disenchantItem($character, $foundItem->item, true);
+            $this->processDisenchant($disenchantService, $character, $disenchantingSkill, $item, $disenchanted);
 
-            if ($result['status'] === 422) {
-                event(new ServerMessageEvent($this->character->user, 'Something went wrong disenchanting: ' . $result['message']));
-
-                Cache::delete('character-slots-to-disenchant-' . $this->character->id);
-
-                throw new Exception('Something went wrong trying to disenchant: ' . $slotId. ' for character: ' . $this->character->name . ' message: ' . $result['message']);
-            }
-
-            $character = $this->character->refresh();
+            $character = $character->refresh();
         }
 
-        Cache::delete('character-slots-to-disenchant-' . $this->character->id);
+        ServerMessageHandler::sendBasicMessage($character->user, 'Look at that! disenchanted all your valid items!');
+    }
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
+    private function processCappedGoldDust(Character $character, Item $item, bool $disenchanted): void
+    {
+        $message = 'You are maxed on gold dust and ' . (
+            $disenchanted ? ' you still managed to disenchant the item: ' . $item->affix_name :
+            'you failed to disenchant the item: ' . $item->affix_name
+        );
 
-        event(new ServerMessageEvent($character->user, 'All done (Disenchanting selected items). You may manage your inventory as normal now.'));
+        ServerMessageHandler::sendBasicMessage($character->user, $message);
+    }
+
+    private function processDisenchant(DisenchantService $disenchantService, Character $character, Skill $disenchantingSkill, Item $item, bool $disenchanted): void
+    {
+        event(new UpdateSkillEvent($disenchantingSkill));
+
+        $message = 'You ' . (
+            $disenchanted ? 'disenchanted the item: ' . $item->affix_name :
+            'failed to disenchant the item: ' . $item->affix_name
+        );
+
+        ServerMessageHandler::sendBasicMessage($character->user, $message);
+
+        $goldDust = $disenchantService->setUp($character)->updateGoldDust($character, !$disenchanted);
+
+        $message = 'You also gained: ' . number_format($goldDust) . ' Gold Dust!';
+
+        ServerMessageHandler::sendBasicMessage($character->user, $message);
     }
 }

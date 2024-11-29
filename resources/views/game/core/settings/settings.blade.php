@@ -30,6 +30,11 @@
                 'uses' => $user,
             ])
         @endif
+        @if ($cosmeticRaceChanger)
+            @include('game.core.settings.partials.cosmetic-race-changer', [
+                'uses' => $user,
+            ])
+        @endif
         @include('game.core.settings.partials.auto-disenchant-settings', [
             'user' => $user,
         ])

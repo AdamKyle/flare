@@ -37,7 +37,7 @@ class GiveKingdomsToNpcHandler
 
         $map = $character->map;
 
-        event(new UpdateMapDetailsBroadcast($map, $character->user, $this->locationService));
+        event(new UpdateMapDetailsBroadcast($character->user, $this->locationService));
 
         event(new UpdateGlobalMap($character));
     }
@@ -64,7 +64,7 @@ class GiveKingdomsToNpcHandler
 
         $map = $user->character->map;
 
-        event(new UpdateMapDetailsBroadcast($map, $user, $this->locationService));
+        event(new UpdateMapDetailsBroadcast($user, $this->locationService));
 
         event(new UpdateGlobalMap($user->character));
     }

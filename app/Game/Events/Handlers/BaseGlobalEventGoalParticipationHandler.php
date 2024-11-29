@@ -74,7 +74,7 @@ class BaseGlobalEventGoalParticipationHandler
      *
      * @throws Exception
      */
-    protected function rewardForCharacter(Character $character, GlobalEventGoal $globalEventGoal)
+    private function rewardForCharacter(Character $character, GlobalEventGoal $globalEventGoal)
     {
 
         $item = Item::where('specialty_type', $globalEventGoal->item_specialty_type_reward)
@@ -90,6 +90,12 @@ class BaseGlobalEventGoalParticipationHandler
             ->first();
 
         if (is_null($item)) {
+            return;
+        }
+
+        if ($character->isInventoryFull()) {
+            event(new ServerMessageEvent($character->user, 'Child, your inventory is too full for you to be rewarded with any items for this event goal! You need to make some room.'));
+
             return;
         }
 

@@ -10,13 +10,15 @@ class FeatureTypes
 
     const COSMETIC_TEXT = 1;
 
-    const NAME_TAGS = 2;
+    const COSMETIC_NAME_TAGS = 2;
 
     const EXTEND_SETS = 3;
 
     const CAPITAL_CITIES = 4;
 
     const CAPITAL_CITY_GOLD_BARS = 5;
+
+    const COSMETIC_RACE_CHANGER = 6;
 
     private int $value;
 
@@ -26,19 +28,21 @@ class FeatureTypes
     protected static array $values = [
         0 => self::REINCARNATION,
         1 => self::COSMETIC_TEXT,
-        2 => self::NAME_TAGS,
+        2 => self::COSMETIC_NAME_TAGS,
         3 => self::EXTEND_SETS,
         4 => self::CAPITAL_CITIES,
         5 => self::CAPITAL_CITY_GOLD_BARS,
+        6 => self::COSMETIC_RACE_CHANGER,
     ];
 
     protected static array $valueNames = [
         self::REINCARNATION => 'Reincarnation',
         self::COSMETIC_TEXT => 'Cosmetic Text',
-        self::NAME_TAGS => 'Name Tags',
+        self::COSMETIC_NAME_TAGS => 'Cosmetic Name Tags',
         self::EXTEND_SETS => 'Give 10 additional sets',
         self::CAPITAL_CITIES => 'Capital Cities',
         self::CAPITAL_CITY_GOLD_BARS => 'Capital City Gold Bars',
+        self::COSMETIC_RACE_CHANGER => 'Cosmetic Race Changer',
     ];
 
     /**
@@ -49,7 +53,7 @@ class FeatureTypes
     public function __construct(int $value)
     {
         if (! in_array($value, self::$values)) {
-            throw new Exception($value.' does not exist.');
+            throw new Exception($value . ' does not exist.');
         }
 
         $this->value = $value;
@@ -75,9 +79,9 @@ class FeatureTypes
         return $this->value === self::COSMETIC_TEXT;
     }
 
-    public function isNameTag(): bool
+    public function isCosmeticNameTag(): bool
     {
-        return $this->value === self::NAME_TAGS;
+        return $this->value === self::COSMETIC_NAME_TAGS;
     }
 
     public function isExtendSets(): bool
@@ -88,5 +92,10 @@ class FeatureTypes
     public function isCapitalCities(): bool
     {
         return $this->value === self::CAPITAL_CITIES;
+    }
+
+    public function isCosmeticRaceChanger(): bool
+    {
+        return $this->value === self::COSMETIC_RACE_CHANGER;
     }
 }

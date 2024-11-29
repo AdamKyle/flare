@@ -98,10 +98,10 @@ class PurgatorySmithHouseRewardHandler
      */
     public function currencyReward(Character $character, ?Event $event = null): Character
     {
-        $maximumAmount = 1000;
+        $maximumAmount = 1_000;
 
         if (! is_null($event)) {
-            $maximumAmount = 50000;
+            $maximumAmount = 5_000;
         }
 
         $goldDust = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
@@ -147,7 +147,7 @@ class PurgatorySmithHouseRewardHandler
     protected function handleItemReward(Character $character, bool $isMythic, ?Event $event = null): Character
     {
         $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->first()->skill_bonus;
-        $maxRoll = $isMythic ? 10000000 : 1000000;
+        $maxRoll = $isMythic ? 1_000 : 5_00;
 
         if ($lootingChance > 0.15) {
             $lootingChance = 0.15;
@@ -206,7 +206,7 @@ class PurgatorySmithHouseRewardHandler
                 'item_id' => $newItem->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You found something LEGENDARY in the basement child: '.$item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You found something LEGENDARY in the basement child: ' . $item->affix_name, $slot->id));
         }
 
         if ($isMythic) {
@@ -217,14 +217,17 @@ class PurgatorySmithHouseRewardHandler
             $newItem->update([
                 'item_prefix_id' => $randomAffixGenerator->generateAffix('prefix')->id,
                 'item_suffix_id' => $randomAffixGenerator->generateAffix('suffix')->id,
+                'is_mythic' => true,
             ]);
+
+            $newItem = $newItem->refresh();
 
             $slot = $character->inventory->slots()->create([
                 'inventory_id' => $character->inventory->id,
                 'item_id' => $newItem->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You found something MYTHICAL in the basement child: '.$item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You found something MYTHICAL in the basement child: ' . $item->affix_name, $slot->id));
         }
     }
 
@@ -250,9 +253,9 @@ class PurgatorySmithHouseRewardHandler
             AnnouncementHandler::createAnnouncement('purgatory_house');
 
             event(new GlobalMessageEvent(
-                'The floor boards creak and the cries of the children trapped in their own misery wale across the lands. '.
-                '"Children of Tlessa, hear me as I lay bare my treasures for you to find in the depths of my own memories." echoes a familiar voice. '.
-                'You recognise it. The Creator ...'
+                'The floor boards creak and the cries of the children trapped in their own misery wale across the lands. ' .
+                    '"Children of Tlessa, hear me as I lay bare my treasures for you to find in the depths of my own memories." echoes a familiar voice. ' .
+                    'You recognise it. The Creator ...'
             ));
         }
     }

@@ -5,6 +5,7 @@ namespace App\Admin\Controllers\Api;
 use App\Admin\Requests\MoveLocationRequest;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
+use App\Flare\Models\Npc;
 use App\Game\Maps\Services\LocationService;
 use App\Http\Controllers\Controller;
 use Facades\App\Flare\Cache\CoordinatesCache;
@@ -25,20 +26,34 @@ class MapManagerController extends Controller
             'x_coordinates' => $coordinates['x'],
             'y_coordinates' => $coordinates['y'],
             'locations' => $this->locationService->fetchLocationsForMap($gameMap),
+            'npcs' => Npc::where('game_map_id', $gameMap->id)->get(),
         ]);
     }
 
-    public function moveLocation(MoveLocationRequest $request, Location $location): JsonResponse
+    public function moveLocation(MoveLocationRequest $request, GameMap $gameMap): JsonResponse
     {
-        $location->update([
-            'x' => $request->x,
-            'y' => $request->y,
-        ]);
+        if ($request->location_id > 0) {
+            $location = Location::find($request->location_id);
 
-        $location = $location->refresh();
+            $location->update([
+                'x' => $request->x,
+                'y' => $request->y,
+            ]);
+        }
+
+        if ($request->npc_id > 0) {
+            $npc = Npc::find($request->npc_id);
+
+            $npc->update([
+                'x_position' => $request->x,
+                'y_position' => $request->y,
+            ]);
+        }
+
 
         return response()->json([
-            'locations' => $this->locationService->fetchLocationsForMap($location->map),
+            'locations' => $this->locationService->fetchLocationsForMap($gameMap),
+            'npcs' => Npc::where('game_map_id', $gameMap->id)->get(),
         ]);
     }
 }

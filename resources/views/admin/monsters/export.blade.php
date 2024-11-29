@@ -10,7 +10,7 @@
             <div class="grid grid-cols-1 gap-3 items-center">
                 <form method="POST" action="{{ route('monsters.export-data') }}" class="text-center">
                     @csrf
-                    <input type="hidden" value="monster" name="monster_type" />
+                    <input type="hidden" value="monsters" name="monster_type" />
                     <x-core.buttons.primary-button type="submit">
                         Export Monsters
                     </x-core.buttons.primary-button>
@@ -18,7 +18,7 @@
 
                 <form method="POST" action="{{ route('monsters.export-data') }}" class="text-center">
                     @csrf
-                    <input type="hidden" value="celestial" name="monster_type" />
+                    <input type="hidden" value="celestials" name="monster_type" />
                     <x-core.buttons.primary-button type="submit">
                         Export Celestials
                     </x-core.buttons.primary-button>
@@ -26,7 +26,7 @@
 
                 <form method="POST" action="{{ route('monsters.export-data') }}" class="text-center">
                     @csrf
-                    <input type="hidden" value="raid_monster" name="monster_type" />
+                    <input type="hidden" value="raid-monsters" name="monster_type" />
                     <x-core.buttons.primary-button type="submit">
                         Export Raid Monsters
                     </x-core.buttons.primary-button>
@@ -34,7 +34,7 @@
 
                 <form method="POST" action="{{ route('monsters.export-data') }}" class="text-center">
                     @csrf
-                    <input type="hidden" value="raid_boss" name="monster_type" />
+                    <input type="hidden" value="raid-bosses" name="monster_type" />
                     <x-core.buttons.primary-button type="submit">
                         Export Raid Bosses
                     </x-core.buttons.primary-button>
@@ -42,9 +42,9 @@
 
                 <form method="POST" action="{{ route('monsters.export-data') }}" class="text-center">
                     @csrf
-                    <input type="hidden" value="special_locations" name="monster_type" />
+                    <input type="hidden" value="weekly-monsters" name="monster_type" />
                     <x-core.buttons.primary-button type="submit">
-                        Special Location Monsters
+                        Weekly Fight Monsters
                     </x-core.buttons.primary-button>
                 </form>
             </div>

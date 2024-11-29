@@ -7,10 +7,14 @@ use App\Flare\Models\Inventory;
 use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Character\Concerns\Boons;
+use App\Game\Reincarnate\Values\MaxReincarnationStats;
 
 class LevelUpValue
 {
     use Boons;
+
+    const BASE_STAT_DAMAGE_MODIFIER = 'base_damage_stat_mod';
+    const BASE_STAT_MODIFIER = 'base_stat_mod';
 
     /**
      * Create the level up value object.
@@ -21,8 +25,8 @@ class LevelUpValue
     {
 
         $gainsAdditionalLevel = $this->gainsAdditionalLevelOnLevelUp($character);
-        $baseStatMod = $this->addModifier($character, 'base_stat_mod', false, $gainsAdditionalLevel);
-        $baseDamageStatMod = $this->addModifier($character, 'base_damage_stat_mod', true, $gainsAdditionalLevel);
+        $baseStatMod = $this->addModifier($character, self::BASE_STAT_MODIFIER, $gainsAdditionalLevel);
+        $baseDamageStatMod = $this->addModifier($character, self::BASE_STAT_DAMAGE_MODIFIER, $gainsAdditionalLevel);
         $newLevel = $character->level + ($gainsAdditionalLevel ? $this->additionalLevelsToGain($character) : 1);
         $maxLevel = $this->getMaxLevel($character);
 
@@ -68,15 +72,28 @@ class LevelUpValue
     /**
      * Add to the stat modifier pool when the stats are maxed out.
      */
-    protected function addModifier(Character $character, string $stat, bool $isDamage = false, bool $gainAdditionalLevel = false): float
+    protected function addModifier(Character $character, string $stat, bool $gainAdditionalLevel = false): float
     {
 
-        if ($isDamage && $character->{$character->damage_stat} >= 999999) {
-            return $character->{$stat} + ($gainAdditionalLevel ? 0.0004 : 0.0002);
+        if ($character->{$character->damage_stat} >= MaxReincarnationStats::MAX_STATS && $stat === self::BASE_STAT_DAMAGE_MODIFIER) {
+            $damageStatBonus = $character->{$stat} + ($gainAdditionalLevel ? 0.0002 : 0.0001);
+
+            if ($damageStatBonus > 0.50) {
+                return 0.50;
+            }
+
+            return $damageStatBonus;
         }
 
-        if ($character->str >= 999999 && ! $isDamage) {
-            return $character->{$stat} + ($gainAdditionalLevel ? 0.0002 : 0.0001);
+
+        if ($character->str >= MaxReincarnationStats::MAX_STATS && $stat === self::BASE_STAT_MODIFIER) {
+            $baseStatBonus = $character->{$stat} + ($gainAdditionalLevel ? 0.00024 : 0.00012);
+
+            if ($baseStatBonus > 0.60) {
+                return 0.60;
+            }
+
+            return $baseStatBonus;
         }
 
         return 0.0;

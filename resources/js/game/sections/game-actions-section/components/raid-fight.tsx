@@ -6,6 +6,7 @@ import RaidFightState from "./types/raid-fight-state";
 import Ajax from "../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import PrimaryLinkButton from "../../../components/ui/buttons/primary-link-button";
+import { formatNumber } from "../../../lib/game/format-number";
 
 export default class RaidFight extends React.Component<
     RaidFightProps,
@@ -22,6 +23,7 @@ export default class RaidFight extends React.Component<
             character_current_health: 0,
             monster_current_health: 0,
             attacks_left: 5,
+            damage_dealt: 0,
             error_message: "",
         };
 
@@ -36,14 +38,16 @@ export default class RaidFight extends React.Component<
             character_current_health: this.props.character_current_health,
             monster_current_health: this.props.monster_current_health,
             attacks_left: this.props.initial_attacks_left,
+            damage_dealt: this.props.initial_damage_dealt,
         });
 
         // @ts-ignore
         this.attacksLeftUpdate.listen(
             "Game.Battle.Events.UpdateRaidAttacksLeft",
-            (event: { attacksLeft: number }) => {
+            (event: { attacksLeft: number; damageDealt: number }) => {
                 this.setState({
                     attacks_left: event.attacksLeft,
+                    damage_dealt: event.damageDealt,
                 });
             },
         );
@@ -73,6 +77,7 @@ export default class RaidFight extends React.Component<
                         this.props.character_current_health,
                     monster_current_health: this.props.monster_current_health,
                     attacks_left: this.props.initial_attacks_left,
+                    damage_dealt: this.props.initial_damage_dealt,
                     battle_messages: [],
                 },
                 () => {
@@ -148,12 +153,20 @@ export default class RaidFight extends React.Component<
         return (
             <Fragment>
                 {this.props.is_raid_boss ? (
-                    <div className="flex items-center justify-center">
-                        <div className="mt-4 text-center font-bold">
-                            Attacks Left: {this.state.attacks_left}/5{" "}
-                            {this.state.attacks_left <= 0
-                                ? "[You can attack again tomorrow]"
-                                : ""}
+                    <div>
+                        <div className="flex items-center justify-center">
+                            <div className="mt-4 text-center font-bold">
+                                Attacks Left: {this.state.attacks_left}/5{" "}
+                                {this.state.attacks_left <= 0
+                                    ? "[You can attack again tomorrow]"
+                                    : ""}
+                            </div>
+                        </div>
+                        <div className="flex items-center justify-center">
+                            <div className="mt-4 text-center font-bold">
+                                Total Damage Dealt:{" "}
+                                {formatNumber(this.state.damage_dealt)}
+                            </div>
                         </div>
                     </div>
                 ) : null}

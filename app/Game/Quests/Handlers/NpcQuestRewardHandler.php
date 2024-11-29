@@ -65,7 +65,7 @@ class NpcQuestRewardHandler
             $passive = $passive->refresh();
 
             event(new ServerMessageEvent($character->user, 'You unlocked a new Kingdom passive! head to your skills section
-            to learn more. You have unlocked: '.$passive->passiveSkill->name));
+            to learn more. You have unlocked: ' . $passive->passiveSkill->name));
         }
 
         if (! is_null($quest->unlocks_feature)) {
@@ -76,21 +76,21 @@ class NpcQuestRewardHandler
                 you to set your character level back to level 1 and keep 20% of your base stats, but you are penalized by having 5% (that stacks per reincarnation)
                 added to your XP. You can now use this feature on your Character Sheet!'));
 
-                GlobalMessageEvent::dispatch($character->name.' has unlocked: Reincarnation! A powerful new way to grow!');
+                GlobalMessageEvent::dispatch($character->name . ' has unlocked: Reincarnation! A powerful new way to grow!');
             }
 
             if ($quest->unlocksFeature()->isCosmeticText()) {
                 event(new ServerMessageEvent($character->user, 'You can now use a new feature in your settings (Hover/Tap Top Right User Icon) to change your chat text
                 to a color of your choice as well as italize or bold your text for public chat messages. How exciting!'));
 
-                event(new GlobalMessageEvent($character->name.' Has unlocked an epic gift! Cosmetic Text! They can truly stand out from the rest of you now!'));
+                event(new GlobalMessageEvent($character->name . ' Has unlocked an epic gift! Cosmetic Text! They can truly stand out from the rest of you now!'));
             }
 
-            if ($quest->unlocksFeature()->isNameTag()) {
+            if ($quest->unlocksFeature()->isCosmeticNameTag()) {
                 event(new ServerMessageEvent($character->user, 'You can now select name tags fro your character to show off in chat by selecting one from your settings page (Hover/Tap To Right User Icon) to change the tag
                 that shows beside your character name in chat!'));
 
-                event(new GlobalMessageEvent($character->name.' Has unlocked an epic gift! Name Tags! Their deeds have not gone unnoticed in the land of Tlessa!'));
+                event(new GlobalMessageEvent($character->name . ' Has unlocked an epic gift! Name Tags! Their deeds have not gone unnoticed in the land of Tlessa!'));
             }
 
             if ($quest->unlocksFeature()->isExtendSets()) {
@@ -99,7 +99,7 @@ class NpcQuestRewardHandler
 
                 event(new ServerMessageEvent($character->user, 'You now have an additional 10 sets. If you head to your Character Sheet, and visit your inventory, under the sets tab you have ten additional sets you can add items to.'));
 
-                event(new GlobalMessageEvent($character->name.' Has unlocked an epic gift! 10 additional sets! Their deeds have not gone unnoticed in the land of Tlessa!'));
+                event(new GlobalMessageEvent($character->name . ' Has unlocked an epic gift! 10 additional sets! Their deeds have not gone unnoticed in the land of Tlessa!'));
             }
         }
     }
@@ -163,12 +163,12 @@ class NpcQuestRewardHandler
             }
         }
 
-        $foundQuestitem = $character->inventory->slots->filter(function($slot) use ($quest) {
+        $foundQuestitem = $character->inventory->slots->filter(function ($slot) use ($quest) {
             return $slot->item_id === $quest->reward_item;
         })->first();
 
         if (!is_null($foundQuestitem)) {
-            broadcast(new ServerMessageEvent($character->user, 'You already own the: '.$quest->rewardItem->name . ' You shall not recieve another.'));
+            broadcast(new ServerMessageEvent($character->user, 'You already own the: ' . $quest->rewardItem->name . ' You shall not recieve another.'));
 
             return;
         }
@@ -184,7 +184,7 @@ class NpcQuestRewardHandler
 
         $this->npcServerMessage($npc, $character, 'given_item');
 
-        broadcast(new ServerMessageEvent($character->user, 'Received: '.$quest->rewardItem->name, $slot->id));
+        broadcast(new ServerMessageEvent($character->user, 'Received: ' . $quest->rewardItem->name, $slot->id));
     }
 
     public function unlockSkill(Quest $quest, Character $character, Npc $npc): void
@@ -203,7 +203,7 @@ class NpcQuestRewardHandler
 
         $this->npcServerMessage($npc, $character, 'skill_unlocked');
 
-        event(new ServerMessageEvent($character->user, 'Unlocked: '.$gameSkill->name.' This skill can now be leveled!'));
+        event(new ServerMessageEvent($character->user, 'Unlocked: ' . $gameSkill->name . ' This skill can now be leveled!'));
 
         event(new UnlockSkillEvent($character->user));
 
@@ -225,7 +225,7 @@ class NpcQuestRewardHandler
 
         $this->npcServerMessage($npc, $character, 'currency_given');
 
-        broadcast(new ServerMessageEvent($character->user, 'Received: '.number_format($quest->reward_gold).' gold from: '.$npc->real_name));
+        broadcast(new ServerMessageEvent($character->user, 'Received: ' . number_format($quest->reward_gold) . ' gold from: ' . $npc->real_name));
     }
 
     public function giveGoldDust(Character $character, Quest $quest, Npc $npc): void
@@ -243,7 +243,7 @@ class NpcQuestRewardHandler
 
         $this->npcServerMessage($npc, $character, 'currency_given');
 
-        broadcast(new ServerMessageEvent($character->user, 'Received: '.number_format($quest->reward_gold_dust).' gold dust from: '.$npc->real_name));
+        broadcast(new ServerMessageEvent($character->user, 'Received: ' . number_format($quest->reward_gold_dust) . ' gold dust from: ' . $npc->real_name));
     }
 
     public function giveShards(Character $character, Quest $quest, Npc $npc): void
@@ -261,7 +261,7 @@ class NpcQuestRewardHandler
 
         $this->npcServerMessage($npc, $character, 'currency_given');
 
-        broadcast(new ServerMessageEvent($character->user, 'Received: '.number_format($quest->reward_shards).' shards from: '.$npc->real_name));
+        broadcast(new ServerMessageEvent($character->user, 'Received: ' . number_format($quest->reward_shards) . ' shards from: ' . $npc->real_name));
     }
 
     public function npcServerMessage(Npc $npc, Character $character, string $type): void
@@ -283,7 +283,7 @@ class NpcQuestRewardHandler
 
         $character = $character->refresh();
 
-        broadcast(new ServerMessageEvent($character->user, 'Quest: '.$quest->name.' completed. Check quest logs under quest logs section.'));
+        broadcast(new ServerMessageEvent($character->user, 'Quest: ' . $quest->name . ' completed. Check quest logs under quest logs section.'));
 
         event(new UpdateTopBarEvent($character));
     }

@@ -12,7 +12,7 @@ use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
 use App\Game\Core\Comparison\ItemComparison;
-use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
@@ -81,11 +81,15 @@ class EquipItemService
 
             $characterInventoryService = $this->characterInventoryService->setCharacter($character);
 
+            $usableSets = $this->characterInventoryService->getUsableSets();
+
             $response = $this->successResult([
                 'inventory' => [
                     'inventory' => $characterInventoryService->fetchCharacterInventory(),
                     'equipped' => $characterInventoryService->fetchEquipped(),
                     'sets' => $characterInventoryService->getCharacterInventorySets(),
+                    'usable_sets' => $usableSets,
+                    'savable_sets' => $usableSets
                 ],
                 'message' => 'Equipped item.',
             ]);
@@ -155,7 +159,7 @@ class EquipItemService
 
         $character = $this->character->refresh();
 
-        event(new UpdateCharacterCurrenciesEvent($character));
+        event(new UpdateCharacterInventoryCountEvent($character));
 
         return $characterSlot->item;
     }

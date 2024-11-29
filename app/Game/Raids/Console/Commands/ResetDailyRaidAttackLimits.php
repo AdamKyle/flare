@@ -36,7 +36,7 @@ class ResetDailyRaidAttackLimits extends Command
             return;
         }
 
-        $isRaidBossDead = is_null(RaidBossParticipation::where('killed_boss', true)->first());
+        $isRaidBossDead = !is_null(RaidBossParticipation::where('killed_boss', true)->first());
 
         if ($isRaidBossDead) {
             return;
@@ -48,7 +48,9 @@ class ResetDailyRaidAttackLimits extends Command
                     'attacks_left' => 5,
                 ]);
 
-                event(new UpdateRaidAttacksLeft($record->character->user_id, 5));
+                $record = $record->refresh();
+
+                event(new UpdateRaidAttacksLeft($record->character->user_id, 5, $record->damage_dealt));
             }
         });
 

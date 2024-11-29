@@ -7,6 +7,7 @@ import InventoryItemsTableState from "../../../../../lib/game/character-sheet/ty
 import UsableItemsDetails from "../../../../../lib/game/character-sheet/types/inventory/usable-items-details";
 import InfoAlert from "../../../../../components/ui/alerts/simple-alerts/info-alert";
 import ItemDetailsModal from "../../../../../components/modals/item-details/item-details-modal";
+import { isEqual } from "lodash";
 
 export default class InventoryTable extends React.Component<
     InventoryTabProps,
@@ -21,6 +22,34 @@ export default class InventoryTable extends React.Component<
             item_type: "",
             selected_slots: [],
         };
+    }
+
+    componentDidUpdate(prevProps: InventoryTabProps) {
+        if (this.props.selected_items !== prevProps.selected_items) {
+            if (
+                this.props.selected_items.length <= 0 &&
+                this.state.selected_slots.length >= 0
+            ) {
+                if (this.state.selected_slots.length !== 0) {
+                    this.setState({
+                        selected_slots: [],
+                    });
+                }
+                return;
+            }
+
+            const selectedSlots = this.props.selected_items.map(
+                (selectedItem) => {
+                    return selectedItem.slot_id;
+                },
+            );
+
+            if (!isEqual(this.state.selected_slots, selectedSlots)) {
+                this.setState({
+                    selected_slots: selectedSlots,
+                });
+            }
+        }
     }
 
     viewItem(item?: InventoryDetails | UsableItemsDetails) {

@@ -7,16 +7,26 @@ use App\Console\AfterDeployment\AllowTraverseForMaps;
 use App\Console\AfterDeployment\AssignNewBuildingsToExistingKingdoms;
 use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
 use App\Console\AfterDeployment\ChangeFeatureTypesOnQuests;
+use App\Console\AfterDeployment\ChangeLegendaryItems;
 use App\Console\AfterDeployment\CreateMonsterCache;
+use App\Console\AfterDeployment\ReBalanceMonsters;
+use App\Console\AfterDeployment\RebalanceStatBasedAffixes;
 use App\Console\AfterDeployment\RemoveInvalidQuestItems;
 use App\Console\AfterDeployment\UpdateCharactersForClassRanks;
+use App\Console\AfterDeployment\RebalanceBaseModifierAffixes;
+use App\Console\AfterDeployment\RebalanceIrresistableDamageAffixes;
+use App\Console\AfterDeployment\RebalanceMythicalItems;
+use App\Console\AfterDeployment\RebalanceSkillReductionAffixes;
+use App\Console\AfterDeployment\RebalanceStatReducingAffixes;
+use App\Console\AfterDeployment\RebalanceTrinkets;
+use App\Console\AfterDeployment\ReduceCharacterBaseModifiersForReincarnation;
+use App\Console\AfterDeployment\ClearPlayersJobs;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
 use App\Console\DevelopmentCommands\CompleteGuideQuestForCharacter;
 use App\Console\DevelopmentCommands\CreateCharacter;
 use App\Console\DevelopmentCommands\CreateEventsForDevelopment;
 use App\Console\DevelopmentCommands\CreateTestCharacters;
 use App\Console\DevelopmentCommands\GivePlayerAncenstorItem;
-use App\Console\DevelopmentCommands\GivePlayerMythicItem;
 use App\Console\DevelopmentCommands\GivePlayerUniqueItem;
 use App\Console\DevelopmentCommands\LevelCharacter;
 use App\Console\DevelopmentCommands\ManageKingdomResources;
@@ -49,6 +59,17 @@ class AppServiceProvider extends ServiceProvider
             AssignNewBuildingsToExistingKingdoms::class,
             AssignNewNpcsToFactionLoyalty::class,
             ManageKingdomResources::class,
+            ReBalanceMonsters::class,
+            RebalanceStatBasedAffixes::class,
+            RebalanceBaseModifierAffixes::class,
+            ReduceCharacterBaseModifiersForReincarnation::class,
+            ChangeLegendaryItems::class,
+            RebalanceMythicalItems::class,
+            RebalanceStatReducingAffixes::class,
+            RebalanceSkillReductionAffixes::class,
+            RebalanceIrresistableDamageAffixes::class,
+            RebalanceTrinkets::class,
+            ClearPlayersJobs::class,
 
             // Development Commands:
             CreateCharacter::class,
@@ -60,7 +81,6 @@ class AppServiceProvider extends ServiceProvider
             ReincarnateCharacter::class,
             GivePlayerUniqueItem::class,
             GivePlayerAncenstorItem::class,
-            GivePlayerMythicItem::class,
             TestExploration::class,
             CompleteGuideQuestForCharacter::class,
             MaxOutCharactersPassiveSkills::class,

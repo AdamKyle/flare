@@ -4,6 +4,7 @@ namespace App\Game\Skills\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Game\Skills\Requests\GemCraftingValidation;
+use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\GemService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
@@ -11,7 +12,7 @@ use Illuminate\Http\JsonResponse;
 class GemCraftingController extends Controller
 {
 
-    public function __construct(private GemService $gemService) {}
+    public function __construct(private GemService $gemService, private CraftingService $craftingService) {}
 
     /**
      * @param Character $character
@@ -22,6 +23,7 @@ class GemCraftingController extends Controller
         return response()->json([
             'tiers' => $this->gemService->getCraftableTiers($character),
             'skill_xp' => $this->gemService->fetchSkillXP($character),
+            'inventory_count' => $this->craftingService->getInventoryCount($character),
         ]);
     }
 
@@ -40,6 +42,7 @@ class GemCraftingController extends Controller
 
         $result['tiers'] = $this->gemService->getCraftableTiers($character);
         $result['skill_xp'] = $this->gemService->fetchSkillXP($character);
+        $result['inventory_count'] = $this->craftingService->getInventoryCount($character);
 
         return response()->json($result, $status);
     }

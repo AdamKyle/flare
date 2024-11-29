@@ -285,16 +285,9 @@ export default class ArmourClassBreakDown extends React.Component<any, any> {
                                 </span>{" "}
                                 <span className="text-green-700 dark:text-green-500">
                                     (+{this.state.details.ac_from_items})
-                                    <sup>*</sup>
                                 </span>
                             </li>
                         </ul>
-                        <p className={"my-4"}>
-                            <sup>*</sup> this number is the total Base AC on all
-                            armour items divided by the amount of armour items
-                            equipped, before modifiers. This number is used to
-                            determine your over all AC after bonuses.
-                        </p>
                         <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
                         <h4>Equipped Modifiers</h4>
                         <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>

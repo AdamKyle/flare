@@ -50,7 +50,7 @@ class DropCheckCalculator
     /**
      * Can we get more difficult items like mythics and specific quest items.
      */
-    public function fetchDifficultItemChance(float $lootingChance = 0.0, int $max = 1000000): bool
+    public function fetchDifficultItemChance(float $lootingChance = 0.0, int $max = 1_000): bool
     {
         return $this->canGetReward($max, $lootingChance);
     }

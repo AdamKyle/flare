@@ -8,8 +8,8 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Character\CharacterInventory\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -94,12 +94,19 @@ class DisenchantService
      */
     public function disenchantWithSkill(InventorySlot $slot): void
     {
+
+        $characterRoll = $this->skillCheckService->characterRoll($this->disenchantingSkill);
+        $dcCheck = $this->skillCheckService->getDCCheck($this->disenchantingSkill);
+
+        $disenchanted = $characterRoll >= $dcCheck;
+
         if ($this->character->gold_dust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
-            $slot->delete();
 
             $affixData = resolve(EnchantingService::class)->fetchAffixes($this->character->refresh());
 
-            event(new UpdateSkillEvent($this->disenchantingSkill));
+            if ($disenchanted) {
+                event(new UpdateSkillEvent($this->disenchantingSkill));
+            }
 
             event(new UpdateCharacterEnchantingList(
                 $this->character->user,
@@ -107,13 +114,21 @@ class DisenchantService
                 $affixData['character_inventory'],
             ));
 
+            $message = 'You are maxed on gold dust and ' . (
+                $disenchanted ? ' you still managed to disenchant the item: ' . $slot->item->affix_name :
+                'you failed to disenchant the item: ' . $slot->item->affix_name
+            );
+
+            ServerMessageHandler::sendBasicMessage($this->character->user, $message);
+
+            $slot->delete();
+
+            event(new UpdateCharacterInventoryCountEvent($this->character));
+
             return;
         }
 
-        $characterRoll = $this->skillCheckService->characterRoll($this->disenchantingSkill);
-        $dcCheck = $this->skillCheckService->getDCCheck($this->disenchantingSkill);
-
-        if ($characterRoll > $dcCheck) {
+        if ($disenchanted) {
             $goldDust = $this->updateGoldDust($this->character);
 
             ServerMessageHandler::handleMessage($this->character->user, 'disenchanted', number_format($goldDust));
@@ -134,6 +149,8 @@ class DisenchantService
             $affixData['affixes'],
             $affixData['character_inventory'],
         ));
+
+        event(new UpdateCharacterInventoryCountEvent($this->character));
     }
 
     /**
@@ -152,6 +169,8 @@ class DisenchantService
         if ($characterCurrentGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST && $canDisenchant) {
             event(new UpdateSkillEvent($this->disenchantingSkill));
 
+            event(new UpdateCharacterInventoryCountEvent($this->character));
+
             return;
         }
 
@@ -161,6 +180,8 @@ class DisenchantService
             ServerMessageHandler::handleMessage($this->character->user, 'disenchanted', number_format($goldDust));
 
             event(new UpdateSkillEvent($this->disenchantingSkill));
+
+            event(new UpdateCharacterInventoryCountEvent($this->character));
         } else {
             $this->updateGoldDust($this->character, true);
 
@@ -171,7 +192,7 @@ class DisenchantService
     /**
      * Update the characters gold dust.
      */
-    protected function updateGoldDust(Character $character, bool $failedCheck = false): int
+    public function updateGoldDust(Character $character, bool $failedCheck = false): int
     {
 
         $goldDust = ! $failedCheck ? rand(2, 1150) : 1;

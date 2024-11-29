@@ -7,14 +7,24 @@
 
 @section('content')
     <div class="container mx-auto lg:px-4 mb-5">
-        <div class="text-center mb-10 lg:mt-10">
-            <h3 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800 text-4xl md:text-7xl">Delusional Memory Event</h3>
-            <p class="mb-5 dark:text-gray-300 text-gray-800 italic">A plane with a story of living deep with in ones own delusions.</p>
-            <p class="mb-10 text-orange-600 dark:text-orange-300 my-2">
-                <strong>Runs from</strong>: {{$event->start_date->format('l, j \of F, Y \a\t g:iA')}}
-                <strong>until</strong>: {{$event->end_date->format('l, j \of F, Y \a\t g:iA')}}
-            </p>
-            <div class="grid md:grid-cols-3 gap-2 md:w-2/3 w-full mr-auto ml-auto">
+        <div class="mb-10 lg:mt-10">
+            <div class="text-center">
+                <h3 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800 text-4xl md:text-7xl">Delusional Memory Event</h3>
+                <p class="mb-5 dark:text-gray-300 text-gray-800 italic">A plane with a story of living deep with in ones own delusions.</p>
+            </div>
+            @if (!is_null($event))
+                <p class="mb-10 text-orange-600 dark:text-orange-300 my-2 text-center">
+                    <strong>Runs from</strong>: {{$event->start_date->format('l, j \of F, Y \a\t g:iA')}}
+                    <strong>until</strong>: {{$event->end_date->format('l, j \of F, Y \a\t g:iA')}}
+                </p>
+            @else
+                <div class="w-1/3 mx-auto">
+                <x-core.alerts.info-alert title="Not yet scheduled">
+                    This event hasn't been scheduled yet. Don't worry The Creator will schedule it soon! Below you can learn more about it for when it is scheduled!
+                </x-core.alerts.info-alert>
+                </div>
+            @endif
+            <div class="grid md:grid-cols-3 gap-2 md:w-2/3 w-full mr-auto ml-auto text-center">
                 <x-core.buttons.link-buttons.primary-button css="mr-2" href="{{ route('register') }}">
                     Join Today!
                 </x-core.buttons.link-buttons.primary-button>
@@ -128,22 +138,7 @@
                 </x-slot:title>
 
                 <p>
-                    If you have access to <a href="/information/planes">Purgatory</a>, fight powerful new monsters that test your might and courage!
-                </p>
-            </x-core.cards.feature-card>
-            <x-core.cards.feature-card>
-                <x-slot:icon>
-                    <i class="ra ra-player-king text-primary-600 relative top-[10px] right-[10px]"></i>
-                </x-slot:icon>
-                <x-slot:title>
-                    <a
-                        href="{{ route('info.page', [
-                            'pageName' => 'weekly-fights',
-                        ]) }}">Cosmic Gear & Weekly Fights</a>
-                </x-slot:title>
-
-                <p>
-                    Looking for more of a challenge for high level players? Take on weekly fights and earn <a href="/information/cosmic-items">Cosmic gear</a>!
+                    If you have access to <a href="/information/planes">Purgatory</a>, fight powerful new monsters that test your might and courage! New? You will be able to fight easier creatures so you can participate to!
                 </p>
             </x-core.cards.feature-card>
             <x-core.cards.feature-card>
@@ -152,15 +147,47 @@
                 </x-slot:icon>
                 <x-slot:title>
                     <a
-                        href="{{ route('info.page', [
-                            'pageName' => 'exploration',
-                        ]) }}">Brand new raid: Jester of Time</a>
+                        href="/game-event-info?event_type=jester-of-time-raid">Jester of Time Raid</a>
                 </x-slot:title>
 
                 <p>
-                    Fight the Jester of Time and his minions for a chance at wining the new tier of gear: <a href="/information/delusional-silver">Delusional Silver</a>!
+                    Fight the Jester of Time and his minions for a chance at wining the new tier of gear: <a href="/information/delusional-silver">Delusional Silver</a>! All players regardless of level can participate in the raid.
                 </p>
             </x-core.cards.feature-card>
+            <x-core.cards.feature-card>
+                <x-slot:icon>
+                    <i class="ra ra-player-king text-primary-600 relative top-[10px] right-[10px]"></i>
+                </x-slot:icon>
+                <x-slot:title>
+                    <a
+                        href="/game-event-info?event_type=corrupted-bishop-raid">Corrupted Bishop Raid</a>
+                </x-slot:title>
+
+                <p>
+                    Fight the Corrupted Bishop and his minions for a chance at wining the new tier of gear: <a href="/information/delusional-silver">Delusional Silver</a>! All players regardless of level can participate in the raid.
+                </p>
+            </x-core.cards.feature-card>
+        </div>
+
+        <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
+            <div class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mt-5 w-full mt-10 mx-auto lg:w-3/4 md:mt-20">
+            <div class="mt-4 lg:mt-0">
+                <img src="{{ asset('promotion/delusional-memories-event/cosmic-item.png') }}"
+                     class="shadow rounded max-w-full h-auto align-middle border-none img-fluid glightbox w-100 mb-5 cursor-pointer" />
+                <div class="text-center text-sm">
+                    Click to make larger.
+                </div>
+            </div>
+            <div class="md:flex md:items-center text-center md:text-left">
+                <div>
+                    <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">Cosmic Items
+                    </h2>
+                    <p class="mb-10 dark:text-gray-300 text-gray-800">Powerful new enchanted items, known as <a href="/information/cosmic-items">Cosmic Gear</a>, can drop at the Alchemical Church <a href="/information/locations">location</a> while on this map. Players just have to omplete the new quests to unlock the ability to take on powerful new <a href="/information/weekly-fights">Weekly Fights</a> down here and eaern them selves a chance at getting this gear!</p>
+                </div>
+            </div>
         </div>
 
         <div class="w-full lg:w-2/4 mx-auto mt-10 lg:mt-20 mb-10 mt-4 lg:mt-0">
@@ -171,16 +198,16 @@
             <dl class="mt-3">
                 <dt>How do I access the event?</dt>
                 <dd>
-                    Simply log in or create a new character and once you are in, click Traverse under the map. If you are on mobile, select Map Movement
+                    Simply log in or create a new character and once you are in, click <a href="/information/traverse">Traverse</a> under the map. If you are on mobile, select Map Movement
                     from the drop down of actions. From here - under the map - is a traverse button, click that to then select Delusional Memories and enter the
                     event.
                 </dd>
                 <dt>What happens when the event is over?</dt>
                 <dd>
-                    When the event ends players wil be moved to Surface - the starting map. All kingdoms settled on Delusional Memories will fall to the ground and
-                    the player with the most kingdoms gets a full set of end game gear: Delusional Silver.
+                    When the event ends players wil be moved to Surface - the starting map. All kingdoms settled on The Ice Plane will fall to the ground and
+                    the player with the most kingdoms gets a full set of end game gear: <a href="/information/delusional-silver">Delusional Silver</a>.
                 </dd>
-                <dt>Mythical, Legendary and End Game Gear - Seems Easy!</dt>
+                <dt>Unique and Mythical End Game Gear - Seems Easy!</dt>
                 <dd>
                     Yes and no. While all players can participate in the event goals and earn these pieces of gear, the gear will only take you so far as, you will need to level your character and take advantage of
                     a variety of other systems in game in order to take full advantage of the gear.
@@ -188,8 +215,8 @@
                 <dt>Lots of this sounds like high level content, what can new players do?</dt>
                 <dd>
                     New players can join in on the quests and the new story line, they can also participate in the global events. As stated before those with out access to end game content, will
-                    face early game monsters to make it fair and inviting to all. Players, even new players, can get Mythical and Legendary gear down here by participating in the global events,
-                    this will take them a long way until they understand more systems in the game.
+                    face early game monsters to make it fair and inviting to all. Players, even new players, can get <a href="/information/unique-items">Unique</a> and even a <a href="/information/mythical-items">Mythical</a> <a href="/information/delusional-silver">Delusional Silver</a>.
+                    gear down here by participating in the global events, this will take them a long way until they understand more systems in the game.
                 </dd>
             </dl>
         </div>

@@ -45,31 +45,24 @@ export default class QuestItemsTable extends React.Component<
         return (
             <Fragment>
                 <div className="mb-5">
-                    <div className="flex flex-row flex-wrap items-center">
-                        <div>
-                            <label
-                                className="label block mt-2 md:mt-0 mb-2 mr-3"
-                                htmlFor="search"
-                            >
-                                Search
-                            </label>
-                        </div>
-                        <div className="w-1/2">
+                    <div className="flex flex-col md:flex-row flex-wrap items-center md:space-x-4">
+                        <div className="w-full md:w-1/2">
                             <input
                                 type="text"
                                 name="search"
-                                className="form-control"
+                                className="form-control w-full"
+                                placeholder="Enter search terms..."
                                 onChange={this.search.bind(this)}
                             />
                         </div>
-                        <div className="mt-2 sm:mt-[-5px] ml-2 md:ml-0 md:mt-0">
+                        <div className="w-full md:w-auto mt-2 md:mt-0">
                             <a
                                 href="/information/quests"
                                 target="_blank"
-                                className="sm:ml-2"
+                                className="inline-flex items-center text-blue-600 hover:text-blue-800"
                             >
                                 Quests help{" "}
-                                <i className="fas fa-external-link-alt"></i>
+                                <i className="fas fa-external-link-alt ml-1"></i>
                             </a>
                         </div>
                     </div>

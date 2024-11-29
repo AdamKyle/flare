@@ -27,9 +27,11 @@ export default class SellSelectedInformation extends React.Component<
                     <strong>This action cannot be undone.</strong>
                 </p>
 
-                <ul className="my-3 pl-4 list-disc ml-4">
-                    {this.renderSelectedItemNames()}
-                </ul>
+                <div className="max-h-[250px] overflow-y-auto">
+                    <ul className="my-3 pl-4 list-disc ml-4">
+                        {this.renderSelectedItemNames()}
+                    </ul>
+                </div>
             </>
         );
     }

@@ -4,6 +4,7 @@ namespace App\Game\Character\Builders\InformationBuilders\AttributeBuilders;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
+use App\Flare\ServerFight\Fight\CharacterAttacks\Types\WeaponType;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\WeaponTypes;
 use Exception;
@@ -38,21 +39,19 @@ class DamageBuilder extends BaseAttribute
         $class = $this->character->class;
         $baseDamage = 0;
 
-        if ($this->character->class->type()->isFighter()) {
-            $baseDamage = $damageStat * 0.15;
-        } elseif ($this->character->class->type()->isArcaneAlchemist()) {
-            $hasStaveEquipped = $this->inventory->filter(function ($slot) {
-                return $slot->item->type === WeaponTypes::STAVE;
-            })->isNotEmpty();
-
-            if ($hasStaveEquipped) {
-                $baseDamage = $damageStat * 0.15;
-            } else {
-                $baseDamage = $damageStat * 0.05;
-            }
-        } else {
-            $baseDamage = $damageStat * 0.05;
-        }
+        $baseDamage = match (true) {
+            $this->character->class->type()->isThief() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, WeaponTypes::WEAPON, 2, WeaponTypes::BOW),
+            $this->character->class->type()->isMerchant() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, WeaponTypes::STAVE, 1, WeaponTypes::BOW),
+            $this->character->class->type()->isFighter() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, WeaponTypes::WEAPON, 2),
+            $this->character->class->type()->isHeretic() || $this->character->class->type()->isArcaneAlchemist() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, WeaponTypes::STAVE),
+            $this->character->class->type()->isBlackSmith() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, WeaponTypes::HAMMER),
+            $this->character->class->type()->isCleric() || $this->character->class->type()->isProphet() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, WeaponTypes::MACE),
+            $this->character->class->type()->isGunslinger() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, WeaponTypes::GUN, 2),
+            $this->character->class->type()->isDancer() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, WeaponTypes::FAN),
+            $this->character->class->type()->isBookBinder() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, WeaponTypes::SCRATCH_AWL),
+            $this->character->class->type()->isRanger() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, WeaponTypes::BOW),
+            default => ($damageStat * 0.05),
+        };
 
         $itemDamage = $this->getDamageFromWeapons($position);
         $skillPercentage = 0;
@@ -76,19 +75,24 @@ class DamageBuilder extends BaseAttribute
             return $damage - ($damage * 0.25);
         }
 
+        if ($damage < 5) {
+            return 8;
+        }
+
         return $damage;
     }
+
 
     public function buildWeaponDamageBreakDown(float $damageStat, bool $voided): array
     {
         $details = [];
 
         if ($this->character->class->type()->isFighter()) {
-            $baseDamage = $damageStat * 0.15;
+            $baseDamage = $damageStat * 0.08;
 
             $details['base_damage'] = number_format($baseDamage);
-            $details['percentage_of_stat_used'] = 0.15;
 
+            $details['percentage_of_stat_used'] = 0.08;
         } elseif ($this->character->class->type()->isArcaneAlchemist()) {
             $hasStaveEquipped = $this->inventory->filter(function ($slot) {
                 return $slot->item->type === WeaponTypes::STAVE;
@@ -307,7 +311,7 @@ class DamageBuilder extends BaseAttribute
         return max($lifeStealAmount, 0);
     }
 
-    protected function getLifeStealAfterPlaneReductions(GameMap $gameMap, float $lifeSteal): float
+    private function getLifeStealAfterPlaneReductions(GameMap $gameMap, float $lifeSteal): float
     {
 
         if ($gameMap->mapType()->isHell()) {
@@ -332,10 +336,39 @@ class DamageBuilder extends BaseAttribute
             }
 
             if ($gameMap->mapType()->isDelusionalMemories()) {
-                return $lifeSteal - ($lifeSteal * .30);
+                return $lifeSteal - ($lifeSteal * .25);
             }
         }
 
         return $lifeSteal;
+    }
+
+    private function buildBonusDamageForClassBasedOnWeaponTypeEquipped(int $damageStat, string $weaponType, int $amount = 1, ?string $orWeaponType = null): int
+    {
+        $duelHanded = [
+            WeaponTypes::STAVE,
+            WeaponTypes::HAMMER,
+            WeaponTypes::BOW,
+        ];
+
+        $matchingItems = $this->inventory->filter(function ($slot) use ($weaponType, $orWeaponType) {
+            return $slot->item->type === $weaponType || ($orWeaponType !== null && $slot->item->type === $orWeaponType);
+        });
+
+        $isDualHandedEquipped = $matchingItems->contains(function ($slot) use ($duelHanded) {
+            return in_array($slot->item->type, $duelHanded);
+        });
+
+        if ($isDualHandedEquipped) {
+            $amount = 1;
+        }
+
+        $hasEquipped = $amount === 1 ? $matchingItems->isNotEmpty() : $matchingItems->count() >= $amount;
+
+        if ($hasEquipped) {
+            return $damageStat * 0.15;
+        }
+
+        return $damageStat * 0.05;
     }
 }

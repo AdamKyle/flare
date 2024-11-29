@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Game\Skills\Services;
 
-use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\GlobalEventCraftingInventory;
 use App\Flare\Models\GlobalEventCraftingInventorySlot;
@@ -13,14 +12,10 @@ use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
-use App\Game\Events\Services\EventGoalsService;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
-use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\Skills\Handlers\HandleUpdatingCraftingGlobalEventGoal;
-use App\Game\Skills\Handlers\UpdateCraftingTasksForFactionLoyalty;
 use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -684,6 +679,20 @@ class CraftingServiceTest extends TestCase
         ];
 
         $this->assertEquals($weaponCraftingXpData, $expected);
+    }
+
+    public function testFetchCharacterInventoryCount()
+    {
+        $character = $this->character->getCharacter();
+
+        $inventoryCount = $this->craftingService->getInventoryCount($character);
+
+        $expected = [
+            'current_count' => $character->getInventoryCount(),
+            'max_inventory' => $character->inventory_max,
+        ];
+
+        $this->assertEquals($expected, $inventoryCount);
     }
 
     public function testItemIsGivenToNpcWhenDoingFactionLoyaltyCrafting()

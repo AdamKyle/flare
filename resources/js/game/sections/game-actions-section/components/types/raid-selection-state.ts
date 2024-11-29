@@ -11,6 +11,7 @@ export default interface RaidSelectionState {
     selected_raid_monster_id: number;
     revived: boolean;
     raid_boss_attacks_left: number;
+    raid_boss_damage_dealt: number;
     is_raid_boss: boolean;
     open_elemental_atonement: boolean;
     elemental_atonement: ElementalAtonement | object;

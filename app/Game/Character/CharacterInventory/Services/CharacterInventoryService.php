@@ -13,6 +13,7 @@ use App\Flare\Transformers\UsableItemTransformer;
 use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Services\MassDisenchantService;
@@ -317,15 +318,12 @@ class CharacterInventoryService
         foreach ($ids as $id) {
             $inventorySet = InventorySet::find($id);
 
-            if (! $inventorySet->is_equipped) {
-
-                $indexes[] = [
-                    'index' => array_search($id, $setIds) + 1,
-                    'id' => $id,
-                    'name' => is_null($inventorySet->name) ? 'Set ' . array_search($id, $setIds) + 1 : $inventorySet->name,
-                    'equipped' => $inventorySet->is_equipped,
-                ];
-            }
+            $indexes[] = [
+                'index' => array_search($id, $setIds) + 1,
+                'id' => $id,
+                'name' => is_null($inventorySet->name) ? 'Set ' . array_search($id, $setIds) + 1 : $inventorySet->name,
+                'equipped' => false,
+            ];
         }
 
         return $indexes;
@@ -341,11 +339,7 @@ class CharacterInventoryService
     public function getInventoryCollection(): Collection
     {
 
-        $slotsToIgnore = Cache::get('character-slots-to-disenchant-' . $this->character->id);
-
-        if (is_null($slotsToIgnore)) {
-            $slotsToIgnore = [];
-        }
+        $slotsToIgnore = Cache::get('character-slots-to-disenchant-' . $this->character->id, []);
 
         return $this->character
             ->inventory
@@ -383,7 +377,7 @@ class CharacterInventoryService
         return $this->character
             ->inventory
             ->slots
-            ->whereNotIn('item.type', ['quest', 'alchemy'])
+            ->whereNotIn('item.type', ['quest', 'alchemy', 'artifact'])
             ->where('equipped', false)
             ->sortBy('id')
             ->pluck('id')
@@ -521,6 +515,8 @@ class CharacterInventoryService
 
         $this->character = $this->character->refresh();
 
+        event(new UpdateCharacterInventoryCountEvent($this->character));
+
         return $this->successResult([
             'message' => 'Destroyed ' . $name . '.',
             'inventory' => [
@@ -534,24 +530,17 @@ class CharacterInventoryService
      *
      * - Will not destroy sets or items in sets.
      * - Will not destroy quest items or usable items.
+     * - Will not destroy artifact items either.
      */
     public function destroyAllItemsInInventory(): array
     {
         $slotIds = $this->findCharacterInventorySlotIds();
 
-        $items = $this->character->inventory->slots->where('item.type', 'artifact')->whereNotNull('item.itemSkillProgressions')->pluck('item.id')->toArray();
-
         $this->character->inventory->slots()->whereIn('id', $slotIds)->delete();
 
-        if (! empty($items)) {
-            $items = Item::whereIn('id', $items)->get();
+        $character = $this->character->refresh();
 
-            foreach ($items as $item) {
-                $item->itemSkillProgressions()->delete();
-
-                $item->delete();
-            }
-        }
+        event(new UpdateCharacterInventoryCountEvent($character));
 
         return $this->successResult([
             'message' => 'Destroyed all items.',
@@ -678,6 +667,8 @@ class CharacterInventoryService
         $character = $this->character->refresh();
 
         event(new UpdateTopBarEvent($character));
+
+        event(new UpdateCharacterInventoryCountEvent($character));
 
         return $this->successResult([
             'message' => 'Destroyed Alchemy Item: ' . $name . '.',

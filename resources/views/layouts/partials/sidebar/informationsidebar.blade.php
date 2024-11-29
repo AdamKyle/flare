@@ -16,6 +16,11 @@
             <span class="icon ra ra-muscle-fat"></span>
             <span class="title">Character Information</span>
         </a>
+        <a href="#no-link" class="link" data-target="[data-menu=events]" data-toggle="tooltip-menu"
+            data-tippy-content="Events">
+            <span class="icon fas fa-calendar"></span>
+            <span class="title">Events</span>
+        </a>
         <a href="#no-link" class="link" data-target="[data-menu=map]" data-toggle="tooltip-menu"
             data-tippy-content="Map">
             <span class="icon ra ra-scroll-unfurled"></span>
@@ -59,10 +64,6 @@
                 <span class="text-sm far fa-comment-dots"></span>
                 Chat Commands
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'events']) }}">
-                <span class="text-sm fas fa-calendar"></span>
-                Events
-            </a>
             <a href="{{ route('info.page', ['pageName' => 'raids']) }}">
                 <span class="text-sm ra ra-monster-skull"></span>
                 Raids
@@ -94,6 +95,10 @@
             <a href="{{ route('info.page', ['pageName' => 'cosmetic-text']) }}">
                 <span class="text-sm icon far fa-keyboard"></span>
                 Cosmetic Text
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'cosmetic-name-tags']) }}">
+                <span class="text-sm icon fas fa-tag"></span>
+                Cosmetic Name Tags
             </a>
         </div>
     </div>
@@ -169,6 +174,36 @@
             <a href="{{ route('info.page', ['pageName' => 'voidance']) }}">
                 <span class="ra ra-burning-book"></span>
                 Voidance/Devoidance
+            </a>
+        </div>
+    </div>
+
+    <div class="menu-detail" data-menu="events">
+        <div class="menu-detail-wrapper">
+            <h6 class="uppercase">Events</h6>
+            <a href="{{ route('info.page', ['pageName' => 'events']) }}">
+                <span class="text-sm fas fa-calendar"></span>
+                Events
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'global-event-goals']) }}">
+                <span class="text-sm fas fa-bars"></span>
+                Global Event Goals
+            </a>
+        </div>
+        <hr />
+        <div class="menu-detail-wrapper">
+            <h6 class="uppercase">Location Based Events</h6>
+            <a href="{{ route('info.page', ['pageName' => 'the-gold-mines-event']) }}">
+                <span class="text-sm ra ra-broken-skull"></span>
+                The Gold Mines Event
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'the-purgatory-smiths-house-event']) }}">
+                <span class="text-sm ra ra-broken-skull"></span>
+                Purgatory Smith's House Event
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'the-old-church-event']) }}">
+                <span class="text-sm ra ra-broken-skull"></span>
+                The Old Church Event
             </a>
         </div>
     </div>
@@ -357,6 +392,10 @@
     <!-- Gear Sets -->
     <div class="menu-detail" data-menu="gear-sets">
         <div class="menu-detail-wrapper">
+            <a href="{{ route('info.page', ['pageName' => 'unique-items']) }}">
+                <span class="ra ra-chain"></span>
+                Uniques (AKA Legendaries)
+            </a>
             <a href="{{ route('info.page', ['pageName' => 'mythical-items']) }}">
                 <span class="ra ra-chain"></span>
                 Mythics

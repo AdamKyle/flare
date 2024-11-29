@@ -2,12 +2,12 @@
 
 namespace Tests\Unit\Game\NpcActions\QueenOfHeartsActions\Services;
 
+use App\Flare\Models\Item;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Flare\Values\RandomAffixDetails;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\NpcActions\QueenOfHeartsActions\Events\UpdateQueenOfHeartsPanel;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\QueenOfHeartsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -15,14 +15,17 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateItemAffix;
 
 class QueenOfHeartsServiceTest extends TestCase
 {
-    use CreateGameMap, CreateItem, RefreshDatabase;
+    use CreateGameMap, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?QueenOfHeartsService $queenOfHeartsService;
+
+    private ?Item $queenOfHeartsQuestItem;
 
     public function setUp(): void
     {
@@ -31,6 +34,10 @@ class QueenOfHeartsServiceTest extends TestCase
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $this->queenOfHeartsService = resolve(QueenOfHeartsService::class);
+        $this->queenOfHeartsQuestItem = $this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::QUEEN_OF_HEARTS,
+        ]);
     }
 
     public function tearDown(): void
@@ -40,100 +47,18 @@ class QueenOfHeartsServiceTest extends TestCase
 
         $this->character = null;
         $this->queenOfHeartsService = null;
-    }
-
-    public function testNotInHell()
-    {
-        Event::fake();
-
-        $character = $this->character->getCharacter();
-
-        $result = $this->queenOfHeartsService->purchaseUnique($character, 'basic');
-
-        Event::assertDispatched(GlobalMessageEvent::class);
-
-        $this->assertEquals('Invalid location to use that.', $result['message']);
-        $this->assertEquals(422, $result['status']);
-    }
-
-    public function testCannotPurchaseWhenInventoryIsFull()
-    {
-        $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
-
-        $character = $this->character->inventoryManagement()->giveItem($questItem)->getCharacter();
-
-        $character->update([
-            'inventory_max' => 0,
-        ]);
-
-        $gameMap = $this->createGameMap(['name' => 'Hell']);
-
-        $character->map()->update(['game_map_id' => $gameMap->id]);
-
-        $character = $character->refresh();
-
-        $result = $this->queenOfHeartsService->purchaseUnique($character, 'basic');
-
-        $this->assertEquals('Your inventory is full.', $result['message']);
-        $this->assertEquals(422, $result['status']);
-    }
-
-    public function testCannotPurchaseWhenYouHaveNoGold()
-    {
-        $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
-
-        $character = $this->character->inventoryManagement()->giveItem($questItem)->getCharacter();
-
-        $character->update([
-            'gold' => 0,
-        ]);
-
-        $gameMap = $this->createGameMap(['name' => 'Hell']);
-
-        $character->map()->update(['game_map_id' => $gameMap->id]);
-
-        $character = $character->refresh();
-
-        $result = $this->queenOfHeartsService->purchaseUnique($character, 'basic');
-
-        $this->assertEquals('Not enough gold.', $result['message']);
-        $this->assertEquals(422, $result['status']);
-    }
-
-    public function testPurchaseUnique()
-    {
-        Event::fake();
-
-        $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
-
-        $character = $this->character->inventoryManagement()->giveItem($questItem)->getCharacter();
-
-        $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
-        ]);
-
-        $gameMap = $this->createGameMap(['name' => 'Hell']);
-
-        $character->map()->update(['game_map_id' => $gameMap->id]);
-
-        $character = $character->refresh();
-
-        $result = $this->queenOfHeartsService->purchaseUnique($character, 'basic');
-
-        Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
-        Event::assertDispatched(UpdateQueenOfHeartsPanel::class);
-        Event::assertDispatched(ServerMessageEvent::class);
-
-        $character = $character->refresh();
-
-        $this->assertEquals(200, $result['status']);
-        $this->assertEquals(2, $character->inventory->slots->count()); // Quest Item + Unique = 2
-        $this->assertLessThan(MaxCurrenciesValue::MAX_GOLD, $character->gold);
+        $this->queenOfHeartsService = null;
     }
 
     public function testCannotReRollForItemThatDoesntExist()
     {
+        $gameMap = $this->createGameMap(['name' => 'Hell']);
+
         $character = $this->character->getCharacter();
+
+        $character->map()->update(['game_map_id' => $gameMap->id]);
+
+        $character = $character->refresh();
 
         $result = $this->queenOfHeartsService->reRollUnique($character, 1, 'all-enchantments', 'everything');
 
@@ -153,7 +78,7 @@ class QueenOfHeartsServiceTest extends TestCase
 
         Event::assertDispatched(GlobalMessageEvent::class);
 
-        $this->assertEquals('Invalid location to use that.', $result['message']);
+        $this->assertEquals('You need to be in Hell to access The Queen of Hearts and have the quest item: ' . $this->queenOfHeartsQuestItem->affix_name . '.', $result['message']);
         $this->assertEquals(422, $result['status']);
     }
 
@@ -162,16 +87,18 @@ class QueenOfHeartsServiceTest extends TestCase
         $gameMap = $this->createGameMap(['name' => 'Hell']);
 
         $character = $this->character->inventoryManagement()
-            ->giveItem($this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]))
+            ->giveItem($this->queenOfHeartsQuestItem)
+            ->giveitem($this->createItem([
+                'item_suffix_id' => $this->createItemAffix([
+                    'cost' => RandomAffixDetails::LEGENDARY,
+                    'randomly_generated' => true,
+                ])
+            ]))
             ->getCharacter();
 
         $character->map()->update(['game_map_id' => $gameMap->id]);
 
-        $character->update(['gold' => 100000000000]);
-
-        $character = $character->refresh();
-
-        $this->queenOfHeartsService->purchaseUnique($character, 'legendary');
+        $character->update(['gold' => 0]);
 
         $character = $character->refresh();
 
@@ -192,16 +119,18 @@ class QueenOfHeartsServiceTest extends TestCase
         $gameMap = $this->createGameMap(['name' => 'Hell']);
 
         $character = $this->character->inventoryManagement()
-            ->giveItem($this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]))
+            ->giveItem($this->queenOfHeartsQuestItem)
+            ->giveitem($this->createItem([
+                'item_suffix_id' => $this->createItemAffix([
+                    'cost' => RandomAffixDetails::LEGENDARY,
+                    'randomly_generated' => true,
+                ])
+            ]))
             ->getCharacter();
 
         $character->map()->update(['game_map_id' => $gameMap->id]);
 
         $character->update(['gold' => MaxCurrenciesValue::MAX_GOLD, 'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST, 'shards' => MaxCurrenciesValue::MAX_SHARDS]);
-
-        $character = $character->refresh();
-
-        $this->queenOfHeartsService->purchaseUnique($character, 'legendary');
 
         $character = $character->refresh();
 
@@ -226,13 +155,13 @@ class QueenOfHeartsServiceTest extends TestCase
 
         Event::assertDispatched(GlobalMessageEvent::class);
 
-        $this->assertEquals('Invalid location to use that.', $result['message']);
+        $this->assertEquals('You need to be in Hell to access The Queen of Hearts and have the quest item: ' . $this->queenOfHeartsQuestItem->affix_name . '.', $result['message']);
         $this->assertEquals(422, $result['status']);
     }
 
     public function testCannotMoveEnchantmentsWhenItemsDoNotExist()
     {
-        $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
+        $questItem = $this->queenOfHeartsQuestItem;
 
         $character = $this->character->inventoryManagement()->giveItem($questItem)->getCharacter();
 
@@ -254,9 +183,18 @@ class QueenOfHeartsServiceTest extends TestCase
 
     public function testCannotMoveEnchantmentsWhenCannotAfford()
     {
-        $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
+        $questItem = $this->queenOfHeartsQuestItem;
 
-        $character = $this->character->inventoryManagement()->giveItem($questItem)->giveItem($this->createItem(['name' => 'Sample', 'type' => 'weapon']))->getCharacter();
+        $character = $this->character->inventoryManagement()
+            ->giveItem($questItem)
+            ->giveItem($this->createItem(['name' => 'Sample', 'type' => 'weapon']))
+            ->giveitem($this->createItem([
+                'item_suffix_id' => $this->createItemAffix([
+                    'cost' => RandomAffixDetails::LEGENDARY,
+                    'randomly_generated' => true,
+                ])
+            ]))
+            ->getCharacter();
 
         $character->update([
             'gold' => 0,
@@ -269,10 +207,6 @@ class QueenOfHeartsServiceTest extends TestCase
         $character->update([
             'gold' => MaxCurrenciesValue::MAX_GOLD,
         ]);
-
-        $character = $character->refresh();
-
-        $this->queenOfHeartsService->purchaseUnique($character, 'legendary');
 
         $character->update(['gold' => 0]);
 
@@ -294,9 +228,18 @@ class QueenOfHeartsServiceTest extends TestCase
 
     public function testCannotMoveEnchantmentsWhenInvalidItemTypeForItemToMoveTo()
     {
-        $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
+        $questItem = $this->queenOfHeartsQuestItem;
 
-        $character = $this->character->inventoryManagement()->giveItem($questItem)->giveItem($this->createItem(['name' => 'Sample', 'type' => 'artifact']))->getCharacter();
+        $character = $this->character->inventoryManagement()
+            ->giveItem($questItem)
+            ->giveItem($this->createItem(['name' => 'Sample', 'type' => 'artifact']))
+            ->giveitem($this->createItem([
+                'item_suffix_id' => $this->createItemAffix([
+                    'cost' => RandomAffixDetails::LEGENDARY,
+                    'randomly_generated' => true,
+                ])
+            ]))
+            ->getCharacter();
 
         $gameMap = $this->createGameMap(['name' => 'Hell']);
 
@@ -305,10 +248,6 @@ class QueenOfHeartsServiceTest extends TestCase
         $character->update([
             'gold' => MaxCurrenciesValue::MAX_GOLD,
         ]);
-
-        $character = $character->refresh();
-
-        $this->queenOfHeartsService->purchaseUnique($character, 'legendary');
 
         $character->update(['gold' => MaxCurrenciesValue::MAX_GOLD]);
 
@@ -330,9 +269,18 @@ class QueenOfHeartsServiceTest extends TestCase
 
     public function testCannotMoveEnchantmentsWhenInvalidItemTypeForItemToMoveFrom()
     {
-        $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
+        $questItem = $this->queenOfHeartsQuestItem;
 
-        $character = $this->character->inventoryManagement()->giveItem($questItem)->giveItem($this->createItem(['name' => 'Sample', 'type' => 'spell-damage']))->getCharacter();
+        $character = $this->character->inventoryManagement()
+            ->giveItem($questItem)
+            ->giveItem($this->createItem(['name' => 'Sample', 'type' => 'spell-damage']))
+            ->giveitem($this->createItem([
+                'item_suffix_id' => $this->createItemAffix([
+                    'cost' => RandomAffixDetails::LEGENDARY,
+                    'randomly_generated' => true,
+                ])
+            ]))
+            ->getCharacter();
 
         $gameMap = $this->createGameMap(['name' => 'Hell']);
 
@@ -341,10 +289,6 @@ class QueenOfHeartsServiceTest extends TestCase
         $character->update([
             'gold' => MaxCurrenciesValue::MAX_GOLD,
         ]);
-
-        $character = $character->refresh();
-
-        $this->queenOfHeartsService->purchaseUnique($character, 'legendary');
 
         $character->update(['gold' => MaxCurrenciesValue::MAX_GOLD]);
 
@@ -372,9 +316,18 @@ class QueenOfHeartsServiceTest extends TestCase
 
     public function testCanMoveEnchantments()
     {
-        $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
+        $questItem = $this->queenOfHeartsQuestItem;
 
-        $character = $this->character->inventoryManagement()->giveItem($questItem)->giveItem($this->createItem(['name' => 'Sample', 'type' => 'weapon']))->getCharacter();
+        $character = $this->character->inventoryManagement()
+            ->giveItem($questItem)
+            ->giveItem($this->createItem(['name' => 'Sample', 'type' => 'weapon']))
+            ->giveitem($this->createItem([
+                'item_suffix_id' => $this->createItemAffix([
+                    'cost' => RandomAffixDetails::LEGENDARY,
+                    'randomly_generated' => true,
+                ])
+            ]))
+            ->getCharacter();
 
         $character->update([
             'gold' => 0,
@@ -389,10 +342,6 @@ class QueenOfHeartsServiceTest extends TestCase
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
             'shards' => MaxCurrenciesValue::MAX_SHARDS,
         ]);
-
-        $character = $character->refresh();
-
-        $this->queenOfHeartsService->purchaseUnique($character, 'legendary');
 
         $character = $character->refresh();
 

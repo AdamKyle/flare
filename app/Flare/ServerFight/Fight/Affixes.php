@@ -30,6 +30,10 @@ class Affixes extends BattleBase
         $weaponDamage = $attackData[$attribute] + ($attackData[$attribute] * $totalDamage);
         $nonStackingWeaponDamage = $attackData[$attribute] + ($attackData[$attribute] * $nonStackingDamage);
 
+        if ($this->isRaidBoss && $weaponDamage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {
+            $weaponDamage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
+        }
+
         if ($totalDamage > 0 || $nonStackingDamage > 0) {
 
             if ($cantBeResisted) {
@@ -70,13 +74,17 @@ class Affixes extends BattleBase
             return 0;
         }
 
-        if (! $character->classType()->isVampire()) {
+        if (!$character->classType()->isVampire()) {
             $this->addMessage('One of your life stealing enchantments causes the enemy to fall to their knees in agony!', 'player-action');
         } else {
             $this->addMessage('The enemy screams in pain as you siphon large amounts of their health towards you!', 'player-action');
         }
 
         $damage = $monsterHealth * $affixLifeStealing;
+
+        if ($this->isRaidBoss && $damage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {
+            $damage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
+        }
 
         if ($cantBeResisted || $this->isEnemyEntranced) {
 

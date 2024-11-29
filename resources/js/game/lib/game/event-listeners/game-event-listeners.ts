@@ -86,7 +86,7 @@ export default class GameEventListeners {
         }
 
         if (this.questListeners) {
-            this.questListeners.initialize(this.component, this.userId);
+            this.questListeners.initialize(this.component);
             this.questListeners.register();
         }
 

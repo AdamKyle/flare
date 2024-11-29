@@ -37,7 +37,10 @@ class RestartGlobalEventGoal extends Command
     protected $description = 'restarts the global event goal if it\'s been finished.';
 
     /**
-     * Execute the console command.
+     * Handle restarting the global event.
+     *
+     * @param EventGoalsService $eventGoalsService
+     * @return void
      */
     public function handle(EventGoalsService $eventGoalsService): void
     {
@@ -89,7 +92,12 @@ class RestartGlobalEventGoal extends Command
     }
 
     /**
-     * Update all characters global map events on the map of the event.
+     * Update the characters global map events
+     *
+     * @param EventGoalsService $eventGoalsService
+     * @param GlobalEventGoal $globalEventGoal
+     * @param array $characterIds
+     * @return void
      */
     private function updateCharactersGlobalMapEvents(EventGoalsService $eventGoalsService, GlobalEventGoal $globalEventGoal, array $characterIds): void
     {
@@ -113,7 +121,10 @@ class RestartGlobalEventGoal extends Command
     }
 
     /**
-     * Handle regular global events.
+     * Handle regular global event
+     *
+     * @param GlobalEventGoal $globalEventGoal
+     * @return void
      */
     private function handleRegularGlobalEvent(GlobalEventGoal $globalEventGoal): void
     {
@@ -133,7 +144,10 @@ class RestartGlobalEventGoal extends Command
     }
 
     /**
-     * Set up the base global event
+     * USet up the base global event
+     *
+     * @param Event $event
+     * @return void
      */
     private function handleStepBaseGlobalEvent(Event $event): void
     {
@@ -173,13 +187,7 @@ class RestartGlobalEventGoal extends Command
 
         $globalEventGoalData = GlobalEventForEventTypeValue::returnGlobalEventInfoForSeasonalEvents($event->type);
 
-        if ($newStep === GlobalEventSteps::CRAFT) {
-            $globalEventGoalData = GlobalEventForEventTypeValue::returnCraftingEventGoal();
-        }
-
-        if ($newStep === GlobalEventSteps::ENCHANT) {
-            $globalEventGoalData = GlobalEventForEventTypeValue::returnEnchantingEventGoal();
-        }
+        $globalEventGoalData = $this->setUpDelusionalMemoriesAdditionalEventGoals($newStep, $globalEventGoalData);
 
         $globalEventGoal = GlobalEventGoal::create($globalEventGoalData);
 
@@ -191,5 +199,25 @@ class RestartGlobalEventGoal extends Command
             ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile)' . ' ' .
             'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items.' .
             ' You can see the event goal for the map specified by being on the map and clicking the Event Goal tab from the map.'));
+    }
+
+    /**
+     * Setup delusional memories additional event goals.
+     *
+     * @param string $newStep
+     * @param array $globalEventGoalData
+     * @return array
+     */
+    private function setUpDelusionalMemoriesAdditionalEventGoals(string $newStep, array $globalEventGoalData): array
+    {
+        if ($newStep === GlobalEventSteps::CRAFT) {
+            $globalEventGoalData = GlobalEventForEventTypeValue::returnDelusionalMemoriesCraftingEventGoal();
+        }
+
+        if ($newStep === GlobalEventSteps::ENCHANT) {
+            $globalEventGoalData = GlobalEventForEventTypeValue::returnDelusionalMemoriesEnchantingEventGoal();
+        }
+
+        return $globalEventGoalData;
     }
 }

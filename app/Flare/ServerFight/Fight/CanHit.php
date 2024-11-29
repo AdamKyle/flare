@@ -10,6 +10,8 @@ class CanHit
 {
     private CharacterCacheData $characterCacheData;
 
+    const MINIMUM_DAMAGE_FOR_A_PLAYER = 500_000_000;
+
     public function __construct(CharacterCacheData $characterCacheData)
     {
         $this->characterCacheData = $characterCacheData;
@@ -17,9 +19,14 @@ class CanHit
 
     public function canPlayerHitMonster(Character $character, ServerMonster $monster, bool $isPlayerVoided)
     {
+
+        if ($monster->isRaidBossMonster() && $character->getInformation()->buildTotalAttack() < self::MINIMUM_DAMAGE_FOR_A_PLAYER) {
+            return true;
+        }
+
         $defenderAgi = $monster->getMonsterStat('agi');
         $characterToHit = $this->characterCacheData->getCachedCharacterData($character, 'to_hit_stat');
-        $statValue = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? $characterToHit : $characterToHit.'_modded');
+        $statValue = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? $characterToHit : $characterToHit . '_modded');
         $characterAccuracy = $this->characterCacheData->getCachedCharacterData($character, 'skills')['accuracy'];
         $enemyDodge = $monster->getMonsterStat('dodge');
 
@@ -29,36 +36,6 @@ class CanHit
 
         if ($enemyDodge >= 1) {
             return false;
-        }
-
-        $playerToHit = $statValue * 0.20;
-        $enemyAgi = $defenderAgi * 0.20;
-
-        if ($playerToHit < 50) {
-            $playerToHit = $statValue;
-        }
-
-        if ($enemyAgi < 50) {
-            $enemyAgi = $defenderAgi;
-        }
-
-        return ($playerToHit + $playerToHit * $characterAccuracy) > ($enemyAgi + $enemyAgi * $enemyDodge);
-    }
-
-    public function canPlayerHitPlayer(Character $attacker, Character $defender, bool $isPlayerVoided)
-    {
-        $defenderAgi = $this->characterCacheData->getCachedCharacterData($defender, 'agi_modded');
-        $characterToHit = $this->characterCacheData->getCachedCharacterData($attacker, 'to_hit_stat');
-        $statValue = $this->characterCacheData->getCachedCharacterData($attacker, $isPlayerVoided ? $characterToHit : $characterToHit.'_modded');
-        $characterAccuracy = $this->characterCacheData->getCachedCharacterData($attacker, 'skills')['accuracy'];
-        $enemyDodge = $this->characterCacheData->getCachedCharacterData($defender, 'skills')['dodge'];
-
-        if ($enemyDodge >= 1) {
-            return false;
-        }
-
-        if ($characterAccuracy >= 1) {
-            return true;
         }
 
         $playerToHit = $statValue * 0.20;
@@ -123,9 +100,13 @@ class CanHit
 
     public function canPlayerCastSpell(Character $character, ServerMonster $monster, bool $isPlayerVoided)
     {
+        if ($monster->isRaidBossMonster() && $character->getInformation()->buildTotalAttack() < self::MINIMUM_DAMAGE_FOR_A_PLAYER) {
+            return true;
+        }
+
         $defenderAgi = $monster->getMonsterStat('agi');
         $characterToHit = $this->characterCacheData->getCachedCharacterData($character, 'to_hit_stat');
-        $statValue = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? $characterToHit : $characterToHit.'_modded');
+        $statValue = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? $characterToHit : $characterToHit . '_modded');
         $characterAccuracy = $this->characterCacheData->getCachedCharacterData($character, 'skills')['casting_accuracy'];
         $enemyDodge = $monster->getMonsterStat('dodge');
 
@@ -149,36 +130,6 @@ class CanHit
         }
 
         return ($playerToHit + $playerToHit * $characterAccuracy) > ($enemyAgi + $enemyAgi * $enemyDodge);
-    }
-
-    public function canPlayerCastSpellOnPlayer(Character $attacker, Character $defender, bool $isPlayerVoided)
-    {
-        $defenderAgi = $this->characterCacheData->getCachedCharacterData($defender, 'agi_modded');
-        $characterToHit = $this->characterCacheData->getCachedCharacterData($attacker, 'to_hit_stat');
-        $statValue = $this->characterCacheData->getCachedCharacterData($attacker, $isPlayerVoided ? $characterToHit : $characterToHit.'_modded');
-        $characterAccuracy = $this->characterCacheData->getCachedCharacterData($attacker, 'skills')['casting_accuracy'];
-        $defenderDodge = $this->characterCacheData->getCachedCharacterData($defender, 'skills')['dodge'];
-
-        if ($characterAccuracy >= 1) {
-            return true;
-        }
-
-        if ($defenderDodge >= 1) {
-            return false;
-        }
-
-        $playerToHit = $statValue * 0.20;
-        $enemyAgi = $defenderAgi * 0.20;
-
-        if ($playerToHit < 50) {
-            $playerToHit = $statValue;
-        }
-
-        if ($enemyAgi < 50) {
-            $enemyAgi = $defenderAgi;
-        }
-
-        return ($playerToHit + $playerToHit * $characterAccuracy) > ($enemyAgi + $enemyAgi * $defenderDodge);
     }
 
     public function canMonsterCastSpell(Character $character, ServerMonster $monster, bool $isPlayerVoided)

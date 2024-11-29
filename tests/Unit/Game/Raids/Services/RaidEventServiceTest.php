@@ -62,7 +62,9 @@ class RaidEventServiceTest extends TestCase
         ]);
 
         (new CharacterFactory)->createBaseCharacter()->givePlayerLocation(
-            $location->x, $location->y, $location->map
+            $location->x,
+            $location->y,
+            $location->map
         );
 
         Cache::put('monsters', [

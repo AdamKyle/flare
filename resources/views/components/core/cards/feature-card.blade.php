@@ -4,7 +4,7 @@
             {{ $icon }}
         </div>
         <div class="w-4/5">
-            <h5 class="text-lg md:text-xl lg:text-2xl">
+            <h5 class="text-lg md:text-xl lg:text-2xl mb-3">
                 {{ $title }}
             </h5>
             <div class="text-sm md:text-base lg:text-lg">

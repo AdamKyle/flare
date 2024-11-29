@@ -191,7 +191,7 @@ class UpdateCraftingTasksForFactionLoyalty
             ->first();
 
         $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)
-            ->setPaidAmount(RandomAffixDetails::MEDIUM);
+            ->setPaidAmount(RandomAffixDetails::LEGENDARY);
 
         $newItem = $item->duplicate();
 

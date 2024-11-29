@@ -23,9 +23,11 @@ export default class DestroySelectedInformation extends React.Component<
                     Are you sure you want to do this?{" "}
                     <strong>You cannot undo this action</strong>.
                 </p>
-                <ul className="my-3 pl-4 list-disc ml-4">
-                    {this.renderSelectedItemNames()}
-                </ul>
+                <div className="max-h-[250px] overflow-y-auto">
+                    <ul className="my-3 pl-4 list-disc ml-4">
+                        {this.renderSelectedItemNames()}
+                    </ul>
+                </div>
             </>
         );
     }

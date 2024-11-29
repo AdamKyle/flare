@@ -36,7 +36,7 @@ class MaxOutCharacter extends Command
         $character = Character::where('name', $characterName)->first();
 
         if (is_null($character)) {
-            $this->error('No character found for name: '.$characterName);
+            $this->error('No character found for name: ' . $characterName);
 
             return;
         }
@@ -64,9 +64,9 @@ class MaxOutCharacter extends Command
 
         $character = $character->refresh();
 
-        Artisan::call('level:character '.$character->id.' '. 4999);
+        Artisan::call('level:character ' . $character->id . ' ' . 4999);
 
-        Artisan::call('assign:top-end-gear '.$character->name);
+        Artisan::call('assign:top-end-gear ' . $character->name);
     }
 
     protected function findItemsToGive(): array
@@ -87,6 +87,7 @@ class MaxOutCharacter extends Command
             'Bag of Chance',
             'Satan\'s Heart',
             'Broken Copper Coin',
+            'Twisted Tree Branch',
         ];
 
         foreach ($itemNames as $itemName) {
@@ -94,7 +95,7 @@ class MaxOutCharacter extends Command
 
             if (is_null($item)) {
 
-                $this->error('Could not find item: '.$itemName);
+                $this->error('Could not find item: ' . $itemName);
 
                 return [];
             }
@@ -123,9 +124,11 @@ class MaxOutCharacter extends Command
                 $skill->update(['level' => 999]);
             }
 
-            if ($skill->baseSkill->type === SkillTypeValue::CRAFTING ||
+            if (
+                $skill->baseSkill->type === SkillTypeValue::CRAFTING ||
                 $skill->baseSkill->type === SkillTypeValue::DISENCHANTING ||
-                $skill->baseSkill->type === SkillTypeValue::ENCHANTING) {
+                $skill->baseSkill->type === SkillTypeValue::ENCHANTING
+            ) {
                 $skill->update(['level' => 400, 'is_hidden' => false, 'is_locked' => false]);
             }
 

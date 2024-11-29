@@ -75,24 +75,28 @@ class MapsController extends Controller
             'path' => $path,
             'default' => $request->default,
             'kingdom_color' => $request->kingdom_color,
-            'only_during_event_type' => $request->only_during_event,
+            'only_during_event_type' => $request->only_during_event_type,
         ]);
 
-        return redirect()->route('maps')->with('success', $request->name.' uploaded successfully.');
+        return redirect()->route('maps')->with('success', $request->name . ' uploaded successfully.');
     }
 
     public function manageBonuses(GameMap $gameMap)
     {
-        return view('admin.maps.manage-bonuses', ['gameMap' => $gameMap, 'locations' => Location::all()]);
+        return view('admin.maps.manage-bonuses', ['gameMap' => $gameMap, 'locations' => Location::all(), 'eventTypes' => EventType::getOptionsForSelect(),]);
     }
 
     public function postBonuses(Request $request, GameMap $gameMap)
     {
 
         $data = $request->all();
-        $map = $data['map'];
+        $map = null;
 
-        unset($data['map']);
+        if (isset($data['map'])) {
+            $map = $data['map'];
+
+            unset($data['map']);
+        }
 
         if (! is_null($map)) {
             $path = Storage::disk('maps')->putFile($request->name, $map);
@@ -102,7 +106,7 @@ class MapsController extends Controller
 
         $gameMap->update($data);
 
-        return redirect()->route('map', ['gameMap' => $gameMap->id])->with('success', $gameMap->name.' now has bonuses.');
+        return redirect()->route('map', ['gameMap' => $gameMap->id])->with('success', $gameMap->name . ' now has bonuses.');
     }
 
     public function manageMapLocations(GameMap $gameMap)

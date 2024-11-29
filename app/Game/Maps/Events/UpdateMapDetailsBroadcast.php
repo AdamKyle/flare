@@ -2,7 +2,6 @@
 
 namespace App\Game\Maps\Events;
 
-use App\Flare\Models\Map;
 use App\Flare\Models\User;
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
@@ -25,7 +24,7 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      */
-    public function __construct(Map $map, User $user, LocationService $service)
+    public function __construct(User $user, LocationService $service)
     {
         $this->map_data = $service->getLocationData($user->character);
 
@@ -39,6 +38,6 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('update-map-'.$this->user->id);
+        return new PrivateChannel('update-map-' . $this->user->id);
     }
 }

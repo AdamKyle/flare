@@ -139,6 +139,14 @@ export default class EventSchedule extends React.Component<
             return "#E11D48";
         }
 
+        if (name === "The Winter Event") {
+            return "#1e4075";
+        }
+
+        if (name === "The Ice Queens Reign") {
+            return "#567cba";
+        }
+
         return "#1976d2";
     }
 

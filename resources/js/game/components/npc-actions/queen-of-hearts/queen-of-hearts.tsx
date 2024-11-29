@@ -10,8 +10,6 @@ import { ceil } from "lodash";
 import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
 
 export default class QueenOfHearts extends React.Component<any, any> {
-    private queenOfHearts: any;
-
     constructor(props: any) {
         super(props);
 
@@ -42,11 +40,6 @@ export default class QueenOfHearts extends React.Component<any, any> {
             loading: true,
             error_message: null,
         };
-
-        // @ts-ignore
-        this.queenOfHearts = Echo.private(
-            "update-queen-of-hearts-panel-" + this.props.user_id,
-        );
     }
 
     componentDidMount() {
@@ -67,28 +60,11 @@ export default class QueenOfHearts extends React.Component<any, any> {
                     console.error(error);
                 },
             );
-
-        // @ts-ignore
-        this.queenOfHearts.listen(
-            "Game.NpcActions.QueenOfHeartsActions.Events.UpdateQueenOfHeartsPanel",
-            (event: any) => {
-                this.setState({
-                    character_uniques: event.panelData.unique_slots,
-                    character_non_uniques: event.panelData.non_unique_slots,
-                });
-            },
-        );
     }
 
     setInitialOption(data: any) {
         this.setState({
             initial_action: data.value,
-        });
-    }
-
-    setBuyOption(data: any) {
-        this.setState({
-            buy_option: data.value,
         });
     }
 
@@ -159,10 +135,6 @@ export default class QueenOfHearts extends React.Component<any, any> {
 
     initialOptions() {
         return [
-            {
-                label: "Buy Item",
-                value: "buy-item",
-            },
             {
                 label: "Re-Roll Item",
                 value: "re-roll-item",
@@ -434,46 +406,6 @@ export default class QueenOfHearts extends React.Component<any, any> {
         });
     }
 
-    buyItem() {
-        this.setState(
-            {
-                preforming_action: true,
-            },
-            () => {
-                new Ajax()
-                    .setRoute(
-                        "character/" +
-                            this.props.character_id +
-                            "/random-enchant/purchase",
-                    )
-                    .setParameters({
-                        type: this.state.buy_option,
-                    })
-                    .doAjaxCall(
-                        "post",
-                        (result: AxiosResponse) => {
-                            this.setState({
-                                preforming_action: false,
-                            });
-                        },
-                        (error: AxiosError) => {
-                            if (typeof error.response !== "undefined") {
-                                this.setState({
-                                    preforming_action: false,
-                                });
-
-                                const response: AxiosResponse = error.response;
-
-                                this.setState({
-                                    error_message: response.data.message,
-                                });
-                            }
-                        },
-                    );
-            },
-        );
-    }
-
     calculateCost() {
         let goldDustCost = 10000;
         let shards = 100;
@@ -697,26 +629,6 @@ export default class QueenOfHearts extends React.Component<any, any> {
                             />
                         ) : null}
 
-                        {this.state.initial_action === "buy-item" ? (
-                            <Fragment>
-                                <Select
-                                    onChange={this.setBuyOption.bind(this)}
-                                    options={this.buyItemOptions()}
-                                    menuPosition={"absolute"}
-                                    menuPlacement={"bottom"}
-                                    styles={{
-                                        menuPortal: (base) => ({
-                                            ...base,
-                                            zIndex: 9999,
-                                            color: "#000000",
-                                        }),
-                                    }}
-                                    menuPortalTarget={document.body}
-                                    value={this.getSelectedBuyValue()}
-                                />
-                            </Fragment>
-                        ) : null}
-
                         {this.state.initial_action === "re-roll-item" ? (
                             <Fragment>
                                 <Select
@@ -889,18 +801,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
                     </div>
                 </div>
 
-                <div className={"text-center lg:ml-[-100px] mt-3 mb-3"}>
-                    {this.state.initial_action === "buy-item" ? (
-                        <PrimaryButton
-                            button_label={"Purchase"}
-                            on_click={this.buyItem.bind(this)}
-                            disabled={
-                                this.state.buy_option === null ||
-                                this.state.preforming_action
-                            }
-                        />
-                    ) : null}
-
+                <div className={"text-center mt-3 mb-3"}>
                     {this.state.initial_action === "re-roll-item" ? (
                         <PrimaryButton
                             button_label={"Re roll"}

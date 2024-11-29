@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Flare\Models\ScheduledEvent;
 use App\Game\Events\Values\EventType;
+use App\Game\Raids\Values\RaidType;
 use App\Http\Request\EventPageRequest;
 use Auth;
 
@@ -27,36 +28,62 @@ class WelcomeController extends Controller
         return redirect()->route('game');
     }
 
+    public function showEventCalendar()
+    {
+        return view('event-calendar');
+    }
+
     public function showEventPage(EventPageRequest $request)
     {
 
         $eventType = $request->event_type;
-        $raids = ['jester-of-time', 'the-smugglers-are-back-raid', 'ice-queen-raid'];
-        $events = ['delusional-memories', 'weekly-celestials', 'weekly-currency-drops', 'weekly-faction-loyalty', 'tlessas-feedback-event'];
+        $raids = ['jester-of-time-raid', 'the-smugglers-are-back-raid', 'ice-queen-raid', 'the-frozen-king-raid', 'corrupted-bishop-raid'];
+        $events = ['delusional-memories', 'weekly-celestials', 'weekly-currency-drops', 'weekly-faction-loyalty', 'tlessas-feedback-event', 'the-winter-event'];
 
         if (in_array($eventType, $raids)) {
 
-            $events = ScheduledEvent::where('event_type', EventType::RAID_EVENT)->where('currently_running', true)->get();
+            $raidType = match ($eventType) {
+                'jester-of-time-raid' => RaidType::JESTER_OF_TIME,
+                'the-smugglers-are-back-raid' => RaidType::PIRATE_LORD,
+                'ice-queen-raid' => RaidType::ICE_QUEEN,
+                'the-frozen-king-raid' => RaidType::FROZEN_KING,
+                'corrupted-bishop-raid' => RaidType::CORRUPTED_BISHOP,
+            };
 
-            foreach ($events as $event) {
-                switch ($eventType) {
-                    case 'jester-of-time':
-                        return view('events.jester-of-time-raid.event-page', [
-                            'event' => $event,
-                        ]);
-                    case 'the-smugglers-are-back-raid':
-                        return view('events.the-smugglers-are-back-raid.event-page', [
-                            'event' => $event,
-                        ]);
-                    case 'ice-queen-raid':
-                        return view('events.ice-queen-raid.event-page', [
-                            'event' => $event,
-                        ]);
-                    default:
-                        return redirect()->to(route('welcome'));
-                }
+            $event = ScheduledEvent::where('event_type', EventType::RAID_EVENT)->where('currently_running', true)->whereHas('raid', function ($query) use ($raidType) {
+                return $query->where('raid_type', $raidType);
+            })->first();
+
+            if (is_null($event)) {
+                $event = ScheduledEvent::where('event_type', EventType::RAID_EVENT)->where('start_date', '>=', now())->whereHas('raid', function ($query) use ($raidType) {
+                    return $query->where('raid_type', $raidType);
+                })->orderBy('id')->first();
             }
 
+            switch ($eventType) {
+                case 'jester-of-time-raid':
+                    return view('events.jester-of-time-raid.event-page', [
+                        'event' => $event,
+                    ]);
+                case 'the-smugglers-are-back-raid':
+                    return view('events.the-smugglers-are-back-raid.event-page', [
+                        'event' => $event,
+                    ]);
+                case 'ice-queen-raid':
+                    return view('events.ice-queen-raid.event-page', [
+                        'event' => $event,
+                    ]);
+                case 'the-frozen-king-raid':
+                    return view('events.frozen-king-raid.event-page', [
+                        'event' => $event,
+                    ]);
+                case 'corrupted-bishop-raid':
+                    return view('events.corrupted-bishop-raid.event-page', [
+                        'event' => $event,
+                    ]);
+                default:
+                    return redirect()->to(route('welcome'));
+            }
         }
 
         if (in_array($eventType, $events)) {
@@ -64,23 +91,27 @@ class WelcomeController extends Controller
             switch ($eventType) {
                 case 'delusional-memories':
                     return view('events.delusional-memories-event.event-page', [
-                        'event' => ScheduledEvent::where('event_type', EventType::DELUSIONAL_MEMORIES_EVENT)->where('currently_running', true)->first(),
+                        'event' => $this->findScheduledEventForEventType($eventType),
+                    ]);
+                case 'the-winter-event':
+                    return view('events.the-winter-event.event-page', [
+                        'event' => $this->findScheduledEventForEventType($eventType),
                     ]);
                 case 'weekly-celestials':
                     return view('events.weekly-celestials-event.event-page', [
-                        'event' => ScheduledEvent::where('event_type', EventType::WEEKLY_CELESTIALS)->where('currently_running', true)->first(),
+                        'event' => $this->findScheduledEventForEventType($eventType),
                     ]);
                 case 'weekly-currency-drops':
                     return view('events.weekly-currency-drops-event.event-page', [
-                        'event' => ScheduledEvent::where('event_type', EventType::WEEKLY_CURRENCY_DROPS)->where('currently_running', true)->first(),
+                        'event' => $this->findScheduledEventForEventType($eventType),
                     ]);
                 case 'weekly-faction-loyalty':
                     return view('events.weekly-faction-loyalty-event.event-page', [
-                        'event' => ScheduledEvent::where('event_type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->where('currently_running', true)->first(),
+                        'event' => $this->findScheduledEventForEventType($eventType),
                     ]);
                 case 'tlessas-feedback-event':
                     return view('events.feedback-event.event-page', [
-                        'event' => ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first(),
+                        'event' => $this->findScheduledEventForEventType($eventType),
                     ]);
                 default:
                     return redirect()->to(route('welcome'));
@@ -88,5 +119,36 @@ class WelcomeController extends Controller
         }
 
         return redirect()->to(route('welcome'));
+    }
+
+    private function findScheduledEventForEventType(string $eventType): ?ScheduledEvent
+    {
+        switch ($eventType) {
+            case 'delusional-memories':
+                return $this->findScheduledEvent(EventType::DELUSIONAL_MEMORIES_EVENT);
+            case 'the-winter-event':
+                return $this->findScheduledEvent(EventType::WINTER_EVENT);
+            case 'weekly-celestials':
+                return $this->findScheduledEvent(EventType::WEEKLY_CELESTIALS);
+            case 'weekly-currency-drops':
+                return $this->findScheduledEvent(EventType::WEEKLY_CURRENCY_DROPS);
+            case 'weekly-faction-loyalty':
+                return $this->findScheduledEvent(EventType::WEEKLY_FACTION_LOYALTY_EVENT);
+            case 'tlessas-feedback-event':
+                return $this->findScheduledEvent(EventType::FEEDBACK_EVENT);
+            default:
+                return null;
+        }
+    }
+
+    private function findScheduledEvent(int $eventType): ?ScheduledEvent
+    {
+        $scheduleEvent = ScheduledEvent::where('event_type', $eventType)->where('currently_running', true)->first();
+
+        if (is_null($scheduleEvent)) {
+            return ScheduledEvent::where('event_type', $eventType)->where('start_date', '>=', now())->orderBy('id')->first();
+        }
+
+        return $scheduleEvent;
     }
 }

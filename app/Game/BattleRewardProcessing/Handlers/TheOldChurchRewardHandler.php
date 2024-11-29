@@ -139,7 +139,7 @@ class TheOldChurchRewardHandler
     protected function handleItemReward(Character $character, ?Event $event = null): Character
     {
         $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->first()->skill_bonus;
-        $maxRoll = 1000000;
+        $maxRoll = 1_000;
 
         if ($lootingChance > 0.15) {
             $lootingChance = 0.15;
@@ -168,7 +168,7 @@ class TheOldChurchRewardHandler
      *
      * @throws Exception
      */
-    protected function rewardForCharacter(Character $character, bool $isMythic = false)
+    protected function rewardForCharacter(Character $character)
     {
         $item = Item::where('specialty_type', ItemSpecialtyType::CORRUPTED_ICE)
             ->whereNull('item_prefix_id')
@@ -182,23 +182,21 @@ class TheOldChurchRewardHandler
             return;
         }
 
-        if (! $isMythic) {
-            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixDetails::MEDIUM);
+        $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixDetails::LEGENDARY);
 
-            $newItem = $item->duplicate();
+        $newItem = $item->duplicate();
 
-            $newItem->update([
-                'item_prefix_id' => $randomAffixGenerator->generateAffix('prefix')->id,
-                'item_suffix_id' => $randomAffixGenerator->generateAffix('suffix')->id,
-            ]);
+        $newItem->update([
+            'item_prefix_id' => $randomAffixGenerator->generateAffix('prefix')->id,
+            'item_suffix_id' => $randomAffixGenerator->generateAffix('suffix')->id,
+        ]);
 
-            $slot = $character->inventory->slots()->create([
-                'inventory_id' => $character->inventory->id,
-                'item_id' => $newItem->id,
-            ]);
+        $slot = $character->inventory->slots()->create([
+            'inventory_id' => $character->inventory->id,
+            'item_id' => $newItem->id,
+        ]);
 
-            event(new ServerMessageEvent($character->user, 'You found something MEDIUM but still unique, in The Old Church child: '.$item->affix_name, $slot->id));
-        }
+        event(new ServerMessageEvent($character->user, 'You found something MEDIUM but still unique, in The Old Church child: ' . $item->affix_name, $slot->id));
     }
 
     /**

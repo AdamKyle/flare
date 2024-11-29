@@ -52,10 +52,17 @@ class CreateEventsForDevelopment extends Command
     /**
      * Create a specific event.
      */
-    private function createEvent(string $eventType, string $eventName): void
+    private function createEvent(int $eventType, string $eventName): void
     {
+
         if ($eventType === EventType::RAID_EVENT) {
-            $raid = Raid::first();
+
+            $selectedRaid = $this->choice(
+                'Which raid do you want to create?',
+                Raid::pluck('name')->toArray()
+            );
+
+            $raid = Raid::where('name', $selectedRaid)->first();
 
             ScheduledEvent::create([
                 'event_type' => $eventType,

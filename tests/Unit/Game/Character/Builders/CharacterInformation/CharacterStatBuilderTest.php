@@ -503,7 +503,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage('weapon', true);
 
-        $this->assertEquals(101, $damage);
+        $this->assertEquals(100, $damage);
     }
 
     public function testWeaponDamageWithSkill()
@@ -1724,7 +1724,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $amount = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
 
-        $this->assertEquals((.99 - (.99 * .30)), $amount);
+        $this->assertEquals((.99 - (.99 * .25)), $amount);
     }
 
     public function testBuildInvalidAffixDamage()

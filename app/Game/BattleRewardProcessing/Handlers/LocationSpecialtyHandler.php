@@ -28,7 +28,6 @@ class LocationSpecialtyHandler
 
     public function handleMonsterFromSpecialLocation(Character $character, WeeklyMonsterFight $weeklyMonsterFight, bool $mainItemIsCosmic = true): void
     {
-
         $lootingDropChance = $character->skills->where('baseSkill.name', '=', 'Looting')->first()->skill_bonus;
 
         $lootingDropChance = min($lootingDropChance, 0.15);
@@ -54,11 +53,18 @@ class LocationSpecialtyHandler
     {
         $character = $this->handOverAward($character, $isCosmic);
 
-        event(new GlobalMessageEvent($character->name.' Has slaughtered a beast beyond comprehension and been rewarded with a cosmic gift!'));
+        event(new GlobalMessageEvent($character->name . ' Has slaughtered a beast beyond comprehension and been rewarded with a cosmic gift!'));
     }
 
     private function handOverAward(Character $character, bool $isCosmic = true, bool $secondaryIsLegendary = false): Character
     {
+
+        if ($character->isInventoryFull()) {
+            event(new ServerMessageEvent($character->user, 'Your inventory is full, you could not get this reward. Child you need to make some room.'));
+
+            return $character;
+        }
+
         $item = $this->giveCharacterRandomItem($character, $isCosmic, $secondaryIsLegendary);
 
         $character->inventory->slots()->create([
@@ -71,11 +77,11 @@ class LocationSpecialtyHandler
         $slot = $character->inventory->slots->where('item_id', '=', $item->id)->first();
 
         if ($secondaryIsLegendary) {
-            event(new ServerMessageEvent($character->user, 'You have received a Legendary item! How exciting! Rewarded with: '.$slot->item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You have received a Legendary item! How exciting! Rewarded with: ' . $slot->item->affix_name, $slot->id));
         } elseif ($isCosmic) {
-            event(new ServerMessageEvent($character->user, 'You have received a Cosmic item! How exciting! Rewarded with: '.$slot->item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You have received a Cosmic item! How exciting! Rewarded with: ' . $slot->item->affix_name, $slot->id));
         } else {
-            event(new ServerMessageEvent($character->user, 'You have received a Mythical item! How exciting! Rewarded with: '.$slot->item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You have received a Mythical item! How exciting! Rewarded with: ' . $slot->item->affix_name, $slot->id));
         }
 
         return $character->refresh();
@@ -129,7 +135,8 @@ class LocationSpecialtyHandler
         return $duplicateItem->refresh();
     }
 
-    private function getType(Character $character, bool $isCosmicItem): ?string {
+    private function getType(Character $character, bool $isCosmicItem): ?string
+    {
 
         $typeOfItem = null;
 
@@ -137,16 +144,19 @@ class LocationSpecialtyHandler
 
         $equippedItems = $this->fetchEquipped($character) ?? collect();
         $equippedChance = 0.01;
+        $totalEquippedChance = 0;
 
-        $chance += match($character->map->gameMap->mapType()) {
-            MapNameValue::HELL => $equippedChance * $equippedItems->whereNull('item.specialty_type')->where('item.skill_level_required', 400)->sum(),
-            MapNameValue::DELUSIONAL_MEMORIES => $equippedChance * $equippedItems->where('item.specialty_type', ItemSpecialtyType::PURGATORY_CHAINS)->sum(),
-            MapNameValue::TWISTED_MEMORIES => $equippedChance * $equippedItems->where('item.specialty_type', ItemSpecialtyType::TWISTED_EARTH)->sum(),
+        $totalEquippedChance = match ($character->map->gameMap->name) {
+            MapNameValue::HELL => $equippedChance * $equippedItems->whereNull('item.specialty_type')->where('item.skill_level_required', 400)->count(),
+            MapNameValue::DELUSIONAL_MEMORIES => $equippedChance * $equippedItems->where('item.specialty_type', ItemSpecialtyType::PURGATORY_CHAINS)->count(),
+            MapNameValue::TWISTED_MEMORIES => $equippedChance * $equippedItems->where('item.specialty_type', ItemSpecialtyType::TWISTED_EARTH)->count(),
             default => 0.0
         };
 
+        $chance += $totalEquippedChance;
+
         if ($chance >= 80) {
-            $typeOfItem = match($character->map->gameMap->mapType()) {
+            $typeOfItem = match ($character->map->gameMap->name) {
                 MapNameValue::HELL => ItemSpecialtyType::HELL_FORGED,
                 MapNameValue::DELUSIONAL_MEMORIES => ItemSpecialtyType::DELUSIONAL_SILVER,
                 MapNameValue::TWISTED_MEMORIES => ItemSpecialtyType::FAITHLESS_PLATE,
@@ -157,7 +167,8 @@ class LocationSpecialtyHandler
         return $typeOfItem;
     }
 
-    protected function getChance(): int {
+    protected function getChance(): int
+    {
         return rand(1, 100);
     }
 }

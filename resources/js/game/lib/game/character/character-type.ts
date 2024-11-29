@@ -1,6 +1,7 @@
 import PositionType from "../../../sections/map/types/map/position-type";
 import AttackTypes from "./attack-types";
 import ExtraActionType from "./extra-action-type";
+import InventoryType from "./inventory-type";
 
 export interface CharacterType {
     id: number;
@@ -49,9 +50,7 @@ export interface CharacterType {
 
     holy_healing_bonus: number;
 
-    inventory_max: number;
-
-    inventory_count: number;
+    inventory_count: InventoryType;
 
     artifact_annulment: number;
 

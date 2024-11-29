@@ -69,7 +69,7 @@ class RandomEnchantmentServiceTest extends TestCase
             ->shouldReceive('shouldAddSuffixToItem')
             ->andReturn(100);
 
-        $basicItem = $randomEnchantmentService->generateForType($character, 'basic');
+        $basicItem = $randomEnchantmentService->generateForType($character);
 
         $this->assertNotNull($basicItem->item_suffix_id);
         $this->assertNotNull($basicItem->item_prefix_id);
@@ -77,13 +77,9 @@ class RandomEnchantmentServiceTest extends TestCase
 
     public function testGetCostForEachType()
     {
-        $basicCost = $this->randomEnchantmentService->getCost('basic');
-        $mediumCost = $this->randomEnchantmentService->getCost('medium');
-        $legendaryCost = $this->randomEnchantmentService->getCost('legendary');
+        $cost = $this->randomEnchantmentService->getCost();
 
-        $this->assertEquals(RandomAffixDetails::BASIC, $basicCost);
-        $this->assertEquals(RandomAffixDetails::MEDIUM, $mediumCost);
-        $this->assertEquals(RandomAffixDetails::LEGENDARY, $legendaryCost);
+        $this->assertEquals(RandomAffixDetails::LEGENDARY, $cost);
     }
 
     public function testFetchAllUniqueItems()

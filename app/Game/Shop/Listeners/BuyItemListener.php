@@ -3,6 +3,7 @@
 namespace App\Game\Shop\Listeners;
 
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Shop\Events\BuyItemEvent;
 
 class BuyItemListener
@@ -26,5 +27,7 @@ class BuyItemListener
         $character = $event->character->refresh();
 
         event(new UpdateCharacterCurrenciesEvent($character));
+
+        event(new UpdateCharacterInventoryCountEvent($character));
     }
 }

@@ -50,6 +50,15 @@ class CastType extends BattleBase
         return $this;
     }
 
+    public function setCharacterAttackAndCast(Character $character, bool $isVoided): CastType
+    {
+
+        $this->attackData = $this->characterCacheData->getDataFromAttackCache($character, $isVoided ? 'voided_attack_and_cast' : 'attack_and_cast');
+        $this->isVoided = $isVoided;
+
+        return $this;
+    }
+
     public function setAllowEntrancing(bool $allow): CastType
     {
 
@@ -68,6 +77,9 @@ class CastType extends BattleBase
     {
 
         $spellDamage = $this->attackData['spell_damage'];
+
+        $spellDamage = $this->getTotalSpellDamage($character, $spellDamage);
+
         $healFor = $this->attackData['heal_for'];
 
         if ($spellDamage <= 0) {
@@ -106,6 +118,18 @@ class CastType extends BattleBase
         }
 
         if ($this->canHit->canPlayerCastSpell($character, $monster, $this->isVoided)) {
+
+            if ($spellDamage < self::MINIMUM_DAMAGE_FOR_A_PLAYER && $monster->isRaidBossMonster()) {
+                $this->addMessage(
+                    'The enemy laughs at you. "Child your spells mean nothing to me. Go on, give it your best shot!"',
+                    'enemy-action'
+                );
+
+                $this->doSpellDamage($character, $monster, $spellDamage);
+
+                return $this;
+            }
+
             if ($monster->getMonsterStat('ac') > $spellDamage) {
                 $this->addMessage('Your damage spell was blocked!', 'enemy-action');
 
@@ -178,6 +202,29 @@ class CastType extends BattleBase
             }
         }
 
+        if ($this->isRaidBoss && $spellDamage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {
+            $spellDamage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
+        }
+
+        $this->monsterHealth -= $spellDamage;
+
+        $this->addMessage('Your damage spell(s) hits ' . $monster->getName() . ' for: ' . number_format($spellDamage), 'player-action');
+
+        $this->specialAttacks->setCharacterHealth($this->characterHealth)
+            ->setMonsterHealth($this->monsterHealth)
+            ->setIsRaidBoss($this->isRaidBoss)
+            ->doCastDamageSpecials($character, $this->attackData);
+
+        $this->characterHealth = $this->specialAttacks->getCharacterHealth();
+        $this->monsterHealth = $this->specialAttacks->getMonsterHealth();
+
+        $this->mergeMessages($this->specialAttacks->getMessages());
+
+        $this->specialAttacks->clearMessages();
+    }
+
+    private function getTotalSpellDamage(Character $character, int $spellDamage): int
+    {
         $criticality = $this->characterCacheData->getCachedCharacterData($character, 'skills')['criticality'];
 
         if (rand(1, 100) > (100 - 100 * $criticality)) {
@@ -188,20 +235,7 @@ class CastType extends BattleBase
 
         $totalDamage = $spellDamage - $spellDamage * $this->attackData['damage_deduction'];
 
-        $this->monsterHealth -= $totalDamage;
-
-        $this->addMessage('Your damage spell(s) hits ' . $monster->getName() . ' for: ' . number_format($totalDamage), 'player-action');
-
-        $this->specialAttacks->setCharacterHealth($this->characterHealth)
-            ->setMonsterHealth($this->monsterHealth)
-            ->doCastDamageSpecials($character, $this->attackData);
-
-        $this->characterHealth = $this->specialAttacks->getCharacterHealth();
-        $this->monsterHealth = $this->specialAttacks->getMonsterHealth();
-
-        $this->mergeMessages($this->specialAttacks->getMessages());
-
-        $this->specialAttacks->clearMessages();
+        return $totalDamage;
     }
 
     public function heal(Character $character)

@@ -83,11 +83,11 @@ class GoldMinesRewardHandler
     public function currencyReward(Character $character, ?Event $event = null): Character
     {
         $maximumAmount = 500;
-        $maximumGold = 10000;
+        $maximumGold = 1000;
 
         if (! is_null($event)) {
-            $maximumAmount = 2000;
-            $maximumGold = 20000;
+            $maximumAmount = 1000;
+            $maximumGold = 5000;
         }
 
         $goldDust = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
@@ -127,7 +127,7 @@ class GoldMinesRewardHandler
     protected function handleItemReward(Character $character, ?Event $event = null): Character
     {
         $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->first()->skill_bonus;
-        $maxRoll = 1000000;
+        $maxRoll = 1_000;
 
         if ($lootingChance > 0.15) {
             $lootingChance = 0.15;
@@ -171,7 +171,7 @@ class GoldMinesRewardHandler
         }
 
         if (! $isMythic) {
-            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixDetails::MEDIUM);
+            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixDetails::LEGENDARY);
 
             $newItem = $item->duplicate();
 
@@ -185,7 +185,7 @@ class GoldMinesRewardHandler
                 'item_id' => $newItem->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You found something MEDIUM but still unique, in the mines child: '.$item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You found something unique, in the mines child: ' . $item->affix_name, $slot->id));
         }
     }
 

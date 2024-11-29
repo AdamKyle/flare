@@ -8,6 +8,7 @@ import { formatNumber } from "../../../lib/game/format-number";
 import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
 import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
 import CraftingXp from "../base-components/skill-xp/crafting-xp";
+import InventoryCount from "../base-components/inventory-count/inventory_count";
 
 export default class GemCrafting extends React.Component<any, any> {
     constructor(props: any) {
@@ -24,6 +25,16 @@ export default class GemCrafting extends React.Component<any, any> {
             errorMessage: null,
             loading: true,
             isCrafting: false,
+            skill_xp: {
+                current_xp: 0,
+                next_level_xp: 0,
+                skill_name: "Unknown",
+                level: 1,
+            },
+            inventory_count: {
+                current_count: 0,
+                max_inventory: 75,
+            },
         };
     }
 
@@ -36,6 +47,7 @@ export default class GemCrafting extends React.Component<any, any> {
                     this.setState({
                         tiersForCrafting: result.data.tiers,
                         skill_xp: result.data.skill_xp,
+                        inventory_count: result.data.inventory_count,
                         loading: false,
                     });
                 },
@@ -69,6 +81,7 @@ export default class GemCrafting extends React.Component<any, any> {
                             this.setState({
                                 tiersForCrafting: result.data.tiers,
                                 skill_xp: result.data.skill_xp,
+                                inventory_count: result.data.inventory_count,
                                 isCrafting: false,
                             });
                         },
@@ -222,6 +235,11 @@ export default class GemCrafting extends React.Component<any, any> {
                                         <CraftingXp
                                             skill_xp={this.state.skill_xp}
                                         />
+                                        <InventoryCount
+                                            inventory_count={
+                                                this.state.inventory_count
+                                            }
+                                        />
                                     </div>
                                 ) : null}
                             </Fragment>
@@ -235,7 +253,7 @@ export default class GemCrafting extends React.Component<any, any> {
                         </div>
                     </div>
                 ) : null}
-                <div className="text-center lg:ml-[-100px] mt-3 mb-3">
+                <div className="text-center mt-3 mb-3">
                     <PrimaryButton
                         button_label={"Craft"}
                         on_click={this.craft.bind(this)}

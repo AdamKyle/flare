@@ -517,30 +517,30 @@ export default class SetsTable
                         </h4>
                     </div>
                 ) : null}
-                <div className="flex flex-row flex-wrap items-center">
-                    <div>
+                <div className="flex flex-col md:flex-row flex-wrap items-center w-full md:space-x-4">
+                    <div className="w-full md:w-auto">
                         <DropDown
                             menu_items={this.buildMenuItems()}
-                            button_title={"Sets"}
+                            button_title="Sets"
                             selected_name={this.state.selected_set}
                             secondary_selected={this.props.set_name_equipped}
                             disabled={this.props.is_dead || this.state.loading}
                         />
                     </div>
-                    <div className="ml-2">
+                    <div className="w-full md:w-auto mt-[-10px] md:mt-0">
                         <DropDown
                             menu_items={this.buildActionsDropDown()}
-                            button_title={"Actions"}
+                            button_title="Actions"
                             disabled={this.props.is_dead || this.state.loading}
                         />
                     </div>
-                    <div className="sm:ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-[10px]">
+                    <div className="w-full md:w-auto md:absolute md:right-[10px]">
                         <input
                             type="text"
                             name="search"
-                            className="form-control"
+                            className="form-control w-full md:w-auto"
                             onChange={this.search.bind(this)}
-                            placeholder={"Search"}
+                            placeholder="Search"
                             value={this.state.search_string}
                         />
                     </div>

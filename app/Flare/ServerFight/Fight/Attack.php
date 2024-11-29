@@ -30,6 +30,8 @@ class Attack
 
     private MonsterAttack $monsterAttack;
 
+    const TOTAL_CHARACTER_ATTACK = 500_000_000_000;
+
     public function __construct(BaseCharacterAttack $baseCharacterAttack, MonsterAttack $monsterAttack)
     {
 
@@ -108,7 +110,7 @@ class Attack
         }
 
         if ($this->monsterHealth <= 0) {
-            $this->battleMessages[] = ['message' => $serverMonster->getName().' has been defeated!', 'type' => 'enemy-action'];
+            $this->battleMessages[] = ['message' => $serverMonster->getName() . ' has been defeated!', 'type' => 'enemy-action'];
 
             return;
         }
@@ -147,7 +149,15 @@ class Attack
             $this->monsterAttack->setCharacterHealth($this->characterHealth);
             $this->monsterAttack->setMonsterHealth($this->monsterHealth);
             $this->monsterAttack->setIsEnemyVoided($this->isEnemyVoided);
-            $this->monsterAttack->monsterAttack($serverMonster, $character, $attackType);
+
+            if ($serverMonster->isRaidBossMonster() && $character->getInformation()->buildTotalAttack() < self::TOTAL_CHARACTER_ATTACK) {
+                $this->monsterAttack->addMessage(
+                    'Oh silly child, you tickle with me your feeble attempts. "I dare say, try again! You won\'t even be able to touch me!"',
+                    'enemy-action'
+                );
+            } else {
+                $this->monsterAttack->monsterAttack($serverMonster, $character, $attackType);
+            }
 
             $this->mergeBattleMessages($this->monsterAttack->getMessages());
 

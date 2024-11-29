@@ -14,7 +14,7 @@ class FactionLoyaltyBattleController extends Controller
 
     public function handleBountyTask(FactionLoyaltyFight $request, Character $character): JsonResponse
     {
-        $result = $this->factionLoyaltyFightService->fightMonster($character, $request->monster_id, $request->npc_id);
+        $result = $this->factionLoyaltyFightService->fightMonster($character, $request->monster_id, $request->npc_id, $request->attack_type);
 
         $status = $result['status'];
         unset($result['status']);

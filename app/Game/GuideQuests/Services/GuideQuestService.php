@@ -83,15 +83,15 @@ class GuideQuestService
         }
 
         if ($quest->gold_reward > 0) {
-            event(new ServerMessageEvent($character->user, 'Rewarded with: '.number_format($quest->gold_reward).' Gold.'));
+            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->gold_reward) . ' Gold.'));
         }
 
         if ($quest->gold_dust_reward > 0) {
-            event(new ServerMessageEvent($character->user, 'Rewarded with: '.number_format($quest->gold_dust_reward).' Gold Dust.'));
+            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->gold_dust_reward) . ' Gold Dust.'));
         }
 
         if ($quest->shards_reward > 0) {
-            event(new ServerMessageEvent($character->user, 'Rewarded with: '.number_format($quest->shards_reward).' Shards.'));
+            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->shards_reward) . ' Shards.'));
         }
 
         $character = $this->giveXP($character, $quest);
@@ -131,7 +131,7 @@ class GuideQuestService
 
         $this->handlePossibleLevelUp($character);
 
-        event(new ServerMessageEvent($character->user, 'Rewarded with: '.number_format($guideQuest->xp_reward).' XP.'));
+        event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($guideQuest->xp_reward) . ' XP.'));
 
         return $character;
     }
@@ -206,11 +206,11 @@ class GuideQuestService
         $nextGuideQuest = null;
 
         if (! is_null($winterEvent)) {
-            $unlocksAtLevelQuest = GuideQuest::where('unlock_at_level', '<=', $character->level)->where('only_during_event', EventType::WINTER_EVENT)->whereNull('parent_id')->orderBy('unlock_at_level', 'asc')->first();
+            $unlocksAtLevelQuest = GuideQuest::where('unlock_at_level', '>=', $character->level)->where('only_during_event', EventType::WINTER_EVENT)->whereNull('parent_id')->orderBy('unlock_at_level', 'asc')->first();
         }
 
         if (! is_null($delusionalEvent)) {
-            $unlocksAtLevelQuest = GuideQuest::where('unlock_at_level', '<=', $character->level)->where('only_during_event', EventType::DELUSIONAL_MEMORIES_EVENT)->whereNull('parent_id')->orderBy('unlock_at_level', 'asc')->first();
+            $unlocksAtLevelQuest = GuideQuest::where('unlock_at_level', '>=', $character->level)->where('only_during_event', EventType::DELUSIONAL_MEMORIES_EVENT)->whereNull('parent_id')->orderBy('unlock_at_level', 'asc')->first();
         }
 
         if (! is_null($unlocksAtLevelQuest)) {

@@ -10,6 +10,7 @@ use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
@@ -114,6 +115,14 @@ class CraftingService
             'next_level_xp' => $skill->xp_max,
             'skill_name' => $skill->name,
             'level' => $skill->level,
+        ];
+    }
+
+    public function getInventoryCount(Character $character): array
+    {
+        return [
+            'current_count' => $character->getInventoryCount(),
+            'max_inventory' => $character->inventory_max,
         ];
     }
 
@@ -407,6 +416,8 @@ class CraftingService
                 'item_id' => $item->id,
                 'inventory_id' => $character->inventory->id,
             ]);
+
+            event(new UpdateCharacterInventoryCountEvent($character));
 
             ServerMessageHandler::handleMessage($character->user, 'crafted', $item->name, $slot->id);
 

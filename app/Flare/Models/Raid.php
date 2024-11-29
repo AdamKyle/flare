@@ -25,6 +25,8 @@ class Raid extends Model
         'corrupted_location_ids',
         'item_specialty_reward_type',
         'artifact_item_id',
+        'raid_type',
+        'scheduled_event_description',
     ];
 
     protected $casts = [
@@ -55,15 +57,22 @@ class Raid extends Model
                 continue;
             }
 
+            if ($this->raid_boss_id !== $monster['id'] && $monster['is_raid_boss']) {
+                continue;
+            }
+
+            if (!in_array($monster['id'], $this->raid_monster_ids) && !$monster['is_raid_boss']) {
+                continue;
+            }
+
             if ($monster['is_raid_boss']) {
-                $monster['name'] = $monster['name'].' (RAID BOSS)';
+                $monster['name'] = $monster['name'] . ' (RAID BOSS)';
             }
 
             $newRaidMonsters[] = $monster;
         }
 
         return $newRaidMonsters;
-
     }
 
     public function raidBoss()
@@ -98,7 +107,7 @@ class Raid extends Model
 
             if (in_array($this->raid_boss_location_id, $locationIds)) {
 
-                $raidBoss['name'] = $raidBoss['name'].' (RAID BOSS)';
+                $raidBoss['name'] = $raidBoss['name'] . ' (RAID BOSS)';
 
                 array_unshift($raidMonsters, $raidBoss);
             }

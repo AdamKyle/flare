@@ -24,11 +24,13 @@ export default class MapListeners implements GameListener {
 
     private corruptedLocations?: Channel;
 
+    private pctCommandUpdate?: Channel;
+
     constructor(
         @inject(CoreEventListener) private coreEventListener: CoreEventListener,
     ) {}
 
-    public initialize(component: Game, userId: number): void {
+    public initialize(component: Game, userId?: number): void {
         this.component = component;
         this.userId = userId;
     }
@@ -52,6 +54,8 @@ export default class MapListeners implements GameListener {
             this.updateSpecialEventGoals = echo.private(
                 "update-location-base-event-goals-" + this.userId,
             );
+            this.pctCommandUpdate = echo.private("update-map-" + this.userId);
+
             this.corruptedLocations = echo.join("corrupt-locations");
         } catch (e: any | unknown) {
             throw new Error(e);
@@ -65,14 +69,15 @@ export default class MapListeners implements GameListener {
         this.listForUpdatesToSpecialShopsAccess();
         this.listenForEventGoalUpdates();
         this.listenForCorruptedLocationUpdates();
+        this.listenForPctCommand();
     }
 
     /**
      * Listen to traverse updates.
      *
-     * @protected
+     * @private
      */
-    protected listenToTraverse() {
+    private listenToTraverse() {
         if (!this.traverseUpdate) {
             return;
         }
@@ -96,9 +101,9 @@ export default class MapListeners implements GameListener {
     /**
      * Listen to base position update.
      *
-     * @protected
+     * @private
      */
-    protected listenToBasePositionUpdate() {
+    private listenToBasePositionUpdate() {
         if (!this.updateCharacterBasePosition) {
             return;
         }
@@ -126,9 +131,9 @@ export default class MapListeners implements GameListener {
     /**
      * Listen for specific location based or plane based crafting types that unlock.
      *
-     * @protected
+     * @private
      */
-    protected listForLocationBasedCraftingTypes() {
+    private listForLocationBasedCraftingTypes() {
         if (!this.updateCraftingTypes) {
             return;
         }
@@ -159,9 +164,9 @@ export default class MapListeners implements GameListener {
     /**
      * Listen for when players should see specific special shop buttons.
      *
-     * @protected
+     * @private
      */
-    protected listForUpdatesToSpecialShopsAccess() {
+    private listForUpdatesToSpecialShopsAccess() {
         if (!this.updateSpecialShopsAccess) {
             return;
         }
@@ -194,9 +199,9 @@ export default class MapListeners implements GameListener {
     /**
      * Listen for global event goal updates.
      *
-     * @protected
+     * @private
      */
-    protected listenForEventGoalUpdates() {
+    private listenForEventGoalUpdates() {
         if (!this.updateSpecialEventGoals) {
             return;
         }
@@ -224,9 +229,9 @@ export default class MapListeners implements GameListener {
     /**
      * Listen for corrupted location updates.
      *
-     * @protected
+     * @private
      */
-    protected listenForCorruptedLocationUpdates() {
+    private listenForCorruptedLocationUpdates() {
         if (!this.corruptedLocations) {
             return;
         }
@@ -258,6 +263,32 @@ export default class MapListeners implements GameListener {
                 this.component.setState({
                     map_data: mapState,
                 });
+            },
+        );
+    }
+
+    /**
+     * Listens for the player using PCT command.
+     *
+     * @private
+     */
+    private listenForPctCommand() {
+        if (!this.pctCommandUpdate) {
+            return;
+        }
+
+        this.pctCommandUpdate.listen(
+            "Game.Maps.Events.UpdateMapDetailsBroadcast",
+            (event: any) => {
+                if (!this.component) {
+                    return;
+                }
+
+                this.component.setStateFromData(event.map_data);
+
+                this.component.updateQuestPlane(
+                    event.map_data.character_map.game_map.name,
+                );
             },
         );
     }

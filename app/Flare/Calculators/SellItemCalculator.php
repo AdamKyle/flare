@@ -10,12 +10,14 @@ class SellItemCalculator
 {
     use IsItemUnique;
 
-    const MAX_AFFIX_COST = 2000000000; // 2 billion gold.
+    const MAX_AFFIX_COST = 2_000_000_000;
 
     /**
      * Fetches the item total sale price.
      *
      * Minus a 5% tax.
+     *
+     * @return int
      */
     public function fetchTotalSalePrice(Item $item): int
     {
@@ -25,22 +27,24 @@ class SellItemCalculator
             return round($cost - $cost * 0.05);
         }
 
-        return floor(($item->cost - ($item->cost * 0.05)));
+        return intval(floor(($item->cost - ($item->cost * 0.05))));
     }
 
     /**
      * Fetch the cost of the item with its affixes.
+     *
+     * @return int
      */
     public function fetchSalePriceWithAffixes(Item $item): int
     {
         $cost = $item->cost;
 
         if ($this->isItemUnique($item)) {
-            return self::MAX_AFFIX_COST;
+            return self::MAX_AFFIX_COST - (self::MAX_AFFIX_COST * 0.05);
         }
 
         if ($this->isItemHoly($item)) {
-            return self::MAX_AFFIX_COST;
+            return self::MAX_AFFIX_COST  - (self::MAX_AFFIX_COST * 0.05);
         }
 
         if (! is_null($item->item_suffix_id)) {
@@ -51,7 +55,6 @@ class SellItemCalculator
             } else {
                 $cost += $item->itemSuffix->cost;
             }
-
         }
 
         if (! is_null($item->item_prefix_id)) {
@@ -74,6 +77,8 @@ class SellItemCalculator
 
     /**
      * Fetch min sale price.
+     *
+     * @return int
      */
     public function fetchMinPrice(Item $item): int
     {
@@ -104,9 +109,24 @@ class SellItemCalculator
 
     /**
      * Is the item considered unique?
+     *
+     * - Unique (affixes are randomly generated)
+     * - Mythic
+     * - Cosmic
+     *
+     * @return bool
      */
-    protected function isItemUnique(Item $item): bool
+    private function isItemUnique(Item $item): bool
     {
+
+        if ($item->is_mythic) {
+            return true;
+        }
+
+        if ($item->is_cosmic) {
+            return true;
+        }
+
         if (! is_null($item->item_suffix_id)) {
             if ($item->itemSuffix->randomly_generated) {
                 return true;
@@ -124,16 +144,20 @@ class SellItemCalculator
 
     /**
      * Is the item considered holy?
+     *
+     * @return bool
      */
-    protected function isItemHoly(Item $item): bool
+    private function isItemHoly(Item $item): bool
     {
         return $item->appliedHolyStacks->count() > 0;
     }
 
     /**
      * Whats the minimum sale price of the unique?
+     *
+     * @return int
      */
-    protected function fetchMinimumSalePriceOfUnique(Item $item): int
+    private function fetchMinimumSalePriceOfUnique(Item $item): int
     {
         $cost = 0;
 

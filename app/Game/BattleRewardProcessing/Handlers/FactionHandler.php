@@ -100,7 +100,7 @@ class FactionHandler
                         if ($faction->game_map_id === $guideQuest->required_faction_id && $guideQuest->required_faction_level !== $faction->current_level) {
                             $faction->current_points += $guideQuest->faction_points_per_kill;
 
-                            event(new ServerMessageEvent($character->user, 'You gained additional '.$guideQuest->faction_points_per_kill.' faction points for the current guide quest. This will end once you reach the faction level requirements.'));
+                            event(new ServerMessageEvent($character->user, 'You gained additional ' . $guideQuest->faction_points_per_kill . ' faction points for the current guide quest. This will end once you reach the faction level requirements.'));
 
                             break;
                         }
@@ -150,7 +150,7 @@ class FactionHandler
      */
     protected function handleFactionLevelUp(Character $character, Faction $faction, string $mapName): void
     {
-        event(new ServerMessageEvent($character->user, $mapName.' faction has gained a new level!'));
+        event(new ServerMessageEvent($character->user, $mapName . ' faction has gained a new level!'));
 
         $faction = $this->updateFaction($faction);
         $character = $character->refresh();
@@ -167,8 +167,8 @@ class FactionHandler
      */
     protected function handleFactionMaxedOut(Character $character, Faction $faction, string $mapName): void
     {
-        event(new ServerMessageEvent($character->user, $mapName.' faction has become maxed out!'));
-        event(new GlobalMessageEvent($character->name.' Has maxed out the faction for: '.$mapName.' They are considered legendary among the people of this land.'));
+        event(new ServerMessageEvent($character->user, $mapName . ' faction has become maxed out!'));
+        event(new GlobalMessageEvent($character->name . ' Has maxed out the faction for: ' . $mapName . ' They are considered legendary among the people of this land.'));
 
         $faction->update([
             'maxed' => true,
@@ -205,7 +205,7 @@ class FactionHandler
         $character = $this->giveCharacterGold($character, $faction->current_level);
         $item = $this->giveCharacterRandomItem($character);
 
-        event(new ServerMessageEvent($character->user, 'Achieved title: '.$title.' of '.$mapName));
+        event(new ServerMessageEvent($character->user, 'Achieved title: ' . $title . ' of ' . $mapName));
 
         if ($character->isInventoryFull()) {
 
@@ -217,7 +217,7 @@ class FactionHandler
                 'item_id' => $item->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'Rewarded with (item with randomly generated affix(es)): '.$item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'Rewarded with (item with randomly generated affix(es)): ' . $item->affix_name, $slot->id));
         }
     }
 
@@ -240,14 +240,14 @@ class FactionHandler
             $character->gold = $characterNewGold;
             $character->save();
 
-            event(new ServerMessageEvent($character->user, 'Received faction gold reward: '.number_format($gold).' gold. You are now gold capped.'));
+            event(new ServerMessageEvent($character->user, 'Received faction gold reward: ' . number_format($gold) . ' gold. You are now gold capped.'));
 
             return $character->refresh();
         }
 
         $character->gold += $gold;
 
-        event(new ServerMessageEvent($character->user, 'Received faction gold reward: '.number_format($gold).' gold.'));
+        event(new ServerMessageEvent($character->user, 'Received faction gold reward: ' . number_format($gold) . ' gold.'));
 
         $character->save();
 
@@ -261,7 +261,7 @@ class FactionHandler
      */
     protected function giveCharacterRandomItem(Character $character): Item
     {
-        $item = Item::where('cost', '<=', RandomAffixDetails::BASIC)
+        $item = Item::where('cost', '<=', RandomAffixDetails::LEGENDARY)
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
             ->whereNull('specialty_type')
@@ -272,7 +272,7 @@ class FactionHandler
 
         $randomAffix = $this->randomAffixGenerator
             ->setCharacter($character)
-            ->setPaidAmount(RandomAffixDetails::BASIC);
+            ->setPaidAmount(RandomAffixDetails::LEGENDARY);
 
         $duplicateItem = $item->duplicate();
 

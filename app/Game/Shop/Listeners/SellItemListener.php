@@ -4,6 +4,7 @@ namespace App\Game\Shop\Listeners;
 
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Shop\Events\SellItemEvent;
 use App\Game\Skills\Services\EnchantingService;
 use Facades\App\Flare\Calculators\SellItemCalculator;
@@ -33,6 +34,10 @@ class SellItemListener
 
         $event->inventorySlot->delete();
 
-        event(new UpdateCharacterCurrenciesEvent($event->character->refresh()));
+        $character = $event->character->refresh();
+
+        event(new UpdateCharacterCurrenciesEvent($character));
+
+        event(new UpdateCharacterInventoryCountEvent($character));
     }
 }

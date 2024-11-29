@@ -18,7 +18,16 @@ class NameTags
 
     const GAMBLING_ADDICT = 'gambling-addict';
 
-    private string $value;
+    const EARTH_EATER = 'earth-eater';
+
+    const DERANGED_LUNITIC_OF_HELL = 'deranged-lunitic-of-hell';
+
+    const HELPER_OF_MR_WHISKERS = 'helper-of-mr-whiskers';
+
+    const ALL_YOUR_BASES_BELONG_TO_US = 'all-your-bases-belong-to-us';
+
+    const FEARSOME_MAGI_OF_THE_MEMORY = 'fearsome-magi-of-the-memory';
+
 
     /**
      * @var string[]
@@ -30,6 +39,11 @@ class NameTags
         self::DEMON_SLAYER => self::DEMON_SLAYER,
         self::QUEEN_OF_HEARTS => self::QUEEN_OF_HEARTS,
         self::GAMBLING_ADDICT => self::GAMBLING_ADDICT,
+        self::EARTH_EATER => self::EARTH_EATER,
+        self::DERANGED_LUNITIC_OF_HELL => self::DERANGED_LUNITIC_OF_HELL,
+        self::HELPER_OF_MR_WHISKERS => self::HELPER_OF_MR_WHISKERS,
+        self::ALL_YOUR_BASES_BELONG_TO_US => self::ALL_YOUR_BASES_BELONG_TO_US,
+        self::FEARSOME_MAGI_OF_THE_MEMORY => self::FEARSOME_MAGI_OF_THE_MEMORY,
     ];
 
     public static array $valueNames = [
@@ -39,6 +53,11 @@ class NameTags
         self::DEMON_SLAYER => 'Twisted Demon Slayer of Galidoth',
         self::QUEEN_OF_HEARTS => 'Lover to the Queen of Hearts',
         self::GAMBLING_ADDICT => 'Gambling Addict',
+        self::EARTH_EATER => 'Savage Earth Eater',
+        self::DERANGED_LUNITIC_OF_HELL => 'A Deranged Lunitic From Hell',
+        self::HELPER_OF_MR_WHISKERS => 'Special helper to Mr. Whiskers',
+        self::ALL_YOUR_BASES_BELONG_TO_US => 'All your bases belong to us',
+        self::FEARSOME_MAGI_OF_THE_MEMORY => 'Most feared magi in all of recent memory',
     ];
 
     /**
@@ -49,9 +68,7 @@ class NameTags
     public function __construct(string $value)
     {
         if (! in_array($value, self::$values)) {
-            throw new Exception($value.' does not exist.');
+            throw new Exception($value . ' does not exist.');
         }
-
-        $this->value = $value;
     }
 }

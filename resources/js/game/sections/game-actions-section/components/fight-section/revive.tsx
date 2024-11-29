@@ -26,7 +26,7 @@ export default class Revive extends React.Component<ReviveProps, {}> {
     render() {
         if (this.props.is_character_dead) {
             return (
-                <div className="text-center my-4 lg:ml-[-140px]">
+                <div className="text-center my-4">
                     <PrimaryButton
                         button_label={"Revive"}
                         on_click={this.revive.bind(this)}

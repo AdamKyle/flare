@@ -5,7 +5,7 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:150,2
     Route::get('/map-actions/{character}', ['uses' => 'Api\BattleController@index']);
 
     Route::middleware(['is.character.exploring'])->group(function () {
-        Route::middleware(['is.character.dead', 'throttle:attacking'])->group(function () {
+        Route::middleware(['is.character.dead', 'throttle:fighting'])->group(function () {
 
             Route::get('/setup-monster-fight/{character}/{monster}', ['uses' => 'Api\BattleController@setupMonster']);
             Route::post('/monster-fight/{character}', ['uses' => 'Api\BattleController@fightMonster']);

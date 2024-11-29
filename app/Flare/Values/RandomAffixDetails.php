@@ -11,22 +11,16 @@ class RandomAffixDetails
      */
     private $value;
 
-    const BASIC = 2000000000;
+    const LEGENDARY = 1_000_000_000;
 
-    const MEDIUM = 4000000000;
+    const MYTHIC = 10_000_000_000;
 
-    const LEGENDARY = 80000000000;
-
-    const MYTHIC = 500000000000;
-
-    const COSMIC = 1000000000000;
+    const COSMIC = 25_000_000_000;
 
     /**
      * @var int[]
      */
     protected static $values = [
-        0 => self::BASIC,
-        1 => self::MEDIUM,
         3 => self::LEGENDARY,
         4 => self::MYTHIC,
         5 => self::COSMIC,
@@ -40,7 +34,7 @@ class RandomAffixDetails
     public function __construct(int $value)
     {
         if (! in_array($value, self::$values)) {
-            throw new Exception($value.' does not exist.');
+            throw new Exception($value . ' does not exist.');
         }
 
         $this->value = $value;
@@ -49,38 +43,30 @@ class RandomAffixDetails
     public function getPercentageRange(): array
     {
         switch ($this->value) {
-            case self::MEDIUM:
-                return [50, 150];
-            case self::LEGENDARY:
-                return [175, 300];
             case self::MYTHIC:
-                return [400, 800];
+                return [65, 90];
             case self::COSMIC:
-                return [900, 1200];
-            case self::BASIC:
+                return [95, 125];
+            case self::LEGENDARY:
             default:
-                return [5, 25];
+                return [10, 65];
         }
     }
 
     public function getDamageRange(): array
     {
         switch ($this->value) {
-            case self::MEDIUM:
-                return [35, 85];
-            case self::LEGENDARY:
-                return [50, 150];
             case self::MYTHIC:
-                return [150, 300];
+                return [30, 60];
             case self::COSMIC:
-                return [300, 500];
-            case self::BASIC:
+                return [75, 110];
+            case self::LEGENDARY:
             default:
-                return [25, 75];
+                return [8, 25];
         }
     }
 
-    public static function names(): array
+    public static function legendaryNames(): array
     {
         return [
             'Petrifying Hatred of Disease',
@@ -101,6 +87,62 @@ class RandomAffixDetails
             'Putrefaction of Mortality',
             'Beam of Lightning',
             'Burst of Precision',
+            'Gift of Subtlety',
+            'Pledge of Mysteries',
+            'Pledge of Demolition'
+        ];
+    }
+
+    public static function mythicalNames(): array
+    {
+        return [
+            'Charge of Disgust',
+            'Eternal Crux of Undoing',
+            'Boon of Mythic Adventure',
+            'Exceptional Curse of Torture',
+            'Major Aspect of Conjuring',
+            'Miracle of Cat Eyes',
+            'Brand of Faultless Dread',
+            'Mark of Fire',
+            'Oath of Superior Danger',
+            'Spark of Mythic Caring',
+            'Spark of Elite Magic',
+            'Aspect of Prime Visibility',
+            'Lesser Core of Sanity',
+            'Oath of Explosions',
+            'Fortified Boon of Fury',
+            'Attunement of Parry',
+            'Bond of Speed',
+            'Crest of the Full Moon',
+            'Mantra of Greater Anxiety',
+            'Grace of Absorption',
+            'Elite Chant of Grace'
+        ];
+    }
+
+    public static function cosmicNames(): array
+    {
+        return [
+            'Astral Veil of Eternity',
+            'Celestian\'s Starlight Bond',
+            'Nebula\'s Whispering Charm',
+            'Galactic Aura of Warding',
+            'Twilight Horizon Seal',
+            'Comet\'s Divine Embrace',
+            'Voidheart Illumination',
+            'Luminous Rift Chant',
+            'Eclipsebound Ward',
+            'Astrarium\'s Ethereal Oath',
+            'Celestial Flux Mantle',
+            'Starfall Requiem',
+            'Infinity\'s Halo of Serenity',
+            'Moonwoven Blessing',
+            'Empyrean\'s Echo Shield',
+            'Cosmos Enigma Relic',
+            'Radiant Aurora Shroud',
+            'Solarbind Sigil',
+            'Mystic Aether Pulse',
+            'Heaven\'s Fragment Incantation'
         ];
     }
 }

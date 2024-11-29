@@ -13,9 +13,9 @@ class GlobalEventForEventTypeValueTest extends TestCase
     public function testGetWinterEventGlobalEventGoalData()
     {
         $expected = [
-            'max_kills' => 190000,
-            'reward_every' => 10000,
-            'next_reward_at' => 10000,
+            'max_kills' => 20000,
+            'reward_every' => 2000,
+            'next_reward_at' => 2000,
             'event_type' => EventType::WINTER_EVENT,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
             'should_be_unique' => true,
@@ -29,9 +29,9 @@ class GlobalEventForEventTypeValueTest extends TestCase
     public function testGetDelusionalMemoriesBattleEventGoalData()
     {
         $expected = [
-            'max_kills' => 400000,
-            'reward_every' => 20000,
-            'next_reward_at' => 20000,
+            'max_kills' => 20000,
+            'reward_every' => 2000,
+            'next_reward_at' => 2000,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
             'should_be_unique' => false,
@@ -55,7 +55,7 @@ class GlobalEventForEventTypeValueTest extends TestCase
             'should_be_mythic' => false,
         ];
 
-        $this->assertEquals($expected, GlobalEventForEventTypeValue::returnCraftingEventGoal());
+        $this->assertEquals($expected, GlobalEventForEventTypeValue::returnDelusionalMemoriesCraftingEventGoal());
     }
 
     public function testGetEnchantingEventGoalData()
@@ -71,7 +71,7 @@ class GlobalEventForEventTypeValueTest extends TestCase
             'should_be_mythic' => false,
         ];
 
-        $this->assertEquals($expected, GlobalEventForEventTypeValue::returnEnchantingEventGoal());
+        $this->assertEquals($expected, GlobalEventForEventTypeValue::returnDelusionalMemoriesEnchantingEventGoal());
     }
 
     public function testGetDelusionalMemoriesGlobalEventSteps()

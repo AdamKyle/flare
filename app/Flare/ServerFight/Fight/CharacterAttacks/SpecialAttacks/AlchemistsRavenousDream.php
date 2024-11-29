@@ -42,6 +42,10 @@ class AlchemistsRavenousDream extends BattleBase
                     $damage = $damage - $damage * $attackData['damage_deduction'];
                 }
 
+                if ($this->isRaidBoss && $damage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {
+                    $damage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
+                }
+
                 $this->monsterHealth -= $damage;
 
                 $this->addMessage('You hit for (Arcane Alchemist Ravenous Dream): ' . number_format($damage), 'player-action');
@@ -52,6 +56,10 @@ class AlchemistsRavenousDream extends BattleBase
                     $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
 
                     $damage = $damage - $damage * $attackData['damage_deduction'];
+                }
+
+                if ($this->isRaidBoss && $damage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {
+                    $damage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
                 }
 
                 if ($damage >= 1) {

@@ -34,4 +34,5 @@ Route::middleware([
     Route::post('/settings/{user}/enable-guide', ['as' => 'user.settings.enable-guide', 'uses' => 'SettingsController@guideSettings']);
     Route::post('/settings/{user}/cosmetic-text', ['as' => 'user.settings.cosmetic-text', 'uses' => 'SettingsController@cosmeticText']);
     Route::post('/settings/{user}/cosmetic-name-tag', ['as' => 'user.settings.cosmetic-name-tag', 'uses' => 'SettingsController@cosmeticNametag']);
+    Route::post('/settings/{user}/cosmetic-race-changer', ['as' => 'user.settings.cosmetic-race-changer', 'uses' => 'SettingsController@cosmeticRaceChanger']);
 });

@@ -4,6 +4,7 @@ namespace Tests\Feature\Game\NpcActions\QueenOfHearts\Controllers\Api;
 
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Flare\Values\RandomAffixDetails;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -46,40 +47,12 @@ class QueenOfHeartsControllerTest extends TestCase
         ]))->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/'.$character->id.'/inventory/uniques');
+            ->call('GET', '/api/character/' . $character->id . '/inventory/uniques');
 
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertCount(2, $jsonData['unique_slots']);
         $this->assertCount(2, $jsonData['non_unique_slots']);
-    }
-
-    public function testPurchase()
-    {
-        $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
-
-        $character = $this->character->inventoryManagement()->giveItem($questItem)->getCharacter();
-
-        $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
-        ]);
-
-        $gameMap = $this->createGameMap(['name' => 'Hell']);
-
-        $character->map()->update(['game_map_id' => $gameMap->id]);
-
-        $character = $character->refresh();
-
-        $this->actingAs($character->user)
-            ->call('POST', '/api/character/'.$character->id.'/random-enchant/purchase', [
-                '_token' => csrf_token(),
-                'type' => 'basic',
-            ]);
-
-        $character = $character->refresh();
-
-        $this->assertEquals(2, $character->inventory->slots->count()); // Quest Item + Unique = 2
-        $this->assertLessThan(MaxCurrenciesValue::MAX_GOLD, $character->gold);
     }
 
     public function testReRoll()
@@ -90,28 +63,24 @@ class QueenOfHeartsControllerTest extends TestCase
 
         $character = $this->character->inventoryManagement()
             ->giveItem($this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]))
+            ->giveItem($this->createItem([
+                'item_prefix_id' => $this->createItemAffix([
+                    'cost' => RandomAffixDetails::LEGENDARY,
+                    'randomly_generated' => true,
+                ]),
+            ]))
             ->getCharacter();
 
         $character->map()->update(['game_map_id' => $gameMap->id]);
 
         $character->update(['gold' => MaxCurrenciesValue::MAX_GOLD, 'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST, 'shards' => MaxCurrenciesValue::MAX_SHARDS]);
 
-        $character = $character->refresh();
-
-        $this->actingAs($character->user)
-            ->call('POST', '/api/character/'.$character->id.'/random-enchant/purchase', [
-                '_token' => csrf_token(),
-                'type' => 'basic',
-            ]);
-
-        $character = $character->refresh();
-
         $slotWithUnique = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->is_unique;
         })->first();
 
         $result = $this->actingAs($character->user)
-            ->call('POST', '/api/character/'.$character->id.'/random-enchant/reroll', [
+            ->call('POST', '/api/character/' . $character->id . '/random-enchant/reroll', [
                 '_token' => csrf_token(),
                 'selected_slot_id' => $slotWithUnique->id,
                 'selected_affix' => 'all-enchantments',
@@ -127,7 +96,16 @@ class QueenOfHeartsControllerTest extends TestCase
     {
         $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS, 'type' => 'quest']);
 
-        $character = $this->character->inventoryManagement()->giveItem($questItem)->giveItem($this->createItem(['name' => 'Sample', 'type' => 'weapon']))->getCharacter();
+        $character = $this->character->inventoryManagement()
+            ->giveItem($questItem)
+            ->giveItem($this->createItem(['name' => 'Sample', 'type' => 'weapon']))
+            ->giveItem($this->createItem([
+                'item_suffix_id' => $this->createItemAffix([
+                    'cost' => RandomAffixDetails::LEGENDARY,
+                    'randomly_generated' => true
+                ])
+            ]))
+            ->getCharacter();
 
         $character->update([
             'gold' => 0,
@@ -143,15 +121,7 @@ class QueenOfHeartsControllerTest extends TestCase
             'shards' => MaxCurrenciesValue::MAX_SHARDS,
         ]);
 
-        $character = $character->refresh();
-
-        $this->actingAs($character->user)
-            ->call('POST', '/api/character/'.$character->id.'/random-enchant/purchase', [
-                '_token' => csrf_token(),
-                'type' => 'legendary',
-            ]);
-
-        $character = $character->refresh();
+        $character = $character->refresh();;
 
         $slotWithUnique = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->is_unique;
@@ -162,7 +132,7 @@ class QueenOfHeartsControllerTest extends TestCase
         })->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/'.$character->id.'/random-enchant/move', [
+            ->call('POST', '/api/character/' . $character->id . '/random-enchant/move', [
                 '_token' => csrf_token(),
                 'type' => 'legendary',
                 'selected_slot_id' => $slotWithUnique->id,

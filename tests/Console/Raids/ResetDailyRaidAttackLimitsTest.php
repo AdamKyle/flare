@@ -52,7 +52,7 @@ class ResetDailyRaidAttackLimitsTest extends TestCase
             'raid_id' => $raid->id,
             'attacks_left' => 0,
             'damage_dealt' => 1000000,
-            'killed_boss' => true,
+            'killed_boss' => false,
         ]);
 
         Artisan::call('reset:daily-raid-attack-limits');
@@ -69,7 +69,7 @@ class ResetDailyRaidAttackLimitsTest extends TestCase
         Event::assertNotDispatched(GlobalMessageEvent::class);
     }
 
-    public function testDoNotresetRaidFightWhenRaidBossNotDead()
+    public function testDoNotresetRaidFightWhenRaidBossIsDead()
     {
         Event::fake();
 
@@ -100,7 +100,7 @@ class ResetDailyRaidAttackLimitsTest extends TestCase
             'raid_id' => $raid->id,
             'attacks_left' => 0,
             'damage_dealt' => 1000000,
-            'killed_boss' => false,
+            'killed_boss' => true,
         ]);
 
         Artisan::call('reset:daily-raid-attack-limits');

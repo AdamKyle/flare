@@ -278,7 +278,7 @@ export default class LabyrinthOracle extends React.Component<
                     </div>
                 ) : null}
 
-                <div className="text-center lg:ml-[-100px] mt-3 mb-3">
+                <div className="text-center mt-3 mb-3">
                     <PrimaryButton
                         button_label={"Transfer"}
                         on_click={this.transfer.bind(this)}

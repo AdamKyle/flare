@@ -34,7 +34,7 @@ class RandomAffixGenerator
      */
     public function setPaidAmount(int $amount = 0): RandomAffixGenerator
     {
-        $this->amountPaid = $amount !== 0 ? $amount : RandomAffixDetails::BASIC;
+        $this->amountPaid = $amount !== 0 ? $amount : RandomAffixDetails::LEGENDARY;
         $details = (new RandomAffixDetails($this->amountPaid));
 
         $this->affixAttributeBuilder = $this->affixAttributeBuilder->setPercentageRange($details->getPercentageRange())

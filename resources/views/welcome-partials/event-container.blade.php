@@ -1,11 +1,11 @@
 @php
 function calculateGridCols(int $numItems) {
     if ($numItems <= 1) {
-        return 'auto'; // No grid, single column
+        return 'auto';
     } else if ($numItems >= 3) {
-        return '3'; // No grid, auto layout
+        return '3';
     } else {
-        return '2'; // Use a 3-column grid
+        return '2';
     }
 }
 @endphp

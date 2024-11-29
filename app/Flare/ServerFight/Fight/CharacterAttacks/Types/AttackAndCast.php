@@ -12,6 +12,8 @@ use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 class AttackAndCast extends BattleBase
 {
 
+    private string $castAttackType;
+
     public function __construct(
         CharacterCacheData $characterCacheData,
         private Entrance $entrance,
@@ -19,6 +21,11 @@ class AttackAndCast extends BattleBase
         private CastType $castType
     ) {
         parent::__construct($characterCacheData);
+    }
+
+    public function setWhichCastType(string $type = 'attack_and_cast')
+    {
+        $this->castAttackType = $type;
     }
 
     public function setCharacterAttackData(Character $character, bool $isVoided): AttackAndCast
@@ -44,6 +51,7 @@ class AttackAndCast extends BattleBase
             return $this;
         }
 
+        $this->setWhichCastType('attack_and_cast');
         $this->handleCastAttack($character, $monster);
 
         if ($this->characterHealth <= 0) {
@@ -90,7 +98,14 @@ class AttackAndCast extends BattleBase
 
         $this->castType->setMonsterHealth($this->monsterHealth);
         $this->castType->setCharacterHealth($this->characterHealth);
-        $this->castType->setCharacterCastAndAttack($character, $this->isVoided);
+
+        if ($this->castAttackType === 'cast_and_attack') {
+            $this->castType->setCharacterCastAndAttack($character, $this->isVoided);
+        }
+
+        if ($this->castAttackType === 'attack_and_cast') {
+            $this->castType->setCharacterAttackAndCast($character, $this->isVoided);
+        }
 
         if ($disableSecondaryAttacks) {
             $this->castType->doNotAllowSecondaryAttacks();

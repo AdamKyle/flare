@@ -101,7 +101,13 @@ class AffixAttributeBuilder
 
     public function setBaseDetails(string $type, int $amountPaid): array
     {
-        $names = RandomAffixDetails::names();
+
+        $names = match ($amountPaid) {
+            RandomAffixDetails::LEGENDARY => RandomAffixDetails::legendaryNames(),
+            RandomAffixDetails::MYTHIC => RandomAffixDetails::mythicalNames(),
+            RandomAffixDetails::COSMIC => RandomAffixDetails::cosmicNames(),
+            default => RandomAffixDetails::legendaryNames(),
+        };
 
         return [
             'name' => $names[rand(0, count($names) - 1)],
@@ -228,7 +234,14 @@ class AffixAttributeBuilder
     public function setSkillBonuses(): array
     {
         $allowedTypes = [
-            1, 2, 3, 4, 5, 6, 7, 13, // The match to the SkillTypeValue const's
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            13, // The match to the SkillTypeValue const's
         ];
 
         return [

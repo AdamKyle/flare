@@ -356,7 +356,7 @@ export default class DamageBreakDown extends React.Component<any, any> {
                         <span className="text-green-700 dark:text-green-500">
                             (+
                             {(
-                                this.state.details.percentage_of_stat * 100
+                                this.state.details.percentage_of_stat_used * 100
                             ).toFixed(2)}
                             %)
                         </span>

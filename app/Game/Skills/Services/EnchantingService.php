@@ -16,6 +16,7 @@ use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Skill;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Events\Concerns\ShouldShowEnchantingEventButton;
 use App\Game\Events\Values\GlobalEventSteps;
@@ -326,6 +327,8 @@ class EnchantingService
         ServerMessageHandler::handleMessage($character->user, 'enchantment_failed', $message);
 
         $this->enchantItemService->deleteSlot($slot);
+
+        event(new UpdateCharacterInventoryCountEvent($character));
     }
 
     private function fetchEventItemsForEnchanting(Character $character): array

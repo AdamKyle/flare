@@ -22,7 +22,7 @@ class CharacterBoonsUpdateBroadcastEvent implements ShouldBroadcastNow
     /**
      * @var User
      */
-    public $user;
+    private $user;
 
     /**
      * Create a new event instance.
@@ -40,6 +40,6 @@ class CharacterBoonsUpdateBroadcastEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('update-boons-'.$this->user->id);
+        return new PrivateChannel('update-boons-' . $this->user->id);
     }
 }

@@ -26,6 +26,7 @@ class CharacterAttack
 
     public function attack(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack
     {
+        $this->weaponType->setIsRaidBoss($monster->isRaidBossMonster());
         $this->weaponType->setCharacterHealth($characterHealth);
         $this->weaponType->setMonsterHealth($monsterHealth);
         $this->weaponType->setCharacterAttackData($character, $isPlayerVoided, AttackTypeValue::ATTACK);
@@ -39,6 +40,7 @@ class CharacterAttack
 
     public function cast(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack
     {
+        $this->castType->setIsRaidBoss($monster->isRaidBossMonster());
         $this->castType->setCharacterHealth($characterHealth);
         $this->castType->setMonsterHealth($monsterHealth);
         $this->castType->setCharacterAttackData($character, $isPlayerVoided, AttackTypeValue::CAST);
@@ -53,6 +55,7 @@ class CharacterAttack
 
     public function attackAndCast(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack
     {
+        $this->attackAndCast->setIsRaidBoss($monster->isRaidBossMonster());
         $this->attackAndCast->setCharacterHealth($characterHealth);
         $this->attackAndCast->setMonsterHealth($monsterHealth);
         $this->attackAndCast->setCharacterAttackData($character, $isPlayerVoided, AttackTypeValue::ATTACK_AND_CAST);
@@ -65,6 +68,7 @@ class CharacterAttack
 
     public function castAndAttack(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack
     {
+        $this->castAndAttack->setIsRaidBoss($monster->isRaidBossMonster());
         $this->castAndAttack->setCharacterHealth($characterHealth);
         $this->castAndAttack->setMonsterHealth($monsterHealth);
         $this->castAndAttack->setCharacterCastAndAttackkData($character, $isPlayerVoided);
@@ -77,6 +81,7 @@ class CharacterAttack
 
     public function defend(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack
     {
+        $this->defend->setIsRaidBoss($monster->isRaidBossMonster());
         $this->defend->setCharacterHealth($characterHealth);
         $this->defend->setMonsterHealth($monsterHealth);
         $this->defend->setCharacterAttackData($character, $isPlayerVoided);

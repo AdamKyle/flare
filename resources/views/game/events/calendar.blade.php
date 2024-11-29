@@ -1,14 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-core.page-title
-        title="Upcoming Events"
-        route="{{route('game')}}"
-        link="{{'Game'}}"
-        color="{{'primary'}}"
-    ></x-core.page-title>
-    <hr />
-    <div id="player-event-calendar"></div>
+    <x-core.cards.card-with-title
+        title="Upcoming events!"
+        buttons="true"
+        backUrl="{{route('game')}}"
+    >
+        <div id="player-event-calendar" data-in-game="true"></div>
+    </x-core.cards.card-with-title>
 @endSection
 
 @push('scripts')

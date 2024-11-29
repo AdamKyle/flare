@@ -20,7 +20,7 @@
                         <x-core.forms.check-box :model="$mapDetails" label="Can Traverse" modelKey="can_traverse"
                                                 name="can_traverse" />
                         <x-core.forms.key-value-select :model="$mapDetails" label="Only For Event Type:"
-                            modelKey="only_during_event" name="only_during_event" :options="$eventTypes" />
+                            modelKey="only_during_event_type" name="only_during_event_type" :options="$eventTypes" />
                         <x-core.forms.file-upload :model="$mapDetails" label="Map:" modelKey="map" name="map" />
                     </x-core.form-wizard.content>
                 </x-core.form-wizard.contents>

@@ -2,20 +2,14 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
-use App\Flare\Models\CapitalCityBuildingQueue;
-use App\Flare\Models\CapitalCityUnitQueue;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\InfoPage;
-use App\Flare\Models\Item;
-use App\Flare\Models\Survey;
-use App\Flare\Models\SurveySnapshot;
-use App\Flare\Models\User;
-use App\Flare\Values\MapNameValue;
+use Artisan;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use App\Flare\Models\GameMap;
+use App\Flare\Models\InfoPage;
+use App\Flare\Models\Survey;
+use App\Flare\Values\MapNameValue;
 
 class MassImportCustomData extends Command
 {
@@ -62,7 +56,7 @@ class MassImportCustomData extends Command
     }
 
     /**
-     * Import the information section
+     * Import the information sectionbalance:monsters
      *
      * @return void
      */

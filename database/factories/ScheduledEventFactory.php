@@ -29,6 +29,7 @@ class ScheduledEventFactory extends Factory
             'end_date' => now(),
             'description' => 'Test',
             'currently_running' => false,
+            'raids_for_event' => null,
         ];
     }
 }

@@ -13,6 +13,7 @@ import DangerButton from "../../ui/buttons/danger-button";
 import { isEqual } from "lodash";
 import { generateServerMessage } from "../../../lib/ajax/generate-server-message";
 import CraftingXp from "../base-components/skill-xp/crafting-xp";
+import InventoryCount from "../base-components/inventory-count/inventory_count";
 
 export default class Trinketry extends React.Component<any, any> {
     constructor(props: any) {
@@ -27,6 +28,10 @@ export default class Trinketry extends React.Component<any, any> {
                 skill_name: "Unknown",
                 level: 1,
             },
+            inventory_count: {
+                current_count: 0,
+                max_inventory: 75,
+            },
         };
     }
 
@@ -40,6 +45,7 @@ export default class Trinketry extends React.Component<any, any> {
                     loading: false,
                     craftable_items: result.data.items,
                     skill_xp: result.data.skill_xp,
+                    inventory_count: result.data.inventory_count,
                 });
             },
             (error: AxiosError) => {},
@@ -118,6 +124,8 @@ export default class Trinketry extends React.Component<any, any> {
                                     loading: false,
                                     craftable_items: result.data.items,
                                     skill_xp: result.data.skill_xp,
+                                    inventory_count:
+                                        result.data.inventory_count,
                                 },
                                 () => {
                                     if (!isEqual(oldItems, result.data.items)) {
@@ -163,11 +171,16 @@ export default class Trinketry extends React.Component<any, any> {
                         {this.state.loading ? <LoadingProgressBar /> : null}
 
                         {this.state.craftable_items.length > 0 ? (
-                            <CraftingXp skill_xp={this.state.skill_xp} />
+                            <>
+                                <CraftingXp skill_xp={this.state.skill_xp} />
+                                <InventoryCount
+                                    inventory_count={this.state.inventory_count}
+                                />
+                            </>
                         ) : null}
                     </div>
                 </div>
-                <div className={"text-center md:ml-[-100px] mt-3 mb-3"}>
+                <div className={"text-center mt-3 mb-3"}>
                     <PrimaryButton
                         button_label={"Craft"}
                         on_click={this.craft.bind(this)}

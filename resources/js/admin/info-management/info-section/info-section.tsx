@@ -234,6 +234,10 @@ export default class InfoSection extends React.Component<any, any> {
                 value: "info.locations.special-locations",
             },
             {
+                label: "Weekly Fight Locations",
+                value: "info.locations.weekly-fight-locations",
+            },
+            {
                 label: "Class Specials",
                 value: "admin.class-specials.class-specials-table",
             },

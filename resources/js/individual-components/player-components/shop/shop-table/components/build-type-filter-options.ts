@@ -24,8 +24,14 @@ export const ITEM_TYPES = [
 
 export const itemTypeFilter = (): { label: string; value: ItemType }[] => {
     return ITEM_TYPES.map((type: ItemType) => {
+        let label = startCase(type);
+
+        if (type === ItemType.WEAPON) {
+            label = "General Weapons";
+        }
+
         return {
-            label: startCase(type),
+            label: label,
             value: type,
         };
     });

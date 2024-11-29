@@ -146,8 +146,6 @@ class WeeklyBattleServiceTest extends TestCase
     public function testMarkMonsterAsKilled()
     {
 
-
-
         $character = $this->characterFactory->getCharacter();
 
 

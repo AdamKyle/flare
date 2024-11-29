@@ -65,6 +65,8 @@ class WeaponType extends BattleBase
     {
         $weaponDamage = $this->attackData['weapon_damage'];
 
+        $weaponDamage = $this->getCriticalityDamage($character, $weaponDamage);
+
         if (! $this->isEnemyEntranced && $this->canEntrance) {
             $this->doEnemyEntrance($character, $serverMonster, $this->entrance);
         }
@@ -85,7 +87,7 @@ class WeaponType extends BattleBase
 
         if ($this->canHit->canPlayerHitMonster($character, $serverMonster, $this->isVoided)) {
 
-            if ($this->canBlock($weaponDamage, $serverMonster->getMonsterStat('ac'))) {
+            if ($this->canBlock($weaponDamage, $serverMonster)) {
                 $this->addMessage('Your weapon was blocked!', 'enemy-action');
 
                 $this->dealSecondaryAttackDamage($character, $serverMonster);
@@ -133,10 +135,11 @@ class WeaponType extends BattleBase
 
     public function weaponDamage(Character $character, string $monsterName, int $weaponDamage)
     {
-
-        $weaponDamage = $this->getCriticalityDamage($character, $weaponDamage);
-
         $totalDamage = $weaponDamage - $weaponDamage * $this->attackData['damage_deduction'];
+
+        if ($this->isRaidBoss && $totalDamage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {
+            $totalDamage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
+        }
 
         $this->monsterHealth -= $totalDamage;
 
@@ -144,6 +147,7 @@ class WeaponType extends BattleBase
 
         $this->specialAttacks->setCharacterHealth($this->characterHealth)
             ->setMonsterHealth($this->monsterHealth)
+            ->setIsRaidBoss($this->isRaidBoss)
             ->doWeaponSpecials($character, $this->attackData);
 
         $this->mergeMessages($this->specialAttacks->getMessages());

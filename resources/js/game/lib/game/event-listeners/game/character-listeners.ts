@@ -3,6 +3,7 @@ import { inject, injectable } from "tsyringe";
 import CoreEventListener from "../core-event-listener";
 import Game from "../../../../game";
 import { Channel } from "laravel-echo";
+import { CharacterType } from "../../character/character-type";
 
 @injectable()
 export default class CharacterListeners implements GameListener {
@@ -11,6 +12,7 @@ export default class CharacterListeners implements GameListener {
 
     private characterTopBar?: Channel;
     private characterCurrencies?: Channel;
+    private characterInventoryCount?: Channel;
     private characterAttacks?: Channel;
     private characterStatus?: Channel;
     private characterRevive?: Channel;
@@ -21,7 +23,7 @@ export default class CharacterListeners implements GameListener {
         @inject(CoreEventListener) private coreEventListener: CoreEventListener,
     ) {}
 
-    initialize(component: Game, userId: number): void {
+    initialize(component: Game, userId?: number): void {
         this.component = component;
         this.userId = userId;
     }
@@ -37,6 +39,9 @@ export default class CharacterListeners implements GameListener {
             );
             this.characterCurrencies = echo.private(
                 "update-currencies-" + this.userId,
+            );
+            this.characterInventoryCount = echo.private(
+                "update-inventory-count-" + this.userId,
             );
             this.characterAttacks = echo.private(
                 "update-character-attacks-" + this.userId,
@@ -59,6 +64,7 @@ export default class CharacterListeners implements GameListener {
     listen(): void {
         this.listenToCharacterTopBar();
         this.listenToCurrencyUpdates();
+        this.listenToInventoryCountUpdate();
         this.listenToAttackDataUpdates();
         this.listenForCharacterStatusUpdates();
         this.listenForCharacterRevive();
@@ -122,6 +128,31 @@ export default class CharacterListeners implements GameListener {
                         ...this.component.state.character,
                         ...event.currencies,
                     },
+                });
+            },
+        );
+    }
+
+    protected listenToInventoryCountUpdate() {
+        if (!this.characterInventoryCount) {
+            return;
+        }
+
+        this.characterInventoryCount.listen(
+            "Game.Character.CharacterInventory.Events.CharacterInventoryCountUpdateBroadcaseEvent",
+            (event: any) => {
+                if (!this.component) {
+                    return;
+                }
+
+                this.component.setState({
+                    character: Object.assign(
+                        {},
+                        this.component.state.character,
+                        {
+                            inventory_count: event.characterInventoryCount,
+                        },
+                    ),
                 });
             },
         );

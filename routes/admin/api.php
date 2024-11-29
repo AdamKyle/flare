@@ -25,10 +25,9 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::post('/admin/create-multiple-events', ['uses' => 'Api\EventScheduleController@createMultipleEvents']);
 
     route::get('admin/map-manager/{gameMap}', ['uses' => 'Api\MapManagerController@getMapData']);
-    route::post('admin/map-manager/move-location/{location}', ['uses' => 'Api\MapManagerController@moveLocation']);
+    route::post('admin/map-manager/move/{gameMap}', ['uses' => 'Api\MapManagerController@moveLocation']);
 
     route::get('admin/fetch-survey/{survey}', ['uses' => 'Api\SurveyController@fetchSurvey']);
     route::post('admin/create-new-survey', ['uses' => 'Api\SurveyController@createSurvey']);
     route::post('admin/save-survey/{survey}', ['uses' => 'Api\SurveyController@saveSurvey']);
-
 });

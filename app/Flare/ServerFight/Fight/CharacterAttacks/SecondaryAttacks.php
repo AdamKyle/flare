@@ -71,6 +71,8 @@ class SecondaryAttacks extends BattleBase
             $resistance = $monster->getMonsterStat('affix_resistance');
         }
 
+        $this->affixes->setIsRaidBoss($this->isRaidBoss);
+
         $damage = $this->affixes->getCharacterAffixDamage($this->attackData, $resistance);
 
         $this->mergeMessages($this->affixes->getMessages());
@@ -114,6 +116,8 @@ class SecondaryAttacks extends BattleBase
         if ($this->isEnemyEntranced) {
             $this->affixes->setEntranced();
         }
+
+        $this->affixes->setIsRaidBoss($this->isRaidBoss);
 
         $lifeStealingDamage = $this->affixes->getAffixLifeSteal($character, $this->attackData, $this->monsterHealth, $resistance);
 

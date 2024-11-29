@@ -10,11 +10,10 @@ use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackType
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\CharacterMaxLevel;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Reincarnate\Values\MaxReincarnationStats;
 
 class CharacterReincarnateService
 {
-    const MAX_STATS = 9999999999;
-
     use CharacterMaxLevel, ResponseBuilder;
 
     private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
@@ -62,45 +61,46 @@ class CharacterReincarnateService
 
             $characterStat = $character->{$stat};
 
-            if ($characterStat >= self::MAX_STATS) {
+            if ($characterStat >= MaxReincarnationStats::MAX_STATS) {
                 continue;
             }
 
             $base = $baseStat->{$stat}() + $character->reincarnated_stat_increase;
-            $characterBonus = $characterStat * 0.20;
+
+            $characterBonus = $characterStat * 0.05;
             $base = $base + $characterBonus;
 
-            if ($base >= self::MAX_STATS) {
-                $base = self::MAX_STATS;
+            if ($base >= MaxReincarnationStats::MAX_STATS) {
+                $base = MaxReincarnationStats::MAX_STATS;
             }
 
             $updatedStats[$stat] = $base;
         }
 
         if (empty($updatedStats)) {
-            return $this->errorResult('You have maxed all stats to '.number_format(self::MAX_STATS).'.');
+            return $this->errorResult('You have maxed all stats to ' . number_format(MaxReincarnationStats::MAX_STATS) . '.');
         }
 
         $newReincarnatedStatBonus = $character->reincarnated_stat_increase + $characterBonus;
 
-        if ($newReincarnatedStatBonus > self::MAX_STATS) {
-            $newReincarnatedStatBonus = self::MAX_STATS;
+        if ($newReincarnatedStatBonus > MaxReincarnationStats::MAX_STATS) {
+            $newReincarnatedStatBonus = MaxReincarnationStats::MAX_STATS;
         }
 
         $timesReincarnated = $character->times_reincarnated + 1;
 
-        $baseXpPenalty = 0.05;
+        $baseXpPenalty = 0.10;
 
         if ($timesReincarnated >= 10 && $timesReincarnated < 25) {
-            $baseXpPenalty = 0.08;
+            $baseXpPenalty = 0.15;
         }
 
         if ($timesReincarnated >= 25 && $timesReincarnated < 50) {
-            $baseXpPenalty = 0.10;
+            $baseXpPenalty = 0.20;
         }
 
         if ($timesReincarnated >= 50) {
-            $baseXpPenalty = 0.12;
+            $baseXpPenalty = 0.25;
         }
 
         $xpPenalty = $character->xp_penalty + $baseXpPenalty;

@@ -6,7 +6,9 @@ use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Events\Handlers\BaseGlobalEventGoalParticipationHandler;
 use App\Game\Events\Values\EventType;
+use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGlobalEventGoal;
@@ -63,6 +65,48 @@ class BaseGlobalEventGoalParticipationHandlerTest extends TestCase
         $character = $character->refresh();
 
         $this->assertCount(0, $character->inventory->slots);
+    }
+
+    public function testPlayersInventoryIsFullWhenItComesToObtainingAReward()
+    {
+
+        Event::fake();
+
+        $item = $this->createItem([
+            'specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER,
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $character->update([
+            'inventory_max' => 1
+        ]);
+
+        $character = $character->refresh();
+
+        $globalEventGoal = $this->createGlobalEventGoal([
+            'max_kills' => 100,
+            'reward_every' => 10,
+            'next_reward_at' => 10,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'should_be_unique' => true,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'should_be_mythic' => false,
+        ]);
+
+        $this->createGlobalEventParticipation([
+            'global_event_goal_id' => $globalEventGoal->id,
+            'character_id' => $character->id,
+            'current_kills' => 500,
+            'current_crafts' => 0,
+        ]);
+
+        $this->baseGlobalEventGoalParticipationHandler->rewardCharactersParticipating($globalEventGoal);
+
+        Event::assertDispatched(ServerMessageEvent::class, function ($event) {
+            return $event->message === 'Child, your inventory is too full for you to be rewarded with any items for this event goal! You need to make some room.';
+        });
     }
 
     public function testPlayerIsRewardedWithUniqueItem()

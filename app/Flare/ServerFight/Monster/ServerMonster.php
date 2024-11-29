@@ -93,6 +93,11 @@ class ServerMonster
         return $this->monster['name'];
     }
 
+    public function isRaidBossMonster(): bool
+    {
+        return $this->monster['is_raid_boss'];
+    }
+
     public function getMonsterStat(string $key): mixed
     {
         return $this->monster[$key];

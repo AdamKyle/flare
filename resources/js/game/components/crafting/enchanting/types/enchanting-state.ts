@@ -1,3 +1,4 @@
+import InventoryCountDeffintion from "../../base-components/inventory-count/deffinitions/inventory-count-definition";
 import SkillXP from "../../base-components/skill-xp/deffinitions/skill-xp";
 
 export interface EnchantingState {
@@ -24,6 +25,8 @@ export interface EnchantingState {
     info_message: string | null;
 
     hide_enchanting_help: boolean;
+
+    inventory_count: InventoryCountDeffintion;
 }
 
 export type ItemToEnchant = {

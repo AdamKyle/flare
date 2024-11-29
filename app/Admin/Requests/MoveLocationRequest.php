@@ -27,6 +27,8 @@ class MoveLocationRequest extends FormRequest
     public function rules()
     {
         return [
+            'location_id' => 'nullable|integer',
+            'npc_id' => 'nullable|integer',
             'x' => 'required|integer',
             'y' => 'required|integer',
         ];

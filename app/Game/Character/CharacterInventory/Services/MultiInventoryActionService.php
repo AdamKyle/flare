@@ -2,14 +2,20 @@
 
 namespace App\Game\Character\CharacterInventory\Services;
 
+
+use Exception;
+use Facades\App\Flare\Calculators\SellItemCalculator;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Flare\Models\Character;
+use App\Flare\Models\InventorySlot;
+use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Builders\EquipManyBuilder;
 use App\Game\Character\CharacterInventory\Jobs\DisenchantMany;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Shop\Events\SellItemEvent;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\DisenchantService;
-use Exception;
-use Illuminate\Support\Facades\Cache;
 
 class MultiInventoryActionService
 {
@@ -22,6 +28,7 @@ class MultiInventoryActionService
         private readonly ShopService $shopService,
         private readonly DisenchantService $disenchantService,
         private readonly CharacterInventoryService $characterInventoryService,
+        private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler,
     ) {}
 
     public function moveManyItemsToSelectedSet(Character $character, int $setId, array $slotIds): array
@@ -51,7 +58,7 @@ class MultiInventoryActionService
         }
 
         return $this->successResult([
-            'message' => 'Moved all selected items to: '.$result['moved_to_set_name'].'.',
+            'message' => 'Moved all selected items to: ' . $result['moved_to_set_name'] . '.',
             'inventory' => $result['inventory'],
         ]);
     }
@@ -65,83 +72,116 @@ class MultiInventoryActionService
             return $this->errorResult($e->getMessage());
         }
 
-        $result = $this->successResult();
-
-        // Equip items
         foreach ($itemsToEquip as $toEquipItem) {
-            $result = $this->equipItemService->equipItem($character, [
-                'position' => $toEquipItem['position'],
-                'slot_id' => $toEquipItem['slot_id'],
-                'equip_type' => $toEquipItem['type'],
-            ]);
-
-            if ($result['status'] === 422) {
-                return $result;
-            }
+            $this->equipItem($character, $toEquipItem);
         }
 
-        return $result;
+        $character = $character->refresh();
+
+        $this->updateCharacterAttackTypesHandler->updateCache($character);
+
+        event(new UpdateCharacterInventoryCountEvent($character));
+
+        $characterInventoryService = $this->characterInventoryService->setCharacter($character);
+
+        return $this->successResult([
+            'message' => 'Equipped valid items to your character.',
+            'inventory' => $characterInventoryService->getInventoryForApi()
+        ]);
     }
 
     public function sellManyItems(Character $character, array $slotIds): array
     {
 
-        $result = $this->errorResult('Nothing happened when trying to sell many items. Did you select anything?');
+        $slots = $character->inventory->slots()
+            ->whereIn('id', $slotIds)
+            ->whereHas('item', function ($query) {
+                return $query->whereNotIn('type', ['alchemy', 'quest', 'artifact', 'trinket']);
+            })
+            ->where('equipped', false)
+            ->get();
 
-        $itemNames = [];
-        $soldFor = 0;
+        $totalSoldFor = 0;
 
-        foreach ($slotIds as $slotId) {
-            $result = $this->shopService->sellSpecificItem($character, $slotId);
-
-            if ($result['status'] === 422) {
-                return $result;
-            }
-
-            $itemNames[] = $result['item_name']; // Collect item names into an array
-            $soldFor += $result['sold_for'];
+        foreach ($slots as $slot) {
+            $totalSoldFor += $this->sellItem($character, $slot);
         }
 
-        $names = implode(', ', $itemNames); // Convert array of item names to a string
+        $character = $character->refresh();
+
+        event(new UpdateCharacterInventoryCountEvent($character));
 
         return $this->successResult([
-            'message' => 'Sold the following items: '.$names.' for a total of: '.number_format($soldFor).' Gold. (After 5% tax is taken)',
-            'inventory' => $result['inventory'],
+            'message' => 'Sold all items for: ' . number_format($totalSoldFor) . ' Gold (Minus 5% on each sale), With the exception of Trinkets and Artifacts to the shop. Check your server messages (below - select Server Messsages tab, or for mobile select Server Messages from the dropw down) for details!',
+            'inventory' => $this->characterInventoryService->setCharacter($character)->getInventoryForApi(),
         ]);
     }
 
     public function disenchantManyItems(Character $character, array $slotIds): array
     {
+        $filteredSlots = $character->inventory->slots
+            ->whereIn('id', $slotIds)
+            ->whereNotIn('item.type', ['alchemy', 'quest', 'trinket', 'artifact'])
+            ->where('equipped', false)
+            ->filter(function ($slot) {
+                return !is_null($slot->item->item_prefix_id) || !is_null($slot->item->item_suffix_id);
+            });
 
-        Cache::put('character-slots-to-disenchant-' . $character->id, $slotIds);
+        $itemIdsToDisenchant = $filteredSlots->pluck('item_id')->toArray();
+        $filteredSlotIds = $filteredSlots->pluck('id')->toArray();
 
-        DisenchantMany::dispatch($character, $slotIds);
+        $character->inventory->slots()->whereIn('id', $filteredSlotIds)->delete();
+
+        $character = $character->refresh();
+
+        DisenchantMany::dispatch($character, $itemIdsToDisenchant);
 
         return $this->successResult([
             'message' => 'Items are queued for disenchanting. Check Server Messages
             (Scroll down for desktop, click Serve Messages tab). If on mobile scroll down,
-            selected Server Messages from the Orange Chat Dropdown.'
+            selected Server Messages from the Orange Chat Dropdown.',
+            'inventory' => $this->characterInventoryService->setCharacter($character)->getInventoryForApi(),
         ]);
     }
 
     public function destroyManyItems(Character $character, array $slotIds): array
     {
-        $result = $this->errorResult('Nothing happened when trying to destroy many items. Did you select anything?');
 
-        $characterInventoryService = $this->characterInventoryService->setCharacter($character);
+        $character->inventory->slots()
+            ->whereIn('id', $slotIds)
+            ->whereHas('item', function ($query) {
+                return $query->whereNotIn('type', ['alchemy', 'quest', 'artifact']);
+            })
+            ->where('equipped', false)
+            ->delete();
 
-        foreach ($slotIds as $slotId) {
+        $character = $character->refresh();
 
-            $result = $characterInventoryService->deleteItem($slotId);
-
-            if ($result['status'] === 422) {
-                return $result;
-            }
-        }
+        event(new UpdateCharacterInventoryCountEvent($character));
 
         return $this->successResult([
-            'message' => 'Destroyed all selected items.',
-            'inventory' => $result['inventory'],
+            'message' => 'Destroyed all selected selected items (with exception of artifacts. You must manually delete these powerful items. Click the name, click delete and confirm you want to do this, if you have the item.)',
+            'inventory' => $this->characterInventoryService->setCharacter($character)->getInventoryForApi(),
         ]);
+    }
+
+    private function equipItem(Character $character, array $equipParams): void
+    {
+        $this->equipItemService->setRequest($equipParams)
+            ->setCharacter($character)
+            ->replaceItem();
+    }
+
+    private function sellItem(Character $character, InventorySlot $slot): int
+    {
+        $item = $slot->item;
+
+        $totalSoldFor = SellItemCalculator::fetchSalePriceWithAffixes($item);
+
+        event(new SellItemEvent($slot, $character));
+
+        ServerMessageHandler::sendBasicMessage($character->user, 'Sold item: ' . $item->affix_name . ' for: ' . number_format($totalSoldFor) . ' (Minus 5% tax) Gold! (Selling to a shop can never go above 2 billion gold for an individual item)');
+
+        return $totalSoldFor;
     }
 }

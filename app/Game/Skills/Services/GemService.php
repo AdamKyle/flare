@@ -7,6 +7,7 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\GemBagSlot;
 use App\Flare\Models\Skill;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Gems\Builders\GemBuilder;
@@ -134,11 +135,15 @@ class GemService
             return $foundGem->refresh();
         }
 
-        return $character->gemBag->gemSlots()->create([
+        $gemSlot = $character->gemBag->gemSlots()->create([
             'character_id' => $character->id,
             'gem_id' => $gem->id,
             'amount' => 1,
         ]);
+
+        event(new UpdateCharacterInventoryCountEvent($character));
+
+        return $gemSlot;
     }
 
     /**
