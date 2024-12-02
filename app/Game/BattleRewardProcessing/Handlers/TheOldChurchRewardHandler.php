@@ -72,7 +72,7 @@ class TheOldChurchRewardHandler
     /**
      * is the monster at least halfway down the list?
      */
-    protected function isMonsterAtLeastHalfWayOrMore(Location $location, Monster $monster): bool
+    private function isMonsterAtLeastHalfWayOrMore(Location $location, Monster $monster): bool
     {
 
         $monsters = Cache::get('monsters')[$location->name];
@@ -92,12 +92,12 @@ class TheOldChurchRewardHandler
      */
     public function currencyReward(Character $character, ?Event $event = null): Character
     {
-        $maximumAmount = 1000;
-        $maximumGold = 20000;
+        $maximumAmount = 1_000;
+        $maximumGold = 20_000;
 
         if (! is_null($event)) {
-            $maximumAmount = 3000;
-            $maximumGold = 40000;
+            $maximumAmount = 5_000;
+            $maximumGold = 40_000;
         }
 
         $goldDust = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
@@ -136,7 +136,7 @@ class TheOldChurchRewardHandler
      *
      * @throws Exception
      */
-    protected function handleItemReward(Character $character, ?Event $event = null): Character
+    private function handleItemReward(Character $character, ?Event $event = null): Character
     {
         $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->first()->skill_bonus;
         $maxRoll = 1_000;
@@ -168,7 +168,7 @@ class TheOldChurchRewardHandler
      *
      * @throws Exception
      */
-    protected function rewardForCharacter(Character $character)
+    private function rewardForCharacter(Character $character)
     {
         $item = Item::where('specialty_type', ItemSpecialtyType::CORRUPTED_ICE)
             ->whereNull('item_prefix_id')
@@ -204,7 +204,7 @@ class TheOldChurchRewardHandler
      *
      * @return void
      */
-    protected function createPossibleEvent()
+    private function createPossibleEvent()
     {
 
         if (Event::where('type', EventType::THE_OLD_CHURCH)->exists()) {

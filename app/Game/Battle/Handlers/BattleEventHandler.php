@@ -68,7 +68,7 @@ class BattleEventHandler
         $character = Character::find($characterId);
 
         if (is_null($monster)) {
-            Log::error('Missing Monster for id: '.$monsterId);
+            Log::error('Missing Monster for id: ' . $monsterId);
 
             return;
         }
@@ -96,12 +96,12 @@ class BattleEventHandler
             ]);
         }
 
-        $monsterFightCache = Cache::get('monster-fight-'.$character->id);
+        $monsterFightCache = Cache::get('monster-fight-' . $character->id);
 
         if (! is_null($monsterFightCache)) {
             $monsterFightCache['health']['current_character_health'] = $characterHealth;
 
-            Cache::put('monster-fight-'.$character->id, $monsterFightCache, 900);
+            Cache::put('monster-fight-' . $character->id, $monsterFightCache, 900);
         }
 
         event(new CharacterRevive($character->user, $characterHealth));

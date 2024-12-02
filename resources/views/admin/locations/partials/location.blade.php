@@ -61,9 +61,9 @@
             <li class="ml-4">Characters can get 1-1000 Gold Dust from fighting monsters. This can be increased to 5,000 if an event is triggered at this area.</li>
             <li class="ml-4">Characters can get 1-1000 Shards from fighting monsters. This can be increased to 5,000 if an event is triggered at this area.</li>
             <li class="ml-4">Characters can get 1-1000 Copper Coins<sup>*</sup> from fighting monsters. This can be increased to 5,000 if an event is triggered at this area.</li>
-            <li class="ml-4">There is a 1/1,000,000 chance to get a Purgatory Chain Legendary Unique from Monsters half way down the list of more. This can be reduced to 1/500,000 chance if an event is triggered at this area.</li>
-            <li class="ml-4">There is a 1/10,000,000 chance to get a Purgatory Chain Mythic from the last monster in the list. This can be reduced to 1/5,000,000 chance if an event is triggered at this area.</li>
-            <li class="ml-4">There is a 1/1,000,000 chance to trigger an event while fighting here to reduce the chances and increase the currencies (the above "if an event is triggered") for 1 hour at this location only.</li>
+            <li class="ml-4">There is a 1/1,000 chance to get a Purgatory Chain Unique from Monsters half way down the list of more. This can be reduced to 1/500 chance if an event is triggered at this area.</li>
+            <li class="ml-4">There is a 1/1,000 chance to get a Purgatory Chain Mythic from the last monster in the list. This can be reduced to 1/00 chance if an event is triggered at this area.</li>
+            <li class="ml-4">There is a 1/1,000 chance to trigger an event while fighting here to reduce the chances and increase the currencies (the above "if an event is triggered") for 1 hour at this location only.</li>
         </ul>
         <p class="mt-4 mb-4 italic"><sup>*</sup> Provided characters have the required quest item to obtain copper coins.</p>
     @endif
@@ -81,11 +81,10 @@
         <ul class="list-disc my-4">
             <li class="ml-4">Characters can get 1-1000 Gold Dust from fighting monsters. This can be increased to 5,000 if an event is triggered at this area.</li>
             <li class="ml-4">Characters can get 1-1000 Shards from fighting monsters. This can be increased to 5,000 if an event is triggered at this area.</li>
-            <li class="ml-4">Characters can get 1-20,000 Gold<sup>*</sup> from fighting monsters. This can be increased to 40,000 if an event is triggered at this area.</li>
-            <li class="ml-4">There is a 1/1,000,000 chance (+15% of your looting) to get a Medium Corrupted Ice <a href="/information/random-enchants" target="_blank">Medium Unique <i className="fas fa-external-link-alt"></i></a> from Monsters halfway down the list of more. This can be reduced to 1/500,000 (+30% Looting) chance if an event is triggered at this area.</li>
-            <li class="ml-4">There is a 1/1,000,000 chance to trigger an event while fighting here to reduce the chances and increase the currencies (the above "if an event is triggered") for 1 hour at this location only.</li>
+            <li class="ml-4">Characters can get 1-20,000 Gold from fighting monsters. This can be increased to 40,000 if an event is triggered at this area.</li>
+            <li class="ml-4">There is a 1/1,000 chance (+15% of your looting) to get a <a href="/information/unique-items" target="_blank">Unique <i className="fas fa-external-link-alt"></i></a> Corrupted Ice from Monsters halfway down the list of more. This can be reduced to 1/500 (+30% Looting) chance if an event is triggered at this area.</li>
+            <li class="ml-4">There is a 1/1,000 chance to trigger an event while fighting here to reduce the chances and increase the currencies (the above "if an event is triggered") for 1 hour at this location only.</li>
         </ul>
-        <p class="mt-4 mb-4 italic"><sup>*</sup> Provided characters have the required quest item to obtain copper coins.</p>
     @endif
 @endif
 

@@ -113,41 +113,38 @@ export default class LocationDetails extends React.Component<
                         true power of their character! Come now child, death
                         awaits!
                     </p>
-                    <ul className="list-disc">
+                    <ul className="list-disc my-4">
+                        <li className="ml-4">
+                            Characters can get 1-1000 Gold Dust from fighting
+                            monsters. This can be increased to 5,000 if an event
+                            is triggered at this area.
+                        </li>
+                        <li className="ml-4">
+                            Characters can get 1-1000 Shards from fighting
+                            monsters. This can be increased to 5,000 if an event
+                            is triggered at this area.
+                        </li>
                         <li className="ml-4">
                             Characters can get 1-20,000 Gold from fighting
                             monsters. This can be increased to 40,000 if an
                             event is triggered at this area.
                         </li>
                         <li className="ml-4">
-                            Characters can get 1-1000 Gold Dust from fighting
-                            monsters. This can be increased to 2,000 if an event
-                            is triggered at this area.
-                        </li>
-                        <li className="ml-4">
-                            Characters can get 1-1000 Shards from fighting
-                            monsters. This can be increased to 2,000 if an event
-                            is triggered at this area.
-                        </li>
-                        <li className="ml-4">
-                            There is a 1/1,000,000 (+15% Looting) chance to get
-                            a random{" "}
-                            <a
-                                href="/information/random-enchants"
-                                target="_blank"
-                            >
-                                Medium Unique{" "}
+                            There is a 1/1,000 chance (+15% of your looting) to
+                            get a{" "}
+                            <a href="/information/unique-items" target="_blank">
+                                Unique{" "}
                                 <i className="fas fa-external-link-alt"></i>
                             </a>{" "}
-                            from Monsters half way down the list of more. This
-                            can be reduced to 1/500,000 (+30% Looting) chance if
-                            an event is triggered at this area.
+                            Corrupted Ice from Monsters halfway down the list of
+                            more. This can be reduced to 1/500 (+30% Looting)
+                            chance if an event is triggered at this area.
                         </li>
                         <li className="ml-4">
-                            There is a 1/1,000,000 chance to trigger an event
-                            while fighting here to reduce the chances and
-                            increase the currencies (the above "if an event is
-                            triggered") for 1 hour at this location only.
+                            There is a 1/1,000 chance to trigger an event while
+                            fighting here to reduce the chances and increase the
+                            currencies (the above "if an event is triggered")
+                            for 1 hour at this location only.
                         </li>
                     </ul>
                 </Fragment>

@@ -33,8 +33,8 @@ class MonsterFightService
     public function setupMonster(Character $character, array $params): array
     {
 
-        Cache::delete('monster-fight-'.$character->id);
-        Cache::delete('character-sheet-'.$character->id);
+        Cache::delete('monster-fight-' . $character->id);
+        Cache::delete('character-sheet-' . $character->id);
 
         $data = $this->monsterPlayerFight->setUpFight($character, $params);
 
@@ -58,14 +58,14 @@ class MonsterFightService
             $this->battleEventHandler->processDeadCharacter($character, $monster);
         }
 
-        Cache::put('monster-fight-'.$character->id, $data, 900);
+        Cache::put('monster-fight-' . $character->id, $data, 900);
 
         return $this->successResult($data);
     }
 
     public function fightMonster(Character $character, string $attackType): array
     {
-        $cache = Cache::get('monster-fight-'.$character->id);
+        $cache = Cache::get('monster-fight-' . $character->id);
 
         if (! $this->isAtMonstersLocation($character, $cache['monster']['id'])) {
             return $this->errorResult('You are too far away from the monster. Move back to it\'s location');
@@ -100,10 +100,9 @@ class MonsterFightService
         $cache['messages'] = $this->monsterPlayerFight->getBattleMessages();
 
         if ($monsterHealth >= 0) {
-            Cache::put('monster-fight-'.$character->id, $cache, 900);
+            Cache::put('monster-fight-' . $character->id, $cache, 900);
         } else {
-            Cache::delete('monster-fight-'.$character->id);
-
+            Cache::delete('monster-fight-' . $character->id);
             BattleAttackHandler::dispatch($character->id, $this->monsterPlayerFight->getMonster()['id'])->onQueue('default_long')->delay(now()->addSeconds(2));
         }
 
@@ -118,7 +117,8 @@ class MonsterFightService
         if (! is_null($monster->only_for_location_type)) {
 
             $location = Location::where('type', $monster->only_for_location_type)->where(
-                'game_map_id', $character->map->game_map_id
+                'game_map_id',
+                $character->map->game_map_id
             )->where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
 
             if (is_null($location)) {
