@@ -74,14 +74,6 @@ return [
             'block_for' => null,
         ],
 
-        'character_daily' => [
-            'driver' => 'redis',
-            'connection' => 'character_daily',
-            'queue' => env('REDIS_QUEUE', 'default'),
-            'retry_after' => 90,
-            'block_for' => null,
-        ],
-
         'weekly_spawn' => [
             'driver' => 'redis',
             'connection' => 'weekly_spawn',
@@ -90,43 +82,11 @@ return [
             'block_for' => null,
         ],
 
-        'weekly_events' => [
-            'driver' => 'redis',
-            'connection' => 'weekly_events',
-            'queue' => env('REDIS_QUEUE', 'default'),
-            'retry_after' => 90,
-            'block_for' => null,
-        ],
-
-        'shop_buying' => [
-            'driver' => 'redis',
-            'connection' => 'shop_buying',
-            'queue' => env('REDIS_QUEUE', 'default'),
-            'retry_after' => 90,
-            'block_for' => null,
-        ],
-
-        'disenchanting' => [
-            'driver' => 'redis',
-            'connection' => 'disenchanting',
-            'queue' => 'default_long',
-            'retry_after' => 1200,
-            'block_for' => null,
-        ],
-
         'long_running' => [
             'driver' => 'redis',
             'connection' => 'default',
             'queue' => 'default_long',
-            'retry_after' => 1200, // Run for max 20 minutes
-            'block_for' => null,
-        ],
-
-        'npc_commands' => [
-            'driver' => 'redis',
-            'connection' => 'npc_commands',
-            'queue' => 'default_long',
-            'retry_after' => 1200, // Run for max 20 minutes
+            'retry_after' => 1200,
             'block_for' => null,
         ],
 

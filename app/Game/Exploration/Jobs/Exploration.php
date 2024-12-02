@@ -2,6 +2,12 @@
 
 namespace App\Game\Exploration\Jobs;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Monster;
@@ -9,18 +15,11 @@ use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
-use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
 use App\Game\Exploration\Events\ExplorationTimeOut;
-use App\Game\GuideQuests\Services\GuideQuestService;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Cache;
+
 
 class Exploration implements ShouldQueue
 {
@@ -42,10 +41,7 @@ class Exploration implements ShouldQueue
         $this->timeDelay = $timeDelay;
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function handle(MonsterPlayerFight $monsterPlayerFight, BattleEventHandler $battleEventHandler, FactionHandler $factionHandler, GuideQuestService $guideQuestService, CharacterCacheData $characterCacheData): void
+    public function handle(MonsterPlayerFight $monsterPlayerFight, BattleEventHandler $battleEventHandler, CharacterCacheData $characterCacheData): void
     {
 
         $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
@@ -96,19 +92,14 @@ class Exploration implements ShouldQueue
         event(new ExplorationTimeOut($this->character->user, 0));
     }
 
-    protected function sendOutEventLogUpdate(string $message, bool $makeItalic = false, bool $isReward = false): void
+    private function sendOutEventLogUpdate(string $message, bool $makeItalic = false, bool $isReward = false): void
     {
         if ($this->character->isLoggedIn()) {
             event(new ExplorationLogUpdate($this->character->user->id, $message, $makeItalic, $isReward));
         }
     }
 
-    /**
-     * Handle the encounter.
-     *
-     * @throws \Exception
-     */
-    protected function encounter(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params, int $timeDelay): bool
+    private function encounter(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params, int $timeDelay): bool
     {
 
         $canSurviveFights = $this->canSurviveFight($response, $automation, $battleEventHandler, $params);
@@ -136,7 +127,7 @@ class Exploration implements ShouldQueue
         return false;
     }
 
-    protected function canSurviveFight(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool
+    private function canSurviveFight(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool
     {
 
         if (Cache::has('can-character-survive-' . $this->character->id)) {
@@ -156,12 +147,7 @@ class Exploration implements ShouldQueue
         return true;
     }
 
-    /**
-     * Fight the monster in automation.
-     *
-     * @throws \Exception
-     */
-    protected function fightAutomationMonster(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool
+    private function fightAutomationMonster(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool
     {
         $fightResponse = $response->fightMonster();
 
@@ -186,10 +172,7 @@ class Exploration implements ShouldQueue
         return true;
     }
 
-    /**
-     * Should we bail on the automation?
-     */
-    protected function shouldBail(?CharacterAutomation $automation = null): bool
+    private function shouldBail(?CharacterAutomation $automation = null): bool
     {
 
         if (is_null($automation)) {
@@ -203,10 +186,7 @@ class Exploration implements ShouldQueue
         return false;
     }
 
-    /**
-     * Update the automation.
-     */
-    protected function updateAutomation(CharacterAutomation $automation): CharacterAutomation
+    private function updateAutomation(CharacterAutomation $automation): CharacterAutomation
     {
         if (! is_null($automation->move_down_monster_list_every)) {
             $characterLevel = $this->character->refresh()->level;
@@ -234,10 +214,7 @@ class Exploration implements ShouldQueue
         return $automation->refresh();
     }
 
-    /**
-     * End the automation.
-     */
-    protected function endAutomation(?CharacterAutomation $automation, CharacterCacheData $characterCacheData): void
+    private function endAutomation(?CharacterAutomation $automation, CharacterCacheData $characterCacheData): void
     {
         if (! is_null($automation)) {
             $automation->delete();
@@ -261,10 +238,7 @@ class Exploration implements ShouldQueue
         }
     }
 
-    /**
-     * Reward the player.
-     */
-    protected function rewardPlayer(Character $character): void
+    private function rewardPlayer(Character $character): void
     {
 
         $gold = $character->gold + 10000;

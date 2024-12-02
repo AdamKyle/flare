@@ -56,7 +56,7 @@ return [
 
     'prefix' => env(
         'HORIZON_PREFIX',
-        Str::slug(env('APP_NAME', 'laravel'), '_').'_horizon:'
+        Str::slug(env('APP_NAME', 'laravel'), '_') . '_horizon:'
     ),
 
     /*
@@ -183,46 +183,8 @@ return [
             'tries' => 2,
             'nice' => 0,
         ],
-        'supervisor-npcs' => [
-            'connection' => 'npc_commands',
-            'queue' => ['default'],
-            'balance' => 'auto',
-            'maxProcesses' => 1,
-            'tries' => 2,
-            'timeout' => 900,
-            'memory' => 128,
-            'nice' => 0,
-        ],
-        'supervisor-daily-characters' => [
-            'connection' => 'character_daily',
-            'queue' => ['default'],
-            'balance' => 'auto',
-            'maxProcesses' => 1,
-            'memory' => 128,
-            'tries' => 1,
-            'nice' => 0,
-        ],
         'supervisor-weekly-spawn' => [
             'connection' => 'weekly_spawn',
-            'queue' => ['default'],
-            'balance' => 'auto',
-            'maxProcesses' => 1,
-            'memory' => 128,
-            'tries' => 1,
-            'nice' => 0,
-        ],
-        'supervisor-disenchanting' => [
-            'connection' => 'disenchanting',
-            'queue' => ['default'],
-            'balance' => 'auto',
-            'maxProcesses' => 1,
-            'memory' => 128,
-            'tries' => 1,
-            'nice' => 0,
-            'timeout' => 900,
-        ],
-        'supervisor-shop-buying' => [
-            'connection' => 'shop_buying',
             'queue' => ['default'],
             'balance' => 'auto',
             'maxProcesses' => 1,
@@ -264,25 +226,6 @@ return [
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
-            'supervisor-disenchanting' => [
-                'connection' => 'disenchanting',
-                'queue' => ['default'],
-                'balance' => 'auto',
-                'maxProcesses' => 1,
-                'memory' => 128,
-                'tries' => 1,
-                'nice' => 0,
-                'timeout' => 900,
-            ],
-            'supervisor-shop-buying' => [
-                'connection' => 'shop_buying',
-                'queue' => ['default'],
-                'balance' => 'auto',
-                'maxProcesses' => 1,
-                'memory' => 128,
-                'tries' => 1,
-                'nice' => 0,
-            ],
             'supervisor-long-running' => [
                 'connection' => 'long_running',
                 'queue' => ['default_long'],
@@ -291,16 +234,6 @@ return [
                 'memory' => 128,
                 'tries' => 2,
                 'timeout' => 900,
-                'nice' => 0,
-            ],
-            'supervisor-npcs' => [
-                'connection' => 'npc_commands',
-                'queue' => ['default_long'],
-                'balance' => 'auto',
-                'maxProcesses' => 1,
-                'tries' => 2,
-                'timeout' => 900,
-                'memory' => 128,
                 'nice' => 0,
             ],
         ],
@@ -313,26 +246,8 @@ return [
                 'connection' => 'kingdom_jobs',
                 'maxProcesses' => 3,
             ],
-            'supervisor-daily-characters' => [
-                'connection' => 'character_daily',
-                'maxProcesses' => 3,
-            ],
             'supervisor-weekly-spawn' => [
                 'connection' => 'weekly_spawn',
-                'maxProcesses' => 3,
-            ],
-            'supervisor-disenchanting' => [
-                'connection' => 'disenchanting',
-                'queue' => ['default'],
-                'balance' => 'auto',
-                'maxProcesses' => 1,
-                'memory' => 128,
-                'tries' => 1,
-                'nice' => 0,
-                'timeout' => 900,
-            ],
-            'supervisor-shop-buying' => [
-                'connection' => 'shop_buying',
                 'maxProcesses' => 3,
             ],
             'supervisor-long-running' => [
@@ -345,17 +260,6 @@ return [
                 'timeout' => 900,
                 'nice' => 0,
             ],
-            'supervisor-npcs' => [
-                'connection' => 'npc_commands',
-                'queue' => ['default_long'],
-                'balance' => 'auto',
-                'maxProcesses' => 1,
-                'tries' => 2,
-                'timeout' => 900,
-                'memory' => 128,
-                'nice' => 0,
-            ],
-
         ],
     ],
 ];
