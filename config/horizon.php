@@ -176,7 +176,7 @@ return [
         ],
         'supervisor-kingdoms' => [
             'connection' => 'kingdom_jobs',
-            'queue' => ['default'],
+            'queue' => ['default_Long'],
             'balance' => 'auto',
             'maxProcesses' => 10,
             'memory' => 256,
@@ -185,7 +185,7 @@ return [
         ],
         'supervisor-weekly-spawn' => [
             'connection' => 'weekly_spawn',
-            'queue' => ['default'],
+            'queue' => ['default_long'],
             'balance' => 'auto',
             'maxProcesses' => 1,
             'memory' => 128,
@@ -207,21 +207,29 @@ return [
     'environments' => [
         'production' => [
             'supervisor-1' => [
+                'connection' => 'redis',
+                'queue' => ['default'],
                 'maxProcesses' => 10,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
             'supervisor-kingdoms' => [
+                'connection' => 'redis',
+                'queue' => ['default_long'],
                 'maxProcesses' => 10,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
             'supervisor-daily-characters' => [
+                'connection' => 'redis',
+                'queue' => ['default'],
                 'maxProcesses' => 10,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
             'supervisor-weekly-spawn' => [
+                'connection' => 'redis',
+                'queue' => ['default_long'],
                 'maxProcesses' => 10,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
