@@ -125,7 +125,7 @@ class CharacterRewardService
         $this->distributeCopperCoins($monster);
 
         $this->currencyEventReward($monster);
-        dump($this->character->isLoggedIn(), !$this->character->is_auto_battling);
+
         if (!$this->character->is_auto_battling && $this->character->isLoggedIn()) {
             event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
         }
