@@ -125,8 +125,8 @@ class CharacterRewardService
         $this->distributeCopperCoins($monster);
 
         $this->currencyEventReward($monster);
-
-        if (! $this->character->is_auto_battling && $this->character->isLoggedIn()) {
+        dump($this->character->isLoggedIn(), !$this->character->is_auto_battling);
+        if (!$this->character->is_auto_battling && $this->character->isLoggedIn()) {
             event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
         }
 
@@ -262,7 +262,7 @@ class CharacterRewardService
         $xp = XPCalculator::fetchXPFromMonster($monster, $this->character->level);
 
         if ($this->character->level >= $monster->max_level && $this->character->user->show_monster_to_low_level_message) {
-            ServerMessageHandler::sendBasicMessage($this->character->user, $monster->name.' has a max level of: '.number_format($monster->max_level).'. You are only getting 1/3rd of: '.number_format($monster->xp).' XP before all bonuses. Move down the list child.');
+            ServerMessageHandler::sendBasicMessage($this->character->user, $monster->name . ' has a max level of: ' . number_format($monster->max_level) . '. You are only getting 1/3rd of: ' . number_format($monster->xp) . ' XP before all bonuses. Move down the list child.');
 
             $addBonus = false;
         }

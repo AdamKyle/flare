@@ -73,7 +73,7 @@ class BattleEventHandler
             return;
         }
 
-        $this->battleRewardService->setUp($monster, $character)->handleBaseRewards();
+        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
 
         $this->secondaryRewardService->handleSecondaryRewards($character);
     }

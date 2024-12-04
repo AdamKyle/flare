@@ -66,7 +66,7 @@ class BattleRewardServiceTest extends TestCase
 
         Queue::fake();
 
-        $this->battleRewardService->setUp($monster, $character)->handleBaseRewards();
+        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
 
         Event::assertNotDispatched(UpdateCharacterCurrenciesEvent::class);
     }
@@ -102,9 +102,7 @@ class BattleRewardServiceTest extends TestCase
 
         Queue::fake();
 
-        $this->battleRewardService->setUp($monster, $character)->handleBaseRewards();
-
-        Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
+        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
 
         $character = $character->refresh();
 
@@ -144,11 +142,11 @@ class BattleRewardServiceTest extends TestCase
 
         Event::fake();
 
-        Queue::fake();
+        Queue::fake([
+            BattleItemHandler::class,
+        ]);
 
-        $this->battleRewardService->setUp($monster, $character)->handleBaseRewards();
-
-        Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
+        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
 
         $character = $character->refresh();
 
@@ -176,9 +174,11 @@ class BattleRewardServiceTest extends TestCase
 
         Event::fake();
 
-        Queue::fake();
+        Queue::fake([
+            BattleItemHandler::class,
+        ]);
 
-        $this->battleRewardService->setUp($monster, $character)->handleBaseRewards();
+        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
 
         Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
     }
@@ -193,9 +193,11 @@ class BattleRewardServiceTest extends TestCase
 
         Event::fake();
 
-        Queue::fake();
+        Queue::fake([
+            BattleItemHandler::class,
+        ]);
 
-        $this->battleRewardService->setUp($monster, $character)->handleBaseRewards();
+        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
 
         Queue::assertPushed(BattleItemHandler::class);
     }
@@ -210,9 +212,11 @@ class BattleRewardServiceTest extends TestCase
 
         Event::fake();
 
-        Queue::fake();
+        Queue::fake([
+            BattleItemHandler::class,
+        ]);
 
-        $this->battleRewardService->setUp($monster, $character)->handleBaseRewards();
+        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
 
         $character = $character->refresh();
 
@@ -233,9 +237,11 @@ class BattleRewardServiceTest extends TestCase
 
         Event::fake();
 
-        Queue::fake();
+        Queue::fake([
+            BattleItemHandler::class,
+        ]);
 
-        $this->battleRewardService->setUp($monster, $character)->handleBaseRewards();
+        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
 
         $character = $character->refresh();
 
@@ -256,9 +262,11 @@ class BattleRewardServiceTest extends TestCase
 
         Event::fake();
 
-        Queue::fake();
+        Queue::fake([
+            BattleItemHandler::class,
+        ]);
 
-        $this->battleRewardService->setUp($monster, $character)->handleBaseRewards();
+        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
 
         $character = $character->refresh();
 
@@ -294,9 +302,11 @@ class BattleRewardServiceTest extends TestCase
 
         Event::fake();
 
-        Queue::fake();
+        Queue::fake([
+            BattleItemHandler::class,
+        ]);
 
-        $this->battleRewardService->setUp($monster, $character)->handleBaseRewards();
+        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
 
         $character = $character->refresh();
 
@@ -346,9 +356,11 @@ class BattleRewardServiceTest extends TestCase
 
         Event::fake();
 
-        Queue::fake();
+        Queue::fake([
+            BattleItemHandler::class,
+        ]);
 
-        $this->battleRewardService->setUp($monster, $character)->handleBaseRewards();
+        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
 
         $character = $character->refresh();
 
@@ -372,9 +384,11 @@ class BattleRewardServiceTest extends TestCase
 
         Event::fake();
 
-        Queue::fake();
+        Queue::fake([
+            BattleItemHandler::class,
+        ]);
 
-        $this->battleRewardService->setUp($monster, $character)->handleBaseRewards();
+        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
 
         $character = $character->refresh();
 

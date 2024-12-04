@@ -69,7 +69,7 @@ return [
         'kingdom_jobs' => [
             'driver' => 'redis',
             'connection' => 'kingdom_jobs',
-            'queue' => env('REDIS_QUEUE', 'default'),
+            'queue' => 'kingdom_jobs',
             'retry_after' => 90,
             'block_for' => null,
         ],
@@ -77,8 +77,64 @@ return [
         'weekly_spawn' => [
             'driver' => 'redis',
             'connection' => 'weekly_spawn',
-            'queue' => env('REDIS_QUEUE', 'default'),
+            'queue' => 'weekly_spawn',
             'retry_after' => 90,
+            'block_for' => null,
+        ],
+
+        'battle_reward_xp' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+            'queue' => 'battle_reward_xp',
+            'retry_after' => 1200,
+            'block_for' => null,
+        ],
+
+        'battle_reward_currencies' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+            'queue' => 'battle_reward_currencies',
+            'retry_after' => 1200,
+            'block_for' => null,
+        ],
+
+        'battle_reward_factions' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+            'queue' => 'battle_reward_factions',
+            'retry_after' => 1200,
+            'block_for' => null,
+        ],
+
+        'battle_reward_global_event' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+            'queue' => 'battle_reward_global_event',
+            'retry_after' => 1200,
+            'block_for' => null,
+        ],
+
+        'battle_reward_location_handlers' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+            'queue' => 'battle_reward_location_handlers',
+            'retry_after' => 1200,
+            'block_for' => null,
+        ],
+
+        'battle_reward_weekly_fights' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+            'queue' => 'battle_reward_weekly_fights',
+            'retry_after' => 1200,
+            'block_for' => null,
+        ],
+
+        'battle_reward_item_handler' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+            'queue' => 'battle_reward_item_handler',
+            'retry_after' => 1200,
             'block_for' => null,
         ],
 
@@ -91,6 +147,7 @@ return [
         ],
 
     ],
+
 
     /*
     |--------------------------------------------------------------------------
