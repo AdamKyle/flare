@@ -2,8 +2,10 @@
 
 namespace App\Flare\Services;
 
+use Exception;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
 use App\Flare\Models\Character;
-use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
@@ -24,11 +26,9 @@ use App\Game\Core\Services\CharacterService;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\SkillService;
-use Exception;
 use Facades\App\Flare\Calculators\XPCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
+
 
 class CharacterRewardService
 {
@@ -192,7 +192,7 @@ class CharacterRewardService
     /**
      * Handle instances where we could have multiple level ups.
      */
-    protected function handleLevelUps(int $leftOverXP, bool $shouldBuildCache = false): void
+    private function handleLevelUps(int $leftOverXP, bool $shouldBuildCache = false): void
     {
 
         $this->handleCharacterLevelUp($leftOverXP, $shouldBuildCache);
@@ -249,7 +249,7 @@ class CharacterRewardService
      *
      * @throws Exception
      */
-    protected function distributeXP(Monster $monster)
+    private function distributeXP(Monster $monster)
     {
 
         $addBonus = true;
@@ -308,7 +308,7 @@ class CharacterRewardService
      *
      * @return void
      */
-    protected function updateCharacterStats(Character $character)
+    private function updateCharacterStats(Character $character)
     {
         $characterData = new Item($character, $this->characterSheetBaseInfoTransformer);
         $characterData = $this->manager->createData($characterData)->toArray();
@@ -323,7 +323,7 @@ class CharacterRewardService
      *
      * @throws Exception
      */
-    protected function distributeGold(Monster $monster)
+    private function distributeGold(Monster $monster)
     {
         $newGold = $this->character->gold + $monster->gold;
 
@@ -343,7 +343,7 @@ class CharacterRewardService
      *
      * @throws Exception
      */
-    protected function distributeCopperCoins(Monster $monster)
+    private function distributeCopperCoins(Monster $monster)
     {
         $copperCoinsItem = ItemModel::where('effect', ItemEffectsValue::GET_COPPER_COINS)->first();
         $mercenarySlotBonusItem = ItemModel::where('effect', ItemEffectsValue::MERCENARY_SLOT_BONUS)->first();
@@ -390,7 +390,7 @@ class CharacterRewardService
     /**
      * Are we at a location with an effect (special location)?
      */
-    protected function purgatoryDungeons(Map $map): ?Location
+    private function purgatoryDungeons(Map $map): ?Location
     {
         return Location::whereNotNull('enemy_strength_type')
             ->where('x', $map->character_position_x)
