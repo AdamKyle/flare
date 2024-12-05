@@ -8,6 +8,7 @@ use App\Flare\Models\Monster;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Events\CharacterRevive;
 use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
@@ -57,25 +58,18 @@ class BattleEventHandler
     }
 
     /**
-     * Process the fact the monster has died.
+     * Processes what we should do when the monster dies.
      *
-     * @throws Exception
+     * - Handles rewarding the player
+     *
+     * @param integer $characterId
+     * @param integer $monsterId
+     * @param boolean $includeXp
+     * @return void
      */
-    public function processMonsterDeath(int $characterId, int $monsterId): void
+    public function processMonsterDeath(int $characterId, int $monsterId, bool $includeXp = true): void
     {
-        $monster = Monster::find($monsterId);
-
-        $character = Character::find($characterId);
-
-        if (is_null($monster)) {
-            Log::error('Missing Monster for id: ' . $monsterId);
-
-            return;
-        }
-
-        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
-
-        $this->secondaryRewardService->handleSecondaryRewards($character);
+        $this->battleRewardService->setUp($characterId, $monsterId)->handleBaseRewards($includeXp);
     }
 
     /**

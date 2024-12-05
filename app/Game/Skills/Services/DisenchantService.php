@@ -13,6 +13,7 @@ use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\CraftingMessageTypes;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -131,7 +132,7 @@ class DisenchantService
         if ($disenchanted) {
             $goldDust = $this->updateGoldDust($this->character);
 
-            ServerMessageHandler::handleMessage($this->character->user, 'disenchanted', number_format($goldDust));
+            ServerMessageHandler::handleMessage($this->character->user, CraftingMessageTypes::DISENCHANTED, number_format($goldDust));
 
             event(new UpdateSkillEvent($this->disenchantingSkill));
         } else {
@@ -177,7 +178,7 @@ class DisenchantService
         if ($canDisenchant) {
             $goldDust = $this->updateGoldDust($this->character);
 
-            ServerMessageHandler::handleMessage($this->character->user, 'disenchanted', number_format($goldDust));
+            ServerMessageHandler::handleMessage($this->character->user, CraftingMessageTypes::DISENCHANTED, number_format($goldDust));
 
             event(new UpdateSkillEvent($this->disenchantingSkill));
 

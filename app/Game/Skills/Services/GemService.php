@@ -12,6 +12,7 @@ use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Gems\Builders\GemBuilder;
 use App\Game\Gems\Values\GemTierValue;
+use App\Game\Messages\Types\CraftingMessageTypes;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Values\SkillTypeValue;
 use Exception;
@@ -64,7 +65,7 @@ class GemService
             event(new UpdateSkillEvent($characterSkill));
         }
 
-        ServerMessageHandler::handleMessage($character->user, 'crafted_gem', $gemBagEntry->gem->name, $gemBagEntry->id);
+        ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::CRAFTED_GEM, $gemBagEntry->gem->name, $gemBagEntry->id);
 
         return $this->successResult();
     }

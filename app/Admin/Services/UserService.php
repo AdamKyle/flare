@@ -10,6 +10,7 @@ use App\Flare\Jobs\UpdateSilencedUserJob;
 use App\Flare\Models\User;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Messages\Types\CharacterMessageTypes;
 use Carbon\Carbon;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
@@ -86,9 +87,9 @@ class UserService
 
         $user = $user->refresh();
 
-        $message = 'The creator has silenced you until: '.$canSpeakAgainAt->format('Y-m-d H:i:s').' ('.(int) $silenceFor.' Minutes server time) Making accounts to get around this is a bannable offense.';
+        $message = 'The creator has silenced you until: ' . $canSpeakAgainAt->format('Y-m-d H:i:s') . ' (' . (int) $silenceFor . ' Minutes server time) Making accounts to get around this is a bannable offense.';
 
-        ServerMessageHandler::handleMessage($user, 'silenced', $message);
+        ServerMessageHandler::handleMessage($user, CharacterMessageTypes::SILENCED, $message);
 
         event(new UpdateTopBarEvent($user->character));
 
@@ -113,7 +114,7 @@ class UserService
      */
     public function broadCastAdminMessage(User $user): void
     {
-        $message = $user->character->name.' Sees the sky open and lightening comes hurtling down, striking the earth - cracking the air for miles around! They have been smitten by the hand of The Creator!';
+        $message = $user->character->name . ' Sees the sky open and lightening comes hurtling down, striking the earth - cracking the air for miles around! They have been smitten by the hand of The Creator!';
 
         event(new GlobalMessageEvent($message));
     }
@@ -127,8 +128,8 @@ class UserService
     {
         event(new RefreshUserScreenEvent($user));
 
-        $unBannedAt = ! is_null($unBanAt) ? $unBanAt->format('l jS \\of F Y h:i:s A').' '.$unBanAt->timezoneName.'.' : 'Forever.';
-        $message = 'You have been banned until: '.$unBannedAt.' For the reason of: '.$user->banned_reason;
+        $unBannedAt = ! is_null($unBanAt) ? $unBanAt->format('l jS \\of F Y h:i:s A') . ' ' . $unBanAt->timezoneName . '.' : 'Forever.';
+        $message = 'You have been banned until: ' . $unBannedAt . ' For the reason of: ' . $user->banned_reason;
 
         BanEmail::dispatch($user, $message)->delay(now()->addMinutes(1));
     }

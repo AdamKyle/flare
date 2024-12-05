@@ -9,6 +9,7 @@ use App\Flare\Models\User;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
+use App\Game\Messages\Types\KingdomMessageTypes;
 use Facades\App\Flare\Values\UserOnlineValue;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Bus\Queueable;
@@ -89,10 +90,10 @@ class RebuildBuilding implements ShouldQueue
             $y = $kingdom->y_position;
             $plane = $kingdom->gameMap->name;
 
-            $message = $this->building->name.' finished being rebuilt for kingdom: '.
-                $this->building->kingdom->name.' on plane: '.$plane.' At: (X/Y) '.$x.'/'.$y.'.';
+            $message = $this->building->name . ' finished being rebuilt for kingdom: ' .
+                $this->building->kingdom->name . ' on plane: ' . $plane . ' At: (X/Y) ' . $x . '/' . $y . '.';
 
-            ServerMessageHandler::handleMessage($this->user, 'building_repair_finished', $message);
+            ServerMessageHandler::handleMessage($this->user, KingdomMessageTypes::BUILDING_REPAIR_FINISHED, $message);
         }
 
         if (! is_null($this->capitalCityBuildingQueueId)) {

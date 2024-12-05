@@ -12,9 +12,11 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Monster;
 use App\Flare\ServerFight\MonsterPlayerFight;
+use App\Flare\Services\CharacterRewardService;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\BattleRewardProcessing\Jobs\ExplorationXpHandler;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
@@ -26,6 +28,8 @@ class Exploration implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public Character $character;
+
+    private CharacterRewardService $characterRewardService;
 
     private int $automationId;
 
@@ -41,8 +45,14 @@ class Exploration implements ShouldQueue
         $this->timeDelay = $timeDelay;
     }
 
-    public function handle(MonsterPlayerFight $monsterPlayerFight, BattleEventHandler $battleEventHandler, CharacterCacheData $characterCacheData): void
-    {
+    public function handle(
+        MonsterPlayerFight $monsterPlayerFight,
+        BattleEventHandler $battleEventHandler,
+        CharacterCacheData $characterCacheData,
+        CharacterRewardService $characterRewardService
+    ): void {
+
+        $this->characterRewardService = $characterRewardService;
 
         $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
 
@@ -113,9 +123,17 @@ class Exploration implements ShouldQueue
             $this->sendOutEventLogUpdate('"Chirst, child there are: ' . $enemies . ' of them ..."
             The Guide hisses at you from the shadows. You ignore his words and prepare for battle. One right after the other ...', true);
 
+            $monster = Monster::find($params['selected_monster_id']);
+            $totalXpToReward = 0;
+            $characterRewardService = $this->characterRewardService->setCharacter($this->character);
+
             for ($i = 1; $i <= $enemies; $i++) {
-                $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id']);
+                $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], false);
+
+                $totalXpToReward += $characterRewardService->fetchXpForMonster($monster);
             }
+
+            ExplorationXpHandler::dispatch($this->character->id, $totalXpToReward)->onQueue('exploration_battle_xp_reward')->delay(now()->addSeconds(2));
 
             $this->sendOutEventLogUpdate('The last of the enemies fall. Covered in blood, exhausted, you look around for any signs of more of their friends. The area is silent. "Another day, another battle.
             We managed to survive." The Guide states as he walks from the shadows. The pair of you set off in search of the next adventure ...
@@ -136,11 +154,19 @@ class Exploration implements ShouldQueue
 
         $this->sendOutEventLogUpdate('"Child, I can see a small group of these creature. If we slaughter them we might learn something." The guide insists. "Theres ten of them. Quick, kill them. We will continue the hunt!"');
 
+        $monster = Monster::find($params['selected_monster_id']);
+        $totalXpToReward = 0;
+        $characterRewardService = $this->characterRewardService->setCharacter($this->character);
+
         for ($i = 1; $i <= 10; $i++) {
-            if (! $this->fightAutomationMonster($response, $automation, $battleEventHandler, $params)) {
+            if (!$this->fightAutomationMonster($response, $automation, $battleEventHandler, $params)) {
                 return false;
             }
+
+            $totalXpToReward += $characterRewardService->fetchXpForMonster($monster);
         }
+
+        ExplorationXpHandler::dispatch($this->character->id, $totalXpToReward)->onQueue('exploration_battle_xp_reward')->delay(now()->addSeconds(2));
 
         Cache::put('can-character-survive-' . $this->character->id, true);
 
@@ -167,7 +193,7 @@ class Exploration implements ShouldQueue
 
         $response->resetBattleMessages();
 
-        $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id']);
+        $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], false);
 
         return true;
     }

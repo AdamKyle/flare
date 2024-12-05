@@ -25,6 +25,8 @@ use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\CharacterMessageTypes;
+use App\Game\Messages\Types\MessageType;
 use App\Game\Skills\Services\SkillService;
 use Facades\App\Flare\Calculators\XPCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -64,7 +66,7 @@ class CharacterRewardService
     /**
      * Set the character.
      *
-     * @return $this
+     * @return CharacterRewardService
      */
     public function setCharacter(Character $character): CharacterRewardService
     {
@@ -82,21 +84,31 @@ class CharacterRewardService
     {
         $this->distributeXP($monster);
 
-        if ($this->character->xp >= $this->character->xp_next) {
-            $leftOverXP = $this->character->xp - $this->character->xp_next;
-
-            if ($leftOverXP > 0) {
-                $this->handleLevelUps($leftOverXP);
-            }
-
-            if ($leftOverXP <= 0) {
-                $this->handleCharacterLevelUp(0);
-            }
-        }
+        $this->handleLevelUp();
 
         if (! $this->character->isLoggedIn()) {
             event(new UpdateTopBarEvent($this->character->refresh()));
         }
+
+        return $this;
+    }
+
+    /**
+     * Distribute a specific amount of XP
+     *
+     * @param integer $xp
+     * @return CharacterRewardService
+     */
+    public function distributeSpecifiedXp(int $xp): CharacterRewardService
+    {
+
+        $this->character->update([
+            'xp' => $xp,
+        ]);
+
+        $this->character = $this->character->refresh();
+
+        $this->handleLevelUp();
 
         return $this;
     }
@@ -190,9 +202,32 @@ class CharacterRewardService
     }
 
     /**
+     * Handle possible level up.
+     *
+     * Takes into account XP over flow.
+     *
+     * @param Character $character
+     * @return void
+     */
+    private function handleLevelUp(): void
+    {
+        if ($this->character->xp >= $this->character->xp_next) {
+            $leftOverXP = $this->character->xp - $this->character->xp_next;
+
+            if ($leftOverXP > 0) {
+                $this->handleMultipleLevelUps($leftOverXP);
+            }
+
+            if ($leftOverXP <= 0) {
+                $this->handleCharacterLevelUp(0);
+            }
+        }
+    }
+
+    /**
      * Handle instances where we could have multiple level ups.
      */
-    private function handleLevelUps(int $leftOverXP, bool $shouldBuildCache = false): void
+    private function handleMultipleLevelUps(int $leftOverXP, bool $shouldBuildCache = false): void
     {
 
         $this->handleCharacterLevelUp($leftOverXP, $shouldBuildCache);
@@ -201,11 +236,11 @@ class CharacterRewardService
             $leftOverXP = $this->character->xp - $this->character->xp_next;
 
             if ($leftOverXP > 0) {
-                $this->handleLevelUps($leftOverXP, false);
+                $this->handleMultipleLevelUps($leftOverXP, false);
             }
 
             if ($leftOverXP <= 0) {
-                $this->handleLevelUps(0, true);
+                $this->handleMultipleLevelUps(0, true);
             }
         }
 
@@ -239,23 +274,43 @@ class CharacterRewardService
             $this->updateCharacterStats($character);
         }
 
-        ServerMessageHandler::handleMessage($character->user, 'level_up', $character->level);
+        ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::LEVEL_UP, $character->level);
     }
 
     /**
      * Assigns XP to the character.
      *
      * @return void
-     *
-     * @throws Exception
      */
-    private function distributeXP(Monster $monster)
+    private function distributeXP(Monster $monster): void
     {
 
+        $xp = $this->fetchXpForMonster($monster);
+
+        $this->character->update([
+            'xp' => $xp,
+        ]);
+
+        $this->character = $this->character->refresh();
+    }
+
+    /**
+     * Fetch the xp for the monster
+     *
+     * - Can return 0 if we cannot gain xp.
+     * - Can return 0 if the xp we would gain is 0.
+     * - Takes into account skills in training
+     * - Takes into account Xp Bonuses such as items (Alchemy and quest)
+     *
+     * @param Monster $monster
+     * @return integer
+     */
+    public function fetchXpForMonster(Monster $monster): int
+    {
         $addBonus = true;
 
         if (!$this->characterXpService->canCharacterGainXP($this->character)) {
-            return;
+            return 0;
         }
 
         // Reduce The XP from the monster if needed.
@@ -287,20 +342,10 @@ class CharacterRewardService
         }
 
         if ($xp === 0) {
-            return;
+            return 0;
         }
 
-        $xp = $this->getXpWithBonuses($xp);
-
-        $characterXp = (int) $this->character->xp;
-
-        $xp = $characterXp + $xp;
-
-        $this->character->update([
-            'xp' => $xp,
-        ]);
-
-        $this->character = $this->character->refresh();
+        return $this->getXpWithBonuses($xp);
     }
 
     /**

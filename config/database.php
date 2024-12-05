@@ -185,7 +185,7 @@ return [
             'database' => 4,
         ],
 
-        'battle_reward_currencies' => [
+        'exploration_battle_xp_reward' => [
             'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
@@ -193,7 +193,7 @@ return [
             'database' => 5,
         ],
 
-        'battle_reward_factions' => [
+        'battle_reward_currencies' => [
             'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
@@ -201,8 +201,7 @@ return [
             'database' => 6,
         ],
 
-
-        'battle_reward_global_event' => [
+        'battle_reward_factions' => [
             'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
@@ -210,7 +209,7 @@ return [
             'database' => 7,
         ],
 
-        'battle_reward_location_handlers' => [
+        'battle_reward_global_event' => [
             'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
@@ -218,7 +217,7 @@ return [
             'database' => 8,
         ],
 
-        'battle_reward_weekly_fights' => [
+        'battle_reward_location_handlers' => [
             'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
@@ -226,7 +225,7 @@ return [
             'database' => 9,
         ],
 
-        'battle_reward_item_handler' => [
+        'battle_reward_weekly_fights' => [
             'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
@@ -234,12 +233,20 @@ return [
             'database' => 10,
         ],
 
-        'long_running' => [
+        'battle_reward_item_handler' => [
             'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => 11,
+        ],
+
+        'long_running' => [
+            'url' => env('REDIS_URL'),
+            'host' => env('REDIS_HOST', '127.0.0.1'),
+            'password' => env('REDIS_PASSWORD', null),
+            'port' => env('REDIS_PORT', 6379),
+            'database' => 12,
         ],
 
     ],

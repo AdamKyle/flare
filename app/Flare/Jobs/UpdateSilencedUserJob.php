@@ -5,6 +5,7 @@ namespace App\Flare\Jobs;
 use App\Admin\Events\UpdateAdminChatEvent;
 use App\Flare\Models\User;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Messages\Types\CharacterMessageTypes;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -43,7 +44,7 @@ class UpdateSilencedUserJob implements ShouldQueue
 
         $user = $this->user->refresh(0);
 
-        ServerMessageHandler::handleMessage($user, 'silenced', $forMessage);
+        ServerMessageHandler::handleMessage($user, CharacterMessageTypes::SILENCED, $forMessage);
 
         event(new UpdateTopBarEvent($user->character));
 

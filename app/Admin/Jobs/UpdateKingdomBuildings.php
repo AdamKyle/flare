@@ -5,6 +5,7 @@ namespace App\Admin\Jobs;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
+use App\Game\Messages\Types\KingdomMessageTypes;
 use Facades\App\Flare\Values\UserOnlineValue;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Bus\Queueable;
@@ -61,10 +62,10 @@ class UpdateKingdomBuildings implements ShouldQueue
                     if (! is_null($kingdom->character)) {
                         $user = $kingdom->character->user;
 
-                        $message = 'Kingdom: '.$kingdom->name.' gained a new building: '.$this->gameBuilding->name;
+                        $message = 'Kingdom: ' . $kingdom->name . ' gained a new building: ' . $this->gameBuilding->name;
 
                         if (UserOnlineValue::isOnline($user)) {
-                            ServerMessageHandler::handleMessage($user, 'new_building', $message);
+                            ServerMessageHandler::handleMessage($user, KingdomMessageTypes::NEW_BUILDING, $message);
                         }
                     }
                 }

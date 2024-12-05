@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\SmeltingProgress;
 use App\Game\Kingdoms\Service\UpdateKingdom;
+use App\Game\Messages\Types\KingdomMessageTypes;
 use Facades\App\Flare\Values\UserOnlineValue;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Bus\Queueable;
@@ -82,11 +83,11 @@ class SmeltSteel implements ShouldQueue
         if (UserOnlineValue::isOnline($user)) {
 
             if ($user->show_unit_recruitment_messages) {
-                $message = 'kingdom: '.$kingdom->name.' on plane: '.$plane.' at: (X/Y) '.$x.'/'.$y.
-                    ' has finished smelting: '.number_format($amount).' of steel and now has: '.
-                    number_format($kingdom->current_steel).' steel.';
+                $message = 'kingdom: ' . $kingdom->name . ' on plane: ' . $plane . ' at: (X/Y) ' . $x . '/' . $y .
+                    ' has finished smelting: ' . number_format($amount) . ' of steel and now has: ' .
+                    number_format($kingdom->current_steel) . ' steel.';
 
-                ServerMessageHandler::handleMessage($user, 'unit_recruitment_finished', $message);
+                ServerMessageHandler::handleMessage($user, KingdomMessageTypes::UNIT_RECRUITMENT_FINISHED, $message);
             }
         }
     }

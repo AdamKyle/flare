@@ -3,6 +3,14 @@
 namespace Tests\Unit\Game\Messages\Builder;
 
 use App\Game\Messages\Builders\ServerMessageBuilder;
+use App\Game\Messages\Types\AdminMessageTypes;
+use App\Game\Messages\Types\CharacterMessageTypes;
+use App\Game\Messages\Types\CraftingMessageTypes;
+use App\Game\Messages\Types\CurrenciesMessageType;
+use App\Game\Messages\Types\KingdomMessageTypes;
+use App\Game\Messages\Types\LotteryMessageType;
+use App\Game\Messages\Types\MessageType;
+use App\Game\Messages\Types\MovementMessageTypes;
 use Tests\TestCase;
 
 class ServerMessageBuilderTest extends TestCase
@@ -206,7 +214,7 @@ class ServerMessageBuilderTest extends TestCase
 
     public function testGoldCapped()
     {
-        $message = $this->serverMessageBuilder->build('gold_capped');
+        $message = $this->serverMessageBuilder->build(CurrenciesMessageType::GOLD_CAPPED);
 
         $this->assertEquals('Gold Rush! You are now gold capped!', $message);
     }
@@ -241,21 +249,21 @@ class ServerMessageBuilderTest extends TestCase
 
     public function testLevelUpCharacter()
     {
-        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('level_up', 1);
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation(MessageType::LEVEL_UP, 1);
 
         $this->assertEquals('You are now level: 1!', $message);
     }
 
     public function testGoldRush()
     {
-        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('gold_rush', 1);
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation(CurrenciesMessageType::GOLD_RUSH, 1);
 
         $this->assertEquals('Gold Rush! Your gold is now: 1 Gold! 5% of your total gold has been awarded to you.', $message);
     }
 
     public function testCrafted()
     {
-        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('crafted', 'Test');
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation(CraftingMessageTypes::CRAFTED, 'Test');
 
         $this->assertEquals('You crafted a: Test!', $message);
     }
@@ -269,112 +277,112 @@ class ServerMessageBuilderTest extends TestCase
 
     public function testDisenchanted()
     {
-        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('disenchanted', 'Test');
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation(CraftingMessageTypes::DISENCHANTED, 'Test');
 
         $this->assertEquals('Disenchanted the item and got: Test Gold Dust.', $message);
     }
 
     public function testLottoMax()
     {
-        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('lotto_max', 'Test');
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation(LotteryMessageType::LOTTO_MAX, 'Test');
 
         $this->assertEquals('You won the daily Gold Dust Lottery! Congrats! You won: Test Gold Dust', $message);
     }
 
     public function testDailyLotto()
     {
-        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('daily_lottery', 'Test');
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation(LotteryMessageType::DAILY_LOTTERY, 'Test');
 
         $this->assertEquals('You got: Test Gold Dust from the daily lottery', $message);
     }
 
     public function testTransmuted()
     {
-        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('transmuted', 'Test');
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation(CraftingMessageTypes::TRANSMUTED, 'Test');
 
         $this->assertEquals('You transmuted a new: Test It shines with a powerful glow!', $message);
     }
 
     public function testEnchantmentFailed()
     {
-        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('enchantment_failed', 'Test');
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation(CraftingMessageTypes::ENCHANTMENT_FAILED, 'Test');
 
         $this->assertEquals('Test', $message);
     }
 
     public function testSilenced()
     {
-        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('silenced', 'Test');
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation(CharacterMessageTypes::SILENCED, 'Test');
 
         $this->assertEquals('Test', $message);
     }
 
     public function testDeletedAffix()
     {
-        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('deleted_affix', 'Test');
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation(AdminMessageTypes::DELETED_AFFIX, 'Test');
 
         $this->assertEquals('Test', $message);
     }
 
     public function testBuildingRepaired()
     {
-        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('building_repair_finished', 'Test');
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation(KingdomMessageTypes::BUILDING_REPAIR_FINISHED, 'Test');
 
         $this->assertEquals('Test', $message);
     }
 
     public function testBuildingUpgraded()
     {
-        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('building_upgrade_finished', 'Test');
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation(KingdomMessageTypes::BUILDING_UPGRADE_FINISHED, 'Test');
 
         $this->assertEquals('Test', $message);
     }
 
     public function testSoldItem()
     {
-        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('sold_item', 'Test');
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation(CharacterMessageTypes::SOLD_ITEM_ON_MARKET, 'Test');
 
         $this->assertEquals('Test', $message);
     }
 
     public function testNewBuilding()
     {
-        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('new_building', 'Test');
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation(KingdomMessageTypes::NEW_BUILDING, 'Test');
 
         $this->assertEquals('Test', $message);
     }
 
     public function testKingdomResourcesUpdated()
     {
-        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('kingdom_resources_update', 'Test');
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation(KingdomMessageTypes::KINGDOM_RESOUCE_UPDATE, 'Test');
 
         $this->assertEquals('Test', $message);
     }
 
     public function testUnitRecruitmentFinished()
     {
-        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('unit_recruitment_finished', 'Test');
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation(KingdomMessageTypes::UNIT_RECRUITMENT_FINISHED, 'Test');
 
         $this->assertEquals('Test', $message);
     }
 
     public function testPlaneTransfer()
     {
-        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('plane_transfer', 'Test');
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation(MovementMessageTypes::PLANE_TRANSFER, 'Test');
 
         $this->assertEquals('Test', $message);
     }
 
     public function testEnchanted()
     {
-        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('enchanted', 'Test');
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation(CraftingMessageTypes::ENCHANTED, 'Test');
 
         $this->assertEquals('Test', $message);
     }
 
     public function testMovedLocation()
     {
-        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('moved_location', 'Test');
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation(MovementMessageTypes::MOVE_LOCATION, 'Test');
 
         $this->assertEquals('Test', $message);
     }

@@ -15,6 +15,7 @@ use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\CraftingMessageTypes;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
 use App\Game\Skills\Handlers\HandleUpdatingCraftingGlobalEventGoal;
 use App\Game\Skills\Handlers\UpdateCraftingTasksForFactionLoyalty;
@@ -419,7 +420,7 @@ class CraftingService
 
             event(new UpdateCharacterInventoryCountEvent($character));
 
-            ServerMessageHandler::handleMessage($character->user, 'crafted', $item->name, $slot->id);
+            ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::CRAFTED, $item->name, $slot->id);
 
             return true;
         }

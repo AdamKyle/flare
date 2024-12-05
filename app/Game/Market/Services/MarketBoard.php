@@ -10,6 +10,7 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Messages\Types\CharacterMessageTypes;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Http\Request;
 
@@ -89,9 +90,9 @@ class MarketBoard
             'gold' => $newGold,
         ]);
 
-        $message = 'Sold market listing: '.$listing->item->affix_name.' for: '.number_format($gold).' After fees (5% tax).';
+        $message = 'Sold market listing: ' . $listing->item->affix_name . ' for: ' . number_format($gold) . ' After fees (5% tax). You now have: ' . number_format($listingCharacter->gold) . '';
 
-        ServerMessageHandler::handleMessage($listingCharacter->user, 'sold_item', $message);
+        ServerMessageHandler::handleMessage($listingCharacter->user, CharacterMessageTypes::SOLD_ITEM_ON_MARKET, $message);
 
         event(new UpdateTopBarEvent($listingCharacter->refresh()));
     }

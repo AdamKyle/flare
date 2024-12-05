@@ -10,6 +10,7 @@ use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
 use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
+use App\Game\Messages\Types\KingdomMessageTypes;
 use Facades\App\Flare\Values\UserOnlineValue;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Bus\Queueable;
@@ -25,7 +26,8 @@ class RecruitUnits implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(private readonly GameUnit $unit,
+    public function __construct(
+        private readonly GameUnit $unit,
         private readonly Kingdom $kingdom,
         private readonly int $amount,
         private readonly int $queueId,
@@ -110,11 +112,11 @@ class RecruitUnits implements ShouldQueue
         if (UserOnlineValue::isOnline($user)) {
 
             if ($user->show_unit_recruitment_messages) {
-                $message = $this->unit->name.' finished recruiting for kingdom: '.
-                    $this->kingdom->name.' on plane: '.$plane.' at: (X/Y) '.$x.'/'.$y.
-                    '. You have a total of: '.number_format($amount);
+                $message = $this->unit->name . ' finished recruiting for kingdom: ' .
+                    $this->kingdom->name . ' on plane: ' . $plane . ' at: (X/Y) ' . $x . '/' . $y .
+                    '. You have a total of: ' . number_format($amount);
 
-                ServerMessageHandler::handleMessage($user, 'unit_recruitment_finished', $message);
+                ServerMessageHandler::handleMessage($user, KingdomMessageTypes::UNIT_RECRUITMENT_FINISHED, $message);
             }
         }
 

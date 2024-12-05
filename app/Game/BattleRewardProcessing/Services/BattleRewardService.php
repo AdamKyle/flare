@@ -39,10 +39,13 @@ class BattleRewardService
         return $this;
     }
 
-    public function handleBaseRewards()
+    public function handleBaseRewards($includeXp = true)
     {
 
-        BattleXpHandler::dispatch($this->characterId, $this->monsterId)->onQueue('battle_reward_xp')->delay(now()->addSeconds(2));
+        if ($includeXp) {
+            BattleXpHandler::dispatch($this->characterId, $this->monsterId)->onQueue('battle_reward_xp')->delay(now()->addSeconds(2));
+        }
+
         BattleCurrenciesHandler::dispatch($this->characterId, $this->monsterId)->onQueue('battle_reward_currencies')->delay(now()->addSeconds(2));
         BattleFactionHandler::dispatch($this->characterId, $this->monsterId)->onQueue('battle_reward_factions')->delay(now()->addSeconds(2));
         BattleGlobalEventHandler::dispatch($this->characterId)->onQueue('battle_reward_global_event')->delay(now()->addSeconds(2));

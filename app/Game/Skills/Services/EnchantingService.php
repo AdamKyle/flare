@@ -21,6 +21,7 @@ use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Events\Concerns\ShouldShowEnchantingEventButton;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\CraftingMessageTypes;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
@@ -324,7 +325,7 @@ class EnchantingService
     {
         $message = 'You failed to apply ' . $affix->name . ' to: ' . $slot->item->refresh()->affix_name . '. The item shatters before you. You lost the investment.';
 
-        ServerMessageHandler::handleMessage($character->user, 'enchantment_failed', $message);
+        ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::ENCHANTMENT_FAILED, $message);
 
         $this->enchantItemService->deleteSlot($slot);
 

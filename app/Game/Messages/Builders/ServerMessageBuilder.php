@@ -2,12 +2,52 @@
 
 namespace App\Game\Messages\Builders;
 
+use App\Game\Messages\Types\Concerns\BaseMessageType;
+use App\Game\Messages\Types\MessageType;
+
 class ServerMessageBuilder
 {
     /**
-     * Build the server message
+     * Build message with additional info based on type.
+     *
+     * - forMessage can be treated as a single value or as a you gained x amount
+     * - newValue is treated as a "you now have x amount of y" and should accompany a forValue
+     *
+     * @param BaseMessageType $type
+     * @param string|integer|null|null $forMessage
+     * @param string|integer|null|null $newValue
+     * @return string
      */
-    public function build(string $type): string
+    public function buildWithAdditionalInformation(BaseMessageType $type, string|int|null $forMessage = null, string|int|null $newValue = null): string
+    {
+        return match ($type->getValue()) {
+            'level_up' => 'You are now level: ' . $forMessage . '!',
+            'gold' => 'You gained: ' . $forMessage . ' Gold! Your new total amount is: ' . $newValue . '.',
+            'gold_dust' => 'You gained: ' . $forMessage . ' Gold Dust! Your new total is: ' . $newValue . '.',
+            'shards' => 'You gained: ' . $forMessage . ' Shards! Your new total is: ' . $newValue . '.',
+            'copper_coins' => 'You gained: ' . $forMessage . ' Copper Coins! Your new total is: ' . $newValue . '.',
+            'gold_rush' => 'Gold Rush! Your gold is now: ' . $forMessage . ' Gold! 5% of your total gold has been awarded to you.',
+            'crafted' => 'You crafted a: ' . $forMessage . '!',
+            'new_damage_stat' => 'The Creator has changed your classes damage stat to: ' . $forMessage . '. Please adjust your gear accordingly for maximum damage.',
+            'disenchanted' => 'Disenchanted the item and got: ' . $forMessage . ' Gold Dust.',
+            'lotto_max' => 'You won the daily Gold Dust Lottery! Congrats! You won: ' . $forMessage . ' Gold Dust',
+            'daily_lottery' => 'You got: ' . $forMessage . ' Gold Dust from the daily lottery',
+            'transmuted' => 'You transmuted a new: ' . $forMessage . ' It shines with a powerful glow!',
+            'crafted_gem' => 'You buff, polish, cut, inspect and are finally proud to call this gem your own! You created a: ' . $forMessage,
+            'enchantment_failed', 'silenced', 'deleted_affix', 'building_repair_finished', 'building_upgrade_finished',
+            'sold_item_on_market', 'new_building', 'kingdom_resources_update', 'unit_recruitment_finished',
+            'plane_transfer', 'enchanted', 'moved_location', 'seer_actions' => $forMessage,
+            default => $this->build($type),
+        };
+    }
+
+    /**
+     * Build strickly based on type.
+     *
+     * @param BaseMessageType $type
+     * @return string
+     */
+    public function build(BaseMessageType $type): string
     {
         switch ($type) {
             case 'message_length_0':
@@ -65,7 +105,7 @@ class ServerMessageBuilder
             case 'no_matching_command':
                 return 'The NPC does not understand you. Their eyes blink in confusion.';
             case 'gold_capped':
-                return 'Gold Rush! You are now gold capped!';
+                return 'You are gold capped! Max gold a character can hold is two trillion. If you have kingdoms try depositing some of it or buying gold bars or maybe spend some of it?';
             case 'failed_to_craft':
                 return 'You failed to craft the item! You lost the investment.';
             case 'failed_to_disenchant':
@@ -74,48 +114,6 @@ class ServerMessageBuilder
                 return 'You failed to transmute the item. It melts into a pool of liquid gold dust before evaporating away. Wasted efforts!';
             default:
                 return '';
-        }
-    }
-
-    public function buildWithAdditionalInformation(string $type, string|int|null $forMessage = null): string
-    {
-        switch ($type) {
-            case 'level_up':
-                return 'You are now level: '.$forMessage.'!';
-            case 'gold_rush':
-                return 'Gold Rush! Your gold is now: '.$forMessage.' Gold! 5% of your total gold has been awarded to you.';
-            case 'crafted':
-                return 'You crafted a: '.$forMessage.'!';
-            case 'new_damage_stat':
-                return 'The Creator has changed your classes damage stat to: '.$forMessage.'. Please adjust your gear accordingly for maximum damage.';
-            case 'disenchanted':
-                return 'Disenchanted the item and got: '.$forMessage.' Gold Dust.';
-            case 'lotto_max':
-                return 'You won the daily Gold Dust Lottery! Congrats! You won: '.$forMessage.' Gold Dust';
-            case 'daily_lottery':
-                return 'You got: '.$forMessage.' Gold Dust from the daily lottery';
-            case 'transmuted':
-                return 'You transmuted a new: '.$forMessage.' It shines with a powerful glow!';
-            case 'crafted_gem':
-                return 'You buff, polish, cut, inspect and are finally proud to call this gem your own! You created a: '.$forMessage;
-            case 'enchantment_failed':
-            case 'silenced':
-            case 'deleted_affix':
-            case 'building_repair_finished':
-            case 'building_upgrade_finished':
-            case 'sold_item':
-            case 'new_building':
-            case 'kingdom_resources_update':
-            case 'unit_recruitment_finished':
-            case 'plane_transfer':
-            case 'enchanted':
-            case 'moved_location':
-            case 'seer_actions':
-            case 'ancient_item':
-                return $forMessage;
-            default:
-                return $this->build($type);
-
         }
     }
 }

@@ -4,6 +4,7 @@ namespace App\Game\Skills\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
+use App\Game\Messages\Types\CraftingMessageTypes;
 use App\Game\Skills\Requests\EnchantingValidation;
 use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\EnchantingService;
@@ -56,7 +57,7 @@ class EnchantingController extends Controller
         $cost = $this->enchantingService->getCostOfEnchantment($character, $request->affix_ids, $slot->item->id);
 
         if ($cost > $character->gold) {
-            ServerMessageHandler::handleMessage($character->user, 'enchantment_failed', 'Not enough gold to enchant that.');
+            ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::ENCHANTMENT_FAILED, 'Not enough gold to enchant that.');
 
             return response()->json([
                 'affixes' => $this->enchantingService->fetchAffixes($character->refresh(), true, false),

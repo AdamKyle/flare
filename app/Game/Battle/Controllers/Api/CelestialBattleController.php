@@ -105,7 +105,7 @@ class CelestialBattleController extends Controller
     public function attack(CelestialFightRequest $request, Character $character, CelestialFight $celestialFight)
     {
         if ($character->is_dead) {
-            broadcast(new ServerMessageEvent($character->user, 'You are dead and cannot participate.'));
+            event(new ServerMessageEvent($character->user, 'You are dead and cannot participate.'));
 
             return response()->json([], 200);
         }
