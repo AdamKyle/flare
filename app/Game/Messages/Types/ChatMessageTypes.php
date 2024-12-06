@@ -4,10 +4,11 @@ namespace App\Game\Messages\Types;
 
 use App\Game\Messages\Types\Concerns\BaseMessageType;
 
-enum NpcMessageTypes: string implements BaseMessageType
+enum ChatMessageTypes: string implements BaseMessageType
 {
-    case SEER_ACTIONS = 'seer_actions';
 
+    case INVALID_MESSAGE_LENGTH = 'invalid_message_length';
+    case CHATTING_TO_MUCH = 'chatting_to_much';
 
     public function getValue(): string
     {

@@ -5,6 +5,8 @@ namespace App\Game\Messages\Services;
 use App\Flare\Handlers\MessageThrottledHandler;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\ChatMessageTypes;
+use App\Game\Messages\Types\Concerns\BaseMessageType;
 
 class ServerMessage
 {
@@ -25,9 +27,9 @@ class ServerMessage
      *
      * @see MessageThrottledHandler
      */
-    public function generateServerMessage(string $type): void
+    public function generateServerMessage(BaseMessageType $type): void
     {
-        if ($type === 'chatting_to_much') {
+        if ($type->getValue() === ChatMessageTypes::CHATTING_TO_MUCH->getValue()) {
             $this->messageThrottledHandler->forUser(auth()->user())->increaseThrottleCount()->silence();
 
             return;

@@ -1,4 +1,5 @@
 import { generateServerMessage } from "../../../lib/ajax/generate-server-message";
+import { ServerMessageEnum } from "../../../lib/enums/server-message-enums/server-message-enum";
 
 /**
  * Move the player in a direction.
@@ -34,25 +35,25 @@ export const movePlayer = (
     }
 
     if (y < 16) {
-        generateServerMessage("cannot_move_up");
+        generateServerMessage(ServerMessageEnum.CANNOT_MOVE_UP);
 
         return false;
     }
 
     if (x < 0) {
-        generateServerMessage("cannot_move_left");
+        generateServerMessage(ServerMessageEnum.CANNOT_MOVE_LEFT);
 
         return false;
     }
 
     if (y > 2496) {
-        generateServerMessage("cannot_move_down");
+        generateServerMessage(ServerMessageEnum.CANNOT_MOVE_DOWN);
 
         return false;
     }
 
     if (x > 2496) {
-        generateServerMessage("cannot_move_right");
+        generateServerMessage(ServerMessageEnum.CANNOT_MOVE_RIGHT);
 
         return false;
     }

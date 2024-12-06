@@ -8,6 +8,8 @@ use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\CharacterMessageTypes;
+use App\Game\Messages\Types\CraftingMessageTypes;
 use App\Game\Skills\Services\AlchemyService;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -126,7 +128,7 @@ class AlchemyServiceTest extends TestCase
         $this->alchemyService->transmute($character, $this->alchemyItem->id);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation('not_enough_gold_dust');
+            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation(CharacterMessageTypes::NOT_ENOUGH_GOLD_DUST);
         });
     }
 
@@ -145,7 +147,7 @@ class AlchemyServiceTest extends TestCase
         $this->alchemyService->transmute($character, $this->alchemyItem->id);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation('not_enough_shards');
+            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation(CharacterMessageTypes::NOT_ENOUGH_SHARDS);
         });
     }
 
@@ -169,7 +171,7 @@ class AlchemyServiceTest extends TestCase
         $this->alchemyService->transmute($character, $this->alchemyItem->refresh()->id);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation('to_hard_to_craft');
+            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation(CraftingMessageTypes::TO_HARD_TO_CRAFT);
         });
     }
 
@@ -193,7 +195,7 @@ class AlchemyServiceTest extends TestCase
         $this->alchemyService->transmute($character, $this->alchemyItem->refresh()->id);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation('to_easy_to_craft');
+            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation(CraftingMessageTypes::TO_EASY_TO_CRAFT);
         });
 
         $character = $character->refresh();
@@ -246,7 +248,7 @@ class AlchemyServiceTest extends TestCase
         $alchemyService->transmute($character, $this->alchemyItem->refresh()->id);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation('failed_to_transmute');
+            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation(CraftingMessageTypes::FAILED_TO_TRANSMUTE);
         });
     }
 
@@ -303,7 +305,7 @@ class AlchemyServiceTest extends TestCase
         $alchemyService->transmute($character, $this->alchemyItem->refresh()->id);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation('inventory_full');
+            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation(CharacterMessageTypes::INVENTORY_IS_FULL);
         });
 
         $this->assertCount(0, $character->inventory->slots);

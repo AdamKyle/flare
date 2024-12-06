@@ -54,7 +54,7 @@ class SeerCampControllerTest extends TestCase
         $character = $character->refresh();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/visit-seer-camp/'.$character->id);
+            ->call('GET', '/api/visit-seer-camp/' . $character->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -83,7 +83,7 @@ class SeerCampControllerTest extends TestCase
         $slot = $character->inventory->slots->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/seer-camp/add-sockets/'.$character->id, [
+            ->call('POST', '/api/seer-camp/add-sockets/' . $character->id, [
                 '_token' => csrf_token(),
                 'slot_id' => $slot->id,
             ]);
@@ -92,7 +92,7 @@ class SeerCampControllerTest extends TestCase
 
         $slot = $slot->refresh();
 
-        $this->assertEquals('Attached sockets to item! (Old Socket Count: '. 0 .', New Count: '.$slot->item->socket_count.').', $jsonData['message']);
+        $this->assertEquals('Attached sockets to item! (Old Socket Count: ' . 0 . ', New Count: ' . $slot->item->socket_count . ').', $jsonData['message']);
     }
 
     public function testAttachGemToItem()
@@ -124,7 +124,7 @@ class SeerCampControllerTest extends TestCase
         $gemSlot = $character->gemBag->gemSlots->where('gem_id', $gemForAddition->id)->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/seer-camp/add-gem/'.$character->id, [
+            ->call('POST', '/api/seer-camp/add-gem/' . $character->id, [
                 '_token' => csrf_token(),
                 'slot_id' => $slot->id,
                 'gem_slot_id' => $gemSlot->id,
@@ -176,7 +176,7 @@ class SeerCampControllerTest extends TestCase
         $gemSlot = $character->gemBag->gemSlots->where('gem_id', $gem->id)->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/seer-camp/replace-gem/'.$character->id, [
+            ->call('POST', '/api/seer-camp/replace-gem/' . $character->id, [
                 '_token' => csrf_token(),
                 'slot_id' => $slot->id,
                 'gem_slot_id' => $gemSlot->id,
@@ -203,7 +203,7 @@ class SeerCampControllerTest extends TestCase
         $character = $this->character->inventoryManagement()->giveItem($item->refresh())->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/seer-camp/gems-to-remove/'.$character->id);
+            ->call('GET', '/api/seer-camp/gems-to-remove/' . $character->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -244,7 +244,7 @@ class SeerCampControllerTest extends TestCase
         })->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/seer-camp/remove-gem/'.$character->id, [
+            ->call('POST', '/api/seer-camp/remove-gem/' . $character->id, [
                 '_token' => csrf_token(),
                 'slot_id' => $slot->id,
                 'gem_id' => $gem->id,
@@ -283,7 +283,7 @@ class SeerCampControllerTest extends TestCase
         $slot = $character->inventory->slots->where('item_id', $item->id)->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/seer-camp/remove-all-gems/'.$character->id.'/'.$slot->id, [
+            ->call('POST', '/api/seer-camp/remove-all-gems/' . $character->id . '/' . $slot->id, [
                 '_token' => csrf_token(),
                 'slot_id' => $slot->id,
             ]);

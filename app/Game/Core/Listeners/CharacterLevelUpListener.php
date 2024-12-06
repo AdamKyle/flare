@@ -2,14 +2,13 @@
 
 namespace App\Game\Core\Listeners;
 
+use Exception;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
 use App\Game\Core\Events\CharacterLevelUpEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Messages\Types\CharacterMessageTypes;
-use App\Game\Messages\Types\MessageType;
-use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class CharacterLevelUpListener

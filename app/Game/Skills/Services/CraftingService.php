@@ -15,6 +15,7 @@ use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\CharacterMessageTypes;
 use App\Game\Messages\Types\CraftingMessageTypes;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
 use App\Game\Skills\Handlers\HandleUpdatingCraftingGlobalEventGoal;
@@ -161,7 +162,7 @@ class CraftingService
         $cost = $this->getItemCost($character, $item);
 
         if ($cost > $character->gold) {
-            ServerMessageHandler::handleMessage($character->user, 'not_enough_gold');
+            ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::NOT_ENOUGH_GOLD);
 
             return false;
         }
@@ -231,13 +232,13 @@ class CraftingService
     protected function attemptToCraftItem(Character $character, Skill $skill, Item $item): bool
     {
         if ($skill->level < $item->skill_level_required) {
-            ServerMessageHandler::handleMessage($character->user, 'to_hard_to_craft');
+            ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::TO_HARD_TO_CRAFT);
 
             return false;
         }
 
         if ($skill->level > $item->skill_level_trivial) {
-            ServerMessageHandler::handleMessage($character->user, 'to_easy_to_craft');
+            ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::TO_EASY_TO_CRAFT);
 
             $this->pickUpItem($character, $item, $skill, true);
 
@@ -253,7 +254,7 @@ class CraftingService
             return true;
         }
 
-        ServerMessageHandler::handleMessage($character->user, 'failed_to_craft');
+        ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::FAILED_TO_CRAFT);
 
         $this->updateCharacterGold($character, $item);
 
@@ -425,7 +426,7 @@ class CraftingService
             return true;
         }
 
-        ServerMessageHandler::handleMessage($character->user, 'inventory_full');
+        ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::INVENTORY_IS_FULL);
 
         return false;
     }

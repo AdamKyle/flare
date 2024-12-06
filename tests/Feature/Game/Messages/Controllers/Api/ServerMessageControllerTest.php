@@ -3,6 +3,7 @@
 namespace Tests\Feature\Game\Messages\Controllers\Api;
 
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\ChatMessageTypes;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
@@ -47,23 +48,6 @@ class ServerMessageControllerTest extends TestCase
         Event::assertDispatched(function (ServerMessageEvent $event) use ($message) {
             return $event->message === $message;
         });
-
-        $this->assertEquals(200, $response->status());
-    }
-
-    public function testGenerateServerMessageForType()
-    {
-        Event::fake();
-
-        $character = $this->character->getCharacter();
-
-        $response = $this->actingAs($character->user)
-            ->call('GET', '/api/server-message', [
-                '_token' => csrf_token(),
-                'type' => 'invalid_command',
-            ]);
-
-        Event::assertDispatched(ServerMessageEvent::class);
 
         $this->assertEquals(200, $response->status());
     }

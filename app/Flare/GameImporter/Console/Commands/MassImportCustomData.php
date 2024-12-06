@@ -9,7 +9,6 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
 use App\Flare\Models\Survey;
 use App\Flare\Values\MapNameValue;
-use Artisan;
 
 class MassImportCustomData extends Command
 {
@@ -32,7 +31,6 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
-        Artisan::call('clear:invalid-capital-city-queues');
 
         $this->importInformationSection();
 

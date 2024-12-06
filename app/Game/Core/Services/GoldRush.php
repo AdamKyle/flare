@@ -5,7 +5,7 @@ namespace App\Game\Core\Services;
 use App\Flare\Models\Character;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
-use App\Game\Messages\Types\CurrenciesMessageType;
+use App\Game\Messages\Types\CurrenciesMessageTypes;
 use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
@@ -49,13 +49,13 @@ class GoldRush
 
         $maxCurrencies = new MaxCurrenciesValue($goldRush, MaxCurrenciesValue::GOLD);
 
-        $type = CurrenciesMessageType::GOLD_RUSH;
+        $type = CurrenciesMessageTypes::GOLD_RUSH;
 
         if ($maxCurrencies->canNotGiveCurrency()) {
             $character->gold = MaxCurrenciesValue::MAX_GOLD;
             $character->save();
 
-            $type = CurrenciesMessageType::GOLD_CAPPED;
+            $type = CurrenciesMessageTypes::GOLD_CAPPED;
         } else {
             $character->gold = $goldRush;
             $character->save();

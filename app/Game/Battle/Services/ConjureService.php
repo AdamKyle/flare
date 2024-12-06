@@ -17,6 +17,7 @@ use App\Game\Maps\Events\UpdateMap;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\NpcMessageTypes;
 use Exception;
 use Facades\App\Flare\Cache\CoordinatesCache;
 
@@ -67,7 +68,7 @@ class ConjureService
         $randomIndex = rand(0, count($types) - 1);
         $plane = $monster->gameMap->name;
 
-        event(new GlobalMessageEvent($character->name.' '.$types[$randomIndex].': '.$monster->name.' on the '.$plane.' plane at (X/Y): '.$x.'/'.$y));
+        event(new GlobalMessageEvent($character->name . ' ' . $types[$randomIndex] . ': ' . $monster->name . ' on the ' . $plane . ' plane at (X/Y): ' . $x . '/' . $y));
     }
 
     /**
@@ -101,10 +102,10 @@ class ConjureService
         $npc = Npc::where('type', NpcTypes::SUMMONER)->first();
         $plane = $character->map->gameMap->name;
 
-        broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('location_of_conjure', $npc, $celestialFight)));
+        broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build(NpcMessageTypes::LOCATION_OF_CONJURE, $npc, $celestialFight)));
 
         if ($type->isPublic()) {
-            event(new GlobalMessageEvent($monster->name.' has been conjured to the '.$plane.' plane.'));
+            event(new GlobalMessageEvent($monster->name . ' has been conjured to the ' . $plane . ' plane.'));
         }
 
         event(new UpdateMap($character->user));
@@ -123,13 +124,13 @@ class ConjureService
         }
 
         if (CelestialFight::where('character_id', $character->id)->get()->isNotEmpty()) {
-            event(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('already_conjured', $npc)));
+            event(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build(NpcMessageTypes::ALREADY_CONJURED, $npc)));
 
             return false;
         }
 
         if ($type === 'public' && CelestialFight::where('type', CelestialConjureType::PUBLIC)->get()->isNotEmpty()) {
-            event(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('public_exists', $npc)));
+            event(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build(NpcMessageTypes::PUBLIC_CONJURATION_EXISTS, $npc)));
 
             return false;
         }
@@ -171,7 +172,7 @@ class ConjureService
 
         event(new UpdateTopBarEvent($character));
 
-        event(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('paid_conjuring', $npc)));
+        event(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build(NpcMessageTypes::PAID_CONJURING, $npc)));
     }
 
     /**

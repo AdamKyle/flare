@@ -26,7 +26,6 @@ use App\Game\Core\Services\CharacterService;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
-use App\Game\Messages\Types\MessageType;
 use App\Game\Skills\Services\SkillService;
 use Facades\App\Flare\Calculators\XPCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;

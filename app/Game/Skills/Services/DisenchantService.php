@@ -138,7 +138,7 @@ class DisenchantService
         } else {
             $this->updateGoldDust($this->character, true);
 
-            ServerMessageHandler::handleMessage($this->character->user, 'failed_to_disenchant');
+            ServerMessageHandler::handleMessage($this->character->user, CraftingMessageTypes::FAILED_TO_DISENCHANT);
         }
 
         $slot->delete();
@@ -186,7 +186,7 @@ class DisenchantService
         } else {
             $this->updateGoldDust($this->character, true);
 
-            ServerMessageHandler::handleMessage($this->character->user, 'failed_to_disenchant');
+            ServerMessageHandler::handleMessage($this->character->user, CraftingMessageTypes::FAILED_TO_DISENCHANT);
         }
     }
 

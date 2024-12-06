@@ -9,6 +9,7 @@ import { getNewXPosition, getNewYPosition } from "../map-position";
 import DirectionalMovement from "../../actions/directional-movement";
 import MapActions from "../../actions/map-actions";
 import MapData from "../request-types/MapData";
+import { ServerMessageEnum } from "../../../../lib/enums/server-message-enums/server-message-enum";
 
 export default class MovePlayer {
     private component: Component;
@@ -50,7 +51,7 @@ export default class MovePlayer {
                 can_player_move: true,
             });
 
-            return generateServerMessage("cant_move");
+            return generateServerMessage(ServerMessageEnum.CANNOT_MOVE);
         }
 
         const playerPosition = movePlayer(
@@ -60,7 +61,7 @@ export default class MovePlayer {
         );
 
         if (!playerPosition) {
-            return generateServerMessage("cant_move");
+            return generateServerMessage(ServerMessageEnum.CANNOT_MOVE);
         }
 
         new Ajax()

@@ -7,6 +7,7 @@ import { generateServerMessage } from "../../lib/ajax/generate-server-message";
 import ChatComponentProps from "./types/components/chat-component-props";
 import ChatComponentState from "./types/components/chat-component-state";
 import clsx from "clsx";
+import { ServerMessageEnum } from "../../lib/enums/server-message-enums/server-message-enum";
 
 export default class Chat extends React.Component<
     ChatComponentProps,
@@ -93,7 +94,9 @@ export default class Chat extends React.Component<
 
     sendPublicMessage() {
         if (this.state.message === "") {
-            return generateServerMessage("message_length_0");
+            return generateServerMessage(
+                ServerMessageEnum.INVALID_MESSAGE_LENGTH,
+            );
         }
 
         if (this.props.is_silenced) {
@@ -130,7 +133,9 @@ export default class Chat extends React.Component<
         );
 
         if (messageData === null) {
-            return generateServerMessage("message_length_0");
+            return generateServerMessage(
+                ServerMessageEnum.INVALID_MESSAGE_LENGTH,
+            );
         }
 
         if (this.props.is_silenced) {
@@ -166,7 +171,7 @@ export default class Chat extends React.Component<
         }
 
         if (response?.status === 429) {
-            generateServerMessage("chatting_to_much");
+            generateServerMessage(ServerMessageEnum.CHATTING_TO_MUCH);
         }
 
         this.props.set_tab_to_updated("server-messages");

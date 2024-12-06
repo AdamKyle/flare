@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameRace;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Messages\Types\CharacterMessageTypes;
 use Facades\App\Flare\Values\UserOnlineValue;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
@@ -108,7 +109,7 @@ class UpdateCharacterStatsService
             if (UserOnlineValue::isOnline($character->user)) {
                 event(new UpdateTopBarEvent($character->refresh()));
 
-                ServerMessageHandler::handleMessage($character->user, 'new_damage_stat', $newClass->damage_stat);
+                ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::NEW_DAMAGE_STAT, $newClass->damage_stat);
             }
         }
 
