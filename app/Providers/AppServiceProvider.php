@@ -2,12 +2,16 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\ServiceProvider;
 use App\Console\AfterDeployment\AddHolyStacksToItems;
 use App\Console\AfterDeployment\AllowTraverseForMaps;
 use App\Console\AfterDeployment\AssignNewBuildingsToExistingKingdoms;
 use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
 use App\Console\AfterDeployment\ChangeFeatureTypesOnQuests;
 use App\Console\AfterDeployment\ChangeLegendaryItems;
+use App\Console\AfterDeployment\ClearInvalidCapitalCityQueues;
 use App\Console\AfterDeployment\CreateMonsterCache;
 use App\Console\AfterDeployment\ReBalanceMonsters;
 use App\Console\AfterDeployment\RebalanceStatBasedAffixes;
@@ -35,9 +39,6 @@ use App\Console\DevelopmentCommands\MaxOutCharactersPassiveSkills;
 use App\Console\DevelopmentCommands\ReincarnateCharacter;
 use App\Console\DevelopmentCommands\TestExploration;
 use App\Console\DevelopmentCommands\UpdateUsersForDevelopment;
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -70,6 +71,7 @@ class AppServiceProvider extends ServiceProvider
             RebalanceIrresistableDamageAffixes::class,
             RebalanceTrinkets::class,
             ClearPlayersJobs::class,
+            ClearInvalidCapitalCityQueues::class,
 
             // Development Commands:
             CreateCharacter::class,

@@ -227,6 +227,9 @@ export default class MapActions extends React.Component<
                         location={this.state.location}
                         handle_close={this.manageViewLocation.bind(this)}
                         character_id={this.props.character_id}
+                        can_move={this.props.can_move}
+                        is_automation_running={this.props.is_automation_running}
+                        is_dead={this.props.is_dead}
                     />
                 ) : null}
             </Fragment>
