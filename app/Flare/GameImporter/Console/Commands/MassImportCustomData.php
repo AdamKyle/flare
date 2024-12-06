@@ -32,10 +32,7 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
-        Artisan::call('import:game-data Items');
-        Artisan::call('import:game-data Locations');
-        Artisan::call('import:game-data Quests');
-        Artisan::call('create:quest-cache');
+        Artisan::call('clear:invalid-capital-city-queues');
 
         $this->importInformationSection();
 

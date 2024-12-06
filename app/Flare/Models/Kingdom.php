@@ -167,6 +167,10 @@ class Kingdom extends Model
 
     public function kingdomItemResistanceBonus(): float
     {
+        if (is_null($this->character)) {
+            return 0;
+        }
+
         $loyalty = $this->character->factionLoyalties()->where('is_pledged', true)->first();
 
         if (is_null($loyalty)) {
