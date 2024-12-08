@@ -34,7 +34,9 @@ class ServerMessageController extends Controller
 
         if ($request->has('type')) {
             try {
-                $this->assignMessageType->assignType($request->type);
+                $type = $this->assignMessageType->assignType($request->type);
+
+                $this->serverMessage->generateServerMessage($type);
 
                 return response()->json();
             } catch (Exception $e) {

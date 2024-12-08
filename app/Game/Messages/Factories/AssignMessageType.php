@@ -5,8 +5,10 @@ namespace App\Game\Messages\Factories;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use App\Game\Messages\Types\ChatMessageTypes;
+use App\Game\Messages\Types\Concerns\BaseMessageType;
 use App\Game\Messages\Types\MapMessageTypes;
 use InvalidArgumentException;
+use ValueError;
 
 class AssignMessageType
 {
@@ -18,18 +20,16 @@ class AssignMessageType
      *
      * @param string $messageType
      * @throws InvalidArgumentException
-     * @return void
+     * @return BaseMessageType
      */
-    public function assignType(string $messageType): void
+    public function assignType(string $messageType): BaseMessageType
     {
         $messageTypeClasses = [ChatMessageTypes::class, MapMessageTypes::class];
 
         foreach ($messageTypeClasses as $messageTypeClass) {
             try {
-                $messageTypeClass::from($messageType);
-
-                return;
-            } catch (Exception $e) {
+                return $messageTypeClass::from($messageType);
+            } catch (ValueError $e) {
                 continue;
             }
         }
