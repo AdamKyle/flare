@@ -379,9 +379,9 @@ class GuideQuestRequirementsService
      */
     public function requiredCurrency(Character $character, GuideQuest $quest, string $currency): GuideQuestRequirementsService
     {
-        if (! is_null($quest->{'required_'.$currency})) {
-            if ($character->{$currency} >= $quest->{'required_'.$currency}) {
-                $this->finishedRequirements[] = 'required_'.$currency;
+        if (! is_null($quest->{'required_' . $currency})) {
+            if ($character->{$currency} >= $quest->{'required_' . $currency}) {
+                $this->finishedRequirements[] = 'required_' . $currency;
             }
         }
 
@@ -419,13 +419,13 @@ class GuideQuestRequirementsService
     public function requiredStats(Character $character, GuideQuest $quest, array $stats): GuideQuestRequirementsService
     {
         foreach ($stats as $stat) {
-            $questStat = $quest->{'required_'.$stat};
+            $questStat = $quest->{'required_' . $stat};
 
             if (! is_null($questStat)) {
                 $value = $character->getInformation()->statMod($stat);
 
                 if ($value >= $questStat) {
-                    $this->finishedRequirements[] = 'required_'.$stat;
+                    $this->finishedRequirements[] = 'required_' . $stat;
                 }
             }
         }

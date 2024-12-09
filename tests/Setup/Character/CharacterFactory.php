@@ -105,9 +105,19 @@ class CharacterFactory
 
         $character = $this->character->refresh();
 
-        Cache::put('character-attack-data-'.$character->id, (new AttackDataCacheSetUp)->getCacheObject());
+        Cache::put('character-attack-data-' . $character->id, (new AttackDataCacheSetUp)->getCacheObject());
 
         return $this;
+    }
+
+    public function getCharacterId(): int
+    {
+        return $this->character->id;
+    }
+
+    public function getCharacterClassId(): int
+    {
+        return $this->character->game_class_id;
     }
 
     public function assignPassiveSkills(?GameBuilding $gameBuilding = null): CharacterFactory
@@ -506,7 +516,7 @@ class CharacterFactory
         $skill = $this->character->skills->where('name', $name)->first();
 
         if (is_null($skill)) {
-            throw new Exception($name.' not found.');
+            throw new Exception($name . ' not found.');
         }
 
         $skill->update($changes);
