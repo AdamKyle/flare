@@ -93,7 +93,7 @@ class PassiveSkillTypeValue
     public function __construct(int $value)
     {
         if (! in_array($value, self::$values)) {
-            throw new Exception($value.' does not exist.');
+            throw new Exception($value . ' does not exist.');
         }
 
         $this->value = $value;

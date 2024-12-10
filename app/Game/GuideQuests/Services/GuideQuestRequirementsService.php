@@ -208,7 +208,7 @@ class GuideQuestRequirementsService
 
             $isInSet = $character->inventorySets->filter(function ($set) use ($quest) {
                 return $set->slots->filter(function ($slot) use ($quest) {
-                    $slot->item->specialty_type === $quest->required_specialty_type;
+                    return $slot->item->specialty_type === $quest->required_specialty_type;
                 })->isNotempty();
             })->isNotEmpty();
 
