@@ -10,13 +10,19 @@ use App\Flare\Models\Item;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\MapNameValue;
+use App\Flare\Values\RandomAffixDetails;
+use App\Game\ClassRanks\Values\ClassSpecialValue;
+use App\Game\Events\Values\EventType;
 use App\Game\GuideQuests\Services\GuideQuestRequirementsService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateFactionLoyalty;
+use Tests\Traits\CreateGameClassSpecial;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameSkill;
+use Tests\Traits\CreateGlobalEventGoal;
 use Tests\Traits\CreateGuideQuest;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateNpc;
@@ -31,6 +37,9 @@ class GuideQuestRequirementsServiceTest extends TestCase
         CreateNpc,
         CreateGameMap,
         CreateFactionLoyalty,
+        CreateGameClassSpecial,
+        CreateEvent,
+        CreateGlobalEventGoal,
         RefreshDatabase;
 
     private ?CharacterFactory $character;
@@ -70,6 +79,25 @@ class GuideQuestRequirementsServiceTest extends TestCase
         $finishedRequirements = $this->guideQuestRequirementsService->requiredLevelCheck($character, $guideQuest)->getFinishedRequirements();
 
         $this->assertContains('required_level', $finishedRequirements);
+    }
+
+    public function testFinishedRequirementsAreReset()
+    {
+        $guideQuest = $this->createGuideQuest([
+            'required_level' => 1,
+        ]);
+
+        $character = $this->character->getCharacter();
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredLevelCheck($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertContains('required_level', $finishedRequirements);
+
+        $this->guideQuestRequirementsService->resetFinishedRequirements();
+
+        $resetRequirements = $this->guideQuestRequirementsService->getFinishedRequirements();
+
+        $this->assertEmpty($resetRequirements);
     }
 
     public function testGetRequiredSkillCheck()
@@ -538,6 +566,23 @@ class GuideQuestRequirementsServiceTest extends TestCase
         $this->assertContains('required_kingdom_level', $finishedRequirements);
     }
 
+    public function testFetchRequiredSpecificKingdomBuildingLevel()
+    {
+        $character = $this->character->kingdomManagement()->assignKingdom()->assignBuilding([], [
+            'level' => 5
+        ])->getCharacter();
+
+        $guideQuest = $this->createGuideQuest([
+            'required_kingdom_building_id' => $character->kingdoms()->first()->buildings()->first()->id,
+            'required_kingdom_building_level' => 2,
+        ]);
+
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredKingdomSpecificBuildingLevel($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertContains('required_kingdom_building_level', $finishedRequirements);
+    }
+
     public function testFetchRequiredKingdomUnitAmount()
     {
         $character = $this->character->kingdomManagement()->assignKingdom()->assignUnits([], 1000)->getCharacter();
@@ -573,5 +618,210 @@ class GuideQuestRequirementsServiceTest extends TestCase
         $finishedRequirements = $this->guideQuestRequirementsService->requiredKingdomPassiveLevel($character, $guideQuest)->getFinishedRequirements();
 
         $this->assertContains('required_passive_level', $finishedRequirements);
+    }
+
+    public function testHasClassRankEquipped()
+    {
+        $character = $this->character->createClassRanks()->getCharacter();
+
+        $gameClassSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $character->game_class_id,
+        ]);
+
+        $character->classSpecialsEquipped()->create([
+            'character_id' => $character->id,
+            'game_class_special_id' => $gameClassSpecial->id,
+            'level' => 1,
+            'current_xp' => 0,
+            'required_xp' => ClassSpecialValue::XP_PER_LEVEL,
+            'equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $guideQuest = $this->createGuideQuest([
+            'required_class_specials_equipped' => 1,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredClassRanksEquipped($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertContains('required_class_specials_equipped', $finishedRequirements);
+    }
+
+    public function testHasClassRankEquippedAndAboveRequiredLevel()
+    {
+        $character = $this->character->createClassRanks()->getCharacter();
+
+        $character->classRanks()->first()->update([
+            'level' => 10,
+        ]);
+
+        $gameClassSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $character->game_class_id,
+        ]);
+
+        $character->classSpecialsEquipped()->create([
+            'character_id' => $character->id,
+            'game_class_special_id' => $gameClassSpecial->id,
+            'level' => 10,
+            'current_xp' => 0,
+            'required_xp' => ClassSpecialValue::XP_PER_LEVEL,
+            'equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $guideQuest = $this->createGuideQuest([
+            'required_class_rank_level' => 5,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredClassRankLevel($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertContains('required_class_rank_level', $finishedRequirements);
+    }
+
+    public function testHasRequiredCurrency()
+    {
+        $character = $this->character->getCharacter();
+
+        $character->update([
+            'gold' => 10_000
+        ]);
+
+        $guideQuest = $this->createGuideQuest([
+            'required_gold' => 5_000,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredCurrency($character, $guideQuest, 'gold')->getFinishedRequirements();
+
+        $this->assertContains('required_gold', $finishedRequirements);
+    }
+
+    public function testHasRequiredStats()
+    {
+        $character = $this->character->getCharacter();
+
+        $guideQuest = $this->createGuideQuest([
+            'required_str' => 1,
+            'required_dex' => 1,
+            'required_int' => 1,
+            'required_dur' => 1,
+            'required_chr' => 1,
+            'required_agi' => 1,
+            'required_focus' => 1
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredStats($character, $guideQuest, [
+            'str',
+            'dex',
+            'int',
+            'dur',
+            'chr',
+            'agi',
+            'focus'
+        ])->getFinishedRequirements();
+
+        $this->assertContains('required_str', $finishedRequirements);
+        $this->assertContains('required_dex', $finishedRequirements);
+        $this->assertContains('required_int', $finishedRequirements);
+        $this->assertContains('required_dur', $finishedRequirements);
+        $this->assertContains('required_chr', $finishedRequirements);
+        $this->assertContains('required_agi', $finishedRequirements);
+        $this->assertContains('required_focus', $finishedRequirements);
+    }
+
+    public function testHasRequiredTotalStats()
+    {
+        $character = $this->character->getCharacter();
+
+        $guideQuest = $this->createGuideQuest([
+            'required_stats' => 1,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredTotalStats($character, $guideQuest, [
+            'str',
+            'dex',
+            'int',
+            'dur',
+            'chr',
+            'agi',
+            'focus'
+        ])->getFinishedRequirements();
+
+        $this->assertContains('required_stats', $finishedRequirements);
+    }
+
+    public function testPlayerMustBeOnSpecificMap()
+    {
+        $character = $this->character->getCharacter();
+
+        $guideQuest = $this->createGuideQuest([
+            'be_on_game_map' => $character->map->game_map_id
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requirePlayerToBeOnASpecificMap($character, $guideQuest)->getFinishedRequirements();;
+
+        $this->assertContains('required_to_be_on_game_map_name', $finishedRequirements);
+    }
+
+    public function testPlayerHasGlobalKillAmount()
+    {
+        $character = $this->character->getCharacter();
+
+        $character->map()->update([
+            'game_map_id' => $this->createGameMap([
+                'name' => MapNameValue::ICE_PLANE,
+            ])->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $this->createEvent([
+            'type' => EventType::WINTER_EVENT,
+        ]);
+
+        $eventGoal = $this->createGlobalEventGoal([
+            'max_kills' => 1000,
+            'event_type' => EventType::WINTER_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        $this->createGlobalEventParticipation([
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id' => $character->id,
+            'current_kills' => 100,
+            'current_crafts' => null,
+        ]);
+
+        $this->createGlobalEventKill([
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id' => $character->id,
+            'kills' => 100,
+        ]);
+
+        $guideQuest = $this->createGuideQuest([
+            'required_event_goal_participation' => 10
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredGlobalEventKillAmount($character, $guideQuest)->getFinishedRequirements();;
+
+        $this->assertContains('required_event_goal_participation', $finishedRequirements);
+    }
+
+    public function testPlayerDoesNotHaveGlobalKillAmountWhenNoEventRunning()
+    {
+        $character = $this->character->getCharacter();
+
+
+        $character = $character->refresh();
+
+        $guideQuest = $this->createGuideQuest([
+            'required_event_goal_participation' => 10
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredGlobalEventKillAmount($character, $guideQuest)->getFinishedRequirements();;
+
+        $this->assertNotContains('required_event_goal_participation', $finishedRequirements);
     }
 }
