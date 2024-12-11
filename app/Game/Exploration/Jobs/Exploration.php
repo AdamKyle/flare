@@ -133,7 +133,7 @@ class Exploration implements ShouldQueue
                 $totalXpToReward += $characterRewardService->fetchXpForMonster($monster);
             }
 
-            ExplorationXpHandler::dispatch($this->character->id, $totalXpToReward)->onQueue('exploration_battle_xp_reward')->delay(now()->addSeconds(2));
+            ExplorationXpHandler::dispatch($this->character->id, $enemies, $totalXpToReward)->onQueue('exploration_battle_xp_reward')->delay(now()->addSeconds(2));
 
             $this->sendOutEventLogUpdate('The last of the enemies fall. Covered in blood, exhausted, you look around for any signs of more of their friends. The area is silent. "Another day, another battle.
             We managed to survive." The Guide states as he walks from the shadows. The pair of you set off in search of the next adventure ...
@@ -166,7 +166,7 @@ class Exploration implements ShouldQueue
             $totalXpToReward += $characterRewardService->fetchXpForMonster($monster);
         }
 
-        ExplorationXpHandler::dispatch($this->character->id, $totalXpToReward)->onQueue('exploration_battle_xp_reward')->delay(now()->addSeconds(2));
+        ExplorationXpHandler::dispatch($this->character->id, 10, $totalXpToReward)->onQueue('exploration_battle_xp_reward')->delay(now()->addSeconds(2));
 
         Cache::put('can-character-survive-' . $this->character->id, true);
 

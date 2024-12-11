@@ -4,8 +4,10 @@ namespace App\Game\BattleRewardProcessing\Providers;
 
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\GlobalEventParticipation;
+use App\Flare\ServerFight\BattleMessages;
 use App\Flare\Services\CharacterRewardService;
 use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
+use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
 use App\Game\BattleRewardProcessing\Handlers\GoldMinesRewardHandler;
@@ -99,6 +101,10 @@ class ServiceProvider extends ApplicationServiceProvider
             return new SecondaryRewardService(
                 $app->make(ClassRankService::class),
             );
+        });
+
+        $this->app->bind(BattleMessageHandler::class, function () {
+            return new BattleMessageHandler();
         });
     }
 

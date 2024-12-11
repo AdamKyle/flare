@@ -18,6 +18,7 @@ use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\LocationType;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
@@ -26,6 +27,7 @@ use App\Game\Core\Services\CharacterService;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
+use App\Game\Messages\Types\CurrenciesMessageTypes;
 use App\Game\Skills\Services\SkillService;
 use Facades\App\Flare\Calculators\XPCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -45,6 +47,8 @@ class CharacterRewardService
 
     private CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer;
 
+    private BattleMessageHandler $battleMessageHandler;
+
     /**
      * Constructor
      */
@@ -53,13 +57,15 @@ class CharacterRewardService
         CharacterService $characterService,
         SkillService $skillService,
         Manager $manager,
-        CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer
+        CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer,
+        BattleMessageHandler $battleMessageHandler,
     ) {
         $this->characterXpService = $characterXpService;
         $this->characterService = $characterService;
         $this->skillService = $skillService;
         $this->characterSheetBaseInfoTransformer = $characterSheetBaseInfoTransformer;
         $this->manager = $manager;
+        $this->battleMessageHandler = $battleMessageHandler;
     }
 
     /**
@@ -191,6 +197,13 @@ class CharacterRewardService
             ]);
 
             $this->character = $this->character->refresh();
+
+            $this->battleMessageHandler->handleCurrencyGainMessage($this->character->user, CurrenciesMessageTypes::GOLD_DUST, $goldDust, $characterGoldDust);
+            $this->battleMessageHandler->handleCurrencyGainMessage($this->character->user, CurrenciesMessageTypes::SHARDS, $shards, $characterShards);
+
+            if ($canHaveCopperCoins) {
+                $this->battleMessageHandler->handleCurrencyGainMessage($this->character->user, CurrenciesMessageTypes::COPPER_COINS, $copperCoins, $characterCopperCoins);
+            }
 
             if (! $this->character->is_auto_battling) {
                 event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
@@ -378,6 +391,10 @@ class CharacterRewardService
         $this->character->update([
             'gold' => $newGold,
         ]);
+
+        $character = $this->character->refresh();
+
+        $this->battleMessageHandler->handleCurrencyGainMessage($character->user, CurrenciesMessageTypes::GOLD, $monster->gold, $newGold);
     }
 
     /**
@@ -420,13 +437,14 @@ class CharacterRewardService
                 $coins = $coins + $coins * $mercenarySlotBonus;
 
                 $newCoins = $this->character->copper_coins + $coins;
-                $maxCurrencies = new MaxCurrenciesValue($newCoins, MaxCurrenciesValue::COPPER);
 
-                if (! $maxCurrencies->canNotGiveCurrency()) {
-                    $this->character->update(['copper_coins' => $newCoins]);
-                } else {
-                    $this->character->update(['copper_coins' => MaxCurrenciesValue::MAX_COPPER]);
+                if ($newCoins >= MaxCurrenciesValue::COPPER) {
+                    $newCoins = MaxCurrenciesValue::MAX_COPPER;
                 }
+
+                $this->character->update(['copper_coins' => $newCoins]);
+
+                $this->battleMessageHandler->handleCurrencyGainMessage($this->character->user, CurrenciesMessageTypes::COPPER_COINS, $coins, $newCoins);
             }
         }
     }

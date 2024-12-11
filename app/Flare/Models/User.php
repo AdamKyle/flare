@@ -37,6 +37,13 @@ class User extends Authenticatable
         'show_kingdom_update_messages',
         'show_building_rebuilt_messages',
         'show_monster_to_low_level_message',
+        'show_xp_for_exploration',
+        'show_xp_per_kill',
+        'show_skill_xp_per_kill',
+        'show_gold_per_kill',
+        'show_gold_dust_per_kill',
+        'show_shards_per_kill',
+        'show_copper_coins_per_kill',
         'auto_disenchant',
         'disable_attack_type_popover',
         'auto_disenchant_amount',
@@ -57,7 +64,8 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
     /**
@@ -80,6 +88,13 @@ class User extends Authenticatable
         'show_kingdom_update_messages' => 'boolean',
         'show_building_rebuilt_messages' => 'boolean',
         'show_monster_to_low_level_message' => 'boolean',
+        'show_xp_for_exploration' => 'boolean',
+        'show_xp_per_kill' => 'boolean',
+        'show_skill_xp_per_kill' => 'boolean',
+        'show_gold_per_kill' => 'boolean',
+        'show_gold_dust_per_kill' => 'boolean',
+        'show_shards_per_kill' => 'boolean',
+        'show_copper_coins_per_kill' => 'boolean',
         'auto_disenchant' => 'boolean',
         'disable_attack_type_popover' => 'boolean',
         'will_be_deleted' => 'boolean',

@@ -10,6 +10,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 use App\Flare\Services\CharacterRewardService;
+use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 
 class ExplorationXpHandler implements ShouldQueue
 {
@@ -17,17 +18,19 @@ class ExplorationXpHandler implements ShouldQueue
 
     /**
      * @param integer $characterId
+     * @param integer $numberOfCreatures
      * @param integer $xp
      */
-    public function __construct(private int $characterId, private int $xp) {}
+    public function __construct(private int $characterId, private int $numberOfCreatures, private int $xp) {}
 
     /**
      * Handle the job
      *
      * @param CharacterRewardService $characterRewardService
+     * @param BattleMessageHandler $battleMessageHandler
      * @return void
      */
-    public function handle(CharacterRewardService $characterRewardService): void
+    public function handle(CharacterRewardService $characterRewardService, BattleMessageHandler $battleMessageHandler): void
     {
         $character = Character::find($this->characterId);
 
@@ -35,7 +38,7 @@ class ExplorationXpHandler implements ShouldQueue
             return;
         }
 
-        $this->processXpReward($character, $characterRewardService);
+        $this->processXpReward($character, $characterRewardService, $battleMessageHandler);
     }
 
     /**
@@ -49,8 +52,10 @@ class ExplorationXpHandler implements ShouldQueue
      * @param CharacterRewardService $characterRewardService
      * @return void
      */
-    private function processXpReward(Character $character, CharacterRewardService $characterRewardService): void
+    private function processXpReward(Character $character, CharacterRewardService $characterRewardService, BattleMessageHandler $battleMessageHandler): void
     {
+        $battleMessageHandler->handleMessageForExplorationXp($character->user, $this->numberOfCreatures, $this->xp);
+
         $characterRewardService->setCharacter($character)->distributeSpecifiedXp($this->xp);
     }
 }
