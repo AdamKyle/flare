@@ -33,7 +33,7 @@ class BattleMessageHandler
             return;
         }
 
-        $message = 'You slaughtered: ' . number_format($numberOfCreatures) . ' and gained a total of: ' . number_format($totalXp);
+        $message = 'You slaughtered: ' . number_format($numberOfCreatures) . ' creatures and gained a total of: ' . number_format($totalXp) . ' XP.';
 
         ServerMessageHandler::sendBasicMessage($user, $message);
     }
@@ -203,6 +203,14 @@ class BattleMessageHandler
         ServerMessageHandler::sendBasicMessage($user, $message);
     }
 
+    /**
+     * handle when a skill gains xp.
+     *
+     * @param User $user
+     * @param string $skillName
+     * @param integer $xpRewarded
+     * @return void
+     */
     public function handleSkillXpUpdate(User $user, string $skillName, int $xpRewarded): void
     {
         if (!UserOnlineValue::isOnline($user)) {

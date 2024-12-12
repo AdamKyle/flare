@@ -32,7 +32,7 @@ class UpdateItemSkill
 
         $skillProgressionToUpdate = $skillProgressionToUpdate->refresh();
 
-        $this->battleMessageHandler->handleItemKillCountMessage($character->user, $item->affix_name, $skillProgressionToUpdate->itemSkill->name, $skillProgressionToUpdate->current_kill, $itemSkillProgression->itemSkill->total_kills_needed);
+        $this->battleMessageHandler->handleItemKillCountMessage($character->user, $item->affix_name, $skillProgressionToUpdate->itemSkill->name, $skillProgressionToUpdate->current_kill, $skillProgressionToUpdate->itemSkill->total_kills_needed);
 
         $this->levelUpSkill($character, $skillProgressionToUpdate);
     }

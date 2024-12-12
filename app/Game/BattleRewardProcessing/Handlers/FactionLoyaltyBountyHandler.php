@@ -88,10 +88,10 @@ class FactionLoyaltyBountyHandler
 
         ServerMessageHandler::sendBasicMessage(
             $character->user,
-            'Your fame with: ' . $factionLoyaltyNpc->npc->real_name .
-                ' on Plane: ' . $factionLoyaltyNpc->npc->gameMap->name .
-                ' is now level: ' . $factionLoyaltyNpc->current_level .
-                ' out of: ' . $factionLoyaltyNpc->max_level . '. You also got some XP and other rewards!'
+            'Your fame with: ' . $helpingNpc->npc->real_name .
+                ' on Plane: ' . $helpingNpc->npc->gameMap->name .
+                ' is now level: ' . $helpingNpc->current_level .
+                ' out of: ' . $helpingNpc->max_level . '. You also got some XP and other rewards!'
         );
 
         $this->handOutXp($character, $helpingNpc, $newLevel, $helpingNpcName);
