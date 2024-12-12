@@ -13,6 +13,7 @@ use App\Flare\Values\RandomAffixDetails;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\CurrenciesMessageTypes;
 use Exception;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
@@ -21,12 +22,8 @@ use Illuminate\Support\Facades\Cache;
 
 class GoldMinesRewardHandler
 {
-    private RandomAffixGenerator $randomAffixGenerator;
 
-    public function __construct(RandomAffixGenerator $randomAffixGenerator)
-    {
-        $this->randomAffixGenerator = $randomAffixGenerator;
-    }
+    public function __construct(private RandomAffixGenerator $randomAffixGenerator, private BattleMessageHandler $battleMessageHandler) {}
 
     public function handleFightingAtGoldMines(Character $character, Monster $monster): Character
     {
@@ -90,13 +87,13 @@ class GoldMinesRewardHandler
             $maximumGold = 5000;
         }
 
-        $goldDust = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
-        $shards = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
-        $gold = RandomNumberGenerator::generateRandomNumber(1, $maximumGold);
+        $goldDustToReward = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
+        $shardsToReward = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
+        $goldToReward = RandomNumberGenerator::generateRandomNumber(1, $maximumGold);
 
-        $gold += $character->gold;
-        $goldDust += $character->gold_dust;
-        $shards += $character->shards;
+        $gold = $character->gold + $goldToReward;
+        $goldDust = $character->gold_dust + $goldDustToReward;
+        $shards = $character->shards + $shardsToReward;
 
         if ($goldDust > MaxCurrenciesValue::MAX_GOLD_DUST) {
             $goldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
@@ -116,7 +113,13 @@ class GoldMinesRewardHandler
             'gold' => $gold,
         ]);
 
-        return $character->refresh();
+        $character = $character->refresh();
+
+        $this->battleMessageHandler->handleCurrencyGainMessage($character->user, CurrenciesMessageTypes::GOLD, $goldToReward, $character->gold);
+        $this->battleMessageHandler->handleCurrencyGainMessage($character->user, CurrenciesMessageTypes::GOLD_DUST, $goldDustToReward, $character->gold_dust);
+        $this->battleMessageHandler->handleCurrencyGainMessage($character->user, CurrenciesMessageTypes::SHARDS, $shardsToReward, $character->shards);
+
+        return $character;
     }
 
     /**

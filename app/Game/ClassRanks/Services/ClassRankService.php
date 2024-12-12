@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterClassRank;
 use App\Flare\Models\CharacterClassSpecialtiesEquipped;
 use App\Flare\Models\GameClassSpecial;
+use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\ClassRanks\Values\ClassRankValue;
@@ -14,18 +15,14 @@ use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\ClassRanksMessageTypes;
 use Exception;
 
 class ClassRankService
 {
     use FetchEquipped, ResponseBuilder;
 
-    private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
-
-    public function __construct(UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes)
-    {
-        $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
-    }
+    public function __construct(private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes, private BattleMessageHandler $battleMessageHandler) {}
 
     /**
      * Get the class specials for the character.
@@ -145,7 +142,7 @@ class ClassRankService
         event(new UpdateTopBarEvent($character));
 
         return $this->successResult(array_merge([
-            'message' => 'Equipped class special: '.$gameClassSpecial->name,
+            'message' => 'Equipped class special: ' . $gameClassSpecial->name,
         ], $this->getSpecials($character)));
     }
 
@@ -171,7 +168,7 @@ class ClassRankService
         $this->updateCharacterAttackTypes->updateCache($character);
 
         return $this->successResult(array_merge([
-            'message' => 'Unequipped class special: '.$classSpecialEquipped->gameClassSpecial->name,
+            'message' => 'Unequipped class special: ' . $classSpecialEquipped->gameClassSpecial->name,
         ], $this->getSpecials($character)));
     }
 
@@ -194,13 +191,15 @@ class ClassRankService
 
         $classRank = $classRank->refresh();
 
+        $this->battleMessageHandler->handleClassRankMessage($character->user, ClassRanksMessageTypes::XP_FOR_CLASS_RANKS, $character->class->name, ClassRankValue::XP_PER_KILL, $classRank->current_xp);
+
         if ($classRank->current_xp >= $classRank->required_xp) {
             $classRank->update([
                 'level' => $classRank->level + 1,
                 'current_xp' => 0,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You gained a new class rank in: '.$character->class->name));
+            event(new ServerMessageEvent($character->user, 'You gained a new class rank in: ' . $character->class->name));
         }
     }
 
@@ -224,18 +223,19 @@ class ClassRankService
 
             $special = $special->refresh();
 
+            $this->battleMessageHandler->handleClassRankMessage($character->user, ClassRanksMessageTypes::XP_FOR_EQUIPPED_CLASS_SPECIALS, $character->class->name, ClassSpecialValue::XP_PER_KILL, $special->current_xp, null, $special->gameClassSpecial->name);
+
             if ($special->current_xp >= $special->required_xp) {
                 $special->update([
                     'level' => $special->level + 1,
                     'current_xp' => 0,
                 ]);
 
-                event(new ServerMessageEvent($character->user, 'Your class special:  '.$special->gameClassSpecial->name.' has gained a new level is now level: '.$special->level));
+                event(new ServerMessageEvent($character->user, 'Your class special:  ' . $special->gameClassSpecial->name . ' has gained a new level is now level: ' . $special->level));
 
                 $this->updateCharacterAttackTypes->updateCache($character->refresh());
             }
         }
-
     }
 
     /**
@@ -243,7 +243,8 @@ class ClassRankService
      *
      * @throws Exception
      */
-    public function giveXpToMasteries(Character $character): void
+    public function
+    giveXpToMasteries(Character $character): void
     {
         $classRank = $character->classRanks()->where('game_class_id', $character->game_class_id)->first();
 
@@ -270,6 +271,10 @@ class ClassRankService
 
                 $weaponMastery = $weaponMastery->refresh();
 
+                $weaponMasteryName = (new WeaponMasteryValue($type))->getName();
+
+                $this->battleMessageHandler->handleClassRankMessage($character->user, ClassRanksMessageTypes::XP_FOR_CLASS_MASTERIES, $character->class->name, WeaponMasteryValue::XP_PER_KILL, $weaponMastery->current_xp, $weaponMasteryName);
+
                 if ($weaponMastery->current_xp >= $weaponMastery->required_xp) {
                     $weaponMastery->update([
                         'level' => $weaponMastery->level + 1,
@@ -280,10 +285,12 @@ class ClassRankService
 
                     $this->updateCharacterAttackTypes->updateCache($character->refresh());
 
-                    event(new ServerMessageEvent($character->user, 'Your class: '.
-                        $classRank->gameClass->name.' has gained a new level in (Weapon Masteries): '.
-                        (new WeaponMasteryValue($type))->getName().
-                        ' and is now level: '.$weaponMastery->level
+                    event(new ServerMessageEvent(
+                        $character->user,
+                        'Your class: ' .
+                            $classRank->gameClass->name . ' has gained a new level in (Weapon Masteries): ' .
+                            $weaponMasteryName .
+                            ' and is now level: ' . $weaponMastery->level
                     ));
                 }
             }
@@ -292,8 +299,10 @@ class ClassRankService
 
     protected function isClassLocked(Character $character, CharacterClassRank $classRank): bool
     {
-        if (! is_null($classRank->gameClass->primary_required_class_id) &&
-            ! is_null($classRank->gameClass->secondary_required_class_id)) {
+        if (
+            ! is_null($classRank->gameClass->primary_required_class_id) &&
+            ! is_null($classRank->gameClass->secondary_required_class_id)
+        ) {
 
             $primaryRequiredClassId = $classRank->gameClass->primary_required_class_id;
             $secondaryRequiredClassId = $classRank->gameClass->secondary_required_class_id;
@@ -302,7 +311,7 @@ class ClassRankService
             $secondaryClassRank = $character->classRanks->where('game_class_id', $secondaryRequiredClassId)->first();
 
             return ! (($primaryClassRank->level >= $classRank->gameClass->primary_required_class_level) &&
-                   ($secondaryClassRank->level >= $classRank->gameClass->secondary_required_class_level));
+                ($secondaryClassRank->level >= $classRank->gameClass->secondary_required_class_level));
         }
 
         return false;

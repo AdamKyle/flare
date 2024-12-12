@@ -15,6 +15,7 @@ use App\Flare\Values\RandomAffixDetails;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\CurrenciesMessageTypes;
 use Exception;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
@@ -23,12 +24,8 @@ use Illuminate\Support\Facades\Cache;
 
 class PurgatorySmithHouseRewardHandler
 {
-    private RandomAffixGenerator $randomAffixGenerator;
 
-    public function __construct(RandomAffixGenerator $randomAffixGenerator)
-    {
-        $this->randomAffixGenerator = $randomAffixGenerator;
-    }
+    public function __construct(private RandomAffixGenerator $randomAffixGenerator, private BattleMessageHandler $battleMessageHandler) {}
 
     public function handleFightingAtPurgatorySmithHouse(Character $character, Monster $monster): Character
     {
@@ -104,19 +101,19 @@ class PurgatorySmithHouseRewardHandler
             $maximumAmount = 5_000;
         }
 
-        $goldDust = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
-        $shards = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
+        $goldDustToGain = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
+        $shardsToGain = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
 
         $hasItemForCopperCoins = $character->inventory->slots->where('item.effect', ItemEffectsValue::GET_COPPER_COINS)->count() > 0;
-        $copperCoins = 0;
+        $copperCoinsToGain = 0;
 
         if ($hasItemForCopperCoins) {
-            $copperCoins = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
+            $copperCoinsToGain = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
         }
 
-        $goldDust += $character->gold_dust;
-        $shards += $character->shards;
-        $copperCoins += $character->copper_coins;
+        $goldDust = $character->gold_dust + $goldDustToGain;
+        $shards = $character->shards + $shardsToGain;
+        $copperCoins = $character->copper_coins + $copperCoinsToGain;
 
         if ($goldDust > MaxCurrenciesValue::MAX_GOLD_DUST) {
             $goldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
@@ -136,7 +133,16 @@ class PurgatorySmithHouseRewardHandler
             'copper_coins' => $copperCoins,
         ]);
 
-        return $character->refresh();
+        $character = $character->refresh();
+
+        $this->battleMessageHandler->handleCurrencyGainMessage($character->user, CurrenciesMessageTypes::GOLD_DUST, $goldDustToGain, $character->gold_dust);
+        $this->battleMessageHandler->handleCurrencyGainMessage($character->user, CurrenciesMessageTypes::SHARDS, $shardsToGain, $character->shards);
+
+        if ($copperCoinsToGain > 0) {
+            $this->battleMessageHandler->handleCurrencyGainMessage($character->user, CurrenciesMessageTypes::COPPER_COINS, $copperCoinsToGain, $character->copper_coins);
+        }
+
+        return $character;
     }
 
     /**

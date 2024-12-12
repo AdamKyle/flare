@@ -19,6 +19,10 @@ return new class extends Migration
             $table->boolean('show_gold_dust_per_kill')->default(true);
             $table->boolean('show_shards_per_kill')->default(true);
             $table->boolean('show_copper_coins_per_kill')->default(true);
+            $table->boolean('show_faction_point_message')->default(true);
+            $table->boolean('show_xp_for_class_masteries')->default(true);
+            $table->boolean('show_xp_for_class_ranks')->default(true);
+            $table->boolean('show_xp_for_equipped_class_specials')->default(true);
         });
     }
 

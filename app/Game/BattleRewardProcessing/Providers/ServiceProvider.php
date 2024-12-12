@@ -37,6 +37,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new FactionHandler(
                 $app->make(RandomAffixGenerator::class),
                 $app->make(GuideQuestService::class),
+                $app->make(BattleMessageHandler::class)
             );
         });
 
@@ -44,6 +45,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new FactionLoyaltyBountyHandler(
                 $app->make(RandomAffixGenerator::class),
                 $app->make(FactionLoyaltyService::class),
+                $app->make(BattleMessageHandler::class),
             );
         });
 
@@ -56,18 +58,21 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(PurgatorySmithHouseRewardHandler::class, function ($app) {
             return new PurgatorySmithHouseRewardHandler(
                 $app->make(RandomAffixGenerator::class),
+                $app->make(BattleMessageHandler::class),
             );
         });
 
         $this->app->bind(GoldMinesRewardHandler::class, function ($app) {
             return new GoldMinesRewardHandler(
                 $app->make(RandomAffixGenerator::class),
+                $app->make(BattleMessageHandler::class),
             );
         });
 
         $this->app->bind(TheOldChurchRewardHandler::class, function ($app) {
             return new TheOldChurchRewardHandler(
                 $app->make(RandomAffixGenerator::class),
+                $app->make(BattleMessageHandler::class),
             );
         });
 
