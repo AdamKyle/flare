@@ -175,4 +175,46 @@ class BattleMessageHandler
 
         ServerMessageHandler::sendBasicMessage($user, $message);
     }
+
+    /**
+     * Handle when an item skills kill count increases.
+     *
+     * @param User $user
+     * @param string $itemName
+     * @param string $skillName
+     * @param integer $currentKillCount
+     * @param integer $maxKillsNeeded
+     * @return void
+     */
+    public function handleItemKillCountMessage(User $user, string $itemName, string $skillName, int $currentKillCount, int $maxKillsNeeded): void
+    {
+        if (!UserOnlineValue::isOnline($user)) {
+            return;
+        }
+
+        if (!$user->show_item_skill_kill_count) {
+            return;
+        }
+
+        $neededKills = $maxKillsNeeded - $currentKillCount;
+
+        $message = 'A item skill: ' . $skillName . ' Attached to an item: ' . $itemName . ' has gained one point towards its kill count and is now at: ' . number_format($currentKillCount) . ' points out of: ' . number_format($maxKillsNeeded) . '. Only: ' . number_format($neededKills) . ' points left to go!';
+
+        ServerMessageHandler::sendBasicMessage($user, $message);
+    }
+
+    public function handleSkillXpUpdate(User $user, string $skillName, int $xpRewarded): void
+    {
+        if (!UserOnlineValue::isOnline($user)) {
+            return;
+        }
+
+        if (!$user->show_skill_xp_per_kill) {
+            return;
+        }
+
+        $message = 'Your skill: ' . $skillName . ' has gained: ' . number_format($xpRewarded) . ' XP! Killing is the key to gaining skill experience child! kill more!';
+
+        ServerMessageHandler::sendBasicMessage($user, $message);
+    }
 }

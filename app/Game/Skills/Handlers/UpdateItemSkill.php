@@ -5,17 +5,14 @@ namespace App\Game\Skills\Handlers;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemSkillProgression;
+use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class UpdateItemSkill
 {
-    private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
 
-    public function __construct(UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes)
-    {
-        $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
-    }
+    public function __construct(private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes, private BattleMessageHandler $battleMessageHandler) {}
 
     public function updateItemSkill(Character $character, Item $item): void
     {
@@ -35,6 +32,8 @@ class UpdateItemSkill
 
         $skillProgressionToUpdate = $skillProgressionToUpdate->refresh();
 
+        $this->battleMessageHandler->handleItemKillCountMessage($character->user, $item->affix_name, $skillProgressionToUpdate->itemSkill->name, $skillProgressionToUpdate->current_kill, $itemSkillProgression->itemSkill->total_kills_needed);
+
         $this->levelUpSkill($character, $skillProgressionToUpdate);
     }
 
@@ -51,8 +50,9 @@ class UpdateItemSkill
 
             $this->updateCharacterAttackTypes->updateCache($character->refresh());
 
-            ServerMessageHandler::sendBasicMessage($character->user,
-                'Your equipped artifacts: '.$itemSkillProgression->item->affix_name.'\'s Skill: '.$itemSkillProgression->itemSkill->name.' has gained a new level and is now level: '.$itemSkillProgression->current_level.'.'
+            ServerMessageHandler::sendBasicMessage(
+                $character->user,
+                'Your equipped artifacts: ' . $itemSkillProgression->item->affix_name . '\'s Skill: ' . $itemSkillProgression->itemSkill->name . ' has gained a new level and is now level: ' . $itemSkillProgression->current_level . '.'
             );
         }
     }

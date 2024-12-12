@@ -23,6 +23,7 @@ return new class extends Migration
             $table->boolean('show_xp_for_class_masteries')->default(true);
             $table->boolean('show_xp_for_class_ranks')->default(true);
             $table->boolean('show_xp_for_equipped_class_specials')->default(true);
+            $table->boolean('show_item_skill_kill_count')->default(true);
         });
     }
 

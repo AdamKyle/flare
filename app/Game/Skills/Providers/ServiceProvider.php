@@ -5,6 +5,7 @@ namespace App\Game\Skills\Providers;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\SkillsTransformer;
+use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
@@ -104,6 +105,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(BasicSkillsTransformer::class),
                 $app->make(SkillsTransformer::class),
                 $app->make(UpdateCharacterAttackTypesHandler::class),
+                $app->make(BattleMessageHandler::class),
             );
         });
 
@@ -137,8 +139,6 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-
-
         $this->app->bind(DisenchantService::class, function ($app) {
             return new DisenchantService($app->make(SkillCheckService::class), $app->make(CharacterInventoryService::class));
         });
@@ -150,6 +150,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(UpdateItemSkill::class, function ($app) {
             return new UpdateItemSkill(
                 $app->make(UpdateCharacterAttackTypesHandler::class),
+                $app->make(BattleMessageHandler::class),
             );
         });
     }

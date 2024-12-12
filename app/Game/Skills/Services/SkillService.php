@@ -9,6 +9,7 @@ use App\Flare\Models\ScheduledEvent;
 use App\Flare\Models\Skill;
 use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\SkillsTransformer;
+use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Events\Values\EventType;
@@ -21,25 +22,13 @@ class SkillService
 {
     use ResponseBuilder;
 
-    private Manager $manager;
-
-    private BasicSkillsTransformer $basicSkillsTransformer;
-
-    private SkillsTransformer $skillsTransformer;
-
-    private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
-
     public function __construct(
-        Manager $manager,
-        BasicSkillsTransformer $basicSkillsTransformer,
-        SkillsTransformer $skillsTransformer,
-        UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
-    ) {
-        $this->manager = $manager;
-        $this->basicSkillsTransformer = $basicSkillsTransformer;
-        $this->skillsTransformer = $skillsTransformer;
-        $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
-    }
+        private Manager $manager,
+        private BasicSkillsTransformer $basicSkillsTransformer,
+        private SkillsTransformer $skillsTransformer,
+        private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
+        private BattleMessageHandler $battleMessageHandler,
+    ) {}
 
     /**
      * Gets the skills for a player.
@@ -135,6 +124,8 @@ class SkillService
 
         $skillInTraining->update(['xp' => $newXp]);
         $skillInTraining = $skillInTraining->refresh();
+
+        $this->battleMessageHandler->handleSkillXpUpdate($character->user, $skillInTraining->name, $skillXp);
 
         while ($newXp >= $skillInTraining->xp_max) {
             $newXp -= $skillInTraining->xp_max;
