@@ -25,7 +25,7 @@ class ServerMessageBuilder
             'gold_dust' => 'You gained: ' . $forMessage . ' Gold Dust! Your new total is: ' . $newValue . '.',
             'shards' => 'You gained: ' . $forMessage . ' Shards! Your new total is: ' . $newValue . '.',
             'copper_coins' => 'You gained: ' . $forMessage . ' Copper Coins! Your new total is: ' . $newValue . '.',
-            'gold_rush' => 'Gold Rush! Your gold is now: ' . $forMessage . ' Gold! 5% of your total gold has been awarded to you.',
+            'gold_rush' => 'Gold Rush! Your gold has increased by: ' . $forMessage . ' Gold! 5% of your total gold has been awarded to you. You now have: ' . $newValue . ' Gold!',
             'crafted' => 'You crafted a: ' . $forMessage . '!',
             'new_damage_stat' => 'The Creator has changed your classes damage stat to: ' . $forMessage . '. Please adjust your gear accordingly for maximum damage.',
             'disenchanted' => 'Disenchanted the item and got: ' . $forMessage . ' Gold Dust.',

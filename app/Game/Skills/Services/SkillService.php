@@ -122,7 +122,6 @@ class SkillService
 
         $skillXp = $this->getXpForSkillIntraining($character, $xp);
 
-
         $newXp = $this->skillInTraining->xp + $skillXp;
 
         $this->skillInTraining->update(['xp' => $newXp]);
@@ -171,7 +170,7 @@ class SkillService
             return 0;
         }
 
-        if ($this->skillInTraining->level === $$this->skillInTraining->baseSkill->max_level) {
+        if ($this->skillInTraining->level === $this->skillInTraining->baseSkill->max_level) {
             return 0;
         }
 
@@ -182,6 +181,8 @@ class SkillService
         if (!is_null($event)) {
             $skillXp += 150;
         }
+
+        return $skillXp;
     }
 
     /**
@@ -193,17 +194,15 @@ class SkillService
      */
     public function getCharacterXpWithSkillTrainingReduction(Character $character, int $xp): int
     {
-        $skillInTraining = $character->skills->where('currently_training', true)->first();
-
-        if (is_null($skillInTraining)) {
+        if (is_null($this->skillInTraining)) {
             return $xp;
         }
 
-        if ($skillInTraining->level === $skillInTraining->baseSkill->max_level) {
+        if ($this->skillInTraining->level === $this->skillInTraining->baseSkill->max_level) {
             return $xp;
         }
 
-        return intval($xp - ($xp * $skillInTraining->xp_towards));
+        return intval($xp - ($xp * $this->skillInTraining->xp_towards));
     }
 
     /**

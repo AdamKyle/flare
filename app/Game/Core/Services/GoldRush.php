@@ -48,7 +48,10 @@ class GoldRush
      */
     private function giveGoldRush(Character $character): void
     {
-        $goldRush = $character->gold + ($character->gold * 0.05);
+
+        $amountGiven = ($character->gold * 0.05);
+
+        $goldRush = $character->gold + $amountGiven;
 
         $maxCurrencies = new MaxCurrenciesValue($goldRush, MaxCurrenciesValue::GOLD);
 
@@ -66,7 +69,7 @@ class GoldRush
 
         $character = $character->refresh();
 
-        ServerMessageHandler::handleMessage($character->user, $type, CurrenciesMessageTypes::GOLD_RUSH, number_format($character->gold));
+        ServerMessageHandler::handleMessage($character->user, $type, number_format($amountGiven), number_format($character->gold));
     }
 
     /**

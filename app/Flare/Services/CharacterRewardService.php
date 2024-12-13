@@ -125,7 +125,7 @@ class CharacterRewardService
      */
     public function distributeSkillXP(Monster $monster): CharacterRewardService
     {
-        $this->skillService->assignXPToTrainingSkill($this->character, $monster->xp);
+        $this->skillService->setSkillInTraining($this->character)->assignXPToTrainingSkill($this->character, $monster->xp);
 
         return $this;
     }
@@ -335,7 +335,7 @@ class CharacterRewardService
         }
 
         // Get XP based on the skill in trainings training sacrificial amount, ie, give me back 85% of this xp.
-        $xp = $this->skillService->getCharacterXpWithSkillTrainingReduction($this->character, $xp);
+        $xp = $this->skillService->setSkillInTraining($this->character)->getCharacterXpWithSkillTrainingReduction($this->character, $xp);
 
         $event = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
 
