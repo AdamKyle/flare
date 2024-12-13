@@ -29,11 +29,6 @@ class TheOldChurchRewardHandler
 
     public function handleFightingAtTheOldChurch(Character $character, Monster $monster): Character
     {
-
-        if ($character->currentAutomations->isNotEmpty()) {
-            return $character;
-        }
-
         $location = Location::where('x', $character->x_position)
             ->where('y', $character->y_position)
             ->where('game_map_id', $character->map->game_map_id)
@@ -58,6 +53,10 @@ class TheOldChurchRewardHandler
         $event = Event::where('type', EventType::THE_OLD_CHURCH)->first();
 
         $character = $this->currencyReward($character, $event);
+
+        if ($character->currentAutomations->isNotEmpty()) {
+            return $character;
+        }
 
         if ($this->isMonsterAtLeastHalfWayOrMore($location, $monster)) {
             $character = $this->handleItemReward($character, $event);

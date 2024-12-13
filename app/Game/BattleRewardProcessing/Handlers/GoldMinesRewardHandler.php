@@ -27,11 +27,6 @@ class GoldMinesRewardHandler
 
     public function handleFightingAtGoldMines(Character $character, Monster $monster): Character
     {
-
-        if ($character->currentAutomations->isNotEmpty()) {
-            return $character;
-        }
-
         $location = Location::where('x', $character->x_position)
             ->where('y', $character->y_position)
             ->where('game_map_id', $character->map->game_map_id)
@@ -48,6 +43,10 @@ class GoldMinesRewardHandler
         $event = Event::where('type', EventType::GOLD_MINES)->first();
 
         $character = $this->currencyReward($character, $event);
+
+        if ($character->currentAutomations->isNotEmpty()) {
+            return $character;
+        }
 
         if ($this->isMonsterAtLeastHalfWayOrMore($location, $monster)) {
             $character = $this->handleItemReward($character, $event);

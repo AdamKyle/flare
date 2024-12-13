@@ -300,10 +300,12 @@ class CharacterRewardService
         $xp = $this->fetchXpForMonster($monster);
 
         $this->character->update([
-            'xp' => $xp,
+            'xp' => $this->character->xp + $xp,
         ]);
 
         $this->character = $this->character->refresh();
+
+        $this->battleMessageHandler->handleXPMessage($this->character->user, $xp, $this->character->xp);
     }
 
     /**

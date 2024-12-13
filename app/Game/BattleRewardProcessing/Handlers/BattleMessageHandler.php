@@ -25,6 +25,7 @@ class BattleMessageHandler
      */
     public function handleMessageForExplorationXp(User $user, int $numberOfCreatures, int $totalXp): void
     {
+
         if (!UserOnlineValue::isOnline($user)) {
             return;
         }
@@ -34,6 +35,29 @@ class BattleMessageHandler
         }
 
         $message = 'You slaughtered: ' . number_format($numberOfCreatures) . ' creatures and gained a total of: ' . number_format($totalXp) . ' XP.';
+
+        ServerMessageHandler::sendBasicMessage($user, $message);
+    }
+
+    /**
+     * Handle when xp is given.
+     *
+     * @param User $user
+     * @param integer $xpGiven
+     * @param integer $currentXp
+     * @return void
+     */
+    public function handleXPMessage(User $user, int $xpGiven, int $currentXp): void
+    {
+        if (!UserOnlineValue::isOnline($user)) {
+            return;
+        }
+
+        if (!$user->show_xp_per_kill) {
+            return;
+        }
+
+        $message = 'You gained: ' . number_format($xpGiven) . ' XP and now you have: ' . number_format($currentXp);
 
         ServerMessageHandler::sendBasicMessage($user, $message);
     }
@@ -121,8 +145,8 @@ class BattleMessageHandler
         ServerMessageHandler::handleMessageWithNewValue(
             $user,
             $currencyType,
-            $currencyGain,
-            $newTotal,
+            number_format($currencyGain),
+            number_format($newTotal),
         );
     }
 

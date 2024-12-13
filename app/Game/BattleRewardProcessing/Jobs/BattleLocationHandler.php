@@ -9,7 +9,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
-use App\Flare\Services\CharacterRewardService;
 use App\Game\BattleRewardProcessing\Handlers\GoldMinesRewardHandler;
 use App\Game\BattleRewardProcessing\Handlers\PurgatorySmithHouseRewardHandler;
 use App\Game\BattleRewardProcessing\Handlers\TheOldChurchRewardHandler;
@@ -61,6 +60,8 @@ class BattleLocationHandler implements ShouldQueue
         if (is_null($monster)) {
             return;
         }
+
+        $this->processLocationBasedRewards($character, $monster, $purgatorySmithHouseRewardHandler, $goldMinesRewardHandler, $theOldChurchRewardHandler);
     }
 
     /**
