@@ -41,10 +41,7 @@ class BattleMessageHandler
     /**
      * Handle message for gaining xp for faction loyalty
      *
-     * @param User $user
-     * @param integer $totalXp
-     * @param integer $newFameLevel
-     * @param string $npcName
+     * @param User $user.
      * @return void
      */
     public function handleFactionLoyaltyXp(User $user, int $totalXp, int $newFameLevel, string $npcName): void
@@ -53,11 +50,11 @@ class BattleMessageHandler
             return;
         }
 
-        if (!$user->show_xp_per_kill) {
+        if (!$user->show_faction_loyalty_xp_gain) {
             return;
         }
 
-        $message = 'For gaining a new fame level (' . $newFameLevel . ') for helping: ' . $npcName . ' with their tasks you were rewarded with: ' . number_format($totalXp) . ' XP!';
+        $message = 'For gaining a new fame level (' . $newFameLevel . ') for helping: ' . $npcName . ' with their tasks you were rewarded with: ' . number_format($totalXp) . ' XP.';
 
         ServerMessageHandler::sendBasicMessage($user, $message);
     }
@@ -83,7 +80,7 @@ class BattleMessageHandler
 
         $neededPoints = $maxPointsNeeded - $currentPoints;
 
-        $message = 'You gained: ' . number_format($numberOfPointsToGain) . ' Faction Points, which puts you at: ' . number_format($currentPoints) . '. You neex ' . number_format($neededPoints) . ' more points to gain a new level!';
+        $message = 'You gained: ' . number_format($numberOfPointsToGain) . ' Faction Points, which puts you at: ' . number_format($currentPoints) . ' points. You need: ' . number_format($neededPoints) . ' more points to gain a new level!';
 
         ServerMessageHandler::sendBasicMessage($user, $message);
     }
@@ -106,20 +103,18 @@ class BattleMessageHandler
      */
     public function handleCurrencyGainMessage(User $user, CurrenciesMessageTypes $currencyType, int $currencyGain, int $newTotal): void
     {
-
         if (!UserOnlineValue::isOnline($user)) {
             return;
         }
 
-        $shouldShowMessage = match ($currencyType) {
-            CurrenciesMessageTypes::GOLD => $user->show_gold_per_kill,
-            CurrenciesMessageTypes::GOLD_DUST => $user->show_gold_dust_per_kill,
-            CurrenciesMessageTypes::SHARDS => $user->show_shards_per_kill,
-            CurrenciesMessageTypes::COPPER_COINS => $user->show_copper_coins_per_kill,
-            default => false,
-        };
+        $showMessageFlags = [
+            CurrenciesMessageTypes::GOLD->value => $user->show_gold_per_kill,
+            CurrenciesMessageTypes::GOLD_DUST->value => $user->show_gold_dust_per_kill,
+            CurrenciesMessageTypes::SHARDS->value => $user->show_shards_per_kill,
+            CurrenciesMessageTypes::COPPER_COINS->value => $user->show_copper_coins_per_kill,
+        ];
 
-        if (!$shouldShowMessage) {
+        if (!$showMessageFlags[$currencyType->value]) {
             return;
         }
 
@@ -130,6 +125,7 @@ class BattleMessageHandler
             $newTotal,
         );
     }
+
 
     /**
      * Uhandles messages for class ranks when they gain XP.
@@ -146,7 +142,6 @@ class BattleMessageHandler
      * @param integer $currentXp
      * @param string|null $weaponMastery
      * @param string|null $classspecial
-     * @throws InvalidArgumentException
      * @return void
      */
     public function handleClassRankMessage(User $user, ClassRanksMessageTypes $classRanksMessageTypes, string $className, int $xpGiven, int $currentXp, string $weaponMastery = null, string $classspecial = null): void
@@ -155,26 +150,27 @@ class BattleMessageHandler
             return;
         }
 
-        $shouldShowMessage = match ($classRanksMessageTypes) {
-            ClassRanksMessageTypes::XP_FOR_CLASS_MASTERIES => $user->show_xp_for_class_masteries,
-            ClassRanksMessageTypes::XP_FOR_CLASS_RANKS => $user->show_xp_for_class_ranks,
-            ClassRanksMessageTypes::XP_FOR_EQUIPPED_CLASS_SPECIALS => $user->show_xp_for_equipped_class_specials,
-            default => false,
-        };
+        $showMessageFlags = [
+            ClassRanksMessageTypes::XP_FOR_CLASS_MASTERIES->value => $user->show_xp_for_class_masteries,
+            ClassRanksMessageTypes::XP_FOR_CLASS_RANKS->value => $user->show_xp_for_class_ranks,
+            ClassRanksMessageTypes::XP_FOR_EQUIPPED_CLASS_SPECIALS->value => $user->show_xp_for_equipped_class_specials,
+        ];
 
-        if (!$shouldShowMessage) {
+        if (!$showMessageFlags[$classRanksMessageTypes->getValue()]) {
             return;
         }
 
-        $message = match ($classRanksMessageTypes) {
-            ClassRanksMessageTypes::XP_FOR_CLASS_MASTERIES => 'Your class: ' . $className . ' has gained experience in a weapon mastery: ' . $weaponMastery . ' of: ' . number_format($xpGiven) . ' XP and now has a total of: ' . number_format($currentXp) . ' XP.',
-            ClassRanksMessageTypes::XP_FOR_CLASS_RANKS => 'Your class rank: ' . $className . ' has gained experience of: ' . number_format($xpGiven) . ' XP and now has a total of: ' . number_format($currentXp) . ' XP.',
-            ClassRanksMessageTypes::XP_FOR_EQUIPPED_CLASS_SPECIALS => 'Your class rank: ' . $className . ' has gained experience in a specialty ypu have equipped: ' . $classspecial . ' of: ' . number_format($xpGiven) . ' XP and now has a total of: ' . number_format($currentXp) . ' XP.',
-            default => throw new InvalidArgument('Invalid message type was given ...'),
-        };
+        $messages = [
+            ClassRanksMessageTypes::XP_FOR_CLASS_MASTERIES->value => 'Your class: ' . $className . ' has gained experience in a weapon mastery: ' . $weaponMastery . ' of: ' . number_format($xpGiven) . ' XP and now has a total of: ' . number_format($currentXp) . ' XP.',
+            ClassRanksMessageTypes::XP_FOR_CLASS_RANKS->value => 'Your class rank: ' . $className . ' has gained experience of: ' . number_format($xpGiven) . ' XP and now has a total of: ' . number_format($currentXp) . ' XP.',
+            ClassRanksMessageTypes::XP_FOR_EQUIPPED_CLASS_SPECIALS->value => 'Your class rank: ' . $className . ' has gained experience in a specialty you have equipped: ' . $classspecial . ' of: ' . number_format($xpGiven) . ' XP and now has a total of: ' . number_format($currentXp) . ' XP.',
+        ];
+
+        $message = $messages[$classRanksMessageTypes->getValue()];
 
         ServerMessageHandler::sendBasicMessage($user, $message);
     }
+
 
     /**
      * Handle when an item skills kill count increases.
