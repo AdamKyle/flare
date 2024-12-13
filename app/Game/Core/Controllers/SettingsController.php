@@ -53,6 +53,19 @@ class SettingsController extends Controller
             'show_kingdom_update_messages' => $request->has('show_kingdom_update_messages') ? $request->show_kingdom_update_messages : false,
             'show_building_rebuilt_messages' => $request->has('show_building_rebuilt_messages') ? $request->show_building_rebuilt_messages : false,
             'show_monster_to_low_level_message' => $request->has('show_monster_to_low_level_message') ? $request->show_monster_to_low_level_message : false,
+            'show_xp_for_exploration' => $request->has('show_xp_for_exploration') ? $request->show_xp_for_exploration : false,
+            'show_xp_per_kill' => $request->has('show_xp_per_kill') ? $request->show_xp_per_kill : false,
+            'show_xp_for_class_masteries' => $request->has('show_xp_for_class_masteries') ? $request->show_xp_for_class_masteries : false,
+            'show_xp_for_class_ranks' => $request->has('show_xp_for_class_ranks') ? $request->show_xp_for_class_ranks : false,
+            'show_xp_for_equipped_class_specials' => $request->has('show_xp_for_equipped_class_specials') ? $request->show_xp_for_equipped_class_specials : false,
+            'show_faction_loyalty_xp_gain' => $request->has('show_faction_loyalty_xp_gain') ? $request->show_faction_loyalty_xp_gain : false,
+            'show_skill_xp_per_kill' => $request->has('show_skill_xp_per_kill') ? $request->show_skill_xp_per_kill : false,
+            'show_item_skill_kill_count' => $request->has('show_item_skill_kill_count') ? $request->show_item_skill_kill_count : false,
+            'show_gold_per_kill' => $request->has('show_gold_per_kill') ? $request->show_gold_per_kill : false,
+            'show_gold_dust_per_kill' => $request->has('show_gold_dust_per_kill') ? $request->show_gold_dust_per_kill : false,
+            'show_shards_per_kill' => $request->has('show_shards_per_kill') ? $request->show_shards_per_kill : false,
+            'show_copper_coins_per_kill' => $request->has('show_copper_coins_per_kill') ? $request->show_copper_coins_per_kill : false,
+            'show_faction_point_message' => $request->has('show_faction_point_message') ? $request->show_faction_point_message : false,
         ]);
 
         return redirect()->back()->with('success', 'Updated chat preferences.');

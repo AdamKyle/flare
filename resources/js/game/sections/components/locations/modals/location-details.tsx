@@ -35,9 +35,10 @@ export default class LocationDetails extends React.Component<
                     <h5 className="text-orange-500 dark:text-orange-400">
                         Gold Mines!
                     </h5>
-                    <WarningAlert additional_css={"my-4 font-bold"}>
+                    <WarningAlert additional_css={"my-4"}>
                         Exploration cannot be used here if you want the below
-                        rewards. You must manually fight.
+                        rewards. You must manually fight. Except for currencies.
+                        You can explore here to gain the currencies.
                     </WarningAlert>
                     <p className="my-4">
                         Welcome to the Gold Mines, a special mid game location
@@ -94,9 +95,10 @@ export default class LocationDetails extends React.Component<
                     <h5 className="text-orange-500 dark:text-orange-400">
                         The Old Church!
                     </h5>
-                    <WarningAlert additional_css={"my-4 font-bold"}>
+                    <WarningAlert additional_css={"my-4"}>
                         Exploration cannot be used here if you want the below
-                        rewards. You must manually fight.
+                        rewards. You must manually fight. Except for currencies.
+                        You can explore here to gain the currencies.
                     </WarningAlert>
 
                     <InfoAlert additional_css={"my-4 font-bold"}>
@@ -179,9 +181,10 @@ export default class LocationDetails extends React.Component<
                     <h5 className="text-orange-500 dark:text-orange-400">
                         Purgatory Smith House!
                     </h5>
-                    <WarningAlert additional_css={"my-4 font-bold"}>
+                    <WarningAlert additional_css={"my-4"}>
                         Exploration cannot be used here if you want the below
-                        rewards. You must use manually fight.
+                        rewards. You must manually fight. Except for currencies.
+                        You can explore here to gain the currencies.
                     </WarningAlert>
                     <p className="mb-4">
                         In this location, a few things will happen for those who
@@ -295,9 +298,10 @@ export default class LocationDetails extends React.Component<
                     <h5 className="text-orange-500 dark:text-orange-400">
                         Corrupted Alchemy Church
                     </h5>
-                    <WarningAlert additional_css={"my-4 font-bold"}>
+                    <WarningAlert additional_css={"my-4"}>
                         Exploration cannot be used here if you want the below
-                        rewards. You must use manually fight.
+                        rewards. You must manually fight. Except for currencies.
+                        You can explore here to gain the currencies.
                     </WarningAlert>
                     <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3"></div>
                     <p className="mb-4">

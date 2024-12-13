@@ -6,7 +6,6 @@ use App\Flare\Models\Character;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\Core\Events\UpdateTopBarEvent;
-use Exception;
 use Facades\App\Game\Skills\Handlers\UpdateItemSkill;
 
 class SecondaryRewardService
@@ -28,8 +27,6 @@ class SecondaryRewardService
      * - Handle character skill progression
      *
      * @return void
-     *
-     * @throws Exception
      */
     public function handleSecondaryRewards(Character $character)
     {
@@ -48,8 +45,11 @@ class SecondaryRewardService
 
     /**
      * Handle item skill updates for artifacts that are equipped with skill trees.
+     *
+     * @param Character $character
+     * @return void
      */
-    protected function handleItemSkillUpdate(Character $character): void
+    private function handleItemSkillUpdate(Character $character): void
     {
         $equippedItems = $this->fetchEquipped($character);
 

@@ -32,7 +32,7 @@
     @if ($locationType->isGoldMines())
         <h3 class="mb-4">Welcome to Gold Mines</h3>
         <x-core.alerts.warning-alert title="ATTN!">
-            Exploration cannot be used here if you want the below rewards. You must manually fight. Except for currencies. YOu can explore here to gain the currencies.
+            Exploration cannot be used here if you want the below rewards. You must manually fight. Except for currencies. You can explore here to gain the currencies.
         </x-core.alerts.warning-alert>
         <p class="mb-4"> This location will let you explore here, for shards to drop off enemies. 1-1000 shards per
             kill.</p>
@@ -54,7 +54,7 @@
     @if ($locationType->isPurgatorySmithHouse())
         <h3 class="mb-4">Welcome to Purgatory Smith House!</h3>
         <x-core.alerts.warning-alert title="ATTN!">
-            Exploration cannot be used here if you want the below rewards. You must manually fight. Except for currencies. YOu can explore here to gain the currencies.
+            Exploration cannot be used here if you want the below rewards. You must manually fight. Except for currencies. You can explore here to gain the currencies.
         </x-core.alerts.warning-alert>
         <p class="my-4">In this location, a few things will happen for those who have access:</p>
         <ul class="list-disc my-4">
@@ -71,7 +71,7 @@
     @if ($locationType->isTheOldChurch())
         <h3 class="mb-4">Welcome to The Old Church!</h3>
         <x-core.alerts.warning-alert title="ATTN!">
-            Exploration cannot be used here if you want the below rewards. You must manually fight. Except for currencies. YOu can explore here to gain the currencies.
+            Exploration cannot be used here if you want the below rewards. You must manually fight. Except for currencies. You can explore here to gain the currencies.
         </x-core.alerts.warning-alert>
         <x-core.alerts.info-alert title="WAIT!">
             The below only applies to those who poses the Christmas Tree Light Bulb Quest item from completing a quest chain that starts with: Thousands of Years Ago ... and

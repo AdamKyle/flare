@@ -114,6 +114,14 @@ return [
             'block_for' => null,
         ],
 
+        'battle_secondary_reward' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+            'queue' => 'battle_secondary_reward',
+            'retry_after' => 1200,
+            'block_for' => null,
+        ],
+
         'battle_reward_factions' => [
             'driver' => 'redis',
             'connection' => 'default',

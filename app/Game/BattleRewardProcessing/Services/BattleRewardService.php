@@ -7,6 +7,7 @@ use App\Game\BattleRewardProcessing\Jobs\BattleFactionHandler;
 use App\Game\BattleRewardProcessing\Jobs\BattleGlobalEventHandler;
 use App\Game\BattleRewardProcessing\Jobs\BattleItemHandler;
 use App\Game\BattleRewardProcessing\Jobs\BattleLocationHandler;
+use App\Game\BattleRewardProcessing\Jobs\BattleSecondaryRewardHandler;
 use App\Game\BattleRewardProcessing\Jobs\BattleWeeklyFightHandler;
 use App\Game\BattleRewardProcessing\Jobs\BattleXpHandler;
 
@@ -46,6 +47,7 @@ class BattleRewardService
             BattleXpHandler::dispatch($this->characterId, $this->monsterId)->onQueue('battle_reward_xp')->delay(now()->addSeconds(2));
         }
 
+        BattleSecondaryRewardHandler::dispatch($this->characterId)->onQueue('battle_secondary_reward')->delay(now()->addSeconds(2));
         BattleCurrenciesHandler::dispatch($this->characterId, $this->monsterId)->onQueue('battle_reward_currencies')->delay(now()->addSeconds(2));
         BattleFactionHandler::dispatch($this->characterId, $this->monsterId)->onQueue('battle_reward_factions')->delay(now()->addSeconds(2));
         BattleGlobalEventHandler::dispatch($this->characterId)->onQueue('battle_reward_global_event')->delay(now()->addSeconds(2));

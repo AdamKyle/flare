@@ -8,32 +8,17 @@ use App\Flare\Models\Monster;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Events\CharacterRevive;
 use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
-use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Messages\Events\ServerMessageEvent;
-use Exception;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
 class BattleEventHandler
 {
     use FetchEquipped;
 
-    private BattleRewardService $battleRewardService;
-
-    private SecondaryRewardService $secondaryRewardService;
-
-    private WeeklyBattleService $weeklyBattleService;
-
-    public function __construct(BattleRewardService $battleRewardService, SecondaryRewardService $secondaryRewardService, WeeklyBattleService $weeklyBattleService)
-    {
-        $this->battleRewardService = $battleRewardService;
-        $this->secondaryRewardService = $secondaryRewardService;
-        $this->weeklyBattleService = $weeklyBattleService;
-    }
+    public function __construct(private BattleRewardService $battleRewardService, private WeeklyBattleService $weeklyBattleService) {}
 
     /**
      * Process the fact the character has died.

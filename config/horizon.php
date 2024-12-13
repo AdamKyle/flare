@@ -243,6 +243,16 @@ return [
             'nice' => 0,
         ],
 
+        'supervisor-battle-secondary-reward' => [
+            'connection' => 'battle_secondary_reward',
+            'queue' => ['battle_secondary_reward'],
+            'balance' => 'auto',
+            'maxProcesses' => 25,
+            'memory' => 256,
+            'tries' => 5,
+            'nice' => 0,
+        ],
+
         'supervisor-battle-reward-factions' => [
             'connection' => 'battle_reward_factions',
             'queue' => ['battle_reward_factions'],
@@ -368,6 +378,16 @@ return [
                 'nice' => 0,
             ],
 
+            'supervisor-battle-secondary-reward' => [
+                'connection' => 'battle_secondary_reward',
+                'queue' => ['battle_secondary_reward'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
             'supervisor-battle-reward-factions' => [
                 'connection' => 'battle_reward_factions',
                 'queue' => ['battle_reward_factions'],
@@ -475,6 +495,16 @@ return [
             'supervisor-battle-reward-currencies' => [
                 'connection' => 'battle_reward_currencies',
                 'queue' => ['battle_reward_currencies'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
+            'supervisor-battle-secondary-reward' => [
+                'connection' => 'battle_secondary_reward',
+                'queue' => ['battle_secondary_reward'],
                 'balance' => 'auto',
                 'maxProcesses' => 25,
                 'memory' => 256,
