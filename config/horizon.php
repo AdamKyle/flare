@@ -223,6 +223,16 @@ return [
             'nice' => 0,
         ],
 
+        'supervisor-exploration-battle-skill-xp-reward' => [
+            'connection' => 'exploration_battle_skill_xp_reward',
+            'queue' => ['exploration_battle_skill_xp_reward'],
+            'balance' => 'auto',
+            'maxProcesses' => 25,
+            'memory' => 256,
+            'tries' => 5,
+            'nice' => 0,
+        ],
+
         'supervisor-battle-reward-currencies' => [
             'connection' => 'battle_reward_currencies',
             'queue' => ['battle_reward_currencies'],
@@ -338,6 +348,16 @@ return [
                 'nice' => 0,
             ],
 
+            'supervisor-exploration-battle-skill-xp-reward' => [
+                'connection' => 'exploration_battle_skill_xp_reward',
+                'queue' => ['exploration_battle_skill_xp_reward'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
             'supervisor-battle-reward-currencies' => [
                 'connection' => 'battle_reward_currencies',
                 'queue' => ['battle_reward_currencies'],
@@ -435,6 +455,16 @@ return [
             'supervisor-exploration-battle-xp-reward' => [
                 'connection' => 'exploration_battle_xp_reward',
                 'queue' => ['exploration_battle_xp_reward'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
+            'supervisor-exploration-battle-skill-xp-reward' => [
+                'connection' => 'exploration_battle_skill_xp_reward',
+                'queue' => ['exploration_battle_skill_xp_reward'],
                 'balance' => 'auto',
                 'maxProcesses' => 25,
                 'memory' => 256,

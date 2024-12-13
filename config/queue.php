@@ -98,6 +98,14 @@ return [
             'block_for' => null,
         ],
 
+        'exploration_battle_skill_xp_reward' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+            'queue' => 'exploration_battle_skill_xp_reward',
+            'retry_after' => 1200,
+            'block_for' => null,
+        ],
+
         'battle_reward_currencies' => [
             'driver' => 'redis',
             'connection' => 'default',

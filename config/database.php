@@ -193,6 +193,14 @@ return [
             'database' => 5,
         ],
 
+        'exploration_battle_skill_xp_reward' => [
+            'url' => env('REDIS_URL'),
+            'host' => env('REDIS_HOST', '127.0.0.1'),
+            'password' => env('REDIS_PASSWORD', null),
+            'port' => env('REDIS_PORT', 6379),
+            'database' => 5,
+        ],
+
         'battle_reward_currencies' => [
             'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),

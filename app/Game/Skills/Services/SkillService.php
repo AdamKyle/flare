@@ -22,6 +22,8 @@ class SkillService
 {
     use ResponseBuilder;
 
+    private ?Skill $skillInTraining;
+
     public function __construct(
         private Manager $manager,
         private BasicSkillsTransformer $basicSkillsTransformer,
@@ -29,6 +31,19 @@ class SkillService
         private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
         private BattleMessageHandler $battleMessageHandler,
     ) {}
+
+    /**
+     * Set the current skill in training
+     *
+     * @param Character $character
+     * @return SkillService
+     */
+    public function setSkillInTraining(Character $character): SkillService
+    {
+        $this->skillInTraining = $character->skills->where('currently_training', true)->first();
+
+        return $this;
+    }
 
     /**
      * Gets the skills for a player.
@@ -101,61 +116,82 @@ class SkillService
      */
     public function assignXPToTrainingSkill(Character $character, int $xp): void
     {
-        $skillInTraining = $character->skills->where('currently_training', true)->first();
+        if (is_null($this->skillInTraining)) {
+            return;
+        }
+
+        $skillXp = $this->getXpForSkillIntraining($character, $xp);
+
+
+        $newXp = $this->skillInTraining->xp + $skillXp;
+
+        $this->skillInTraining->update(['xp' => $newXp]);
+        $skillInTraining = $this->skillInTraining->refresh();
+
+        $this->battleMessageHandler->handleSkillXpUpdate($character->user, $skillInTraining->name, $skillXp);
+
+        $this->handlePossibleLevelUpForSkill($skillInTraining, $newXp);
+    }
+
+    /**
+     * Give a specific amount of xp to a skill in training
+     *
+     * @param Character $character
+     * @param integer $totalXpToGive
+     * @return void
+     */
+    public function giveXpToTrainingSkill(Character $character, int $totalXpToGive): void
+    {
+        if (is_null($this->skillInTraining)) {
+            return;
+        }
+
+        $newXp = $this->skillInTraining->xp + $totalXpToGive;
+
+        $this->skillInTraining->update(['xp' => $newXp]);
+        $skillInTraining = $this->skillInTraining->refresh();
+
+        $this->battleMessageHandler->handleSkillXpUpdate($character->user, $skillInTraining->name, $totalXpToGive);
+
+        $this->handlePossibleLevelUpForSkill($skillInTraining, $newXp);
+    }
+
+    /**
+     * Get the xp for the skill in training
+     *
+     * @param Character $character
+     * @param integer $xp
+     * @return integer
+     */
+    public function getXpForSkillIntraining(Character $character, int $xp): int
+    {
         $event = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
 
-        if (is_null($skillInTraining)) {
-            return;
+        if (is_null($this->skillInTraining)) {
+            return 0;
         }
 
-        if ($skillInTraining->level === $skillInTraining->baseSkill->max_level) {
-            return;
+        if ($this->skillInTraining->level === $$this->skillInTraining->baseSkill->max_level) {
+            return 0;
         }
 
-        $skillXp = $xp + ($xp * $skillInTraining->xp_towards);
-        $skillXp = $skillXp + $skillXp * ($skillInTraining->skill_training_bonus + $character->map->gameMap->skill_training_bonus);
+        $skillXp = $xp + ($xp * $this->skillInTraining->xp_towards);
+        $skillXp = $skillXp + $skillXp * ($this->skillInTraining->skill_training_bonus + $character->map->gameMap->skill_training_bonus);
         $skillXp += 5;
 
         if (!is_null($event)) {
             $skillXp += 150;
         }
-
-        $newXp = $skillInTraining->xp + $skillXp;
-
-        $skillInTraining->update(['xp' => $newXp]);
-        $skillInTraining = $skillInTraining->refresh();
-
-        $this->battleMessageHandler->handleSkillXpUpdate($character->user, $skillInTraining->name, $skillXp);
-
-        while ($newXp >= $skillInTraining->xp_max) {
-            $newXp -= $skillInTraining->xp_max;
-
-            $skillInTraining = $this->levelUpSkill($skillInTraining);
-
-            if ($skillInTraining->level === $skillInTraining->baseSkill->max_level) {
-                $newXp = 0;
-
-                $skillInTraining->update(['xp' => $newXp]);
-
-                $skillInTraining = $skillInTraining->refresh();
-
-                break;
-            }
-
-            $skillInTraining->update(['xp' => $newXp]);
-
-            $skillInTraining = $skillInTraining->refresh();
-        }
-
-        if ($newXp > 0) {
-            $skillInTraining->update(['xp' => $newXp]);
-        }
     }
 
     /**
      * Get the XP after being reduced from any skill in training.
+     *
+     * @param Character $character
+     * @param integer $xp
+     * @return integer
      */
-    public function getXpWithSkillTrainingReduction(Character $character, int $xp): int
+    public function getCharacterXpWithSkillTrainingReduction(Character $character, int $xp): int
     {
         $skillInTraining = $character->skills->where('currently_training', true)->first();
 
@@ -220,13 +256,46 @@ class SkillService
         $skill->update(['xp' => $newXp]);
     }
 
+    /**
+     * Handle possibly leveling up the skill.
+     *
+     * @param Skill $skillInTraining
+     * @param integer $newXp
+     * @return void
+     */
+    private function handlePossibleLevelUpForSkill(Skill $skillInTraining, int $newXp): void
+    {
+        while ($newXp >= $skillInTraining->xp_max) {
+            $newXp -= $skillInTraining->xp_max;
+
+            $skillInTraining = $this->levelUpSkill($skillInTraining);
+
+            if ($skillInTraining->level === $skillInTraining->baseSkill->max_level) {
+                $newXp = 0;
+
+                $skillInTraining->update(['xp' => $newXp]);
+
+                $skillInTraining = $skillInTraining->refresh();
+
+                break;
+            }
+
+            $skillInTraining->update(['xp' => $newXp]);
+
+            $skillInTraining = $skillInTraining->refresh();
+        }
+
+        if ($newXp > 0) {
+            $skillInTraining->update(['xp' => $newXp]);
+        }
+    }
 
     /**
      * Level a skill.
      *
      * @throws Exception
      */
-    protected function levelUpSkill(Skill $skill): Skill
+    private function levelUpSkill(Skill $skill): Skill
     {
         if ($skill->xp >= $skill->xp_max) {
 
