@@ -1,10 +1,10 @@
 import React from "react";
-import BasicCard from "../../../game/components/ui/cards/basic-card";
 import OtherStatistics from "./components/other-statistics";
 import CharacterReincarnationStatistics from "./components/character-reincarnation-statistics";
 import CharacterTotalGold from "./components/character-total-gold";
 import CharacterQuestCompletion from "./components/character-quest-completion";
 import CharactersOnlineContainer from "../../../individual-components/public-components/characters-online-stats/characters-online-container";
+import BasicCard from "../../components/ui/cards/basic-card";
 
 export default class UserStatistics extends React.Component<any, any> {
     constructor(props: any) {

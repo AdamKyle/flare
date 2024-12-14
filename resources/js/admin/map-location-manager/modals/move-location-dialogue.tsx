@@ -1,12 +1,12 @@
 import React from "react";
 import Select from "react-select";
-import PrimaryButton from "../../../game/components/ui/buttons/primary-button";
-import Dialogue from "../../../game/components/ui/dialogue/dialogue";
-import LoadingProgressBar from "../../../game/components/ui/progress-bars/loading-progress-bar";
 import LocationDetails from "../../../game/sections/map/types/location-details";
 import MoveLocationAjax from "../ajax/move-location-ajax";
 import { gridOverLayContainer } from "../container/grid-overlay-container";
 import NpcDetails from "../types/deffinitions/npc-details";
+import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
+import PrimaryButton from "../../components/ui/buttons/primary-button";
+import Dialogue from "../../components/ui/dialogue/dialogue";
 
 interface MoveLocationDialogueProps {
     is_open: boolean;

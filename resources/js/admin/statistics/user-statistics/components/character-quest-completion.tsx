@@ -1,13 +1,13 @@
 import React from "react";
 import { AxisOptions, Chart } from "react-charts";
-import ComponentLoading from "../../../../game/components/ui/loading/component-loading";
-import ResizableBox from "../../../../game/components/ui/resizable-box";
-import DropDown from "../../../../game/components/ui/drop-down/drop-down";
 import Ajax from "../../../../game/lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
-import DangerButton from "../../../../game/components/ui/buttons/danger-button";
-import SuccessButton from "../../../../game/components/ui/buttons/success-button";
 import { capitalize, startCase } from "lodash";
+import ComponentLoading from "../../../components/ui/loading/component-loading";
+import { ResizableBox } from "react-resizable";
+import DropDown from "../../../components/ui/drop-down/drop-down";
+import SuccessButton from "../../../components/ui/buttons/success-button";
+import DangerButton from "../../../components/ui/buttons/danger-button";
 
 type QuestCompleted = {
     name: string;

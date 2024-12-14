@@ -1,16 +1,16 @@
 import React from "react";
-import PrimaryButton from "../../../game/components/ui/buttons/primary-button";
 import { DialogActions } from "@mui/material";
-import DangerButton from "../../../game/components/ui/buttons/danger-button";
-import LoadingProgressBar from "../../../game/components/ui/progress-bars/loading-progress-bar";
 import EventSchedulerForm from "./event-scheduler-form";
 import EventForm from "../types/deffinitions/components/event-form";
 import EventSchedulerEditorProps from "../types/components/event-scheduler-editor-props";
 import EventSchedulerEditorState from "../types/components/event-scheduler-editor-state";
 import { format } from "date-fns";
-import DangerAlert from "../../../game/components/ui/alerts/simple-alerts/danger-alert";
 import { AxiosError, AxiosResponse } from "axios";
 import Ajax from "../../../game/lib/ajax/ajax";
+import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
+import DangerAlert from "../../components/ui/alerts/simple-alerts/danger-alert";
+import DangerButton from "../../components/ui/buttons/danger-button";
+import PrimaryButton from "../../components/ui/buttons/primary-button";
 
 export default class EventSchedulerEditor extends React.Component<
     EventSchedulerEditorProps,

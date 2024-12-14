@@ -1,5 +1,4 @@
 import React from "react";
-import Calendar from "../../game/components/ui/scheduler/calendar";
 import EventSchedulerEditor from "./components/event-scheduler-editor";
 import {
     FieldProps,
@@ -8,12 +7,13 @@ import {
 } from "@aldabil/react-scheduler/types";
 import Ajax from "../../game/lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
-import LoadingProgressBar from "../../game/components/ui/progress-bars/loading-progress-bar";
 import EventScheduleState from "./types/event-schedule-state";
-import EventView from "../../game/components/ui/scheduler/event-view";
-import PrimaryButton from "../../game/components/ui/buttons/primary-button";
 import GenerateEventType from "./modals/generate-event-type";
 import { DateTime } from "luxon";
+import LoadingProgressBar from "../components/ui/progress-bars/loading-progress-bar";
+import PrimaryButton from "../components/ui/buttons/primary-button";
+import Calendar from "../components/ui/scheduler/calendar";
+import EventView from "../components/ui/scheduler/event-view";
 
 export default class EventSchedule extends React.Component<
     {},

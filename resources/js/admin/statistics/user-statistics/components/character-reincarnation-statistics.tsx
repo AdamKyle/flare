@@ -2,8 +2,8 @@ import React from "react";
 import Ajax from "../../../../game/lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import { AxisOptions, Chart } from "react-charts";
-import ComponentLoading from "../../../../game/components/ui/loading/component-loading";
-import ResizableBox from "../../../../game/components/ui/resizable-box";
+import ComponentLoading from "../../../components/ui/loading/component-loading";
+import ResizableBox from "../../../components/ui/resizable-box";
 
 type CharacterReincarnation = {
     times: number;

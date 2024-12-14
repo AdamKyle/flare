@@ -1,10 +1,9 @@
 import React, { Fragment } from "react";
 import Ajax from "../../../../game/lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
-import ComponentLoading from "../../../../game/components/ui/loading/component-loading";
-import { Basic } from "react-organizational-chart/dist/stories/Tree.stories";
-import BasicCard from "../../../../game/components/ui/cards/basic-card";
 import { formatNumber } from "../../../../game/lib/game/format-number";
+import ComponentLoading from "../../../components/ui/loading/component-loading";
+import BasicCard from "../../../components/ui/cards/basic-card";
 
 export default class OtherStatistics extends React.Component<any, any> {
     constructor(props: any) {

@@ -1,7 +1,7 @@
 import React from "react";
-import MarkdownElement from "../../../game/components/ui/markdown-element/markdown-element";
 import SurveyPreviewProps from "../types/survey-preview-props";
 import Field from "../deffinitions/field";
+import MarkdownElement from "../../components/ui/markdown-element/markdown-element";
 
 export default class SurveyPreview extends React.Component<SurveyPreviewProps> {
     previewRef: React.RefObject<HTMLDivElement>;

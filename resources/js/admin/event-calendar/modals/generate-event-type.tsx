@@ -1,17 +1,17 @@
 import React, { Fragment } from "react";
 import GenerateExtentTypeProps from "../types/modals/generate-event-type-props";
-import DangerAlert from "../../../game/components/ui/alerts/simple-alerts/danger-alert";
-import LoadingProgressBar from "../../../game/components/ui/progress-bars/loading-progress-bar";
 import GenerateExtentTypeState from "../types/modals/generate-event-type-state";
 import { setHours, setMinutes } from "date-fns";
 import Select from "react-select";
-import Dialogue from "../../../game/components/ui/dialogue/dialogue";
-import InfoAlert from "../../../game/components/ui/alerts/simple-alerts/info-alert";
 import Ajax from "../../../game/lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import AjaxInterface from "../../../game/lib/ajax/ajax-interface";
 import { DateTime } from "luxon";
 import { cloneDeep } from "lodash";
+import Dialogue from "../../components/ui/dialogue/dialogue";
+import DangerAlert from "../../components/ui/alerts/simple-alerts/danger-alert";
+import InfoAlert from "../../components/ui/alerts/simple-alerts/info-alert";
+import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
 
 export default class GenerateEventType extends React.Component<
     GenerateExtentTypeProps,

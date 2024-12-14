@@ -1,11 +1,5 @@
 import React from "react";
 import SurveyPreview from "./component/survey-preview";
-import PrimaryOutlineButton from "../../game/components/ui/buttons/primary-outline-button";
-import SuccessOutlineButton from "../../game/components/ui/buttons/success-outline-button";
-import OrangeOutlineButton from "../../game/components/ui/buttons/orange-outline-button";
-import LoadingProgressBar from "../../game/components/ui/progress-bars/loading-progress-bar";
-import DangerAlert from "../../game/components/ui/alerts/simple-alerts/danger-alert";
-import SuccessAlert from "../../game/components/ui/alerts/simple-alerts/success-alert";
 import CreateNewSurvey from "./ajax/create-new-survey";
 import { surveyBuilderContainer } from "./container/survey-builder-container";
 import EditSurvey from "./ajax/edit-survey";
@@ -15,6 +9,12 @@ import SurveyBuilderProps from "./types/survey-builder-props";
 import InputField from "./deffinitions/input-field";
 import { InputType } from "./deffinitions/input-type";
 import InputFieldComponent from "./component/input-field-component";
+import LoadingProgressBar from "../components/ui/progress-bars/loading-progress-bar";
+import DangerAlert from "../components/ui/alerts/simple-alerts/danger-alert";
+import SuccessAlert from "../components/ui/alerts/simple-alerts/success-alert";
+import SuccessOutlineButton from "../components/ui/buttons/success-outline-button";
+import PrimaryOutlineButton from "../components/ui/buttons/primary-outline-button";
+import OrangeOutlineButton from "../components/ui/buttons/orange-outline-button";
 
 export default class SurveyBuilder extends React.Component<
     SurveyBuilderProps,

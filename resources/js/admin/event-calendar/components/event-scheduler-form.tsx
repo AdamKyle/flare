@@ -11,8 +11,8 @@ import { Value } from "react-datetime-picker/src/shared/types";
 import "react-datetime-picker/dist/DateTimePicker.css";
 import "react-calendar/dist/Calendar.css";
 import "react-clock/dist/Clock.css";
-import InfoAlert from "../../../game/components/ui/alerts/simple-alerts/info-alert";
 import clsx from "clsx";
+import InfoAlert from "../../components/ui/alerts/simple-alerts/info-alert";
 
 export default class EventSchedulerForm extends React.Component<
     EventSchedulerFormProps,

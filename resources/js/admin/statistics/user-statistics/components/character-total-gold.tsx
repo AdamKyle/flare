@@ -2,9 +2,9 @@ import React, { Fragment } from "react";
 import Ajax from "../../../../game/lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import { AxisOptions, Chart } from "react-charts";
-import ComponentLoading from "../../../../game/components/ui/loading/component-loading";
-import ResizableBox from "../../../../game/components/ui/resizable-box";
 import { formatNumber } from "../../../../game/lib/game/format-number";
+import ResizableBox from "../../../components/ui/resizable-box";
+import ComponentLoading from "../../../components/ui/loading/component-loading";
 
 type CharacterTotalGoldType = {
     times: number;

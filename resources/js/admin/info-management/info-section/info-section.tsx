@@ -1,12 +1,12 @@
 import React from "react";
-import BasicCard from "../../../game/components/ui/cards/basic-card";
 import Select from "react-select";
-import PrimaryButton from "../../../game/components/ui/buttons/primary-button";
 import { isEqual, debounce } from "lodash";
-import ComponentLoading from "../../../game/components/ui/loading/component-loading";
-import SuccessButton from "../../../game/components/ui/buttons/success-button";
-import OrangeButton from "../../../game/components/ui/buttons/orange-button";
 import { Editor } from "@tinymce/tinymce-react";
+import ComponentLoading from "../../components/ui/loading/component-loading";
+import BasicCard from "../../components/ui/cards/basic-card";
+import OrangeButton from "../../components/ui/buttons/orange-button";
+import SuccessButton from "../../components/ui/buttons/success-button";
+import PrimaryButton from "../../components/ui/buttons/primary-button";
 
 export default class InfoSection extends React.Component<any, any> {
     constructor(props: any) {

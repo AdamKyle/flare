@@ -1,6 +1,4 @@
 import React, { Component } from "react";
-import DangerAlert from "../../game/components/ui/alerts/simple-alerts/danger-alert";
-import LoadingProgressBar from "../../game/components/ui/progress-bars/loading-progress-bar";
 import LocationDetails from "../../game/sections/map/types/location-details";
 import InitializeMapAjax from "./ajax/initialize-map-ajax";
 import { gridOverLayContainer } from "./container/grid-overlay-container";
@@ -8,6 +6,8 @@ import GridOverlay from "./grid-overlay";
 import MapManagerProps from "./types/map-manager-props";
 import MapManagerState from "./types/map-manager-state";
 import NpcDetails from "./types/deffinitions/npc-details";
+import LoadingProgressBar from "../components/ui/progress-bars/loading-progress-bar";
+import DangerAlert from "../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class MapManager extends Component<
     MapManagerProps,
