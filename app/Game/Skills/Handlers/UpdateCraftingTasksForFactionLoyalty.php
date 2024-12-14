@@ -205,7 +205,7 @@ class UpdateCraftingTasksForFactionLoyalty
             'item_id' => $newItem->id,
         ]);
 
-        event(new ServerMessageEvent($character->user, 'You found something of MEDIUM value child. A simple reward: ' . $item->affix_name, $slot->id));
+        event(new ServerMessageEvent($character->user, 'You found something Unique in value child. A simple reward: ' . $item->affix_name, $slot->id));
     }
 
     /**

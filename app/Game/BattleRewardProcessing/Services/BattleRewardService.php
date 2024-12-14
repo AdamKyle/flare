@@ -41,11 +41,15 @@ class BattleRewardService
         return $this;
     }
 
-    public function handleBaseRewards($includeXp = true)
+    public function handleBaseRewards($includeXp = true, $includeEventRewards = true)
     {
 
         if ($includeXp) {
             BattleXpHandler::dispatch($this->characterId, $this->monsterId)->onQueue('battle_reward_xp')->delay(now()->addSeconds(2));
+        }
+
+        if ($includeEventRewards) {
+            WinterEventChristmasGiftHandler::dispatch($this->characterId)->onQueue('event_battle_reward')->delay(now()->addSeconds(2));
         }
 
         BattleSecondaryRewardHandler::dispatch($this->characterId)->onQueue('battle_secondary_reward')->delay(now()->addSeconds(2));
@@ -55,8 +59,5 @@ class BattleRewardService
         BattleLocationHandler::dispatch($this->characterId, $this->monsterId)->onQueue('battle_reward_location_handlers')->delay(now()->addSeconds(2));
         BattleWeeklyFightHandler::dispatch($this->characterId, $this->monsterId)->onQueue('battle_reward_weekly_fights')->delay(now()->addSeconds(2));
         BattleItemHandler::dispatch($this->characterId, $this->monsterId)->onQueue('battle_reward_item_handler')->delay(now()->addSeconds(2));
-
-        // For special Events:
-        WinterEventChristmasGiftHandler::dispatch($this->characterId)->onQueue('event_battle_reward')->delay(now()->addSeconds(2));
     }
 }

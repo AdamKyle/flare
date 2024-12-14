@@ -16,6 +16,7 @@ use App\Flare\Services\CharacterRewardService;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\BattleRewardProcessing\Jobs\Events\WinterEventChristmasGiftHandler;
 use App\Game\BattleRewardProcessing\Jobs\ExplorationSkillXpHandler;
 use App\Game\BattleRewardProcessing\Jobs\ExplorationXpHandler;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
@@ -136,7 +137,7 @@ class Exploration implements ShouldQueue
             $characterSkillService = $this->skillService->setSkillInTraining($this->character);
 
             for ($i = 1; $i <= $enemies; $i++) {
-                $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], false);
+                $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], false, false);
 
                 $totalXpToReward += $characterRewardService->fetchXpForMonster($monster);
                 $totalSkillXpToReward += $characterSkillService->getXpForSkillIntraining($this->character, $monster->xp);
@@ -144,6 +145,7 @@ class Exploration implements ShouldQueue
 
             ExplorationXpHandler::dispatch($this->character->id, $enemies, $totalXpToReward)->onQueue('exploration_battle_xp_reward')->delay(now()->addSeconds(2));
             ExplorationSkillXpHandler::dispatch($this->character->id, $totalSkillXpToReward)->onQueue('exploration_battle_skill_xp_reward')->delay(now()->addSeconds(2));
+            WinterEventChristmasGiftHandler::dispatch($this->character->id)->onQueue('event_battle_reward')->delay(now()->addSeconds(2));
 
             $this->sendOutEventLogUpdate('The last of the enemies fall. Covered in blood, exhausted, you look around for any signs of more of their friends. The area is silent. "Another day, another battle.
             We managed to survive." The Guide states as he walks from the shadows. The pair of you set off in search of the next adventure ...
@@ -182,6 +184,7 @@ class Exploration implements ShouldQueue
 
         ExplorationXpHandler::dispatch($this->character->id, 10, $totalXpToReward)->onQueue('exploration_battle_xp_reward')->delay(now()->addSeconds(2));
         ExplorationSkillXpHandler::dispatch($this->character->id, $totalSkillXpToReward)->onQueue('exploration_battle_skill_xp_reward')->delay(now()->addSeconds(2));
+        WinterEventChristmasGiftHandler::dispatch($this->character->id)->onQueue('event_battle_reward')->delay(now()->addSeconds(2));
 
         Cache::put('can-character-survive-' . $this->character->id, true);
 
@@ -208,7 +211,7 @@ class Exploration implements ShouldQueue
 
         $response->resetBattleMessages();
 
-        $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], false);
+        $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], false, false);
 
         return true;
     }
