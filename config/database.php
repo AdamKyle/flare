@@ -177,12 +177,20 @@ return [
             'database' => 3,
         ],
 
+        'event_battle_reward' => [
+            'url' => env('REDIS_URL'),
+            'host' => env('REDIS_HOST', '127.0.0.1'),
+            'password' => env('REDIS_PASSWORD', null),
+            'port' => env('REDIS_PORT', 6379),
+            'database' => 5,
+        ],
+
         'battle_reward_xp' => [
             'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
-            'database' => 4,
+            'database' => 6,
         ],
 
         'exploration_battle_xp_reward' => [
@@ -190,7 +198,7 @@ return [
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
-            'database' => 5,
+            'database' => 7,
         ],
 
         'exploration_battle_skill_xp_reward' => [
@@ -198,7 +206,7 @@ return [
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
-            'database' => 5,
+            'database' => 8,
         ],
 
         'battle_reward_currencies' => [
@@ -206,7 +214,7 @@ return [
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
-            'database' => 6,
+            'database' => 9,
         ],
 
         'battle_secondary_reward' => [
@@ -214,7 +222,7 @@ return [
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
-            'database' => 6,
+            'database' => 10,
         ],
 
         'battle_reward_factions' => [
@@ -222,7 +230,7 @@ return [
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
-            'database' => 7,
+            'database' => 11,
         ],
 
         'battle_reward_global_event' => [
@@ -230,7 +238,7 @@ return [
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
-            'database' => 8,
+            'database' => 12,
         ],
 
         'battle_reward_location_handlers' => [
@@ -238,7 +246,7 @@ return [
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
-            'database' => 9,
+            'database' => 13,
         ],
 
         'battle_reward_weekly_fights' => [
@@ -246,7 +254,7 @@ return [
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
-            'database' => 10,
+            'database' => 14,
         ],
 
         'battle_reward_item_handler' => [
@@ -254,7 +262,7 @@ return [
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
-            'database' => 11,
+            'database' => 15,
         ],
 
         'long_running' => [
@@ -262,7 +270,7 @@ return [
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
-            'database' => 12,
+            'database' => 16,
         ],
 
     ],

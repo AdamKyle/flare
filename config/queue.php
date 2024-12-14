@@ -82,6 +82,14 @@ return [
             'block_for' => null,
         ],
 
+        'event_battle_reward' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+            'queue' => 'event_battle_reward',
+            'retry_after' => 1200,
+            'block_for' => null,
+        ],
+
         'battle_reward_xp' => [
             'driver' => 'redis',
             'connection' => 'default',

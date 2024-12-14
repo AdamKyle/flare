@@ -192,6 +192,17 @@ return [
             'tries' => 1,
             'nice' => 0,
         ],
+
+        'supervisor-event-battle-reward' => [
+            'connection' => 'event_battle_reward',
+            'queue' => ['event_battle_reward'],
+            'balance' => 'auto',
+            'maxProcesses' => 25,
+            'memory' => 256,
+            'tries' => 5,
+            'nice' => 0,
+        ],
+
         'supervisor-long-running' => [
             'connection' => 'long_running',
             'queue' => ['default_long'],
@@ -338,6 +349,17 @@ return [
                 'timeout' => 900,
                 'nice' => 0,
             ],
+
+            'supervisor-event-battle-reward' => [
+                'connection' => 'event_battle_reward',
+                'queue' => ['event_battle_reward'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
             'supervisor-battle-reward-xp' => [
                 'connection' => 'battle_reward_xp',
                 'queue' => ['battle_reward_xp'],
@@ -462,6 +484,17 @@ return [
                 'timeout' => 900,
                 'nice' => 0,
             ],
+
+            'supervisor-event-battle-reward' => [
+                'connection' => 'event_battle_reward',
+                'queue' => ['event_battle_reward'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
             'supervisor-battle-reward-xp' => [
                 'connection' => 'battle_reward_xp',
                 'queue' => ['battle_reward_xp'],

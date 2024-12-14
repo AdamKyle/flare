@@ -213,7 +213,7 @@ class TheOldChurchRewardHandler
             return;
         }
 
-        if (RandomNumberGenerator::generateTrueRandomNumber(1000000) >= 1000000) {
+        if (RandomNumberGenerator::generateTrueRandomNumber(1000) >= 999) {
             Event::create([
                 'type' => EventType::THE_OLD_CHURCH,
                 'started_at' => now(),

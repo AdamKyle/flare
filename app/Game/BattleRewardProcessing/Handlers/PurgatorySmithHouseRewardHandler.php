@@ -249,7 +249,7 @@ class PurgatorySmithHouseRewardHandler
             return;
         }
 
-        if (RandomNumberGenerator::generateTrueRandomNumber(1000000) >= 1000000) {
+        if (RandomNumberGenerator::generateTrueRandomNumber(1000) >= 999) {
             Event::create([
                 'type' => EventType::PURGATORY_SMITH_HOUSE,
                 'started_at' => now(),
