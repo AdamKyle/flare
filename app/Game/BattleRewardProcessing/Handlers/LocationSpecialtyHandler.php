@@ -53,7 +53,7 @@ class LocationSpecialtyHandler
     {
         $character = $this->handOverAward($character, $isCosmic);
 
-        event(new GlobalMessageEvent($character->name . ' Has slaughtered a beast beyond comprehension and been rewarded with a cosmic gift!'));
+        event(new GlobalMessageEvent($character->name . ' Has slaughtered a beast beyond comprehension and been rewarded with an interesting gift!'));
     }
 
     private function handOverAward(Character $character, bool $isCosmic = true, bool $secondaryIsLegendary = false): Character

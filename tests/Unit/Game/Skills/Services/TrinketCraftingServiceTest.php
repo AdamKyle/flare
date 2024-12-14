@@ -8,6 +8,8 @@ use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\CharacterMessageTypes;
+use App\Game\Messages\Types\CraftingMessageTypes;
 use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\ItemListCostTransformerService;
 use App\Game\Skills\Services\SkillCheckService;
@@ -147,7 +149,7 @@ class TrinketCraftingServiceTest extends TestCase
         $this->trinketCraftingService->craft($character, $this->trinket->refresh());
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->build('to_hard_to_craft');
+            return $event->message === resolve(ServerMessageBuilder::class)->build(CraftingMessageTypes::TO_HARD_TO_CRAFT);
         });
     }
 
@@ -173,7 +175,7 @@ class TrinketCraftingServiceTest extends TestCase
         $character = $character->refresh();
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->build('to_easy_to_craft');
+            return $event->message === resolve(ServerMessageBuilder::class)->build(CraftingMessageTypes::TO_EASY_TO_CRAFT);
         });
 
         $this->assertCount(1, $character->inventory->slots->toArray());
@@ -331,7 +333,7 @@ class TrinketCraftingServiceTest extends TestCase
         $this->assertCount(0, $character->inventory->slots->toArray());
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->build('inventory_full');
+            return $event->message === resolve(ServerMessageBuilder::class)->build(CharacterMessageTypes::INVENTORY_IS_FULL);
         });
     }
 

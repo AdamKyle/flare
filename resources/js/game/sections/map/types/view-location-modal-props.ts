@@ -12,4 +12,10 @@ export default interface ViewLocationModalProps {
     character_id: number;
 
     handle_close: () => void;
+
+    can_move: boolean;
+
+    is_automation_running: boolean;
+
+    is_dead: boolean;
 }

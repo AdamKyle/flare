@@ -18,6 +18,7 @@ use App\Game\Core\Services\CharacterService;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use App\Game\Skills\Values\SkillTypeValue;
+use DB;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -52,6 +53,37 @@ class CharacterFactory
 
     private ?InventorySetManagement $inventorySetManagement = null;
 
+    private array $userAttributes = [];
+
+    /**
+     * Set a series of user attributes for use during the user creation of character creation.
+     *
+     * @param array $attributes
+     * @return CharacterFactory
+     */
+    public function setAttributesOnUserForCreation(array $attributes): CharacterFactory
+    {
+        $this->userAttributes = $attributes;
+
+        return $this;
+    }
+
+    public function createSessionForCharacter(): CharacterFactory
+    {
+        DB::table('sessions')->truncate();
+
+        DB::table('sessions')->insert([[
+            'id' => '1',
+            'user_id' => $this->character->user->id,
+            'ip_address' => '1',
+            'user_agent' => '1',
+            'payload' => '1',
+            'last_activity' => 1602801731,
+        ]]);
+
+        return $this;
+    }
+
     /**
      * Creates a base character associated with a user.
      *
@@ -71,7 +103,7 @@ class CharacterFactory
             $class = $this->createClass($classOptions);
         }
 
-        $user = $this->createUser();
+        $user = $this->createUser($this->userAttributes);
 
         $this->character = $this->createCharacter([
             'damage_stat' => $class->damage_stat,
@@ -105,9 +137,19 @@ class CharacterFactory
 
         $character = $this->character->refresh();
 
-        Cache::put('character-attack-data-'.$character->id, (new AttackDataCacheSetUp)->getCacheObject());
+        Cache::put('character-attack-data-' . $character->id, (new AttackDataCacheSetUp)->getCacheObject());
 
         return $this;
+    }
+
+    public function getCharacterId(): int
+    {
+        return $this->character->id;
+    }
+
+    public function getCharacterClassId(): int
+    {
+        return $this->character->game_class_id;
     }
 
     public function assignPassiveSkills(?GameBuilding $gameBuilding = null): CharacterFactory
@@ -506,7 +548,7 @@ class CharacterFactory
         $skill = $this->character->skills->where('name', $name)->first();
 
         if (is_null($skill)) {
-            throw new Exception($name.' not found.');
+            throw new Exception($name . ' not found.');
         }
 
         $skill->update($changes);

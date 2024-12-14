@@ -76,6 +76,7 @@ use App\Flare\Transformers\UsableItemTransformer;
 use App\Flare\Values\BaseSkillValue;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\View\Components\ItemDisplayColor;
+use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\AttackDetails\CharacterAttackBuilder;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ClassRanksWeaponMasteriesBuilder;
@@ -202,7 +203,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterService::class),
                 $app->make(SkillService::class),
                 $app->make(Manager::class),
-                $app->make(CharacterSheetBaseInfoTransformer::class)
+                $app->make(CharacterSheetBaseInfoTransformer::class),
+                $app->make(BattleMessageHandler::class)
             );
         });
 

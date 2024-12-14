@@ -82,8 +82,8 @@ class BattleController extends Controller
         if (! is_null($locationWithType)) {
             $monstersForLocation = Cache::get('special-location-monsters');
 
-            if (isset($monstersForLocation['location-type-'.$locationWithType->type])) {
-                $monsters = $monstersForLocation['location-type-'.$locationWithType->type];
+            if (isset($monstersForLocation['location-type-' . $locationWithType->type])) {
+                $monsters = $monstersForLocation['location-type-' . $locationWithType->type];
             }
         }
 
@@ -129,7 +129,6 @@ class BattleController extends Controller
 
     public function fightMonster(AttackTypeRequest $attackTypeRequest, Character $character): JsonResponse
     {
-
         $result = $this->monsterFightService->fightMonster($character, $attackTypeRequest->attack_type);
 
         $status = $result['status'];

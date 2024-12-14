@@ -266,14 +266,14 @@ class Item extends Model
         $itemName = '';
 
         if (! is_null($itemPrefix)) {
-            $itemName = '*'.$itemPrefix->name.'* '.$this->name;
+            $itemName = '*' . $itemPrefix->name . '* ' . $this->name;
         }
 
         if (! is_null($itemSuffix)) {
             if ($itemName !== '') {
-                $itemName .= ' *'.$itemSuffix->name.'*';
+                $itemName .= ' *' . $itemSuffix->name . '*';
             } else {
-                $itemName = $this->name.' *'.$itemSuffix->name.'*';
+                $itemName = $this->name . ' *' . $itemSuffix->name . '*';
             }
         }
 
@@ -506,15 +506,15 @@ class Item extends Model
      */
     public function getTotalPercentageForStat(string $stat): float
     {
-        $baseStat = is_null($this->{$stat.'_mod'}) ? 0.0 : $this->{$stat.'_mod'};
+        $baseStat = is_null($this->{$stat . '_mod'}) ? 0.0 : $this->{$stat . '_mod'};
 
         if (! is_null($this->itemPrefix)) {
-            $statBonus = $this->itemPrefix->{$stat.'_mod'};
+            $statBonus = $this->itemPrefix->{$stat . '_mod'};
             $baseStat += ! is_null($statBonus) ? $statBonus : 0.0;
         }
 
         if (! is_null($this->itemSuffix)) {
-            $statBonus = $this->itemSuffix->{$stat.'_mod'};
+            $statBonus = $this->itemSuffix->{$stat . '_mod'};
             $baseStat += ! is_null($statBonus) ? $statBonus : 0.0;
         }
 

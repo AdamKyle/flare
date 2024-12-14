@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Messages\Types\LotteryMessageType;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Support\Facades\Cache;
 
@@ -32,7 +33,7 @@ class DailyGoldDustService
 
         $character = $character->refresh();
 
-        ServerMessageHandler::handleMessage($character->user, 'daily_lottery', number_format($amount));
+        ServerMessageHandler::handleMessageWithNewValue($character->user, LotteryMessageType::DAILY_LOTTERY, number_format($amount), number_format($character->gold_dust));
 
         event(new UpdateTopBarEvent($character));
     }
@@ -44,7 +45,8 @@ class DailyGoldDustService
     {
 
         if (! Cache::has('daily-gold-dust-lottery-won')) {
-            event(new GlobalMessageEvent($character->name.' has won the daily Gold Dust Lottery!
+            event(new GlobalMessageEvent(
+                $character->name . ' has won the daily Gold Dust Lottery!
             (Gold Dust is used in Alchemy and Quests - See Help section -> Click Help I\'m stuck, and see currencies under: Character Information -> Currencies)'
             ));
 
@@ -63,7 +65,7 @@ class DailyGoldDustService
             Cache::put('daily-gold-dust-lottery-won', $character->id);
         }
 
-        ServerMessageHandler::handleMessage($character->user, 'lotto_max', number_format(self::LOTTO_MAX));
+        ServerMessageHandler::handleMessageWithNewValue($character->user, LotteryMessageType::LOTTO_MAX, number_format(self::LOTTO_MAX), number_format($character->gold_dust));
 
         event(new UpdateTopBarEvent($character));
     }

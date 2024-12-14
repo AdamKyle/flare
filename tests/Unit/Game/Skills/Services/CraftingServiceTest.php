@@ -16,6 +16,8 @@ use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\CharacterMessageTypes;
+use App\Game\Messages\Types\CraftingMessageTypes;
 use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -282,7 +284,7 @@ class CraftingServiceTest extends TestCase
         ]);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation('not_enough_gold');
+            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation(CharacterMessageTypes::NOT_ENOUGH_GOLD);
         });
 
         $this->assertFalse($result);
@@ -312,7 +314,7 @@ class CraftingServiceTest extends TestCase
         ]);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation('to_hard_to_craft');
+            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation(CraftingMessageTypes::TO_HARD_TO_CRAFT);
         });
 
         $this->assertFalse($result);
@@ -342,7 +344,7 @@ class CraftingServiceTest extends TestCase
         ]);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation('to_easy_to_craft');
+            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation(CraftingMessageTypes::TO_EASY_TO_CRAFT);
         });
 
         $this->assertTrue($result);
@@ -401,7 +403,7 @@ class CraftingServiceTest extends TestCase
         ]);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation('inventory_full');
+            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation(CharacterMessageTypes::INVENTORY_IS_FULL);
         });
     }
 
@@ -435,7 +437,7 @@ class CraftingServiceTest extends TestCase
         ]);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation('failed_to_craft');
+            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation(CraftingMessageTypes::FAILED_TO_CRAFT);
         });
     }
 

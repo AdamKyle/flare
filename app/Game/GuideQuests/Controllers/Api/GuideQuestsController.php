@@ -20,7 +20,9 @@ class GuideQuestsController extends Controller
 
     public function getCurrentQuest(User $user): JsonResponse
     {
-        return $this->getNextQuest($user->character);
+        return response()->json([
+            ...$this->guideQuestService->fetchQuestForCharacter($user->character)
+        ]);
     }
 
     public function handInQuest(User $user, GuideQuest $guideQuest): JsonResponse
@@ -28,25 +30,17 @@ class GuideQuestsController extends Controller
         $character = $user->character;
         $response = $this->guideQuestService->handInQuest($character, $guideQuest);
 
-        $message = 'You have completed the quest: "'.$guideQuest->name.'". On to the next! Below is the next quest for you to do!';
+        $message = 'You have completed the quest: "' . $guideQuest->name . '". On to the next! Below is the next quest for you to do!';
 
         if ($response) {
-            return $this->getNextQuest($character->refresh(), $message);
+            return response()->json([
+                'message' => $message,
+                ...$this->guideQuestService->fetchQuestForCharacter($character)
+            ]);
         }
 
         return response()->json([
-            'message' => 'Oh christ, something is wrong. Quick call The Creator! Submit a bug report indicating the guide quest failed to load.',
+            'message' => 'You cannot hand in this guide quest. You must meet all the requirements first.',
         ], 422);
-    }
-
-    /**
-     * Get the next guide quest.
-     */
-    protected function getNextQuest(Character $character, string $message = ''): JsonResponse
-    {
-        $data = $this->guideQuestService->fetchQuestForCharacter($character);
-
-
-        return response()->json([...$data, 'message' => $message]);
     }
 }

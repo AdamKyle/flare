@@ -23,6 +23,7 @@ use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\MovementMessageTypes;
 use Facades\App\Flare\Cache\CoordinatesCache;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Support\Facades\Cache;
@@ -149,9 +150,9 @@ class TraverseService
 
         $this->updateMonstersList($character, $location);
 
-        $message = 'You have traveled to: '.$character->map->gameMap->name;
+        $message = 'You have traveled to: ' . $character->map->gameMap->name;
 
-        ServerMessageHandler::handleMessage($character->user, 'plane_transfer', $message);
+        ServerMessageHandler::handleMessage($character->user, MovementMessageTypes::PLANE_TRANSFER, $message);
 
         $gameMap = $character->map->gameMap;
 
@@ -163,7 +164,7 @@ class TraverseService
 
             event(new ServerMessageEvent($character->user, $message));
 
-            event(new GlobalMessageEvent('The gates have opened for: '.$character->name.'. They have entered the realm of shadows!'));
+            event(new GlobalMessageEvent('The gates have opened for: ' . $character->name . '. They have entered the realm of shadows!'));
         }
 
         if ($gameMap->mapType()->isHell()) {
@@ -171,7 +172,7 @@ class TraverseService
 
             event(new ServerMessageEvent($character->user, $message));
 
-            event(new GlobalMessageEvent('Hell\'s gates swing wide for: '.$character->name.'. May the light of The Poet, be their guide through such darkness!'));
+            event(new GlobalMessageEvent('Hell\'s gates swing wide for: ' . $character->name . '. May the light of The Poet, be their guide through such darkness!'));
         }
 
         if ($gameMap->mapType()->isPurgatory()) {
@@ -179,7 +180,7 @@ class TraverseService
 
             event(new ServerMessageEvent($character->user, $message));
 
-            event(new GlobalMessageEvent('Thunder claps in the sky: '.$character->name.' has called forth The Creator\'s gates of despair! The Creator is Furious! "Hear me, child! I shall face you in the depths of my despair and crush the soul from your bones!" the lands fall silent, the children no longer have faith and the fabric of time rips open...'));
+            event(new GlobalMessageEvent('Thunder claps in the sky: ' . $character->name . ' has called forth The Creator\'s gates of despair! The Creator is Furious! "Hear me, child! I shall face you in the depths of my despair and crush the soul from your bones!" the lands fall silent, the children no longer have faith and the fabric of time rips open...'));
         }
 
         if ($gameMap->mapType()->isTheIcePlane()) {
@@ -195,7 +196,7 @@ class TraverseService
 
             event(new ServerMessageEvent($character->user, $message));
 
-            event(new GlobalMessageEvent('"She is the reason the world is trapped in these lies." '.$character->name.' enters into a place where their own heart becomes a memory that is twisted into hate.'));
+            event(new GlobalMessageEvent('"She is the reason the world is trapped in these lies." ' . $character->name . ' enters into a place where their own heart becomes a memory that is twisted into hate.'));
         }
 
         if ($gameMap->mapType()->isDelusionalMemories()) {
@@ -203,7 +204,7 @@ class TraverseService
 
             event(new ServerMessageEvent($character->user, $message));
 
-            event(new GlobalMessageEvent('"Fliniguss has gone mad."  the Red Hawk Soldier states. "Help us put him down!" '.$character->name.' enters into a place where the war of the ages past never ended.'));
+            event(new GlobalMessageEvent('"Fliniguss has gone mad."  the Red Hawk Soldier states. "Help us put him down!" ' . $character->name . ' enters into a place where the war of the ages past never ended.'));
         }
 
         event(new UpdateCharacterStatus($character));
@@ -275,7 +276,7 @@ class TraverseService
         $newYPosition = $character->map->character_position_y;
 
         if ($newXPosition !== $xPosition || $newYPosition !== $yPosition) {
-            ServerMessageHandler::handleMessage($character->user, 'moved_location', 'Your character was moved as you are missing the appropriate quest item or were not allowed to enter the area.');
+            ServerMessageHandler::handleMessage($character->user, MovementMessageTypes::MOVE_LOCATION, 'Your character was moved as you are missing the appropriate quest item or were not allowed to enter the area.');
         }
     }
 

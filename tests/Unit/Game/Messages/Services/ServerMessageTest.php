@@ -4,6 +4,7 @@ namespace Tests\Unit\Game\Messages\Services;
 
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Services\ServerMessage;
+use App\Game\Messages\Types\ChatMessageTypes;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
@@ -46,7 +47,7 @@ class ServerMessageTest extends TestCase
 
         Auth::login($user);
 
-        $this->serverMessage->generateServerMessage('chatting_to_much');
+        $this->serverMessage->generateServerMessage(ChatMessageTypes::CHATTING_TO_MUCH);
 
         $user = $user->refresh();
 
@@ -62,7 +63,7 @@ class ServerMessageTest extends TestCase
 
         Event::fake();
 
-        $this->serverMessage->generateServerMessage('message_length_0');
+        $this->serverMessage->generateServerMessage(ChatMessageTypes::INVALID_MESSAGE_LENGTH);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
             return $event->message === 'Your message cannot be empty.';

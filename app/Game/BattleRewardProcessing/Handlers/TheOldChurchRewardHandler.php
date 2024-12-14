@@ -15,6 +15,7 @@ use App\Flare\Values\RandomAffixDetails;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\CurrenciesMessageTypes;
 use Exception;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
@@ -23,20 +24,11 @@ use Illuminate\Support\Facades\Cache;
 
 class TheOldChurchRewardHandler
 {
-    private RandomAffixGenerator $randomAffixGenerator;
 
-    public function __construct(RandomAffixGenerator $randomAffixGenerator)
-    {
-        $this->randomAffixGenerator = $randomAffixGenerator;
-    }
+    public function __construct(private RandomAffixGenerator $randomAffixGenerator, private BattleMessageHandler $battleMessageHandler) {}
 
     public function handleFightingAtTheOldChurch(Character $character, Monster $monster): Character
     {
-
-        if ($character->currentAutomations->isNotEmpty()) {
-            return $character;
-        }
-
         $location = Location::where('x', $character->x_position)
             ->where('y', $character->y_position)
             ->where('game_map_id', $character->map->game_map_id)
@@ -62,6 +54,10 @@ class TheOldChurchRewardHandler
 
         $character = $this->currencyReward($character, $event);
 
+        if ($character->currentAutomations->isNotEmpty()) {
+            return $character;
+        }
+
         if ($this->isMonsterAtLeastHalfWayOrMore($location, $monster)) {
             $character = $this->handleItemReward($character, $event);
         }
@@ -72,7 +68,7 @@ class TheOldChurchRewardHandler
     /**
      * is the monster at least halfway down the list?
      */
-    protected function isMonsterAtLeastHalfWayOrMore(Location $location, Monster $monster): bool
+    private function isMonsterAtLeastHalfWayOrMore(Location $location, Monster $monster): bool
     {
 
         $monsters = Cache::get('monsters')[$location->name];
@@ -92,21 +88,21 @@ class TheOldChurchRewardHandler
      */
     public function currencyReward(Character $character, ?Event $event = null): Character
     {
-        $maximumAmount = 1000;
-        $maximumGold = 20000;
+        $maximumAmount = 1_000;
+        $maximumGold = 20_000;
 
         if (! is_null($event)) {
-            $maximumAmount = 3000;
-            $maximumGold = 40000;
+            $maximumAmount = 5_000;
+            $maximumGold = 40_000;
         }
 
-        $goldDust = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
-        $shards = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
-        $gold = RandomNumberGenerator::generateRandomNumber(1, $maximumGold);
+        $goldDustToReward = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
+        $shardsToReward = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
+        $goldToReward = RandomNumberGenerator::generateRandomNumber(1, $maximumGold);
 
-        $gold += $character->gold;
-        $goldDust += $character->gold_dust;
-        $shards += $character->shards;
+        $gold = $character->gold + $goldToReward;
+        $goldDust = $character->gold_dust + $goldDustToReward;
+        $shards = $character->shards + $shardsToReward;
 
         if ($goldDust > MaxCurrenciesValue::MAX_GOLD_DUST) {
             $goldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
@@ -126,7 +122,13 @@ class TheOldChurchRewardHandler
             'gold' => $gold,
         ]);
 
-        return $character->refresh();
+        $character = $character->refresh();
+
+        $this->battleMessageHandler->handleCurrencyGainMessage($character->user, CurrenciesMessageTypes::GOLD, $goldToReward, $character->gold);
+        $this->battleMessageHandler->handleCurrencyGainMessage($character->user, CurrenciesMessageTypes::GOLD_DUST, $goldDustToReward, $character->gold_dust);
+        $this->battleMessageHandler->handleCurrencyGainMessage($character->user, CurrenciesMessageTypes::SHARDS, $shardsToReward, $character->shards);
+
+        return $character;
     }
 
     /**
@@ -136,7 +138,7 @@ class TheOldChurchRewardHandler
      *
      * @throws Exception
      */
-    protected function handleItemReward(Character $character, ?Event $event = null): Character
+    private function handleItemReward(Character $character, ?Event $event = null): Character
     {
         $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->first()->skill_bonus;
         $maxRoll = 1_000;
@@ -168,7 +170,7 @@ class TheOldChurchRewardHandler
      *
      * @throws Exception
      */
-    protected function rewardForCharacter(Character $character)
+    private function rewardForCharacter(Character $character)
     {
         $item = Item::where('specialty_type', ItemSpecialtyType::CORRUPTED_ICE)
             ->whereNull('item_prefix_id')
@@ -196,7 +198,7 @@ class TheOldChurchRewardHandler
             'item_id' => $newItem->id,
         ]);
 
-        event(new ServerMessageEvent($character->user, 'You found something MEDIUM but still unique, in The Old Church child: ' . $item->affix_name, $slot->id));
+        event(new ServerMessageEvent($character->user, 'You found something unique, in The Old Church child: ' . $item->affix_name, $slot->id));
     }
 
     /**
@@ -204,14 +206,14 @@ class TheOldChurchRewardHandler
      *
      * @return void
      */
-    protected function createPossibleEvent()
+    private function createPossibleEvent()
     {
 
         if (Event::where('type', EventType::THE_OLD_CHURCH)->exists()) {
             return;
         }
 
-        if (RandomNumberGenerator::generateTrueRandomNumber(1000000) >= 1000000) {
+        if (RandomNumberGenerator::generateTrueRandomNumber(1000) >= 999) {
             Event::create([
                 'type' => EventType::THE_OLD_CHURCH,
                 'started_at' => now(),

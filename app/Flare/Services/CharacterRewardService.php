@@ -2,8 +2,10 @@
 
 namespace App\Flare\Services;
 
+use Exception;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
 use App\Flare\Models\Character;
-use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
@@ -16,6 +18,7 @@ use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\LocationType;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
@@ -23,12 +26,12 @@ use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\CharacterMessageTypes;
+use App\Game\Messages\Types\CurrenciesMessageTypes;
 use App\Game\Skills\Services\SkillService;
-use Exception;
 use Facades\App\Flare\Calculators\XPCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
+
 
 class CharacterRewardService
 {
@@ -44,6 +47,8 @@ class CharacterRewardService
 
     private CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer;
 
+    private BattleMessageHandler $battleMessageHandler;
+
     /**
      * Constructor
      */
@@ -52,19 +57,21 @@ class CharacterRewardService
         CharacterService $characterService,
         SkillService $skillService,
         Manager $manager,
-        CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer
+        CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer,
+        BattleMessageHandler $battleMessageHandler,
     ) {
         $this->characterXpService = $characterXpService;
         $this->characterService = $characterService;
         $this->skillService = $skillService;
         $this->characterSheetBaseInfoTransformer = $characterSheetBaseInfoTransformer;
         $this->manager = $manager;
+        $this->battleMessageHandler = $battleMessageHandler;
     }
 
     /**
      * Set the character.
      *
-     * @return $this
+     * @return CharacterRewardService
      */
     public function setCharacter(Character $character): CharacterRewardService
     {
@@ -82,21 +89,31 @@ class CharacterRewardService
     {
         $this->distributeXP($monster);
 
-        if ($this->character->xp >= $this->character->xp_next) {
-            $leftOverXP = $this->character->xp - $this->character->xp_next;
-
-            if ($leftOverXP > 0) {
-                $this->handleLevelUps($leftOverXP);
-            }
-
-            if ($leftOverXP <= 0) {
-                $this->handleCharacterLevelUp(0);
-            }
-        }
+        $this->handleLevelUp();
 
         if (! $this->character->isLoggedIn()) {
             event(new UpdateTopBarEvent($this->character->refresh()));
         }
+
+        return $this;
+    }
+
+    /**
+     * Distribute a specific amount of XP
+     *
+     * @param integer $xp
+     * @return CharacterRewardService
+     */
+    public function distributeSpecifiedXp(int $xp): CharacterRewardService
+    {
+
+        $this->character->update([
+            'xp' => $xp,
+        ]);
+
+        $this->character = $this->character->refresh();
+
+        $this->handleLevelUp();
 
         return $this;
     }
@@ -108,7 +125,7 @@ class CharacterRewardService
      */
     public function distributeSkillXP(Monster $monster): CharacterRewardService
     {
-        $this->skillService->assignXPToTrainingSkill($this->character, $monster->xp);
+        $this->skillService->setSkillInTraining($this->character)->assignXPToTrainingSkill($this->character, $monster->xp);
 
         return $this;
     }
@@ -126,7 +143,7 @@ class CharacterRewardService
 
         $this->currencyEventReward($monster);
 
-        if (! $this->character->is_auto_battling && $this->character->isLoggedIn()) {
+        if (!$this->character->is_auto_battling && $this->character->isLoggedIn()) {
             event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
         }
 
@@ -181,6 +198,13 @@ class CharacterRewardService
 
             $this->character = $this->character->refresh();
 
+            $this->battleMessageHandler->handleCurrencyGainMessage($this->character->user, CurrenciesMessageTypes::GOLD_DUST, $goldDust, $characterGoldDust);
+            $this->battleMessageHandler->handleCurrencyGainMessage($this->character->user, CurrenciesMessageTypes::SHARDS, $shards, $characterShards);
+
+            if ($canHaveCopperCoins) {
+                $this->battleMessageHandler->handleCurrencyGainMessage($this->character->user, CurrenciesMessageTypes::COPPER_COINS, $copperCoins, $characterCopperCoins);
+            }
+
             if (! $this->character->is_auto_battling) {
                 event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
             }
@@ -190,9 +214,32 @@ class CharacterRewardService
     }
 
     /**
+     * Handle possible level up.
+     *
+     * Takes into account XP over flow.
+     *
+     * @param Character $character
+     * @return void
+     */
+    private function handleLevelUp(): void
+    {
+        if ($this->character->xp >= $this->character->xp_next) {
+            $leftOverXP = $this->character->xp - $this->character->xp_next;
+
+            if ($leftOverXP > 0) {
+                $this->handleMultipleLevelUps($leftOverXP);
+            }
+
+            if ($leftOverXP <= 0) {
+                $this->handleCharacterLevelUp(0);
+            }
+        }
+    }
+
+    /**
      * Handle instances where we could have multiple level ups.
      */
-    protected function handleLevelUps(int $leftOverXP, bool $shouldBuildCache = false): void
+    private function handleMultipleLevelUps(int $leftOverXP, bool $shouldBuildCache = false): void
     {
 
         $this->handleCharacterLevelUp($leftOverXP, $shouldBuildCache);
@@ -201,11 +248,11 @@ class CharacterRewardService
             $leftOverXP = $this->character->xp - $this->character->xp_next;
 
             if ($leftOverXP > 0) {
-                $this->handleLevelUps($leftOverXP, false);
+                $this->handleMultipleLevelUps($leftOverXP, false);
             }
 
             if ($leftOverXP <= 0) {
-                $this->handleLevelUps(0, true);
+                $this->handleMultipleLevelUps(0, true);
             }
         }
 
@@ -239,36 +286,58 @@ class CharacterRewardService
             $this->updateCharacterStats($character);
         }
 
-        ServerMessageHandler::handleMessage($character->user, 'level_up', $character->level);
+        ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::LEVEL_UP, $character->level);
     }
 
     /**
      * Assigns XP to the character.
      *
      * @return void
-     *
-     * @throws Exception
      */
-    protected function distributeXP(Monster $monster)
+    private function distributeXP(Monster $monster): void
     {
 
+        $xp = $this->fetchXpForMonster($monster);
+
+        $this->character->update([
+            'xp' => $this->character->xp + $xp,
+        ]);
+
+        $this->character = $this->character->refresh();
+
+        $this->battleMessageHandler->handleXPMessage($this->character->user, $xp, $this->character->xp);
+    }
+
+    /**
+     * Fetch the xp for the monster
+     *
+     * - Can return 0 if we cannot gain xp.
+     * - Can return 0 if the xp we would gain is 0.
+     * - Takes into account skills in training
+     * - Takes into account Xp Bonuses such as items (Alchemy and quest)
+     *
+     * @param Monster $monster
+     * @return integer
+     */
+    public function fetchXpForMonster(Monster $monster): int
+    {
         $addBonus = true;
 
         if (!$this->characterXpService->canCharacterGainXP($this->character)) {
-            return;
+            return 0;
         }
 
         // Reduce The XP from the monster if needed.
         $xp = XPCalculator::fetchXPFromMonster($monster, $this->character->level);
 
         if ($this->character->level >= $monster->max_level && $this->character->user->show_monster_to_low_level_message) {
-            ServerMessageHandler::sendBasicMessage($this->character->user, $monster->name.' has a max level of: '.number_format($monster->max_level).'. You are only getting 1/3rd of: '.number_format($monster->xp).' XP before all bonuses. Move down the list child.');
+            ServerMessageHandler::sendBasicMessage($this->character->user, $monster->name . ' has a max level of: ' . number_format($monster->max_level) . '. You are only getting 1/3rd of: ' . number_format($monster->xp) . ' XP before all bonuses. Move down the list child.');
 
             $addBonus = false;
         }
 
         // Get XP based on the skill in trainings training sacrificial amount, ie, give me back 85% of this xp.
-        $xp = $this->skillService->getXpWithSkillTrainingReduction($this->character, $xp);
+        $xp = $this->skillService->setSkillInTraining($this->character)->getCharacterXpWithSkillTrainingReduction($this->character, $xp);
 
         $event = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
 
@@ -287,20 +356,10 @@ class CharacterRewardService
         }
 
         if ($xp === 0) {
-            return;
+            return 0;
         }
 
-        $xp = $this->getXpWithBonuses($xp);
-
-        $characterXp = (int) $this->character->xp;
-
-        $xp = $characterXp + $xp;
-
-        $this->character->update([
-            'xp' => $xp,
-        ]);
-
-        $this->character = $this->character->refresh();
+        return $this->getXpWithBonuses($xp);
     }
 
     /**
@@ -308,7 +367,7 @@ class CharacterRewardService
      *
      * @return void
      */
-    protected function updateCharacterStats(Character $character)
+    private function updateCharacterStats(Character $character)
     {
         $characterData = new Item($character, $this->characterSheetBaseInfoTransformer);
         $characterData = $this->manager->createData($characterData)->toArray();
@@ -323,7 +382,7 @@ class CharacterRewardService
      *
      * @throws Exception
      */
-    protected function distributeGold(Monster $monster)
+    private function distributeGold(Monster $monster)
     {
         $newGold = $this->character->gold + $monster->gold;
 
@@ -334,6 +393,10 @@ class CharacterRewardService
         $this->character->update([
             'gold' => $newGold,
         ]);
+
+        $character = $this->character->refresh();
+
+        $this->battleMessageHandler->handleCurrencyGainMessage($character->user, CurrenciesMessageTypes::GOLD, $monster->gold, $newGold);
     }
 
     /**
@@ -343,7 +406,7 @@ class CharacterRewardService
      *
      * @throws Exception
      */
-    protected function distributeCopperCoins(Monster $monster)
+    private function distributeCopperCoins(Monster $monster)
     {
         $copperCoinsItem = ItemModel::where('effect', ItemEffectsValue::GET_COPPER_COINS)->first();
         $mercenarySlotBonusItem = ItemModel::where('effect', ItemEffectsValue::MERCENARY_SLOT_BONUS)->first();
@@ -376,13 +439,14 @@ class CharacterRewardService
                 $coins = $coins + $coins * $mercenarySlotBonus;
 
                 $newCoins = $this->character->copper_coins + $coins;
-                $maxCurrencies = new MaxCurrenciesValue($newCoins, MaxCurrenciesValue::COPPER);
 
-                if (! $maxCurrencies->canNotGiveCurrency()) {
-                    $this->character->update(['copper_coins' => $newCoins]);
-                } else {
-                    $this->character->update(['copper_coins' => MaxCurrenciesValue::MAX_COPPER]);
+                if ($newCoins >= MaxCurrenciesValue::COPPER) {
+                    $newCoins = MaxCurrenciesValue::MAX_COPPER;
                 }
+
+                $this->character->update(['copper_coins' => $newCoins]);
+
+                $this->battleMessageHandler->handleCurrencyGainMessage($this->character->user, CurrenciesMessageTypes::COPPER_COINS, $coins, $newCoins);
             }
         }
     }
@@ -390,7 +454,7 @@ class CharacterRewardService
     /**
      * Are we at a location with an effect (special location)?
      */
-    protected function purgatoryDungeons(Map $map): ?Location
+    private function purgatoryDungeons(Map $map): ?Location
     {
         return Location::whereNotNull('enemy_strength_type')
             ->where('x', $map->character_position_x)

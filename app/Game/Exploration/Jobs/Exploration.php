@@ -2,31 +2,38 @@
 
 namespace App\Game\Exploration\Jobs;
 
-use App\Flare\Models\Character;
-use App\Flare\Models\CharacterAutomation;
-use App\Flare\Models\Monster;
-use App\Flare\ServerFight\MonsterPlayerFight;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Battle\Handlers\BattleEventHandler;
-use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
-use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
-use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
-use App\Game\Exploration\Events\ExplorationLogUpdate;
-use App\Game\Exploration\Events\ExplorationTimeOut;
-use App\Game\GuideQuests\Services\GuideQuestService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
+use App\Flare\Models\Character;
+use App\Flare\Models\CharacterAutomation;
+use App\Flare\Models\Monster;
+use App\Flare\ServerFight\MonsterPlayerFight;
+use App\Flare\Services\CharacterRewardService;
+use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\BattleRewardProcessing\Jobs\Events\WinterEventChristmasGiftHandler;
+use App\Game\BattleRewardProcessing\Jobs\ExplorationSkillXpHandler;
+use App\Game\BattleRewardProcessing\Jobs\ExplorationXpHandler;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Exploration\Events\ExplorationLogUpdate;
+use App\Game\Exploration\Events\ExplorationTimeOut;
+use App\Game\Skills\Services\SkillService;
 
 class Exploration implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public Character $character;
+
+    private CharacterRewardService $characterRewardService;
+
+    private SkillService $skillService;
 
     private int $automationId;
 
@@ -42,11 +49,17 @@ class Exploration implements ShouldQueue
         $this->timeDelay = $timeDelay;
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function handle(MonsterPlayerFight $monsterPlayerFight, BattleEventHandler $battleEventHandler, FactionHandler $factionHandler, GuideQuestService $guideQuestService, CharacterCacheData $characterCacheData): void
-    {
+    public function handle(
+        MonsterPlayerFight $monsterPlayerFight,
+        BattleEventHandler $battleEventHandler,
+        CharacterCacheData $characterCacheData,
+        CharacterRewardService $characterRewardService,
+        SkillService $skillService
+    ): void {
+
+        $this->characterRewardService = $characterRewardService;
+
+        $this->skillService = $skillService;
 
         $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
 
@@ -96,19 +109,14 @@ class Exploration implements ShouldQueue
         event(new ExplorationTimeOut($this->character->user, 0));
     }
 
-    protected function sendOutEventLogUpdate(string $message, bool $makeItalic = false, bool $isReward = false): void
+    private function sendOutEventLogUpdate(string $message, bool $makeItalic = false, bool $isReward = false): void
     {
         if ($this->character->isLoggedIn()) {
             event(new ExplorationLogUpdate($this->character->user->id, $message, $makeItalic, $isReward));
         }
     }
 
-    /**
-     * Handle the encounter.
-     *
-     * @throws \Exception
-     */
-    protected function encounter(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params, int $timeDelay): bool
+    private function encounter(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params, int $timeDelay): bool
     {
 
         $canSurviveFights = $this->canSurviveFight($response, $automation, $battleEventHandler, $params);
@@ -122,9 +130,22 @@ class Exploration implements ShouldQueue
             $this->sendOutEventLogUpdate('"Chirst, child there are: ' . $enemies . ' of them ..."
             The Guide hisses at you from the shadows. You ignore his words and prepare for battle. One right after the other ...', true);
 
+            $monster = Monster::find($params['selected_monster_id']);
+            $totalXpToReward = 0;
+            $totalSkillXpToReward = 0;
+            $characterRewardService = $this->characterRewardService->setCharacter($this->character);
+            $characterSkillService = $this->skillService->setSkillInTraining($this->character);
+
             for ($i = 1; $i <= $enemies; $i++) {
-                $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id']);
+                $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], false, false);
+
+                $totalXpToReward += $characterRewardService->fetchXpForMonster($monster);
+                $totalSkillXpToReward += $characterSkillService->getXpForSkillIntraining($this->character, $monster->xp);
             }
+
+            ExplorationXpHandler::dispatch($this->character->id, $enemies, $totalXpToReward)->onQueue('exploration_battle_xp_reward')->delay(now()->addSeconds(2));
+            ExplorationSkillXpHandler::dispatch($this->character->id, $totalSkillXpToReward)->onQueue('exploration_battle_skill_xp_reward')->delay(now()->addSeconds(2));
+            WinterEventChristmasGiftHandler::dispatch($this->character->id)->onQueue('event_battle_reward')->delay(now()->addSeconds(2));
 
             $this->sendOutEventLogUpdate('The last of the enemies fall. Covered in blood, exhausted, you look around for any signs of more of their friends. The area is silent. "Another day, another battle.
             We managed to survive." The Guide states as he walks from the shadows. The pair of you set off in search of the next adventure ...
@@ -136,7 +157,7 @@ class Exploration implements ShouldQueue
         return false;
     }
 
-    protected function canSurviveFight(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool
+    private function canSurviveFight(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool
     {
 
         if (Cache::has('can-character-survive-' . $this->character->id)) {
@@ -145,23 +166,32 @@ class Exploration implements ShouldQueue
 
         $this->sendOutEventLogUpdate('"Child, I can see a small group of these creature. If we slaughter them we might learn something." The guide insists. "Theres ten of them. Quick, kill them. We will continue the hunt!"');
 
+        $monster = Monster::find($params['selected_monster_id']);
+        $totalXpToReward = 0;
+        $totalSkillXpToReward = 0;
+        $characterRewardService = $this->characterRewardService->setCharacter($this->character);
+        $characterSkillService = $this->skillService->setSkillInTraining($this->character);
+
+
         for ($i = 1; $i <= 10; $i++) {
-            if (! $this->fightAutomationMonster($response, $automation, $battleEventHandler, $params)) {
+            if (!$this->fightAutomationMonster($response, $automation, $battleEventHandler, $params)) {
                 return false;
             }
+
+            $totalXpToReward += $characterRewardService->fetchXpForMonster($monster);
+            $totalSkillXpToReward += $characterSkillService->getXpForSkillIntraining($this->character, $monster->xp);
         }
+
+        ExplorationXpHandler::dispatch($this->character->id, 10, $totalXpToReward)->onQueue('exploration_battle_xp_reward')->delay(now()->addSeconds(2));
+        ExplorationSkillXpHandler::dispatch($this->character->id, $totalSkillXpToReward)->onQueue('exploration_battle_skill_xp_reward')->delay(now()->addSeconds(2));
+        WinterEventChristmasGiftHandler::dispatch($this->character->id)->onQueue('event_battle_reward')->delay(now()->addSeconds(2));
 
         Cache::put('can-character-survive-' . $this->character->id, true);
 
         return true;
     }
 
-    /**
-     * Fight the monster in automation.
-     *
-     * @throws \Exception
-     */
-    protected function fightAutomationMonster(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool
+    private function fightAutomationMonster(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool
     {
         $fightResponse = $response->fightMonster();
 
@@ -181,15 +211,12 @@ class Exploration implements ShouldQueue
 
         $response->resetBattleMessages();
 
-        $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id']);
+        $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], false, false);
 
         return true;
     }
 
-    /**
-     * Should we bail on the automation?
-     */
-    protected function shouldBail(?CharacterAutomation $automation = null): bool
+    private function shouldBail(?CharacterAutomation $automation = null): bool
     {
 
         if (is_null($automation)) {
@@ -203,10 +230,7 @@ class Exploration implements ShouldQueue
         return false;
     }
 
-    /**
-     * Update the automation.
-     */
-    protected function updateAutomation(CharacterAutomation $automation): CharacterAutomation
+    private function updateAutomation(CharacterAutomation $automation): CharacterAutomation
     {
         if (! is_null($automation->move_down_monster_list_every)) {
             $characterLevel = $this->character->refresh()->level;
@@ -234,10 +258,7 @@ class Exploration implements ShouldQueue
         return $automation->refresh();
     }
 
-    /**
-     * End the automation.
-     */
-    protected function endAutomation(?CharacterAutomation $automation, CharacterCacheData $characterCacheData): void
+    private function endAutomation(?CharacterAutomation $automation, CharacterCacheData $characterCacheData): void
     {
         if (! is_null($automation)) {
             $automation->delete();
@@ -261,10 +282,7 @@ class Exploration implements ShouldQueue
         }
     }
 
-    /**
-     * Reward the player.
-     */
-    protected function rewardPlayer(Character $character): void
+    private function rewardPlayer(Character $character): void
     {
 
         $gold = $character->gold + 10000;

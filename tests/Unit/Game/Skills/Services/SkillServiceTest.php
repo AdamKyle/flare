@@ -125,7 +125,7 @@ class SkillServiceTest extends TestCase
     {
         $character = $this->character->getCharacter();
 
-        $this->skillService->assignXPToTrainingSkill($character, 10);
+        $this->skillService->setSkillInTraining($character)->assignXPToTrainingSkill($character, 10);
 
         $skill = $character->refresh()->skills->first();
 
@@ -143,7 +143,7 @@ class SkillServiceTest extends TestCase
             'currently_training' => true,
         ]);
 
-        $this->skillService->assignXPToTrainingSkill($character->refresh(), 10);
+        $this->skillService->setSkillInTraining($character)->assignXPToTrainingSkill($character->refresh(), 10);
 
         $skill = $skill->refresh();
 
@@ -163,7 +163,7 @@ class SkillServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->skillService->assignXPToTrainingSkill($character, 10);
+        $this->skillService->setSkillInTraining($character)->assignXPToTrainingSkill($character, 10);
 
         $skill = $character->refresh()->skills->where('currently_training', true)->first();
 
@@ -189,7 +189,7 @@ class SkillServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->skillService->assignXPToTrainingSkill($character, 10);
+        $this->skillService->setSkillInTraining($character)->assignXPToTrainingSkill($character, 10);
 
         $skill = $character->refresh()->skills->where('currently_training', true)->first();
 
@@ -211,7 +211,7 @@ class SkillServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->skillService->assignXPToTrainingSkill($character, 1500);
+        $this->skillService->setSkillInTraining($character)->assignXPToTrainingSkill($character, 1500);
 
         $skill = $character->refresh()->skills->where('currently_training', true)->first();
 
@@ -235,7 +235,7 @@ class SkillServiceTest extends TestCase
             'level' => $skill->baseSkill->max_level - 1,
         ]);
 
-        $this->skillService->assignXPToTrainingSkill($character->refresh(), 1500);
+        $this->skillService->setSkillInTraining($character)->assignXPToTrainingSkill($character->refresh(), 1500);
 
         $skill = $character->refresh()->skills->first();
 

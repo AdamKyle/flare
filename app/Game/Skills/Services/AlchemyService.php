@@ -11,6 +11,8 @@ use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\CharacterMessageTypes;
+use App\Game\Messages\Types\CraftingMessageTypes;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Services\Traits\UpdateCharacterCurrency;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -98,13 +100,13 @@ class AlchemyService
         }
 
         if ($goldDustCost > $character->gold_dust) {
-            ServerMessageHandler::handleMessage($character->user, 'not_enough_gold_dust');
+            ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::NOT_ENOUGH_GOLD_DUST);
 
             return;
         }
 
         if ($shardsCost > $character->shards) {
-            ServerMessageHandler::handleMessage($character->user, 'not_enough_shards');
+            ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::NOT_ENOUGH_SHARDS);
 
             return;
         }
@@ -118,7 +120,7 @@ class AlchemyService
 
         if ($skill->level < $item->skill_level_required) {
 
-            ServerMessageHandler::handleMessage($character->user, 'to_hard_to_craft');
+            ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::TO_HARD_TO_CRAFT);
 
             $this->pickUpItem($character, $item, $skill, true);
 
@@ -132,7 +134,7 @@ class AlchemyService
 
         if ($skill->level > $item->skill_level_trivial) {
 
-            ServerMessageHandler::handleMessage($character->user, 'to_easy_to_craft');
+            ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::TO_EASY_TO_CRAFT);
 
             $this->pickUpItem($character, $item, $skill, true);
 
@@ -158,7 +160,7 @@ class AlchemyService
             return;
         }
 
-        ServerMessageHandler::handleMessage($character->user, 'failed_to_transmute');
+        ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::FAILED_TO_TRANSMUTE);
 
         $character = $character->refresh();
 
@@ -190,7 +192,7 @@ class AlchemyService
             return true;
         }
 
-        ServerMessageHandler::handleMessage($character->user, 'inventory_full');
+        ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::INVENTORY_IS_FULL);
 
         return false;
     }

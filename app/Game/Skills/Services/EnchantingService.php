@@ -21,6 +21,7 @@ use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Events\Concerns\ShouldShowEnchantingEventButton;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\CraftingMessageTypes;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
@@ -258,20 +259,20 @@ class EnchantingService
             $this->wasTooEasy = false;
 
             if ($enchantingSkill->level < $affix->skill_level_required) {
-                ServerMessageHandler::handleMessage($character->user, 'to_hard_to_craft');
+                ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::TO_HARD_TO_CRAFT);
 
                 return;
             }
 
             if ($character->getInformation()->statMod('int') < $affix->int_required) {
-                ServerMessageHandler::handleMessage($character->user, 'int_to_low_enchanting');
+                ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::INT_TO_LOW_ENCHANTING);
 
                 return;
             }
 
             if ($enchantingSkill->level > $affix->skill_level_trivial) {
                 if (!$this->sentToEasyMessage) {
-                    ServerMessageHandler::handleMessage($character->user, 'to_easy_to_craft');
+                    ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::TO_EASY_TO_CRAFT);
 
                     $this->sentToEasyMessage = true;
                 }
@@ -313,7 +314,7 @@ class EnchantingService
     {
         $message = 'Applied enchantment: ' . $affix->name . ' to: ' . $slot->item->refresh()->affix_name;
 
-        ServerMessageHandler::handleMessage($character->user, 'enchanted', $message, $slot->id);
+        ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::ENCHANTED, $message, $slot->id);
 
         if (! $tooEasy) {
             event(new UpdateSkillEvent($enchantingSkill));
@@ -324,7 +325,7 @@ class EnchantingService
     {
         $message = 'You failed to apply ' . $affix->name . ' to: ' . $slot->item->refresh()->affix_name . '. The item shatters before you. You lost the investment.';
 
-        ServerMessageHandler::handleMessage($character->user, 'enchantment_failed', $message);
+        ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::ENCHANTMENT_FAILED, $message);
 
         $this->enchantItemService->deleteSlot($slot);
 

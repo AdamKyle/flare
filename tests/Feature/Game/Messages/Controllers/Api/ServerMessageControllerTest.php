@@ -2,9 +2,10 @@
 
 namespace Tests\Feature\Game\Messages\Controllers\Api;
 
-use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\MapMessageTypes;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 
@@ -51,23 +52,6 @@ class ServerMessageControllerTest extends TestCase
         $this->assertEquals(200, $response->status());
     }
 
-    public function testGenerateServerMessageForType()
-    {
-        Event::fake();
-
-        $character = $this->character->getCharacter();
-
-        $response = $this->actingAs($character->user)
-            ->call('GET', '/api/server-message', [
-                '_token' => csrf_token(),
-                'type' => 'invalid_command',
-            ]);
-
-        Event::assertDispatched(ServerMessageEvent::class);
-
-        $this->assertEquals(200, $response->status());
-    }
-
     public function testFailToGenerateServerMessage()
     {
         Event::fake();
@@ -86,5 +70,43 @@ class ServerMessageControllerTest extends TestCase
         $this->assertEquals(422, $response->status());
 
         $this->assertEquals('Cannot generate server message for either type or custom message.', $jsonData['message']);
+    }
+
+    public function testGenerateServerMessageWithType()
+    {
+        Event::fake();
+
+        $character = $this->character->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/server-message', [
+                '_token' => csrf_token(),
+                'type' => MapMessageTypes::CANNOT_MOVE_DOWN->getValue()
+            ]);
+
+        Event::assertDispatched(ServerMessageEvent::class);
+
+        $this->assertEquals(200, $response->status());
+    }
+
+    public function testFailToGenerateServerMessageForInvalidType()
+    {
+        Event::fake();
+
+        $character = $this->character->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/server-message', [
+                '_token' => csrf_token(),
+                'type' => 'skjfhf'
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        Event::assertNotDispatched(ServerMessageEvent::class);
+
+        $this->assertEquals(422, $response->status());
+
+        $this->assertEquals('Invalid message type was passed when trying to generate server message', $jsonData['message']);
     }
 }

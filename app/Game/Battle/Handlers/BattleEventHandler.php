@@ -9,30 +9,16 @@ use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Events\CharacterRevive;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
-use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Messages\Events\ServerMessageEvent;
-use Exception;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
 class BattleEventHandler
 {
     use FetchEquipped;
 
-    private BattleRewardService $battleRewardService;
-
-    private SecondaryRewardService $secondaryRewardService;
-
-    private WeeklyBattleService $weeklyBattleService;
-
-    public function __construct(BattleRewardService $battleRewardService, SecondaryRewardService $secondaryRewardService, WeeklyBattleService $weeklyBattleService)
-    {
-        $this->battleRewardService = $battleRewardService;
-        $this->secondaryRewardService = $secondaryRewardService;
-        $this->weeklyBattleService = $weeklyBattleService;
-    }
+    public function __construct(private BattleRewardService $battleRewardService, private WeeklyBattleService $weeklyBattleService) {}
 
     /**
      * Process the fact the character has died.
@@ -57,25 +43,19 @@ class BattleEventHandler
     }
 
     /**
-     * Process the fact the monster has died.
+     * Processes what we should do when the monster dies.
      *
-     * @throws Exception
+     * - Handles rewarding the player
+     *
+     * @param integer $characterId
+     * @param integer $monsterId
+     * @param boolean $includeXp
+     * @param boolean $includeEventReward
+     * @return void
      */
-    public function processMonsterDeath(int $characterId, int $monsterId): void
+    public function processMonsterDeath(int $characterId, int $monsterId, bool $includeXp = true, $includeEventReward = true): void
     {
-        $monster = Monster::find($monsterId);
-
-        $character = Character::find($characterId);
-
-        if (is_null($monster)) {
-            Log::error('Missing Monster for id: '.$monsterId);
-
-            return;
-        }
-
-        $this->battleRewardService->setUp($monster, $character)->handleBaseRewards();
-
-        $this->secondaryRewardService->handleSecondaryRewards($character);
+        $this->battleRewardService->setUp($characterId, $monsterId)->handleBaseRewards($includeXp, $includeEventReward);
     }
 
     /**
@@ -96,12 +76,12 @@ class BattleEventHandler
             ]);
         }
 
-        $monsterFightCache = Cache::get('monster-fight-'.$character->id);
+        $monsterFightCache = Cache::get('monster-fight-' . $character->id);
 
         if (! is_null($monsterFightCache)) {
             $monsterFightCache['health']['current_character_health'] = $characterHealth;
 
-            Cache::put('monster-fight-'.$character->id, $monsterFightCache, 900);
+            Cache::put('monster-fight-' . $character->id, $monsterFightCache, 900);
         }
 
         event(new CharacterRevive($character->user, $characterHealth));

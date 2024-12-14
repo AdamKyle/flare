@@ -2,7 +2,6 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
-use Artisan;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
@@ -10,6 +9,7 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
 use App\Flare\Models\Survey;
 use App\Flare\Values\MapNameValue;
+use Artisan;
 
 class MassImportCustomData extends Command
 {

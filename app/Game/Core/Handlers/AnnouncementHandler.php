@@ -90,7 +90,7 @@ class AnnouncementHandler
         }
 
         $message = 'From now until: ' . $event->ends_at->format('l, j \of F \a\t h:ia \G\M\TP') . ' ' .
-            'Players who are in The Gold Mines will have double chance to get MEDIUM uniques gear. ' .
+            'Players who are in The Gold Mines will have double chance to get unique gear. ' .
             'Players will also get 2x the amount of Gold Dust, Shards and Gold from critters.';
 
         $announcement = Announcement::create([
@@ -111,7 +111,7 @@ class AnnouncementHandler
         }
 
         $message = 'From now until: ' . $event->ends_at->format('l, j \of F \a\t h:ia \G\M\TP') . ' ' .
-            'Players who are in The Old Church will have double chance to get MEDIUM uniques Corrupted Ice gear. ' .
+            'Players who are in The Old Church will have double chance to get a unique Corrupted Ice gear. ' .
             'Players will also get 2x the amount of Gold Dust, Shards and Gold from critters.';
 
         $announcement = Announcement::create([

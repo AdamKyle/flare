@@ -4,8 +4,10 @@ namespace App\Game\BattleRewardProcessing\Providers;
 
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\GlobalEventParticipation;
+use App\Flare\ServerFight\BattleMessages;
 use App\Flare\Services\CharacterRewardService;
 use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
+use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
 use App\Game\BattleRewardProcessing\Handlers\GoldMinesRewardHandler;
@@ -35,6 +37,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new FactionHandler(
                 $app->make(RandomAffixGenerator::class),
                 $app->make(GuideQuestService::class),
+                $app->make(BattleMessageHandler::class)
             );
         });
 
@@ -42,6 +45,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new FactionLoyaltyBountyHandler(
                 $app->make(RandomAffixGenerator::class),
                 $app->make(FactionLoyaltyService::class),
+                $app->make(BattleMessageHandler::class),
             );
         });
 
@@ -54,18 +58,21 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(PurgatorySmithHouseRewardHandler::class, function ($app) {
             return new PurgatorySmithHouseRewardHandler(
                 $app->make(RandomAffixGenerator::class),
+                $app->make(BattleMessageHandler::class),
             );
         });
 
         $this->app->bind(GoldMinesRewardHandler::class, function ($app) {
             return new GoldMinesRewardHandler(
                 $app->make(RandomAffixGenerator::class),
+                $app->make(BattleMessageHandler::class),
             );
         });
 
         $this->app->bind(TheOldChurchRewardHandler::class, function ($app) {
             return new TheOldChurchRewardHandler(
                 $app->make(RandomAffixGenerator::class),
+                $app->make(BattleMessageHandler::class),
             );
         });
 
@@ -99,6 +106,10 @@ class ServiceProvider extends ApplicationServiceProvider
             return new SecondaryRewardService(
                 $app->make(ClassRankService::class),
             );
+        });
+
+        $this->app->bind(BattleMessageHandler::class, function () {
+            return new BattleMessageHandler();
         });
     }
 

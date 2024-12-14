@@ -7,6 +7,7 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\CraftingMessageTypes;
 use App\Game\Skills\Services\Traits\UpdateCharacterCurrency;
 use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -81,13 +82,13 @@ class TrinketCraftingService
         }
 
         if ($trinkentrySkill->level < $item->skill_level_required) {
-            ServerMessageHandler::handlemessage($character->user, 'to_hard_to_craft');
+            ServerMessageHandler::handlemessage($character->user, CraftingMessageTypes::TO_HARD_TO_CRAFT);
 
             return $this->fetchItemsToCraft($character);
         }
 
         if ($trinkentrySkill->level > $item->skill_level_trivial) {
-            ServerMessageHandler::handlemessage($character->user, 'to_easy_to_craft');
+            ServerMessageHandler::handlemessage($character->user, CraftingMessageTypes::TO_EASY_TO_CRAFT);
 
             $this->updateTrinketCost($character, $item);
 

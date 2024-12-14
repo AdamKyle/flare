@@ -2,12 +2,13 @@
 
 namespace App\Game\Core\Listeners;
 
+use Exception;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
 use App\Game\Core\Events\CharacterLevelUpEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Services\CharacterService;
-use Exception;
+use App\Game\Messages\Types\CharacterMessageTypes;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class CharacterLevelUpListener
@@ -40,7 +41,7 @@ class CharacterLevelUpListener
 
             $character = $event->character->refresh();
 
-            ServerMessageHandler::handleMessage($character->user, 'level_up', $character->level);
+            ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::LEVEL_UP, $character->level);
 
             if ($event->shouldUpdateCache) {
                 $this->buildCharacterAttackTypes->buildCache($character);
@@ -48,7 +49,6 @@ class CharacterLevelUpListener
                 event(new UpdateTopBarEvent($character));
                 event(new UpdateCharacterAttackEvent($character));
             }
-
         } else {
             event(new UpdateTopBarEvent($event->character));
         }

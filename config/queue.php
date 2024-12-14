@@ -69,15 +69,7 @@ return [
         'kingdom_jobs' => [
             'driver' => 'redis',
             'connection' => 'kingdom_jobs',
-            'queue' => env('REDIS_QUEUE', 'default'),
-            'retry_after' => 90,
-            'block_for' => null,
-        ],
-
-        'character_daily' => [
-            'driver' => 'redis',
-            'connection' => 'character_daily',
-            'queue' => env('REDIS_QUEUE', 'default'),
+            'queue' => 'kingdom_jobs',
             'retry_after' => 90,
             'block_for' => null,
         ],
@@ -85,31 +77,95 @@ return [
         'weekly_spawn' => [
             'driver' => 'redis',
             'connection' => 'weekly_spawn',
-            'queue' => env('REDIS_QUEUE', 'default'),
+            'queue' => 'weekly_spawn',
             'retry_after' => 90,
             'block_for' => null,
         ],
 
-        'weekly_events' => [
+        'event_battle_reward' => [
             'driver' => 'redis',
-            'connection' => 'weekly_events',
-            'queue' => env('REDIS_QUEUE', 'default'),
-            'retry_after' => 90,
+            'connection' => 'default',
+            'queue' => 'event_battle_reward',
+            'retry_after' => 1200,
             'block_for' => null,
         ],
 
-        'shop_buying' => [
+        'battle_reward_xp' => [
             'driver' => 'redis',
-            'connection' => 'shop_buying',
-            'queue' => env('REDIS_QUEUE', 'default'),
-            'retry_after' => 90,
+            'connection' => 'default',
+            'queue' => 'battle_reward_xp',
+            'retry_after' => 1200,
             'block_for' => null,
         ],
 
-        'disenchanting' => [
+        'exploration_battle_xp_reward' => [
             'driver' => 'redis',
-            'connection' => 'disenchanting',
-            'queue' => 'default_long',
+            'connection' => 'default',
+            'queue' => 'exploration_battle_xp_reward',
+            'retry_after' => 1200,
+            'block_for' => null,
+        ],
+
+        'exploration_battle_skill_xp_reward' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+            'queue' => 'exploration_battle_skill_xp_reward',
+            'retry_after' => 1200,
+            'block_for' => null,
+        ],
+
+        'battle_reward_currencies' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+            'queue' => 'battle_reward_currencies',
+            'retry_after' => 1200,
+            'block_for' => null,
+        ],
+
+        'battle_secondary_reward' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+            'queue' => 'battle_secondary_reward',
+            'retry_after' => 1200,
+            'block_for' => null,
+        ],
+
+        'battle_reward_factions' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+            'queue' => 'battle_reward_factions',
+            'retry_after' => 1200,
+            'block_for' => null,
+        ],
+
+        'battle_reward_global_event' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+            'queue' => 'battle_reward_global_event',
+            'retry_after' => 1200,
+            'block_for' => null,
+        ],
+
+        'battle_reward_location_handlers' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+            'queue' => 'battle_reward_location_handlers',
+            'retry_after' => 1200,
+            'block_for' => null,
+        ],
+
+        'battle_reward_weekly_fights' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+            'queue' => 'battle_reward_weekly_fights',
+            'retry_after' => 1200,
+            'block_for' => null,
+        ],
+
+        'battle_reward_item_handler' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+            'queue' => 'battle_reward_item_handler',
             'retry_after' => 1200,
             'block_for' => null,
         ],
@@ -118,19 +174,12 @@ return [
             'driver' => 'redis',
             'connection' => 'default',
             'queue' => 'default_long',
-            'retry_after' => 1200, // Run for max 20 minutes
-            'block_for' => null,
-        ],
-
-        'npc_commands' => [
-            'driver' => 'redis',
-            'connection' => 'npc_commands',
-            'queue' => 'default_long',
-            'retry_after' => 1200, // Run for max 20 minutes
+            'retry_after' => 1200,
             'block_for' => null,
         ],
 
     ],
+
 
     /*
     |--------------------------------------------------------------------------

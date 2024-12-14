@@ -85,6 +85,7 @@ class ItemsService
                 ItemEffectsValue::MERCENARY_SLOT_BONUS,
                 ItemEffectsValue::TWISTED_TREE_BRANCH,
                 ItemEffectsValue::TWISTED_DUNGEONS,
+                ItemEffectsValue::THE_OLD_CHURCH,
             ],
             'specialtyTypes' => [
                 ItemSpecialtyType::HELL_FORGED,
@@ -177,6 +178,6 @@ class ItemsService
 
         $item->delete();
 
-        return $this->successResult(['message' => 'success', $name.' was deleted successfully.']);
+        return $this->successResult(['message' => 'success', $name . ' was deleted successfully.']);
     }
 }

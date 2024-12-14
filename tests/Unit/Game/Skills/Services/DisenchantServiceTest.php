@@ -9,6 +9,7 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\CraftingMessageTypes;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Services\DisenchantService;
@@ -276,7 +277,7 @@ class DisenchantServiceTest extends TestCase
         Event::assertDispatched(UpdateCharacterEnchantingList::class);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->build('failed_to_disenchant');
+            return $event->message === resolve(ServerMessageBuilder::class)->build(CraftingMessageTypes::FAILED_TO_DISENCHANT);
         });
     }
 
@@ -431,7 +432,7 @@ class DisenchantServiceTest extends TestCase
         $this->assertEquals(1, $character->gold_dust);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->build('failed_to_disenchant');
+            return $event->message === resolve(ServerMessageBuilder::class)->build(CraftingMessageTypes::FAILED_TO_DISENCHANT);
         });
     }
 

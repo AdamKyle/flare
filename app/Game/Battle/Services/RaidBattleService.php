@@ -313,7 +313,7 @@ class RaidBattleService
             $raid = Raid::where('raid_boss_id', $monsterId)->first();
 
             if (is_null($raid)) {
-                BattleAttackHandler::dispatch($character->id, $this->monsterPlayerFight->getMonster()['id'])->onQueue('default_long');
+                BattleAttackHandler::dispatch($character->id, $this->monsterPlayerFight->getMonster()['id'])->onQueue('default_long')->delay(now()->addSeconds(2));
 
                 return $this->successResult([
                     'character_current_health' => $health['current_character_health'],
@@ -322,7 +322,7 @@ class RaidBattleService
                 ]);
             }
 
-            RaidBossRewardHandler::dispatch($character->id, $raid->id, $monsterId);
+            RaidBossRewardHandler::dispatch($character->id, $raid->id, $monsterId)->onQueue('default_long')->delay(now()->addSeconds(2));
 
             return $this->successResult([
                 'character_current_health' => $health['current_character_health'],

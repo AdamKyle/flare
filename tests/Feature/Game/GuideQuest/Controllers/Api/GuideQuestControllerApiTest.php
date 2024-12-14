@@ -9,7 +9,7 @@ use Tests\TestCase;
 use Tests\Traits\CreateGuideQuest;
 use Tests\Traits\CreateItem;
 
-class GuideQuestControllerTest extends TestCase
+class GuideQuestControllerApiTest extends TestCase
 {
     use CreateGuideQuest, CreateItem, RefreshDatabase;
 
@@ -53,7 +53,7 @@ class GuideQuestControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/guide-quests/hand-in/'.$character->user->id.'/'.$guideQuestToHandIn->id, [
+            ->call('POST', '/api/guide-quests/hand-in/' . $character->user->id . '/' . $guideQuestToHandIn->id, [
                 '_token' => csrf_token(),
             ]);
 
@@ -65,5 +65,48 @@ class GuideQuestControllerTest extends TestCase
         foreach ($jsonData['can_hand_in'] as $canHandIn) {
             $this->assertFalse($canHandIn['can_hand_in']);
         }
+    }
+
+    public function testGetCurrentQuest()
+    {
+        $this->createGuideQuest([
+            'name' => 'hand in',
+            'required_level' => 1,
+        ]);
+
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/guide-quest/' . $character->user->id, [
+                '_token' => csrf_token(),
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertCount(1, $jsonData['completed_requirements']);
+        $this->assertIsArray($jsonData['can_hand_in']);
+
+        foreach ($jsonData['can_hand_in'] as $canHandIn) {
+            $this->assertTrue($canHandIn['can_hand_in']);
+        }
+    }
+
+    public function testFailToHandInGuideQuest()
+    {
+        $guideQuestToHandIn = $this->createGuideQuest([
+            'name' => 'hand in',
+            'required_level' => 10,
+        ]);
+
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/guide-quests/hand-in/' . $character->user->id . '/' . $guideQuestToHandIn->id, [
+                '_token' => csrf_token(),
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals('You cannot hand in this guide quest. You must meet all the requirements first.', $jsonData['message']);
     }
 }

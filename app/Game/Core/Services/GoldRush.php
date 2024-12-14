@@ -4,16 +4,20 @@ namespace App\Game\Core\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Messages\Types\CurrenciesMessageTypes;
 use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class GoldRush
 {
+
     /**
-     * Process a potential gold rush.
+     * Process potential gold rush
      *
-     * @throws \Exception
+     * @param Character $character
+     * @return void
      */
     public function processPotentialGoldRush(Character $character): void
     {
@@ -42,19 +46,22 @@ class GoldRush
      *
      * @throws \Exception
      */
-    protected function giveGoldRush(Character $character): void
+    private function giveGoldRush(Character $character): void
     {
-        $goldRush = $character->gold + ($character->gold * 0.05);
+
+        $amountGiven = ($character->gold * 0.05);
+
+        $goldRush = $character->gold + $amountGiven;
 
         $maxCurrencies = new MaxCurrenciesValue($goldRush, MaxCurrenciesValue::GOLD);
 
-        $type = 'gold_rush';
+        $type = CurrenciesMessageTypes::GOLD_RUSH;
 
         if ($maxCurrencies->canNotGiveCurrency()) {
             $character->gold = MaxCurrenciesValue::MAX_GOLD;
             $character->save();
 
-            $type = 'gold_capped';
+            $type = CurrenciesMessageTypes::GOLD_CAPPED;
         } else {
             $character->gold = $goldRush;
             $character->save();
@@ -62,7 +69,7 @@ class GoldRush
 
         $character = $character->refresh();
 
-        ServerMessageHandler::handleMessage($character->user, $type, number_format($character->gold));
+        ServerMessageHandler::handleMessage($character->user, $type, number_format($amountGiven), number_format($character->gold));
     }
 
     /**

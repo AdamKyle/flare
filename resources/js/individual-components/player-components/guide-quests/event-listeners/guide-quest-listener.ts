@@ -12,8 +12,6 @@ export default class GuideQuestListener
     private component?: Game | GuideButton;
     private userId?: number;
 
-    private guideQuestButton?: Channel;
-
     private openGuideQuestButton?: Channel;
 
     constructor(
@@ -31,10 +29,6 @@ export default class GuideQuestListener
         try {
             const echo = this.coreEventListener.getEcho();
 
-            this.guideQuestButton = echo.private(
-                "guide-quest-button-" + this.userId,
-            );
-
             this.openGuideQuestButton = echo.private(
                 "force-open-guide-quest-modal-" + this.userId,
             );
@@ -44,34 +38,7 @@ export default class GuideQuestListener
     }
 
     listen(): void {
-        this.listenForGuideQuestUpdates();
         this.listenForForceOpenGuideQuestModal();
-    }
-
-    /**
-     * Listen to the guide quest update - if we should show it or not.
-     *
-     * @protected
-     */
-    protected listenForGuideQuestUpdates() {
-        if (!this.guideQuestButton) {
-            return;
-        }
-
-        this.guideQuestButton.listen(
-            "Game.GuideQuests.Events.RemoveGuideQuestButton",
-            (event: any) => {
-                if (!this.component) {
-                    return;
-                }
-
-                if (this.component instanceof GuideButton) {
-                    this.component.setState({
-                        show_button: false,
-                    });
-                }
-            },
-        );
     }
 
     protected listenForForceOpenGuideQuestModal() {

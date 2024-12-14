@@ -6,6 +6,7 @@ use App\Flare\Handlers\MessageThrottledHandler;
 use App\Game\Maps\Services\PctService;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Console\Commands\CleanChat;
+use App\Game\Messages\Factories\AssignMessageType;
 use App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Game\Messages\Services\FetchMessages;
 use App\Game\Messages\Services\PrivateMessage;
@@ -52,6 +53,10 @@ class ServiceProvider extends ApplicationServiceProvider
             return new ServerMessageHandler(
                 $app->make(ServerMessageBuilder::class)
             );
+        });
+
+        $this->app->bind(AssignMessageType::class, function () {
+            return new AssignMessageType();
         });
     }
 

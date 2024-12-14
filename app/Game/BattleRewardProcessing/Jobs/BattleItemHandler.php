@@ -2,35 +2,44 @@
 
 namespace App\Game\BattleRewardProcessing\Jobs;
 
-use App\Flare\Models\Character;
-use App\Flare\Models\Monster;
-use App\Game\Core\Services\DropCheckService;
-use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use App\Flare\Models\Character;
+use App\Flare\Models\Monster;
+use App\Game\Core\Services\DropCheckService;
+
 
 class BattleItemHandler implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private Character $character;
-
-    private Monster $monster;
-
-    public function __construct(Character $character, Monster $monster)
-    {
-        $this->character = $character;
-        $this->monster = $monster;
-    }
+    public function __construct(private int $characterId, private int $monsterId) {}
 
     /**
-     * @throws Exception
+     * Handle the job.
+     *
+     * - Handle drops from the monster.
+     *
+     * @param DropCheckService $dropCheckService
+     * @return void
      */
     public function handle(DropCheckService $dropCheckService): void
     {
-        $dropCheckService->process($this->character->refresh(), $this->monster);
+
+        $character = Character::find($this->characterId);
+        $monster = Monster::find($this->monsterId);
+
+        if (is_null($character)) {
+            return;
+        }
+
+        if (is_null($monster)) {
+            return;
+        }
+
+        $dropCheckService->process($character, $monster);
     }
 }

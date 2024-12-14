@@ -2,10 +2,12 @@
 
 namespace Tests\Unit\Game\Messages\Handlers;
 
-use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Handlers\ServerMessageHandler;
+use App\Game\Messages\Types\CharacterMessageTypes;
+use App\Game\Messages\Types\CurrenciesMessageTypes;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 
@@ -35,7 +37,7 @@ class ServerMessageHandlerTest extends TestCase
 
         Event::fake();
 
-        $this->serverMessageHandler->handleMessage($user, 'level_up', 1);
+        $this->serverMessageHandler->handleMessage($user, CharacterMessageTypes::LEVEL_UP, 1);
 
         Event::assertDispatched(ServerMessageEvent::class);
     }
@@ -47,6 +49,17 @@ class ServerMessageHandlerTest extends TestCase
         Event::fake();
 
         $this->serverMessageHandler->sendBasicMessage($user, 'message');
+
+        Event::assertDispatched(ServerMessageEvent::class);
+    }
+
+    public function testHandleMessageWithNewValue()
+    {
+        $user = $this->createUser();
+
+        Event::fake();
+
+        $this->serverMessageHandler->handleMessageWithNewValue($user, CurrenciesMessageTypes::GOLD, 200, 500);
 
         Event::assertDispatched(ServerMessageEvent::class);
     }

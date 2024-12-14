@@ -23,15 +23,12 @@ use Exception;
 
 class FactionHandler
 {
-    private RandomAffixGenerator $randomAffixGenerator;
 
-    private GuideQuestService $guideQuestService;
-
-    public function __construct(RandomAffixGenerator $randomAffixGenerator, GuideQuestService $guideQuestService)
-    {
-        $this->randomAffixGenerator = $randomAffixGenerator;
-        $this->guideQuestService = $guideQuestService;
-    }
+    public function __construct(
+        private RandomAffixGenerator $randomAffixGenerator,
+        private GuideQuestService $guideQuestService,
+        private BattleMessageHandler $battleMessageHandler
+    ) {}
 
     /**
      * Handle faction points.
@@ -62,15 +59,22 @@ class FactionHandler
             return;
         }
 
+        $factionPointsToReward = FactionLevel::gatPointsPerLevel($faction->current_level);
+
         if ($this->playerHasQuestItem($character)) {
-            $faction->current_points += 50;
-        } else {
-            $faction->current_points += FactionLevel::gatPointsPerLevel($faction->current_level);
+            $factionPointsToReward += 50;
         }
 
-        if ($faction->current_points > $faction->points_needed) {
-            $faction->current_points = $faction->points_needed;
+        $newPointsToAssign = $faction->current_points + $factionPointsToReward;
+
+        if ($newPointsToAssign > $faction->points_needed) {
+            $newPointsToAssign = $faction->points_needed;
         }
+
+        $faction->current_points = $newPointsToAssign;
+
+        $this->battleMessageHandler->handleFactionPointGain($character->user, $factionPointsToReward, $newPointsToAssign, $faction->points_needed);
+
 
         if ($faction->current_points === $faction->points_needed && ! FactionLevel::isMaxLevel($faction->current_level)) {
             $this->handleFactionLevelUp($character, $faction, $map->name);

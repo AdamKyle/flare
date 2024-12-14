@@ -12,6 +12,7 @@ use App\Flare\Values\AutomationType;
 use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\CharacterMessageTypes;
 use App\Game\Skills\Services\DisenchantService;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Facades\App\Flare\Calculators\SellItemCalculator;
@@ -258,7 +259,7 @@ class BattleDrop
             if (! $character->isInventoryFull()) {
                 $this->giveItemToPlayer($character, $item);
             } else {
-                ServerMessageHandler::handleMessage($character->user, 'inventory_full');
+                ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::INVENTORY_IS_FULL);
             }
         }
     }
@@ -301,20 +302,20 @@ class BattleDrop
             ]);
 
             if ($item->type === 'quest') {
-                $message = $character->name.' has found: '.$item->affix_name;
+                $message = $character->name . ' has found: ' . $item->affix_name;
 
                 $slot = $character->refresh()->inventory->slots()->where('item_id', $item->id)->first();
 
-                event(new ServerMessageEvent($character->user, 'You found: '.$item->affix_name.' on the enemies corpse.', $slot->id));
+                event(new ServerMessageEvent($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
 
                 broadcast(new GlobalMessageEvent($message));
             } else {
                 $slot = $character->refresh()->inventory->slots()->where('item_id', $item->id)->first();
 
-                event(new ServerMessageEvent($character->user, 'You found: '.$item->affix_name.' on the enemies corpse.', $slot->id));
+                event(new ServerMessageEvent($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
 
                 if ($isMythic) {
-                    event(new GlobalMessageEvent($character->name.' Has found a mythical item on the enemies corpse! Such a rare drop!'));
+                    event(new GlobalMessageEvent($character->name . ' Has found a mythical item on the enemies corpse! Such a rare drop!'));
                 }
             }
         }

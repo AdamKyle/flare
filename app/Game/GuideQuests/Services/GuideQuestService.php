@@ -27,14 +27,10 @@ class GuideQuestService
         $this->guideQuestRequirementsService = $guideQuestRequirementsService;
     }
 
-    public function fetchQuestForCharacter(Character $character): ?array
+    public function fetchQuestForCharacter(Character $character): array
     {
 
         $quests = $this->fetchNextGuideQuest($character);
-
-        if (is_null($quests)) {
-            return null;
-        }
 
         $canHandIn = [];
         $completedAttributes = [];
@@ -82,18 +78,6 @@ class GuideQuestService
             $shards = MaxCurrenciesValue::MAX_SHARDS;
         }
 
-        if ($quest->gold_reward > 0) {
-            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->gold_reward) . ' Gold.'));
-        }
-
-        if ($quest->gold_dust_reward > 0) {
-            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->gold_dust_reward) . ' Gold Dust.'));
-        }
-
-        if ($quest->shards_reward > 0) {
-            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->shards_reward) . ' Shards.'));
-        }
-
         $character = $this->giveXP($character, $quest);
 
         $character->update([
@@ -109,31 +93,23 @@ class GuideQuestService
 
         $character = $character->refresh();
 
+        if ($quest->gold_reward > 0) {
+            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->gold_reward) . ' Gold. You now have: ' . number_format($character->gold)));
+        }
+
+        if ($quest->gold_dust_reward > 0) {
+            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->gold_dust_reward) . ' Gold Dust. You now have: ' . number_format($character->gold_dust)));
+        }
+
+        if ($quest->shards_reward > 0) {
+            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->shards_reward) . ' Shards. You now have: ' . number_format($character->shards)));
+        }
+
         event(new UpdateTopBarEvent($character));
 
         event(new ShowGuideQuestCompletedToast($character->user, false));
 
         return true;
-    }
-
-    public function giveXP(Character $character, GuideQuest $guideQuest): Character
-    {
-
-        if ($guideQuest->xp_reward <= 0) {
-            return $character;
-        }
-
-        $character->update([
-            'xp' => $character->xp + $guideQuest->xp_reward,
-        ]);
-
-        $character = $character->refresh();
-
-        $this->handlePossibleLevelUp($character);
-
-        event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($guideQuest->xp_reward) . ' XP.'));
-
-        return $character;
     }
 
     public function canHandInQuest(Character $character, GuideQuest $quest, bool $ignoreAutomation = false): bool
@@ -197,7 +173,27 @@ class GuideQuestService
         return false;
     }
 
-    protected function fetchNextGuideQuest(Character $character): array
+    private function giveXP(Character $character, GuideQuest $guideQuest): Character
+    {
+
+        if ($guideQuest->xp_reward <= 0) {
+            return $character;
+        }
+
+        $character->update([
+            'xp' => $character->xp + $guideQuest->xp_reward,
+        ]);
+
+        $character = $character->refresh();
+
+        $this->handlePossibleLevelUp($character);
+
+        event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($guideQuest->xp_reward) . ' XP.'));
+
+        return $character;
+    }
+
+    private function fetchNextGuideQuest(Character $character): array
     {
 
         $winterEvent = Event::where('type', EventType::WINTER_EVENT)->first();
@@ -249,7 +245,7 @@ class GuideQuestService
         return $guideQuests;
     }
 
-    protected function fetchNextRegularGuideQuest(Character $character): ?GuideQuest
+    private function fetchNextRegularGuideQuest(Character $character): ?GuideQuest
     {
         $lastCompletedGuideQuest = $character->questsCompleted()
             ->whereHas('guideQuest', function ($query) {
@@ -260,7 +256,7 @@ class GuideQuestService
             ->first();
 
         if (is_null($lastCompletedGuideQuest)) {
-            return GuideQuest::first();
+            return GuideQuest::whereNull('only_during_event')->whereNull('unlock_at_level')->first();
         }
 
         $questId = GuideQuest::whereNull('only_during_event')
@@ -271,27 +267,14 @@ class GuideQuestService
         return GuideQuest::find($questId);
     }
 
-    protected function fetchNextEventQuest(Character $character, GuideQuest $initialEventGuideQuest): ?GuideQuest
+    private function fetchNextEventQuest(Character $character, GuideQuest $initialEventGuideQuest): ?GuideQuest
     {
-
-        if (! is_null($initialEventGuideQuest->unlock_at_level)) {
-            if ($character->level < $initialEventGuideQuest->unlock_at_level) {
-                return null;
-            }
-        }
-
         $completedFirstEventQuest = $character->questsCompleted()
             ->where('guide_quest_id', $initialEventGuideQuest->id)
             ->first();
 
         if (is_null($completedFirstEventQuest)) {
             return $initialEventGuideQuest;
-        }
-
-        $completedIds = $character->questsCompleted()->whereNotNull('guide_quest_id')->pluck('guide_quest_id')->toArray();
-
-        if (! in_array($initialEventGuideQuest->id, $completedIds)) {
-            return GuideQuest::where('parent_id', $initialEventGuideQuest->id)->orderBy('id')->first();
         }
 
         $nextGuideQuest = GuideQuest::where('parent_id', $initialEventGuideQuest->id)->orderBy('id')->first();
@@ -303,7 +286,7 @@ class GuideQuestService
         return $this->fetchNextEventQuest($character, $nextGuideQuest);
     }
 
-    protected function requiredAttributeNames(GuideQuest $quest): array
+    private function requiredAttributeNames(GuideQuest $quest): array
     {
 
         $requiredAttributes = [];
@@ -324,10 +307,6 @@ class GuideQuestService
             }
 
             if ($key === 'required_secondary_skill') {
-                continue;
-            }
-
-            if ($key === 'required_skill_type') {
                 continue;
             }
 

@@ -16,20 +16,21 @@ class OpenGuideQuestModal implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
     use SerializesModels;
 
-    private User $user;
-
     public bool $openButton = false;
 
     /**
-     * Constructor
+     * @param User $user
      */
-    public function __construct(User $user) {
+    public function __construct(private User $user)
+    {
 
         $guideQuestService = resolve(GuideQuestService::class);
 
         $openModal = true;
 
-        if (is_null($guideQuestService->fetchQuestForCharacter($user->character))) {
+        $quests = $guideQuestService->fetchQuestForCharacter($user->character);
+
+        if (empty($quests['quests'])) {
             $openModal = false;
         }
 
@@ -42,8 +43,8 @@ class OpenGuideQuestModal implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn()
+    public function broadcastOn(): Channel | array
     {
-        return new PrivateChannel('force-open-guide-quest-modal-'.$this->user->id);
+        return new PrivateChannel('force-open-guide-quest-modal-' . $this->user->id);
     }
 }

@@ -35,9 +35,10 @@ export default class LocationDetails extends React.Component<
                     <h5 className="text-orange-500 dark:text-orange-400">
                         Gold Mines!
                     </h5>
-                    <WarningAlert additional_css={"my-4 font-bold"}>
+                    <WarningAlert additional_css={"my-4"}>
                         Exploration cannot be used here if you want the below
-                        rewards. You must manually fight.
+                        rewards. You must manually fight. Except for currencies.
+                        You can explore here to gain the currencies.
                     </WarningAlert>
                     <p className="my-4">
                         Welcome to the Gold Mines, a special mid game location
@@ -94,9 +95,10 @@ export default class LocationDetails extends React.Component<
                     <h5 className="text-orange-500 dark:text-orange-400">
                         The Old Church!
                     </h5>
-                    <WarningAlert additional_css={"my-4 font-bold"}>
+                    <WarningAlert additional_css={"my-4"}>
                         Exploration cannot be used here if you want the below
-                        rewards. You must manually fight.
+                        rewards. You must manually fight. Except for currencies.
+                        You can explore here to gain the currencies.
                     </WarningAlert>
 
                     <InfoAlert additional_css={"my-4 font-bold"}>
@@ -113,41 +115,38 @@ export default class LocationDetails extends React.Component<
                         true power of their character! Come now child, death
                         awaits!
                     </p>
-                    <ul className="list-disc">
+                    <ul className="list-disc my-4">
+                        <li className="ml-4">
+                            Characters can get 1-1000 Gold Dust from fighting
+                            monsters. This can be increased to 5,000 if an event
+                            is triggered at this area.
+                        </li>
+                        <li className="ml-4">
+                            Characters can get 1-1000 Shards from fighting
+                            monsters. This can be increased to 5,000 if an event
+                            is triggered at this area.
+                        </li>
                         <li className="ml-4">
                             Characters can get 1-20,000 Gold from fighting
                             monsters. This can be increased to 40,000 if an
                             event is triggered at this area.
                         </li>
                         <li className="ml-4">
-                            Characters can get 1-1000 Gold Dust from fighting
-                            monsters. This can be increased to 2,000 if an event
-                            is triggered at this area.
-                        </li>
-                        <li className="ml-4">
-                            Characters can get 1-1000 Shards from fighting
-                            monsters. This can be increased to 2,000 if an event
-                            is triggered at this area.
-                        </li>
-                        <li className="ml-4">
-                            There is a 1/1,000,000 (+15% Looting) chance to get
-                            a random{" "}
-                            <a
-                                href="/information/random-enchants"
-                                target="_blank"
-                            >
-                                Medium Unique{" "}
+                            There is a 1/1,000 chance (+15% of your looting) to
+                            get a{" "}
+                            <a href="/information/unique-items" target="_blank">
+                                Unique{" "}
                                 <i className="fas fa-external-link-alt"></i>
                             </a>{" "}
-                            from Monsters half way down the list of more. This
-                            can be reduced to 1/500,000 (+30% Looting) chance if
-                            an event is triggered at this area.
+                            Corrupted Ice from Monsters halfway down the list of
+                            more. This can be reduced to 1/500 (+30% Looting)
+                            chance if an event is triggered at this area.
                         </li>
                         <li className="ml-4">
-                            There is a 1/1,000,000 chance to trigger an event
-                            while fighting here to reduce the chances and
-                            increase the currencies (the above "if an event is
-                            triggered") for 1 hour at this location only.
+                            There is a 1/1,000 chance to trigger an event while
+                            fighting here to reduce the chances and increase the
+                            currencies (the above "if an event is triggered")
+                            for 1 hour at this location only.
                         </li>
                     </ul>
                 </Fragment>
@@ -182,9 +181,10 @@ export default class LocationDetails extends React.Component<
                     <h5 className="text-orange-500 dark:text-orange-400">
                         Purgatory Smith House!
                     </h5>
-                    <WarningAlert additional_css={"my-4 font-bold"}>
+                    <WarningAlert additional_css={"my-4"}>
                         Exploration cannot be used here if you want the below
-                        rewards. You must use manually fight.
+                        rewards. You must manually fight. Except for currencies.
+                        You can explore here to gain the currencies.
                     </WarningAlert>
                     <p className="mb-4">
                         In this location, a few things will happen for those who
@@ -298,9 +298,10 @@ export default class LocationDetails extends React.Component<
                     <h5 className="text-orange-500 dark:text-orange-400">
                         Corrupted Alchemy Church
                     </h5>
-                    <WarningAlert additional_css={"my-4 font-bold"}>
+                    <WarningAlert additional_css={"my-4"}>
                         Exploration cannot be used here if you want the below
-                        rewards. You must use manually fight.
+                        rewards. You must manually fight. Except for currencies.
+                        You can explore here to gain the currencies.
                     </WarningAlert>
                     <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3"></div>
                     <p className="mb-4">

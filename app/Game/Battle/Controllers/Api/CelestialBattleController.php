@@ -15,6 +15,7 @@ use App\Game\Battle\Services\CelestialFightService;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\NpcMessageTypes;
 use App\Http\Controllers\Controller;
 
 class CelestialBattleController extends Controller
@@ -63,7 +64,7 @@ class CelestialBattleController extends Controller
 
             $this->conjureService->conjure($monster, $character, $request->type);
         } else {
-            event(new ServerMessageEvent($character->user, $this->npcServerMessage->build('cant_afford_conjuring', $npc)));
+            event(new ServerMessageEvent($character->user, $this->npcServerMessage->build(NpcMessageTypes::CANT_AFFORD_CONJURATION, $npc)));
 
             return response()->json([], 200);
         }
@@ -105,7 +106,7 @@ class CelestialBattleController extends Controller
     public function attack(CelestialFightRequest $request, Character $character, CelestialFight $celestialFight)
     {
         if ($character->is_dead) {
-            broadcast(new ServerMessageEvent($character->user, 'You are dead and cannot participate.'));
+            event(new ServerMessageEvent($character->user, 'You are dead and cannot participate.'));
 
             return response()->json([], 200);
         }

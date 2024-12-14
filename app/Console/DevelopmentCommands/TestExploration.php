@@ -45,6 +45,10 @@ class TestExploration extends Command
 
         $this->line('Starting explorations for 1 hour, using default attack type, killing the first surface monster ...');
 
+        $bar = $this->output->createProgressBar($characters > count());
+
+        $bar->start();
+
         foreach ($characters as $character) {
             $explorationAutomationService->beginAutomation($character, [
                 'selected_monster_id' => Monster::where('name', 'Sewer Rat')->first()->id,
@@ -52,7 +56,11 @@ class TestExploration extends Command
                 'attack_type' => 'attack',
                 'move_down_the_list_every' => null,
             ]);
+
+            $bar->advance();
         }
+
+        $bar->finish();
 
         $this->line('Automations have been started.');
     }
@@ -74,14 +82,13 @@ class TestExploration extends Command
         if ($numberOfCharacters > $characters->count()) {
             $charactersToCreate = $numberOfCharacters - $characters->count();
 
-            $this->line('Creating character amount: '.$charactersToCreate);
+            $this->line('Creating character amount: ' . $charactersToCreate);
 
             $this->createTheCharacters($characterBuilder, $charactersToCreate);
 
             $this->line('Characters created.');
 
             return $this->getTheCharacters($characterBuilder, $numberOfCharacters, $characterToIgnore);
-
         }
 
         return $characters->take($numberOfCharacters)->get();
@@ -102,7 +109,6 @@ class TestExploration extends Command
             $gameRace = GameRace::inRandomOrder()->first();
 
             $this->createCharacter($characterBuilder, $user, $surfaceMap, $gameClass, $gameRace);
-
         }
     }
 
@@ -112,9 +118,9 @@ class TestExploration extends Command
     protected function createUser(): User
     {
         return User::create([
-            'email' => Str::random(8).'@test.com',
+            'email' => Str::random(8) . '@test.com',
             'password' => Hash::make(Str::random(8)),
-            'ip_address' => '0.0.0.'.rand(1, 100),
+            'ip_address' => '0.0.0.' . rand(1, 100),
             'last_logged_in' => now(),
             'guide_enabled' => false,
         ]);
@@ -133,7 +139,7 @@ class TestExploration extends Command
 
         $characterBuilder->setRace($race)
             ->setClass($class)
-            ->createCharacter($user, $map, Str::random(4).str_replace(' ', '', $class->name))
+            ->createCharacter($user, $map, Str::random(4) . str_replace(' ', '', $class->name))
             ->assignSkills()
             ->assignPassiveSkills()
             ->buildCharacterCache();

@@ -15,6 +15,8 @@ use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Types\Concerns\BaseMessageType;
+use App\Game\Messages\Types\NpcMessageTypes;
 use App\Game\Quests\Events\UnlockSkillEvent;
 
 class NpcQuestRewardHandler
@@ -182,7 +184,7 @@ class NpcQuestRewardHandler
             $this->updateCharacterAttackDataCache($character);
         }
 
-        $this->npcServerMessage($npc, $character, 'given_item');
+        $this->npcServerMessage($npc, $character, NpcMessageTypes::GIVE_ITEM);
 
         broadcast(new ServerMessageEvent($character->user, 'Received: ' . $quest->rewardItem->name, $slot->id));
     }
@@ -201,7 +203,7 @@ class NpcQuestRewardHandler
 
         $this->updateCharacterAttackDataCache($character);
 
-        $this->npcServerMessage($npc, $character, 'skill_unlocked');
+        $this->npcServerMessage($npc, $character, NpcMessageTypes::SKILL_UNLOCKED);
 
         event(new ServerMessageEvent($character->user, 'Unlocked: ' . $gameSkill->name . ' This skill can now be leveled!'));
 
@@ -223,7 +225,7 @@ class NpcQuestRewardHandler
             'gold' => $newValue,
         ]);
 
-        $this->npcServerMessage($npc, $character, 'currency_given');
+        $this->npcServerMessage($npc, $character, NpcMessageTypes::CURRENCY_GIVEN);
 
         broadcast(new ServerMessageEvent($character->user, 'Received: ' . number_format($quest->reward_gold) . ' gold from: ' . $npc->real_name));
     }
@@ -241,7 +243,7 @@ class NpcQuestRewardHandler
             'gold_dust' => $newValue,
         ]);
 
-        $this->npcServerMessage($npc, $character, 'currency_given');
+        $this->npcServerMessage($npc, $character, NpcMessageTypes::CURRENCY_GIVEN);
 
         broadcast(new ServerMessageEvent($character->user, 'Received: ' . number_format($quest->reward_gold_dust) . ' gold dust from: ' . $npc->real_name));
     }
@@ -259,12 +261,12 @@ class NpcQuestRewardHandler
             'shards' => $newValue,
         ]);
 
-        $this->npcServerMessage($npc, $character, 'currency_given');
+        $this->npcServerMessage($npc, $character, NpcMessageTypes::CURRENCY_GIVEN);
 
         broadcast(new ServerMessageEvent($character->user, 'Received: ' . number_format($quest->reward_shards) . ' shards from: ' . $npc->real_name));
     }
 
-    public function npcServerMessage(Npc $npc, Character $character, string $type): void
+    public function npcServerMessage(Npc $npc, Character $character, BaseMessageType $type): void
     {
         broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build($type, $npc)));
     }

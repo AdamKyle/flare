@@ -56,7 +56,7 @@ return [
 
     'prefix' => env(
         'HORIZON_PREFIX',
-        Str::slug(env('APP_NAME', 'laravel'), '_').'_horizon:'
+        Str::slug(env('APP_NAME', 'laravel'), '_') . '_horizon:'
     ),
 
     /*
@@ -176,60 +176,33 @@ return [
         ],
         'supervisor-kingdoms' => [
             'connection' => 'kingdom_jobs',
-            'queue' => ['default'],
+            'queue' => ['kingdom_jobs'],
             'balance' => 'auto',
             'maxProcesses' => 10,
             'memory' => 256,
             'tries' => 2,
             'nice' => 0,
         ],
-        'supervisor-npcs' => [
-            'connection' => 'npc_commands',
-            'queue' => ['default'],
-            'balance' => 'auto',
-            'maxProcesses' => 1,
-            'tries' => 2,
-            'timeout' => 900,
-            'memory' => 128,
-            'nice' => 0,
-        ],
-        'supervisor-daily-characters' => [
-            'connection' => 'character_daily',
-            'queue' => ['default'],
-            'balance' => 'auto',
-            'maxProcesses' => 1,
-            'memory' => 128,
-            'tries' => 1,
-            'nice' => 0,
-        ],
         'supervisor-weekly-spawn' => [
             'connection' => 'weekly_spawn',
-            'queue' => ['default'],
+            'queue' => ['weekly_spawn'],
             'balance' => 'auto',
             'maxProcesses' => 1,
             'memory' => 128,
             'tries' => 1,
             'nice' => 0,
         ],
-        'supervisor-disenchanting' => [
-            'connection' => 'disenchanting',
-            'queue' => ['default'],
+
+        'supervisor-event-battle-reward' => [
+            'connection' => 'event_battle_reward',
+            'queue' => ['event_battle_reward'],
             'balance' => 'auto',
-            'maxProcesses' => 1,
-            'memory' => 128,
-            'tries' => 1,
-            'nice' => 0,
-            'timeout' => 900,
-        ],
-        'supervisor-shop-buying' => [
-            'connection' => 'shop_buying',
-            'queue' => ['default'],
-            'balance' => 'auto',
-            'maxProcesses' => 1,
-            'memory' => 128,
-            'tries' => 1,
+            'maxProcesses' => 25,
+            'memory' => 256,
+            'tries' => 5,
             'nice' => 0,
         ],
+
         'supervisor-long-running' => [
             'connection' => 'long_running',
             'queue' => ['default_long'],
@@ -240,69 +213,253 @@ return [
             'timeout' => 1900,
             'nice' => 0,
         ],
+
+        'supervisor-battle-reward-xp' => [
+            'connection' => 'battle_reward_xp',
+            'queue' => ['battle_reward_xp'],
+            'balance' => 'auto',
+            'maxProcesses' => 25,
+            'memory' => 256,
+            'tries' => 5,
+            'nice' => 0,
+        ],
+
+        'supervisor-exploration-battle-xp-reward' => [
+            'connection' => 'exploration_battle_xp_reward',
+            'queue' => ['exploration_battle_xp_reward'],
+            'balance' => 'auto',
+            'maxProcesses' => 25,
+            'memory' => 256,
+            'tries' => 5,
+            'nice' => 0,
+        ],
+
+        'supervisor-exploration-battle-skill-xp-reward' => [
+            'connection' => 'exploration_battle_skill_xp_reward',
+            'queue' => ['exploration_battle_skill_xp_reward'],
+            'balance' => 'auto',
+            'maxProcesses' => 25,
+            'memory' => 256,
+            'tries' => 5,
+            'nice' => 0,
+        ],
+
+        'supervisor-battle-reward-currencies' => [
+            'connection' => 'battle_reward_currencies',
+            'queue' => ['battle_reward_currencies'],
+            'balance' => 'auto',
+            'maxProcesses' => 25,
+            'memory' => 256,
+            'tries' => 5,
+            'nice' => 0,
+        ],
+
+        'supervisor-battle-secondary-reward' => [
+            'connection' => 'battle_secondary_reward',
+            'queue' => ['battle_secondary_reward'],
+            'balance' => 'auto',
+            'maxProcesses' => 25,
+            'memory' => 256,
+            'tries' => 5,
+            'nice' => 0,
+        ],
+
+        'supervisor-battle-reward-factions' => [
+            'connection' => 'battle_reward_factions',
+            'queue' => ['battle_reward_factions'],
+            'balance' => 'auto',
+            'maxProcesses' => 25,
+            'memory' => 256,
+            'tries' => 5,
+            'nice' => 0,
+        ],
+
+        'supervisor-battle-reward-global-event' => [
+            'connection' => 'battle_reward_global_event',
+            'queue' => ['battle_reward_global_event'],
+            'balance' => 'auto',
+            'maxProcesses' => 25,
+            'memory' => 256,
+            'tries' => 5,
+            'nice' => 0,
+        ],
+
+        'supervisor-battle-reward-location-handlers' => [
+            'connection' => 'battle_reward_location_handlers',
+            'queue' => ['battle_reward_location_handlers'],
+            'balance' => 'auto',
+            'maxProcesses' => 25,
+            'memory' => 256,
+            'tries' => 5,
+            'nice' => 0,
+        ],
+
+        'supervisor-battle-reward-weekly-fights' => [
+            'connection' => 'battle_reward_weekly_fights',
+            'queue' => ['battle_reward_weekly_fights'],
+            'balance' => 'auto',
+            'maxProcesses' => 25,
+            'memory' => 256,
+            'tries' => 5,
+            'nice' => 0,
+        ],
+
+        'supervisor-battle-reward-item-handler' => [
+            'connection' => 'battle_reward_item_handler',
+            'queue' => ['battle_reward_item_handler'],
+            'balance' => 'auto',
+            'maxProcesses' => 25,
+            'memory' => 256,
+            'tries' => 5,
+            'nice' => 0,
+        ],
+
     ],
+
 
     'environments' => [
         'production' => [
             'supervisor-1' => [
+                'connection' => 'redis',
+                'queue' => ['default'],
                 'maxProcesses' => 10,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
             'supervisor-kingdoms' => [
-                'maxProcesses' => 10,
-                'balanceMaxShift' => 1,
-                'balanceCooldown' => 3,
-            ],
-            'supervisor-daily-characters' => [
+                'connection' => 'kingdom_jobs',
+                'queue' => ['kingdom_jobs'],
                 'maxProcesses' => 10,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
             'supervisor-weekly-spawn' => [
+                'connection' => 'weekly_spawn',
+                'queue' => ['weekly_spawn'],
                 'maxProcesses' => 10,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
-            'supervisor-disenchanting' => [
-                'connection' => 'disenchanting',
-                'queue' => ['default'],
-                'balance' => 'auto',
-                'maxProcesses' => 1,
-                'memory' => 128,
-                'tries' => 1,
-                'nice' => 0,
-                'timeout' => 900,
-            ],
-            'supervisor-shop-buying' => [
-                'connection' => 'shop_buying',
-                'queue' => ['default'],
-                'balance' => 'auto',
-                'maxProcesses' => 1,
-                'memory' => 128,
-                'tries' => 1,
-                'nice' => 0,
-            ],
             'supervisor-long-running' => [
                 'connection' => 'long_running',
                 'queue' => ['default_long'],
-                'balance' => 'auto',
                 'maxProcesses' => 2,
                 'memory' => 128,
                 'tries' => 2,
                 'timeout' => 900,
                 'nice' => 0,
             ],
-            'supervisor-npcs' => [
-                'connection' => 'npc_commands',
-                'queue' => ['default_long'],
+
+            'supervisor-event-battle-reward' => [
+                'connection' => 'event_battle_reward',
+                'queue' => ['event_battle_reward'],
                 'balance' => 'auto',
-                'maxProcesses' => 1,
-                'tries' => 2,
-                'timeout' => 900,
-                'memory' => 128,
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
                 'nice' => 0,
             ],
+
+            'supervisor-battle-reward-xp' => [
+                'connection' => 'battle_reward_xp',
+                'queue' => ['battle_reward_xp'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
+            'supervisor-exploration-battle-xp-reward' => [
+                'connection' => 'exploration_battle_xp_reward',
+                'queue' => ['exploration_battle_xp_reward'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
+            'supervisor-exploration-battle-skill-xp-reward' => [
+                'connection' => 'exploration_battle_skill_xp_reward',
+                'queue' => ['exploration_battle_skill_xp_reward'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
+            'supervisor-battle-reward-currencies' => [
+                'connection' => 'battle_reward_currencies',
+                'queue' => ['battle_reward_currencies'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
+            'supervisor-battle-secondary-reward' => [
+                'connection' => 'battle_secondary_reward',
+                'queue' => ['battle_secondary_reward'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
+            'supervisor-battle-reward-factions' => [
+                'connection' => 'battle_reward_factions',
+                'queue' => ['battle_reward_factions'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
+            'supervisor-battle-reward-global-event' => [
+                'connection' => 'battle_reward_global_event',
+                'queue' => ['battle_reward_global_event'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
+            'supervisor-battle-reward-location-handlers' => [
+                'connection' => 'battle_reward_location_handlers',
+                'queue' => ['battle_reward_location_handlers'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
+            'supervisor-battle-reward-weekly-fights' => [
+                'connection' => 'battle_reward_weekly_fights',
+                'queue' => ['battle_reward_weekly_fights'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
+            'supervisor-battle-reward-item-handler' => [
+                'connection' => 'battle_reward_item_handler',
+                'queue' => ['battle_reward_item_handler'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
         ],
 
         'local' => [
@@ -313,26 +470,8 @@ return [
                 'connection' => 'kingdom_jobs',
                 'maxProcesses' => 3,
             ],
-            'supervisor-daily-characters' => [
-                'connection' => 'character_daily',
-                'maxProcesses' => 3,
-            ],
             'supervisor-weekly-spawn' => [
                 'connection' => 'weekly_spawn',
-                'maxProcesses' => 3,
-            ],
-            'supervisor-disenchanting' => [
-                'connection' => 'disenchanting',
-                'queue' => ['default'],
-                'balance' => 'auto',
-                'maxProcesses' => 1,
-                'memory' => 128,
-                'tries' => 1,
-                'nice' => 0,
-                'timeout' => 900,
-            ],
-            'supervisor-shop-buying' => [
-                'connection' => 'shop_buying',
                 'maxProcesses' => 3,
             ],
             'supervisor-long-running' => [
@@ -345,17 +484,118 @@ return [
                 'timeout' => 900,
                 'nice' => 0,
             ],
-            'supervisor-npcs' => [
-                'connection' => 'npc_commands',
-                'queue' => ['default_long'],
+
+            'supervisor-event-battle-reward' => [
+                'connection' => 'event_battle_reward',
+                'queue' => ['event_battle_reward'],
                 'balance' => 'auto',
-                'maxProcesses' => 1,
-                'tries' => 2,
-                'timeout' => 900,
-                'memory' => 128,
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
+            'supervisor-battle-reward-xp' => [
+                'connection' => 'battle_reward_xp',
+                'queue' => ['battle_reward_xp'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
+            'supervisor-exploration-battle-xp-reward' => [
+                'connection' => 'exploration_battle_xp_reward',
+                'queue' => ['exploration_battle_xp_reward'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
+            'supervisor-exploration-battle-skill-xp-reward' => [
+                'connection' => 'exploration_battle_skill_xp_reward',
+                'queue' => ['exploration_battle_skill_xp_reward'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
+            'supervisor-battle-reward-currencies' => [
+                'connection' => 'battle_reward_currencies',
+                'queue' => ['battle_reward_currencies'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
+            'supervisor-battle-secondary-reward' => [
+                'connection' => 'battle_secondary_reward',
+                'queue' => ['battle_secondary_reward'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
+            'supervisor-battle-reward-factions' => [
+                'connection' => 'battle_reward_factions',
+                'queue' => ['battle_reward_factions'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
+            'supervisor-battle-reward-global-event' => [
+                'connection' => 'battle_reward_global_event',
+                'queue' => ['battle_reward_global_event'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
+            'supervisor-battle-reward-location-handlers' => [
+                'connection' => 'battle_reward_location_handlers',
+                'queue' => ['battle_reward_location_handlers'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
+            'supervisor-battle-reward-weekly-fights' => [
+                'connection' => 'battle_reward_weekly_fights',
+                'queue' => ['battle_reward_weekly_fights'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
+
+            'supervisor-battle-reward-item-handler' => [
+                'connection' => 'battle_reward_item_handler',
+                'queue' => ['battle_reward_item_handler'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
                 'nice' => 0,
             ],
 
         ],
     ],
+
 ];

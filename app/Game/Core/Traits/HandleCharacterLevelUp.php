@@ -2,14 +2,15 @@
 
 namespace App\Game\Core\Traits;
 
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
 use App\Flare\Models\Character;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Services\CharacterService;
+use App\Game\Messages\Types\CharacterMessageTypes;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
 
 trait HandleCharacterLevelUp
 {
@@ -74,7 +75,7 @@ trait HandleCharacterLevelUp
 
         $this->updateCharacterStats($character);
 
-        ServerMessageHandler::handleMessage($character->user, 'level_up', $character->level);
+        ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::LEVEL_UP, $character->level);
 
         return $character;
     }
