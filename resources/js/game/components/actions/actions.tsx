@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import Card from "../../ui/cards/card";
+import Card from "../../../ui/cards/card";
 import IconSection from "./partials/icon-section/icon-section";
 import MonsterSection from "./partials/monster-section";
 

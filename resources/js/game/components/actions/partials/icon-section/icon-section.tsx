@@ -1,10 +1,10 @@
 import React, { ReactNode } from "react";
 import IconContainer from "../../components/icon-section/icon-container";
-import IconButton from "../../../../ui/buttons/icon-button";
-import { ButtonVariant } from "../../../../ui/buttons/enums/button-variant-enum";
+import IconButton from "../../../../../ui/buttons/icon-button";
+import { ButtonVariant } from "../../../../../ui/buttons/enums/button-variant-enum";
 import CharacterCard from "../floating-cards/character-details/character-card";
-import { serviceContainer } from "../../../../service-container/core-container";
-import EventSystemDeffintion from "../../../../event-system/deffintions/event-system-deffintion";
+import { serviceContainer } from "../../../../../service-container/core-container";
+import EventSystemDeffintion from "../../../../../event-system/deffintions/event-system-deffintion";
 import { useManageCharacterCardVisibility } from "../floating-cards/character-details/hooks/use-manage-character-card-visibility";
 import { AnimatePresence, motion } from "framer-motion";
 import { useManageCraftingCardVisibility } from "../floating-cards/crafting-section/hooks/use-manage-crafting-card-visibility";

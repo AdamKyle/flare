@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
-import LinkButton from "../../../../ui/buttons/link-button";
-import { ButtonVariant } from "../../../../ui/buttons/enums/button-variant-enum";
+import LinkButton from "../../../../../ui/buttons/link-button";
+import { ButtonVariant } from "../../../../../ui/buttons/enums/button-variant-enum";
 import MonsterTopSectionProps from "./types/monster-top-section-props";
 
 const MonsterTopSection = (props: MonsterTopSectionProps): ReactNode => {

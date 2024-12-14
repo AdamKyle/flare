@@ -1,8 +1,8 @@
 import React, { ReactNode } from "react";
 import FloatingCard from "../../../components/icon-section/floating-card";
 import CharacterCardDetails from "./character-card-details";
-import { serviceContainer } from "../../../../../service-container/core-container";
-import EventSystemDeffintion from "../../../../../event-system/deffintions/event-system-deffintion";
+import { serviceContainer } from "../../../../../../service-container/core-container";
+import EventSystemDeffintion from "../../../../../../event-system/deffintions/event-system-deffintion";
 import { ActionCardEvents } from "../EventTypes/action-cards";
 
 const CharacterCard = (): ReactNode => {

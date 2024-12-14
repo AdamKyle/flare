@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import EventSystemDeffintion from "../../../../../../event-system/deffintions/event-system-deffintion";
+import EventSystemDeffintion from "../../../../../../../event-system/deffintions/event-system-deffintion";
 import { ActionCardEvents } from "../../EventTypes/action-cards";
 import UseManageCraftingCardVisibilityDeffinition from "./deffinitions/use-manage-crafting-card-visibility-deffinition";
 import UseManageCraftingCardVisibilityState from "./types/use-manage-crafting-card-visibility-state";

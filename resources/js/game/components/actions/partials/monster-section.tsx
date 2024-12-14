@@ -4,11 +4,11 @@ import AttackButtonsContainer from "../components/fight-section/attack-buttons-c
 import HealthBarContainer from "../components/fight-section/health-bar-container";
 import HealthBar from "../components/fight-section/health-bar";
 import { HealthBarType } from "../components/fight-section/enums/health-bar-type";
-import Button from "../../../ui/buttons/button";
-import { ButtonVariant } from "../../../ui/buttons/enums/button-variant-enum";
-import GradientButton from "../../../ui/buttons/gradient-button";
-import { ButtonGradientVarient } from "../../../ui/buttons/enums/button-gradient-variant";
-import Separator from "../../../ui/seperatror/separator";
+import Button from "../../../../ui/buttons/button";
+import { ButtonVariant } from "../../../../ui/buttons/enums/button-variant-enum";
+import GradientButton from "../../../../ui/buttons/gradient-button";
+import { ButtonGradientVarient } from "../../../../ui/buttons/enums/button-gradient-variant";
+import Separator from "../../../../ui/seperatror/separator";
 import AttackMessages from "../components/fight-section/attack-messages";
 import AttackMessageDeffintion from "../components/fight-section/deffinitions/attack-message-deffinition";
 import { AttackMessageType } from "../components/fight-section/enums/attack-message-type";

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import EventSystemDeffintion from "../../../../../../event-system/deffintions/event-system-deffintion";
+import EventSystemDeffintion from "../../../../../../../event-system/deffintions/event-system-deffintion";
 import { ActionCardEvents } from "../../EventTypes/action-cards";
 import UseManageCharacterCardVisibilityDeffinition from "./deffinitions/use-manage-character-card-visibility-deffinition";
 import UseManageCharacterCardVisibilityState from "./types/use-manage-character-card-visibility-state";

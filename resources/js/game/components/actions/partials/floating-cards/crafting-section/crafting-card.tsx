@@ -1,9 +1,9 @@
 import React, { ReactNode } from "react";
 import FloatingCard from "../../../components/icon-section/floating-card";
-import Button from "../../../../../ui/buttons/button";
-import { ButtonVariant } from "../../../../../ui/buttons/enums/button-variant-enum";
-import { serviceContainer } from "../../../../../service-container/core-container";
-import EventSystemDeffintion from "../../../../../event-system/deffintions/event-system-deffintion";
+import Button from "../../../../../../ui/buttons/button";
+import { ButtonVariant } from "../../../../../../ui/buttons/enums/button-variant-enum";
+import { serviceContainer } from "../../../../../../service-container/core-container";
+import EventSystemDeffintion from "../../../../../../event-system/deffintions/event-system-deffintion";
 import { ActionCardEvents } from "../EventTypes/action-cards";
 
 const CraftingCard = (): ReactNode => {
