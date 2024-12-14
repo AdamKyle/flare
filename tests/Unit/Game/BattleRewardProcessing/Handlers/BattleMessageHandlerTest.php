@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Unit\Game\BattleRewardProcessing\Handlers;
+
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\ClassRanksMessageTypes;
