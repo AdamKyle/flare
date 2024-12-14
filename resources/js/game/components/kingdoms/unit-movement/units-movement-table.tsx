@@ -1,9 +1,9 @@
 import { AxiosError, AxiosResponse } from "axios";
 import React, { Fragment } from "react";
-import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
-import Table from "../../../components/ui/data-tables/table";
-import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
-import Ajax from "../../../lib/ajax/ajax";
+import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
+import Table from "../../ui/data-tables/table";
+import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
+import Ajax from "../../../../admin/lib/ajax/ajax";
 import { BuildUnitsInMovementColumns } from "../table-columns/build-units-in-movement-columns";
 import UnitsInMovementTableProps from "../types/units-in-movement-table-props";
 import UnitsInMovementTableState from "../types/units-in-movement-table-state";

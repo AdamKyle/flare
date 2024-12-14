@@ -1,8 +1,8 @@
-import Tabs from "../../../components/ui/tabs/tabs";
-import TabPanel from "../../../components/ui/tabs/tab-panel";
+import Tabs from "../../ui/tabs/tabs";
+import TabPanel from "../../ui/tabs/tab-panel";
 import BuildingsTable from "../buildings/buildings-table";
 import UnitsTable from "../units/units-table";
-import BasicCard from "../../../components/ui/cards/basic-card";
+import BasicCard from "../../ui/cards/basic-card";
 import React from "react";
 import KingdomQueues from "../queues/kingdom-queues";
 

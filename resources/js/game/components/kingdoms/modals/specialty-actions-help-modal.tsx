@@ -1,5 +1,5 @@
 import React from "react";
-import Dialogue from "../../../components/ui/dialogue/dialogue";
+import Dialogue from "../../ui/dialogue/dialogue";
 
 export default class SpecialtyActionsHelpModal extends React.Component<
     any,

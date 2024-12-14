@@ -1,7 +1,7 @@
 import React from "react";
-import { formatNumber } from "../../../lib/game/format-number";
-import HelpDialogue from "../../../components/ui/dialogue/help-dialogue";
-import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
+import { formatNumber } from "../../../../admin/lib/game/format-number";
+import HelpDialogue from "../../ui/dialogue/help-dialogue";
+import InfoAlert from "../../ui/alerts/simple-alerts/info-alert";
 
 export default class TimeHelpModal extends React.Component<any, any> {
     constructor(props: any) {

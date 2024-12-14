@@ -1,8 +1,8 @@
 import clsx from "clsx";
 import React, { Fragment } from "react";
-import InfoAlert from "../../components/ui/alerts/simple-alerts/info-alert";
-import BasicCard from "../../components/ui/cards/basic-card";
-import { formatNumber } from "../../lib/game/format-number";
+import InfoAlert from "../ui/alerts/simple-alerts/info-alert";
+import BasicCard from "../ui/cards/basic-card";
+import { formatNumber } from "../../../admin/lib/game/format-number";
 import {
     BuildingLogDetails,
     UnitLogDetails,

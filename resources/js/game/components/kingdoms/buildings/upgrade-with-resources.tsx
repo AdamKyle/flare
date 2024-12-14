@@ -1,12 +1,12 @@
 import { upperFirst } from "lodash";
 import React, { Fragment } from "react";
-import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
-import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
-import DangerButton from "../../../components/ui/buttons/danger-button";
-import PrimaryButton from "../../../components/ui/buttons/primary-button";
-import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
-import { serviceContainer } from "../../../lib/containers/core-container";
-import { formatNumber } from "../../../lib/game/format-number";
+import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
+import SuccessAlert from "../../ui/alerts/simple-alerts/success-alert";
+import DangerButton from "../../ui/buttons/danger-button";
+import PrimaryButton from "../../ui/buttons/primary-button";
+import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
+import { serviceContainer } from "../../../../admin/lib/containers/core-container";
+import { formatNumber } from "../../../../admin/lib/game/format-number";
 import UpgradeWithResourcesAjax from "../ajax/upgrade-with-resources-ajax";
 
 export default class UpgradeWithResources extends React.Component<any, any> {

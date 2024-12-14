@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import BasicCard from "../../../components/ui/cards/basic-card";
+import BasicCard from "../../ui/cards/basic-card";
 import BuildingInformation from "./building-information";
 import BuildingsTable from "./buildings-table";
 import BuildingDetails from "./deffinitions/building-details";

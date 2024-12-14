@@ -1,9 +1,9 @@
 import React from "react";
-import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
-import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
-import Dialogue from "../../../components/ui/dialogue/dialogue";
+import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
+import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
+import Dialogue from "../../ui/dialogue/dialogue";
 import { AxiosError, AxiosResponse } from "axios";
-import Ajax from "../../../lib/ajax/ajax";
+import Ajax from "../../../../admin/lib/ajax/ajax";
 import AbandonKingdomModalProps from "../types/modals/abandon-kingdom-modal-props";
 import AbandonKingdomModalState from "../types/modals/abandon-kingdom-modal-state";
 

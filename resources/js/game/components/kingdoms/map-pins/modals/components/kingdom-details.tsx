@@ -1,13 +1,16 @@
 import { AxiosError, AxiosResponse } from "axios";
 import React, { Fragment } from "react";
-import AttackKingdomModal from "../../../../../components/kingdoms/modals/attack-kingdom-modal";
-import DangerAlert from "../../../../../components/ui/alerts/simple-alerts/danger-alert";
-import DangerOutlineButton from "../../../../../components/ui/buttons/danger-outline-button";
-import PrimaryOutlineButton from "../../../../../components/ui/buttons/primary-outline-button";
-import ComponentLoading from "../../../../../components/ui/loading/component-loading";
-import LoadingProgressBar from "../../../../../components/ui/progress-bars/loading-progress-bar";
-import Ajax from "../../../../../lib/ajax/ajax";
-import { formatNumber, percent } from "../../../../../lib/game/format-number";
+import AttackKingdomModal from "../../../modals/attack-kingdom-modal";
+import DangerAlert from "../../../../ui/alerts/simple-alerts/danger-alert";
+import DangerOutlineButton from "../../../../ui/buttons/danger-outline-button";
+import PrimaryOutlineButton from "../../../../ui/buttons/primary-outline-button";
+import ComponentLoading from "../../../../ui/loading/component-loading";
+import LoadingProgressBar from "../../../../ui/progress-bars/loading-progress-bar";
+import Ajax from "../../../../../../admin/lib/ajax/ajax";
+import {
+    formatNumber,
+    percent,
+} from "../../../../../../admin/lib/game/format-number";
 import KingdomDetailsProps from "../../../types/map/kingdom-pins/modals/components/kingdom-details-props";
 import KingdomHelpModal from "../kingdom-help-modal";
 import KingdomTopSection from "./kingdom-top-section";

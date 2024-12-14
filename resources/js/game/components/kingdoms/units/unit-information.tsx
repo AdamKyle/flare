@@ -1,9 +1,9 @@
 import { parseInt } from "lodash";
 import React, { Fragment, ReactNode } from "react";
-import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
-import PrimaryOutlineButton from "../../../components/ui/buttons/primary-outline-button";
-import BasicCard from "../../../components/ui/cards/basic-card";
-import { formatNumber } from "../../../lib/game/format-number";
+import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
+import PrimaryOutlineButton from "../../ui/buttons/primary-outline-button";
+import BasicCard from "../../ui/cards/basic-card";
+import { formatNumber } from "../../../../admin/lib/game/format-number";
 import BuildingDetails from "../buildings/deffinitions/building-details";
 import TimeHelpModal from "../modals/time-help-modal";
 import RecruitWithResources from "./recruit-with-resources";

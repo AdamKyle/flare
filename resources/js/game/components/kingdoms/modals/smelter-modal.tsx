@@ -1,13 +1,13 @@
 import React, { Fragment } from "react";
-import Dialogue from "../../../components/ui/dialogue/dialogue";
-import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
-import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
-import { formatNumber } from "../../../lib/game/format-number";
-import Ajax from "../../../lib/ajax/ajax";
+import Dialogue from "../../ui/dialogue/dialogue";
+import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
+import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
+import { formatNumber } from "../../../../admin/lib/game/format-number";
+import Ajax from "../../../../admin/lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import clsx from "clsx";
-import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";
-import DangerButton from "../../../components/ui/buttons/danger-button";
+import TimerProgressBar from "../../ui/progress-bars/timer-progress-bar";
+import DangerButton from "../../ui/buttons/danger-button";
 import { DateTime } from "luxon";
 
 export default class SmelterModal extends React.Component<any, any> {

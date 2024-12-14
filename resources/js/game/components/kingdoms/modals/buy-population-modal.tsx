@@ -1,9 +1,9 @@
 import React from "react";
-import Dialogue from "../../../components/ui/dialogue/dialogue";
-import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
-import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
-import { formatNumber } from "../../../lib/game/format-number";
-import Ajax from "../../../lib/ajax/ajax";
+import Dialogue from "../../ui/dialogue/dialogue";
+import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
+import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
+import { formatNumber } from "../../../../admin/lib/game/format-number";
+import Ajax from "../../../../admin/lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import BuyPopulationModalProps from "../types/modals/buy-population-modal-props";
 import BuyPopulationModalState from "../types/modals/buy-population-modal-state";

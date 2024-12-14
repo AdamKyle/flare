@@ -1,8 +1,8 @@
 import React from "react";
-import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
-import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
-import Dialogue from "../../../components/ui/dialogue/dialogue";
-import Ajax from "../../../lib/ajax/ajax";
+import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
+import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
+import Dialogue from "../../ui/dialogue/dialogue";
+import Ajax from "../../../../admin/lib/ajax/ajax";
 import { Axios, AxiosError, AxiosResponse } from "axios";
 import ChangeNameModalProps from "../types/modals/change-name-modal-props";
 import ChangeNameState from "../types/modals/change-name-state";

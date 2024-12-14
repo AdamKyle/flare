@@ -1,5 +1,5 @@
 import React from "react";
-import HelpDialogue from "../../../../components/ui/dialogue/help-dialogue";
+import HelpDialogue from "../../../ui/dialogue/help-dialogue";
 
 export default class KingdomHelpModal extends React.Component<any, any> {
     constructor(props: any) {

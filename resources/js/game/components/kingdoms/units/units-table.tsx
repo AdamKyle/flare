@@ -1,10 +1,10 @@
 import { AxiosError, AxiosResponse } from "axios";
 import React, { Fragment } from "react";
-import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
-import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
-import Table from "../../../components/ui/data-tables/table";
-import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
-import Ajax from "../../../lib/ajax/ajax";
+import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
+import SuccessAlert from "../../ui/alerts/simple-alerts/success-alert";
+import Table from "../../ui/data-tables/table";
+import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
+import Ajax from "../../../../admin/lib/ajax/ajax";
 import BuildingDetails from "../buildings/deffinitions/building-details";
 import { BuildUnitsColumns } from "../table-columns/build-units-columns";
 import UnitsTableProps from "../types/units-table-props";

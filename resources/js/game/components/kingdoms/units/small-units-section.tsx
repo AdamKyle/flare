@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import BasicCard from "../../../components/ui/cards/basic-card";
+import BasicCard from "../../ui/cards/basic-card";
 import UnitInformation from "./unit-information";
 import UnitsTable from "./units-table";
 import SmallUnitSectionProps from "../types/small-unit-section-props";

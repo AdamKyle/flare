@@ -1,11 +1,11 @@
 import React, { Fragment } from "react";
-import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
-import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
-import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
-import PrimaryButton from "../../../components/ui/buttons/primary-button";
-import DangerButton from "../../../components/ui/buttons/danger-button";
+import SuccessAlert from "../../ui/alerts/simple-alerts/success-alert";
+import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
+import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
+import PrimaryButton from "../../ui/buttons/primary-button";
+import DangerButton from "../../ui/buttons/danger-button";
 import { parseInt } from "lodash";
-import Ajax from "../../../lib/ajax/ajax";
+import Ajax from "../../../../admin/lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 
 export default class RecruitWithResources extends React.Component<any, any> {

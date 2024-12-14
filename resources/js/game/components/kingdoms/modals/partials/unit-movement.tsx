@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import InfoAlert from "../../../../components/ui/alerts/simple-alerts/info-alert";
+import InfoAlert from "../../../ui/alerts/simple-alerts/info-alert";
 import MoveUnits from "../../unit-movement/move-units";
 import UnitMovementProps from "../../types/modals/partials/unit-movement-props";
 import UnitMovementState from "../../types/modals/partials/unit-movement-state";

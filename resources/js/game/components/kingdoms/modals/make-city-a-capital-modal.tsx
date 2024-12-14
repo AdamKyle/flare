@@ -1,12 +1,12 @@
 import React from "react";
-import Dialogue from "../../../components/ui/dialogue/dialogue";
+import Dialogue from "../../ui/dialogue/dialogue";
 import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
 import DangerAlert from "../../ui/alerts/simple-alerts/danger-alert";
 import SuccessAlert from "../../ui/alerts/simple-alerts/success-alert";
 import MakeCityACapitalModalProps from "../types/modals/make-city-a-capital-modal-props";
 import MakeCityACapitalModalState from "../types/modals/make-city-a-capital-modal-state";
 import MakeCapitalCityAjax from "../ajax/make-capigtal-city-ajax";
-import { serviceContainer } from "../../../lib/containers/core-container";
+import { serviceContainer } from "../../../../admin/lib/containers/core-container";
 
 export default class MakeCityACapitalModal extends React.Component<
     MakeCityACapitalModalProps,
