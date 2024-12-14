@@ -1,4 +1,5 @@
 import { match } from "ts-pattern";
+
 import { AttackMessageType } from "../enums/attack-message-type";
 
 export const fetchAttackMessageColorForType = (

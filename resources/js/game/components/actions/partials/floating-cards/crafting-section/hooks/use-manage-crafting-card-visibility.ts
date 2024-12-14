@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import EventSystemDeffintion from "../../../../../../../event-system/deffintions/event-system-deffintion";
-import { ActionCardEvents } from "../../EventTypes/action-cards";
+
 import UseManageCraftingCardVisibilityDeffinition from "./deffinitions/use-manage-crafting-card-visibility-deffinition";
 import UseManageCraftingCardVisibilityState from "./types/use-manage-crafting-card-visibility-state";
+import EventSystemDefinition from "../../../../../../../event-system/deffintions/event-system-definition";
+import { ActionCardEvents } from "../../EventTypes/action-cards";
 
 export const useManageCraftingCardVisibility = (
-    eventSystem: EventSystemDeffintion,
+    eventSystem: EventSystemDefinition,
 ): UseManageCraftingCardVisibilityDeffinition => {
     const closeCardEventEmitter = eventSystem.isEventRegistered(
         ActionCardEvents.CLOSE_CRATING_CARD,

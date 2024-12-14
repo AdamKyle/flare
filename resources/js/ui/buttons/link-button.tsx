@@ -1,8 +1,9 @@
-import React, { ReactNode } from "react";
 import clsx from "clsx";
-import LinkButtonProps from "./types/link-button-props";
+import React, { ReactNode } from "react";
+
 import { baseStyles } from "./styles/link-buttons/base-styles";
 import { variantStyles } from "./styles/link-buttons/variant-styles";
+import LinkButtonProps from "./types/link-button-props";
 
 const LinkButton = (props: LinkButtonProps): ReactNode => {
     return (

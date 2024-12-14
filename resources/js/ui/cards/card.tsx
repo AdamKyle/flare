@@ -1,4 +1,5 @@
 import React, { ReactNode } from "react";
+
 import CardProps from "./types/card-props";
 
 const Card = (props: CardProps): ReactNode => {

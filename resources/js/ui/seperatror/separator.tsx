@@ -1,6 +1,7 @@
-import React, { ReactNode } from "react";
-import SeperatorProps from "./types/seperator-props";
 import clsx from "clsx";
+import React, { ReactNode } from "react";
+
+import SeperatorProps from "./types/seperator-props";
 
 const Separator = (props: SeperatorProps): ReactNode => {
     return (

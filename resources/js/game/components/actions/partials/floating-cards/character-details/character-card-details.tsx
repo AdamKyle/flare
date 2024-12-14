@@ -1,8 +1,9 @@
 import React, { ReactNode } from "react";
-import XpBar from "../../../components/character-details/xp-bar";
-import Separator from "../../../../../../ui/seperatror/separator";
+
 import Button from "../../../../../../ui/buttons/button";
 import { ButtonVariant } from "../../../../../../ui/buttons/enums/button-variant-enum";
+import Separator from "../../../../../../ui/seperatror/separator";
+import XpBar from "../../../components/character-details/xp-bar";
 
 const CharacterCardDetails = (): ReactNode => {
     return (

@@ -1,8 +1,9 @@
-import React, { ReactNode } from "react";
-import HealthBarProps from "./types/health-bar-props";
 import clsx from "clsx";
+import React, { ReactNode } from "react";
+
 import { fetchHealthBarColorForType } from "./helpers/fetch-health-bar-color-for-type";
 import { healthBarPercentage } from "./helpers/fetch-health-bar-percentage";
+import HealthBarProps from "./types/health-bar-props";
 
 const HealthBar = (props: HealthBarProps): ReactNode => {
     return (

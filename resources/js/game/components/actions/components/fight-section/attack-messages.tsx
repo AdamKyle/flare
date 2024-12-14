@@ -1,6 +1,7 @@
 import React, { ReactNode } from "react";
-import AttackMessagesProps from "./types/attack-messages-props";
+
 import Messages from "./partials/messages";
+import AttackMessagesProps from "./types/attack-messages-props";
 
 const AttackMessages = (props: AttackMessagesProps): ReactNode => {
     return (

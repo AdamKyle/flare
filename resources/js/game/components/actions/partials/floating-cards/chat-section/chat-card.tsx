@@ -1,14 +1,15 @@
 import React, { ReactNode } from "react";
-import FloatingCard from "../../../components/icon-section/floating-card";
+
+import EventSystemDefinition from "../../../../../../event-system/deffintions/event-system-definition";
 import { serviceContainer } from "../../../../../../service-container/core-container";
-import EventSystemDeffintion from "../../../../../../event-system/deffintions/event-system-deffintion";
-import { ActionCardEvents } from "../EventTypes/action-cards";
 import Button from "../../../../../../ui/buttons/button";
 import { ButtonVariant } from "../../../../../../ui/buttons/enums/button-variant-enum";
+import FloatingCard from "../../../components/icon-section/floating-card";
+import { ActionCardEvents } from "../EventTypes/action-cards";
 
 const ChatCard = (): ReactNode => {
     const eventSystem =
-        serviceContainer().fetch<EventSystemDeffintion>("EventSystem");
+        serviceContainer().fetch<EventSystemDefinition>("EventSystem");
 
     const handleCloseCard = () => {
         const event = eventSystem.getEventEmitter<{ [key: string]: boolean }>(

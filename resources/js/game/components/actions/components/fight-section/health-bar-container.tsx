@@ -1,4 +1,5 @@
 import React, { ReactNode } from "react";
+
 import HealthBarContainerProps from "./types/health-bar-container-props";
 
 const HealthBarContainer = (props: HealthBarContainerProps): ReactNode => {

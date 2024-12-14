@@ -1,4 +1,5 @@
 import React, { ReactNode } from "react";
+
 import FloatingCardProps from "./types/floating-card-props";
 
 const FloatingCard = (props: FloatingCardProps): ReactNode => {

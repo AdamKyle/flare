@@ -1,4 +1,5 @@
 import { match } from "ts-pattern";
+
 import { HealthBarType } from "../enums/health-bar-type";
 
 export const fetchHealthBarColorForType = (

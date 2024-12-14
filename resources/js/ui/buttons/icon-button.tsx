@@ -1,8 +1,9 @@
-import React, { ReactNode } from "react";
 import clsx from "clsx";
-import IconButtonProps from "./types/icon-button-props";
+import React, { ReactNode } from "react";
+
 import { baseStyles } from "./styles/button/base-styles";
 import { variantStyles } from "./styles/button/variant-styles";
+import IconButtonProps from "./types/icon-button-props";
 
 const IconButton = (props: IconButtonProps): ReactNode => {
     return (

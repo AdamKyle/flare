@@ -1,19 +1,24 @@
-import React, { ReactNode } from "react";
-import MonsterTopSection from "../components/fight-section/monster-top-section";
-import AttackButtonsContainer from "../components/fight-section/attack-buttons-container";
-import HealthBarContainer from "../components/fight-section/health-bar-container";
-import HealthBar from "../components/fight-section/health-bar";
-import { HealthBarType } from "../components/fight-section/enums/health-bar-type";
+import React, { ReactNode, useState } from "react";
+
 import Button from "../../../../ui/buttons/button";
+import { ButtonGradientVarient } from "../../../../ui/buttons/enums/button-gradient-variant";
 import { ButtonVariant } from "../../../../ui/buttons/enums/button-variant-enum";
 import GradientButton from "../../../../ui/buttons/gradient-button";
-import { ButtonGradientVarient } from "../../../../ui/buttons/enums/button-gradient-variant";
 import Separator from "../../../../ui/seperatror/separator";
+import AttackButtonsContainer from "../components/fight-section/attack-buttons-container";
 import AttackMessages from "../components/fight-section/attack-messages";
 import AttackMessageDeffintion from "../components/fight-section/deffinitions/attack-message-deffinition";
 import { AttackMessageType } from "../components/fight-section/enums/attack-message-type";
+import { HealthBarType } from "../components/fight-section/enums/health-bar-type";
+import HealthBar from "../components/fight-section/health-bar";
+import HealthBarContainer from "../components/fight-section/health-bar-container";
+import MonsterTopSection from "../components/fight-section/monster-top-section";
 
 const MonsterSection = (): ReactNode => {
+    const [, setNextAction] = useState<number>(0);
+    const [, setPrevAction] = useState<number>(0);
+    const [, setViewStats] = useState<number>(0);
+
     const messages: AttackMessageDeffintion[] = [
         {
             message: "You Attack for 150,000 Damage!",
@@ -34,9 +39,15 @@ const MonsterSection = (): ReactNode => {
         <>
             <MonsterTopSection
                 img_src="https://placecats.com/250/250"
-                next_action={() => (currentIndex: number) => {}}
-                prev_action={() => (currentIndex: number) => {}}
-                view_stats_action={() => (monsterId: number) => {}}
+                next_action={() => (currentIndex: number) => {
+                    setNextAction(currentIndex);
+                }}
+                prev_action={() => (currentIndex: number) => {
+                    setPrevAction(currentIndex);
+                }}
+                view_stats_action={() => (monsterId: number) => {
+                    setViewStats(monsterId);
+                }}
                 monster_name="Sewer Rat"
             />
             <HealthBarContainer>

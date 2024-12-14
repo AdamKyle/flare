@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+
 import { ButtonVariant } from "../enums/button-variant-enum";
 
 export default interface IconButtonProps<T extends unknown[] = []> {

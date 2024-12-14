@@ -1,16 +1,17 @@
-import React, { ReactNode } from "react";
-import IconContainer from "../../components/icon-section/icon-container";
-import IconButton from "../../../../../ui/buttons/icon-button";
-import { ButtonVariant } from "../../../../../ui/buttons/enums/button-variant-enum";
-import CharacterCard from "../floating-cards/character-details/character-card";
-import { serviceContainer } from "../../../../../service-container/core-container";
-import EventSystemDeffintion from "../../../../../event-system/deffintions/event-system-deffintion";
-import { useManageCharacterCardVisibility } from "../floating-cards/character-details/hooks/use-manage-character-card-visibility";
 import { AnimatePresence, motion } from "framer-motion";
-import { useManageCraftingCardVisibility } from "../floating-cards/crafting-section/hooks/use-manage-crafting-card-visibility";
-import CraftingCard from "../floating-cards/crafting-section/crafting-card";
-import { useManageChatCardVisibility } from "../floating-cards/chat-section/hooks/use-manage-chat-card-visibility";
+import React, { ReactNode } from "react";
+
+import EventSystemDeffintion from "../../../../../event-system/deffintions/event-system-definition";
+import { serviceContainer } from "../../../../../service-container/core-container";
+import { ButtonVariant } from "../../../../../ui/buttons/enums/button-variant-enum";
+import IconButton from "../../../../../ui/buttons/icon-button";
+import IconContainer from "../../components/icon-section/icon-container";
+import CharacterCard from "../floating-cards/character-details/character-card";
+import { useManageCharacterCardVisibility } from "../floating-cards/character-details/hooks/use-manage-character-card-visibility";
 import ChatCard from "../floating-cards/chat-section/chat-card";
+import { useManageChatCardVisibility } from "../floating-cards/chat-section/hooks/use-manage-chat-card-visibility";
+import CraftingCard from "../floating-cards/crafting-section/crafting-card";
+import { useManageCraftingCardVisibility } from "../floating-cards/crafting-section/hooks/use-manage-crafting-card-visibility";
 
 const IconSection = (): ReactNode => {
     const eventSystem =

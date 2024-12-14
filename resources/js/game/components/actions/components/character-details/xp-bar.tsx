@@ -1,6 +1,7 @@
 import React, { ReactNode } from "react";
-import XpBarProps from "./types/xp-bar-props";
+
 import { xpbarPercentage } from "./helpers/xp-bar-percentage";
+import XpBarProps from "./types/xp-bar-props";
 
 const XpBar = (props: XpBarProps): ReactNode => {
     return (

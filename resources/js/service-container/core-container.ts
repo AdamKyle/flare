@@ -1,4 +1,5 @@
 import { container, InjectionToken } from "tsyringe";
+
 import CoreContainerDeffinition from "./deffinitions/core-container-definition";
 import { serviceContainers } from "../configuration/modular-container";
 

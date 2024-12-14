@@ -1,8 +1,9 @@
-import React, { ReactNode } from "react";
 import clsx from "clsx";
-import GradientButtonProps from "./types/gradient-button-props";
+import React, { ReactNode } from "react";
+
 import { baseStyles } from "./styles/gradient-button/base-styles";
 import { variantStyles } from "./styles/gradient-button/variant-styles";
+import GradientButtonProps from "./types/gradient-button-props";
 
 const GradientButton = (props: GradientButtonProps): ReactNode => {
     return (

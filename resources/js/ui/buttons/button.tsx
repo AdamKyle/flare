@@ -1,8 +1,9 @@
-import React, { ReactNode } from "react";
-import ButtonProps from "./types/button-props";
 import clsx from "clsx";
-import { variantStyles } from "./styles/button/variant-styles";
+import React, { ReactNode } from "react";
+
 import { baseStyles } from "./styles/button/base-styles";
+import { variantStyles } from "./styles/button/variant-styles";
+import ButtonProps from "./types/button-props";
 
 const Button = (props: ButtonProps): ReactNode => {
     return (

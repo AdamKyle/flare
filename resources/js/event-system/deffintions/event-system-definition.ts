@@ -1,7 +1,7 @@
 import EventEmitterDeffintion from "./event-emitter-deffinition";
 import EventMapDeffinition from "./event-map-deffinition";
 
-export default interface EventSystemDeffintion {
+export default interface EventSystemDefinition {
     /**
      * Register an event.
      *

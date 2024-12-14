@@ -1,13 +1,14 @@
 import React, { ReactNode } from "react";
-import FloatingCard from "../../../components/icon-section/floating-card";
+
 import CharacterCardDetails from "./character-card-details";
+import EventSystemDefinition from "../../../../../../event-system/deffintions/event-system-definition";
 import { serviceContainer } from "../../../../../../service-container/core-container";
-import EventSystemDeffintion from "../../../../../../event-system/deffintions/event-system-deffintion";
+import FloatingCard from "../../../components/icon-section/floating-card";
 import { ActionCardEvents } from "../EventTypes/action-cards";
 
 const CharacterCard = (): ReactNode => {
     const eventSystem =
-        serviceContainer().fetch<EventSystemDeffintion>("EventSystem");
+        serviceContainer().fetch<EventSystemDefinition>("EventSystem");
 
     const handleCloseCard = () => {
         const event = eventSystem.getEventEmitter<{ [key: string]: boolean }>(

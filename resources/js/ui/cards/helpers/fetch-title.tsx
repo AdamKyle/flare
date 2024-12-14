@@ -1,6 +1,7 @@
 import React, { ReactNode } from "react";
-import { TitleSize } from "../enums/title-size";
 import { match } from "ts-pattern";
+
+import { TitleSize } from "../enums/title-size";
 
 export const fetchTitle = (title: string, titleSize?: TitleSize): ReactNode => {
     return match(titleSize)
