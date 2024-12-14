@@ -159,9 +159,21 @@
                     <a href="/game-event-info?event_type=the-frozen-king-raid">The Frozen King Raid</a>
                 </x-slot:title>
                 <p>
-                    Battle the Frozen King for <a href="/information/corrupted-ice">Corrupted Ice Gear</a> and complete raid quests to unlock <a href="#">Race Change</a>. Join in no matter your level or gear!
+                    Battle the Frozen King for <a href="/information/corrupted-ice">Corrupted Ice Gear</a> and complete raid quests to unlock Race Change. Join in no matter your level or gear!
                 </p>
             </x-core.cards.feature-card>
+        </div>
+
+        <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
+            <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
+                <span class="fa-stack">
+                    <i class="fas fa-gift mr-2"></i>
+                </span>
+                A gift for you from Mr. Whiskers
+            </h2>
+            <p class="mb-10 dark:text-gray-300 text-gray-800">
+               While exploring or manually fighting you have a 35% chance for Mr. Whiskers to give you a gift that is either <a href="/information/enchanting">Normal</a>, <a href="/information/unique-items">Unique</a>, <a href="/information/mythical-items">Mythical</a> or even <a href="/information/cosmic-items">Cosmic</a>! All you have to do is be on The Ice Plane and kill anything.
+            </p>
         </div>
 
 
