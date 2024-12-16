@@ -1,7 +1,7 @@
-import EventSystemDeffintion from 'event-system/deffintions/event-system-definition';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import React, { ReactNode } from 'react';
 
+import { MotionDiv } from './components/motion-div';
 import IconContainer from '../../components/icon-section/icon-container';
 import CharacterCard from '../floating-cards/character-details/character-card';
 import { useManageCharacterCardVisibility } from '../floating-cards/character-details/hooks/use-manage-character-card-visibility';
@@ -13,20 +13,14 @@ import { useManageCraftingCardVisibility } from '../floating-cards/crafting-sect
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import IconButton from 'ui/buttons/icon-button';
 
-import { serviceContainer } from 'service-container/core-container';
-
-const IconSection = (): ReactNode => {
-  const eventSystem =
-    serviceContainer().fetch<EventSystemDeffintion>('EventSystem');
-
+export const IconSection = (): ReactNode => {
   const { showCharacterCard, openCharacterCard } =
-    useManageCharacterCardVisibility(eventSystem);
+    useManageCharacterCardVisibility();
 
   const { showCraftingCard, openCraftingCard } =
-    useManageCraftingCardVisibility(eventSystem);
+    useManageCraftingCardVisibility();
 
-  const { showChatCard, openChatCard } =
-    useManageChatCardVisibility(eventSystem);
+  const { showChatCard, openChatCard } = useManageChatCardVisibility();
 
   return (
     <IconContainer>
@@ -61,94 +55,23 @@ const IconSection = (): ReactNode => {
 
       <AnimatePresence>
         {showCharacterCard && (
-          <motion.div
-            initial={{
-              x: window.innerWidth <= 768 ? 0 : -100,
-              y: window.innerWidth <= 768 ? -50 : 0,
-              opacity: 0,
-            }}
-            animate={{
-              x: 0,
-              y: 0,
-              opacity: 1,
-            }}
-            exit={{
-              x: window.innerWidth <= 768 ? 0 : -100,
-              y: window.innerWidth <= 768 ? 0 : 0,
-              opacity: 0,
-            }}
-            transition={{ duration: 0.5 }}
-            style={{
-              position: 'absolute',
-              top: window.innerWidth <= 768 ? '5rem' : '0',
-              left: window.innerWidth <= 768 ? '-195px' : '-1rem',
-              zIndex: 10,
-            }}
-          >
+          <MotionDiv>
             <CharacterCard />
-          </motion.div>
+          </MotionDiv>
         )}
 
         {showCraftingCard && (
-          <motion.div
-            initial={{
-              x: window.innerWidth <= 768 ? 0 : -100,
-              y: window.innerWidth <= 768 ? -50 : 0,
-              opacity: 0,
-            }}
-            animate={{
-              x: 0,
-              y: 0,
-              opacity: 1,
-            }}
-            exit={{
-              x: window.innerWidth <= 768 ? 0 : -100,
-              y: window.innerWidth <= 768 ? 0 : 0,
-              opacity: 0,
-            }}
-            transition={{ duration: 0.5 }}
-            style={{
-              position: 'absolute',
-              top: window.innerWidth <= 768 ? '5rem' : '0',
-              left: window.innerWidth <= 768 ? '-195px' : '-1rem',
-              zIndex: 10,
-            }}
-          >
+          <MotionDiv>
             <CraftingCard />
-          </motion.div>
+          </MotionDiv>
         )}
 
         {showChatCard && (
-          <motion.div
-            initial={{
-              x: window.innerWidth <= 768 ? 0 : -100,
-              y: window.innerWidth <= 768 ? -50 : 0,
-              opacity: 0,
-            }}
-            animate={{
-              x: 0,
-              y: 0,
-              opacity: 1,
-            }}
-            exit={{
-              x: window.innerWidth <= 768 ? 0 : -100,
-              y: window.innerWidth <= 768 ? 0 : 0,
-              opacity: 0,
-            }}
-            transition={{ duration: 0.5 }}
-            style={{
-              position: 'absolute',
-              top: window.innerWidth <= 768 ? '5rem' : '0',
-              left: window.innerWidth <= 768 ? '-195px' : '-1rem',
-              zIndex: 10,
-            }}
-          >
+          <MotionDiv>
             <ChatCard />
-          </motion.div>
+          </MotionDiv>
         )}
       </AnimatePresence>
     </IconContainer>
   );
 };
-
-export default IconSection;

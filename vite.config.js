@@ -24,9 +24,12 @@ export default defineConfig({
     },
     resolve: {
         alias: {
+            configuration: path.resolve(__dirname, 'resources/js/configuration'),
+            'event-system': path.resolve(__dirname, 'resources/js/event-system'),
             components: path.resolve(__dirname, 'resources/js/components'),
             ui: path.resolve(__dirname, 'resources/js/ui'),
             'service-container': path.resolve(__dirname, 'resources/js/service-container'),
+            'service-container-provider': path.resolve(__dirname, 'resources/js/service-container-provider'),
         },
     },
     build: {

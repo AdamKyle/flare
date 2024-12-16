@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 
-import IconSection from './partials/icon-section/icon-section';
+import { IconSection } from './partials/icon-section/icon-section';
 import MonsterSection from './partials/monster-section';
 import Card from '../../../ui/cards/card';
 

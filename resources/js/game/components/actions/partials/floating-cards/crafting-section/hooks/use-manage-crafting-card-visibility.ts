@@ -1,55 +1,56 @@
+import { useEventSystem } from 'event-system/hooks/use-event-system';
 import { useEffect, useState } from 'react';
 
-import UseManageCraftingCardVisibilityDeffinition from './deffinitions/use-manage-crafting-card-visibility-deffinition';
+import UseManageCraftingCardVisibilityDefinition from './deffinitions/use-manage-crafting-card-visibility-definition';
 import UseManageCraftingCardVisibilityState from './types/use-manage-crafting-card-visibility-state';
-import EventSystemDefinition from '../../../../../../../event-system/deffintions/event-system-definition';
 import { ActionCardEvents } from '../../EventTypes/action-cards';
 
-export const useManageCraftingCardVisibility = (
-  eventSystem: EventSystemDefinition
-): UseManageCraftingCardVisibilityDeffinition => {
-  const closeCardEventEmitter = eventSystem.isEventRegistered(
-    ActionCardEvents.CLOSE_CRATING_CARD
-  )
-    ? eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-        ActionCardEvents.CLOSE_CRATING_CARD
-      )
-    : eventSystem.registerEvent<{ [key: string]: boolean }>(
-        ActionCardEvents.CLOSE_CRATING_CARD
-      );
+export const useManageCraftingCardVisibility =
+  (): UseManageCraftingCardVisibilityDefinition => {
+    const eventSystem = useEventSystem();
 
-  const [showCraftingCard, setShowCraftingCard] =
-    useState<UseManageCraftingCardVisibilityState['showCraftingCard']>(false);
+    const closeCardEventEmitter = eventSystem.isEventRegistered(
+      ActionCardEvents.CLOSE_CRATING_CARD
+    )
+      ? eventSystem.getEventEmitter<{ [key: string]: boolean }>(
+          ActionCardEvents.CLOSE_CRATING_CARD
+        )
+      : eventSystem.registerEvent<{ [key: string]: boolean }>(
+          ActionCardEvents.CLOSE_CRATING_CARD
+        );
 
-  useEffect(() => {
-    const closeCardListener = () => setShowCraftingCard(false);
+    const [showCraftingCard, setShowCraftingCard] =
+      useState<UseManageCraftingCardVisibilityState['showCraftingCard']>(false);
 
-    closeCardEventEmitter.on(
-      ActionCardEvents.CLOSE_CRATING_CARD,
-      closeCardListener
-    );
+    useEffect(() => {
+      const closeCardListener = () => setShowCraftingCard(false);
 
-    return () => {
-      closeCardEventEmitter.off(
+      closeCardEventEmitter.on(
         ActionCardEvents.CLOSE_CRATING_CARD,
         closeCardListener
       );
+
+      return () => {
+        closeCardEventEmitter.off(
+          ActionCardEvents.CLOSE_CRATING_CARD,
+          closeCardListener
+        );
+      };
+    }, [closeCardEventEmitter]);
+
+    const openCraftingCard = () => {
+      const closeCharacterCardEvent = eventSystem.getEventEmitter<{
+        [key: string]: boolean;
+      }>(ActionCardEvents.CLOSE_CHARACTER_CARD);
+      const closeChatCardEvent = eventSystem.getEventEmitter<{
+        [key: string]: boolean;
+      }>(ActionCardEvents.CLOSE_CHAT_CARD);
+
+      closeCharacterCardEvent.emit(ActionCardEvents.CLOSE_CHARACTER_CARD, true);
+      closeChatCardEvent.emit(ActionCardEvents.CLOSE_CHAT_CARD, true);
+
+      setShowCraftingCard(true);
     };
-  }, [closeCardEventEmitter]);
 
-  const openCraftingCard = () => {
-    const closeCharacterCardEvent = eventSystem.getEventEmitter<{
-      [key: string]: boolean;
-    }>(ActionCardEvents.CLOSE_CHARACTER_CARD);
-    const closeChatCardEvent = eventSystem.getEventEmitter<{
-      [key: string]: boolean;
-    }>(ActionCardEvents.CLOSE_CHAT_CARD);
-
-    closeCharacterCardEvent.emit(ActionCardEvents.CLOSE_CHARACTER_CARD, true);
-    closeChatCardEvent.emit(ActionCardEvents.CLOSE_CHAT_CARD, true);
-
-    setShowCraftingCard(true);
+    return { showCraftingCard, openCraftingCard };
   };
-
-  return { showCraftingCard, openCraftingCard };
-};
