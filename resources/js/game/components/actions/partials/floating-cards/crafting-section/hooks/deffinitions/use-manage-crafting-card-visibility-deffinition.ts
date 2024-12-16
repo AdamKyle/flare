@@ -1,4 +1,4 @@
 export default interface UseManageCraftingCardVisibilityDeffinition {
-    showCraftingCard: boolean;
-    openCraftingCard: () => void;
+  showCraftingCard: boolean;
+  openCraftingCard: () => void;
 }

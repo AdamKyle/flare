@@ -1,3 +1,3 @@
 export default interface UseManageCraftingCardVisibilityState {
-    showCraftingCard: boolean;
+  showCraftingCard: boolean;
 }

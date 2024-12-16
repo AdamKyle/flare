@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
+import { ReactNode } from 'react';
 
 export default interface IconContainerProps {
-    children: ReactNode | ReactNode[];
+  children: ReactNode | ReactNode[];
 }

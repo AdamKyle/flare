@@ -1,3 +1,3 @@
 export default interface UseManageChatCardVisibilityState {
-    showChatCard: boolean;
+  showChatCard: boolean;
 }

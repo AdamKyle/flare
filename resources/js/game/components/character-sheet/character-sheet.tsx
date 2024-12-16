@@ -1,7 +1,7 @@
-import { ReactNode } from "react";
+import { ReactNode } from 'react';
 
 const CharacterSheet = (): ReactNode => {
-    return "Character Sheet Content ...";
+  return 'Character Sheet Content ...';
 };
 
 export default CharacterSheet;

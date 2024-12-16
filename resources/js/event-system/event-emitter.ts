@@ -1,32 +1,32 @@
-import EventEmitterDeffintion from "./deffintions/event-emitter-deffinition";
-import EventMapDeffinition from "./deffintions/event-map-deffinition";
+import EventEmitterDeffintion from './deffintions/event-emitter-deffinition';
+import EventMapDeffinition from './deffintions/event-map-deffinition';
 
 export default class EventEmitter<T extends EventMapDeffinition>
-    implements EventEmitterDeffintion<T>
+  implements EventEmitterDeffintion<T>
 {
-    private listeners: {
-        [K in keyof T]?: Array<(data: T[K]) => void>;
-    } = {};
+  private listeners: {
+    [K in keyof T]?: Array<(data: T[K]) => void>;
+  } = {};
 
-    on<K extends keyof T>(eventType: K, listener: (data: T[K]) => void): void {
-        if (!this.listeners[eventType]) {
-            this.listeners[eventType] = [];
-        }
-
-        this.listeners[eventType].push(listener);
+  on<K extends keyof T>(eventType: K, listener: (data: T[K]) => void): void {
+    if (!this.listeners[eventType]) {
+      this.listeners[eventType] = [];
     }
 
-    emit<K extends keyof T>(eventType: K, data: T[K]): void {
-        const eventListeners = this.listeners[eventType];
+    this.listeners[eventType].push(listener);
+  }
 
-        eventListeners?.forEach((listener) => {
-            listener(data);
-        });
-    }
+  emit<K extends keyof T>(eventType: K, data: T[K]): void {
+    const eventListeners = this.listeners[eventType];
 
-    off<K extends keyof T>(eventType: K, listener: (data: T[K]) => void): void {
-        const eventListeners = this.listeners[eventType];
+    eventListeners?.forEach((listener) => {
+      listener(data);
+    });
+  }
 
-        eventListeners?.filter((l) => l !== listener);
-    }
+  off<K extends keyof T>(eventType: K, listener: (data: T[K]) => void): void {
+    const eventListeners = this.listeners[eventType];
+
+    eventListeners?.filter((l) => l !== listener);
+  }
 }

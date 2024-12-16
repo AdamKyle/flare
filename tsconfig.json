@@ -8,11 +8,8 @@
         "removeComments": true,
         "sourceMap": true,
         "baseUrl": "./",
-        "paths": {
-            "@mui/*": ["node_modules/@mui/*/"]
-        },
-        "strict": true,                 // Enable strict type-checking options
-        "skipLibCheck": false,          // Skip type checking of declaration files
+        "strict": true,
+        "skipLibCheck": false,
         "noImplicitAny": true,
         "allowSyntheticDefaultImports": true,
         "downlevelIteration": true,
@@ -23,7 +20,14 @@
             "ES2021.String",
             "dom",
             "dom.iterable"
-        ]
+        ],
+        "paths": {
+            "configuration/*": ["resources/js/configuration/*"],
+            "event-system/*": ["resources/js/event-system/*"],
+            "ui/*": ["resources/js/ui/*"],
+            "service-container/*": ["resources/js/service-container/*"],
+            "service-container-provider/*": ["resources/js/service-container-provider/*"]
+        }
     },
     "skipLibCheck": true,
     "include": ["resources/js/**/*"],

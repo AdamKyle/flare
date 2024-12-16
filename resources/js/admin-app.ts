@@ -1,4 +1,4 @@
 /**
  * Bootstrap the application.
  */
-import "./bootstrap";
+import './bootstrap';

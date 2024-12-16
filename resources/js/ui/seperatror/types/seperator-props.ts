@@ -1,3 +1,3 @@
 export default interface SeperatorProps {
-    additional_css?: string;
+  additional_css?: string;
 }

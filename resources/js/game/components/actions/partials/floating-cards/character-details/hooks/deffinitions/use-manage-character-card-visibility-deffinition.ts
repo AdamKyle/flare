@@ -1,4 +1,4 @@
 export default interface UseManageCharacterCardVisibilityDeffinition {
-    showCharacterCard: boolean;
-    openCharacterCard: () => void;
+  showCharacterCard: boolean;
+  openCharacterCard: () => void;
 }

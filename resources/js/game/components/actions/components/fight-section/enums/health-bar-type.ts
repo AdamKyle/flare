@@ -1,4 +1,4 @@
 export enum HealthBarType {
-    ENEMY,
-    PLAYER,
+  ENEMY,
+  PLAYER,
 }

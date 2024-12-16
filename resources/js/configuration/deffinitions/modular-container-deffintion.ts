@@ -1,5 +1,5 @@
-import CoreContainerDeffinition from "../../service-container/deffinitions/core-container-definition";
+import CoreContainerDefinition from '../../service-container/deffinitions/core-container-definition';
 
 export type ModularContainerDeffintion = (
-    container: CoreContainerDeffinition,
+  container: CoreContainerDefinition
 ) => void;

@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import react from '@vitejs/plugin-react';
+import path from 'path';
 
-// Determine if we are in development mode
 const isDevelopment = process.env.NODE_ENV === 'local';
 
 export default defineConfig({
@@ -24,18 +24,15 @@ export default defineConfig({
     },
     resolve: {
         alias: {
-            '@mui': '/node_modules/@mui',
+            components: path.resolve(__dirname, 'resources/js/components'),
+            ui: path.resolve(__dirname, 'resources/js/ui'),
+            'service-container': path.resolve(__dirname, 'resources/js/service-container'),
         },
     },
     build: {
         minify: !isDevelopment,
         sourcemap: isDevelopment,
         inlineDynamicImports: !isDevelopment,
-        terserOptions: {
-            compress: {
-                drop_console: !isDevelopment,
-            },
-        },
         chunkSizeWarningLimit: 2000,
         rollupOptions: {
             output: {
@@ -45,14 +42,6 @@ export default defineConfig({
                         const packageName = match[1];
                         if (id.includes('node_modules/')) {
                             return `vendor_${packageName}`;
-                        } else {
-                            // Specify specific packages to group into smaller chunks
-                            if (packageName === 'date-fns') {
-                                return 'date_fns'; // Group date-fns into a separate chunk
-                            }
-                            if (packageName.startsWith('game-related-package')) {
-                                return 'game'; // Group game-related packages into a separate chunk
-                            }
                         }
                     }
                 },
