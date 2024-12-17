@@ -1,9 +1,9 @@
 import { useEventSystem } from 'event-system/hooks/use-event-system';
 import { useEffect, useState } from 'react';
 
-import UseManageCharacterCardVisibilityDeffinition from './deffinitions/use-manage-character-card-visibility-deffinition';
+import UseManageCharacterCardVisibilityDeffinition from './definitions/use-manage-character-card-visibility-definition';
 import UseManageCharacterCardVisibilityState from './types/use-manage-character-card-visibility-state';
-import { ActionCardEvents } from '../../EventTypes/action-cards';
+import { ActionCardEvents } from '../../event-types/action-cards';
 
 export const useManageCharacterCardVisibility =
   (): UseManageCharacterCardVisibilityDeffinition => {

@@ -3,5 +3,5 @@ export default interface MonsterTopSectionProps {
   monster_name: string;
   next_action: (currentIndex: number) => void;
   prev_action: (currentIndex: number) => void;
-  view_stats_action: (monsterId: number) => void;
+  view_monster_stats: () => void;
 }

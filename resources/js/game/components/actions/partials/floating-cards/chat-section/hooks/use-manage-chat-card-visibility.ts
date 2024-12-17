@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 import useManageChatCardVisibilityDefinition from './deffinitions/use-manage-chat-card-visibility-deffinition';
 import UseManageChatCardVisibilityState from './types/use-manage-chat-card-visibility-state';
-import { ActionCardEvents } from '../../EventTypes/action-cards';
+import { ActionCardEvents } from '../../event-types/action-cards';
 
 export const useManageChatCardVisibility =
   (): useManageChatCardVisibilityDefinition => {

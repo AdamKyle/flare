@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 import UseManageCraftingCardVisibilityDefinition from './deffinitions/use-manage-crafting-card-visibility-definition';
 import UseManageCraftingCardVisibilityState from './types/use-manage-crafting-card-visibility-state';
-import { ActionCardEvents } from '../../EventTypes/action-cards';
+import { ActionCardEvents } from '../../event-types/action-cards';
 
 export const useManageCraftingCardVisibility =
   (): UseManageCraftingCardVisibilityDefinition => {

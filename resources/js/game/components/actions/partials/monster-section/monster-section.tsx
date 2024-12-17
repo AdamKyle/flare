@@ -1,13 +1,14 @@
 import React, { ReactNode, useState } from 'react';
 
-import AttackButtonsContainer from '../components/fight-section/attack-buttons-container';
-import AttackMessages from '../components/fight-section/attack-messages';
-import AttackMessageDefinition from '../components/fight-section/deffinitions/attack-message-definition';
-import { AttackMessageType } from '../components/fight-section/enums/attack-message-type';
-import { HealthBarType } from '../components/fight-section/enums/health-bar-type';
-import HealthBar from '../components/fight-section/health-bar';
-import HealthBarContainer from '../components/fight-section/health-bar-container';
-import MonsterTopSection from '../components/fight-section/monster-top-section';
+import MonsterSectionProps from './types/monster-section-props';
+import AttackButtonsContainer from '../../components/fight-section/attack-buttons-container';
+import AttackMessages from '../../components/fight-section/attack-messages';
+import AttackMessageDefinition from '../../components/fight-section/deffinitions/attack-message-definition';
+import { AttackMessageType } from '../../components/fight-section/enums/attack-message-type';
+import { HealthBarType } from '../../components/fight-section/enums/health-bar-type';
+import HealthBar from '../../components/fight-section/health-bar';
+import HealthBarContainer from '../../components/fight-section/health-bar-container';
+import MonsterTopSection from '../../components/fight-section/monster-top-section';
 
 import Button from 'ui/buttons/button';
 import { ButtonGradientVarient } from 'ui/buttons/enums/button-gradient-variant';
@@ -15,10 +16,9 @@ import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import GradientButton from 'ui/buttons/gradient-button';
 import Separator from 'ui/seperatror/separator';
 
-const MonsterSection = (): ReactNode => {
+const MonsterSection = (props: MonsterSectionProps): ReactNode => {
   const [, setNextAction] = useState<number>(0);
   const [, setPrevAction] = useState<number>(0);
-  const [, setViewStats] = useState<number>(0);
 
   const messages: AttackMessageDefinition[] = [
     {
@@ -45,9 +45,7 @@ const MonsterSection = (): ReactNode => {
         prev_action={() => (currentIndex: number) => {
           setPrevAction(currentIndex);
         }}
-        view_stats_action={() => (monsterId: number) => {
-          setViewStats(monsterId);
-        }}
+        view_monster_stats={props.show_monster_stats}
         monster_name="Sewer Rat"
       />
       <HealthBarContainer>

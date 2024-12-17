@@ -3,7 +3,7 @@ import React, { ReactNode } from 'react';
 
 import CharacterCardDetails from './character-card-details';
 import FloatingCard from '../../../components/icon-section/floating-card';
-import { ActionCardEvents } from '../EventTypes/action-cards';
+import { ActionCardEvents } from '../event-types/action-cards';
 
 import { serviceContainer } from 'service-container/core-container';
 

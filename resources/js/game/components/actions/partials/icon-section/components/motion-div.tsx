@@ -25,7 +25,7 @@ export const MotionDiv = (props: MotionDevProps): ReactNode => {
       transition={{ duration: 0.5 }}
       style={{
         position: 'absolute',
-        top: window.innerWidth <= 900 ? '5rem' : '0',
+        top: window.innerWidth <= 900 ? '0' : '-25px',
         left: motionLeftPositionHelper(),
         zIndex: 10,
       }}

@@ -1,8 +1,9 @@
 import React, { ReactNode } from 'react';
 
 import MonsterTopSectionProps from './types/monster-top-section-props';
-import { ButtonVariant } from '../../../../../ui/buttons/enums/button-variant-enum';
-import LinkButton from '../../../../../ui/buttons/link-button';
+
+import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import LinkButton from 'ui/buttons/link-button';
 
 const MonsterTopSection = (props: MonsterTopSectionProps): ReactNode => {
   return (
@@ -50,7 +51,7 @@ const MonsterTopSection = (props: MonsterTopSectionProps): ReactNode => {
         <LinkButton
           label="View Stats"
           variant={ButtonVariant.PRIMARY}
-          on_click={() => props.view_stats_action(1)}
+          on_click={() => props.view_monster_stats()}
         />
       </div>
     </>

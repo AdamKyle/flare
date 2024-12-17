@@ -2,7 +2,7 @@ import EventSystemDefinition from 'event-system/deffintions/event-system-definit
 import React, { ReactNode } from 'react';
 
 import FloatingCard from '../../../components/icon-section/floating-card';
-import { ActionCardEvents } from '../EventTypes/action-cards';
+import { ActionCardEvents } from '../event-types/action-cards';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
