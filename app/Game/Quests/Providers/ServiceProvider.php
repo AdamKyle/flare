@@ -2,6 +2,7 @@
 
 namespace App\Game\Quests\Providers;
 
+use App\Game\Factions\FactionLoyalty\Services\UpdateFactionLoyaltyService;
 use App\Game\Maps\Validation\CanTravelToMap;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
@@ -38,6 +39,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(NpcQuestRewardHandler::class, function ($app) {
             return new NpcQuestRewardHandler(
                 $app->make(NpcServerMessageBuilder::class),
+                $app->make(UpdateFactionLoyaltyService::class)
             );
         });
 
