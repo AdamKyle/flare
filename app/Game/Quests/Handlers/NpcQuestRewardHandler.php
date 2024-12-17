@@ -12,6 +12,7 @@ use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\HandleCharacterLevelUp;
+use App\Game\Factions\FactionLoyalty\Services\UpdateFactionLoyaltyService;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -23,12 +24,10 @@ class NpcQuestRewardHandler
 {
     use HandleCharacterLevelUp;
 
-    private NpcServerMessageBuilder $npcServerMessageBuilder;
-
-    public function __construct(NpcServerMessageBuilder $npcServerMessageBuilder)
-    {
-        $this->npcServerMessageBuilder = $npcServerMessageBuilder;
-    }
+    public function __construct(
+        private readonly NpcServerMessageBuilder     $npcServerMessageBuilder,
+        private readonly UpdateFactionLoyaltyService $updateFactionLoyaltyService)
+    {}
 
     public function processReward(Quest $quest, Npc $npc, Character $character): void
     {
@@ -162,6 +161,10 @@ class NpcQuestRewardHandler
                 broadcast(new GlobalMessageEvent('Lighting streaks across the skies, blackness fills the skies. A thunderous roar is heard across the land.'));
 
                 broadcast(new ServerMessageEvent($character->user, 'Careful, child. You seem to have angered The Creator. Are you prepared?'));
+            }
+
+            if ($effectType->purgatory()) {
+                $this->updateFactionLoyaltyService->updateFactionLoyaltyBountyTasks($character);
             }
         }
 

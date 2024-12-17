@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Console\AfterDeployment\UpdateCharacterFactionBounties;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
@@ -72,6 +73,7 @@ class AppServiceProvider extends ServiceProvider
             RebalanceTrinkets::class,
             ClearPlayersJobs::class,
             ClearInvalidCapitalCityQueues::class,
+            UpdateCharacterFactionBounties::class,
 
             // Development Commands:
             CreateCharacter::class,
