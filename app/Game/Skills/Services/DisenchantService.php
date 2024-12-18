@@ -172,6 +172,8 @@ class DisenchantService
 
             event(new UpdateCharacterInventoryCountEvent($this->character));
 
+            ServerMessageHandler::sendBasicMessage($this->character->user, 'Disenchanted item but got no gold dust as you are capped. Maybe you want to auto sell it (can be enabled in your settings, profile icon -> settings, scroll down to Auto Disenchant)?');
+
             return;
         }
 

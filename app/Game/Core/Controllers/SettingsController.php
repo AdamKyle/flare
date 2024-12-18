@@ -73,7 +73,6 @@ class SettingsController extends Controller
 
     public function autoDisenchantSettings(Request $request, User $user)
     {
-
         if (filter_var($request->auto_disenchant, FILTER_VALIDATE_BOOLEAN) === false) {
             $request->merge([
                 'auto_disenchant' => false,

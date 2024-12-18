@@ -140,9 +140,9 @@ class BattleDrop
     }
 
     /**
-     * Handles drops for special locations.
-     *
+     * @param Character $character
      * @return void
+     * @throws Exception
      */
     public function handleSpecialLocationQuestItem(Character $character)
     {
@@ -184,13 +184,20 @@ class BattleDrop
     }
 
     /**
-     * Depending on the map name and the location, we fetch the drop item from the cache.
+     * @param Character $character
+     * @param string $gameMapName
+     * @param Location|null $locationWithEffect
+     * @return Item|null
      */
     protected function getDropFromCache(Character $character, string $gameMapName, ?Location $locationWithEffect = null): ?Item
     {
         return $this->randomItemDropBuilder->generateItem($this->getMaxLevelBasedOnPlane($character));
     }
 
+    /**
+     * @param Character $character
+     * @return int
+     */
     protected function getMaxLevelBasedOnPlane(Character $character): int
     {
         $characterLevel = $character->level;
@@ -309,10 +316,12 @@ class BattleDrop
     private function handleDisenchantOrAutoSell(Character $character, Item $item): void {
         $maxCurrenciesValue = new MaxCurrenciesValue($character->gold_dust, MaxCurrenciesValue::GOLD_DUST);
 
-        if ($maxCurrenciesValue->canNotGiveCurrency()) {
-            $this->shopService->autoSellItem($character, $item);
+        if ($character->user->auto_sell_item) {
+            if ($maxCurrenciesValue->canNotGiveCurrency()) {
+                $this->shopService->autoSellItem($character, $item);
 
-            return;
+                return;
+            }
         }
 
         $this->disenchantService->setUp($character)->disenchantItemWithSkill();
