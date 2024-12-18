@@ -71,18 +71,23 @@ class SettingsController extends Controller
         return redirect()->back()->with('success', 'Updated chat preferences.');
     }
 
-    public function autoDisenchantSettings(request $request, User $user)
+    public function autoDisenchantSettings(Request $request, User $user)
     {
 
-        if ($request->has('auto_disenchant')) {
-            if (is_null($request->auto_disenchant_amount)) {
-                return redirect()->back()->with('error', 'You must select to either disenchant all items that drop or only those under 1 Billion gold.');
-            }
+        if (filter_var($request->auto_disenchant, FILTER_VALIDATE_BOOLEAN) === false) {
+            $request->merge([
+                'auto_disenchant' => false,
+                'auto_sell_item' => false,
+                'auto_disenchant_amount' => null,
+            ]);
+        } else if (is_null($request->auto_disenchant_amount)) {
+            return redirect()->back()->with('error', 'You must select an disenchant amount.');
         }
 
         $user->update([
-            'auto_disenchant' => $request->has('auto_disenchant') ? $request->auto_disenchant : false,
+            'auto_disenchant' => filter_var($request->auto_disenchant, FILTER_VALIDATE_BOOLEAN),
             'auto_disenchant_amount' => $request->has('auto_disenchant_amount') ? ($request->auto_disenchant_amount !== '' ? $request->auto_disenchant_amount : null) : null,
+            'auto_sell_item' => $request->has('auto_sell_item') ? $request->auto_sell_item : false,
         ]);
 
         return redirect()->back()->with('success', 'Updated auto disenchant preferences.');

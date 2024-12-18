@@ -14,6 +14,7 @@ use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Shop\Events\SellItemEvent;
 use Facades\App\Flare\Calculators\SellItemCalculator;
@@ -225,5 +226,30 @@ class ShopService
         event(new SellItemEvent($inventorySlot, $character));
 
         return $totalSoldFor;
+    }
+
+    /**
+     * @param Character $character
+     * @param Item $item
+     * @return Character
+     */
+    public function autoSellItem(Character $character, Item $item): Character {
+        $totalSoldFor = SellItemCalculator::fetchSalePriceWithAffixes($item);
+
+        $newGold = $character->gold + $totalSoldFor;
+
+        if ($newGold > MaxCurrenciesValue::MAX_GOLD) {
+            $newGold = MaxCurrenciesValue::MAX_GOLD;
+
+            event(new ServerMessageEvent($character->user, 'You are Gold Dust Capped so the item: ' . $item->affix_name . ' auto sold for: ' . number_format($totalSoldFor) . ' Gold. You are now gold capped at: ' . number_format($newGold) . ' Gold. Go spend some of it, or buy Gold Bars for your kingdoms.'));
+        } else {
+            event(new ServerMessageEvent($character->user, 'You are Gold Dust Capped so the item: ' . $item->affix_name . ' auto sold for: ' . number_format($totalSoldFor) . ' Gold. You now have total amount of gold: ' . number_format($newGold) . ' Gold.'));
+        }
+
+        $character->update([
+            'gold' => $newGold,
+        ]);
+
+        return $character->refresh();
     }
 }
