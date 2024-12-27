@@ -6,7 +6,7 @@ import tailwindcssDir from "tailwindcss-dir";
 export default {
     mode: 'jit',
     content: [
-        './resources/**/*.{js,vue,blade.php,jsx,tsx}',
+        './resources/**/*.{js,vue,blade.php,jsx,tsx,ts}',
         './app/Flare/View/Livewire/**/*.php',
         './vendor/rappasoft/laravel-livewire-tables/resources/views/**/*.blade.php'
     ],

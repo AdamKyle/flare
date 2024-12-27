@@ -1,20 +1,22 @@
-import React, { Fragment, ReactNode } from "react";
-import Table from "../../../../../components/ui/data-tables/table";
-import { BuildInventoryTableColumns } from "../../../../../lib/game/character-sheet/helpers/inventory/build-inventory-table-columns";
+import React, { ReactNode } from "react";
 import InventoryDetails from "../../../../../lib/game/character-sheet/types/inventory/inventory-details";
 import ActionsInterface from "../../../../../lib/game/character-sheet/helpers/inventory/actions-interface";
 import DangerButton from "../../../../../components/ui/buttons/danger-button";
-import DropDown from "../../../../../components/ui/drop-down/drop-down";
-import LoadingProgressBar from "../../../../../components/ui/progress-bars/loading-progress-bar";
 import Ajax from "../../../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import { isEqual } from "lodash";
 import EquippedInventoryTabProps from "../../../../../lib/game/character-sheet/types/tabs/equipped-inventory-tab-props";
 import EquippedTableState from "../../../../../lib/game/character-sheet/types/tables/equipped-table-state";
-import SuccessAlert from "../../../../../components/ui/alerts/simple-alerts/success-alert";
 import UsableItemsDetails from "../../../../../lib/game/character-sheet/types/inventory/usable-items-details";
-import InventoryUseDetails from "../../modals/inventory-item-details";
-import DangerAlert from "../../../../../components/ui/alerts/simple-alerts/danger-alert";
+import {
+    defaultPositionImage,
+    defaultPositionImageAlt,
+    Position,
+    positionTypeMap,
+} from "./equipped-section/enums/position-paths";
+import { determineEquipmentType } from "./equipped-section/enums/equipment-types";
+import { getEquipmentImagePath } from "./equipped-section/enums/equipment-position-paths";
+import { borderStyles } from "./equipped-section/styles/border-styles";
 
 export default class EquippedTable
     extends React.Component<EquippedInventoryTabProps, EquippedTableState>
@@ -275,106 +277,94 @@ export default class EquippedTable
         );
     }
 
-    render() {
+    handleClick(itemName: string) {
+        console.log(itemName);
+    }
+
+    renderSlot(name: string, position: Position) {
+        let path = defaultPositionImage[position];
+        const altText = defaultPositionImageAlt[position];
+
+        const itemType = positionTypeMap[position];
+
+        console.log(itemType);
+
+        const item = this.state.data.find((item: InventoryDetails) => {
+            return item.type === itemType;
+        });
+
+        let itemName = "Sample";
+
+        if (!item) {
+            return (
+                <div
+                    className={`w-16 h-16 text-white flex items-center justify-center border border-gray-600 rounded`}
+                    onClick={() => this.handleClick(itemName)}
+                    onMouseOver={(e: React.MouseEvent<HTMLDivElement>) => {
+                        e.currentTarget.title = `${name}: ${itemName}`;
+                    }}
+                    aria-label={`${name}: ${itemName}`}
+                >
+                    <img src={path} width={64} alt={altText} />
+                </div>
+            );
+        }
+
+        const itemEquipmentType = determineEquipmentType(item);
+
+        path = getEquipmentImagePath(position, itemEquipmentType);
+        itemName = item.item_name;
+
+        const borderClasses = borderStyles(itemEquipmentType);
+
         return (
-            <Fragment>
-                {this.state.success_message !== null ? (
-                    <SuccessAlert
-                        additional_css={"mb-4 mt-4"}
-                        close_alert={this.manageSuccessMessage.bind(this)}
-                    >
-                        {this.state.success_message}
-                    </SuccessAlert>
-                ) : null}
+            <div
+                className={`w-16 h-16 text-white flex items-center justify-center border border-gray-600 rounded ${borderClasses}`}
+                onClick={() => this.handleClick(itemName)}
+                onMouseOver={(e: React.MouseEvent<HTMLDivElement>) => {
+                    e.currentTarget.title = `${name}: ${itemName}`;
+                }}
+                aria-label={`${name}: ${itemName}`}
+            >
+                <img src={path} width={64} alt={altText} />
+            </div>
+        );
+    }
 
-                {this.state.error_message !== null ? (
-                    <DangerAlert
-                        additional_css={"mb-4 mt-4"}
-                        close_alert={this.manageErrorMessage.bind(this)}
-                    >
-                        {this.state.error_message}
-                    </DangerAlert>
-                ) : null}
-                <div className="mb-5">
-                    <div className="flex flex-col md:flex-row flex-wrap items-center md:space-x-4 w-full">
-                        <div className="mt-2 md:mt-0 md:ml-2 w-full md:w-auto">
-                            <DangerButton
-                                button_label="Unequip All"
-                                additional_css="w-full md:w-auto"
-                                on_click={this.unequipAll.bind(this)}
-                                disabled={
-                                    this.props.is_dead ||
-                                    this.state.data.length === 0 ||
-                                    this.props.is_automation_running ||
-                                    this.state.loading
-                                }
-                            />
+    render() {
+        console.log(this.state.data);
+        return (
+            <div className="flex justify-center">
+                <div className="flex items-center p-4 space-x-8">
+                    <div className="flex flex-col items-center space-y-4">
+                        <div>{this.renderSlot("Head", Position.HELMET)}</div>
+
+                        <div className="grid grid-cols-3 gap-4">
+                            {this.renderSlot("Sleeves", Position.SLEEVES_LEFT)}
+                            {this.renderSlot("Body", Position.BODY)}
+                            {this.renderSlot("Sleeves", Position.SLEEVES_RIGHT)}
                         </div>
 
-                        {this.hasEmptySet() && (
-                            <div className="md:ml-2 w-full md:w-auto">
-                                <DropDown
-                                    menu_items={this.buildMenuItems()}
-                                    button_title="Assign to Set"
-                                    disabled={
-                                        this.props.is_dead ||
-                                        this.props.is_automation_running ||
-                                        this.state.loading
-                                    }
-                                />
-                            </div>
-                        )}
-
-                        {this.props.is_set_equipped && (
-                            <div className="mt-2 md:mt-0 md:ml-2 text-green-700 dark:text-green-500 w-full md:w-auto">
-                                Set Equipped.
-                            </div>
-                        )}
-
-                        <div className="w-full md:w-auto sm:ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-[10px]">
-                            <input
-                                type="text"
-                                name="search"
-                                className="form-control w-full md:w-auto"
-                                onChange={this.search.bind(this)}
-                                placeholder="search"
-                            />
+                        <div className="grid grid-cols-3 gap-4">
+                            {this.renderSlot("Gloves", Position.GLOVES_LEFT)}
+                            {this.renderSlot("Leggings", Position.LEGGINGS)}
+                            {this.renderSlot("Gloves", Position.GLOVES_RIGHT)}
                         </div>
+
+                        <div>{this.renderSlot("Feet", Position.FEET)}</div>
                     </div>
 
-                    {this.state.loading ? (
-                        <LoadingProgressBar
-                            show_label={true}
-                            label={
-                                "Unequipping items and recalculating your stats (this can take a few seconds) ..."
-                            }
-                        />
-                    ) : null}
+                    <div className="grid grid-cols-2 gap-4">
+                        {this.renderSlot("Weapon", Position.WEAPON_LEFT)}
+                        {this.renderSlot("Weapon", Position.WEAPON_RIGHT)}
+                        {this.renderSlot("Ring", Position.RING_LEFT)}
+                        {this.renderSlot("Ring", Position.RING_RIGHT)}
+                        {this.renderSlot("Spell", Position.SPELL_LEFT)}
+                        {this.renderSlot("Spell", Position.SPELL_RIGHT)}
+                        {this.renderSlot("Trinket", Position.TRINKET)}
+                    </div>
                 </div>
-
-                {this.state.view_item && this.state.item_id !== null ? (
-                    <InventoryUseDetails
-                        character_id={this.props.character_id}
-                        item_id={this.state.item_id}
-                        is_open={this.state.view_item}
-                        manage_modal={this.viewItem.bind(this)}
-                    />
-                ) : null}
-
-                <div className={"max-w-full overflow-y-hidden"}>
-                    <Table
-                        data={this.state.data}
-                        columns={BuildInventoryTableColumns(
-                            this.props.view_port,
-                            this,
-                            this.viewItem.bind(this),
-                            this.props.manage_skills,
-                            "equipped",
-                        )}
-                        dark_table={this.props.dark_tables}
-                    />
-                </div>
-            </Fragment>
+            </div>
         );
     }
 }

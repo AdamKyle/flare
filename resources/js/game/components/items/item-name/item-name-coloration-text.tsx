@@ -35,10 +35,6 @@ export default class ItemNameColorationText extends React.Component<
             return "text-amber-600 dark:text-amber-500";
         }
 
-        if (item.is_mythic) {
-            return "text-amber-600 dark:text-amber-500";
-        }
-
         if (item.is_unique) {
             return "text-green-700 dark:text-green-600";
         }

@@ -86,6 +86,7 @@
         "rpg-awesome": "^0.2.0",
         "styled-components": "^6.1.8",
         "tailwindcss-classnames": "^3.0.2",
+        "ts-pattern": "^5.6.0",
         "tsyringe": "^4.8.0"
     },
     "type": "module"
