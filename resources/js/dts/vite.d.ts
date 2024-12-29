@@ -2,8 +2,7 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_BASE_URL: string;
-  // Add other environment variables here as needed
+  readonly VITE_BASE_IMAGE_URL: string;
 }
 
 interface ImportMeta {

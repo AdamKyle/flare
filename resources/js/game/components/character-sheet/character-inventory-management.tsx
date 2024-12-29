@@ -1,7 +1,9 @@
 import React, { ReactNode } from 'react';
 
+import InventorySection from './partials/character-inventory/inventory-section';
+
 const CharacterInventoryManagement = (): ReactNode => {
-  return <p>Character Inventory Here ...</p>;
+  return <InventorySection />;
 };
 
 export default CharacterInventoryManagement;
