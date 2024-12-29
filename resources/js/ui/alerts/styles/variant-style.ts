@@ -6,20 +6,21 @@ export const variantStyle = (variant: AlertVariant) => {
   return match(variant)
     .with(
       AlertVariant.INFO,
-      () => 'border-danube-400 dark:border-danube-500 bg-danube-100'
+      () => 'border-danube-400 dark:border-danube-500 dark:bg-danube-700'
     )
     .with(
       AlertVariant.SUCCESS,
-      () => 'border-emerald-400 dark:border-emerald-400 bg-emerald-100'
+      () =>
+        'border-emerald-400 dark:border-emerald-400 bg-emerald-100 dark:bg-emerald-700'
     )
     .with(
       AlertVariant.DANGER,
-      () => 'border-rose-400 dark:border-rose-500 bg-rose-100'
+      () => 'border-rose-400 dark:border-rose-500 bg-rose-100 dark:bg-rose:700'
     )
     .with(
       AlertVariant.WARNING,
       () =>
-        'border-mango-tango-400 dark:border-mango-tango-500 bg-mango-tango-100'
+        'border-mango-tango-400 dark:border-mango-tango-500 bg-mango-tango-100 dark:bg-mango-tango-700'
     )
     .otherwise(() => '');
 };

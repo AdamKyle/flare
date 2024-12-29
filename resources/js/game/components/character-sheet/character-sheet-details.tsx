@@ -1,10 +1,14 @@
 import React, { ReactNode } from 'react';
 
+import CharacterSheetDetailsProps from './types/character-sheet-details-props';
+
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Separator from 'ui/seperatror/separator';
 
-const CharacterSheetDetails = (): ReactNode => {
+const CharacterSheetDetails = (
+  props: CharacterSheetDetailsProps
+): ReactNode => {
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -72,6 +76,12 @@ const CharacterSheetDetails = (): ReactNode => {
           </h3>
           <Separator />
 
+          <p className={'my-2 mb-2'}>
+            Resistances and reductions help against stronger enemies, to help
+            you quickly take them down. Specific enchantments will help raise
+            these.
+          </p>
+
           <dl>
             <dt>Spell Evasion:</dt>
             <dd>75%</dd>
@@ -115,6 +125,11 @@ const CharacterSheetDetails = (): ReactNode => {
           </h3>
           <Separator />
 
+          <p className={'my-2 mb-2'}>
+            Gems boost elemental power, aiding in battles against stronger
+            enemies, including raid bosses and weekly events.
+          </p>
+
           <dl>
             <dt>Fire:</dt>
             <dd>75%</dd>
@@ -137,7 +152,7 @@ const CharacterSheetDetails = (): ReactNode => {
         <div>
           <div>
             <Button
-              on_click={() => {}}
+              on_click={() => props.openCharacterInventory()}
               label={'Manage Inventory'}
               variant={ButtonVariant.PRIMARY}
               additional_css={'w-full my-2'}
@@ -145,7 +160,7 @@ const CharacterSheetDetails = (): ReactNode => {
           </div>
           <div>
             <Button
-              on_click={() => {}}
+              on_click={() => props.openReincarnationSystem()}
               label={'Manage Reincarnation'}
               variant={ButtonVariant.SUCCESS}
               additional_css={'w-full my-2'}
@@ -154,7 +169,7 @@ const CharacterSheetDetails = (): ReactNode => {
 
           <div>
             <Button
-              on_click={() => {}}
+              on_click={() => props.openClassRanksSystem()}
               label={'Manage Class Ranks'}
               variant={ButtonVariant.SUCCESS}
               additional_css={'w-full my-2'}

@@ -1,8 +1,8 @@
 import { useEventSystem } from 'event-system/hooks/use-event-system';
 import { useState, useEffect } from 'react';
 
-import { CharacterSheet } from '../event-types/character-sheet';
 import UseCharacterSheetVisibilityState from './types/use-character-sheet-visibility-state';
+import { CharacterSheet } from '../character-sheet/event-types/character-sheet';
 
 export const useCharacterSheetVisibility =
   (): UseCharacterSheetVisibilityState => {

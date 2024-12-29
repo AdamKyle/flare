@@ -1,14 +1,14 @@
 import { useEventSystem } from 'event-system/hooks/use-event-system';
 
-import { CharacterSheet } from '../event-types/character-sheet';
 import UseCharacterSheetVisibilityDefinition from './definitions/use-character-sheet-visibility-definition';
 import { ActionCardEvents } from '../actions/partials/floating-cards/event-types/action-cards';
+import { CharacterSheet } from '../character-sheet/event-types/character-sheet';
 
 export const useManageCharacterSheetVisibility =
   (): UseCharacterSheetVisibilityDefinition => {
     const eventSystem = useEventSystem();
 
-    const closeCharacterSheetEmitter = eventSystem.isEventRegistered(
+    const manageCharacterSheetEmitter = eventSystem.isEventRegistered(
       CharacterSheet.OPEN_CHARACTER_SHEET
     )
       ? eventSystem.getEventEmitter<{ [key: string]: boolean }>(
@@ -33,14 +33,14 @@ export const useManageCharacterSheetVisibility =
       closeChatCardEvent.emit(ActionCardEvents.OPEN_CHAT_CARD, false);
       closeCharacterCardEvent.emit(ActionCardEvents.OPEN_CHARACTER_CARD, false);
 
-      closeCharacterSheetEmitter.emit(
+      manageCharacterSheetEmitter.emit(
         CharacterSheet.OPEN_CHARACTER_SHEET,
         true
       );
     };
 
     const closeCharacterSheet = () => {
-      closeCharacterSheetEmitter.emit(
+      manageCharacterSheetEmitter.emit(
         CharacterSheet.OPEN_CHARACTER_SHEET,
         false
       );
