@@ -1,6 +1,8 @@
 import React, { ReactNode } from 'react';
 import { match } from 'ts-pattern';
 
+import { ApiUrls } from './api/enums/api-urls';
+import { useCharacterSheetApi } from './api/hooks/use-character-sheet-api';
 import CharacterClassRanks from './character-class-ranks';
 import CharacterInventoryManagement from './character-inventory-management';
 import CharacterReincarnation from './character-reincarnation';
@@ -11,7 +13,10 @@ import { useManageReincarnationVisibility } from './hooks/use-manage-reincarnati
 import { CharacterSheetContainerVisibilityType } from './types/character-sheet-container-visibility-type';
 import CharacterSheetProps from './types/character-sheet-props';
 
+import { Alert } from 'ui/alerts/alert';
+import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Container from 'ui/container/container';
+import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
   const { showReincarnation, openReincarnation, closeReincarnation } =
@@ -20,6 +25,21 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
     useManageClassRanksVisibility();
   const { showInventory, openInventory, closeInventory } =
     useManageCharacterInventoryVisibility();
+
+  const { data, error, loading } = useCharacterSheetApi({
+    url: ApiUrls.CHARACTER_SHEET,
+    urlParams: { character: 1 },
+  });
+
+  if (loading) {
+    return <InfiniteLoader />;
+  }
+
+  if (error) {
+    return <Alert variant={AlertVariant.DANGER}>{error.message}</Alert>;
+  }
+
+  console.log(data);
 
   const renderCharacterSheetScreen = (): ReactNode => {
     return match({ showReincarnation, showClassRanks, showInventory })

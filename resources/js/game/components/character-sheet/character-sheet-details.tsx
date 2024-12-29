@@ -1,8 +1,10 @@
 import React, { ReactNode } from 'react';
 
 import CharacterSheetDetailsProps from './types/character-sheet-details-props';
+import XpBar from '../actions/components/character-details/xp-bar';
 
 import Button from 'ui/buttons/button';
+import ProgressButton from 'ui/buttons/button-progress';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Separator from 'ui/seperatror/separator';
 
@@ -11,7 +13,7 @@ const CharacterSheetDetails = (
 ): ReactNode => {
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div>
           <dl>
             <dt>Character Name:</dt>
@@ -39,7 +41,7 @@ const CharacterSheetDetails = (
         <div>
           <dl>
             <dt>Level:</dt>
-            <dd>1,000</dd>
+            <dd>1,000 / 5,000</dd>
             <dt>Health:</dt>
             <dd>2,000</dd>
             <dt>Total Attack:</dt>
@@ -50,9 +52,23 @@ const CharacterSheetDetails = (
             <dd>500</dd>
           </dl>
         </div>
+
+        <div>
+          <dl>
+            <dt>To Hit Stat:</dt>
+            <dd>Dex</dd>
+            <dt>Class Bonus:</dt>
+            <dd>50%</dd>
+          </dl>
+        </div>
       </div>
       <Separator />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className={'w-full lg:w-1/2 lg:mx-auto lg:my-4'}>
+        <XpBar current_xp={1000} max_xp={10000} />
+      </div>
+
+      <Separator />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div>
           <dl>
             <dt>Raw STR:</dt>
@@ -151,9 +167,10 @@ const CharacterSheetDetails = (
         </div>
         <div>
           <div>
-            <Button
-              on_click={() => props.openCharacterInventory()}
-              label={'Manage Inventory'}
+            <ProgressButton
+              progress={10}
+              on_click={props.openCharacterInventory}
+              label={'Manage Inventory (56/75)'}
               variant={ButtonVariant.PRIMARY}
               additional_css={'w-full my-2'}
             />

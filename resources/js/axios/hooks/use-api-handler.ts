@@ -1,9 +1,9 @@
 import { useContext } from 'react';
 
 import { ApiHandlerContext } from '../api-handler-context';
-import AxiosDefinition from '../definitions/axios-definition';
+import ApiHandleContextDefinition from '../definitions/api-handle-context-definition';
 
-export const useApiHandler = (): AxiosDefinition => {
+export const useApiHandler = (): ApiHandleContextDefinition => {
   const context = useContext(ApiHandlerContext);
 
   if (!context) {

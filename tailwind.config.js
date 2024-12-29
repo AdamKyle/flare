@@ -216,7 +216,14 @@ export default {
                 "9/16": "56.25%",
             },
             animation: {
-                "spin-slow": "spin 3s linear infinite",
+                progress: 'progress 1s infinite linear',
+            },
+            keyframes: {
+                progress: {
+                    '0%': {transform: 'translateX(0) scaleX(0)'},
+                    '40%': {transform: 'translateX(0) scaleX(0.4)'},
+                    '100%': {transform: 'translateX(100%) scaleX(0.5)'},
+                },
             },
             typography: (theme) => ({
                 default: {

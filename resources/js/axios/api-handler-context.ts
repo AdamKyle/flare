@@ -1,5 +1,6 @@
 import { createContext } from 'react';
 
-import AxiosDefinition from './definitions/axios-definition';
+import ApiHandleContextDefinition from './definitions/api-handle-context-definition';
 
-export const ApiHandlerContext = createContext<AxiosDefinition | null>(null);
+export const ApiHandlerContext =
+  createContext<ApiHandleContextDefinition | null>(null);
