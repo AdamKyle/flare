@@ -1,10 +1,12 @@
 import { eventServiceContainer } from 'event-system/event-service-container';
 
-import { ModularContainerDeffintion } from './deffinitions/modular-container-deffintion';
+import { ModularContainerDefinition } from './deffinitions/modular-container-definition';
+import { axiosServiceContainer } from '../axios/axios-service-container';
 
 /**
  * Register service containers here.
  */
-export const serviceContainers: ModularContainerDeffintion[] = [
+export const serviceContainers: ModularContainerDefinition[] = [
   eventServiceContainer,
+  axiosServiceContainer,
 ];
