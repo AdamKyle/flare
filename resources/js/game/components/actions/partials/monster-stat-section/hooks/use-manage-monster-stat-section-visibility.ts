@@ -9,14 +9,14 @@ export const useManageMonsterStatSectionVisibility =
   (): UseManageMonsterStatSectionVisibilityDefinition => {
     const eventSystem = useEventSystem();
 
-    const closeStatsSectionEmitter = eventSystem.isEventRegistered(
-      MonsterStatsEvents.CLOSE_MONSTER_STATS
+    const manageStatSectionEmitter = eventSystem.isEventRegistered(
+      MonsterStatsEvents.OPEN_MONSTER_STATS
     )
       ? eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-          MonsterStatsEvents.CLOSE_MONSTER_STATS
+          MonsterStatsEvents.OPEN_MONSTER_STATS
         )
       : eventSystem.registerEvent<{ [key: string]: boolean }>(
-          MonsterStatsEvents.CLOSE_MONSTER_STATS
+          MonsterStatsEvents.OPEN_MONSTER_STATS
         );
 
     const [showMonsterStatsSection, setShowMonsterStatsSection] =
@@ -25,30 +25,37 @@ export const useManageMonsterStatSectionVisibility =
       >(false);
 
     useEffect(() => {
-      const closeCardListener = () => setShowMonsterStatsSection(false);
+      const closeCardListener = (visible: boolean) =>
+        setShowMonsterStatsSection(visible);
 
-      closeStatsSectionEmitter.on(
-        MonsterStatsEvents.CLOSE_MONSTER_STATS,
+      manageStatSectionEmitter.on(
+        MonsterStatsEvents.OPEN_MONSTER_STATS,
         closeCardListener
       );
 
       return () => {
-        closeStatsSectionEmitter.off(
-          MonsterStatsEvents.CLOSE_MONSTER_STATS,
+        manageStatSectionEmitter.off(
+          MonsterStatsEvents.OPEN_MONSTER_STATS,
           closeCardListener
         );
       };
-    }, [closeStatsSectionEmitter]);
+    }, [manageStatSectionEmitter]);
 
     const showMonsterStats = () => {
       const closeStatsSectionEvent = eventSystem.getEventEmitter<{
         [key: string]: boolean;
-      }>(MonsterStatsEvents.CLOSE_MONSTER_STATS);
+      }>(MonsterStatsEvents.OPEN_MONSTER_STATS);
 
-      closeStatsSectionEvent.emit(MonsterStatsEvents.CLOSE_MONSTER_STATS, true);
-
-      setShowMonsterStatsSection(true);
+      closeStatsSectionEvent.emit(MonsterStatsEvents.OPEN_MONSTER_STATS, true);
     };
 
-    return { showMonsterStatsSection, showMonsterStats };
+    const closeMonsterStats = () => {
+      const closeStatsSectionEvent = eventSystem.getEventEmitter<{
+        [key: string]: boolean;
+      }>(MonsterStatsEvents.OPEN_MONSTER_STATS);
+
+      closeStatsSectionEvent.emit(MonsterStatsEvents.OPEN_MONSTER_STATS, false);
+    };
+
+    return { showMonsterStatsSection, closeMonsterStats, showMonsterStats };
   };

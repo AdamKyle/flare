@@ -1,36 +1,20 @@
-import { useEventSystem } from 'event-system/hooks/use-event-system';
 import React, { ReactNode } from 'react';
 
-import { MonsterStatsEvents } from './event-types/monster-stats';
+import { useManageMonsterStatSectionVisibility } from './hooks/use-manage-monster-stat-section-visibility';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
-import Button from 'ui/buttons/button';
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Container from 'ui/container/container';
 import Separator from 'ui/seperatror/separator';
 
 export const MonsterStatSection = (): ReactNode => {
-  const eventSystem = useEventSystem();
-
-  const handleCloseStats = () => {
-    const event = eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-      MonsterStatsEvents.CLOSE_MONSTER_STATS
-    );
-
-    event.emit(MonsterStatsEvents.CLOSE_MONSTER_STATS, true);
-  };
+  const { closeMonsterStats } = useManageMonsterStatSectionVisibility();
 
   return (
-    <Container>
-      <div className="flex justify-end mb-4">
-        <Button
-          on_click={handleCloseStats}
-          label="Close"
-          variant={ButtonVariant.DANGER}
-        />
-      </div>
-
+    <Container
+      manageSectionVisibility={closeMonsterStats}
+      title={'Monster Name'}
+    >
       <div role="region" aria-labelledby="celestial-info" className="mb-6">
         <h2 id="celestial-info" className="sr-only">
           Celestial Creature Information

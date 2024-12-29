@@ -1,3 +1,3 @@
 export enum MonsterStatsEvents {
-  CLOSE_MONSTER_STATS = 'close_monster_stats',
+  OPEN_MONSTER_STATS = 'openmonster_stats',
 }
