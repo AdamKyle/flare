@@ -1,5 +1,5 @@
-import EventEmitterDeffintion from './event-emitter-deffinition';
-import EventMapDeffinition from './event-map-deffinition';
+import EventEmitterDefinition from './event-emitter-deffinition';
+import EventMapDefinition from './event-map-definition';
 
 export default interface EventSystemDefinition {
   /**
@@ -7,9 +7,9 @@ export default interface EventSystemDefinition {
    *
    * @param name
    */
-  registerEvent<T extends EventMapDeffinition>(
+  registerEvent<T extends EventMapDefinition>(
     name: string
-  ): EventEmitterDeffintion<T>;
+  ): EventEmitterDefinition<T>;
 
   /**
    * Is the event already registered?
@@ -23,7 +23,7 @@ export default interface EventSystemDefinition {
    *
    * @param name
    */
-  getEventEmitter<T extends EventMapDeffinition>(
+  getEventEmitter<T extends EventMapDefinition>(
     name: string
-  ): EventEmitterDeffintion<T>;
+  ): EventEmitterDefinition<T>;
 }

@@ -1,8 +1,8 @@
-import EventEmitterDeffintion from './deffintions/event-emitter-deffinition';
-import EventMapDeffinition from './deffintions/event-map-deffinition';
+import EventEmitterDefinition from './deffintions/event-emitter-deffinition';
+import EventMapDefinition from './deffintions/event-map-definition';
 
-export default class EventEmitter<T extends EventMapDeffinition>
-  implements EventEmitterDeffintion<T>
+export default class EventEmitter<T extends EventMapDefinition>
+  implements EventEmitterDefinition<T>
 {
   private listeners: {
     [K in keyof T]?: Array<(data: T[K]) => void>;
@@ -14,6 +14,8 @@ export default class EventEmitter<T extends EventMapDeffinition>
     }
 
     this.listeners[eventType].push(listener);
+
+    console.log('listeners', this.listeners);
   }
 
   emit<K extends keyof T>(eventType: K, data: T[K]): void {
@@ -27,6 +29,8 @@ export default class EventEmitter<T extends EventMapDeffinition>
   off<K extends keyof T>(eventType: K, listener: (data: T[K]) => void): void {
     const eventListeners = this.listeners[eventType];
 
-    eventListeners?.filter((l) => l !== listener);
+    if (eventListeners) {
+      this.listeners[eventType] = eventListeners.filter((l) => l !== listener);
+    }
   }
 }

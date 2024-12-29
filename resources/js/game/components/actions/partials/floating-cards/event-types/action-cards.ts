@@ -1,5 +1,5 @@
 export enum ActionCardEvents {
-  CLOSE_CHARACTER_CARD = 'close_character_card',
-  CLOSE_CRATING_CARD = 'close_crafting_card',
-  CLOSE_CHAT_CARD = 'close_chat_card',
+  OPEN_CHARACTER_CARD = 'open_character_card',
+  OPEN_CRATING_CARD = 'open_crafting_card',
+  OPEN_CHAT_CARD = 'open_chat_card',
 }

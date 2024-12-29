@@ -1,28 +1,16 @@
-import EventSystemDefinition from 'event-system/deffintions/event-system-definition';
 import React, { ReactNode } from 'react';
 
 import CharacterCardDetails from './character-card-details';
+import { useManageCharacterCardVisibility } from './hooks/use-manage-character-card-visibility';
 import FloatingCard from '../../../components/icon-section/floating-card';
-import { ActionCardEvents } from '../event-types/action-cards';
-
-import { serviceContainer } from 'service-container/core-container';
 
 const CharacterCard = (): ReactNode => {
-  const eventSystem =
-    serviceContainer().fetch<EventSystemDefinition>('EventSystem');
-
-  const handleCloseCard = () => {
-    const event = eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-      ActionCardEvents.CLOSE_CHARACTER_CARD
-    );
-
-    event.emit(ActionCardEvents.CLOSE_CHARACTER_CARD, true);
-  };
+  const { closeCharacterChard } = useManageCharacterCardVisibility();
 
   return (
     <FloatingCard
       title="Character Name (Lvl: 5,000)"
-      close_action={handleCloseCard}
+      close_action={closeCharacterChard}
     >
       <CharacterCardDetails />
     </FloatingCard>

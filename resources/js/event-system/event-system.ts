@@ -1,41 +1,41 @@
 import { singleton } from 'tsyringe';
 
-import EventEmitterDeffintion from './deffintions/event-emitter-deffinition';
-import EventMapDeffinition from './deffintions/event-map-deffinition';
+import EventEmitterDefinition from './deffintions/event-emitter-deffinition';
+import EventMapDefinition from './deffintions/event-map-definition';
 import EventSystemDefinition from './deffintions/event-system-definition';
 import EventEmitter from './event-emitter';
 
 @singleton()
 export default class EventSystem implements EventSystemDefinition {
   private emitters: {
-    [key: string]: EventEmitterDeffintion<EventMapDeffinition>;
+    [key: string]: EventEmitterDefinition<EventMapDefinition>;
   } = {};
 
   isEventRegistered(name: string): boolean {
     return !!this.emitters[name];
   }
 
-  registerEvent<T extends EventMapDeffinition>(
+  registerEvent<T extends EventMapDefinition>(
     name: string
-  ): EventEmitterDeffintion<T> {
+  ): EventEmitterDefinition<T> {
     if (this.emitters[name]) {
       throw new Error(`Emitter name: ${name} is already registered.`);
     }
 
-    const emitter = new EventEmitter<T>() as EventEmitterDeffintion<T>;
+    const emitter = new EventEmitter<T>() as EventEmitterDefinition<T>;
     this.emitters[name] = emitter;
 
     return emitter;
   }
-  getEventEmitter<T extends EventMapDeffinition>(
+  getEventEmitter<T extends EventMapDefinition>(
     name: string
-  ): EventEmitterDeffintion<T> {
+  ): EventEmitterDefinition<T> {
     const emitter = this.emitters[name];
 
     if (!emitter) {
       throw new Error(`${name} is not registered.`);
     }
 
-    return emitter as EventEmitterDeffintion<T>;
+    return emitter as EventEmitterDefinition<T>;
   }
 }

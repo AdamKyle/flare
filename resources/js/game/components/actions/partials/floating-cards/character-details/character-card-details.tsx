@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 
+import { useManageCharacterSheetVisibility } from '../../../../hooks/use-manage-character-sheet-visibility';
 import XpBar from '../../../components/character-details/xp-bar';
 
 import Button from 'ui/buttons/button';
@@ -7,6 +8,8 @@ import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Separator from 'ui/seperatror/separator';
 
 const CharacterCardDetails = (): ReactNode => {
+  const { openCharacterSheet } = useManageCharacterSheetVisibility();
+
   return (
     <>
       <XpBar current_xp={150} max_xp={1000} />
@@ -61,7 +64,9 @@ const CharacterCardDetails = (): ReactNode => {
       <Separator />
       <Button
         label="See More Details"
-        on_click={() => {}}
+        on_click={() => {
+          openCharacterSheet();
+        }}
         variant={ButtonVariant.PRIMARY}
         additional_css="w-full"
       />

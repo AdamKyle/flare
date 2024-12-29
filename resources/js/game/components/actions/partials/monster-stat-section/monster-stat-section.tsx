@@ -7,6 +7,7 @@ import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import Container from 'ui/container/container';
 import Separator from 'ui/seperatror/separator';
 
 export const MonsterStatSection = (): ReactNode => {
@@ -21,7 +22,7 @@ export const MonsterStatSection = (): ReactNode => {
   };
 
   return (
-    <div className="w-full mt-4 md:mt-0 md:w-2/3 md:mx-auto md:px-4 md:py-6">
+    <Container>
       <div className="flex justify-end mb-4">
         <Button
           on_click={handleCloseStats}
@@ -156,6 +157,6 @@ export const MonsterStatSection = (): ReactNode => {
           </dl>
         </div>
       </div>
-    </div>
+    </Container>
   );
 };

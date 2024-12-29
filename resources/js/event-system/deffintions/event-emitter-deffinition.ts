@@ -1,8 +1,8 @@
-import EventMapDeffinition from './event-map-deffinition';
+import EventMapDefinition from './event-map-definition';
 
-export default interface EventEmitterDeffintion<T extends EventMapDeffinition> {
+export default interface EventEmitterDefinition<T extends EventMapDefinition> {
   /**
-   * When an event is fired off for a spefific type for its listener.
+   * When an event is fired off for a specific type for its listener.
    *
    * @param eventType
    * @param listener

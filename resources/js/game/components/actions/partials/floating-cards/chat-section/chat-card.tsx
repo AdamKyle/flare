@@ -1,28 +1,16 @@
-import EventSystemDefinition from 'event-system/deffintions/event-system-definition';
 import React, { ReactNode } from 'react';
 
+import { useManageChatCardVisibility } from './hooks/use-manage-chat-card-visibility';
 import FloatingCard from '../../../components/icon-section/floating-card';
-import { ActionCardEvents } from '../event-types/action-cards';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 
-import { serviceContainer } from 'service-container/core-container';
-
 const ChatCard = (): ReactNode => {
-  const eventSystem =
-    serviceContainer().fetch<EventSystemDefinition>('EventSystem');
-
-  const handleCloseCard = () => {
-    const event = eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-      ActionCardEvents.CLOSE_CHAT_CARD
-    );
-
-    event.emit(ActionCardEvents.CLOSE_CHAT_CARD, true);
-  };
+  const { closeChatCard } = useManageChatCardVisibility();
 
   return (
-    <FloatingCard title="Chat" close_action={handleCloseCard}>
+    <FloatingCard title="Chat" close_action={closeChatCard}>
       <div className="flex items-center mb-2">
         <Button
           label="Send"
@@ -56,7 +44,7 @@ const ChatCard = (): ReactNode => {
             bread wafted from the local bakery, mingling with the scent of
             blooming flowers. As the stars began to twinkle, a gentle breeze
             carried the promise of a peaceful night, inviting all to pause and
-            reflect on the beauty surrounding them.
+            reflect on the beauty surrounding them.resources/
           </li>
           <li>
             <span className="underline font-bold">
