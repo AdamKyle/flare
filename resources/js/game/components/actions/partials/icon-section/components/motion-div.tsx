@@ -27,7 +27,7 @@ export const MotionDiv = (props: MotionDevProps): ReactNode => {
         position: 'absolute',
         top: window.innerWidth <= 900 ? '4rem' : '-25px',
         left: motionLeftPositionHelper(),
-        zIndex: 10,
+        zIndex: 20,
       }}
     >
       {props.children}

@@ -15,6 +15,7 @@ import CharacterSheetProps from './types/character-sheet-props';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
+import Card from 'ui/cards/card';
 import Container from 'ui/container/container';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
@@ -77,7 +78,7 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
       manageSectionVisibility={renderManageSectionVisibility()}
       title={renderTitle()}
     >
-      {renderCharacterSheetScreen()}
+      <Card>{renderCharacterSheetScreen()}</Card>
     </Container>
   );
 };

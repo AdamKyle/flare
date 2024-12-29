@@ -1,10 +1,10 @@
 import React, { ReactNode } from 'react';
 
-import { IconSection } from '../icon-section/icon-section';
 import MonsterSection from '../monster-section/monster-section';
 import { useManageMonsterStatSectionVisibility } from '../monster-stat-section/hooks/use-manage-monster-stat-section-visibility';
 import { MonsterStatSection } from '../monster-stat-section/monster-stat-section';
 import { useScrollIconMenu } from './hooks/use-scroll-icon-menu';
+import NavigationActionsComponent from './navigation-actions';
 
 import Card from 'ui/cards/card';
 
@@ -18,22 +18,9 @@ const Actions = (): ReactNode => {
     <Card>
       <div className="w-full flex flex-col lg:flex-row">
         <div className="relative">
-          {isMobile ? (
-            <div>
-              <IconSection />
-            </div>
-          ) : (
-            <div
-              style={{
-                position: 'absolute',
-                top: `${scrollY + 10}px`,
-                left: '10px',
-                transition: 'top 0.2s',
-              }}
-            >
-              <IconSection />
-            </div>
-          )}
+          {!showMonsterStatsSection ? (
+            <NavigationActionsComponent scrollY={scrollY} isMobile={isMobile} />
+          ) : null}
         </div>
         <div className="flex flex-col items-center lg:items-start w-full">
           {showMonsterStatsSection ? (

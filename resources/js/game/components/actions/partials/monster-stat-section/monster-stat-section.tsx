@@ -30,7 +30,7 @@ export const MonsterStatSection = (): ReactNode => {
         </Alert>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
         <div>
           <dl>
             <dt className="font-semibold">Monster Name:</dt>

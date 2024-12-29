@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import UseScrollIconMenuDefinition from './definitions/use-scroll-icon-menu-definition';
-import UseScrollIconMenuState from './types/use-scroll-icon-menu-state';
+import UseScrollIconMenuDefinition from '../definitions/use-scroll-icon-menu-definition';
+import UseScrollIconMenuState from '../types/use-scroll-icon-menu-state';
 
 export const useScrollIconMenu = (): UseScrollIconMenuDefinition => {
   const [scrollY, setScrollY] = useState<UseScrollIconMenuState['scrollY']>(0);
@@ -13,7 +13,9 @@ export const useScrollIconMenu = (): UseScrollIconMenuDefinition => {
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
 
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+
+    console.log('window inner width', window.innerWidth);
 
     checkMobile();
     window.addEventListener('resize', checkMobile);
