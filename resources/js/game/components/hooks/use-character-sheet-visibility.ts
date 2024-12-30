@@ -6,9 +6,10 @@ import { CharacterSheet } from '../character-sheet/event-types/character-sheet';
 
 export const useCharacterSheetVisibility =
   (): UseCharacterSheetVisibilityState => {
+    const eventSystem = useEventSystem();
+
     const [showCharacterSheet, setShowCharacterSheet] =
       useState<UseCharacterSheetVisibilityState['showCharacterSheet']>(false);
-    const eventSystem = useEventSystem();
 
     const characterSheetVisibility = eventSystem.getEventEmitter<{
       [key: string]: boolean;

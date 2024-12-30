@@ -15,8 +15,6 @@ export const useScrollIconMenu = (): UseScrollIconMenuDefinition => {
 
     const checkMobile = () => setIsMobile(window.innerWidth < 1024);
 
-    console.log('window inner width', window.innerWidth);
-
     checkMobile();
     window.addEventListener('resize', checkMobile);
 

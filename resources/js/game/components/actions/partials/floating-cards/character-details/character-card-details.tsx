@@ -1,14 +1,17 @@
 import React, { ReactNode } from 'react';
 
+import { useManageCharacterInventoryVisibility } from './hooks/use-manage-character-inventory-visibility';
 import { useManageCharacterSheetVisibility } from '../../../../hooks/use-manage-character-sheet-visibility';
 import XpBar from '../../../components/character-details/xp-bar';
 
 import Button from 'ui/buttons/button';
+import ProgressButton from 'ui/buttons/button-progress';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Separator from 'ui/seperatror/separator';
 
 const CharacterCardDetails = (): ReactNode => {
   const { openCharacterSheet } = useManageCharacterSheetVisibility();
+  const { openCharacterInventory } = useManageCharacterInventoryVisibility();
 
   return (
     <>
@@ -62,6 +65,13 @@ const CharacterCardDetails = (): ReactNode => {
         </dl>
       </div>
       <Separator />
+      <ProgressButton
+        progress={10}
+        on_click={() => openCharacterInventory()}
+        label="Manage Inventory (56/75)"
+        variant={ButtonVariant.SUCCESS}
+        additional_css="w-full my-2"
+      />
       <Button
         label="See More Details"
         on_click={() => {

@@ -152,9 +152,9 @@ export default {
                 DEFAULT: "1px 1px 5px 0 rgba(0, 0, 0, 0.16)",
             },
             screens: {
-                'sm': '0px',
+                'sm': '568px',
 
-                'md': '667px',
+                'md': '768px',
 
                 'lg': '1024px',
 
