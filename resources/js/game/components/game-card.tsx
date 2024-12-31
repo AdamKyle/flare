@@ -3,16 +3,15 @@ import React, { ReactNode } from 'react';
 import Actions from './actions/partials/actions/actions';
 import { useManageMonsterStatSectionVisibility } from './actions/partials/monster-stat-section/hooks/use-manage-monster-stat-section-visibility';
 import { MonsterStatSection } from './actions/partials/monster-stat-section/monster-stat-section';
-import CharacterInventoryManagement from './character-sheet/character-inventory-management';
 import CharacterSheet from './character-sheet/character-sheet';
+import { useAttackDetailsVisibility } from './character-sheet/hooks/use-attack-details-visibility';
 import GameLoader from './game-loader/game-loader';
 import { useCharacterInventoryVisibility } from './hooks/use-character-inventory-visibility';
 import { useCharacterSheetVisibility } from './hooks/use-character-sheet-visibility';
 import { useGameLoaderVisibility } from './hooks/use-game-loader-visibility';
 import { useManageCharacterSheetVisibility } from './hooks/use-manage-character-sheet-visibility';
-
-import Card from 'ui/cards/card';
-import ContainerWithTitle from 'ui/container/container-with-title';
+import CharacterAttackTypeBreakdown from './partials/character-attack-type-breakdown';
+import CharacterInventory from './partials/character-inventory';
 
 export const GameCard = (): ReactNode => {
   const { closeCharacterSheet } = useManageCharacterSheetVisibility();
@@ -22,6 +21,9 @@ export const GameCard = (): ReactNode => {
 
   const { showCharacterInventory, closeInventory } =
     useCharacterInventoryVisibility();
+
+  const { showAttackType, attackType, closeAttackDetails } =
+    useAttackDetailsVisibility();
 
   const { showCharacterSheet } = useCharacterSheetVisibility();
 
@@ -41,17 +43,17 @@ export const GameCard = (): ReactNode => {
     return <MonsterStatSection />;
   }
 
-  if (showCharacterInventory) {
+  if (showAttackType && attackType !== null) {
     return (
-      <ContainerWithTitle
-        manageSectionVisibility={closeInventory}
-        title={'Character Name Inventory'}
-      >
-        <Card>
-          <CharacterInventoryManagement />
-        </Card>
-      </ContainerWithTitle>
+      <CharacterAttackTypeBreakdown
+        close_attack_details={closeAttackDetails}
+        attack_type={attackType}
+      />
     );
+  }
+
+  if (showCharacterInventory) {
+    return <CharacterInventory close_inventory={closeInventory} />;
   }
 
   return <Actions showMonsterStats={showMonsterStats} />;

@@ -18,6 +18,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
     protected array $defaultIncludes = [
         'inventory_count',
         'resistance_info',
+        'reincarnation_info',
     ];
 
     public function setIgnoreReductions(bool $ignoreReductions): void
@@ -63,7 +64,6 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'agi_modded' => $characterStatBuilder->statMod('agi'),
             'focus_modded' => $characterStatBuilder->statMod('focus'),
             'attack' => $characterStatBuilder->buildTotalAttack(),
-            'healing' => $characterStatBuilder->buildHealing(),
             'health' => $characterStatBuilder->buildHealth(),
             'ac' => $characterStatBuilder->buildDefence(),
             'class_bonus_chance' => (new ClassAttackValue($character))->buildAttackData()['chance'],
@@ -74,6 +74,13 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'resurrection_chance' => $characterStatBuilder->buildResurrectionChance(),
             'spell_evasion' => $characterStatBuilder,
             'elemental_atonements' => $characterStatBuilder->buildElementalAtonement(),
+            'weapon_attack' => $characterStatBuilder->buildDamage('weapon'),
+            'voided_weapon_attack' => $characterStatBuilder->buildDamage('weapon', true),
+            'ring_damage' => $characterStatBuilder->buildDamage('ring'),
+            'spell_damage' => $characterStatBuilder->buildDamage('spell-damage'),
+            'voided_spell_damage' => $characterStatBuilder->buildDamage('spell-damage', true),
+            'healing_amount' => $characterStatBuilder->buildHealing(),
+            'voided_healing_amount' => $characterStatBuilder->buildHealing(true),
         ];
     }
 
@@ -84,5 +91,9 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
 
     public function includeResistanceInfo(Character $character) {
         return $this->item($character, new CharacterResistanceInfoTransformer);
+    }
+
+    public function includereincarnationInfo(Character $character) {
+        return $this->item($character, new CharacterReincarnationInfoTransformer);
     }
 }

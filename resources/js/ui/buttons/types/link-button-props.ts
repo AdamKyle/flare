@@ -1,7 +1,9 @@
+import { ReactNode } from 'react';
+
 import { ButtonVariant } from '../enums/button-variant-enum';
 
 export default interface LinkButtonProps {
-  label: string;
+  label: string | ReactNode;
   variant: ButtonVariant;
   on_click: () => void;
   aria_label?: string;

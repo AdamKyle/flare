@@ -1,3 +1,5 @@
+import { AttackTypes } from '../enums/attack-types';
+
 import CharacterSheetDefinition from 'game-data/api-data-definitions/character/character-sheet-definition';
 
 export default interface CharacterSheetDetailsProps {
@@ -5,4 +7,6 @@ export default interface CharacterSheetDetailsProps {
   openClassRanksSystem: () => void;
   openCharacterInventory: () => void;
   characterData: CharacterSheetDefinition;
+  showAttackType: boolean;
+  attackType: AttackTypes | null;
 }

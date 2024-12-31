@@ -16,7 +16,7 @@ const LinkButton = (props: LinkButtonProps): ReactNode => {
         props.additional_css
       )}
       disabled={props.disabled}
-      aria-label={props.aria_label || props.label}
+      aria-label={props.aria_label}
       role="button"
     >
       {props.label}

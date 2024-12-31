@@ -1,6 +1,7 @@
 import InventoryCountDefinition from './inventory-count-definition';
 
 import ElementalAtonementDefinition from 'game-data/api-data-definitions/character/elemental-atonement-definition';
+import ReincarnationInfoDefinition from 'game-data/api-data-definitions/character/reincarnation-info-definition';
 import ResistanceInfoDefinition from 'game-data/api-data-definitions/character/resistance-info-definition';
 
 export default interface CharacterSheetDefinition {
@@ -19,7 +20,6 @@ export default interface CharacterSheetDefinition {
   to_hit_stat: string;
   ac: number;
   attack: number;
-  healing: number;
   health: number;
   resurrection_chance: number;
   gold: number;
@@ -40,7 +40,15 @@ export default interface CharacterSheetDefinition {
   agi_modded: number;
   chr_modded: number;
   focus_modded: number;
+  weapon_attack: number;
+  voided_weapon_attack: number;
+  ring_damage: number;
+  spell_damage: number;
+  voided_spell_damage: number;
+  healing_amount: number;
+  voided_healing_amount: number;
   inventory_count: InventoryCountDefinition;
   resistance_info: ResistanceInfoDefinition;
   elemental_atonements: ElementalAtonementDefinition;
+  reincarnation_info: ReincarnationInfoDefinition;
 }

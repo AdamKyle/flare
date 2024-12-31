@@ -1,6 +1,13 @@
 import { capitalize } from 'lodash';
 import React, { ReactNode } from 'react';
+import { match } from 'ts-pattern';
 
+import { AttackTypes } from './enums/attack-types';
+import { useManageAttackDetailsBreakdown } from './hooks/use-manage-attack-details-breakdown';
+import Healing from './partials/character-attack-types/healing';
+import RingDamage from './partials/character-attack-types/ring-damage';
+import SpellDamage from './partials/character-attack-types/spell-damage';
+import WeaponDamage from './partials/character-attack-types/weapon-damage';
 import CharacterSheetDetailsProps from './types/character-sheet-details-props';
 import {
   formatNumberWithCommas,
@@ -8,20 +15,45 @@ import {
 } from '../../util/format-number';
 import XpBar from '../actions/components/character-details/xp-bar';
 
+import { Alert } from 'ui/alerts/alert';
+import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';
 import ProgressButton from 'ui/buttons/button-progress';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import LinkButton from 'ui/buttons/link-button';
 import Separator from 'ui/seperatror/separator';
 
 const CharacterSheetDetails = (
   props: CharacterSheetDetailsProps
 ): ReactNode => {
+  const { openAttackDetails } = useManageAttackDetailsBreakdown();
+
   const characterData = props.characterData;
 
   const characterInventorProgress =
     (characterData.inventory_count.inventory_count /
       characterData.inventory_count.inventory_max) *
     100;
+
+  const renderAttackDetailsType = (attackType: AttackTypes): ReactNode => {
+    return match(attackType)
+      .with(AttackTypes.WEAPON, () => <WeaponDamage />)
+      .with(AttackTypes.SPELL_DAMAGE, () => <SpellDamage />)
+      .with(AttackTypes.HEALING, () => <Healing />)
+      .with(AttackTypes.RING_DAMAGE, () => <RingDamage />)
+      .otherwise(() => (
+        <Alert variant={AlertVariant.DANGER}>
+          <p>
+            Invalid component returned. This is a bug. Please head to discord:
+            Top Right Profile icon, CLick discord and report this in #bugs.
+          </p>
+        </Alert>
+      ));
+  };
+
+  if (props.showAttackType && props.attackType !== null) {
+    return renderAttackDetailsType(props.attackType);
+  }
 
   return (
     <>
@@ -34,6 +66,11 @@ const CharacterSheetDetails = (
             <dd>{characterData.race}</dd>
             <dt className="font-bold">Class:</dt>
             <dd>{characterData.class}</dd>
+            <dt className="font-bold">Level:</dt>
+            <dd>
+              {formatNumberWithCommas(characterData.level)} /{' '}
+              {formatNumberWithCommas(characterData.max_level)}
+            </dd>
           </dl>
         </div>
         <div>
@@ -50,17 +87,48 @@ const CharacterSheetDetails = (
         </div>
         <div>
           <dl>
-            <dt className="font-bold">Level:</dt>
-            <dd>
-              {formatNumberWithCommas(characterData.level)} /{' '}
-              {formatNumberWithCommas(characterData.max_level)}
-            </dd>
             <dt className="font-bold">Health:</dt>
             <dd>{formatNumberWithCommas(characterData.health)}</dd>
-            <dt className="font-bold">Total Attack:</dt>
-            <dd>{formatNumberWithCommas(characterData.attack)}</dd>
-            <dt className="font-bold">Total Healing:</dt>
-            <dd>{formatNumberWithCommas(characterData.healing)}</dd>
+            <dt className="font-bold">
+              <LinkButton
+                label={'Weapon Damage:'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openAttackDetails(AttackTypes.WEAPON)}
+                aria_label={'Weapon Damage Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
+            <dd>{formatNumberWithCommas(characterData.weapon_attack)}</dd>
+            <dt className="font-bold">
+              <LinkButton
+                label={'Healing Amount:'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openAttackDetails(AttackTypes.HEALING)}
+                aria_label={'Healing Amount Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
+            <dd>{formatNumberWithCommas(characterData.healing_amount)}</dd>
+            <dt className="font-bold">
+              <LinkButton
+                label={'Spell Damage:'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openAttackDetails(AttackTypes.SPELL_DAMAGE)}
+                aria_label={'Spell Damage Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
+            <dd>{formatNumberWithCommas(characterData.spell_damage)}</dd>
+            <dt className="font-bold">
+              <LinkButton
+                label={'Ring Damage:'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openAttackDetails(AttackTypes.RING_DAMAGE)}
+                aria_label={'Ring Damage Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
+            <dd>{formatNumberWithCommas(characterData.ring_damage)}</dd>
             <dt className="font-bold">AC (Defence):</dt>
             <dd>{formatNumberWithCommas(characterData.ac)}</dd>
           </dl>

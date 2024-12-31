@@ -3,4 +3,5 @@ export enum CharacterSheet {
   OPEN_REINCARNATION_SYSTEM = 'open_reincarnation_system',
   OPEN_CLASS_RANKS_SYSTEM = 'open_class_ranks_system',
   OPEN_INVENTORY_SECTION = 'open_inventory_section',
+  OPEN_ATTACK_DETAILS = 'open_attack_details',
 }

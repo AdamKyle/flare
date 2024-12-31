@@ -16,7 +16,7 @@ const GameDataProvider = (props: GameDataProviderProps): React.ReactNode => {
       setCharacterId(parseInt(characterIdContent, 10) || 0);
     }
   }, []);
-  console.log(characterId);
+
   return (
     <GameDataContext.Provider value={{ gameData, setGameData, characterId }}>
       {props.children}

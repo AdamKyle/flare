@@ -8,9 +8,6 @@ use App\Flare\Models\CharacterBoon;
 use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\User;
-use App\Flare\Transformers\CharacterElementalAtonementTransformer;
-use App\Flare\Transformers\CharacterReincarnationInfoTransformer;
-use App\Flare\Transformers\CharacterResistanceInfoTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\CharacterStatDetailsTransformer;
 use App\Flare\Transformers\SkillsTransformer;
@@ -19,7 +16,6 @@ use App\Game\Character\Builders\StatDetailsBuilder\StatModifierDetails;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Game\Core\Events\GlobalTimeOut;
 use App\Game\Core\Jobs\EndGlobalTimeOut;
-use App\Game\Core\Requests\SpecificDetailsRequest;
 use App\Game\Core\Requests\StatDetailsRequest;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\Events\Values\EventType;
@@ -49,16 +45,6 @@ class CharacterSheetController extends Controller
         return response()->json($sheet);
     }
 
-    public function baseCharacterInformation(Character $character, CharacterSheetBaseInfoTransformer $characterBaseInfo)
-    {
-        $character = new Item($character, $characterBaseInfo);
-        $details = $this->manager->createData($character)->toArray();
-
-        return response()->json([
-            'base_info' => $details,
-        ], 200);
-    }
-
     public function statDetails(Character $character, CharacterStatDetailsTransformer $characterStatDetailsTransformer)
     {
         $character = new Item($character, $characterStatDetailsTransformer);
@@ -69,48 +55,9 @@ class CharacterSheetController extends Controller
         ], 200);
     }
 
-    public function resistanceInfo(Character $character, CharacterResistanceInfoTransformer $characterResistanceInfoTransformer)
-    {
-        $character = new Item($character, $characterResistanceInfoTransformer);
-        $details = $this->manager->createData($character)->toArray();
-
-        return response()->json([
-            'resistance_info' => $details,
-        ], 200);
-    }
-
-    public function reincarnationInfo(Character $character, CharacterReincarnationInfoTransformer $characterReincarnationInfoTransformer)
-    {
-        $character = new Item($character, $characterReincarnationInfoTransformer);
-        $details = $this->manager->createData($character)->toArray();
-
-        return response()->json([
-            'reincarnation_details' => $details,
-        ], 200);
-    }
-
-    public function elementalAtonementInfo(Character $character, CharacterElementalAtonementTransformer $characterElementalAtonementTransformer)
-    {
-        $character = new Item($character, $characterElementalAtonementTransformer);
-        $details = $this->manager->createData($character)->toArray();
-
-        return response()->json([
-            'elemental_atonement_details' => $details,
-        ], 200);
-    }
-
     public function statBreakDown(StatDetailsRequest $request, Character $character)
     {
         $breakDownDetails = $this->statModifierDetails->setCharacter($character)->forStat($request->stat_type);
-
-        return response()->json([
-            'break_down' => $breakDownDetails,
-        ]);
-    }
-
-    public function specificStatBreakDown(SpecificDetailsRequest $request, Character $character)
-    {
-        $breakDownDetails = $this->statModifierDetails->setCharacter($character)->buildSpecificBreakDown($request->type, $request->is_voided);
 
         return response()->json([
             'break_down' => $breakDownDetails,
