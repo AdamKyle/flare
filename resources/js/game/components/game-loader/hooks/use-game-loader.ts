@@ -7,18 +7,22 @@ import { GameLoaderApiUrls } from '../api/enums/game-loader-api-urls';
 import { useCharacterSheetApi } from '../api/hooks/use-character-sheet-api';
 import { useMonsterApi } from '../api/hooks/use-monster-api';
 
+import { useGameData } from 'game-data/hooks/use-game-data';
+
 export const useGameLoader = (): UseGameLoaderDefinition => {
+  const { characterId } = useGameData();
+
   const { fetchCharacterData } = useCharacterSheetApi({
     url: GameLoaderApiUrls.CHARACTER_SHEET,
     urlParams: {
-      character: 1,
+      character: characterId,
     },
   });
 
   const { fetchMonstersData } = useMonsterApi({
     url: GameLoaderApiUrls.MONSTERS,
     urlParams: {
-      character: 1,
+      character: characterId,
     },
   });
 
@@ -37,10 +41,10 @@ export const useGameLoader = (): UseGameLoaderDefinition => {
     ]);
 
   useEffect(() => {
-    if (loading) {
+    if (characterId !== 0 && loading) {
       executeBatchApiCalls();
     }
-  }, [executeBatchApiCalls, loading]);
+  }, [executeBatchApiCalls, loading, characterId]);
 
   return {
     loading,
