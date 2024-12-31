@@ -1,9 +1,9 @@
 import { useEventSystem } from 'event-system/hooks/use-event-system';
 import { useEffect, useState } from 'react';
 
-import useManageClassRanksVisibilityDefinition from '../definitions/use-manage-class-ranks-visibility-definition';
+import useManageClassRanksVisibilityDefinition from './definitions/use-manage-class-ranks-visibility-definition';
 import { CharacterSheet } from '../event-types/character-sheet';
-import UseManageClassRanksVisibilityState from '../types/use-manage-class-ranks-visibility-state';
+import UseManageClassRanksVisibilityState from './types/use-manage-class-ranks-visibility-state';
 
 export const useManageClassRanksVisibility =
   (): useManageClassRanksVisibilityDefinition => {

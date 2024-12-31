@@ -25,6 +25,9 @@ export default [
             'import/resolver': {
                 alias: {
                     map: [
+                        ['event-system', './resources/js/even-system'],
+                        ['axios', './resources/js/api-handler'],
+                        ['game-data', './resources/js/game-data'],
                         ['components', './resources/js/components'],
                         ['ui', './resources/js/ui'],
                         ['service-container', './resources/js/service-container'],
@@ -70,7 +73,17 @@ export default [
                             position: "before",
                         },
                         {
+                            pattern: "api-handler/**",
+                            group: "internal",
+                            position: "after",
+                        },
+                        {
                             pattern: "event-system/**",
+                            group: "internal",
+                            position: "after",
+                        },
+                        {
+                            pattern: "game-data/**",
                             group: "internal",
                             position: "after",
                         },

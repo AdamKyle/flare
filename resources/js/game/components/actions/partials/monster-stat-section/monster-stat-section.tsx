@@ -5,14 +5,14 @@ import { useManageMonsterStatSectionVisibility } from './hooks/use-manage-monste
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Card from 'ui/cards/card';
-import Container from 'ui/container/container';
+import ContainerWithTitle from 'ui/container/container-with-title';
 import Separator from 'ui/seperatror/separator';
 
 export const MonsterStatSection = (): ReactNode => {
   const { closeMonsterStats } = useManageMonsterStatSectionVisibility();
 
   return (
-    <Container
+    <ContainerWithTitle
       manageSectionVisibility={closeMonsterStats}
       title={'Monster Name'}
     >
@@ -149,6 +149,6 @@ export const MonsterStatSection = (): ReactNode => {
           </div>
         </div>
       </Card>
-    </Container>
+    </ContainerWithTitle>
   );
 };

@@ -1,9 +1,9 @@
 import { useEventSystem } from 'event-system/hooks/use-event-system';
 import { useEffect, useState } from 'react';
 
-import useManageCharacterInventoryVisibilityDefinition from '../definitions/use-manage-character-inventory-visibility-definition';
+import useManageCharacterInventoryVisibilityDefinition from './definitions/use-manage-character-inventory-visibility-definition';
 import { CharacterSheet } from '../event-types/character-sheet';
-import useManageCharacterInventoryVisibilityState from '../types/use-manage-character-inventory-visibility-state';
+import useManageCharacterInventoryVisibilityState from './types/use-manage-character-inventory-visibility-state';
 
 export const useManageCharacterInventoryVisibility =
   (): useManageCharacterInventoryVisibilityDefinition => {

@@ -1,9 +1,9 @@
 import { useEventSystem } from 'event-system/hooks/use-event-system';
 import { useEffect, useState } from 'react';
 
-import UseManageReincarnationVisibilityDefinition from '../definitions/use-manage-reincarnation-visibility-definition';
+import UseManageReincarnationVisibilityDefinition from './definitions/use-manage-reincarnation-visibility-definition';
 import { CharacterSheet } from '../event-types/character-sheet';
-import UseManageCharacterReincarnationVisibilityState from '../types/use-manage-character-reincarnation-visibility-state';
+import UseManageCharacterReincarnationVisibilityState from './types/use-manage-character-reincarnation-visibility-state';
 
 export const useManageReincarnationVisibility =
   (): UseManageReincarnationVisibilityDefinition => {

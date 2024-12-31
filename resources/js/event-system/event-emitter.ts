@@ -14,8 +14,6 @@ export default class EventEmitter<T extends EventMapDefinition>
     }
 
     this.listeners[eventType].push(listener);
-
-    console.log(this.listeners);
   }
 
   emit<K extends keyof T>(eventType: K, data: T[K]): void {

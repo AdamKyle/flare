@@ -5,12 +5,14 @@ import { useManageMonsterStatSectionVisibility } from './actions/partials/monste
 import { MonsterStatSection } from './actions/partials/monster-stat-section/monster-stat-section';
 import CharacterInventoryManagement from './character-sheet/character-inventory-management';
 import CharacterSheet from './character-sheet/character-sheet';
+import GameLoader from './game-loader/game-loader';
 import { useCharacterInventoryVisibility } from './hooks/use-character-inventory-visibility';
 import { useCharacterSheetVisibility } from './hooks/use-character-sheet-visibility';
+import { useGameLoaderVisibility } from './hooks/use-game-loader-visibility';
 import { useManageCharacterSheetVisibility } from './hooks/use-manage-character-sheet-visibility';
 
 import Card from 'ui/cards/card';
-import Container from 'ui/container/container';
+import ContainerWithTitle from 'ui/container/container-with-title';
 
 export const GameCard = (): ReactNode => {
   const { closeCharacterSheet } = useManageCharacterSheetVisibility();
@@ -22,6 +24,12 @@ export const GameCard = (): ReactNode => {
     useCharacterInventoryVisibility();
 
   const { showCharacterSheet } = useCharacterSheetVisibility();
+
+  const { showGameLoader } = useGameLoaderVisibility();
+
+  if (showGameLoader) {
+    return <GameLoader />;
+  }
 
   if (showCharacterSheet) {
     return (
@@ -35,14 +43,14 @@ export const GameCard = (): ReactNode => {
 
   if (showCharacterInventory) {
     return (
-      <Container
+      <ContainerWithTitle
         manageSectionVisibility={closeInventory}
         title={'Character Name Inventory'}
       >
         <Card>
           <CharacterInventoryManagement />
         </Card>
-      </Container>
+      </ContainerWithTitle>
     );
   }
 

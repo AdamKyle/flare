@@ -91,14 +91,12 @@ class BattleController extends Controller
 
         $monsters = collect($monsters);
 
-        return response()->json([
-            'monsters' => $monsters->map(function ($monster) {
-                return [
-                    'id' => $monster['id'],
-                    'name' => $monster['name'],
-                ];
-            }),
-        ]);
+        return response()->json($monsters->map(function ($monster) {
+            return [
+                'id' => $monster['id'],
+                'name' => $monster['name'],
+            ];
+        }));
     }
 
     public function setupMonster(AttackTypeRequest $attackTypeRequest, Character $character, Monster $monster): JsonResponse

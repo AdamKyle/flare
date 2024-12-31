@@ -26,11 +26,13 @@ export default defineConfig({
         alias: {
             configuration: path.resolve(__dirname, 'resources/js/configuration'),
             'event-system': path.resolve(__dirname, 'resources/js/event-system'),
+            'api-handler': path.resolve(__dirname, 'resources/js/api-handler'),
+            'game-data': path.resolve(__dirname, 'resources/js/game-data'),
             components: path.resolve(__dirname, 'resources/js/components'),
             ui: path.resolve(__dirname, 'resources/js/ui'),
             'service-container': path.resolve(__dirname, 'resources/js/service-container'),
-            'service-container-provider': path.resolve(__dirname, 'resources/js/service-container-provider'),
-        },
+            'service-container-provider': path.resolve(__dirname, 'resources/js/service-container-provider')
+        }
     },
     build: {
         minify: !isDevelopment,

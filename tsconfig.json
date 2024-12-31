@@ -24,6 +24,8 @@
         "paths": {
             "configuration/*": ["resources/js/configuration/*"],
             "event-system/*": ["resources/js/event-system/*"],
+            "game-data/*": ["resources/js/game-data/*"],
+            "api-handler/*": ["resources/js/api-handler/*"],
             "ui/*": ["resources/js/ui/*"],
             "service-container/*": ["resources/js/service-container/*"],
             "service-container-provider/*": ["resources/js/service-container-provider/*"]

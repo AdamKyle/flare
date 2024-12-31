@@ -11,9 +11,15 @@ export const useCharacterSheetVisibility =
     const [showCharacterSheet, setShowCharacterSheet] =
       useState<UseCharacterSheetVisibilityState['showCharacterSheet']>(false);
 
-    const characterSheetVisibility = eventSystem.getEventEmitter<{
-      [key: string]: boolean;
-    }>(CharacterSheet.OPEN_CHARACTER_SHEET);
+    const characterSheetVisibility = eventSystem.isEventRegistered(
+      CharacterSheet.OPEN_CHARACTER_SHEET
+    )
+      ? eventSystem.getEventEmitter<{ [key: string]: boolean }>(
+          CharacterSheet.OPEN_CHARACTER_SHEET
+        )
+      : eventSystem.registerEvent<{ [key: string]: boolean }>(
+          CharacterSheet.OPEN_CHARACTER_SHEET
+        );
 
     useEffect(() => {
       const updateVisibility = (visible: boolean) => {

@@ -57,7 +57,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'attack' => $characterStatBuilder->buildTotalAttack(),
             'health' => $characterStatBuilder->buildHealth(),
             'ac' => $characterStatBuilder->buildDefence(),
-            'class_bonus_chance' => (new ClassAttackValue($character))->buildAttackData(),
+            'class_bonus_chance' => (new ClassAttackValue($character))->buildAttackData()['chance'],
             'gold' => number_format($character->gold),
             'gold_dust' => number_format($character->gold_dust),
             'shards' => number_format($character->shards),

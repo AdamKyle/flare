@@ -1,7 +1,7 @@
+import { axiosServiceContainer } from 'api-handler/axios-service-container';
 import { eventServiceContainer } from 'event-system/event-service-container';
 
 import { ModularContainerDefinition } from './deffinitions/modular-container-definition';
-import { axiosServiceContainer } from '../axios/axios-service-container';
 
 /**
  * Register service containers here.

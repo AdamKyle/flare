@@ -46,9 +46,7 @@ class CharacterSheetController extends Controller
         $character = new Item($character, $characterSheetBaseInfoTransformer);
         $sheet = $this->manager->createData($character)->toArray();
 
-        return response()->json([
-            'sheet' => $sheet,
-        ], 200);
+        return response()->json($sheet);
     }
 
     public function baseCharacterInformation(Character $character, CharacterSheetBaseInfoTransformer $characterBaseInfo)
