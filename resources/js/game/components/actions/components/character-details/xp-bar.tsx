@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react';
 
 import { xpbarPercentage } from './helpers/xp-bar-percentage';
 import XpBarProps from './types/xp-bar-props';
+import { formatNumberWithCommas } from '../../../../util/format-number';
 
 const XpBar = (props: XpBarProps): ReactNode => {
   return (
@@ -12,7 +13,8 @@ const XpBar = (props: XpBarProps): ReactNode => {
         </span>
         <span>Xp</span>
         <span aria-labelledby="xp-label" aria-live="polite">
-          {props.current_xp}/{props.max_xp}
+          {formatNumberWithCommas(props.current_xp)}/
+          {formatNumberWithCommas(props.max_xp)}
         </span>
       </div>
       <div className="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2">

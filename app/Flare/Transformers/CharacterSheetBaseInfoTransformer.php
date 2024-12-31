@@ -17,6 +17,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
 
     protected array $defaultIncludes = [
         'inventory_count',
+        'resistance_info',
     ];
 
     public function setIgnoreReductions(bool $ignoreReductions): void
@@ -43,10 +44,17 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'race' => $character->race->name,
             'race_id' => $character->race->id,
             'to_hit_stat' => $character->class->to_hit_stat,
-            'level' => number_format($character->level),
-            'max_level' => number_format($this->getMaxLevel($character)),
+            'level' => $character->level,
+            'max_level' => $this->getMaxLevel($character),
             'xp' => (int) $character->xp,
             'xp_next' => (int) $character->xp_next,
+            'str_raw' => $character->str,
+            'dur_raw' => $character->dur,
+            'dex_raw' => $character->dex,
+            'chr_raw' => $character->chr,
+            'int_raw' => $character->int,
+            'agi_raw' => $character->agi,
+            'focus_raw' => $character->focus,
             'str_modded' => $characterStatBuilder->statMod('str'),
             'dur_modded' => $characterStatBuilder->statMod('dur'),
             'dex_modded' => $characterStatBuilder->statMod('dex'),
@@ -55,19 +63,26 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'agi_modded' => $characterStatBuilder->statMod('agi'),
             'focus_modded' => $characterStatBuilder->statMod('focus'),
             'attack' => $characterStatBuilder->buildTotalAttack(),
+            'healing' => $characterStatBuilder->buildHealing(),
             'health' => $characterStatBuilder->buildHealth(),
             'ac' => $characterStatBuilder->buildDefence(),
             'class_bonus_chance' => (new ClassAttackValue($character))->buildAttackData()['chance'],
-            'gold' => number_format($character->gold),
-            'gold_dust' => number_format($character->gold_dust),
-            'shards' => number_format($character->shards),
-            'copper_coins' => number_format($character->copper_coins),
+            'gold' => $character->gold,
+            'gold_dust' => $character->gold_dust,
+            'shards' => $character->shards,
+            'copper_coins' => $character->copper_coins,
             'resurrection_chance' => $characterStatBuilder->buildResurrectionChance(),
+            'spell_evasion' => $characterStatBuilder,
+            'elemental_atonements' => $characterStatBuilder->buildElementalAtonement(),
         ];
     }
 
     public function includeInventoryCount(Character $character)
     {
         return $this->item($character, new CharacterInventoryCountTransformer);
+    }
+
+    public function includeResistanceInfo(Character $character) {
+        return $this->item($character, new CharacterResistanceInfoTransformer);
     }
 }

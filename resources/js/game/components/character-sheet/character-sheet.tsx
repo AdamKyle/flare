@@ -10,6 +10,9 @@ import { useManageClassRanksVisibility } from './hooks/use-manage-class-ranks-vi
 import { useManageReincarnationVisibility } from './hooks/use-manage-reincarnation-visibility';
 import CharacterSheetProps from './types/character-sheet-props';
 
+import { GameDataError } from 'game-data/components/game-data-error';
+import { useGameData } from 'game-data/hooks/use-game-data';
+
 import Card from 'ui/cards/card';
 import ContainerWithTitle from 'ui/container/container-with-title';
 
@@ -21,6 +24,23 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
   const { showInventory, openInventory, closeInventory } =
     useManageCharacterInventoryVisibility();
 
+  const { gameData } = useGameData();
+
+  const characterData = gameData?.character;
+
+  if (!characterData) {
+    return (
+      <ContainerWithTitle
+        manageSectionVisibility={props.manageCharacterSheetVisibility}
+        title={'An error occurred'}
+      >
+        <Card>
+          <GameDataError />
+        </Card>
+      </ContainerWithTitle>
+    );
+  }
+
   const renderCharacterSheetScreen = (): ReactNode => {
     return match({ showReincarnation, showClassRanks, showInventory })
       .with({ showReincarnation: true }, () => <CharacterReincarnation />)
@@ -31,15 +51,19 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
           openReincarnationSystem={openReincarnation}
           openClassRanksSystem={openClassRanks}
           openCharacterInventory={openInventory}
+          characterData={characterData}
         />
       ));
   };
 
   const renderTitle = (): string => {
     return match({ showReincarnation, showClassRanks, showInventory })
-      .with({ showReincarnation: true }, () => 'Character Name Reincarnation')
-      .with({ showClassRanks: true }, () => 'Character Name Class Ranks')
-      .with({ showInventory: true }, () => 'Character Name Inventory')
+      .with(
+        { showReincarnation: true },
+        () => `${characterData.name} Reincarnation`
+      )
+      .with({ showClassRanks: true }, () => `${characterData.name} Class Ranks`)
+      .with({ showInventory: true }, () => `${characterData.name} Inventory`)
       .otherwise(() => 'Character Name');
   };
 

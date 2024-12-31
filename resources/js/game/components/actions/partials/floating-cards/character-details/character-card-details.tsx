@@ -1,6 +1,8 @@
 import React, { ReactNode } from 'react';
 
 import { useManageCharacterInventoryVisibility } from './hooks/use-manage-character-inventory-visibility';
+import CharacterCardDetailsProps from './types/character-card-details-props';
+import { shortenNumber } from '../../../../../util/format-number';
 import { useManageCharacterSheetVisibility } from '../../../../hooks/use-manage-character-sheet-visibility';
 import XpBar from '../../../components/character-details/xp-bar';
 
@@ -9,30 +11,39 @@ import ProgressButton from 'ui/buttons/button-progress';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Separator from 'ui/seperatror/separator';
 
-const CharacterCardDetails = (): ReactNode => {
+const CharacterCardDetails = ({
+  characterData,
+}: CharacterCardDetailsProps): ReactNode => {
   const { openCharacterSheet } = useManageCharacterSheetVisibility();
   const { openCharacterInventory } = useManageCharacterInventoryVisibility();
 
+  const characterInventorProgress =
+    (characterData.inventory_count.inventory_count /
+      characterData.inventory_count.inventory_max) *
+    100;
+
   return (
     <>
-      <XpBar current_xp={150} max_xp={1000} />
+      <XpBar current_xp={characterData.xp} max_xp={characterData.xp_next} />
       <div className="grid grid-cols-2 gap-2">
         <div>
           <h4 className="text-danube-500 dark:text-danube-700">Stats</h4>
           <Separator />
           <dl className="text-gray-600 dark:text-gray-700">
             <dt className="font-bold">Str</dt>
-            <dd>1.0K</dd>
+            <dd>{shortenNumber(characterData.str_modded)}</dd>
             <dt className="font-bold">Dex</dt>
-            <dd>1.0K</dd>
+            <dd>{shortenNumber(characterData.dex_modded)}</dd>
             <dt className="font-bold">Int</dt>
-            <dd>1.0K</dd>
+            <dd>{shortenNumber(characterData.int_modded)}</dd>
+            <dt className="font-bold">Dur</dt>
+            <dd>{shortenNumber(characterData.dur_modded)}</dd>
             <dt className="font-bold">Agi</dt>
-            <dd>1.0K</dd>
+            <dd>{shortenNumber(characterData.agi_modded)}</dd>
             <dt className="font-bold">Chr</dt>
-            <dd>1.0K</dd>
+            <dd>{shortenNumber(characterData.chr_modded)}</dd>
             <dt className="font-bold">Focus</dt>
-            <dd>1.0K</dd>
+            <dd>{shortenNumber(characterData.focus_modded)}</dd>
           </dl>
         </div>
         <div>
@@ -40,13 +51,13 @@ const CharacterCardDetails = (): ReactNode => {
           <Separator />
           <dl className="text-gray-600 dark:text-gray-700">
             <dt className="font-bold">HP</dt>
-            <dd>100K</dd>
+            <dd>{shortenNumber(characterData.health)}</dd>
             <dt className="font-bold">ATK</dt>
-            <dd>100K</dd>
+            <dd>{shortenNumber(characterData.attack)}</dd>
             <dt className="font-bold">Healing</dt>
-            <dd>100K</dd>
-            <dt className="font-bold">Def</dt>
-            <dd>100K</dd>
+            <dd>{shortenNumber(characterData.healing)}</dd>
+            <dt className="font-bold">AC (Defence)</dt>
+            <dd>{shortenNumber(characterData.ac)}</dd>
           </dl>
         </div>
       </div>
@@ -55,20 +66,20 @@ const CharacterCardDetails = (): ReactNode => {
         <Separator />
         <dl className="text-gray-600 dark:text-gray-700">
           <dt className="font-bold">Gold</dt>
-          <dd>2.0T</dd>
+          <dd>{shortenNumber(characterData.gold)}</dd>
           <dt className="font-bold">Gold Dust</dt>
-          <dd>1.0M</dd>
+          <dd>{shortenNumber(characterData.gold_dust)}</dd>
           <dt className="font-bold">Shards</dt>
-          <dd>1.0M</dd>
+          <dd>{shortenNumber(characterData.shards)}</dd>
           <dt className="font-bold">Copper Coins</dt>
-          <dd>1.0M</dd>
+          <dd>{shortenNumber(characterData.copper_coins)}</dd>
         </dl>
       </div>
       <Separator />
       <ProgressButton
-        progress={10}
+        progress={characterInventorProgress}
         on_click={() => openCharacterInventory()}
-        label="Manage Inventory (56/75)"
+        label={`Manage Inventory (${characterData.inventory_count.inventory_count}/${characterData.inventory_count.inventory_max})`}
         variant={ButtonVariant.SUCCESS}
         additional_css="w-full my-2"
       />

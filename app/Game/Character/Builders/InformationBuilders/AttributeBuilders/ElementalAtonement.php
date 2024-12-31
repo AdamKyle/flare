@@ -86,7 +86,7 @@ class ElementalAtonement extends BaseAttribute
         foreach ($atonements as $key => $values) {
             $average = array_sum($values) / count($values);
 
-            $averages[$key] = $average > 0.75 ? 0.75 : $average;
+            $averages[strtolower($key)] = $average > 0.75 ? 0.75 : $average;
         }
 
         return $averages;
