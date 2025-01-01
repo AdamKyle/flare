@@ -3,7 +3,9 @@ import { match, P } from 'ts-pattern';
 
 import CharacterAttackTypeBreakdownProps from './types/character-attack-type-breakdown-props';
 import { AttackTypes } from '../character-sheet/enums/attack-types';
+import Defence from '../character-sheet/partials/character-attack-types/defence';
 import Healing from '../character-sheet/partials/character-attack-types/healing';
+import Health from '../character-sheet/partials/character-attack-types/health';
 import RingDamage from '../character-sheet/partials/character-attack-types/ring-damage';
 import SpellDamage from '../character-sheet/partials/character-attack-types/spell-damage';
 import WeaponDamage from '../character-sheet/partials/character-attack-types/weapon-damage';
@@ -48,6 +50,14 @@ const CharacterAttackTypeBreakdown = ({
         { attack_type: AttackTypes.RING_DAMAGE },
         () => `${characterData.name} Ring Damage`
       )
+      .with(
+        { attack_type: AttackTypes.HEALTH },
+        () => `${characterData.name} Health Breakdown`
+      )
+      .with(
+        { attack_type: AttackTypes.DEFENCE },
+        () => `${characterData.name} Defence Breakdown`
+      )
       .otherwise(() => `${characterData.name}`);
   };
 
@@ -61,7 +71,9 @@ const CharacterAttackTypeBreakdown = ({
             AttackTypes.WEAPON,
             AttackTypes.SPELL_DAMAGE,
             AttackTypes.HEALING,
-            AttackTypes.RING_DAMAGE
+            AttackTypes.RING_DAMAGE,
+            AttackTypes.HEALTH,
+            AttackTypes.DEFENCE
           ),
         },
         () => close_attack_details
@@ -75,6 +87,8 @@ const CharacterAttackTypeBreakdown = ({
       .with(AttackTypes.SPELL_DAMAGE, () => <SpellDamage />)
       .with(AttackTypes.HEALING, () => <Healing />)
       .with(AttackTypes.RING_DAMAGE, () => <RingDamage />)
+      .with(AttackTypes.HEALTH, () => <Health />)
+      .with(AttackTypes.DEFENCE, () => <Defence />)
       .otherwise(() => (
         <Alert variant={AlertVariant.DANGER}>
           <p>

@@ -105,6 +105,14 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
         () => `${characterData.name} Ring Damage`
       )
       .with(
+        { showAttackType: true, attackType: AttackTypes.HEALTH },
+        () => `${characterData.name} Health Breakdown`
+      )
+      .with(
+        { showAttackType, attackType: AttackTypes.DEFENCE },
+        () => `${characterData.name} Defence Breakdown`
+      )
+      .with(
         { showStatDetails: true },
         () => `${characterData.name} ${getStatName(statType)} break down`
       )
@@ -131,7 +139,9 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
             AttackTypes.WEAPON,
             AttackTypes.SPELL_DAMAGE,
             AttackTypes.HEALING,
-            AttackTypes.RING_DAMAGE
+            AttackTypes.RING_DAMAGE,
+            AttackTypes.HEALTH,
+            AttackTypes.DEFENCE
           ),
         },
         () => closeAttackDetails

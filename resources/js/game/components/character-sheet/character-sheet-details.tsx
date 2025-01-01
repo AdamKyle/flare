@@ -6,7 +6,9 @@ import { AttackTypes } from './enums/attack-types';
 import { StatTypes } from './enums/stat-types';
 import { useManageAttackDetailsBreakdown } from './hooks/use-manage-attack-details-breakdown';
 import { useManageStatDetailsBreakdown } from './hooks/use-manage-stat-details-breakdown';
+import Defence from './partials/character-attack-types/defence';
 import Healing from './partials/character-attack-types/healing';
+import Health from './partials/character-attack-types/health';
 import RingDamage from './partials/character-attack-types/ring-damage';
 import SpellDamage from './partials/character-attack-types/spell-damage';
 import WeaponDamage from './partials/character-attack-types/weapon-damage';
@@ -45,6 +47,8 @@ const CharacterSheetDetails = (
       .with(AttackTypes.SPELL_DAMAGE, () => <SpellDamage />)
       .with(AttackTypes.HEALING, () => <Healing />)
       .with(AttackTypes.RING_DAMAGE, () => <RingDamage />)
+      .with(AttackTypes.HEALTH, () => <Health />)
+      .with(AttackTypes.DEFENCE, () => <Defence />)
       .otherwise(() => (
         <Alert variant={AlertVariant.DANGER}>
           <p>
@@ -95,7 +99,15 @@ const CharacterSheetDetails = (
         </div>
         <div>
           <dl>
-            <dt className="font-bold">Health:</dt>
+            <dt className="font-bold">
+              <LinkButton
+                label={'Health:'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openAttackDetails(AttackTypes.HEALTH)}
+                aria_label={'Health Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
             <dd>{formatNumberWithCommas(characterData.health)}</dd>
             <dt className="font-bold">
               <LinkButton
@@ -137,7 +149,15 @@ const CharacterSheetDetails = (
               />
             </dt>
             <dd>{formatNumberWithCommas(characterData.ring_damage)}</dd>
-            <dt className="font-bold">AC (Defence):</dt>
+            <dt className="font-bold">
+              <LinkButton
+                label={'AC (Defence):'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openAttackDetails(AttackTypes.DEFENCE)}
+                aria_label={'Armour Class (Defence) Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
             <dd>{formatNumberWithCommas(characterData.ac)}</dd>
           </dl>
         </div>

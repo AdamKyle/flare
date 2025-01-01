@@ -113,9 +113,25 @@ const CharacterCardDetails = ({
           <h4 className="text-danube-500 dark:text-danube-700">Attack Stats</h4>
           <Separator />
           <dl className="text-gray-600 dark:text-gray-700">
-            <dt className="font-bold">HP:</dt>
+            <dt className="font-bold">
+              <LinkButton
+                label={'HP:'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openAttackDetails(AttackTypes.HEALTH)}
+                aria_label={'HP Breakdown Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
             <dd>{shortenNumber(characterData.health)}</dd>
-            <dt className="font-bold">AC (Defence):</dt>
+            <dt className="font-bold">
+              <LinkButton
+                label={'AC (Defence):'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openAttackDetails(AttackTypes.DEFENCE)}
+                aria_label={'Ac (Defence) Breakdown Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
             <dd>{shortenNumber(characterData.ac)}</dd>
             <dt className="font-bold">
               <LinkButton

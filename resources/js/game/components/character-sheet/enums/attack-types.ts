@@ -3,4 +3,6 @@ export enum AttackTypes {
   SPELL_DAMAGE,
   HEALING,
   RING_DAMAGE,
+  HEALTH,
+  DEFENCE,
 }
