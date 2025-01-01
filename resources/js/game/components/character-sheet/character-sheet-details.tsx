@@ -3,11 +3,14 @@ import React, { ReactNode } from 'react';
 import { match } from 'ts-pattern';
 
 import { AttackTypes } from './enums/attack-types';
+import { StatTypes } from './enums/stat-types';
 import { useManageAttackDetailsBreakdown } from './hooks/use-manage-attack-details-breakdown';
+import { useManageStatDetailsBreakdown } from './hooks/use-manage-stat-details-breakdown';
 import Healing from './partials/character-attack-types/healing';
 import RingDamage from './partials/character-attack-types/ring-damage';
 import SpellDamage from './partials/character-attack-types/spell-damage';
 import WeaponDamage from './partials/character-attack-types/weapon-damage';
+import { CharacterStatTypeDetails } from './partials/character-stat-types/character-stat-type-details';
 import CharacterSheetDetailsProps from './types/character-sheet-details-props';
 import {
   formatNumberWithCommas,
@@ -27,6 +30,7 @@ const CharacterSheetDetails = (
   props: CharacterSheetDetailsProps
 ): ReactNode => {
   const { openAttackDetails } = useManageAttackDetailsBreakdown();
+  const { openStatDetails } = useManageStatDetailsBreakdown();
 
   const characterData = props.characterData;
 
@@ -53,6 +57,10 @@ const CharacterSheetDetails = (
 
   if (props.showAttackType && props.attackType !== null) {
     return renderAttackDetailsType(props.attackType);
+  }
+
+  if (props.showStatType && props.statType !== null) {
+    return <CharacterStatTypeDetails stat_type={props.statType} />;
   }
 
   return (
@@ -195,19 +203,75 @@ const CharacterSheetDetails = (
         </div>
         <div>
           <dl>
-            <dt className="font-bold">Modded STR:</dt>
+            <dt className="font-bold">
+              <LinkButton
+                label={'Modded STR:'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openStatDetails(StatTypes.STR)}
+                aria_label={'Modded Str Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
             <dd>{shortenNumber(characterData.str_modded)}</dd>
-            <dt className="font-bold">Modded DEX:</dt>
+            <dt className="font-bold">
+              <LinkButton
+                label={'Modded DEX:'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openStatDetails(StatTypes.DEX)}
+                aria_label={'Modded Dex Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
             <dd>{shortenNumber(characterData.dex_modded)}</dd>
-            <dt className="font-bold">Modded INT:</dt>
+            <dt className="font-bold">
+              <LinkButton
+                label={'Modded INT:'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openStatDetails(StatTypes.INT)}
+                aria_label={'Modded Int Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
             <dd>{shortenNumber(characterData.int_modded)}</dd>
-            <dt className="font-bold">Modded DUR:</dt>
+            <dt className="font-bold">
+              <LinkButton
+                label={'Modded DUR:'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openStatDetails(StatTypes.DUR)}
+                aria_label={'Modded Dur Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
             <dd>{shortenNumber(characterData.dur_modded)}</dd>
-            <dt className="font-bold">Modded AGI:</dt>
+            <dt className="font-bold">
+              <LinkButton
+                label={'Modded AGI:'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openStatDetails(StatTypes.AGI)}
+                aria_label={'Modded Agi Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
             <dd>{shortenNumber(characterData.agi_modded)}</dd>
-            <dt className="font-bold">Modded CHR:</dt>
+            <dt className="font-bold">
+              <LinkButton
+                label={'Modded CHR:'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openStatDetails(StatTypes.CHR)}
+                aria_label={'Modded Chr Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
             <dd>{shortenNumber(characterData.chr_modded)}</dd>
-            <dt className="font-bold">Modded FOCUS:</dt>
+            <dt className="font-bold">
+              <LinkButton
+                label={'Modded FOCUS:'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openStatDetails(StatTypes.FOCUS)}
+                aria_label={'Modded Focus Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
             <dd>{shortenNumber(characterData.focus_modded)}</dd>
           </dl>
           <h3 className="text-danube-500 dark:text-danube-700 mt-5">

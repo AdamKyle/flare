@@ -38,6 +38,7 @@ class StatModifierDetails
      */
     public function forStat(string $stat): array
     {
+
         $details = [];
 
         $details['base_value'] = number_format($this->character->{$stat});
@@ -50,7 +51,7 @@ class StatModifierDetails
         return $details;
     }
 
-    public function buildSpecificBreakDown(string $type, bool $isVodied): array
+    public function buildSpecificBreakDown(string $type, bool $isVodied = false): array
     {
         switch ($type) {
             case 'health':

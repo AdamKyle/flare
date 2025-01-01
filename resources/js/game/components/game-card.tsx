@@ -5,6 +5,8 @@ import { useManageMonsterStatSectionVisibility } from './actions/partials/monste
 import { MonsterStatSection } from './actions/partials/monster-stat-section/monster-stat-section';
 import CharacterSheet from './character-sheet/character-sheet';
 import { useAttackDetailsVisibility } from './character-sheet/hooks/use-attack-details-visibility';
+import { useStatDetailsVisibility } from './character-sheet/hooks/use-stat-details-visibility';
+import CharacterStatTypeBreakDown from './character-sheet/partials/character-stat-types/character-stat-type-breakdown';
 import GameLoader from './game-loader/game-loader';
 import { useCharacterInventoryVisibility } from './hooks/use-character-inventory-visibility';
 import { useCharacterSheetVisibility } from './hooks/use-character-sheet-visibility';
@@ -24,6 +26,9 @@ export const GameCard = (): ReactNode => {
 
   const { showAttackType, attackType, closeAttackDetails } =
     useAttackDetailsVisibility();
+
+  const { showStatDetails, statType, closeStatDetails } =
+    useStatDetailsVisibility();
 
   const { showCharacterSheet } = useCharacterSheetVisibility();
 
@@ -48,6 +53,15 @@ export const GameCard = (): ReactNode => {
       <CharacterAttackTypeBreakdown
         close_attack_details={closeAttackDetails}
         attack_type={attackType}
+      />
+    );
+  }
+
+  if (showStatDetails && statType !== null) {
+    return (
+      <CharacterStatTypeBreakDown
+        stat_type={statType}
+        close_stat_type={closeStatDetails}
       />
     );
   }

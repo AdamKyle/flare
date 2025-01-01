@@ -11,6 +11,7 @@ Route::group(['middleware' => ['is.character.who.they.say.they.are']], function 
     Route::get('/character-sheet/{character}/base-inventory-info', ['uses' => 'Api\CharacterSheetController@baseInventoryInfo']);
     Route::get('/character-sheet/{character}/stat-details', ['uses' => 'Api\CharacterSheetController@statDetails']);
     Route::get('/character-sheet/{character}/stat-break-down', ['uses' => 'Api\CharacterSheetController@statBreakDown']);
+    Route::get('/character-sheet/{character}/specific-attribute-break-down', ['uses' => 'Api\CharacterSheetController@specificStatBreakDown']);
 
     Route::get('/character-location-data/{character}', ['uses' => 'Api\CharacterSheetController@basicLocationInformation']);
 

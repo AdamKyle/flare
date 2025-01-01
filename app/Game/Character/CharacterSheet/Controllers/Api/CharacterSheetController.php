@@ -14,6 +14,7 @@ use App\Flare\Transformers\SkillsTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Character\Builders\StatDetailsBuilder\StatModifierDetails;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
+use App\Game\Character\CharacterSheet\Requests\SpecificDetailsRequest;
 use App\Game\Core\Events\GlobalTimeOut;
 use App\Game\Core\Jobs\EndGlobalTimeOut;
 use App\Game\Core\Requests\StatDetailsRequest;
@@ -58,6 +59,18 @@ class CharacterSheetController extends Controller
     public function statBreakDown(StatDetailsRequest $request, Character $character)
     {
         $breakDownDetails = $this->statModifierDetails->setCharacter($character)->forStat($request->stat_type);
+
+        return response()->json([
+            'break_down' => $breakDownDetails,
+        ]);
+    }
+
+    public function specificStatBreakDown(SpecificDetailsRequest $request, Character $character)
+    {
+        $breakDownDetails = [
+            'regular' => $this->statModifierDetails->setCharacter($character)->buildSpecificBreakDown($request->type),
+            'voided' => $this->statModifierDetails->setCharacter($character)->buildSpecificBreakDown($request->type, true),
+        ];
 
         return response()->json([
             'break_down' => $breakDownDetails,

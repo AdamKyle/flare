@@ -4,4 +4,5 @@ export enum CharacterSheet {
   OPEN_CLASS_RANKS_SYSTEM = 'open_class_ranks_system',
   OPEN_INVENTORY_SECTION = 'open_inventory_section',
   OPEN_ATTACK_DETAILS = 'open_attack_details',
+  OPEN_STAT_DETAILS = 'open_stat_details',
 }

@@ -4,7 +4,9 @@ import { useManageCharacterInventoryVisibility } from './hooks/use-manage-charac
 import CharacterCardDetailsProps from './types/character-card-details-props';
 import { shortenNumber } from '../../../../../util/format-number';
 import { AttackTypes } from '../../../../character-sheet/enums/attack-types';
+import { StatTypes } from '../../../../character-sheet/enums/stat-types';
 import { useManageAttackDetailsBreakdown } from '../../../../character-sheet/hooks/use-manage-attack-details-breakdown';
+import { useManageStatDetailsBreakdown } from '../../../../character-sheet/hooks/use-manage-stat-details-breakdown';
 import { useManageCharacterSheetVisibility } from '../../../../hooks/use-manage-character-sheet-visibility';
 import XpBar from '../../../components/character-details/xp-bar';
 
@@ -20,6 +22,7 @@ const CharacterCardDetails = ({
   const { openCharacterSheet } = useManageCharacterSheetVisibility();
   const { openCharacterInventory } = useManageCharacterInventoryVisibility();
   const { openAttackDetails } = useManageAttackDetailsBreakdown();
+  const { openStatDetails } = useManageStatDetailsBreakdown();
 
   const characterInventorProgress =
     (characterData.inventory_count.inventory_count /
@@ -34,19 +37,75 @@ const CharacterCardDetails = ({
           <h4 className="text-danube-500 dark:text-danube-700">Stats</h4>
           <Separator />
           <dl className="text-gray-600 dark:text-gray-700">
-            <dt className="font-bold">Str:</dt>
+            <dt className="font-bold">
+              <LinkButton
+                label={'Str:'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openStatDetails(StatTypes.STR)}
+                aria_label={'Str Breakdown Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
             <dd>{shortenNumber(characterData.str_modded)}</dd>
-            <dt className="font-bold">Dex:</dt>
+            <dt className="font-bold">
+              <LinkButton
+                label={'Dex:'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openStatDetails(StatTypes.DEX)}
+                aria_label={'Dex Breakdown Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
             <dd>{shortenNumber(characterData.dex_modded)}</dd>
-            <dt className="font-bold">Int:</dt>
+            <dt className="font-bold">
+              <LinkButton
+                label={'Int:'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openStatDetails(StatTypes.INT)}
+                aria_label={'Int Breakdown Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
             <dd>{shortenNumber(characterData.int_modded)}</dd>
-            <dt className="font-bold">Dur:</dt>
+            <dt className="font-bold">
+              <LinkButton
+                label={'Dur:'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openStatDetails(StatTypes.DUR)}
+                aria_label={'Dur Breakdown Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
             <dd>{shortenNumber(characterData.dur_modded)}</dd>
-            <dt className="font-bold">Agi:</dt>
+            <dt className="font-bold">
+              <LinkButton
+                label={'Agi:'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openStatDetails(StatTypes.AGI)}
+                aria_label={'Agi Breakdown Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
             <dd>{shortenNumber(characterData.agi_modded)}</dd>
-            <dt className="font-bold">Chr:</dt>
+            <dt className="font-bold">
+              <LinkButton
+                label={'Chr:'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openStatDetails(StatTypes.CHR)}
+                aria_label={'Chr Breakdown Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
             <dd>{shortenNumber(characterData.chr_modded)}</dd>
-            <dt className="font-bold">Focus:</dt>
+            <dt className="font-bold">
+              <LinkButton
+                label={'Focus:'}
+                variant={ButtonVariant.PRIMARY}
+                on_click={() => openStatDetails(StatTypes.FOCUS)}
+                aria_label={'Focus Breakdown Link'}
+                additional_css={'font-bold'}
+              />
+            </dt>
             <dd>{shortenNumber(characterData.focus_modded)}</dd>
           </dl>
         </div>

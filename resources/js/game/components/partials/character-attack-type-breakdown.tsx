@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { match } from 'ts-pattern';
+import { match, P } from 'ts-pattern';
 
 import CharacterAttackTypeBreakdownProps from './types/character-attack-type-breakdown-props';
 import { AttackTypes } from '../character-sheet/enums/attack-types';
@@ -55,14 +55,15 @@ const CharacterAttackTypeBreakdown = ({
     return match({
       attack_type,
     })
-      .with({ attack_type: AttackTypes.WEAPON }, () => close_attack_details)
       .with(
-        { attack_type: AttackTypes.SPELL_DAMAGE },
-        () => close_attack_details
-      )
-      .with({ attack_type: AttackTypes.HEALING }, () => close_attack_details)
-      .with(
-        { attack_type: AttackTypes.RING_DAMAGE },
+        {
+          attack_type: P.union(
+            AttackTypes.WEAPON,
+            AttackTypes.SPELL_DAMAGE,
+            AttackTypes.HEALING,
+            AttackTypes.RING_DAMAGE
+          ),
+        },
         () => close_attack_details
       )
       .otherwise(() => () => {});
