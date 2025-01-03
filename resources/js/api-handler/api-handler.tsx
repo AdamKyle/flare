@@ -3,17 +3,20 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import AxiosDefinition from './definitions/axios-definition';
 
 export default class ApiHandler implements AxiosDefinition {
-  async get<T>(url: string, config: AxiosRequestConfig = {}): Promise<T> {
+  async get<T>(
+    url: string,
+    config: AxiosRequestConfig & { params?: object } = {}
+  ): Promise<T> {
     this.setCsrfToken(config);
     const modifiedUrl = this.addApiPrefix(url);
     const response: AxiosResponse<T> = await axios.get<T>(modifiedUrl, config);
     return response.data;
   }
 
-  async post<T, D>(
+  async post<T, C, D>(
     url: string,
     data: D,
-    config: AxiosRequestConfig = {}
+    config: AxiosRequestConfig & { params?: C } = {}
   ): Promise<T> {
     this.setCsrfToken(config);
     const modifiedUrl = this.addApiPrefix(url);

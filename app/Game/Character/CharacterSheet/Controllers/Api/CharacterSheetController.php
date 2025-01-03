@@ -60,9 +60,7 @@ class CharacterSheetController extends Controller
     {
         $breakDownDetails = $this->statModifierDetails->setCharacter($character)->forStat($request->stat_type);
 
-        return response()->json([
-            'break_down' => $breakDownDetails,
-        ]);
+        return response()->json($breakDownDetails);
     }
 
     public function specificStatBreakDown(SpecificDetailsRequest $request, Character $character)

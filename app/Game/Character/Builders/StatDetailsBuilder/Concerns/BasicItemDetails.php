@@ -20,6 +20,7 @@ trait BasicItemDetails
             'affix_count' => $item->affix_count,
             'is_unique' => $this->isUnique($item),
             'holy_stacks_applied' => $item->holy_stacks_applied,
+            'max_holy_stacks' => $item->holy_stacks,
             'is_mythic' => $item->is_mythic,
             'is_cosmic' => $item->is_cosmic,
         ];

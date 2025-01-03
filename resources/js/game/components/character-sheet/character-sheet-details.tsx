@@ -64,7 +64,12 @@ const CharacterSheetDetails = (
   }
 
   if (props.showStatType && props.statType !== null) {
-    return <CharacterStatTypeDetails stat_type={props.statType} />;
+    return (
+      <CharacterStatTypeDetails
+        stat_type={props.statType}
+        character_id={characterData.id}
+      />
+    );
   }
 
   return (

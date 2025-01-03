@@ -21,3 +21,15 @@ export const getStatName = (statType: StatTypes | null): string => {
     .with(StatTypes.FOCUS, () => 'Focus')
     .otherwise(() => 'Unknown stat type');
 };
+
+export const getStatAbbreviation = (statType: StatTypes): string => {
+  return match(statType)
+    .with(StatTypes.STR, () => 'str')
+    .with(StatTypes.DEX, () => 'dex')
+    .with(StatTypes.INT, () => 'int')
+    .with(StatTypes.DUR, () => 'dur')
+    .with(StatTypes.AGI, () => 'agi')
+    .with(StatTypes.CHR, () => 'chr')
+    .with(StatTypes.FOCUS, () => 'focus')
+    .otherwise(() => 'Unknown');
+};

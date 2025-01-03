@@ -28,7 +28,10 @@ const CharacterStatTypeBreakDown = ({
       title={`${characterData.name} ${getStatName(stat_type)} break down`}
     >
       <Card>
-        <CharacterStatTypeDetails stat_type={stat_type} />
+        <CharacterStatTypeDetails
+          stat_type={stat_type}
+          character_id={characterData.id}
+        />
       </Card>
     </ContainerWithTitle>
   );

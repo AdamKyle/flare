@@ -1,18 +1,27 @@
+import { AxiosRequestConfig } from 'axios';
+
 export default interface AxiosDefinition {
   /**
-   * Handles get requests.
+   * Handles GET requests.
    *
-   * @param url
-   * @param config
+   * @param url - The endpoint to send the GET request to.
+   * @param config - Optional Axios configuration, including query parameters.
    */
-  get<T, C>(url: string, config?: Record<string, C>): Promise<T>;
+  get<T, C>(
+    url: string,
+    config?: AxiosRequestConfig & { params?: C }
+  ): Promise<T>;
 
   /**
-   * handles post requests.
+   * Handles POST requests.
    *
-   * @param url
-   * @param data
-   * @param config
+   * @param url - The endpoint to send the POST request to.
+   * @param data - The data payload to include in the request body.
+   * @param config - Optional Axios configuration, including query parameters.
    */
-  post<T, C, D>(url: string, data: D, config?: Record<string, C>): Promise<T>;
+  post<T, C, D>(
+    url: string,
+    data: D,
+    config?: AxiosRequestConfig & { params?: C }
+  ): Promise<T>;
 }
