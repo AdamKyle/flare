@@ -90,7 +90,7 @@ class EnchantingService
         $newInventory = [];
 
         foreach ($inventory as $item) {
-            if ($item['attached_affixes_count'] === 0) {
+            if ($item['affix_count'] === 0) {
                 array_unshift($newInventory, $item);
             } else {
                 $newInventory[] = $item;
