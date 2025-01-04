@@ -1,17 +1,15 @@
 import React, { ReactNode } from 'react';
 
-import {
-  defaultPositionImage,
-  defaultPositionImageAlt,
-} from './enums/equipment-positions';
 import EquippedSlotProps from './types/equipped-slot-props';
+import { fetchEquippedImage } from './utils/fetch-equipped-image';
 
 const EquippedSlot = (props: EquippedSlotProps): ReactNode => {
-  const { positionName, position } = props;
+  const { positionName, position, equipped_item } = props;
 
-  let path = defaultPositionImage[position];
-  let itemName = 'Nothing Equipped';
-  const altText = defaultPositionImageAlt[position];
+  const { path, altText, itemName } = fetchEquippedImage(
+    position,
+    equipped_item
+  );
 
   return (
     <button

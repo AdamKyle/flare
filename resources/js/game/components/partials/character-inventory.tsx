@@ -26,7 +26,7 @@ const CharacterInventory = ({
       title={`${characterData.name} Inventory`}
     >
       <Card>
-        <CharacterInventoryManagement />
+        <CharacterInventoryManagement character_id={characterData.id} />
       </Card>
     </ContainerWithTitle>
   );

@@ -1,0 +1,32 @@
+export enum InventoryItemTypes {
+  ARTIFACT = 'artifact',
+  HAMMER = 'hammer',
+  BOW = 'bow',
+  GUN = 'gun',
+  FAN = 'fan',
+  MACE = 'mace',
+  SCRATCH_AWL = 'scratch-awl',
+  STAVE = 'stave',
+  BODY = 'body',
+  SHIELD = 'shield',
+  LEGGINGS = 'leggings',
+  FEET = 'feet',
+  SLEEVES = 'sleeves',
+  HELMET = 'helmet',
+  GLOVES = 'gloves',
+  RING_ONE = 'ring-one',
+  RING_TWO = 'ring-two',
+  SPELL_ONE = 'spell-one',
+  SPELL_TWO = 'spell-two',
+  TRINKET = 'trinket',
+  QUEST = 'quest',
+}
+
+export const armourPositions = [
+  InventoryItemTypes.BODY,
+  InventoryItemTypes.FEET,
+  InventoryItemTypes.HELMET,
+  InventoryItemTypes.GLOVES,
+  InventoryItemTypes.LEGGINGS,
+  InventoryItemTypes.SLEEVES,
+];

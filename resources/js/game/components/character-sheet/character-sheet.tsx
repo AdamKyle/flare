@@ -57,7 +57,9 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
         />
       ))
       .with({ showClassRanks: true }, () => <CharacterClassRanks />)
-      .with({ showInventory: true }, () => <CharacterInventoryManagement />)
+      .with({ showInventory: true }, () => (
+        <CharacterInventoryManagement character_id={characterData.id} />
+      ))
       .otherwise(() => (
         <CharacterSheetDetails
           openReincarnationSystem={openReincarnation}

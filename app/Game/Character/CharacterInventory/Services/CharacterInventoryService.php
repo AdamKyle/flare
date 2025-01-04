@@ -280,7 +280,7 @@ class CharacterInventoryService
                 ->where('items.type', 'alchemy');
         })->select('inventory_slots.*')->get();
 
-        $slots = new LeagueCollection($slots, $this->usableItemTransformer);
+        $slots = new LeagueCollection($slots, $this->inventoryTransformer);
 
         return $this->manager->createData($slots)->toArray();
     }
