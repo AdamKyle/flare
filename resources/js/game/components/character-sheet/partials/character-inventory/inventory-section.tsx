@@ -2,9 +2,11 @@ import React, { ReactNode } from 'react';
 
 import { CharacterInventoryApiUrls } from './api/enums/character-inventory-api-urls';
 import { useGetCharacterInventory } from './api/hooks/use-get-character-inventory';
+import Backpack from './backpack';
 import { Position } from './enums/equipment-positions';
 import { InventoryItemTypes } from './enums/inventory-item-types';
 import EquippedSlot from './equipped-slot';
+import { useCharacterBackpackVisibility } from './hooks/use-character-backpack-visibility';
 import HorizontalIcons from './horizontal-icons';
 import InventorySectionProps from './types/inventory-section-props';
 import { fetchEquippedArmour } from './utils/fetch-equipped-armour';
@@ -19,6 +21,8 @@ import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 const InventorySection = ({
   character_id,
 }: InventorySectionProps): ReactNode => {
+  const { showBackpack, closeBackpack } = useCharacterBackpackVisibility();
+
   const { data, error, loading } = useGetCharacterInventory({
     url: CharacterInventoryApiUrls.CHARACTER_INVENTORY,
     urlParams: { character: character_id },
@@ -36,13 +40,24 @@ const InventorySection = ({
     return <GameDataError />;
   }
 
-  const isMobile = window.innerWidth < 768;
-
-  console.log(data);
+  if (showBackpack) {
+    return (
+      <Backpack
+        close_backpack={closeBackpack}
+        inventory_items={data.inventory}
+        quest_items={data.quest_items}
+      />
+    );
+  }
 
   return (
     <div className="relative">
-      {isMobile ? <HorizontalIcons /> : <VerticalSideIcons />}
+      <div className="hidden lg:block">
+        <VerticalSideIcons />
+      </div>
+      <div className="lg:hidden">
+        <HorizontalIcons />
+      </div>
 
       <div className="flex justify-center">
         <div className="flex items-center lg:p-4 space-x-4 w-full lg:w-3/4 md:justify-center">

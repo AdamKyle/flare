@@ -1,3 +1,1 @@
-yarn cleanup
-
-git add -A
+yarn lint && yarn type-check && yarn cleanup

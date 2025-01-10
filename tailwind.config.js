@@ -2,6 +2,7 @@ import colors from "tailwindcss/colors";
 import aspectRatio from "@tailwindcss/aspect-ratio";
 import tailWindPros from '@tailwindcss/typography';
 import tailwindcssDir from "tailwindcss-dir";
+import tailwindScrollBar from 'tailwind-scrollbar'
 
 export default {
     mode: 'jit',
@@ -38,12 +39,30 @@ export default {
                 '950': '#222f49',
             },
             'artifact-colors': {
-                '200': '#e9b8e2',
-                '800': '#82326b',
+                DEFAULT: "#fcf6fd",
+                '100': '#f9ebfc',
+                '200': '#f3d7f7',
+                '300': '#ecb7f0',
+                '400': '#e08ce6',
+                '500': '#cf5fd6',
+                '600': '#b53fba',
+                '700': '#a034a2',
+                '800': '#7d2a7e',
+                '900': '#682767',
+                '950': '#430f42',
             },
             'cosmic-colors': {
-                '600': '#7A6AC1',
-                '700': '#6959A9',
+                DEFAULT: '#fcf3ff',
+                '100': '#f9e7ff',
+                '200': '#f3cdff',
+                '300': '#eba7ff',
+                '400': '#e172ff',
+                '500': '#d03df8',
+                '600': '#b61cdd',
+                '700': '#9b14b7',
+                '800': '#84139a',
+                '900': '#6b157a',
+                '950': '#470052',
             },
             'item-skill-training': {
                 '300': '#f7c852',
@@ -62,7 +81,7 @@ export default {
                 900: "#061929",
             },
             indigo: {
-                50: "#eef2ff",
+                DEFAULT: "#eef2ff",
                 100: "#e0e7ff",
                 200: "#c7d2fe",
                 300: "#a5b4fc",
@@ -86,7 +105,7 @@ export default {
                 900: "#151515",
             },
             rose: {
-                '50': '#fff1f2',
+                DEFAULT: '#fff1f2',
                 '100': '#ffe4e6',
                 '200': '#fecdd3',
                 '300': '#fda4af',
@@ -99,7 +118,7 @@ export default {
                 '950': '#4c0519',
             },
             emerald: {
-                '50': '#ecfdf5',
+                DEFAULT: '#ecfdf5',
                 '100': '#d1fae5',
                 '200': '#a7f3d0',
                 '300': '#6ee7b7',
@@ -112,7 +131,7 @@ export default {
                 '950': '#022c22',
             },
             danube: {
-                '50': '#f1f7fd',
+                DEFAULT: '#f1f7fd',
                 '100': '#e0eef9',
                 '200': '#c9e1f4',
                 '300': '#a4ceec',
@@ -125,7 +144,7 @@ export default {
                 '950': '#212e4a',
             },
             'mango-tango': {
-                '50': '#fffaec',
+                DEFAULT: '#fffaec',
                 '100': '#fff4d3',
                 '200': '#ffe5a5',
                 '300': '#ffd16d',
@@ -137,7 +156,19 @@ export default {
                 '900': '#823d0c',
                 '950': '#461c04',
             },
-
+            'marigold': {
+                DEFAULT: '#f9f7ed',
+                '100': '#f0ead1',
+                '200': '#e2d6a6',
+                '300': '#d1ba73',
+                '400': '#c2a14d',
+                '500': '#b68f40',
+                '600': '#9a7034',
+                '700': '#7c542c',
+                '800': '#68462b',
+                '900': '#5a3c29',
+                '950': '#331f15',
+            },
 
         },
         extend: {
@@ -282,7 +313,7 @@ export default {
             }),
         },
     },
-    plugins: [tailWindPros, aspectRatio, tailwindcssDir],
+    plugins: [tailWindPros, aspectRatio, tailwindcssDir, tailwindScrollBar],
     variants: {
         backgroundColor: ({ after }) => after(['disabled']),
         extend: {

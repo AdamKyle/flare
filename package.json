@@ -63,6 +63,7 @@
         "pusher-js": "^8.4.0-rc2",
         "reflect-metadata": "^0.2.2",
         "rpg-awesome": "^0.2.0",
+        "tailwind-scrollbar": "^3.1.0",
         "tailwindcss-classnames": "^3.0.2",
         "tippy.js": "^6.3.7",
         "ts-pattern": "^5.5.0",
