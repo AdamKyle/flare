@@ -7,15 +7,15 @@ import { Position } from './enums/equipment-positions';
 import { InventoryItemTypes } from './enums/inventory-item-types';
 import EquippedSlot from './equipped-slot';
 import { useCharacterBackpackVisibility } from './hooks/use-character-backpack-visibility';
-import HorizontalIcons from './horizontal-icons';
 import InventorySectionProps from './types/inventory-section-props';
 import { fetchEquippedArmour } from './utils/fetch-equipped-armour';
-import VerticalSideIcons from './vertical-side-icons';
+import { inventoryIconButtons } from './utils/inventory-icon-buttons';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
+import { MobileIconContainer } from 'ui/icon-container/mobile-icon-container';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const InventorySection = ({
@@ -52,12 +52,7 @@ const InventorySection = ({
 
   return (
     <div className="relative">
-      <div className="hidden lg:block">
-        <VerticalSideIcons />
-      </div>
-      <div className="lg:hidden">
-        <HorizontalIcons />
-      </div>
+      <MobileIconContainer icon_buttons={inventoryIconButtons()} />
 
       <div className="flex justify-center">
         <div className="flex items-center lg:p-4 space-x-4 w-full lg:w-3/4 md:justify-center">

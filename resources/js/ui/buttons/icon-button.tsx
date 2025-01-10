@@ -14,7 +14,7 @@ const IconButton = (props: IconButtonProps): ReactNode => {
         variantStyles(props.variant),
         props.additional_css
       )}
-      aria-label={props.aria_lebel || 'Icon Button'}
+      aria-label={props.aria_lebel || props.label || 'Icon Button'}
       disabled={props.disabled}
       role="button"
       type="button"

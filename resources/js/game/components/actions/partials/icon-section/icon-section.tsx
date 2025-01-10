@@ -2,7 +2,6 @@ import { AnimatePresence } from 'framer-motion';
 import React, { ReactNode } from 'react';
 
 import { MotionDiv } from './components/motion-div';
-import IconContainer from '../../components/icon-section/icon-container';
 import CharacterCard from '../floating-cards/character-details/character-card';
 import { useManageCharacterCardVisibility } from '../floating-cards/character-details/hooks/use-manage-character-card-visibility';
 import ChatCard from '../floating-cards/chat-section/chat-card';
@@ -12,6 +11,7 @@ import { useManageCraftingCardVisibility } from '../floating-cards/crafting-sect
 
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import IconButton from 'ui/buttons/icon-button';
+import IconContainer from 'ui/icon-container/icon-container';
 
 export const IconSection = (): ReactNode => {
   const { showCharacterCard, openCharacterCard } =
