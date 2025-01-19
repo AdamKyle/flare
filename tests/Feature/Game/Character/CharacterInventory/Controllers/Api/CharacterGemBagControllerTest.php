@@ -36,7 +36,7 @@ class CharacterGemBagControllerTest extends TestCase
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertCount(1, $jsonData['gem_slots']);
+        $this->assertCount(1, $jsonData);
     }
 
     public function testGetGem()

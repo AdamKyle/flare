@@ -65,7 +65,7 @@ class GemShopService
             number_format($cost['shards']) . ' Shards and ' . number_format($cost['copper_coins']) . ' Copper Coins.';
 
         return $this->successResult([
-            'gems' => $this->characterGemBagService->getGems($character->refresh())['gem_slots'],
+            'gems' => $this->characterGemBagService->getGems($character->refresh()),
             'message' => $message,
         ]);
     }
@@ -118,7 +118,7 @@ class GemShopService
         event(new UpdateCharacterInventoryCountEvent($character));
 
         return $this->successResult([
-            'gems' => $this->characterGemBagService->getGems($character->refresh())['gem_slots'],
+            'gems' => $this->characterGemBagService->getGems($character->refresh()),
             'message' => $message,
         ]);
     }

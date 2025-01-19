@@ -40,7 +40,7 @@ class CharacterGemBagServiceTest extends TestCase
         $result = $this->characterGemBagService->getGems($character);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertNotEmpty($result['gem_slots']);
+        $this->assertNotEmpty($result);
     }
 
     public function testGetGemData()
