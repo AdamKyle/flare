@@ -1,10 +1,14 @@
 import { useOpenCharacterBackpack } from '../hooks/use-open-character-backpack';
+import { useOpenCharacterGemBag } from '../hooks/use-open-character-gem-bag';
+import { useOpenCharacterUsableInventory } from '../hooks/use-open-character-usable-inventory';
 
 import IconButtonDefinition from 'ui/buttons/definitions/icon-button-definition';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 
 export const inventoryIconButtons = (): IconButtonDefinition[] => {
   const { openBackpack } = useOpenCharacterBackpack();
+  const { openUsableInventory } = useOpenCharacterUsableInventory();
+  const { openGemBag } = useOpenCharacterGemBag();
 
   return [
     {
@@ -18,14 +22,14 @@ export const inventoryIconButtons = (): IconButtonDefinition[] => {
       label: 'Usable',
       icon: 'ra ra-player text-sm',
       variant: ButtonVariant.PRIMARY,
-      onClick: () => {},
+      onClick: openUsableInventory,
       additionalCss: 'w-full',
     },
     {
       label: 'Gems',
       icon: 'ra ra-player text-sm',
       variant: ButtonVariant.PRIMARY,
-      onClick: () => {},
+      onClick: openGemBag,
       additionalCss: 'w-full',
     },
     {

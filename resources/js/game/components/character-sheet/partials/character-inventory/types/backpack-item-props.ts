@@ -1,5 +1,5 @@
 import BaseInventoryItemDefinition from '../api-definitions/base-inventory-item-definition';
 
-export default interface BackpackItemState {
+export default interface BackpackItemProps {
   item: BaseInventoryItemDefinition;
 }

@@ -10,4 +10,9 @@ export default interface BaseInventoryItemDefinition extends BaseItemDetails {
   position: InventoryPositionDefinition;
   usable: boolean;
   type: InventoryItemTypes;
+  damages_kingdoms: boolean;
+  kingdom_damage: number | null;
+  lasts_for: number;
+  can_stack: boolean;
+  effect: string;
 }

@@ -1,7 +1,6 @@
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
-import { InventoryItemTypes } from './enums/inventory-item-types';
 import {
   backpackBaseItemStyles,
   backpackBorderStyles,
@@ -9,17 +8,19 @@ import {
   backpackFocusRingStyles,
   backpackItemTextColors,
 } from './styles/backpack-item-styles';
-import BackpackItemProps from './types/backpack-item-props';
+import UsableItemProps from './types/usable-item-props';
+import { formatNumberWithCommas } from '../../../../util/format-number';
 
-const BackpackItem = ({ item }: BackpackItemProps): ReactNode => {
+const UsableItem = ({ item }: UsableItemProps): ReactNode => {
   const itemColor = backpackItemTextColors(item);
 
   const renderItemDetails = (): ReactNode => {
-    if (item.type === InventoryItemTypes.QUEST) {
+    if (item.damages_kingdoms) {
       if (item.effect !== null) {
         return (
           <span>
-            <strong>Effects</strong>: {item.effect}
+            <strong>Damage dealt when dropped</strong>:{' '}
+            {formatNumberWithCommas(item.kingdom_damage || 0)}
           </span>
         );
       }
@@ -30,15 +31,7 @@ const BackpackItem = ({ item }: BackpackItemProps): ReactNode => {
     return (
       <>
         <span>
-          <strong>Type</strong>: {item.type}
-        </span>{' '}
-        |{' '}
-        <span>
-          <strong>Damage</strong>: {item.attack}
-        </span>{' '}
-        |{' '}
-        <span>
-          <strong>AC</strong>: {item.ac}
+          <strong>Lasts For (Minutes)</strong>: {item.lasts_for}
         </span>
       </>
     );
@@ -65,4 +58,4 @@ const BackpackItem = ({ item }: BackpackItemProps): ReactNode => {
   );
 };
 
-export default BackpackItem;
+export default UsableItem;

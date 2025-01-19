@@ -36,7 +36,7 @@ class CharacterGemBagService
         $gems = new Collection($character->gemBag->gemSlots, $this->characterGemBagTransformer);
         $gems = $this->manager->createData($gems)->toArray();
 
-        return $this->successResult(['gem_slots' => $gems]);
+        return $this->successResult($gems);
     }
 
     public function getGemData(Character $character, GemBagSlot $gemSlot): array

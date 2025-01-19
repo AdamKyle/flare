@@ -1,9 +1,10 @@
 import { isEmpty } from 'lodash';
 import React, { ReactNode } from 'react';
 
+import BaseInventoryItemDefinition from './api-definitions/base-inventory-item-definition';
 import BackpackItem from './backpack-item';
 import { useInfiniteScroll } from './hooks/use-infinite-scroll';
-import BackpackState from './types/backpack-state';
+import BackpackProps from './types/backpack-props';
 
 import BackButton from 'ui/buttons/back-button';
 import { InfiniteScroll } from 'ui/infinite-scroll/infinite-scroll';
@@ -13,7 +14,7 @@ const Backpack = ({
   close_backpack,
   inventory_items,
   quest_items,
-}: BackpackState): ReactNode => {
+}: BackpackProps): ReactNode => {
   const {
     visibleItems: visibleInventoryItems,
     handleScroll: handleInventoryScroll,
@@ -40,7 +41,10 @@ const Backpack = ({
               </div>
             )}
             {visibleInventoryItems.map((item) => (
-              <BackpackItem key={item.slot_id} item={item} />
+              <BackpackItem
+                key={item.slot_id}
+                item={item as BaseInventoryItemDefinition}
+              />
             ))}
           </InfiniteScroll>
         </div>
@@ -61,7 +65,10 @@ const Backpack = ({
               </div>
             )}
             {visibleQuestItems.map((item) => (
-              <BackpackItem key={item.slot_id} item={item} />
+              <BackpackItem
+                key={item.slot_id}
+                item={item as BaseInventoryItemDefinition}
+              />
             ))}
           </InfiniteScroll>
         </div>

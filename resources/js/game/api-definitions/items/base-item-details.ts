@@ -7,5 +7,6 @@ export interface BaseItemDetails {
   is_mythical: boolean;
   is_unique: boolean;
   name: string;
+  description: string;
   type: string;
 }

@@ -6,8 +6,12 @@ import Backpack from './backpack';
 import { Position } from './enums/equipment-positions';
 import { InventoryItemTypes } from './enums/inventory-item-types';
 import EquippedSlot from './equipped-slot';
+import GemBag from './gem-bag';
 import { useCharacterBackpackVisibility } from './hooks/use-character-backpack-visibility';
+import { useCharacterGemBagVisibility } from './hooks/use-character-gem-bag-visibility';
+import { useCharacterUsableInventoryVisibility } from './hooks/use-character-usable-inventory-visibility';
 import InventorySectionProps from './types/inventory-section-props';
+import UsableInventory from './usable-inventory';
 import { fetchEquippedArmour } from './utils/fetch-equipped-armour';
 import { inventoryIconButtons } from './utils/inventory-icon-buttons';
 
@@ -22,6 +26,9 @@ const InventorySection = ({
   character_id,
 }: InventorySectionProps): ReactNode => {
   const { showBackpack, closeBackpack } = useCharacterBackpackVisibility();
+  const { showUsableInventory, closeUsableInventory } =
+    useCharacterUsableInventoryVisibility();
+  const { showGemBag, closeGemBag } = useCharacterGemBagVisibility();
 
   const { data, error, loading } = useGetCharacterInventory({
     url: CharacterInventoryApiUrls.CHARACTER_INVENTORY,
@@ -48,6 +55,19 @@ const InventorySection = ({
         quest_items={data.quest_items}
       />
     );
+  }
+
+  if (showUsableInventory) {
+    return (
+      <UsableInventory
+        close_usable_Section={closeUsableInventory}
+        usable_items={data.usable_items}
+      />
+    );
+  }
+
+  if (showGemBag) {
+    return <GemBag close_gem_bag={closeGemBag} character_id={character_id} />;
   }
 
   return (

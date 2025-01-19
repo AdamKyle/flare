@@ -15,7 +15,8 @@ export const variantStyle = (variant: AlertVariant) => {
     )
     .with(
       AlertVariant.DANGER,
-      () => 'border-rose-400 dark:border-rose-500 bg-rose-100 dark:bg-rose:700'
+      () =>
+        'border-rose-400 dark:border-rose-500 bg-rose-100 dark:bg-rose-700 text:rose-700 dark:text-rose-100'
     )
     .with(
       AlertVariant.WARNING,

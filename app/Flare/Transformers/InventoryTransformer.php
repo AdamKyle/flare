@@ -17,6 +17,7 @@ class InventoryTransformer extends TransformerAbstract
             'item_id' => $slot->item->id,
             'slot_id' => $slot->id,
             'name' => $slot->item->affix_name,
+            'description' => $slot->item->description,
             'type' => $slot->item->type,
             'affix_count' => $slot->item->affix_count,
             'is_unique' => $slot->item->is_unique,
@@ -27,6 +28,11 @@ class InventoryTransformer extends TransformerAbstract
             'ac' => $slot->item->getTotalDefence(),
             'attack' => $slot->item->getTotalDamage(),
             'usable' => $slot->item->usable,
+            'damages_kingdoms' => $slot->item->damages_kingdoms,
+            'kingdom_damage' => $slot->item->kingdom_damage,
+            'lasts_for' => $slot->item->lasts_for,
+            'can_stack' => $slot->item->can_stack,
+            'effect' => $slot->item->effect,
             'position' => $slot->position,
         ];
     }

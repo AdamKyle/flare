@@ -33,7 +33,7 @@ class CharacterGemSlotsTransformer extends TransformerAbstract
         };
 
         return [
-            'id' => $gemBagSlot->id,
+            'slot_id' => $gemBagSlot->id,
             'name' => $gemBagSlot->gem->name,
             'tier' => $gemBagSlot->gem->tier,
             'amount' => $gemBagSlot->amount,
