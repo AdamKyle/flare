@@ -2,6 +2,7 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
@@ -103,6 +104,7 @@ class MassImportCustomData extends Command
      * Import the game maps
      *
      * @return void
+     * @throws Exception
      */
     private function importGameMaps(): void
     {

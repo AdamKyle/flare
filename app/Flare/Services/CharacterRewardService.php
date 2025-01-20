@@ -108,7 +108,7 @@ class CharacterRewardService
     {
 
         $this->character->update([
-            'xp' => $xp,
+            'xp' => $this->character->xp + $xp,
         ]);
 
         $this->character = $this->character->refresh();
