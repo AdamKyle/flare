@@ -11,6 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class CapitalCityBuildingRequestMovement implements ShouldQueue
 {
@@ -53,6 +54,10 @@ class CapitalCityBuildingRequestMovement implements ShouldQueue
         $queueData = $queueData->refresh();
 
         event(new UpdateCapitalCityBuildingQueueTable($queueData->character));
+
+        Log::channel('capital_city_building_upgrades')->info('Processing Building Request', [
+            '$queueData' => $queueData,
+        ]);
 
         $capitalCityBuildingManagement->processBuildingRequest(
             $queueData

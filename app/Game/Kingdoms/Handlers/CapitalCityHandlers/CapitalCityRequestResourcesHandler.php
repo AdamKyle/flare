@@ -13,6 +13,7 @@ use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest as CapitalCityResourceRequ
 use App\Game\Kingdoms\Service\KingdomMovementTimeCalculationService;
 use App\Game\Kingdoms\Service\ResourceTransferService;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
+use Illuminate\Support\Facades\Log;
 
 class CapitalCityRequestResourcesHandler
 {
@@ -41,6 +42,7 @@ class CapitalCityRequestResourcesHandler
      * @param array $summedMissingCosts
      * @param array $requestData
      * @param Kingdom $kingdom
+     * @param string $type
      * @return void
      */
     public function handleResourceRequests(
@@ -53,6 +55,10 @@ class CapitalCityRequestResourcesHandler
     ): void {
         $kingdomWhoCanAfford = $this->getKingdomWhoCanAffordCosts($character, $kingdom, $summedMissingCosts);
 
+        Log::channel('capital_city_building_upgrades')->info('handleResourceRequests', [
+            '$kingdomWhoCanAfford' => $kingdomWhoCanAfford->id,
+        ]);
+
         if (is_null($kingdomWhoCanAfford)) {
             $requestData = $this->markRequestsAsRejected($requestData);
             $this->messages[] = 'Resource Request Rejected: No kingdom could be found to request the resources for these buildings.';
@@ -60,6 +66,8 @@ class CapitalCityRequestResourcesHandler
             $queue = $this->updateQueueData($queue, $requestData, CapitalCityQueueStatus::REJECTED);
 
             $this->logAndTriggerEvents($queue);
+
+            Log::channel('capital_city_building_upgrades')->info('Requests were rejected because: Resource Request Rejected: No kingdom could be found to request the resources for these buildings.');
 
             return;
         }
@@ -72,6 +80,8 @@ class CapitalCityRequestResourcesHandler
 
             $this->logAndTriggerEvents($queue);
 
+            Log::channel('capital_city_building_upgrades')->info('Requests were rejected because: Resource Request Rejected: Your kingdoms: ' . $kingdom->name . ' and ' . $kingdomWhoCanAfford->name . ' both must have a Market Place at level 5 or higher.');
+
             return;
         }
 
@@ -82,6 +92,8 @@ class CapitalCityRequestResourcesHandler
             $queue = $this->updateQueueData($queue, $requestData, CapitalCityQueueStatus::REJECTED);
 
             $this->logAndTriggerEvents($queue);
+
+            Log::channel('capital_city_building_upgrades')->info('Requests were rejected because: Resource Request Rejected: Resource Request Rejected: When asking ' . $kingdomWhoCanAfford->name . ' For the resources to fulfill each request, the kingdom told us they do not have the population (need 50) to send a caravan of resources.');
 
             return;
         }
@@ -95,10 +107,20 @@ class CapitalCityRequestResourcesHandler
 
             $this->logAndTriggerEvents($queue);
 
+            Log::channel('capital_city_building_upgrades')->info('Requests were rejected because: Resource Request Rejected: When asking ' . $kingdomWhoCanAfford->name . ' For the resources to fulfill each request, the kingdom told us they do not have enough spearmen (need 75) to go with the caravan and guard them.');
+
             return;
         }
 
         $queue = $this->updateQueueData($queue, $requestData, CapitalCityQueueStatus::REQUESTING);
+
+        Log::channel('capital_city_building_upgrades')->info('Sending Resource Request', [
+            '$queue' => $queue,
+            '$kingdom' => $kingdom->id,
+            '$kingdomWhoCanAfford' => $kingdomWhoCanAfford->id,
+            '$summedMissingCosts' => $summedMissingCosts,
+            '$type' => $type,
+        ]);
 
         $this->createResourceRequest($queue, $kingdom, $kingdomWhoCanAfford, $summedMissingCosts, $type);
 
@@ -133,6 +155,7 @@ class CapitalCityRequestResourcesHandler
      * @param Kingdom $requestingKingdom
      * @param Kingdom $requestingFromKingdom
      * @param array $missingResources
+     * @param string $type
      * @return void
      */
     private function createResourceRequest(
@@ -166,7 +189,7 @@ class CapitalCityRequestResourcesHandler
         $queue = $queue->refresh();
 
         $delayJobTime = $timeToKingdom >= 15 ? $startTime->clone()->addMinutes(15) : $timeTillFinished;
-
+        Log::channel('capital_city_building_upgrades')->info('Dispatching Resource Requests');
         CapitalCityResourceRequestJob::dispatch($queue->id, $resourceRequest->id, $type)->delay($delayJobTime);
 
         $this->resourceTransferService->sendOffBasicUnitMovement($requestingKingdom, $requestingFromKingdom, $missingResources);

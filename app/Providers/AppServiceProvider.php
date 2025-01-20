@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Console\AfterDeployment\ClearPlayersKingdomJobs;
 use App\Console\AfterDeployment\UpdateCharacterFactionBounties;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Mail;
@@ -72,6 +73,7 @@ class AppServiceProvider extends ServiceProvider
             RebalanceIrresistableDamageAffixes::class,
             RebalanceTrinkets::class,
             ClearPlayersJobs::class,
+            ClearPlayersKingdomJobs::class,
             ClearInvalidCapitalCityQueues::class,
             UpdateCharacterFactionBounties::class,
 
