@@ -103,6 +103,12 @@ class CapitalCityManagementController extends Controller
 
     public function recruitUnits(RecruitUnitRequestsRequest $recruitUnitRequestsRequest, Character $character, Kingdom $kingdom)
     {
+        Log::channel('capital_city_unit_recruitments')->info('recruitUnits endpoint called', [
+            '$buildingUpgradeRequestsRequest' => $recruitUnitRequestsRequest->all(),
+            '$character' => $character->id,
+            '$kingdom' => $kingdom->id,
+        ]);
+
         $result = $this->capitalCityManagementService->sendOffUnitRecruitmentOrders($character, $kingdom, $recruitUnitRequestsRequest->request_data);
 
         $status = $result['status'];

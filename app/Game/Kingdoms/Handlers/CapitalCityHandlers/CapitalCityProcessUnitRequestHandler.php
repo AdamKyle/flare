@@ -19,6 +19,7 @@ use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
+use Illuminate\Support\Facades\Log;
 
 
 class CapitalCityProcessUnitRequestHandler
@@ -80,6 +81,8 @@ class CapitalCityProcessUnitRequestHandler
 
             $this->capitalCityKingdomLogHandler->possiblyCreateLogForUnitQueue($capitalCityUnitQueue);
 
+            Log::channel('capital_city_unit_recruitments')->info('Unit request rejected because: Units were rejected because even after requesting resources, you still do not have enough resources for one or more units so the entire request was canceled out of frustration.');
+
             return;
         }
 
@@ -90,8 +93,10 @@ class CapitalCityProcessUnitRequestHandler
         $capitalCityUnitQueue = $capitalCityUnitQueue->refresh();
 
         if (!empty($missingResources)) {
+            Log::channel('capital_city_unit_recruitments')->info('Handling missing resources');
             $this->handleResourceRequests($capitalCityUnitQueue, $character, $missingResources, $requestData, $kingdom);
         } else {
+            Log::channel('capital_city_unit_recruitments')->info('Handling No resource requests - should recruit units.');
             $this->handleNoResourceRequests($character, $capitalCityUnitQueue, $requestData);
         }
     }
@@ -277,7 +282,7 @@ class CapitalCityProcessUnitRequestHandler
 
                 $totalTimeInSeconds += $this->unitService->getTotalTimeForUnitRecruitment($character, $gameUnit, $data['amount']);
             }
-
+            Log::channel('capital_city_unit_recruitments')->info('Creating Unit Recruitment Request');
             $this->createUnitRecruitmentRequest($capitalCityUnitQueue, $filteredRequestData, $totalTimeInSeconds);
         } else {
             $this->logAndTriggerEvents($capitalCityUnitQueue);
@@ -357,23 +362,17 @@ class CapitalCityProcessUnitRequestHandler
 
             $capitalCityUnitQueue = $capitalCityUnitQueue->refresh();
 
-            if ($totalTimeInSeconds >= 900) {
-                CapitalCityUnitRequest::dispatch($capitalCityUnitQueue->id, $totalCosts)->delay(
-                    now()->addSeconds($totalTimeInSeconds)
-                );
-
-                event(new UpdateCapitalCityUnitQueueTable($capitalCityUnitQueue->character));
-
-                return;
-            }
+            Log::channel('capital_city_unit_recruitments')->info('dispatching request', [
+                '$capitalCityUnitQueue' => $capitalCityUnitQueue->id,
+                '$totalCosts' => $totalCosts,
+                '$totalTimeInSeconds' => $totalTimeInSeconds,
+            ]);
 
             CapitalCityUnitRequest::dispatch($capitalCityUnitQueue->id, $totalCosts)->delay(
                 now()->addSeconds($totalTimeInSeconds)
             );
 
             event(new UpdateCapitalCityUnitQueueTable($capitalCityUnitQueue->character));
-
-            return;
         }
     }
 

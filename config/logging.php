@@ -44,6 +44,13 @@ return [
             'days' => 1,
         ],
 
+        'capital_city_unit_recruitments' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/capital-city-unit-recruitments.log'),
+            'level' => 'debug',
+            'days' => 1,
+        ],
+
         'stack' => [
             'driver' => 'stack',
             'channels' => ['daily'],

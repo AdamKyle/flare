@@ -17,6 +17,7 @@ use App\Game\Kingdoms\Validation\KingdomUnitResourceValidation;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 
 class CapitalCityUnitManagementRequestHandler
@@ -51,6 +52,12 @@ class CapitalCityUnitManagementRequestHandler
             $queueData['unit_request_data'] = $unitRequests;
 
             $queue = CapitalCityUnitQueue::create($queueData);
+
+            Log::channel('capital_city_unit_recruitments')->info('Triggering events for createUnitRequests', [
+                '$queue' => $queue,
+                '$character' => $character->id,
+                '$kingdom' => $kingdom->id,
+            ]);
 
             $this->triggerEvents($queue, $character, $kingdom, $time);
             $this->updateKingdomStatus($kingdom);
