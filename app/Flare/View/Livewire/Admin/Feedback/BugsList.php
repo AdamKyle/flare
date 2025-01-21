@@ -29,6 +29,10 @@ class BugsList extends DataTableComponent
             Column::make('Character Name', 'character_id')->format(function ($value) {
                 $character = Character::find($value);
 
+                if (is_null($character)) {
+                    return '<span>Recently Deleted Character</span>';
+                }
+
                 return '<a href="/admin/user/'.$character->user->id.'">'.$character->name.'</a>';
             })->html(),
 
