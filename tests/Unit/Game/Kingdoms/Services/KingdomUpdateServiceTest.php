@@ -4,6 +4,7 @@ namespace Tests\Unit\Game\Kingdoms\Services;
 
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Kingdom;
+use App\Flare\Models\KingdomLog;
 use App\Flare\Values\NpcTypes;
 use App\Game\Kingdoms\Service\KingdomUpdateService;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
@@ -541,6 +542,114 @@ class KingdomUpdateServiceTest extends TestCase
         // We just let the event fall through more for code coverage then anything else.
         // The Event::fake states it was not dispatched, when it was.
         $this->assertNotNull($kingdom);
+    }
+
+    public function testUpdateKingdomToNotBeProtected() {
+        $kingdom = $this->createKingdomForCharacter();
+
+        $kingdom->update([
+            'protected_until' => now()->subWeeks(4)
+        ]);
+
+        $character = $kingdom->character;
+
+        $character->user->update([
+            'show_kingdom_update_messages' => true,
+        ]);
+
+        $kingdom = $kingdom->refresh();
+
+        DB::table('sessions')->truncate();
+
+        DB::table('sessions')->insert([[
+            'id' => '1',
+            'user_id' => $character->refresh()->user->id,
+            'ip_address' => '1',
+            'user_agent' => '1',
+            'payload' => '1',
+            'last_activity' => 1602801731,
+        ]]);
+
+        $this->kingdomUpdateService->setKingdom($kingdom)->updateKingdom();
+
+        $kingdom = $this->kingdomUpdateService->getKingdom();
+
+        $this->assertNull($kingdom->protected_until);
+    }
+
+    public function testKingdomSufferMoraleDamageForNotBeingWalked() {
+        $kingdom = $this->createKingdomForCharacter();
+
+        $kingdom->update([
+            'last_walked' => now()->subDays(31)
+        ]);
+
+
+        $this->kingdomUpdateService->setKingdom($kingdom)->updateKingdom();
+
+        $kingdom = $this->kingdomUpdateService->getKingdom();
+
+        $this->assertLessThan(1.0, $kingdom->current_morale);
+    }
+
+    public function testHandKingdomToNpcWhenLastWalkedIsNull() {
+        $kingdom = $this->createKingdomForCharacter();
+
+        $kingdom->update([
+            'last_walked' => null
+        ]);
+
+        $this->kingdomUpdateService->setKingdom($kingdom)->updateKingdom();
+
+        $kingdom = $kingdom->refresh();
+
+        $this->assertTrue($kingdom->npc_owned);
+    }
+
+    public function testHandleWhenAKingdomGivesResourcesButDoesntStateWhatResource() {
+        $kingdom = $this->createKingdomForCharacter();
+
+        $kingdom->buildings()->create([
+            'game_building_id' => $this->createGameBuilding([
+                'name' => 'building with no resource increase',
+                'is_resource_building' => true,
+
+            ])->id,
+            'kingdom_id' => $kingdom->id,
+            'level' => 1,
+            'max_defence' => 100,
+            'max_durability' => 100,
+            'current_durability' => 100,
+            'current_defence' => 100,
+        ]);
+
+        $kingdom = $kingdom->refresh();
+
+        $this->kingdomUpdateService->setKingdom($kingdom)->updateKingdom();
+
+        $kingdom = $kingdom->refresh();
+
+        $this->assertNotNull($kingdom);
+    }
+
+    public function testKingdomHasTooMuchPopulationAndCannotAffordTheCost() {
+        $kingdom = $this->createKingdomForCharacter();
+
+        $kingdom->update([
+            'current_population' => 2_000_000_000,
+            'treasury' => 0,
+        ]);
+
+        $character = $kingdom->character;
+
+        $this->kingdomUpdateService->setKingdom($kingdom)->updateKingdom();
+
+        $kingdomLog = KingdomLog::where('character_id', $character->id)->first();
+
+        $this->assertNotNull($kingdomLog);
+
+        // Character should have lost their kingdom
+        $this->assertEmpty($character->kingdoms);
     }
 
     protected function bailIfMissingKeyElements(?Kingdom $kingdom)

@@ -151,10 +151,6 @@ class KingdomUpdateService
 
         $this->updateKingdomMorale();
 
-        if (is_null($this->kingdom)) {
-            return;
-        }
-
         $this->updateKingdomTreasury();
 
         $this->updateKingdomResources();
@@ -373,7 +369,7 @@ class KingdomUpdateService
 
         foreach ($resources as $resource) {
             $building = $this->kingdom->buildings->where('gives_resources', true)->where('increase_in_'.$resource)->first();
-
+            dump($building->name);
             if (is_null($building)) {
                 continue;
             }
