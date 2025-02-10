@@ -369,16 +369,12 @@ class KingdomUpdateService
 
         foreach ($resources as $resource) {
             $building = $this->kingdom->buildings->where('gives_resources', true)->where('increase_in_'.$resource)->first();
-            dump($building->name);
-            if (is_null($building)) {
-                continue;
-            }
 
             if ($building->current_durability === 0) {
                 continue;
             }
 
-            if (! is_null($building)) {
+            if (!is_null($building)) {
                 $this->increaseResource($building, $resource);
             }
         }

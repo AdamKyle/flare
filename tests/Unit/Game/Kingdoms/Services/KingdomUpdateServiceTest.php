@@ -2,14 +2,15 @@
 
 namespace Tests\Unit\Game\Kingdoms\Services;
 
+use Exception;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
 use App\Flare\Values\NpcTypes;
 use App\Game\Kingdoms\Service\KingdomUpdateService;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameBuilding;
@@ -607,6 +608,10 @@ class KingdomUpdateServiceTest extends TestCase
     }
 
     public function testHandleWhenAKingdomGivesResourcesButDoesntStateWhatResource() {
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('building with no resource increase does not exist');
+
         $kingdom = $this->createKingdomForCharacter();
 
         $kingdom->buildings()->create([
