@@ -14,13 +14,12 @@ use App\Game\Kingdoms\Values\KingdomMaxValue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameBuilding;
-use Tests\Traits\CreateGameMap;
-use Tests\Traits\CreateKingdom;
 use Tests\Traits\CreateNpc;
+use Tests\Unit\Game\Kingdoms\Helpers\CreateKingdomHelper;
 
 class KingdomUpdateServiceTest extends TestCase
 {
-    use CreateGameBuilding, CreateGameMap, CreateKingdom, CreateNpc, RefreshDatabase;
+    use CreateGameBuilding, CreateNpc, CreateKingdomHelper, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -44,7 +43,7 @@ class KingdomUpdateServiceTest extends TestCase
 
     public function testCanUpdateKingdom()
     {
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $this->bailIfMissingKeyElements($kingdom);
 
@@ -56,7 +55,7 @@ class KingdomUpdateServiceTest extends TestCase
     public function testHandsKingdomToNpc()
     {
 
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $this->bailIfMissingKeyElements($kingdom);
 
@@ -95,7 +94,7 @@ class KingdomUpdateServiceTest extends TestCase
 
     public function testOverPopulatedAndTakesAllTreasury()
     {
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $this->bailIfMissingKeyElements($kingdom);
 
@@ -118,7 +117,7 @@ class KingdomUpdateServiceTest extends TestCase
 
     public function testOverPopulatedAndTakesSomeTreasury()
     {
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $this->bailIfMissingKeyElements($kingdom);
 
@@ -141,7 +140,7 @@ class KingdomUpdateServiceTest extends TestCase
 
     public function testOverPopulatedAndTakesAllGoldBars()
     {
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $this->bailIfMissingKeyElements($kingdom);
 
@@ -164,7 +163,7 @@ class KingdomUpdateServiceTest extends TestCase
 
     public function testOverPopulatedAndTakesSomeGoldBars()
     {
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $this->bailIfMissingKeyElements($kingdom);
 
@@ -187,7 +186,7 @@ class KingdomUpdateServiceTest extends TestCase
 
     public function testOverPopulatedAndTakesAllCharacterGold()
     {
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $this->bailIfMissingKeyElements($kingdom);
 
@@ -218,7 +217,7 @@ class KingdomUpdateServiceTest extends TestCase
 
     public function testOverPopulatedAndTakesSomeCharacterGold()
     {
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $this->bailIfMissingKeyElements($kingdom);
 
@@ -249,7 +248,7 @@ class KingdomUpdateServiceTest extends TestCase
 
     public function testDoNotUpdateKingdomTreasuryWhenMaxed()
     {
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $this->bailIfMissingKeyElements($kingdom);
 
@@ -271,7 +270,7 @@ class KingdomUpdateServiceTest extends TestCase
 
     public function testUpdateKingdomTreasuryWhenTreasuryIsZero()
     {
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $this->bailIfMissingKeyElements($kingdom);
 
@@ -294,7 +293,7 @@ class KingdomUpdateServiceTest extends TestCase
 
     public function testUpdateKingdomTreasuryWhenTreasuryIsNotZero()
     {
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $this->bailIfMissingKeyElements($kingdom);
 
@@ -317,7 +316,7 @@ class KingdomUpdateServiceTest extends TestCase
 
     public function testGiveNoResourcesToKingdomWhenBuildingsDurabilityIsZero()
     {
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $this->bailIfMissingKeyElements($kingdom);
 
@@ -358,7 +357,7 @@ class KingdomUpdateServiceTest extends TestCase
 
     public function testGiveSomeResourcesToKingdomWhenBuildingsDamaged()
     {
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $this->bailIfMissingKeyElements($kingdom);
 
@@ -399,7 +398,7 @@ class KingdomUpdateServiceTest extends TestCase
 
     public function testGiveFullResourcesToKingdomWhenBuildingsAreNotDamaged()
     {
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $this->bailIfMissingKeyElements($kingdom);
 
@@ -432,7 +431,7 @@ class KingdomUpdateServiceTest extends TestCase
 
     public function testDoNotUpdatePopulationWhenFarmDurabilityIsAtZero()
     {
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $this->bailIfMissingKeyElements($kingdom);
 
@@ -461,7 +460,7 @@ class KingdomUpdateServiceTest extends TestCase
 
     public function testOnlyGiveSomePopulationBasedOnDurabilityOfFarm()
     {
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $this->bailIfMissingKeyElements($kingdom);
 
@@ -490,7 +489,7 @@ class KingdomUpdateServiceTest extends TestCase
 
     public function testGiveFullPopulation()
     {
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $this->bailIfMissingKeyElements($kingdom);
 
@@ -513,7 +512,7 @@ class KingdomUpdateServiceTest extends TestCase
 
     public function testUpdateCharacterServerMessage()
     {
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $this->bailIfMissingKeyElements($kingdom);
 
@@ -546,7 +545,7 @@ class KingdomUpdateServiceTest extends TestCase
     }
 
     public function testUpdateKingdomToNotBeProtected() {
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $kingdom->update([
             'protected_until' => now()->subWeeks(4)
@@ -579,7 +578,7 @@ class KingdomUpdateServiceTest extends TestCase
     }
 
     public function testKingdomSufferMoraleDamageForNotBeingWalked() {
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $kingdom->update([
             'last_walked' => now()->subDays(31)
@@ -594,7 +593,7 @@ class KingdomUpdateServiceTest extends TestCase
     }
 
     public function testHandKingdomToNpcWhenLastWalkedIsNull() {
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $kingdom->update([
             'last_walked' => null
@@ -612,7 +611,7 @@ class KingdomUpdateServiceTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('building with no resource increase does not exist');
 
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $kingdom->buildings()->create([
             'game_building_id' => $this->createGameBuilding([
@@ -638,7 +637,7 @@ class KingdomUpdateServiceTest extends TestCase
     }
 
     public function testKingdomHasTooMuchPopulationAndCannotAffordTheCost() {
-        $kingdom = $this->createKingdomForCharacter();
+        $kingdom = $this->createKingdomForCharacter($this->character);
 
         $kingdom->update([
             'current_population' => 2_000_000_000,
@@ -666,104 +665,5 @@ class KingdomUpdateServiceTest extends TestCase
         if (is_null($this->kingdomUpdateService)) {
             $this->fail('Kingdom update service is not setup.');
         }
-    }
-
-    protected function createKingdomForCharacter(): ?Kingdom
-    {
-
-        if (is_null($this->character)) {
-            return null;
-        }
-
-        $gameMap = GameMap::first();
-
-        if (is_null($gameMap)) {
-            $this->fail('Was a game map created or a location given to the player?');
-        }
-
-        $kingdom = $this->createKingdom([
-            'character_id' => $this->character->getCharacter()->id,
-            'game_map_id' => $gameMap->id,
-            'current_wood' => 500,
-            'current_population' => 0,
-            'last_walked' => now(),
-        ]);
-
-        $kingdom->buildings()->insert([
-            [
-                'game_building_id' => $this->createGameBuilding([
-                    'is_farm' => true,
-                    'decrease_morale_amount' => 0.20,
-                    'increase_morale_amount' => 0.10,
-                ])->id,
-                'kingdom_id' => $kingdom->id,
-                'level' => 1,
-                'max_defence' => 100,
-                'max_durability' => 100,
-                'current_durability' => 100,
-                'current_defence' => 100,
-            ],
-            [
-                'game_building_id' => $this->createGameBuilding([
-                    'is_resource_building' => true,
-                    'increase_wood_amount' => 100,
-                ])->id,
-                'kingdom_id' => $kingdom->id,
-                'level' => 1,
-                'max_defence' => 100,
-                'max_durability' => 100,
-                'current_durability' => 100,
-                'current_defence' => 100,
-            ],
-            [
-                'game_building_id' => $this->createGameBuilding([
-                    'is_resource_building' => true,
-                    'increase_iron_amount' => 100,
-                ])->id,
-                'kingdom_id' => $kingdom->id,
-                'level' => 1,
-                'max_defence' => 100,
-                'max_durability' => 100,
-                'current_durability' => 100,
-                'current_defence' => 100,
-            ],
-            [
-                'game_building_id' => $this->createGameBuilding([
-                    'is_resource_building' => true,
-                    'increase_clay_amount' => 100,
-                ])->id,
-                'kingdom_id' => $kingdom->id,
-                'level' => 1,
-                'max_defence' => 100,
-                'max_durability' => 100,
-                'current_durability' => 100,
-                'current_defence' => 100,
-            ],
-            [
-                'game_building_id' => $this->createGameBuilding([
-                    'is_resource_building' => true,
-                    'increase_stone_amount' => 100,
-                ])->id,
-                'kingdom_id' => $kingdom->id,
-                'level' => 1,
-                'max_defence' => 100,
-                'max_durability' => 100,
-                'current_durability' => 100,
-                'current_defence' => 100,
-            ],
-            [
-                'game_building_id' => $this->createGameBuilding([
-                    'name' => 'Keep',
-                ])->id,
-                'kingdom_id' => $kingdom->id,
-                'level' => 1,
-                'max_defence' => 100,
-                'max_durability' => 100,
-                'current_durability' => 100,
-                'current_defence' => 100,
-            ],
-        ]);
-
-        return $kingdom->refresh();
     }
 }

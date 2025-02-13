@@ -236,7 +236,7 @@ class ServerMessageBuilderTest extends TestCase
 
     public function testKingdomResourcesUpdated()
     {
-        $message = $this->serverMessageBuilder->buildWithAdditionalInformation(KingdomMessageTypes::KINGDOM_RESOUCE_UPDATE, 'Test');
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation(KingdomMessageTypes::KINGDOM_RESOURCES_UPDATE, 'Test');
 
         $this->assertEquals('Test', $message);
     }

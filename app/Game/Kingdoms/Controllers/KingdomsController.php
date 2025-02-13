@@ -32,25 +32,6 @@ class KingdomsController extends Controller
         ]);
     }
 
-    public function attackLog(Character $character, KingdomLog $kingdomLog)
-    {
-        $kingdomLog->update([
-            'opened' => true,
-        ]);
-
-        $kingdomLog = $kingdomLog->refresh();
-
-        Notification::where('type', 'kingdom')->where('character_id', $character->id)->delete();
-
-        event(new UpdateKingdomLogs($character));
-
-        return view('game.kingdoms.attack-log', [
-            'log' => $this->kingdomLogService->setLog($kingdomLog)->attackReport(),
-            'type' => $kingdomLog->status,
-            'character' => $character,
-        ]);
-    }
-
     public function batchDeleteLogs(Request $request, Character $character)
     {
         $logs = KingdomLog::findMany($request->logs);
