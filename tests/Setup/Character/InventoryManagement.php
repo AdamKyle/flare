@@ -185,15 +185,26 @@ class InventoryManagement
      * You must first use the giveItem command, before calling this.
      * The index param is the index of the array starting at 0.
      *
+     * @param int $index
      * @return int|null
      */
-    public function getSlotId(int $index)
+    public function getSlotId(int $index): ?int
     {
         if (isset($this->slotIds[$index])) {
             return $this->slotIds[$index];
         }
 
         return null;
+    }
+
+    /**
+     * Return slots ids
+     *
+     * @return array
+     */
+    public function getSlotIds(): array
+    {
+        return $this->slotIds;
     }
 
     /**

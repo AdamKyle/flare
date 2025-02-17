@@ -181,7 +181,7 @@ class Kingdom extends Model
 
         $totalDefence = $factionNpcs->sum('current_kingdom_item_defence_bonus');
 
-        return min($totalDefence, 0.95);
+        return min($totalDefence, .95);
     }
 
     public function getWallsDefence(): float
