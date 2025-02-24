@@ -31,6 +31,7 @@ class ExcelMapper
             RacesImport::class,
         ],
         'Items' => ItemsImport::class,
+        'Weapons' => ItemsImport::class,
         'Monsters' => MonstersImport::class,
         'Skills' => [
             ItemSkillsImport::class,

@@ -14,7 +14,7 @@ use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\NpcActions\LabyrinthOracle\Events\LabyrinthOracleUpdate;
 
-class InventorySetService
+class  InventorySetService
 {
     use ResponseBuilder;
 

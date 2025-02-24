@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
-use App\Console\AfterDeployment\ClearPlayersKingdomJobs;
-use App\Console\AfterDeployment\UpdateCharacterFactionBounties;
+
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
+use App\Console\AfterDeployment\ChangePlayerWeapons;
+use App\Console\AfterDeployment\ClearPlayersKingdomJobs;
+use App\Console\AfterDeployment\UpdateCharacterFactionBounties;
 use App\Console\AfterDeployment\AddHolyStacksToItems;
 use App\Console\AfterDeployment\AllowTraverseForMaps;
 use App\Console\AfterDeployment\AssignNewBuildingsToExistingKingdoms;
@@ -76,6 +78,7 @@ class AppServiceProvider extends ServiceProvider
             ClearPlayersKingdomJobs::class,
             ClearInvalidCapitalCityQueues::class,
             UpdateCharacterFactionBounties::class,
+            ChangePlayerWeapons::class,
 
             // Development Commands:
             CreateCharacter::class,

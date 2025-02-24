@@ -5,6 +5,7 @@ namespace App\Flare\GameImporter\Console\Commands;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
@@ -32,6 +33,8 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
+
+        Artisan::call('import:game-data Weapons');
 
         $this->importInformationSection();
 
