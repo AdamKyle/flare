@@ -59,7 +59,7 @@ class GameSkill extends Model
 
     public function skillType(): SkillTypeValue
     {
-        return new SkillTypeValue($this->type);
+        return SkillTypeValue::tryFrom($this->type);
     }
 
     public function gameClass()
