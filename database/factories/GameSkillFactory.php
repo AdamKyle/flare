@@ -34,7 +34,7 @@ class GameSkillFactory extends Factory
             'game_class_id' => null,
             'can_train' => true,
             'skill_bonus_per_level' => 0.01,
-            'type' => SkillTypeValue::TRAINING,
+            'type' => SkillTypeValue::TRAINING->value,
             'game_class_id' => null,
         ];
     }

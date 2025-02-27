@@ -227,7 +227,7 @@ class GemService
      */
     protected function getCraftingSkill(Character $character): Skill
     {
-        $name = (new SkillTypeValue(SkillTypeValue::GEM_CRAFTING))->getNamedValue();
+        $name = SkillTypeValue::tryFrom(SkillTypeValue::GEM_CRAFTING->value)->getNamedValue();
         $gameSkill = GameSkill::where('name', $name)->first();
         $skill = $character->skills()->where('game_skill_id', $gameSkill->id)->first();
 

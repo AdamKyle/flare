@@ -98,7 +98,7 @@ class CharacterStatBuilderTest extends TestCase
             'xp' => 100,
             'xp_max' => 1000,
             'xp_towards' => 0,
-            'skill_type' => SkillTypeValue::EFFECTS_CLASS,
+            'skill_type' => SkillTypeValue::EFFECTS_CLASS->value,
             'is_hidden' => false,
         ]);
 

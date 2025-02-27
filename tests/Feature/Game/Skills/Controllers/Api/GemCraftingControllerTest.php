@@ -27,7 +27,7 @@ class GemCraftingControllerTest extends TestCase
 
         $craftingSkill = $this->createGameSkill([
             'name' => 'Gem Crafting',
-            'type' => SkillTypeValue::GEM_CRAFTING,
+            'type' => SkillTypeValue::GEM_CRAFTING->value,
             'max_level' => 100,
         ]);
 

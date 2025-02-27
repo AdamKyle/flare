@@ -52,7 +52,7 @@ class UseItemServiceTest extends TestCase
             'usable' => true,
             'lasts_for' => 30,
             'type' => 'alchemy',
-            'affects_skill_type' => SkillTypeValue::TRAINING,
+            'affects_skill_type' => SkillTypeValue::TRAINING->value,
         ]);
 
         $character = (new CharacterFactory)->createBaseCharacter()
@@ -84,7 +84,7 @@ class UseItemServiceTest extends TestCase
             'usable' => true,
             'lasts_for' => 30,
             'type' => 'alchemy',
-            'affects_skill_type' => SkillTypeValue::TRAINING,
+            'affects_skill_type' => SkillTypeValue::TRAINING->value,
         ]);
 
         $character = (new CharacterFactory)->createBaseCharacter()
@@ -127,7 +127,7 @@ class UseItemServiceTest extends TestCase
             'usable' => true,
             'lasts_for' => 30,
             'type' => 'alchemy',
-            'affects_skill_type' => SkillTypeValue::TRAINING,
+            'affects_skill_type' => SkillTypeValue::TRAINING->value,
             'can_stack' => true,
         ]);
 
@@ -171,7 +171,7 @@ class UseItemServiceTest extends TestCase
             'usable' => true,
             'lasts_for' => 30,
             'type' => 'alchemy',
-            'affects_skill_type' => SkillTypeValue::TRAINING,
+            'affects_skill_type' => SkillTypeValue::TRAINING->value,
             'can_stack' => false,
         ]);
 
@@ -215,7 +215,7 @@ class UseItemServiceTest extends TestCase
             'usable' => true,
             'lasts_for' => 30,
             'type' => 'alchemy',
-            'affects_skill_type' => SkillTypeValue::TRAINING,
+            'affects_skill_type' => SkillTypeValue::TRAINING->value,
         ]);
 
         $character = (new CharacterFactory)->createBaseCharacter()
@@ -244,7 +244,7 @@ class UseItemServiceTest extends TestCase
             'usable' => true,
             'lasts_for' => 30,
             'type' => 'alchemy',
-            'affects_skill_type' => SkillTypeValue::TRAINING,
+            'affects_skill_type' => SkillTypeValue::TRAINING->value,
         ]);
 
         $character = (new CharacterFactory)->createBaseCharacter()

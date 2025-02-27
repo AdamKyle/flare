@@ -643,16 +643,16 @@ class CharacterFactory
      */
     protected function assignBaseSkills()
     {
-        $accuracy = $this->returnGameSkill('Accuracy', SkillTypeValue::TRAINING);
-        $timeout = $this->returnGameSkill('Fighters Timeout', SkillTypeValue::EFFECTS_BATTLE_TIMER);
-        $castingAccuracy = $this->returnGameSkill('Casting Accuracy', SkillTypeValue::TRAINING);
-        $criticality = $this->returnGameSkill('Criticality', SkillTypeValue::TRAINING);
-        $dodge = $this->returnGameSkill('Dodge', SkillTypeValue::TRAINING);
-        $looting = $this->returnGameSkill('Looting', SkillTypeValue::TRAINING);
-        $kingmanship = $this->returnGameSkill('Kingmanship', SkillTypeValue::EFFECTS_KINGDOM);
-        $alchemy = $this->returnGameSkill('Alchemy', SkillTypeValue::ALCHEMY);
-        $disenchanting = $this->returnGameSkill('Disenchanting', SkillTypeValue::DISENCHANTING);
-        $enchanting = $this->returnGameSkill('Enchanting', SkillTypeValue::ENCHANTING);
+        $accuracy = $this->returnGameSkill('Accuracy', SkillTypeValue::TRAINING->value);
+        $timeout = $this->returnGameSkill('Fighters Timeout', SkillTypeValue::EFFECTS_BATTLE_TIMER->value);
+        $castingAccuracy = $this->returnGameSkill('Casting Accuracy', SkillTypeValue::TRAINING->value);
+        $criticality = $this->returnGameSkill('Criticality', SkillTypeValue::TRAINING->value);
+        $dodge = $this->returnGameSkill('Dodge', SkillTypeValue::TRAINING->value);
+        $looting = $this->returnGameSkill('Looting', SkillTypeValue::TRAINING->value);
+        $kingmanship = $this->returnGameSkill('Kingmanship', SkillTypeValue::EFFECTS_KINGDOM->value);
+        $alchemy = $this->returnGameSkill('Alchemy', SkillTypeValue::ALCHEMY->value);
+        $disenchanting = $this->returnGameSkill('Disenchanting', SkillTypeValue::DISENCHANTING->value);
+        $enchanting = $this->returnGameSkill('Enchanting', SkillTypeValue::ENCHANTING->value);
 
         $this->createSkill([
             'character_id' => $this->character->id,

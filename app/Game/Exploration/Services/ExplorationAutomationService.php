@@ -80,7 +80,7 @@ class ExplorationAutomationService
 
     public function setTimeDelay(Character $character): void
     {
-        $fightTimeOutSkill = $character->skills->where('baseSkill.type', SkillTypeValue::EFFECTS_BATTLE_TIMER)->first();
+        $fightTimeOutSkill = $character->skills->where('baseSkill.type', SkillTypeValue::EFFECTS_BATTLE_TIMER->value)->first();
 
         $this->timeDelay = 5 - (5 * $fightTimeOutSkill->fight_time_out_mod);
     }

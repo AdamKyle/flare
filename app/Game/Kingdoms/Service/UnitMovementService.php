@@ -278,7 +278,7 @@ class UnitMovementService
         $timeToKingdom = $this->distanceCalculation->calculateMinutes($pixelDistance);
 
         if (is_null($passiveSkillType)) {
-            $skill = $character->skills()->where('skill_type', SkillTypeValue::EFFECTS_KINGDOM)->first();
+            $skill = $character->skills()->where('skill_type', SkillTypeValue::EFFECTS_KINGDOM->value)->first();
 
             $timeToKingdom -= ($timeToKingdom * $skill->unit_movement_time_reduction);
 

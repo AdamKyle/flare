@@ -135,13 +135,13 @@ class GuideQuestRequirementsServiceTest extends TestCase
     public function testGetClassSkillCheck()
     {
         $guideQuest = $this->createGuideQuest([
-            'required_skill_type' => SkillTypeValue::EFFECTS_CLASS,
+            'required_skill_type' => SkillTypeValue::EFFECTS_CLASS->value,
             'required_skill_type_level' => 1,
         ]);
 
         $character = $this->character->assignSkill(
             $this->createGameSkill([
-                'type' => SkillTypeValue::EFFECTS_CLASS,
+                'type' => SkillTypeValue::EFFECTS_CLASS->value,
                 'game_class_id' => $this->character->getCharacterClassId(),
             ]),
             10
@@ -155,13 +155,13 @@ class GuideQuestRequirementsServiceTest extends TestCase
     public function testGetCraftingSkillCheck()
     {
         $guideQuest = $this->createGuideQuest([
-            'required_skill_type' => SkillTypeValue::CRAFTING,
+            'required_skill_type' => SkillTypeValue::CRAFTING->value,
             'required_skill_type_level' => 1,
         ]);
 
         $character = $this->character->assignSkill(
             $this->createGameSkill([
-                'type' => SkillTypeValue::CRAFTING
+                'type' => SkillTypeValue::CRAFTING->value
             ]),
             10
         )->getCharacter();
@@ -175,7 +175,7 @@ class GuideQuestRequirementsServiceTest extends TestCase
     {
         Log::shouldReceive('info')
             ->once()
-            ->with('999 does not exist.');
+            ->with('Invalid Skill Type Value for: 999');
 
         $guideQuest = $this->createGuideQuest([
             'required_skill_type' => 999,

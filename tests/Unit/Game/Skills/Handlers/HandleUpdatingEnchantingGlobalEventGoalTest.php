@@ -33,7 +33,7 @@ class HandleUpdatingEnchantingGlobalEventGoalTest extends TestCase
         $this->handleUpdateEnchantingGlobalEventGoal = resolve(HandleUpdatingEnchantingGlobalEventGoal::class);
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(
-            $this->createGameSkill(['name' => 'Enchanting', 'type' => SkillTypeValue::ENCHANTING]),
+            $this->createGameSkill(['name' => 'Enchanting', 'type' => SkillTypeValue::ENCHANTING->value]),
             400
         );
     }

@@ -67,7 +67,7 @@ class BaseTransformer extends TransformerAbstract
 
     public function isAlchemyLocked(Character $character)
     {
-        $alchemy = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();
+        $alchemy = GameSkill::where('type', SkillTypeValue::ALCHEMY->value)->first();
 
         if (is_null($alchemy)) {
             return true;

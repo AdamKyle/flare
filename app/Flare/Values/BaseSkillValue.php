@@ -12,7 +12,6 @@ class BaseSkillValue
      */
     public function getBaseCharacterSkillValue(Character $character, GameSkill $skill): array
     {
-
         return [
             'character_id' => $character->id,
             'game_skill_id' => $skill->id,

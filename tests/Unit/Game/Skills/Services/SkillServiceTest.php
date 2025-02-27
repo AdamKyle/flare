@@ -32,7 +32,7 @@ class SkillServiceTest extends TestCase
 
         $this->skill = $this->createGameSkill([
             'name' => 'skill',
-            'type' => SkillTypeValue::TRAINING,
+            'type' => SkillTypeValue::TRAINING->value,
             'can_train' => true,
         ]);
 

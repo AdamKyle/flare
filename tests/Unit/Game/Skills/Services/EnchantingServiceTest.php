@@ -64,7 +64,7 @@ class EnchantingServiceTest extends TestCase
 
         $this->enchantingSkill = $this->createGameSkill([
             'name' => 'Enchanting',
-            'type' => SkillTypeValue::ENCHANTING,
+            'type' => SkillTypeValue::ENCHANTING->value,
         ]);
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(

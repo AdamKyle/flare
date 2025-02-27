@@ -3,95 +3,90 @@
 namespace Tests\Unit\Game\Skills\Values;
 
 use App\Game\Skills\Values\SkillTypeValue;
-use Exception;
 use Tests\TestCase;
 
 class SkillTypeValueTest extends TestCase
 {
-    public function testInvalidEventType()
-    {
-        $this->expectException(Exception::class);
-
-        new SkillTypeValue(905);
-    }
-
     public function testIsTraining()
     {
-        $this->assertTrue((new SkillTypeValue(SkillTypeValue::TRAINING))->isTraining());
+        $this->assertTrue(SkillTypeValue::tryFrom(SkillTypeValue::TRAINING->value)->isTraining());
     }
 
     public function testIsCrafting()
     {
-        $this->assertTrue((new SkillTypeValue(SkillTypeValue::CRAFTING))->isCrafting());
+        $this->assertTrue(SkillTypeValue::tryFrom(SkillTypeValue::CRAFTING->value)->isCrafting());
     }
 
     public function testIsEnchanting()
     {
-        $this->assertTrue((new SkillTypeValue(SkillTypeValue::ENCHANTING))->isEnchanting());
+        $this->assertTrue(SkillTypeValue::tryFrom(SkillTypeValue::ENCHANTING->value)->isEnchanting());
     }
 
     public function testIsDisenchanting()
     {
-        $this->assertTrue((new SkillTypeValue(SkillTypeValue::DISENCHANTING))->isDisenchanting());
+        $this->assertTrue(SkillTypeValue::tryFrom(SkillTypeValue::DISENCHANTING->value)->isDisenchanting());
     }
 
     public function testIsAlchemy()
     {
-        $this->assertTrue((new SkillTypeValue(SkillTypeValue::ALCHEMY))->isAlchemy());
+        $this->assertTrue(SkillTypeValue::tryFrom(SkillTypeValue::ALCHEMY->value)->isAlchemy());
     }
 
     public function testIsBattleTimer()
     {
-        $this->assertTrue((new SkillTypeValue(SkillTypeValue::EFFECTS_BATTLE_TIMER))->isBattleTimer());
+        $this->assertTrue(SkillTypeValue::tryFrom(SkillTypeValue::EFFECTS_BATTLE_TIMER->value)->isBattleTimer());
     }
 
     public function testIsMovementTimer()
     {
-        $this->assertTrue((new SkillTypeValue(SkillTypeValue::EFFECTS_MOVEMENT_TIMER))->isMovementTimer());
+        $this->assertTrue(SkillTypeValue::tryFrom(SkillTypeValue::EFFECTS_MOVEMENT_TIMER->value)->isMovementTimer());
     }
 
     public function testIsDirectionalTimer()
     {
-        $this->assertTrue((new SkillTypeValue(SkillTypeValue::EFFECTS_DIRECTIONAL_MOVE_TIMER))->isDirectionalMovementTimer());
+        $this->assertTrue(SkillTypeValue::tryFrom(SkillTypeValue::EFFECTS_DIRECTIONAL_MOVE_TIMER->value)->isDirectionalMovementTimer());
     }
 
     public function testIsKingdomBuildingTimer()
     {
-        $this->assertTrue((new SkillTypeValue(SkillTypeValue::EFFECTS_KINGDOM_BUILDING_TIMERS))->isKingdomBuildingTimer());
+        $this->assertTrue(SkillTypeValue::tryFrom(SkillTypeValue::EFFECTS_KINGDOM_BUILDING_TIMERS->value)->isKingdomBuildingTimer());
     }
 
-    public function testIsKingdomUnitRecruitmentTimer()
+    public function testIsUnitRecruitmentTimer()
     {
-        $this->assertTrue((new SkillTypeValue(SkillTypeValue::EFFECTS_UNIT_RECRUITMENT_TIMER))->isUnitRecruitmentTimer());
+        $this->assertTrue(SkillTypeValue::tryFrom(SkillTypeValue::EFFECTS_UNIT_RECRUITMENT_TIMER->value)->isUnitRecruitmentTimer());
     }
 
-    public function testIsKingdomUnitMovementTimer()
+    public function testIsUnitMovementTimer()
     {
-        $this->assertTrue((new SkillTypeValue(SkillTypeValue::EFFECTS_UNIT_MOVEMENT_TIMER))->isUnitMovementTimer());
+        $this->assertTrue(SkillTypeValue::tryFrom(SkillTypeValue::EFFECTS_UNIT_MOVEMENT_TIMER->value)->isUnitMovementTimer());
     }
 
     public function testIsSpellEvasion()
     {
-        $this->assertTrue((new SkillTypeValue(SkillTypeValue::EFFECTS_SPELL_EVASION))->isSpellEvasion());
+        $this->assertTrue(SkillTypeValue::tryFrom(SkillTypeValue::EFFECTS_SPELL_EVASION->value)->isSpellEvasion());
     }
 
     public function testIsKingdom()
     {
-        $this->assertTrue((new SkillTypeValue(SkillTypeValue::EFFECTS_KINGDOM))->effectsKingdom());
+        $this->assertTrue(SkillTypeValue::tryFrom(SkillTypeValue::EFFECTS_KINGDOM->value)->effectsKingdom());
     }
 
     public function testEffectsClass()
     {
-        $this->assertTrue((new SkillTypeValue(SkillTypeValue::EFFECTS_CLASS))->effectsClassSkills());
+        $this->assertTrue(SkillTypeValue::tryFrom(SkillTypeValue::EFFECTS_CLASS->value)->effectsClassSkills());
     }
 
-    public function testGetNamedValues()
+    public function testIsGemCrafting()
     {
-        $this->assertEquals(SkillTypeValue::getValues(), SkillTypeValue::getValues());
+        $this->assertTrue(SkillTypeValue::tryFrom(SkillTypeValue::GEM_CRAFTING->value)->isGemCrafting());
     }
 
     public function testGetNamedValue()
     {
-        $this->assertEquals((new SkillTypeValue(SkillTypeValue::EFFECTS_CLASS))->getNamedValue(), SkillTypeValue::getValues()[SkillTypeValue::EFFECTS_CLASS]);
+        $this->assertEquals(
+            SkillTypeValue::getValues()[SkillTypeValue::EFFECTS_CLASS->value],
+            SkillTypeValue::EFFECTS_CLASS->getNamedValue()
+        );
     }
 }

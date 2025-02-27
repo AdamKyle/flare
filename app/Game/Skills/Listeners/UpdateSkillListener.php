@@ -44,7 +44,7 @@ class UpdateSkillListener
         $this->updateSkill($event->skill, $skillXP);
 
         if ($event->skill->type()->isDisenchanting()) {
-            $enchantingSkill = Skill::where('game_skill_id', GameSkill::where('type', SkillTypeValue::ENCHANTING)->first()->id)
+            $enchantingSkill = Skill::where('game_skill_id', GameSkill::where('type', SkillTypeValue::ENCHANTING->value)->first()->id)
                 ->where('character_id', $event->skill->character_id)
                 ->first();
 

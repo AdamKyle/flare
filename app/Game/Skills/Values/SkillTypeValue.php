@@ -226,6 +226,7 @@ enum SkillTypeValue: int
      */
     public function effectsClassSkills(): bool
     {
+        dump($this, self::EFFECTS_CLASS);
         return $this === self::EFFECTS_CLASS;
     }
 

@@ -36,7 +36,7 @@ class HandleUpdatingCraftingGlobalEventGoalTest extends TestCase
         $this->handleUpdatingCraftingGlobalEventGoal = resolve(HandleUpdatingCraftingGlobalEventGoal::class);
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(
-            $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING]),
+            $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value]),
             400
         );
     }

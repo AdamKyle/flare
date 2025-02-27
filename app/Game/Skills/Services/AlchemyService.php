@@ -34,7 +34,7 @@ class AlchemyService
 
     public function fetchAlchemistItems(Character $character, bool $showMerchantMessage = true)
     {
-        $gameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();
+        $gameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY->value)->first();
 
         $skill = Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
 
@@ -52,7 +52,7 @@ class AlchemyService
 
     public function fetchSkillXP(Character $character): array
     {
-        $gameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();
+        $gameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY->value)->first();
 
         $skill = Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
 
@@ -66,7 +66,7 @@ class AlchemyService
 
     public function transmute(Character $character, int $itemId): void
     {
-        $gameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();
+        $gameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY->value)->first();
         $skill = Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
         $item = Item::find($itemId);
 

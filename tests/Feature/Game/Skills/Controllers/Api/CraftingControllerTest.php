@@ -28,7 +28,7 @@ class CraftingControllerTest extends TestCase
 
         $craftingSkill = $this->createGameSkill([
             'name' => 'Weapon Crafting',
-            'type' => SkillTypeValue::CRAFTING,
+            'type' => SkillTypeValue::CRAFTING->value,
         ]);
 
         $this->character = (new CharacterFactory)->createBaseCharacter()

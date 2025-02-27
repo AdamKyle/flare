@@ -717,7 +717,7 @@ class StatModifierDetailsTest extends TestCase
                 'description' => 'Test Class Skill',
                 'name' => 'Class Skill',
                 'max_level' => 999,
-                'type' => SkillTypeValue::EFFECTS_CLASS,
+                'type' => SkillTypeValue::EFFECTS_CLASS->value,
                 'game_class_id' => $this->gameClass->id,
                 'base_damage_mod_bonus_per_level' => 1.0,
                 'base_healing_mod_bonus_per_level' => 1.0,
