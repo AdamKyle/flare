@@ -108,9 +108,13 @@ class ItemsController extends Controller
                 'trinket',
             ],
             'specialty-shops' => [
+                ItemSpecialtyType::PIRATE_LORD_LEATHER,
                 ItemSpecialtyType::HELL_FORGED,
                 ItemSpecialtyType::PURGATORY_CHAINS,
-                ItemSpecialtyType::PIRATE_LORD_LEATHER,
+                ItemSpecialtyType::CORRUPTED_ICE,
+                ItemSpecialtyType::DELUSIONAL_SILVER,
+                ItemSpecialtyType::TWISTED_EARTH,
+                ItemSpecialtyType::FAITHLESS_PLATE,
             ],
         ];
 

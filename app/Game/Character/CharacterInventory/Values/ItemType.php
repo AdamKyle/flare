@@ -15,4 +15,6 @@ enum ItemType: string {
     case CENSER = 'censer';
     case CLAW = 'claw';
     case SWORD = 'sword';
+    case SPELL_HEALING = 'spell-healing';
+    case SPELL_DAMAGE = 'spell-damage';
 }

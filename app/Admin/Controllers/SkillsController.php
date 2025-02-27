@@ -31,7 +31,7 @@ class SkillsController extends Controller
     {
         return view('admin.skills.manage', [
             'skill' => null,
-            'skillTypes' => SkillTypeValue::$namedValues,
+            'skillTypes' => SkillTypeValue::getValues(),
             'gameClasses' => GameClass::pluck('name', 'id'),
         ]);
     }
@@ -40,7 +40,7 @@ class SkillsController extends Controller
     {
         return view('admin.skills.manage', [
             'skill' => $skill,
-            'skillTypes' => SkillTypeValue::$namedValues,
+            'skillTypes' => SkillTypeValue::getValues(),
             'gameClasses' => GameClass::pluck('name', 'id'),
         ]);
     }

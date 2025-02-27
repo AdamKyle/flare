@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 
+use App\Console\AfterDeployment\CleanInvalidWeapons;
+use App\Console\AfterDeployment\CleanMarketPlaceOfInvalidWeapons;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
@@ -79,6 +81,8 @@ class AppServiceProvider extends ServiceProvider
             ClearInvalidCapitalCityQueues::class,
             UpdateCharacterFactionBounties::class,
             ChangePlayerWeapons::class,
+            CleanInvalidWeapons::class,
+            CleanMarketPlaceOfInvalidWeapons::class,
 
             // Development Commands:
             CreateCharacter::class,

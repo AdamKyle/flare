@@ -35,6 +35,9 @@ class MassImportCustomData extends Command
     {
 
         Artisan::call('import:game-data Weapons');
+        Artisan::call('import:game-data Armour');
+        Artisan::call('change:player-weapons');
+        Artisan::call('clean:market-weapons');
 
         $this->importInformationSection();
 
@@ -46,7 +49,7 @@ class MassImportCustomData extends Command
     }
 
     /**
-     * Import the information sectionbalance:monsters
+     * Import the information section balance:monsters
      *
      * @return void
      */

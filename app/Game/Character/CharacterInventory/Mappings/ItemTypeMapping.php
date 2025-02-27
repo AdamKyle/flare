@@ -20,38 +20,18 @@ final class ItemTypeMapping
             'fighter'          => ItemType::SWORD,
             'vampire'          => ItemType::CLAW,
             'ranger'           => ItemType::BOW,
-            'prophet'          => ItemType::CENSER,
-            'heretic'          => ItemType::WAND,
+            'prophet'          => [ItemType::CENSER, ItemType::SPELL_HEALING],
+            'heretic'          => [ItemType::WAND, ItemType::STAVE, ItemType::SPELL_DAMAGE],
             'thief'            => ItemType::DAGGER,
             'blacksmith'       => ItemType::HAMMER,
-            'arcane alchemist' => ItemType::STAVE,
-            'prisoner'         => self::allWeapons(),
-            'merchant'         => self::merchantWeapons(),
+            'arcane alchemist' => [ItemType::STAVE, ItemType::SPELL_DAMAGE],
+            'prisoner'         => ItemType::cases(),
+            'merchant'         => [ItemType::BOW, ItemType::STAVE],
             'dancer'           => ItemType::FAN,
             'cleric'           => ItemType::MACE,
             'gunslinger'       => ItemType::GUN,
             'book binder'      => ItemType::SCRATCH_AWL,
             default            => null,
         };
-    }
-
-    /**
-     * Returns an array of all available weapon types.
-     *
-     * @return ItemType[]
-     */
-    private static function allWeapons(): array
-    {
-        return ItemType::cases();
-    }
-
-    /**
-     * Returns an array containing ItemType::BOW and ItemType::STAVE.
-     *
-     * @return ItemType[]
-     */
-    private static function merchantWeapons(): array
-    {
-        return [ItemType::BOW, ItemType::STAVE];
     }
 }

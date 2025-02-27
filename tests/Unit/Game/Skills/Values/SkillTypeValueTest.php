@@ -87,11 +87,11 @@ class SkillTypeValueTest extends TestCase
 
     public function testGetNamedValues()
     {
-        $this->assertEquals(SkillTypeValue::getValues(), SkillTypeValue::$namedValues);
+        $this->assertEquals(SkillTypeValue::getValues(), SkillTypeValue::getValues());
     }
 
     public function testGetNamedValue()
     {
-        $this->assertEquals((new SkillTypeValue(SkillTypeValue::EFFECTS_CLASS))->getNamedValue(), SkillTypeValue::$namedValues[SkillTypeValue::EFFECTS_CLASS]);
+        $this->assertEquals((new SkillTypeValue(SkillTypeValue::EFFECTS_CLASS))->getNamedValue(), SkillTypeValue::getValues()[SkillTypeValue::EFFECTS_CLASS]);
     }
 }
