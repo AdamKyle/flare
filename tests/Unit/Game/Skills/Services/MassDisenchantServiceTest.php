@@ -187,8 +187,8 @@ class MassDisenchantServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $disenchantSkill = $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING)->first();
-        $enchantingSkill = $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING)->first();
+        $disenchantSkill = $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING->value)->first();
+        $enchantingSkill = $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING->value)->first();
 
         $this->assertGreaterThan(1, $disenchantSkill->level);
         $this->assertGreaterThan(1, $enchantingSkill->level);
@@ -208,11 +208,11 @@ class MassDisenchantServiceTest extends TestCase
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
         ]);
 
-        $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING)->first()->update([
+        $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING->value)->first()->update([
             'xp_max' => 1,
         ]);
 
-        $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING)->first()->update([
+        $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING->value)->first()->update([
             'xp_max' => 1,
         ]);
 
@@ -234,8 +234,8 @@ class MassDisenchantServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $disenchantSkill = $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING)->first();
-        $enchantingSkill = $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING)->first();
+        $disenchantSkill = $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING->value)->first();
+        $enchantingSkill = $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING->value)->first();
 
         $this->assertGreaterThan(1, $disenchantSkill->level);
         $this->assertGreaterThan(1, $enchantingSkill->level);
@@ -250,11 +250,11 @@ class MassDisenchantServiceTest extends TestCase
             'skill_training_bonus' => .50,
         ]);
 
-        $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING)->first()->update([
+        $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING->value)->first()->update([
             'xp_max' => 1,
         ]);
 
-        $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING)->first()->update([
+        $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING->value)->first()->update([
             'xp_max' => 1,
         ]);
 
@@ -268,8 +268,8 @@ class MassDisenchantServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $disenchantSkill = $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING)->first();
-        $enchantingSkill = $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING)->first();
+        $disenchantSkill = $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING->value)->first();
+        $enchantingSkill = $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING->value)->first();
 
         $this->assertGreaterThan(1, $disenchantSkill->level);
         $this->assertGreaterThan(1, $enchantingSkill->level);
@@ -289,11 +289,11 @@ class MassDisenchantServiceTest extends TestCase
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
         ]);
 
-        $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING)->first()->update([
+        $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING->value)->first()->update([
             'xp_max' => 1,
         ]);
 
-        $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING)->first()->update([
+        $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING->value)->first()->update([
             'xp_max' => 1,
         ]);
 
@@ -317,8 +317,8 @@ class MassDisenchantServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $disenchantSkill = $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING)->first();
-        $enchantingSkill = $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING)->first();
+        $disenchantSkill = $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING->value)->first();
+        $enchantingSkill = $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING->value)->first();
 
         $this->assertGreaterThan(1, $disenchantSkill->level);
         $this->assertGreaterThan(1, $enchantingSkill->level);
@@ -353,13 +353,13 @@ class MassDisenchantServiceTest extends TestCase
             }),
         );
 
-        $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING)->first()->update([
+        $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING->value)->first()->update([
             'xp_max' => 1,
         ]);
 
         $character = $character->refresh();
 
-        $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING)->first()->update([
+        $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING->value)->first()->update([
             'xp_max' => 1,
         ]);
 
@@ -371,8 +371,8 @@ class MassDisenchantServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $disenchantSkill = $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING)->first();
-        $enchantingSkill = $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING)->first();
+        $disenchantSkill = $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING->value)->first();
+        $enchantingSkill = $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING->value)->first();
 
         $this->assertGreaterThan(1, $disenchantSkill->level);
         $this->assertGreaterThan(1, $enchantingSkill->level);
