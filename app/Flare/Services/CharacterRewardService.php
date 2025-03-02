@@ -218,10 +218,9 @@ class CharacterRewardService
      *
      * Takes into account XP over flow.
      *
-     * @param Character $character
      * @return void
      */
-    private function handleLevelUp(): void
+    public function handleLevelUp(): void
     {
         if ($this->character->xp >= $this->character->xp_next) {
             $leftOverXP = $this->character->xp - $this->character->xp_next;
@@ -292,6 +291,7 @@ class CharacterRewardService
     /**
      * Assigns XP to the character.
      *
+     * @param Monster $monster
      * @return void
      */
     private function distributeXP(Monster $monster): void

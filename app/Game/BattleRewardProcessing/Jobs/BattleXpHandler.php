@@ -53,6 +53,7 @@ class BattleXpHandler implements ShouldQueue
      * @param Monster $monster
      * @param CharacterRewardService $characterRewardService
      * @return void
+     * @throws \Exception
      */
     private function processXpReward(Character $character, Monster $monster, CharacterRewardService $characterRewardService): void
     {

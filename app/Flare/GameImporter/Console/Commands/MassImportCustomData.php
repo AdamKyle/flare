@@ -38,6 +38,7 @@ class MassImportCustomData extends Command
         Artisan::call('import:game-data Armour');
         Artisan::call('change:player-weapons');
         Artisan::call('clean:market-weapons');
+        Artisan::call('change:character-reincarnation-xp-penalty');
 
         $this->importInformationSection();
 

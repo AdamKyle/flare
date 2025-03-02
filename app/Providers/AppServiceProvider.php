@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 
+use App\Console\AfterDeployment\ChangeCharacterReincarnationXpPenalty;
 use App\Console\AfterDeployment\CleanInvalidWeapons;
 use App\Console\AfterDeployment\CleanMarketPlaceOfInvalidWeapons;
 use Illuminate\Support\Facades\Blade;
@@ -83,6 +84,7 @@ class AppServiceProvider extends ServiceProvider
             ChangePlayerWeapons::class,
             CleanInvalidWeapons::class,
             CleanMarketPlaceOfInvalidWeapons::class,
+            ChangeCharacterReincarnationXpPenalty::class,
 
             // Development Commands:
             CreateCharacter::class,

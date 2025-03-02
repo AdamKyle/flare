@@ -89,19 +89,7 @@ class CharacterReincarnateService
 
         $timesReincarnated = $character->times_reincarnated + 1;
 
-        $baseXpPenalty = 0.10;
-
-        if ($timesReincarnated >= 10 && $timesReincarnated < 25) {
-            $baseXpPenalty = 0.15;
-        }
-
-        if ($timesReincarnated >= 25 && $timesReincarnated < 50) {
-            $baseXpPenalty = 0.20;
-        }
-
-        if ($timesReincarnated >= 50) {
-            $baseXpPenalty = 0.25;
-        }
+        $baseXpPenalty = 0.02;
 
         $xpPenalty = $character->xp_penalty + $baseXpPenalty;
 
