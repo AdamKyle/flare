@@ -8,6 +8,9 @@ use Illuminate\Console\Command;
 
 class ChangeCharacterReincarnationXpPenalty extends Command
 {
+
+    const NEW_REINCARNATION_XP_PENALTY = 0.02;
+
     /**
      * The name and signature of the console command.
      *
@@ -30,7 +33,7 @@ class ChangeCharacterReincarnationXpPenalty extends Command
         Character::where('times_reincarnated', '>=', 1)->chunkById(1000, function ($characters) use ($characterRewardService) {
             foreach ($characters as $character) {
                 $xpForNextLevelBase = $this->getXpForNextLevel($character->level);
-                $reincarnationPenalty = 0.02 * $character->times_reincarnated;
+                $reincarnationPenalty = self::NEW_REINCARNATION_XP_PENALTY * $character->times_reincarnated;
 
                 $xpForNextLevel = $xpForNextLevelBase + ($xpForNextLevelBase * $reincarnationPenalty);
 
