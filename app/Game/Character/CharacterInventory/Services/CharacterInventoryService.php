@@ -346,7 +346,8 @@ class CharacterInventoryService
             ->slots
             ->whereNotIn('item.type', ['quest', 'alchemy'])
             ->whereNotIn('id', $slotsToIgnore)
-            ->where('equipped', false);
+            ->where('equipped', false)
+            ->sortByDesc(fn($slot) => (float) $slot->item->getTotalPercentageForStat($this->character->damage_stat));
     }
 
     /**
@@ -360,9 +361,13 @@ class CharacterInventoryService
 
         $slots = $this->getInventoryCollection();
 
+        $sortedStats = $slots->pluck('item')->mapWithKeys(fn($item) => [
+            $item->affix_name => $item->getTotalPercentageForStat($this->character->damage_stat)
+        ]);
+
         $slots = new LeagueCollection($slots, $this->inventoryTransformer);
 
-        return array_reverse($this->manager->createData($slots)->toArray());
+        return $this->manager->createData($slots)->toArray();
     }
 
     /**
