@@ -154,7 +154,7 @@ class ChangePlayerWeapons extends Command
         $properTypeForCharacter = ItemTypeMapping::getForClass($character->class->name);
 
         if (is_array($properTypeForCharacter)) {
-            $properTypeForCharacter = $properTypeForCharacter[rand(0, count($properTypeForCharacter) - 1)];
+            $properTypeForCharacter = $properTypeForCharacter[0];
         }
 
         return $properTypeForCharacter;
@@ -168,6 +168,7 @@ class ChangePlayerWeapons extends Command
 
 
         if (!is_null($oldItem->specialty_type)) {
+
             return $item->where('specialty_type', $oldItem->specialty_type)->first();
         }
 
@@ -178,6 +179,7 @@ class ChangePlayerWeapons extends Command
 
     private function moveFromOldItemToNewItem(Item $oldItem, Item $newItem): Item {
 
+        $newItem = $newItem->duplicate();
 
         $newItem->update([
             'item_prefix_id' => $oldItem->item_prefix_id,
