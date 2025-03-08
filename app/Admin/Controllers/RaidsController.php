@@ -39,12 +39,16 @@ class RaidsController extends Controller
     {
         return view('admin.raids.manage', [
             'raid' => null,
-            'monsters' =>  Monster::where('is_raid_monster', true)->get()->map(function ($monster) {
-                return collect([
+            'monsters' => Monster::where('is_raid_monster', true)
+                ->select('monsters.*')
+                ->join('game_maps', 'monsters.game_map_id', '=', 'game_maps.id')
+                ->orderBy('game_maps.name')
+                ->with('gameMap')
+                ->get()
+                ->map(fn($monster) => (object) [
                     'name' => $monster->name . ' (' . $monster->gameMap->name . ')',
                     'id' => $monster->id,
-                ]);
-            }),
+                ]),
             'locations' => Location::all(),
             'raidBosses' => Monster::where('is_raid_boss', true)->get(),
             'itemTypes' => [
