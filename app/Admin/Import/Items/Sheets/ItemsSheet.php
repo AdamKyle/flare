@@ -58,7 +58,7 @@ class ItemsSheet implements ToCollection
         }
     }
 
-    protected function returnCleanItem(array $item)
+    private function returnCleanItem(array $item)
     {
         $cleanData = [];
 

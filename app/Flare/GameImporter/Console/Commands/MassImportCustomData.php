@@ -2,6 +2,7 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
+use App\Flare\Models\Monster;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
@@ -34,11 +35,19 @@ class MassImportCustomData extends Command
     public function handle()
     {
 
+        Artisan::call('remove:duplicate-items');
         Artisan::call('import:game-data Weapons');
         Artisan::call('import:game-data Armour');
         Artisan::call('change:player-weapons');
         Artisan::call('clean:market-weapons');
+        Artisan::call('update:weapons-and-armour-with-new-stats');
+        Artisan::call('add:holy-stacks-to-items');
         Artisan::call('change:character-reincarnation-xp-penalty');
+
+        Monster::where('is_celestial_entity', true)->delete();
+
+        Artisan::call('import:game-data Monsters');
+        Artisan::call('generate:monster-cache');
 
         $this->importInformationSection();
 
