@@ -1,4 +1,5 @@
 import ItemDefinition from "../../../../game/components/items/deffinitions/item-definition";
+import { ItemType } from "../../../../game/components/items/enums/item-type";
 
 export default interface ShopState {
     loading: boolean;

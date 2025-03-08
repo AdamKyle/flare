@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
@@ -48,6 +49,8 @@ class MassImportCustomData extends Command
 
         Artisan::call('import:game-data Monsters');
         Artisan::call('generate:monster-cache');
+
+        Cache::delete('items-for-shop');
 
         $this->importInformationSection();
 

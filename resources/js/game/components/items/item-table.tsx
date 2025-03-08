@@ -40,12 +40,30 @@ export default class ItemTable extends React.Component<ItemTableProps, any> {
         });
     }
 
+    componentDidUpdate(
+        prevProps: Readonly<ItemTableProps>,
+        prevState: Readonly<any>,
+        snapshot?: any,
+    ) {
+        if (prevProps.items !== this.props.items) {
+            this.setState({ items: this.props.items });
+        }
+    }
+
     clearFilters() {
-        this.setState({
-            items: this.props.items,
-            filter_type: undefined,
-            search_term: "",
-        });
+        this.setState(
+            {
+                items: this.props.items,
+                filter_type: undefined,
+                search_term: "",
+            },
+            () => {
+                this.props.set_item_filter({
+                    filter: null,
+                    search_text: null,
+                });
+            },
+        );
     }
 
     setSelectedFilterType(data: any) {
@@ -53,22 +71,17 @@ export default class ItemTable extends React.Component<ItemTableProps, any> {
             return;
         }
 
-        let filteredItems = this.props.items.filter(
-            (item: ItemDefinition) => item.type === data.value,
+        this.setState(
+            {
+                filter_type: data.value,
+            },
+            () => {
+                this.props.set_item_filter({
+                    filter: data.value,
+                    search_text: this.state.search_term,
+                });
+            },
         );
-
-        if (this.state.search_term !== "") {
-            filteredItems = filteredItems.filter((item: ItemDefinition) => {
-                return item.name
-                    .toLowerCase()
-                    .includes(this.state.search_term.toLowerCase());
-            });
-        }
-
-        this.setState({
-            filter_type: data.value,
-            items: filteredItems,
-        });
     }
 
     getSelectedFilterValue() {
@@ -108,26 +121,10 @@ export default class ItemTable extends React.Component<ItemTableProps, any> {
     }
 
     filterItems(searchTerm: string) {
-        if (searchTerm === "") {
-            let items = this.props.items;
-
-            if (typeof this.state.filter_type !== "undefined") {
-                items = items.filter(
-                    (item: ItemDefinition) =>
-                        item.type === this.state.filter_type,
-                );
-            }
-
-            return this.setState({
-                items: items,
-            });
-        }
-
-        const filteredItems = this.state.items.filter((item: any) =>
-            item.name.toLowerCase().includes(searchTerm.toLowerCase()),
-        );
-
-        this.setState({ items: filteredItems });
+        this.props.set_item_filter({
+            filter: this.state.filter_type,
+            search_text: searchTerm,
+        });
     }
 
     render() {

@@ -15,6 +15,7 @@ import BasicCard from "../../../game/components/ui/cards/basic-card";
 import { formatNumber } from "../../../game/lib/game/format-number";
 import ShopListenerDefinition from "./event-listeners/shop-listener-definition";
 import ShopListener from "./event-listeners/shop-listener";
+import { ItemType } from "../../../game/components/items/enums/item-type";
 
 export default class Shop extends React.Component<ShopProps, ShopState> {
     private ajax: ShopAjax;
@@ -94,14 +95,23 @@ export default class Shop extends React.Component<ShopProps, ShopState> {
         });
     }
 
+    filterShop(shopFilter: {
+        filter: string | null;
+        search_text: string | null;
+    }) {
+        this.ajax.doShopAction(this, SHOP_ACTIONS.FETCH, {
+            filter: shopFilter.filter,
+            search_text: shopFilter.search_text,
+        });
+    }
+
     render() {
-        if (this.state.items.length === 0) {
+        if (this.state.loading) {
             return <LoadingProgressBar />;
         }
 
         return (
             <>
-                {this.state.loading ? <LoadingProgressBar /> : null}
                 <BasicCard additionalClasses={"my-4"}>
                     <div>
                         <strong>Your Gold:</strong>{" "}
@@ -157,6 +167,7 @@ export default class Shop extends React.Component<ShopProps, ShopState> {
                                 this.viewBuyMany.bind(this),
                                 this.viewComparison.bind(this),
                             )}
+                            set_item_filter={this.filterShop.bind(this)}
                         />
                     </div>
                 )}

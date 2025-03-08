@@ -2,7 +2,7 @@ import { ItemType } from "../../../../../game/components/items/enums/item-type";
 import { startCase } from "lodash";
 
 export const ITEM_TYPES = [
-    ItemType.WEAPON,
+    ItemType.CLASS_SPECIFIC,
     ItemType.HAMMER,
     ItemType.FAN,
     ItemType.BOW,
@@ -26,8 +26,8 @@ export const itemTypeFilter = (): { label: string; value: ItemType }[] => {
     return ITEM_TYPES.map((type: ItemType) => {
         let label = startCase(type);
 
-        if (type === ItemType.WEAPON) {
-            label = "General Weapons";
+        if (type === ItemType.CLASS_SPECIFIC) {
+            label = "For your class";
         }
 
         return {

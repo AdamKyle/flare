@@ -10,6 +10,7 @@ use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
+use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Core\Events\UpdateTopBarEvent;
@@ -21,6 +22,7 @@ use Facades\App\Flare\Calculators\SellItemCalculator;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 class ShopService
 {
@@ -43,30 +45,13 @@ class ShopService
         $this->characterInventoryService = $characterInventoryService;
     }
 
-    public function getItemsForShop(): array
+    public function getItemsForShop(Character $character, ?string $type, ?string $searchText): array
     {
-
-        $cachedItems = Cache::get('items-for-shop');
-
-        if (! is_null($cachedItems)) {
-            return $cachedItems;
-        }
-
-        $items = Item::where('cost', '<=', 2000000000)
-            ->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
-            ->whereNull('item_suffix_id')
-            ->whereNull('item_prefix_id')
-            ->whereNull('specialty_type')
-            ->inRandomOrder()
-            ->get();
+        $items = $this->fetchItemsForShopBasedOnCharacterClass($character, $type, $searchText);
 
         $items = new Collection($items, $this->itemTransformer);
 
-        $items = $this->manager->createData($items)->toArray();
-
-        Cache::put('items-for-shop', $items);
-
-        return $items;
+        return $this->manager->createData($items)->toArray();
     }
 
     public function sellSpecificItem(Character $character, int $slotId): array
@@ -140,36 +125,6 @@ class ShopService
                 'inventory' => $inventory->getInventoryForType('inventory'),
             ],
         ]);
-    }
-
-    /**
-     * Sell all the items in the inventory.
-     *
-     * Sell all that are not equipped and not a quest item.
-     */
-    private function sellAllItemsInInventory(Character $character): int
-    {
-        $invalidTypes = ['alchemy', 'quest', 'trinket'];
-
-        $itemsToSell = $character->inventory->slots()->with('item')->get()->filter(function ($slot) use ($invalidTypes) {
-            return ! $slot->equipped && ! in_array($slot->item->type, $invalidTypes);
-        });
-
-        if ($itemsToSell->isEmpty()) {
-            return 0;
-        }
-
-        $cost = 0;
-
-        foreach ($itemsToSell as $slot) {
-            $cost += SellItemCalculator::fetchSalePriceWithAffixes($slot->item);
-        }
-
-        $ids = $itemsToSell->pluck('id');
-
-        $character->inventory->slots()->whereIn('id', $ids)->delete();
-
-        return floor($cost - ($cost * 0.05));
     }
 
     /**
@@ -252,4 +207,64 @@ class ShopService
 
         return $character->refresh();
     }
+
+    /**
+     * Sell all the items in the inventory.
+     *
+     * Sell all that are not equipped and not a quest item.
+     */
+    private function sellAllItemsInInventory(Character $character): int
+    {
+        $invalidTypes = ['alchemy', 'quest', 'trinket'];
+
+        $itemsToSell = $character->inventory->slots()->with('item')->get()->filter(function ($slot) use ($invalidTypes) {
+            return ! $slot->equipped && ! in_array($slot->item->type, $invalidTypes);
+        });
+
+        if ($itemsToSell->isEmpty()) {
+            return 0;
+        }
+
+        $cost = 0;
+
+        foreach ($itemsToSell as $slot) {
+            $cost += SellItemCalculator::fetchSalePriceWithAffixes($slot->item);
+        }
+
+        $ids = $itemsToSell->pluck('id');
+
+        $character->inventory->slots()->whereIn('id', $ids)->delete();
+
+        return floor($cost - ($cost * 0.05));
+    }
+
+    private function fetchItemsForShopBasedOnCharacterClass(Character $character, ?string $type, ?string $searchText): EloquentCollection {
+        $className = $character->class->name;
+
+        $types = is_null($type) ? ItemTypeMapping::getForClass($className) : $type;
+
+        $items = Item::where('cost', '<=', 2000000000)
+            ->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
+            ->whereNull('item_suffix_id')
+            ->whereNull('item_prefix_id')
+            ->whereNull('specialty_type');
+
+        if (!is_null($types)) {
+            if (is_array($types)) {
+                $items = $items->whereIn('type', $types);
+            } else {
+                $items = $items->where('type', $types);
+            }
+        }
+
+        if (!is_null($searchText)) {
+            $items = $items->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($searchText) . '%']);
+        }
+
+        return $items
+            ->orderBy('type', 'asc')
+            ->orderBy('cost', 'asc')
+            ->get();
+    }
+
 }

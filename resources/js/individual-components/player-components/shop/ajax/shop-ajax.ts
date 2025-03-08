@@ -147,8 +147,6 @@ export default class ShopAjax {
         action: Method,
         params?: any,
     ) {
-        component.setState({ loading: true });
-
         this.ajax
             .setRoute(route)
             .setParameters(params)
