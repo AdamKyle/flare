@@ -528,7 +528,7 @@ class ClassRanksServiceTest extends TestCase
 
                     continue;
                 }
-                
+
                 $this->assertEquals(0, $mastery->level);
             }
         }

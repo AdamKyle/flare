@@ -19,6 +19,14 @@ enum ItemType: string {
     case SPELL_DAMAGE = 'spell-damage';
     case RING = 'ring';
 
+    /**
+     * Gets a list of all valid weapon types.
+     *
+     * - Ignores spells
+     * - Ignore rings
+     *
+     * @return array
+     */
     public static function validWeapons(): array {
         return array_map(
             fn(self $type) => $type->value,
@@ -30,6 +38,13 @@ enum ItemType: string {
         );
     }
 
+    /**
+     * Gets all weapon types including spells.
+     *
+     * - ignores rings
+     *
+     * @return array
+     */
     public static function allWeaponTypes(): array {
         return array_map(
             fn(self $type) => $type->value,
@@ -39,6 +54,12 @@ enum ItemType: string {
         );
     }
 
+    /**
+     * Returns the proper name of a weapon type.
+     *
+     * @param string $type
+     * @return string
+     */
     public static function getProperNameForType(string $type): string {
         return ucwords(str_replace('-', ' ', $type));
     }
