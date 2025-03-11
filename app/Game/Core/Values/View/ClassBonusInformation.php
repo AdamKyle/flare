@@ -56,25 +56,25 @@ class ClassBonusInformation
 
         if ($classAttackValue->isThief()) {
             $details['type'] = Str::ucfirst(ClassAttackValue::THIEVES_SHADOW_DANCE);
-            $details['requires'] = 'Dual weapons equipped';
-            $details['description'] = 'With dual weapons equipped, you have a chance to slip by the enemy and instantly hit them.';
+            $details['requires'] = 'Dual daggers equipped';
+            $details['description'] = 'With dual daggers equipped, you have a chance to slip by the enemy and instantly hit them.';
         }
 
         if ($classAttackValue->isHeretic()) {
             $details['type'] = Str::ucfirst(ClassAttackValue::HERETICS_DOUBLE_CAST);
-            $details['requires'] = 'Damage spell equipped';
+            $details['requires'] = 'One or two wands equipped';
             $details['description'] = 'With a damage spell equipped you have a small chance to cast another spell. Enemies cannot avoid this.';
         }
 
         if ($classAttackValue->isProphet()) {
             $details['type'] = Str::ucfirst(ClassAttackValue::PROPHET_HEALING);
-            $details['requires'] = 'Healing spell equipped';
+            $details['requires'] = 'One or two censers equipped';
             $details['description'] = 'With a healing spell equipped you have a small chance to have the Lords blessing bestowed upon you. Your healing spells will fire again.';
         }
 
         if ($classAttackValue->isVampire()) {
             $details['type'] = Str::ucfirst(ClassAttackValue::VAMPIRE_THIRST);
-            $details['requires'] = 'N/A';
+            $details['requires'] = 'One or two claws equipped';
             $details['description'] = 'Every time you attack, you have a chance to fire off the thirst which can steal 15% of your dur from the enemy while attacking and defending.';
         }
 

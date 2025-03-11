@@ -4,6 +4,7 @@ namespace App\Providers;
 
 
 use App\Console\AfterDeployment\ChangeCharacterReincarnationXpPenalty;
+use App\Console\AfterDeployment\ChangeWeaponTypesForClassRanks;
 use App\Console\AfterDeployment\CleanInvalidWeapons;
 use App\Console\AfterDeployment\CleanMarketPlaceOfInvalidWeapons;
 use App\Console\AfterDeployment\UpdateWeaponsAndArmourWithNewStats;
@@ -87,6 +88,7 @@ class AppServiceProvider extends ServiceProvider
             CleanMarketPlaceOfInvalidWeapons::class,
             ChangeCharacterReincarnationXpPenalty::class,
             UpdateWeaponsAndArmourWithNewStats::class,
+            ChangeWeaponTypesForClassRanks::class,
 
             // Development Commands:
             CreateCharacter::class,

@@ -7,6 +7,7 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\Map;
 use App\Flare\Values\AttackTypeValue;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Character\Concerns\FetchEquipped;
 use Exception;
 
@@ -46,7 +47,7 @@ class CharacterAttackBuilder
     {
         $attack = $this->baseAttack(AttackTypeValue::ATTACK, $voided);
 
-        $attack['weapon_damage'] = $this->characterStatBuilder->buildDamage('weapon', $voided);
+        $attack['weapon_damage'] = $this->characterStatBuilder->buildDamage(array_map(fn($case) => $case->value, ItemType::cases()), $voided);
 
         return $attack;
     }
@@ -117,7 +118,7 @@ class CharacterAttackBuilder
         return [
             'attack_type' => $attackType,
             'name' => $this->character->name,
-            'ring_damage' => $this->characterStatBuilder->buildDamage('ring', $voided),
+            'ring_damage' => $this->characterStatBuilder->buildDamage(ItemType::RING->value, $voided),
             'heal_for' => $this->characterStatBuilder->buildHealing($voided),
             'res_chance' => $this->characterStatBuilder->buildResurrectionChance(),
             'damage_deduction' => $characterReduction,

@@ -52,6 +52,8 @@ class MassImportCustomData extends Command
 
         Cache::delete('items-for-shop');
 
+        Artisan::call('create:character-attack-data');
+
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {

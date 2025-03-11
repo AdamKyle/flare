@@ -33,6 +33,9 @@ class InfoPageController extends Controller
 {
     use ItemsShowInformation, MonstersShowInformation;
 
+    public function __construct(private readonly ClassBonusInformation $classBonusInformation) {
+    }
+
     public function search(Request $request)
     {
 
@@ -83,7 +86,7 @@ class InfoPageController extends Controller
     {
         return view('information.classes.class', [
             'class' => $class,
-            'classBonus' => (new ClassBonusInformation)->buildClassBonusDetailsForInfo($class->name),
+            'classBonus' => $this->classBonusInformation->buildClassBonusDetailsForInfo($class->name),
         ]);
     }
 

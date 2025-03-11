@@ -1,5 +1,5 @@
 <p class="mt-2">
-    Dancers are those who use props, like fans, to entice and seduce their enemy while slicing them to bits and laughing about it afterward.
+    Dancers are those who use props, like fans, to entice and seduce their enemy while slicing them to bits and laughing about it afterwards.
 </p>
 <p>
     Agility is how you hit while Dexterity is how you deal damage. Dancers like <a href='/information/combat'>Attack</a> when it comes to damage.

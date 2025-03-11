@@ -6,13 +6,13 @@
             Damage Spells and Staves
         </dd>
         <dt>
-            Bonus Weapon Damage
+            Bonus Damage
         </dt>
         <dd>+15% of your damage stat when you have a Stave equipped.</dd>
     </dl>
     <p class="my-2">
         Damage spells and Staves will increase the intelligence of the caster and focus more of their attack on damage as their base damage stat is intelligence.
-        Arcane alchmists are very simmilar to Heretics - the core difference s a staff will deal tons of damage when you class special fires off
+        Arcane alchemists are very similar to Heretics - the core differences a staff will deal tons of damage when you class special fires off
     </p>
     <p class="mb-2">
         Arcane Alchemists do best with

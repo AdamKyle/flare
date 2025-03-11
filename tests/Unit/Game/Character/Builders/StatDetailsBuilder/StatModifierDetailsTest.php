@@ -8,6 +8,7 @@ use App\Flare\Models\GameMap;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MapNameValue;
 use App\Game\Character\Builders\StatDetailsBuilder\StatModifierDetails;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -170,7 +171,7 @@ class StatModifierDetailsTest extends TestCase
     {
         $character = $this->createCharacterForData($this->character);
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('weapon', false);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown(ItemType::SWORD->value, false);
 
         $this->assertEquals($character->damage_stat, $data['damage_stat_name']);
         $this->assertGreaterThan(0, $data['damage_stat_amount']);
@@ -245,7 +246,7 @@ class StatModifierDetailsTest extends TestCase
     {
         $character = $this->createCharacterForData($this->character);
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('weapon', true);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown(ItemType::SWORD->value, true);
 
         $this->assertEquals($character->damage_stat, $data['damage_stat_name']);
         $this->assertGreaterThan(0, $data['damage_stat_amount']);
@@ -320,7 +321,7 @@ class StatModifierDetailsTest extends TestCase
     {
         $character = $this->character->getCharacter();
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('weapon', false);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown(ItemType::SWORD->value, false);
 
         $this->assertEquals($character->damage_stat, $data['damage_stat_name']);
         $this->assertGreaterThan(0, $data['damage_stat_amount']);
@@ -371,7 +372,7 @@ class StatModifierDetailsTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter([], $this->gameClass)->givePlayerLocation()->getCharacter();
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('spell-damage', false);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown(ItemType::SPELL_DAMAGE->value, false);
 
         $this->assertEquals($character->damage_stat, $data['damage_stat_name']);
         $this->assertGreaterThan(0, $data['damage_stat_amount']);
@@ -495,7 +496,7 @@ class StatModifierDetailsTest extends TestCase
 
         $character = $character->refresh();
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('weapon', false);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown(ItemType::SWORD->value, false);
 
         $this->assertGreaterThan(0, $data['non_equipped_damage_amount']);
         $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
@@ -517,7 +518,7 @@ class StatModifierDetailsTest extends TestCase
 
         $character = $character->refresh();
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('weapon', false);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown(ItemType::SWORD->value, false);
 
         $this->assertGreaterThan(0, $data['non_equipped_damage_amount']);
         $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
@@ -539,7 +540,7 @@ class StatModifierDetailsTest extends TestCase
 
         $character = $character->refresh();
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('weapon', false);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown(ItemType::SWORD->value, false);
 
         $this->assertGreaterThan(0, $data['non_equipped_damage_amount']);
         $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
@@ -549,7 +550,7 @@ class StatModifierDetailsTest extends TestCase
     {
 
         $item = $this->createItem([
-            'type' => 'weapon',
+            'type' => ItemType::SWORD->value,
             'item_prefix_id' => $this->createItemAffix([
                 'type' => 'prefix',
                 'dur_mod' => 1.0,
@@ -619,7 +620,7 @@ class StatModifierDetailsTest extends TestCase
             )
             ->giveItem(
                 $this->createItem([
-                    'type' => 'weapon',
+                    'type' => ItemType::SPELL_HEALING->value,
                     'item_suffix_id' => $this->createItemAffix([
                         'type' => 'suffix',
                         'dur_mod' => 1.0,

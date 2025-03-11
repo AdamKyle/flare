@@ -13,6 +13,10 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ClassesController extends Controller
 {
+
+    public function __construct(private readonly ClassBonusInformation $classBonusInformation) {
+    }
+
     public function index()
     {
         return view('admin.classes.list');
@@ -22,7 +26,7 @@ class ClassesController extends Controller
     {
         return view('admin.classes.class', [
             'class' => $class,
-            'classBonus' => (new ClassBonusInformation)->buildClassBonusDetailsForInfo($class->name),
+            'classBonus' => $this->classBonusInformation->buildClassBonusDetailsForInfo($class->name),
         ]);
     }
 

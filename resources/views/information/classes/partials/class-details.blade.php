@@ -107,7 +107,7 @@
 
 
     <x-core.cards.card-with-title title="Hints">
-        <div class="prose dark:prose-invert">
+        <div class="prose dark:prose-invert m-auto">
             @if ($class->type()->isFighter())
                 @include('information.classes.partials.fighter')
             @endif

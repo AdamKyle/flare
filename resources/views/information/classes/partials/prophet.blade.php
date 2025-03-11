@@ -5,13 +5,13 @@
 If you have no healing spells equipped you will still do 30% healing of your chr stat.</p>
 
 <p>Prophets will always want one healing spell if they plan to get off their double heal special attack.</p>
-<p>Prophets who also wield a weapon and a shield will get an extra 15% of their modded CHR towards their attack.</p>
+<p>Prophets who also wield a censer and a shield will get an extra 15% of their modded CHR towards their attack.</p>
 <p>
   For affixes, focus first on chr and focus based, while having at least one <a href="/information/enchanting">life stealing affix</a> and at least
   one <a href="/information/enchanting">damaging affix</a>.
 </p>
 <p>
-  Prophets should focus on a good weapon, shield and healing spell and play either Cast and Attack or Attack and Cast
+  Prophets should focus on a good censer, shield and healing spell and play either Cast and Attack or Attack and Cast
   depending on which slot their healing spell and weapon is in.
 </p>
 <p>

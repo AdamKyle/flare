@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Character\Builders\StatDetailsBuilder\Concerns\BasicItemDetails;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Character\Concerns\FetchEquipped;
 use Facades\App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;
 use Illuminate\Support\Collection;
@@ -117,7 +118,7 @@ class StatModifierDetails
         $equipped = $this->fetchEquipped($this->character);
 
         if (is_null($equipped)) {
-            if ($type === 'weapon') {
+            if (in_array($type, ItemType::validWeapons())) {
 
                 if ($this->character->classType()->isAlcoholic()) {
                     $value = $damageStatAmount * 0.25;
@@ -137,7 +138,7 @@ class StatModifierDetails
                 }
             }
 
-            if ($type === 'spell-damage' && $this->character->classType()->isHeretic()) {
+            if ($type === ItemType::SPELL_DAMAGE->value && $this->character->classType()->isHeretic()) {
 
                 $value = $damageStatAmount * 0.15;
 
@@ -151,23 +152,14 @@ class StatModifierDetails
         $details['class_specialties'] = $type === 'ring' ? null : $this->fetchClassRankSpecialtiesDetails('base_damage');
         $details['ancestral_item_skill_data'] = $type === 'ring' ? null : $this->fetchAncestralItemSkills('base_damage');
 
-        $typeAttributes = [];
+        $typeAttributes = match (true) {
+            in_array($type, ItemType::validWeapons()) => $this->character->getInformation()->getDamageBuilder()->buildWeaponDamageBreakDown($damageStatAmount, $isVoided),
+            $type === ItemType::SPELL_DAMAGE->value => $this->character->getInformation()->getDamageBuilder()->buildSpellDamageBreakDownDetails($isVoided),
+            $type === ItemType::RING->value => $this->character->getInformation()->getDamageBuilder()->buildRingDamageBreakDown(),
+            $type === ItemType::SPELL_HEALING->value => $this->character->getInformation()->getHealingBuilder()->getHealingBuilder($isVoided),
+            default => [],
+        };
 
-        switch ($type) {
-            case 'weapon':
-                $typeAttributes = $this->character->getInformation()->getDamageBuilder()->buildWeaponDamageBreakDown($damageStatAmount, $isVoided);
-                break;
-            case 'spell-damage':
-                $typeAttributes = $this->character->getInformation()->getDamageBuilder()->buildSpellDamageBreakDownDetails($isVoided);
-                break;
-            case 'ring':
-                $typeAttributes = $this->character->getInformation()->getDamageBuilder()->buildRingDamageBreakDown();
-                break;
-            case 'spell-healing':
-                $typeAttributes = $this->character->getInformation()->getHealingBuilder()->getHealingBuilder($isVoided);
-            default:
-                break;
-        }
 
         return array_merge($details, $typeAttributes);
     }
@@ -282,26 +274,24 @@ class StatModifierDetails
             }
 
             return $details;
-        } else {
-            $classSpecialties = $this->character->classSpecialsEquipped
-                ->where('equipped', '=', true)
-                ->where($stat.'_mod', '>', 0);
-
-            foreach ($classSpecialties as $classSpecialty) {
-                $details[] = [
-                    'name' => $classSpecialty->gameClassSpecial->name,
-                    'amount' => $classSpecialty->base_damage_stat_increase,
-                ];
-            }
-
-            if (empty($details)) {
-                return null;
-            }
-
-            return $details;
         }
 
-        return null;
+        $classSpecialties = $this->character->classSpecialsEquipped
+            ->where('equipped', '=', true)
+            ->where($stat.'_mod', '>', 0);
+
+        foreach ($classSpecialties as $classSpecialty) {
+            $details[] = [
+                'name' => $classSpecialty->gameClassSpecial->name,
+                'amount' => $classSpecialty->base_damage_stat_increase,
+            ];
+        }
+
+        if (empty($details)) {
+            return null;
+        }
+
+        return $details;
     }
 
     /**
