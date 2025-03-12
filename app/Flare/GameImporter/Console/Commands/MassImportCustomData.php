@@ -51,8 +51,12 @@ class MassImportCustomData extends Command
         Artisan::call('generate:monster-cache');
 
         Cache::delete('items-for-shop');
+        Cache::delete('crafting-table-data');
 
         Artisan::call('create:character-attack-data');
+
+        Artisan::call('remove:duplicate-items');
+
 
         $this->importInformationSection();
 

@@ -5,4 +5,6 @@ export default interface ItemTableState {
     items: ItemDefinition[] | [];
     item_to_view: ItemDefinition | null;
     error_message: string | null;
+    filter: string | null;
+    search_text: string | null;
 }

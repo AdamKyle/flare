@@ -55,6 +55,14 @@ enum ItemType: string {
     }
 
     /**
+     * Get all types as a string array
+     * @return array
+     */
+    public static function allTypes(): array {
+        return array_map(fn(self $type) => $type->value, self::cases());
+    }
+
+    /**
      * Returns the proper name of a weapon type.
      *
      * @param string $type
@@ -62,5 +70,17 @@ enum ItemType: string {
      */
     public static function getProperNameForType(string $type): string {
         return ucwords(str_replace('-', ' ', $type));
+    }
+
+    /**
+     * Get valid weapons as options.
+     *
+     * @return array
+     */
+    public static function getValidWeaponsAsOptions(): array {
+        return array_combine(
+            self::validWeapons(),
+            array_map(fn($type) => ucwords(str_replace('-', ' ', $type)), self::validWeapons())
+        );
     }
 }

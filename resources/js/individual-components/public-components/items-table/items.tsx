@@ -8,11 +8,16 @@ import { itemsTableServiceContainer } from "./container/items-container";
 import DangerAlert from "../../../game/components/ui/alerts/simple-alerts/danger-alert";
 import ItemTableState from "./types/item-table-state";
 
+type TableFilterParams = {
+    filter?: string | null;
+    search_text?: string | null;
+};
+
 export default class Items extends React.Component<
     ItemTableProps,
     ItemTableState
 > {
-    private ajax: ItemTableAjax;
+    private ajax: ItemTableAjax<TableFilterParams>;
 
     private itemsTableColumns: ItemTableColumns;
 
@@ -24,6 +29,8 @@ export default class Items extends React.Component<
             items: [],
             item_to_view: null,
             error_message: null,
+            filter: null,
+            search_text: null,
         };
 
         this.ajax = itemsTableServiceContainer().fetch(ItemTableAjax);
@@ -63,6 +70,25 @@ export default class Items extends React.Component<
         });
     }
 
+    onFilterChange() {
+        this.ajax.fetchTableData(this, this.props.type, {
+            filter: this.state.filter,
+            search_text: this.state.search_text,
+        });
+    }
+
+    setFilters(filters: { filter: string | null; search_text: string | null }) {
+        this.setState(
+            {
+                filter: filters.filter,
+                search_text: filters.search_text,
+            },
+            () => {
+                this.onFilterChange();
+            },
+        );
+    }
+
     render() {
         if (this.props.type === null) {
             return;
@@ -90,6 +116,7 @@ export default class Items extends React.Component<
                     this.props.type,
                 )}
                 close_view_item_action={this.closeViewSection.bind(this)}
+                set_item_filter={this.setFilters.bind(this)}
             />
         );
     }

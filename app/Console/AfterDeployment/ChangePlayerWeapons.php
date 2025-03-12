@@ -2,12 +2,12 @@
 
 namespace App\Console\AfterDeployment;
 
+use Exception;
+use Illuminate\Console\Command;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
-use App\Game\Character\CharacterInventory\Values\ItemType;
-use Exception;
-use Illuminate\Console\Command;
+
 
 class ChangePlayerWeapons extends Command
 {
@@ -150,7 +150,7 @@ class ChangePlayerWeapons extends Command
         return $character->refresh();
     }
 
-    private function getProperTypeForCharacter(Character $character): ItemType|null {
+    private function getProperTypeForCharacter(Character $character): string|null {
         $properTypeForCharacter = ItemTypeMapping::getForClass($character->class->name);
 
         if (is_array($properTypeForCharacter)) {
@@ -160,8 +160,8 @@ class ChangePlayerWeapons extends Command
         return $properTypeForCharacter;
     }
 
-    private function fetchNewItem(Item $oldItem, ItemType $properTypeForCharacter): Item {
-        $item = Item::where('type', $properTypeForCharacter->value)
+    private function fetchNewItem(Item $oldItem, string $properTypeForCharacter): Item {
+        $item = Item::where('type', $properTypeForCharacter)
             ->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
             ->whereNull('item_suffix_id')
             ->whereNull('item_prefix_id');

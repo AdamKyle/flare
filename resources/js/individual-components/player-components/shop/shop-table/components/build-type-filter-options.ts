@@ -3,6 +3,10 @@ import { startCase } from "lodash";
 
 export const ITEM_TYPES = [
     ItemType.CLASS_SPECIFIC,
+    ItemType.DAGGER,
+    ItemType.WAND,
+    ItemType.CLAW,
+    ItemType.CENSER,
     ItemType.HAMMER,
     ItemType.FAN,
     ItemType.BOW,
@@ -22,17 +26,23 @@ export const ITEM_TYPES = [
     ItemType.RING,
 ];
 
-export const itemTypeFilter = (): { label: string; value: ItemType }[] => {
-    return ITEM_TYPES.map((type: ItemType) => {
-        let label = startCase(type);
+export const itemTypeFilter = (
+    showForYourClass: boolean,
+): { label: string; value: ItemType }[] => {
+    return ITEM_TYPES.filter(
+        (type: ItemType) =>
+            showForYourClass || type !== ItemType.CLASS_SPECIFIC,
+    ) // Remove CLASS_SPECIFIC if false
+        .map((type: ItemType) => {
+            let label = startCase(type);
 
-        if (type === ItemType.CLASS_SPECIFIC) {
-            label = "For your class";
-        }
+            if (type === ItemType.CLASS_SPECIFIC && showForYourClass) {
+                label = "For your class";
+            }
 
-        return {
-            label: label,
-            value: type,
-        };
-    });
+            return {
+                label: label,
+                value: type,
+            };
+        });
 };

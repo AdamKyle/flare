@@ -5,6 +5,7 @@ namespace App\Game\Core\Comparison;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Traits\IsItemUnique;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use Illuminate\Database\Eloquent\Collection;
 
 class ItemComparison
@@ -35,18 +36,14 @@ class ItemComparison
         $positions = match ($toCompare->type) {
             'spell-damage',
             'spell-healing' => ['spell-one', 'spell-two'],
-            'weapon',
-            'mace',
-            'gun',
-            'fan',
-            'scratch-awl',
-            'stave',
-            'bow',
-            'hammer',
             'shield' => ['left-hand', 'right-hand'],
             'ring' => ['ring-one', 'ring-two'],
-            default => [$toCompare->type]
+            default => null
         };
+
+        if (is_null($positions)) {
+            $positions = in_array($toCompare->type, ItemType::validWeapons()) ? ['left-hand', 'right-hand'] : null;
+        }
 
         $foundInventorySlots = $inventorySlots->filter(function ($slot) use ($positions) {
             return in_array($slot->position, $positions);

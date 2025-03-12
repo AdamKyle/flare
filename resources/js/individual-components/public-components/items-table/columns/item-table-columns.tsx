@@ -7,7 +7,7 @@ import { TableType } from "../types/table-type";
 type OnClick = (itemId: number) => void;
 
 export default class ItemTableColumns {
-    public buildColumns(onClick: OnClick, tableType: string) {
+    public buildColumns(onClick: OnClick, tableType?: string) {
         let itemsTableColumns: any[] = [
             {
                 name: "Name",

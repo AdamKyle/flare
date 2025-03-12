@@ -9,6 +9,7 @@ use App\Flare\Models\Skill;
 use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -74,17 +75,12 @@ class CraftingService
     {
 
         $craftingType = $params['crafting_type'];
-        $defaultToWeapon = [
-            'hammer',
-            'bow',
-            'stave',
-            'gun',
-            'fan',
-            'mace',
-            'scratch-awl',
-        ];
+        $defaultToWeapon = ItemType::validWeapons();
 
-        if (in_array($craftingType, $defaultToWeapon)) {
+        if (
+            (is_array($craftingType) && empty(array_diff($craftingType, $defaultToWeapon))) ||
+            (!is_array($craftingType) && in_array($craftingType, $defaultToWeapon))
+        ) {
             $craftingType = 'weapon';
         }
 
@@ -96,16 +92,14 @@ class CraftingService
     /**
      * Get Crafting XP
      */
-    public function getCraftingXP(Character $character, string $type): array
+    public function getCraftingXP(Character $character, string|array $type): array
     {
+
+        $defaultToWeapon = ItemType::validWeapons();
+
         if (
-            $type == 'hammer' ||
-            $type == 'bow' ||
-            $type == 'stave' ||
-            $type === 'gun' ||
-            $type === 'fan' ||
-            $type === 'mace' ||
-            $type === 'scratch-awl'
+            (is_array($type) && empty(array_diff($type, $defaultToWeapon))) ||
+            (!is_array($type) && in_array($type, $defaultToWeapon))
         ) {
             $type = 'weapon';
         }
@@ -268,13 +262,7 @@ class CraftingService
     {
 
         if (
-            $craftingType === 'hammer' ||
-            $craftingType === 'bow' ||
-            $craftingType === 'stave' ||
-            $craftingType === 'gun' ||
-            $craftingType === 'fan' ||
-            $craftingType === 'mace' ||
-            $craftingType === 'scratch-awl'
+            in_array($craftingType, ItemType::validWeapons())
         ) {
             $craftingType = 'weapon';
         }
@@ -291,9 +279,9 @@ class CraftingService
      *
      * @throws Exception
      */
-    protected function getItems(Character $character, Skill $skill, string $craftingType, bool $merchantMessage = true): SupportCollection
+    protected function getItems(Character $character, Skill $skill, string|array $craftingType, bool $merchantMessage = true): SupportCollection
     {
-        $twoHandedWeapons = ['bow', 'hammer', 'stave'];
+        $twoHandedWeapons = [ItemType::BOW->value, ItemType::HAMMER->value, ItemType::STAVE->value];
         $craftingTypes = ['armour', 'ring', 'spell'];
 
         $items = Item::where('can_craft', true)
@@ -304,17 +292,19 @@ class CraftingService
             ->doesnthave('sockets')
             ->orderBy('skill_level_required', 'asc');
 
-        if (in_array($craftingType, $twoHandedWeapons)) {
-            $items->where('default_position', strtolower($craftingType));
-        } elseif (in_array($craftingType, $craftingTypes)) {
-            $items->where('crafting_type', strtolower($craftingType));
+        $craftingTypeArray = is_array($craftingType) ? $craftingType : [$craftingType];
+
+        if (!empty(array_intersect($craftingTypeArray, $twoHandedWeapons))) {
+            $items->whereIn('default_position', array_map('strtolower', $craftingTypeArray));
+        } elseif (!empty(array_intersect($craftingTypeArray, $craftingTypes))) {
+            $items->whereIn('crafting_type', array_map('strtolower', $craftingTypeArray));
         } else {
-            $items->where('type', strtolower($craftingType));
+            $items->whereIn('type', array_map('strtolower', $craftingTypeArray));
         }
 
         $items = $items->select('name', 'cost', 'type', 'id')->get();
 
-        return $this->itemListCostTransformerService->reduceCostOfCraftingItems($character, $items, $craftingType, $merchantMessage);
+        return $this->itemListCostTransformerService->reduceCostOfCraftingItems($character, $items, $merchantMessage);
     }
 
     /**

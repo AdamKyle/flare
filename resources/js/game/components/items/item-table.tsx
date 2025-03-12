@@ -169,7 +169,7 @@ export default class ItemTable extends React.Component<ItemTableProps, any> {
                                         )}
                                         options={
                                             this.props.custom_filter ??
-                                            itemTypeFilter()
+                                            itemTypeFilter(false)
                                         }
                                         menuPosition={"absolute"}
                                         menuPlacement={"bottom"}

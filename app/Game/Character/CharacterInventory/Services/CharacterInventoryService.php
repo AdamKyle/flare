@@ -13,6 +13,7 @@ use App\Flare\Transformers\UsableItemTransformer;
 use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -437,7 +438,6 @@ class CharacterInventoryService
      */
     public function setInventory(): CharacterInventoryService
     {
-
         $this->inventory = $this->getInventory();
 
         return $this;
@@ -731,20 +731,12 @@ class CharacterInventoryService
         }
 
         $acceptedTypes = [
-            'weapon',
+            ...ItemType::validWeapons(),
             'ring',
             'shield',
             'artifact',
             'spell',
             'armour',
-            'trinket',
-            'stave',
-            'hammer',
-            'bow',
-            'fan',
-            'scratch-awl',
-            'gun',
-            'mace',
             'alchemy',
             'quest',
         ];

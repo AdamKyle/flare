@@ -43,6 +43,7 @@ export default class Crafting extends React.Component<any, any> {
                 current_count: 0,
                 max_inventory: 75,
             },
+            error_message: null,
         };
 
         // @ts-ignore
@@ -95,6 +96,54 @@ export default class Crafting extends React.Component<any, any> {
         }
     }
 
+    getCraftableItemsForClass() {
+        this.setState(
+            {
+                loading: true,
+            },
+            () => {
+                const url = craftingGetEndPoints(
+                    "craft-for-class",
+                    this.props.character_id,
+                );
+
+                new Ajax()
+                    .setRoute(url)
+                    .setParameters({
+                        crafting_type: this.state.selected_type,
+                    })
+                    .doAjaxCall(
+                        "get",
+                        (result: AxiosResponse) => {
+                            this.setState({
+                                loading: false,
+                                craftable_items: result.data.items,
+                                skill_xp: result.data.xp,
+                                inventory_count: result.data.inventory_count,
+                                show_craft_for_event:
+                                    result.data.show_craft_for_event,
+                            });
+                        },
+                        (error: AxiosError) => {
+                            const response: AxiosResponse | undefined =
+                                error.response;
+
+                            this.setState({
+                                loading: false,
+                                selected_type: null,
+                            });
+
+                            if (response) {
+                                this.setState({
+                                    error_message: response.data.message,
+                                });
+                            }
+                        },
+                    );
+            },
+        );
+    }
+
     setTypeToCraft(data: any) {
         this.setState(
             {
@@ -106,6 +155,12 @@ export default class Crafting extends React.Component<any, any> {
                     this.state.selected_type !== null &&
                     this.state.selected_type !== ""
                 ) {
+                    if (this.state.selected_type === "for-class") {
+                        this.getCraftableItemsForClass();
+
+                        return;
+                    }
+
                     const url = craftingGetEndPoints(
                         "craft",
                         this.props.character_id,
@@ -313,6 +368,7 @@ export default class Crafting extends React.Component<any, any> {
                                 select_type_to_craft={this.setTypeToCraft.bind(
                                     this,
                                 )}
+                                error_message={this.state.error_message}
                             />
                         ) : this.state.selected_type === "armour" ? (
                             this.state.sorted_armour.length > 0 ? (

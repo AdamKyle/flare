@@ -5,7 +5,14 @@
  * @param characterId
  */
 export const craftingGetEndPoints = (
-    type: "craft" | "enchant" | "alchemy" | "workbench" | "trinketry" | null,
+    type:
+        | "craft-for-class"
+        | "craft"
+        | "enchant"
+        | "alchemy"
+        | "workbench"
+        | "trinketry"
+        | null,
     characterId: number,
 ): string => {
     if (type === null) {
@@ -13,6 +20,8 @@ export const craftingGetEndPoints = (
     }
 
     switch (type) {
+        case "craft-for-class":
+            return "craft-for-class/" + characterId;
         case "craft":
             return "crafting/" + characterId;
         case "enchant":

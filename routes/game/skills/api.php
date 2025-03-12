@@ -9,6 +9,9 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.a
         // Fetch Items
         Route::get('/crafting/{character}', ['uses' => 'Api\CraftingController@fetchItemsToCraft']);
 
+        // Fetch Craftable Weapons for class
+        Route::get('/craft-for-class/{character}', ['uses' => 'Api\CraftingController@fetchItemsForClass']);
+
         // Fetch Item Affixes
         Route::get('/enchanting/{character}', ['uses' => 'Api\EnchantingController@fetchAffixes']);
 

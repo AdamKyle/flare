@@ -6,18 +6,22 @@ import Items from "../items";
 import { AxiosError, AxiosResponse } from "axios";
 
 @injectable()
-export default class ItemTableAjax {
+export default class ItemTableAjax<T extends Record<string, unknown>> {
     constructor(@inject(Ajax) private ajax: AjaxInterface) {}
 
-    public fetchTableData(component: Items, type: string | null) {
-        if (type === null) {
+    public fetchTableData(
+        component: Items,
+        type?: string,
+        params: T = {} as T,
+    ) {
+        if (!type) {
             component.setState({ loading: false });
 
             return;
         }
 
         if (type === TableType.CRAFTING) {
-            return this.fetchCraftingTableItems(component);
+            return this.fetchCraftingTableItems(component, params);
         }
 
         let specialtyType = null;
@@ -38,29 +42,32 @@ export default class ItemTableAjax {
         this.fetchSpecialtyTypeItems(component, specialtyType);
     }
 
-    private fetchCraftingTableItems(component: Items) {
-        this.ajax.setRoute("items-list").doAjaxCall(
-            "get",
-            (result: AxiosResponse) => {
-                component.setState({
-                    loading: false,
-                    items: result.data.items,
-                });
-            },
-            (error: AxiosError) => {
-                component.setState({
-                    loading: false,
-                });
-
-                if (typeof error.response !== "undefined") {
-                    const response: AxiosResponse = error.response;
-
+    private fetchCraftingTableItems<T>(component: Items, params: T) {
+        this.ajax
+            .setRoute("items-list")
+            .setParameters(params || {})
+            .doAjaxCall(
+                "get",
+                (result: AxiosResponse) => {
                     component.setState({
-                        error_message: response.data.message,
+                        loading: false,
+                        items: result.data.items,
                     });
-                }
-            },
-        );
+                },
+                (error: AxiosError) => {
+                    component.setState({
+                        loading: false,
+                    });
+
+                    if (typeof error.response !== "undefined") {
+                        const response: AxiosResponse = error.response;
+
+                        component.setState({
+                            error_message: response.data.message,
+                        });
+                    }
+                },
+            );
     }
 
     private fetchSpecialtyTypeItems(component: Items, specialtyType: string) {

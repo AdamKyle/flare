@@ -95,9 +95,8 @@ trait FactionLoyalty
     /**
      * Should we show the npc craft button?
      */
-    public function showCraftForNpcButton(Character $character, string $craftingType): bool
+    public function showCraftForNpcButton(Character $character, string|array $craftingType): bool
     {
-
         $pledgedFaction = $character->factionLoyalties()->where('is_pledged', true)->first();
 
         if (is_null($pledgedFaction)) {
@@ -110,6 +109,11 @@ trait FactionLoyalty
             return false;
         }
 
-        return collect($assistingNpc->factionLoyaltyNpcTasks->fame_tasks)->contains('type', $craftingType);
+        $craftingTypeArray = is_array($craftingType) ? $craftingType : [$craftingType];
+
+        return collect($assistingNpc->factionLoyaltyNpcTasks->fame_tasks)
+            ->pluck('type')
+            ->intersect($craftingTypeArray)
+            ->isNotEmpty();
     }
 }

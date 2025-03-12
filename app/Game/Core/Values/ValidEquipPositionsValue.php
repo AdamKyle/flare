@@ -4,6 +4,7 @@ namespace App\Game\Core\Values;
 
 use App\Flare\Models\Item;
 use App\Flare\Values\ArmourTypes;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 
 class ValidEquipPositionsValue
 {
@@ -23,14 +24,7 @@ class ValidEquipPositionsValue
         $positions = [];
 
         switch ($item->type) {
-            case 'weapon':
-            case 'stave':
-            case 'bow':
-            case 'gun':
-            case 'fan':
-            case 'mace':
-            case 'scratch-awl':
-            case 'hammer':
+            case in_array($item->type, ItemType::validWeapons()):
             case 'shield':
                 $positions = ['left-hand', 'right-hand'];
                 break;

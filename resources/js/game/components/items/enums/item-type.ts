@@ -1,6 +1,10 @@
 export enum ItemType {
     // Weapon Types
     CLASS_SPECIFIC = "class-specific",
+    DAGGER = "dagger",
+    CLAW = "claw",
+    WAND = "wand",
+    CENSER = "censer",
     STAVE = "stave",
     BOW = "bow",
     HAMMER = "hammer",

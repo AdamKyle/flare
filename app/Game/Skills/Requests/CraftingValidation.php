@@ -2,6 +2,7 @@
 
 namespace App\Game\Skills\Requests;
 
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CraftingValidation extends FormRequest
@@ -25,7 +26,7 @@ class CraftingValidation extends FormRequest
     {
         return [
             'item_to_craft' => 'required|integer',
-            'type' => 'required|in:weapon,hammer,bow,fan,gun,mace,scratch-awl,stave,armour,spell,ring',
+            'type' => 'required|in:' . implode(',', ItemType::allTypes()),
             'craft_for_npc' => 'required|bool',
             'craft_for_event' => 'required|bool',
         ];

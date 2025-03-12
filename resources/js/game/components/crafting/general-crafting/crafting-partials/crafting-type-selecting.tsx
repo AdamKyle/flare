@@ -1,6 +1,7 @@
 import React, { Fragment } from "react";
 import Select from "react-select";
 import CraftingSelectionTypeProps from "./types/crafting-type-selection-props";
+import DangerAlert from "../../../ui/alerts/simple-alerts/danger-alert";
 
 export default class CraftingTypeSelection extends React.Component<
     CraftingSelectionTypeProps,
@@ -13,8 +14,28 @@ export default class CraftingTypeSelection extends React.Component<
 
         this.selectableTypes = [
             {
-                label: "General Weapons",
-                value: "weapon",
+                label: "For my class",
+                value: "for-class",
+            },
+            {
+                label: "Daggers",
+                value: "dagger",
+            },
+            {
+                label: "Swords",
+                value: "sword",
+            },
+            {
+                label: "Claws",
+                value: "claw",
+            },
+            {
+                label: "Wands",
+                value: "wand",
+            },
+            {
+                label: "Censers",
+                value: "censer",
             },
             {
                 label: "Staves",
@@ -81,11 +102,20 @@ export default class CraftingTypeSelection extends React.Component<
                     menuPortalTarget={document.body}
                     value={this.defaultCraftingType()}
                 />
+                {this.props.error_message !== null && (
+                    <DangerAlert additional_css={"mt-4"}>
+                        {this.props.error_message}
+                    </DangerAlert>
+                )}
                 <p className="mt-3 text-sm">
-                    When it comes to weapons there are general "weapons" that
-                    any one can use, then there are specialty weapons: Hammers,
-                    Staves, Bows, Guns, Fans, Maces and Scratch Awls for Weapon
-                    Crafting. You can craft ANY of these types to gain levels.
+                    When it comes to weapons, selecting "For my class" will
+                    return only the weapons for your class. In the case of
+                    Alcoholics class, you won't have any weapons. So you'll be
+                    asked to select another category as Alcoholics don't use
+                    weapons. For Prisoner class you'll be asked to select any
+                    category of weapon as you don't have a septic weapon type
+                    tied to your class. Of course, you can craft any weapon to
+                    gain Weapon Crafting experience.
                 </p>
             </Fragment>
         );
