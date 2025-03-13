@@ -29,7 +29,5 @@ if (infoManagementInit !== null) {
 
     const root = createRoot(infoManagementInit);
 
-    root.render(
-        <InfoManagement user_id={props.userId} info_page_id={infoPageId} />,
-    );
+    root.render(<InfoManagement info_page_id={infoPageId} />);
 }

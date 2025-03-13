@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, ChangeEvent } from "react";
 import InfoSection from "./info-section/info-section";
 import DangerAlert from "../../game/components/ui/alerts/simple-alerts/danger-alert";
 import Ajax from "../../game/lib/ajax/ajax";
@@ -9,9 +9,15 @@ import ComponentLoading from "../../game/components/ui/loading/component-loading
 import SuccessButton from "../../game/components/ui/buttons/success-button";
 import DangerButton from "../../game/components/ui/buttons/danger-button";
 import { cloneDeep, isEqual } from "lodash";
+import InfoManagementProps from "./types/info-management-props";
+import InfoManagementState from "./types/info-management-state";
+import InfoSectionData from "./types/info-section-data";
 
-export default class InfoManagement extends React.Component<any, any> {
-    constructor(props: any) {
+export default class InfoManagement extends React.Component<
+    InfoManagementProps,
+    InfoManagementState
+> {
+    constructor(props: InfoManagementProps) {
         super(props);
 
         this.state = {
@@ -25,74 +31,72 @@ export default class InfoManagement extends React.Component<any, any> {
         };
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         if (this.props.info_page_id !== 0) {
-            this.setState(
-                {
-                    loading: true,
-                },
-                () => {
-                    new Ajax()
-                        .setRoute("admin/info-section/page")
-                        .setParameters({
-                            page_id: this.props.info_page_id,
-                        })
-                        .doAjaxCall(
-                            "get",
-                            (result: AxiosResponse) => {
-                                this.setState({
-                                    page_name: result.data.page_name,
-                                    info_sections: result.data.page_sections,
-                                    loading: false,
-                                });
-                            },
-                            (error: AxiosError) => {},
-                        );
-                },
-            );
+            this.fetchPageData();
         } else {
             this.addSection();
         }
     }
 
-    formatAndSendData(section: any, redirect: boolean) {
+    fetchPageData = (): void => {
+        this.setState({ loading: true }, () => {
+            new Ajax()
+                .setRoute("admin/info-section/page")
+                .setParameters({
+                    page_id: this.props.info_page_id,
+                })
+                .doAjaxCall(
+                    "get",
+                    (result: AxiosResponse) => {
+                        this.setState({
+                            page_name: result.data.page_name,
+                            info_sections: result.data.page_sections,
+                            loading: false,
+                        });
+                    },
+                    (error: AxiosError) => {
+                        this.setState({
+                            loading: false,
+                            error_message: "Failed to load page data.",
+                        });
+                    },
+                );
+        });
+    };
+
+    formatAndSendData = (section: InfoSectionData, redirect: boolean): void => {
         const form = new FormData();
 
-        form.append("content", section.content);
-        form.append("live_wire_component", section.live_wire_component);
-        form.append("item_table_type", section.item_table_type);
+        form.append("content", section.content || "");
+        form.append("live_wire_component", section.live_wire_component || "");
+        form.append("item_table_type", section.item_table_type || "");
         form.append("page_name", this.state.page_name);
-        form.append("order", section.order);
+        form.append("order", section.order.toString());
 
-        if (section.content_image_path !== null) {
+        if (section.content_image_path) {
             form.append("content_image", section.content_image_path);
         }
 
         if (this.props.info_page_id !== 0) {
-            form.append("page_id", this.props.info_page_id);
+            form.append("page_id", this.props.info_page_id.toString());
         }
 
         this.postForm(form, redirect);
-    }
+    };
 
-    updateSection(index: number) {
+    updateSection = (index: number): void => {
         const sectionToUpdate = cloneDeep(this.state.info_sections[index]);
-
         this.formatAndSendData(sectionToUpdate, false);
-    }
+    };
 
-    postForm(form: FormData, redirect: boolean) {
-        this.setState(
-            {
-                posting: true,
-            },
-            () => {
-                this.post(form, redirect);
-            },
-        );
-    }
+    postForm = (form: FormData, redirect: boolean): void => {
+        this.setState({ posting: true }, () => {
+            this.post(form, redirect);
+        });
+    };
 
-    delete() {
+    delete = (): void => {
         new Ajax()
             .setRoute("admin/info-section/delete-page")
             .setParameters({
@@ -101,18 +105,21 @@ export default class InfoManagement extends React.Component<any, any> {
             .doAjaxCall(
                 "post",
                 (result: AxiosResponse) => {
-                    location.href = "/admin/information-management";
+                    window.location.href = "/admin/information-management";
                 },
-                (error: AxiosError) => {},
+                (error: AxiosError) => {
+                    this.setState({
+                        error_message: "Failed to delete page.",
+                    });
+                },
             );
-    }
+    };
 
-    post(form: FormData, redirect: boolean) {
-        let url = "admin/info-section/store-page";
-
-        if (this.props.info_page_id !== 0) {
-            url = "admin/info-section/update-page";
-        }
+    post = (form: FormData, redirect: boolean): void => {
+        const url =
+            this.props.info_page_id !== 0
+                ? "admin/info-section/update-page"
+                : "admin/info-section/store-page";
 
         new Ajax()
             .setRoute(url)
@@ -122,6 +129,7 @@ export default class InfoManagement extends React.Component<any, any> {
                 (result: AxiosResponse) => {
                     this.setState({
                         posting: false,
+                        success_message: "Successfully saved section.",
                     });
 
                     if (redirect) {
@@ -133,21 +141,19 @@ export default class InfoManagement extends React.Component<any, any> {
                 (error: AxiosError) => {
                     this.setState({
                         posting: false,
+                        error_message: "Failed to save section.",
                     });
-
                     console.error(error);
                 },
             );
-    }
+    };
 
-    deleteSection(order: number) {
+    deleteSection = (order: number): void => {
         new Ajax()
             .setRoute(
                 "admin/info-section/delete-section/" + this.props.info_page_id,
             )
-            .setParameters({
-                order: order,
-            })
+            .setParameters({ order })
             .doAjaxCall(
                 "post",
                 (result: AxiosResponse) => {
@@ -155,7 +161,7 @@ export default class InfoManagement extends React.Component<any, any> {
                     const stateSections = cloneDeep(this.state.info_sections);
 
                     stateSections.forEach(
-                        (stateSection: any, index: number) => {
+                        (stateSection: InfoSectionData, index: number) => {
                             if (
                                 !isEqual(
                                     stateSection.content,
@@ -164,65 +170,57 @@ export default class InfoManagement extends React.Component<any, any> {
                             ) {
                                 stateSections[index] = sections[index];
                             }
-
                             stateSections[index].order = parseInt(
                                 sections[index].order,
                             );
                         },
                     );
 
+                    this.setState({ info_sections: stateSections });
+                },
+                (error: AxiosError) => {
                     this.setState({
-                        info_sections: stateSections,
+                        error_message: "Failed to delete section.",
                     });
                 },
-                (error: AxiosError) => {},
             );
-    }
+    };
 
-    setInfoSections(index: number, content: any) {
+    setInfoSections = (index: number, content: InfoSectionData): void => {
         const sections = cloneDeep(this.state.info_sections);
-
         sections[index] = content;
+        this.setState({ info_sections: sections });
+    };
 
-        this.setState({
-            info_sections: sections,
-        });
-    }
-
-    addSection() {
+    addSection = (): void => {
         const infoSections = cloneDeep(this.state.info_sections);
-        const order = 1;
-
-        infoSections.push({
+        const newSection: InfoSectionData = {
             live_wire_component: null,
             content: null,
             content_image_path: null,
             is_new_section: true,
-            order: order,
-        });
+            order: 1,
+        };
+
+        infoSections.push(newSection);
 
         if (infoSections.length > 1) {
             const sectionToPublish = infoSections[infoSections.length - 2];
-
             infoSections[infoSections.length - 1].order =
-                parseInt(sectionToPublish.order) + 1;
-
+                sectionToPublish.order + 1;
             this.formatAndSendData(sectionToPublish, false);
         }
 
-        this.setState({
-            info_sections: infoSections,
-        });
-    }
+        this.setState({ info_sections: infoSections });
+    };
 
-    saveAndFinish() {
+    saveAndFinish = (): void => {
         const infoSections = cloneDeep(this.state.info_sections);
         const sectionToSave = infoSections[infoSections.length - 1];
-
         this.formatAndSendData(sectionToSave, true);
-    }
+    };
 
-    removeSection(index: number) {
+    removeSection = (index: number): void => {
         if (index <= 0) {
             return;
         }
@@ -234,64 +232,73 @@ export default class InfoManagement extends React.Component<any, any> {
             typeof infoSections[index].is_new_section === "undefined"
         ) {
             const section = infoSections[index];
-
             infoSections.splice(index, 1);
-
             this.deleteSection(section.order);
         } else {
             infoSections.splice(index, 1);
         }
 
-        this.setState({
-            info_sections: infoSections,
-        });
-    }
+        this.setState({ info_sections: infoSections });
+    };
 
-    setPageName(event: React.ChangeEvent<HTMLInputElement>) {
-        this.setState({
-            page_name: event.target.value,
-        });
-    }
+    setPageName = (event: ChangeEvent<HTMLInputElement>): void => {
+        this.setState({ page_name: event.target.value });
+    };
 
-    goHome() {
-        return (location.href = "/");
-    }
+    goHome = (): void => {
+        window.location.href = "/";
+    };
 
-    goBack() {
+    goBack = (): void => {
         if (this.props.info_page_id !== 0) {
-            return (location.href =
-                "/admin/information-management/page/" +
-                this.props.info_page_id);
+            window.location.href =
+                "/admin/information-management/page/" + this.props.info_page_id;
+        } else {
+            window.location.href = "/admin/information-management";
         }
+    };
 
-        return (location.href = "/admin/information-management");
-    }
-
-    renderContentSections() {
+    renderContentSections = (): JSX.Element[] => {
         return this.state.info_sections.map(
-            (infoSection: any, index: number, elements: any[]) => {
+            (
+                infoSection: InfoSectionData,
+                index: number,
+                elements: InfoSectionData[],
+            ) => {
                 return (
                     <InfoSection
+                        key={`section-${index}`}
                         index={index}
                         sections_length={this.state.info_sections.length}
                         content={infoSection}
-                        update_parent_element={this.setInfoSections.bind(this)}
-                        remove_section={this.removeSection.bind(this)}
+                        update_parent_element={this.setInfoSections}
+                        remove_section={this.removeSection}
                         add_section={
                             index === elements.length - 1
-                                ? this.addSection.bind(this)
+                                ? this.addSection
                                 : null
                         }
-                        save_and_finish={this.saveAndFinish.bind(this)}
-                        update_section={this.updateSection.bind(this)}
+                        save_and_finish={this.saveAndFinish}
+                        update_section={this.updateSection}
                     />
                 );
             },
         );
-    }
+    };
 
-    render() {
-        if (this.state.loading) {
+    render(): JSX.Element {
+        const {
+            loading,
+            error_message,
+            success_message,
+            page_name,
+            posting,
+            posting_index,
+            info_sections,
+        } = this.state;
+        const { info_page_id } = this.props;
+
+        if (loading) {
             return (
                 <div className="py-5">
                     <ComponentLoading />
@@ -305,65 +312,59 @@ export default class InfoManagement extends React.Component<any, any> {
                     <h3 className="text-left">Content</h3>
                     <div className="text-right">
                         <SuccessButton
-                            button_label={"Home Section"}
-                            on_click={this.goHome.bind(this)}
-                            additional_css={"mr-2"}
+                            button_label="Home Section"
+                            on_click={this.goHome}
+                            additional_css="mr-2"
                         />
                         <SuccessButton
-                            button_label={"Back"}
-                            on_click={this.goBack.bind(this)}
-                            additional_css={"mr-2"}
+                            button_label="Back"
+                            on_click={this.goBack}
+                            additional_css="mr-2"
                         />
-                        {this.props.info_page_id !== 0 ? (
+                        {info_page_id !== 0 && (
                             <DangerButton
-                                button_label={"Delete Page"}
-                                on_click={this.delete.bind(this)}
+                                button_label="Delete Page"
+                                on_click={this.delete}
                             />
-                        ) : null}
+                        )}
                     </div>
                 </div>
 
-                {this.state.error_message !== null ? (
-                    <DangerAlert additional_css={"my-4"}>
-                        {this.state.error_message}
+                {error_message !== null && (
+                    <DangerAlert additional_css="my-4">
+                        {error_message}
                     </DangerAlert>
-                ) : null}
+                )}
 
-                {this.state.success_message !== null ? (
-                    <SuccessAlert additional_css={"my-4"}>
-                        {this.state.success_message}
+                {success_message !== null && (
+                    <SuccessAlert additional_css="my-4">
+                        {success_message}
                     </SuccessAlert>
-                ) : null}
+                )}
 
                 <div className="my-5">
                     <label className="label block mb-2">Page Name</label>
                     <input
                         type="text"
                         className="form-control"
-                        onChange={this.setPageName.bind(this)}
-                        value={this.state.page_name}
-                        disabled={this.props.info_page_id !== 0}
+                        onChange={this.setPageName}
+                        value={page_name}
+                        disabled={info_page_id !== 0}
                     />
                 </div>
 
-                {this.state.posting ? (
+                {posting && (
                     <div className="mt-4 mb-4">
                         <ManualProgressBar
-                            label={"Posting #: " + this.state.posting_index}
-                            secondary_label={
-                                this.state.posting_index +
-                                "/" +
-                                this.state.info_sections.length +
-                                " sections posted"
-                            }
+                            label={`Posting #: ${posting_index}`}
+                            secondary_label={`${posting_index}/${info_sections.length} sections posted`}
                             percentage_left={
-                                this.state.posting_index /
-                                (this.state.info_sections.length - 1)
+                                posting_index / (info_sections.length - 1)
                             }
                             show_loading_icon={true}
                         />
                     </div>
-                ) : null}
+                )}
 
                 {this.renderContentSections()}
             </Fragment>
