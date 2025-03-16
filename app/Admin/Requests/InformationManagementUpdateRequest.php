@@ -4,7 +4,7 @@ namespace App\Admin\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class InformationManagementRequest extends FormRequest
+class InformationManagementUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -20,9 +20,10 @@ class InformationManagementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content' => 'required|string',
+            'content' => 'nullable|string',
             'page_name' => 'required|string',
             'order' => 'required|string',
+            'new_order' => 'nullable|string',
             'content_image' => 'nullable|file|mimes:png|max:2000',
             'live_wire_component' => 'nullable|string',
             'item_table_type' => 'nullable|string',
@@ -37,7 +38,6 @@ class InformationManagementRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'content' => 'Content is missing.',
             'page_name' => 'Page name is missing',
             'content_image.mimetypes' => 'Images can only be PNG',
             'content_image.max' => 'Images can only be a max size of 2mb\'s',

@@ -8,7 +8,7 @@ import SuccessAlert from "../../game/components/ui/alerts/simple-alerts/success-
 import ComponentLoading from "../../game/components/ui/loading/component-loading";
 import SuccessButton from "../../game/components/ui/buttons/success-button";
 import DangerButton from "../../game/components/ui/buttons/danger-button";
-import { cloneDeep, isEqual } from "lodash";
+import { cloneDeep, forEach, isEmpty, isEqual } from "lodash";
 import InfoManagementProps from "./types/info-management-props";
 import InfoManagementState from "./types/info-management-state";
 import InfoSectionData from "./types/info-section-data";
@@ -90,9 +90,14 @@ export default class InfoManagement extends React.Component<
         this.formatAndSendData(sectionToUpdate, false);
     };
 
-    postForm = (form: FormData, redirect: boolean): void => {
+    postForm = (
+        form: FormData,
+        redirect: boolean,
+        resolve?: () => void,
+        reject?: () => void,
+    ): void => {
         this.setState({ posting: true }, () => {
-            this.post(form, redirect);
+            this.post(form, redirect, resolve, reject);
         });
     };
 
@@ -105,7 +110,9 @@ export default class InfoManagement extends React.Component<
             .doAjaxCall(
                 "post",
                 (result: AxiosResponse) => {
-                    window.location.href = "/admin/information-management";
+                    this.setState({
+                        info_sections: result.data.page_sections,
+                    });
                 },
                 (error: AxiosError) => {
                     this.setState({
@@ -115,7 +122,12 @@ export default class InfoManagement extends React.Component<
             );
     };
 
-    post = (form: FormData, redirect: boolean): void => {
+    post = (
+        form: FormData,
+        redirect: boolean,
+        resolve?: () => void,
+        reject?: () => void,
+    ): void => {
         const url =
             this.props.info_page_id !== 0
                 ? "admin/info-section/update-page"
@@ -129,7 +141,7 @@ export default class InfoManagement extends React.Component<
                 (result: AxiosResponse) => {
                     this.setState({
                         posting: false,
-                        success_message: "Successfully saved section.",
+                        info_sections: result.data.page_sections,
                     });
 
                     if (redirect) {
@@ -137,6 +149,7 @@ export default class InfoManagement extends React.Component<
                             "/admin/information-management/page/" +
                             result.data.pageId;
                     }
+                    if (resolve) resolve();
                 },
                 (error: AxiosError) => {
                     this.setState({
@@ -144,8 +157,45 @@ export default class InfoManagement extends React.Component<
                         error_message: "Failed to save section.",
                     });
                     console.error(error);
+                    if (reject) reject();
                 },
             );
+    };
+
+    addNewSection = (form: FormData): void => {
+        new Ajax()
+            .setRoute("admin/info-section/add-section")
+            .setParameters(form)
+            .doAjaxCall(
+                "post",
+                (result: AxiosResponse) => {
+                    this.setState({
+                        posting: false,
+                        page_name: result.data.page_name,
+                        info_sections: result.data.page_sections,
+                    });
+                },
+                (error: AxiosError) => {
+                    this.setState({
+                        posting: false,
+                        error_message: "Failed to add new section.",
+                    });
+
+                    console.error(error);
+                },
+            );
+    };
+
+    insertNewSectionAtIndex = (section: InfoSectionData): void => {
+        const form = new FormData();
+
+        if (this.props.info_page_id !== 0) {
+            form.append("page_id", this.props.info_page_id.toString());
+        }
+
+        form.append("section_to_insert", JSON.stringify(section));
+
+        this.addNewSection(form);
     };
 
     deleteSection = (order: number): void => {
@@ -189,34 +239,80 @@ export default class InfoManagement extends React.Component<
     setInfoSections = (index: number, content: InfoSectionData): void => {
         const sections = cloneDeep(this.state.info_sections);
         sections[index] = content;
+
         this.setState({ info_sections: sections });
     };
 
     addSection = (): void => {
-        const infoSections = cloneDeep(this.state.info_sections);
+        let infoSections = cloneDeep(this.state.info_sections);
+
+        const lastEntry = infoSections[infoSections.length - 1];
+
         const newSection: InfoSectionData = {
             live_wire_component: null,
+            item_table_type: null,
             content: null,
             content_image_path: null,
             is_new_section: true,
-            order: 1,
+            order: 0,
         };
+
+        if (lastEntry) {
+            newSection.order = lastEntry.order + 1;
+        }
 
         infoSections.push(newSection);
 
-        if (infoSections.length > 1) {
-            const sectionToPublish = infoSections[infoSections.length - 2];
-            infoSections[infoSections.length - 1].order =
-                sectionToPublish.order + 1;
-            this.formatAndSendData(sectionToPublish, false);
+        infoSections = infoSections.map((infoSection) => {
+            if (infoSection.is_new_section) {
+                return infoSection;
+            }
+
+            infoSection.is_new_section = false;
+
+            return infoSection;
+        });
+
+        this.setState({ info_sections: infoSections }, () => {
+            this.formatAndSendData(lastEntry, false);
+        });
+    };
+
+    addSectionAbove = (index: number): void => {
+        const infoSections = cloneDeep(this.state.info_sections);
+        const newSection: InfoSectionData = {
+            live_wire_component: null,
+            item_table_type: null,
+            content: null,
+            content_image_path: null,
+            is_new_section: true,
+            order: infoSections[index]?.order || 0,
+            insert_at_index: index,
+        };
+
+        infoSections.splice(index, 0, newSection);
+
+        for (let i = index + 1; i < infoSections.length; i++) {
+            if (!infoSections[i].is_new_section) {
+                infoSections[i].new_order = infoSections[i].order + 1;
+            }
         }
 
-        this.setState({ info_sections: infoSections });
+        for (let i = 0; i < infoSections.length; i++) {
+            if (!infoSections[i].is_new_section) {
+                infoSections[i].is_new_section = false;
+            }
+        }
+
+        this.setState({ info_sections: infoSections }, () => {
+            this.insertNewSectionAtIndex(newSection);
+        });
     };
 
     saveAndFinish = (): void => {
         const infoSections = cloneDeep(this.state.info_sections);
         const sectionToSave = infoSections[infoSections.length - 1];
+
         this.formatAndSendData(sectionToSave, true);
     };
 
@@ -265,6 +361,9 @@ export default class InfoManagement extends React.Component<
                 index: number,
                 elements: InfoSectionData[],
             ) => {
+                const isPosting =
+                    index === this.state.posting_index && this.state.posting;
+
                 return (
                     <InfoSection
                         key={`section-${index}`}
@@ -273,6 +372,7 @@ export default class InfoManagement extends React.Component<
                         content={infoSection}
                         update_parent_element={this.setInfoSections}
                         remove_section={this.removeSection}
+                        add_section_above={this.addSectionAbove}
                         add_section={
                             index === elements.length - 1
                                 ? this.addSection
@@ -280,6 +380,7 @@ export default class InfoManagement extends React.Component<
                         }
                         save_and_finish={this.saveAndFinish}
                         update_section={this.updateSection}
+                        is_posting={isPosting}
                     />
                 );
             },

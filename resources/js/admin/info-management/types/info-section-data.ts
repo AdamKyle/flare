@@ -5,4 +5,6 @@ export default interface InfoSectionData {
     item_table_type?: string | null | undefined;
     order: number;
     is_new_section?: boolean;
+    insert_at_index?: number;
+    new_order?: number;
 }

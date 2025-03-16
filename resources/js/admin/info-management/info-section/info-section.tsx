@@ -12,6 +12,7 @@ import InfoSectionState from "./types/info-section-state";
 import SelectOption from "./types/select-option";
 import { buildLivewireTableOptions } from "./utils/build-livewire-table-options";
 import { buildItemTableOptions } from "./utils/build-item-table-options";
+import LoadingProgressBar from "../../../game/components/ui/progress-bars/loading-progress-bar";
 
 export default class InfoSection extends React.Component<
     InfoSectionProps,
@@ -34,7 +35,7 @@ export default class InfoSection extends React.Component<
 
         this.debouncedUpdate = debounce((content, callback) => {
             this.setState({ content }, () => {
-                this.updateParentElement;
+                this.updateParentElement();
 
                 if (callback) {
                     callback();
@@ -64,7 +65,9 @@ export default class InfoSection extends React.Component<
     ): void {
         this.setState(
             { selected_live_wire_component: option?.value || null },
-            this.updateParentElement,
+            () => {
+                this.updateParentElement();
+            },
         );
     }
 
@@ -74,14 +77,9 @@ export default class InfoSection extends React.Component<
     ): void {
         this.setState(
             { selected_item_table_type: option?.value || null },
-            this.updateParentElement,
-        );
-    }
-
-    setOrder(e: ChangeEvent<HTMLInputElement>): void {
-        this.setState(
-            { order: parseInt(e.target.value, 10) || 0 },
-            this.updateParentElement,
+            () => {
+                this.updateParentElement();
+            },
         );
     }
 
@@ -101,10 +99,9 @@ export default class InfoSection extends React.Component<
 
     setFileForUpload(event: ChangeEvent<HTMLInputElement>): void {
         if (event.target.files && event.target.files.length > 0) {
-            this.setState(
-                { image_to_upload: event.target.files[0] },
-                this.updateParentElement,
-            );
+            this.setState({ image_to_upload: event.target.files[0] }, () => {
+                this.updateParentElement();
+            });
         }
     }
 
@@ -134,6 +131,7 @@ export default class InfoSection extends React.Component<
             add_section,
             save_and_finish,
             update_section,
+            add_section_above,
         } = this.props;
 
         if (loading) {
@@ -143,13 +141,33 @@ export default class InfoSection extends React.Component<
         return (
             <BasicCard additionalClasses="mb-4">
                 {index !== 0 && (
-                    <div className="mb-5">
+                    <div className="my-4 relative">
                         <button
                             type="button"
                             onClick={this.removeSection.bind(this)}
-                            className="text-red-600 dark:text-red-500 absolute right-[5px] top-[5px]"
+                            className="text-red-600 dark:text-red-500 absolute right-[5px] top-[-30px]"
                         >
                             <i className="fas fa-times-circle"></i>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => add_section_above(index)}
+                            className="text-blue-600 dark:text-blue-500 absolute left-[5px] top-[-30px]"
+                        >
+                            <i className="fas fa-plus-circle"></i>
+                        </button>
+                    </div>
+                )}
+
+                {index === 0 && (
+                    <div className="my-4 relative">
+                        <button
+                            type="button"
+                            onClick={() => add_section_above(index)}
+                            className="text-blue-600 dark:text-blue-500 absolute left-[5px] top-[-30px]"
+                        >
+                            <i className="fas fa-plus-circle"></i>
                         </button>
                     </div>
                 )}
@@ -170,16 +188,6 @@ export default class InfoSection extends React.Component<
                         });
                     }}
                 />
-
-                <div className="my-5">
-                    <label className="block mb-2 label">Order</label>
-                    <input
-                        type="number"
-                        className="form-control"
-                        onChange={this.setOrder.bind(this)}
-                        value={order}
-                    />
-                </div>
 
                 <div className="my-5">
                     <input
@@ -222,6 +230,8 @@ export default class InfoSection extends React.Component<
                         value={this.defaultSelectedItemType()}
                     />
                 </div>
+
+                {this.props.is_posting ? <LoadingProgressBar /> : null}
 
                 <div className="flex justify-end mt-4">
                     {sections_length !== 1 && add_section === null && (
