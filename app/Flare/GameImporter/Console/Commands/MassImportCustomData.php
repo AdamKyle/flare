@@ -50,6 +50,8 @@ class MassImportCustomData extends Command
         Artisan::call('import:game-data Monsters');
         Artisan::call('generate:monster-cache');
 
+        Artisan::call('import:game-data Raids');
+
         Cache::delete('items-for-shop');
         Cache::delete('crafting-table-data');
 
