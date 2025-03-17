@@ -45,21 +45,21 @@ trait FactionLoyalty
     {
 
         $existingFame = $helpingNpc->current_fame;
+        $tasks = $helpingNpc->factionLoyaltyNpcTasks->fame_tasks;
 
-        $tasks = array_map(function ($task) use ($key, $id) {
+        foreach ($tasks as $index => $task) {
+            if (isset($task[$key]) && $task[$key] === $id) {
+                $amount = min($task['current_amount'] + 1, $task['required_amount']);
 
-            $amount = min($task['current_amount'] + 1, $task['required_amount']);
+                $event = Event::where('type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->first();
 
-            $event = Event::where('type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->first();
+                if (! is_null($event)) {
+                    $amount = min($task['current_amount'] + 2, $task['required_amount']);
+                }
 
-            if (! is_null($event)) {
-                $amount = min($task['current_amount'] + 2, $task['required_amount']);
+               $tasks[$index]['current_amount'] = $amount;
             }
-
-            return isset($task[$key]) && ($task[$key] === $id) ?
-                array_merge($task, ['current_amount' => $amount]) :
-                $task;
-        }, $helpingNpc->factionLoyaltyNpcTasks->fame_tasks);
+        }
 
         $helpingNpc->factionLoyaltyNpcTasks()->update([
             'fame_tasks' => $tasks,

@@ -27,8 +27,6 @@ class ItemsController extends Controller
         $filter = $request->get('filter');
         $searchText = $request->get('search_text');
 
-        dump($filter, $searchText, $request->all());
-
         $cache = Cache::get('crafting-table-data');
 
         if (!is_null($cache) && is_null($filter) && is_null($searchText)) {

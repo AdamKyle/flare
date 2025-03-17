@@ -34,8 +34,6 @@ class FactionLoyaltyFightService
         if ($result) {
             $this->battleEventHandler->processMonsterDeath($character->id, $monsterId);
 
-            event(new FactionLoyaltyUpdate($character->user, $this->factionLoyaltyService->getLoyaltyInfoForPlane($character)));
-
             return $this->successResult([
                 'message' => 'You have slaughtered the monster! ' . $npc->real_name . ' is happy with your progress! (Check Server Messages for more details on items and additional messages. On mobile, you can select Server Messages from the Orange Chat Tabs drop down below)',
                 'must_revive' => false,

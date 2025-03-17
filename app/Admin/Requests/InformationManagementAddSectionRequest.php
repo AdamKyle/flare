@@ -27,8 +27,6 @@ class InformationManagementAddSectionRequest extends FormRequest
                 $this->merge(['section_to_insert' => $decodedSections]);
             }
         }
-
-        dump($this->section_to_insert);
     }
 
     /**

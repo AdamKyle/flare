@@ -52,9 +52,9 @@ class BattleRewardService
             WinterEventChristmasGiftHandler::dispatch($this->characterId)->onQueue('event_battle_reward')->delay(now()->addSeconds(2));
         }
 
+        BattleFactionHandler::dispatch($this->characterId, $this->monsterId)->onQueue('battle_reward_factions')->delay(now()->addSeconds(2));
         BattleSecondaryRewardHandler::dispatch($this->characterId)->onQueue('battle_secondary_reward')->delay(now()->addSeconds(2));
         BattleCurrenciesHandler::dispatch($this->characterId, $this->monsterId)->onQueue('battle_reward_currencies')->delay(now()->addSeconds(2));
-        BattleFactionHandler::dispatch($this->characterId, $this->monsterId)->onQueue('battle_reward_factions')->delay(now()->addSeconds(2));
         BattleGlobalEventHandler::dispatch($this->characterId)->onQueue('battle_reward_global_event')->delay(now()->addSeconds(2));
         BattleLocationHandler::dispatch($this->characterId, $this->monsterId)->onQueue('battle_reward_location_handlers')->delay(now()->addSeconds(2));
         BattleWeeklyFightHandler::dispatch($this->characterId, $this->monsterId)->onQueue('battle_reward_weekly_fights')->delay(now()->addSeconds(2));

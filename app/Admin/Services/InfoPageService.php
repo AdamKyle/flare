@@ -48,7 +48,7 @@ class InfoPageService
     private function create(array $params): InfoPage
     {
         $section = $this->createSection($params);
-        dump('Create', $section);
+
         return $this->storeContents($params['page_name'], $section);
     }
 
@@ -62,20 +62,17 @@ class InfoPageService
     private function storeContents(string $pageName, array $sections): InfoPage
     {
         $page = InfoPage::where('page_name', Str::kebab(strtolower($pageName)))->first();
-        dump('storeContents', $page);
+
         if (! is_null($page)) {
             $pageSections = array_values($page->page_sections);
             $pageSections[] = $sections;
             $page->update(['page_sections' => $pageSections]);
         } else {
-            dump('Should be here, storing contents?');
             $pageSections = [$sections];
             $page = InfoPage::create([
                 'page_name' => Str::kebab(strtolower($pageName)),
                 'page_sections' => $pageSections,
             ]);
-
-            dump($page);
         }
 
         return $page->refresh();
