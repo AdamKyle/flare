@@ -50,8 +50,6 @@ export default class FactionLoyaltyListeners implements FactionLoyaltyListener {
                     return;
                 }
 
-                console.log(event);
-
                 this.component.setState(
                     {
                         npcs: event.factionLoyalty.npcs,
