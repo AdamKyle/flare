@@ -7,6 +7,7 @@ use App\Flare\Models\Event;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Collection;
@@ -43,7 +44,8 @@ class LoginMessage implements ShouldQueue
         $celestialEvent = Event::where('type', EventType::WEEKLY_CELESTIALS)->first();
 
         if (! is_null($celestialEvent)) {
-            event(new ServerMessageEvent($user, 'Celestials have been set free till tomorrow at 1pm GMT-6. All you have to do is move around to watch them spawn (80% chance). Celestials Drop Valuable shards for Alchemy crafting!'));
+            $endTime = Carbon::parse($celestialEvent->ends_at)->setTimeFrom(env('TIME_ZONE'))->format('g A T');
+            event(new ServerMessageEvent($user, 'Celestials have been set free till tomorrow at: '.$endTime.'. All you have to do is move around to watch them spawn (80% chance). Celestials Drop Valuable shards for Alchemy crafting!'));
         }
     }
 }
