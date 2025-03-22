@@ -45,12 +45,18 @@ class MassImportCustomData extends Command
         Artisan::call('add:holy-stacks-to-items');
         Artisan::call('change:character-reincarnation-xp-penalty');
 
+        Artisan::call('import:game-data Items');
+        Artisan::call('import:game-data Locations');
+        Artisan::call('import:game-data Npcs');
+
         Monster::where('is_celestial_entity', true)->delete();
 
         Artisan::call('import:game-data Monsters');
         Artisan::call('generate:monster-cache');
 
         Artisan::call('import:game-data Raids');
+
+        Artisan::call('import:game-data Quests');
 
         Cache::delete('items-for-shop');
         Cache::delete('crafting-table-data');
@@ -59,7 +65,8 @@ class MassImportCustomData extends Command
 
         Artisan::call('remove:duplicate-items');
 
-
+        Artisan::call('create:quest-cache');
+        
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
