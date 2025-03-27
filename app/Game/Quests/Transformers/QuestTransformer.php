@@ -23,6 +23,7 @@ class QuestTransformer extends TransformerAbstract
             'parent_quest_id' => $quest->parent_quest_id,
             'required_quest_id' => $quest->required_quest_id,
             'belongs_to_map_name' => $quest->belongs_to_map_name,
+            'required_quest_chain_details' => $quest->required_quest_chain_details,
         ];
     }
 

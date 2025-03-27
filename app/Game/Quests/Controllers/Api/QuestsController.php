@@ -45,7 +45,7 @@ class QuestsController extends Controller
         $quest = $quest->loadRelations();
 
         if ($quest->unlocks_skill) {
-            $quest->unlocks_skill_name = (new SkillTypeValue($quest->unlocks_skill_type))->getNamedValue();
+            $quest->unlocks_skill_name = SkillTypeValue::tryFrom($quest->unlocks_skill_type)->getNamedValue();
         }
 
         if (! $quest->unlocks_skill) {
@@ -61,7 +61,7 @@ class QuestsController extends Controller
         if (! is_null($quest->unlocks_passive_id)) {
             $quest->unlocks_passive_name = PassiveSkill::find($quest->unlocks_passive_id)->name;
         } else {
-            $quest->unlocks_passive_name = null;
+            $quest->unlockhandInQuests_passive_name = null;
         }
 
         return response()->json($quest);

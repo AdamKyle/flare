@@ -14,6 +14,9 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
 class QuestsSheet implements ToCollection
 {
+
+    private $requiredQuestChains = [];
+
     public function collection(Collection $rows)
     {
         $questsWhichRequireOtherQuests = [];
@@ -40,6 +43,12 @@ class QuestsSheet implements ToCollection
             $questData = $this->returnCleanItem($quest);
 
             Quest::updateOrCreate(['name' => $questData['name']], $questData);
+        }
+
+        foreach ($this->requiredQuestChains as $requiredQuestChain) {
+            Quest::where('name', $requiredQuestChain['parent_quest_name'])-> update([
+                'required_quest_chain' => Quest::whereIn('name', explode(', ', $requiredQuestChain['required_quest_chain_names']))->pluck('id')
+            ]);
         }
     }
 
@@ -194,6 +203,19 @@ class QuestsSheet implements ToCollection
             } else {
                 $quest['assisting_npc_id'] = $npc->id;
             }
+        }
+
+        if (!isset($quest['required_quest_chain'])) {
+            $quest['required_quest_chain'] = null;
+        } else {
+            $requiredQuestsForChain = $quest['required_quest_chain'];
+
+            $this->requiredQuestChains[] = [
+                'parent_quest_name' => $quest['name'],
+                'required_quest_chain_names' => $requiredQuestsForChain
+            ];
+
+            $quest['required_quest_chain'] = null;
         }
 
         unset($quest['item_name']);

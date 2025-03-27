@@ -121,32 +121,57 @@ export default class QuestDetailsModal extends React.Component<any, any> {
         return this.state.quest_details.name;
     }
 
-    getNPCCommands(npc: any) {
-        return npc.commands.map((command: any) => command.command).join(", ");
+    getRequiredQuestChainDetails() {
+        const { required_quest_chain_details, completed_quests } = this.props;
+
+        if (!required_quest_chain_details) {
+            return null;
+        }
+
+        const { quest_ids, quest_names, map_name, starts_with_npc } =
+            required_quest_chain_details;
+
+        return (
+            <div className="text-sm leading-relaxed">
+                <p className="mb-2">
+                    You need to complete a quest chain first before you can do
+                    this quest. This quest chain starts with the NPC:{" "}
+                    <strong>{starts_with_npc}</strong> and consists of the
+                    following quests:
+                </p>
+
+                <p className="mb-2">
+                    {quest_names.map((name: string, index: number) => {
+                        const questId = quest_ids[index];
+                        const isCompleted = completed_quests.includes(questId);
+                        const isLast = index === quest_names.length - 1;
+
+                        return (
+                            <span key={questId} className="inline">
+                                <i
+                                    className={`${
+                                        isCompleted
+                                            ? "fas fa-check text-green-600"
+                                            : "far fa-square text-gray-500"
+                                    } mr-1`}
+                                ></i>
+                                <strong>{name}</strong>
+                                {!isLast && <span>, </span>}
+                            </span>
+                        );
+                    })}
+                </p>
+
+                <p>
+                    The quest line will start on the map:{" "}
+                    <strong>{map_name}</strong>.
+                </p>
+            </div>
+        );
     }
 
     getRequiredQuestDetails() {
         if (this.state.quest_details !== null) {
-            if (this.state.quest_details.parent_chain_quest !== null) {
-                const questName =
-                    this.state.quest_details.parent_chain_quest.name;
-                const npcName =
-                    this.state.quest_details.parent_chain_quest.npc.real_name;
-                const mapName =
-                    this.state.quest_details.parent_chain_quest
-                        .belongs_to_map_name;
-
-                return (
-                    <span>
-                        You must complete another quest first, to start this
-                        story line. Complete the quest chain starting with:{" "}
-                        <strong>{questName}</strong> For the NPC:{" "}
-                        <strong>{npcName}</strong> who resides on:{" "}
-                        <strong>{mapName}</strong>.
-                    </span>
-                );
-            }
-
             if (this.state.quest_details.required_quest !== null) {
                 const questName = this.state.quest_details.required_quest.name;
                 const npcName =
@@ -429,7 +454,10 @@ export default class QuestDetailsModal extends React.Component<any, any> {
 
     render() {
         const npcPLaneAccess = this.fetchNpcPlaneAccess();
-
+        console.log(
+            "Has required quest chain complete?: ",
+            this.props.is_required_quest_chain_complete,
+        );
         return (
             <Dialogue
                 is_open={this.props.is_open}
@@ -453,6 +481,11 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                         {!this.props.is_required_quest_complete ? (
                             <WarningAlert additional_css={"my-4"}>
                                 {this.getRequiredQuestDetails()}
+                            </WarningAlert>
+                        ) : null}
+                        {!this.props.is_required_quest_chain_complete ? (
+                            <WarningAlert additional_css={"mb-4"}>
+                                {this.getRequiredQuestChainDetails()}
                             </WarningAlert>
                         ) : null}
                         <Tabs tabs={this.tabs} full_width={true}>
@@ -539,7 +572,10 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                     className={
                                         "my-4 max-h-[160px] overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-md bg-slate-200 dark:bg-slate-700 p-4 " +
                                         (!this.props.is_parent_complete ||
-                                        !this.props.is_required_quest_complete
+                                        !this.props
+                                            .is_required_quest_complete ||
+                                        !this.props
+                                            .is_required_quest_chain_complete
                                             ? " blur-sm"
                                             : "")
                                     }

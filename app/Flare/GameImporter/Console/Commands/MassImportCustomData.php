@@ -58,6 +58,8 @@ class MassImportCustomData extends Command
 
         Artisan::call('import:game-data Quests');
 
+        Artisan::call('create:quest-chain-relationships');
+
         Cache::delete('items-for-shop');
         Cache::delete('crafting-table-data');
 
@@ -66,7 +68,7 @@ class MassImportCustomData extends Command
         Artisan::call('remove:duplicate-items');
 
         Artisan::call('create:quest-cache');
-        
+
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {

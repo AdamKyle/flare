@@ -27,6 +27,22 @@ export default class QuestNode extends React.Component<QuestNodeProps, any> {
         return false;
     }
 
+    isAllRequiredQuestsInChainComplete() {
+        if (this.props.quest !== null) {
+            if (this.props.quest.required_quest_chain_details !== null) {
+                const requiredQuests =
+                    this.props.quest.required_quest_chain_details.quest_ids;
+                const completedQuests = new Set(this.props.completed_quests);
+
+                return requiredQuests.every((requiredQuest: number) =>
+                    completedQuests.has(requiredQuest),
+                );
+            }
+        }
+
+        return true;
+    }
+
     isParentQuestComplete() {
         if (this.props.quest !== null) {
             if (this.props.quest.is_parent) {
@@ -55,6 +71,13 @@ export default class QuestNode extends React.Component<QuestNodeProps, any> {
     }
 
     render() {
+        if (this.props.quest?.name === "Searching for a coin") {
+            console.log(
+                !this.isRequiredQuestComplete(),
+                !this.isAllRequiredQuestsInChainComplete(),
+                this.isParentQuestComplete(),
+            );
+        }
         return (
             <div>
                 <button
@@ -62,22 +85,27 @@ export default class QuestNode extends React.Component<QuestNodeProps, any> {
                     role="button"
                     className={clsx(
                         {
-                            "text-yellow-700 dark:text-yellow-600":
-                                !this.isRequiredQuestComplete() &&
-                                this.isParentQuestComplete(),
-                        },
-                        {
-                            "text-blue-500 dark:text-blue-400":
-                                !this.isQuestCompleted() &&
-                                this.isParentQuestComplete(),
-                        },
-                        {
                             "text-green-700 dark:text-green-600":
                                 this.isQuestCompleted(),
                         },
                         {
                             "text-red-500 dark:text-red-400":
+                                !this.isQuestCompleted() &&
                                 !this.isParentQuestComplete(),
+                        },
+                        {
+                            "text-yellow-700 dark:text-yellow-600":
+                                !this.isQuestCompleted() &&
+                                this.isParentQuestComplete() &&
+                                (!this.isRequiredQuestComplete() ||
+                                    !this.isAllRequiredQuestsInChainComplete()),
+                        },
+                        {
+                            "text-blue-500 dark:text-blue-400":
+                                !this.isQuestCompleted() &&
+                                this.isParentQuestComplete() &&
+                                this.isRequiredQuestComplete() &&
+                                this.isAllRequiredQuestsInChainComplete(),
                         },
                     )}
                     onClick={this.showQuestDetails.bind(this)}
@@ -94,6 +122,11 @@ export default class QuestNode extends React.Component<QuestNodeProps, any> {
                         is_parent_complete={this.isParentQuestComplete()}
                         is_quest_complete={this.isQuestCompleted()}
                         is_required_quest_complete={this.isRequiredQuestComplete()}
+                        is_required_quest_chain_complete={this.isAllRequiredQuestsInChainComplete()}
+                        required_quest_chain_details={
+                            this.props.quest?.required_quest_chain_details
+                        }
+                        completed_quests={this.props.completed_quests}
                         update_quests={this.props.update_quests}
                     />
                 ) : null}

@@ -7,6 +7,7 @@ use App\Console\AfterDeployment\ChangeCharacterReincarnationXpPenalty;
 use App\Console\AfterDeployment\ChangeWeaponTypesForClassRanks;
 use App\Console\AfterDeployment\CleanInvalidWeapons;
 use App\Console\AfterDeployment\CleanMarketPlaceOfInvalidWeapons;
+use App\Console\AfterDeployment\CreateQuestChainRelationships;
 use App\Console\AfterDeployment\UpdateWeaponsAndArmourWithNewStats;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Mail;
@@ -89,6 +90,7 @@ class AppServiceProvider extends ServiceProvider
             ChangeCharacterReincarnationXpPenalty::class,
             UpdateWeaponsAndArmourWithNewStats::class,
             ChangeWeaponTypesForClassRanks::class,
+            CreateQuestChainRelationships::class,
 
             // Development Commands:
             CreateCharacter::class,

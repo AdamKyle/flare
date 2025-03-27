@@ -65,6 +65,8 @@ class QuestsController extends Controller
             'raids' => Raid::pluck('name', 'id')->toArray(),
             'requiredQuests' => Quest::pluck('name', 'id')->toArray(),
             'eventTypes' => EventType::getOptionsForSelect(),
+            'questsForChain' => Quest::all(),
+            'selectedQuestsForChain' => [],
         ]);
     }
 
@@ -83,6 +85,8 @@ class QuestsController extends Controller
             'raids' => Raid::pluck('name', 'id')->toArray(),
             'requiredQuests' => Quest::pluck('name', 'id')->toArray(),
             'eventTypes' => EventType::getOptionsForSelect(),
+            'questsForChain' => Quest::all(),
+            'selectedQuestsForChain' => is_null($quest->required_quest_chain) ? [] : $quest->required_quest_chain,
         ]);
     }
 

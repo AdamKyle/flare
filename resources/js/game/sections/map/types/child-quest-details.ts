@@ -14,4 +14,11 @@ export interface ChildQuestDetails {
     required_quest_id: number | null;
 
     child_quests: ChildQuestDetails[];
+
+    required_quest_chain_details: {
+        quest_ids: number[];
+        quest_names: string[];
+        map_name: string;
+        starts_with_npc: string;
+    } | null;
 }
