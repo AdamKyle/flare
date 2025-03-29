@@ -139,9 +139,22 @@ export default class InfoManagement extends React.Component<
             .doAjaxCall(
                 "post",
                 (result: AxiosResponse) => {
+                    const existingSections = cloneDeep(
+                        this.state.info_sections,
+                    );
+                    const updatedSections = result.data.page_sections;
+
+                    const mergedSections = [...updatedSections];
+
+                    existingSections.forEach((section: InfoSectionData) => {
+                        if (section.is_new_section) {
+                            mergedSections.push(section);
+                        }
+                    });
+
                     this.setState({
                         posting: false,
-                        info_sections: result.data.page_sections,
+                        info_sections: mergedSections,
                     });
 
                     if (redirect) {
@@ -274,6 +287,10 @@ export default class InfoManagement extends React.Component<
         });
 
         this.setState({ info_sections: infoSections }, () => {
+            if (!lastEntry) {
+                return;
+            }
+
             this.formatAndSendData(lastEntry, false);
         });
     };
