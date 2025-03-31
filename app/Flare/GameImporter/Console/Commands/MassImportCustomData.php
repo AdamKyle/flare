@@ -38,6 +38,7 @@ class MassImportCustomData extends Command
     {
 
         Artisan::call('remove:duplicate-items');
+        Artisan::call('import:game-data Skills');
         Artisan::call('import:game-data Weapons');
         Artisan::call('import:game-data Armour');
         Artisan::call('import:game-data Items');

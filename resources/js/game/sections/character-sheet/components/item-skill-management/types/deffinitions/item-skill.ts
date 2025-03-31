@@ -3,7 +3,7 @@ export default interface ItemSkill {
     description: string;
     agi_mod: number;
     base_ac_mod: number;
-    base_attack_mod: number;
+    base_damage_mod: number;
     base_healing_mod: number;
     chr_mod: number;
     current_kill: number;

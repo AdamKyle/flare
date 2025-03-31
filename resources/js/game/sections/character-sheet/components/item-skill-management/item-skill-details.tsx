@@ -119,7 +119,7 @@ export default class ItemSkillDetails extends React.Component<
 
     render() {
         const skillData = this.props.skill_progression_data;
-
+        console.log("skillData", skillData);
         const parentSkill: ItemSkill | undefined = findParentSkill(
             this.props.skill_progression_data.item_skill,
             this.props.skills,
@@ -330,15 +330,18 @@ export default class ItemSkillDetails extends React.Component<
                             <dd
                                 className={clsx({
                                     "text-green-600 dark:text-green-400":
-                                        skillData.item_skill.base_attack_mod >
+                                        skillData.item_skill.base_damage_mod >
                                         0,
                                 })}
                             >
-                                {(skillData.base_attack_mod * 100).toFixed(0)}%{" "}
-                                {skillData.item_skill.base_attack_mod > 0
+                                {(
+                                    skillData.item_skill.base_damage_mod * 100
+                                ).toFixed(0)}
+                                %{" "}
+                                {skillData.item_skill.base_damage_mod > 0
                                     ? "(+" +
                                       (
-                                          skillData.item_skill.base_attack_mod *
+                                          skillData.item_skill.base_damage_mod *
                                           100
                                       ).toFixed(0) +
                                       "%/Lv)"
