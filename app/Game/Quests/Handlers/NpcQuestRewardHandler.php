@@ -102,6 +102,14 @@ class NpcQuestRewardHandler
 
                 event(new GlobalMessageEvent($character->name . ' Has unlocked an epic gift! 10 additional sets! Their deeds have not gone unnoticed in the land of Tlessa!'));
             }
+
+            if ($quest->unlocksFeature()->isExtendedBackpack()) {
+                $character->update(['inventory_max' => 150]);
+
+                event(new ServerMessageEvent($character->user, 'Your inventory has been increased from a max of 75 slots to 150 slots. You can now carry more.'));
+
+                event(new GlobalMessageEvent($character->name . ' Has unlocked an epic gift! They now have more inventory slots up from 75 to a new max of 150!'));
+            }
         }
     }
 
