@@ -262,7 +262,7 @@ class ShopService
         }
 
         return $items
-            ->orderBy('type', 'asc')
+            ->orderBy('type', 'desc')
             ->orderBy('cost', 'asc')
             ->get();
     }
