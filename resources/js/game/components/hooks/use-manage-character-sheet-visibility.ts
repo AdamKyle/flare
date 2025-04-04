@@ -8,15 +8,9 @@ export const useManageCharacterSheetVisibility =
   (): UseCharacterSheetVisibilityDefinition => {
     const eventSystem = useEventSystem();
 
-    const manageCharacterSheetEmitter = eventSystem.isEventRegistered(
-      CharacterSheet.OPEN_CHARACTER_SHEET
-    )
-      ? eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-          CharacterSheet.OPEN_CHARACTER_SHEET
-        )
-      : eventSystem.registerEvent<{ [key: string]: boolean }>(
-          CharacterSheet.OPEN_CHARACTER_SHEET
-        );
+    const manageCharacterSheetEmitter = eventSystem.fetchOrCreateEventEmitter<{
+      [key: string]: boolean;
+    }>(CharacterSheet.OPEN_CHARACTER_SHEET);
 
     const openCharacterSheet = () => {
       const closeCraftingCardEvent = eventSystem.getEventEmitter<{

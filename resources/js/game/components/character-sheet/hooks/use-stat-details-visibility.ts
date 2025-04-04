@@ -16,15 +16,9 @@ export const useStatDetailsVisibility =
     const [statType, setStatType] =
       useState<UseStatDetailsVisibilityState['statType']>(null);
 
-    const manageStatDetailsEmitter = eventSystem.isEventRegistered(
-      CharacterSheet.OPEN_STAT_DETAILS
-    )
-      ? eventSystem.getEventEmitter<{ [key: string]: [boolean, StatTypes?] }>(
-          CharacterSheet.OPEN_STAT_DETAILS
-        )
-      : eventSystem.registerEvent<{ [key: string]: [boolean, StatTypes?] }>(
-          CharacterSheet.OPEN_STAT_DETAILS
-        );
+    const manageStatDetailsEmitter = eventSystem.fetchOrCreateEventEmitter<{
+      [key: string]: [boolean, StatTypes?];
+    }>(CharacterSheet.OPEN_STAT_DETAILS);
 
     useEffect(() => {
       const updateVisibility = ([visible, statType]: [boolean, StatTypes?]) => {

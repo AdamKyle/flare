@@ -14,15 +14,9 @@ export const useManageCharacterInventoryVisibility =
         false
       );
 
-    const manageInventoryEmitter = eventSystem.isEventRegistered(
-      CharacterSheet.OPEN_INVENTORY_SECTION
-    )
-      ? eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-          CharacterSheet.OPEN_INVENTORY_SECTION
-        )
-      : eventSystem.registerEvent<{ [key: string]: boolean }>(
-          CharacterSheet.OPEN_INVENTORY_SECTION
-        );
+    const manageInventoryEmitter = eventSystem.fetchOrCreateEventEmitter<{
+      [key: string]: boolean;
+    }>(CharacterSheet.OPEN_INVENTORY_SECTION);
 
     useEffect(() => {
       const updateVisibility = (visible: boolean) => {

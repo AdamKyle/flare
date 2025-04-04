@@ -6,15 +6,9 @@ import UseCharacterGemBagDefinition from './definition/use-character-gem-bag-def
 export const useOpenCharacterGemBag = (): UseCharacterGemBagDefinition => {
   const eventSystem = useEventSystem();
 
-  const manageCharacterGemBag = eventSystem.isEventRegistered(
-    CharacterInventory.OPEN_GEM_BAG
-  )
-    ? eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-        CharacterInventory.OPEN_GEM_BAG
-      )
-    : eventSystem.registerEvent<{ [key: string]: boolean }>(
-        CharacterInventory.OPEN_GEM_BAG
-      );
+  const manageCharacterGemBag = eventSystem.fetchOrCreateEventEmitter<{
+    [key: string]: boolean;
+  }>(CharacterInventory.OPEN_GEM_BAG);
 
   const openGemBag = () => {
     manageCharacterGemBag.emit(CharacterInventory.OPEN_GEM_BAG, true);

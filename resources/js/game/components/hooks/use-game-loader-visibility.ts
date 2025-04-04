@@ -12,15 +12,9 @@ export const useGameLoaderVisibility =
     const [showGameLoader, setShowGameLoader] =
       useState<GameLoaderVisibility['showGameLoader']>(true);
 
-    const gameLoaderVisibility = eventSystem.isEventRegistered(
-      GameLoaderEvents.SHOW_GAME_LOADER
-    )
-      ? eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-          GameLoaderEvents.SHOW_GAME_LOADER
-        )
-      : eventSystem.registerEvent<{ [key: string]: boolean }>(
-          GameLoaderEvents.SHOW_GAME_LOADER
-        );
+    const gameLoaderVisibility = eventSystem.fetchOrCreateEventEmitter<{
+      [key: string]: boolean;
+    }>(GameLoaderEvents.SHOW_GAME_LOADER);
 
     useEffect(() => {
       const updateVisibility = (visible: boolean) => {

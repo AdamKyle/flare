@@ -12,15 +12,9 @@ export const useManageClassRanksVisibility =
     const [showClassRanks, setShowClassRanks] =
       useState<UseManageClassRanksVisibilityState['showClassRanks']>(false);
 
-    const manageClassRanksEventEmitter = eventSystem.isEventRegistered(
-      CharacterSheet.OPEN_CLASS_RANKS_SYSTEM
-    )
-      ? eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-          CharacterSheet.OPEN_CLASS_RANKS_SYSTEM
-        )
-      : eventSystem.registerEvent<{ [key: string]: boolean }>(
-          CharacterSheet.OPEN_CLASS_RANKS_SYSTEM
-        );
+    const manageClassRanksEventEmitter = eventSystem.fetchOrCreateEventEmitter<{
+      [key: string]: boolean;
+    }>(CharacterSheet.OPEN_CLASS_RANKS_SYSTEM);
 
     useEffect(() => {
       const updateVisibility = (visible: boolean) => {

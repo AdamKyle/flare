@@ -9,15 +9,9 @@ export const useManageCraftingCardVisibility =
   (): UseManageCraftingCardVisibilityDefinition => {
     const eventSystem = useEventSystem();
 
-    const openCardEventEmitter = eventSystem.isEventRegistered(
-      ActionCardEvents.OPEN_CRATING_CARD
-    )
-      ? eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-          ActionCardEvents.OPEN_CRATING_CARD
-        )
-      : eventSystem.registerEvent<{ [key: string]: boolean }>(
-          ActionCardEvents.OPEN_CRATING_CARD
-        );
+    const openCardEventEmitter = eventSystem.fetchOrCreateEventEmitter<{
+      [key: string]: boolean;
+    }>(ActionCardEvents.OPEN_CRATING_CARD);
 
     const [showCraftingCard, setShowCraftingCard] =
       useState<UseManageCraftingCardVisibilityState['showCraftingCard']>(false);

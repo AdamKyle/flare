@@ -8,15 +8,10 @@ export const useManageCharacterInventoryVisibility =
   (): UseManageCharacterInventoryVisibility => {
     const eventSystem = useEventSystem();
 
-    const manageCharacterInventoryEmitter = eventSystem.isEventRegistered(
-      CharacterSheet.OPEN_INVENTORY_SECTION
-    )
-      ? eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-          CharacterSheet.OPEN_INVENTORY_SECTION
-        )
-      : eventSystem.registerEvent<{ [key: string]: boolean }>(
-          CharacterSheet.OPEN_INVENTORY_SECTION
-        );
+    const manageCharacterInventoryEmitter =
+      eventSystem.fetchOrCreateEventEmitter<{ [key: string]: boolean }>(
+        CharacterSheet.OPEN_INVENTORY_SECTION
+      );
 
     const openCharacterInventory = () => {
       const closeCraftingCardEvent = eventSystem.getEventEmitter<{

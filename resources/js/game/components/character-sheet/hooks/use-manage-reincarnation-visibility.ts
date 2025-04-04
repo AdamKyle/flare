@@ -14,15 +14,9 @@ export const useManageReincarnationVisibility =
         UseManageCharacterReincarnationVisibilityState['showReincarnation']
       >(false);
 
-    const manageReincarnationEmitter = eventSystem.isEventRegistered(
-      CharacterSheet.OPEN_REINCARNATION_SYSTEM
-    )
-      ? eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-          CharacterSheet.OPEN_REINCARNATION_SYSTEM
-        )
-      : eventSystem.registerEvent<{ [key: string]: boolean }>(
-          CharacterSheet.OPEN_REINCARNATION_SYSTEM
-        );
+    const manageReincarnationEmitter = eventSystem.fetchOrCreateEventEmitter<{
+      [key: string]: boolean;
+    }>(CharacterSheet.OPEN_REINCARNATION_SYSTEM);
 
     useEffect(() => {
       const updateVisibility = (visible: boolean) => {

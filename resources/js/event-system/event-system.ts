@@ -27,6 +27,7 @@ export default class EventSystem implements EventSystemDefinition {
 
     return emitter;
   }
+
   getEventEmitter<T extends EventMapDefinition>(
     name: string
   ): EventEmitterDefinition<T> {
@@ -37,5 +38,15 @@ export default class EventSystem implements EventSystemDefinition {
     }
 
     return emitter as EventEmitterDefinition<T>;
+  }
+
+  fetchOrCreateEventEmitter<T extends EventMapDefinition>(
+    name: string
+  ): EventEmitterDefinition<T> {
+    if (this.isEventRegistered(name)) {
+      return this.getEventEmitter(name);
+    }
+
+    return this.registerEvent(name);
   }
 }

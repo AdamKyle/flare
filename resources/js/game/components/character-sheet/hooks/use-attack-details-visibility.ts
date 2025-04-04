@@ -17,15 +17,9 @@ export const useAttackDetailsVisibility =
     const [attackType, setAttackType] =
       useState<UseManageAttackTypeDetailsVisibilityState['attackType']>(null);
 
-    const manageAttackDetailsEmitter = eventSystem.isEventRegistered(
-      CharacterSheet.OPEN_ATTACK_DETAILS
-    )
-      ? eventSystem.getEventEmitter<{ [key: string]: [boolean, AttackTypes?] }>(
-          CharacterSheet.OPEN_ATTACK_DETAILS
-        )
-      : eventSystem.registerEvent<{ [key: string]: [boolean, AttackTypes?] }>(
-          CharacterSheet.OPEN_ATTACK_DETAILS
-        );
+    const manageAttackDetailsEmitter = eventSystem.fetchOrCreateEventEmitter<{
+      [key: string]: [boolean, AttackTypes?];
+    }>(CharacterSheet.OPEN_ATTACK_DETAILS);
 
     useEffect(() => {
       const updateVisibility = ([visible, attackType]: [

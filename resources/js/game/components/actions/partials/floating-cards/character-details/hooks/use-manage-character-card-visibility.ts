@@ -9,15 +9,9 @@ export const useManageCharacterCardVisibility =
   (): UseManageCharacterCardVisibilityDefinition => {
     const eventSystem = useEventSystem();
 
-    const manageCardEventEmitter = eventSystem.isEventRegistered(
-      ActionCardEvents.OPEN_CHARACTER_CARD
-    )
-      ? eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-          ActionCardEvents.OPEN_CHARACTER_CARD
-        )
-      : eventSystem.registerEvent<{ [key: string]: boolean }>(
-          ActionCardEvents.OPEN_CHARACTER_CARD
-        );
+    const manageCardEventEmitter = eventSystem.fetchOrCreateEventEmitter<{
+      [key: string]: boolean;
+    }>(ActionCardEvents.OPEN_CHARACTER_CARD);
 
     const [showCharacterCard, setShowCharacterCard] =
       useState<UseManageCharacterCardVisibilityState['showCharacterCard']>(

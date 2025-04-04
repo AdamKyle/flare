@@ -8,15 +8,9 @@ export const useManageStatDetailsBreakdown =
   (): UseManageStatDetailsBreakdownDefinition => {
     const eventSystem = useEventSystem();
 
-    const manageStatDetailsEmitter = eventSystem.isEventRegistered(
-      CharacterSheet.OPEN_STAT_DETAILS
-    )
-      ? eventSystem.getEventEmitter<{ [key: string]: [boolean, StatTypes?] }>(
-          CharacterSheet.OPEN_STAT_DETAILS
-        )
-      : eventSystem.registerEvent<{ [key: string]: [boolean, StatTypes?] }>(
-          CharacterSheet.OPEN_STAT_DETAILS
-        );
+    const manageStatDetailsEmitter = eventSystem.fetchOrCreateEventEmitter<{
+      [key: string]: [boolean, StatTypes?];
+    }>(CharacterSheet.OPEN_STAT_DETAILS);
 
     const openStatDetails = (statType: StatTypes) => {
       manageStatDetailsEmitter.emit(CharacterSheet.OPEN_STAT_DETAILS, [

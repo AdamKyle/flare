@@ -9,15 +9,9 @@ export const useManageChatCardVisibility =
   (): useManageChatCardVisibilityDefinition => {
     const eventSystem = useEventSystem();
 
-    const openCardEventEmitter = eventSystem.isEventRegistered(
-      ActionCardEvents.OPEN_CHAT_CARD
-    )
-      ? eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-          ActionCardEvents.OPEN_CHAT_CARD
-        )
-      : eventSystem.registerEvent<{ [key: string]: boolean }>(
-          ActionCardEvents.OPEN_CHAT_CARD
-        );
+    const openCardEventEmitter = eventSystem.fetchOrCreateEventEmitter<{
+      [key: string]: boolean;
+    }>(ActionCardEvents.OPEN_CHAT_CARD);
 
     const [showChatCard, setShowChatCard] =
       useState<UseManageChatCardVisibilityState['showChatCard']>(false);

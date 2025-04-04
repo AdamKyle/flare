@@ -8,15 +8,9 @@ export const useManageAttackDetailsBreakdown =
   (): UseManageAttackDetailsBreakdown => {
     const eventSystem = useEventSystem();
 
-    const manageAttackDetailsEmitter = eventSystem.isEventRegistered(
+    const manageAttackDetailsEmitter = eventSystem.fetchOrCreateEventEmitter(
       CharacterSheet.OPEN_ATTACK_DETAILS
-    )
-      ? eventSystem.getEventEmitter<{ [key: string]: [boolean, AttackTypes?] }>(
-          CharacterSheet.OPEN_ATTACK_DETAILS
-        )
-      : eventSystem.registerEvent<{ [key: string]: [boolean, AttackTypes?] }>(
-          CharacterSheet.OPEN_ATTACK_DETAILS
-        );
+    );
 
     const openAttackDetails = (attackType: AttackTypes) => {
       manageAttackDetailsEmitter.emit(CharacterSheet.OPEN_INVENTORY_SECTION, [

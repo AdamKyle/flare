@@ -12,15 +12,10 @@ export const useCharacterBackpackVisibility =
     const [showBackpack, setShowBackpack] =
       useState<UseCharacterBackpackVisibilityState['showBackpack']>(false);
 
-    const manageCharacterBackpackEmitter = eventSystem.isEventRegistered(
-      CharacterInventory.OPEN_BACKPACK
-    )
-      ? eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-          CharacterInventory.OPEN_BACKPACK
-        )
-      : eventSystem.registerEvent<{ [key: string]: boolean }>(
-          CharacterInventory.OPEN_BACKPACK
-        );
+    const manageCharacterBackpackEmitter =
+      eventSystem.fetchOrCreateEventEmitter<{ [key: string]: boolean }>(
+        CharacterInventory.OPEN_BACKPACK
+      );
 
     useEffect(() => {
       const updateVisibility = (visible: boolean) => {

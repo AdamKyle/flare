@@ -7,15 +7,10 @@ export const useOpenCharacterUsableInventory =
   (): UseOpenCharacterUsableInventoryDefinition => {
     const eventSystem = useEventSystem();
 
-    const manageCharacterUsableInventory = eventSystem.isEventRegistered(
-      CharacterInventory.OPEN_USABLE_INVENTORY
-    )
-      ? eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-          CharacterInventory.OPEN_USABLE_INVENTORY
-        )
-      : eventSystem.registerEvent<{ [key: string]: boolean }>(
-          CharacterInventory.OPEN_USABLE_INVENTORY
-        );
+    const manageCharacterUsableInventory =
+      eventSystem.fetchOrCreateEventEmitter<{ [key: string]: boolean }>(
+        CharacterInventory.OPEN_USABLE_INVENTORY
+      );
 
     const openUsableInventory = () => {
       manageCharacterUsableInventory.emit(

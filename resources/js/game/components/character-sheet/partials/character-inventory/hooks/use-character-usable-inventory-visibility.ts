@@ -14,15 +14,10 @@ export const useCharacterUsableInventoryVisibility =
         UseCharacterUsableInventoryVisibilityState['showUsableInventory']
       >(false);
 
-    const manageCharacterUsableInventory = eventSystem.isEventRegistered(
-      CharacterInventory.OPEN_USABLE_INVENTORY
-    )
-      ? eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-          CharacterInventory.OPEN_USABLE_INVENTORY
-        )
-      : eventSystem.registerEvent<{ [key: string]: boolean }>(
-          CharacterInventory.OPEN_USABLE_INVENTORY
-        );
+    const manageCharacterUsableInventory =
+      eventSystem.fetchOrCreateEventEmitter<{ [key: string]: boolean }>(
+        CharacterInventory.OPEN_USABLE_INVENTORY
+      );
 
     useEffect(() => {
       const updateVisibility = (visible: boolean) => {

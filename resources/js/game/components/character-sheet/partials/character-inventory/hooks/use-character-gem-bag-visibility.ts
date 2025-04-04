@@ -12,15 +12,10 @@ export const useCharacterGemBagVisibility =
     const [showGemBag, setShowGemBag] =
       useState<UseCharacterGemBagVisibilityState['showGemBag']>(false);
 
-    const manageCharacterGemBagVisibility = eventSystem.isEventRegistered(
-      CharacterInventory.OPEN_GEM_BAG
-    )
-      ? eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-          CharacterInventory.OPEN_GEM_BAG
-        )
-      : eventSystem.registerEvent<{ [key: string]: boolean }>(
-          CharacterInventory.OPEN_GEM_BAG
-        );
+    const manageCharacterGemBagVisibility =
+      eventSystem.fetchOrCreateEventEmitter<{ [key: string]: boolean }>(
+        CharacterInventory.OPEN_GEM_BAG
+      );
 
     useEffect(() => {
       const updateVisibility = (visible: boolean) => {

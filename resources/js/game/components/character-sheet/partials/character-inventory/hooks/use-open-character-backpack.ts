@@ -7,15 +7,9 @@ export const useOpenCharacterBackpack =
   (): UseOpenCharacterBackpackDefinition => {
     const eventSystem = useEventSystem();
 
-    const manageCharacterBackpack = eventSystem.isEventRegistered(
-      CharacterInventory.OPEN_BACKPACK
-    )
-      ? eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-          CharacterInventory.OPEN_BACKPACK
-        )
-      : eventSystem.registerEvent<{ [key: string]: boolean }>(
-          CharacterInventory.OPEN_BACKPACK
-        );
+    const manageCharacterBackpack = eventSystem.fetchOrCreateEventEmitter<{
+      [key: string]: boolean;
+    }>(CharacterInventory.OPEN_BACKPACK);
 
     const openBackpack = () => {
       manageCharacterBackpack.emit(CharacterInventory.OPEN_BACKPACK, true);

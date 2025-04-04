@@ -9,15 +9,9 @@ export const useManageMonsterStatSectionVisibility =
   (): UseManageMonsterStatSectionVisibilityDefinition => {
     const eventSystem = useEventSystem();
 
-    const manageStatSectionEmitter = eventSystem.isEventRegistered(
-      MonsterStatsEvents.OPEN_MONSTER_STATS
-    )
-      ? eventSystem.getEventEmitter<{ [key: string]: boolean }>(
-          MonsterStatsEvents.OPEN_MONSTER_STATS
-        )
-      : eventSystem.registerEvent<{ [key: string]: boolean }>(
-          MonsterStatsEvents.OPEN_MONSTER_STATS
-        );
+    const manageStatSectionEmitter = eventSystem.fetchOrCreateEventEmitter<{
+      [key: string]: boolean;
+    }>(MonsterStatsEvents.OPEN_MONSTER_STATS);
 
     const [showMonsterStatsSection, setShowMonsterStatsSection] =
       useState<

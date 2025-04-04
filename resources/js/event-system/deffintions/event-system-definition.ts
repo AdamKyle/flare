@@ -6,6 +6,7 @@ export default interface EventSystemDefinition {
    * Register an event.
    *
    * @param name
+   * @return EventEmitterDefinition<T>
    */
   registerEvent<T extends EventMapDefinition>(
     name: string
@@ -15,6 +16,7 @@ export default interface EventSystemDefinition {
    * Is the event already registered?
    *
    * @param name
+   * @return boolean
    */
   isEventRegistered(name: string): boolean;
 
@@ -22,8 +24,19 @@ export default interface EventSystemDefinition {
    * Get the registered event emitter.
    *
    * @param name
+   * @return EventEmitterDefinition<T>
    */
   getEventEmitter<T extends EventMapDefinition>(
+    name: string
+  ): EventEmitterDefinition<T>;
+
+  /**
+   * Fetches or creates the event emitter
+   *
+   * @param name
+   * @return EventEmitterDefinition<T>
+   */
+  fetchOrCreateEventEmitter<T extends EventMapDefinition>(
     name: string
   ): EventEmitterDefinition<T>;
 }
