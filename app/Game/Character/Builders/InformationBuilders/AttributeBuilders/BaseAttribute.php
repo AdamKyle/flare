@@ -7,6 +7,7 @@ use App\Flare\Models\GameClass;
 use App\Flare\Models\Item;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Character\Builders\StatDetailsBuilder\Concerns\BasicItemDetails;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use Illuminate\Support\Collection;
 
 class BaseAttribute
@@ -180,29 +181,13 @@ class BaseAttribute
     protected function getDamageFromWeapons(string $position): int
     {
 
+        $itemTypes = array_map(fn($case) => $case->value, ItemType::cases());
+
         if ($position === 'both') {
-            return $this->inventory->whereIn('item.type', [
-                WeaponTypes::WEAPON,
-                WeaponTypes::HAMMER,
-                WeaponTypes::BOW,
-                WeaponTypes::STAVE,
-                WeaponTypes::GUN,
-                WeaponTypes::FAN,
-                WeaponTypes::MACE,
-                WeaponTypes::SCRATCH_AWL,
-            ])->sum('item.base_damage');
+            return $this->inventory->whereIn('item.type', $itemTypes)->sum('item.base_damage');
         }
 
-        return $this->inventory->whereIn('item.type', [
-            WeaponTypes::WEAPON,
-            WeaponTypes::HAMMER,
-            WeaponTypes::BOW,
-            WeaponTypes::STAVE,
-            WeaponTypes::GUN,
-            WeaponTypes::FAN,
-            WeaponTypes::MACE,
-            WeaponTypes::SCRATCH_AWL,
-        ])->where('position', $position)
+        return $this->inventory->whereIn('item.type', $itemTypes)->where('position', $position)
             ->sum('item.base_damage');
     }
 

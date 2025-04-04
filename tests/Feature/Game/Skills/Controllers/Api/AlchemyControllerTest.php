@@ -26,7 +26,7 @@ class AlchemyControllerTest extends TestCase
 
         $craftingSkill = $this->createGameSkill([
             'name' => 'Alchemy',
-            'type' => SkillTypeValue::CRAFTING,
+            'type' => SkillTypeValue::CRAFTING->value,
         ]);
 
         $this->character = (new CharacterFactory)->createBaseCharacter()

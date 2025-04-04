@@ -17,6 +17,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class CapitalCityUnitRequest implements ShouldQueue
 {
@@ -66,6 +67,8 @@ class CapitalCityUnitRequest implements ShouldQueue
         ]);
 
         $queueData = $queueData->refresh();
+
+        Log::channel('capital_city_unit_recruitments')->info('Units should now be requested.');
 
         event(new UpdateCapitalCityUnitRecruitments($queueData->character, $queueData->requestingKingdom));
         event(new UpdateCapitalCityUnitQueueTable($queueData->character));

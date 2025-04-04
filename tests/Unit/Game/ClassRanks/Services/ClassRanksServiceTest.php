@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\ClassRanks\Services;
 
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\ClassRanks\Values\ClassRankValue;
 use App\Game\ClassRanks\Values\ClassSpecialValue;
@@ -500,7 +501,7 @@ class ClassRanksServiceTest extends TestCase
         }
     }
 
-    public function testLevelWeaponSpeacitly()
+    public function testLevelEquippedItemSpecialty()
     {
         $character = $this->character->equipStartingEquipment()->getCharacter();
 
@@ -514,18 +515,21 @@ class ClassRanksServiceTest extends TestCase
 
         $character = $character->refresh();
 
+        $equippedItemType = $character->inventory->slots()->where('equipped', true)->first()->item->type;
+
         $this->classRankService->giveXpToMasteries($character);
 
         $character = $character->refresh();
 
         foreach ($character->classRanks as $rank) {
             foreach ($rank->weaponMasteries as $mastery) {
-
-                if ((new WeaponMasteryValue($mastery->weapon_type))->isWeapon()) {
+                if (in_array($equippedItemType, ItemType::allWeaponTypes()) && $mastery->weapon_type === $equippedItemType) {
                     $this->assertEquals(1, $mastery->level);
-                } else {
-                    $this->assertEquals(0, $mastery->level);
+
+                    continue;
                 }
+
+                $this->assertEquals(0, $mastery->level);
             }
         }
     }

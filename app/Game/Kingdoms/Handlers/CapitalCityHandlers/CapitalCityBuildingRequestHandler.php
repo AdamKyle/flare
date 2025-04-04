@@ -15,6 +15,7 @@ use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Validation\KingdomBuildingResourceValidation;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
+use Illuminate\Support\Facades\Log;
 
 class CapitalCityBuildingRequestHandler
 {
@@ -66,9 +67,15 @@ class CapitalCityBuildingRequestHandler
             $timeTillFinished += $minutesToRebuild;
 
             if ($buildingRequest['secondary_status'] === CapitalCityQueueStatus::REPAIRING) {
+                Log::channel('capital_city_building_upgrades')->info('Should be repairing for building', [
+                    '$building' => $building->id,
+                ]);
                 $upgrading = false;
                 $this->kingdomBuildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
             } else {
+                Log::channel('capital_city_building_upgrades')->info('Should be upgrading for building', [
+                    '$building' => $building->id,
+                ]);
                 $this->kingdomBuildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
             }
         }

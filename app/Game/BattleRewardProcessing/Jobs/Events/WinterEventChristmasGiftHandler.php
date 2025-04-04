@@ -227,10 +227,11 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
     /**
      * Give item to the player.
      *
-     * - If cosmic announce to all of chat.
+     * - If cosmic announce to all chat.
      *
      * @param Character $character
      * @param Item $item
+     * @param int $costOfAffix
      * @return void
      */
     private function giveItemToPlayer(Character $character, Item $item, int $costOfAffix): void
@@ -240,7 +241,7 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
         ]);
 
         if ($item->is_cosmic) {
-            event(new GlobalMessageEvent('Holy crap! Mr. Whiskers gave a COSMIC item to: ' . $character->name . ' what a rare fine! Kill creatures in The Ice Plane to try and earn yours while The Winter Event is running! Free christmas gifts for all while slaughtering creatures down there. Exploration works too! Do not miss out!'));
+            event(new GlobalMessageEvent('Holy crap! Mr. Whiskers gave a COSMIC item to: ' . $character->name . ' what a rare find! Kill creatures in The Ice Plane to try and earn yours while The Winter Event is running! Free christmas gifts for all while slaughtering creatures down there. Exploration works too! Do not miss out!'));
         }
 
         $type = match (true) {
@@ -250,6 +251,6 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
             default => 'Normal'
         };
 
-        event(new ServerMessageEvent($character->user, 'Mr. Whiskers has given you an item child! How fun is that? You got this because it is christmas time. You ununwrap your gift only to recieve a (' . $type . '): ' . $item->affix_name, $slot->id));
+        event(new ServerMessageEvent($character->user, 'Mr. Whiskers has given you an item child! How fun is that? You got this because it is christmas time. You unwrap your gift only to receive a (' . $type . '): ' . $item->affix_name, $slot->id));
     }
 }

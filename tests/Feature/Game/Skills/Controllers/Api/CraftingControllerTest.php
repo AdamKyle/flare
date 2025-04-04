@@ -4,6 +4,7 @@ namespace Tests\Feature\Game\Skills\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -28,7 +29,7 @@ class CraftingControllerTest extends TestCase
 
         $craftingSkill = $this->createGameSkill([
             'name' => 'Weapon Crafting',
-            'type' => SkillTypeValue::CRAFTING,
+            'type' => SkillTypeValue::CRAFTING->value,
         ]);
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
@@ -178,7 +179,7 @@ class CraftingControllerTest extends TestCase
     public function testCannotCraft()
     {
         $item = $this->createItem([
-            'crafting_type' => 'weapon',
+            'crafting_type' => ItemType::DAGGER->value,
             'can_craft' => true,
             'skill_level_required' => 1,
             'skill_level_trivial' => 25,
@@ -207,7 +208,8 @@ class CraftingControllerTest extends TestCase
     public function testCraftItem()
     {
         $item = $this->createItem([
-            'type' => 'weapon',
+            'type' => ItemType::DAGGER->value,
+            'crafting_type' => ItemType::DAGGER->value,
             'can_craft' => true,
             'skill_level_required' => 1,
             'skill_level_trivial' => 25,

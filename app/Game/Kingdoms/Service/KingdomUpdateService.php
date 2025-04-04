@@ -151,10 +151,6 @@ class KingdomUpdateService
 
         $this->updateKingdomMorale();
 
-        if (is_null($this->kingdom)) {
-            return;
-        }
-
         $this->updateKingdomTreasury();
 
         $this->updateKingdomResources();
@@ -166,7 +162,7 @@ class KingdomUpdateService
         $this->updateKingdomProtectedUntil();
     }
 
-    protected function createKingdomLog(Character $character, array $additionalData, int $status)
+    private function createKingdomLog(Character $character, array $additionalData, int $status)
     {
 
         $log = [
@@ -193,7 +189,7 @@ class KingdomUpdateService
      *
      * @return void
      */
-    protected function updateKingdomProtectedUntil()
+    private function updateKingdomProtectedUntil()
     {
         if (is_null($this->kingdom->protected_until)) {
             return;
@@ -212,7 +208,7 @@ class KingdomUpdateService
         $this->kingdom = $this->kingdom->refresh();
     }
 
-    protected function destroyNPCKingdom(): void
+    private function destroyNPCKingdom(): void
     {
         $this->destroyKingdom($this->kingdom);
 
@@ -222,7 +218,7 @@ class KingdomUpdateService
     /**
      * Is the current population greater than the max population?
      */
-    protected function isTheOldManAngry(): bool
+    private function isTheOldManAngry(): bool
     {
 
         $currentPopulation = $this->kingdom->current_population;
@@ -238,7 +234,7 @@ class KingdomUpdateService
      * - If the kingdom has been walked and is not NPC owned, has it been walked in the last 30 days?
      *   - If the date since last walked is equal to or greater than 30 days, than hand it over.
      */
-    protected function shouldGiveKingdomToNpc(): bool
+    private function shouldGiveKingdomToNpc(): bool
     {
         if (! $this->kingdom->npc_owned && is_null($this->kingdom->last_walked)) {
             return true;
@@ -258,7 +254,7 @@ class KingdomUpdateService
     /**
      * Get the last time walked in days.
      */
-    protected function getLastTimeWalked(): int
+    private function getLastTimeWalked(): int
     {
         return $this->kingdom->last_walked->diffInDays(now());
     }
@@ -268,7 +264,7 @@ class KingdomUpdateService
      *
      * - Only heals if the buildings are not in queue.
      */
-    protected function healBuildingsByPercentage(): void
+    private function healBuildingsByPercentage(): void
     {
         $buildings = $this->kingdom->buildings;
 
@@ -299,7 +295,7 @@ class KingdomUpdateService
      * - If a kingdom has buildings whose durability is less than then the buildings max durability
      *   and the building can increase/decrease the morale it will lose or gain morale based on the durability.
      */
-    protected function updateKingdomMorale(): void
+    private function updateKingdomMorale(): void
     {
         $lastWalked = $this->getLastTimeWalked();
         $character = $this->kingdom->character;
@@ -332,7 +328,7 @@ class KingdomUpdateService
      * - We add the kingmanship (or skill that effects kingdoms) skill bonus to the amount to give.
      * - We also divide the keep level by 100 to give an additional bonus.
      */
-    protected function updateKingdomTreasury(): void
+    private function updateKingdomTreasury(): void
     {
         if (KingdomMaxValue::isTreasuryAtMax($this->kingdom)) {
             return;
@@ -367,22 +363,18 @@ class KingdomUpdateService
      * - If the buildings durability is 0 move on.
      * - Finally increase the resource of the building.
      */
-    protected function updateKingdomResources(): void
+    private function updateKingdomResources(): void
     {
         $resources = ['wood', 'clay', 'stone', 'iron'];
 
         foreach ($resources as $resource) {
             $building = $this->kingdom->buildings->where('gives_resources', true)->where('increase_in_'.$resource)->first();
 
-            if (is_null($building)) {
-                continue;
-            }
-
             if ($building->current_durability === 0) {
                 continue;
             }
 
-            if (! is_null($building)) {
+            if (!is_null($building)) {
                 $this->increaseResource($building, $resource);
             }
         }
@@ -397,7 +389,7 @@ class KingdomUpdateService
      * - Gives partial population based on the durability of the farm building.
      * - Gives full resources if the building durability is maxed.
      */
-    protected function updateKingdomPopulation(): void
+    private function updateKingdomPopulation(): void
     {
         $building = $this->kingdom->buildings->where('is_farm', true)->first();
         $increaseAmount = $building->population_increase;
@@ -472,7 +464,7 @@ class KingdomUpdateService
     private function getCharacterSkillThatEffectsKingdoms(Character $character): Skill
     {
         return $character->skills->filter(function ($skill) {
-            return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM;
+            return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM->value;
         })->first();
     }
 
@@ -493,7 +485,7 @@ class KingdomUpdateService
      * - Will send email if the user is not online and has the setting enabled.
      * - Updates the player kingdom.
      */
-    protected function alertUsersOfKingdomRemoval(): void
+    private function alertUsersOfKingdomRemoval(): void
     {
         $user = $this->kingdom->character->user;
 
@@ -512,7 +504,7 @@ class KingdomUpdateService
         $this->updateKingdom->updateKingdom($this->kingdom);
     }
 
-    protected function alertUserToLossOfProtection(): void
+    private function alertUserToLossOfProtection(): void
     {
         $user = $this->kingdom->character->user;
 

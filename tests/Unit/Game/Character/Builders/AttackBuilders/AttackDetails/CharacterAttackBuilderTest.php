@@ -41,28 +41,10 @@ class CharacterAttackBuilderTest extends TestCase
         $this->characterAttackBuilder = null;
     }
 
-    private function setUpCharacterForTests(): Character
-    {
-        $item = $this->createItem([
-            'type' => WeaponTypes::STAVE,
-            'base_damage' => 10,
-        ]);
-
-        $spellDamage = $this->createItem([
-            'type' => SpellTypes::DAMAGE,
-            'base_damage' => 10,
-        ]);
-
-        return $this->character->inventoryManagement()
-            ->giveItem($item, true, 'left-hand')
-            ->giveItem($spellDamage, true, 'spell-one')
-            ->getCharacter();
-    }
-
     public function testBuildWeaponDamage()
     {
         $character = $this->setUpCharacterForTests();
-
+        dump('testBuildWeaponDamage');
         $attack = $this->characterAttackBuilder->setCharacter($character)->buildAttack();
 
         $this->assertGreaterThan(0, $attack['weapon_damage']);
@@ -146,5 +128,23 @@ class CharacterAttackBuilderTest extends TestCase
 
         $this->assertGreaterThan(0, $attack['weapon_damage']);
         $this->assertEmpty($attack['special_damage']);
+    }
+
+    private function setUpCharacterForTests(): Character
+    {
+        $item = $this->createItem([
+            'type' => WeaponTypes::STAVE,
+            'base_damage' => 10,
+        ]);
+
+        $spellDamage = $this->createItem([
+            'type' => SpellTypes::DAMAGE,
+            'base_damage' => 10,
+        ]);
+
+        return $this->character->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->giveItem($spellDamage, true, 'spell-one')
+            ->getCharacter();
     }
 }

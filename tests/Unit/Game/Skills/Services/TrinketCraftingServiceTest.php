@@ -43,7 +43,7 @@ class TrinketCraftingServiceTest extends TestCase
 
         $this->trinketSkill = $this->createGameSkill([
             'name' => 'Trinketry',
-            'type' => SkillTypeValue::CRAFTING,
+            'type' => SkillTypeValue::CRAFTING->value,
         ]);
 
         $this->trinket = $this->createItem([

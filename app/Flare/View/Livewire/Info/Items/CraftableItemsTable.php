@@ -3,6 +3,7 @@
 namespace App\Flare\View\Livewire\Info\Items;
 
 use App\Flare\Models\Item;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
@@ -36,29 +37,19 @@ class CraftableItemsTable extends DataTableComponent
 
     protected function buildOptions(): array
     {
-        $options = [
-            '' => 'Please Select',
-            'weapon' => 'General Weapons',
-            'bow' => 'Bows',
-            'gun' => 'Guns',
-            'fan' => 'Fans',
-            'scratch-awl' => 'Scratch Awls',
-            'mace' => 'Maces',
-            'stave' => 'Staves',
-            'hammer' => 'Hammers',
-            'body' => 'Body',
-            'helmet' => 'Helmets',
-            'shield' => 'Shields',
-            'sleeves' => 'Sleeves',
-            'gloves' => 'Gloves',
-            'leggings' => 'Leggings',
-            'feet' => 'Feet',
-            'ring' => 'Rings',
-            'spell-healing' => 'Healing Spells',
-            'spell-damage' => 'Damage Spells',
-        ];
-
-        return $options;
+        return array_merge(
+            ['' => 'Please Select'],
+            ItemType::getValidWeaponsAsOptions(),
+            [
+                'body' => 'Body',
+                'helmet' => 'Helmets',
+                'shield' => 'Shields',
+                'sleeves' => 'Sleeves',
+                'gloves' => 'Gloves',
+                'leggings' => 'Leggings',
+                'feet' => 'Feet',
+            ]
+        );
     }
 
     public function columns(): array

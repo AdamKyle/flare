@@ -18,15 +18,14 @@ class ExplorationSkillXpHandler implements ShouldQueue
 
     /**
      * @param integer $characterId
-     * @param integer $numberOfCreatures
      * @param integer $xp
      */
-    public function __construct(private int $characterId, private int $xp) {}
+    public function __construct(private int $characterId, private readonly int $xp) {}
 
     /**
      * Handle the job
      *
-     * @param CharacterRewardService $characterRewardService
+     * @param SkillService $skillService
      * @return void
      */
     public function handle(SkillService $skillService): void
@@ -44,8 +43,7 @@ class ExplorationSkillXpHandler implements ShouldQueue
      * Process Skill XP Reward
      *
      * @param Character $character
-     * @param Monster $monster
-     * @param CharacterRewardService $characterRewardService
+     * @param SkillService $skillService
      * @return void
      */
     private function processSkillXpReward(Character $character, SkillService $skillService): void

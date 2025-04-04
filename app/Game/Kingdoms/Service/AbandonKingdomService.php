@@ -71,7 +71,7 @@ class AbandonKingdomService
         $message = $kingdom->name . ' Has been given to the NPC due to being abandoned, at Location (x/y): '
             . $kingdom->x_position . '/' . $kingdom->y_position . ' on the: ' . $kingdom->gameMap->name . ' plane.';
 
-        ServerMessageHandler::handleMessage($this->character->user, KingdomMessageTypes::KINGDOM_RESOUCE_UPDATE, $message);
+        ServerMessageHandler::handleMessage($this->character->user, KingdomMessageTypes::KINGDOM_RESOURCES_UPDATE, $message);
 
         $this->updateKingdom->updateKingdomAllKingdoms($character);
 
@@ -88,7 +88,7 @@ class AbandonKingdomService
      * - resources
      * - treasury
      */
-    protected function reduceAttributes(): void
+    private function reduceAttributes(): void
     {
         $this->kingdom->update([
             'current_morale' => 0.10,
@@ -98,7 +98,7 @@ class AbandonKingdomService
             'current_clay' => 0,
             'current_iron' => 0,
             'treasury' => 0,
-            'protected_until' => null,
+            'private_until' => null,
         ]);
 
         $this->kingdom = $this->kingdom->refresh();
@@ -109,7 +109,7 @@ class AbandonKingdomService
      *
      * - Stacks if they abandon multiple.
      */
-    protected function setTimeOut(): void
+    private function setTimeOut(): void
     {
         if (! is_null($this->character->can_settle_again_at)) {
             $time = $this->character->can_settle_again_at->addMinutes(15);

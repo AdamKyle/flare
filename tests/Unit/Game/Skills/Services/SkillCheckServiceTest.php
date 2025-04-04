@@ -27,7 +27,7 @@ class SkillCheckServiceTest extends TestCase
 
         $this->gemSkill = $this->createGameSkill([
             'name' => 'Gem Crafting',
-            'type' => SkillTypeValue::GEM_CRAFTING,
+            'type' => SkillTypeValue::GEM_CRAFTING->value,
         ]);
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(

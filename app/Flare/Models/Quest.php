@@ -24,6 +24,7 @@ class Quest extends Model
         'raid_id',
         'required_quest_id',
         'parent_chain_quest_id',
+        'required_quest_chain',
         'reincarnated_times',
         'access_to_map_id',
         'gold_dust_cost',
@@ -57,6 +58,7 @@ class Quest extends Model
         'raid_id' => 'integer',
         'required_quest_id' => 'integer',
         'parent_chain_quest_id' => 'integer',
+        'required_quest_chain' => 'array',
         'reincarnated_times' => 'integer',
         'gold_dust_cost' => 'integer',
         'shard_cost' => 'integer',
@@ -82,6 +84,8 @@ class Quest extends Model
 
     protected $appends = [
         'belongs_to_map_name',
+        'required_quest_chain_details',
+        'unlocks_passive_name',
     ];
 
     public function eventType(): ?EventType
@@ -106,7 +110,22 @@ class Quest extends Model
             $result = $result->merge(self::flattenChildQuests($quest));
         }
 
-        return $result;
+        $allRequiredIds = $result->pluck('required_quest_chain')
+            ->filter()
+            ->flatten()
+            ->unique();
+
+        $questNameMap = self::whereIn('id', $allRequiredIds)->pluck('name', 'id')->toArray();
+
+        return $result->map(function ($quest) use ($questNameMap) {
+            $quest->required_quest_chain_names = collect($quest->required_quest_chain ?? [])
+                ->map(fn($id) => $questNameMap[$id] ?? null)
+                ->filter()
+                ->values()
+                ->all();
+
+            return $quest;
+        })->values();
     }
 
     private static function flattenChildQuests(Quest $quest)
@@ -135,7 +154,6 @@ class Quest extends Model
             'rewardItem',
             'item',
             'requiredQuest',
-            'parentChainQuest',
             'factionMap',
             'item.dropLocation',
             'secondaryItem',
@@ -162,11 +180,6 @@ class Quest extends Model
     public function requiredQuest()
     {
         return $this->belongsTo($this, 'required_quest_id')->with('raid');
-    }
-
-    public function parentChainQuest()
-    {
-        return $this->belongsTo($this, 'parent_chain_quest_id')->with('raid');
     }
 
     public function secondaryItem()
@@ -227,6 +240,12 @@ class Quest extends Model
         return null;
     }
 
+    public function getUnlocksPassiveNameAttribute() {
+        if (!is_null($this->unlocks_passive_id)) {
+            return $this->passive->name;
+        }
+    }
+
     public function getRequiredItemMonsterAttribute()
     {
         if (! is_null($this->item_id)) {
@@ -243,6 +262,22 @@ class Quest extends Model
         }
 
         return null;
+    }
+
+    public function getRequiredQuestChainDetailsAttribute() {
+
+        if (is_null($this->required_quest_chain)) {
+            return null;
+        }
+
+        $firstQuest = self::find($this->required_quest_chain[0]);
+
+        return [
+            'quest_ids' => $this->required_quest_chain,
+            'quest_names' => self::whereIn('id', $this->required_quest_chain)->pluck('name')->toArray(),
+            'map_name' => $firstQuest->npc->gameMap->name,
+            'starts_with_npc' => $firstQuest->npc->real_name,
+        ];
     }
 
     protected static function newFactory()

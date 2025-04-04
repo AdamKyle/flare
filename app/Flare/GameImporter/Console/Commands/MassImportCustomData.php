@@ -2,14 +2,15 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
 use App\Flare\Models\Survey;
 use App\Flare\Values\MapNameValue;
-use Artisan;
 
 class MassImportCustomData extends Command
 {
@@ -33,10 +34,10 @@ class MassImportCustomData extends Command
 
     public function handle()
     {
-
         Artisan::call('import:game-data Items');
         Artisan::call('import:game-data "Kingdom Passive Skills"');
         Artisan::call('import:game-data Quests');
+
 
         $this->importInformationSection();
 
@@ -56,7 +57,7 @@ class MassImportCustomData extends Command
     }
 
     /**
-     * Import the information sectionbalance:monsters
+     * Import the information section balance:monsters
      *
      * @return void
      */
@@ -117,6 +118,7 @@ class MassImportCustomData extends Command
      * Import the game maps
      *
      * @return void
+     * @throws Exception
      */
     private function importGameMaps(): void
     {

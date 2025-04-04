@@ -6,6 +6,7 @@ use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -40,13 +41,13 @@ class ComparisonServiceTest extends TestCase
 
     public function testItemComparisonDetailsIsEmptyWhenNothingEquipped()
     {
-        $item = $this->createItem(['type' => WeaponTypes::WEAPON]);
+        $item = $this->createItem(['type' => ItemType::WAND->value]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
         $slot = $character->inventory->slots->first();
 
-        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot, WeaponTypes::WEAPON);
+        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot, ItemType::DAGGER->value);
 
         $this->assertEmpty($comparisonData['details']);
     }
@@ -57,7 +58,7 @@ class ComparisonServiceTest extends TestCase
 
         $character = $this->character->inventoryManagement()->giveItem($item)->giveItem(
             $this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => ItemType::SWORD->value,
                 'base_damage' => 25,
                 'str_mod' => 0.10,
             ]), true, 'left-hand'
@@ -65,7 +66,7 @@ class ComparisonServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot, WeaponTypes::WEAPON);
+        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot, ItemType::SWORD->value);
 
         $this->assertEmpty($comparisonData['details']);
         $this->assertEquals($item->affix_name, $comparisonData['itemToEquip']['name']);
@@ -77,7 +78,7 @@ class ComparisonServiceTest extends TestCase
 
         $character = $this->character->inventoryManagement()->giveItem($item)->giveItem(
             $this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => ItemType::WAND->value,
                 'base_damage' => 25,
                 'str_mod' => 0.10,
             ]), true, 'left-hand'
@@ -85,7 +86,7 @@ class ComparisonServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot, WeaponTypes::WEAPON);
+        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot, ItemType::STAVE->value);
 
         $this->assertEmpty($comparisonData['details']);
         $this->assertEquals($item->affix_name, $comparisonData['itemToEquip']['affix_name']);
@@ -93,11 +94,11 @@ class ComparisonServiceTest extends TestCase
 
     public function testItemComparisonDetailsIsNotEmptyWhenSomethingEquipped()
     {
-        $item = $this->createItem(['type' => WeaponTypes::WEAPON]);
+        $item = $this->createItem(['type' => ItemType::SWORD->value]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->giveItem(
             $this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => ItemType::SWORD->value,
                 'base_damage' => 25,
                 'str_mod' => 0.10,
             ]), true, 'left-hand'
@@ -105,24 +106,24 @@ class ComparisonServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot, WeaponTypes::WEAPON);
+        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot, ItemType::SWORD->value);
 
         $this->assertNotEmpty($comparisonData['details']);
     }
 
     public function testBuildShopDataForBow()
     {
-        $item = $this->createItem(['type' => WeaponTypes::BOW]);
+        $item = $this->createItem(['type' => ItemType::BOW->value]);
 
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => ItemType::SWORD->value,
                 'base_damage' => 25,
                 'str_mod' => 0.10,
             ]), true, 'left-hand'
         )->getCharacter();
 
-        $comparisonData = $this->comparisonService->buildShopData($character, $item, WeaponTypes::BOW);
+        $comparisonData = $this->comparisonService->buildShopData($character, $item, ItemType::BOW->value);
 
         $this->assertEquals($item->affix_name, $comparisonData['itemToEquip']['affix_name']);
     }
@@ -146,7 +147,7 @@ class ComparisonServiceTest extends TestCase
 
     public function testBuildShopDataForSpell()
     {
-        $item = $this->createItem(['type' => SpellTypes::DAMAGE]);
+        $item = $this->createItem(['type' => ItemType::SPELL_DAMAGE->value]);
 
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([
@@ -156,14 +157,14 @@ class ComparisonServiceTest extends TestCase
             ]), true, 'spell-one'
         )->getCharacter();
 
-        $comparisonData = $this->comparisonService->buildShopData($character, $item, SpellTypes::DAMAGE);
+        $comparisonData = $this->comparisonService->buildShopData($character, $item, ItemType::SPELL_DAMAGE->value);
 
         $this->assertEquals($item->affix_name, $comparisonData['itemToEquip']['affix_name']);
     }
 
     public function testBuildShopDataForSpellInEquippedSet()
     {
-        $item = $this->createItem(['type' => SpellTypes::DAMAGE]);
+        $item = $this->createItem(['type' => ItemType::SPELL_DAMAGE->value]);
 
         $character = $this->character->inventorySetManagement()->createInventorySets(10)->putItemInSet($this->createItem([
             'type' => SpellTypes::HEALING,
@@ -171,7 +172,7 @@ class ComparisonServiceTest extends TestCase
             'str_mod' => 0.10,
         ]), 0, 'spell-one')->getCharacter();
 
-        $comparisonData = $this->comparisonService->buildShopData($character, $item, SpellTypes::DAMAGE);
+        $comparisonData = $this->comparisonService->buildShopData($character, $item, ItemType::SPELL_DAMAGE->value);
 
         $this->assertEquals($item->affix_name, $comparisonData['itemToEquip']['affix_name']);
     }

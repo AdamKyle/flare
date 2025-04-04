@@ -44,7 +44,10 @@ class ItemsSheet implements ToCollection
                     $itemData['unlocks_class_id'] = $gameClass->id;
                 }
 
-                $item = Item::where('name', $itemData['name'])->first();
+                $item = Item::where('name', $itemData['name'])
+                    ->whereNull('item_suffix_id')
+                    ->whereNull('item_prefix_id')
+                    ->first();
 
                 if (! is_null($item)) {
                     $item->update($itemData);
@@ -55,7 +58,7 @@ class ItemsSheet implements ToCollection
         }
     }
 
-    protected function returnCleanItem(array $item)
+    private function returnCleanItem(array $item)
     {
         $cleanData = [];
 

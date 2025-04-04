@@ -7,6 +7,8 @@ use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Character\CharacterInventory\Values\ArmourType;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -161,10 +163,10 @@ class ClassAttackValue
     public function buildFighterChance()
     {
         $this->chance['type'] = self::FIGHTERS_DOUBLE_DAMAGE;
-        $this->chance['only'] = 'weapon';
+        $this->chance['only'] = ItemType::SWORD->value;
         $this->chance['class_name'] = 'Fighter';
-        $this->chance['has_item'] = $this->hasItemTypeEquipped('weapon');
-        $this->chance['amount'] = $this->getItemCollection('weapon')->count();
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::SWORD->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::SWORD->value)->count();
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
 
     }
@@ -172,79 +174,80 @@ class ClassAttackValue
     public function buildProphetChance()
     {
         $this->chance['type'] = self::PROPHET_HEALING;
-        $this->chance['only'] = 'spell-healing';
+        $this->chance['only'] = ItemType::CENSER->value;
         $this->chance['class_name'] = 'Prophet';
-        $this->chance['has_item'] = $this->hasItemTypeEquipped('spell-healing');
-        $this->chance['amount'] = $this->getItemCollection('spell-healing')->count();
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::CENSER->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::CENSER->value)->count();
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
     public function buildThiefChance()
     {
         $this->chance['type'] = self::THIEVES_SHADOW_DANCE;
-        $this->chance['only'] = 'weapon';
+        $this->chance['only'] = ItemType::DAGGER->value;
         $this->chance['class_name'] = 'Thief';
-        $this->chance['has_item'] = $this->hasMultipleOfSameType('weapon', 2);
-        $this->chance['amount'] = $this->getItemCollection('weapon')->count();
+        $this->chance['has_item'] = $this->hasMultipleOfSameType(ItemType::DAGGER->value, 2);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::DAGGER->value)->count();
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
     public function buildHereticChance()
     {
         $this->chance['type'] = self::HERETICS_DOUBLE_CAST;
-        $this->chance['only'] = 'spell-damage';
+        $this->chance['only'] = ItemType::WAND->value;
         $this->chance['class_name'] = 'Heretic';
-        $this->chance['has_item'] = $this->hasItemTypeEquipped('spell-damage');
-        $this->chance['amount'] = $this->getItemCollection('spell-damage')->count();
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::WAND->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::WAND->value)->count();
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
     public function buildRangersChance()
     {
         $this->chance['type'] = self::RANGER_TRIPLE_ATTACK;
-        $this->chance['only'] = 'bow';
+        $this->chance['only'] = ItemType::BOW->value;
         $this->chance['class_name'] = 'Ranger';
-        $this->chance['has_item'] = $this->hasItemTypeEquipped('bow');
-        $this->chance['amount'] = $this->getItemCollection('bow')->count();
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::BOW->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::BOW->value)->count();
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
     public function buildVampiresChance()
     {
         $this->chance['type'] = self::VAMPIRE_THIRST;
+        $this->chance['only'] = ItemType::CLAW->value;
         $this->chance['class_name'] = 'Vampire';
-        $this->chance['has_item'] = true;
-        $this->chance['amount'] = 0;
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::CLAW->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::CLAW->value)->count();
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
     public function buildBlacksmithsChance()
     {
         $this->chance['type'] = self::BLACKSMITHS_HAMMER_SMASH;
-        $this->chance['only'] = 'hammer';
+        $this->chance['only'] = ItemType::HAMMER->value;
         $this->chance['class_name'] = 'Blacksmith';
-        $this->chance['has_item'] = $this->hasItemTypeEquipped('hammer');
-        $this->chance['amount'] = $this->getItemCollection('hammer')->count();
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::HAMMER->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::HAMMER->value)->count();
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
     public function buildArcaneAlchemistChance()
     {
         $this->chance['type'] = self::ARCANE_ALCHEMISTS_DREAMS;
-        $this->chance['only'] = 'stave';
+        $this->chance['only'] = ItemType::STAVE->value;
         $this->chance['class_name'] = 'Arcane Alchemist';
-        $this->chance['has_item'] = $this->hasItemTypeEquipped('stave');
-        $this->chance['amount'] = $this->getItemCollection('stave')->count();
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::STAVE->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::STAVE->value)->count();
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
     public function buildPrisonerChance()
     {
         $this->chance['type'] = self::PRISONER_RAGE;
-        $this->chance['only'] = 'weapon';
+        $this->chance['only'] = 'Any weapon type equipped';
         $this->chance['class_name'] = 'Prisoner';
-        $this->chance['has_item'] = $this->hasItemTypeEquipped('weapon');
-        $this->chance['amount'] = $this->getItemCollection('weapon')->count();
+        $this->chance['has_item'] = $this->hasAnyWeaponEquipped();
+        $this->chance['amount'] = $this->getItemCollectionCountForAnyType();
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
@@ -253,48 +256,38 @@ class ClassAttackValue
         $this->chance['type'] = self::ALCOHOLIC_PUKE;
         $this->chance['only'] = 'No weapon equipped';
         $this->chance['class_name'] = 'Alcoholic';
-        $this->chance['has_item'] = ! $this->hasItemTypeEquipped('weapon') &&
-                                      ! $this->hasItemTypeEquipped('stave') &&
-                                      ! $this->hasItemTypeEquipped('bow') &&
-                                      ! $this->hasItemTypeEquipped('gun') &&
-                                      ! $this->hasItemTypeEquipped('fan') &&
-                                      ! $this->hasItemTypeEquipped('hammer') &&
-                                      ! $this->hasItemTypeEquipped('spell-damage') &&
-                                      ! $this->hasItemTypeEquipped('gun') &&
-                                      ! $this->hasItemTypeEquipped('fan') &&
-                                      ! $this->hasItemTypeEquipped('mace');
-        ! $this->hasItemTypeEquipped('spell-healing');
-        $this->chance['amount'] = 0;
+        $this->chance['has_item'] = $this->hasNoWeaponEquipped();
+        $this->chance['amount'] = $this->getItemCollectionCountForAnyType();
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
     public function buildGunSlingersChance()
     {
         $this->chance['type'] = self::GUNSLINGERS_ASSASSINATION;
-        $this->chance['only'] = 'Guns';
+        $this->chance['only'] = ItemType::GUN->value;
         $this->chance['class_name'] = 'Gunslinger';
-        $this->chance['has_item'] = $this->hasItemTypeEquipped('gun');
-        $this->chance['amount'] = $this->getItemCollection('gun')->count();
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::GUN->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::GUN->value)->count();
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
     public function buildSensualDance()
     {
         $this->chance['type'] = self::SENSUAL_DANCE;
-        $this->chance['only'] = 'Fans';
+        $this->chance['only'] = ItemType::FAN->value;
         $this->chance['class_name'] = 'Dancer';
-        $this->chance['has_item'] = $this->hasItemTypeEquipped('fan');
-        $this->chance['amount'] = $this->getItemCollection('fan')->count();
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::FAN->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::FAN->value)->count();
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
     public function buildBookBindersFear()
     {
         $this->chance['type'] = self::BOOK_BINDERS_FEAR;
-        $this->chance['only'] = 'Scatch Awls';
+        $this->chance['only'] = ucwords(str_replace('-', ' ', ItemType::SCRATCH_AWL->value));
         $this->chance['class_name'] = 'Book Binder';
-        $this->chance['has_item'] = $this->hasItemTypeEquipped('scratch-awl');
-        $this->chance['amount'] = $this->getItemCollection('scratch-awl')->count();
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::SCRATCH_AWL->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::SCRATCH_AWL->value)->count();
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
@@ -303,8 +296,8 @@ class ClassAttackValue
         $this->chance['type'] = self::HOLY_SMITE;
         $this->chance['only'] = 'Mace and Shield';
         $this->chance['class_name'] = 'Cleric';
-        $this->chance['has_item'] = $this->hasItemTypeEquipped('mace') && $this->hasItemTypeEquipped('shield');
-        $this->chance['amount'] = $this->getItemCollection('mace')->count();
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::MACE->value) && $this->hasItemTypeEquipped(ArmourType::SHIELD->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::MACE->value)->count();
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
@@ -313,18 +306,78 @@ class ClassAttackValue
         $this->chance['type'] = self::MERCHANTS_SUPPLY;
         $this->chance['only'] = 'Stave or Bow';
         $this->chance['class_name'] = 'Merchant';
-        $this->chance['has_item'] = $this->hasItemTypeEquipped('stave') || $this->hasItemTypeEquipped('bow');
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::STAVE->value) || $this->hasItemTypeEquipped(ItemType::BOW->value);
+        $this->chance['amount'] = $this->getItemCollectionCountForTypes([
+            ItemType::STAVE->value,
+            ItemType::BOW->value,
+        ]);
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
-    protected function hasItemTypeEquipped(string $type): bool
+    private function hasItemTypeEquipped(string $type): bool
     {
         return $this->getItemCollection($type)->isNotEmpty();
     }
 
-    protected function hasMultipleOfSameType(string $type, int $amountNeeded = 1): bool
+    private function hasAnyWeaponEquipped(): bool {
+        $itemTypes = array_map(fn($case) => $case->value, ItemType::cases());
+
+        foreach ($itemTypes as $type) {
+            if ($this->getItemCollection($type)->isNotEmpty()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function hasNoWeaponEquipped(): bool {
+        $itemTypes = array_map(fn($case) => $case->value, ItemType::cases());
+        $typeIsNotEquipped = false;
+
+        foreach ($itemTypes as $type) {
+            if ($this->getItemCollection($type)->isNotEmpty()) {
+                $typeIsNotEquipped = true;
+            } else {
+                $typeIsNotEquipped = false;
+            }
+        }
+
+        return $typeIsNotEquipped;
+    }
+
+    private function hasMultipleOfSameType(string $type, int $amountNeeded = 1): bool
     {
         return $this->getItemCollection($type)->count() === $amountNeeded;
+    }
+
+    private function getItemCollectionCountForAnyType(): int {
+        $itemTypes = array_map(fn($case) => $case->value, ItemType::cases());
+        $count = 0;
+
+        foreach ($itemTypes as $type) {
+            $itemCollection = $this->getItemCollection($type);
+
+            if ($itemCollection->isNotEmpty()) {
+                $count += $itemCollection->count();
+            }
+        }
+
+        return $count;
+    }
+
+    private function getItemCollectionCountForTypes(array $types): int {
+        $count = 0;
+
+        foreach ($types as $type) {
+            $itemCollection = $this->getItemCollection($type);
+
+            if ($itemCollection->isNotEmpty()) {
+                $count += $itemCollection->count();
+            }
+        }
+
+        return $count;
     }
 
     private function getItemCollection(string $type): Collection

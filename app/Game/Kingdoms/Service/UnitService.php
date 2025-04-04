@@ -205,7 +205,7 @@ class UnitService
     public function fetchTimeReduction(Character $character): Skill
     {
         return $character->skills->filter(function ($skill) {
-            return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM;
+            return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM->value;
         })->first();
     }
 

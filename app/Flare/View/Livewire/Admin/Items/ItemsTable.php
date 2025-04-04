@@ -3,6 +3,7 @@
 namespace App\Flare\View\Livewire\Admin\Items;
 
 use App\Flare\Models\Item;
+use App\Flare\View\Livewire\Admin\Items\Values\ItemTableSelectOptions;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
@@ -96,34 +97,20 @@ class ItemsTable extends DataTableComponent
 
     protected function buildOptions(): array
     {
-        $options = [
-            '' => 'Please Select',
-            'weapon' => 'Weapons',
-            'bow' => 'Bows',
-            'gun' => 'Guns',
-            'fan' => 'Fans',
-            'mace' => 'Maces',
-            'scratch-awl' => 'Scratch Awl',
-            'stave' => 'Staves',
-            'hammer' => 'Hammers',
-            'body' => 'Body',
-            'helmet' => 'Helmets',
-            'shield' => 'Shields',
-            'sleeves' => 'Sleeves',
-            'gloves' => 'Gloves',
-            'leggings' => 'Leggings',
-            'feet' => 'Feet',
-            'ring' => 'Rings',
-            'spell-healing' => 'Healing Spells',
-            'spell-damage' => 'Damage Spells',
-        ];
+        $options = ItemTableSelectOptions::getLabels();
 
         if (! is_null(auth()->user())) {
             if (auth()->user()->hasRole('Admin')) {
-                $options['trinket'] = 'Trinkets';
-                $options['quest'] = 'Quest items';
-                $options['alchemy'] = 'Alchemy items';
-                $options['artifact'] = 'Artifacts';
+
+                $options = [
+                    ...$options,
+                    ...[
+                        ItemTableSelectOptions::TRINKET->value => 'Trinkets',
+                        ItemTableSelectOptions::QUEST->value => 'Quest items',
+                        ItemTableSelectOptions::ALCHEMY->value => 'Alchemy items',
+                        ItemTableSelectOptions::ARTIFACT->value => 'Artifacts',
+                    ]
+                ];
             }
         }
 

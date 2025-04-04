@@ -108,7 +108,7 @@ class WeeklyBattleService
 
         $locationType = new LocationType($monster->only_for_location_type);
 
-        if ($locationType->isAlchemyChurch()) {
+        if ($locationType->isAlchemyChurch() || $locationType->isCaveOfMemories()) {
             $this->locationSpecialtyHandler->handleMonsterFromSpecialLocation($character, $weeklyMonsterFight);
         }
 

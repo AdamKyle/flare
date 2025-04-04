@@ -164,7 +164,7 @@ class GuideQuest extends Model
             return null;
         }
 
-        return SkillTypeValue::$namedValues[$this->required_skill_type];
+        return SkillTypeValue::getValues()[$this->required_skill_type];
     }
 
     public function getSecondarySkillNameAttribute()

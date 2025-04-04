@@ -17,6 +17,7 @@ use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessBuildingReq
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessUnitRequestHandler;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
+use Illuminate\Support\Facades\Log;
 
 class CapitalCityResourceRequest implements ShouldQueue
 {
@@ -86,8 +87,6 @@ class CapitalCityResourceRequest implements ShouldQueue
 
         $requestingKingdom->save();
 
-        $requestingKingdom = $requestingKingdom->refresh();
-
         if ($this->type === CapitalCityResourceRequestType::UNIT_QUEUE) {
             $unitRequestData = $queueData->unit_request_data;
 
@@ -139,6 +138,8 @@ class CapitalCityResourceRequest implements ShouldQueue
             $capitalCityResourceRequestData->delete();
 
             event(new UpdateCapitalCityBuildingQueueTable($queueData->character->refresh()));
+
+            Log::channel('capital_city_building_upgrades')->info('Handling Building Requests after requesting resources.');
 
             $capitalCityProcessBuildingRequestHandler->handleBuildingRequests($queueData, true);
 

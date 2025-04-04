@@ -32,7 +32,7 @@ class SkillServiceTest extends TestCase
 
         $this->skill = $this->createGameSkill([
             'name' => 'skill',
-            'type' => SkillTypeValue::TRAINING,
+            'type' => SkillTypeValue::TRAINING->value,
             'can_train' => true,
         ]);
 
@@ -94,7 +94,7 @@ class SkillServiceTest extends TestCase
     {
         $secondarySkill = $this->createGameSkill([
             'name' => 'skill',
-            'type' => SkillTypeValue::TRAINING,
+            'type' => SkillTypeValue::TRAINING->value,
             'can_train' => true,
         ]);
 
@@ -248,7 +248,7 @@ class SkillServiceTest extends TestCase
     public function testCraftSkillDoesNotGetXpBecauseItsMaxLevel()
     {
         $craftingSkill = $this->createGameSkill([
-            'type' => SkillTypeValue::CRAFTING,
+            'type' => SkillTypeValue::CRAFTING->value,
             'name' => 'Weapon Crafting',
         ]);
 
@@ -269,7 +269,7 @@ class SkillServiceTest extends TestCase
         ]);
 
         $craftingSkill = $this->createGameSkill([
-            'type' => SkillTypeValue::CRAFTING,
+            'type' => SkillTypeValue::CRAFTING->value,
             'name' => 'Weapon Crafting',
         ]);
 
@@ -290,7 +290,7 @@ class SkillServiceTest extends TestCase
         ]);
 
         $regularSkill = $this->createGameSkill([
-            'type' => SkillTypeValue::TRAINING,
+            'type' => SkillTypeValue::TRAINING->value,
             'name' => 'Accuracy',
         ]);
 
@@ -305,7 +305,7 @@ class SkillServiceTest extends TestCase
     public function testAssignXpToRegularSkillAndLevelItUp()
     {
         $craftingSkill = $this->createGameSkill([
-            'type' => SkillTypeValue::TRAINING,
+            'type' => SkillTypeValue::TRAINING->value,
             'name' => 'Accuracy',
         ]);
 
@@ -322,7 +322,7 @@ class SkillServiceTest extends TestCase
     public function testAssignXpToRegularSkillAndDoNotLevelItUpWhenMaxed()
     {
         $craftingSkill = $this->createGameSkill([
-            'type' => SkillTypeValue::TRAINING,
+            'type' => SkillTypeValue::TRAINING->value,
             'name' => 'Accuracy',
         ]);
 
@@ -340,7 +340,7 @@ class SkillServiceTest extends TestCase
     public function testAssignXpToRegularSkillAndDoNotLevelItBeyondLevel400()
     {
         $craftingSkill = $this->createGameSkill([
-            'type' => SkillTypeValue::TRAINING,
+            'type' => SkillTypeValue::TRAINING->value,
             'name' => 'Accuracy',
         ]);
 

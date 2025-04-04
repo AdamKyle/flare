@@ -30,10 +30,14 @@ class ShopController extends Controller
         $this->shopService = $shopService;
     }
 
-    public function fetchItemsForShop(Character $character): JsonResponse
+    public function fetchItemsForShop(Character $character, Request $request): JsonResponse
     {
+
+        $type = $request->get('filter');
+        $searchText = $request->get('search_text');
+
         return response()->json([
-            'items' => $this->shopService->getItemsForShop(),
+            'items' => $this->shopService->getItemsForShop($character, $type, $searchText),
             'gold' => $character->gold,
             'inventory_count' => $character->getInventoryCount(),
             'inventory_max' => $character->inventory_max,

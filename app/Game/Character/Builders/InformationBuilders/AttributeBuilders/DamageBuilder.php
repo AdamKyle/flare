@@ -7,6 +7,7 @@ use App\Flare\Models\GameMap;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\WeaponType;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\WeaponTypes;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use Exception;
 use Illuminate\Support\Collection;
 
@@ -19,9 +20,6 @@ class DamageBuilder extends BaseAttribute
         $this->classRanksWeaponMasteriesBuilder = $classRanksWeaponMasteriesBuilder;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function initialize(Character $character, Collection $skills, ?Collection $inventory): void
     {
         parent::initialize($character, $skills, $inventory);
@@ -37,19 +35,18 @@ class DamageBuilder extends BaseAttribute
     public function buildWeaponDamage(float $damageStat, bool $voided = false, string $position = 'both'): float
     {
         $class = $this->character->class;
-        $baseDamage = 0;
 
         $baseDamage = match (true) {
-            $this->character->class->type()->isThief() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, WeaponTypes::WEAPON, 2, WeaponTypes::BOW),
-            $this->character->class->type()->isMerchant() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, WeaponTypes::STAVE, 1, WeaponTypes::BOW),
-            $this->character->class->type()->isFighter() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, WeaponTypes::WEAPON, 2),
-            $this->character->class->type()->isHeretic() || $this->character->class->type()->isArcaneAlchemist() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, WeaponTypes::STAVE),
-            $this->character->class->type()->isBlackSmith() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, WeaponTypes::HAMMER),
-            $this->character->class->type()->isCleric() || $this->character->class->type()->isProphet() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, WeaponTypes::MACE),
-            $this->character->class->type()->isGunslinger() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, WeaponTypes::GUN, 2),
-            $this->character->class->type()->isDancer() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, WeaponTypes::FAN),
-            $this->character->class->type()->isBookBinder() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, WeaponTypes::SCRATCH_AWL),
-            $this->character->class->type()->isRanger() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, WeaponTypes::BOW),
+            $this->character->class->type()->isThief() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, ItemType::DAGGER->value, 2, ItemType::BOW->value),
+            $this->character->class->type()->isMerchant() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, ItemType::STAVE->value, 1, ItemType::BOW->value),
+            $this->character->class->type()->isFighter() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, ItemType::SWORD->value, 2),
+            $this->character->class->type()->isHeretic() || $this->character->class->type()->isArcaneAlchemist() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, ItemType::STAVE->value),
+            $this->character->class->type()->isBlackSmith() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, ItemType::HAMMER->value),
+            $this->character->class->type()->isCleric() || $this->character->class->type()->isProphet() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, ItemType::MACE->value),
+            $this->character->class->type()->isGunslinger() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, ItemType::GUN->value, 2),
+            $this->character->class->type()->isDancer() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, ItemType::FAN->value),
+            $this->character->class->type()->isBookBinder() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, ItemType::SCRATCH_AWL->value),
+            $this->character->class->type()->isRanger() => $this->buildBonusDamageForClassBasedOnWeaponTypeEquipped($damageStat, ItemType::BOW->value),
             default => ($damageStat * 0.05),
         };
 
@@ -131,16 +128,7 @@ class DamageBuilder extends BaseAttribute
         }
 
         $slots = $this->inventory->filter(function ($slot) {
-            return in_array($slot->item->type, [
-                WeaponTypes::WEAPON,
-                WeaponTypes::STAVE,
-                WeaponTypes::SCRATCH_AWL,
-                WeaponTypes::HAMMER,
-                WeaponTypes::MACE,
-                WeaponTypes::GUN,
-                WeaponTypes::FAN,
-                WeaponTypes::BOW,
-            ]);
+            return in_array($slot->item->type, ItemType::validWeapons());
         });
 
         foreach ($slots as $slot) {
@@ -169,7 +157,7 @@ class DamageBuilder extends BaseAttribute
     {
         $class = $this->character->class;
 
-        $itemDamage = $this->getDamageFromItems('spell-damage', $position);
+        $itemDamage = $this->getDamageFromItems(ItemType::SPELL_DAMAGE->value, $position);
 
         $skillPercentage = 0;
 
@@ -194,9 +182,9 @@ class DamageBuilder extends BaseAttribute
     {
         $details = [];
 
-        $details['attached_affixes'] = $this->getAttributeBonusFromAllItemAffixesDetails('base_damage', $voided, 'spell-damage');
+        $details['attached_affixes'] = $this->getAttributeBonusFromAllItemAffixesDetails('base_damage', $voided, ItemType::SPELL_DAMAGE->value);
         $details['skills_effecting_damage'] = null;
-        $details['base_damage'] = number_format($this->getDamageFromItems('spell-damage', 'both'));
+        $details['base_damage'] = number_format($this->getDamageFromItems(ItemType::SPELL_DAMAGE->value, 'both'));
 
         if ($this->shouldIncludeSkillDamage($this->character->class, 'spell')) {
             $details['skills_effecting_damage'] = $this->fetchBaseAttributeFromSkillsDetails('base_damage');
@@ -204,8 +192,8 @@ class DamageBuilder extends BaseAttribute
 
         $details['masteries'] = [];
 
-        $details['masteries'][] = $this->classRanksWeaponMasteriesBuilder->fetchClassMasteryBreakDownForPosition('spell-damage', 'spell-one');
-        $details['masteries'][] = $this->classRanksWeaponMasteriesBuilder->fetchClassMasteryBreakDownForPosition('spell-damage', 'spell-two');
+        $details['masteries'][] = $this->classRanksWeaponMasteriesBuilder->fetchClassMasteryBreakDownForPosition(ItemType::SPELL_DAMAGE->value, 'spell-one');
+        $details['masteries'][] = $this->classRanksWeaponMasteriesBuilder->fetchClassMasteryBreakDownForPosition(ItemType::SPELL_DAMAGE->value, 'spell-two');
 
         $details['masteries'] = array_filter($details['masteries']);
 
@@ -214,7 +202,7 @@ class DamageBuilder extends BaseAttribute
 
     public function buildRingDamageBreakDown(): array
     {
-        $details['attached_affixes'] = $this->getAttributeBonusFromAllItemAffixesDetails('base_damage', false, 'ring');
+        $details['attached_affixes'] = $this->getAttributeBonusFromAllItemAffixesDetails('base_damage', false, ItemType::RING->value);
         $details['base_damage'] = $this->getDamageFromItems('ring', 'both');
         $details['skills_effecting_damage'] = null;
         $details['masteries'] = [];
@@ -225,7 +213,8 @@ class DamageBuilder extends BaseAttribute
     /**
      * Build stacking affix damage.
      *
-     * @return int
+     * @param bool $voided
+     * @return float
      */
     public function buildAffixStackingDamage(bool $voided = false): float
     {
@@ -243,7 +232,8 @@ class DamageBuilder extends BaseAttribute
     /**
      * Build affix non stacking damage.
      *
-     * @return int
+     * @param bool $voided
+     * @return float
      */
     public function buildAffixNonStackingDamage(bool $voided = false): float
     {
@@ -346,9 +336,9 @@ class DamageBuilder extends BaseAttribute
     private function buildBonusDamageForClassBasedOnWeaponTypeEquipped(int $damageStat, string $weaponType, int $amount = 1, ?string $orWeaponType = null): int
     {
         $duelHanded = [
-            WeaponTypes::STAVE,
-            WeaponTypes::HAMMER,
-            WeaponTypes::BOW,
+            ItemType::STAVE->value,
+            ItemType::HAMMER->value,
+            ItemType::BOW->value,
         ];
 
         $matchingItems = $this->inventory->filter(function ($slot) use ($weaponType, $orWeaponType) {

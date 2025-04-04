@@ -29,6 +29,20 @@
                     </x-core.alerts.info-alert>
                 </div>
                 <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="custom-checkbox mb-5" for="auto_sell_item">
+                            <input type="hidden" name="auto_sell_item" value="0"/>
+                            <input type="checkbox" id="auto_sell_item" name="auto_sell_item" value="1" {{$user->auto_sell_item ? 'checked' : ''}}>
+                            <span></span>
+                            <span>Auto Sell?</span>
+                        </label>
+                    </div>
+                    <x-core.alerts.info-alert title="ATTN!">
+                        By selecting this you are saying you want to auto sell items you cannot disenchant because you are Gold Dust capped.
+                    </x-core.alerts.info-alert>
+                </div>
+                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 <div class="grid md:grid-cols-2 gap-4 mb-4">
                     <div>
                         <div class="mb-5">

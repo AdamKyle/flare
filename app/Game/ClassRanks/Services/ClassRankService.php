@@ -8,6 +8,8 @@ use App\Flare\Models\CharacterClassSpecialtiesEquipped;
 use App\Flare\Models\GameClassSpecial;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\ClassRanks\Values\ClassRankValue;
 use App\Game\ClassRanks\Values\ClassSpecialValue;
@@ -60,37 +62,86 @@ class ClassRankService
         $classRanks = $character->classRanks()->with(['gameClass', 'weaponMasteries'])->get();
 
         $classRanks = $classRanks->transform(function ($classRank) use ($character) {
-
             $classRank->class_name = $classRank->gameClass->name;
-
             $classRank->is_active = $classRank->gameClass->id === $character->game_class_id;
-
             $classRank->is_locked = $this->isClassLocked($character, $classRank);
 
-            $classRank->weapon_masteries = $classRank->weaponMasteries->transform(function ($weaponMastery) {
+            $preferredType = ItemTypeMapping::getForClass($classRank->gameClass->name);
 
-                $weaponMastery->mastery_name = (new WeaponMasteryValue($weaponMastery->weapon_type))->getName();
+            $sortedWeaponMasteries = [];
 
-                return $weaponMastery;
+            $tempMasteries = $classRank->weaponMasteries->all();
+
+            usort($tempMasteries, function ($a, $b) use ($preferredType) {
+                $typeA = $a->weapon_type;
+                $typeB = $b->weapon_type;
+
+                if (is_null($preferredType)) {
+                    return 0;
+                }
+
+                if (is_array($preferredType)) {
+                    $indexA = array_search($typeA, $preferredType);
+                    $indexB = array_search($typeB, $preferredType);
+
+                    $indexA = $indexA === false ? PHP_INT_MAX : $indexA;
+                    $indexB = $indexB === false ? PHP_INT_MAX : $indexB;
+
+                    return $indexA <=> $indexB;
+                }
+
+                // Single preferred type
+                if ($typeA === $preferredType && $typeB !== $preferredType) {
+                    return -1;
+                }
+                if ($typeB === $preferredType && $typeA !== $preferredType) {
+                    return 1;
+                }
+
+                return 0;
             });
+
+            foreach ($tempMasteries as $mastery) {
+                $masteryData = [
+                    'id' => $mastery->id,
+                    'character_class_rank_id' => $mastery->character_class_rank_id,
+                    'weapon_type' => $mastery->weapon_type,
+                    'current_xp' => $mastery->current_xp,
+                    'required_xp' => $mastery->required_xp,
+                    'mastery_name' => ucwords(str_replace('-', ' ', $mastery->weapon_type)),
+                ];
+
+                $sortedWeaponMasteries[] = $masteryData;
+            }
+
+            $classRank->weapon_masteries = $sortedWeaponMasteries;
+
 
             $primaryClass = $classRank->gameClass->primaryClassRequired;
             $secondaryClass = $classRank->gameClass->secondaryClassRequired;
 
-            $classRank->primary_class_name = ! is_null($primaryClass) ? $primaryClass->name : null;
-            $classRank->secondary_class_name = ! is_null($secondaryClass) ? $secondaryClass->name : null;
+            $classRank->primary_class_name = !is_null($primaryClass) ? $primaryClass->name : null;
+            $classRank->secondary_class_name = !is_null($secondaryClass) ? $secondaryClass->name : null;
             $classRank->primary_class_required_level = $classRank->gameClass->primary_required_class_level;
             $classRank->secondary_class_required_level = $classRank->gameClass->secondary_required_class_level;
 
             return $classRank;
-        })->sortByDesc(function ($item) {
-            return $item->is_active;
-        })->all();
+        })->sortByDesc(fn($item) => $item->is_active)
+            ->values();
+
+        $result = [];
+
+        foreach ($classRanks as $rank) {
+            $rankData = $rank->toArray();
+            $rankData['weapon_masteries'] = $rank->weapon_masteries;
+            $result[] = $rankData;
+        }
 
         return $this->successResult([
-            'class_ranks' => array_values($classRanks),
+            'class_ranks' => $result,
         ]);
     }
+
 
     /**
      * Equip a class specialty
@@ -254,9 +305,9 @@ class ClassRankService
             return;
         }
 
-        foreach (WeaponMasteryValue::getTypes() as $type) {
+        foreach (ItemType::allWeaponTypes() as $type) {
 
-            $inventorySlot = $inventory->where('item.type', WeaponMasteryValue::getTypeForNumericalValue($type))->first();
+            $inventorySlot = $inventory->where('item.type', $type)->first();
 
             if (! is_null($inventorySlot)) {
                 $weaponMastery = $classRank->weaponMasteries()->where('weapon_type', $type)->first();
@@ -271,7 +322,7 @@ class ClassRankService
 
                 $weaponMastery = $weaponMastery->refresh();
 
-                $weaponMasteryName = (new WeaponMasteryValue($type))->getName();
+                $weaponMasteryName = ItemType::getProperNameForType($type);
 
                 $this->battleMessageHandler->handleClassRankMessage($character->user, ClassRanksMessageTypes::XP_FOR_CLASS_MASTERIES, $character->class->name, WeaponMasteryValue::XP_PER_KILL, $weaponMastery->current_xp, $weaponMasteryName);
 

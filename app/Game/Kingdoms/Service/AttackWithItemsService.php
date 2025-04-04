@@ -38,40 +38,28 @@ class AttackWithItemsService
     {
 
         if (! $this->doesCharacterHaveItems($character->inventory, $slots)) {
-            return $this->errorResult('You are not allowed to do that.');
+            return $this->errorResult('You don\'t own these items.');
         }
 
         if ($character->id === $kingdom->character_id) {
-            return $this->errorResult('You are not allowed to do that.');
+            return $this->errorResult('You cannot attack your own kingdoms.');
         }
 
         if (! is_null($kingdom->protected_until)) {
-            return $this->errorResult('You are not allowed to do that.');
+            return $this->errorResult('This kingdom is currently under The Creators protection and cannot be targeted right now.');
         }
 
         if ($character->map->game_map_id !== $kingdom->game_map_id) {
-            return $this->errorResult('You are not allowed to do that.');
+            return $this->errorResult('You need to be on the same plane as the kingdom you want to attack with items.');
         }
 
         $itemDefence = $kingdom->kingdomItemResistanceBonus();
-
-        if ($itemDefence >= 1.0) {
-
-            event(new GlobalMessageEvent($character->name.' tried to drop items on a kingdom: '.
-                $kingdom->name.' on the plane: '.$kingdom->gameMap->name.' At (X/Y): '.$kingdom->x_position.'/'.$kingdom->y_position.
-                ' but this kingdom is well defended against such tricks. The armies prepare for battle!'
-            ));
-
-            return $this->successResult([
-                'message' => 'You dropped the items but they did nothing. This kingdom is resistant tro the damage. No ogs created.',
-            ]);
-        }
 
         $this->setOldBuildings($kingdom);
         $this->setOldUnits($kingdom);
 
         $damage = $this->gatherDamage($character->inventory, $slots);
-        $reduction = $this->getReductionToDamage($kingdom) / 100;
+        $reduction = $kingdom->fetchKingdomDefenceBonus();
 
         $damage -= ($damage * $reduction);
 
@@ -96,9 +84,10 @@ class AttackWithItemsService
             $moraleLoss = $currentMorale - $newMorale;
         }
 
-        event(new GlobalMessageEvent($character->name.' has done devastating damage to the kingdom: '.
-            $kingdom->name.' on the plane: '.$kingdom->gameMap->name.' At (X/Y): '.$kingdom->x_position.'/'.$kingdom->y_position.
-            ' doing a total of: '.number_format($damage * 100).'% damage.'
+        event(new GlobalMessageEvent(
+            $character->name . ' has done devastating damage to the kingdom: ' .
+                $kingdom->name . ' on the plane: ' . $kingdom->gameMap->name . ' At (X/Y): ' . $kingdom->x_position . '/' . $kingdom->y_position .
+                ' doing a total of: ' . number_format($damage * 100) . '% damage.'
         ));
 
         $this->createLogs($character, $kingdom, $damage, $moraleLoss);
@@ -135,13 +124,13 @@ class AttackWithItemsService
 
             KingdomLog::create($attributes);
 
-            event(new ServerMessageEvent($kingdom->character->user, $character->name.' has dropped bombs on your kingdom: '.
-                $kingdom->name.' on the plane: '.$kingdom->gameMap->name.' At (X/Y): '.$kingdom->x_position.'/'.$kingdom->y_position.
-                ' doing a total of: '.number_format($damageDone * 100).'% damage.'));
+            event(new ServerMessageEvent($kingdom->character->user, $character->name . ' has dropped bombs on your kingdom: ' .
+                $kingdom->name . ' on the plane: ' . $kingdom->gameMap->name . ' At (X/Y): ' . $kingdom->x_position . '/' . $kingdom->y_position .
+                ' doing a total of: ' . number_format($damageDone * 100) . '% damage.'));
 
             $kingdom = $kingdom->refresh();
 
-            $this->updateKingdom->updateKingdomLogs($kingdom->character);
+            $this->updateKingdom->updateKingdomLogs($kingdom->character, true);
             $this->updateKingdom->updateKingdom($kingdom);
         }
 
@@ -149,11 +138,11 @@ class AttackWithItemsService
 
         KingdomLog::create($attributes);
 
-        event(new ServerMessageEvent($character->user, 'You have dropped bombs on a kingdom: '.
-            $kingdom->name.' on the plane: '.$kingdom->gameMap->name.' At (X/Y): '.$kingdom->x_position.'/'.$kingdom->y_position.
-            ' doing a total of: '.number_format($damageDone * 100).'% damage.'));
+        event(new ServerMessageEvent($character->user, 'You have dropped bombs on a kingdom: ' .
+            $kingdom->name . ' on the plane: ' . $kingdom->gameMap->name . ' At (X/Y): ' . $kingdom->x_position . '/' . $kingdom->y_position .
+            ' doing a total of: ' . number_format($damageDone * 100) . '% damage.'));
 
-        $this->updateKingdom->updateKingdomLogs($character->refresh());
+        $this->updateKingdom->updateKingdomLogs($character->refresh(), true);
     }
 
     /**
@@ -266,25 +255,5 @@ class AttackWithItemsService
         }
 
         return $damage;
-    }
-
-    /**
-     * get the reduction in damage.
-     */
-    protected function getReductionToDamage(Kingdom $kingdom): float
-    {
-        $totalDefence = $kingdom->fetchKingdomDefenceBonus();
-
-        $reduction = 0.0;
-
-        if ($totalDefence > 1) {
-            $reduction = ($totalDefence - 1) / 0.05;
-
-            if ($reduction < 0.05) {
-                return 0.05;
-            }
-        }
-
-        return $reduction;
     }
 }

@@ -8,7 +8,7 @@
     ],
     "license": "MIT",
     "require": {
-        "php": ">=8.3",
+        "php": ">=8.4",
         "bkwld/cloner": "^3.11.0",
         "christianessl/landmap-generation": "^1.0",
         "deployer/deployer": "v7.2.0",

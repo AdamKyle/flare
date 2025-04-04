@@ -33,13 +33,13 @@ class SkillsControllerTest extends TestCase
     {
         $trainingSkill = $this->createGameSkill([
             'name' => 'training skill',
-            'type' => SkillTypeValue::TRAINING,
+            'type' => SkillTypeValue::TRAINING->value,
             'can_train' => true,
         ]);
 
         $craftingSkill = $this->createGameSkill([
             'name' => 'crafting skill',
-            'type' => SkillTypeValue::CRAFTING,
+            'type' => SkillTypeValue::CRAFTING->value,
             'can_train' => false,
         ]);
 

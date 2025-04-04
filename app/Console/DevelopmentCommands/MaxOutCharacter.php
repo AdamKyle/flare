@@ -120,23 +120,23 @@ class MaxOutCharacter extends Command
     {
         foreach ($character->skills as $skill) {
 
-            if ($skill->baseSkill->type === SkillTypeValue::TRAINING) {
+            if ($skill->baseSkill->type === SkillTypeValue::TRAINING->value) {
                 $skill->update(['level' => 999]);
             }
 
             if (
-                $skill->baseSkill->type === SkillTypeValue::CRAFTING ||
-                $skill->baseSkill->type === SkillTypeValue::DISENCHANTING ||
-                $skill->baseSkill->type === SkillTypeValue::ENCHANTING
+                $skill->baseSkill->type === SkillTypeValue::CRAFTING->value ||
+                $skill->baseSkill->type === SkillTypeValue::DISENCHANTING->value ||
+                $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value
             ) {
                 $skill->update(['level' => 400, 'is_hidden' => false, 'is_locked' => false]);
             }
 
-            if ($skill->baseSkill->type === SkillTypeValue::ALCHEMY) {
+            if ($skill->baseSkill->type === SkillTypeValue::ALCHEMY->value) {
                 $skill->update(['level' => 200, 'is_hidden' => false, 'is_locked' => false]);
             }
 
-            if ($skill->baseSkill->type === SkillTypeValue::EFFECTS_CLASS) {
+            if ($skill->baseSkill->type === SkillTypeValue::EFFECTS_CLASS->value) {
                 $skill->update(['level' => 400, 'is_hidden' => false, 'is_locked' => false]);
             }
         }

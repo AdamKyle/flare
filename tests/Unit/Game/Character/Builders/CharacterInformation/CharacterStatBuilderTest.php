@@ -8,6 +8,7 @@ use App\Flare\Values\MapNameValue;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilder;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -98,7 +99,7 @@ class CharacterStatBuilderTest extends TestCase
             'xp' => 100,
             'xp_max' => 1000,
             'xp_towards' => 0,
-            'skill_type' => SkillTypeValue::EFFECTS_CLASS,
+            'skill_type' => SkillTypeValue::EFFECTS_CLASS->value,
             'is_hidden' => false,
         ]);
 
@@ -449,7 +450,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'weapon',
+            'type' => ItemType::DAGGER->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_damage' => 100,
@@ -465,7 +466,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $character = $character->refresh();
 
-        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage('weapon');
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::DAGGER->value);
 
         $this->assertGreaterThan(100, $damage);
     }
@@ -485,7 +486,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'weapon',
+            'type' => ItemType::BOW->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_damage' => 100,
@@ -501,7 +502,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $character = $character->refresh();
 
-        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage('weapon', true);
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::BOW->value, true);
 
         $this->assertEquals(100, $damage);
     }
@@ -521,7 +522,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'weapon',
+            'type' => ItemType::STAVE->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_damage' => 100,
@@ -542,7 +543,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $character = $character->refresh();
 
-        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage('weapon');
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::STAVE->value);
 
         $this->assertGreaterThan(100, $damage);
     }
@@ -562,7 +563,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'ring',
-            'type' => 'ring',
+            'type' => ItemType::RING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_damage' => 1000,
@@ -572,7 +573,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $character = $character->refresh();
 
-        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage('ring');
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::RING->value);
 
         $this->assertEquals(1000, $damage);
     }
@@ -592,13 +593,13 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-damage',
+            'type' => ItemType::SPELL_DAMAGE->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_damage' => 100,
         ]);
 
-        $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-once', 'weapon')->getCharacter();
+        $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'weapon')->getCharacter();
 
         $class = $this->createClass([
             'name' => 'Vampire',
@@ -608,7 +609,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $character = $character->refresh();
 
-        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage('spell-damage');
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::SPELL_DAMAGE->value);
 
         $this->assertGreaterThan(100, $damage);
     }
@@ -628,7 +629,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-damage',
+            'type' => ItemType::SPELL_DAMAGE->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_damage' => 100,
@@ -644,7 +645,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $character = $character->refresh();
 
-        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage('spell-damage', true);
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::SPELL_DAMAGE->value, true);
 
         $this->assertEquals(100, $damage);
     }
@@ -664,7 +665,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-damage',
+            'type' => ItemType::SPELL_DAMAGE->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_damage' => 100,
@@ -685,7 +686,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $character = $character->refresh();
 
-        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage('spell-damage');
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::SPELL_DAMAGE->value);
 
         $this->assertGreaterThan(100, $damage);
     }
@@ -782,7 +783,7 @@ class CharacterStatBuilderTest extends TestCase
 
     public function testGetPositionalHealing()
     {
-        $item = $this->createItem(['name' => 'sample', 'type' => 'spell-healing', 'base_healing' => 100]);
+        $item = $this->createItem(['name' => 'sample', 'type' => ItemType::SPELL_HEALING->value, 'base_healing' => 100]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'sample')->getCharacter();
 
@@ -795,7 +796,7 @@ class CharacterStatBuilderTest extends TestCase
     {
         $cleric = $this->createClass(['name' => CharacterClassValue::CLERIC]);
 
-        $item = $this->createItem(['name' => 'sample', 'type' => 'spell-healing', 'base_healing' => 100]);
+        $item = $this->createItem(['name' => 'sample', 'type' => ItemType::SPELL_HEALING->value, 'base_healing' => 100]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'sample')->getCharacter();
 
@@ -853,7 +854,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -889,7 +890,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -925,7 +926,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -1031,7 +1032,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -1060,7 +1061,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -1092,7 +1093,7 @@ class CharacterStatBuilderTest extends TestCase
     {
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'base_healing' => 100,
             'resurrection_chance' => 1.0,
         ]);
@@ -1111,7 +1112,7 @@ class CharacterStatBuilderTest extends TestCase
     {
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'base_healing' => 100,
             'resurrection_chance' => 1.0,
         ]);
@@ -1138,7 +1139,7 @@ class CharacterStatBuilderTest extends TestCase
     {
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'base_healing' => 100,
             'resurrection_chance' => 1.0,
         ]);
@@ -1165,7 +1166,7 @@ class CharacterStatBuilderTest extends TestCase
     {
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'base_healing' => 100,
             'resurrection_chance' => 1.0,
         ]);
@@ -1198,7 +1199,7 @@ class CharacterStatBuilderTest extends TestCase
     {
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'base_healing' => 100,
             'resurrection_chance' => 1.0,
         ]);
@@ -1237,7 +1238,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -1267,7 +1268,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -1297,7 +1298,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -1313,7 +1314,7 @@ class CharacterStatBuilderTest extends TestCase
     {
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'base_healing' => 100,
         ]);
 
@@ -1341,7 +1342,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -1371,7 +1372,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -1401,7 +1402,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -1424,7 +1425,7 @@ class CharacterStatBuilderTest extends TestCase
     {
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'base_healing' => 100,
         ]);
 
@@ -1452,7 +1453,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -1483,7 +1484,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -1520,7 +1521,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -1563,7 +1564,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -1606,7 +1607,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -1649,7 +1650,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -1697,7 +1698,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -1764,7 +1765,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -1794,7 +1795,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -1835,7 +1836,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -1867,7 +1868,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'weapon',
-            'type' => 'spell-healing',
+            'type' => ItemType::SPELL_HEALING->value,
             'item_suffix_id' => $itemSuffixAffix->id,
             'item_prefix_id' => $itemPrefixAffix->id,
             'base_healing' => 100,
@@ -2010,8 +2011,10 @@ class CharacterStatBuilderTest extends TestCase
             ->equipStartingEquipment()
             ->getCharacter();
 
-        $fighterDamage = $this->characterStatBuilder->setCharacter($fighter)->buildDamage('weapon');
-        $alcoholicDamage = $this->characterStatBuilder->setCharacter($alcoholic)->buildDamage('weapon');
+        $itemTypes = array_map(fn($case) => $case->value, ItemType::cases());
+
+        $fighterDamage = $this->characterStatBuilder->setCharacter($fighter)->buildDamage($itemTypes);
+        $alcoholicDamage = $this->characterStatBuilder->setCharacter($alcoholic)->buildDamage($itemTypes);
 
         $this->assertGreaterThan($alcoholicDamage, $fighterDamage);
     }
@@ -2042,8 +2045,10 @@ class CharacterStatBuilderTest extends TestCase
             ->levelCharacterUp(25)
             ->getCharacter();
 
-        $fighterDamage = $this->characterStatBuilder->setCharacter($fighter)->buildDamage('weapon');
-        $alcoholicDamage = $this->characterStatBuilder->setCharacter($alcoholic)->buildDamage('weapon');
+        $itemTypes = array_map(fn($case) => $case->value, ItemType::cases());
+
+        $fighterDamage = $this->characterStatBuilder->setCharacter($fighter)->buildDamage($itemTypes);
+        $alcoholicDamage = $this->characterStatBuilder->setCharacter($alcoholic)->buildDamage($itemTypes);
 
         $this->assertGreaterThan($fighterDamage, $alcoholicDamage);
     }
@@ -2113,12 +2118,12 @@ class CharacterStatBuilderTest extends TestCase
         )->givePlayerLocation()
             ->inventoryManagement()
             ->giveItem(
-                $this->createItem(['type' => 'spell-healing', 'base_healing' => 10]),
+                $this->createItem(['type' => ItemType::SPELL_HEALING->value, 'base_healing' => 10]),
                 true,
                 'spell-one'
             )
             ->giveItem(
-                $this->createItem(['type' => 'spell-healing', 'base_healing' => 10]),
+                $this->createItem(['type' => ItemType::SPELL_HEALING->value, 'base_healing' => 10]),
                 true,
                 'spell-two'
             )
@@ -2135,12 +2140,12 @@ class CharacterStatBuilderTest extends TestCase
         )->givePlayerLocation()
             ->inventoryManagement()
             ->giveItem(
-                $this->createItem(['type' => 'spell-healing', 'base_healing' => 10]),
+                $this->createItem(['type' => ItemType::SPELL_HEALING->value, 'base_healing' => 10]),
                 true,
                 'spell-one'
             )
             ->giveItem(
-                $this->createItem(['type' => 'spell-healing', 'base_healing' => 10]),
+                $this->createItem(['type' => ItemType::SPELL_HEALING->value, 'base_healing' => 10]),
                 true,
                 'spell-two'
             )

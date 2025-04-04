@@ -33,7 +33,7 @@ class ItemListCostTransformerService
         return $items;
     }
 
-    public function reduceCostOfCraftingItems(Character $character, Collection $items, string $craftingType, bool $showMerchantMessage): SupportCollection
+    public function reduceCostOfCraftingItems(Character $character, Collection $items, bool $showMerchantMessage): SupportCollection
     {
         if ($character->classType()->isBlacksmith() && $this->isItemsOfType($items, [WeaponTypes::WEAPON, ...ArmourTypes::armourTypes()])) {
             if ($showMerchantMessage) {

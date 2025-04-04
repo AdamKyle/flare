@@ -71,7 +71,11 @@ class GuideQuestRequirementsService
     {
         if (! is_null($quest->required_skill_type)) {
             try {
-                $skillType = new SkillTypeValue($quest->required_skill_type);
+                $skillType = SkillTypeValue::tryFrom($quest->required_skill_type);
+
+                if (is_null($skillType)) {
+                    throw new Exception('Invalid Skill Type Value for: ' . $quest->required_skill_type);
+                }
 
                 if ($skillType->effectsClassSkills()) {
                     $this->classSkillCheck($character, $quest);
@@ -490,7 +494,7 @@ class GuideQuestRequirementsService
     protected function craftingSkillTypeCheck(Character $character, GuideQuest $quest): void
     {
         $classSkill = $character->skills()->whereHas('baseSkill', function ($query) {
-            $query->where('type', SkillTypeValue::CRAFTING);
+            $query->where('type', SkillTypeValue::CRAFTING->value);
         })->where('level', '>=', $quest->required_skill_type_level)->first();
 
         if (! is_null($classSkill)) {

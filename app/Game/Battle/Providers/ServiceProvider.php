@@ -22,6 +22,7 @@ use App\Game\Core\Services\GoldRush;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
+use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\DisenchantService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
@@ -47,7 +48,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(BattleDrop::class, function ($app) {
             return new BattleDrop(
                 $app->make(RandomItemDropBuilder::class),
-                $app->make(DisenchantService::class)
+                $app->make(DisenchantService::class),
+                $app->make(ShopService::class)
             );
         });
 

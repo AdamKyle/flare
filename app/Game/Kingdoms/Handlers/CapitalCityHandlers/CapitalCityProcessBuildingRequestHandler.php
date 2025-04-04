@@ -12,6 +12,7 @@ use App\Game\Kingdoms\Validation\KingdomBuildingResourceValidation;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
 use App\Game\Maps\Calculations\DistanceCalculation;
+use Illuminate\Support\Facades\Log;
 
 class CapitalCityProcessBuildingRequestHandler
 {
@@ -55,6 +56,13 @@ class CapitalCityProcessBuildingRequestHandler
 
         $summedMissingCosts = $this->calculateSummedMissingCosts($requestData);
 
+        Log::channel('capital_city_building_upgrades')->info('handleBuildingRequests', [
+            '$requestData' => $requestData,
+            '$kingdom' => $kingdom->id,
+            '$character' => $character->id,
+            '$summedMissingCosts' => $summedMissingCosts
+        ]);
+
         if (!empty($summedMissingCosts) && $shouldFailForMissingCosts) {
             $requestData = collect($requestData)
                 ->map(fn($item) => array_merge($item, ['secondary_status' => CapitalCityQueueStatus::REJECTED]))
@@ -71,13 +79,15 @@ class CapitalCityProcessBuildingRequestHandler
             $capitalCityBuildingQueue = $capitalCityBuildingQueue->refresh();
 
             $this->capitalCityKingdomLogHandler->possiblyCreateLogForBuildingQueue($capitalCityBuildingQueue);
-
+            Log::channel('capital_city_building_upgrades')->info('All buildings were rejected because: Buildings were rejected because even after requesting resources, you still do not have enough resources for one or more buildings so the entire request was canceled out of frustration.');
             return;
         }
 
         if (!empty($summedMissingCosts)) {
+            Log::channel('capital_city_building_upgrades')->info('Summed missing costs were not empty.');
             $this->handleResourceRequests($capitalCityBuildingQueue, $character, $summedMissingCosts, $requestData, $kingdom);
         } else {
+            Log::channel('capital_city_building_upgrades')->info('No resources need to be requested.');
             $this->handleNoResourceRequests($capitalCityBuildingQueue, $requestData);
         }
     }
@@ -223,8 +233,10 @@ class CapitalCityProcessBuildingRequestHandler
         ]));
 
         if (!$hasBuildingOrRepairing) {
+            Log::channel('capital_city_building_upgrades')->info('We have no buildings in BUILDING, REPAIRING or REQUESTING status');
             $this->createLogAndTriggerEvents($capitalCityBuildingQueue);
         } else {
+            Log::channel('capital_city_building_upgrades')->info('Handling Upgrade or repair request');
             $this->createUpgradeOrRepairRequest($capitalCityBuildingQueue, $capitalCityBuildingQueue->kingdom, $requestData);
             $this->sendOffEvents($capitalCityBuildingQueue);
         }

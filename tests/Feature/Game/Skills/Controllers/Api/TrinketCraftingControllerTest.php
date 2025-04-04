@@ -26,7 +26,7 @@ class TrinketCraftingControllerTest extends TestCase
 
         $craftingSkill = $this->createGameSkill([
             'name' => 'Trinketry',
-            'type' => SkillTypeValue::CRAFTING,
+            'type' => SkillTypeValue::CRAFTING->value,
             'max_level' => 100,
         ]);
 

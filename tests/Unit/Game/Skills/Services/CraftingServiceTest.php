@@ -53,7 +53,7 @@ class CraftingServiceTest extends TestCase
 
         $this->craftingSkill = $this->createGameSkill([
             'name' => 'Weapon Crafting',
-            'type' => SkillTypeValue::CRAFTING,
+            'type' => SkillTypeValue::CRAFTING->value,
         ]);
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(
@@ -98,7 +98,7 @@ class CraftingServiceTest extends TestCase
     {
         $character = $this->character->assignSkill($this->createGameSkill([
             'name' => 'Armour Crafting',
-            'type' => SkillTypeValue::CRAFTING,
+            'type' => SkillTypeValue::CRAFTING->value,
         ]))->getCharacter();
 
         $this->createItem([
@@ -139,7 +139,7 @@ class CraftingServiceTest extends TestCase
     {
         $character = $this->character->assignSkill($this->createGameSkill([
             'name' => 'Spell Crafting',
-            'type' => SkillTypeValue::CRAFTING,
+            'type' => SkillTypeValue::CRAFTING->value,
         ]))->getCharacter();
 
         $this->createItem([

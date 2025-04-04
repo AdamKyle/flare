@@ -9,6 +9,7 @@ use App\Flare\Models\User;
 use App\Game\Messages\Events\NPCMessageEvent;
 use App\Game\Messages\Events\PrivateMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use Carbon\Carbon;
 
 class PrivateMessage
 {
@@ -93,7 +94,11 @@ class PrivateMessage
     private function getNPCTypeMessage(Npc $npc): string
     {
         if ($npc->type()->isConjurer()) {
-            return 'I hold the gates closed over the Celestials. Alas they seem to escape my grasp once a week on Wednesdays at 1pm GMT-6.
+
+            $time = Carbon::tomorrow()->setTimezone(env('TIME_ZONE'))->setHour(13)->setMinute(0);
+            $formattedTime = $time->format('g A T');
+
+            return 'I hold the gates closed over the Celestials. Alas they seem to escape my grasp once a week on Wednesdays at '.$formattedTime.'.
             Want to conjure your own? Click conjure under the map. Celestials can drop shards, used in Alchemy, The Queen of Hearts and Quests!
             These creatures cost Gold Dust and Gold to conjure and are stronger then current plane creatures! They even take into consideration special
             plane effects. See Help docs for more info. You can only conjure creatures for the plane you are on, all except Purgatory! Alas, I am busy now child, away with you!';

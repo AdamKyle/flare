@@ -77,7 +77,7 @@ class AlchemyServiceTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
             'name' => CharacterClassValue::ARCANE_ALCHEMIST,
         ]))->assignSkill($this->createGameSkill([
-            'type' => SkillTypeValue::ALCHEMY,
+            'type' => SkillTypeValue::ALCHEMY->value,
         ]), 10)->givePlayerLocation()->getCharacter();
 
         $result = $this->alchemyService->fetchAlchemistItems($character);
@@ -96,7 +96,7 @@ class AlchemyServiceTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
             'name' => CharacterClassValue::MERCHANT,
         ]))->assignSkill($this->createGameSkill([
-            'type' => SkillTypeValue::ALCHEMY,
+            'type' => SkillTypeValue::ALCHEMY->value,
         ]), 10)->givePlayerLocation()->getCharacter();
 
         $result = $this->alchemyService->fetchAlchemistItems($character);
@@ -387,7 +387,7 @@ class AlchemyServiceTest extends TestCase
 
         $alchemyCraftingXpData = $this->alchemyService->fetchSkillXP($character);
 
-        $alchemySkill = $character->skills()->where('game_skill_id', GameSkill::where('type', SkillTypeValue::ALCHEMY)->first()->id)->first();
+        $alchemySkill = $character->skills()->where('game_skill_id', GameSkill::where('type', SkillTypeValue::ALCHEMY->value)->first()->id)->first();
 
         $expected = [
             'current_xp' => 0,

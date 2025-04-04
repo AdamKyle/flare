@@ -42,8 +42,7 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute
 
         $classRank = $this->character->classRanks->where('game_class_id', $this->character->game_class_id)->first();
 
-        $mastery = WeaponMasteryValue::getNumericValueForStringType($slot->item->type);
-        $mastery = $classRank->weaponMasteries->where('weapon_type', $mastery)->where('character_class_rank_id', $classRank->id)->first();
+        $mastery = $classRank->weaponMasteries->where('weapon_type', $slot->item->type)->where('character_class_rank_id', $classRank->id)->first();
 
         return [
             'position' => $position,

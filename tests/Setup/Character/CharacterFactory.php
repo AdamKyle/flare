@@ -13,6 +13,7 @@ use App\Flare\Models\User;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Core\Values\FactionLevel;
@@ -185,7 +186,9 @@ class CharacterFactory
             'level' => 0,
         ]);
 
-        foreach (WeaponMasteryValue::getTypes() as $type) {
+        $itemTypes = array_map(fn($case) => $case->value, ItemType::cases());
+
+        foreach ($itemTypes as $type) {
             $classRank->weaponMasteries()->create([
                 'character_class_rank_id' => $classRank->id,
                 'weapon_type' => $type,
@@ -202,6 +205,8 @@ class CharacterFactory
 
     public function addAdditionalClassRanks(array $gameClassIds): CharacterFactory
     {
+        $itemTypes = array_map(fn($case) => $case->value, ItemType::cases());
+
         foreach ($gameClassIds as $gameClassId) {
             $classRank = $this->character->classRanks()->create([
                 'character_id' => $this->character->id,
@@ -211,7 +216,7 @@ class CharacterFactory
                 'level' => 0,
             ]);
 
-            foreach (WeaponMasteryValue::getTypes() as $type) {
+            foreach ($itemTypes as $type) {
                 $classRank->weaponMasteries()->create([
                     'character_class_rank_id' => $classRank->id,
                     'weapon_type' => $type,
@@ -415,7 +420,7 @@ class CharacterFactory
     {
         $item = $this->createItem([
             'name' => 'Rusty Dagger',
-            'type' => 'weapon',
+            'type' => ItemType::DAGGER->value,
             'base_damage' => '6',
         ]);
 
@@ -643,16 +648,16 @@ class CharacterFactory
      */
     protected function assignBaseSkills()
     {
-        $accuracy = $this->returnGameSkill('Accuracy', SkillTypeValue::TRAINING);
-        $timeout = $this->returnGameSkill('Fighters Timeout', SkillTypeValue::EFFECTS_BATTLE_TIMER);
-        $castingAccuracy = $this->returnGameSkill('Casting Accuracy', SkillTypeValue::TRAINING);
-        $criticality = $this->returnGameSkill('Criticality', SkillTypeValue::TRAINING);
-        $dodge = $this->returnGameSkill('Dodge', SkillTypeValue::TRAINING);
-        $looting = $this->returnGameSkill('Looting', SkillTypeValue::TRAINING);
-        $kingmanship = $this->returnGameSkill('Kingmanship', SkillTypeValue::EFFECTS_KINGDOM);
-        $alchemy = $this->returnGameSkill('Alchemy', SkillTypeValue::ALCHEMY);
-        $disenchanting = $this->returnGameSkill('Disenchanting', SkillTypeValue::DISENCHANTING);
-        $enchanting = $this->returnGameSkill('Enchanting', SkillTypeValue::ENCHANTING);
+        $accuracy = $this->returnGameSkill('Accuracy', SkillTypeValue::TRAINING->value);
+        $timeout = $this->returnGameSkill('Fighters Timeout', SkillTypeValue::EFFECTS_BATTLE_TIMER->value);
+        $castingAccuracy = $this->returnGameSkill('Casting Accuracy', SkillTypeValue::TRAINING->value);
+        $criticality = $this->returnGameSkill('Criticality', SkillTypeValue::TRAINING->value);
+        $dodge = $this->returnGameSkill('Dodge', SkillTypeValue::TRAINING->value);
+        $looting = $this->returnGameSkill('Looting', SkillTypeValue::TRAINING->value);
+        $kingmanship = $this->returnGameSkill('Kingmanship', SkillTypeValue::EFFECTS_KINGDOM->value);
+        $alchemy = $this->returnGameSkill('Alchemy', SkillTypeValue::ALCHEMY->value);
+        $disenchanting = $this->returnGameSkill('Disenchanting', SkillTypeValue::DISENCHANTING->value);
+        $enchanting = $this->returnGameSkill('Enchanting', SkillTypeValue::ENCHANTING->value);
 
         $this->createSkill([
             'character_id' => $this->character->id,

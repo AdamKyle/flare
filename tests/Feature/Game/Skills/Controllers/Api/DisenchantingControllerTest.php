@@ -26,7 +26,7 @@ class DisenchantingControllerTest extends TestCase
 
         $craftingSkill = $this->createGameSkill([
             'name' => 'Disenchanting',
-            'type' => SkillTypeValue::DISENCHANTING,
+            'type' => SkillTypeValue::DISENCHANTING->value,
         ]);
 
         $this->character = (new CharacterFactory)->createBaseCharacter()

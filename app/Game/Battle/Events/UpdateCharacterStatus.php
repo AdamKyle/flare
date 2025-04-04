@@ -73,7 +73,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
         $alchemySkill = Skill::where('character_id', $character->id)
             ->where('game_skill_id', GameSkill::where(
                 'type',
-                SkillTypeValue::ALCHEMY
+                SkillTypeValue::ALCHEMY->value
             )->first()->id)->first();
 
         if (is_null($alchemySkill)) {

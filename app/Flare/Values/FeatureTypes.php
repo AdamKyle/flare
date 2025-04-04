@@ -20,6 +20,8 @@ class FeatureTypes
 
     const COSMETIC_RACE_CHANGER = 6;
 
+    const EXTENDED_BACKPACK = 7;
+
     private int $value;
 
     /**
@@ -33,6 +35,7 @@ class FeatureTypes
         4 => self::CAPITAL_CITIES,
         5 => self::CAPITAL_CITY_GOLD_BARS,
         6 => self::COSMETIC_RACE_CHANGER,
+        7 => self::EXTENDED_BACKPACK,
     ];
 
     protected static array $valueNames = [
@@ -43,6 +46,7 @@ class FeatureTypes
         self::CAPITAL_CITIES => 'Capital Cities',
         self::CAPITAL_CITY_GOLD_BARS => 'Capital City Gold Bars',
         self::COSMETIC_RACE_CHANGER => 'Cosmetic Race Changer',
+        self::EXTENDED_BACKPACK => 'Increased Inventory Space (150 slots)',
     ];
 
     /**
@@ -87,6 +91,10 @@ class FeatureTypes
     public function isExtendSets(): bool
     {
         return $this->value === self::EXTEND_SETS;
+    }
+
+    public function isExtendedBackpack(): bool {
+        return $this->value === self::EXTENDED_BACKPACK;
     }
 
     public function isCapitalCities(): bool

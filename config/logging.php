@@ -37,11 +37,18 @@ return [
     'channels' => [
 
         // Game Related
-        'equip_best' => [
+        'capital_city_building_upgrades' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/equip-best.log'),
+            'path' => storage_path('logs/capital-city-building-upgrades.log'),
             'level' => 'debug',
-            'days' => 14,
+            'days' => 1,
+        ],
+
+        'capital_city_unit_recruitments' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/capital-city-unit-recruitments.log'),
+            'level' => 'debug',
+            'days' => 1,
         ],
 
         'stack' => [

@@ -3,11 +3,11 @@
             Weapon Type:
         </dt>
         <dd>
-            General Weapons (Duel Weilded)
+            Any type
         </dd>
     </dl>
     <p class="my-2">
-        With two general weapons equipped you can face down your captors and slughter those that would dare to hold you hostage as you make your escape towards freedom!
+        With two weapons equipped you can face down your captors and slighter those that would dare to hold you hostage as you make your escape towards freedom!
     </p>
     <p class="mb-2">
         Prisoners do best with

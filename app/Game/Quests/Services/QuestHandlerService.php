@@ -137,6 +137,12 @@ class QuestHandlerService
             return true;
         }
 
+        if (! $this->hasCompletedRequiredQuestChain($character, $quest)) {
+            $this->bailMessage = 'You need to complete all the quests in the specified chain before handing this one in.';
+
+            return true;
+        }
+
         return false;
     }
 

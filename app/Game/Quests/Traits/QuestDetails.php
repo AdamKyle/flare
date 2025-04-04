@@ -148,4 +148,12 @@ trait QuestDetails
 
         return true;
     }
+
+    protected function hasCompletedRequiredQuestChain(Character $character, Quest $quest): bool {
+        if (!is_null($quest->required_quest_chain)) {
+            return $character->questsCompleted->whereIn('quest_id', $quest->required_quest_chain)->count() === count($quest->required_quest_chain);
+        }
+
+        return true;
+    }
 }

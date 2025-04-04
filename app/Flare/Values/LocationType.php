@@ -33,6 +33,8 @@ class LocationType
 
     const TWSITED_MAIDENS_DUNGEONS = 10;
 
+    const CAVE_OF_MEMORIES = 11;
+
     protected static $values = [
         0 => self::PURGATORY_SMITH_HOUSE,
         1 => self::GOLD_MINES,
@@ -45,6 +47,7 @@ class LocationType
         8 => self::LORDS_STRONG_HOLD,
         9 => self::BROKEN_ANVIL,
         10 => self::TWSITED_MAIDENS_DUNGEONS,
+        11 => self::CAVE_OF_MEMORIES,
     ];
 
     /**
@@ -62,6 +65,7 @@ class LocationType
         self::LORDS_STRONG_HOLD => 'Lords Strong Hold',
         self::BROKEN_ANVIL => 'Hells Broken Anvil',
         self::TWSITED_MAIDENS_DUNGEONS => 'Twisted Maidens Dungeons',
+        self::CAVE_OF_MEMORIES => 'Cave of Memories',
     ];
 
     /**
@@ -154,5 +158,9 @@ class LocationType
 
     public function isTwistedMaidensDungeons(): bool {
         return $this->value === self::TWSITED_MAIDENS_DUNGEONS;
+    }
+
+    public function isCaveOfMemories(): bool {
+        return $this->value === self::CAVE_OF_MEMORIES;
     }
 }

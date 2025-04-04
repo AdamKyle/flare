@@ -119,7 +119,7 @@ class UpdateSkillEventTest extends TestCase
     {
         $gameSkill = $this->createGameSkill([
             'name' => 'Alchemy',
-            'type' => SkillTypeValue::ALCHEMY,
+            'type' => SkillTypeValue::ALCHEMY->value,
         ]);
         $character = $this->character->getCharacter();
 
@@ -158,7 +158,7 @@ class UpdateSkillEventTest extends TestCase
     {
         $gameSkill = $this->createGameSkill([
             'name' => 'Accuracy',
-            'type' => SkillTypeValue::TRAINING,
+            'type' => SkillTypeValue::TRAINING->value,
         ]);
 
         $character = $this->character->getCharacter();

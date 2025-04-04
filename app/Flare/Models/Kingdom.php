@@ -141,7 +141,7 @@ class Kingdom extends Model
     public function fetchKingBasedSkillValue(string $attribute): float
     {
         return $this->character->skills->filter(function ($skill) {
-            return $skill->skill_type === SkillTypeValue::EFFECTS_KINGDOM;
+            return $skill->skill_type === SkillTypeValue::EFFECTS_KINGDOM->value;
         })->first()->{$attribute};
     }
 
@@ -181,7 +181,7 @@ class Kingdom extends Model
 
         $totalDefence = $factionNpcs->sum('current_kingdom_item_defence_bonus');
 
-        return min($totalDefence, 0.95);
+        return min($totalDefence, .95);
     }
 
     public function getWallsDefence(): float

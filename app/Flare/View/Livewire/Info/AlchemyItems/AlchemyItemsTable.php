@@ -2,8 +2,8 @@
 
 namespace App\Flare\View\Livewire\Info\AlchemyItems;
 
-use App\Flare\AlchemyItemGenerator\Values\AlchemyItemType;
 use App\Flare\Models\Item;
+use App\Game\Character\CharacterInventory\Values\AlchemyItemType;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
@@ -11,11 +11,21 @@ use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
 class AlchemyItemsTable extends DataTableComponent
 {
+    /**
+     * Configures the table's primary key.
+     *
+     * @return void
+     */
     public function configure(): void
     {
         $this->setPrimaryKey('id');
     }
 
+    /**
+     * Builds the query for retrieving alchemy items.
+     *
+     * @return Builder
+     */
     public function builder(): Builder
     {
         return Item::whereNull('item_prefix_id')
@@ -24,20 +34,11 @@ class AlchemyItemsTable extends DataTableComponent
             ->whereNull('gold_bars_cost');
     }
 
-    protected function buildOptions(): array
-    {
-        return [
-            AlchemyItemType::INCREASE_STATS => 'Increases Stats',
-            AlchemyItemType::INCREASE_SKILL_TYPE => 'Increases Training Skills',
-            AlchemyItemType::INCREASE_DAMAGE => 'Increases Damage',
-            AlchemyItemType::INCREASE_ARMOUR => 'Increases Armour',
-            AlchemyItemType::INCREASE_HEALING => 'Increases Healing',
-            AlchemyItemType::INCREASE_ALCHEMY_SKILL => 'Increases Alchemy Skill',
-            AlchemyItemType::DAMAGES_KINGDOMS => 'Damages Kingdoms',
-            AlchemyItemType::HOLY_OILS => 'Holy Oils',
-        ];
-    }
-
+    /**
+     * Defines filters for the table.
+     *
+     * @return array
+     */
     public function filters(): array
     {
         return [
@@ -45,28 +46,59 @@ class AlchemyItemsTable extends DataTableComponent
                 ->options($this->buildOptions())
                 ->filter(function (Builder $builder, string $value) {
                     $builder->where('alchemy_type', $value);
-
                     return $builder;
                 }),
         ];
     }
 
+    /**
+     * Defines the columns displayed in the table.
+     *
+     * @return array
+     */
     public function columns(): array
     {
         return [
-            Column::make('Name')->searchable()->format(function ($value, $row) {
-                $itemId = Item::where('name', $value)->first()->id;
+            Column::make('Name')
+                ->searchable()
+                ->format(function ($value, $row) {
+                    $itemId = Item::where('name', $value)->first()->id;
+                    return '<a href="/items/' . $itemId . '">' . $row->name . '</a>';
+                })
+                ->html(),
+            Column::make('Gold Dust Cost')
+                ->sortable()
+                ->format(function ($value) {
+                    return number_format($value);
+                }),
+            Column::make('Shards Cost')
+                ->sortable()
+                ->format(function ($value) {
+                    return number_format($value);
+                }),
+            Column::make('Min Crafting Lv.', 'skill_level_required')
+                ->sortable(),
+            Column::make('Trivial Crafting Lv.', 'skill_level_trivial')
+                ->sortable(),
+        ];
+    }
 
-                return '<a href="/items/'.$itemId.'" >'.$row->name.'</a>';
-            })->html(),
-            Column::make('Gold Dust Cost')->sortable()->format(function ($value) {
-                return number_format($value);
-            }),
-            Column::make('Shards Cost')->sortable()->format(function ($value) {
-                return number_format($value);
-            }),
-            Column::make('Min Crafting Lv.', 'skill_level_required')->sortable(),
-            Column::make('Trivial Crafting Lv.', 'skill_level_trivial')->sortable(),
+    /**
+     * Builds an array of alchemy item type options for the filter.
+     *
+     * @return array
+     */
+    private function buildOptions(): array
+    {
+        return [
+            AlchemyItemType::INCREASE_STATS->value         => 'Increases Stats',
+            AlchemyItemType::INCREASE_SKILL_TYPE->value    => 'Increases Training Skills',
+            AlchemyItemType::INCREASE_DAMAGE->value        => 'Increases Damage',
+            AlchemyItemType::INCREASE_ARMOUR->value        => 'Increases Armour',
+            AlchemyItemType::INCREASE_HEALING->value       => 'Increases Healing',
+            AlchemyItemType::INCREASE_ALCHEMY_SKILL->value => 'Increases Alchemy Skill',
+            AlchemyItemType::DAMAGES_KINGDOMS->value       => 'Damages Kingdoms',
+            AlchemyItemType::HOLY_OILS->value              => 'Holy Oils',
         ];
     }
 }

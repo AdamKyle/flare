@@ -2,6 +2,8 @@
 
 namespace App\Game\BattleRewardProcessing\Jobs;
 
+use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
+use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -27,9 +29,10 @@ class BattleFactionHandler implements ShouldQueue
      *
      * @param FactionHandler $factionHandler
      * @param FactionLoyaltyBountyHandler $factionLoyaltyBountyHandler
+     * @param FactionLoyaltyService $factionLoyaltyService
      * @return void
      */
-    public function handle(FactionHandler $factionHandler, FactionLoyaltyBountyHandler $factionLoyaltyBountyHandler): void
+    public function handle(FactionHandler $factionHandler, FactionLoyaltyBountyHandler $factionLoyaltyBountyHandler, FactionLoyaltyService $factionLoyaltyService): void
     {
         $character = Character::find($this->characterId);
         $monster = Monster::find($this->monsterId);
@@ -45,6 +48,8 @@ class BattleFactionHandler implements ShouldQueue
         $this->handleFactionRewards($character, $monster, $factionHandler);
 
         $this->handleFactionBounties($character, $monster, $factionLoyaltyBountyHandler);
+
+        event(new FactionLoyaltyUpdate($character->user, $factionLoyaltyService->getLoyaltyInfoForPlane($character)));
     }
 
     /**

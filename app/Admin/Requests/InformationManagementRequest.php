@@ -21,7 +21,7 @@ class InformationManagementRequest extends FormRequest
     {
         return [
             'content' => 'required|string',
-            'page_name' => 'required',
+            'page_name' => 'required|string',
             'order' => 'required|string',
             'content_image' => 'nullable|file|mimes:png|max:2000',
             'live_wire_component' => 'nullable|string',

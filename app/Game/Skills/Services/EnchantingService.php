@@ -220,7 +220,7 @@ class EnchantingService
 
     protected function getEnchantingSkill(Character $character): Skill
     {
-        $gameSkill = GameSkill::where('type', SkillTypeValue::ENCHANTING)->first();
+        $gameSkill = GameSkill::where('type', SkillTypeValue::ENCHANTING->value)->first();
 
         return Skill::where('character_id', $character->id)->where('game_skill_id', $gameSkill->id)->first();
     }

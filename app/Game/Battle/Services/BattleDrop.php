@@ -8,12 +8,16 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Quest;
+use App\Flare\Models\User;
 use App\Flare\Values\AutomationType;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
+use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\DisenchantService;
+use Exception;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -23,10 +27,6 @@ class BattleDrop
 {
     use CanHaveQuestItem;
 
-    private RandomItemDropBuilder $randomItemDropBuilder;
-
-    private DisenchantService $disenchantService;
-
     private Monster $monster;
 
     private ?Location $locationWithEffect;
@@ -35,11 +35,15 @@ class BattleDrop
 
     private float $lootingChance;
 
-    public function __construct(RandomItemDropBuilder $randomItemDropBuilder, DisenchantService $disenchantService)
-    {
-        $this->randomItemDropBuilder = $randomItemDropBuilder;
-        $this->disenchantService = $disenchantService;
-    }
+    /**
+     * @param RandomItemDropBuilder $randomItemDropBuilder
+     * @param DisenchantService $disenchantService
+     * @param ShopService $shopService
+     */
+    public function __construct(
+        private readonly RandomItemDropBuilder $randomItemDropBuilder,
+        private readonly DisenchantService $disenchantService,
+        private readonly ShopService $shopService) {}
 
     /**
      * Set Monster.
@@ -136,9 +140,9 @@ class BattleDrop
     }
 
     /**
-     * Handles drops for special locations.
-     *
+     * @param Character $character
      * @return void
+     * @throws Exception
      */
     public function handleSpecialLocationQuestItem(Character $character)
     {
@@ -180,13 +184,20 @@ class BattleDrop
     }
 
     /**
-     * Depending on the map name and the location, we fetch the drop item from the cache.
+     * @param Character $character
+     * @param string $gameMapName
+     * @param Location|null $locationWithEffect
+     * @return Item|null
      */
     protected function getDropFromCache(Character $character, string $gameMapName, ?Location $locationWithEffect = null): ?Item
     {
         return $this->randomItemDropBuilder->generateItem($this->getMaxLevelBasedOnPlane($character));
     }
 
+    /**
+     * @param Character $character
+     * @return int
+     */
     protected function getMaxLevelBasedOnPlane(Character $character): int
     {
         $characterLevel = $character->level;
@@ -248,6 +259,7 @@ class BattleDrop
      * Attempts to pick up the item and give it to the player.
      *
      * @return void
+     * @throws Exception
      */
     protected function attemptToPickUpItem(Character $character, Item $item)
     {
@@ -266,13 +278,18 @@ class BattleDrop
 
     /**
      * Auto disenchants the item using the characters disenchanting skill.
+     *
+     * @param Character $character
+     * @param Item $item
+     * @throws Exception
      */
     private function autoDisenchantItem(Character $character, Item $item): void
     {
         $user = $character->user;
 
         if ($user->auto_disenchant_amount === 'all') {
-            $this->disenchantService->setUp($character->refresh())->disenchantItemWithSkill();
+
+            $this->handleDisenchantOrAutoSell($character, $item);
 
             return;
         }
@@ -280,12 +297,34 @@ class BattleDrop
         if ($user->auto_disenchant_amount === '1-billion') {
             $cost = SellItemCalculator::fetchSalePriceWithAffixes($item);
 
-            if ($cost >= 1000000000) {
+            if ($cost >= 1_000_000_000) {
                 $this->giveItemToPlayer($character, $item);
             } else {
-                $this->disenchantService->setUp($character->refresh())->disenchantItemWithSkill();
+                $this->handleDisenchantOrAutoSell($character, $item);
             }
         }
+    }
+
+    /**
+     * Handle either auto selling the item or auto disenchanting the item.
+     *
+     * @param Character $character
+     * @param Item $item
+     * @return void
+     * @throws Exception
+     */
+    private function handleDisenchantOrAutoSell(Character $character, Item $item): void {
+        $maxCurrenciesValue = new MaxCurrenciesValue($character->gold_dust, MaxCurrenciesValue::GOLD_DUST);
+
+        if ($character->user->auto_sell_item) {
+            if ($maxCurrenciesValue->canNotGiveCurrency()) {
+                $this->shopService->autoSellItem($character, $item);
+
+                return;
+            }
+        }
+
+        $this->disenchantService->setUp($character)->disenchantItemWithSkill();
     }
 
     /**

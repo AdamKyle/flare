@@ -1,15 +1,14 @@
 <p class="mt-2">
     Focus on your Intelligence and Focus stat while leveling Casting Accuracy followed by your class skill.
 </p>
-<p>Heretics will want two shields, for added dur, and two damage spells. This will allow their class skill to fire off
-    the double cast chance.</p>
+<p>Heretics can use Staves, Wands or Damage Spells. All of which help to increase your intelligence which helps you deal damage to enemies.</p>
 <x-core.alerts.info-alert title="Tip!">
     <p>
-        When you first start out, for added attack, you could go stave, two spells and a body piece. This allows you to
+        When you first start out, for added attack, you could go two wands, two damage spells and a body piece. This allows you to
         use Attack and Cast,
         and focus on Accuracy, so you can actually hit harder creatures, before switching to Casting Accuracy. You can
         read more about this in
-        <a href="/information/skill-information">Skills</a> and <a href="/information/combat">Combat</a>
+        <a href="/information/skill-information">Skills</a> and <a href="/information/combat">Combat</a>.
     </p>
 </x-core.alerts.info-alert>
 <p>Heretics also get 30% of their intelligence added to their spell damage or 15% if they have no damage spells

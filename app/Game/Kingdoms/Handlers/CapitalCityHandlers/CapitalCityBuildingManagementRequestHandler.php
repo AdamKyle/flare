@@ -16,6 +16,7 @@ use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class CapitalCityBuildingManagementRequestHandler
 {
@@ -74,6 +75,13 @@ class CapitalCityBuildingManagementRequestHandler
             if ($timeNeeded >= 15) {
                 $dispatchTime = $currentTime->clone()->addMinutes(15);
             }
+
+            Log::channel('capital_city_building_upgrades')->info('Dispatching Queue Movement', [
+                '$capitalCityBuildingQueue' => $capitalCityBuildingQueue,
+                '$character' => $character->id,
+                '$kingdom' => $kingdom->id,
+                '$dispatchTime' => $dispatchTime,
+            ]);
 
             $this->dispatchQueueMovement($capitalCityBuildingQueue, $dispatchTime);
             $this->sendOffEvents($character, $kingdom);

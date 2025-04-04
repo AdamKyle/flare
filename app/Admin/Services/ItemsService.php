@@ -60,7 +60,7 @@ class ItemsService
                 'artifact',
                 'alchemy',
             ],
-            'skillTypes' => SkillTypeValue::$namedValues,
+            'skillTypes' => SkillTypeValue::getValues(),
             'effects' => [
                 ItemEffectsValue::WALK_ON_WATER,
                 ItemEffectsValue::WALK_ON_DEATH_WATER,

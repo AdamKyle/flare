@@ -28,7 +28,7 @@ class CharacterClassRankWeaponMastery extends Model
      */
     protected $casts = [
         'class_rank_id' => 'integer',
-        'weapon_type' => 'integer',
+        'weapon_type' => 'string',
         'current_xp' => 'integer',
         'required_xp' => 'integer',
         'level' => 'integer',

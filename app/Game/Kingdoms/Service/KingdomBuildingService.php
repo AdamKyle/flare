@@ -198,7 +198,7 @@ class KingdomBuildingService
     private function calculateBuildingTimeReduction(KingdomBuilding $building, int $toLevel = 1): int|float
     {
         $skillBonus = $building->kingdom->character->skills->filter(function ($skill) {
-            return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM;
+            return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM->value;
         })->first()->building_time_reduction;
 
         if ($toLevel > 1) {

@@ -14,6 +14,7 @@ use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ElementalA
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HealingBuilder;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilder;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Character\Concerns\Boons;
 use App\Game\Character\Concerns\FetchEquipped;
 use Exception;
@@ -335,14 +336,19 @@ class CharacterStatBuilder
      *
      * @throws Exception
      */
-    public function buildDamage(string $type, bool $voided = false): int
+    public function buildDamage(string|array $type, bool $voided = false): int
     {
-
         $stat = $this->statMod($this->character->damage_stat, $voided);
 
-        if (is_null($this->equippedItems)) {
-            if ($type === 'weapon') {
+        $validWeaponTypes = array_diff(
+            array_column(ItemType::cases(), 'value'),
+            [ItemType::RING->value, ItemType::SPELL_DAMAGE->value, ItemType::SPELL_HEALING->value]
+        );
 
+        $types = is_array($type) ? $type : [$type];
+
+        if (is_null($this->equippedItems)) {
+            if (!empty(array_intersect($types, $validWeaponTypes))) {
                 if ($this->character->classType()->isAlcoholic()) {
                     return $stat + ($stat * 0.25);
                 }
@@ -352,31 +358,22 @@ class CharacterStatBuilder
                 }
 
                 $value = $stat * 0.02;
-
-                return $value < 5 ? 5 : $value;
+                return max($value, 5);
             }
 
-            if ($type === 'spell-damage' && $this->character->classType()->isHeretic()) {
+            if (in_array(ItemType::SPELL_DAMAGE->value, $types) && $this->character->classType()->isHeretic()) {
                 $value = $stat * 0.15;
-
-                return $value < 5 ? 5 : $value;
+                return max($value, 5);
             }
 
             return 0;
         }
 
-        switch ($type) {
-            case 'weapon':
-                $damage = $this->damageBuilder->buildWeaponDamage($stat, $voided);
-                break;
-            case 'ring':
-                return $this->damageBuilder->buildRingDamage();
-            case 'spell-damage':
-                $damage = $this->spellDamageBonus($this->damageBuilder->buildSpellDamage($voided), $voided);
-                break;
-            default:
-                $damage = 0;
-        }
+        $ringDamage = $this->getRingDamage($types);
+        $spellDamage = $this->getSpellDamage($types, $voided);
+        $weaponDamage = $this->getWeaponDamage($stat, $types, $validWeaponTypes, $voided);
+
+        $damage = $ringDamage + $spellDamage + $weaponDamage;
 
         $classSpecialsBonus = $this->character->classSpecialsEquipped
             ->where('equipped', true)
@@ -385,12 +382,40 @@ class CharacterStatBuilder
 
         $itemSkillBonus = 0;
 
-        if (! is_null($this->equippedItems)) {
+        if (!is_null($this->equippedItems)) {
             $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, 'base_damage');
         }
 
         return ceil($damage + ($damage * ($this->holyInfo()->fetchAttackBonus() + $classSpecialsBonus + $itemSkillBonus)));
     }
+
+    private function getRingDamage(array $types): int {
+        if (in_array(ItemType::RING->value, $types)) {
+            return $this->damageBuilder->buildRingDamage();
+        }
+
+        return 0;
+    }
+
+    private function getSpellDamage(array $types, bool $voided = false): int {
+        if (in_array(ItemType::SPELL_DAMAGE->value, $types)) {
+            return $this->spellDamageBonus(
+                $this->damageBuilder->buildSpellDamage($voided),
+                $voided
+            );
+        }
+
+        return 0;
+    }
+
+    private function getWeaponDamage(string $stat, array $types, array $validWeaponTypes, bool $voided = false): int {
+        if (!empty(array_intersect($types, $validWeaponTypes))) {
+            return $this->damageBuilder->buildWeaponDamage($stat, $voided);
+        }
+
+        return 0;
+    }
+
 
     /**
      * Add bonus to spell damage.

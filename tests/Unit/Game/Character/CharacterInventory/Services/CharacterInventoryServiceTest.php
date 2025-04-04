@@ -140,13 +140,13 @@ class CharacterInventoryServiceTest extends TestCase
             'item_prefix_id' => $this->createItemAffix(['type' => 'prefix'])->id,
         ]), 75)->getCharacter();
 
-        $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING)->first()->update([
+        $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING->value)->first()->update([
             'xp_max' => 1,
         ]);
 
         $character = $character->refresh();
 
-        $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING)->first()->update([
+        $character->skills->where('baseSkill.type', SkillTypeValue::ENCHANTING->value)->first()->update([
             'xp_max' => 1,
         ]);
 
