@@ -2,22 +2,28 @@ import { useEventSystem } from 'event-system/hooks/use-event-system';
 import { useEffect, useState } from 'react';
 
 import { SidePeek } from '../event-types/side-peek';
-import defaultSidePeekProps from './types/default-side-peek-props';
-import { ComponentForSidePeekPropsType } from './types/component-for-side-peek-props-type';
 import UseManageSidePeekVisibilityDefinition from './deffinitions/use-manage-side-peek-visibility-definition';
-import {SidePeekComponentMapper} from "../component-registration/side-peek-component-mapper";
-import {SidePeekComponentRegistrationEnum} from "../component-registration/side-peek-component-registration-enum";
+import { ComponentForSidePeekPropsType } from './types/component-for-side-peek-props-type';
+import defaultSidePeekProps from './types/default-side-peek-props';
+import { SidePeekComponentMapper } from '../component-registration/side-peek-component-mapper';
+import { SidePeekComponentRegistrationEnum } from '../component-registration/side-peek-component-registration-enum';
 
-export const useDynamicComponentVisibility = <T extends object>(): UseManageSidePeekVisibilityDefinition<T> => {
+export const useDynamicComponentVisibility = <
+  T extends object,
+>(): UseManageSidePeekVisibilityDefinition<T> => {
   const eventSystem = useEventSystem();
 
-  const [componentKey, setComponentKey] = useState<SidePeekComponentRegistrationEnum | null>(null);
-  const [componentProps, setComponentProps] = useState<ComponentForSidePeekPropsType<T>>(
-    defaultSidePeekProps as ComponentForSidePeekPropsType<T>
-  );
+  const [componentKey, setComponentKey] =
+    useState<SidePeekComponentRegistrationEnum | null>(null);
+  const [componentProps, setComponentProps] = useState<
+    ComponentForSidePeekPropsType<T>
+  >(defaultSidePeekProps as ComponentForSidePeekPropsType<T>);
 
   const emitter = eventSystem.fetchOrCreateEventEmitter<{
-    [SidePeek.SIDE_PEEK]: [SidePeekComponentRegistrationEnum, ComponentForSidePeekPropsType<T>];
+    [SidePeek.SIDE_PEEK]: [
+      SidePeekComponentRegistrationEnum,
+      ComponentForSidePeekPropsType<T>,
+    ];
   }>(SidePeek.SIDE_PEEK);
 
   useEffect(() => {
@@ -53,10 +59,9 @@ export const useDynamicComponentVisibility = <T extends object>(): UseManageSide
 
   const ComponentToRender = componentKey ? mapper[componentKey] : null;
 
-
   return {
     ComponentToRender,
     componentProps,
-    closeSidePeek
+    closeSidePeek,
   };
 };

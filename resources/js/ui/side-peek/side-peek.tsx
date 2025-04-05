@@ -33,9 +33,7 @@ const SidePeek = (props: SidePeekProps) => {
             <i className="fa-solid fa-times text-xl text-gray-700"></i>
           </button>
         </div>
-        <div className="p-4">
-          {props.children}
-        </div>
+        <div className="p-4">{props.children}</div>
       </div>
     </>
   );
