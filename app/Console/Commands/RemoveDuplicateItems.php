@@ -44,6 +44,13 @@ class RemoveDuplicateItems extends Command
             $mainItemId = min($ids);
             $ids = array_diff($ids, [$mainItemId]);
 
+            $mainItem = Item::find($mainItemId);
+
+            if (!$mainItem) {
+                $this->warn("Skipping. Main item ID {$mainItemId} does not exist.");
+                continue;
+            }
+
             $this->info("[Duplicate items] Item Name: {$duplicate->name} has " . count($ids) . " duplicates => IDs: [" . implode(', ', $ids) . "]");
 
             $this->updateRecordsForItemIds($ids, $mainItemId);
@@ -113,6 +120,12 @@ class RemoveDuplicateItems extends Command
      */
     private function updateRecord(string $modelClass, array $ids, int $mainItemId): void
     {
+        if (!Item::find($mainItemId)) {
+            $this->warn("Cannot update $modelClass: target item ID $mainItemId doesn't exist.");
+
+            return;
+        }
+
         $modelClass::whereIn('item_id', $ids)->update(['item_id' => $mainItemId]);
     }
 
