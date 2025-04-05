@@ -1,4 +1,3 @@
 export default interface UseManageSidePeekVisibilityTypeState {
-  isOpen: boolean,
-
+  isOpen: boolean;
 }

@@ -11,7 +11,6 @@ import { InfiniteScroll } from 'ui/infinite-scroll/infinite-scroll';
 const GemBagInfiniteScroll = ({
   gems,
 }: GemBagInfiniteScrollProps): ReactNode => {
-  console.log('gems', gems);
   const { visibleItems: visibleGems, handleScroll: handleInventoryScroll } =
     useInfiniteScroll({ items: gems, chunkSize: 5 });
 

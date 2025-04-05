@@ -1,24 +1,25 @@
-import clsx from "clsx";
+import clsx from 'clsx';
 import React from 'react';
 
 import SidePeekProps from 'ui/side-peek/types/side-peek-props';
 
 const SidePeek = (props: SidePeekProps) => {
-
   const handleClickingOutSide = () => {
     if (!props.allow_clicking_outside) {
       return;
     }
 
     props.on_close();
-  }
+  };
 
   return (
     <>
-      <div
-        className="fixed inset-0 z-40 bg-black bg-opacity-50"
-        onClick={handleClickingOutSide}
-      />
+      {props.is_open && (
+        <div
+          className="fixed inset-0 z-40 bg-black bg-opacity-50"
+          onClick={handleClickingOutSide}
+        />
+      )}
       <div
         className={clsx(
           'fixed top-0 right-0 h-full bg-white shadow-lg z-50 transition-transform duration-300 ease-in-out',
@@ -33,7 +34,7 @@ const SidePeek = (props: SidePeekProps) => {
           </button>
         </div>
         <div className="p-4">
-          <p>This is the side panel content.</p>
+          {props.children}
         </div>
       </div>
     </>

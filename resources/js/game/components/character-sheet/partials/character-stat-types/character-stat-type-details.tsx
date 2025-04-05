@@ -39,8 +39,6 @@ export const CharacterStatTypeDetails = ({
     return <GameDataError />;
   }
 
-  console.log(data);
-
   return (
     <div>
       <dl>

@@ -3,4 +3,4 @@ const defaultSidePeekProps = {
   allow_clicking_outside: false,
 };
 
-export default defaultSidePeekProps
+export default defaultSidePeekProps;

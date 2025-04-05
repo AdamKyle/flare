@@ -4,7 +4,7 @@ import React, { ReactNode } from 'react';
 import { SeerviceContainer } from 'service-container-provider/service-container';
 
 import { GameCard } from './components/game-card';
-import BaseSidePeek from "./components/side-peeks/base/base-side-peek";
+import BaseSidePeek from './components/side-peeks/base/base-side-peek';
 
 import GameDataProvider from 'game-data/components/game-data-provider';
 

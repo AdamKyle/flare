@@ -1,10 +1,9 @@
-import React from "react";
+import React from 'react';
 
-import { ComponentForSidePeekPropsType } from "../types/component-for-side-peek-props-type";
+import { ComponentForSidePeekPropsType } from '../types/component-for-side-peek-props-type';
 
 export default interface UseManageSidePeekVisibilityDefinition<T> {
-  isOpen: boolean;
-  componentToRender: React.ComponentType<ComponentForSidePeekPropsType<T>>;
+  ComponentToRender: React.ComponentType<ComponentForSidePeekPropsType<T>> | null;
   componentProps: ComponentForSidePeekPropsType<T>;
   closeSidePeek: () => void;
 }
