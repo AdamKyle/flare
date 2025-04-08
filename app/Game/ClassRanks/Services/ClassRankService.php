@@ -109,6 +109,7 @@ class ClassRankService
                     'current_xp' => $mastery->current_xp,
                     'required_xp' => $mastery->required_xp,
                     'mastery_name' => ucwords(str_replace('-', ' ', $mastery->weapon_type)),
+                    'level' => $mastery->level,
                 ];
 
                 $sortedWeaponMasteries[] = $masteryData;
