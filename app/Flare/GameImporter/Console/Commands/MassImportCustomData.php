@@ -36,43 +36,6 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
-
-        Artisan::call('remove:duplicate-items');
-        Artisan::call('import:game-data Skills');
-        Artisan::call('import:game-data Weapons');
-        Artisan::call('import:game-data Armour');
-        Artisan::call('import:game-data Items');
-        Artisan::call('import:game-data Locations');
-        Artisan::call('import:game-data Npcs');
-
-        Artisan::call('change:player-weapons');
-        Artisan::call('clean:market-weapons');
-        Artisan::call('update:weapons-and-armour-with-new-stats');
-        Artisan::call('add:holy-stacks-to-items');
-        Artisan::call('change:character-reincarnation-xp-penalty');
-
-        Monster::where('is_celestial_entity', true)->delete();
-
-        Artisan::call('import:game-data Monsters');
-        Artisan::call('generate:monster-cache');
-
-        Artisan::call('import:game-data Raids');
-
-        Artisan::call('import:game-data Quests');
-
-        Artisan::call('create:quest-chain-relationships');
-
-        Cache::delete('items-for-shop');
-        Cache::delete('crafting-table-data');
-
-        Artisan::call('create:character-attack-data');
-
-        Artisan::call('remove:duplicate-items');
-
-        Artisan::call('create:quest-cache');
-
-        Item::where('type', 'weapon')->delete();
-
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
