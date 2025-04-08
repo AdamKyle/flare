@@ -37,7 +37,7 @@ class UpdateCharactersForClassRanks extends Command
                             'level' => 0,
                         ]);
 
-                        $classRank->load('weaponMasteries');
+                        $classRank->load('weaponMasteries', 'gameClass');
                     }
 
                     $this->syncWeaponMasteries($classRank);
@@ -52,32 +52,35 @@ class UpdateCharactersForClassRanks extends Command
 
     protected function syncWeaponMasteries(CharacterClassRank $classRank): void
     {
-        $existingMasteries = $classRank->weaponMasteries->keyBy('weapon_type');
+        $existing = [];
+        foreach ($classRank->weaponMasteries as $mastery) {
+            $existing[$mastery->weapon_type] = $mastery;
+        }
 
         $className = strtolower(trim($classRank->gameClass->name));
-        $preferredTypes = ItemTypeMapping::getForClass($className);
-        $preferredTypes = is_array($preferredTypes) ? $preferredTypes : ($preferredTypes ? [$preferredTypes] : []);
-        $firstPreferred = $preferredTypes[0] ?? null;
+        $preferred = ItemTypeMapping::getForClass($className);
+        $preferred = is_array($preferred) ? $preferred : ($preferred ? [$preferred] : []);
+        $firstPreferred = $preferred[0] ?? null;
 
         $allTypes = ItemType::allWeaponTypes();
+        $misaligned = $classRank->weaponMasteries->whereNotIn('weapon_type', $allTypes)->values();
+        $misalignedIndex = 0;
 
         foreach ($allTypes as $type) {
-            $existing = $classRank->weaponMasteries->firstWhere('weapon_type', $type);
-
-            if ($existing) {
+            if (isset($existing[$type])) {
                 continue;
             }
 
-            $misaligned = $classRank->weaponMasteries->first(fn($m) => !in_array($m->weapon_type, $allTypes));
-            if ($misaligned) {
-                $misaligned->update(['weapon_type' => $type]);
+            if ($misalignedIndex < $misaligned->count()) {
+                $misaligned->get($misalignedIndex)->update(['weapon_type' => $type]);
+                $misalignedIndex++;
                 continue;
             }
 
             $level = 0;
             if ($firstPreferred && $firstPreferred === $type) {
                 $level = 5;
-            } elseif (in_array($type, $preferredTypes)) {
+            } elseif (in_array($type, $preferred)) {
                 $level = 2;
             }
 

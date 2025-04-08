@@ -71,13 +71,6 @@ export default class QuestNode extends React.Component<QuestNodeProps, any> {
     }
 
     render() {
-        if (this.props.quest?.name === "Searching for a coin") {
-            console.log(
-                !this.isRequiredQuestComplete(),
-                !this.isAllRequiredQuestsInChainComplete(),
-                this.isParentQuestComplete(),
-            );
-        }
         return (
             <div>
                 <button

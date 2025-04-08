@@ -119,7 +119,7 @@ export default class ItemSkillDetails extends React.Component<
 
     render() {
         const skillData = this.props.skill_progression_data;
-        console.log("skillData", skillData);
+
         const parentSkill: ItemSkill | undefined = findParentSkill(
             this.props.skill_progression_data.item_skill,
             this.props.skills,
