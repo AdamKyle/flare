@@ -207,6 +207,8 @@ export default class CharacterClassRanks extends React.Component<
             );
         }
 
+        console.log(this.state.class_name_selected);
+
         return (
             <div className="max-h-[375px] overflow-y-auto">
                 {this.state.open_class_details &&
