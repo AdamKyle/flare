@@ -239,7 +239,7 @@ class SpecialtyShop
 
         return $character->inventory->slots->filter(function ($slot) use ($itemType) {
             if ($slot->item->type === $itemType) {
-                if ($slot->item->skill_level_required === 400) {
+                if ($slot->item->skill_level_trivial >= 400) {
                     return $slot;
                 }
             }

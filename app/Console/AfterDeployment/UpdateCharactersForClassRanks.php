@@ -2,60 +2,45 @@
 
 namespace App\Console\AfterDeployment;
 
+use Illuminate\Console\Command;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterClassRank;
 use App\Flare\Models\GameClass;
+use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\ClassRanks\Values\ClassRankValue;
-use App\Game\ClassRanks\Values\WeaponMasteryValue;
-use Illuminate\Console\Command;
 
 class UpdateCharactersForClassRanks extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'assign:class-ranks';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Assigns Class Ranks to Characters';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): void
     {
-        $gameClasses = GameClass::all();
+        $gameClasses = GameClass::all()->keyBy('id');
 
         $bar = $this->output->createProgressBar(Character::count());
         $bar->start();
 
-        Character::chunkById(100, function ($characters) use ($gameClasses, $bar) {
+        Character::with(['classRanks.weaponMasteries', 'classRanks.gameClass'])->chunkById(100, function ($characters) use ($gameClasses, $bar) {
             foreach ($characters as $character) {
                 foreach ($gameClasses as $gameClass) {
-                    $classRank = $character->classRanks()->where('game_class_id', $gameClass->id)->first();
-                    $hasGameClass = ! is_null($classRank);
+                    $classRank = $character->classRanks->firstWhere('game_class_id', $gameClass->id);
 
-                    if ($hasGameClass) {
-                        $this->assignWeaponMasteriesToClassRanks($classRank);
+                    if (!$classRank) {
+                        $classRank = $character->classRanks()->create([
+                            'character_id' => $character->id,
+                            'game_class_id' => $gameClass->id,
+                            'current_xp' => 0,
+                            'required_xp' => ClassRankValue::XP_PER_LEVEL,
+                            'level' => 0,
+                        ]);
 
-                        continue;
+                        $classRank->load('weaponMasteries', 'gameClass');
                     }
 
-                    $classRank = $character->classRanks()->create([
-                        'character_id' => $character->id,
-                        'game_class_id' => $gameClass->id,
-                        'current_xp' => 0,
-                        'required_xp' => ClassRankValue::XP_PER_LEVEL,
-                        'level' => 0,
-                    ]);
-
-                    $this->assignWeaponMasteriesToClassRanks($classRank);
+                    $this->syncWeaponMasteries($classRank);
                 }
 
                 $bar->advance();
@@ -65,92 +50,47 @@ class UpdateCharactersForClassRanks extends Command
         $bar->finish();
     }
 
-    protected function assignWeaponMasteriesToClassRanks(CharacterClassRank $classRank): void
+    protected function syncWeaponMasteries(CharacterClassRank $classRank): void
     {
-        foreach (WeaponMasteryValue::getTypes() as $type) {
+        $existing = [];
+        foreach ($classRank->weaponMasteries as $mastery) {
+            $existing[$mastery->weapon_type] = $mastery;
+        }
 
-            $foundMastery = $classRank->weaponMasteries()->where('weapon_type', $type)->first();
+        $className = strtolower(trim($classRank->gameClass->name));
+        $preferred = ItemTypeMapping::getForClass($className);
+        $preferred = is_array($preferred) ? $preferred : ($preferred ? [$preferred] : []);
+        $firstPreferred = $preferred[0] ?? null;
 
-            if (! is_null($foundMastery)) {
+        $allTypes = ItemType::allWeaponTypes();
+        $misaligned = $classRank->weaponMasteries->whereNotIn('weapon_type', $allTypes)->values();
+        $misalignedIndex = 0;
+
+        foreach ($allTypes as $type) {
+            if (isset($existing[$type])) {
                 continue;
+            }
+
+            if ($misalignedIndex < $misaligned->count()) {
+                $misaligned->get($misalignedIndex)->update(['weapon_type' => $type]);
+                $misalignedIndex++;
+                continue;
+            }
+
+            $level = 0;
+            if ($firstPreferred && $firstPreferred === $type) {
+                $level = 5;
+            } elseif (in_array($type, $preferred)) {
+                $level = 2;
             }
 
             $classRank->weaponMasteries()->create([
                 'character_class_rank_id' => $classRank->id,
                 'weapon_type' => $type,
-                'current_xp' => 0,
-                'required_xp' => WeaponMasteryValue::XP_PER_LEVEL,
-                'level' => $this->getDefaultLevel($classRank, $type),
+                'current_xp' => $level * ClassRankValue::XP_PER_LEVEL,
+                'required_xp' => ClassRankValue::XP_PER_LEVEL,
+                'level' => $level,
             ]);
         }
-    }
-
-    protected function getDefaultLevel(CharacterClassRank $classRank, int $type)
-    {
-        if (($classRank->gameClass->type()->isFighter() ||
-             $classRank->gameClass->type()->isThief() ||
-             $classRank->gameClass->type()->isVampire() ||
-             $classRank->gameClass->type()->isPrisoner() ||
-             $classRank->gameClass->type()->isBlackSmith()) && (new WeaponMasteryValue($type))->isWeapon()) {
-            return 5;
-        }
-
-        if (($classRank->gameClass->type()->isHeretic() || $classRank->gameClass->type()->isArcaneAlchemist()) && (new WeaponMasteryValue($type))->isStaff()) {
-            return 5;
-        }
-
-        if (($classRank->gameClass->type()->isHeretic() || $classRank->gameClass->type()->isArcaneAlchemist()) && (new WeaponMasteryValue($type))->isDamageSpell()) {
-            return 5;
-        }
-
-        if (($classRank->gameClass->type()->isProphet()) && (new WeaponMasteryValue($type))->isHealingSpell()) {
-            return 5;
-        }
-
-        if (($classRank->gameClass->type()->isRanger() || $classRank->gameClass->type()->isArcaneAlchemist()) && (new WeaponMasteryValue($type))->isHealingSpell()) {
-            return 2;
-        }
-
-        if (($classRank->gameClass->type()->isRanger()) && (new WeaponMasteryValue($type))->isBow()) {
-            return 5;
-        }
-
-        if (($classRank->gameClass->type()->isBookBinder()) && (new WeaponMasteryValue($type))->isScratchAwl()) {
-            return 5;
-        }
-
-        if (($classRank->gameClass->type()->isThief() || $classRank->gameClass->type()->isArcaneAlchemist()) && (new WeaponMasteryValue($type))->isBow()) {
-            return 2;
-        }
-
-        if (($classRank->gameClass->type()->isBlackSmith()) && (new WeaponMasteryValue($type))->isHammer()) {
-            return 5;
-        }
-
-        if (($classRank->gameClass->type()->isMerchant()) && (new WeaponMasteryValue($type))->isBow()) {
-            return 3;
-        }
-
-        if (($classRank->gameClass->type()->isMerchant()) && (new WeaponMasteryValue($type))->isStaff()) {
-            return 5;
-        }
-
-        if (($classRank->gameClass->type()->isGunslinger()) && (new WeaponMasteryValue($type))->isGun()) {
-            return 5;
-        }
-
-        if (($classRank->gameClass->type()->isDancer()) && (new WeaponMasteryValue($type))->isFan()) {
-            return 5;
-        }
-
-        if (($classRank->gameClass->type()->isCleric()) && (new WeaponMasteryValue($type))->isMace()) {
-            return 5;
-        }
-
-        if (($classRank->gameClass->type()->isBookBinder()) && (new WeaponMasteryValue($type))->isScratchAwl()) {
-            return 5;
-        }
-
-        return 0;
     }
 }

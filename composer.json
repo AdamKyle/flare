@@ -11,7 +11,7 @@
         "php": ">=8.4",
         "bkwld/cloner": "^3.11.0",
         "christianessl/landmap-generation": "^1.0",
-        "deployer/deployer": "v7.2.0",
+        "deployer/deployer": "v7.5.12",
         "doctrine/dbal": "^3.1",
         "guzzlehttp/guzzle": "^7.0.1",
         "http-interop/http-factory-guzzle": "^1.0",

@@ -16,6 +16,7 @@ use App\Flare\Models\User;
 use App\Flare\Values\BaseSkillValue;
 use App\Flare\Values\BaseStatValue;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
+use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
 use App\Game\ClassRanks\Values\ClassRankValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use App\Game\Core\Values\FactionLevel;
@@ -107,7 +108,16 @@ class CharacterBuilderService
             'character_id' => $this->character->id,
         ]);
 
-        $starterWeaponId = Item::where('type', 'weapon')->whereNull('item_suffix_id')->whereNull('item_prefix_id')->orderBy('cost', 'asc')->first()->id;
+        $types = ItemTypeMapping::getForClass($this->character->class->name);
+
+
+        if (is_array($types)) {
+            $weaponType = $types[0];
+        } else {
+            $weaponType = $types;
+        }
+
+        $starterWeaponId = Item::where('type', $weaponType)->whereNull('item_suffix_id')->whereNull('item_prefix_id')->where('skill_level_required', 1)->first()->id;
 
         $this->character->inventory->slots()->create([
             'inventory_id' => $this->character->inventory->id,
