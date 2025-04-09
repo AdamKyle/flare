@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import UseGetCharacterGemBagDefinition from './definitions/use-get-character-gem-bag-definition';
 import UseGetCharacterGemBagState from './types/use-get-character-gem-bag-state';
-import BaseGemDetails from '../../../../../../api-definitions/items/base-gem-details';
+import BaseGemDetails from '../../../../../api-definitions/items/base-gem-details';
 
 export const useGetCharacterGemBag = (
   params: ApiParametersDefinitions

@@ -1,6 +1,6 @@
-import { BaseItemDetails } from '../../../../../api-definitions/items/base-item-details';
-import { InventoryPositionDefinition } from '../enums/equipment-positions';
-import { InventoryItemTypes } from '../enums/inventory-item-types';
+import { BaseItemDetails } from '../../../../api-definitions/items/base-item-details';
+import { InventoryPositionDefinition } from '../../../character-sheet/partials/character-inventory/enums/equipment-positions';
+import { InventoryItemTypes } from '../../../character-sheet/partials/character-inventory/enums/inventory-item-types';
 
 export default interface BaseInventoryItemDefinition extends BaseItemDetails {
   item_id: number;

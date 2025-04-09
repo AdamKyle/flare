@@ -1,7 +1,5 @@
 import React, { ReactNode } from 'react';
 
-import { CharacterInventoryApiUrls } from './api/enums/character-inventory-api-urls';
-import { useGetCharacterInventory } from './api/hooks/use-get-character-inventory';
 import Backpack from './backpack';
 import { Position } from './enums/equipment-positions';
 import { InventoryItemTypes } from './enums/inventory-item-types';
@@ -14,6 +12,8 @@ import InventorySectionProps from './types/inventory-section-props';
 import UsableInventory from './usable-inventory';
 import { fetchEquippedArmour } from './utils/fetch-equipped-armour';
 import { inventoryIconButtons } from './utils/inventory-icon-buttons';
+import { CharacterInventoryApiUrls } from '../../../side-peeks/character-inventory/api/enums/character-inventory-api-urls';
+import { useGetCharacterInventory } from '../../../side-peeks/character-inventory/api/hooks/use-get-character-inventory';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 

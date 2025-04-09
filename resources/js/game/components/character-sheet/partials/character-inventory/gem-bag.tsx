@@ -1,9 +1,9 @@
 import React, { ReactNode } from 'react';
 
-import { CharacterInventoryApiUrls } from './api/enums/character-inventory-api-urls';
-import { useGetCharacterGemBag } from './api/hooks/use-get-character-gem-bag';
 import GemBagInfiniteScroll from './gem-bag-inifinite-scroll';
 import GemBagProps from './types/gem-bag-props';
+import { CharacterInventoryApiUrls } from '../../../side-peeks/character-inventory/api/enums/character-inventory-api-urls';
+import { useGetCharacterGemBag } from '../../../side-peeks/character-inventory/api/hooks/use-get-character-gem-bag';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 

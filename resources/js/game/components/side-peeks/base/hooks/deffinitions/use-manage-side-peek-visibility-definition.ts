@@ -1,11 +1,11 @@
-import React from 'react';
+import React from "react";
 
-import { ComponentForSidePeekPropsType } from '../types/component-for-side-peek-props-type';
+import { SidePeekComponentPropsMap } from '../../component-registration/side-peek-component-props-map';
 
-export default interface UseManageSidePeekVisibilityDefinition<T> {
-  ComponentToRender: React.ComponentType<
-    ComponentForSidePeekPropsType<T>
-  > | null;
-  componentProps: ComponentForSidePeekPropsType<T>;
+export type AllSidePeekProps = SidePeekComponentPropsMap[keyof SidePeekComponentPropsMap];
+
+export default interface UseManageSidePeekVisibilityDefinition {
+  ComponentToRender: React.ComponentType<AllSidePeekProps> | null;
+  componentProps: AllSidePeekProps;
   closeSidePeek: () => void;
 }

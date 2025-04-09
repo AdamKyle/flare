@@ -1,14 +1,11 @@
 import React from 'react';
 
-import { SidePeekComponentRegistrationEnum } from './side-peek-component-registration-enum';
-import BackPack from '../../character-inventory/backpack';
-import { ComponentForSidePeekPropsType } from '../hooks/types/component-for-side-peek-props-type';
+import {SidePeekComponentRegistry} from "./side-peek-component-registery";
 
-export const SidePeekComponentMapper = <T extends object>() => {
-  return {
-    [SidePeekComponentRegistrationEnum.BACKPACK]: BackPack,
-  } as Record<
-    SidePeekComponentRegistrationEnum,
-    React.ComponentType<ComponentForSidePeekPropsType<T>>
+export const SidePeekComponentMapper = Object.fromEntries(
+  Object.entries(SidePeekComponentRegistry).map(([key, { component }]) => [key, component])
+) as {
+  [K in keyof typeof SidePeekComponentRegistry]: React.ComponentType<
+    typeof SidePeekComponentRegistry[K]['props']
   >;
 };

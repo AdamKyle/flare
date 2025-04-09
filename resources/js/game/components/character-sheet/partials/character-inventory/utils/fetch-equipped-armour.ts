@@ -1,4 +1,4 @@
-import BaseInventoryItemDefinition from '../api-definitions/base-inventory-item-definition';
+import BaseInventoryItemDefinition from '../../../../side-peeks/character-inventory/api-definitions/base-inventory-item-definition';
 import { InventoryItemTypes } from '../enums/inventory-item-types';
 
 type PartialInventoryItemTypes =

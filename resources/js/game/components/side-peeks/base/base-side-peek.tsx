@@ -6,10 +6,11 @@ import SidePeek from 'ui/side-peek/side-peek';
 
 const BaseSidePeek = () => {
   const { ComponentToRender, componentProps, closeSidePeek } =
-    useDynamicComponentVisibility<Record<string, unknown>>();
+    useDynamicComponentVisibility();
 
   return (
     <SidePeek
+      title={componentProps.title}
       is_open={componentProps.is_open}
       on_close={closeSidePeek}
       allow_clicking_outside={componentProps.allow_clicking_outside}

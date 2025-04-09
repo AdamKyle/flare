@@ -1,6 +1,6 @@
 import { match } from 'ts-pattern';
 
-import BaseInventoryItemDefinition from '../api-definitions/base-inventory-item-definition';
+import BaseInventoryItemDefinition from '../../../../side-peeks/character-inventory/api-definitions/base-inventory-item-definition';
 import {
   defaultPositionImage,
   defaultPositionImageAlt,

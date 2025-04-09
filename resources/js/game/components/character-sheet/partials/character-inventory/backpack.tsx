@@ -1,10 +1,10 @@
 import { isEmpty } from 'lodash';
 import React, { ReactNode } from 'react';
 
-import BaseInventoryItemDefinition from './api-definitions/base-inventory-item-definition';
 import BackpackItem from './backpack-item';
 import { useInfiniteScroll } from './hooks/use-infinite-scroll';
 import BackpackProps from './types/backpack-props';
+import BaseInventoryItemDefinition from '../../../side-peeks/character-inventory/api-definitions/base-inventory-item-definition';
 
 import BackButton from 'ui/buttons/back-button';
 import { InfiniteScroll } from 'ui/infinite-scroll/infinite-scroll';

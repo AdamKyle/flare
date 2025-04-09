@@ -1,10 +1,10 @@
 import { isEmpty } from 'lodash';
 import React, { ReactNode } from 'react';
 
-import BaseInventoryItemDefinition from './api-definitions/base-inventory-item-definition';
 import { useInfiniteScroll } from './hooks/use-infinite-scroll';
 import UsableInventoryProps from './types/usable-inventory-props';
 import UsableItem from './usable-item';
+import BaseInventoryItemDefinition from '../../../side-peeks/character-inventory/api-definitions/base-inventory-item-definition';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
