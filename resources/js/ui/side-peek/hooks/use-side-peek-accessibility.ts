@@ -14,10 +14,10 @@ interface SidePeekAccessibilityDefinition {
 }
 
 export const useSidePeekAccessibility = ({
-                                           is_open,
-                                           allow_clicking_outside,
-                                           on_close,
-                                         }: SidePeekAccessibilityProps): SidePeekAccessibilityDefinition=> {
+  is_open,
+  allow_clicking_outside,
+  on_close,
+}: SidePeekAccessibilityProps): SidePeekAccessibilityDefinition => {
   const dialogRef = useRef<HTMLDivElement>(null);
 
   if (is_open && dialogRef.current) {

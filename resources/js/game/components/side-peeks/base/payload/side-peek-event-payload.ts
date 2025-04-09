@@ -1,4 +1,4 @@
-import {SidePeekComponentPropsMap} from "../component-registration/side-peek-component-props-map";
+import { SidePeekComponentPropsMap } from '../component-registration/side-peek-component-props-map';
 
 // SidePeekEventPayload is a union type that maps each SidePeekComponentRegistrationEnum key
 // to a tuple containing:
@@ -11,4 +11,3 @@ import {SidePeekComponentPropsMap} from "../component-registration/side-peek-com
 export type SidePeekEventPayload = {
   [K in keyof SidePeekComponentPropsMap]: [K, SidePeekComponentPropsMap[K]];
 }[keyof SidePeekComponentPropsMap];
-

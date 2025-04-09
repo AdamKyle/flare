@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import React from 'react';
 
-import {useSidePeekAccessibility} from "ui/side-peek/hooks/use-side-peek-accessibility";
+import { useSidePeekAccessibility } from 'ui/side-peek/hooks/use-side-peek-accessibility';
 import SidePeekProps from 'ui/side-peek/types/side-peek-props';
 
 const SidePeek = (props: SidePeekProps) => {
