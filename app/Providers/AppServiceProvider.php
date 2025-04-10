@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Console\AfterDeployment\FixFactionLoyaltyCraftingTasks;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
@@ -90,6 +91,7 @@ class AppServiceProvider extends ServiceProvider
             UpdateWeaponsAndArmourWithNewStats::class,
             ChangeWeaponTypesForClassRanks::class,
             CreateQuestChainRelationships::class,
+            FixFactionLoyaltyCraftingTasks::class,
 
             // Development Commands:
             CreateCharacter::class,
