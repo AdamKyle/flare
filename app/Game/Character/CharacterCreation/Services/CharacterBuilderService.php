@@ -117,7 +117,14 @@ class CharacterBuilderService
             $weaponType = $types;
         }
 
-        $starterWeaponId = Item::where('type', $weaponType)->whereNull('item_suffix_id')->whereNull('item_prefix_id')->where('skill_level_required', 1)->first()->id;
+        $starterWeaponId = Item::where('type', $weaponType)
+            ->whereNull('item_suffix_id')
+            ->whereNull('item_prefix_id')
+            ->whereNull('specialty_type')
+            ->doesntHave('appliedHolyStacks')
+            ->doesntHave('sockets')
+            ->where('skill_level_required', 1)
+            ->first()->id;
 
         $this->character->inventory->slots()->create([
             'inventory_id' => $this->character->inventory->id,

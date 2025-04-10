@@ -36,6 +36,11 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
+
+        Artisan::call('import:game-data Armour');
+        Artisan::call('import:game-data Weapons');
+        Artisan::call('clean:duplicate-craftable-items');
+
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
