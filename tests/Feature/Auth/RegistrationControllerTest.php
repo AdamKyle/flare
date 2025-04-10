@@ -32,10 +32,13 @@ class RegistrationControllerTest extends TestCase
     {
         parent::setUp();
 
+        // The default class for the factory is fighter,
+        // Fighters use swords by default.
         $this->createItem([
-            'name' => 'Rusty Dagger',
-            'type' => 'weapon',
+            'name' => 'Rusty blade',
+            'type' => 'sword',
             'base_damage' => 3,
+            'skill_level_required' => 1,
         ]);
 
         $this->createPassiveSkill();
