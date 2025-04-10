@@ -14,6 +14,7 @@ use App\Flare\Models\Npc;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MapNameValue;
 use App\Game\Events\Values\EventType;
+use Exception;
 use Illuminate\Console\Command;
 
 class AssignNewNpcsToFactionLoyalty extends Command
@@ -90,6 +91,8 @@ class AssignNewNpcsToFactionLoyalty extends Command
                     'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
                     'fame_tasks' => array_merge($bountyTasks, $craftingTasks),
                 ]);
+
+                $this->info('Created for: ' . $npc->real_name);
             }
         }
 
@@ -236,6 +239,7 @@ class AssignNewNpcsToFactionLoyalty extends Command
      * @param string $type
      * @param string $gamMapName
      * @return Item
+     * @throws Exception
      */
     private function getItemForCraftingTask(string $type, string $gamMapName): Item
     {
@@ -247,7 +251,7 @@ class AssignNewNpcsToFactionLoyalty extends Command
             ->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
             ->whereNull('specialty_type');
 
-        if ($gameMapValue->isSurface() || $gameMapValue->isTheIcePlane()) {
+        if ($gameMapValue->isSurface() || $gameMapValue->isTheIcePlane() || $gameMapValue->isDelusionalMemories()) {
             $item->where('skill_level_required', '<=', 50);
         }
 
@@ -261,6 +265,14 @@ class AssignNewNpcsToFactionLoyalty extends Command
 
         if ($gameMapValue->isHell()) {
             $item->where('skill_level_required', '<=', 300);
+        }
+
+        if ($gameMapValue->isPurgatory()) {
+            $item->where('skill_level_required', '<=', 350);
+        }
+
+        if ($gameMapValue->isTwistedMemories()) {
+            $item->where('skill_level_required', '<=', 370);
         }
 
         return $item->where('crafting_type', $type)->first();

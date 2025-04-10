@@ -13,6 +13,70 @@ use Illuminate\Support\Facades\DB;
 
 class RemoveDuplicateItems extends Command
 {
+
+    private $skillLevelRequiredForCraftableItems = [
+        1,
+        5,
+        7,
+        10,
+        12,
+        15,
+        16,
+        18,
+        20,
+        23,
+        25,
+        27,
+        29,
+        31,
+        33,
+        35,
+        37,
+        40,
+        41,
+        44,
+        46,
+        48,
+        50,
+        52,
+        56,
+        63,
+        69,
+        76,
+        82,
+        88,
+        96,
+        104,
+        110,
+        116,
+        123,
+        132,
+        141,
+        149,
+        157,
+        165,
+        173,
+        181,
+        189,
+        195,
+        201,
+        209,
+        222,
+        236,
+        250,
+        265,
+        278,
+        288,
+        305,
+        317,
+        330,
+        344,
+        360,
+        375,
+        389,
+    ];
+
+
     /**
      * The name and signature of the console command.
      *
@@ -34,6 +98,28 @@ class RemoveDuplicateItems extends Command
      */
     public function handle(): void
     {
+
+        $this->cleanUpDuplicates();
+
+        $this->cleanUpCraftableItems();
+
+        Artisan::call('cleanup:unused-items');
+
+        $this->info('All done.');
+    }
+
+    private function cleanUpCraftableItems(): void {
+        foreach ($this->skillLevelRequiredForCraftableItems as $skillLevel) {
+            Artisan::call('clean:duplicate-craftable-items '. $skillLevel);
+        }
+    }
+
+    /**
+     * Clean up duplicate items.
+     *
+     * @return void
+     */
+    private function cleanUpDuplicates(): void {
         $idsToRemove = [];
         $idsToCleanUp = [];
 
@@ -62,10 +148,6 @@ class RemoveDuplicateItems extends Command
         $this->cleanUpDuplicateItemsWithoutRelations($idsToRemove, $idsToCleanUp);
         $this->removeItems($idsToRemove);
         $this->cleanUpItems($idsToCleanUp);
-
-        Artisan::call('cleanup:unused-items');
-
-        $this->info('All done.');
     }
 
     /**

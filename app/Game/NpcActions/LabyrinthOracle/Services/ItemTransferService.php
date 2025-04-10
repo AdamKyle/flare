@@ -104,7 +104,7 @@ class ItemTransferService
         $this->itemToTransferToDuplicated = $this->itemToTransferToDuplicated->refresh();
 
         $itemSlotToTransferFrom->update([
-            'item_id' => $this->itemToTransferFromDuplicated->id,
+            'item_id' => $this->getProperItemFromAfterTransfer($this->itemToTransferFromDuplicated)->id,
         ]);
 
         $itemSlotToTransferTo->update([
@@ -119,6 +119,31 @@ class ItemTransferService
             'message' => 'Transferred attributes (Enchantments, Holy Oils and Gems) from: '.$this->itemToTransferFromDuplicated->affix_name.' To: '.$this->itemToTransferToDuplicated->affix_name.'. Check Server Messages (Mobile: Chat Tabs Drop Down -> Server Messages) for link to new item!',
             'inventory' => $this->fetchInventoryItems($character),
         ]);
+    }
+
+    private function getProperItemFromAfterTransfer(Item $itemToMoveFrom): Item {
+        $isEmptyItem = is_null($itemToMoveFrom->item_suffix_id) &&
+            is_null($itemToMoveFrom->item_prefix_id) &&
+            is_null($itemToMoveFrom->specialty_type) &&
+            $itemToMoveFrom->appliedHolyStacks->isEmpty() &&
+            $itemToMoveFrom->sockets->isEmpty();
+
+        if ($isEmptyItem) {
+            $itemToGiveBack = Item::where('name', $itemToMoveFrom->name)
+                ->whereNull('item_suffix_id')
+                ->whereNull('item_prefix_id')
+                ->whereNull('specialty_type')
+                ->doesntHave('appliedHolyStacks')
+                ->doesntHave('sockets')
+                ->first();
+
+            $itemToMoveFrom->delete();
+
+            return $itemToGiveBack;
+        }
+
+        return $itemToMoveFrom;
+
     }
 
     protected function cannotMoveGems(Character $character, Item $item): bool
