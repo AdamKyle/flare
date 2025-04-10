@@ -89,6 +89,7 @@ class CleanUpDuplicateWeapons extends Command
         }
 
         $firstItemToKeep = null;
+        $originalCount = $items->count();
 
         foreach ($items as $item) {
             if (is_null($firstItemToKeep)) {
@@ -102,5 +103,7 @@ class CleanUpDuplicateWeapons extends Command
 
             $item->delete();
         }
+
+        $this->info('Cleaned: ' . $originalCount . ' of type: ' . $weaponType);
     }
 }
