@@ -8,6 +8,7 @@ use App\Flare\Models\InventorySet;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
+use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Flare\Values\ArmourTypes;
@@ -23,6 +24,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
+use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use League\Fractal\Resource\Collection as LeagueCollection;
 
 class CharacterInventoryService
@@ -32,52 +34,52 @@ class CharacterInventoryService
     /**
      * @var Character
      */
-    private $character;
+    private Character $character;
 
     /**
      * @var InventorySlot
      */
-    private $inventorySlot;
+    private InventorySlot $inventorySlot;
+
+    /**
+     * @var Collection
+     */
+    private Collection $inventory;
 
     /**
      * @var array
      */
-    private $positions;
+    private array $positions;
 
+    /**
+     * @var bool
+     */
     private bool $isInventorySetIsEquipped = false;
 
+    /**
+     * @var string
+     */
     private string $inventorySetEquippedName = '';
 
-    private Collection $inventory;
-
-    private InventoryTransformer $inventoryTransformer;
-
-    private UsableItemTransformer $usableItemTransformer;
-
-    private MassDisenchantService $massDisenchantService;
-
-    private UpdateCharacterSkillsService $updateCharacterSkillsService;
-
-    private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler;
-
-    private Manager $manager;
-
+    /**
+     * @param InventoryTransformer $inventoryTransformer
+     * @param UsableItemTransformer $usableItemTransformer
+     * @param MassDisenchantService $massDisenchantService
+     * @param UpdateCharacterSkillsService $updateCharacterSkillsService
+     * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler
+     * @param Pagination $pagination
+     * @param Manager $manager
+     */
     public function __construct(
-        InventoryTransformer $inventoryTransformer,
-        UsableItemTransformer $usableItemTransformer,
-        MassDisenchantService $massDisenchantService,
-        UpdateCharacterSkillsService $updateCharacterSkillsService,
-        UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler,
-        Manager $manager,
+        private readonly InventoryTransformer $inventoryTransformer,
+        private readonly UsableItemTransformer $usableItemTransformer,
+        private readonly MassDisenchantService $massDisenchantService,
+        private readonly UpdateCharacterSkillsService $updateCharacterSkillsService,
+        private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler,
+        private readonly Pagination $pagination,
+        private readonly Manager $manager,
 
-    ) {
-        $this->inventoryTransformer = $inventoryTransformer;
-        $this->usableItemTransformer = $usableItemTransformer;
-        $this->massDisenchantService = $massDisenchantService;
-        $this->updateCharacterSkillsService = $updateCharacterSkillsService;
-        $this->updateCharacterAttackTypesHandler = $updateCharacterAttackTypesHandler;
-        $this->manager = $manager;
-    }
+    ) {}
 
     /**
      * Set the character
@@ -289,7 +291,7 @@ class CharacterInventoryService
     /**
      * Returns the quest items.
      */
-    public function getQuestItems(): array
+    public function getQuestItems(): Collection
     {
         $inventory = Inventory::where('character_id', $this->character->id)->first();
 
@@ -298,9 +300,7 @@ class CharacterInventoryService
                 ->where('items.type', 'quest');
         })->select('inventory_slots.*')->get();
 
-        $slots = new LeagueCollection($slots, $this->inventoryTransformer);
-
-        return $this->manager->createData($slots)->toArray();
+        return $slots;
     }
 
     /**
@@ -356,19 +356,36 @@ class CharacterInventoryService
      *
      * - Does not include equipped, usable or quest items.
      * - Only comes from inventory, does not include sets.
+     *
+     * @param int $perPage
+     * @param int $page
+     * @return array
      */
-    public function fetchCharacterInventory(): array
+    public function fetchCharacterInventory(int $perPage = 10, int $page = 1): array
     {
-
         $slots = $this->getInventoryCollection();
 
-        $sortedStats = $slots->pluck('item')->mapWithKeys(fn($item) => [
-            $item->affix_name => $item->getTotalPercentageForStat($this->character->damage_stat)
-        ]);
+        return $this->buildPaginatedDate($slots, $perPage, $page);
+    }
 
-        $slots = new LeagueCollection($slots, $this->inventoryTransformer);
+    public function fetchCharacterQuestItems(int $perPage = 10, int $page = 1): array {
+        $slots = $this->getQuestItems();
 
-        return $this->manager->createData($slots)->toArray();
+        return $this->buildPaginatedDate($slots, $perPage, $page);
+    }
+
+    private function buildPaginatedDate(collection $slots, int $perPage, int $page): array {
+        $paginator = $this->pagination->paginateCollection($slots, $perPage, $page);
+
+        $slots = new LeagueCollection($paginator->items(), $this->inventoryTransformer);
+
+        $slots->setPaginator(new IlluminatePaginatorAdapter($paginator));
+
+        $data = $this->manager->createData($slots)->toArray();
+
+        $data['meta']['can_load_more'] = $paginator->hasMorePages();
+
+        return $data;
     }
 
     /**

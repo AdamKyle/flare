@@ -1,10 +1,11 @@
 import { useEventSystem } from 'event-system/hooks/use-event-system';
 
+import UseOpenCharacterBackpackProps from "./types/use-open-character-backpack-props";
 import { SidePeekComponentRegistrationEnum } from '../../../../side-peeks/base/component-registration/side-peek-component-registration-enum';
 import { SidePeekEventMap } from '../../../../side-peeks/base/event-map/side-peek-event-map';
 import { SidePeek } from '../../../../side-peeks/base/event-types/side-peek';
 
-export const useOpenCharacterBackpack = () => {
+export const useOpenCharacterBackpack = (props: UseOpenCharacterBackpackProps) => {
   const eventSystem = useEventSystem();
 
   const emitter = eventSystem.fetchOrCreateEventEmitter<SidePeekEventMap>(
@@ -18,7 +19,7 @@ export const useOpenCharacterBackpack = () => {
       {
         is_open: true,
         title: 'Backpack',
-        character_id: 0,
+        character_id: props.character_id,
       }
     );
   };

@@ -3,7 +3,6 @@
 namespace App\Game\Core\Providers;
 
 use App\Flare\Builders\BuildMythicItem;
-use App\Flare\Transformers\Serializers\CoreSerializer;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Core\Comparison\ItemComparison;
 use App\Game\Core\Services\CharacterPassiveSkills;
@@ -23,12 +22,7 @@ class ServiceProvider extends ApplicationServiceProvider
     public function register()
     {
         $this->app->bind(Manager::class, function ($app) {
-            $manager = new Manager;
-
-            // Attach the serializer
-            $manager->setSerializer(new CoreSerializer);
-
-            return $manager;
+            return new Manager;
         });
 
         $this->app->bind(CharacterPassiveSkills::class, function () {

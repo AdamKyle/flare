@@ -2,10 +2,10 @@
 
 namespace App\Game\Character\CharacterInventory\Providers;
 
+use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\InventoryTransformer;
-use App\Flare\Transformers\Serializers\CoreSerializer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Builders\EquipManyBuilder;
@@ -35,16 +35,9 @@ class ServiceProvider extends ApplicationServiceProvider
     public function register()
     {
 
-        // @codeCoverageIgnoreStart
-        $this->app->bind(Manager::class, function ($app) {
-            $manager = new Manager;
-
-            // Attach the serializer
-            $manager->setSerializer(new CoreSerializer);
-
-            return $manager;
+        $this->app->bind(Manager::class, function () {
+            return new Manager;
         });
-        // @codeCoverageIgnoreEnd
 
         $this->app->bind(SetHandsValidation::class, function () {
             return new SetHandsValidation;
@@ -75,6 +68,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(MassDisenchantService::class),
                 $app->make(UpdateCharacterSkillsService::class),
                 $app->make(UpdateCharacterAttackTypesHandler::class),
+                $app->make(Pagination::class),
                 $app->make(Manager::class)
             );
         });

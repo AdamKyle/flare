@@ -3,6 +3,12 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import AxiosDefinition from './definitions/axios-definition';
 
 export default class ApiHandler implements AxiosDefinition {
+
+  /**
+   * Get data from the server
+   * @param url
+   * @param config
+   */
   async get<T>(
     url: string,
     config: AxiosRequestConfig & { params?: object } = {}
@@ -13,6 +19,13 @@ export default class ApiHandler implements AxiosDefinition {
     return response.data;
   }
 
+  /**
+   * Post data to the server.
+   *
+   * @param url
+   * @param data
+   * @param config
+   */
   async post<T, C, D>(
     url: string,
     data: D,

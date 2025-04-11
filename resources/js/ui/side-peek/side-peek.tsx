@@ -29,9 +29,11 @@ const SidePeek = (props: SidePeekProps) => {
         aria-labelledby="sidepeek-title"
         onKeyDown={handleKeyDown}
         className={clsx(
-          'fixed top-0 right-0 h-full bg-white dark:bg-gray-800 shadow-lg z-50 transition-transform duration-300 ease-in-out',
+          'fixed top-0 right-0 h-full w-full sm:w-1/4 z-50',
+          'bg-white dark:bg-gray-800 shadow-lg',
+          'transition-transform duration-300 ease-in-out',
           props.is_open ? 'translate-x-0' : 'translate-x-full',
-          'w-full sm:w-1/4'
+          'flex flex-col'
         )}
       >
         <div className="flex justify-between items-center p-4 border-b dark:border-gray-700">
@@ -51,7 +53,8 @@ const SidePeek = (props: SidePeekProps) => {
             </h2>
           </div>
         </div>
-        <div className="p-4 text-gray-900 dark:text-gray-100">
+
+        <div className="flex-1 min-h-0">
           {props.children}
         </div>
       </div>

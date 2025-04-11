@@ -1,78 +1,24 @@
 import React, { ReactNode } from 'react';
 
-import Backpack from './backpack';
 import { Position } from './enums/equipment-positions';
 import { InventoryItemTypes } from './enums/inventory-item-types';
 import EquippedSlot from './equipped-slot';
-import GemBag from './gem-bag';
-import { useCharacterBackpackVisibility } from './hooks/use-character-backpack-visibility';
-import { useCharacterGemBagVisibility } from './hooks/use-character-gem-bag-visibility';
-import { useCharacterUsableInventoryVisibility } from './hooks/use-character-usable-inventory-visibility';
 import InventorySectionProps from './types/inventory-section-props';
-import UsableInventory from './usable-inventory';
 import { fetchEquippedArmour } from './utils/fetch-equipped-armour';
 import { inventoryIconButtons } from './utils/inventory-icon-buttons';
-import { CharacterInventoryApiUrls } from '../../../side-peeks/character-inventory/api/enums/character-inventory-api-urls';
-import { useGetCharacterInventory } from '../../../side-peeks/character-inventory/api/hooks/use-get-character-inventory';
 
-import { GameDataError } from 'game-data/components/game-data-error';
-
-import { Alert } from 'ui/alerts/alert';
-import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import { MobileIconContainer } from 'ui/icon-container/mobile-icon-container';
-import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const InventorySection = ({
   character_id,
 }: InventorySectionProps): ReactNode => {
-  const { showBackpack, closeBackpack } = useCharacterBackpackVisibility();
-  const { showUsableInventory, closeUsableInventory } =
-    useCharacterUsableInventoryVisibility();
-  const { showGemBag, closeGemBag } = useCharacterGemBagVisibility();
 
-  const { data, error, loading } = useGetCharacterInventory({
-    url: CharacterInventoryApiUrls.CHARACTER_INVENTORY,
-    urlParams: { character: character_id },
-  });
-
-  if (loading) {
-    return <InfiniteLoader />;
-  }
-
-  if (error) {
-    return <Alert variant={AlertVariant.DANGER}>{error.message}</Alert>;
-  }
-
-  if (data === null) {
-    return <GameDataError />;
-  }
-
-  if (showBackpack) {
-    return (
-      <Backpack
-        close_backpack={closeBackpack}
-        inventory_items={data.inventory}
-        quest_items={data.quest_items}
-      />
-    );
-  }
-
-  if (showUsableInventory) {
-    return (
-      <UsableInventory
-        close_usable_Section={closeUsableInventory}
-        usable_items={data.usable_items}
-      />
-    );
-  }
-
-  if (showGemBag) {
-    return <GemBag close_gem_bag={closeGemBag} character_id={character_id} />;
-  }
+  // TODO: this is just temporary
+ const data = {equipped: []}
 
   return (
     <div className="relative">
-      <MobileIconContainer icon_buttons={inventoryIconButtons()} />
+      <MobileIconContainer icon_buttons={inventoryIconButtons({character_id: character_id})} />
 
       <div className="flex justify-center">
         <div className="flex items-center lg:p-4 space-x-4 w-full lg:w-3/4 md:justify-center">

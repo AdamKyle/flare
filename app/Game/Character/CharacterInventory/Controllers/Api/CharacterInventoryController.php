@@ -8,6 +8,7 @@ use App\Flare\Models\Item;
 use App\Flare\Transformers\ItemTransformer;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Requests\EquipItemValidation;
+use App\Game\Character\CharacterInventory\Requests\InventoryPaginationRequest;
 use App\Game\Character\CharacterInventory\Requests\MoveItemRequest;
 use App\Game\Character\CharacterInventory\Requests\RemoveItemRequest;
 use App\Game\Character\CharacterInventory\Requests\RenameSetRequest;
@@ -47,11 +48,25 @@ class CharacterInventoryController extends Controller
         $this->useItemService = $useItemService;
     }
 
-    public function inventory(Character $character): JsonResponse
-    {
-        $inventory = $this->characterInventoryService->setCharacter($character);
 
-        return response()->json($inventory->getInventoryForApi());
+    public function inventory(InventoryPaginationRequest $request, Character $character): JsonResponse
+    {
+        return response()->json(
+            $this->characterInventoryService->setCharacter($character)->fetchCharacterInventory($request->per_page, $request->page)
+        );
+    }
+
+    public function questItems(InventoryPaginationRequest $request, Character $character): JsonResponse {
+        return response()->json(
+            $this->characterInventoryService->setCharacter($character)->fetchCharacterQuestItems($request->per_page, $request->page)
+        );
+    }
+
+    public function equippedItems(Character $character): JsonResponse {
+
+        return response()->json([
+            'equipped' => $this->characterInventoryService->setCharacter($character)->fetchEquipped(),
+        ]);
     }
 
     public function itemDetails(Character $character, Item $item, Manager $manager, ItemTransformer $itemTransformer): JsonResponse

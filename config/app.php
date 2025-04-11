@@ -194,6 +194,7 @@ return [
         App\Flare\AlchemyItemGenerator\Providers\ServiceProvider::class,
         App\Flare\GameImporter\Providers\ServiceProvider::class,
         App\Flare\ExponentialCurve\Providers\ServiceProvider::class,
+        App\Flare\Pagination\Providers\ServiceProvider::class,
 
         /**
          * Component Related
