@@ -12,13 +12,14 @@ import { MobileIconContainer } from 'ui/icon-container/mobile-icon-container';
 const InventorySection = ({
   character_id,
 }: InventorySectionProps): ReactNode => {
-
   // TODO: this is just temporary
- const data = {equipped: []}
+  const data = { equipped: [] };
 
   return (
     <div className="relative">
-      <MobileIconContainer icon_buttons={inventoryIconButtons({character_id: character_id})} />
+      <MobileIconContainer
+        icon_buttons={inventoryIconButtons({ character_id: character_id })}
+      />
 
       <div className="flex justify-center">
         <div className="flex items-center lg:p-4 space-x-4 w-full lg:w-3/4 md:justify-center">

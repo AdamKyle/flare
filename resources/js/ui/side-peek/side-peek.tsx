@@ -54,9 +54,7 @@ const SidePeek = (props: SidePeekProps) => {
           </div>
         </div>
 
-        <div className="flex-1 min-h-0">
-          {props.children}
-        </div>
+        <div className="flex-1 min-h-0">{props.children}</div>
       </div>
     </>
   );

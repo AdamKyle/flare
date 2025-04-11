@@ -7,7 +7,10 @@ export const GameDataError = (): ReactNode => {
   return (
     <Alert variant={AlertVariant.DANGER}>
       <p>
-        Whoops! We seem to have encountered an error that should not have happened. Please head to Discord and post a screen shot of this in #bugs. Please make sure to give as much details for your bug report as possible!
+        Whoops! We seem to have encountered an error that should not have
+        happened. Please head to Discord and post a screen shot of this in
+        #bugs. Please make sure to give as much details for your bug report as
+        possible!
       </p>
     </Alert>
   );

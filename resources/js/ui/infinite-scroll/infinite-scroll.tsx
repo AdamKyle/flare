@@ -15,9 +15,7 @@ const InfiniteScroll = (props: InfiniteScrollProps) => {
       )}
       onScroll={props.handle_scroll}
     >
-      <div className="pb-8">
-        {props.children}
-      </div>
+      <div className="pb-8">{props.children}</div>
     </div>
   );
 };

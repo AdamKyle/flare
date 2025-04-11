@@ -1,5 +1,5 @@
 import ApiParametersDefinitions from 'api-handler/definitions/api-parameters-definitions';
-import {ApiResponseDefinition} from "api-handler/definitions/api-response-definition";
+import { ApiResponseDefinition } from 'api-handler/definitions/api-response-definition';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useCallback } from 'react';
@@ -16,7 +16,7 @@ export const useCharacterSheetApi = (
 
   const fetchCharacterData = useCallback(async () => {
     try {
-      const response =  await apiHandler.get<
+      const response = await apiHandler.get<
         ApiResponseDefinition<CharacterSheetDefinition>,
         AxiosResponse<ApiResponseDefinition<CharacterSheetDefinition>>
       >(url);

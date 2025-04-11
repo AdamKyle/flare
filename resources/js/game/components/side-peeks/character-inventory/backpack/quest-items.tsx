@@ -1,41 +1,39 @@
-import UsePaginatedApiHandler from "api-handler/hooks/use-paginated-api-handler";
-import React, {ReactNode} from "react";
+import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
+import React, { ReactNode } from 'react';
 
-import InventoryList from "./inventory-list";
-import {useInfiniteScroll} from "../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll";
-import {CharacterInventoryApiUrls} from "../api/enums/character-inventory-api-urls";
-import BackPackItemsProps from "./types/back-pack-items-props";
+import InventoryList from './inventory-list';
+import BackPackItemsProps from './types/back-pack-items-props';
+import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
+import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
+import BaseInventoryItemDefinition from '../api-definitions/base-inventory-item-definition';
 
-import {GameDataError} from "game-data/components/game-data-error";
+import { GameDataError } from 'game-data/components/game-data-error';
 
-import Button from "ui/buttons/button";
-import {ButtonVariant} from "ui/buttons/enums/button-variant-enum";
-import InfiniteLoader from "ui/loading-bar/infinite-loader";
-import BaseInventoryItemDefinition from "../api-definitions/base-inventory-item-definition";
+import Button from 'ui/buttons/button';
+import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
-
-
-const QuestItems = ({character_id, on_switch_view}: BackPackItemsProps): ReactNode => {
-
-  const { data, error, loading, canLoadMore, isLoadingMore, setPage } = UsePaginatedApiHandler<BaseInventoryItemDefinition>({
-    url: CharacterInventoryApiUrls.CHARACTER_QUEST_ITEMS,
-    urlParams: { character: character_id }
-  });
+const QuestItems = ({
+  character_id,
+  on_switch_view,
+}: BackPackItemsProps): ReactNode => {
+  const { data, error, loading, canLoadMore, isLoadingMore, setPage } =
+    UsePaginatedApiHandler<BaseInventoryItemDefinition>({
+      url: CharacterInventoryApiUrls.CHARACTER_QUEST_ITEMS,
+      urlParams: { character: character_id },
+    });
 
   const onEndReached = () => {
     if (!canLoadMore || isLoadingMore) {
       return;
     }
 
-    setPage(prevValue => prevValue + 1)
-  }
+    setPage((prevValue) => prevValue + 1);
+  };
 
-  const {
-    handleScroll: handleInventoryScroll,
-  } = useInfiniteScroll({
+  const { handleScroll: handleInventoryScroll } = useInfiniteScroll({
     on_end_reached: onEndReached,
   });
-
 
   if (error) {
     return <GameDataError />;
@@ -64,6 +62,6 @@ const QuestItems = ({character_id, on_switch_view}: BackPackItemsProps): ReactNo
       </div>
     </div>
   );
-}
+};
 
 export default QuestItems;

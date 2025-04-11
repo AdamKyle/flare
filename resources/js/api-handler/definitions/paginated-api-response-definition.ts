@@ -10,5 +10,5 @@ export interface PaginatedApiResponseDefinition<T> {
       total: number;
       total_pages: number;
     };
-  }
+  };
 }

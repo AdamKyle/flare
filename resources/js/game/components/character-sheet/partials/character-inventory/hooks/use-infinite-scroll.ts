@@ -4,8 +4,8 @@ import UseInfiniteScrollDefinition from './definition/use-infinite-scroll-defini
 import UseInfiniteScrollParams from './definition/use-infinite-scroll-params';
 
 export const useInfiniteScroll = ({
-                                    on_end_reached
-                                  }: UseInfiniteScrollParams): UseInfiniteScrollDefinition => {
+  on_end_reached,
+}: UseInfiniteScrollParams): UseInfiniteScrollDefinition => {
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
     if (scrollTop + clientHeight >= scrollHeight - 10) {

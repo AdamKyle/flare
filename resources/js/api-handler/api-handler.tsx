@@ -3,7 +3,6 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import AxiosDefinition from './definitions/axios-definition';
 
 export default class ApiHandler implements AxiosDefinition {
-
   /**
    * Get data from the server
    * @param url
