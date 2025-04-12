@@ -56,9 +56,9 @@ const UsePaginatedApiHandler = <T>(
   }, [fetchPaginatedData]);
 
   useEffect(() => {
-    setPage(1)
-    setRefresh(prevValue => !prevValue);
-  }, [searchText])
+    setPage(1);
+    setRefresh((prevValue) => !prevValue);
+  }, [searchText]);
 
   return {
     data,

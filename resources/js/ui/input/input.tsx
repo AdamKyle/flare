@@ -1,7 +1,8 @@
 import React from 'react';
-import InputProps from "ui/input/types/input-props";
 
-const Input = ({on_change, value}: InputProps) => {
+import InputProps from 'ui/input/types/input-props';
+
+const Input = ({ on_change, value }: InputProps) => {
   return (
     <input
       type="text"
@@ -11,7 +12,7 @@ const Input = ({on_change, value}: InputProps) => {
       onChange={on_change}
       value={value}
     />
-  )
-}
+  );
+};
 
 export default Input;

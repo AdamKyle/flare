@@ -29,7 +29,7 @@ const CharacterCardDetails = ({
       characterData.inventory_count.data.inventory_max) *
     100;
 
-  console.log(characterData)
+  console.log(characterData);
 
   return (
     <>

@@ -1,5 +1,6 @@
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
-import React, {useMemo} from 'react';
+import { debounce } from 'lodash';
+import React, { useMemo } from 'react';
 
 import InventoryList from './inventory-list';
 import BackPackItemsProps from './types/back-pack-items-props';
@@ -11,19 +12,25 @@ import { GameDataError } from 'game-data/components/game-data-error';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
-import Input from "ui/input/input";
-import {debounce} from "lodash";
 
 const BackPackItems = ({
   character_id,
   on_switch_view,
 }: BackPackItemsProps) => {
-  const { data, error, loading, canLoadMore, isLoadingMore, setPage, setSearchText } =
-    UsePaginatedApiHandler<BaseInventoryItemDefinition>({
-      url: CharacterInventoryApiUrls.CHARACTER_INVENTORY,
-      urlParams: { character: character_id },
-    });
+  const {
+    data,
+    error,
+    loading,
+    canLoadMore,
+    isLoadingMore,
+    setPage,
+    setSearchText,
+  } = UsePaginatedApiHandler<BaseInventoryItemDefinition>({
+    url: CharacterInventoryApiUrls.CHARACTER_INVENTORY,
+    urlParams: { character: character_id },
+  });
 
   const onEndReached = () => {
     if (!canLoadMore || isLoadingMore) {
@@ -41,7 +48,7 @@ const BackPackItems = ({
   const onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     debouncedSetSearchText(value);
-  }
+  };
 
   const { handleScroll: handleInventoryScroll } = useInfiniteScroll({
     on_end_reached: onEndReached,
