@@ -37,8 +37,8 @@ const CharacterSheetDetails = (
   const characterData = props.characterData;
 
   const characterInventorProgress =
-    (characterData.inventory_count.inventory_count /
-      characterData.inventory_count.inventory_max) *
+    (characterData.inventory_count.data.inventory_count /
+      characterData.inventory_count.data.inventory_max) *
     100;
 
   const renderAttackDetailsType = (attackType: AttackTypes): ReactNode => {
@@ -322,7 +322,7 @@ const CharacterSheetDetails = (
           <ProgressButton
             progress={characterInventorProgress}
             on_click={props.openCharacterInventory}
-            label={`Manage Inventory (${characterData.inventory_count.inventory_count}/${characterData.inventory_count.inventory_max})`}
+            label={`Manage Inventory (${characterData.inventory_count.data.inventory_count}/${characterData.inventory_count.data.inventory_max})`}
             variant={ButtonVariant.PRIMARY}
             additional_css="w-full my-2"
           />

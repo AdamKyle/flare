@@ -26,6 +26,7 @@ class InventoryPaginationRequest extends FormRequest
         return [
             'per_page' => 'required|min:1|integer',
             'page' => 'required|min:1|integer',
+            'search_text' => 'nullable|string',
         ];
     }
 
@@ -34,6 +35,17 @@ class InventoryPaginationRequest extends FormRequest
         return [
             'per_page.required' => 'How many do you want per page?',
             'page.required' => 'What page are we trying to fetch?',
+            'search_text.required' => 'What are you searching for?',
         ];
     }
+
+    public function prepareForValidation(): void
+    {
+        $this->merge([
+            'search_text' => $this->has('search_text') && is_null($this->input('search_text'))
+                ? ''
+                : $this->input('search_text'),
+        ]);
+    }
+
 }

@@ -19,6 +19,8 @@ const UsePaginatedApiHandler = <T>(
   const [canLoadMore, setCanLoadMore] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
+  const [searchText, setSearchText] = useState('');
+  const [refresh, setRefresh] = useState(false);
 
   const fetchPaginatedData = useCallback(async () => {
     if (page > 1) setIsLoadingMore(true);
@@ -31,6 +33,7 @@ const UsePaginatedApiHandler = <T>(
         params: {
           per_page: perPage,
           page,
+          search_text: searchText,
         },
       });
 
@@ -46,11 +49,16 @@ const UsePaginatedApiHandler = <T>(
       setLoading(false);
       setIsLoadingMore(false);
     }
-  }, [apiHandler, url, page, perPage]);
+  }, [apiHandler, url, page, perPage, refresh]);
 
   useEffect(() => {
     fetchPaginatedData().catch(console.error);
   }, [fetchPaginatedData]);
+
+  useEffect(() => {
+    setPage(1)
+    setRefresh(prevValue => !prevValue);
+  }, [searchText])
 
   return {
     data,
@@ -60,6 +68,7 @@ const UsePaginatedApiHandler = <T>(
     isLoadingMore,
     page,
     setPage,
+    setSearchText,
   };
 };
 

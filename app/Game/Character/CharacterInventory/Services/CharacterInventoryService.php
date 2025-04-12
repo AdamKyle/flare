@@ -23,6 +23,7 @@ use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use League\Fractal\Manager;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use League\Fractal\Resource\Collection as LeagueCollection;
@@ -290,18 +291,28 @@ class CharacterInventoryService
 
     /**
      * Returns the quest items.
+     *
+     * @param string $searchText
+     * @return Collection
      */
-    public function getQuestItems(): Collection
+    public function getQuestItems(string $searchText = ''): Collection
     {
         $inventory = Inventory::where('character_id', $this->character->id)->first();
 
-        $slots = InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function ($join) {
-            $join->on('inventory_slots.item_id', '=', 'items.id')
-                ->where('items.type', 'quest');
-        })->select('inventory_slots.*')->get();
+        $query = InventorySlot::where('inventory_slots.inventory_id', $inventory->id)
+            ->join('items', function ($join) {
+                $join->on('inventory_slots.item_id', '=', 'items.id')
+                    ->where('items.type', 'quest');
+            })
+            ->select('inventory_slots.*');
 
-        return $slots;
+        if (!empty($searchText)) {
+            $query->where('items.name', 'LIKE', '%' . $searchText . '%');
+        }
+
+        return $query->with('item')->get();
     }
+
 
     /**
      * Gets a list of usable slot's
@@ -336,19 +347,36 @@ class CharacterInventoryService
      *  - Does not include equipped, usable or quest items.
      *  - Only comes from inventory, does not include sets.
      *  - If the character is currently disenchanting selected items, do not get those items.
+     *
+     * @param string $searchText
+     * @return Collection
      */
-    public function getInventoryCollection(): Collection
+    public function getInventoryCollection(string $searchText = ''): Collection
     {
-
         $slotsToIgnore = Cache::get('character-slots-to-disenchant-' . $this->character->id, []);
 
-        return $this->character
+        $slots = $this->character
             ->inventory
             ->slots
             ->whereNotIn('item.type', ['quest', 'alchemy'])
             ->whereNotIn('id', $slotsToIgnore)
-            ->where('equipped', false)
-            ->sortByDesc(fn($slot) => (float) $slot->item->getTotalPercentageForStat($this->character->damage_stat));
+            ->where('equipped', false);
+
+        if (!empty($searchText)) {
+            $search = Str::lower($searchText);
+
+            $slots = $slots->filter(function ($slot) use ($search) {
+                $item = $slot->item;
+
+                return Str::contains(Str::lower($item->name), $search) ||
+                    ($item->itemPrefix && Str::contains(Str::lower($item->itemPrefix->name), $search)) ||
+                    ($item->itemSuffix && Str::contains(Str::lower($item->itemSuffix->name), $search));
+            });
+        }
+
+        return $slots->sortByDesc(
+            fn($slot) => (float) $slot->item->getTotalPercentageForStat($this->character->damage_stat)
+        );
     }
 
     /**
@@ -359,17 +387,18 @@ class CharacterInventoryService
      *
      * @param int $perPage
      * @param int $page
+     * @param string $searchText
      * @return array
      */
-    public function fetchCharacterInventory(int $perPage = 10, int $page = 1): array
+    public function fetchCharacterInventory(int $perPage = 10, int $page = 1, string $searchText = ''): array
     {
-        $slots = $this->getInventoryCollection();
+        $slots = $this->getInventoryCollection($searchText);
 
         return $this->buildPaginatedDate($slots, $perPage, $page);
     }
 
-    public function fetchCharacterQuestItems(int $perPage = 10, int $page = 1): array {
-        $slots = $this->getQuestItems();
+    public function fetchCharacterQuestItems(int $perPage = 10, int $page = 1, string $searchText = ''): array {
+        $slots = $this->getQuestItems($searchText);
 
         return $this->buildPaginatedDate($slots, $perPage, $page);
     }

@@ -1,5 +1,5 @@
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
-import React from 'react';
+import React, {useMemo} from 'react';
 
 import InventoryList from './inventory-list';
 import BackPackItemsProps from './types/back-pack-items-props';
@@ -12,12 +12,14 @@ import { GameDataError } from 'game-data/components/game-data-error';
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
+import Input from "ui/input/input";
+import {debounce} from "lodash";
 
 const BackPackItems = ({
   character_id,
   on_switch_view,
 }: BackPackItemsProps) => {
-  const { data, error, loading, canLoadMore, isLoadingMore, setPage } =
+  const { data, error, loading, canLoadMore, isLoadingMore, setPage, setSearchText } =
     UsePaginatedApiHandler<BaseInventoryItemDefinition>({
       url: CharacterInventoryApiUrls.CHARACTER_INVENTORY,
       urlParams: { character: character_id },
@@ -30,6 +32,16 @@ const BackPackItems = ({
 
     setPage((prevValue) => prevValue + 1);
   };
+
+  const debouncedSetSearchText = useMemo(
+    () => debounce((value: string) => setSearchText(value), 300),
+    []
+  );
+
+  const onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    debouncedSetSearchText(value);
+  }
 
   const { handleScroll: handleInventoryScroll } = useInfiniteScroll({
     on_end_reached: onEndReached,
@@ -53,6 +65,9 @@ const BackPackItems = ({
         />
       </div>
       <hr className="w-full border-t border-gray-300 dark:border-gray-600" />
+      <div className="pt-2 px-4">
+        <Input on_change={onSearch} />
+      </div>
       <div className="flex-1 min-h-0">
         <InventoryList
           items={data}

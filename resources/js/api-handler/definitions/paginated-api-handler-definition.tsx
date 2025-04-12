@@ -10,4 +10,5 @@ export default interface PaginatedApiHandlerDefinition<T> {
   isLoadingMore: boolean;
   page: number;
   setPage: StateSetter<number>;
+  setSearchText: StateSetter<string>;
 }

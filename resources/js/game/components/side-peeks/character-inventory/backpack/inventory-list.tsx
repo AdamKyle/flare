@@ -42,7 +42,7 @@ const InventoryList = ({
 
   return (
     <div className="w-full h-full text-gray-800 dark:text-gray-200">
-      <InfiniteScroll handle_scroll={on_scroll_to_end} additional_css={'my-4'}>
+      <InfiniteScroll handle_scroll={on_scroll_to_end} additional_css={'my-2'}>
         {renderBackPackItems()}
       </InfiniteScroll>
     </div>

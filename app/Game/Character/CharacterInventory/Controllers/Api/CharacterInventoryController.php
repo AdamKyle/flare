@@ -52,13 +52,13 @@ class CharacterInventoryController extends Controller
     public function inventory(InventoryPaginationRequest $request, Character $character): JsonResponse
     {
         return response()->json(
-            $this->characterInventoryService->setCharacter($character)->fetchCharacterInventory($request->per_page, $request->page)
+            $this->characterInventoryService->setCharacter($character)->fetchCharacterInventory($request->per_page, $request->page, $request->search_text)
         );
     }
 
     public function questItems(InventoryPaginationRequest $request, Character $character): JsonResponse {
         return response()->json(
-            $this->characterInventoryService->setCharacter($character)->fetchCharacterQuestItems($request->per_page, $request->page)
+            $this->characterInventoryService->setCharacter($character)->fetchCharacterQuestItems($request->per_page, $request->page, $request->search_text)
         );
     }
 
