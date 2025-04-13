@@ -11,4 +11,5 @@ export default interface PaginatedApiHandlerDefinition<T> {
   page: number;
   setPage: StateSetter<number>;
   setSearchText: StateSetter<string>;
+  onEndReached: () => void;
 }

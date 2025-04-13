@@ -4,6 +4,7 @@ namespace App\Game\Character\CharacterInventory\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\GemBagSlot;
+use App\Flare\Pagination\Requests\PaginationRequest;
 use App\Game\Character\CharacterInventory\Services\CharacterGemBagService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
@@ -18,7 +19,7 @@ class CharacterGemBagController extends Controller
         $this->characterGemBagService = $characterGemBagService;
     }
 
-    public function getGemSlots(Character $character): JsonResponse
+    public function getGemSlots(PaginationRequest $inventoryPaginationRequest, Character $character): JsonResponse
     {
 
         $result = $this->characterGemBagService->getGems($character);

@@ -1,8 +1,8 @@
 import { isEmpty } from 'lodash';
 import React, { ReactNode } from 'react';
 
+import BackpackItem from './backpack-item';
 import InventoryListProps from './types/inventory-list-props';
-import BackpackItem from '../../../character-sheet/partials/character-inventory/backpack-item';
 import BaseInventoryItemDefinition from '../api-definitions/base-inventory-item-definition';
 
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';

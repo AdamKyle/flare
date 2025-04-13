@@ -60,6 +60,14 @@ const UsePaginatedApiHandler = <T>(
     setRefresh((prevValue) => !prevValue);
   }, [searchText]);
 
+  const onEndReached = () => {
+    if (!canLoadMore || isLoadingMore) {
+      return;
+    }
+
+    setPage((prevValue) => prevValue + 1);
+  };
+
   return {
     data,
     error,
@@ -67,8 +75,9 @@ const UsePaginatedApiHandler = <T>(
     canLoadMore,
     isLoadingMore,
     page,
-    setPage,
+    onEndReached,
     setSearchText,
+    setPage,
   };
 };
 

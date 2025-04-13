@@ -11,7 +11,7 @@ export const inventoryIconButtons = (
 ): IconButtonDefinition[] => {
   const { openBackpack } = useOpenCharacterBackpack(params);
   const { openUsableInventory } = useOpenCharacterUsableInventory();
-  const { openGemBag } = useOpenCharacterGemBag();
+  const { openGemBag } = useOpenCharacterGemBag(params);
 
   return [
     {

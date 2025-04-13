@@ -1,6 +1,4 @@
-import React from 'react';
-
 export default interface InputProps {
-  on_change: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  value?: string;
+  on_change: (value: string) => void;
+  clearable?: boolean;
 }

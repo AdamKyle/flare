@@ -1,14 +1,14 @@
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
-import { backpackBaseItemStyles } from './styles/backpack-item-styles';
+import { backpackBaseItemStyles } from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
 import {
   gemSlotBorderStyles,
   gemSlotButtonBackgroundColor,
   gemSlotFocusRingStyles,
   gemSlotTextColor,
-} from './styles/gem-slot-styles';
-import GemSlotProps from './types/gem-slot-props';
+} from '../../../character-sheet/partials/character-inventory/styles/gem-slot-styles';
+import GemSlotProps from '../../../character-sheet/partials/character-inventory/types/gem-slot-props';
 
 const GemSlot = ({ gem_slot }: GemSlotProps): ReactNode => {
   const itemColor = gemSlotTextColor(gem_slot);

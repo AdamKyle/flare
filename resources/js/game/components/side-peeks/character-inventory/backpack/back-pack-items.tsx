@@ -19,34 +19,18 @@ const BackPackItems = ({
   character_id,
   on_switch_view,
 }: BackPackItemsProps) => {
-  const {
-    data,
-    error,
-    loading,
-    canLoadMore,
-    isLoadingMore,
-    setPage,
-    setSearchText,
-  } = UsePaginatedApiHandler<BaseInventoryItemDefinition>({
-    url: CharacterInventoryApiUrls.CHARACTER_INVENTORY,
-    urlParams: { character: character_id },
-  });
-
-  const onEndReached = () => {
-    if (!canLoadMore || isLoadingMore) {
-      return;
-    }
-
-    setPage((prevValue) => prevValue + 1);
-  };
+  const { data, error, loading, setSearchText, onEndReached } =
+    UsePaginatedApiHandler<BaseInventoryItemDefinition>({
+      url: CharacterInventoryApiUrls.CHARACTER_INVENTORY,
+      urlParams: { character: character_id },
+    });
 
   const debouncedSetSearchText = useMemo(
     () => debounce((value: string) => setSearchText(value), 300),
     []
   );
 
-  const onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  const onSearch = (value: string) => {
     debouncedSetSearchText(value);
   };
 
@@ -73,7 +57,7 @@ const BackPackItems = ({
       </div>
       <hr className="w-full border-t border-gray-300 dark:border-gray-600" />
       <div className="pt-2 px-4">
-        <Input on_change={onSearch} />
+        <Input on_change={onSearch} clearable />
       </div>
       <div className="flex-1 min-h-0">
         <InventoryList

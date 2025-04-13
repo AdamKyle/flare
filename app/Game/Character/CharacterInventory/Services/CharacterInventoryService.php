@@ -394,27 +394,13 @@ class CharacterInventoryService
     {
         $slots = $this->getInventoryCollection($searchText);
 
-        return $this->buildPaginatedDate($slots, $perPage, $page);
+        return $this->pagination->buildPaginatedDate($slots, $this->inventoryTransformer, $perPage, $page);
     }
 
     public function fetchCharacterQuestItems(int $perPage = 10, int $page = 1, string $searchText = ''): array {
         $slots = $this->getQuestItems($searchText);
 
-        return $this->buildPaginatedDate($slots, $perPage, $page);
-    }
-
-    private function buildPaginatedDate(collection $slots, int $perPage, int $page): array {
-        $paginator = $this->pagination->paginateCollection($slots, $perPage, $page);
-
-        $slots = new LeagueCollection($paginator->items(), $this->inventoryTransformer);
-
-        $slots->setPaginator(new IlluminatePaginatorAdapter($paginator));
-
-        $data = $this->manager->createData($slots)->toArray();
-
-        $data['meta']['can_load_more'] = $paginator->hasMorePages();
-
-        return $data;
+        return $this->pagination->buildPaginatedDate($slots, $this->inventoryTransformer, $perPage, $page);
     }
 
     /**

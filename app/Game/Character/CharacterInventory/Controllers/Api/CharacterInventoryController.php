@@ -5,10 +5,10 @@ namespace App\Game\Character\CharacterInventory\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
+use App\Flare\Pagination\Requests\PaginationRequest;
 use App\Flare\Transformers\ItemTransformer;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Requests\EquipItemValidation;
-use App\Game\Character\CharacterInventory\Requests\InventoryPaginationRequest;
 use App\Game\Character\CharacterInventory\Requests\MoveItemRequest;
 use App\Game\Character\CharacterInventory\Requests\RemoveItemRequest;
 use App\Game\Character\CharacterInventory\Requests\RenameSetRequest;
@@ -49,14 +49,14 @@ class CharacterInventoryController extends Controller
     }
 
 
-    public function inventory(InventoryPaginationRequest $request, Character $character): JsonResponse
+    public function inventory(PaginationRequest $request, Character $character): JsonResponse
     {
         return response()->json(
             $this->characterInventoryService->setCharacter($character)->fetchCharacterInventory($request->per_page, $request->page, $request->search_text)
         );
     }
 
-    public function questItems(InventoryPaginationRequest $request, Character $character): JsonResponse {
+    public function questItems(PaginationRequest $request, Character $character): JsonResponse {
         return response()->json(
             $this->characterInventoryService->setCharacter($character)->fetchCharacterQuestItems($request->per_page, $request->page, $request->search_text)
         );

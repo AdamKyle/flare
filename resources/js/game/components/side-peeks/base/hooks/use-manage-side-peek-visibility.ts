@@ -59,6 +59,7 @@ export const useDynamicComponentVisibility =
       : null;
 
     return {
+      componentKey,
       ComponentToRender,
       componentProps,
       closeSidePeek,

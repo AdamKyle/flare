@@ -4,6 +4,7 @@ namespace App\Game\Character\CharacterInventory\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\GemBagSlot;
+use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\CharacterGemSlotsTransformer;
 use App\Flare\Transformers\CharacterGemsTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -15,28 +16,53 @@ class CharacterGemBagService
 {
     use ResponseBuilder;
 
-    private Manager $manager;
-
-    private CharacterGemsTransformer $gemsTransformer;
-
-    private CharacterGemSlotsTransformer $characterGemBagTransformer;
-
-    public function __construct(Manager $manager, CharacterGemSlotsTransformer $characterGemBagTransformer, CharacterGemsTransformer $gemsTransformer)
-    {
-        $this->manager = $manager;
-        $this->gemsTransformer = $gemsTransformer;
-        $this->characterGemBagTransformer = $characterGemBagTransformer;
-    }
+    /**
+     * @param Manager $manager
+     * @param CharacterGemSlotsTransformer $characterGemBagTransformer
+     * @param CharacterGemsTransformer $gemsTransformer
+     * @param Pagination $pagination
+     */
+    public function __construct(
+        private readonly Manager $manager,
+        private readonly CharacterGemSlotsTransformer $characterGemBagTransformer,
+        private readonly CharacterGemsTransformer $gemsTransformer,
+        private readonly Pagination $pagination,
+    ){}
 
     /**
      * Get gems from character bag.
+     *
+     * @param Character $character
+     * @param int $perPage
+     * @param int $page
+     * @param string $searchText
+     * @param array $filters
+     * @return array
      */
-    public function getGems(Character $character): array
+    public function getGems(Character $character, int $perPage = 10, int $page = 1, string $searchText = '', array $filters = []): array
     {
-        $gems = new Collection($character->gemBag->gemSlots, $this->characterGemBagTransformer);
-        $gems = $this->manager->createData($gems)->toArray();
+        $gemSlots = $character->gemBag->gemSlots;
 
-        return $this->successResult($gems);
+        if (!empty($searchText)) {
+            $gemSlots = $gemSlots->filter(function (GemBagSlot $gemSlot) use ($searchText) {
+                return stripos($gemSlot->gem->name, $searchText) !== false;
+            });
+        }
+
+        if (isset($filters['tier'])) {
+            $gemSlots = $gemSlots->filter(function (GemBagSlot $gemSlot) use ($filters) {
+                return $gemSlot->gem->tier === $filters['tier'];
+            });
+        }
+
+        $paginatedData = $this->pagination->buildPaginatedDate(
+            $gemSlots,
+            $this->characterGemBagTransformer,
+            $perPage,
+            $page
+        );
+
+        return $this->successResult($paginatedData);
     }
 
     public function getGemData(Character $character, GemBagSlot $gemSlot): array

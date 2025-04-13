@@ -1,15 +1,15 @@
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
-import { InventoryItemTypes } from './enums/inventory-item-types';
+import { InventoryItemTypes } from '../../../character-sheet/partials/character-inventory/enums/inventory-item-types';
 import {
   backpackBaseItemStyles,
   backpackBorderStyles,
   backpackButtonBackground,
   backpackFocusRingStyles,
   backpackItemTextColors,
-} from './styles/backpack-item-styles';
-import BackpackItemProps from './types/backpack-item-props';
+} from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
+import BackpackItemProps from '../../../character-sheet/partials/character-inventory/types/backpack-item-props';
 
 const BackpackItem = ({ item }: BackpackItemProps): ReactNode => {
   const itemColor = backpackItemTextColors(item);
