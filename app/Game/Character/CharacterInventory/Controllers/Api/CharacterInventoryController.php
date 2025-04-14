@@ -62,6 +62,12 @@ class CharacterInventoryController extends Controller
         );
     }
 
+    public function usableItems(PaginationRequest $request, Character $character): JsonResponse {
+        return response()->json(
+            $this->characterInventoryService->setCharacter($character)->fetchCharacterUsableItems($request->per_page, $request->page, $request->search_text, $request->filters)
+        );
+    }
+
     public function equippedItems(Character $character): JsonResponse {
 
         return response()->json([

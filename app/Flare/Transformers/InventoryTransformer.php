@@ -34,6 +34,13 @@ class InventoryTransformer extends TransformerAbstract
             'can_stack' => $slot->item->can_stack,
             'effect' => $slot->item->effect,
             'position' => $slot->position,
+            'increase_skill_bonus_by' => $slot->item->increase_skill_bonus_by,
+            'increase_skill_training_bonus_by' => $slot->item->increase_skill_training_bonus_by,
+            'base_healing_mod' => $slot->item->base_healing_mod,
+            'base_ac_mod' => $slot->item->base_ac_mod,
+            'base_damage_mod' => $slot->item->base_damage_mod,
+            'stat_increase' => $slot->item->stat_increase,
+            'holy_level' => $slot->item->holy_level,
         ];
     }
 }

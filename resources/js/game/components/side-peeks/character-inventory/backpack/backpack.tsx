@@ -1,6 +1,6 @@
 import React, { ReactNode, useState } from 'react';
 
-import BackPackItems from './back-pack-items';
+import BackpackItems from './backpack-items';
 import QuestItems from './quest-items';
 import BackPackProps from './types/backpack-props';
 
@@ -9,7 +9,7 @@ const BackPack = ({ character_id }: BackPackProps): ReactNode => {
 
   if (isShowingInventory) {
     return (
-      <BackPackItems
+      <BackpackItems
         character_id={character_id}
         on_switch_view={setIsShowingInventory}
       />

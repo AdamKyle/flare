@@ -10,7 +10,7 @@ export const inventoryIconButtons = (
   params: InventoryIconButtonsParamDefinition
 ): IconButtonDefinition[] => {
   const { openBackpack } = useOpenCharacterBackpack(params);
-  const { openUsableInventory } = useOpenCharacterUsableInventory();
+  const { openUsableInventory } = useOpenCharacterUsableInventory(params);
   const { openGemBag } = useOpenCharacterGemBag(params);
 
   return [

@@ -6,6 +6,9 @@ export interface BaseItemDetails {
   is_cosmic: boolean;
   is_mythical: boolean;
   is_unique: boolean;
+  usable: boolean;
+  holy_level: number | null;
+  damages_kingdoms: boolean;
   name: string;
   description: string;
   type: string;

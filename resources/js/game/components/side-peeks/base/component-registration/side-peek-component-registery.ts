@@ -3,6 +3,8 @@ import BackPack from '../../character-inventory/backpack/backpack';
 import BackPackProps from '../../character-inventory/backpack/types/backpack-props';
 import GemBag from '../../character-inventory/gem-bag/gem-bag';
 import GemBagProps from '../../character-inventory/gem-bag/types/gem-bag-props';
+import UsableItemsProps from '../../character-inventory/usable-items/types/usable-items-props';
+import UsableItems from '../../character-inventory/usable-items/usable-items';
 
 export const SidePeekComponentRegistry = {
   [SidePeekComponentRegistrationEnum.BACKPACK]: {
@@ -12,6 +14,10 @@ export const SidePeekComponentRegistry = {
   [SidePeekComponentRegistrationEnum.GEM_BAG]: {
     component: GemBag,
     props: {} as GemBagProps,
+  },
+  [SidePeekComponentRegistrationEnum.USABLE_ITEMS]: {
+    component: UsableItems,
+    props: {} as UsableItemsProps,
   },
   // Add more components here
 };

@@ -19,10 +19,10 @@ class CharacterGemBagController extends Controller
         $this->characterGemBagService = $characterGemBagService;
     }
 
-    public function getGemSlots(PaginationRequest $inventoryPaginationRequest, Character $character): JsonResponse
+    public function getGemSlots(PaginationRequest $request, Character $character): JsonResponse
     {
 
-        $result = $this->characterGemBagService->getGems($character);
+        $result = $this->characterGemBagService->getGems($character, $request->per_page, $request->page, $request->search_text, $request->filters);
         $status = $result['status'];
 
         unset($result['status']);

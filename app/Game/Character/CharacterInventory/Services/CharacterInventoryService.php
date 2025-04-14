@@ -274,19 +274,38 @@ class CharacterInventoryService
 
     /**
      * Returns the usable items.
+     *
+     * @param string $searchText
+     * @param array $filters
+     * @return Collection
      */
-    public function getUsableItems(): array
+    public function getUsableItems(string $searchText = '', array $filters = []): Collection
     {
         $inventory = Inventory::where('character_id', $this->character->id)->first();
 
-        $slots = InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function ($join) {
-            $join->on('inventory_slots.item_id', '=', 'items.id')
-                ->where('items.type', 'alchemy');
-        })->select('inventory_slots.*')->get();
+        $query = InventorySlot::where('inventory_slots.inventory_id', $inventory->id)
+            ->join('items', function ($join) use ($searchText, $filters) {
+                $join->on('inventory_slots.item_id', '=', 'items.id')
+                    ->where('items.type', 'alchemy');
 
-        $slots = new LeagueCollection($slots, $this->inventoryTransformer);
+                if (!empty($searchText)) {
+                    $join->where('items.name', 'like', '%' . $searchText . '%');
+                }
 
-        return $this->manager->createData($slots)->toArray();
+                if (!empty($filters['usable'])) {
+                    $join->whereNotNull('items.lasts_for');
+                }
+
+                if (!empty($filters['kingdom'])) {
+                    $join->whereNotNull('items.kingdom_damage');
+                }
+
+                if (!empty($filters['holy'])) {
+                    $join->whereNotNull('items.holy_level');
+                }
+            });
+
+        return $query->select('inventory_slots.*')->get();
     }
 
     /**
@@ -399,6 +418,12 @@ class CharacterInventoryService
 
     public function fetchCharacterQuestItems(int $perPage = 10, int $page = 1, string $searchText = ''): array {
         $slots = $this->getQuestItems($searchText);
+
+        return $this->pagination->buildPaginatedDate($slots, $this->inventoryTransformer, $perPage, $page);
+    }
+
+    public function fetchCharacterUsableItems(int $perPage = 10, int $page = 1, string $searchText = '', array $filter = []): array {
+        $slots = $this->getUsableItems($searchText, $filter);
 
         return $this->pagination->buildPaginatedDate($slots, $this->inventoryTransformer, $perPage, $page);
     }

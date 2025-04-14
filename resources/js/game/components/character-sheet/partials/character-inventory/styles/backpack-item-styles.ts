@@ -24,6 +24,11 @@ export const backpackFocusRingStyles = (item: BaseItemDetails) => {
     .with({ type: 'artifact' }, () => 'focus:ring-artifact-colors-800')
     .with({ type: 'quest' }, () => 'focus:ring-marigold-800')
     .with({ is_cosmic: true }, () => 'focus:ring-cosmic-colors-800')
+    .when(
+      (item) =>
+        item.usable || (item.holy_level ?? 0) > 0 || item.damages_kingdoms,
+      () => 'focus:ring-wisp-pink-800'
+    )
     .otherwise(() => 'focus:ring-gray-800');
 };
 
@@ -52,6 +57,11 @@ export const backpackBorderStyles = (item: BaseItemDetails) => {
     .with(
       { is_cosmic: true },
       () => 'border-cosmic-colors-800 dark:border-cosmic-colors-500'
+    )
+    .when(
+      (item) =>
+        item.usable || (item.holy_level ?? 0) > 0 || item.damages_kingdoms,
+      () => 'border-wisp-pink-800 dark:border-wisp-pink-500'
     )
     .otherwise(() => 'border-gray-800 dark:border-gray-500');
 };
@@ -101,6 +111,12 @@ export const backpackButtonBackground = (item: BaseItemDetails) => {
       () =>
         'bg-cosmic-colors-200 dark:bg-cosmic-colors-100 hover:bg-cosmic-colors-300 dark:hover:bg-cosmic-colors-200'
     )
+    .when(
+      (item) =>
+        item.usable || (item.holy_level ?? 0) > 0 || item.damages_kingdoms,
+      () =>
+        'bg-wisp-pink-200 dark:bg-wisp-pink-100 hover:bg-wisp-pink-300 dark:hover:bg-wisp-pink-200'
+    )
     .otherwise(
       () =>
         'bg-gray-200 dark:bg-gray-200 hover:bg-gray-300 dark:bg-gray-100 dark:hover:bg-gray-300'
@@ -126,6 +142,11 @@ export const backpackItemTextColors = (item: BaseItemDetails): string => {
     .with(
       { is_cosmic: true },
       () => 'text-cosmic-colors-700 dark:text-cosmic-colors-600'
+    )
+    .when(
+      (item) =>
+        item.usable || (item.holy_level ?? 0) > 0 || item.damages_kingdoms,
+      () => 'text-wisp-pink-700 dark:text-wisp-pink-600'
     )
     .otherwise(() => 'text-gray-600 dark:text-gray-700');
 };

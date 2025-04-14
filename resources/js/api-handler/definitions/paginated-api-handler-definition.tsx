@@ -2,7 +2,10 @@ import { AxiosErrorDefinition } from 'api-handler/definitions/axios-error-defini
 
 import { StateSetter } from '../../types/state-setter-type';
 
-export default interface PaginatedApiHandlerDefinition<T> {
+export default interface PaginatedApiHandlerDefinition<
+  T,
+  F extends Record<string, unknown>,
+> {
   data: T[];
   error: AxiosErrorDefinition | null;
   loading: boolean;
@@ -11,5 +14,6 @@ export default interface PaginatedApiHandlerDefinition<T> {
   page: number;
   setPage: StateSetter<number>;
   setSearchText: StateSetter<string>;
+  setFilters: StateSetter<F>;
   onEndReached: () => void;
 }

@@ -5,21 +5,25 @@ import { useApiHandler } from 'api-handler/hooks/use-api-handler';
 import { AxiosError, AxiosRequestConfig } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 
-const UsePaginatedApiHandler = <T>(
+const UsePaginatedApiHandler = <
+  T,
+  F extends Record<string, unknown> = Record<string, unknown>,
+>(
   params: ApiParametersDefinitions,
   perPage = 10
-): PaginatedApiHandlerDefinition<T> => {
+): PaginatedApiHandlerDefinition<T, F> => {
   const { apiHandler, getUrl } = useApiHandler();
   const url = getUrl(params.url, params.urlParams);
 
   const [data, setData] = useState<T[]>([]);
   const [error, setError] =
-    useState<PaginatedApiHandlerDefinition<T>['error']>(null);
+    useState<PaginatedApiHandlerDefinition<T, F>['error']>(null);
   const [loading, setLoading] = useState(true);
   const [canLoadMore, setCanLoadMore] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState('');
+  const [filters, setFilters] = useState<F>({} as F);
   const [refresh, setRefresh] = useState(false);
 
   const fetchPaginatedData = useCallback(async () => {
@@ -34,6 +38,7 @@ const UsePaginatedApiHandler = <T>(
           per_page: perPage,
           page,
           search_text: searchText,
+          filters,
         },
       });
 
@@ -77,6 +82,7 @@ const UsePaginatedApiHandler = <T>(
     page,
     onEndReached,
     setSearchText,
+    setFilters,
     setPage,
   };
 };

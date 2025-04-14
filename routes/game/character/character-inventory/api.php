@@ -2,6 +2,7 @@
 
 Route::get('/character/{character}/inventory', ['uses' => 'Api\CharacterInventoryController@inventory']);
 Route::get('/character/{character}/quest-items', ['uses' => 'Api\CharacterInventoryController@questItems']);
+Route::get('/character/{character}/usable-items', ['uses' => 'Api\CharacterInventoryController@usableItems']);
 Route::get('/character/{character}/equipped_items',  ['uses' => 'Api\CharacterInventoryController@equippedItems']);
 Route::get('/character/{character}/inventory/comparison', ['uses' => 'Api\ItemComparisonController@compareItem']);
 Route::get('/character/{character}/inventory/comparison-from-chat', ['uses' => 'Api\ItemComparisonController@compareItemFromChat']);
