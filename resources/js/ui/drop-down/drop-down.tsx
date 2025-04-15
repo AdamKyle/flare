@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { isEmpty } from 'lodash';
 import React, { ReactNode, useRef, useState, useEffect } from 'react';
 
@@ -96,9 +97,12 @@ const Dropdown = ({
             setOpen(false);
             setFocusedIndex(null);
           }}
-          className={`px-4 py-2 cursor-pointer ${
-            focusedIndex === idx ? 'bg-gray-200 dark:bg-gray-700 rounded-md' : ''
-          } hover:bg-gray-200 dark:hover:bg-gray-700`}
+          className={clsx(
+            'mx-1 my-1 px-4 py-4 cursor-pointer rounded-lg transition-colors duration-100',
+            focusedIndex === idx
+              ? 'bg-gray-300 dark:bg-gray-700'
+              : 'hover:bg-gray-300 dark:hover:bg-gray-800'
+          )}
         >
           {label}
         </li>
