@@ -292,16 +292,27 @@ class CharacterInventoryService
                     $join->where('items.name', 'like', '%' . $searchText . '%');
                 }
 
-                if (!empty($filters['usable'])) {
-                    $join->whereNotNull('items.lasts_for');
+                if (isset($filters['increase-stats'])) {
+                    $join->whereNotNull('items.increase_stat_by');
                 }
 
-                if (!empty($filters['kingdom'])) {
-                    $join->whereNotNull('items.kingdom_damage');
+                if (isset($filters['effects-skills'])) {
+                    $join->whereNotNull('items.increase_skill_bonus_by')
+                         ->whereNotNull('items.increase_skill_training_bonus_by');
                 }
 
-                if (!empty($filters['holy'])) {
-                    $join->whereNotNull('items.holy_level');
+                if (isset($filters['effects-base-modifiers'])) {
+                    $join->whereNotNull('items.base_damage_mod')
+                        ->orWhereNotNull('items.base_healing_mod')
+                        ->orWhereNotNull('items.base_attack_mod');
+                }
+
+                if (isset($filters['damages-kingdoms'])) {
+                    $join->where('items.damages_kingdoms', true);
+                }
+
+                if (isset($filters['holy-oils'])) {
+                    $join->where('items.can_use_on_other_items', true);
                 }
             });
 

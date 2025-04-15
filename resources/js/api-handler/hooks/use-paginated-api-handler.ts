@@ -63,7 +63,7 @@ const UsePaginatedApiHandler = <
   useEffect(() => {
     setPage(1);
     setRefresh((prevValue) => !prevValue);
-  }, [searchText]);
+  }, [searchText, filters]);
 
   const onEndReached = () => {
     if (!canLoadMore || isLoadingMore) {
