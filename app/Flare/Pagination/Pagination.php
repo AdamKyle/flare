@@ -15,6 +15,42 @@ readonly class Pagination {
     public function __construct(private Manager $manager) {}
 
     /**
+     * Responsible for paginating a Support Collection.
+     *
+     * @param Collection $items
+     * @param int $perPage
+     * @param int $currentPage
+     * @return array
+     */
+    public function paginateCollectionResponse(Collection $items, int $perPage = 15, int $currentPage = 1): array
+    {
+        $total = $items->count();
+        $sliced = $items->slice(($currentPage - 1) * $perPage, $perPage)->values();
+
+        $paginator = new LengthAwarePaginator($sliced, $total, $perPage, $currentPage);
+
+        return [
+            'data' => $paginator->items(),
+            'meta' => [
+                'can_load_more' => $paginator->hasMorePages(),
+                'pagination' => [
+                    'count' => $paginator->count(),
+                    'current_page' => $paginator->currentPage(),
+                    'links' => [
+                        'next' => $paginator->nextPageUrl(),
+                        'prev' => $paginator->previousPageUrl(),
+                    ],
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                    'total_pages' => $paginator->lastPage(),
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Transforms for the data and paginates it.
+     *
      * @param EloquentCollection $slots
      * @param TransformerAbstract $transformer
      * @param int $perPage

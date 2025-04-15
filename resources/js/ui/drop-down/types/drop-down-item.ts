@@ -1,1 +1,4 @@
-export type DropdownItem = Record<string, string | number>;
+export type DropdownItem = {
+  label: string;
+  value: string | number;
+};

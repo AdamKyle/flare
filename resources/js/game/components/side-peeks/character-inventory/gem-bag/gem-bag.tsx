@@ -26,7 +26,7 @@ const GemBag = ({ character_id }: GemBagProps) => {
   );
 
   const onSearch = (value: string) => {
-    debouncedSetSearchText(value);
+    debouncedSetSearchText(value.trim());
   };
 
   const { handleScroll: handleGemBagScroll } = useInfiniteScroll({

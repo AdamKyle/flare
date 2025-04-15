@@ -2,16 +2,23 @@ import clsx from 'clsx';
 import { isEmpty } from 'lodash';
 import React, { ReactNode, useRef, useState, useEffect } from 'react';
 
+import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import DropdownProps from 'ui/drop-down/types/drop-down-props';
+import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 
 const Dropdown = ({
   items,
   on_select,
   all_click_outside,
   on_clear,
+  selection_placeholder,
+  use_pagination,
+  handle_scroll,
+  additional_scroll_css,
+  pre_selected_item,
 }: DropdownProps) => {
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState('');
+  const [selected, setSelected] = useState<string | number>('');
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
@@ -60,6 +67,22 @@ const Dropdown = ({
     }
   }, [focusedIndex, open]);
 
+  useEffect(() => {
+    if (!pre_selected_item) {
+      return;
+    }
+
+    setSelected(pre_selected_item.value);
+  }, [pre_selected_item]);
+
+  const onScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (!handle_scroll) {
+      return;
+    }
+
+    handle_scroll(e);
+  };
+
   const renderDropdownIcon = (): ReactNode => {
     if (isEmpty(selected)) {
       return (
@@ -81,18 +104,17 @@ const Dropdown = ({
   };
 
   const renderItemsForDropdown = (): ReactNode => {
-    return items.map((item, idx) => {
-      const [label] = Object.keys(item);
+    return items.map((item: DropdownItem, idx) => {
       const itemId = `dropdown-item-${idx}`;
       return (
         <li
           key={idx}
           id={itemId}
           role="option"
-          aria-selected={selected === label}
+          aria-selected={selected === item.value}
           tabIndex={-1}
           onClick={() => {
-            setSelected(label);
+            setSelected(item.value);
             on_select(item);
             setOpen(false);
             setFocusedIndex(null);
@@ -104,14 +126,50 @@ const Dropdown = ({
               : 'hover:bg-gray-300 dark:hover:bg-gray-800'
           )}
         >
-          {label}
+          {item.label}
         </li>
       );
     });
   };
 
+  const renderSelectedItem = () => {
+    const found = items.find((item) => item.value === selected);
+    return found ? found.label : '';
+  };
+
   const renderDropdown = (): ReactNode => {
     if (!open) return null;
+
+    const list = (
+      <ul
+        id="dropdown-listbox"
+        role="listbox"
+        ref={listRef}
+        aria-activedescendant={
+          focusedIndex !== null ? `dropdown-item-${focusedIndex}` : undefined
+        }
+        className="w-full max-h-60 overflow-auto text-black dark:text-white"
+      >
+        {renderItemsForDropdown()}
+      </ul>
+    );
+
+    if (use_pagination) {
+      return (
+        <div className="absolute z-50 w-full mt-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 rounded-md">
+          <InfiniteScroll
+            handle_scroll={onScroll}
+            additional_css={clsx(
+              'max-h-60',
+              additional_scroll_css,
+              'scrollbar-thin scrollbar-thumb-primary-300 scrollbar-track-primary-100 dark:scrollbar-thumb-primary-400 dark:scrollbar-track-primary-200 scrollbar-thumb-rounded-md'
+            )}
+          >
+            {list}
+          </InfiniteScroll>
+        </div>
+      );
+    }
 
     return (
       <ul
@@ -121,11 +179,27 @@ const Dropdown = ({
         aria-activedescendant={
           focusedIndex !== null ? `dropdown-item-${focusedIndex}` : undefined
         }
-        className="absolute z-50 w-full mt-1 max-h-60 overflow-auto border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-black dark:text-white"
+        className="absolute z-50 w-full mt-1 max-h-60 overflow-auto border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-black dark:text-white rounded-md scrollbar-thin scrollbar-thumb-primary-300 scrollbar-track-primary-100 dark:scrollbar-thumb-primary-400 dark:scrollbar-track-primary-200 scrollbar-thumb-rounded-md"
       >
         {renderItemsForDropdown()}
       </ul>
     );
+  };
+
+  const renderSelectionText = () => {
+    if (selected) {
+      return (
+        <div className="text-gray-900 dark:text-white">
+          {renderSelectedItem()}
+        </div>
+      );
+    }
+
+    if (selection_placeholder) {
+      return <div className="text-gray-400">{selection_placeholder}</div>;
+    }
+
+    return <div className="text-gray-400">Select an option</div>;
   };
 
   return (
@@ -143,11 +217,9 @@ const Dropdown = ({
         aria-expanded={open}
         aria-controls="dropdown-listbox"
         onClick={() => setOpen((prev) => !prev)}
-        className="w-full p-2 pr-10 pl-3 rounded-md border border-gray-500 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center relative"
+        className="w-full p-2 pr-10 pl-3 rounded-md border border-gray-500 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center relative"
       >
-        <span className="flex-1 truncate">
-          {selected || 'Select an option'}
-        </span>
+        <span className="flex-1 truncate">{renderSelectionText()}</span>
         <span className="absolute right-3 top-1/2 -translate-y-1/2">
           {renderDropdownIcon()}
         </span>

@@ -28,16 +28,17 @@ const UsableItems = ({ character_id }: UsableItemsProps) => {
   );
 
   const onSearch = (value: string) => {
-    debouncedSetSearchText(value);
+    debouncedSetSearchText(value.trim());
   };
 
   const { handleScroll: handleInventoryScroll } = useInfiniteScroll({
     on_end_reached: onEndReached,
   });
 
-  const handleFilterChange = (value: DropdownItem) => {
-    const [key, val] = Object.entries(value)[0];
-    setFilters({ [val]: key });
+  const handleFilterChange = (dropDownValue: DropdownItem) => {
+    setFilters({
+      [dropDownValue.value]: true,
+    });
   };
 
   const handleClearFilters = () => {
@@ -61,12 +62,16 @@ const UsableItems = ({ character_id }: UsableItemsProps) => {
       <div className="pb-4 px-4 mt-4">
         <Dropdown
           items={[
-            { 'Increase Stats': 'increase-stats' },
-            { 'Effects Skills': 'effects-skills' },
-            { 'Effects Base Modifiers': 'effects-base-modifiers' },
-            { 'Damages Kingdoms': 'damages-kingdoms' },
-            { 'Holy Oils': 'holy-oils' },
+            { label: 'Increase Stats', value: 'increase-stats' },
+            { label: 'Effects Skills', value: 'effects-skills' },
+            {
+              label: 'Effects Base Modifiers',
+              value: 'effects-base-modifiers',
+            },
+            { label: 'Damages Kingdoms', value: 'damages-kingdoms' },
+            { label: 'Holy Oils', value: 'holy-oils' },
           ]}
+          selection_placeholder={'Filter items by'}
           on_select={handleFilterChange}
           on_clear={handleClearFilters}
         />

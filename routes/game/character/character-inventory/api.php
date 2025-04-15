@@ -6,6 +6,8 @@ Route::get('/character/{character}/usable-items', ['uses' => 'Api\CharacterInven
 Route::get('/character/{character}/equipped_items',  ['uses' => 'Api\CharacterInventoryController@equippedItems']);
 Route::get('/character/{character}/inventory/comparison', ['uses' => 'Api\ItemComparisonController@compareItem']);
 Route::get('/character/{character}/inventory/comparison-from-chat', ['uses' => 'Api\ItemComparisonController@compareItemFromChat']);
+Route::get('/character/{character}/inventory/sets', ['uses' => 'Api\CharacterInventoryController@currentSets']);
+Route::get('/character/{character}/inventory/set-items', ['uses' => 'Api\CharacterInventoryController@getSetItems']);
 
 Route::get('/character/{character}/gem-bag', ['uses' => 'Api\CharacterGemBagController@getGemSlots']);
 Route::get('/character/{character}/gem-details/{gemBagSlot}', ['uses' => 'Api\CharacterGemBagController@getGem']);

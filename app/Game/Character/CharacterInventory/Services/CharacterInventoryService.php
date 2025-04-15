@@ -220,24 +220,22 @@ class CharacterInventoryService
     /**
      * Get character inventory sets.
      */
-    public function getCharacterInventorySets(): array
+    public function getCharacterInventorySets(int $perPage = 10, int $page = 1): array
     {
         $sets = [];
 
         foreach ($this->character->inventorySets as $index => $inventorySet) {
 
-            $slots = new LeagueCollection($inventorySet->slots, $this->inventoryTransformer);
-
             if (is_null($inventorySet->name)) {
-                $sets['Set ' . $index + 1] = [
-                    'items' => array_reverse($this->manager->createData($slots)->toArray()),
+                $sets[] = [
+                    'name' => 'Set ' . $index + 1,
                     'equippable' => $inventorySet->can_be_equipped,
                     'set_id' => $inventorySet->id,
                     'equipped' => $inventorySet->is_equipped,
                 ];
             } else {
-                $sets[$inventorySet->name] = [
-                    'items' => array_reverse($this->manager->createData($slots)->toArray()),
+                $sets[] = [
+                    'name' => $inventorySet->name,
                     'equippable' => $inventorySet->can_be_equipped,
                     'set_id' => $inventorySet->id,
                     'equipped' => $inventorySet->is_equipped,
@@ -245,7 +243,33 @@ class CharacterInventoryService
             }
         }
 
-        return $sets;
+        $setCollection = collect($sets);
+
+        return $this->pagination->paginateCollectionResponse($setCollection, $perPage, $page);
+    }
+
+    public function getSetItems(int $perPage = 10, int $page = 1, string $search = '', array $filters = []): array {
+        $sets = $this->character->inventorySets();
+
+        if (isset($filters['set_id'])) {
+            $set = $sets->where('id', $filters['set_id'])->first();
+        } else {
+            $set = $sets->first();
+        }
+
+        $slots = $set->slots;
+
+        if (!empty($search)) {
+            $slots = $slots->filter(function ($slot) use ($search) {
+                $item = $slot->item;
+
+                return Str::contains(Str::lower($item->name), Str::lower($search)) ||
+                    ($item->itemPrefix && Str::contains(Str::lower($item->itemPrefix->name), Str::lower($search))) ||
+                    ($item->itemSuffix && Str::contains(Str::lower($item->itemSuffix->name), Str::lower($search)));
+            });
+        }
+
+        return $this->pagination->buildPaginatedDate($slots, $this->inventoryTransformer, $perPage, $page);
     }
 
     /**

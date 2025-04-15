@@ -75,6 +75,18 @@ class CharacterInventoryController extends Controller
         ]);
     }
 
+    public function currentSets(PaginationRequest $request, Character $character): JsonResponse {
+        return response()->json(
+            $this->characterInventoryService->setCharacter($character)->getCharacterInventorySets($request->per_page, $request->page),
+        );
+    }
+
+    public function getSetItems(PaginationRequest $request, Character $character): JsonResponse {
+        return response()->json(
+            $this->characterInventoryService->setCharacter($character)->getSetItems($request->per_page, $request->page, $request->search_text, $request->filters),
+        );
+    }
+
     public function itemDetails(Character $character, Item $item, Manager $manager, ItemTransformer $itemTransformer): JsonResponse
     {
 

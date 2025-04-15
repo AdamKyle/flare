@@ -31,7 +31,7 @@ const BackpackItems = ({
   );
 
   const onSearch = (value: string) => {
-    debouncedSetSearchText(value);
+    debouncedSetSearchText(value.trim());
   };
 
   const { handleScroll: handleInventoryScroll } = useInfiniteScroll({
