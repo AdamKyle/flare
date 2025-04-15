@@ -10,10 +10,10 @@ import BaseInventoryItemDefinition from '../api-definitions/base-inventory-item-
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
+import Dropdown from 'ui/drop-down/drop-down';
+import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
-import Dropdown from "ui/drop-down/drop-down";
-import {DropdownItem} from "ui/drop-down/types/drop-down-item";
 
 const UsableItems = ({ character_id }: UsableItemsProps) => {
   const { data, error, loading, setSearchText, setFilters, onEndReached } =
@@ -42,7 +42,7 @@ const UsableItems = ({ character_id }: UsableItemsProps) => {
 
   const handleClearFilters = () => {
     setFilters({});
-  }
+  };
 
   if (error) {
     return <GameDataError />;
@@ -59,13 +59,17 @@ const UsableItems = ({ character_id }: UsableItemsProps) => {
         <Input on_change={onSearch} clearable />
       </div>
       <div className="pb-4 px-4 mt-4">
-        <Dropdown items={[
-          {'Increase Stats': 'increase-stats'},
-          {'Effects Skills': 'effects-skills'},
-          {'Effects Base Modifiers': 'effects-base-modifiers'},
-          {'Damages Kingdoms': 'damages-kingdoms'},
-          {'Holy Oils': 'holy-oils'}
-        ]} on_select={handleFilterChange} on_clear={handleClearFilters} />
+        <Dropdown
+          items={[
+            { 'Increase Stats': 'increase-stats' },
+            { 'Effects Skills': 'effects-skills' },
+            { 'Effects Base Modifiers': 'effects-base-modifiers' },
+            { 'Damages Kingdoms': 'damages-kingdoms' },
+            { 'Holy Oils': 'holy-oils' },
+          ]}
+          on_select={handleFilterChange}
+          on_clear={handleClearFilters}
+        />
       </div>
       <div className="flex-1 min-h-0">
         <UsableItemsList

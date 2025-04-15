@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+
 import InputProps from 'ui/input/types/input-props';
 
 const Input = ({ on_change, clearable }: InputProps) => {
@@ -28,8 +29,8 @@ const Input = ({ on_change, clearable }: InputProps) => {
       >
         <i className="fas fa-times"></i>
       </button>
-    )
-  }
+    );
+  };
 
   return (
     <div className="relative w-full">
