@@ -25,9 +25,7 @@ const Actions = (props: ActionsProps): ReactNode => {
           </div>
 
           <div className="hidden lg:block absolute top-[20px] left-1/2 translate-x-[360px] w-[480px]">
-            <Card>
-              content
-            </Card>
+            <Card>content</Card>
           </div>
         </div>
       </Card>
