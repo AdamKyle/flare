@@ -20,6 +20,7 @@ export const useOpenCharacterSets = (
       is_open: true,
       title: 'Inventory Sets',
       character_id: props.character_id,
+      allow_clicking_outside: true,
     });
   };
 

@@ -23,6 +23,7 @@ export const useOpenCharacterGemBag = (
         is_open: true,
         title: 'Gem Bag',
         character_id: props.character_id,
+        allow_clicking_outside: true,
       }
     );
   };

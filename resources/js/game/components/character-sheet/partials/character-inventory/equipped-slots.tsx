@@ -1,25 +1,23 @@
-import React from "react";
+import React from 'react';
 
-import {CharacterEquippedApiUrls} from "./api/enums/character-equipped-api-urls";
-import useCharacterEquippedItemsApi from "./api/hooks/use-character-equipped-items-api";
-import {Position} from "./enums/equipment-positions";
-import {InventoryItemTypes} from "./enums/inventory-item-types";
-import EquippedSlot from "./equipped-slot";
-import EquippedSlotsProps from "./types/equipped-slots-props";
-import {fetchEquippedArmour} from "./utils/fetch-equipped-armour";
+import { CharacterEquippedApiUrls } from './api/enums/character-equipped-api-urls';
+import useCharacterEquippedItemsApi from './api/hooks/use-character-equipped-items-api';
+import { Position } from './enums/equipment-positions';
+import { InventoryItemTypes } from './enums/inventory-item-types';
+import EquippedSlot from './equipped-slot';
+import EquippedSlotsProps from './types/equipped-slots-props';
+import { fetchEquippedArmour } from './utils/fetch-equipped-armour';
 
-import {GameDataError} from "game-data/components/game-data-error";
+import { GameDataError } from 'game-data/components/game-data-error';
 
-import InfiniteLoader from "ui/loading-bar/infinite-loader";
+import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
-
-
-const EquippedSlots = ({character_id}: EquippedSlotsProps) => {
-  const {data, loading, error} = useCharacterEquippedItemsApi({
+const EquippedSlots = ({ character_id }: EquippedSlotsProps) => {
+  const { data, loading, error } = useCharacterEquippedItemsApi({
     url: CharacterEquippedApiUrls.CHARACTER_EQUIPPED,
     urlParams: {
       character: character_id,
-    }
+    },
   });
 
   if (error) {
@@ -27,7 +25,11 @@ const EquippedSlots = ({character_id}: EquippedSlotsProps) => {
   }
 
   if (loading) {
-    return <InfiniteLoader />;
+    return (
+      <div className="h-[384px]">
+        <InfiniteLoader />
+      </div>
+    );
   }
 
   return (
@@ -35,10 +37,7 @@ const EquippedSlots = ({character_id}: EquippedSlotsProps) => {
       <div className="flex flex-col items-center space-y-4">
         <div>
           <EquippedSlot
-            equipped_item={fetchEquippedArmour(
-              data,
-              InventoryItemTypes.HELMET
-            )}
+            equipped_item={fetchEquippedArmour(data, InventoryItemTypes.HELMET)}
             positionName={'Helmet'}
             position={Position.HELMET}
           />
@@ -54,10 +53,7 @@ const EquippedSlots = ({character_id}: EquippedSlotsProps) => {
             position={Position.SLEEVES_LEFT}
           />
           <EquippedSlot
-            equipped_item={fetchEquippedArmour(
-              data,
-              InventoryItemTypes.BODY
-            )}
+            equipped_item={fetchEquippedArmour(data, InventoryItemTypes.BODY)}
             positionName={'Body'}
             position={Position.BODY}
           />
@@ -73,10 +69,7 @@ const EquippedSlots = ({character_id}: EquippedSlotsProps) => {
 
         <div className="grid grid-cols-3 gap-4">
           <EquippedSlot
-            equipped_item={fetchEquippedArmour(
-              data,
-              InventoryItemTypes.GLOVES
-            )}
+            equipped_item={fetchEquippedArmour(data, InventoryItemTypes.GLOVES)}
             positionName={'Gloves (Left)'}
             position={Position.GLOVES_LEFT}
           />
@@ -89,10 +82,7 @@ const EquippedSlots = ({character_id}: EquippedSlotsProps) => {
             position={Position.LEGGINGS}
           />
           <EquippedSlot
-            equipped_item={fetchEquippedArmour(
-              data,
-              InventoryItemTypes.GLOVES
-            )}
+            equipped_item={fetchEquippedArmour(data, InventoryItemTypes.GLOVES)}
             positionName={'Gloves (Right)'}
             position={Position.GLOVES_RIGHT}
           />
@@ -100,10 +90,7 @@ const EquippedSlots = ({character_id}: EquippedSlotsProps) => {
 
         <div>
           <EquippedSlot
-            equipped_item={fetchEquippedArmour(
-              data,
-              InventoryItemTypes.FEET
-            )}
+            equipped_item={fetchEquippedArmour(data, InventoryItemTypes.FEET)}
             positionName={'Feet'}
             position={Position.FEET}
           />
@@ -148,7 +135,7 @@ const EquippedSlots = ({character_id}: EquippedSlotsProps) => {
         />
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default EquippedSlots;

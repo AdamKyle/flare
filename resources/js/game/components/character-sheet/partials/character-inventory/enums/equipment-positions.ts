@@ -92,22 +92,3 @@ export const defaultPositionImageAlt: Record<Position, string> = {
   [Position.TRINKET]: 'Trinket',
   [Position.ARTIFACT]: 'Artifact',
 };
-
-export const positionTypeMap: Record<Position, string> = {
-  [Position.HELMET]: 'helmet',
-  [Position.BODY]: 'body',
-  [Position.SLEEVES_LEFT]: 'sleeves',
-  [Position.SLEEVES_RIGHT]: 'sleeves',
-  [Position.GLOVES_LEFT]: 'gloves',
-  [Position.GLOVES_RIGHT]: 'gloves',
-  [Position.LEGGINGS]: 'leggings',
-  [Position.FEET]: 'feet',
-  [Position.WEAPON_RIGHT]: 'weapon',
-  [Position.WEAPON_LEFT]: 'weapon',
-  [Position.SPELL_RIGHT]: 'spell-one',
-  [Position.SPELL_LEFT]: 'spell-two',
-  [Position.RING_RIGHT]: 'ring-one',
-  [Position.RING_LEFT]: 'ring-two',
-  [Position.TRINKET]: 'trinket',
-  [Position.ARTIFACT]: 'artifact',
-};

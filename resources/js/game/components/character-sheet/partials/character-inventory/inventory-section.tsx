@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 
-import EquippedSlots from "./equipped-slots";
+import EquippedSlots from './equipped-slots';
 import InventorySectionProps from './types/inventory-section-props';
 import { inventoryIconButtons } from './utils/inventory-icon-buttons';
 
@@ -9,7 +9,6 @@ import { MobileIconContainer } from 'ui/icon-container/mobile-icon-container';
 const InventorySection = ({
   character_id,
 }: InventorySectionProps): ReactNode => {
-
   return (
     <div className="relative">
       <MobileIconContainer

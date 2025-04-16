@@ -22,8 +22,6 @@ export const backpackFocusRingStyles = (item: BaseItemDetails) => {
     .with({ affix_count: 1 }, () => 'focus:ring-blue-800')
     .with({ affix_count: 2 }, () => 'focus:ring-fuchsia-800')
 
-
-
     .with({ type: 'trinket' }, () => 'focus:ring-red-800')
     .with({ type: 'artifact' }, () => 'focus:ring-artifact-colors-800')
     .with({ type: 'quest' }, () => 'focus:ring-marigold-800')
@@ -53,8 +51,6 @@ export const backpackBorderStyles = (item: BaseItemDetails) => {
       { affix_count: 2 },
       () => 'border-fuchsia-800 dark:border-fuchsia-300'
     )
-
-
 
     .with({ type: 'trinket' }, () => 'border-red-800 dark:border-red-500')
     .with(
@@ -107,8 +103,6 @@ export const backpackButtonBackground = (item: BaseItemDetails) => {
         'bg-fuchsia-200 dark:bg-fuchsia-100 hover:bg-fuchsia-300 dark:hover:bg-fuchsia-200'
     )
 
-
-
     .with(
       { type: 'trinket' },
       () => 'bg-red-200 dark:bg-red-100 hover:bg-red-300 dark:hover:bg-red-200'
@@ -150,8 +144,6 @@ export const backpackItemTextColors = (item: BaseItemDetails): string => {
     )
     .with({ affix_count: 1 }, () => 'text-blue-500')
     .with({ affix_count: 2 }, () => 'text-fuchsia-800 dark:text-fuchsia-600')
-
-
 
     .with({ type: 'trinket' }, () => 'text-red-700 dark:text-red-500')
     .with(

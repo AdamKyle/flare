@@ -23,6 +23,7 @@ export const useOpenCharacterUsableInventory = (
         is_open: true,
         title: 'Usable Items',
         character_id: props.character_id,
+        allow_clicking_outside: true,
       }
     );
   };

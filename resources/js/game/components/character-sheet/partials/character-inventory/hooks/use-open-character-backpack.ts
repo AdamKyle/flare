@@ -22,6 +22,7 @@ export const useOpenCharacterBackpack = (
         is_open: true,
         title: 'Backpack',
         character_id: props.character_id,
+        allow_clicking_outside: true,
       }
     );
   };

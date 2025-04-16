@@ -4,7 +4,6 @@ import { BaseItemDetails } from '../../api-definitions/items/base-item-details';
 
 export const itemTextColor = (item: BaseItemDetails): string => {
   return match(item)
-
     .with(
       { is_cosmic: true },
       () => 'text-cosmic-colors-700 dark:text-cosmic-colors-600'
