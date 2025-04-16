@@ -13,7 +13,7 @@ const MonsterTopSection = (props: MonsterTopSectionProps): ReactNode => {
         alt="A cute cat"
         className="
                     mx-auto mt-4 rounded-md drop-shadow-md
-                    sm:w-64 md:w-72 lg:w-80 lg:w-96
+                    sm:w-64 md:w-72 lg:w-80
                     transition-all duration-300 ease-in-out transform hover:scale-105
                     dark:drop-shadow-lg dark:border dark:border-gray-700 dark:bg-gray-800
                     focus:outline-none focus:ring-2 focus:ring-danube-500 focus:ring-offset-2 focus:ring-offset-white
