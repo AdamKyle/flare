@@ -142,6 +142,20 @@ export default class FactionNpcTasks extends React.Component<
         );
     }
 
+    isCraftingTaskButtonDisabled(fameTask: FameTasks) {
+        return (
+            !this.props.can_craft ||
+            this.state.crafting ||
+            this.state.must_revive ||
+            fameTask.current_amount === fameTask.required_amount ||
+            !this.props.faction_loyalty_npc.currently_helping ||
+            !(
+                this.props.faction_loyalty_npc.npc.game_map_id ===
+                this.props.character_map_id
+            )
+        );
+    }
+
     renderTasks(fameTasks: FameTasks[], bounties: boolean) {
         return fameTasks
             .filter((fameTask: FameTasks) => {
@@ -188,15 +202,9 @@ export default class FactionNpcTasks extends React.Component<
                                                 fameTask.item_id,
                                             );
                                         }}
-                                        disabled={
-                                            !this.props.can_craft ||
-                                            this.state.crafting ||
-                                            this.state.must_revive ||
-                                            fameTask.current_amount ===
-                                                fameTask.required_amount ||
-                                            !this.props.faction_loyalty_npc
-                                                .currently_helping
-                                        }
+                                        disabled={this.isCraftingTaskButtonDisabled(
+                                            fameTask,
+                                        )}
                                     />
                                 )}
                             </div>
