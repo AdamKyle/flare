@@ -43,26 +43,7 @@ class ConjureService
         $x = $this->getXPosition();
         $y = $this->getYPosition();
 
-        if ($this->isEventWithCelestialsRunning()) {
-
-            $currentDate = now();
-
-            $eventsRunning = Event::where('started_at', '<=', $currentDate)->where('ends_at', '>=', $currentDate)->get();
-
-            foreach ($eventsRunning as $event) {
-                if ($this->isCelestialFromEventMap($event, $monster)) {
-
-                    $x = $this->getXPosition();
-                    $y = $this->getYPosition();
-
-                    $monster = $this->createCelestialRecord($x, $y, [
-                        $monster->gameMap->name,
-                    ]);
-                }
-            }
-        } else {
-            $monster = $this->createCelestialRecord($x, $y, [MapNameValue::DELUSIONAL_MEMORIES, MapNameValue::ICE_PLANE]);
-        }
+        $monster = $this->createCelestialRecord($x, $y, [MapNameValue::ICE_PLANE]);
 
         $types = ['has awoken', 'has angered', 'has enraged', 'has set free', 'has set loose'];
         $randomIndex = rand(0, count($types) - 1);
@@ -219,10 +200,10 @@ class ConjureService
         return $monsterGameMapId === $gameMapId;
     }
 
-    private function createCelestialRecord(int $x, int $y, array $additionalInvalidMaps = []): Monster
+    private function createCelestialRecord(int $x, int $y, array $invalidMapNames = []): Monster
     {
 
-        $invalidMaps = GameMap::whereIn('name', array_merge([MapNameValue::PURGATORY, MapNameValue::HELL], $additionalInvalidMaps))->pluck('id')->toArray();
+        $invalidMaps = GameMap::whereIn('name', $invalidMapNames)->pluck('id')->toArray();
 
         $monster = Monster::where('is_celestial_entity', true)
             ->whereNotIn('game_map_id', $invalidMaps)

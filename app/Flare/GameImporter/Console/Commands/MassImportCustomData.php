@@ -36,13 +36,6 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
-
-        Artisan::call('import:game-data Armour');
-        Artisan::call('import:game-data Weapons');
-        Artisan::call('clean:duplicate-craftable-items');
-        Artisan::call('assign:new-npcs-to-faction-loyalty');
-        Artisan::call('fix:faction-loyalty-crafting-tasks');
-
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
