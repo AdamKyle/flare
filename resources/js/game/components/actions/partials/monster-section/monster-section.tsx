@@ -98,7 +98,7 @@ const MonsterSection = (props: MonsterSectionProps): ReactNode => {
           on_click={() => {}}
         />
       </AttackButtonsContainer>
-      <div className='block xl:hidden'>
+      <div className="block xl:hidden">
         <Separator additional_css="w-full lg:w-1/5 mx-auto my-6" />
         <AttackMessages messages={messages} />
       </div>

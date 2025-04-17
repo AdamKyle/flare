@@ -1,10 +1,11 @@
 import React from 'react';
+
+import FightLogProps from './types/fight-log-props';
 import AttackMessages from '../../components/fight-section/attack-messages';
 import AttackMessageDefinition from '../../components/fight-section/deffinitions/attack-message-definition';
 import { AttackMessageType } from '../../components/fight-section/enums/attack-message-type';
-import FightLogProps from './types/fight-log-props';
 
-const FightLog = ({close_action}: FightLogProps) => {
+const FightLog = ({ close_action }: FightLogProps) => {
   const messages: AttackMessageDefinition[] = [
     {
       message: 'You Attack for 150,000 Damage!',
@@ -40,6 +41,6 @@ const FightLog = ({close_action}: FightLogProps) => {
       </div>
     </div>
   );
-}
+};
 
-export default FightLog
+export default FightLog;
