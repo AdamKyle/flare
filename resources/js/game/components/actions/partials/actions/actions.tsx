@@ -1,14 +1,16 @@
-import React, { ReactNode } from 'react';
 import clsx from 'clsx';
-import MonsterSection from '../monster-section/monster-section';
+import React, { ReactNode } from 'react';
+
+import NavigationActionsComponent from './navigation-actions';
 import AttackMessages from '../../components/fight-section/attack-messages';
 import FightLog from '../monster-section/fight-log';
+import MonsterSection from '../monster-section/monster-section';
 import { useScrollIconMenu } from './hooks/use-scroll-icon-menu';
-import NavigationActionsComponent from './navigation-actions';
 import ActionsProps from './types/actions-props';
-import Card from 'ui/cards/card';
 import AttackMessageDefinition from '../../components/fight-section/deffinitions/attack-message-definition';
 import { AttackMessageType } from '../../components/fight-section/enums/attack-message-type';
+
+import Card from 'ui/cards/card';
 
 interface ExtendedActionsProps extends ActionsProps {
   /** toggle showing the right‑hand Character/FightLog panel */
@@ -39,13 +41,10 @@ const Actions = (props: ExtendedActionsProps): ReactNode => {
       <Card>
         {/* outer grid: 1col on mobile, 2col when no character panel, 3col when visible */}
         <div
-          className={clsx(
-            'grid grid-cols-1 gap-4 auto-rows-min p-4',
-            {
-              'lg:grid-cols-[6rem_1fr]': !showCharacterPanel,
-              'lg:grid-cols-[6rem_1fr_1fr]': showCharacterPanel,
-            }
-          )}
+          className={clsx('grid grid-cols-1 gap-4 auto-rows-min p-4', {
+            'lg:grid-cols-[6rem_1fr]': !showCharacterPanel,
+            'lg:grid-cols-[6rem_1fr_1fr]': showCharacterPanel,
+          })}
         >
           {/* Sidebar */}
           <aside
