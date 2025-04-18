@@ -70,5 +70,5 @@ export const GameCard = (): ReactNode => {
     return <CharacterInventory close_inventory={closeInventory} />;
   }
 
-  return <Actions showMonsterStats={showMonsterStats} />;
+  return <Actions showMonsterStats={showMonsterStats} showCharacterPanel={true} />;
 };
