@@ -39,13 +39,10 @@ const Actions = (props: ExtendedActionsProps): ReactNode => {
     <div className="w-3/4 mx-auto">
       <Card>
         <div
-          className={clsx(
-            'grid grid-cols-1 gap-4 p-4 items-start',
-            {
-              'lg:grid-cols-[6rem_1fr]': !showCharacterPanel,
-              'lg:grid-cols-[6rem_1fr_1fr]': showCharacterPanel,
-            }
-          )}
+          className={clsx('grid grid-cols-1 gap-4 p-4 items-start', {
+            'lg:grid-cols-[6rem_1fr]': !showCharacterPanel,
+            'lg:grid-cols-[6rem_1fr_1fr]': showCharacterPanel,
+          })}
         >
           {/* Sidebar */}
           <aside className="flex justify-between lg:flex-col lg:space-y-2 border-b lg:border-b-0 lg:border-r pb-2 lg:pb-0">
