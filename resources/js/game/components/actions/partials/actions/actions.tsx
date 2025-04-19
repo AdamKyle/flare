@@ -13,7 +13,6 @@ import { AttackMessageType } from '../../components/fight-section/enums/attack-m
 import Card from 'ui/cards/card';
 
 interface ExtendedActionsProps extends ActionsProps {
-  /** toggle showing the right‑hand Character/FightLog panel */
   showCharacterPanel: boolean;
 }
 
@@ -39,41 +38,34 @@ const Actions = (props: ExtendedActionsProps): ReactNode => {
   return (
     <div className="w-3/4 mx-auto">
       <Card>
-        {/* outer grid: 1col on mobile, 2col when no character panel, 3col when visible */}
         <div
-          className={clsx('grid grid-cols-1 gap-4 auto-rows-min p-4', {
-            'lg:grid-cols-[6rem_1fr]': !showCharacterPanel,
-            'lg:grid-cols-[6rem_1fr_1fr]': showCharacterPanel,
-          })}
+          className={clsx(
+            'grid grid-cols-1 gap-4 p-4 items-start',
+            {
+              'lg:grid-cols-[6rem_1fr]': !showCharacterPanel,
+              'lg:grid-cols-[6rem_1fr_1fr]': showCharacterPanel,
+            }
+          )}
         >
           {/* Sidebar */}
-          <aside
-            className={clsx(
-              'flex justify-between lg:flex-col lg:space-y-2',
-              'border-b lg:border-b-0 lg:border-r pb-2 lg:pb-0'
-            )}
-          >
+          <aside className="flex justify-between lg:flex-col lg:space-y-2 border-b lg:border-b-0 lg:border-r pb-2 lg:pb-0">
             <NavigationActionsComponent scrollY={scrollY} isMobile={isMobile} />
           </aside>
 
           {/* Monster + Attack Messages */}
           <div className="flex flex-col items-center space-y-4">
             <MonsterSection show_monster_stats={showMonsterStats} />
-
             <div className="w-full p-2 bg-gray-100">
               <AttackMessages messages={messages} />
             </div>
           </div>
 
-          {/* Character/FightLog panel, only if enabled */}
-          <aside
-            className={clsx(
-              'p-4 bg-gray-50 border-t lg:border-t-0 lg:border-l',
-              { hidden: !showCharacterPanel }
-            )}
-          >
-            <FightLog close_action={() => {}} />
-          </aside>
+          {/* Character/FightLog panel (horizontal center only) */}
+          {showCharacterPanel && (
+            <aside className="p-4 bg-gray-50 border-t lg:border-t-0 lg:border-l flex justify-center">
+              <FightLog close_action={() => {}} />
+            </aside>
+          )}
         </div>
       </Card>
     </div>
