@@ -30,7 +30,6 @@ class WeeklyBattleService
      */
     public function handleCharacterDeath(Character $character, Monster $monster): void
     {
-
         if (! in_array($monster->only_for_location_type, $this->validLocationTypes)) {
             return;
         }

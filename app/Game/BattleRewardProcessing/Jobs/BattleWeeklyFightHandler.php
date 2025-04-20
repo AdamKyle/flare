@@ -2,6 +2,7 @@
 
 namespace App\Game\BattleRewardProcessing\Jobs;
 
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -26,19 +27,18 @@ class BattleWeeklyFightHandler implements ShouldQueue
      *
      * @param WeeklyBattleService $weeklyBattleService
      * @return void
+     * @throws Exception
      */
     public function handle(WeeklyBattleService $weeklyBattleService): void
     {
         $character = Character::find($this->characterId);
         $monster = Monster::find($this->monsterId);
 
-        if (is_null($character)) {
+        if (is_null($character) || is_null($monster)) {
             return;
         }
 
-        if (is_null($monster)) {
-            return;
-        }
+        $this->processWeeklyFight($character, $monster, $weeklyBattleService);
     }
 
     /**
@@ -51,6 +51,7 @@ class BattleWeeklyFightHandler implements ShouldQueue
      * @param Monster $monster
      * @param WeeklyBattleService $weeklyBattleService
      * @return void
+     * @throws Exception
      */
     private function processWeeklyFight(Character $character, Monster $monster, WeeklyBattleService $weeklyBattleService): void
     {
