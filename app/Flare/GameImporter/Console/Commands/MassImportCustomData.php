@@ -36,6 +36,9 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
+
+        Artisan::call('fix:weapon-mastery-types');
+
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
