@@ -7,6 +7,7 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
+use Exception;
 use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
@@ -18,6 +19,7 @@ class GoldRush
      *
      * @param Character $character
      * @return void
+     * @throws Exception
      */
     public function processPotentialGoldRush(Character $character): void
     {
@@ -44,7 +46,7 @@ class GoldRush
     /**
      * Give the player a gold rush.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     private function giveGoldRush(Character $character): void
     {
@@ -69,7 +71,7 @@ class GoldRush
 
         $character = $character->refresh();
 
-        ServerMessageHandler::handleMessage($character->user, $type, number_format($amountGiven), number_format($character->gold));
+        ServerMessageHandler::handleMessageWithNewValue($character->user, $type, number_format($amountGiven), number_format($character->gold));
     }
 
     /**

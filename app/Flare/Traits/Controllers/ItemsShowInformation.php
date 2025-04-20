@@ -136,7 +136,7 @@ trait ItemsShowInformation
         }
 
         if ($item->usable && ! is_null($item->affects_skill_type)) {
-            $type = new SkillTypeValue($item->affects_skill_type);
+            $type = SkillTypeValue::tryFrom($item->affects_skill_type);
 
             $query = GameSkill::where('type', $item->affects_skill_type);
 

@@ -42,10 +42,10 @@ class BattleWeeklyFightHandler implements ShouldQueue
     }
 
     /**
-     * Process dealing with weeklu fights
+     * Process dealing with weekly fights
      *
-     * - These are special locations with specific monsters that only be faught once per week.
-     *   - Handles rewards and updating the weekly fight details including marking the creature as ddefeated for the week.
+     * - These are special locations with specific monsters that only be fought once per week.
+     *   - Handles rewards and updating the weekly fight details including marking the creature as defeated for the week.
      *
      * @param Character $character
      * @param Monster $monster
