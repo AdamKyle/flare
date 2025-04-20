@@ -17,6 +17,7 @@ use App\Flare\Values\BaseSkillValue;
 use App\Flare\Values\BaseStatValue;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\ClassRanks\Values\ClassRankValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use App\Game\Core\Values\FactionLevel;
@@ -322,7 +323,7 @@ class CharacterBuilderService
      */
     protected function assignWeaponMasteriesToClassRanks(CharacterClassRank $classRank): void
     {
-        foreach (WeaponMasteryValue::getTypes() as $type) {
+        foreach (ItemType::allWeaponTypes() as $type) {
             $classRank->weaponMasteries()->create([
                 'character_class_rank_id' => $classRank->id,
                 'weapon_type' => $type,
@@ -340,67 +341,47 @@ class CharacterBuilderService
      *
      * @throws Exception
      */
-    protected function getDefaultLevel(CharacterClassRank $classRank, int $type)
+    protected function getDefaultLevel(CharacterClassRank $classRank, string $type)
     {
-        if (($classRank->gameClass->type()->isFighter() ||
-            $classRank->gameClass->type()->isThief() ||
-            $classRank->gameClass->type()->isVampire() ||
-            $classRank->gameClass->type()->isBlackSmith()) && (new WeaponMasteryValue($type))->isWeapon()) {
-            return 5;
+        $mapping = ItemTypeMapping::getForClass(
+            $classRank->gameClass->name
+        );
+
+        if (is_null($mapping)) {
+            return 0;
         }
 
-        if (($classRank->gameClass->type()->isHeretic() || $classRank->gameClass->type()->isArcaneAlchemist()) && (new WeaponMasteryValue($type))->isStaff()) {
-            return 5;
+        if (is_string($mapping)) {
+            return $type === $mapping
+                ? 5
+                : 0;
         }
 
-        if (($classRank->gameClass->type()->isHeretic() || $classRank->gameClass->type()->isArcaneAlchemist()) && (new WeaponMasteryValue($type))->isDamageSpell()) {
-            return 5;
+        $pos = array_search(
+            $type,
+            $mapping,
+            true
+        );
+
+        if ($pos === false) {
+            return 0;
         }
 
-        if (($classRank->gameClass->type()->isProphet()) && (new WeaponMasteryValue($type))->isHealingSpell()) {
-            return 5;
+        $classType = $classRank->gameClass->type();
+
+        if ($classType->isPrisoner()) {
+            return $pos === 0
+                ? 5
+                : 0;
         }
 
-        if (($classRank->gameClass->type()->isRanger() || $classRank->gameClass->type()->isArcaneAlchemist()) && (new WeaponMasteryValue($type))->isHealingSpell()) {
-            return 2;
+        if ($classType->isMerchant()) {
+            return $pos === 0
+                ? 2
+                : 3;
         }
 
-        if (($classRank->gameClass->type()->isRanger()) && (new WeaponMasteryValue($type))->isBow()) {
-            return 5;
-        }
-
-        if (($classRank->gameClass->type()->isThief() || $classRank->gameClass->type()->isArcaneAlchemist()) && (new WeaponMasteryValue($type))->isBow()) {
-            return 2;
-        }
-
-        if (($classRank->gameClass->type()->isBlackSmith()) && (new WeaponMasteryValue($type))->isHammer()) {
-            return 5;
-        }
-
-        if (($classRank->gameClass->type()->isMerchant()) && (new WeaponMasteryValue($type))->isBow()) {
-            return 3;
-        }
-
-        if (($classRank->gameClass->type()->isMerchant()) && (new WeaponMasteryValue($type))->isStaff()) {
-            return 5;
-        }
-
-        if (($classRank->gameClass->type()->isGunslinger()) && (new WeaponMasteryValue($type))->isGun()) {
-            return 5;
-        }
-
-        if (($classRank->gameClass->type()->isDancer()) && (new WeaponMasteryValue($type))->isFan()) {
-            return 5;
-        }
-
-        if (($classRank->gameClass->type()->isCleric()) && (new WeaponMasteryValue($type))->isMace()) {
-            return 5;
-        }
-
-        if (($classRank->gameClass->type()->isBookBinder()) && (new WeaponMasteryValue($type))->isScratchAwl()) {
-            return 5;
-        }
-
-        return 0;
+        return 5;
     }
+
 }
