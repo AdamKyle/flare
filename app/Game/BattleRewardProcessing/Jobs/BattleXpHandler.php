@@ -2,6 +2,7 @@
 
 namespace App\Game\BattleRewardProcessing\Jobs;
 
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -26,6 +27,7 @@ class BattleXpHandler implements ShouldQueue
      *
      * @param CharacterRewardService $characterRewardService
      * @return void
+     * @throws Exception
      */
     public function handle(CharacterRewardService $characterRewardService): void
     {
@@ -53,7 +55,7 @@ class BattleXpHandler implements ShouldQueue
      * @param Monster $monster
      * @param CharacterRewardService $characterRewardService
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     private function processXpReward(Character $character, Monster $monster, CharacterRewardService $characterRewardService): void
     {

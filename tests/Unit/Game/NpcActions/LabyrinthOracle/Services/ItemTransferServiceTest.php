@@ -498,7 +498,15 @@ class ItemTransferServiceTest extends TestCase
             'type' => 'prefix',
         ]);
 
+        $nameOfItToMoveFrom = 'Sample To Move From';
+
+        // Create a blank item as the one to move from will be deleted.
+        $this->createItem([
+            'name' => $nameOfItToMoveFrom,
+        ]);
+
         $itemToTransferFrom = $this->createItem([
+            'name'  => $nameOfItToMoveFrom,
             'item_suffix_id' => $attachedSuffix->id,
             'item_prefix_id' => $attachedPrefix->id,
             'socket_count' => 2,
@@ -602,7 +610,15 @@ class ItemTransferServiceTest extends TestCase
             'type' => 'prefix',
         ]);
 
+        $nameOfItToMoveFrom = 'Sample To Move From';
+
+        // Create a blank item as the one to move from will be deleted.
+        $this->createItem([
+            'name' => $nameOfItToMoveFrom,
+        ]);
+
         $itemToTransferFrom = $this->createItem([
+            'name' => $nameOfItToMoveFrom,
             'item_suffix_id' => $attachedSuffix->id,
             'item_prefix_id' => $attachedPrefix->id,
             'socket_count' => 2,

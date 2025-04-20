@@ -28,6 +28,38 @@ abstract class TestCase extends BaseTestCase
 
             $this->attackDataCacheSetUp->mockCacheBuilder($this->app);
         }
+
+        config([
+            'queue.default' => 'sync',
+            'queue.connections.battle_reward_xp' => [
+                'driver' => 'sync',
+            ],
+            'queue.connections.event_battle_reward' => [
+                'driver' => 'sync',
+            ],
+            'queue.connections.battle_reward_factions' => [
+                'driver' => 'sync',
+            ],
+            'queue.connections.battle_secondary_reward' => [
+                'driver' => 'sync',
+            ],
+            'queue.connections.battle_reward_currencies' => [
+                'driver' => 'sync',
+            ],
+            'queue.connections.battle_reward_global_event' => [
+                'driver' => 'sync',
+            ],
+            'queue.connections.battle_reward_location_handlers' => [
+                'driver' => 'sync',
+            ],
+            'queue.connections.battle_reward_weekly_fights' => [
+                'driver' => 'sync',
+            ],
+            'queue.connections.battle_reward_item_handler' => [
+                'driver' => 'sync',
+            ],
+        ]);
+
     }
 
     public function tearDown(): void
