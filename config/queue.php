@@ -84,7 +84,7 @@ return [
 
         'event_battle_reward' => [
             'driver' => 'redis',
-            'connection' => 'default',
+            'connection' => 'event_battle_reward',
             'queue' => 'event_battle_reward',
             'retry_after' => 1200,
             'block_for' => null,
@@ -92,7 +92,7 @@ return [
 
         'battle_reward_xp' => [
             'driver' => 'redis',
-            'connection' => 'default',
+            'connection' => 'battle_reward_xp',
             'queue' => 'battle_reward_xp',
             'retry_after' => 1200,
             'block_for' => null,
@@ -100,7 +100,7 @@ return [
 
         'exploration_battle_xp_reward' => [
             'driver' => 'redis',
-            'connection' => 'default',
+            'connection' => 'exploration_battle_xp_reward',
             'queue' => 'exploration_battle_xp_reward',
             'retry_after' => 1200,
             'block_for' => null,
@@ -108,7 +108,7 @@ return [
 
         'exploration_battle_skill_xp_reward' => [
             'driver' => 'redis',
-            'connection' => 'default',
+            'connection' => 'exploration_battle_skill_xp_reward',
             'queue' => 'exploration_battle_skill_xp_reward',
             'retry_after' => 1200,
             'block_for' => null,
@@ -116,7 +116,7 @@ return [
 
         'battle_reward_currencies' => [
             'driver' => 'redis',
-            'connection' => 'default',
+            'connection' => 'battle_reward_currencies',
             'queue' => 'battle_reward_currencies',
             'retry_after' => 1200,
             'block_for' => null,
@@ -124,7 +124,7 @@ return [
 
         'battle_secondary_reward' => [
             'driver' => 'redis',
-            'connection' => 'default',
+            'connection' => 'battle_secondary_reward',
             'queue' => 'battle_secondary_reward',
             'retry_after' => 1200,
             'block_for' => null,
@@ -132,7 +132,7 @@ return [
 
         'battle_reward_factions' => [
             'driver' => 'redis',
-            'connection' => 'default',
+            'connection' => 'battle_reward_factions',
             'queue' => 'battle_reward_factions',
             'retry_after' => 1200,
             'block_for' => null,
@@ -140,7 +140,7 @@ return [
 
         'battle_reward_global_event' => [
             'driver' => 'redis',
-            'connection' => 'default',
+            'connection' => 'battle_reward_global_event',
             'queue' => 'battle_reward_global_event',
             'retry_after' => 1200,
             'block_for' => null,
@@ -148,7 +148,7 @@ return [
 
         'battle_reward_location_handlers' => [
             'driver' => 'redis',
-            'connection' => 'default',
+            'connection' => 'battle_reward_location_handlers',
             'queue' => 'battle_reward_location_handlers',
             'retry_after' => 1200,
             'block_for' => null,
@@ -156,7 +156,7 @@ return [
 
         'battle_reward_weekly_fights' => [
             'driver' => 'redis',
-            'connection' => 'default',
+            'connection' => 'battle_reward_weekly_fights',
             'queue' => 'battle_reward_weekly_fights',
             'retry_after' => 1200,
             'block_for' => null,
@@ -164,7 +164,7 @@ return [
 
         'battle_reward_item_handler' => [
             'driver' => 'redis',
-            'connection' => 'default',
+            'connection' => 'battle_reward_item_handler',
             'queue' => 'battle_reward_item_handler',
             'retry_after' => 1200,
             'block_for' => null,
@@ -172,13 +172,14 @@ return [
 
         'long_running' => [
             'driver' => 'redis',
-            'connection' => 'default',
+            'connection' => 'long_running',
             'queue' => 'default_long',
             'retry_after' => 1200,
             'block_for' => null,
         ],
 
     ],
+
 
 
     /*
