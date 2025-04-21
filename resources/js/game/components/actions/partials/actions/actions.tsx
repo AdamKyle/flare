@@ -3,22 +3,33 @@ import React, { ReactNode } from 'react';
 
 import NavigationActionsComponent from './navigation-actions';
 import AttackMessages from '../../components/fight-section/attack-messages';
-import FightLog from '../monster-section/fight-log';
 import MonsterSection from '../monster-section/monster-section';
 import { useScrollIconMenu } from './hooks/use-scroll-icon-menu';
 import ActionsProps from './types/actions-props';
 import AttackMessageDefinition from '../../components/fight-section/deffinitions/attack-message-definition';
 import { AttackMessageType } from '../../components/fight-section/enums/attack-message-type';
+import CharacterCard from '../floating-cards/character-details/character-card';
+import { useManageCharacterCardVisibility } from '../floating-cards/character-details/hooks/use-manage-character-card-visibility';
+import CraftingCard from '../floating-cards/crafting-section/crafting-card';
+import { useManageCraftingCardVisibility } from '../floating-cards/crafting-section/hooks/use-manage-crafting-card-visibility';
 
 import Card from 'ui/cards/card';
 
-interface ExtendedActionsProps extends ActionsProps {
-  showCharacterPanel: boolean;
-}
-
-const Actions = (props: ExtendedActionsProps): ReactNode => {
+const Actions = (props: ActionsProps): ReactNode => {
   const { scrollY, isMobile } = useScrollIconMenu();
-  const { showCharacterPanel, showMonsterStats } = props;
+  const { showMonsterStats } = props;
+
+  const { showCharacterCard } = useManageCharacterCardVisibility();
+
+  const { showCraftingCard } = useManageCraftingCardVisibility();
+
+  const isShowingSideSection = (): boolean => {
+    return showCharacterCard || showCraftingCard;
+  };
+
+  const isNotShowingSideSection = (): boolean => {
+    return !showCraftingCard && !showCharacterCard;
+  };
 
   const messages: AttackMessageDefinition[] = [
     {
@@ -36,31 +47,40 @@ const Actions = (props: ExtendedActionsProps): ReactNode => {
   ];
 
   return (
-    <div className="w-3/4 mx-auto">
+    <div className="w-full lg:w-3/4 mx-auto">
       <Card>
         <div
           className={clsx('grid grid-cols-1 gap-4 p-4 items-start', {
-            'lg:grid-cols-[6rem_1fr]': !showCharacterPanel,
-            'lg:grid-cols-[6rem_1fr_1fr]': showCharacterPanel,
+            'lg:grid-cols-[6rem_1fr]': isNotShowingSideSection(),
+            'lg:grid-cols-[6rem_1fr_1fr]': isShowingSideSection(),
           })}
         >
-          {/* Sidebar */}
           <aside className="flex justify-between lg:flex-col lg:space-y-2 border-b lg:border-b-0 lg:border-r pb-2 lg:pb-0">
             <NavigationActionsComponent scrollY={scrollY} isMobile={isMobile} />
           </aside>
 
-          {/* Monster + Attack Messages */}
           <div className="flex flex-col items-center space-y-4">
-            <MonsterSection show_monster_stats={showMonsterStats} />
-            <div className="w-full p-2 bg-gray-100">
-              <AttackMessages messages={messages} />
+            <div
+              className={clsx('w-full lg:w-1/2 mx-auto', {
+                'lg:w-full': isShowingSideSection(),
+              })}
+            >
+              <MonsterSection show_monster_stats={showMonsterStats} />
+              <div className="w-full p-2 bg-gray-100 my-4">
+                <AttackMessages messages={messages} />
+              </div>
             </div>
           </div>
 
-          {/* Character/FightLog panel (horizontal center only) */}
-          {showCharacterPanel && (
+          {showCharacterCard && (
             <aside className="p-4 bg-gray-50 border-t lg:border-t-0 lg:border-l flex justify-center">
-              <FightLog close_action={() => {}} />
+              <CharacterCard />
+            </aside>
+          )}
+
+          {showCraftingCard && (
+            <aside className="p-4 bg-gray-50 border-t lg:border-t-0 lg:border-l flex justify-center">
+              <CraftingCard />
             </aside>
           )}
         </div>
