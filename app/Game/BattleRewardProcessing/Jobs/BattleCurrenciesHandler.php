@@ -2,6 +2,7 @@
 
 namespace App\Game\BattleRewardProcessing\Jobs;
 
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -55,6 +56,7 @@ class BattleCurrenciesHandler implements ShouldQueue
      * @param CharacterRewardService $characterRewardService
      * @param GoldRush $goldRush
      * @return void
+     * @throws Exception
      */
     private function handleCurrenciesRewards(Character $character, Monster $monster, CharacterRewardService $characterRewardService, GoldRush $goldRush): void
     {

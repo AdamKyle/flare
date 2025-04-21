@@ -2,6 +2,7 @@
 
 namespace App\Game\BattleRewardProcessing\Jobs;
 
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -26,31 +27,31 @@ class BattleWeeklyFightHandler implements ShouldQueue
      *
      * @param WeeklyBattleService $weeklyBattleService
      * @return void
+     * @throws Exception
      */
     public function handle(WeeklyBattleService $weeklyBattleService): void
     {
         $character = Character::find($this->characterId);
         $monster = Monster::find($this->monsterId);
 
-        if (is_null($character)) {
+        if (is_null($character) || is_null($monster)) {
             return;
         }
 
-        if (is_null($monster)) {
-            return;
-        }
+        $this->processWeeklyFight($character, $monster, $weeklyBattleService);
     }
 
     /**
-     * Process dealing with weeklu fights
+     * Process dealing with weekly fights
      *
-     * - These are special locations with specific monsters that only be faught once per week.
-     *   - Handles rewards and updating the weekly fight details including marking the creature as ddefeated for the week.
+     * - These are special locations with specific monsters that only be fought once per week.
+     *   - Handles rewards and updating the weekly fight details including marking the creature as defeated for the week.
      *
      * @param Character $character
      * @param Monster $monster
      * @param WeeklyBattleService $weeklyBattleService
      * @return void
+     * @throws Exception
      */
     private function processWeeklyFight(Character $character, Monster $monster, WeeklyBattleService $weeklyBattleService): void
     {

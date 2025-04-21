@@ -14,7 +14,7 @@ class CharacterClassRankWeaponMastery extends Model
      * @var array
      */
     protected $fillable = [
-        'class_rank_id',
+        'character_class_rank_id',
         'weapon_type',
         'current_xp',
         'required_xp',
@@ -27,7 +27,7 @@ class CharacterClassRankWeaponMastery extends Model
      * @var array
      */
     protected $casts = [
-        'class_rank_id' => 'integer',
+        'character_class_rank_id' => 'integer',
         'weapon_type' => 'string',
         'current_xp' => 'integer',
         'required_xp' => 'integer',
@@ -36,6 +36,6 @@ class CharacterClassRankWeaponMastery extends Model
 
     public function classRank()
     {
-        return $this->belongsTo(CharacterClassRank::class, 'class_rank_id', 'id');
+        return $this->belongsTo(CharacterClassRank::class, 'character_class_rank_id', 'id');
     }
 }

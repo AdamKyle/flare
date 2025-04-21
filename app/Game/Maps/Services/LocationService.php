@@ -17,7 +17,6 @@ use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackType
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Maps\Events\UpdateLocationBasedCraftingOptions;
 use App\Game\Maps\Events\UpdateLocationBasedEventGoals;
-use App\Game\Maps\Events\UpdateLocationBasedSpecialShops;
 use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
 use App\Game\Maps\Services\Common\LiveCharacterCount;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
@@ -87,6 +86,9 @@ class LocationService
             'characters_on_map' => $this->getActiveUsersCountForMap($character),
             'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type,
             'is_event_based' => $this->isEventBasedUpdate,
+            'can_access_hell_forged_shop' => $character->map->gameMap->mapType()->isHell(),
+            'can_access_purgatory_chains_shop' =>  $character->map->gameMap->mapType()->isPurgatory(),
+            'can_access_twisted_earth_shop' => $character->map->gameMap->mapType()->isTwistedMemories(),
         ];
     }
 
@@ -102,9 +104,6 @@ class LocationService
 
         // Update location based crafting options:
         event(new UpdateLocationBasedCraftingOptions($character->user));
-
-        // Update location based special shops:
-        event(new UpdateLocationBasedSpecialShops($character->user));
 
         // Update location based event goals
         event(new UpdateLocationBasedEventGoals($character->user));

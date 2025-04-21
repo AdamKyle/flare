@@ -12,6 +12,7 @@ use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Events\Values\EventType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -145,6 +146,10 @@ class BattleRewardServiceTest extends TestCase
         Queue::fake([
             BattleItemHandler::class,
         ]);
+
+        app('queue')->addConnector('sync', function () {
+            return new SyncConnector;
+        });
 
         $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
 

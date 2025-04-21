@@ -49,6 +49,8 @@ class MonsterFightService
 
             event(new AttackTimeOutEvent($character));
 
+            Cache::put('monster-fight-' . $character->id, $data, 900);
+
             return $this->successResult($data);
         }
 
