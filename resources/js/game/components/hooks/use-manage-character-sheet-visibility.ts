@@ -16,15 +16,11 @@ export const useManageCharacterSheetVisibility =
       const closeCraftingCardEvent = eventSystem.getEventEmitter<{
         [key: string]: boolean;
       }>(ActionCardEvents.OPEN_CRATING_CARD);
-      const closeChatCardEvent = eventSystem.getEventEmitter<{
-        [key: string]: boolean;
-      }>(ActionCardEvents.OPEN_CHAT_CARD);
       const closeCharacterCardEvent = eventSystem.getEventEmitter<{
         [key: string]: boolean;
       }>(ActionCardEvents.OPEN_CHARACTER_CARD);
 
       closeCraftingCardEvent.emit(ActionCardEvents.OPEN_CRATING_CARD, false);
-      closeChatCardEvent.emit(ActionCardEvents.OPEN_CHAT_CARD, false);
       closeCharacterCardEvent.emit(ActionCardEvents.OPEN_CHARACTER_CARD, false);
 
       manageCharacterSheetEmitter.emit(

@@ -1,7 +1,7 @@
 import InventoryCountDefinition from './inventory-count-definition';
 
 import ElementalAtonementDefinition from 'game-data/api-data-definitions/character/elemental-atonement-definition';
-import ReincarnationInfoDefinition from 'game-data/api-data-definitions/character/reincarnation-info-definition';
+import { ReincarnationInfoDefinition } from 'game-data/api-data-definitions/character/reincarnation-info-definition';
 import ResistanceInfoDefinition from 'game-data/api-data-definitions/character/resistance-info-definition';
 
 export default interface CharacterSheetDefinition {

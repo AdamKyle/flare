@@ -16,7 +16,7 @@ import { useManageCraftingCardVisibility } from '../floating-cards/crafting-sect
 import Card from 'ui/cards/card';
 
 const Actions = (props: ActionsProps): ReactNode => {
-  const { scrollY, isMobile } = useScrollIconMenu();
+  const { isMobile } = useScrollIconMenu();
   const { showMonsterStats } = props;
 
   const { showCharacterCard } = useManageCharacterCardVisibility();
@@ -56,7 +56,7 @@ const Actions = (props: ActionsProps): ReactNode => {
           })}
         >
           <aside className="flex justify-between lg:flex-col lg:space-y-2 border-b lg:border-b-0 lg:border-r pb-2 lg:pb-0">
-            <NavigationActionsComponent scrollY={scrollY} isMobile={isMobile} />
+            <NavigationActionsComponent isMobile={isMobile} />
           </aside>
 
           <div className="flex flex-col items-center space-y-4">

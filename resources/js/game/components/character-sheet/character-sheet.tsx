@@ -53,7 +53,7 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
     return match({ showReincarnation, showClassRanks, showInventory })
       .with({ showReincarnation: true }, () => (
         <CharacterReincarnation
-          reincarnation_info={characterData.reincarnation_info}
+          reincarnation_info={characterData.reincarnation_info.data}
         />
       ))
       .with({ showClassRanks: true }, () => <CharacterClassRanks />)

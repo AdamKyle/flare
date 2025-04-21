@@ -37,12 +37,8 @@ export const useManageCraftingCardVisibility =
       const closeCharacterCardEvent = eventSystem.getEventEmitter<{
         [key: string]: boolean;
       }>(ActionCardEvents.OPEN_CHARACTER_CARD);
-      const closeChatCardEvent = eventSystem.getEventEmitter<{
-        [key: string]: boolean;
-      }>(ActionCardEvents.OPEN_CHAT_CARD);
 
       closeCharacterCardEvent.emit(ActionCardEvents.OPEN_CHARACTER_CARD, false);
-      closeChatCardEvent.emit(ActionCardEvents.OPEN_CHAT_CARD, false);
 
       openCardEventEmitter.emit(ActionCardEvents.OPEN_CRATING_CARD, true);
     };
