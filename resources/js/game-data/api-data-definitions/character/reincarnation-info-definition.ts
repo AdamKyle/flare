@@ -7,5 +7,5 @@ export interface ReincarnationBaseInfoDefinition {
 }
 
 export interface ReincarnationInfoDefinition {
-  data: ReincarnationBaseInfoDefinition
+  data: ReincarnationBaseInfoDefinition;
 }

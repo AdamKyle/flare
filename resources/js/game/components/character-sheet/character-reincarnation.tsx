@@ -12,7 +12,6 @@ import LinkButton from 'ui/buttons/link-button';
 const CharacterReincarnation = ({
   reincarnation_info,
 }: CharacterReincarnationProps): ReactNode => {
-
   const linkLabel = (): ReactNode => {
     return (
       <span>

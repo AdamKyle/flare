@@ -11,8 +11,7 @@ const NavigationActionsComponent = (props: NavigationActions): ReactNode => {
           <IconSection />
         </div>
       ) : (
-        <div
-        >
+        <div>
           <IconSection />
         </div>
       )}

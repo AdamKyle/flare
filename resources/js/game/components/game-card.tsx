@@ -7,6 +7,7 @@ import CharacterSheet from './character-sheet/character-sheet';
 import { useAttackDetailsVisibility } from './character-sheet/hooks/use-attack-details-visibility';
 import { useStatDetailsVisibility } from './character-sheet/hooks/use-stat-details-visibility';
 import CharacterStatTypeBreakDown from './character-sheet/partials/character-stat-types/character-stat-type-breakdown';
+import Chat from './chat-section/chat';
 import GameLoader from './game-loader/game-loader';
 import { useCharacterInventoryVisibility } from './hooks/use-character-inventory-visibility';
 import { useCharacterSheetVisibility } from './hooks/use-character-sheet-visibility';
@@ -14,8 +15,6 @@ import { useGameLoaderVisibility } from './hooks/use-game-loader-visibility';
 import { useManageCharacterSheetVisibility } from './hooks/use-manage-character-sheet-visibility';
 import CharacterAttackTypeBreakdown from './partials/character-attack-type-breakdown';
 import CharacterInventory from './partials/character-inventory';
-
-import Chat from './chat-section/chat';
 
 export const GameCard = (): ReactNode => {
   const { closeCharacterSheet } = useManageCharacterSheetVisibility();
