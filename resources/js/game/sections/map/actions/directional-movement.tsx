@@ -4,7 +4,6 @@ import PrimaryOutlineButton from "../../../components/ui/buttons/primary-outline
 import TraverseModal from "../modals/traverse-modal";
 import DirectionalMovementProps from "../types/directional-movement-props";
 import DirectionalMovementState from "../types/directional-movement-state";
-import clsx from "clsx";
 
 export default class DirectionalMovement extends React.Component<
     DirectionalMovementProps,
@@ -77,6 +76,7 @@ export default class DirectionalMovement extends React.Component<
                         handle_close={this.traverse.bind(this)}
                         character_id={this.props.character_id}
                         map_id={this.props.map_id}
+                        update_map_state={this.props.update_map_state}
                     />
                 ) : null}
             </Fragment>

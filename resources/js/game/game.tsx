@@ -303,10 +303,11 @@ export default class Game extends React.Component<GameProps, GameState> {
         });
     }
 
-    setMapState(mapData: MapState): void {
-        this.setState({
-            map_data: mapData,
-        });
+    setMapState(mapData: Partial<MapState>): void {
+        this.setState((prevState) => ({
+            ...prevState,
+            ...mapData,
+        }));
     }
 
     setCanSeeFactionLoyaltyTab(canSee: boolean, factionId?: number) {
@@ -400,6 +401,10 @@ export default class Game extends React.Component<GameProps, GameState> {
         }
 
         if (this.state.character_status === null) {
+            return this.renderLoading();
+        }
+
+        if (this.state.map_data === null) {
             return this.renderLoading();
         }
 
@@ -635,6 +640,18 @@ export default class Game extends React.Component<GameProps, GameState> {
                                             update_show_map_mobile={this.updateMapVisibility.bind(
                                                 this,
                                             )}
+                                            can_access_hell_forged_shop={
+                                                this.state.map_data
+                                                    .can_access_hell_forged_shop
+                                            }
+                                            can_access_purgatory_chains_shop={
+                                                this.state.map_data
+                                                    .can_access_purgatory_chains_shop
+                                            }
+                                            can_access_twisted_earth_shop={
+                                                this.state.map_data
+                                                    .can_access_twisted_earth_shop
+                                            }
                                         />
                                     </ActionTabs>
                                 </BasicCard>

@@ -18,8 +18,6 @@ export default class MapListeners implements GameListener {
 
     private updateCraftingTypes?: Channel;
 
-    private updateSpecialShopsAccess?: Channel;
-
     private updateSpecialEventGoals?: Channel;
 
     private corruptedLocations?: Channel;
@@ -48,9 +46,6 @@ export default class MapListeners implements GameListener {
             this.updateCraftingTypes = echo.private(
                 "update-location-base-crafting-options-" + this.userId,
             );
-            this.updateSpecialShopsAccess = echo.private(
-                "update-location-base-shops-" + this.userId,
-            );
             this.updateSpecialEventGoals = echo.private(
                 "update-location-base-event-goals-" + this.userId,
             );
@@ -66,7 +61,6 @@ export default class MapListeners implements GameListener {
         this.listenToTraverse();
         this.listenToBasePositionUpdate();
         this.listForLocationBasedCraftingTypes();
-        this.listForUpdatesToSpecialShopsAccess();
         this.listenForEventGoalUpdates();
         this.listenForCorruptedLocationUpdates();
         this.listenForPctCommand();
@@ -153,41 +147,6 @@ export default class MapListeners implements GameListener {
                 character.can_access_queen = event.canUseQueenOfHearts;
                 character.can_access_labyrinth_oracle =
                     event.canAccessLabyrinthOracle;
-
-                this.component.setState({
-                    character: character,
-                });
-            },
-        );
-    }
-
-    /**
-     * Listen for when players should see specific special shop buttons.
-     *
-     * @private
-     */
-    private listForUpdatesToSpecialShopsAccess() {
-        if (!this.updateSpecialShopsAccess) {
-            return;
-        }
-
-        this.updateSpecialShopsAccess.listen(
-            "Game.Maps.Events.UpdateLocationBasedSpecialShops",
-            (event: any) => {
-                if (!this.component) {
-                    return;
-                }
-
-                const character = JSON.parse(
-                    JSON.stringify(this.component.state.character),
-                );
-
-                character.can_access_hell_forged =
-                    event.canAccessHellForgedShop;
-                character.can_access_purgatory_chains =
-                    event.canAccessPurgatoryChainsShop;
-                character.can_access_twisted_memories =
-                    event.camAccessTwistedEarthShop;
 
                 this.component.setState({
                     character: character,

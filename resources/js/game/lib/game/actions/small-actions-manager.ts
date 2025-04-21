@@ -140,21 +140,21 @@ export default class SmallActionsManager {
             });
         }
 
-        if (props.character.can_access_hell_forged) {
+        if (props.can_access_hell_forged_shop) {
             options.push({
                 label: "Hell Forged Gear",
                 value: "hell-forged-gear",
             });
         }
 
-        if (props.character.can_access_purgatory_chains) {
+        if (props.can_access_purgatory_chains_shop) {
             options.push({
                 label: "Purgatory Chains Gear",
                 value: "purgatory-chains-gear",
             });
         }
 
-        if (props.character.can_access_twisted_memories) {
+        if (props.can_access_twisted_earth_shop) {
             options.push({
                 label: "Twisted Earth",
                 value: "twisted-earth-gear",

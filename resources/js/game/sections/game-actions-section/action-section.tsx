@@ -38,6 +38,15 @@ export default class ActionSection extends React.Component<
                         update_show_map_mobile={
                             this.props.update_show_map_mobile
                         }
+                        can_access_hell_forged_shop={
+                            this.props.can_access_hell_forged_shop
+                        }
+                        can_access_purgatory_chains_shop={
+                            this.props.can_access_purgatory_chains_shop
+                        }
+                        can_access_twisted_earth_shop={
+                            this.props.can_access_twisted_earth_shop
+                        }
                     />
                 ) : (
                     <Actions
@@ -54,6 +63,15 @@ export default class ActionSection extends React.Component<
                         fame_tasks={this.props.fame_tasks}
                         update_show_map_mobile={
                             this.props.update_show_map_mobile
+                        }
+                        can_access_hell_forged_shop={
+                            this.props.can_access_hell_forged_shop
+                        }
+                        can_access_purgatory_chains_shop={
+                            this.props.can_access_purgatory_chains_shop
+                        }
+                        can_access_twisted_earth_shop={
+                            this.props.can_access_twisted_earth_shop
                         }
                     />
                 )}

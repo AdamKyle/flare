@@ -50,11 +50,6 @@ broadCast::channel('update-location-base-crafting-options-{userId}', function ($
     return $user->id === (int) $userId;
 });
 
-// When we need to update special locations
-broadCast::channel('update-location-base-shops-{userId}', function ($user, $userId) {
-    return $user->id === (int) $userId;
-});
-
 // When we need to update event goals
 broadCast::channel('update-location-base-event-goals-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;

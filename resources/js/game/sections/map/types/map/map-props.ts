@@ -32,7 +32,7 @@ export default interface MapProps {
 
     map_data: MapState | null;
 
-    set_map_data: (mapData: MapState) => void;
+    set_map_data: (mapData: Partial<MapState>) => void;
 
     can_move: boolean;
 }

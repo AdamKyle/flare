@@ -157,6 +157,10 @@ export default class MapStateManager {
             automation_time_out: 0,
             celestial_time_out: 0,
             is_event_based: data.is_event_based,
+            can_access_hell_forged_shop: data.can_access_hell_forged_shop,
+            can_access_purgatory_chains_shop:
+                data.can_access_purgatory_chains_shop,
+            can_access_twisted_earth_shop: data.can_access_twisted_earth_shop,
         };
     }
 

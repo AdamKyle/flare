@@ -34,6 +34,12 @@ export type MapDetails = {
     characters_on_map: number;
 
     is_event_based: boolean;
+
+    can_access_hell_forged_shop: boolean;
+
+    can_access_purgatory_chains_shop: boolean;
+
+    can_access_twisted_earth_shop: boolean;
 };
 
 export default interface MapState extends MapDetails {

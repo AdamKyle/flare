@@ -287,7 +287,7 @@ export default class Actions extends React.Component<
                             </div>
                         )}
 
-                        {this.props.character.can_access_hell_forged && (
+                        {this.props.can_access_hell_forged_shop && (
                             <div className="w-full">
                                 <SuccessOutlineButton
                                     button_label={"Hell Forged Gear"}
@@ -300,7 +300,7 @@ export default class Actions extends React.Component<
                             </div>
                         )}
 
-                        {this.props.character.can_access_purgatory_chains && (
+                        {this.props.can_access_purgatory_chains_shop && (
                             <div className="w-full">
                                 <SuccessOutlineButton
                                     button_label={"Purgatory Chains Gear"}
@@ -313,7 +313,7 @@ export default class Actions extends React.Component<
                             </div>
                         )}
 
-                        {this.props.character.can_access_twisted_memories && (
+                        {this.props.can_access_twisted_earth_shop && (
                             <div className="w-full">
                                 <SuccessOutlineButton
                                     button_label={"Twisted Earth Gear"}

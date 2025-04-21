@@ -64,6 +64,9 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             automation_time_out: 0,
             celestial_time_out: 0,
             is_event_based: false,
+            can_access_hell_forged_shop: false,
+            can_access_purgatory_chains_shop: false,
+            can_access_twisted_earth_shop: false,
         };
 
         // @ts-ignore
@@ -230,6 +233,8 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         const state = MapStateManager.buildChangeState(data, this);
 
         this.setState(state, () => {
+            this.props.set_map_data(data);
+
             if (typeof callback === "function") {
                 return callback();
             }

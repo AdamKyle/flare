@@ -133,6 +133,8 @@ export default class TraverseModal extends React.Component<any, any> {
                         is_traversing: false,
                     });
 
+                    this.props.update_map_state(result.data);
+
                     this.props.handle_close();
                 },
                 (error: AxiosError) => {
