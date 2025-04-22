@@ -20,6 +20,7 @@ class GameMap extends Model
     protected $fillable = [
         'name',
         'path',
+        'tile_map',
         'default',
         'kingdom_color',
         'xp_bonus',
@@ -33,6 +34,7 @@ class GameMap extends Model
     ];
 
     protected $casts = [
+        'tile_map' => 'array',
         'default' => 'boolean',
         'xp_bonus' => 'float',
         'skill_training_bonus' => 'float',

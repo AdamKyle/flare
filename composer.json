@@ -15,6 +15,7 @@
         "doctrine/dbal": "^3.1",
         "guzzlehttp/guzzle": "^7.0.1",
         "http-interop/http-factory-guzzle": "^1.0",
+        "intervention/image": "^3.11",
         "knplabs/github-api": "^3.0",
         "laravel/framework": "^11.0",
         "laravel/helpers": "^1.6",

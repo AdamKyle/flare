@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->boolean('auto_sell_item')->default(false);
+        Schema::table('game_maps', function (Blueprint $table) {
+            $table->json('tile_map')->nullable();
         });
     }
 
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('game_maps', function (Blueprint $table) {
             //
         });
     }
