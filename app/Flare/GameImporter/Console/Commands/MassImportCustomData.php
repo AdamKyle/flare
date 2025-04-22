@@ -34,12 +34,12 @@ class MassImportCustomData extends Command
 
     public function handle()
     {
-
         Artisan::call('import:game-data Items');
         Artisan::call('import:game-data "Kingdom Passive Skills"');
         Artisan::call('import:game-data Quests');
 
         $this->importInformationSection();
+
 
         if (config('app.env') !== 'production') {
             $this->importGameMaps();
