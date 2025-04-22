@@ -36,10 +36,14 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
+        Artisan::call('change:player-weapons');
 
-        Artisan::call('fix:weapon-mastery-types');
+        Item::where('type', 'weapon')->delete();
+
+        Artisan::call('fix:faction-loyalty-crafting-tasks');
 
         $this->importInformationSection();
+
 
         if (config('app.env') !== 'production') {
             $this->importGameMaps();
