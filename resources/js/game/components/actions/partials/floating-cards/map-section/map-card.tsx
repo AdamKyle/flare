@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { useManageMapSectionVisibility } from './hooks/use-manage-map-section-visibility';
+import { useToggleFullMapVisibility } from '../../../../map-section/hooks/use-toggle-full-map-visibility';
 import FloatingCard from '../../../components/icon-section/floating-card';
 
 import Button from 'ui/buttons/button';
@@ -8,6 +9,7 @@ import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 
 const MapCard = () => {
   const { closeMapCard } = useManageMapSectionVisibility();
+  const { openFullMap } = useToggleFullMapVisibility();
 
   return (
     <FloatingCard title={'Map: Surface'} close_action={closeMapCard}>
@@ -57,6 +59,14 @@ const MapCard = () => {
           on_click={() => {}}
           label={'Conjure'}
           variant={ButtonVariant.PRIMARY}
+        />
+      </div>
+      <div className="my-2 p-2 w-full">
+        <Button
+          on_click={openFullMap}
+          label={'View Full Map'}
+          variant={ButtonVariant.SUCCESS}
+          additional_css={'w-full'}
         />
       </div>
     </FloatingCard>

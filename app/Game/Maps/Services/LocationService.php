@@ -71,24 +71,27 @@ class LocationService
 
         $lockedLocation = $this->getLockedLocation($character);
 
+        $gameMap = $character->map->gameMap;
+
         return [
-            'map_url' => Storage::disk('maps')->url($character->map_url),
-            'character_map' => $character->map,
-            'locations' => $this->fetchLocationData($character)->merge($this->fetchCorruptedLocationData($raid)),
-            'can_move' => $character->can_move,
-            'can_move_again_at' => $character->can_move_again_at,
-            'coordinates' => $this->coordinatesCache->getFromCache(),
-            'celestial_id' => $this->getCelestialEntityId($character),
-            'can_settle_kingdom' => $this->canSettle,
-            'my_kingdoms' => $this->getKingdoms($character),
-            'npc_kingdoms' => Kingdom::select('id', 'x_position', 'y_position', 'npc_owned', 'name')->whereNull('character_id')->where('game_map_id', $character->map->game_map_id)->where('npc_owned', true)->get(),
-            'other_kingdoms' => $this->getEnemyKingdoms($character),
-            'characters_on_map' => $this->getActiveUsersCountForMap($character),
-            'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type,
-            'is_event_based' => $this->isEventBasedUpdate,
-            'can_access_hell_forged_shop' => $character->map->gameMap->mapType()->isHell(),
-            'can_access_purgatory_chains_shop' =>  $character->map->gameMap->mapType()->isPurgatory(),
-            'can_access_twisted_earth_shop' => $character->map->gameMap->mapType()->isTwistedMemories(),
+            'tiles' => $gameMap->tile_map,
+//            'map_url' => Storage::disk('maps')->url($character->map_url),
+//            'character_map' => $character->map,
+//            'locations' => $this->fetchLocationData($character)->merge($this->fetchCorruptedLocationData($raid)),
+//            'can_move' => $character->can_move,
+//            'can_move_again_at' => $character->can_move_again_at,
+//            'coordinates' => $this->coordinatesCache->getFromCache(),
+//            'celestial_id' => $this->getCelestialEntityId($character),
+//            'can_settle_kingdom' => $this->canSettle,
+//            'my_kingdoms' => $this->getKingdoms($character),
+//            'npc_kingdoms' => Kingdom::select('id', 'x_position', 'y_position', 'npc_owned', 'name')->whereNull('character_id')->where('game_map_id', $character->map->game_map_id)->where('npc_owned', true)->get(),
+//            'other_kingdoms' => $this->getEnemyKingdoms($character),
+//            'characters_on_map' => $this->getActiveUsersCountForMap($character),
+//            'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type,
+//            'is_event_based' => $this->isEventBasedUpdate,
+//            'can_access_hell_forged_shop' => $character->map->gameMap->mapType()->isHell(),
+//            'can_access_purgatory_chains_shop' =>  $character->map->gameMap->mapType()->isPurgatory(),
+//            'can_access_twisted_earth_shop' => $character->map->gameMap->mapType()->isTwistedMemories(),
         ];
     }
 

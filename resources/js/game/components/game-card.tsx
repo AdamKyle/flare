@@ -13,6 +13,8 @@ import { useCharacterInventoryVisibility } from './hooks/use-character-inventory
 import { useCharacterSheetVisibility } from './hooks/use-character-sheet-visibility';
 import { useGameLoaderVisibility } from './hooks/use-game-loader-visibility';
 import { useManageCharacterSheetVisibility } from './hooks/use-manage-character-sheet-visibility';
+import FullMap from './map-section/full-map';
+import { useToggleFullMapVisibility } from './map-section/hooks/use-toggle-full-map-visibility';
 import CharacterAttackTypeBreakdown from './partials/character-attack-type-breakdown';
 import CharacterInventory from './partials/character-inventory';
 
@@ -34,6 +36,8 @@ export const GameCard = (): ReactNode => {
   const { showCharacterSheet } = useCharacterSheetVisibility();
 
   const { showGameLoader } = useGameLoaderVisibility();
+
+  const { showFullMap, closeMap } = useToggleFullMapVisibility();
 
   if (showGameLoader) {
     return <GameLoader />;
@@ -69,6 +73,10 @@ export const GameCard = (): ReactNode => {
 
   if (showCharacterInventory) {
     return <CharacterInventory close_inventory={closeInventory} />;
+  }
+
+  if (showFullMap) {
+    return <FullMap close_map={closeMap} />;
   }
 
   return (
