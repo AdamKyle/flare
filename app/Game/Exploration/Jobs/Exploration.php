@@ -182,9 +182,9 @@ class Exploration implements ShouldQueue
             $totalSkillXpToReward += $characterSkillService->getXpForSkillIntraining($this->character, $monster->xp);
         }
 
-        ExplorationXpHandler::dispatch($this->character->id, 10, $totalXpToReward)->onQueue('exploration_battle_xp_reward')->delay(now()->addSeconds(2));
-        ExplorationSkillXpHandler::dispatch($this->character->id, $totalSkillXpToReward)->onQueue('exploration_battle_skill_xp_reward')->delay(now()->addSeconds(2));
-        WinterEventChristmasGiftHandler::dispatch($this->character->id)->onQueue('event_battle_reward')->delay(now()->addSeconds(2));
+        ExplorationXpHandler::dispatch($this->character->id, 10, $totalXpToReward)->onConnection('exploration_battle_xp_reward')->onQueue('exploration_battle_xp_reward')->delay(now()->addSeconds(2));
+        ExplorationSkillXpHandler::dispatch($this->character->id, $totalSkillXpToReward)->onConnection('exploration_battle_skill_xp_reward')->onQueue('exploration_battle_skill_xp_reward')->delay(now()->addSeconds(2));
+        WinterEventChristmasGiftHandler::dispatch($this->character->id)->onConnection('event_battle_reward')->onQueue('event_battle_reward')->delay(now()->addSeconds(2));
 
         Cache::put('can-character-survive-' . $this->character->id, true);
 
