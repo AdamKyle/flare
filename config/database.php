@@ -151,6 +151,7 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => env('REDIS_DB', 0),
+            'prefix' => env('REDIS_PREFIX', 'planesoftlessa_database_'),
         ],
 
         'cache' => [
@@ -159,6 +160,7 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => env('REDIS_CACHE_DB', 1),
+            'prefix' => env('REDIS_PREFIX', 'planesoftlessa_database_'),
         ],
 
         'kingdom_jobs' => [
@@ -167,6 +169,7 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => 2,
+            'prefix' => env('REDIS_PREFIX', 'planesoftlessa_database_'),
         ],
 
         'weekly_spawn' => [
@@ -175,6 +178,7 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => 3,
+            'prefix' => env('REDIS_PREFIX', 'planesoftlessa_database_'),
         ],
 
         'event_battle_reward' => [
@@ -183,6 +187,7 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => 5,
+            'prefix' => env('REDIS_PREFIX', 'planesoftlessa_database_'),
         ],
 
         'battle_reward_xp' => [
@@ -191,6 +196,7 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => 6,
+            'prefix' => env('REDIS_PREFIX', 'planesoftlessa_database_'),
         ],
 
         'exploration_battle_xp_reward' => [
@@ -199,6 +205,7 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => 7,
+            'prefix' => env('REDIS_PREFIX', 'planesoftlessa_database_'),
         ],
 
         'exploration_battle_skill_xp_reward' => [
@@ -207,6 +214,7 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => 8,
+            'prefix' => env('REDIS_PREFIX', 'planesoftlessa_database_'),
         ],
 
         'battle_reward_currencies' => [
@@ -215,6 +223,7 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => 9,
+            'prefix' => env('REDIS_PREFIX', 'planesoftlessa_database_'),
         ],
 
         'battle_secondary_reward' => [
@@ -223,6 +232,7 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => 10,
+            'prefix' => env('REDIS_PREFIX', 'planesoftlessa_database_'),
         ],
 
         'battle_reward_factions' => [
@@ -230,8 +240,8 @@ return [
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
-            'prefix' => env('REDIS_PREFIX', 'planesoftlessa_database_'),
             'database' => 11,
+            'prefix' => env('REDIS_PREFIX', 'planesoftlessa_database_'),
         ],
 
         'battle_reward_global_event' => [
@@ -240,6 +250,7 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => 12,
+            'prefix' => env('REDIS_PREFIX', 'planesoftlessa_database_'),
         ],
 
         'battle_reward_location_handlers' => [
@@ -248,6 +259,7 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => 13,
+            'prefix' => env('REDIS_PREFIX', 'planesoftlessa_database_'),
         ],
 
         'battle_reward_weekly_fights' => [
@@ -256,6 +268,7 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => 14,
+            'prefix' => env('REDIS_PREFIX', 'planesoftlessa_database_'),
         ],
 
         'battle_reward_item_handler' => [
@@ -264,6 +277,7 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => 15,
+            'prefix' => env('REDIS_PREFIX', 'planesoftlessa_database_'),
         ],
 
         'long_running' => [
@@ -272,9 +286,7 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => 16,
+            'prefix' => env('REDIS_PREFIX', 'planesoftlessa_database_'),
         ],
-
     ],
-
-
 ];
