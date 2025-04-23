@@ -143,9 +143,9 @@ class Exploration implements ShouldQueue
                 $totalSkillXpToReward += $characterSkillService->getXpForSkillIntraining($this->character, $monster->xp);
             }
 
-            ExplorationXpHandler::dispatch($this->character->id, $enemies, $totalXpToReward)->onQueue('exploration_battle_xp_reward')->delay(now()->addSeconds(2));
-            ExplorationSkillXpHandler::dispatch($this->character->id, $totalSkillXpToReward)->onQueue('exploration_battle_skill_xp_reward')->delay(now()->addSeconds(2));
-            WinterEventChristmasGiftHandler::dispatch($this->character->id)->onQueue('event_battle_reward')->delay(now()->addSeconds(2));
+            ExplorationXpHandler::dispatch($this->character->id, $enemies, $totalXpToReward)->onConnection('exploration_battle_xp_reward')->onQueue('exploration_battle_xp_reward')->delay(now()->addSeconds(2));
+            ExplorationSkillXpHandler::dispatch($this->character->id, $totalSkillXpToReward)->onConnection('exploration_battle_skill_xp_reward')->onQueue('exploration_battle_skill_xp_reward')->delay(now()->addSeconds(2));
+            WinterEventChristmasGiftHandler::dispatch($this->character->id)->onConnection('event_battle_reward')->onQueue('event_battle_reward')->delay(now()->addSeconds(2));
 
             $this->sendOutEventLogUpdate('The last of the enemies fall. Covered in blood, exhausted, you look around for any signs of more of their friends. The area is silent. "Another day, another battle.
             We managed to survive." The Guide states as he walks from the shadows. The pair of you set off in search of the next adventure ...
@@ -182,9 +182,9 @@ class Exploration implements ShouldQueue
             $totalSkillXpToReward += $characterSkillService->getXpForSkillIntraining($this->character, $monster->xp);
         }
 
-        ExplorationXpHandler::dispatch($this->character->id, 10, $totalXpToReward)->onQueue('exploration_battle_xp_reward')->delay(now()->addSeconds(2));
-        ExplorationSkillXpHandler::dispatch($this->character->id, $totalSkillXpToReward)->onQueue('exploration_battle_skill_xp_reward')->delay(now()->addSeconds(2));
-        WinterEventChristmasGiftHandler::dispatch($this->character->id)->onQueue('event_battle_reward')->delay(now()->addSeconds(2));
+        ExplorationXpHandler::dispatch($this->character->id, 10, $totalXpToReward)->onConnection('exploration_battle_xp_reward')->onQueue('exploration_battle_xp_reward')->delay(now()->addSeconds(2));
+        ExplorationSkillXpHandler::dispatch($this->character->id, $totalSkillXpToReward)->onConnection('exploration_battle_skill_xp_reward')->onQueue('exploration_battle_skill_xp_reward')->delay(now()->addSeconds(2));
+        WinterEventChristmasGiftHandler::dispatch($this->character->id)->onConnection('event_battle_reward')->onQueue('event_battle_reward')->delay(now()->addSeconds(2));
 
         Cache::put('can-character-survive-' . $this->character->id, true);
 
