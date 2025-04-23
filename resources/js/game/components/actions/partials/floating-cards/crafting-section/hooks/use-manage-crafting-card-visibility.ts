@@ -2,7 +2,6 @@ import { useEventSystem } from 'event-system/hooks/use-event-system';
 import { useEffect, useState } from 'react';
 
 import UseManageCraftingCardVisibilityDefinition from './definitions/use-manage-crafting-card-visibility-definition';
-import UseManageCraftingCardVisibilityState from './types/use-manage-crafting-card-visibility-state';
 import { ActionCardEvents } from '../../event-types/action-cards';
 
 export const useManageCraftingCardVisibility =
@@ -14,7 +13,7 @@ export const useManageCraftingCardVisibility =
     }>(ActionCardEvents.OPEN_CRATING_CARD);
 
     const [showCraftingCard, setShowCraftingCard] =
-      useState<UseManageCraftingCardVisibilityState['showCraftingCard']>(false);
+      useState<boolean>(false);
 
     useEffect(() => {
       const closeCardListener = (visible: boolean) =>
@@ -37,6 +36,12 @@ export const useManageCraftingCardVisibility =
       const closeCharacterCardEvent = eventSystem.getEventEmitter<{
         [key: string]: boolean;
       }>(ActionCardEvents.OPEN_CHARACTER_CARD);
+
+      const closeMapCardEvent = eventSystem.getEventEmitter<{
+        [key: string]: boolean;
+      }>(ActionCardEvents.OPEN_MAP_SECTION);
+
+      closeMapCardEvent.emit(ActionCardEvents.OPEN_MAP_SECTION, false);
 
       closeCharacterCardEvent.emit(ActionCardEvents.OPEN_CHARACTER_CARD, false);
 

@@ -6,11 +6,14 @@ import { useManageCraftingCardVisibility } from '../floating-cards/crafting-sect
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import IconButton from 'ui/buttons/icon-button';
 import IconContainer from 'ui/icon-container/icon-container';
+import { useManageMapSectionVisibility } from '../floating-cards/map-section/hooks/use-manage-map-section-visibility';
 
 export const IconSection = (): ReactNode => {
   const { openCharacterCard } = useManageCharacterCardVisibility();
 
   const { openCraftingCard } = useManageCraftingCardVisibility();
+
+  const { openMapCard } = useManageMapSectionVisibility();
 
   return (
     <IconContainer>
@@ -39,7 +42,7 @@ export const IconSection = (): ReactNode => {
         label="Map"
         icon={<i className="ra ra-compass text-sm" aria-hidden="true"></i>}
         variant={ButtonVariant.PRIMARY}
-        on_click={() => {}}
+        on_click={openMapCard}
         additional_css="w-full lg:w-auto"
       />
     </IconContainer>

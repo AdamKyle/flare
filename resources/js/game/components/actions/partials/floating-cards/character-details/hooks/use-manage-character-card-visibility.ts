@@ -2,7 +2,6 @@ import { useEventSystem } from 'event-system/hooks/use-event-system';
 import { useEffect, useState } from 'react';
 
 import UseManageCharacterCardVisibilityDefinition from './definitions/use-manage-character-card-visibility-definition';
-import UseManageCharacterCardVisibilityState from './types/use-manage-character-card-visibility-state';
 import { ActionCardEvents } from '../../event-types/action-cards';
 
 export const useManageCharacterCardVisibility =
@@ -14,7 +13,7 @@ export const useManageCharacterCardVisibility =
     }>(ActionCardEvents.OPEN_CHARACTER_CARD);
 
     const [showCharacterCard, setShowCharacterCard] =
-      useState<UseManageCharacterCardVisibilityState['showCharacterCard']>(
+      useState<boolean>(
         false
       );
 
@@ -40,7 +39,13 @@ export const useManageCharacterCardVisibility =
         [key: string]: boolean;
       }>(ActionCardEvents.OPEN_CRATING_CARD);
 
+      const closeMapCardEvent = eventSystem.getEventEmitter<{
+        [key: string]: boolean;
+      }>(ActionCardEvents.OPEN_MAP_SECTION);
+
       closeCraftingCardEvent.emit(ActionCardEvents.OPEN_CRATING_CARD, false);
+
+      closeMapCardEvent.emit(ActionCardEvents.OPEN_MAP_SECTION, false);
 
       manageCardEventEmitter.emit(ActionCardEvents.OPEN_CHARACTER_CARD, true);
     };

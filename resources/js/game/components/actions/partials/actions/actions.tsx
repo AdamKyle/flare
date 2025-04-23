@@ -13,6 +13,7 @@ import { useManageCharacterCardVisibility } from '../floating-cards/character-de
 import { useManageCraftingCardVisibility } from '../floating-cards/crafting-section/hooks/use-manage-crafting-card-visibility';
 
 import Card from 'ui/cards/card';
+import { useManageMapSectionVisibility } from '../floating-cards/map-section/hooks/use-manage-map-section-visibility';
 
 const Actions = (props: ActionsProps): ReactNode => {
   const { isMobile } = useIsMobile();
@@ -22,12 +23,14 @@ const Actions = (props: ActionsProps): ReactNode => {
 
   const { showCraftingCard } = useManageCraftingCardVisibility();
 
+  const {showMapCard} = useManageMapSectionVisibility();
+
   const isShowingSideSection = (): boolean => {
-    return showCharacterCard || showCraftingCard;
+    return showCharacterCard || showCraftingCard || showMapCard;
   };
 
   const isNotShowingSideSection = (): boolean => {
-    return !showCraftingCard && !showCharacterCard;
+    return !showCraftingCard && !showCharacterCard && !showMapCard;
   };
 
   const messages: AttackMessageDefinition[] = [
