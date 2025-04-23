@@ -1,8 +1,8 @@
 import { useEventSystem } from 'event-system/hooks/use-event-system';
 import { useEffect, useState } from 'react';
 
-import { ActionCardEvents } from '../../event-types/action-cards';
 import UseManageMapSectionVisibilityDefinition from './definitions/use-manage-map-section-visibility-definition';
+import { ActionCardEvents } from '../../event-types/action-cards';
 
 export const useManageMapSectionVisibility =
   (): UseManageMapSectionVisibilityDefinition => {
@@ -12,12 +12,10 @@ export const useManageMapSectionVisibility =
       [key: string]: boolean;
     }>(ActionCardEvents.OPEN_MAP_SECTION);
 
-    const [showMapCard, setShowMapCard] =
-      useState<boolean>(false);
+    const [showMapCard, setShowMapCard] = useState<boolean>(false);
 
     useEffect(() => {
-      const closeCardListener = (visible: boolean) =>
-        setShowMapCard(visible);
+      const closeCardListener = (visible: boolean) => setShowMapCard(visible);
 
       openMapEventEmitter.on(
         ActionCardEvents.OPEN_MAP_SECTION,

@@ -11,9 +11,9 @@ import AttackMessageDefinition from '../../components/fight-section/deffinitions
 import { AttackMessageType } from '../../components/fight-section/enums/attack-message-type';
 import { useManageCharacterCardVisibility } from '../floating-cards/character-details/hooks/use-manage-character-card-visibility';
 import { useManageCraftingCardVisibility } from '../floating-cards/crafting-section/hooks/use-manage-crafting-card-visibility';
+import { useManageMapSectionVisibility } from '../floating-cards/map-section/hooks/use-manage-map-section-visibility';
 
 import Card from 'ui/cards/card';
-import { useManageMapSectionVisibility } from '../floating-cards/map-section/hooks/use-manage-map-section-visibility';
 
 const Actions = (props: ActionsProps): ReactNode => {
   const { isMobile } = useIsMobile();
@@ -23,7 +23,7 @@ const Actions = (props: ActionsProps): ReactNode => {
 
   const { showCraftingCard } = useManageCraftingCardVisibility();
 
-  const {showMapCard} = useManageMapSectionVisibility();
+  const { showMapCard } = useManageMapSectionVisibility();
 
   const isShowingSideSection = (): boolean => {
     return showCharacterCard || showCraftingCard || showMapCard;

@@ -12,7 +12,7 @@ const ActionSection = () => {
 
   const { showCraftingCard } = useManageCraftingCardVisibility();
 
-  const {showMapCard} = useManageMapSectionVisibility();
+  const { showMapCard } = useManageMapSectionVisibility();
 
   const renderCharacterSheetSection = () => {
     if (!showCharacterCard) {
@@ -35,8 +35,8 @@ const ActionSection = () => {
       return;
     }
 
-    return <MapCard />
-  }
+    return <MapCard />;
+  };
 
   return (
     <aside className="p-4 bg-gray-50 lg:border-l flex justify-center">

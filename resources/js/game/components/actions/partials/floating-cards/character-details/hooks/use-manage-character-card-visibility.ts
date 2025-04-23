@@ -12,10 +12,7 @@ export const useManageCharacterCardVisibility =
       [key: string]: boolean;
     }>(ActionCardEvents.OPEN_CHARACTER_CARD);
 
-    const [showCharacterCard, setShowCharacterCard] =
-      useState<boolean>(
-        false
-      );
+    const [showCharacterCard, setShowCharacterCard] = useState<boolean>(false);
 
     useEffect(() => {
       const closeCardListener = (visible: boolean) =>

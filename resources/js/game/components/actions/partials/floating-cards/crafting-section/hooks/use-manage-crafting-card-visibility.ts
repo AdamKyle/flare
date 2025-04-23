@@ -12,8 +12,7 @@ export const useManageCraftingCardVisibility =
       [key: string]: boolean;
     }>(ActionCardEvents.OPEN_CRATING_CARD);
 
-    const [showCraftingCard, setShowCraftingCard] =
-      useState<boolean>(false);
+    const [showCraftingCard, setShowCraftingCard] = useState<boolean>(false);
 
     useEffect(() => {
       const closeCardListener = (visible: boolean) =>
