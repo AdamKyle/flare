@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import UseDraggableContainerDefinition from 'ui/draggable/hooks/definition/use-draggable-container-definition';
 
 /**
- * A hook that enables dragging of any content inside a container using mouse interaction.
+ * A hook that enables dragging of any content inside a container using mouse interaction,
+ * with enforced bounds so the draggable content can't escape the visible container.
  *
  * @returns An object containing:
  * - `containerRef`: Ref to attach to the outer container.
@@ -21,14 +22,25 @@ export function useDraggableContainer(): UseDraggableContainerDefinition {
 
   useEffect(() => {
     function onMouseMove(e: MouseEvent) {
-      if (!dragging || !start) return;
+      if (!dragging || !start || !containerRef.current || !contentRef.current)
+        return;
 
-      setPosition((prev) => {
-        const newX = prev.x + e.clientX - start.x;
-        const newY = prev.y + e.clientY - start.y;
-        setStart({ x: e.clientX, y: e.clientY });
-        return { x: newX, y: newY };
-      });
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const contentRect = contentRef.current.getBoundingClientRect();
+
+      const deltaX = e.clientX - start.x;
+      const deltaY = e.clientY - start.y;
+
+      const newX = position.x + deltaX;
+      const newY = position.y + deltaY;
+
+      const minX = containerRect.width - contentRect.width;
+      const minY = containerRect.height - contentRect.height;
+      const clampedX = Math.min(0, Math.max(minX, newX));
+      const clampedY = Math.min(0, Math.max(minY, newY));
+
+      setPosition({ x: clampedX, y: clampedY });
+      setStart({ x: e.clientX, y: e.clientY });
     }
 
     function onMouseUp() {
@@ -42,7 +54,7 @@ export function useDraggableContainer(): UseDraggableContainerDefinition {
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
     };
-  }, [dragging, start]);
+  }, [dragging, start, position]);
 
   function onMouseDown(e: React.MouseEvent) {
     setDragging(true);

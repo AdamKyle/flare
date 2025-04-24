@@ -3,7 +3,7 @@ import React from 'react';
 
 import { MapApiUrls } from './api/enums/map-api-urls';
 import useBaseMapDetailsApi from './api/hooks/use-base-map-details-api';
-import DraggableMap from './draggable-map';
+import Map from './map';
 import FullMapProps from './types/full-map-props';
 
 import { GameDataError } from 'game-data/components/game-data-error';
@@ -64,19 +64,13 @@ const FullMap = ({ close_map }: FullMapProps) => {
     );
   }
 
-  const tiles = data.tiles;
-
   return (
     <ContainerWithTitle
       manageSectionVisibility={close_map}
       title={'Map: Surface'}
     >
       <Card>
-        <DraggableMap
-          containerHeight={500}
-          containerWidth={500}
-          tiles={tiles}
-        />
+        <Map additional_css={'h-[550px]'} />
       </Card>
     </ContainerWithTitle>
   );

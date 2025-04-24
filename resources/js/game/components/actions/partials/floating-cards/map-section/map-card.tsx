@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useManageMapSectionVisibility } from './hooks/use-manage-map-section-visibility';
 import { useToggleFullMapVisibility } from '../../../../map-section/hooks/use-toggle-full-map-visibility';
+import Map from '../../../../map-section/map';
 import FloatingCard from '../../../components/icon-section/floating-card';
 
 import Button from 'ui/buttons/button';
@@ -14,7 +15,7 @@ const MapCard = () => {
   return (
     <FloatingCard title={'Map: Surface'} close_action={closeMapCard}>
       <div className="text-center">
-        <img src={'https://placecats.com/neo/500/500'} />
+        <Map additional_css={'h-[350px] border-2 border-slate-600'} />
       </div>
       <div className="my-2 p-2 flex flex-col gap-2 md:flex-row justify-center">
         <Button
