@@ -23,7 +23,7 @@ const useBaseMapDetailsApi = (
         BaseMapApiDefinition,
         AxiosRequestConfig<AxiosResponse<BaseMapApiDefinition>>
       >(url);
-
+      console.log(result);
       setData(result);
     } catch (error) {
       if (error instanceof AxiosError) {

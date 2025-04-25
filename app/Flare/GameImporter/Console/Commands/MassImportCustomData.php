@@ -34,9 +34,6 @@ class MassImportCustomData extends Command
 
     public function handle()
     {
-        Artisan::call('import:game-data Items');
-        Artisan::call('import:game-data "Kingdom Passive Skills"');
-        Artisan::call('import:game-data Quests');
 
         $this->importInformationSection();
 
@@ -45,15 +42,9 @@ class MassImportCustomData extends Command
             $this->importGameMaps();
         }
 
+        Artisan::call('break:maps-into-pieces');
+
         $this->importSurveys();
-
-        if (config('app.env') !== 'production') {
-            $this->importGameMaps();
-        }
-
-        Artisan::call('assign:new-skills');
-        Artisan::call('create:quest-cache');
-        Artisan::call('create:character-attack-data');
     }
 
     /**

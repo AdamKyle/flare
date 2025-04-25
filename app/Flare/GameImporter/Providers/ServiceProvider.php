@@ -3,6 +3,7 @@
 namespace App\Flare\GameImporter\Providers;
 
 use App\Flare\GameImporter\Console\Commands\ImportGameData;
+use App\Flare\GameImporter\Console\Commands\MassImportCustomData;
 use App\Flare\GameImporter\Values\ExcelMapper;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
@@ -21,6 +22,7 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->commands([
             ImportGameData::class,
+            MassImportCustomData::class,
         ]);
     }
 

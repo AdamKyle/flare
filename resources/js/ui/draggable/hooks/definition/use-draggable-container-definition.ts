@@ -5,4 +5,6 @@ export default interface UseDraggableContainerDefinition {
   contentRef: React.RefObject<HTMLDivElement | null>;
   position: { x: number; y: number };
   onMouseDown: (e: React.MouseEvent) => void;
+  onTouchStart: (e: React.TouchEvent) => void;
+  onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => void;
 }

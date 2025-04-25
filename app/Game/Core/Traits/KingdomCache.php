@@ -18,12 +18,6 @@ trait KingdomCache
      */
     public function getKingdoms(Character $character): array
     {
-        $plane = $character->map->gameMap->name;
-
-        if (Cache::has('character-kingdoms-'.$plane.'-'.$character->id)) {
-            return Cache::get('character-kingdoms-'.$plane.'-'.$character->id);
-        }
-
         $kingdoms = Kingdom::select('id', 'x_position', 'y_position', 'color', 'name')
             ->where('character_id', $character->id)
             ->where('game_map_id', $character->map->game_map_id)
@@ -33,9 +27,7 @@ trait KingdomCache
             return [];
         }
 
-        Cache::put('character-kingdoms-'.$plane.'-'.$character->id, $this->createKingdomArray($kingdoms));
-
-        return Cache::get('character-kingdoms-'.$plane.'-'.$character->id);
+        return $this->createKingdomArray($kingdoms);
     }
 
     /**
@@ -202,7 +194,6 @@ trait KingdomCache
                 'name' => $kingdom->name,
                 'x_position' => $kingdom->x_position,
                 'y_position' => $kingdom->y_position,
-                'color' => $kingdom->color,
             ];
         }
 
