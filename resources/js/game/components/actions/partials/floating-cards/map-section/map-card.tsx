@@ -15,7 +15,10 @@ const MapCard = () => {
   return (
     <FloatingCard title={'Map: Surface'} close_action={closeMapCard}>
       <div className="text-center">
-        <Map additional_css={'h-[350px] border-2 border-slate-600'} />
+        <Map
+          additional_css={'h-[350px] border-2 border-slate-600'}
+          zoom={2.25}
+        />
       </div>
       <div className="my-2 p-2 flex flex-col gap-2 md:flex-row justify-center">
         <Button

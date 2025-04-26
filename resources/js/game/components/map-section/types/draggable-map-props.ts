@@ -5,4 +5,5 @@ export default interface DraggableMapProps {
   map_icons?: MapIcon[];
   additional_css: string;
   on_click: (mapIcon: MapIcon) => void;
+  zoom?: number;
 }

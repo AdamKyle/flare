@@ -14,7 +14,7 @@ import { useGameData } from 'game-data/hooks/use-game-data';
 
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
-const Map = ({ additional_css }: MapProps) => {
+const Map = ({ additional_css, zoom }: MapProps) => {
   const { gameData } = useGameData();
 
   const characterData = gameData?.character;
@@ -68,6 +68,7 @@ const Map = ({ additional_css }: MapProps) => {
         tiles={tiles}
         map_icons={characterKingdoms}
         on_click={handleMapClick}
+        zoom={zoom}
       />
     </div>
   );
