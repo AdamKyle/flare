@@ -5,6 +5,7 @@ import importPlugin from 'eslint-plugin-import';
 import stylisticJs from '@stylistic/eslint-plugin-js';
 import reactHooks from 'eslint-plugin-react-hooks';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
+import prettierPlugin from 'eslint-plugin-prettier';
 
 export default [
   {
@@ -26,6 +27,7 @@ export default [
       '@stylistic/js': stylisticJs,
       'react-hooks': reactHooks,
       'jsx-a11y': jsxA11y,
+      'prettier': prettierPlugin,
     },
     settings: {
       'import/resolver': {
@@ -45,6 +47,7 @@ export default [
     rules: {
       ...eslint.configs.recommended.rules,
       ...tseslint.configs.recommended.rules,
+      ...prettierPlugin.configs.recommended.rules,
       "import/order": [
         "warn",
         {
@@ -125,7 +128,7 @@ export default [
           ignoreUrls: true,
           ignoreStrings: true,
           ignoreTemplateLiterals: true,
-          ignoreComments: false
+          ignoreComments: true
         }
       ],
       // stylistic variant
@@ -137,7 +140,7 @@ export default [
           ignoreUrls: true,
           ignoreStrings: true,
           ignoreTemplateLiterals: true,
-          ignoreComments: false
+          ignoreComments: true
         }
       ],
       "no-undef": [
