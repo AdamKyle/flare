@@ -8,6 +8,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
+use App\Flare\Models\Map;
 use App\Flare\Models\Raid;
 use App\Flare\Values\LocationEffectValue;
 use App\Flare\Values\LocationType;
@@ -75,6 +76,7 @@ class LocationService
 
         return [
             'tiles' => $gameMap->tile_map,
+            'character_position' => $this->characterPosition($character->map),
 //            'map_url' => Storage::disk('maps')->url($character->map_url),
 //            'character_map' => $character->map,
 //            'locations' => $this->fetchLocationData($character)->merge($this->fetchCorruptedLocationData($raid)),
@@ -92,6 +94,15 @@ class LocationService
 //            'can_access_hell_forged_shop' => $character->map->gameMap->mapType()->isHell(),
 //            'can_access_purgatory_chains_shop' =>  $character->map->gameMap->mapType()->isPurgatory(),
 //            'can_access_twisted_earth_shop' => $character->map->gameMap->mapType()->isTwistedMemories(),
+        ];
+    }
+
+    protected function characterPosition(Map $map): array {
+        return [
+            'x_position' => $map->character_position_x,
+            'y_position' => $map->character_position_y,
+            'position_x' => $map->position_x,
+            'position_y' => $map->position_y,
         ];
     }
 

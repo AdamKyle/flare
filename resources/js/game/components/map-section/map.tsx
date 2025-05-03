@@ -1,5 +1,5 @@
 import { isNil } from 'lodash';
-import React from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 
 import { MapApiUrls } from './api/enums/map-api-urls';
 import useBaseMapDetailsApi from './api/hooks/use-base-map-details-api';
@@ -15,6 +15,14 @@ import { useGameData } from 'game-data/hooks/use-game-data';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const Map = ({ additional_css, zoom }: MapProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    console.log('🔍 [Step 1] container size:', rect.width, rect.height);
+  }, []);
+
   const { gameData } = useGameData();
 
   const characterData = gameData?.character;
@@ -61,12 +69,21 @@ const Map = ({ additional_css, zoom }: MapProps) => {
     }
   );
 
+  const characterPosition: MapIcon = {
+    x: data.character_position.x_position,
+    y: data.character_position.y_position,
+    src: MapIconPaths.CHARACTER,
+    alt: characterData.name,
+    id: characterData.id,
+  };
+
   return (
-    <div className={additional_css}>
+    <div className={additional_css} ref={containerRef}>
       <DraggableMap
         additional_css={'w-full h-full'}
         tiles={tiles}
         map_icons={characterKingdoms}
+        character={characterPosition}
         on_click={handleMapClick}
         zoom={zoom}
       />

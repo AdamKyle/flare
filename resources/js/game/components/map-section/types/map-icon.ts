@@ -3,6 +3,6 @@ export default interface MapIcon {
   y: number;
   src: string;
   alt?: string;
-  is_character_kingdom: boolean;
+  is_character_kingdom?: boolean;
   id: number;
 }

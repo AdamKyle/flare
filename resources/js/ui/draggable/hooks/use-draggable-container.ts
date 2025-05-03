@@ -112,6 +112,7 @@ export const useDraggableContainer = (): UseDraggableContainerDefinition => {
     containerRef,
     contentRef,
     position,
+    setPosition,
     onMouseDown,
     onTouchStart,
     onKeyDown,

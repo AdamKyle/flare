@@ -1,6 +1,7 @@
 import React from 'react';
 
 import DraggableMapProps from './types/draggable-map-props';
+import { calculateCharacterCenter } from './utils/map-geometry';
 
 import DraggableContainerWrapper from 'ui/draggable/draggable-container';
 
@@ -10,6 +11,7 @@ const DraggableMap = ({
   tiles,
   additional_css,
   map_icons = [],
+  character,
   on_click,
   zoom = 1,
 }: DraggableMapProps) => {
@@ -35,6 +37,31 @@ const DraggableMap = ({
         }}
       />
     ));
+  };
+
+  const renderCharacter = () => {
+    return (
+      <img
+        className="absolute"
+        src={character.src}
+        alt={character.alt}
+        draggable={false}
+        style={{
+          left: `${character.x * zoom}px`,
+          top: `${character.y * zoom}px`,
+          width: `${16 * zoom}px`,
+          height: `${16 * zoom}px`,
+          imageRendering: 'pixelated',
+          backgroundColor: 'transparent',
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat',
+          border: 'none',
+          padding: 0,
+          margin: 0,
+          zIndex: 1,
+        }}
+      />
+    );
   };
 
   const renderIcons = () => {
@@ -63,8 +90,18 @@ const DraggableMap = ({
     ));
   };
 
+  const characterCenter = calculateCharacterCenter(
+    character.x,
+    character.y,
+    zoom
+  );
+
   return (
-    <DraggableContainerWrapper additional_css={additional_css}>
+    <DraggableContainerWrapper
+      additional_css={additional_css}
+      center_on_x={characterCenter.charCenterX}
+      center_on_y={characterCenter.charCenterY}
+    >
       <div
         role="group"
         aria-label="Map grid"
@@ -78,6 +115,7 @@ const DraggableMap = ({
         }}
       >
         {renderMap()}
+        {renderCharacter()}
         {renderIcons()}
       </div>
     </DraggableContainerWrapper>

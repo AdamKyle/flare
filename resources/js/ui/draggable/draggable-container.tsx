@@ -1,21 +1,36 @@
 import clsx from 'clsx';
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 
 import { useDraggableContainer } from 'ui/draggable/hooks/use-draggable-container';
 import DraggableContainerWrapperProps from 'ui/draggable/types/draggable-container-wrapper-props';
+import { calculateClamCentreOffset } from 'ui/draggable/utils/calculate-clam-centre-offset';
 
 const DraggableContainerWrapper = ({
   additional_css,
   children,
+  center_on_x,
+  center_on_y,
 }: DraggableContainerWrapperProps) => {
   const {
     containerRef,
     contentRef,
     position,
+    setPosition,
     onMouseDown,
     onTouchStart,
     onKeyDown,
   } = useDraggableContainer();
+
+  useLayoutEffect(() => {
+    const centerOffset = calculateClamCentreOffset(
+      containerRef,
+      contentRef,
+      center_on_x,
+      center_on_y
+    );
+
+    setPosition({ x: centerOffset.clamped_x, y: centerOffset.clamped_y });
+  }, [containerRef, contentRef, center_on_x, center_on_y, setPosition]);
 
   return (
     <div
