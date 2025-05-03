@@ -1,3 +1,5 @@
+import CharacterSheetDefinition from 'game-data/api-data-definitions/character/character-sheet-definition';
+
 export default interface UseOpenCharacterKingdomInfoModalProps {
-  character_id: number;
+  characterData: CharacterSheetDefinition | null | undefined;
 }

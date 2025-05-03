@@ -6,4 +6,5 @@ export default interface MapDetailsApiRequestParams {
   characterData?: CharacterSheetDefinition | null;
   url: string;
   callback?: StateSetter<{ x: number; y: number }>;
+  handleResetMapMovement?: () => void;
 }

@@ -18,15 +18,13 @@ import { useGameData } from 'game-data/hooks/use-game-data';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const Map = ({ additional_css, zoom }: MapProps) => {
-  const { movementAmount, movementType, resetMovementAmount } =
-    useDirectionallyMoveCharacter();
-
-  const containerRef = useRef<HTMLDivElement>(null);
-
   const [characterMapPosition, setCharacterMapPosition] = useState<{
     x: number;
     y: number;
   }>({ x: 0, y: 0 });
+
+  const { movementAmount, movementType, resetMovementAmount } =
+    useDirectionallyMoveCharacter();
 
   const { gameData } = useGameData();
 
@@ -34,23 +32,27 @@ const Map = ({ additional_css, zoom }: MapProps) => {
 
   const { loading, error, data } = useBaseMapDetailsApi({
     url: MapApiUrls.BASE_MAP_DETAILS,
-    characterData: characterData,
     callback: setCharacterMapPosition,
+    characterData,
   });
 
   const { setRequestParams, error: movementError } =
     useMoveCharacterDirectionallyApi({
       url: MapApiUrls.MOVE_CHARACTER_DIRECTIONALLY,
-      characterData: characterData,
       callback: setCharacterMapPosition,
+      handleResetMapMovement: resetMovementAmount,
+      characterData,
     });
 
   const { setUpdateCharacterPosition, updatePosition } =
     useProcessDirectionalMovement({
       onPositionChange: setRequestParams,
       onCharacterPositionChange: setCharacterMapPosition,
-      handleResetMovement: resetMovementAmount,
     });
+
+  const { openCharacterKingdomDetails } = useOpenCharacterKingdomInfoModal({
+    characterData
+  });
 
   useEffect(() => {
     if (!movementType) {
@@ -70,10 +72,6 @@ const Map = ({ additional_css, zoom }: MapProps) => {
   if (!characterData) {
     return <GameDataError />;
   }
-
-  const { openCharacterKingdomDetails } = useOpenCharacterKingdomInfoModal({
-    character_id: characterData.id,
-  });
 
   if (loading) {
     return <InfiniteLoader />;
@@ -102,8 +100,6 @@ const Map = ({ additional_css, zoom }: MapProps) => {
     }
   );
 
-  console.log('characterMapPosition', characterMapPosition);
-
   const characterPosition: MapIcon = {
     x: characterMapPosition.x,
     y: characterMapPosition.y,
@@ -113,7 +109,7 @@ const Map = ({ additional_css, zoom }: MapProps) => {
   };
 
   return (
-    <div className={additional_css} ref={containerRef}>
+    <div className={additional_css}>
       <DraggableMap
         additional_css={'w-full h-full'}
         tiles={tiles}

@@ -30,6 +30,7 @@ export const useMoveCharacterDirectionallyApi = (
     if (!params.characterData) {
       return;
     }
+
     try {
       const result = await apiHandler.post<
         CharacterPosition,
@@ -39,6 +40,11 @@ export const useMoveCharacterDirectionallyApi = (
         character_position_x: requestParams.character_position_x,
         character_position_y: requestParams.character_position_y,
       });
+
+      if (params.handleResetMapMovement) {
+        params.handleResetMapMovement();
+      }
+
       if (params.callback) {
         params.callback({
           x: result.x_position,
@@ -56,6 +62,7 @@ export const useMoveCharacterDirectionallyApi = (
     if (!params.characterData) {
       return;
     }
+
     if (
       requestParams.character_position_x < 16 &&
       requestParams.character_position_y < 16

@@ -6,5 +6,4 @@ export default interface UseProcessDirectionalMovementParams {
     character_position_y: number;
   }>;
   onCharacterPositionChange: StateSetter<{ x: number; y: number }>;
-  handleResetMovement: () => void;
 }
