@@ -6,6 +6,7 @@ import stylisticJs from '@stylistic/eslint-plugin-js';
 import reactHooks from 'eslint-plugin-react-hooks';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import prettierPlugin from 'eslint-plugin-prettier';
+import unusedImports from 'eslint-plugin-unused-imports';
 
 export default [
   {
@@ -28,6 +29,7 @@ export default [
       'react-hooks': reactHooks,
       'jsx-a11y': jsxA11y,
       'prettier': prettierPlugin,
+      'unused-imports': unusedImports,
     },
     settings: {
       'import/resolver': {
@@ -48,6 +50,22 @@ export default [
       ...eslint.configs.recommended.rules,
       ...tseslint.configs.recommended.rules,
       ...prettierPlugin.configs.recommended.rules,
+
+      // remove TypeScript‑ESLint’s unused‑vars check
+      '@typescript-eslint/no-unused-vars': 'off',
+
+      // auto‑remove unused imports and variables
+      'unused-imports/no-unused-imports': 'warn',
+      'unused-imports/no-unused-vars': [
+        'warn',
+        {
+          vars: 'all',
+          varsIgnorePattern: '^_',
+          args: 'after-used',
+          argsIgnorePattern: '^_',
+        },
+      ],
+
       "import/order": [
         "warn",
         {
@@ -119,7 +137,6 @@ export default [
           },
         },
       ],
-      // core ESLint max‑len
       'max-len': [
         'warn',
         {
@@ -131,7 +148,6 @@ export default [
           ignoreComments: true
         }
       ],
-      // stylistic variant
       '@stylistic/js/max-len': [
         'warn',
         {

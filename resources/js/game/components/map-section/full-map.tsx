@@ -18,6 +18,11 @@ const FullMap = ({ close_map }: FullMapProps) => {
 
   const characterData = gameData?.character;
 
+  const { loading, error, data } = useBaseMapDetailsApi({
+    url: MapApiUrls.BASE_MAP_DETAILS,
+    characterData,
+  });
+
   if (!characterData) {
     return (
       <ContainerWithTitle
@@ -30,13 +35,6 @@ const FullMap = ({ close_map }: FullMapProps) => {
       </ContainerWithTitle>
     );
   }
-
-  const { loading, error, data } = useBaseMapDetailsApi({
-    url: MapApiUrls.BASE_MAP_DETAILS,
-    urlParams: {
-      character: characterData.id,
-    },
-  });
 
   if (loading) {
     return (

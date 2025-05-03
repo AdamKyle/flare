@@ -29,8 +29,6 @@ const CharacterCardDetails = ({
       characterData.inventory_count.data.inventory_max) *
     100;
 
-  console.log(characterData);
-
   return (
     <>
       <XpBar current_xp={characterData.xp} max_xp={characterData.xp_next} />

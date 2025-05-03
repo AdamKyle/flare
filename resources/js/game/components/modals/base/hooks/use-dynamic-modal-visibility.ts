@@ -30,8 +30,6 @@ export const useDynamicModalVisibility =
         key: ModalComponentRegistrationTypes,
         props: AllModalProps
       ) => {
-        console.log('useDynamicModalVisibility', key, props);
-
         setComponentKey(key);
         setComponentProps({
           ...defaultModalProps,

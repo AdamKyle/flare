@@ -11,7 +11,7 @@ export type ModalComponentPropsMap = {
 /**
  * Enforces at compile time that every modal extends the Modal Props from the UI component.
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 type _ValidateAllModalProps = {
   [K in keyof ModalComponentPropsMap]: ModalComponentPropsMap[K] extends ModalProps
     ? true
