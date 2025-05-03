@@ -16,12 +16,10 @@ import { GameDataError } from 'game-data/components/game-data-error';
 import { useGameData } from 'game-data/hooks/use-game-data';
 
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
+import CharacterMapPosition from './types/character-map-position';
 
 const Map = ({ additional_css, zoom }: MapProps) => {
-  const [characterMapPosition, setCharacterMapPosition] = useState<{
-    x: number;
-    y: number;
-  }>({ x: 0, y: 0 });
+  const [characterMapPosition, setCharacterMapPosition] = useState<CharacterMapPosition>({ x: 0, y: 0 });
 
   const { movementAmount, movementType, resetMovementAmount } =
     useDirectionallyMoveCharacter();
