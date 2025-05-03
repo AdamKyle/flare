@@ -15,11 +15,14 @@ export const useDirectionallyMoveCharacter =
     );
 
     const moveCharacterEmitter = eventSystem.fetchOrCreateEventEmitter<{
-      [key: string]: [number, MapMovementTypes];
+      [key: string]: [number, MapMovementTypes | null];
     }>(MapActions.MOVE_CHARACTER);
 
     useEffect(() => {
-      const updateMovement = (amount: number, type: MapMovementTypes) => {
+      const updateMovement = (
+        amount: number,
+        type: MapMovementTypes | null
+      ) => {
         setMovementAmount(amount);
         setMovementType(type);
       };
@@ -38,9 +41,14 @@ export const useDirectionallyMoveCharacter =
       moveCharacterEmitter.emit(MapActions.MOVE_CHARACTER, amount, direction);
     };
 
+    const resetMovementAmount = () => {
+      moveCharacterEmitter.emit(MapActions.MOVE_CHARACTER, 0, null);
+    };
+
     return {
       movementAmount,
       movementType,
       moveCharacterDirectionally,
+      resetMovementAmount,
     };
   };

@@ -70,7 +70,7 @@ class WalkingService extends BaseMovementService
         if (! is_null($location)) {
 
             if ($this->traversePlayer($location, $character)) {
-                return $this->successResult($this->movementService->accessLocationService()->getLocationData($character));
+                return $this->successResult($this->movementService->accessLocationService()->getCharacterPositionData($character->map));
             }
 
             $this->movementService->giveLocationReward($character, $location);
@@ -80,6 +80,6 @@ class WalkingService extends BaseMovementService
 
         event(new MoveTimeOutEvent($character));
 
-        return $this->successResult($this->movementService->accessLocationService()->getLocationData($character));
+        return $this->successResult($this->movementService->accessLocationService()->getCharacterPositionData($character->map));
     }
 }

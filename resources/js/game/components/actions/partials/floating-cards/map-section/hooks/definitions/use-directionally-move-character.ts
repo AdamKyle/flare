@@ -7,4 +7,5 @@ export default interface UseDirectionallyMoveCharacter {
     amount: number,
     direction: MapMovementTypes
   ) => void;
+  resetMovementAmount: () => void;
 }

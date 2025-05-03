@@ -4,10 +4,10 @@ import { useCallback, useEffect, useState } from 'react';
 
 import BaseMapApiDefinition from './definitions/base-map-api-definition';
 import BaseMapDetailsApiDefinition from './definitions/base-map-details-api-definition';
-import UseBaseMapDetailsParams from './definitions/use-base-map-details-params';
+import MapDetailsApiRequestParams from './definitions/map-details-api-request-params';
 
 const useBaseMapDetailsApi = (
-  params: UseBaseMapDetailsParams
+  params: MapDetailsApiRequestParams
 ): BaseMapDetailsApiDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
 
@@ -16,19 +16,18 @@ const useBaseMapDetailsApi = (
     useState<BaseMapDetailsApiDefinition['error']>(null);
   const [loading, setLoading] = useState(true);
 
-  if (!params.characterData) {
-    setLoading(false);
+  let url = '';
 
-    return {
-      data,
-      error,
-      loading,
-    };
+  if (params.characterData) {
+    url = getUrl(params.url, { character: params.characterData.id });
   }
 
-  const url = getUrl(params.url, { character: params.characterData.id });
+  const fetchCharacterMapDetails = useCallback(async () => {
+    if (!params.characterData) {
+      setLoading(false);
+      return;
+    }
 
-  const fetchCharacterEquippedItems = useCallback(async () => {
     try {
       const result = await apiHandler.get<
         BaseMapApiDefinition,
@@ -37,19 +36,15 @@ const useBaseMapDetailsApi = (
 
       setData(result);
 
-      if (!params.callback) {
-        return;
+      if (params.callback) {
+        params.callback({
+          x: result.character_position.x_position,
+          y: result.character_position.y_position,
+        });
       }
-
-      params.callback({
-        x: result.character_position.x_position,
-        y: result.character_position.y_position,
-      });
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        setError(error.response?.data || null);
-      } else {
-        setError(null);
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        setError(err.response?.data || null);
       }
     } finally {
       setLoading(false);
@@ -57,8 +52,8 @@ const useBaseMapDetailsApi = (
   }, [apiHandler, url]);
 
   useEffect(() => {
-    fetchCharacterEquippedItems().catch(console.error);
-  }, [fetchCharacterEquippedItems]);
+    fetchCharacterMapDetails().catch(() => {});
+  }, [fetchCharacterMapDetails]);
 
   return {
     data,

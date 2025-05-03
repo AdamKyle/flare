@@ -26,8 +26,6 @@ class MoveRequest extends FormRequest
         return [
             'character_position_x' => 'required|integer',
             'character_position_y' => 'required|integer',
-            'position_x' => 'required|integer',
-            'position_y' => 'required|integer',
         ];
     }
 
@@ -41,8 +39,6 @@ class MoveRequest extends FormRequest
         return [
             'character_position_x.required' => 'character x position is required.',
             'character_position_y.required' => 'character y position is required.',
-            'position_x.required' => 'position x is required.',
-            'position_y.required' => 'position y is required.',
         ];
     }
 }

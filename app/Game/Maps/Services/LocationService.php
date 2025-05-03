@@ -76,7 +76,7 @@ class LocationService
 
         return [
             'tiles' => $gameMap->tile_map,
-            'character_position' => $this->characterPosition($character->map),
+            'character_position' => $this->getCharacterPositionData($character->map),
 //            'map_url' => Storage::disk('maps')->url($character->map_url),
 //            'character_map' => $character->map,
 //            'locations' => $this->fetchLocationData($character)->merge($this->fetchCorruptedLocationData($raid)),
@@ -97,12 +97,11 @@ class LocationService
         ];
     }
 
-    protected function characterPosition(Map $map): array {
+
+    public function getCharacterPositionData(Map $map): array {
         return [
             'x_position' => $map->character_position_x,
             'y_position' => $map->character_position_y,
-            'position_x' => $map->position_x,
-            'position_y' => $map->position_y,
         ];
     }
 

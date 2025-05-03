@@ -1,49 +1,25 @@
 import { isNil } from 'lodash';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { MapApiUrls } from './api/enums/map-api-urls';
 import useBaseMapDetailsApi from './api/hooks/use-base-map-details-api';
+import { useMoveCharacterDirectionallyApi } from './api/hooks/use-move-character-directionally-api';
 import DraggableMap from './draggable-map';
 import { MapIconPaths } from './enums/map-icon-paths';
 import { useOpenCharacterKingdomInfoModal } from './hooks/use-open-character-kingdom-info-modal';
+import { useProcessDirectionalMovement } from './hooks/use-process-directional-movement';
 import MapIcon from './types/map-icon';
 import MapProps from './types/map-props';
 import { useDirectionallyMoveCharacter } from '../actions/partials/floating-cards/map-section/hooks/use-directionally-move-character';
-import { MapMovementTypes } from '../actions/partials/floating-cards/map-section/map-movement-types/map-movement-types';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 import { useGameData } from 'game-data/hooks/use-game-data';
 
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
-const getNextPosition = (
-  baseX: number,
-  baseY: number,
-  movementAmount: number,
-  movementType: MapMovementTypes | null
-): { x: number; y: number } => {
-  if (!movementType) {
-    return { x: baseX, y: baseY };
-  }
-
-  if (movementType === MapMovementTypes.EAST) {
-    baseX += movementAmount;
-  }
-  if (movementType === MapMovementTypes.WEST) {
-    baseX += movementAmount;
-  }
-  if (movementType === MapMovementTypes.NORTH) {
-    baseY += movementAmount;
-  }
-  if (movementType === MapMovementTypes.SOUTH) {
-    baseY += movementAmount;
-  }
-
-  return { x: baseX, y: baseY };
-};
-
 const Map = ({ additional_css, zoom }: MapProps) => {
-  const { movementAmount, movementType } = useDirectionallyMoveCharacter();
+  const { movementAmount, movementType, resetMovementAmount } =
+    useDirectionallyMoveCharacter();
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -62,6 +38,35 @@ const Map = ({ additional_css, zoom }: MapProps) => {
     callback: setCharacterMapPosition,
   });
 
+  const { setRequestParams, error: movementError } =
+    useMoveCharacterDirectionallyApi({
+      url: MapApiUrls.MOVE_CHARACTER_DIRECTIONALLY,
+      characterData: characterData,
+      callback: setCharacterMapPosition,
+    });
+
+  const { setUpdateCharacterPosition, updatePosition } =
+    useProcessDirectionalMovement({
+      onPositionChange: setRequestParams,
+      onCharacterPositionChange: setCharacterMapPosition,
+      handleResetMovement: resetMovementAmount,
+    });
+
+  useEffect(() => {
+    if (!movementType) {
+      return;
+    }
+
+    updatePosition({
+      baseX: characterMapPosition.x,
+      baseY: characterMapPosition.y,
+      movementAmount,
+      movementType,
+    });
+
+    setUpdateCharacterPosition((prevValue) => !prevValue);
+  }, [movementAmount, movementType]);
+
   if (!characterData) {
     return <GameDataError />;
   }
@@ -74,7 +79,7 @@ const Map = ({ additional_css, zoom }: MapProps) => {
     return <InfiniteLoader />;
   }
 
-  if (isNil(data) || error) {
+  if (isNil(data) || error || movementError) {
     return <GameDataError />;
   }
 
@@ -97,16 +102,11 @@ const Map = ({ additional_css, zoom }: MapProps) => {
     }
   );
 
-  const newCharacterPosition = getNextPosition(
-    characterMapPosition.x,
-    characterMapPosition.y,
-    movementAmount,
-    movementType
-  );
+  console.log('characterMapPosition', characterMapPosition);
 
   const characterPosition: MapIcon = {
-    x: newCharacterPosition.x,
-    y: newCharacterPosition.y,
+    x: characterMapPosition.x,
+    y: characterMapPosition.y,
     src: MapIconPaths.CHARACTER,
     alt: characterData.name,
     id: characterData.id,

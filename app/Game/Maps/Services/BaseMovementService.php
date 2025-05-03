@@ -170,6 +170,13 @@ class BaseMovementService
     {
         $coordinates = $this->coordinatesCache->getFromCache();
 
+        dump(
+            $coordinates['x'],
+            $this->x,
+            $coordinates['y'],
+            $this->y,
+        );
+
         if (! in_array($this->x, $coordinates['x']) || ! in_array($this->y, $coordinates['y'])) {
             return false;
         }
