@@ -1,0 +1,62 @@
+{
+  "entry": [
+    "resources/js/app.ts"
+  ],
+  "extensions": [
+    ".ts",
+    ".tsx",
+    ".js",
+    ".jsx"
+  ],
+  "ignoreUnused": [
+    "@headlessui/react",
+    "@types/node",
+    "@types/react-resizable",
+    "framer-motion",
+    "postcss-custom-properties",
+    "postcss-import",
+    "postcss-nested",
+    "postcss-nesting",
+    "rpg-awesome",
+    "tailwind-scrollbar",
+    "tailwindcss-classnames",
+    "tippy.js"
+  ],
+  "ignorePatterns": [
+    "postcss.config.js",
+    "vite.config.ts",
+    "eslint.config.js",
+    "eslint-rules/**",
+    "resources/js/dts/**",
+    "public/**",
+    "resources/js/vendor/livewire-data-tables.js",
+    "resources/js/vendor/livewire.js",
+    "resources/js/vendor/theme-script.js",
+    "tailwind.config.js",
+    "vite.config.js"
+  ],
+  "ignoreUnresolved": [],
+  "ignoreUnimported": [
+    "resources/vendor/theme/assets/js/components/alerts.js",
+    "resources/vendor/theme/assets/js/components/cards.js",
+    "resources/vendor/theme/assets/js/components/charts.js",
+    "resources/vendor/theme/assets/js/components/collapse.js",
+    "resources/vendor/theme/assets/js/components/customizer.js",
+    "resources/vendor/theme/assets/js/components/extras-charts.js",
+    "resources/vendor/theme/assets/js/components/file-input.js",
+    "resources/vendor/theme/assets/js/components/fullscreen.js",
+    "resources/vendor/theme/assets/js/components/menu.js",
+    "resources/vendor/theme/assets/js/components/modal.js",
+    "resources/vendor/theme/assets/js/components/overlay.js",
+    "resources/vendor/theme/assets/js/components/rating-stars.js",
+    "resources/vendor/theme/assets/js/components/show-password.js",
+    "resources/vendor/theme/assets/js/components/sidebar.js",
+    "resources/vendor/theme/assets/js/components/tabs.js",
+    "resources/vendor/theme/assets/js/components/tippy.js",
+    "resources/vendor/theme/assets/js/components/toasts.js",
+    "resources/vendor/theme/assets/js/components/toggle-darkmode.js",
+    "resources/vendor/theme/assets/js/dark-mode/dark-mode.js",
+    "resources/vendor/theme/assets/js/extras.js",
+    "resources/vendor/theme/assets/js/script.js"
+  ]
+}

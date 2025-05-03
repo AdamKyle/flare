@@ -2,7 +2,7 @@ import { AxiosErrorDefinition } from 'api-handler/definitions/axios-error-defini
 
 import CharacterStatBreakDownDefinition from '../../../api-definitions/character-stat-break-down-definition';
 
-export default interface UseCharacterStatBreakDownState {
+export default interface UseGetCharacterStatBreakdownDefinition {
   data: CharacterStatBreakDownDefinition | null;
   error: AxiosErrorDefinition | null;
   loading: boolean;

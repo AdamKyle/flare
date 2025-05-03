@@ -4,17 +4,14 @@ import { useEffect, useState } from 'react';
 import { StatTypes } from '../enums/stat-types';
 import { CharacterSheet } from '../event-types/character-sheet';
 import UseStatDefinitionVisibilityDefinition from './definitions/use-stat-definition-visibility-definition';
-import UseStatDetailsVisibilityState from './types/use-stat-details-visibility-state';
 
 export const useStatDetailsVisibility =
   (): UseStatDefinitionVisibilityDefinition => {
     const eventSystem = useEventSystem();
 
-    const [showStatDetails, setShowStatDetails] =
-      useState<UseStatDetailsVisibilityState['showStateDetails']>(false);
+    const [showStatDetails, setShowStatDetails] = useState<boolean>(false);
 
-    const [statType, setStatType] =
-      useState<UseStatDetailsVisibilityState['statType']>(null);
+    const [statType, setStatType] = useState<StatTypes | null>(null);
 
     const manageStatDetailsEmitter = eventSystem.fetchOrCreateEventEmitter<{
       [key: string]: [boolean, StatTypes?];

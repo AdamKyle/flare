@@ -9,7 +9,7 @@ export const useCharacterSheetVisibility =
     const eventSystem = useEventSystem();
 
     const [showCharacterSheet, setShowCharacterSheet] =
-      useState<UseCharacterSheetVisibilityState['showCharacterSheet']>(false);
+      useState<boolean>(false);
 
     const characterSheetVisibility = eventSystem.fetchOrCreateEventEmitter<{
       [key: string]: boolean;

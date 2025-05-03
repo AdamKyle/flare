@@ -2,15 +2,13 @@ import { useEventSystem } from 'event-system/hooks/use-event-system';
 import { useEffect, useState } from 'react';
 
 import UseGameLoaderVisibilityDefinition from './definitions/use-game-loader-visibility-definition';
-import GameLoaderVisibility from './types/use-game-loader-visibility';
 import { GameLoaderEvents } from '../game-loader/event-types/game-loader-events';
 
 export const useGameLoaderVisibility =
   (): UseGameLoaderVisibilityDefinition => {
     const eventSystem = useEventSystem();
 
-    const [showGameLoader, setShowGameLoader] =
-      useState<GameLoaderVisibility['showGameLoader']>(true);
+    const [showGameLoader, setShowGameLoader] = useState<boolean>(true);
 
     const gameLoaderVisibility = eventSystem.fetchOrCreateEventEmitter<{
       [key: string]: boolean;

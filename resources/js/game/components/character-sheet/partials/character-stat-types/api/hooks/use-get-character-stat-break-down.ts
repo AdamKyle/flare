@@ -4,22 +4,22 @@ import { useState, useEffect, useCallback } from 'react';
 
 import FetchCharacterStatInfoApiParams from './definitions/fetch-character-stat-info-api-params';
 import UseGetCharacterStatBreakDownParams from './definitions/use-get-character-stat-break-down-params';
-import UseCharacterStatBreakDownState from './types/use-character-stat-break-down-state';
 import CharacterStatBreakDownDefinition from '../../api-definitions/character-stat-break-down-definition';
 import { characterStatParamBuilder } from '../param-builders/character-stat-param-builder';
+import UseGetCharacterStatBreakdownDefinition from './types/use-get-character-stat-breakdown-definition';
 
 export const useGetCharacterStatBreakDown = (
   params: UseGetCharacterStatBreakDownParams
-) => {
+): UseGetCharacterStatBreakdownDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
   const url = getUrl(params.url, params.urlParams);
 
-  const [data, setData] =
-    useState<UseCharacterStatBreakDownState['data']>(null);
+  const [data, setData] = useState<CharacterStatBreakDownDefinition | null>(
+    null
+  );
   const [error, setError] =
-    useState<UseCharacterStatBreakDownState['error']>(null);
-  const [loading, setLoading] =
-    useState<UseCharacterStatBreakDownState['loading']>(true);
+    useState<UseGetCharacterStatBreakdownDefinition['error']>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchCharacterStatInfo = useCallback(
     async ({ statType }: FetchCharacterStatInfoApiParams) => {

@@ -4,18 +4,13 @@ import { useEffect, useState } from 'react';
 import { AttackTypes } from '../enums/attack-types';
 import { CharacterSheet } from '../event-types/character-sheet';
 import UseManageAttackDetailsVisibilityDefinition from './definitions/use-manage-attack-details-visibility-definition';
-import UseManageAttackTypeDetailsVisibilityState from './types/use-manage-attack-type-details-visibility-state';
 
 export const useAttackDetailsVisibility =
   (): UseManageAttackDetailsVisibilityDefinition => {
     const eventSystem = useEventSystem();
 
-    const [showAttackType, setShowAttackType] =
-      useState<UseManageAttackTypeDetailsVisibilityState['showAttackType']>(
-        false
-      );
-    const [attackType, setAttackType] =
-      useState<UseManageAttackTypeDetailsVisibilityState['attackType']>(null);
+    const [showAttackType, setShowAttackType] = useState<boolean>(false);
+    const [attackType, setAttackType] = useState<AttackTypes | null>(null);
 
     const manageAttackDetailsEmitter = eventSystem.fetchOrCreateEventEmitter<{
       [key: string]: [boolean, AttackTypes?];

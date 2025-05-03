@@ -3,15 +3,16 @@ import { useCallback, useRef, useState } from 'react';
 
 import BatchApiCallsParameterDefinition from './definitions/batch-api-calls-parameter-definition';
 import UseBatchApiCallsDefinition from './definitions/use-batch-api-calls-definition';
-import { BatchApiCallsState } from './types/use-batch-api-calls-state';
+
+import GameDataDefinition from 'game-data/deffinitions/game-data-definition';
 
 export const useBatchApiCalls = (
   apiCalls: BatchApiCallsParameterDefinition[]
 ): UseBatchApiCallsDefinition => {
-  const [loading, setLoading] = useState<BatchApiCallsState['loading']>(true);
-  const [progress, setProgress] = useState<BatchApiCallsState['progress']>(0);
-  const [error, setError] = useState<BatchApiCallsState['error']>(null);
-  const [data, setData] = useState<BatchApiCallsState['data']>({
+  const [loading, setLoading] = useState<boolean>(true);
+  const [progress, setProgress] = useState<number>(0);
+  const [error, setError] = useState<UseBatchApiCallsDefinition['error']>(null);
+  const [data, setData] = useState<GameDataDefinition>({
     character: null,
     monsters: [],
   });

@@ -3,16 +3,12 @@ import { useEffect, useState } from 'react';
 
 import useManageCharacterInventoryVisibilityDefinition from './definitions/use-manage-character-inventory-visibility-definition';
 import { CharacterSheet } from '../event-types/character-sheet';
-import useManageCharacterInventoryVisibilityState from './types/use-manage-character-inventory-visibility-state';
 
 export const useManageCharacterInventoryVisibility =
   (): useManageCharacterInventoryVisibilityDefinition => {
     const eventSystem = useEventSystem();
 
-    const [showInventory, setShowInventory] =
-      useState<useManageCharacterInventoryVisibilityState['showInventory']>(
-        false
-      );
+    const [showInventory, setShowInventory] = useState<boolean>(false);
 
     const manageInventoryEmitter = eventSystem.fetchOrCreateEventEmitter<{
       [key: string]: boolean;

@@ -1,1 +1,1 @@
-yarn lint && yarn type-check && yarn cleanup
+yarn lint && yarn type-check && yarn cleanup && yarn unused-files-check

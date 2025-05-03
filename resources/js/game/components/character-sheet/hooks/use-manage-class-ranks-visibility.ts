@@ -3,14 +3,12 @@ import { useEffect, useState } from 'react';
 
 import useManageClassRanksVisibilityDefinition from './definitions/use-manage-class-ranks-visibility-definition';
 import { CharacterSheet } from '../event-types/character-sheet';
-import UseManageClassRanksVisibilityState from './types/use-manage-class-ranks-visibility-state';
 
 export const useManageClassRanksVisibility =
   (): useManageClassRanksVisibilityDefinition => {
     const eventSystem = useEventSystem();
 
-    const [showClassRanks, setShowClassRanks] =
-      useState<UseManageClassRanksVisibilityState['showClassRanks']>(false);
+    const [showClassRanks, setShowClassRanks] = useState<boolean>(false);
 
     const manageClassRanksEventEmitter = eventSystem.fetchOrCreateEventEmitter<{
       [key: string]: boolean;

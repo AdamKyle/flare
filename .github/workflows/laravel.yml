@@ -41,6 +41,12 @@ jobs:
         run: php artisan storage:link
       - name: Install dependencies (Laravel Vite)
         run: yarn build
+      - name: Run Yarn Checks
+        run: | 
+          yarn lint
+          yarn type-check
+          yarn cleanup
+          yarn unused-files-check
       - name: Execute tests (Unit and Feature tests) via PHPUnit
         env:
           DB_CONNECTION: mysql
