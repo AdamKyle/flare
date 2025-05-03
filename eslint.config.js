@@ -7,6 +7,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import prettierPlugin from 'eslint-plugin-prettier';
 import unusedImports from 'eslint-plugin-unused-imports';
+import noEarlyReturnHook from './eslint-rules/no-early-return-before-hook.js';
 
 export default [
   {
@@ -30,6 +31,11 @@ export default [
       'jsx-a11y': jsxA11y,
       'prettier': prettierPlugin,
       'unused-imports': unusedImports,
+      'local-hooks': {
+        rules: {
+          'no-early-return-before-hook': noEarlyReturnHook,
+        },
+      },
     },
     settings: {
       'import/resolver': {
@@ -61,6 +67,9 @@ export default [
       // Validate hooks and dep
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
+
+      // Custom hook: No early returns before hook calls.
+      'local-hooks/no-early-return-before-hook': 'error',
 
       'unused-imports/no-unused-vars': [
         'warn',
