@@ -26,52 +26,60 @@ export const useMoveCharacterDirectionallyApi = (
     url = getUrl(params.url, { character: params.characterData.id });
   }
 
-  const moveCharacterDirectionally = useCallback(async () => {
-    if (!params.characterData) {
-      return;
-    }
-
-    try {
-      const result = await apiHandler.post<
-        CharacterPosition,
-        AxiosRequestConfig<AxiosResponse<CharacterPosition>>,
-        MoveCharacterRequestDefinition
-      >(url, {
-        character_position_x: requestParams.character_position_x,
-        character_position_y: requestParams.character_position_y,
-      });
-
-      if (params.handleResetMapMovement) {
-        params.handleResetMapMovement();
+  const moveCharacterDirectionally = useCallback(
+    async () => {
+      if (!params.characterData) {
+        return;
       }
 
-      if (params.callback) {
-        params.callback({
-          x: result.x_position,
-          y: result.y_position,
+      try {
+        const result = await apiHandler.post<
+          CharacterPosition,
+          AxiosRequestConfig<AxiosResponse<CharacterPosition>>,
+          MoveCharacterRequestDefinition
+        >(url, {
+          character_position_x: requestParams.character_position_x,
+          character_position_y: requestParams.character_position_y,
         });
+
+        if (params.handleResetMapMovement) {
+          params.handleResetMapMovement();
+        }
+
+        if (params.callback) {
+          params.callback({
+            x: result.x_position,
+            y: result.y_position,
+          });
+        }
+      } catch (err) {
+        if (err instanceof AxiosError) {
+          setError(err.response?.data || null);
+        }
       }
-    } catch (err) {
-      if (err instanceof AxiosError) {
-        setError(err.response?.data || null);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [apiHandler, url, requestParams]
+  );
+
+  useEffect(
+    () => {
+      if (!params.characterData) {
+        return;
       }
-    }
-  }, [apiHandler, url, requestParams]);
 
-  useEffect(() => {
-    if (!params.characterData) {
-      return;
-    }
+      if (
+        requestParams.character_position_x < 16 &&
+        requestParams.character_position_y < 16
+      ) {
+        return;
+      }
 
-    if (
-      requestParams.character_position_x < 16 &&
-      requestParams.character_position_y < 16
-    ) {
-      return;
-    }
-
-    moveCharacterDirectionally().catch(() => {});
-  }, [moveCharacterDirectionally, requestParams]);
+      moveCharacterDirectionally().catch(() => {});
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [moveCharacterDirectionally, requestParams]
+  );
 
   return {
     error,

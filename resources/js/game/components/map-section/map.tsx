@@ -1,5 +1,5 @@
 import { isNil } from 'lodash';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { MapApiUrls } from './api/enums/map-api-urls';
 import useBaseMapDetailsApi from './api/hooks/use-base-map-details-api';
@@ -8,6 +8,7 @@ import DraggableMap from './draggable-map';
 import { MapIconPaths } from './enums/map-icon-paths';
 import { useOpenCharacterKingdomInfoModal } from './hooks/use-open-character-kingdom-info-modal';
 import { useProcessDirectionalMovement } from './hooks/use-process-directional-movement';
+import CharacterMapPosition from './types/character-map-position';
 import MapIcon from './types/map-icon';
 import MapProps from './types/map-props';
 import { useDirectionallyMoveCharacter } from '../actions/partials/floating-cards/map-section/hooks/use-directionally-move-character';
@@ -16,10 +17,10 @@ import { GameDataError } from 'game-data/components/game-data-error';
 import { useGameData } from 'game-data/hooks/use-game-data';
 
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
-import CharacterMapPosition from './types/character-map-position';
 
 const Map = ({ additional_css, zoom }: MapProps) => {
-  const [characterMapPosition, setCharacterMapPosition] = useState<CharacterMapPosition>({ x: 0, y: 0 });
+  const [characterMapPosition, setCharacterMapPosition] =
+    useState<CharacterMapPosition>({ x: 0, y: 0 });
 
   const { movementAmount, movementType, resetMovementAmount } =
     useDirectionallyMoveCharacter();
@@ -49,23 +50,27 @@ const Map = ({ additional_css, zoom }: MapProps) => {
     });
 
   const { openCharacterKingdomDetails } = useOpenCharacterKingdomInfoModal({
-    characterData
+    characterData,
   });
 
-  useEffect(() => {
-    if (!movementType) {
-      return;
-    }
+  useEffect(
+    () => {
+      if (!movementType) {
+        return;
+      }
 
-    updatePosition({
-      baseX: characterMapPosition.x,
-      baseY: characterMapPosition.y,
-      movementAmount,
-      movementType,
-    });
+      updatePosition({
+        baseX: characterMapPosition.x,
+        baseY: characterMapPosition.y,
+        movementAmount,
+        movementType,
+      });
 
-    setUpdateCharacterPosition((prevValue) => !prevValue);
-  }, [movementAmount, movementType]);
+      setUpdateCharacterPosition((prevValue) => !prevValue);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [movementAmount, movementType]
+  );
 
   if (!characterData) {
     return <GameDataError />;

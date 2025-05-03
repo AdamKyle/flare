@@ -51,11 +51,17 @@ export default [
       ...tseslint.configs.recommended.rules,
       ...prettierPlugin.configs.recommended.rules,
 
+
       // remove TypeScript‑ESLint’s unused‑vars check
       '@typescript-eslint/no-unused-vars': 'off',
 
       // auto‑remove unused imports and variables
       'unused-imports/no-unused-imports': 'warn',
+
+      // Validate hooks and dep
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+
       'unused-imports/no-unused-vars': [
         'warn',
         {

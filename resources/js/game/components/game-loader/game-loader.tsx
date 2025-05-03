@@ -17,15 +17,19 @@ const GameLoader = (): ReactNode => {
 
   const { setGameData } = useGameData();
 
-  useEffect(() => {
-    if (!loading) {
-      setGameData(data);
+  useEffect(
+    () => {
+      if (!loading) {
+        setGameData(data);
 
-      if (!error) {
-        hideGameLoader();
+        if (!error) {
+          hideGameLoader();
+        }
       }
-    }
-  }, [loading, data, error]);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [loading, data, error]
+  );
 
   if (loading) {
     return (

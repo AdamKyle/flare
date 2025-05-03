@@ -16,13 +16,17 @@ export const useOpenCharacterKingdomInfoModal = (
   );
 
   const openCharacterKingdomDetails = (kingdom_id: number) => {
+    if (!props.characterData) {
+      return;
+    }
+
     emitter.emit(
       Modal.MODAL,
       ModalComponentRegistrationTypes.CHARACTER_KINGDOM,
       {
         is_open: true,
         title: 'Character Kingdom',
-        character_id: props.character_id,
+        character_id: props.characterData.id,
         kingdom_id: kingdom_id,
         allow_clicking_outside: true,
       }

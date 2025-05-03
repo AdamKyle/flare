@@ -44,11 +44,15 @@ export const useGetCharacterStatBreakDown = (
     [apiHandler, url]
   );
 
-  useEffect(() => {
-    fetchCharacterStatInfo({ statType: params.statType }).catch((error) =>
-      console.error(error)
-    );
-  }, [fetchCharacterStatInfo]);
+  useEffect(
+    () => {
+      fetchCharacterStatInfo({ statType: params.statType }).catch((error) =>
+        console.error(error)
+      );
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [fetchCharacterStatInfo]
+  );
 
   return { data, error, loading };
 };

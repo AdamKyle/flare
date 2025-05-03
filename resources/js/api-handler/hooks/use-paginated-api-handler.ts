@@ -26,35 +26,41 @@ const UsePaginatedApiHandler = <
   const [filters, setFilters] = useState<F>({} as F);
   const [refresh, setRefresh] = useState(false);
 
-  const fetchPaginatedData = useCallback(async () => {
-    if (page > 1) setIsLoadingMore(true);
+  const fetchPaginatedData = useCallback(
+    async () => {
+      if (page > 1) setIsLoadingMore(true);
 
-    try {
-      const result = await apiHandler.get<
-        PaginatedApiResponseDefinition<T[]>,
-        AxiosRequestConfig<PaginatedApiResponseDefinition<T[]>>
-      >(url, {
-        params: {
-          per_page: perPage,
-          page,
-          search_text: searchText,
-          filters,
-        },
-      });
+      try {
+        const result = await apiHandler.get<
+          PaginatedApiResponseDefinition<T[]>,
+          AxiosRequestConfig<PaginatedApiResponseDefinition<T[]>>
+        >(url, {
+          params: {
+            per_page: perPage,
+            page,
+            search_text: searchText,
+            filters,
+          },
+        });
 
-      setData((prev) => (page === 1 ? result.data : [...prev, ...result.data]));
-      setCanLoadMore(result.meta.can_load_more);
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        setError(error.response?.data || null);
-      } else {
-        setError(null);
+        setData((prev) =>
+          page === 1 ? result.data : [...prev, ...result.data]
+        );
+        setCanLoadMore(result.meta.can_load_more);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          setError(error.response?.data || null);
+        } else {
+          setError(null);
+        }
+      } finally {
+        setLoading(false);
+        setIsLoadingMore(false);
       }
-    } finally {
-      setLoading(false);
-      setIsLoadingMore(false);
-    }
-  }, [apiHandler, url, page, perPage, refresh]);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [apiHandler, url, page, perPage, refresh]
+  );
 
   useEffect(() => {
     fetchPaginatedData().catch(console.error);

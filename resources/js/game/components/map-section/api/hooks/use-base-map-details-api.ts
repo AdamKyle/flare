@@ -22,34 +22,38 @@ const useBaseMapDetailsApi = (
     url = getUrl(params.url, { character: params.characterData.id });
   }
 
-  const fetchCharacterMapDetails = useCallback(async () => {
-    if (!params.characterData) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const result = await apiHandler.get<
-        BaseMapApiDefinition,
-        AxiosRequestConfig<AxiosResponse<BaseMapApiDefinition>>
-      >(url);
-
-      setData(result);
-
-      if (params.callback) {
-        params.callback({
-          x: result.character_position.x_position,
-          y: result.character_position.y_position,
-        });
+  const fetchCharacterMapDetails = useCallback(
+    async () => {
+      if (!params.characterData) {
+        setLoading(false);
+        return;
       }
-    } catch (err) {
-      if (err instanceof AxiosError) {
-        setError(err.response?.data || null);
+
+      try {
+        const result = await apiHandler.get<
+          BaseMapApiDefinition,
+          AxiosRequestConfig<AxiosResponse<BaseMapApiDefinition>>
+        >(url);
+
+        setData(result);
+
+        if (params.callback) {
+          params.callback({
+            x: result.character_position.x_position,
+            y: result.character_position.y_position,
+          });
+        }
+      } catch (err) {
+        if (err instanceof AxiosError) {
+          setError(err.response?.data || null);
+        }
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
-    }
-  }, [apiHandler, url]);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [apiHandler, url]
+  );
 
   useEffect(() => {
     fetchCharacterMapDetails().catch(() => {});

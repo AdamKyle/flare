@@ -1,3 +1,6 @@
 export default interface InventoryIconButtonsParamDefinition {
-  character_id: number;
+  openBackpack: () => void;
+  openUsableInventory: () => void;
+  openGemBag: () => void;
+  openSets: () => void;
 }

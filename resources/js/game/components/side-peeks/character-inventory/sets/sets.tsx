@@ -28,6 +28,7 @@ const Sets = ({ character_id }: SetsProps): ReactNode => {
 
   const debouncedSetSearchText = useMemo(
     () => debounce((value: string) => setSearchText(value), 300),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 

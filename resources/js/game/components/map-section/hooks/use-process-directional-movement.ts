@@ -19,19 +19,27 @@ export const useProcessDirectionalMovement = ({
     y: 0,
   });
 
-  useEffect(() => {
-    onPositionChange({
-      character_position_x: characterMapPosition.x,
-      character_position_y: characterMapPosition.y,
-    });
-  }, [updateCharacterPosition]);
+  useEffect(
+    () => {
+      onPositionChange({
+        character_position_x: characterMapPosition.x,
+        character_position_y: characterMapPosition.y,
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [updateCharacterPosition]
+  );
 
-  useEffect(() => {
-    onCharacterPositionChange({
-      x: characterMapPosition.x,
-      y: characterMapPosition.y,
-    });
-  }, [characterMapPosition]);
+  useEffect(
+    () => {
+      onCharacterPositionChange({
+        x: characterMapPosition.x,
+        y: characterMapPosition.y,
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [characterMapPosition]
+  );
 
   const updatePosition = ({
     baseX,
