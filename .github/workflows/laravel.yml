@@ -32,9 +32,6 @@ jobs:
           rm -rf composer.lock
           composer install
           yarn install
-      # TODO: There is an issue with the way we use resizable box, commented for now to fix that later
-      # - name: Type Check
-      #   run: yarn type-check
       - name: Generate key
         run: php artisan key:generate
       - name: Link Storage
