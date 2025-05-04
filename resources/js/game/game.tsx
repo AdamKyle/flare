@@ -4,6 +4,7 @@ import React, { ReactNode } from 'react';
 import { SeerviceContainer } from 'service-container-provider/service-container';
 
 import { GameCard } from './components/game-card';
+import { EchoHandlerProvider } from '../websocket-handler/components/echo-handler-provider';
 import BaseModal from './components/modals/base/base-modal';
 import BaseSidePeek from './components/side-peeks/base/base-side-peek';
 
@@ -14,11 +15,13 @@ export const Game = (): ReactNode => {
     <SeerviceContainer>
       <EventSystemProvider>
         <ApiHandlerProvider>
-          <GameDataProvider>
-            <BaseSidePeek />
-            <BaseModal />
-            <GameCard />
-          </GameDataProvider>
+          <EchoHandlerProvider>
+            <GameDataProvider>
+              <BaseSidePeek />
+              <BaseModal />
+              <GameCard />
+            </GameDataProvider>
+          </EchoHandlerProvider>
         </ApiHandlerProvider>
       </EventSystemProvider>
     </SeerviceContainer>
