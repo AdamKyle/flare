@@ -4,12 +4,12 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { CharacterPosition } from './definitions/base-map-api-definition';
 import BaseMapDetailsApiDefinition from './definitions/base-map-details-api-definition';
-import MapDetailsApiRequestParams from './definitions/map-details-api-request-params';
 import MoveCharacterRequestDefinition from './definitions/move-character-request-definition';
 import UseMoveCharacterDirectionallyApiDefinition from './definitions/use-move-character-directionally-api-definition';
+import UseMoveCharacterDirectionallyApiParams from './definitions/use-move-character-directionally-api-params';
 
 export const useMoveCharacterDirectionallyApi = (
-  params: MapDetailsApiRequestParams
+  params: UseMoveCharacterDirectionallyApiParams
 ): UseMoveCharacterDirectionallyApiDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
   const [error, setError] =

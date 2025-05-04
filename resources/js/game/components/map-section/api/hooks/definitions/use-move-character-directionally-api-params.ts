@@ -1,14 +1,11 @@
-import { TimeOutDetails } from './base-map-api-definition';
+import { StateSetter } from '../../../../../../types/state-setter-type';
 import CharacterMapPosition from '../../../types/character-map-position';
 
 import CharacterSheetDefinition from 'game-data/api-data-definitions/character/character-sheet-definition';
 
-export default interface MapDetailsApiRequestParams {
+export default interface UseMoveCharacterDirectionallyApiParams {
   characterData?: CharacterSheetDefinition | null;
   url: string;
-  callback?: (
-    characterPosition: CharacterMapPosition,
-    timeoutDetails: TimeOutDetails
-  ) => void;
+  callback?: StateSetter<CharacterMapPosition>;
   handleResetMapMovement?: () => void;
 }

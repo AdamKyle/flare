@@ -38,10 +38,13 @@ const useBaseMapDetailsApi = (
         setData(result);
 
         if (params.callback) {
-          params.callback({
-            x: result.character_position.x_position,
-            y: result.character_position.y_position,
-          });
+          params.callback(
+            {
+              x: result.character_position.x_position,
+              y: result.character_position.y_position,
+            },
+            result.time_out_details
+          );
         }
       } catch (err) {
         if (err instanceof AxiosError) {

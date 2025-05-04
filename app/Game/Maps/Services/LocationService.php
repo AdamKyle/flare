@@ -77,6 +77,7 @@ class LocationService
         return [
             'tiles' => $gameMap->tile_map,
             'character_position' => $this->getCharacterPositionData($character->map),
+            'time_out_details' => $this->getMapTimeOutDetails($character),
 //            'map_url' => Storage::disk('maps')->url($character->map_url),
 //            'character_map' => $character->map,
 //            'locations' => $this->fetchLocationData($character)->merge($this->fetchCorruptedLocationData($raid)),
@@ -102,6 +103,17 @@ class LocationService
         return [
             'x_position' => $map->character_position_x,
             'y_position' => $map->character_position_y,
+        ];
+    }
+
+    private function getMapTimeOutDetails(Character $character): array {
+        $canMoveAgainAt = $character->can_move_again_at;
+        $timeLeft = is_null($canMoveAgainAt) ? 0 : max(0, now()->diffInSeconds($character->can_move_again_at));
+
+        return [
+            'can_move' => $character->can_move,
+            'time_left' => $timeLeft,
+            'show_timer' => $timeLeft > 0,
         ];
     }
 

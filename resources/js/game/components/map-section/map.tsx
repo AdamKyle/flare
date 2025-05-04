@@ -2,6 +2,7 @@ import { isNil } from 'lodash';
 import React, { useEffect, useState } from 'react';
 
 import { MapApiUrls } from './api/enums/map-api-urls';
+import { TimeOutDetails } from './api/hooks/definitions/base-map-api-definition';
 import useBaseMapDetailsApi from './api/hooks/use-base-map-details-api';
 import { useMoveCharacterDirectionallyApi } from './api/hooks/use-move-character-directionally-api';
 import DraggableMap from './draggable-map';
@@ -13,6 +14,7 @@ import MapIcon from './types/map-icon';
 import MapProps from './types/map-props';
 import { useMovementTimer } from './websockets/hooks/use-movement-timer';
 import { useDirectionallyMoveCharacter } from '../actions/partials/floating-cards/map-section/hooks/use-directionally-move-character';
+import { useFetchMovementTimeoutData } from '../actions/partials/floating-cards/map-section/hooks/use-fetch-movement-timeout-data';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 import { useGameData } from 'game-data/hooks/use-game-data';
@@ -26,13 +28,31 @@ const Map = ({ additional_css, zoom }: MapProps) => {
   const { movementAmount, movementType, resetMovementAmount } =
     useDirectionallyMoveCharacter();
 
+  const { handleEventData } = useFetchMovementTimeoutData();
+
   const { gameData } = useGameData();
 
   const characterData = gameData?.character;
 
+  const mapDetailsHandler = (
+    characterMapPosition: CharacterMapPosition,
+    timeoutDetails: TimeOutDetails
+  ) => {
+    handleEventData({
+      canMove: timeoutDetails.can_move,
+      activateBar: timeoutDetails.show_timer,
+      forLength: timeoutDetails.time_left,
+    });
+
+    setCharacterMapPosition({
+      x: characterMapPosition.x,
+      y: characterMapPosition.y,
+    });
+  };
+
   const { loading, error, data } = useBaseMapDetailsApi({
     url: MapApiUrls.BASE_MAP_DETAILS,
-    callback: setCharacterMapPosition,
+    callback: mapDetailsHandler,
     characterData,
   });
 
