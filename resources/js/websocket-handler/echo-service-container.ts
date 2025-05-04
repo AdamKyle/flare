@@ -9,7 +9,7 @@ export const echoServiceContainer: ModularContainerDefinition = (
   container: CoreContainerDefinition
 ) => {
   container.register<EchoInitializerDefinition>(
-    'ApiHandler',
+    'EchoInitializer',
     new EchoInitializer()
   );
 };

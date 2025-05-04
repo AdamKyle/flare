@@ -9,5 +9,5 @@ export default interface EchoInitializerDefinition {
   /**
    * Gets the instance of echo
    */
-  getEcho: () => Echo<'pusher'>;
+  getEcho: () => Echo<'reverb'>;
 }

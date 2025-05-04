@@ -11,6 +11,7 @@ import { useProcessDirectionalMovement } from './hooks/use-process-directional-m
 import CharacterMapPosition from './types/character-map-position';
 import MapIcon from './types/map-icon';
 import MapProps from './types/map-props';
+import { useMovementTimer } from './websockets/hooks/use-movement-timer';
 import { useDirectionallyMoveCharacter } from '../actions/partials/floating-cards/map-section/hooks/use-directionally-move-character';
 
 import { GameDataError } from 'game-data/components/game-data-error';
@@ -50,6 +51,10 @@ const Map = ({ additional_css, zoom }: MapProps) => {
     });
 
   const { openCharacterKingdomDetails } = useOpenCharacterKingdomInfoModal({
+    characterData,
+  });
+
+  useMovementTimer({
     characterData,
   });
 

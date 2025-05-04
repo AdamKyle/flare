@@ -11,7 +11,7 @@ export const EchoHandlerProvider = (
   props: EchoHandlerProviderProps
 ): ReactNode => {
   const echoInitialization =
-    serviceContainer().fetch<EchoInitializerDefinition>('EchoInitialization');
+    serviceContainer().fetch<EchoInitializerDefinition>('EchoInitializer');
 
   return (
     <EchoHandlerContext.Provider value={{ echoInitialization }}>
