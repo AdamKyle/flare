@@ -10,9 +10,11 @@ const TILE_SIZE = 250;
 const DraggableMap = ({
   tiles,
   additional_css,
-  map_icons = [],
+  character_kingdom_icons,
+  location_icons,
   character,
-  on_click,
+  on_character_kingdom_click,
+  on_location_click,
   zoom = 1,
 }: DraggableMapProps) => {
   const tileSize = TILE_SIZE * zoom;
@@ -64,11 +66,37 @@ const DraggableMap = ({
     );
   };
 
-  const renderIcons = () => {
-    return map_icons.map((icon, id) => (
+  const renderCharacterKingdoms = () => {
+    return character_kingdom_icons.map((icon, id) => (
       <button
         key={id}
-        onClick={() => on_click(icon)}
+        onClick={() => on_character_kingdom_click(icon)}
+        aria-label={icon.alt || 'Map Icon'}
+        className="absolute"
+        style={{
+          left: `${icon.x * zoom}px`,
+          top: `${icon.y * zoom}px`,
+          width: 16 * zoom,
+          height: 16 * zoom,
+          backgroundImage: `url(${icon.src})`,
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat',
+          backgroundColor: 'transparent',
+          border: 'none',
+          padding: 0,
+          margin: 0,
+          cursor: 'pointer',
+          imageRendering: 'pixelated',
+        }}
+      />
+    ));
+  };
+
+  const renderMapLocations = () => {
+    return location_icons.map((icon, id) => (
+      <button
+        key={id}
+        onClick={() => on_location_click(icon)}
         aria-label={icon.alt || 'Map Icon'}
         className="absolute"
         style={{
@@ -116,7 +144,8 @@ const DraggableMap = ({
       >
         {renderMap()}
         {renderCharacter()}
-        {renderIcons()}
+        {renderCharacterKingdoms()}
+        {renderMapLocations()}
       </div>
     </DraggableContainerWrapper>
   );

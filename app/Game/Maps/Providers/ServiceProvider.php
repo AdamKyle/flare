@@ -6,6 +6,7 @@ use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\MonsterTransformer;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
@@ -21,6 +22,7 @@ use App\Game\Maps\Services\TeleportService;
 use App\Game\Maps\Services\TraverseService;
 use App\Game\Maps\Services\UpdateRaidMonsters;
 use App\Game\Maps\Services\WalkingService;
+use App\Game\Maps\Transformers\LocationsTransformer;
 use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Maps\Values\MapTileValue;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -119,6 +121,9 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CoordinatesCache::class),
                 $app->make(CharacterCacheData::class),
                 $app->make(UpdateCharacterAttackTypesHandler::class),
+                $app->make(LocationsTransformer::class),
+                $app->make(PlainDataSerializer::class),
+                $app->make(Manager::class)
             );
         });
 
@@ -135,6 +140,10 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(LocationService::class),
                 $app->make(Manager::class),
             );
+        });
+
+        $this->app->bind(LocationsTransformer::class , function () {
+            return new LocationsTransformer;
         });
 
         $this->commands([

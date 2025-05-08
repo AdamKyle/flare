@@ -8,6 +8,7 @@ import { useMoveCharacterDirectionallyApi } from './api/hooks/use-move-character
 import DraggableMap from './draggable-map';
 import { MapIconPaths } from './enums/map-icon-paths';
 import { useOpenCharacterKingdomInfoModal } from './hooks/use-open-character-kingdom-info-modal';
+import { useOpenLocationInfoModal } from './hooks/use-open-location-info-modal';
 import { useProcessDirectionalMovement } from './hooks/use-process-directional-movement';
 import CharacterMapPosition from './types/character-map-position';
 import MapIcon from './types/map-icon';
@@ -74,6 +75,10 @@ const Map = ({ additional_css, zoom }: MapProps) => {
     characterData,
   });
 
+  const { openLocationDetails } = useOpenLocationInfoModal({
+    characterData,
+  });
+
   useMovementTimer({
     characterData,
   });
@@ -109,8 +114,28 @@ const Map = ({ additional_css, zoom }: MapProps) => {
     return <GameDataError />;
   }
 
-  const handleMapClick = (icon: MapIcon) => {
-    openCharacterKingdomDetails(icon.id);
+  const handleCharacterKingdomClick = (icon: MapIcon) => {
+    const foundKingdom = data.character_kingdoms.find(
+      (kingdom) => kingdom.id === icon.id
+    );
+
+    if (!foundKingdom) {
+      return;
+    }
+
+    openCharacterKingdomDetails(icon.id, foundKingdom.name);
+  };
+
+  const handleLocationClick = (icon: MapIcon) => {
+    const foundLocation = data.locations.find(
+      (location) => location.id === icon.id
+    );
+
+    if (!foundLocation) {
+      return;
+    }
+
+    openLocationDetails(icon.id, foundLocation.name);
   };
 
   const tiles = data.tiles;
@@ -136,14 +161,36 @@ const Map = ({ additional_css, zoom }: MapProps) => {
     id: characterData.id,
   };
 
+  const mapLocations: MapIcon[] = data.locations.map((location) => {
+    let mapIconSrc: string = MapIconPaths.LOCATION;
+
+    if (location.is_port) {
+      mapIconSrc = MapIconPaths.PORT_LOCATION;
+    }
+
+    if (location.is_corrupted) {
+      mapIconSrc = MapIconPaths.CORRUPTED_LOCATION;
+    }
+
+    return {
+      x: location.x_position,
+      y: location.y_position,
+      src: mapIconSrc,
+      alt: location.name,
+      id: location.id,
+    };
+  });
+
   return (
     <div className={additional_css}>
       <DraggableMap
         additional_css={'w-full h-full'}
         tiles={tiles}
-        map_icons={characterKingdoms}
+        character_kingdom_icons={characterKingdoms}
+        location_icons={mapLocations}
         character={characterPosition}
-        on_click={handleMapClick}
+        on_character_kingdom_click={handleCharacterKingdomClick}
+        on_location_click={handleLocationClick}
         zoom={zoom}
       />
     </div>

@@ -1,13 +1,13 @@
 import { useEventSystem } from 'event-system/hooks/use-event-system';
 
-import UseOpenCharacterKingdomInfoModalDefinition from './definitions/use-open-character-kingdom-info-modal-definition';
-import UseOpenCharacterKingdomInfoModalProps from './types/use-open-character-kingdom-info-modal-props';
+import UseOpenCharacterKingdomInfoModalDefinition from './definitions/use-open-location-info-modal-definition';
+import UseOpenLocationInfoModalProps from './types/use-open-location-info-modal-props';
 import { ModalComponentRegistrationTypes } from '../../modals/base/component-registration/modal-component-registration-types';
 import { ModalEventMap } from '../../modals/base/event-map/modal-event-map';
 import { Modal } from '../../modals/base/event-types/modal';
 
-export const useOpenCharacterKingdomInfoModal = (
-  props: UseOpenCharacterKingdomInfoModalProps
+export const useOpenLocationInfoModal = (
+  props: UseOpenLocationInfoModalProps
 ): UseOpenCharacterKingdomInfoModalDefinition => {
   const eventSystem = useEventSystem();
 
@@ -15,10 +15,7 @@ export const useOpenCharacterKingdomInfoModal = (
     Modal.MODAL
   );
 
-  const openCharacterKingdomDetails = (
-    kingdom_id: number,
-    kingdom_name: string
-  ) => {
+  const openLocationDetails = (location_id: number, location_name: string) => {
     if (!props.characterData) {
       return;
     }
@@ -28,15 +25,15 @@ export const useOpenCharacterKingdomInfoModal = (
       ModalComponentRegistrationTypes.CHARACTER_KINGDOM,
       {
         is_open: true,
-        title: kingdom_name,
+        title: location_name,
         character_id: props.characterData.id,
-        kingdom_id: kingdom_id,
+        location_id: location_id,
         allow_clicking_outside: true,
       }
     );
   };
 
   return {
-    openCharacterKingdomDetails,
+    openLocationDetails,
   };
 };

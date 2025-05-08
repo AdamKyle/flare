@@ -1,10 +1,12 @@
 import { ModalComponentRegistrationTypes } from './modal-component-registration-types';
 import CharacterKingdomDetailsProps from '../../kingdom-modals/types/character-kingdom-details-props';
+import LocationDetailsProps from '../../location-modal/types/location-details-props';
 
 import ModalProps from 'ui/modal/types/modal-props';
 
 export type ModalComponentPropsMap = {
   [ModalComponentRegistrationTypes.CHARACTER_KINGDOM]: CharacterKingdomDetailsProps;
+  [ModalComponentRegistrationTypes.LOCATION]: LocationDetailsProps;
   // Add More ...
 };
 

@@ -10,6 +10,8 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Models\Map;
 use App\Flare\Models\Raid;
+use App\Flare\Models\ScheduledEvent;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Flare\Values\LocationEffectValue;
 use App\Flare\Values\LocationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
@@ -21,23 +23,17 @@ use App\Game\Maps\Events\UpdateLocationBasedEventGoals;
 use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
 use App\Game\Maps\Services\Common\LiveCharacterCount;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
+use App\Game\Maps\Transformers\LocationsTransformer;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
+use League\Fractal\Resource\Collection as LeagueCollection;
+use League\Fractal\Serializer\ArraySerializer;
 
 class LocationService
 {
     use CanPlayerMassEmbezzle, KingdomCache, LiveCharacterCount, UpdateRaidMonstersForLocation;
-
-    private CoordinatesCache $coordinatesCache;
-
-    private CharacterCacheData $characterCacheData;
-
-    private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
-
-    /**
-     * @var ?Location | null
-     */
-    private ?Location $location;
 
     /**
      * @var bool | false
@@ -46,11 +42,13 @@ class LocationService
 
     private bool $isEventBasedUpdate = false;
 
-    public function __construct(CoordinatesCache $coordinatesCache, CharacterCacheData $characterCacheData, UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes)
+    public function __construct(private readonly CoordinatesCache                  $coordinatesCache,
+                                private readonly CharacterCacheData                $characterCacheData,
+                                private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
+                                private readonly LocationsTransformer              $locationTransformer,
+                                private readonly PlainDataSerializer               $plainArraySerializer,
+                                private readonly Manager                           $manager)
     {
-        $this->coordinatesCache = $coordinatesCache;
-        $this->characterCacheData = $characterCacheData;
-        $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
     }
 
     public function setIsEventBasedUpdate(bool $isEventBased): LocationService
@@ -80,7 +78,7 @@ class LocationService
             'time_out_details' => $this->getMapTimeOutDetails($character),
 //            'map_url' => Storage::disk('maps')->url($character->map_url),
 //            'character_map' => $character->map,
-//            'locations' => $this->fetchLocationData($character)->merge($this->fetchCorruptedLocationData($raid)),
+            'locations' => $this->fetchLocationData($character),
 //            'can_move' => $character->can_move,
 //            'can_move_again_at' => $character->can_move_again_at,
 //            'coordinates' => $this->coordinatesCache->getFromCache(),
@@ -143,11 +141,18 @@ class LocationService
     /**
      * Fetch the locations for this map the characters on.
      */
-    public function fetchLocationData(Character $character): Collection
+    public function fetchLocationData(Character $character): array
     {
-        $locations = Location::with('questRewardItem')->where('game_map_id', $character->map->game_map_id)->get();
 
-        return $this->transformLocationData($locations);
+        $gameMap = $character->map->gameMap;
+
+        $locations = Location::with('questRewardItem')->where('game_map_id', $gameMap->id)->get();
+
+        $this->manager->setSerializer($this->plainArraySerializer);
+
+        $locationData = new LeagueCollection($locations, $this->locationTransformer);
+
+        return $this->manager->createData($locationData)->toArray();
     }
 
     /**
@@ -165,7 +170,8 @@ class LocationService
      *
      * If no raid is set, return an empty collection.
      *
-     * @param  ?Raid  $raid
+     * @param  ?Raid $raid
+     * @return Collection
      */
     public function fetchCorruptedLocationData(?Raid $raid = null): Collection
     {

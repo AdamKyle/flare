@@ -65,6 +65,7 @@ use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\ItemTransformer;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Kingdoms\Transformers\KingdomAttackLogsTransformer;
 use App\Game\Kingdoms\Transformers\KingdomBuildingTransformer;
 use App\Game\Kingdoms\Transformers\KingdomTransformer;
@@ -448,6 +449,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(SiteAccessStatisticService::class, function () {
             return new SiteAccessStatisticService();
+        });
+
+        $this->app->bind(PlainDataSerializer::class, function () {
+            return new PlainDataSerializer;
         });
     }
 
