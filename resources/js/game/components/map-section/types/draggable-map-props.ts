@@ -1,12 +1,11 @@
+import { ReactNode } from 'react';
+
 import MapIcon from './map-icon';
 
 export default interface DraggableMapProps {
-  tiles: string[][];
-  character_kingdom_icons: MapIcon[];
-  location_icons: MapIcon[];
   character: MapIcon;
+  tiles: string[][];
   additional_css: string;
-  on_character_kingdom_click: (mapIcon: MapIcon) => void;
-  on_location_click: (mapIcon: MapIcon) => void;
   zoom?: number;
+  children: ReactNode[];
 }

@@ -1,4 +1,5 @@
-import { SidePeekComponentMapper } from '../../component-registration/side-peek-component-mapper';
+import React from 'react';
+
 import { SidePeekComponentPropsMap } from '../../component-registration/side-peek-component-props-map';
 import { SidePeekComponentRegistrationEnum } from '../../component-registration/side-peek-component-registration-enum';
 
@@ -7,9 +8,7 @@ export type AllSidePeekProps =
 
 export default interface UseManageSidePeekVisibilityDefinition {
   componentKey: SidePeekComponentRegistrationEnum | null;
-  ComponentToRender:
-    | (typeof SidePeekComponentMapper)[keyof typeof SidePeekComponentMapper]
-    | null;
+  ComponentToRender: React.ComponentType<Record<string, unknown>> | null;
   componentProps: AllSidePeekProps;
   closeSidePeek: () => void;
 }

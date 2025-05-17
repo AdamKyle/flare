@@ -1,122 +1,19 @@
 import React from 'react';
 
+import { MapTileSize } from './enums/map-tile-size';
 import DraggableMapProps from './types/draggable-map-props';
 import { calculateCharacterCenter } from './utils/map-geometry';
 
 import DraggableContainerWrapper from 'ui/draggable/draggable-container';
 
-const TILE_SIZE = 250;
-
 const DraggableMap = ({
-  tiles,
   additional_css,
-  character_kingdom_icons,
-  location_icons,
-  character,
-  on_character_kingdom_click,
-  on_location_click,
   zoom = 1,
+  character,
+  children,
+  tiles,
 }: DraggableMapProps) => {
-  const tileSize = TILE_SIZE * zoom;
-
-  const renderMap = () => {
-    return tiles.flat().map((url, i) => (
-      <img
-        key={i}
-        src={url}
-        draggable={false}
-        alt="Map Tile"
-        aria-hidden="true"
-        style={{
-          width: `${tileSize}px`,
-          height: `${tileSize}px`,
-          display: 'block',
-          objectFit: 'cover',
-          imageRendering: 'pixelated',
-          margin: 0,
-          padding: 0,
-          border: 'none',
-        }}
-      />
-    ));
-  };
-
-  const renderCharacter = () => {
-    return (
-      <img
-        className="absolute"
-        src={character.src}
-        alt={character.alt}
-        draggable={false}
-        style={{
-          left: `${character.x * zoom}px`,
-          top: `${character.y * zoom}px`,
-          width: `${16 * zoom}px`,
-          height: `${16 * zoom}px`,
-          imageRendering: 'pixelated',
-          backgroundColor: 'transparent',
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          border: 'none',
-          padding: 0,
-          margin: 0,
-          zIndex: 1,
-        }}
-      />
-    );
-  };
-
-  const renderCharacterKingdoms = () => {
-    return character_kingdom_icons.map((icon, id) => (
-      <button
-        key={id}
-        onClick={() => on_character_kingdom_click(icon)}
-        aria-label={icon.alt || 'Map Icon'}
-        className="absolute"
-        style={{
-          left: `${icon.x * zoom}px`,
-          top: `${icon.y * zoom}px`,
-          width: 16 * zoom,
-          height: 16 * zoom,
-          backgroundImage: `url(${icon.src})`,
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          backgroundColor: 'transparent',
-          border: 'none',
-          padding: 0,
-          margin: 0,
-          cursor: 'pointer',
-          imageRendering: 'pixelated',
-        }}
-      />
-    ));
-  };
-
-  const renderMapLocations = () => {
-    return location_icons.map((icon, id) => (
-      <button
-        key={id}
-        onClick={() => on_location_click(icon)}
-        aria-label={icon.alt || 'Map Icon'}
-        className="absolute"
-        style={{
-          left: `${icon.x * zoom}px`,
-          top: `${icon.y * zoom}px`,
-          width: 16 * zoom,
-          height: 16 * zoom,
-          backgroundImage: `url(${icon.src})`,
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          backgroundColor: 'transparent',
-          border: 'none',
-          padding: 0,
-          margin: 0,
-          cursor: 'pointer',
-          imageRendering: 'pixelated',
-        }}
-      />
-    ));
-  };
+  const tileSize = MapTileSize.TILE_SIZE * zoom;
 
   const characterCenter = calculateCharacterCenter(
     character.x,
@@ -142,10 +39,7 @@ const DraggableMap = ({
           fontSize: 0,
         }}
       >
-        {renderMap()}
-        {renderCharacter()}
-        {renderCharacterKingdoms()}
-        {renderMapLocations()}
+        {children}
       </div>
     </DraggableContainerWrapper>
   );

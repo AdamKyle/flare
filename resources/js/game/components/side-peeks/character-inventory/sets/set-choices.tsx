@@ -59,6 +59,7 @@ const SetChoices = ({
       selection_placeholder={'Select a set'}
       pre_selected_item={setOptions[0]}
       use_pagination
+      all_click_outside
     />
   );
 };

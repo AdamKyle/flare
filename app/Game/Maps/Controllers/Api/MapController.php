@@ -21,36 +21,27 @@ use Illuminate\Support\Facades\Cache;
 
 class MapController extends Controller
 {
-    private MovementService $movementService;
-
-    private SetSailService $setSail;
-
-    private TeleportService $teleportService;
-
-    private WalkingService $walkingService;
 
     public function __construct(
-        MovementService $movementService,
-        TeleportService $teleportService,
-        WalkingService $walkingService,
-        SetSailService $setSail
+        private readonly LocationService $locationService,
+        private readonly MovementService $movementService,
+        private readonly TeleportService $teleportService,
+        private readonly WalkingService $walkingService,
+        private readonly SetSailService $setSail
     ) {
-        $this->movementService = $movementService;
-        $this->teleportService = $teleportService;
-        $this->walkingService = $walkingService;
-        $this->setSail = $setSail;
 
         $this->middleware('is.character.dead')->except(['mapInformation', 'fetchQuests']);
     }
 
     public function mapInformation(Character $character, LocationService $locationService): JsonResponse
     {
-        return response()->json($locationService->getLocationData($character));
+        return response()->json($this->locationService->getLocationData($character));
     }
 
     public function updateLocationActions(Character $character, LocationService $locationService): JsonResponse
     {
-        return response()->json($locationService->locationBasedEvents($character));
+        $this->locationService->locationBasedEvents($character);
+        return response()->json([]);
     }
 
     /**
@@ -94,6 +85,12 @@ class MapController extends Controller
         unset($response['status']);
 
         return response()->json($response, $status);
+    }
+
+    public function fetchTeleportCoordinates(Character $character): JsonResponse {
+        $teleportCoordinates = $this->locationService->getTeleportLocations($character);
+
+        return response()->json($teleportCoordinates);
     }
 
     /**

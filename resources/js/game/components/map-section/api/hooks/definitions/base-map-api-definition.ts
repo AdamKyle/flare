@@ -1,18 +1,5 @@
-interface CharacterKingdoms {
-  name: string;
-  x_position: number;
-  y_position: number;
-  id: number;
-}
-
-interface Locations {
-  id: number;
-  name: string;
-  x_position: number;
-  y_position: number;
-  is_port: boolean;
-  is_corrupted: boolean;
-}
+import CharacterKingdomsPositionDefinitions from '../../../../../api-definitions/map-details/character-kingdoms-position-definitions';
+import LocationsPositionDefinition from '../../../../../api-definitions/map-details/locations-position-definition';
 
 export interface TimeOutDetails {
   can_move: boolean;
@@ -27,8 +14,10 @@ export interface CharacterPosition {
 
 export default interface BaseMapApiDefinition {
   tiles: string[][];
-  character_kingdoms: CharacterKingdoms[];
-  locations: Locations[];
+  character_kingdoms: CharacterKingdomsPositionDefinitions[];
+  locations: LocationsPositionDefinition[];
+  npc_kingdoms: CharacterKingdomsPositionDefinitions[];
+  enemy_kingdoms: CharacterKingdomsPositionDefinitions[];
   character_position: CharacterPosition;
   time_out_details: TimeOutDetails;
 }

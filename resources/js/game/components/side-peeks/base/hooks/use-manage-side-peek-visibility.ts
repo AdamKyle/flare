@@ -6,8 +6,8 @@ import UseManageSidePeekVisibilityDefinition, {
   AllSidePeekProps,
 } from './deffinitions/use-manage-side-peek-visibility-definition';
 import defaultSidePeekProps from './types/default-side-peek-props';
-import { SidePeekComponentMapper } from '../component-registration/side-peek-component-mapper';
 import { SidePeekComponentRegistrationEnum } from '../component-registration/side-peek-component-registration-enum';
+import { LooseSidePeekMapper } from '../event-map/loose-side-peek-event-map';
 import { SidePeekEventMap } from '../event-map/side-peek-event-map';
 
 export const useDynamicComponentVisibility =
@@ -55,7 +55,7 @@ export const useDynamicComponentVisibility =
     };
 
     const ComponentToRender = componentKey
-      ? SidePeekComponentMapper[componentKey]
+      ? LooseSidePeekMapper[componentKey]
       : null;
 
     return {

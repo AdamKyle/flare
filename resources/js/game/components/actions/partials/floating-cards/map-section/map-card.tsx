@@ -1,22 +1,49 @@
-import React from 'react';
+import ApiErrorAlert from 'api-handler/components/api-error-alert';
+import { isEmpty, isNil } from 'lodash';
+import React, { useEffect, useState } from 'react';
 
 import { useDirectionallyMoveCharacter } from './hooks/use-directionally-move-character';
 import { useFetchMovementTimeoutData } from './hooks/use-fetch-movement-timeout-data';
+import { useManageMapMovementErrorState } from './hooks/use-manage-map-movement-error-state';
 import { useManageMapSectionVisibility } from './hooks/use-manage-map-section-visibility';
+import { useManageSetSailButtonState } from './hooks/use-manage-set-sail-button-state';
 import { MapMovementTypes } from './map-movement-types/map-movement-types';
+import { useEmitCharacterPosition } from '../../../../map-section/hooks/use-emit-character-position';
+import { UseOpenTeleportSidePeek } from '../../../../map-section/hooks/use-open-teleport-sidepeek';
 import { useToggleFullMapVisibility } from '../../../../map-section/hooks/use-toggle-full-map-visibility';
 import Map from '../../../../map-section/map';
 import FloatingCard from '../../../components/icon-section/floating-card';
+
+import { useGameData } from 'game-data/hooks/use-game-data';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import TimerBar from 'ui/timer-bar/timer-bar';
 
 const MapCard = () => {
+  const [characterId, setCharacterId] = useState(0);
+
   const { closeMapCard } = useManageMapSectionVisibility();
   const { openFullMap } = useToggleFullMapVisibility();
   const { moveCharacterDirectionally } = useDirectionallyMoveCharacter();
   const { canMove, showTimerBar, lengthOfTime } = useFetchMovementTimeoutData();
+  const { isSetSailEnabled } = useManageSetSailButtonState();
+  const { gameData } = useGameData();
+  const { openTeleport } = UseOpenTeleportSidePeek();
+  const { errorMessage } = useManageMapMovementErrorState();
+  const { characterPosition } = useEmitCharacterPosition();
+
+  useEffect(() => {
+    if (isNil(gameData)) {
+      return;
+    }
+
+    if (isNil(gameData.character)) {
+      return;
+    }
+
+    setCharacterId(gameData.character?.id);
+  }, [gameData]);
 
   const renderTimerBar = () => {
     if (!showTimerBar) {
@@ -32,12 +59,32 @@ const MapCard = () => {
     );
   };
 
+  const renderMapError = () => {
+    if (isEmpty(errorMessage)) {
+      return null;
+    }
+
+    return <ApiErrorAlert apiError={errorMessage} />;
+  };
+
+  const isSetSailDisabled = () => {
+    if (!isSetSailEnabled) {
+      return true;
+    }
+
+    return !canMove;
+  };
+
   return (
     <FloatingCard title={'Map: Surface'} close_action={closeMapCard}>
       <div className="text-center">
         <Map additional_css={'h-[350px] border-2 border-slate-600'} zoom={2} />
       </div>
       {renderTimerBar()}
+      {renderMapError()}
+      <div className="my-2 p-2">
+        Map Position (X/Y): {characterPosition.x}/{characterPosition.y})
+      </div>
       <div className="my-2 p-2 flex flex-col gap-2 md:flex-row justify-center">
         <Button
           on_click={() =>
@@ -73,7 +120,9 @@ const MapCard = () => {
 
       <div className="my-2 p-2 flex flex-col gap-2 md:flex-row justify-center">
         <Button
-          on_click={() => {}}
+          on_click={() =>
+            openTeleport(characterId, characterPosition.x, characterPosition.y)
+          }
           label={'Teleport'}
           variant={ButtonVariant.PRIMARY}
           disabled={!canMove}
@@ -82,7 +131,7 @@ const MapCard = () => {
           on_click={() => {}}
           label={'Set Sail'}
           variant={ButtonVariant.PRIMARY}
-          disabled={!canMove}
+          disabled={isSetSailDisabled()}
         />
         <Button
           on_click={() => {}}

@@ -76,17 +76,13 @@ class LocationService
             'tiles' => $gameMap->tile_map,
             'character_position' => $this->getCharacterPositionData($character->map),
             'time_out_details' => $this->getMapTimeOutDetails($character),
-//            'map_url' => Storage::disk('maps')->url($character->map_url),
-//            'character_map' => $character->map,
             'locations' => $this->fetchLocationData($character),
-//            'can_move' => $character->can_move,
-//            'can_move_again_at' => $character->can_move_again_at,
-//            'coordinates' => $this->coordinatesCache->getFromCache(),
+            'coordinates' => $this->coordinatesCache->getFromCache(),
 //            'celestial_id' => $this->getCelestialEntityId($character),
 //            'can_settle_kingdom' => $this->canSettle,
             'character_kingdoms' => $this->getKingdoms($character),
-//            'npc_kingdoms' => Kingdom::select('id', 'x_position', 'y_position', 'npc_owned', 'name')->whereNull('character_id')->where('game_map_id', $character->map->game_map_id)->where('npc_owned', true)->get(),
-//            'other_kingdoms' => $this->getEnemyKingdoms($character),
+            'npc_kingdoms' => $this->getNpcKingdoms($character),
+            'enemy_kingdoms' => $this->getEnemyKingdoms($character),
 //            'characters_on_map' => $this->getActiveUsersCountForMap($character),
 //            'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type,
 //            'is_event_based' => $this->isEventBasedUpdate,
@@ -94,6 +90,25 @@ class LocationService
 //            'can_access_purgatory_chains_shop' =>  $character->map->gameMap->mapType()->isPurgatory(),
 //            'can_access_twisted_earth_shop' => $character->map->gameMap->mapType()->isTwistedMemories(),
         ];
+    }
+
+    public function getTeleportLocations(Character $character): array {
+        return [
+            'character_kingdoms' => $this->getKingdoms($character),
+            'npc_kingdoms' => $this->getNpcKingdoms($character),
+            'enemy_kingdoms' => $this->getEnemyKingdoms($character),
+            'locations' => $this->fetchLocationData($character),
+            'coordinates' => $this->coordinatesCache->getFromCache(),
+        ];
+    }
+
+    protected function getNpcKingdoms(Character $character): array {
+        return Kingdom::select('id', 'x_position', 'y_position', 'name')
+            ->whereNull('character_id')
+            ->where('game_map_id', $character->map->game_map_id)
+            ->where('npc_owned', true)
+            ->get()
+            ->toArray();
     }
 
 

@@ -7,7 +7,6 @@ import { MapMovementTypes } from '../../actions/partials/floating-cards/map-sect
 
 export const useProcessDirectionalMovement = ({
   onPositionChange,
-  onCharacterPositionChange,
 }: UseProcessDirectionalMovementParams): UseProcessDirectionalMovementDefinition => {
   const [updateCharacterPosition, setUpdateCharacterPosition] = useState(false);
 
@@ -28,17 +27,6 @@ export const useProcessDirectionalMovement = ({
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [updateCharacterPosition]
-  );
-
-  useEffect(
-    () => {
-      onCharacterPositionChange({
-        x: characterMapPosition.x,
-        y: characterMapPosition.y,
-      });
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [characterMapPosition]
   );
 
   const updatePosition = ({

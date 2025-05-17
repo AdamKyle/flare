@@ -1,8 +1,16 @@
 import clsx from 'clsx';
-import { isEmpty } from 'lodash';
-import React, { ReactNode, useRef, useState, useEffect } from 'react';
+import React, {
+  ReactNode,
+  useRef,
+  useState,
+  useEffect,
+  KeyboardEvent,
+  FocusEvent,
+  UIEvent,
+  MouseEvent,
+} from 'react';
+import { match } from 'ts-pattern';
 
-import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import DropdownProps from 'ui/drop-down/types/drop-down-props';
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 
@@ -16,131 +24,134 @@ const Dropdown = ({
   handle_scroll,
   additional_scroll_css,
   pre_selected_item,
+  is_in_modal,
 }: DropdownProps) => {
-  const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<string | number>('');
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedValue, setSelectedValue] = useState<string | number>('');
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
-  const ref = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
 
-  const handleBlur = (e: React.FocusEvent<HTMLDivElement>) => {
+  const handleBlur = (event: FocusEvent<HTMLDivElement>) => {
     if (!all_click_outside) return;
-    if (!e.currentTarget.contains(e.relatedTarget)) {
-      setOpen(false);
+    if (!event.currentTarget.contains(event.relatedTarget)) {
+      setIsOpen(false);
       setFocusedIndex(null);
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (!open) return;
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setFocusedIndex((prev) =>
-        prev === null || prev === items.length - 1 ? 0 : prev + 1
-      );
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setFocusedIndex((prev) =>
-        prev === null || prev === 0 ? items.length - 1 : prev - 1
-      );
-    } else if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      if (focusedIndex !== null) {
-        const item = items[focusedIndex];
-        const [label] = Object.keys(item);
-        setSelected(label);
-        on_select(item);
-        setOpen(false);
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (!isOpen) return;
+
+    match(event.key as string)
+      .with('ArrowDown', () => {
+        event.preventDefault();
+        setFocusedIndex((prev) =>
+          prev === null || prev === items.length - 1 ? 0 : prev + 1
+        );
+      })
+      .with('ArrowUp', () => {
+        event.preventDefault();
+        setFocusedIndex((prev) =>
+          prev === null || prev === 0 ? items.length - 1 : prev - 1
+        );
+      })
+      .with('Enter', ' ', () => {
+        event.preventDefault();
+        if (focusedIndex !== null) {
+          const item = items[focusedIndex];
+          setSelectedValue(item.value);
+          on_select(item);
+          setIsOpen(false);
+          setFocusedIndex(null);
+        }
+      })
+      .with('Escape', () => {
+        event.preventDefault();
+        setIsOpen(false);
         setFocusedIndex(null);
-      }
-    } else if (e.key === 'Escape') {
-      e.preventDefault();
-      setOpen(false);
-      setFocusedIndex(null);
-    }
+      })
+      .otherwise(() => {});
   };
 
   useEffect(() => {
-    if (open && focusedIndex !== null && listRef.current) {
-      const el = listRef.current.children[focusedIndex] as HTMLElement;
-      el?.scrollIntoView({ block: 'nearest' });
+    if (isOpen && focusedIndex !== null && listRef.current) {
+      const element = listRef.current.children[focusedIndex] as HTMLElement;
+      element?.scrollIntoView({ block: 'nearest' });
     }
-  }, [focusedIndex, open]);
+  }, [focusedIndex, isOpen]);
 
   useEffect(() => {
-    if (!pre_selected_item) {
-      return;
-    }
-
-    setSelected(pre_selected_item.value);
+    if (!pre_selected_item) return;
+    setSelectedValue(pre_selected_item.value);
   }, [pre_selected_item]);
 
-  const onScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    if (!handle_scroll) {
-      return;
+  const onScroll = (event: UIEvent<HTMLDivElement>) => {
+    if (handle_scroll) {
+      handle_scroll(event);
     }
-
-    handle_scroll(e);
   };
 
-  const renderDropdownIcon = (): ReactNode => {
-    if (isEmpty(selected)) {
-      return (
-        <i className="fas fa-chevron-down text-gray-500 dark:text-gray-300"></i>
-      );
-    }
+  const handleClearSelection = (e: MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    setSelectedValue('');
+    setIsOpen(false);
+    if (on_clear) on_clear();
+  };
 
-    return (
+  const renderIcon = (): ReactNode =>
+    selectedValue === '' ? (
+      <i className="fas fa-chevron-down text-gray-500 dark:text-gray-300" />
+    ) : (
       <i
         className="fas fa-times text-gray-500 dark:text-gray-300 cursor-pointer"
-        onClick={(e) => {
-          e.stopPropagation();
-          setSelected('');
-          on_clear();
-          setOpen(false);
+        onClick={handleClearSelection}
+      />
+    );
+
+  const renderItems = (): ReactNode =>
+    items.map((item, index) => (
+      <li
+        key={item.value + '-' + index}
+        id={`dropdown-item-${index}`}
+        role="option"
+        aria-selected={selectedValue === item.value}
+        tabIndex={-1}
+        onClick={() => {
+          setSelectedValue(item.value);
+          on_select(item);
+          setIsOpen(false);
+          setFocusedIndex(null);
         }}
-      ></i>
+        className={clsx(
+          'mx-1 my-1 px-4 py-4 cursor-pointer rounded-lg transition-colors duration-100',
+          focusedIndex === index
+            ? 'bg-gray-300 dark:bg-gray-700'
+            : 'hover:bg-gray-300 dark:hover:bg-gray-800'
+        )}
+      >
+        {item.label}
+      </li>
+    ));
+
+  const renderSelectionText = (): ReactNode => {
+    if (selectedValue) {
+      const found = items.find((it) => it.value === selectedValue);
+      return (
+        <div className="text-gray-900 dark:text-white">{found?.label}</div>
+      );
+    }
+    return (
+      <div className="text-gray-400">
+        {selection_placeholder || 'Select an option'}
+      </div>
     );
   };
 
-  const renderItemsForDropdown = (): ReactNode => {
-    return items.map((item: DropdownItem, idx) => {
-      const itemId = `dropdown-item-${idx}`;
-      return (
-        <li
-          key={idx}
-          id={itemId}
-          role="option"
-          aria-selected={selected === item.value}
-          tabIndex={-1}
-          onClick={() => {
-            setSelected(item.value);
-            on_select(item);
-            setOpen(false);
-            setFocusedIndex(null);
-          }}
-          className={clsx(
-            'mx-1 my-1 px-4 py-4 cursor-pointer rounded-lg transition-colors duration-100',
-            focusedIndex === idx
-              ? 'bg-gray-300 dark:bg-gray-700'
-              : 'hover:bg-gray-300 dark:hover:bg-gray-800'
-          )}
-        >
-          {item.label}
-        </li>
-      );
-    });
-  };
+  const renderDropdownList = (): ReactNode => {
+    if (!isOpen) return null;
 
-  const renderSelectedItem = () => {
-    const found = items.find((item) => item.value === selected);
-    return found ? found.label : '';
-  };
-
-  const renderDropdown = (): ReactNode => {
-    if (!open) return null;
-
-    const list = (
+    const listMarkup = (
       <ul
         id="dropdown-listbox"
         role="listbox"
@@ -148,15 +159,27 @@ const Dropdown = ({
         aria-activedescendant={
           focusedIndex !== null ? `dropdown-item-${focusedIndex}` : undefined
         }
-        className="w-full max-h-60 overflow-auto text-black dark:text-white"
+        className={clsx(
+          'w-full text-black dark:text-white',
+          !use_pagination && 'max-h-60 overflow-auto',
+          !use_pagination &&
+            'border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 rounded-md scrollbar-thin scrollbar-thumb-primary-300 scrollbar-track-primary-100 dark:scrollbar-thumb-primary-400 dark:scrollbar-track-primary-200 scrollbar-thumb-rounded-md'
+        )}
       >
-        {renderItemsForDropdown()}
+        {renderItems()}
       </ul>
+    );
+
+    const wrapperClasses = clsx(
+      'absolute w-full mt-1',
+      is_in_modal ? 'z-[9999]' : 'z-50',
+      use_pagination &&
+        'border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 rounded-md'
     );
 
     if (use_pagination) {
       return (
-        <div className="absolute z-50 w-full mt-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 rounded-md">
+        <div className={wrapperClasses}>
           <InfiniteScroll
             handle_scroll={onScroll}
             additional_css={clsx(
@@ -165,67 +188,38 @@ const Dropdown = ({
               'scrollbar-thin scrollbar-thumb-primary-300 scrollbar-track-primary-100 dark:scrollbar-thumb-primary-400 dark:scrollbar-track-primary-200 scrollbar-thumb-rounded-md'
             )}
           >
-            {list}
+            {listMarkup}
           </InfiniteScroll>
         </div>
       );
     }
 
-    return (
-      <ul
-        id="dropdown-listbox"
-        role="listbox"
-        ref={listRef}
-        aria-activedescendant={
-          focusedIndex !== null ? `dropdown-item-${focusedIndex}` : undefined
-        }
-        className="absolute z-50 w-full mt-1 max-h-60 overflow-auto border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-black dark:text-white rounded-md scrollbar-thin scrollbar-thumb-primary-300 scrollbar-track-primary-100 dark:scrollbar-thumb-primary-400 dark:scrollbar-track-primary-200 scrollbar-thumb-rounded-md"
-      >
-        {renderItemsForDropdown()}
-      </ul>
-    );
-  };
-
-  const renderSelectionText = () => {
-    if (selected) {
-      return (
-        <div className="text-gray-900 dark:text-white">
-          {renderSelectedItem()}
-        </div>
-      );
-    }
-
-    if (selection_placeholder) {
-      return <div className="text-gray-400">{selection_placeholder}</div>;
-    }
-
-    return <div className="text-gray-400">Select an option</div>;
+    return <div className={wrapperClasses}>{listMarkup}</div>;
   };
 
   return (
     <div
-      ref={ref}
+      ref={containerRef}
       onBlur={handleBlur}
       tabIndex={0}
       onKeyDown={handleKeyDown}
-      className="relative w-full"
+      className={clsx('relative w-full', is_in_modal && 'overflow-visible')}
     >
       <div
         tabIndex={0}
         role="button"
         aria-haspopup="listbox"
-        aria-expanded={open}
+        aria-expanded={isOpen}
         aria-controls="dropdown-listbox"
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={() => setIsOpen((prev) => !prev)}
         className="w-full p-2 pr-10 pl-3 rounded-md border border-gray-500 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center relative"
       >
         <span className="flex-1 truncate">{renderSelectionText()}</span>
         <span className="absolute right-3 top-1/2 -translate-y-1/2">
-          {renderDropdownIcon()}
+          {renderIcon()}
         </span>
       </div>
-
-      {renderDropdown()}
+      {renderDropdownList()}
     </div>
   );
 };

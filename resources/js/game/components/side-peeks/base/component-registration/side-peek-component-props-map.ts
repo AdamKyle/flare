@@ -3,11 +3,13 @@ import BackPackProps from '../../character-inventory/backpack/types/backpack-pro
 import GemBagProps from '../../character-inventory/gem-bag/types/gem-bag-props';
 import SetsProps from '../../character-inventory/sets/types/sets-props';
 import UsableItemsProps from '../../character-inventory/usable-items/types/usable-items-props';
+import TeleportProps from '../../map-actions/teleport/types/teleport-props';
 
 export type SidePeekComponentPropsMap = {
   [SidePeekComponentRegistrationEnum.BACKPACK]: BackPackProps;
   [SidePeekComponentRegistrationEnum.GEM_BAG]: GemBagProps;
   [SidePeekComponentRegistrationEnum.USABLE_ITEMS]: UsableItemsProps;
   [SidePeekComponentRegistrationEnum.SETS]: SetsProps;
+  [SidePeekComponentRegistrationEnum.MAP_ACTIONS_TELEPORT]: TeleportProps;
   // Future components go here
 };

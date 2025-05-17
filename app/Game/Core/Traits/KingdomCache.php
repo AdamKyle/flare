@@ -58,27 +58,14 @@ trait KingdomCache
      *
      * @return mixed
      */
-    public function getEnemyKingdoms(Character $character, bool $refresh = false)
+    public function getEnemyKingdoms(Character $character)
     {
-        $plane = $character->map->gameMap->name;
-
-        if (Cache::has('enemy-kingdoms-'.$plane) && ! $refresh) {
-            return Cache::get('enemy-kingdoms-'.$plane);
-        } else {
-            $kingdoms = Kingdom::select('x_position', 'y_position', 'id', 'color', 'character_id', 'name', 'current_morale', 'game_map_id')
-                ->whereNotNull('character_id')
-                ->where('game_map_id', $character->map->game_map_id)
-                ->get()
-                ->transform(function ($kingdom) {
-                    $kingdom->character_name = $kingdom->character->name;
-
-                    return $kingdom;
-                })->all();
-
-            Cache::put('enemy-kingdoms-'.$plane, $kingdoms);
-        }
-
-        return Cache::get('enemy-kingdoms-'.$plane);
+        return Kingdom::select('x_position', 'y_position', 'id', 'name')
+            ->whereNotNull('character_id')
+            ->where('character_id', '!=', $character->id)
+            ->where('game_map_id', $character->map->game_map_id)
+            ->get()
+            ->toArray();
     }
 
     /**

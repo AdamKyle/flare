@@ -7,6 +7,8 @@ import Sets from '../../character-inventory/sets/sets';
 import SetsProps from '../../character-inventory/sets/types/sets-props';
 import UsableItemsProps from '../../character-inventory/usable-items/types/usable-items-props';
 import UsableItems from '../../character-inventory/usable-items/usable-items';
+import Teleport from '../../map-actions/teleport/teleport';
+import TeleportProps from '../../map-actions/teleport/types/teleport-props';
 
 export const SidePeekComponentRegistry = {
   [SidePeekComponentRegistrationEnum.BACKPACK]: {
@@ -24,6 +26,10 @@ export const SidePeekComponentRegistry = {
   [SidePeekComponentRegistrationEnum.SETS]: {
     component: Sets,
     props: {} as SetsProps,
+  },
+  [SidePeekComponentRegistrationEnum.MAP_ACTIONS_TELEPORT]: {
+    component: Teleport,
+    props: {} as TeleportProps,
   },
   // Add more components here
 };
