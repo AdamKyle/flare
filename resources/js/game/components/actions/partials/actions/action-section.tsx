@@ -39,7 +39,7 @@ const ActionSection = () => {
   };
 
   return (
-    <aside className="w-full md:w-auto p-4 bg-gray-50 lg:border-l flex justify-center">
+    <aside className="w-full md:w-auto p-4 flex justify-center">
       {renderCharacterSheetSection()}
       {renderCraftingSection()}
       {renderShowMapSection()}

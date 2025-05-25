@@ -6,7 +6,11 @@ import CoordinatesDropDownProps from './types/coordinates-drop-down-props';
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
-const CoordinatesDropDown = ({ coordinates }: CoordinatesDropDownProps) => {
+const CoordinatesDropDown = ({
+  coordinates,
+  default_position,
+  on_select,
+}: CoordinatesDropDownProps) => {
   if (isEmpty(coordinates)) {
     return null;
   }
@@ -19,7 +23,7 @@ const CoordinatesDropDown = ({ coordinates }: CoordinatesDropDownProps) => {
   });
 
   const handleSelection = (selectedCoordinate: DropdownItem) => {
-    console.log(selectedCoordinate);
+    on_select(selectedCoordinate);
   };
 
   return (
@@ -27,6 +31,7 @@ const CoordinatesDropDown = ({ coordinates }: CoordinatesDropDownProps) => {
       items={coordinateOptions}
       on_select={handleSelection}
       selection_placeholder={'Select a coordinate'}
+      pre_selected_item={default_position}
       all_click_outside
       is_in_modal
     />

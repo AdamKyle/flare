@@ -1,12 +1,17 @@
-import { isEmpty } from 'lodash';
+import { isEmpty, isNil } from 'lodash';
 import React from 'react';
 
 import NpcKingdomsDropDownProps from './types/npc-kingdoms-drop-down-props';
+import { LocationTypes } from '../enums/location-types';
 
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
-const NpcKingdomDropDown = ({ npc_kingdoms }: NpcKingdomsDropDownProps) => {
+const NpcKingdomDropDown = ({
+  npc_kingdoms,
+  on_select,
+  location_type_selected,
+}: NpcKingdomsDropDownProps) => {
   if (isEmpty(npc_kingdoms)) {
     return null;
   }
@@ -19,7 +24,15 @@ const NpcKingdomDropDown = ({ npc_kingdoms }: NpcKingdomsDropDownProps) => {
   });
 
   const handleSelection = (selectedKingdom: DropdownItem) => {
-    console.log(selectedKingdom);
+    on_select(selectedKingdom, LocationTypes.NPC_KINGDOM);
+  };
+
+  const shouldForceClear = () => {
+    if (isNil(location_type_selected)) {
+      return false;
+    }
+
+    return location_type_selected !== LocationTypes.NPC_KINGDOM;
   };
 
   return (
@@ -29,6 +42,7 @@ const NpcKingdomDropDown = ({ npc_kingdoms }: NpcKingdomsDropDownProps) => {
       selection_placeholder={'Select an NPC kingdom'}
       all_click_outside
       is_in_modal
+      force_clear={shouldForceClear()}
     />
   );
 };

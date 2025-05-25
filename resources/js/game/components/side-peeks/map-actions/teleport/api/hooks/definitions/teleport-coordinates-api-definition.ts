@@ -1,7 +1,7 @@
 import CharacterKingdomsPositionDefinitions from '../../../../../../../api-definitions/map-details/character-kingdoms-position-definitions';
 import LocationsPositionDefinition from '../../../../../../../api-definitions/map-details/locations-position-definition';
 
-interface Coordinates {
+export interface Coordinates {
   x: number[];
   y: number[];
 }

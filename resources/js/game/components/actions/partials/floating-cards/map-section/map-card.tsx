@@ -14,6 +14,8 @@ import { useToggleFullMapVisibility } from '../../../../map-section/hooks/use-to
 import Map from '../../../../map-section/map';
 import FloatingCard from '../../../components/icon-section/floating-card';
 
+import CharacterSheetDefinition from 'game-data/api-data-definitions/character/character-sheet-definition';
+import { GameDataError } from 'game-data/components/game-data-error';
 import { useGameData } from 'game-data/hooks/use-game-data';
 
 import Button from 'ui/buttons/button';
@@ -21,7 +23,8 @@ import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import TimerBar from 'ui/timer-bar/timer-bar';
 
 const MapCard = () => {
-  const [characterId, setCharacterId] = useState(0);
+  const [characterData, setCharacterData] =
+    useState<CharacterSheetDefinition | null>(null);
 
   const { closeMapCard } = useManageMapSectionVisibility();
   const { openFullMap } = useToggleFullMapVisibility();
@@ -42,7 +45,7 @@ const MapCard = () => {
       return;
     }
 
-    setCharacterId(gameData.character?.id);
+    setCharacterData(gameData.character);
   }, [gameData]);
 
   const renderTimerBar = () => {
@@ -74,6 +77,14 @@ const MapCard = () => {
 
     return !canMove;
   };
+
+  if (isNil(characterData)) {
+    return (
+      <FloatingCard title={'Error Loading Data'} close_action={closeMapCard}>
+        <GameDataError />
+      </FloatingCard>
+    );
+  }
 
   return (
     <FloatingCard title={'Map: Surface'} close_action={closeMapCard}>
@@ -121,7 +132,11 @@ const MapCard = () => {
       <div className="my-2 p-2 flex flex-col gap-2 md:flex-row justify-center">
         <Button
           on_click={() =>
-            openTeleport(characterId, characterPosition.x, characterPosition.y)
+            openTeleport(
+              characterData,
+              characterPosition.x,
+              characterPosition.y
+            )
           }
           label={'Teleport'}
           variant={ButtonVariant.PRIMARY}

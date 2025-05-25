@@ -7,7 +7,7 @@ import { LocationTypes } from '../enums/location-types';
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
-const LocationsDropDown = ({
+const PortLocationsDropDown = ({
   locations,
   location_type_selected,
   on_select,
@@ -24,7 +24,7 @@ const LocationsDropDown = ({
   });
 
   const handleSelection = (selectedLocation: DropdownItem) => {
-    on_select(selectedLocation, LocationTypes.LOCATION);
+    on_select(selectedLocation, LocationTypes.PORT_LOCATION);
   };
 
   const shouldForceClear = () => {
@@ -32,7 +32,7 @@ const LocationsDropDown = ({
       return false;
     }
 
-    return location_type_selected !== LocationTypes.LOCATION;
+    return location_type_selected !== LocationTypes.PORT_LOCATION;
   };
 
   return (
@@ -47,4 +47,4 @@ const LocationsDropDown = ({
   );
 };
 
-export default LocationsDropDown;
+export default PortLocationsDropDown;

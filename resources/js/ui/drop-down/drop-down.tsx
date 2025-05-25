@@ -25,6 +25,7 @@ const Dropdown = ({
   additional_scroll_css,
   pre_selected_item,
   is_in_modal,
+  force_clear,
 }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string | number>('');
@@ -33,7 +34,9 @@ const Dropdown = ({
   const listRef = useRef<HTMLUListElement>(null);
 
   const handleBlur = (event: FocusEvent<HTMLDivElement>) => {
-    if (!all_click_outside) return;
+    if (!all_click_outside) {
+      return;
+    }
     if (!event.currentTarget.contains(event.relatedTarget)) {
       setIsOpen(false);
       setFocusedIndex(null);
@@ -82,9 +85,28 @@ const Dropdown = ({
   }, [focusedIndex, isOpen]);
 
   useEffect(() => {
-    if (!pre_selected_item) return;
+    if (!pre_selected_item) {
+      return;
+    }
+
     setSelectedValue(pre_selected_item.value);
   }, [pre_selected_item]);
+
+  useEffect(
+    () => {
+      if (!force_clear) {
+        return;
+      }
+
+      setSelectedValue('');
+
+      if (on_clear) {
+        on_clear();
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [force_clear]
+  );
 
   const onScroll = (event: UIEvent<HTMLDivElement>) => {
     if (handle_scroll) {
@@ -96,7 +118,9 @@ const Dropdown = ({
     e.stopPropagation();
     setSelectedValue('');
     setIsOpen(false);
-    if (on_clear) on_clear();
+    if (on_clear) {
+      on_clear();
+    }
   };
 
   const renderIcon = (): ReactNode =>

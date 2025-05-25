@@ -10,27 +10,47 @@ const BaseSidePeek = () => {
   const { ComponentToRender, componentProps, closeSidePeek } =
     useDynamicComponentVisibility();
 
+  const handleSecondaryActionClick = () => {
+    closeSidePeek();
+
+    if (componentProps.footer_secondary_action) {
+      componentProps.footer_secondary_action();
+    }
+  };
+
+  const renderFooterSecondaryAction = () => {
+    return (
+      <Button
+        on_click={handleSecondaryActionClick}
+        label={componentProps.footer_secondary_label || 'Cancel'}
+        variant={ButtonVariant.DANGER}
+      />
+    );
+  };
+
+  const renderFooterPrimaryAction = () => {
+    if (!componentProps.footer_primary_action) {
+      return;
+    }
+
+    return (
+      <Button
+        on_click={componentProps.footer_primary_action}
+        label={componentProps.footer_primary_label || ''}
+        variant={ButtonVariant.PRIMARY}
+      />
+    );
+  };
+
   const renderFooter = () => {
-    if (
-      !componentProps.has_footer ||
-      !componentProps.footer_secondary_action ||
-      !componentProps.footer_primary_action
-    ) {
+    if (!componentProps.has_footer) {
       return null;
     }
 
     return (
       <div className="border-t p-4 flex justify-between">
-        <Button
-          on_click={componentProps.footer_secondary_action}
-          label={componentProps.footer_secondary_label || ''}
-          variant={ButtonVariant.DANGER}
-        />
-        <Button
-          on_click={componentProps.footer_primary_action}
-          label={componentProps.footer_primary_label || ''}
-          variant={ButtonVariant.PRIMARY}
-        />
+        {renderFooterSecondaryAction()}
+        {renderFooterPrimaryAction()}
       </div>
     );
   };

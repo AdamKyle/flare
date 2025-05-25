@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { useSidePeekAccessibility } from 'ui/side-peek/hooks/use-side-peek-accessibility';
 import SidePeekProps from 'ui/side-peek/types/side-peek-props';
@@ -11,6 +11,28 @@ const SidePeek = (props: SidePeekProps) => {
       allow_clicking_outside: props.allow_clicking_outside,
       on_close: props.on_close,
     });
+
+  useEffect(() => {
+    const className = 'body-no-scroll';
+
+    if (document.body.classList.contains(className)) {
+      return;
+    }
+
+    if (props.is_open) {
+      document.body.classList.add(className);
+    } else {
+      if (!document.body.classList.contains(className)) {
+        return;
+      }
+
+      document.body.classList.remove(className);
+    }
+
+    return () => {
+      document.body.classList.remove(className);
+    };
+  }, [props.is_open]);
 
   return (
     <>

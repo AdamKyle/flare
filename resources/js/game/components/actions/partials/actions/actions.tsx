@@ -61,7 +61,7 @@ const Actions = (props: ActionsProps): ReactNode => {
           })}
         >
           <MonsterSection show_monster_stats={showMonsterStats} />
-          <div className="w-full p-2 bg-gray-100 my-4">
+          <div className="mt-4 rounded-lg bg-gray-100 dark:bg-gray-700 p-4 text-sm border border-solid border-gray-200 dark:border-gray-800 ">
             <AttackMessages messages={messages} />
           </div>
         </div>
@@ -78,7 +78,7 @@ const Actions = (props: ActionsProps): ReactNode => {
             'lg:grid-cols-[6rem_1fr_1fr]': isShowingSideSection(),
           })}
         >
-          <aside className="flex justify-between lg:flex-col lg:space-y-2 border-b lg:border-b-0 lg:border-r pb-2 lg:pb-0 mx-auto">
+          <aside className="flex justify-between lg:flex-col lg:space-y-2 pb-2 lg:pb-0 mx-auto">
             <NavigationActionsComponent />
           </aside>
 

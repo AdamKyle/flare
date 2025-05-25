@@ -1,13 +1,16 @@
-import { isEmpty } from 'lodash';
+import { isEmpty, isNil } from 'lodash';
 import React from 'react';
 
 import EnemyKingdomsDropDownProps from './types/enemy-kingdoms-drop-down-props';
+import { LocationTypes } from '../enums/location-types';
 
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
 const EnemyKingdomsDropDown = ({
   enemy_kingdoms,
+  location_type_selected,
+  on_select,
 }: EnemyKingdomsDropDownProps) => {
   if (isEmpty(enemy_kingdoms)) {
     return null;
@@ -21,7 +24,15 @@ const EnemyKingdomsDropDown = ({
   });
 
   const handleSelection = (selectedKingdom: DropdownItem) => {
-    console.log(selectedKingdom);
+    on_select(selectedKingdom, LocationTypes.ENEMY_KINGDOM);
+  };
+
+  const shouldForceClear = () => {
+    if (isNil(location_type_selected)) {
+      return false;
+    }
+
+    return location_type_selected !== LocationTypes.ENEMY_KINGDOM;
   };
 
   return (
@@ -31,6 +42,7 @@ const EnemyKingdomsDropDown = ({
       selection_placeholder={'Select an enemy kingdom'}
       all_click_outside
       is_in_modal
+      force_clear={shouldForceClear()}
     />
   );
 };

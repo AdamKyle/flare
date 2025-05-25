@@ -3,11 +3,13 @@ import { SidePeekComponentRegistrationEnum } from '../../side-peeks/base/compone
 import { SidePeek } from '../../side-peeks/base/event-types/side-peek';
 import { useSidePeekEmitter } from '../../side-peeks/base/hooks/use-side-peek-emitter';
 
+import CharacterSheetDefinition from 'game-data/api-data-definitions/character/character-sheet-definition';
+
 export const UseOpenTeleportSidePeek = (): UseOpenTeleportModalDefinition => {
   const sidePeekEmitter = useSidePeekEmitter();
 
   const openTeleport = (
-    character_id: number,
+    character_data: CharacterSheetDefinition,
     character_x: number,
     character_y: number
   ) => {
@@ -17,15 +19,10 @@ export const UseOpenTeleportSidePeek = (): UseOpenTeleportModalDefinition => {
       {
         is_open: true,
         title: 'Teleport',
-        character_id: character_id,
+        character_data: character_data,
         x: character_x,
         y: character_y,
         allow_clicking_outside: true,
-        footer_primary_label: 'Teleport',
-        footer_primary_action: () => {},
-        footer_secondary_label: 'Cancel',
-        footer_secondary_action: () => {},
-        has_footer: true,
       }
     );
   };
