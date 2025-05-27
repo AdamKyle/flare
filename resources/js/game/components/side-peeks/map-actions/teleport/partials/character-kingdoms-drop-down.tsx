@@ -10,6 +10,7 @@ import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 const CharacterKingdomsDropDown = ({
   character_kingdoms,
   on_select,
+  on_clear,
   location_type_selected,
 }: CharacterKingdomsDropDownProps) => {
   if (isEmpty(character_kingdoms)) {
@@ -35,10 +36,19 @@ const CharacterKingdomsDropDown = ({
     return location_type_selected !== LocationTypes.MY_KINGDOM;
   };
 
+  const handleOnClear = () => {
+    if (location_type_selected !== LocationTypes.LOCATION) {
+      return;
+    }
+
+    on_clear();
+  };
+
   return (
     <Dropdown
       items={kingdomChoices}
       on_select={handleSelection}
+      on_clear={handleOnClear}
       selection_placeholder={'Select one of your kingdoms'}
       all_click_outside
       is_in_modal

@@ -10,6 +10,7 @@ const CoordinatesDropDown = ({
   coordinates,
   default_position,
   on_select,
+  on_clear,
 }: CoordinatesDropDownProps) => {
   if (isEmpty(coordinates)) {
     return null;
@@ -30,6 +31,7 @@ const CoordinatesDropDown = ({
     <Dropdown
       items={coordinateOptions}
       on_select={handleSelection}
+      on_clear={on_clear}
       selection_placeholder={'Select a coordinate'}
       pre_selected_item={default_position}
       all_click_outside

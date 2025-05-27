@@ -7,4 +7,5 @@ export default interface CharacterKingdomsDropDownProps {
   character_kingdoms: CharacterKingdomsPositionDefinitions[];
   location_type_selected: LocationTypes | null;
   on_select: (item: DropdownItem, locationType: LocationTypes) => void;
+  on_clear: () => void;
 }

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import CoordinatesDropDown from './coordinates-drop-down';
 import CoordinatesProps from './types/coordinates-props';
+import { CoordinateTypes } from '../enums/coordinate-types';
 
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
@@ -10,6 +11,7 @@ const Coordinates = ({
   x,
   y,
   on_select_coordinates,
+  on_clear_coordinates,
 }: CoordinatesProps) => {
   const [selectedCoordinates, setSelectedCoordinates] = useState({
     x: x,
@@ -26,7 +28,6 @@ const Coordinates = ({
   };
 
   const onSelectXCoordinate = (selectedValue: DropdownItem) => {
-    console.log('Here - onSelectXCoordinate');
     setSelectedCoordinates((prev) => ({
       x: parseInt(selectedValue.value as string, 10),
       y: prev.y,
@@ -42,6 +43,14 @@ const Coordinates = ({
     }));
 
     setUpdateParent((prevValue) => !prevValue);
+  };
+
+  const onClearXCoordinate = () => {
+    on_clear_coordinates(CoordinateTypes.X);
+  };
+
+  const onClearYCoordinate = () => {
+    on_clear_coordinates(CoordinateTypes.Y);
   };
 
   useEffect(
@@ -69,6 +78,7 @@ const Coordinates = ({
           coordinates={coordinates.x}
           default_position={getPreSelectedCoordinate(selectedCoordinates.x)}
           on_select={onSelectXCoordinate}
+          on_clear={onClearXCoordinate}
         />
       </div>
       <div className="grid gap-2">
@@ -79,6 +89,7 @@ const Coordinates = ({
           coordinates={coordinates.y}
           default_position={getPreSelectedCoordinate(selectedCoordinates.y)}
           on_select={onSelectYCoordinate}
+          on_clear={onClearYCoordinate}
         />
       </div>
     </div>

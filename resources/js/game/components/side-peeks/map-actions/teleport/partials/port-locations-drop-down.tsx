@@ -11,6 +11,7 @@ const PortLocationsDropDown = ({
   locations,
   location_type_selected,
   on_select,
+  on_clear,
 }: LocationDropDownProps) => {
   if (isEmpty(locations)) {
     return null;
@@ -35,10 +36,19 @@ const PortLocationsDropDown = ({
     return location_type_selected !== LocationTypes.PORT_LOCATION;
   };
 
+  const handleOnClear = () => {
+    if (location_type_selected !== LocationTypes.PORT_LOCATION) {
+      return;
+    }
+
+    on_clear();
+  };
+
   return (
     <Dropdown
       items={locationChoices}
       on_select={handleSelection}
+      on_clear={handleOnClear}
       selection_placeholder={'Select a location'}
       force_clear={shouldForceClear()}
       all_click_outside

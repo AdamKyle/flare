@@ -10,6 +10,7 @@ import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 const NpcKingdomDropDown = ({
   npc_kingdoms,
   on_select,
+  on_clear,
   location_type_selected,
 }: NpcKingdomsDropDownProps) => {
   if (isEmpty(npc_kingdoms)) {
@@ -35,10 +36,19 @@ const NpcKingdomDropDown = ({
     return location_type_selected !== LocationTypes.NPC_KINGDOM;
   };
 
+  const handleOnClear = () => {
+    if (location_type_selected !== LocationTypes.NPC_KINGDOM) {
+      return;
+    }
+
+    on_clear();
+  };
+
   return (
     <Dropdown
       items={kingdomChoices}
-      on_select={handleSelection}
+      on_select={handleOnClear}
+      on_clear={on_clear}
       selection_placeholder={'Select an NPC kingdom'}
       all_click_outside
       is_in_modal

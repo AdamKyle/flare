@@ -5,6 +5,7 @@ import { match } from 'ts-pattern';
 
 import { TeleportModalUrls } from './api/enums/teleport-modal-urls';
 import { useFetchTeleportCoordinatesApi } from './api/hooks/use-fetch-teleport-coordinates-api';
+import { CoordinateTypes } from './enums/coordinate-types';
 import { LocationTypes } from './enums/location-types';
 import CharacterKingdomsDropDown from './partials/character-kingdoms-drop-down';
 import Coordinates from './partials/coordinates';
@@ -42,6 +43,10 @@ const Teleport = ({ character_data, x, y }: TeleportProps) => {
 
   useEffect(
     () => {
+      if (isNil(selectedLocationType)) {
+        return;
+      }
+
       const calculatedCostOfTeleport = calculateCostOfTeleport({
         character_position: { x_position: x, y_position: y },
         new_character_position: {
@@ -115,10 +120,33 @@ const Teleport = ({ character_data, x, y }: TeleportProps) => {
     });
   };
 
+  const handleOnClearDropDown = () => {
+    setSelectedLocationType(null);
+    setSelectedCoordinates({
+      x,
+      y,
+    });
+    setCostOfTeleport(0);
+    setCanAffordToTeleport(false);
+    setTimeOutvalue(0);
+  };
+
+  const handleClearCoordinateType = (coordinateType: CoordinateTypes) => {
+    setSelectedLocationType(null);
+    setSelectedCoordinates((prev) => ({
+      x: coordinateType === CoordinateTypes.X ? x : prev.x,
+      y: coordinateType === CoordinateTypes.Y ? y : prev.y,
+    }));
+    setCostOfTeleport(0);
+    setCanAffordToTeleport(false);
+    setTimeOutvalue(0);
+  };
+
   const handleUpdatingCoordinateSelection = (coordinates: {
     x: number;
     y: number;
   }) => {
+    console.log('handleUpdatingCoordinateSelection', x, y);
     setSelectedCoordinates(coordinates);
     setSelectedLocationType(LocationTypes.COORDINATE);
   };
@@ -152,6 +180,7 @@ const Teleport = ({ character_data, x, y }: TeleportProps) => {
         <CharacterKingdomsDropDown
           character_kingdoms={data.character_kingdoms}
           on_select={handleSelectedItem}
+          on_clear={handleOnClearDropDown}
           location_type_selected={selectedLocationType}
         />
       </div>
@@ -171,6 +200,7 @@ const Teleport = ({ character_data, x, y }: TeleportProps) => {
         <EnemyKingdomsDropDown
           enemy_kingdoms={data.enemy_kingdoms}
           on_select={handleSelectedItem}
+          on_clear={handleOnClearDropDown}
           location_type_selected={selectedLocationType}
         />
       </div>
@@ -190,6 +220,7 @@ const Teleport = ({ character_data, x, y }: TeleportProps) => {
         <NpcKingdomDropDown
           npc_kingdoms={data.npc_kingdoms}
           on_select={handleSelectedItem}
+          on_clear={handleOnClearDropDown}
           location_type_selected={selectedLocationType}
         />
       </div>
@@ -245,6 +276,8 @@ const Teleport = ({ character_data, x, y }: TeleportProps) => {
     );
   };
 
+  console.log('select coordinates', selectedCoordinates);
+
   return (
     <div className="p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
       <div className="grid gap-2">
@@ -254,6 +287,7 @@ const Teleport = ({ character_data, x, y }: TeleportProps) => {
         <LocationsDropDown
           locations={data.locations.filter((location) => !location.is_port)}
           on_select={handleSelectedItem}
+          on_clear={handleOnClearDropDown}
           location_type_selected={selectedLocationType}
         />
       </div>
@@ -264,6 +298,7 @@ const Teleport = ({ character_data, x, y }: TeleportProps) => {
         <PortLocationsDropDown
           locations={data.locations.filter((location) => location.is_port)}
           location_type_selected={selectedLocationType}
+          on_clear={handleOnClearDropDown}
           on_select={handleSelectedItem}
         />
       </div>
@@ -283,6 +318,7 @@ const Teleport = ({ character_data, x, y }: TeleportProps) => {
         x={selectedCoordinates.x}
         y={selectedCoordinates.y}
         on_select_coordinates={handleUpdatingCoordinateSelection}
+        on_clear_coordinates={handleClearCoordinateType}
       />
 
       <Separator />

@@ -7,4 +7,5 @@ export default interface LocationDropDownProps {
   locations: LocationsPositionDefinition[];
   location_type_selected: LocationTypes | null;
   on_select: (item: DropdownItem, locationType: LocationTypes) => void;
+  on_clear: () => void;
 }

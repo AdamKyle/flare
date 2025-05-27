@@ -48,10 +48,10 @@ const TimerBar = ({ length, title, additional_css }: TimerBarProps) => {
   return (
     <div className={clsx('w-full', additional_css)}>
       <div className="flex justify-between items-center mb-1">
-        <span className="text-sm font-medium text-gray-900 dark:text-gray-700">
+        <span className="text-sm font-medium text-gray-900 dark:text-gray-300">
           {title}
         </span>
-        <span className="text-sm font-mono text-gray-800 dark:text-gray-700">
+        <span className="text-sm font-mono text-gray-800 dark:text-gray-300">
           {formattedRemaining}
         </span>
       </div>

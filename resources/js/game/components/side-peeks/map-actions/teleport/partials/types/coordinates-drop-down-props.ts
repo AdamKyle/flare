@@ -4,4 +4,5 @@ export default interface CoordinatesDropDownProps {
   coordinates: number[];
   default_position: DropdownItem;
   on_select: (selectedItem: DropdownItem) => void;
+  on_clear: () => void;
 }
