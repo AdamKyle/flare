@@ -40,7 +40,7 @@ const MapCard = () => {
   const { isSetSailEnabled } = useManageSetSailButtonState();
   const { gameData } = useGameData();
   const { openTeleport } = UseOpenTeleportSidePeek();
-  const { errorMessage } = useManageMapMovementErrorState();
+  const { errorMessage, resetErrorMessage } = useManageMapMovementErrorState();
   const { characterPosition } = useEmitCharacterPosition();
 
   useEffect(() => {
@@ -66,6 +66,10 @@ const MapCard = () => {
     });
   }, [characterPosition]);
 
+  const handleCloseAlert = () => {
+    resetErrorMessage();
+  };
+
   const renderTimerBar = () => {
     if (!showTimerBar) {
       return;
@@ -85,7 +89,9 @@ const MapCard = () => {
       return null;
     }
 
-    return <ApiErrorAlert apiError={errorMessage} />;
+    return (
+      <ApiErrorAlert apiError={errorMessage} on_close={handleCloseAlert} />
+    );
   };
 
   const isSetSailDisabled = () => {

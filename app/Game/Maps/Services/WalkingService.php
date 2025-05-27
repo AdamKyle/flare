@@ -43,7 +43,7 @@ class WalkingService extends BaseMovementService
     {
 
         if (! $this->validateCoordinates()) {
-            return $this->errorResult('Invalid coordinates');
+            return $this->errorResult('You cannot go any further that way.');
         }
 
         if (! $this->mapTileValue->canWalk($character, $this->x, $this->y)) {

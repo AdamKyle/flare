@@ -1,5 +1,6 @@
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { isNil } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 
 import { CharacterPosition } from './definitions/base-map-api-definition';
@@ -7,11 +8,16 @@ import BaseMapDetailsApiDefinition from './definitions/base-map-details-api-defi
 import MoveCharacterRequestDefinition from './definitions/move-character-request-definition';
 import UseMoveCharacterDirectionallyApiDefinition from './definitions/use-move-character-directionally-api-definition';
 import UseMoveCharacterDirectionallyApiParams from './definitions/use-move-character-directionally-api-params';
+import { useDirectionallyMoveCharacter } from '../../../actions/partials/floating-cards/map-section/hooks/use-directionally-move-character';
+import { useManageMapMovementErrorState } from '../../../actions/partials/floating-cards/map-section/hooks/use-manage-map-movement-error-state';
 
 export const useMoveCharacterDirectionallyApi = (
   params: UseMoveCharacterDirectionallyApiParams
 ): UseMoveCharacterDirectionallyApiDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
+  const { showMessage } = useManageMapMovementErrorState();
+  const { resetMovementAmount } = useDirectionallyMoveCharacter();
+
   const [error, setError] =
     useState<BaseMapDetailsApiDefinition['error']>(null);
   const [requestParams, setRequestParams] =
@@ -55,6 +61,13 @@ export const useMoveCharacterDirectionallyApi = (
       } catch (err) {
         if (err instanceof AxiosError) {
           setError(err.response?.data);
+
+          setRequestParams({
+            character_position_x: 0,
+            character_position_y: 0,
+          });
+
+          resetMovementAmount();
         }
       }
     },
@@ -79,6 +92,18 @@ export const useMoveCharacterDirectionallyApi = (
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [moveCharacterDirectionally, requestParams]
+  );
+
+  useEffect(
+    () => {
+      if (isNil(error)) {
+        return;
+      }
+
+      showMessage(error.message);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [error]
   );
 
   return {

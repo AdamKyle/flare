@@ -11,6 +11,7 @@ export const Alert = (props: AlertProps): React.ReactNode => {
 
   const handleClose = (): void => {
     setVisible(false);
+
     if (props.on_close) {
       props.on_close();
     }
@@ -22,7 +23,7 @@ export const Alert = (props: AlertProps): React.ReactNode => {
     }
 
     return (
-      <button type="button" className="alert-close" onClick={handleClose}>
+      <button type="button" onClick={handleClose} className="ml-4">
         <i className="fas fa-times" />
       </button>
     );
@@ -31,8 +32,14 @@ export const Alert = (props: AlertProps): React.ReactNode => {
   return (
     <>
       {visible && (
-        <div className={clsx(baseStyle(), variantStyle(props.variant))}>
-          {props.children}
+        <div
+          className={clsx(
+            baseStyle(),
+            variantStyle(props.variant),
+            'flex justify-between items-start'
+          )}
+        >
+          <div className="flex-1">{props.children}</div>
           {renderCloseButton()}
         </div>
       )}
