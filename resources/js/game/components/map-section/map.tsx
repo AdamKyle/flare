@@ -33,7 +33,8 @@ const Map = ({ additional_css, zoom = 1 }: MapProps) => {
 
   const { manageSetSailButtonState } = useManageSetSailButtonState();
 
-  const { emitCharacterPosition } = useEmitCharacterPosition();
+  const { emitCharacterPosition, characterPosition: emittedCharacterPosition } =
+    useEmitCharacterPosition();
 
   const { gameData } = useGameData();
 
@@ -99,6 +100,31 @@ const Map = ({ additional_css, zoom = 1 }: MapProps) => {
     manageSetSailButtonState(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [characterMapPosition]);
+
+  useEffect(
+    () => {
+      if (
+        emittedCharacterPosition.x === 0 ||
+        emittedCharacterPosition.y === 0
+      ) {
+        return;
+      }
+
+      if (
+        emittedCharacterPosition.x === characterMapPosition.x &&
+        emittedCharacterPosition.y === characterMapPosition.y
+      ) {
+        return;
+      }
+
+      setCharacterMapPosition({
+        x: emittedCharacterPosition.x,
+        y: emittedCharacterPosition.y,
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [emittedCharacterPosition]
+  );
 
   if (!characterData) {
     return <GameDataError />;

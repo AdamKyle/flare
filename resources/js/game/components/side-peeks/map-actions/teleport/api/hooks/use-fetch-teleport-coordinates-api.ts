@@ -3,11 +3,11 @@ import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 
 import TeleportCoordinatesApiDefinition from './definitions/teleport-coordinates-api-definition';
-import UseFetchTeleportCoordinatesAoiParams from './definitions/use-fetch-teleport-coordinates-aoi-params';
 import UseFetchTeleportCoordinatesApiDefinition from './definitions/use-fetch-teleport-coordinates-api-definition';
+import UseFetchTeleportCoordinatesApiParams from './definitions/use-fetch-teleport-coordinates-api-params';
 
 export const useFetchTeleportCoordinatesApi = (
-  params: UseFetchTeleportCoordinatesAoiParams
+  params: UseFetchTeleportCoordinatesApiParams
 ): UseFetchTeleportCoordinatesApiDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
 

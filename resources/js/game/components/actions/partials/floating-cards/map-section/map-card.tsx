@@ -8,6 +8,7 @@ import { useManageMapMovementErrorState } from './hooks/use-manage-map-movement-
 import { useManageMapSectionVisibility } from './hooks/use-manage-map-section-visibility';
 import { useManageSetSailButtonState } from './hooks/use-manage-set-sail-button-state';
 import { MapMovementTypes } from './map-movement-types/map-movement-types';
+import { CharacterPosition } from '../../../../map-section/api/hooks/definitions/base-map-api-definition';
 import { useEmitCharacterPosition } from '../../../../map-section/hooks/use-emit-character-position';
 import { UseOpenTeleportSidePeek } from '../../../../map-section/hooks/use-open-teleport-sidepeek';
 import { useToggleFullMapVisibility } from '../../../../map-section/hooks/use-toggle-full-map-visibility';
@@ -25,6 +26,12 @@ import TimerBar from 'ui/timer-bar/timer-bar';
 const MapCard = () => {
   const [characterData, setCharacterData] =
     useState<CharacterSheetDefinition | null>(null);
+
+  const [characterMapPosition, setCharacterMapPosition] =
+    useState<CharacterPosition>({
+      x_position: 0,
+      y_position: 0,
+    });
 
   const { closeMapCard } = useManageMapSectionVisibility();
   const { openFullMap } = useToggleFullMapVisibility();
@@ -47,6 +54,17 @@ const MapCard = () => {
 
     setCharacterData(gameData.character);
   }, [gameData]);
+
+  useEffect(() => {
+    if (characterPosition.x === 0 || characterPosition.y === 0) {
+      return;
+    }
+
+    setCharacterMapPosition({
+      x_position: characterPosition.x,
+      y_position: characterPosition.y,
+    });
+  }, [characterPosition]);
 
   const renderTimerBar = () => {
     if (!showTimerBar) {
@@ -94,7 +112,8 @@ const MapCard = () => {
       {renderTimerBar()}
       {renderMapError()}
       <div className="my-2 p-2">
-        Map Position (X/Y): {characterPosition.x}/{characterPosition.y})
+        Map Position (X/Y): {characterMapPosition.x_position}/
+        {characterMapPosition.y_position})
       </div>
       <div className="my-2 p-2 flex flex-col gap-2 md:flex-row justify-center">
         <Button

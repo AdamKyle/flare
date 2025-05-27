@@ -52,6 +52,7 @@ class MoveTimeOutListener
 
         if ($time < 1) {
             $timeOut = now()->addMinute();
+            $time = 1;
         } else {
             $timeOut = now()->addMinutes($time);
         }

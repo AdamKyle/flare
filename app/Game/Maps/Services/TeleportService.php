@@ -70,9 +70,11 @@ class TeleportService extends BaseMovementService
 
         $character = $this->updateCharacterMapPosition($character);
 
-        $this->teleportCharacter($character, $location, $usingPCTCommand);
+        $character = $this->teleportCharacter($character, $location, $usingPCTCommand);
 
-        return $this->successResult($this->movementService->accessLocationService()->getLocationData($character));
+        return $this->successResult(
+            $this->movementService->accessLocationService()->getCharacterPositionData($character->map)
+        );
     }
 
     /**
@@ -86,7 +88,7 @@ class TeleportService extends BaseMovementService
      *
      * @throws Exception
      */
-    protected function teleportCharacter(Character $character, ?Location $location = null, bool $pctCommand = false): void
+    protected function teleportCharacter(Character $character, ?Location $location = null, bool $pctCommand = false): Character
     {
 
         $timeout = $this->timeout;
@@ -114,12 +116,14 @@ class TeleportService extends BaseMovementService
         if (! is_null($location)) {
 
             if ($this->traversePlayer($location, $character)) {
-                return;
+                return $character;
             }
 
             $this->movementService->giveLocationReward($character, $location);
         }
 
         $this->updateMonstersList($character, $location);
+
+        return $character;
     }
 }

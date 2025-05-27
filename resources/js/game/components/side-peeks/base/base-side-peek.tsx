@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
+import { useCloseSidePeekEmitter } from './hooks/use-close-side-peek-emitter';
 import { useDynamicComponentVisibility } from './hooks/use-manage-side-peek-visibility';
 
 import Button from 'ui/buttons/button';
@@ -9,6 +10,20 @@ import SidePeek from 'ui/side-peek/side-peek';
 const BaseSidePeek = () => {
   const { ComponentToRender, componentProps, closeSidePeek } =
     useDynamicComponentVisibility();
+
+  const { shouldClose } = useCloseSidePeekEmitter();
+
+  useEffect(
+    () => {
+      if (!shouldClose) {
+        return;
+      }
+
+      closeSidePeek();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [shouldClose]
+  );
 
   const handleSecondaryActionClick = () => {
     closeSidePeek();

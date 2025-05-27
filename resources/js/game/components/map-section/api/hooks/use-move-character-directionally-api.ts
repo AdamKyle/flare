@@ -54,7 +54,7 @@ export const useMoveCharacterDirectionallyApi = (
         }
       } catch (err) {
         if (err instanceof AxiosError) {
-          setError(err.response?.data || null);
+          setError(err.response?.data);
         }
       }
     },

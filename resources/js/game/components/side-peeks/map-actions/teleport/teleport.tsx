@@ -5,6 +5,7 @@ import { match } from 'ts-pattern';
 
 import { TeleportModalUrls } from './api/enums/teleport-modal-urls';
 import { useFetchTeleportCoordinatesApi } from './api/hooks/use-fetch-teleport-coordinates-api';
+import { useTeleportPlayerApi } from './api/hooks/use-teleport-player-api';
 import { CoordinateTypes } from './enums/coordinate-types';
 import { LocationTypes } from './enums/location-types';
 import CharacterKingdomsDropDown from './partials/character-kingdoms-drop-down';
@@ -28,6 +29,11 @@ import Separator from 'ui/seperatror/separator';
 const Teleport = ({ character_data, x, y }: TeleportProps) => {
   const { data, error, loading } = useFetchTeleportCoordinatesApi({
     url: TeleportModalUrls.TELEPORT_COORDINATES,
+    character_id: character_data.id,
+  });
+
+  const { setRequestParams } = useTeleportPlayerApi({
+    url: TeleportModalUrls.TELEPORT_PLAYER,
     character_id: character_data.id,
   });
 
@@ -146,9 +152,17 @@ const Teleport = ({ character_data, x, y }: TeleportProps) => {
     x: number;
     y: number;
   }) => {
-    console.log('handleUpdatingCoordinateSelection', x, y);
     setSelectedCoordinates(coordinates);
     setSelectedLocationType(LocationTypes.COORDINATE);
+  };
+
+  const handleTeleportPlayer = () => {
+    setRequestParams({
+      x: selectedCoordinates.x,
+      y: selectedCoordinates.y,
+      cost: costOfTeleport,
+      timeout: timeOutValue,
+    });
   };
 
   if (loading) {
@@ -266,7 +280,7 @@ const Teleport = ({ character_data, x, y }: TeleportProps) => {
           </span>
         </div>
         <Button
-          on_click={() => {}}
+          on_click={handleTeleportPlayer}
           label={'Teleport'}
           variant={ButtonVariant.PRIMARY}
           disabled={costOfTeleport <= 0 || !canAffordToTeleport}
@@ -275,8 +289,6 @@ const Teleport = ({ character_data, x, y }: TeleportProps) => {
       </div>
     );
   };
-
-  console.log('select coordinates', selectedCoordinates);
 
   return (
     <div className="p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">

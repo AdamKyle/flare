@@ -44,7 +44,7 @@ class CharacterAttackBuilderTest extends TestCase
     public function testBuildWeaponDamage()
     {
         $character = $this->setUpCharacterForTests();
-        dump('testBuildWeaponDamage');
+
         $attack = $this->characterAttackBuilder->setCharacter($character)->buildAttack();
 
         $this->assertGreaterThan(0, $attack['weapon_damage']);

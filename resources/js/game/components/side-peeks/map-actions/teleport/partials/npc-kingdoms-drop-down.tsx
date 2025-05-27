@@ -47,8 +47,8 @@ const NpcKingdomDropDown = ({
   return (
     <Dropdown
       items={kingdomChoices}
-      on_select={handleOnClear}
-      on_clear={on_clear}
+      on_select={handleSelection}
+      on_clear={handleOnClear}
       selection_placeholder={'Select an NPC kingdom'}
       all_click_outside
       is_in_modal

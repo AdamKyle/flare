@@ -10,6 +10,7 @@ export const useMovementTimer = ({ characterData }: UseMovementTimerParams) => {
   const { handleEventData: onDataUpdate } = useFetchMovementTimeoutData();
 
   const handleEventData = (data: MapMovementEventTimeoutDefinition) => {
+    console.log('Movement Timer', data);
     onDataUpdate(data);
   };
 
