@@ -19,6 +19,7 @@ import MapProps from './types/map-props';
 import { useMovementTimer } from './websockets/hooks/use-movement-timer';
 import { useFetchMovementTimeoutData } from '../actions/partials/floating-cards/map-section/hooks/use-fetch-movement-timeout-data';
 import { useManageSetSailButtonState } from '../actions/partials/floating-cards/map-section/hooks/use-manage-set-sail-button-state';
+import { useManageViewLocationState } from '../actions/partials/floating-cards/map-section/hooks/use-manage-view-location-state';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 import { useGameData } from 'game-data/hooks/use-game-data';
@@ -32,6 +33,7 @@ const Map = ({ additional_css, zoom = 1 }: MapProps) => {
   const { handleEventData } = useFetchMovementTimeoutData();
 
   const { manageSetSailButtonState } = useManageSetSailButtonState();
+  const { canViewLocationData } = useManageViewLocationState();
 
   const { emitCharacterPosition, characterPosition: emittedCharacterPosition } =
     useEmitCharacterPosition();
@@ -83,21 +85,33 @@ const Map = ({ additional_css, zoom = 1 }: MapProps) => {
   useEffect(() => {
     emitCharacterPosition(characterMapPosition);
 
-    const foundPort = data?.locations.find((location) => {
+    const foundLocation = data?.locations.find((location) => {
       return (
         location.x_position === characterMapPosition.x &&
-        location.y_position === characterMapPosition.y &&
-        location.is_port
+        location.y_position === characterMapPosition.y
       );
     });
 
-    if (!foundPort) {
+    if (!foundLocation) {
       manageSetSailButtonState(false);
+      canViewLocationData(false, null);
+      return;
+    }
 
+    if (!foundLocation.is_port) {
+      manageSetSailButtonState(false);
+      canViewLocationData(true, {
+        location_id: foundLocation.id,
+        location_name: foundLocation.name,
+      });
       return;
     }
 
     manageSetSailButtonState(true);
+    canViewLocationData(true, {
+      location_id: foundLocation.id,
+      location_name: foundLocation.name,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [characterMapPosition]);
 

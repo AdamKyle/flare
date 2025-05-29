@@ -70,6 +70,10 @@ const BaseSidePeek = () => {
     );
   };
 
+  if (!componentProps.is_open) {
+    return null;
+  }
+
   return (
     <SidePeek
       title={componentProps.title}

@@ -7,11 +7,12 @@ import { useFetchMovementTimeoutData } from './hooks/use-fetch-movement-timeout-
 import { useManageMapMovementErrorState } from './hooks/use-manage-map-movement-error-state';
 import { useManageMapSectionVisibility } from './hooks/use-manage-map-section-visibility';
 import { useManageSetSailButtonState } from './hooks/use-manage-set-sail-button-state';
+import { useManageViewLocationState } from './hooks/use-manage-view-location-state';
 import { MapMovementTypes } from './map-movement-types/map-movement-types';
 import { CharacterPosition } from '../../../../map-section/api/hooks/definitions/base-map-api-definition';
 import { useEmitCharacterPosition } from '../../../../map-section/hooks/use-emit-character-position';
+import { useOpenLocationInfoModal } from '../../../../map-section/hooks/use-open-location-info-modal';
 import { UseOpenTeleportSidePeek } from '../../../../map-section/hooks/use-open-teleport-sidepeek';
-import { useToggleFullMapVisibility } from '../../../../map-section/hooks/use-toggle-full-map-visibility';
 import Map from '../../../../map-section/map';
 import FloatingCard from '../../../components/icon-section/floating-card';
 
@@ -34,7 +35,6 @@ const MapCard = () => {
     });
 
   const { closeMapCard } = useManageMapSectionVisibility();
-  const { openFullMap } = useToggleFullMapVisibility();
   const { moveCharacterDirectionally } = useDirectionallyMoveCharacter();
   const { canMove, showTimerBar, lengthOfTime } = useFetchMovementTimeoutData();
   const { isSetSailEnabled } = useManageSetSailButtonState();
@@ -42,6 +42,10 @@ const MapCard = () => {
   const { openTeleport } = UseOpenTeleportSidePeek();
   const { errorMessage, resetErrorMessage } = useManageMapMovementErrorState();
   const { characterPosition } = useEmitCharacterPosition();
+  const { isViewLocationEnabled, locationData } = useManageViewLocationState();
+  const { openLocationDetails } = useOpenLocationInfoModal({
+    characterData: gameData?.character,
+  });
 
   useEffect(() => {
     if (isNil(gameData)) {
@@ -68,6 +72,14 @@ const MapCard = () => {
 
   const handleCloseAlert = () => {
     resetErrorMessage();
+  };
+
+  const handleViewLocationDetails = () => {
+    if (isNil(locationData)) {
+      return;
+    }
+
+    openLocationDetails(locationData.location_id, locationData.location_name);
   };
 
   const renderTimerBar = () => {
@@ -187,10 +199,11 @@ const MapCard = () => {
       </div>
       <div className="my-2 p-2 w-full">
         <Button
-          on_click={openFullMap}
-          label={'View Full Map'}
+          on_click={handleViewLocationDetails}
+          label={'View Location'}
           variant={ButtonVariant.SUCCESS}
           additional_css={'w-full'}
+          disabled={!isViewLocationEnabled}
         />
       </div>
     </FloatingCard>
