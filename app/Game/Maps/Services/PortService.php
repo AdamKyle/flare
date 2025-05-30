@@ -5,7 +5,6 @@ namespace App\Game\Maps\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Game\Maps\Calculations\DistanceCalculation;
-use App\Game\Maps\Values\MapPositionValue;
 use Illuminate\Database\Eloquent\Collection;
 
 class PortService
@@ -14,11 +13,6 @@ class PortService
      * @var DistanceCalculation
      */
     private $distanceCalculator;
-
-    /**
-     * @var MapPositionValue
-     */
-    private $mapPositionValue;
 
     /**
      * @var array
@@ -30,10 +24,9 @@ class PortService
      *
      * @return void
      */
-    public function __construct(DistanceCalculation $distanceCalculation, MapPositionValue $mapPositionValue)
+    public function __construct(DistanceCalculation $distanceCalculation)
     {
         $this->distanceCalculator = $distanceCalculation;
-        $this->mapPositionValue = $mapPositionValue;
     }
 
     /**

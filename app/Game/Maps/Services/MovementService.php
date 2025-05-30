@@ -16,7 +16,6 @@ use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
 use App\Game\Maps\Services\Common\LiveCharacterCount;
-use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
@@ -46,11 +45,6 @@ class MovementService
      * @var CoordinatesCache
      */
     private $coordinatesCache;
-
-    /**
-     * @var MapPositionValue
-     */
-    private $mapPositionValue;
 
     /**
      * @var TraverseService
@@ -84,7 +78,6 @@ class MovementService
         MapTileValue $mapTile,
         CharacterSheetBaseInfoTransformer $characterAttackTransformer,
         CoordinatesCache $coordinatesCache,
-        MapPositionValue $mapPositionValue,
         TraverseService $traverseService,
         ConjureService $conjureService,
         BuildMonsterCacheService $buildMonsterCacheService,
@@ -95,7 +88,6 @@ class MovementService
         $this->mapTile = $mapTile;
         $this->characterAttackTransformer = $characterAttackTransformer;
         $this->coordinatesCache = $coordinatesCache;
-        $this->mapPositionValue = $mapPositionValue;
         $this->traverseService = $traverseService;
         $this->conjureService = $conjureService;
         $this->buildMonsterCacheService = $buildMonsterCacheService;

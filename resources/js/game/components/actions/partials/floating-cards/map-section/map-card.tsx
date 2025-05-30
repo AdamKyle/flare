@@ -11,7 +11,7 @@ import { useManageViewLocationState } from './hooks/use-manage-view-location-sta
 import { MapMovementTypes } from './map-movement-types/map-movement-types';
 import { CharacterPosition } from '../../../../map-section/api/hooks/definitions/base-map-api-definition';
 import { useEmitCharacterPosition } from '../../../../map-section/hooks/use-emit-character-position';
-import { useOpenLocationInfoModal } from '../../../../map-section/hooks/use-open-location-info-modal';
+import { useOpenLocationInfoSidePeek } from '../../../../map-section/hooks/use-open-location-info-side-peek';
 import { UseOpenTeleportSidePeek } from '../../../../map-section/hooks/use-open-teleport-sidepeek';
 import Map from '../../../../map-section/map';
 import FloatingCard from '../../../components/icon-section/floating-card';
@@ -43,7 +43,7 @@ const MapCard = () => {
   const { errorMessage, resetErrorMessage } = useManageMapMovementErrorState();
   const { characterPosition } = useEmitCharacterPosition();
   const { isViewLocationEnabled, locationData } = useManageViewLocationState();
-  const { openLocationDetails } = useOpenLocationInfoModal({
+  const { openLocationDetails } = useOpenLocationInfoSidePeek({
     characterData: gameData?.character,
   });
 

@@ -1,13 +1,13 @@
 import UseOpenCharacterKingdomInfoModalDefinition from './definitions/use-open-character-kingdom-info-modal-definition';
 import UseOpenCharacterKingdomInfoModalProps from './types/use-open-character-kingdom-info-modal-props';
-import { ModalComponentRegistrationTypes } from '../../modals/base/component-registration/modal-component-registration-types';
-import { Modal } from '../../modals/base/event-types/modal';
-import { useModalEmitter } from '../../modals/base/hooks/use-modal-emitter';
+import { SidePeekComponentRegistrationEnum } from '../../side-peeks/base/component-registration/side-peek-component-registration-enum';
+import { SidePeek } from '../../side-peeks/base/event-types/side-peek';
+import { useSidePeekEmitter } from '../../side-peeks/base/hooks/use-side-peek-emitter';
 
-export const useOpenCharacterKingdomInfoModal = (
+export const useOpenCharacterKingdomInfoSidePeek = (
   props: UseOpenCharacterKingdomInfoModalProps
 ): UseOpenCharacterKingdomInfoModalDefinition => {
-  const modalEmitter = useModalEmitter();
+  const sidePeekEmitter = useSidePeekEmitter();
 
   const openCharacterKingdomDetails = (
     kingdom_id: number,
@@ -17,9 +17,9 @@ export const useOpenCharacterKingdomInfoModal = (
       return;
     }
 
-    modalEmitter.emit(
-      Modal.MODAL,
-      ModalComponentRegistrationTypes.CHARACTER_KINGDOM,
+    sidePeekEmitter.emit(
+      SidePeek.SIDE_PEEK,
+      SidePeekComponentRegistrationEnum.CHARACTER_KINGDOM_DETAILS,
       {
         is_open: true,
         title: kingdom_name,

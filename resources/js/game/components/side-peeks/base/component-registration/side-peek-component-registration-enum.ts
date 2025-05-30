@@ -11,4 +11,10 @@ export enum SidePeekComponentRegistrationEnum {
    * Map Actions
    */
   MAP_ACTIONS_TELEPORT = 'MAP_ACTIONS_TELEPORT',
+
+  /**
+   * Map Details
+   */
+  LOCATION_DETAILS = 'LOCATION_DETAILS',
+  CHARACTER_KINGDOM_DETAILS = 'CHARACTER_KINGDOM_DETAILS',
 }

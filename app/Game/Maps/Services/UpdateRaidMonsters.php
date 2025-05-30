@@ -6,14 +6,12 @@ use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Game\Battle\Services\ConjureService;
-use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Maps\Values\MapTileValue;
 
 class UpdateRaidMonsters extends BaseMovementService
 {
     public function __construct(
         MapTileValue $mapTileValue,
-        MapPositionValue $mapPositionValue,
         CoordinatesCache $coordinatesCache,
         ConjureService $conjureService,
         MovementService $movementService,
@@ -21,7 +19,6 @@ class UpdateRaidMonsters extends BaseMovementService
     ) {
         parent::__construct(
             $mapTileValue,
-            $mapPositionValue,
             $coordinatesCache,
             $conjureService,
             $movementService,

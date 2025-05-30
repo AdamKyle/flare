@@ -7,7 +7,6 @@ use App\Flare\Models\Character;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
-use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
@@ -18,7 +17,6 @@ class WalkingService extends BaseMovementService
 
     public function __construct(
         MapTileValue $mapTileValue,
-        MapPositionValue $mapPositionValue,
         CoordinatesCache $coordinatesCache,
         ConjureService $conjureService,
         MovementService $movementService,
@@ -26,7 +24,6 @@ class WalkingService extends BaseMovementService
     ) {
         parent::__construct(
             $mapTileValue,
-            $mapPositionValue,
             $coordinatesCache,
             $conjureService,
             $movementService,

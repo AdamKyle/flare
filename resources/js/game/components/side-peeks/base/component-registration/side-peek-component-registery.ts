@@ -7,6 +7,10 @@ import Sets from '../../character-inventory/sets/sets';
 import SetsProps from '../../character-inventory/sets/types/sets-props';
 import UsableItemsProps from '../../character-inventory/usable-items/types/usable-items-props';
 import UsableItems from '../../character-inventory/usable-items/usable-items';
+import CharacterKingdomDetails from '../../map-actions/kingdom-details/character-kingdom-details';
+import CharacterKingdomDetailsProps from '../../map-actions/kingdom-details/types/character-kingdom-details-props';
+import LocationDetails from '../../map-actions/location-details/location-details';
+import LocationDetailsProps from '../../map-actions/location-details/types/location-details-props';
 import Teleport from '../../map-actions/teleport/teleport';
 import TeleportProps from '../../map-actions/teleport/types/teleport-props';
 
@@ -30,6 +34,14 @@ export const SidePeekComponentRegistry = {
   [SidePeekComponentRegistrationEnum.MAP_ACTIONS_TELEPORT]: {
     component: Teleport,
     props: {} as TeleportProps,
+  },
+  [SidePeekComponentRegistrationEnum.LOCATION_DETAILS]: {
+    component: LocationDetails,
+    props: {} as LocationDetailsProps,
+  },
+  [SidePeekComponentRegistrationEnum.CHARACTER_KINGDOM_DETAILS]: {
+    component: CharacterKingdomDetails,
+    props: {} as CharacterKingdomDetailsProps,
   },
   // Add more components here
 };

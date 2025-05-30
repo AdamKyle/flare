@@ -23,7 +23,6 @@ use App\Game\Maps\Services\TraverseService;
 use App\Game\Maps\Services\UpdateRaidMonsters;
 use App\Game\Maps\Services\WalkingService;
 use App\Game\Maps\Transformers\LocationsTransformer;
-use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Maps\Values\MapTileValue;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
@@ -41,18 +40,13 @@ class ServiceProvider extends ApplicationServiceProvider
             return new DistanceCalculation;
         });
 
-        $this->app->bind(MapPositionValue::class, function ($app) {
-            return new MapPositionValue;
-        });
-
         $this->app->bind(PortService::class, function ($app) {
-            return new PortService($app->make(DistanceCalculation::class), $app->make(MapPositionValue::class));
+            return new PortService($app->make(DistanceCalculation::class));
         });
 
         $this->app->bind(TeleportService::class, function ($app) {
             return new TeleportService(
                 $app->make(MapTileValue::class),
-                $app->make(MapPositionValue::class),
                 $app->make(CoordinatesCache::class),
                 $app->make(ConjureService::class),
                 $app->make(MovementService::class),
@@ -63,7 +57,6 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(WalkingService::class, function ($app) {
             return new WalkingService(
                 $app->make(MapTileValue::class),
-                $app->make(MapPositionValue::class),
                 $app->make(CoordinatesCache::class),
                 $app->make(ConjureService::class),
                 $app->make(MovementService::class),
@@ -74,7 +67,6 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(UpdateRaidMonsters::class, function ($app) {
             return new UpdateRaidMonsters(
                 $app->make(MapTileValue::class),
-                $app->make(MapPositionValue::class),
                 $app->make(CoordinatesCache::class),
                 $app->make(ConjureService::class),
                 $app->make(MovementService::class),
@@ -85,7 +77,6 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(SetSailService::class, function ($app) {
             return new SetSailService(
                 $app->make(MapTileValue::class),
-                $app->make(MapPositionValue::class),
                 $app->make(CoordinatesCache::class),
                 $app->make(ConjureService::class),
                 $app->make(MovementService::class),
@@ -133,7 +124,6 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(MapTileValue::class),
                 $app->make(CharacterSheetBaseInfoTransformer::class),
                 $app->make(CoordinatesCache::class),
-                $app->make(MapPositionValue::class),
                 $app->make(TraverseService::class),
                 $app->make(ConjureService::class),
                 $app->make(BuildMonsterCacheService::class),

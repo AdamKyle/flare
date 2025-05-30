@@ -15,7 +15,6 @@ use App\Flare\Values\MapNameValue;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Maps\Events\UpdateCharacterBasePosition;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
-use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
@@ -28,8 +27,6 @@ class BaseMovementService
 
     protected MapTileValue $mapTileValue;
 
-    protected MapPositionValue $mapPositionValue;
-
     protected CoordinatesCache $coordinatesCache;
 
     protected ConjureService $conjureService;
@@ -40,7 +37,6 @@ class BaseMovementService
 
     public function __construct(
         MapTileValue $mapTileValue,
-        MapPositionValue $mapPositionValue,
         CoordinatesCache $coordinatesCache,
         ConjureService $conjureService,
         MovementService $movementService,
@@ -48,7 +44,6 @@ class BaseMovementService
     ) {
 
         $this->mapTileValue = $mapTileValue;
-        $this->mapPositionValue = $mapPositionValue;
         $this->coordinatesCache = $coordinatesCache;
         $this->conjureService = $conjureService;
         $this->movementService = $movementService;
@@ -124,8 +119,6 @@ class BaseMovementService
         $map->update([
             'character_position_x' => $this->x,
             'character_position_y' => $this->y,
-            'position_x' => $this->mapPositionValue->fetchXPosition($this->x, $map->position_x),
-            'position_y' => $this->mapPositionValue->fetchYPosition($this->y),
         ]);
 
         event(new UpdateCharacterBasePosition($character->user->id, $this->x, $this->y, $character->map->game_map_id));

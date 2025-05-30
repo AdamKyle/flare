@@ -8,8 +8,8 @@ import DraggableMap from './draggable-map';
 import { MapIconPaths } from './enums/map-icon-paths';
 import { useEmitCharacterPosition } from './hooks/use-emit-character-position';
 import { useManageMovement } from './hooks/use-manage-movement';
-import { useOpenCharacterKingdomInfoModal } from './hooks/use-open-character-kingdom-info-modal';
-import { useOpenLocationInfoModal } from './hooks/use-open-location-info-modal';
+import { useOpenCharacterKingdomInfoSidePeek } from './hooks/use-open-character-kingdom-info-side-peek';
+import { useOpenLocationInfoSidePeek } from './hooks/use-open-location-info-side-peek';
 import CharacterPin from './partials/character-pin';
 import MapLocations from './partials/map-locations';
 import MapTiles from './partials/map-tiles';
@@ -70,11 +70,11 @@ const Map = ({ additional_css, zoom = 1 }: MapProps) => {
     characterData,
   });
 
-  const { openCharacterKingdomDetails } = useOpenCharacterKingdomInfoModal({
+  const { openCharacterKingdomDetails } = useOpenCharacterKingdomInfoSidePeek({
     characterData,
   });
 
-  const { openLocationDetails } = useOpenLocationInfoModal({
+  const { openLocationDetails } = useOpenLocationInfoSidePeek({
     characterData,
   });
 

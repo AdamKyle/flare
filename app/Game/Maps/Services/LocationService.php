@@ -25,11 +25,8 @@ use App\Game\Maps\Services\Common\LiveCharacterCount;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 use App\Game\Maps\Transformers\LocationsTransformer;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Storage;
 use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
 use League\Fractal\Resource\Collection as LeagueCollection;
-use League\Fractal\Serializer\ArraySerializer;
 
 class LocationService
 {

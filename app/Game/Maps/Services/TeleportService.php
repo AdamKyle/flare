@@ -9,7 +9,6 @@ use App\Game\Battle\Services\ConjureService;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
-use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Maps\Values\MapTileValue;
 use Exception;
 
@@ -19,7 +18,6 @@ class TeleportService extends BaseMovementService
 
     public function __construct(
         MapTileValue $mapTileValue,
-        MapPositionValue $mapPositionValue,
         CoordinatesCache $coordinatesCache,
         ConjureService $conjureService,
         MovementService $movementService,
@@ -27,7 +25,6 @@ class TeleportService extends BaseMovementService
     ) {
         parent::__construct(
             $mapTileValue,
-            $mapPositionValue,
             $coordinatesCache,
             $conjureService,
             $movementService,
