@@ -1,0 +1,14 @@
+import BaseInventoryItemDefinition from '../../../character-inventory/api-definitions/base-inventory-item-definition';
+import { LocationTypes } from '../../location-details/enums/location-types';
+
+export default interface LocationDetailsApi {
+  description: string;
+  can_players_enter: false;
+  can_auto_battle: false;
+  location_type: LocationTypes;
+  is_corrupted: boolean;
+  quest_reward_item: BaseInventoryItemDefinition | null;
+  required_quest_item: BaseInventoryItemDefinition | null;
+  x: number;
+  y: number;
+}
