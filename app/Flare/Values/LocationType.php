@@ -90,6 +90,10 @@ class LocationType
         return self::$namedValues;
     }
 
+    public function getNamedValue(): string {
+        return self::$namedValues[$this->value];
+    }
+
     /**
      * Is purgatory smith house?
      */

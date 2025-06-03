@@ -173,7 +173,12 @@ const Map = ({ additional_css, zoom = 1 }: MapProps) => {
       return;
     }
 
-    openLocationDetails(icon.id, foundLocation.name);
+    openLocationDetails(
+      icon.id,
+      foundLocation.name,
+      data.character_position.x_position,
+      data.character_position.x_position
+    );
   };
 
   const tiles = data.tiles;

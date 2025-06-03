@@ -3,6 +3,7 @@
 namespace App\Game\Maps\Controllers\Api;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\Location;
 use App\Flare\Models\Quest;
 use App\Game\Maps\Requests\MoveRequest;
 use App\Game\Maps\Requests\QuestDataRequest;
@@ -35,18 +36,20 @@ class MapController extends Controller
 
     public function mapInformation(Character $character, LocationService $locationService): JsonResponse
     {
-        return response()->json($this->locationService->getLocationData($character));
+        return response()->json($this->locationService->getMapData($character));
     }
 
     public function updateLocationActions(Character $character, LocationService $locationService): JsonResponse
     {
         $this->locationService->locationBasedEvents($character);
+
         return response()->json([]);
     }
 
-    /**
-     * @throws Exception
-     */
+    public function getLocationInformation(Location $location): JsonResponse {
+        return response()->json($this->locationService->getLocationData($location));
+    }
+
     public function move(MoveRequest $request, Character $character): JsonResponse
     {
         if (! $character->can_move) {

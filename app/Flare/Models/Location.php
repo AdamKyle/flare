@@ -85,6 +85,10 @@ class Location extends Model
         return new LocationType($this->type);
     }
 
+    public function locationQuestItems() {
+        return $this->hasMany(Item::class, 'id', 'drop_location_id');
+    }
+
     protected static function newFactory()
     {
         return LocationFactory::new();

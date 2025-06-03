@@ -79,7 +79,12 @@ const MapCard = () => {
       return;
     }
 
-    openLocationDetails(locationData.location_id, locationData.location_name);
+    openLocationDetails(
+      locationData.location_id,
+      locationData.location_name,
+      characterPosition.x,
+      characterPosition.y
+    );
   };
 
   const renderTimerBar = () => {

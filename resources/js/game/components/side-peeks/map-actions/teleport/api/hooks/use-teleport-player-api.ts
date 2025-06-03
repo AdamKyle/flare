@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import UseTeleportPlayerApiParams from './definitions/use-teleport-player-api-params';
 import BaseMapDetailsApiDefinition from '../../../../../map-section/api/hooks/definitions/base-map-details-api-definition';
-import { TeleportModalUrls } from '../enums/teleport-modal-urls';
+import { TeleportApiUrls } from '../enums/teleport-api-urls';
 import TeleportCharacterRequestDefinition from './definitions/teleport-character-request-definition';
 import { UseTeleportPlayerApiDefinition } from './definitions/use-teleport-player-api-definition';
 import { useManageMapMovementErrorState } from '../../../../../actions/partials/floating-cards/map-section/hooks/use-manage-map-movement-error-state';
@@ -31,7 +31,7 @@ export const useTeleportPlayerApi = (
       timeout: 0,
     });
 
-  const url = getUrl(TeleportModalUrls.TELEPORT_PLAYER, {
+  const url = getUrl(TeleportApiUrls.TELEPORT_PLAYER, {
     character: params.character_id,
   });
 

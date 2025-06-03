@@ -3,8 +3,8 @@ import { debounce } from 'lodash';
 import React, { useMemo } from 'react';
 
 import UsableItemsProps from './types/usable-items-props';
-import UsableItemsList from './usable-items-list';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
+import UsableItemsList from '../../components/items/usable-items-list';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
 import BaseInventoryItemDefinition from '../api-definitions/base-inventory-item-definition';
 

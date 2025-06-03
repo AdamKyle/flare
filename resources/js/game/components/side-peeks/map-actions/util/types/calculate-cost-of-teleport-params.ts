@@ -1,4 +1,4 @@
-import { CharacterPosition } from '../../../../../map-section/api/hooks/definitions/base-map-api-definition';
+import { CharacterPosition } from '../../../../map-section/api/hooks/definitions/base-map-api-definition';
 
 export default interface CalculateCostOfTeleportParams {
   character_position: CharacterPosition;

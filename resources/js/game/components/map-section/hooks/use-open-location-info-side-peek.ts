@@ -9,7 +9,12 @@ export const useOpenLocationInfoSidePeek = (
 ): UseOpenCharacterKingdomInfoModalDefinition => {
   const sidePeekEmitter = useSidePeekEmitter();
 
-  const openLocationDetails = (location_id: number, location_name: string) => {
+  const openLocationDetails = (
+    location_id: number,
+    location_name: string,
+    character_x: number,
+    character_y: number
+  ) => {
     if (!props.characterData) {
       return;
     }
@@ -21,8 +26,11 @@ export const useOpenLocationInfoSidePeek = (
         is_open: true,
         title: location_name,
         character_id: props.characterData.id,
+        character_gold: props.characterData.gold,
         location_id: location_id,
         allow_clicking_outside: true,
+        character_x,
+        character_y,
       }
     );
   };

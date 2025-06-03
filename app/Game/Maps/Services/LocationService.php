@@ -2,18 +2,18 @@
 
 namespace App\Game\Maps\Services;
 
+use App\Game\Maps\Transformers\LocationTransformer;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
+use League\Fractal\Resource\Collection as LeagueCollection;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
-use App\Flare\Models\GameMap;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Models\Map;
 use App\Flare\Models\Raid;
-use App\Flare\Models\ScheduledEvent;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
-use App\Flare\Values\LocationEffectValue;
-use App\Flare\Values\LocationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
@@ -24,9 +24,8 @@ use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
 use App\Game\Maps\Services\Common\LiveCharacterCount;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 use App\Game\Maps\Transformers\LocationsTransformer;
-use Illuminate\Support\Collection;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection as LeagueCollection;
+use League\Fractal\Resource\Item;
+
 
 class LocationService
 {
@@ -48,24 +47,15 @@ class LocationService
     {
     }
 
-    public function setIsEventBasedUpdate(bool $isEventBased): LocationService
-    {
-        $this->isEventBasedUpdate = $isEventBased;
-
-        return $this;
-    }
-
     /**
      * Get location data
      */
-    public function getLocationData(Character $character, ?Raid $raid = null): array
+    public function getMapData(Character $character, ?Raid $raid = null): array
     {
 
         $this->locationBasedEvents($character);
 
         $this->kingdomManagement($character);
-
-        $lockedLocation = $this->getLockedLocation($character);
 
         $gameMap = $character->map->gameMap;
 
@@ -87,6 +77,12 @@ class LocationService
 //            'can_access_purgatory_chains_shop' =>  $character->map->gameMap->mapType()->isPurgatory(),
 //            'can_access_twisted_earth_shop' => $character->map->gameMap->mapType()->isTwistedMemories(),
         ];
+    }
+
+    public function getLocationData(Location $location): array {
+        $locationData = new Item($location, new LocationTransformer());
+
+        return $this->manager->createData($locationData)->toArray();
     }
 
     public function getTeleportLocations(Character $character): array {
@@ -158,105 +154,13 @@ class LocationService
 
         $gameMap = $character->map->gameMap;
 
-        $locations = Location::with('questRewardItem')->where('game_map_id', $gameMap->id)->get();
+        $locations = Location::where('game_map_id', $gameMap->id)->get();
 
         $this->manager->setSerializer($this->plainArraySerializer);
 
         $locationData = new LeagueCollection($locations, $this->locationTransformer);
 
         return $this->manager->createData($locationData)->toArray();
-    }
-
-    /**
-     * Fetch locations based on map.
-     */
-    public function fetchLocationsForMap(GameMap $map): Collection
-    {
-        $locations = Location::with('questRewardItem')->where('game_map_id', $map->id)->get();
-
-        return $this->transformLocationData($locations);
-    }
-
-    /**
-     * Fetch corrupted locatuions based on the raid.
-     *
-     * If no raid is set, return an empty collection.
-     *
-     * @param  ?Raid $raid
-     * @return Collection
-     */
-    public function fetchCorruptedLocationData(?Raid $raid = null): Collection
-    {
-
-        if (is_null($raid)) {
-            return collect();
-        }
-
-        $corruptedLocationIds = $raid->corrupted_location_ids;
-
-        array_push($corruptedLocationIds, $raid->raid_boss_location_id);
-
-        $locations = Location::whereIn('id', $corruptedLocationIds)->get();
-
-        return $this->transformLocationData($locations);
-    }
-
-    /**
-     * Add additional data to the location data.
-     */
-    protected function transformLocationData(Collection $locations): Collection
-    {
-        return $locations->transform(function ($location) {
-
-            $location->increases_enemy_stats_by = null;
-            $location->increase_enemy_percentage_by = null;
-            $location->type_name = null;
-
-            if (! is_null($location->type)) {
-                if ((new LocationType($location->type))->isPurgatorySmithHouse()) {
-                    $location->type_name = 'Purgatory Smiths House';
-                }
-
-                if ((new LocationType($location->type))->isUnderWaterCaves()) {
-                    $location->type_name = 'Underwater Caves';
-                }
-
-                if ((new LocationType($location->type))->isAlchemyChurch()) {
-                    $location->type_name = 'Alchemy Church';
-                }
-            }
-
-            if (! is_null($location->enemy_strength_type)) {
-                $location->increases_enemy_stats_by = LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type);
-                $location->increase_enemy_percentage_by = LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type);
-
-                if (! is_null($location->type)) {
-                    $locationType = new LocationType($location->type);
-
-                    if ($locationType->isGoldMines()) {
-                        $location->type_name = 'Gold Mines';
-                    }
-
-                    if ($locationType->isPurgatoryDungeons()) {
-                        $location->type_name = 'Purgatory Dungeons';
-                    }
-
-                    if ($locationType->isTheOldChurch()) {
-                        $location->type_name = 'The Old Church';
-                    }
-                }
-            }
-
-            $location->required_quest_item_name = null;
-
-            if (! is_null($location->required_quest_item_id)) {
-                $location->required_quest_item_name = $location->requiredQuestItem->name;
-            }
-
-            $location->game_map_name = $location->map->name;
-
-            return $location;
-        });
     }
 
     /**
@@ -306,17 +210,5 @@ class LocationService
         if (is_null($this->location)) {
             $this->canSettle = true;
         }
-    }
-
-    /**
-     * Gets locked location details.
-     */
-    protected function getLockedLocation(Character $character): ?Location
-    {
-        return Location::where('x', $character->map->character_position_x)
-            ->where('y', $character->map->character_position_y)
-            ->where('game_map_id', $character->map->game_map_id)
-            ->whereNotNull('required_quest_item_id')
-            ->first();
     }
 }

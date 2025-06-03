@@ -1,17 +1,17 @@
 import { isEmpty } from 'lodash';
 import React, { ReactNode } from 'react';
 
-import BackpackItem from './backpack-item';
-import InventoryListProps from './types/inventory-list-props';
-import BaseInventoryItemDefinition from '../api-definitions/base-inventory-item-definition';
+import GenericItem from './generic-item';
+import GenericItemListProps from './types/generic-item-list-props';
+import BaseInventoryItemDefinition from '../../character-inventory/api-definitions/base-inventory-item-definition';
 
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 
-const InventoryList = ({
+const GenericItemList = ({
   items,
   is_quest_items,
   on_scroll_to_end,
-}: InventoryListProps): ReactNode => {
+}: GenericItemListProps): ReactNode => {
   const renderBackPackItems = () => {
     if (isEmpty(items) && is_quest_items) {
       return (
@@ -36,7 +36,7 @@ const InventoryList = ({
     }
 
     return items.map((item: BaseInventoryItemDefinition) => (
-      <BackpackItem key={item.slot_id} item={item} />
+      <GenericItem key={item.slot_id} item={item} />
     ));
   };
 
@@ -49,4 +49,4 @@ const InventoryList = ({
   );
 };
 
-export default InventoryList;
+export default GenericItemList;

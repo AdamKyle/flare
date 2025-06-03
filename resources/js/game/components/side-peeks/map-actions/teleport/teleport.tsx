@@ -1,9 +1,8 @@
-import clsx from 'clsx';
 import { isEmpty, isNil } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { match } from 'ts-pattern';
 
-import { TeleportModalUrls } from './api/enums/teleport-modal-urls';
+import { TeleportApiUrls } from './api/enums/teleport-api-urls';
 import { useFetchTeleportCoordinatesApi } from './api/hooks/use-fetch-teleport-coordinates-api';
 import { useTeleportPlayerApi } from './api/hooks/use-teleport-player-api';
 import { CoordinateTypes } from './enums/coordinate-types';
@@ -15,25 +14,23 @@ import LocationsDropDown from './partials/locations-drop-down';
 import NpcKingdomDropDown from './partials/npc-kingdoms-drop-down';
 import PortLocationsDropDown from './partials/port-locations-drop-down';
 import TeleportProps from './types/teleport-props';
-import { calculateCostOfTeleport } from './util/calculate-cost-of-teleport';
-import { formatNumberWithCommas } from '../../../../util/format-number';
+import TeleportSection from '../../components/map-actions/teleport-section';
+import { calculateCostOfTeleport } from '../util/calculate-cost-of-teleport';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
-import Button from 'ui/buttons/button';
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import Separator from 'ui/seperatror/separator';
 
 const Teleport = ({ character_data, x, y }: TeleportProps) => {
   const { data, error, loading } = useFetchTeleportCoordinatesApi({
-    url: TeleportModalUrls.TELEPORT_COORDINATES,
+    url: TeleportApiUrls.TELEPORT_COORDINATES,
     character_id: character_data.id,
   });
 
   const { setRequestParams } = useTeleportPlayerApi({
-    url: TeleportModalUrls.TELEPORT_PLAYER,
+    url: TeleportApiUrls.TELEPORT_PLAYER,
     character_id: character_data.id,
   });
 
@@ -242,51 +239,14 @@ const Teleport = ({ character_data, x, y }: TeleportProps) => {
   };
 
   const renderCostSection = () => {
-    if (costOfTeleport <= 0) {
-      return null;
-    }
-
     return (
-      <div className="mt-4 rounded-lg bg-gray-100 dark:bg-gray-700 p-4 space-y-2 text-sm border border-solid border-gray-200 dark:border-gray-800 ">
-        <div className="flex justify-between">
-          <span className="font-medium text-gray-800 dark:text-gray-200">
-            Your Gold:
-          </span>
-          <span className="font-mono text-gray-900 dark:text-gray-100">
-            {formatNumberWithCommas(character_data.gold)}
-          </span>
-        </div>
-        <div className="flex justify-between">
-          <span className="font-medium text-gray-800 dark:text-gray-200">
-            Cost:
-          </span>
-          <span
-            className={clsx(
-              'font-mono',
-              canAffordToTeleport
-                ? 'text-emerald-600 dark:text-emerald-500'
-                : 'text-rose-600 hover:text-rose-500'
-            )}
-          >
-            {formatNumberWithCommas(costOfTeleport)}
-          </span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-gray-800 dark:text-gray-200">
-            Time Out value:
-          </span>
-          <span className="text-danube-600 hover:text-danube-500">
-            {timeOutValue} (Minutes)
-          </span>
-        </div>
-        <Button
-          on_click={handleTeleportPlayer}
-          label={'Teleport'}
-          variant={ButtonVariant.PRIMARY}
-          disabled={costOfTeleport <= 0 || !canAffordToTeleport}
-          additional_css={'mt-2 w-full'}
-        />
-      </div>
+      <TeleportSection
+        character_gold={character_data.gold}
+        cost_of_teleport={costOfTeleport}
+        on_teleport={handleTeleportPlayer}
+        can_afford_to_teleport={canAffordToTeleport}
+        time_out_value={timeOutValue}
+      />
     );
   };
 

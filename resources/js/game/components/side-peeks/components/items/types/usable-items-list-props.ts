@@ -1,6 +1,6 @@
 import React from 'react';
 
-import BaseInventoryItemDefinition from '../../api-definitions/base-inventory-item-definition';
+import BaseInventoryItemDefinition from '../../../character-inventory/api-definitions/base-inventory-item-definition';
 
 export default interface UsableItemsListProps {
   items: BaseInventoryItemDefinition[];

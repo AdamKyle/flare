@@ -11,7 +11,7 @@ import {
 } from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
 import BackpackItemProps from '../../../character-sheet/partials/character-inventory/types/backpack-item-props';
 
-const BackpackItem = ({ item }: BackpackItemProps): ReactNode => {
+const GenericItem = ({ item }: BackpackItemProps): ReactNode => {
   const itemColor = backpackItemTextColors(item);
 
   const renderItemDetails = (): ReactNode => {
@@ -65,4 +65,4 @@ const BackpackItem = ({ item }: BackpackItemProps): ReactNode => {
   );
 };
 
-export default BackpackItem;
+export default GenericItem;

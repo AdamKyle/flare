@@ -14,6 +14,8 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.a
 
     Route::get('/map/teleport-coordinates/{character}', ['uses' => 'Api\MapController@fetchTeleportCoordinates']);
 
+    Route::get('/map/location-details/{location}', ['uses' => 'Api\MapController@getLocationInformation']);
+
     Route::group(['middleware' => 'throttle:moving'], function () {
 
         // Map Movement:

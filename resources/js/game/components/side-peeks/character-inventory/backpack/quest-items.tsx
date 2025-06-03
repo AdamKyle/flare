@@ -2,9 +2,9 @@ import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler'
 import { debounce } from 'lodash';
 import React, { ReactNode, useMemo } from 'react';
 
-import InventoryList from './inventory-list';
-import BackPackItemsProps from './types/back-pack-items-props';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
+import GenericItemList from '../../components/items/generic-item-list';
+import GenericItemProps from '../../components/items/types/generic-item-props';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
 import BaseInventoryItemDefinition from '../api-definitions/base-inventory-item-definition';
 
@@ -18,7 +18,7 @@ import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 const QuestItems = ({
   character_id,
   on_switch_view,
-}: BackPackItemsProps): ReactNode => {
+}: GenericItemProps): ReactNode => {
   const { data, error, loading, setSearchText, onEndReached } =
     UsePaginatedApiHandler<BaseInventoryItemDefinition>({
       url: CharacterInventoryApiUrls.CHARACTER_QUEST_ITEMS,
@@ -61,7 +61,7 @@ const QuestItems = ({
         <Input on_change={onSearch} clearable />
       </div>
       <div className="flex-1 min-h-0">
-        <InventoryList
+        <GenericItemList
           items={data}
           is_quest_items={true}
           on_scroll_to_end={handleQuestItemsScroll}
