@@ -12,7 +12,9 @@
 
     @guest
     @else
-        <meta name="player" content="{{ auth()->user()->character->id }}">
+        @if (auth()->user()->character)
+            <meta name="player" content="{{ auth()->user()->character->id }}">
+        @endif
 
         @if (!auth()->user()->hasRole('Admin'))
             <meta name="character" content="{{ auth()->user()->character->id}}">
