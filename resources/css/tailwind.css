@@ -2,7 +2,6 @@
 
 @import "../../node_modules/rpg-awesome/css/rpg-awesome.css";
 
-@import "../vendor/theme/assets/css/style.css";
 @import "./map.css";
 @import "./fight-buttons.css";
 @import "./react-data-tables.css";

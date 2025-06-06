@@ -45,8 +45,6 @@
 
     @vite('resources/js/vendor/livewire.js')
 
-    @vite('resources/vendor/theme/assets/js/dark-mode/dark-mode.js')
-
     @stack('head')
 </head>
 @php
@@ -156,8 +154,6 @@
 
     @livewireScriptConfig
 
-    @vite('resources/js/vendor/theme-script.js')
-
     @if (!is_null(auth()->user()))
         @if (!auth()->user()->hasRole('Admin'))
             @vite('resources/js/app.ts')
@@ -168,7 +164,6 @@
                             }, 30000);
                         </script>
         @else
-            @vite('resources/js/admin-app.ts')
 
             <script>
                 const lightbox = GLightbox();
