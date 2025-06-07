@@ -20,6 +20,7 @@
     "rpg-awesome",
     "tailwind-scrollbar",
     "tailwindcss-classnames",
+    "@tailwindcss/vite",
     "tippy.js"
   ],
   "ignorePatterns": [
