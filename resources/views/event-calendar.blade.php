@@ -10,7 +10,6 @@
     </x-core.cards.card-with-title>
 @endsection
 
-
 @push('scripts')
     @vite('resources/js/player-event-calendar-component.ts')
 @endpush

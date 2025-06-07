@@ -44,49 +44,49 @@
         </tr>
     </thead>
     <tbody>
-    @foreach($affixes as $affix)
-        <tr>
-            <td>{{$affix->id}}</td>
-            <td>{{$affix->name}}</td>
-            <td>{{$affix->description}}</td>
-            <td>{{$affix->base_damage_mod}}</td>
-            <td>{{$affix->base_healing_mod}}</td>
-            <td>{{$affix->base_ac_mod}}</td>
-            <td>{{$affix->str_mod}}</td>
-            <td>{{$affix->dur_mod}}</td>
-            <td>{{$affix->dex_mod}}</td>
-            <td>{{$affix->chr_mod}}</td>
-            <td>{{$affix->int_mod}}</td>
-            <td>{{$affix->agi_mod}}</td>
-            <td>{{$affix->focus_mod}}</td>
-            <td>{{$affix->str_reduction}}</td>
-            <td>{{$affix->dur_reduction}}</td>
-            <td>{{$affix->dex_reduction}}</td>
-            <td>{{$affix->chr_reduction}}</td>
-            <td>{{$affix->int_reduction}}</td>
-            <td>{{$affix->agi_reduction}}</td>
-            <td>{{$affix->focus_reduction}}</td>
-            <td>{{$affix->reduces_enemy_stats}}</td>
-            <td>{{$affix->steal_life_amount}}</td>
-            <td>{{$affix->damage}}</td>
-            <td>{{$affix->int_required}}</td>
-            <td>{{$affix->skill_level_required}}</td>
-            <td>{{$affix->skill_level_trivial}}</td>
-            <td>{{$affix->skill_name}}</td>
-            <td>{{$affix->affects_skill_type}}</td>
-            <td>{{$affix->skill_bonus}}</td>
-            <td>{{$affix->skill_training_bonus}}</td>
-            <td>{{$affix->can_drop}}</td>
-            <td>{{$affix->damage_can_stack}}</td>
-            <td>{{$affix->irresistible_damage}}</td>
-            <td>{{$affix->cost}}</td>
-            <td>{{$affix->type}}</td>
-            <td>{{$affix->entranced_chance}}</td>
-            <td>{{$affix->devouring_light}}</td>
-            <td>{{$affix->skill_reduction}}</td>
-            <td>{{$affix->resistance_reduction}}</td>
-            <td>{{$affix->affix_type}}</td>
-        </tr>
-    @endforeach
+        @foreach ($affixes as $affix)
+            <tr>
+                <td>{{ $affix->id }}</td>
+                <td>{{ $affix->name }}</td>
+                <td>{{ $affix->description }}</td>
+                <td>{{ $affix->base_damage_mod }}</td>
+                <td>{{ $affix->base_healing_mod }}</td>
+                <td>{{ $affix->base_ac_mod }}</td>
+                <td>{{ $affix->str_mod }}</td>
+                <td>{{ $affix->dur_mod }}</td>
+                <td>{{ $affix->dex_mod }}</td>
+                <td>{{ $affix->chr_mod }}</td>
+                <td>{{ $affix->int_mod }}</td>
+                <td>{{ $affix->agi_mod }}</td>
+                <td>{{ $affix->focus_mod }}</td>
+                <td>{{ $affix->str_reduction }}</td>
+                <td>{{ $affix->dur_reduction }}</td>
+                <td>{{ $affix->dex_reduction }}</td>
+                <td>{{ $affix->chr_reduction }}</td>
+                <td>{{ $affix->int_reduction }}</td>
+                <td>{{ $affix->agi_reduction }}</td>
+                <td>{{ $affix->focus_reduction }}</td>
+                <td>{{ $affix->reduces_enemy_stats }}</td>
+                <td>{{ $affix->steal_life_amount }}</td>
+                <td>{{ $affix->damage }}</td>
+                <td>{{ $affix->int_required }}</td>
+                <td>{{ $affix->skill_level_required }}</td>
+                <td>{{ $affix->skill_level_trivial }}</td>
+                <td>{{ $affix->skill_name }}</td>
+                <td>{{ $affix->affects_skill_type }}</td>
+                <td>{{ $affix->skill_bonus }}</td>
+                <td>{{ $affix->skill_training_bonus }}</td>
+                <td>{{ $affix->can_drop }}</td>
+                <td>{{ $affix->damage_can_stack }}</td>
+                <td>{{ $affix->irresistible_damage }}</td>
+                <td>{{ $affix->cost }}</td>
+                <td>{{ $affix->type }}</td>
+                <td>{{ $affix->entranced_chance }}</td>
+                <td>{{ $affix->devouring_light }}</td>
+                <td>{{ $affix->skill_reduction }}</td>
+                <td>{{ $affix->resistance_reduction }}</td>
+                <td>{{ $affix->affix_type }}</td>
+            </tr>
+        @endforeach
     </tbody>
 </table>

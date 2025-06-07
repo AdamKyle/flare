@@ -7,7 +7,7 @@
             buttons="true"
             backUrl="{{route('admin.single.survey', ['survey' => $surveyId])}}"
         >
-            <div id="survey-builder" data-survey-id="{{$surveyId}}"></div>
+            <div id="survey-builder" data-survey-id="{{ $surveyId }}"></div>
         </x-core.cards.card-with-title>
     </x-core.layout.info-container>
 @endsection

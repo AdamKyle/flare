@@ -21,9 +21,15 @@
         @foreach ($locations as $location)
             <tr>
                 <td>{{ $location->name }}</td>
-                <td>{{ !is_null($location->game_map_id) ? $location->map->name : '' }}</td>
-                <td>{{ !is_null($location->quest_reward_item_id) ? $location->questRewardItem->name : '' }}</td>
-                <td>{{ !is_null($location->required_quest_item_id) ? $location->requiredQuestItem->name : '' }}</td>
+                <td>
+                    {{ ! is_null($location->game_map_id) ? $location->map->name : '' }}
+                </td>
+                <td>
+                    {{ ! is_null($location->quest_reward_item_id) ? $location->questRewardItem->name : '' }}
+                </td>
+                <td>
+                    {{ ! is_null($location->required_quest_item_id) ? $location->requiredQuestItem->name : '' }}
+                </td>
                 <td>{{ $location->description }}</td>
                 <td>{{ $location->is_port }}</td>
                 <td>{{ $location->can_players_enter }}</td>
@@ -32,7 +38,9 @@
                 <td>{{ $location->x }}</td>
                 <td>{{ $location->y }}</td>
                 <td>{{ $location->type }}</td>
-                <td>{{ !is_null($location->enemy_strength_type) ? 'Yes' : 'No' }}</td>
+                <td>
+                    {{ ! is_null($location->enemy_strength_type) ? 'Yes' : 'No' }}
+                </td>
                 <td>{{ $location->pin_css_class }}</td>
             </tr>
         @endforeach

@@ -4,7 +4,7 @@
 @if (empty($details))
     @include('game.core.partials.equip.details.item-stat-details', ['item' => $item])
 @else
-    @if (!is_null($item->default_position))
+    @if (! is_null($item->default_position))
         @include('game.core.partials.equip.details.stat-details', ['details' => $details, 'hasDefaultPosition' => true])
     @else
         <div class="row">
@@ -18,6 +18,5 @@
             </div>
         </div>
     @endif
-
 @endif
 <hr />

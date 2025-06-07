@@ -2,7 +2,6 @@
 
 @section('content')
     <div class="w-full lg:w-3/4 ml-auto mr-auto">
-
         <x-core.page-title
             title="Characters"
             route="{{route('game')}}"

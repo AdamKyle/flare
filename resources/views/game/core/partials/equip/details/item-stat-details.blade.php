@@ -1,5 +1,5 @@
 <dl class="mt-2">
-    <dt>Attack <sup>*</sup></sup>:</dt>
+    <dt>Attack <sup>*</sup>:</dt>
     <dd><span class={{$item->getTotalDamage() > 0 ? 'text-success' : ''}}>{{$item->getTotalDamage()}}</span></dd>
     <dt>AC:</dt>
     <dd><span class={{$item->getTotalDefence() > 0 ? 'text-success' : ''}}>{{$item->getTotalDefence()}}</span></dd>

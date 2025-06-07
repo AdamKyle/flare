@@ -2,8 +2,7 @@
 
 @section('content')
     <x-core.layout.smaller-container>
-
-        @forelse($releases as $release)
+        @forelse ($releases as $release)
             <x-release-note :releaseNote="$release" />
         @empty
             <x-core.cards.card-with-title css="mb-5" title="No Releases">

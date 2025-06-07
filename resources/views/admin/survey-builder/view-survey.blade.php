@@ -22,42 +22,86 @@
 
             @foreach ($survey['sections'] as $section)
                 <div class="mb-8">
-                    <h2 class="text-2xl font-semibold mb-4">{{ $section['title'] }}</h2>
+                    <h2 class="text-2xl font-semibold mb-4">
+                        {{ $section['title'] }}
+                    </h2>
 
                     <p class="mb-6 text-lg">{{ $section['description'] }}</p>
 
-                    <div class="space-y-4 pl-4 border-l-4 border-gray-300 dark:border-gray-700">
+                    <div
+                        class="space-y-4 pl-4 border-l-4 border-gray-300 dark:border-gray-700"
+                    >
                         @foreach ($section['input_types'] as $field)
                             <div>
                                 @if ($field['type'] === 'text')
-                                    <label class="block text-lg font-medium">{{ $field['label'] }}</label>
-                                    <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700">
+                                    <label class="block text-lg font-medium">
+                                        {{ $field['label'] }}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700"
+                                    />
                                 @elseif ($field['type'] === 'checkbox')
-                                    <label class="block text-lg font-medium">{{ $field['label'] }}</label>
+                                    <label class="block text-lg font-medium">
+                                        {{ $field['label'] }}
+                                    </label>
                                     @foreach ($field['options'] as $index => $option)
                                         <div class="flex items-center mt-1">
-                                            <input id="checkbox-{{ $index }}" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded dark:bg-gray-800 dark:border-gray-700">
-                                            <label for="checkbox-{{ $index }}" class="ml-2">{{ $option }}</label>
+                                            <input
+                                                id="checkbox-{{ $index }}"
+                                                type="checkbox"
+                                                class="h-4 w-4 text-indigo-600 border-gray-300 rounded dark:bg-gray-800 dark:border-gray-700"
+                                            />
+                                            <label
+                                                for="checkbox-{{ $index }}"
+                                                class="ml-2"
+                                            >
+                                                {{ $option }}
+                                            </label>
                                         </div>
                                     @endforeach
                                 @elseif ($field['type'] === 'radio')
-                                    <label class="block text-lg font-medium">{{ $field['label'] }}</label>
+                                    <label class="block text-lg font-medium">
+                                        {{ $field['label'] }}
+                                    </label>
                                     @foreach ($field['options'] as $index => $option)
                                         <div class="flex items-center mt-1">
-                                            <input id="radio-{{ $index }}" type="radio" name="{{ $field['label'] }}" class="h-4 w-4 text-indigo-600 border-gray-300 dark:bg-gray-800 dark:border-gray-700">
-                                            <label for="radio-{{ $index }}" class="ml-2">{{ $option }}</label>
+                                            <input
+                                                id="radio-{{ $index }}"
+                                                type="radio"
+                                                name="{{ $field['label'] }}"
+                                                class="h-4 w-4 text-indigo-600 border-gray-300 dark:bg-gray-800 dark:border-gray-700"
+                                            />
+                                            <label
+                                                for="radio-{{ $index }}"
+                                                class="ml-2"
+                                            >
+                                                {{ $option }}
+                                            </label>
                                         </div>
                                     @endforeach
                                 @elseif ($field['type'] === 'select')
-                                    <label class="block text-lg font-medium">{{ $field['label'] }}</label>
-                                    <select class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300">
+                                    <label class="block text-lg font-medium">
+                                        {{ $field['label'] }}
+                                    </label>
+                                    <select
+                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300"
+                                    >
                                         @foreach ($field['options'] as $index => $option)
-                                            <option value="{{ $option }}">{{ $option }}</option>
+                                            <option value="{{ $option }}">
+                                                {{ $option }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 @elseif ($field['type'] === 'markdown')
-                                    <label class="block text-lg font-medium">{{ $field['label'] }}</label>
-                                    <textarea class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-600 p-6" rows="3" placeholder="This will be a Markdown component in the game."></textarea>
+                                    <label class="block text-lg font-medium">
+                                        {{ $field['label'] }}
+                                    </label>
+                                    <textarea
+                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-600 p-6"
+                                        rows="3"
+                                        placeholder="This will be a Markdown component in the game."
+                                    ></textarea>
                                 @endif
                             </div>
                         @endforeach

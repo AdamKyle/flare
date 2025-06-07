@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite'
 import path from 'path';
 
 const isDevelopment = process.env.NODE_ENV === 'local';
@@ -8,11 +9,12 @@ const isDevelopment = process.env.NODE_ENV === 'local';
 export default defineConfig({
     plugins: [
         laravel([
-            'resources/css/tailwind.css',
+            'resources/css/styles.css',
             'resources/js/app.ts',
             'resources/js/vendor/livewire-data-tables.js',
             'resources/js/vendor/livewire.js',
         ]),
+        tailwindcss(),
         react(),
     ],
     optimizeDeps: {

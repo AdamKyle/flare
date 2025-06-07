@@ -1,12 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
-
     <x-core.layout.info-container>
         @php
             $backUrl = route('quests.index');
 
-            if (!auth()->user()->hasRole('Admin')) {
+            if (
+                ! auth()
+                    ->user()
+                    ->hasRole('Admin')
+            ) {
                 $backUrl = '/information/quests';
             }
         @endphp
@@ -20,24 +23,18 @@
             @include('admin.quests.partials.show', ['quest' => $quest])
         </x-core.cards.card-with-title>
 
-
         <div class="grid md:grid-cols-2 gap-2">
-            <x-core.cards.card-with-title
-                title="Before Completion Text"
-            >
+            <x-core.cards.card-with-title title="Before Completion Text">
                 <p>
-                    {!! nl2br($quest->before_completion_description)  !!}
+                    {!! nl2br($quest->before_completion_description) !!}
                 </p>
             </x-core.cards.card-with-title>
 
-            <x-core.cards.card-with-title
-                title="After Completion Text"
-            >
+            <x-core.cards.card-with-title title="After Completion Text">
                 <p>
-                    {!! nl2br($quest->after_completion_description)  !!}
+                    {!! nl2br($quest->after_completion_description) !!}
                 </p>
             </x-core.cards.card-with-title>
         </div>
-
     </x-core.layout.info-container>
 @endsection

@@ -5,7 +5,11 @@
         @php
             $backUrl = route('locations.list');
 
-            if (!auth()->user()->hasRole('Admin')) {
+            if (
+                ! auth()
+                    ->user()
+                    ->hasRole('Admin')
+            ) {
                 $backUrl = '/information/locations';
             }
         @endphp
@@ -16,37 +20,65 @@
             backUrl="{{$backUrl}}"
             editUrl="{{route('location.edit', ['location' => $location->id])}}"
         >
-            @include('admin.locations.partials.location', [
-                'location' => $location,
-            ])
+            @include(
+                'admin.locations.partials.location',
+                [
+                    'location' => $location,
+                ]
+            )
         </x-core.cards.card-with-title>
 
-        @if (!is_null($location->questRewardItem))
-            <x-core.cards.card-with-title
-                title="Quest Item"
-            >
-                <p class='my-2'>This location will drop a quest item upon visiting the location.</p>
+        @if (! is_null($location->questRewardItem))
+            <x-core.cards.card-with-title title="Quest Item">
+                <p class="my-2">
+                    This location will drop a quest item upon visiting the
+                    location.
+                </p>
                 <dl>
                     <dt>Item Name:</dt>
-                    <dd>{{$location->questRewardItem->name}}</dd>
-                    @if (!is_null($usedInQuest))
+                    <dd>{{ $location->questRewardItem->name }}</dd>
+                    @if (! is_null($usedInQuest))
                         <dt>Used in quest:</dt>
                         <dd>
                             @guest
-                            <a href="{{route('info.page.quest', [
-                                                            'quest' => $usedInQuest->id
-                                                        ])}}" target="_blank"><i class="fas fa-external-link-alt"></i> {{$usedInQuest->name}}</a>
-                        @else
-                            @if (auth()->user()->hasRole('Admin'))
-                                <a href="{{route('quests.show', [
-                                                            'quest' => $usedInQuest->id
-                                                        ])}}" target="_blank"><i class="fas fa-external-link-alt"></i> {{$usedInQuest->name}}</a>
+                                <a
+                                    href="{{
+                                        route('info.page.quest', [
+                                            'quest' => $usedInQuest->id,
+                                        ])
+                                    }}"
+                                    target="_blank"
+                                >
+                                    <i class="fas fa-external-link-alt"></i>
+                                    {{ $usedInQuest->name }}
+                                </a>
                             @else
-                                <a href="{{route('info.page.quest', [
-                                                            'quest' => $usedInQuest->id
-                                                        ])}}" target="_blank"><i class="fas fa-external-link-alt"></i> {{$usedInQuest->name}}</a>
-                            @endif
-                        @endguest
+                                @if (auth()->user()->hasRole('Admin'))
+                                    <a
+                                        href="{{
+                                            route('quests.show', [
+                                                'quest' => $usedInQuest->id,
+                                            ])
+                                        }}"
+                                        target="_blank"
+                                    >
+                                        <i class="fas fa-external-link-alt"></i>
+                                        {{ $usedInQuest->name }}
+                                    </a>
+                                @else
+                                    <a
+                                        href="{{
+                                        route('info.page.quest', [
+                                            'quest' => $usedInQuest->id,
+                                        ])
+                                    }}"
+                                        target="_blank"
+                                    >
+                                        <i class="fas fa-external-link-alt"></i>
+                                        {{ $usedInQuest->name }}
+                                    </a>
+                                @endif
+                            @endguest
                         </dd>
                     @endif
                 </dl>

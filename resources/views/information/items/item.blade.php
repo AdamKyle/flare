@@ -10,8 +10,11 @@
             <x-item-display-color :item="$item" />
         </x-core.page-title-slot>
 
-        @include('game.items.item', [
-            'item' => $item
-        ])
+        @include(
+            'game.items.item',
+            [
+                'item' => $item,
+            ]
+        )
     </div>
 @endsection

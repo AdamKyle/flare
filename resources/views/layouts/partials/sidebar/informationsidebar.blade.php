@@ -1,48 +1,86 @@
 <!-- Menu Bar -->
 <aside class="menu-bar menu-sticky">
     <div class="menu-items">
-        <a href="{{ route('info.page', ['pageName' => 'home']) }}" class="link" data-toggle="tooltip-menu"
-            data-tippy-content="Home">
+        <a
+            href="{{ route('info.page', ['pageName' => 'home']) }}"
+            class="link"
+            data-toggle="tooltip-menu"
+            data-tippy-content="Home"
+        >
             <span class="icon la la-book-open"></span>
             <span class="title">Home</span>
         </a>
-        <a href="#no-link" class="link" data-target="[data-menu=basic-info]" data-toggle="tooltip-menu"
-            data-tippy-content="Basic Info">
+        <a
+            href="#no-link"
+            class="link"
+            data-target="[data-menu=basic-info]"
+            data-toggle="tooltip-menu"
+            data-tippy-content="Basic Info"
+        >
             <span class="icon fas fa-question-circle"></span>
             <span class="title">Basic Information</span>
         </a>
-        <a href="#no-link" class="link" data-target="[data-menu=character-info]" data-toggle="tooltip-menu"
-            data-tippy-content="Character Info">
+        <a
+            href="#no-link"
+            class="link"
+            data-target="[data-menu=character-info]"
+            data-toggle="tooltip-menu"
+            data-tippy-content="Character Info"
+        >
             <span class="icon ra ra-muscle-fat"></span>
             <span class="title">Character Information</span>
         </a>
-        <a href="#no-link" class="link" data-target="[data-menu=events]" data-toggle="tooltip-menu"
-            data-tippy-content="Events">
+        <a
+            href="#no-link"
+            class="link"
+            data-target="[data-menu=events]"
+            data-toggle="tooltip-menu"
+            data-tippy-content="Events"
+        >
             <span class="icon fas fa-calendar"></span>
             <span class="title">Events</span>
         </a>
-        <a href="#no-link" class="link" data-target="[data-menu=map]" data-toggle="tooltip-menu"
-            data-tippy-content="Map">
+        <a
+            href="#no-link"
+            class="link"
+            data-target="[data-menu=map]"
+            data-toggle="tooltip-menu"
+            data-tippy-content="Map"
+        >
             <span class="icon ra ra-scroll-unfurled"></span>
             <span class="title">Map</span>
         </a>
-        <a href="#no-link" class="link" data-target="[data-menu=kingdom]" data-toggle="tooltip-menu"
-            data-tippy-content="Kingdom">
+        <a
+            href="#no-link"
+            class="link"
+            data-target="[data-menu=kingdom]"
+            data-toggle="tooltip-menu"
+            data-tippy-content="Kingdom"
+        >
             <span class="icon ra ra-tower"></span>
             <span class="title">Kingdoms</span>
         </a>
-        <a href="#no-link" class="link" data-target="[data-menu=game-systems]" data-toggle="tooltip-menu"
-            data-tippy-content="Game Systems">
+        <a
+            href="#no-link"
+            class="link"
+            data-target="[data-menu=game-systems]"
+            data-toggle="tooltip-menu"
+            data-tippy-content="Game Systems"
+        >
             <span class="icon ra ra-tower"></span>
             <span class="title">Game Systems</span>
         </a>
-        <a href="#no-link" class="link" data-target="[data-menu=gear-sets]" data-toggle="tooltip-menu"
-            data-tippy-content="Gear Sets">
+        <a
+            href="#no-link"
+            class="link"
+            data-target="[data-menu=gear-sets]"
+            data-toggle="tooltip-menu"
+            data-tippy-content="Gear Sets"
+        >
             <span class="icon ra ra-knight-helmet"></span>
             <span class="title">Gear Sets</span>
         </a>
     </div>
-
 
     <!-- Basic Information -->
     <div class="menu-detail" data-menu="basic-info">
@@ -52,7 +90,9 @@
                 <span class="text-sm fas fa-info-circle"></span>
                 Rules
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'some-clicking-required']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'some-clicking-required']) }}"
+            >
                 <span class="fas fa-mouse-pointer"></span>
                 Some clicking Required
             </a>
@@ -60,7 +100,9 @@
                 <span class="text-sm fas fa-cogs"></span>
                 Player Settings
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'chat-commands']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'chat-commands']) }}"
+            >
                 <span class="text-sm far fa-comment-dots"></span>
                 Chat Commands
             </a>
@@ -68,7 +110,9 @@
                 <span class="text-sm ra ra-monster-skull"></span>
                 Raids
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'weekly-fights']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'weekly-fights']) }}"
+            >
                 <span class="text-sm ra ra-monster-skull"></span>
                 Weekly Fights
             </a>
@@ -92,11 +136,15 @@
         <hr />
         <div class="menu-detail-wrapper">
             <h6 class="uppercase">Cosmetic Features</h6>
-            <a href="{{ route('info.page', ['pageName' => 'cosmetic-text']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'cosmetic-text']) }}"
+            >
                 <span class="text-sm icon far fa-keyboard"></span>
                 Cosmetic Text
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'cosmetic-name-tags']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'cosmetic-name-tags']) }}"
+            >
                 <span class="text-sm icon fas fa-tag"></span>
                 Cosmetic Name Tags
             </a>
@@ -106,7 +154,9 @@
     <!-- Character -->
     <div class="menu-detail" data-menu="character-info">
         <div class="menu-detail-wrapper">
-            <a href="{{ route('info.page', ['pageName' => 'races-and-classes']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'races-and-classes']) }}"
+            >
                 <span class="ra ra-player"></span>
                 Races and Classes
             </a>
@@ -114,20 +164,27 @@
                 <span class="fas fa-users"></span>
                 Class ranks
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'character-stats']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'character-stats']) }}"
+            >
                 <span class="far fa-chart-bar"></span>
                 Character Stats
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'reincarnation']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'reincarnation']) }}"
+            >
                 <span class="ra ra-player-pyromaniac"></span>
                 Reincarnation
             </a>
             <a href="{{ route('info.page', ['pageName' => 'character-xp']) }}">
-                <span class="fas fa-chart-line"></span> Character XP
+                <span class="fas fa-chart-line"></span>
+                Character XP
             </a>
             <hr />
             <h6 class="uppercase">Skills</h6>
-            <a href="{{ route('info.page', ['pageName' => 'skill-information']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'skill-information']) }}"
+            >
                 <span class="ra ra-aura"></span>
                 Skills
             </a>
@@ -135,17 +192,21 @@
                 <span class="ra ra-player-pyromaniac"></span>
                 Class Skills
             </a>
-            <hr>
+            <hr />
             <h6 class="uppercase">Equipment</h6>
             <a href="{{ route('info.page', ['pageName' => 'equipment']) }}">
                 <span class="ra ra-axe"></span>
                 Equipment
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'gear-progression']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'gear-progression']) }}"
+            >
                 <span class="fas fa-level-up-alt"></span>
                 Gear Progression
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'equipment-sets']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'equipment-sets']) }}"
+            >
                 <span class="ra ra-battered-axe"></span>
                 Equipment Sets
             </a>
@@ -159,11 +220,15 @@
                 <span class="ra ra-archer"></span>
                 Combat
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'how-healing-works']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'how-healing-works']) }}"
+            >
                 <span class="ra ra-archer"></span>
                 Healing & Resurrection
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'ambush-and-counter']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'ambush-and-counter']) }}"
+            >
                 <span class="ra ra-muscle-fat"></span>
                 Ambush and Counter
             </a>
@@ -185,7 +250,9 @@
                 <span class="text-sm fas fa-calendar"></span>
                 Events
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'global-event-goals']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'global-event-goals']) }}"
+            >
                 <span class="text-sm fas fa-bars"></span>
                 Global Event Goals
             </a>
@@ -193,15 +260,21 @@
         <hr />
         <div class="menu-detail-wrapper">
             <h6 class="uppercase">Location Based Events</h6>
-            <a href="{{ route('info.page', ['pageName' => 'the-gold-mines-event']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'the-gold-mines-event']) }}"
+            >
                 <span class="text-sm ra ra-broken-skull"></span>
                 The Gold Mines Event
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'the-purgatory-smiths-house-event']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'the-purgatory-smiths-house-event']) }}"
+            >
                 <span class="text-sm ra ra-broken-skull"></span>
                 Purgatory Smith's House Event
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'the-old-church-event']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'the-old-church-event']) }}"
+            >
                 <span class="text-sm ra ra-broken-skull"></span>
                 The Old Church Event
             </a>
@@ -237,7 +310,9 @@
                 <span class="fas fa-search-location"></span>
                 Map Locations
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'special-locations']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'special-locations']) }}"
+            >
                 <span class="fas fa-dungeon"></span>
                 Special Locations
             </a>
@@ -247,7 +322,9 @@
                 <span class="ra ra-arrow-cluster"></span>
                 Factions
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'faction-loyalty']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'faction-loyalty']) }}"
+            >
                 <span class="ra ra-double-team"></span>
                 Factions Loyalty
             </a>
@@ -261,46 +338,64 @@
                 <span class="ra ra-guarded-tower"></span>
                 Kingdoms
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'attacking-kingdoms']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'attacking-kingdoms']) }}"
+            >
                 <span class="ra ra-daggers"></span>
                 Attacking a kingdom
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'items-and-kingdoms']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'items-and-kingdoms']) }}"
+            >
                 <span class="fas fa-flask"></span>
                 Using items on kingdoms
             </a>
-            <hr>
+            <hr />
             <a href="{{ route('info.page', ['pageName' => 'npc-kingdoms']) }}">
                 <span class="ra ra-player"></span>
                 NPC Kingdoms
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'kingdom-passive-skills']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'kingdom-passive-skills']) }}"
+            >
                 <span class="fas fa-sitemap"></span>
                 Kingdom Passive Skills
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'kingdom-resource-expansion']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'kingdom-resource-expansion']) }}"
+            >
                 <span class="fas fa-expand-arrows-alt"></span>
                 Kingdom Resource Expansion
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'resource-request']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'resource-request']) }}"
+            >
                 <span class="fas fa-people-carry"></span>
                 Kingdom Resource Requests
             </a>
             <hr />
             <h6>Capital Cities</h6>
-            <a href="{{ route('info.page', ['pageName' => 'capital-cities']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'capital-cities']) }}"
+            >
                 <span class="fas fa-university"></span>
                 What are Capital Cities
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'managing-buildings-with-capital-cities']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'managing-buildings-with-capital-cities']) }}"
+            >
                 <span class="fas fa-university"></span>
                 Manageing Buildings
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'managing-units-through-capital-cities']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'managing-units-through-capital-cities']) }}"
+            >
                 <span class="fas fa-university"></span>
                 Manageing Units
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'managing-gold-bars-through-capital-cities']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'managing-gold-bars-through-capital-cities']) }}"
+            >
                 <span class="fas fa-university"></span>
                 Manageing Gold Bars
             </a>
@@ -339,7 +434,9 @@
                 <span class="ra ra-burning-book"></span>
                 Enchanting
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'disenchanting']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'disenchanting']) }}"
+            >
                 <span class="ra ra-explosion"></span>
                 Disenchanting
             </a>
@@ -347,7 +444,9 @@
                 <span class="ra ra-round-bottom-flask"></span>
                 Alchemy (Usable items)
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'random-enchants']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'random-enchants']) }}"
+            >
                 <span class="ra ra-fairy-wand"></span>
                 Random Enchantments (Uniques)
             </a>
@@ -367,7 +466,9 @@
                 <span class="fas fa-campground"></span>
                 Seer Camp
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'labyrinth-oracle']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'labyrinth-oracle']) }}"
+            >
                 <span class="ra ra-eye-monster"></span>
                 Labyrinth Oracle
             </a>
@@ -396,7 +497,9 @@
                 <span class="ra ra-chain"></span>
                 Uniques (AKA Legendaries)
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'mythical-items']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'mythical-items']) }}"
+            >
                 <span class="ra ra-chain"></span>
                 Mythics
             </a>
@@ -404,35 +507,51 @@
                 <span class="ra ra-chain"></span>
                 Cosmic Items
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'hell-forged-set']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'hell-forged-set']) }}"
+            >
                 <span class="ra ra-axe"></span>
                 Hell Forged
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'purgatory-chains-set']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'purgatory-chains-set']) }}"
+            >
                 <span class="ra ra-lightning-sword"></span>
                 Purgatory Chains
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'pirate-lord-leather-set']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'pirate-lord-leather-set']) }}"
+            >
                 <span class="ra ra-dervish-swords"></span>
                 Pirate Lord Leather
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'corrupted-ice']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'corrupted-ice']) }}"
+            >
                 <span class="ra ra-kaleidoscope"></span>
                 Corrupted Ice
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'twisted-earth']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'twisted-earth']) }}"
+            >
                 <span class="ra ra-kaleidoscope"></span>
                 Twisted Earth
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'delusional-silver']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'delusional-silver']) }}"
+            >
                 <span class="ra ra-kaleidoscope"></span>
                 Delusional Silver
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'faithless-plate']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'faithless-plate']) }}"
+            >
                 <span class="ra ra-kaleidoscope"></span>
                 Faithless Plate
             </a>
-            <a href="{{ route('info.page', ['pageName' => 'ancestral-items']) }}">
+            <a
+                href="{{ route('info.page', ['pageName' => 'ancestral-items']) }}"
+            >
                 <span class="ra ra-crowned-heart"></span>
                 Ancestral Items
             </a>

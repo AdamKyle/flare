@@ -3,7 +3,7 @@
         {{ nl2br($item->description) }}
     </p>
 
-    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+    <div class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
 
     <dl>
         <dt>Can Stack? (Allows you to use multiple at once)</dt>
@@ -12,7 +12,7 @@
         <dd>{{ $item->lasts_for }}</dd>
     </dl>
 
-    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+    <div class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
 
     <dl>
         <dt>Xp bonus per kill</dt>
@@ -21,21 +21,27 @@
         <dd>{{ $item->gains_additional_level ? 'Yes' : 'No' }}</dd>
     </dl>
 
-    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+    <div class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
 
     <div class="grid md:grid-cols-3 gap-3">
         <div>
             <strong>Stats</strong>
-            <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+            <div
+                class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"
+            ></div>
             <dl>
                 <dt>All Stat increase %</dt>
                 <dd>{{ $item->increase_stat_by * 100, 2 }}%</dd>
             </dl>
         </div>
-        <div class='block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+        <div
+            class="block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"
+        ></div>
         <div>
             <strong>Modifiers</strong>
-            <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+            <div
+                class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"
+            ></div>
             <dl>
                 <dt>Base Damage Mod</dt>
                 <dd>{{ $item->base_damage_mod * 100 }} %</dd>
@@ -45,25 +51,33 @@
                 <dd>{{ $item->base_healing_mod * 100 }} %</dd>
             </dl>
         </div>
-        <div class='block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+        <div
+            class="block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"
+        ></div>
         <div>
             <strong>Skill Modifiers</strong>
-            <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+            <div
+                class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"
+            ></div>
             @php
                 $skillBonus = $item->increase_skill_bonus_by * 100;
                 $skillTrainingBonus = $item->increase_skill_training_bonus_by * 100;
             @endphp
+
             <dl>
                 <dt>Effects Skills:</dt>
-                <dd>{{ !is_null($item->affects_skill_type) ? implode(',', $skills) : 'N/A' }}</dd>
+                <dd>
+                    {{ ! is_null($item->affects_skill_type) ? implode(',', $skills) : 'N/A' }}
+                </dd>
                 <dt>Skill Bonus</dt>
                 <dd>{{ $skillBonus > 100 ? 100 : $skillBonus }}%</dd>
                 <dt>Skill XP Bonus</dt>
-                <dd>{{ $skillTrainingBonus > 100 ? 100 : $skillTrainingBonus }}%</dd>
+                <dd>
+                    {{ $skillTrainingBonus > 100 ? 100 : $skillTrainingBonus }}%
+                </dd>
             </dl>
         </div>
     </div>
-
 </x-core.cards.card-with-title>
 
 @if ($item->can_craft)
@@ -71,7 +85,9 @@
         <div class="grid md:grid-cols-2 gap-3">
             <div>
                 <strong>Crafting Information</strong>
-                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                <div
+                    class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"
+                ></div>
                 <dl>
                     <dt>Skill Required</dt>
                     <dd>
@@ -87,27 +103,31 @@
                     <dd>{{ $item->skill_level_trivial }}</dd>
                 </dl>
             </div>
-            <div class='block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+            <div
+                class="block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"
+            ></div>
             <div>
                 <strong>Crafting Cost</strong>
-                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                <div
+                    class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"
+                ></div>
                 <dl>
-                    @if (!is_null($item->gold_cost) || $item->gold_cost > 0)
+                    @if (! is_null($item->gold_cost) || $item->gold_cost > 0)
                         <dt>Gold Cost</dt>
                         <dd>{{ number_format($item->gold_cost) }}</dd>
                     @endif
 
-                    @if (!is_null($item->gold_dust_cost) || $item->gold_dust_cost > 0)
+                    @if (! is_null($item->gold_dust_cost) || $item->gold_dust_cost > 0)
                         <dt>Gold Dust Cost</dt>
                         <dd>{{ number_format($item->gold_dust_cost) }}</dd>
                     @endif
 
-                    @if (!is_null($item->shards_cost) || $item->shards_cost > 0)
+                    @if (! is_null($item->shards_cost) || $item->shards_cost > 0)
                         <dt>Shard Cost</dt>
                         <dd>{{ number_format($item->shards_cost) }}</dd>
                     @endif
 
-                    @if (!is_null($item->copper_coin_cost) || $item->copper_coin_cost > 0)
+                    @if (! is_null($item->copper_coin_cost) || $item->copper_coin_cost > 0)
                         <dt>Gold Cost</dt>
                         <dd>{{ number_format($item->copper_coin_cost) }}</dd>
                     @endif

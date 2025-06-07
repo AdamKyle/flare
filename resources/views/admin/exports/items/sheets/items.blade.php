@@ -137,7 +137,9 @@
                 <td>{{ $item->affix_damage_reduction }}</td>
                 <td>{{ $item->devouring_light }}</td>
                 <td>{{ $item->devouring_darkness }}</td>
-                <td>{{ !is_null($item->dropLocation) ? $item->dropLocation->name : null }}</td>
+                <td>
+                    {{ ! is_null($item->dropLocation) ? $item->dropLocation->name : null }}
+                </td>
                 <td>{{ $item->xp_bonus }}</td>
                 <td>{{ $item->ignores_caps }}</td>
                 <td>{{ $item->can_use_on_other_items }}</td>
@@ -148,8 +150,12 @@
                 <td>{{ $item->counter_chance }}</td>
                 <td>{{ $item->counter_resistance }}</td>
                 <td>{{ $item->gains_additional_level }}</td>
-                <td>{{ is_null($item->unlocksClass) ? '' : $item->unlocksClass->name }}</td>
-                <td>{{ is_null($item->item_skill_id) ? '' : $item->itemSkill->name }}</td>
+                <td>
+                    {{ is_null($item->unlocksClass) ? '' : $item->unlocksClass->name }}
+                </td>
+                <td>
+                    {{ is_null($item->item_skill_id) ? '' : $item->itemSkill->name }}
+                </td>
             </tr>
         @endforeach
     </tbody>

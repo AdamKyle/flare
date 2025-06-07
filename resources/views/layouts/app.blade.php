@@ -1,43 +1,42 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="ltr">
+
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Language" content="en">
-    <meta name="google" content="notranslate">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+    <meta http-equiv="Content-Language" content="en" />
+    <meta name="google" content="notranslate" />
 
     <!-- CSRF Token -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
 
     @guest
     @else
-        @if (auth()->user()->character)
-            <meta name="player" content="{{ auth()->user()->character->id }}">
-        @endif
-
-        @if (!auth()->user()->hasRole('Admin'))
-            <meta name="character" content="{{ auth()->user()->character->id}}">
+        @if (!is_null(auth()->user()->character))
+            <meta name="player" content="{{ auth()->user()->character->id }}" />
         @endif
     @endguest
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'Planes of Tlessa') }}</title>
 
     <x-core.pwa-meta-tags.meta-tags title="Planes of Tlessa" />
 
     <!-- Fonts -->
-    <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css"
+        integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous" />
 
     @auth
-        @if(auth()->user()->hasRole('Admin'))
+        @if (auth()->user()->hasRole('Admin'))
             <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
         @endif
     @endauth
 
-    @vite('resources/css/tailwind.css')
+    @vite('resources/css/styles.css')
 
     @livewireStyles
 
@@ -47,124 +46,47 @@
 
     @stack('head')
 </head>
-@php
-    $previousUrlIsInfo = strpos(url()->previous(), 'information') !== false;
-@endphp
 
-<body>
-    @guest
-        <header class="top-bar hidden md:block">
-    @else
-        <header class="top-bar">
-    @endif
-
-        <!-- Menu Toggler -->
-        @auth
-            <button type="button" class="menu-toggler la la-bars" data-toggle="menu"></button>
-        @endauth
-
-        <!-- Brand -->
-        @guest
-            <span class="brand relative top-[20px] hidden md:block"><a href="/">Planes of Tlessa</a></span>
-        @else
-            <span class="brand hidden md:block"><a href="/">Planes of Tlessa</a></span>
-        @endguest
-
-
-        <!-- Right -->
-        <div class="flex items-center absolute right-0 mr-2">
-
-            <!-- Dark Mode -->
-            @guest
-                <div class="hidden md:block md:contents">
-                    <label class="switch switch_outlined" data-toggle="tooltip" data-tippy-content="Toggle Dark Mode">
-                        <input id="darkModeToggler" type="checkbox">
-                        <span></span>
-                    </label>
-                    <span class="ml-4">Test Dark Mode</span>
-
-                    <a href="{{route('login')}}" class="ml-6 mr-2 text-lg">Login</a> | <a href="{{route('register')}}" class="ml-2 mr-2 text-lg">Register</a>
-                </div>
-            @endguest
-
-            @auth
-                <div>
-                    @if (!is_null(auth()->user()->character))
-                        @include('layouts.partials.player.guide-button')
-                    @endif
-                </div>
-
-                <div class="mx-4 hidden sm:block">
-                    <a href="/releases" target="_blank">Version: {{GameVersion::version()}}</a>
-                </div>
-
-                <div class="mx-4 hidden sm:block">
-                    <a href="/information/where-to-start" target="_blank">Help, I'm Stuck!</a>
-                </div>
-
-                <div>
-                    <label class="switch switch_outlined" data-toggle="tooltip" data-tippy-content="Toggle Dark Mode">
-                        <input id="darkModeToggler" type="checkbox">
-                        <span></span>
-                        <i class="fas fa-adjust pl-2"></i>
-                    </label>
-                </div>
-
-                <!-- User Menu -->
-                @include('layouts.partials.profile-drop-down')
-            @endauth
-        </div>
-    </header>
-
-    @auth
-        @if(auth()->user()->hasRole('Admin'))
-            @include('layouts.partials.sidebar.adminsidebar')
-        @else
-            @include('layouts.partials.sidebar.playersidebar')
-        @endif
-    @endauth
-
-    <!-- Workspace -->
-    @auth
-        @if (auth()->user()->hasRole('Admin'))
-            <main class="workspace mb-10 dark:bg-gray-900">
-        @else
-            <main class="workspace  dark:bg-gray-900">
-        @endif
-    @endauth
-
-    @guest
-        <main class="workspace dark:bg-gray-900">
-    @endguest
-
-        @guest
-            @include('layouts.partials.alerts')
-            @yield('content')
-        @endguest
-
-        @auth
-            @include('layouts.partials.alerts')
-            @yield('content')
-        @endauth
-
-    @guest
-        </main>
-    @endguest
-    <!-- Scripts -->
+<body x-data="{
+    'loaded': true,
+    'darkMode': false,
+    'stickyMenu': false,
+    'sidebarToggle': false,
+    'scrollTop': false,
+}" x-init="darkMode = JSON.parse(localStorage.getItem('darkMode'))
+$watch('darkMode', (value) =>
+    localStorage.setItem('darkMode', JSON.stringify(value)),
+)" :class="{ 'dark bg-gray-800': darkMode === true }">
+    <x-core.page.page-wrapper>
+        @include('layouts.partials.core-side-bar')
+        <x-core.page.content-area>
+            @include('layouts.partials.core-header')
+            <main>
+                @include('layouts.partials.alerts')
+                @yield('content')
+            </main>
+        </x-core.page.content-area>
+    </x-core.page.page-wrapper>
 
     @livewireScriptConfig
+
+    <script src="{{ asset('vendor/theme/script.js') }}"></script>
 
     @if (!is_null(auth()->user()))
         @if (!auth()->user()->hasRole('Admin'))
             @vite('resources/js/app.ts')
 
-                        <script>
-                            setInterval(() => {
-                                fetch('/api/game-heart-beat', { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } });
-                            }, 30000);
-                        </script>
+            <script>
+                setInterval(() => {
+                    fetch('/api/game-heart-beat', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                    });
+                }, 30000);
+            </script>
         @else
-
             <script>
                 const lightbox = GLightbox();
             </script>
@@ -173,4 +95,5 @@
 
     @stack('scripts')
 </body>
+
 </html>

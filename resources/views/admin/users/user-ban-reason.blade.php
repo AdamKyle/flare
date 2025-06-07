@@ -7,29 +7,51 @@
                 <h4 class="mt-3">Reason For Ban</h4>
             </div>
             <div class="col-md-6 align-self-right">
-                <a href="{{ url()->previous() }}" class="btn btn-danger float-right ml-2">Cancel</a>
+                <a
+                    href="{{ url()->previous() }}"
+                    class="btn btn-danger float-right ml-2"
+                >
+                    Cancel
+                </a>
             </div>
         </div>
 
         <div class="card">
             <div class="card-body">
-                <form method="POST"
-                    action="{{ route('ban.user.with.reason', [
-                        'user' => $user,
-                    ]) }}">
+                <form
+                    method="POST"
+                    action="{{
+                        route('ban.user.with.reason', [
+                            'user' => $user,
+                        ])
+                    }}"
+                >
                     @csrf
 
                     <input type="hidden" name="for" value="{{ $for }}" />
 
                     <div class="form-group row">
-                        <label for="reason"
-                            class="col-md-4 col-form-label text-md-right">{{ __('Reason for ban') }}</label>
+                        <label
+                            for="reason"
+                            class="col-md-4 col-form-label text-md-right"
+                        >
+                            {{ __('Reason for ban') }}
+                        </label>
 
                         <div class="col-md-6">
-                            <textarea id="reason" type="reason" class="form-control @error('reason') is-invalid @enderror" name="reason"
-                                value="{{ $email ?? old('reason') }}" required autofocus></textarea>
-                            <small id="reasonHelp" class="form-text text-muted">This reason will be emailed to the user as a
-                                reason why.</small>
+                            <textarea
+                                id="reason"
+                                type="reason"
+                                class="form-control @error('reason') is-invalid @enderror"
+                                name="reason"
+                                value="{{ $email ?? old('reason') }}"
+                                required
+                                autofocus
+                            ></textarea>
+                            <small id="reasonHelp" class="form-text text-muted">
+                                This reason will be emailed to the user as a
+                                reason why.
+                            </small>
 
                             @error('reason')
                                 <span class="invalid-feedback" role="alert">

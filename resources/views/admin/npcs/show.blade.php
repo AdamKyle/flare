@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-
     <div class="mt-10 mb-10 w-full lg:w-3/5 m-auto">
         <x-core.page-title
             title="{{$npc->real_name}}"
@@ -19,5 +18,4 @@
 
         @include('admin.npcs.partials.show', ['npc' => $npc])
     </div>
-
 @endsection

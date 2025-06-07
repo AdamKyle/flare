@@ -1,3 +1,3 @@
 <nav class="tab-nav">
-    {{$slot}}
+    {{ $slot }}
 </nav>

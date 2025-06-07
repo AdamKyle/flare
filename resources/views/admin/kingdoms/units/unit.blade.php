@@ -9,19 +9,25 @@
                 $backUrl = '/information/kingdoms';
             }
 
-            if (!is_null(auth()->user())) {
-                if (!auth()->user()->hasRole('Admin')) {
+            if (! is_null(auth()->user())) {
+                if (
+                    ! auth()
+                        ->user()
+                        ->hasRole('Admin')
+                ) {
                     $backUrl = '/information/kingdoms';
                 }
 
-                if (auth()->user()->hasRole('Admin')) {
+                if (
+                    auth()
+                        ->user()
+                        ->hasRole('Admin')
+                ) {
                     $backUrl = '/admin/kingdoms/units';
                 }
             }
-
-
-
         @endphp
+
         {{-- Spacer div. --}}
         <div class="pb-10"></div>
         <x-core.cards.card-with-title
@@ -30,10 +36,12 @@
             backUrl="{{$backUrl}}"
             editUrl="{{route('units.edit', ['gameUnit' => $unit->id])}}"
         >
-            @include('admin.kingdoms.units.partials.unit-attributes', [
-                'unit' => $unit
-            ])
+            @include(
+                'admin.kingdoms.units.partials.unit-attributes',
+                [
+                    'unit' => $unit,
+                ]
+            )
         </x-core.cards.card-with-title>
     </x-core.layout.info-container>
-
 @endsection

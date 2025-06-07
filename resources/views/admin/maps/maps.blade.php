@@ -5,7 +5,8 @@
         <x-core.page-title
             title="Game Maps"
             route="{{route('home')}}"
-            color="success" link="Home"
+            color="success"
+            link="Home"
         >
             <x-core.buttons.link-buttons.primary-button
                 href="{{route('maps.upload')}}"

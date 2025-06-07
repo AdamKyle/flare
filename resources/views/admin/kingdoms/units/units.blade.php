@@ -4,7 +4,8 @@
     <x-core.page-title
         title="Kingdom Units"
         route="{{route('home')}}"
-        color="success" link="Home"
+        color="success"
+        link="Home"
     >
         <x-core.buttons.link-buttons.primary-button
             href="{{route('units.create')}}"

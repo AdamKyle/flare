@@ -4,12 +4,14 @@
     if (is_null(auth()->user())) {
         $backUrl = url()->previous();
     } else {
-        if (!auth()->user()->hasRole('Admin')) {
+        if (
+            ! auth()
+                ->user()
+                ->hasRole('Admin')
+        ) {
             $backUrl = route('game.shop.buy', ['character' => auth()->user()->character->id]);
         }
     }
-
-
 @endphp
 
 <h2 class="mt-2 font-light">
@@ -37,11 +39,11 @@
     </div>
 </div>
 
-<div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+<div class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
 
 @if ($item->type === 'alchemy' && $item->damages_kingdoms)
     @include('game.items.components.item-kingdom-details')
-@elseif ($item->type === 'alchemy' && !is_null($item->holy_level))
+@elseif ($item->type === 'alchemy' && ! is_null($item->holy_level))
     @include('game.items.components.item-holy-oil-details')
 @elseif ($item->type === 'alchemy' && $item->usable)
     @include('game.items.components.item-usable')

@@ -7,7 +7,11 @@
 
             if (is_null(auth()->user())) {
                 $backUrl = '/';
-            } else if (!auth()->user()->hasRole('Admin')) {
+            } elseif (
+                ! auth()
+                    ->user()
+                    ->hasRole('Admin')
+            ) {
                 $backUrl = '/';
             }
         @endphp
@@ -18,60 +22,96 @@
             backUrl="{{$backUrl}}"
             editUrl="{{route('admin.items-skills.edit', ['itemSkill' => $itemSkill])}}"
         >
-            <p class="mt-4 mb-4">{{$itemSkill->description}}</p>
-            <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-            <div class='grid md:grid-cols-2 gap-2'>
+            <p class="mt-4 mb-4">{{ $itemSkill->description }}</p>
+            <div
+                class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"
+            ></div>
+            <div class="grid md:grid-cols-2 gap-2">
                 <div>
-                    <h3 class="text-sky-600 dark:text-sky-500">Stat Modifiers</h3>
-                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                    <h3 class="text-sky-600 dark:text-sky-500">
+                        Stat Modifiers
+                    </h3>
+                    <div
+                        class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"
+                    ></div>
                     <dl>
                         <dt>Str Modifier:</dt>
-                        <dd>{{$itemSkill->str_mod * 100}}%</dd>
+                        <dd>{{ $itemSkill->str_mod * 100 }}%</dd>
                         <dt>Dex Modifier:</dt>
-                        <dd>{{$itemSkill->dex_mod * 100}}%</dd>
+                        <dd>{{ $itemSkill->dex_mod * 100 }}%</dd>
                         <dt>Dur Modifier:</dt>
-                        <dd>{{$itemSkill->dur_mod * 100}}%</dd>
+                        <dd>{{ $itemSkill->dur_mod * 100 }}%</dd>
                         <dt>Int Modifier:</dt>
-                        <dd >{{$itemSkill->int_mod * 100}}%</dd>
+                        <dd>{{ $itemSkill->int_mod * 100 }}%</dd>
                         <dt>Chr Modifier:</dt>
-                        <dd >{{$itemSkill->chr_mod * 100}}%</dd>
+                        <dd>{{ $itemSkill->chr_mod * 100 }}%</dd>
                         <dt>Agi Modifier:</dt>
-                        <dd>{{$itemSkill->agi_mod * 100}}%</dd>
+                        <dd>{{ $itemSkill->agi_mod * 100 }}%</dd>
                         <dt>Focus Modifier:</dt>
-                        <dd>{{$itemSkill->focus_mod * 100}}%</dd>
+                        <dd>{{ $itemSkill->focus_mod * 100 }}%</dd>
                     </dl>
                 </div>
-                <div class='block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                <div
+                    class="block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"
+                ></div>
                 <div>
-                    <h3 class="text-sky-600 dark:text-sky-500">Damage/AC/Healing Modifiers</h3>
-                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                    <h3 class="text-sky-600 dark:text-sky-500">
+                        Damage/AC/Healing Modifiers
+                    </h3>
+                    <div
+                        class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"
+                    ></div>
                     <dl>
                         <dt>Base Attack Modifier:</dt>
-                        <dd>{{$itemSkill->base_damage_mod * 100}}%</dd>
+                        <dd>{{ $itemSkill->base_damage_mod * 100 }}%</dd>
                         <dt>Base AC Modifier:</dt>
-                        <dd>{{$itemSkill->base_ac_mod * 100}}%</dd>
+                        <dd>{{ $itemSkill->base_ac_mod * 100 }}%</dd>
                         <dt>Base Healing Modifier:</dt>
-                        <dd>{{$itemSkill->base_healing_mod * 100}}%</dd>
+                        <dd>{{ $itemSkill->base_healing_mod * 100 }}%</dd>
                     </dl>
-                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                    <div
+                        class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"
+                    ></div>
                     <h3 class="text-sky-600 dark:text-sky-500">Level Info</h3>
-                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                    <div
+                        class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"
+                    ></div>
                     <dl>
                         <dt>Max Level:</dt>
-                        <dd>{{$itemSkill->max_level}}</dd>
+                        <dd>{{ $itemSkill->max_level }}</dd>
                         <dt>Total Kills Per Level:</dt>
-                        <dd>{{$itemSkill->total_kills_needed}}</dd>
+                        <dd>{{ $itemSkill->total_kills_needed }}</dd>
                         <dt>Unlocks at Parent Skill Level:</dt>
-                        <dd>{{!is_null($itemSkill->parent_level_needed) ? $itemSkill->parent_level_needed : 'N/A'}}</dd>
+                        <dd>
+                            {{ ! is_null($itemSkill->parent_level_needed) ? $itemSkill->parent_level_needed : 'N/A' }}
+                        </dd>
                         <dt>Parent Skill</dt>
-                        @if (!is_null($itemSkill->parent))
+                        @if (! is_null($itemSkill->parent))
                             <dd>
-                                @if (!auth()->user())
-                                    <a href="/information/item-skills/skill/{{$itemSkill->id}}" target="_blank">  <i class="fas fa-external-link-alt"></i> {{$itemSkill->name}}</a>
-                                @elseif (!auth()->user()->hasRole('Admin'))
-                                    <a href="/information/item-skills/skill/{{$itemSkill->id}}" target="_blank">  <i class="fas fa-external-link-alt"></i> {{$itemSkill->name}}</a>
+                                @if (! auth()->user())
+                                    <a
+                                        href="/information/item-skills/skill/{{ $itemSkill->id }}"
+                                        target="_blank"
+                                    >
+                                        <i class="fas fa-external-link-alt"></i>
+                                        {{ $itemSkill->name }}
+                                    </a>
+                                @elseif (! auth()->user()->hasRole('Admin'))
+                                    <a
+                                        href="/information/item-skills/skill/{{ $itemSkill->id }}"
+                                        target="_blank"
+                                    >
+                                        <i class="fas fa-external-link-alt"></i>
+                                        {{ $itemSkill->name }}
+                                    </a>
                                 @else
-                                    <a href="/admin/item-skills/{{$itemSkill->id}}" target="_blank">  <i class="fas fa-external-link-alt"></i> {{$itemSkill->name}}</a>
+                                    <a
+                                        href="/admin/item-skills/{{ $itemSkill->id }}"
+                                        target="_blank"
+                                    >
+                                        <i class="fas fa-external-link-alt"></i>
+                                        {{ $itemSkill->name }}
+                                    </a>
                                 @endif
                             </dd>
                         @else
@@ -82,13 +122,20 @@
             </div>
             @if ($itemSkill->children()->count() > 0)
                 <div class="my-4">
-                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                    <div
+                        class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"
+                    ></div>
                     <h3 class="text-sky-600 dark:text-sky-500">Child Skills</h3>
-                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                    <div
+                        class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"
+                    ></div>
 
-                    @livewire('admin.item-skills.item-skills-table', [
-                        'parentSkill' => $itemSkill->id
-                    ])
+                    @livewire(
+                        'admin.item-skills.item-skills-table',
+                        [
+                            'parentSkill' => $itemSkill->id,
+                        ]
+                    )
                 </div>
             @endif
         </x-core.cards.card-with-title>

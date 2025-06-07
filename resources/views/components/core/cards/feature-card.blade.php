@@ -1,5 +1,7 @@
 <x-core.cards.card-with-hover>
-    <div class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-4 h-full">
+    <div
+        class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-4 h-full"
+    >
         <div class="w-1/5 text-7xl">
             {{ $icon }}
         </div>

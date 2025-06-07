@@ -7,9 +7,12 @@
             buttons="true"
             backUrl="{{url()->previous()}}"
         >
-            @include('admin.locations.partials.location', [
-                'location' => $location,
-            ])
+            @include(
+                'admin.locations.partials.location',
+                [
+                    'location' => $location,
+                ]
+            )
         </x-core.cards.card-with-title>
     </div>
 @endsection

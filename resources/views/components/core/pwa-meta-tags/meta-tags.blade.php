@@ -1,21 +1,33 @@
-@props(['title' => config('app.name', 'PlanesOfTlessa')])
+@props([
+    'title' => config('app.name',
+    'PlanesOfTlessa'),
+])
 
 <title>{{ $title }}</title>
 
 <!-- PWA Manifest -->
-<link rel="manifest" href={{asset("manifest.json")}}>
+<link rel="manifest" href="{{ asset('manifest.json') }}" />
 
 <!-- Favicon and App Icons -->
-<link rel="icon" type="image/png" sizes="192x192" href="/pwa-images/tlessa-icons/tlessa-icon-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/pwa-images/tlessa-icons/tlessa-icon-180.png">
+<link
+    rel="icon"
+    type="image/png"
+    sizes="192x192"
+    href="/pwa-images/tlessa-icons/tlessa-icon-192.png"
+/>
+<link
+    rel="apple-touch-icon"
+    sizes="180x180"
+    href="/pwa-images/tlessa-icons/tlessa-icon-180.png"
+/>
 
 <!-- Theme color -->
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#000000" />
 
 <!-- Apple-specific meta tags -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="{{ $title }}">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta name="apple-mobile-web-app-title" content="{{ $title }}" />
 
 <!-- Apple Startup Images -->
 @php
@@ -33,22 +45,35 @@
     ];
 @endphp
 
-@foreach($splashScreens as $size => $file)
-    <link rel="apple-touch-startup-image" href="/{{ $file }}" media="(device-width: {{ explode('x', $size)[0] }}px) and (device-height: {{ explode('x', $size)[1] }}px)">
+@foreach ($splashScreens as $size => $file)
+    <link
+        rel="apple-touch-startup-image"
+        href="/{{ $file }}"
+        media="(device-width: {{ explode('x', $size)[0] }}px) and (device-height: {{ explode('x', $size)[1] }}px)"
+    />
 @endforeach
 
 <!-- General Web App Tags -->
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="application-name" content="{{ $title }}">
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="application-name" content="{{ $title }}" />
 
 <!-- Additional meta tags for SEO and social media -->
-<meta name="description" content="{{ $title }}">
-<meta property="og:title" content="{{ $title }}">
-<meta property="og:description" content="Experience the web in a new way with our Progressive Web App.">
-<meta property="og:image" content="/pwa-images/tlessa-icons/tlessa-icon-512.png">
-<meta property="og:url" content="{{ url()->current() }}">
+<meta name="description" content="{{ $title }}" />
+<meta property="og:title" content="{{ $title }}" />
+<meta
+    property="og:description"
+    content="Experience the web in a new way with our Progressive Web App."
+/>
+<meta
+    property="og:image"
+    content="/pwa-images/tlessa-icons/tlessa-icon-512.png"
+/>
+<meta property="og:url" content="{{ url()->current() }}" />
 
 <!-- Windows -->
-<meta name="msapplication-TileColor" content="#000000">
-<meta name="msapplication-TileImage" content="/pwa-images/tlessa-icons/tlessa-icon-144.png">
-<meta name="msapplication-config" content="/browserconfig.xml">
+<meta name="msapplication-TileColor" content="#000000" />
+<meta
+    name="msapplication-TileImage"
+    content="/pwa-images/tlessa-icons/tlessa-icon-144.png"
+/>
+<meta name="msapplication-config" content="/browserconfig.xml" />

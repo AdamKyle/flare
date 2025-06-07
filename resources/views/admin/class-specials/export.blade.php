@@ -7,7 +7,11 @@
             buttons="true"
             backUrl="{{route('class-specials.list')}}"
         >
-            <form method="POST" action="{{ route('class-specials.export') }}" class="text-center">
+            <form
+                method="POST"
+                action="{{ route('class-specials.export') }}"
+                class="text-center"
+            >
                 @csrf
                 <x-core.buttons.primary-button type="submit">
                     Export

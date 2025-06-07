@@ -8,16 +8,20 @@
                 <h4 class="uppercase">Request Form</h4>
             </div>
 
-            <x-core.cards.form-card css="mt-5 p-5 md:p-10" method="POST"  action="{{ route('un.ban.request.submit', ['user' => $user])}}">
+            <x-core.cards.form-card css="mt-5 p-5 md:p-10" method="POST"
+                action="{{ route('un.ban.request.submit', ['user' => $user]) }}">
                 @csrf
 
                 <div class="mb-4 mt-4">
-                    <strong>Reason you were banned:</strong> {{$user->banned_reason}}
+                    <strong>Reason you were banned:</strong>
+                    {{ $user->banned_reason }}
                 </div>
 
                 <div class="mb-5">
-                    <label for="unban-message" class="label block mb-2">Reason</label>
-                    <textarea class="form-control" id="unban-message" name="unban_message" value="{{old('unban_message')}}"></textarea>
+                    <label for="unban-message" class="label block mb-2">
+                        Reason
+                    </label>
+                    <textarea class="form-control" id="unban-message" name="unban_message" value="{{ old('unban_message') }}"></textarea>
                 </div>
 
                 <div class="flex">
@@ -26,8 +30,6 @@
                     </x-core.buttons.primary-button>
                 </div>
             </x-core.cards.form-card>
-
-
         </div>
     </div>
 @endsection

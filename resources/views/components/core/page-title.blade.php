@@ -2,7 +2,7 @@
     'title' => '',
     'route' => '#',
     'color' => 'primary',
-    'link'  => ''
+    'link' => '',
 ])
 
 <x-core.grids.two-column>
@@ -14,24 +14,31 @@
             <div class="float-right mt-[14px]">
                 @switch($color)
                     @case('success')
-                        <x-core.buttons.link-buttons.success-button href="{{$route}}">
-                            {{$link}}
+                        <x-core.buttons.link-buttons.success-button
+                            href="{{$route}}"
+                        >
+                            {{ $link }}
                         </x-core.buttons.link-buttons.success-button>
+
                         @break
                     @case('primary')
-                        <x-core.buttons.link-buttons.primary-button href="{{$route}}">
-                            {{$link}}
+                        <x-core.buttons.link-buttons.primary-button
+                            href="{{$route}}"
+                        >
+                            {{ $link }}
                         </x-core.buttons.link-buttons.primary-button>
+
                         @break
                     @default
-                        <x-core.buttons.link-buttons.success-button href="{{$route}}">
-                            {{$link}}
+                        <x-core.buttons.link-buttons.success-button
+                            href="{{$route}}"
+                        >
+                            {{ $link }}
                         </x-core.buttons.link-buttons.success-button>
                 @endswitch
 
-                {{$slot}}
+                {{ $slot }}
             </div>
         </div>
-
     </x-slot>
 </x-core.grids.two-column>

@@ -10,9 +10,14 @@
 
             @if (config('app.disabled_reg_and_login'))
                 <x-core.alerts.info-alert title="ATTN!">
-                    Deepest apologizes, however Planes of Tlessa is currently down for maintenance and unlike other deployments,
-                    this one has had to disable the Registration and Login for a short time. We promise to be back up and running soon
-                    and hope to see you all in-game soon. For more info, please check <a href="https://discord.gg/hcwdqJUerh" target="_blank">Discord.</a>
+                    Deepest apologizes, however Planes of Tlessa is currently
+                    down for maintenance and unlike other deployments, this one
+                    has had to disable the Registration and Login for a short
+                    time. We promise to be back up and running soon and hope to
+                    see you all in-game soon. For more info, please check
+                    <a href="https://discord.gg/hcwdqJUerh" target="_blank">
+                        Discord.
+                    </a>
                 </x-core.alerts.info-alert>
             @endif
 
@@ -20,28 +25,37 @@
                 @csrf
 
                 <div class="mb-5">
-                    <label class="label block mb-2" for="name">{{ __('E-Mail Address') }}</label>
-                    <input id="name" type="email" class="form-control" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
+                    <label class="label block mb-2" for="name">
+                        {{ __('E-Mail Address') }}
+                    </label>
+                    <input id="name" type="email" class="form-control" name="email" value="{{ old('email') }}"
+                        required autocomplete="email" autofocus />
                     @error('email')
-                    <div class="text-red-800 dark:text-red-500 pt-3" role="alert">
-                        <strong>{{$message}}</strong>
-                    </div>
+                        <div class="text-red-800 dark:text-red-500 pt-3" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </div>
                     @enderror
                 </div>
                 <div class="mb-5">
-                    <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Password') }}</label>
-                    <input id="password" type="password" class="form-control" name="password" required autocomplete="new-password" autofocus>
+                    <label for="password" class="col-md-4 col-form-label text-md-right">
+                        {{ __('Password') }}
+                    </label>
+                    <input id="password" type="password" class="form-control" name="password" required
+                        autocomplete="new-password" autofocus />
                     @error('password')
-                    <div class="text-red-800 dark:text-red-500 pt-3" role="alert">
-                        <strong>{{$message}}</strong>
-                    </div>
+                        <div class="text-red-800 dark:text-red-500 pt-3" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </div>
                     @enderror
                 </div>
                 <div class="grid lg:grid-cols-1 gap-3">
-                    <x-core.buttons.primary-button css="ltr:ml-auto rtl:mr-auto uppercase" type="submit">Login!</x-core.buttons.primary-button>
+                    <x-core.buttons.primary-button css="ltr:ml-auto rtl:mr-auto uppercase" type="submit">
+                        Login!
+                    </x-core.buttons.primary-button>
 
                     <a href="/information/account-deletion" class="ml-2" target="_blank">
-                        Account Deletion <i class="fas fa-external-link-alt"></i>
+                        Account Deletion
+                        <i class="fas fa-external-link-alt"></i>
                     </a>
                     <a class="ml-2" href="{{ route('password.request') }}">
                         {{ __('Forgot Your Password?') }}

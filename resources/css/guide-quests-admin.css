@@ -1,9 +1,0 @@
-.guide-quest-instructions {
-    p {
-        @apply mb-4 mt-4;
-    }
-
-    ul {
-        @apply list-disc ml-10;
-    }
-}

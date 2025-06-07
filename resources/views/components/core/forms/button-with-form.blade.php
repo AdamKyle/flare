@@ -1,12 +1,12 @@
 @props([
     'formRoute' => '',
-    'buttonTitle' => ''
+    'buttonTitle' => '',
 ])
 
-<form action="{{$formRoute}}" method="POST">
+<form action="{{ $formRoute }}" method="POST">
     @csrf
 
     <x-core.buttons.primary-button type="submit">
-        {{$buttonTitle}}
+        {{ $buttonTitle }}
     </x-core.buttons.primary-button>
 </form>

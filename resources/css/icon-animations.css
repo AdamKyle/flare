@@ -1,8 +1,0 @@
-.fa-beat {
-    animation: heartbeat 1s ease infinite;
-}
-
-@keyframes heartbeat {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-}
