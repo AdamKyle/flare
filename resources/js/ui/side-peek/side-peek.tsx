@@ -38,7 +38,7 @@ const SidePeek = (props: SidePeekProps) => {
     <>
       {props.is_open && (
         <div
-          className="fixed inset-0 z-40 bg-black bg-opacity-50 dark:bg-black/70"
+          className="fixed inset-0 z-40 bg-black opacity-50 dark:bg-black/70 z-[99999]"
           onClick={handleClickingOutside}
           aria-hidden="true"
         />
@@ -55,7 +55,7 @@ const SidePeek = (props: SidePeekProps) => {
           'bg-white dark:bg-gray-800 shadow-lg',
           'transition-transform duration-300 ease-in-out',
           props.is_open ? 'translate-x-0' : 'translate-x-full',
-          'flex flex-col'
+          'flex flex-col position-static z-[99999]'
         )}
       >
         <div className="flex justify-between items-center p-4 border-b dark:border-gray-700">
