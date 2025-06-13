@@ -12,6 +12,7 @@ const IconButton = (props: IconButtonProps): ReactNode => {
       className={clsx(
         baseStyles(),
         variantStyles(props.variant),
+        'py-3',
         props.additional_css
       )}
       aria-label={props.aria_lebel || props.label || 'Icon Button'}
@@ -19,10 +20,12 @@ const IconButton = (props: IconButtonProps): ReactNode => {
       role="button"
       type="button"
     >
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col lg:flex-row items-center">
         {props.icon}
         {props.label && (
-          <span className="text-sm mt-1 text-center">{props.label}</span>
+          <span className="text-sm mt-1 lg:mt-0 lg:ml-1 text-center">
+            {props.label}
+          </span>
         )}
       </div>
     </button>

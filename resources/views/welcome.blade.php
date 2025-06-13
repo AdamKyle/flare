@@ -74,7 +74,7 @@
                 src="{{ asset('promotion/game.png') }}"
                 class="shadow rounded max-w-full h-auto align-middle border-none img-fluid lg:max-w-[60%] my-4 m-auto glightbox cursor-pointer"
             />
-            <div class="text-sm text-center">Click to make larger.</div>
+            <div class="text-sm text-center text-gray-800 dark:text-gray-300">Click to make larger.</div>
         </div>
 
         <div class="w-full mx-auto mt-20 text-center lg:w-2/4">
@@ -249,7 +249,7 @@
                     src="{{ asset('promotion/map.png') }}"
                     class="h-auto max-w-full mb-5 align-middle border-none rounded shadow cursor-pointer img-fluid glightbox w-100"
                 />
-                <div class="text-sm text-center">Click to make larger.</div>
+                <div class="text-sm text-center text-gray-800 dark:text-gray-300">Click to make larger.</div>
             </div>
             <div class="text-center md:flex md:items-center md:text-left">
                 <div>
@@ -301,7 +301,7 @@
                     src="{{ asset('promotion/corrupted-locations.png') }}"
                     class="h-auto max-w-full mb-5 align-middle border-none rounded shadow cursor-pointer img-fluid glightbox w-100"
                 />
-                <div class="text-sm text-center">Click to make larger.</div>
+                <div class="text-sm text-center text-gray-800 dark:text-gray-300">Click to make larger.</div>
             </div>
 
             <div class="text-center md:flex md:items-center md:text-left">
@@ -538,7 +538,7 @@
                 <i class="far fa-question-circle"></i>
                 FAQ
             </h2>
-            <dl class="mt-3">
+            <dl class="mt-3 text-gray-800 dark:text-gray-300">
                 <dt>Are there Ads?</dt>
                 <dd>No. There are no ads whatsoever.</dd>
                 <dt>Is it persistent?</dt>

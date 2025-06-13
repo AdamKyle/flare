@@ -2,4 +2,33 @@
 
 @import './theme/theme-styles.css';
 
+@import '../../node_modules/rpg-awesome/css/rpg-awesome.min.css';
+
+/**
+  Keep side bar and header drop downs hidden till after alpine loads.
+ */
 [x-cloak] { display: none !important; }
+
+/**
+  Common DL, DT and DD styling.
+ */
+dl {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 0;
+  margin-bottom: -10px;
+}
+
+dt {
+  width: 50%;
+  text-align: left;
+  font-weight: bolder;
+  margin-bottom: 4px;
+}
+
+dd {
+  margin-left: auto;
+  width: 50%;
+  margin-bottom: 4px;
+  padding-left: 5px;
+}

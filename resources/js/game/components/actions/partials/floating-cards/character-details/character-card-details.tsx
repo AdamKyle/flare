@@ -24,10 +24,12 @@ const CharacterCardDetails = ({
   const { openAttackDetails } = useManageAttackDetailsBreakdown();
   const { openStatDetails } = useManageStatDetailsBreakdown();
 
-  const characterInventorProgress =
+  const rawProgress =
     (characterData.inventory_count.data.inventory_count /
       characterData.inventory_count.data.inventory_max) *
     100;
+
+  const characterInventorProgress = Math.min(rawProgress, 100);
 
   return (
     <>

@@ -1,70 +1,97 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container flex items-center justify-center">
-        <div class="w-full md:w-1/2 xl:w-1/3">
-            <div class="mx-5 md:mx-10">
-                <h2 class="uppercase">Welcome back!</h2>
-                <h4 class="uppercase">Child! Countless adventures await us!</h4>
-            </div>
+    <div class="min-h-screen flex justify-center items-start pt-16 px-4">
+        <div class="w-full max-w-md space-y-8">
+            <header class="text-center">
+                <h1 class="text-3xl font-extrabold text-gray-900 dark:text-gray-100">Welcome Back!</h1>
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400 uppercase">Child! Countless adventures await us!</p>
+            </header>
 
-            @if (config('app.disabled_reg_and_login'))
+            @if(config('app.disabled_reg_and_login'))
                 <x-core.alerts.info-alert title="ATTN!">
-                    Deepest apologizes, however Planes of Tlessa is currently
-                    down for maintenance and unlike other deployments, this one
-                    has had to disable the Registration and Login for a short
-                    time. We promise to be back up and running soon and hope to
-                    see you all in-game soon. For more info, please check
-                    <a href="https://discord.gg/hcwdqJUerh" target="_blank">
-                        Discord.
-                    </a>
+                    Deepest apologizes, however Planes of Tlessa is currently down for maintenance and registration/login are paused. We promise to be back soon. For updates, check
+                    <a href="https://discord.gg/hcwdqJUerh" target="_blank" rel="noopener" class="text-danube-600 hover:underline">
+                        Discord
+                    </a>.
                 </x-core.alerts.info-alert>
             @endif
 
-            <x-core.cards.form-card css="mt-5 p-5 md:p-10" method="POST" action="{{ route('login') }}">
+            <form method="POST" action="{{ route('login') }}" class="bg-white dark:bg-gray-900 shadow-lg rounded-lg p-8 space-y-6">
                 @csrf
 
-                <div class="mb-5">
-                    <label class="label block mb-2" for="name">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                         {{ __('E-Mail Address') }}
                     </label>
-                    <input id="name" type="email" class="form-control" name="email" value="{{ old('email') }}"
-                        required autocomplete="email" autofocus />
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      value="{{ old('email') }}"
+                      required
+                      autocomplete="email"
+                      autofocus
+                      aria-invalid="@error('email') true @enderror"
+                      aria-describedby="email-error"
+                      class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:bg-gray-900 dark:text-white"
+                    />
                     @error('email')
-                        <div class="text-red-800 dark:text-red-500 pt-3" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </div>
+                    <p id="email-error" class="mt-2 text-sm text-red-600 dark:text-red-400" role="alert">
+                        {{ $message }}
+                    </p>
                     @enderror
                 </div>
-                <div class="mb-5">
-                    <label for="password" class="col-md-4 col-form-label text-md-right">
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                         {{ __('Password') }}
                     </label>
-                    <input id="password" type="password" class="form-control" name="password" required
-                        autocomplete="new-password" autofocus />
+                    <input
+                      id="password"
+                      name="password"
+                      type="password"
+                      required
+                      autocomplete="current-password"
+                      aria-invalid="@error('password') true @enderror"
+                      aria-describedby="password-error"
+                      class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:bg-gray-900 dark:text-white"
+                    />
                     @error('password')
-                        <div class="text-red-800 dark:text-red-500 pt-3" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </div>
+                    <p id="password-error" class="mt-2 text-sm text-red-600 dark:text-red-400" role="alert">
+                        {{ $message }}
+                    </p>
                     @enderror
                 </div>
-                <div class="grid lg:grid-cols-1 gap-3">
-                    <x-core.buttons.primary-button css="ltr:ml-auto rtl:mr-auto uppercase" type="submit">
-                        Login!
-                    </x-core.buttons.primary-button>
 
-                    <a href="/information/account-deletion" class="ml-2" target="_blank">
-                        Account Deletion
-                        <i class="fas fa-external-link-alt"></i>
-                    </a>
-                    <a class="ml-2" href="{{ route('password.request') }}">
-                        {{ __('Forgot Your Password?') }}
-                    </a>
-                    <a class="ml-2" href="{{ route('un.ban.request') }}">
-                        {{ __('Banned Unfairly?') }}
-                    </a>
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+                    <button
+                      type="submit"
+                      class="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    >
+                        {{ __('Login!') }}
+                    </button>
+
+                    <div class="flex flex-col space-y-2 text-center sm:text-right">
+                        <a
+                          href="/information/account-deletion"
+                          target="_blank"
+                          rel="noopener"
+                          class="text-sm text-danube-600 hover:underline flex items-center justify-center sm:justify-end"
+                        >
+                            Account Deletion
+                            <i class="fas fa-external-link-alt ml-1" aria-hidden="true"></i>
+                            <span class="sr-only">(opens in new tab)</span>
+                        </a>
+                        <a href="{{ route('password.request') }}" class="text-sm text-danube-600 hover:underline">
+                            {{ __('Forgot Your Password?') }}
+                        </a>
+                        <a href="{{ route('un.ban.request') }}" class="text-sm text-danube-600 hover:underline">
+                            {{ __('Banned Unfairly?') }}
+                        </a>
+                    </div>
                 </div>
-            </x-core.cards.form-card>
+            </form>
         </div>
     </div>
 @endsection
