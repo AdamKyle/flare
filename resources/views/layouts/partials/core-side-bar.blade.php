@@ -1,22 +1,44 @@
-<aside
-  x-cloak
-  :class="sidebarToggle ? 'translate-x-0' : '-translate-x-full'"
-  class="sidebar fixed left-0 top-0 z-9999 flex h-screen w-[290px] flex-col overflow-y-hidden border-r border-gray-200 bg-white px-5 duration-300 ease-linear dark:border-gray-800 dark:bg-black"
-  @click.outside="sidebarToggle = false"
->
+<x-sidebar.container>
   <!-- SIDEBAR HEADER -->
-  <div class="sidebar-header flex items-center gap-2 pb-7 pt-8">
-    <a href="index.html">
-      <span class="logo">
-        <img class="dark:hidden" src="./images/logo/logo.svg" alt="Logo"/>
-        <img class="hidden dark:block" src="./images/logo/logo-dark.svg" alt="Logo"/>
-      </span>
-    </a>
-  </div>
+  <x-sidebar.header href="#" title="Game Options" />
   <!-- SIDEBAR HEADER -->
 
   <div class="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
     <nav x-data="{ selected: $persist('Dashboard') }">
+
+      <x-sidebar.menu-items.group-options-container headerTitle="Game Aspects">
+        <x-sidebar.menu-items.nested-container
+          name="Locations"
+          key="Locations"
+          activePages="['import','export','locations']"
+          selected="Locations"
+          icon="ra ra-wooden-sign"
+        >
+          <x-sidebar.menu-items.nested-menu-option
+            href="#"
+            pageKey="locations"
+            icon="ra ra-wooden-sign"
+          >
+            Locations
+          </x-sidebar.menu-items.nested-menu-option>
+          <x-sidebar.menu-items.nested-menu-option
+            href="#"
+            pageKey="import"
+            icon="fas fa-file-import"
+          >
+            Import Locations
+          </x-sidebar.menu-items.nested-menu-option>
+          <x-sidebar.menu-items.nested-menu-option
+            href="#"
+            pageKey="export"
+            icon="fas fa-file-download"
+          >
+            Export Locations
+          </x-sidebar.menu-items.nested-menu-option>
+        </x-sidebar.menu-items.nested-container>
+
+      </x-sidebar.menu-items.group-options-container>
+
       <!-- MENU GROUP -->
       <div>
         <h3 class="mb-6 text-xs uppercase leading-[20px] text-gray-400">
@@ -243,44 +265,62 @@
           </li>
 
           <!-- Pages -->
-          <li>
-            <a
+          <x-sidebar.menu-items.nested-container
+            name="Pages"
+            key="Pages"
+            activePages="['fileManager','pricingTables','blank','page404','page500','page503','success','faq','comingSoon','termsCondition','maintenance']"
+            selected="Pages"
+            icon="fas fa-file"
+          >
+            <x-sidebar.menu-items.nested-menu-option
               href="#"
-              @click.prevent="selected = selected === 'Pages' ? '' : 'Pages'"
-              class="menu-item group"
-              :class="(selected === 'Pages' || ['fileManager','pricingTables','blank','page404','page500','page503','success','faq','comingSoon','termsCondition','maintenance'].includes(page))
-                        ? 'menu-item-active' : 'menu-item-inactive'"
+              pageKey="fileManager"
             >
-              <i
-                :class="selected === 'Pages'
-                          ? 'fas fa-file text-danube-500 dark:text-danube-400'
-                          : 'fas fa-file text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300'"
-              ></i>
-              <span class="menu-item-text">Pages</span>
-              <i
-                :class="selected === 'Pages'
-                          ? 'fas fa-chevron-down ml-auto text-danube-500 dark:text-danube-400'
-                          : 'fas fa-chevron-right ml-auto text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover=text-gray-300'"
-              ></i>
-            </a>
-            <div :class="selected === 'Pages' ? 'block translate transform overflow-hidden' : 'hidden translate transform overflow-hidden'">
-              <ul class="menu-dropdown mt-2 flex flex-col gap-1 pl-9">
-                <li><a href="file-manager.html" class="menu-dropdown-item group" :class="page==='fileManager'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">File Manager <span class="menu-dropdown-badge" :class="page==='fileManager'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
-                <li><a href="pricing-tables.html" class="menu-dropdown-item group" :class="page==='pricingTables'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">Pricing Tables <span class="menu-dropdown-badge" :class="page==='pricingTables'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
-                <li><a href="faq.html" class="menu-dropdown-item group" :class="page==='faq'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">Faq's <span class="menu-dropdown-badge" :class="page==='faq'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
-                <li><a href="blank.html" class="menu-dropdown-item group" :class="page==='blank'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">Blank Page <span class="menu-dropdown-badge" :class="page==='blank'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
-                <li><a href="404.html" class="menu-dropdown-item group" :class="page==='page404'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">404 Error <span class="menu-dropdown-badge" :class="page==='page404'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
-                <li><a href="500.html" class="menu-dropdown-item group" :class="page==='page500'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">500 Error <span class="menu-dropdown-badge" :class="page==='page500'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
-                <li><a href="503.html" class="menu-dropdown-item group" :class="page==='page503'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">503 Error <span class="menu-dropdown-badge" :class="page==='page503'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
-                <li><a href="coming-soon.html" class="menu-dropdown-item group" :class="page==='comingSoon'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">Coming Soon <span class="menu-dropdown-badge" :class="page==='comingSoon'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
-                <li><a href="maintenance.html" class="menu-dropdown-item group" :class="page==='termsCondition'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">Maintenance <span class="menu-dropdown-badge" :class="page==='termsCondition'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
-                <li><a href="success.html" class="menu-dropdown-item group" :class="page==='success'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">Success <span class="menu-dropdown-badge" :class="page==='success'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
-              </ul>
-            </div>
-          </li>
-
+              File Manager
+            </x-sidebar.menu-items.nested-menu-option>
+            <li><a href="pricing-tables.html" class="menu-dropdown-item group" :class="page==='pricingTables'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">Pricing Tables <span class="menu-dropdown-badge" :class="page==='pricingTables'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
+            <li><a href="faq.html" class="menu-dropdown-item group" :class="page==='faq'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">Faq's <span class="menu-dropdown-badge" :class="page==='faq'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
+            <li><a href="blank.html" class="menu-dropdown-item group" :class="page==='blank'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">Blank Page <span class="menu-dropdown-badge" :class="page==='blank'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
+            <li><a href="404.html" class="menu-dropdown-item group" :class="page==='page404'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">404 Error <span class="menu-dropdown-badge" :class="page==='page404'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
+            <li><a href="500.html" class="menu-dropdown-item group" :class="page==='page500'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">500 Error <span class="menu-dropdown-badge" :class="page==='page500'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
+            <li><a href="503.html" class="menu-dropdown-item group" :class="page==='page503'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">503 Error <span class="menu-dropdown-badge" :class="page==='page503'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
+            <li><a href="coming-soon.html" class="menu-dropdown-item group" :class="page==='comingSoon'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">Coming Soon <span class="menu-dropdown-badge" :class="page==='comingSoon'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
+            <li><a href="maintenance.html" class="menu-dropdown-item group" :class="page==='termsCondition'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">Maintenance <span class="menu-dropdown-badge" :class="page==='termsCondition'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
+            <li><a href="success.html" class="menu-dropdown-item group" :class="page==='success'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">Success <span class="menu-dropdown-badge" :class="page==='success'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
+          </x-sidebar.menu-items.nested-container>
         </ul>
       </div>
+
+      <x-sidebar.menu-items.group-options-container headerTitle="Support">
+        <x-sidebar.menu-items.group-option href="#"  itemKey="Chat" pageKey="chat" icon="fas fa-file">
+          Chat
+        </x-sidebar.menu-items.group-option>
+
+        <x-sidebar.menu-items.nested-container
+          name="Pages"
+          key="Pages"
+          activePages="['fileManager','pricingTables','blank','page404','page500','page503','success','faq','comingSoon','termsCondition','maintenance']"
+          selected="Pages"
+          icon="fas fa-file"
+        >
+          <x-sidebar.menu-items.nested-menu-option
+            href="#"
+            pageKey="fileManager"
+          >
+            File Manager
+          </x-sidebar.menu-items.nested-menu-option>
+          <li><a href="pricing-tables.html" class="menu-dropdown-item group" :class="page==='pricingTables'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">Pricing Tables <span class="menu-dropdown-badge" :class="page==='pricingTables'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
+          <li><a href="faq.html" class="menu-dropdown-item group" :class="page==='faq'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">Faq's <span class="menu-dropdown-badge" :class="page==='faq'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
+          <li><a href="blank.html" class="menu-dropdown-item group" :class="page==='blank'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">Blank Page <span class="menu-dropdown-badge" :class="page==='blank'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
+          <li><a href="404.html" class="menu-dropdown-item group" :class="page==='page404'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">404 Error <span class="menu-dropdown-badge" :class="page==='page404'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
+          <li><a href="500.html" class="menu-dropdown-item group" :class="page==='page500'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">500 Error <span class="menu-dropdown-badge" :class="page==='page500'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
+          <li><a href="503.html" class="menu-dropdown-item group" :class="page==='page503'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">503 Error <span class="menu-dropdown-badge" :class="page==='page503'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
+          <li><a href="coming-soon.html" class="menu-dropdown-item group" :class="page==='comingSoon'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">Coming Soon <span class="menu-dropdown-badge" :class="page==='comingSoon'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
+          <li><a href="maintenance.html" class="menu-dropdown-item group" :class="page==='termsCondition'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">Maintenance <span class="menu-dropdown-badge" :class="page==='termsCondition'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
+          <li><a href="success.html" class="menu-dropdown-item group" :class="page==='success'?'menu-dropdown-item-active':'menu-dropdown-item-inactive'">Success <span class="menu-dropdown-badge" :class="page==='success'?'menu-dropdown-badge-active':'menu-dropdown-badge-inactive'">Pro</span></a></li>
+        </x-sidebar.menu-items.nested-container>
+
+      </x-sidebar.menu-items.group-options-container>
 
       <!-- SUPPORT GROUP -->
       <div>
@@ -428,4 +468,4 @@
       </div>
     </nav>
   </div>
-</aside>
+</x-sidebar.container>
