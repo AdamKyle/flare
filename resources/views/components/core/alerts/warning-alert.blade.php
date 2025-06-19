@@ -4,16 +4,18 @@
 ])
 
 <div
-    x-data="{ show: true }"
-    x-show="show"
-    class="flex w-full mx-auto justify-between items-center bg-yellow-100 relative text-yellow-700 py-3 px-3 rounded-md shadow-sm shadow-red-200 border-solid border-2 border-yellow-400 dark:bg-yellow-200 dark:text-yellow-700 dark:shadow-gray-900 dark:border-yellow-500 mb-5"
-    role="alert"
+  x-data="{ show: true }"
+  x-show="show"
+  role="alert"
+  class="flex w-full mx-auto items-start bg-mango-tango-100 dark:bg-mango-tango-200 border border-mango-tango-400 dark:border-mango-tango-500 text-mango-tango-800 dark:text-mango-tango-900 p-4 rounded-lg shadow-md mb-6"
 >
-    <div>
-        <p class="font-bold text-yellow-700 dark:text-yellow-800-800 mb-5">
-            <i class="{{ $icon }}"></i>
-            {{ $title }}
-        </p>
-        {{ $slot }}
+    <div class="flex-shrink-0">
+        <i class="{{ $icon }} text-2xl" aria-hidden="true"></i>
+    </div>
+    <div class="ml-4">
+        <h3 class="text-lg font-semibold">{{ $title }}</h3>
+        <div class="mt-1 text-sm leading-relaxed">
+            {{ $slot }}
+        </div>
     </div>
 </div>

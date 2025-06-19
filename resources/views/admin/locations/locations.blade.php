@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container-fluid">
-        <x-core.page-title
+    <div class="w-full md:w-3/4 mx-auto my-4 px-4">
+        <x-core.page.title
             title="Locations"
             route="{{route('home')}}"
             color="success"
@@ -28,7 +28,7 @@
                 <i class="fas fa-file-upload"></i>
                 Import
             </x-core.buttons.link-buttons.primary-button>
-        </x-core.page-title>
+        </x-core.page.title>
         @livewire('admin.locations.locations-table')
     </div>
 @endsection

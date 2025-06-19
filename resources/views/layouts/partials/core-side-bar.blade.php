@@ -15,7 +15,7 @@
           icon="ra ra-wooden-sign"
         >
           <x-sidebar.menu-items.nested-menu-option
-            href="#"
+            href="{{route('locations.list')}}"
             pageKey="locations"
             icon="ra ra-wooden-sign"
           >

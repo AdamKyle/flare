@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-core.layout.info-container>
+  <x-core.layout.info-container>
         @php
             $backUrl = route('locations.list');
 

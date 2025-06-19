@@ -56,7 +56,7 @@
       document.documentElement.classList.toggle('dark', value);
     });
   "
-  class="bg-white dark:bg-gray-800 transition-colors duration-200"
+  class="bg-gray-100 dark:bg-gray-800 transition-colors duration-200"
 >
 <x-core.page.page-wrapper>
   @include('layouts.partials.core-side-bar')
