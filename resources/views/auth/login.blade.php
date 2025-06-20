@@ -17,7 +17,7 @@
                 </x-core.alerts.info-alert>
             @endif
 
-            <form method="POST" action="{{ route('login') }}" class="bg-white dark:bg-gray-900 shadow-lg rounded-lg p-8 space-y-6">
+            <form method="POST" action="{{ route('login') }}" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 space-y-6">
                 @csrf
 
                 <div>

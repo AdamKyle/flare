@@ -73,7 +73,7 @@ class LocationsController extends Controller
             }
         }
 
-        return view('admin.locations.location', [
+        return view('information.locations.location', [
             'location' => $location,
             'increasesEnemyStrengthBy' => $increasesEnemyStrengthBy,
             'increasesDropChanceBy' => $increasesDropChanceBy,

@@ -20,7 +20,7 @@
       @endif
 
       <form method="POST" action="{{ route('register') }}"
-            class="bg-white dark:bg-gray-900 shadow-lg rounded-lg p-8 space-y-6">
+            class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 space-y-6">
         @csrf
 
         {{-- E-Mail Address --}}
