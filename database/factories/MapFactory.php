@@ -23,8 +23,6 @@ class MapFactory extends Factory
     {
         return [
             'character_id' => 1,
-            'position_x' => 0,
-            'position_y' => 0,
             'character_position_x' => 32,
             'character_position_y' => 32,
         ];

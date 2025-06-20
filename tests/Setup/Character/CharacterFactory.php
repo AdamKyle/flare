@@ -489,8 +489,6 @@ class CharacterFactory
 
         $this->createMap([
             'character_id' => $this->character->id,
-            'position_x' => $x,
-            'position_y' => $y,
             'character_position_x' => $x,
             'character_position_y' => $y,
             'game_map_id' => $gameMap->id,

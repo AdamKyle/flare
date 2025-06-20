@@ -6,7 +6,7 @@
 <div
   role="banner"
   aria-label="{{ $title }} sidebar header"
-  class="sidebar-header flex items-center gap-3 px-6 py-8 bg-gray-100 dark:bg-gray-900 py-4"
+  class="sidebar-header flex items-center gap-3 px-6 py-8 bg-white dark:bg-gray-800 py-4"
 >
   <a
     href="{{ $href }}"
