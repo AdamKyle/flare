@@ -134,7 +134,7 @@ class InitiateRaid implements ShouldQueue
      */
     private function updateCorruptLocations(Raid $raid, LocationService $locationService): void
     {
-        event(new CorruptLocations($locationService->fetchCorruptedLocationData($raid)->toArray()));
+        event(new CorruptLocations($locationService->fetchCorruptedLocationData($raid)));
     }
 
     /**

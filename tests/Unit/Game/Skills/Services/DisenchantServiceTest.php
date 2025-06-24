@@ -505,7 +505,7 @@ class DisenchantServiceTest extends TestCase
         $result = $disenchantingService->disenchantItem($character, $this->itemToDisenchant);
 
         $this->assertEquals('Disenchanted item ' . $this->itemToDisenchant->affix_name . ' Check server message tab for Gold Dust output.', $result['message']);
-        $this->assertEmpty($result['inventory']['inventory']);
+        $this->assertEmpty($result['inventory']['data']);
         $this->assertEquals(200, $result['status']);
     }
 }

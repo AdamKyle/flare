@@ -2,12 +2,12 @@
 
 @section('content')
     <x-core.layout.info-container>
-        <x-core.page-title
+        <x-core.page.title
             title="{{$character->name}}"
             route="{{route('home')}}"
             color="success"
             link="Home"
-        ></x-core.page-title>
+        ></x-core.page.title>
 
         <x-core.cards.card>
             <div class="grid md:grid-cols-2 gap-3 mb-4">

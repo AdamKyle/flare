@@ -2,7 +2,7 @@
 
 @section('content')
     <x-core.layout.info-container>
-        <x-core.page-title
+        <x-core.page.title
             title="{{ $guideQuest->name }}"
             route="{{ auth()->user()->hasRole('Admin')? route('admin.guide-quests'): route('completed.guide-quests', ['user' => auth()->user()->id]) }}"
             color="success"
@@ -15,7 +15,7 @@
                     Edit Quest
                 </x-core.buttons.link-buttons.primary-button>
             @endif
-        </x-core.page-title>
+        </x-core.page.title>
 
         <x-core.cards.card>
             <div class="grid md:grid-cols-2 gap-4">

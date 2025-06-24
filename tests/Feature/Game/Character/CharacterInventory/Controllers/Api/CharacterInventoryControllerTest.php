@@ -37,11 +37,16 @@ class CharacterInventoryControllerTest extends TestCase
         $character = $this->character->inventoryManagement()->giveItem($this->createItem())->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/'.$character->id.'/inventory');
+            ->call('GET', '/api/character/'.$character->id.'/inventory', [
+                'per_page' => 10,
+                'page'     => 1,
+                'search_text' => '',
+            ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertNotEmpty($jsonData['inventory']);
+
+        $this->assertNotEmpty($jsonData['data']);
     }
 
     public function testFailToGetApiItemDetails()
@@ -55,7 +60,7 @@ class CharacterInventoryControllerTest extends TestCase
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals('You cannot do that.', $jsonData['message']);
+        $this->assertEquals("There's nothing here for that slot.", $jsonData['message']);
     }
 
     public function testGetItemDetails()

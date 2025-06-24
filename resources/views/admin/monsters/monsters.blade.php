@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-core.page-title
+    <x-core.page.title
         title="Monsters & Celestials"
         route="{{route('home')}}"
         color="success"
@@ -27,7 +27,7 @@
             <i class="fas fa-file-upload"></i>
             Import
         </x-core.buttons.link-buttons.primary-button>
-    </x-core.page-title>
+    </x-core.page.title>
 
     @livewire('admin.monsters.monsters-table')
 @endsection

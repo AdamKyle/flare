@@ -7,7 +7,7 @@
 
 <x-core.grids.two-column>
     <x-slot name="columnOne">
-        <h1 class="mt-2 font-light text-break text-2xl">{{$title}}</h1>
+        <h1 class="mt-2 font-light text-break text-2xl text-gray-800 dark:text-gray-400">{{$title}}</h1>
     </x-slot>
     <x-slot name="columnTwo">
         <div class="relative">

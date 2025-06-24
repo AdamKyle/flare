@@ -2,12 +2,12 @@
 
 @section('content')
     <div class="w-full lg:w-3/4 mx-auto pb-10">
-        <x-core.page-title
+        <x-core.page.title
             title="Goblin Shack (Buying)"
             route="{{route('game')}}"
             link="Game"
             color="primary"
-        ></x-core.page-title>
+        ></x-core.page.title>
 
         <div class="m-auto">
             <x-core.cards.card>

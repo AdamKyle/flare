@@ -2,12 +2,12 @@
 
 @section('content')
     <div class="w-full md:max-w-[65ch] ml-auto mr-auto">
-        <x-core.page-title
+        <x-core.page.title
             title="Planes of Tlessa Donations"
             route="{{url()->previous()}}"
             link="Back"
             color="primary"
-        ></x-core.page-title>
+        ></x-core.page.title>
 
         <x-core.cards.card>
             <div class="prose dark:prose my-4">

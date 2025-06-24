@@ -192,17 +192,27 @@ class EnchantingServiceTest extends TestCase
 
     public function testFetchAffixesAndItemsThatCanBeEnchantedWithAlreadyEnchantedItemAtTheBottom()
     {
-        $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->giveItem($this->createItem([
+        $unenchanted = $this->itemToEnchant;
+        $enchanted   = $this->createItem([
             'item_prefix_id' => $this->prefix->id,
             'item_suffix_id' => $this->suffix->id,
-        ]))->getCharacter();
+        ]);
 
-        $result = $this->enchantingService->fetchAffixes($character, true);
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($unenchanted)
+            ->giveItem($enchanted)
+            ->getCharacter();
+
+        $result    = $this->enchantingService->fetchAffixes($character, true);
+        $inventory = $result['character_inventory'];
 
         $this->assertNotEmpty($result['affixes']);
-        $this->assertNotEmpty($result['character_inventory']);
-
-        $this->assertArrayHasKey(array_key_last($result['character_inventory']), $result['character_inventory']);
+        $this->assertNotEmpty($inventory);
+        $this->assertEquals(
+            $enchanted->id,
+            $inventory->last()->item_id
+        );
     }
 
     public function testGetCostOfItemAffixesAsZeroWhenAffixesDoNotExist()

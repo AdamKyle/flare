@@ -17,14 +17,14 @@ class UpdateCharacterEnchantingList implements ShouldBroadcastNow
 
     public Collection $availableAffixes;
 
-    public array $inventory;
+    public Collection $inventory;
 
     private User $user;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(User $user, Collection $availableAffixes, array $inventory)
+    public function __construct(User $user, Collection $availableAffixes, Collection $inventory)
     {
         $this->user = $user;
         $this->availableAffixes = $availableAffixes;
@@ -34,9 +34,9 @@ class UpdateCharacterEnchantingList implements ShouldBroadcastNow
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return Channel|array
+     * @return Channel
      */
-    public function broadcastOn()
+    public function broadcastOn(): Channel
     {
         return new PrivateChannel('update-enchanting-list-'.$this->user->id);
     }

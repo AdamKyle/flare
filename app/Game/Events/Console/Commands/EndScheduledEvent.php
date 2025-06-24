@@ -515,7 +515,7 @@ class EndScheduledEvent extends Command
             'has_raid_boss' => false,
         ]);
 
-        event(new CorruptLocations($locationService->fetchCorruptedLocationData($raid)->toArray()));
+        event(new CorruptLocations($locationService->fetchCorruptedLocationData($raid)));
     }
 
     /**

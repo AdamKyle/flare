@@ -3,6 +3,7 @@
 namespace App\Game\Gems\Providers;
 
 use App\Flare\Transformers\CharacterGemsTransformer;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Gems\Builders\GemBuilder;
 use App\Game\Gems\Services\AttachedGemService;
@@ -25,12 +26,17 @@ class ServiceProvider extends ApplicationServiceProvider
             return new AttachedGemService(
                 $app->make(CharacterGemsTransformer::class),
                 $app->make(Manager::class),
+                $app->make(PlainDataSerializer::class),
                 $app->make(CharacterInventoryService::class)
             );
         });
 
         $this->app->bind(GemComparison::class, function ($app) {
-            return new GemComparison($app->make(CharacterGemsTransformer::class), $app->make(Manager::class));
+            return new GemComparison(
+                $app->make(CharacterGemsTransformer::class),
+                $app->make(PlainDataSerializer::class),
+                $app->make(Manager::class)
+            );
         });
 
         $this->app->bind(ItemAtonements::class, function ($app) {

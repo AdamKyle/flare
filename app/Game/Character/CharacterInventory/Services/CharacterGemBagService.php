@@ -7,6 +7,7 @@ use App\Flare\Models\GemBagSlot;
 use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\CharacterGemSlotsTransformer;
 use App\Flare\Transformers\CharacterGemsTransformer;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Core\Traits\ResponseBuilder;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
@@ -18,12 +19,14 @@ class CharacterGemBagService
 
     /**
      * @param Manager $manager
+     * @param PlainDataSerializer $plainArraySerializer
      * @param CharacterGemSlotsTransformer $characterGemBagTransformer
      * @param CharacterGemsTransformer $gemsTransformer
      * @param Pagination $pagination
      */
     public function __construct(
         private readonly Manager $manager,
+        private readonly PlainDataSerializer $plainArraySerializer,
         private readonly CharacterGemSlotsTransformer $characterGemBagTransformer,
         private readonly CharacterGemsTransformer $gemsTransformer,
         private readonly Pagination $pagination,
@@ -73,6 +76,9 @@ class CharacterGemBagService
         }
 
         $gem = new Item($gemSlot->gem, $this->gemsTransformer);
+
+        $this->manager->setSerializer($this->plainArraySerializer);
+
         $gem = $this->manager->createData($gem)->toArray();
 
         return $this->successResult(['gem' => $gem]);

@@ -173,17 +173,23 @@ class CharacterInventoryServiceTest extends TestCase
     {
         $item = $this->createItem();
 
-        $character = $this->character->inventorySetManagement()->createInventorySets()->putItemInSet($item, 0)->getCharacter();
+        $character = $this->character
+            ->inventorySetManagement()
+            ->createInventorySets()
+            ->putItemInSet($item, 0)
+            ->getCharacter();
 
-        $character->inventorySets()->first()->update([
-            'name' => 'Sample',
-        ]);
-
+        $character->inventorySets()->first()->update(['name' => 'Sample']);
         $character = $character->refresh();
 
-        $sets = $this->characterInventoryService->setCharacter($character)->getCharacterInventorySets();
+        $sets = $this->characterInventoryService
+            ->setCharacter($character)
+            ->getCharacterInventorySets();
 
-        $this->assertTrue(array_key_exists('Sample', $sets));
+        $this->assertContains(
+            'Sample',
+            array_column($sets['data'], 'name')
+        );
     }
 
     public function testGetNoNameForNoEquippedSet()
@@ -359,7 +365,7 @@ class CharacterInventoryServiceTest extends TestCase
 
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Destroyed all items.', $result['message']);
-        $this->assertCount(1, $result['inventory']['inventory']);
+        $this->assertCount(1, $result['inventory']);
         $this->assertCount(1, $character->inventory->slots->where('item.type', 'alchemy'));
     }
 

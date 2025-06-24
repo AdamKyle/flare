@@ -640,10 +640,8 @@ class CharacterInventoryService
         event(new UpdateCharacterInventoryCountEvent($character));
 
         return $this->successResult([
-            'message' => 'Destroyed all items.',
-            'inventory' => [
-                'inventory' => $this->getInventoryForType('inventory'),
-            ],
+            'message'   => 'Destroyed all items.',
+            'inventory' => $this->getInventoryCollection(),
         ]);
     }
 

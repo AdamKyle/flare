@@ -3,7 +3,7 @@
 @section('content')
     <div class="mt-20 mb-10 w-full lg:w-3/5 m-auto">
         <div class="m-auto">
-            <x-core.page-title
+            <x-core.page.title
                 title="{{ $survey['title'] }}"
                 route="{{ route('admin.surveys') }}"
                 link="Back"
@@ -15,7 +15,7 @@
                 >
                     Edit
                 </x-core.buttons.link-buttons.primary-button>
-            </x-core.page-title>
+            </x-core.page.title>
         </div>
         <x-core.cards.card>
             <p class="mb-6 text-lg">{{ $survey['description'] }}</p>

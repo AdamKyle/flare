@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Gem;
 use App\Flare\Models\Item as FlareItem;
 use App\Flare\Transformers\CharacterGemsTransformer;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Gems\Traits\GetItemAtonements;
 use App\Game\Gems\Values\GemTypeValue;
@@ -17,15 +18,16 @@ class GemComparison
 {
     use GetItemAtonements, ResponseBuilder;
 
-    private Manager $manager;
-
-    private CharacterGemsTransformer $characterGemsTransformer;
-
-    public function __construct(CharacterGemsTransformer $characterGemsTransformer, Manager $manager)
-    {
-        $this->characterGemsTransformer = $characterGemsTransformer;
-        $this->manager = $manager;
-    }
+    /**
+     * @param CharacterGemsTransformer $characterGemsTransformer
+     * @param PlainDataSerializer $plainDataSerializer
+     * @param Manager $manager
+     */
+    public function __construct(
+        private readonly CharacterGemsTransformer $characterGemsTransformer,
+        private readonly PlainDataSerializer $plainDataSerializer,
+        private readonly Manager $manager
+    ){}
 
     public function compareGemForItem(Character $character, int $inventorySlotId, int $gemSlotId): array
     {
@@ -57,7 +59,7 @@ class GemComparison
                 'attached_gems' => [],
                 'socket_data' => $itemSocketData,
                 'has_gems_on_item' => false,
-                'gem_to_attach' => $this->manager->createData(new Item($gemSlot->gem, $this->characterGemsTransformer))->toArray(),
+                'gem_to_attach' => $this->manager->setSerializer($this->plainDataSerializer)->createData(new Item($gemSlot->gem, $this->characterGemsTransformer))->toArray(),
                 'when_replacing' => [],
                 'if_replaced' => [],
             ]);
@@ -89,11 +91,11 @@ class GemComparison
             'attached_gems' => array_values($slot->item->sockets->map(function ($itemSocket) {
                 $gem = new Item($itemSocket->gem, $this->characterGemsTransformer);
 
-                return $this->manager->createData($gem)->toArray();
+                return $this->manager->setSerializer($this->plainDataSerializer)->createData($gem)->toArray();
             })->toArray()),
             'socket_data' => $itemSocketData,
             'has_gems_on_item' => true,
-            'gem_to_attach' => $this->manager->createData(new Item($gemSlot->gem, $this->characterGemsTransformer))->toArray(),
+            'gem_to_attach' => $this->manager->setSerializer($this->plainDataSerializer)->createData(new Item($gemSlot->gem, $this->characterGemsTransformer))->toArray(),
             'when_replacing' => $comparisonData['when_replacing'],
             'if_replacing_atonements' => $comparisonData['if_replaced_atonements'],
             'original_atonement' => $this->getElementAtonement($socket->item),

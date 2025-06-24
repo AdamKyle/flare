@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="mt-10 mb-10 w-full lg:w-3/5 m-auto">
-        <x-core.page-title
+        <x-core.page.title
             title="{{$npc->real_name}}"
             route="{{route('npcs.index')}}"
             color="success"
@@ -14,7 +14,7 @@
             >
                 Edit NPC
             </x-core.buttons.link-buttons.primary-button>
-        </x-core.page-title>
+        </x-core.page.title>
 
         @include('admin.npcs.partials.show', ['npc' => $npc])
     </div>

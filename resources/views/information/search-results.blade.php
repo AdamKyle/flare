@@ -2,8 +2,8 @@
 
 @section('content')
     <x-core.layout.info-container>
-        <x-core.page-title title="Search Results" route="{{ url()->previous() }}" color="success"
-            link="Back"></x-core.page-title>
+        <x-core.page.title title="Search Results" route="{{ url()->previous() }}" color="success"
+            link="Back"></x-core.page.title>
 
         <form id="search-form" method="GET" action="{{ route('info.search') }}">
             @csrf

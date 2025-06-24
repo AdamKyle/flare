@@ -2,12 +2,12 @@
 
 @section('content')
     <x-core.layout.info-container>
-        <x-core.page-title
+        <x-core.page.title
             title="Export Quest Data"
             route="{{route('home')}}"
             color="success"
             link="Home"
-        ></x-core.page-title>
+        ></x-core.page.title>
 
         <x-core.cards.card>
             <div class="text-center mt-4">

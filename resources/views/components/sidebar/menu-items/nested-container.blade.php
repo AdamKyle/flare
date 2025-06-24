@@ -39,7 +39,7 @@
       ? 'block translate transform overflow-hidden'
       : 'hidden translate transform overflow-hidden'"
   >
-    <ul class="menu-dropdown mt-2 flex flex-col gap-1 pl-9">
+    <ul class="menu-dropdown mt-2 flex flex-col gap-1 pl-2 pr-2">
       {{ $slot }}
     </ul>
   </div>

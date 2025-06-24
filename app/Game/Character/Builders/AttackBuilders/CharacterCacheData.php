@@ -4,6 +4,7 @@ namespace App\Game\Character\Builders\AttackBuilders;
 
 use App\Flare\Models\Character;
 use App\Flare\Transformers\CharacterAttackDataTransformer;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
@@ -12,7 +13,12 @@ use League\Fractal\Resource\Item;
 class CharacterCacheData
 {
 
-    public function __construct(private Manager $manager, private CharacterAttackDataTransformer $characterAttackDataTransformer, private CharacterStatBuilder $characterStatBuilder) {}
+    public function __construct(
+        private readonly Manager                        $manager,
+        private readonly PlainDataSerializer            $plainDataSerializer,
+        private readonly CharacterAttackDataTransformer $characterAttackDataTransformer,
+        private readonly CharacterStatBuilder           $characterStatBuilder
+    ) {}
 
     public function setCharacterDefendAc(Character $character, int $defence)
     {
@@ -87,6 +93,9 @@ class CharacterCacheData
         $this->characterAttackDataTransformer->setIgnoreReductions($ignoreReductions);
 
         $characterSheet = new Item($character, $this->characterAttackDataTransformer);
+
+        $this->manager->setSerializer($this->plainDataSerializer);
+
         $characterSheet = $this->manager->createData($characterSheet)->toArray();
 
         $characterStatBuilder = $this->characterStatBuilder->setCharacter($character);

@@ -2,12 +2,12 @@
 
 @section('content')
     <div class="w-full ml-auto mr-auto">
-        <x-core.page-title
+        <x-core.page.title
             title="{{$character->name}}"
             route="{{url()->previous()}}"
             link="Back"
             color="primary"
-        ></x-core.page-title>
+        ></x-core.page.title>
 
         <x-core.cards.card>
             <div class="grid lg:grid-cols-2 gap-2">

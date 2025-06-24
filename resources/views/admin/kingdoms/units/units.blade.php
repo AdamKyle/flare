@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-core.page-title
+    <x-core.page.title
         title="Kingdom Units"
         route="{{route('home')}}"
         color="success"
@@ -13,6 +13,6 @@
         >
             Create Unit
         </x-core.buttons.link-buttons.primary-button>
-    </x-core.page-title>
+    </x-core.page.title>
     @livewire('admin.kingdoms.units.units-table')
 @endsection

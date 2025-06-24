@@ -35,8 +35,6 @@ class MapChatColorTest extends TestCase
 
         $map = $this->createMap([
             'character_id' => $character->id,
-            'position_x' => 0,
-            'position_y' => 0,
             'character_position_x' => 0,
             'character_position_y' => 0,
             'game_map_id' => $this->createGameMap([
@@ -55,8 +53,6 @@ class MapChatColorTest extends TestCase
 
         $map = $this->createMap([
             'character_id' => $character->id,
-            'position_x' => 0,
-            'position_y' => 0,
             'character_position_x' => 0,
             'character_position_y' => 0,
             'game_map_id' => $this->createGameMap([
@@ -75,8 +71,6 @@ class MapChatColorTest extends TestCase
 
         $map = $this->createMap([
             'character_id' => $character->id,
-            'position_x' => 0,
-            'position_y' => 0,
             'character_position_x' => 0,
             'character_position_y' => 0,
             'game_map_id' => $this->createGameMap([
@@ -95,8 +89,6 @@ class MapChatColorTest extends TestCase
 
         $map = $this->createMap([
             'character_id' => $character->id,
-            'position_x' => 0,
-            'position_y' => 0,
             'character_position_x' => 0,
             'character_position_y' => 0,
             'game_map_id' => $this->createGameMap([
@@ -115,8 +107,6 @@ class MapChatColorTest extends TestCase
 
         $map = $this->createMap([
             'character_id' => $character->id,
-            'position_x' => 0,
-            'position_y' => 0,
             'character_position_x' => 0,
             'character_position_y' => 0,
             'game_map_id' => $this->createGameMap([
@@ -135,8 +125,6 @@ class MapChatColorTest extends TestCase
 
         $map = $this->createMap([
             'character_id' => $character->id,
-            'position_x' => 0,
-            'position_y' => 0,
             'character_position_x' => 0,
             'character_position_y' => 0,
             'game_map_id' => $this->createGameMap([
@@ -155,8 +143,6 @@ class MapChatColorTest extends TestCase
 
         $map = $this->createMap([
             'character_id' => $character->id,
-            'position_x' => 0,
-            'position_y' => 0,
             'character_position_x' => 0,
             'character_position_y' => 0,
             'game_map_id' => $this->createGameMap([

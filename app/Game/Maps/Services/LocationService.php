@@ -3,9 +3,6 @@
 namespace App\Game\Maps\Services;
 
 use App\Game\Maps\Transformers\LocationTransformer;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Collection as LeagueCollection;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
@@ -25,6 +22,8 @@ use App\Game\Maps\Services\Common\LiveCharacterCount;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 use App\Game\Maps\Transformers\LocationsTransformer;
 use League\Fractal\Resource\Item;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection as LeagueCollection;
 
 
 class LocationService
@@ -147,7 +146,10 @@ class LocationService
     }
 
     /**
-     * Fetch the locations for this map the characters on.
+     * Fetch location data for a character based on their map.
+     *
+     * @param Character $character
+     * @return array
      */
     public function fetchLocationData(Character $character): array
     {
@@ -155,6 +157,22 @@ class LocationService
         $gameMap = $character->map->gameMap;
 
         $locations = Location::where('game_map_id', $gameMap->id)->get();
+
+        $this->manager->setSerializer($this->plainArraySerializer);
+
+        $locationData = new LeagueCollection($locations, $this->locationTransformer);
+
+        return $this->manager->createData($locationData)->toArray();
+    }
+
+    /**
+     * Find corrupted locations for a raid.
+     *
+     * @param Raid $raid
+     * @return array
+     */
+    public function fetchCorruptedLocationData(Raid $raid): array {
+        $locations = Location::where('is_corrupted', true)->whereIn('id', $raid->corrupted_location_ids)->get();
 
         $this->manager->setSerializer($this->plainArraySerializer);
 

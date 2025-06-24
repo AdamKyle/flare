@@ -5,6 +5,7 @@ namespace App\Game\Gems\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Transformers\CharacterGemsTransformer;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Traits\ResponseBuilder;
 use League\Fractal\Manager;
@@ -14,17 +15,18 @@ class AttachedGemService
 {
     use ResponseBuilder;
 
-    private CharacterGemsTransformer $gemsTransformer;
-
-    private Manager $manager;
-
-    private CharacterInventoryService $characterInventoryService;
-
-    public function __construct(CharacterGemsTransformer $gemsTransformer, Manager $manager, CharacterInventoryService $characterInventoryService)
+    /**
+     * @param CharacterGemsTransformer $gemsTransformer
+     * @param Manager $manager
+     * @param PlainDataSerializer $plainDataSerializer
+     * @param CharacterInventoryService $characterInventoryService
+     */
+    public function __construct(
+        private readonly CharacterGemsTransformer $gemsTransformer,
+        private readonly Manager $manager,
+        private readonly PlainDataSerializer $plainDataSerializer,
+        private readonly CharacterInventoryService $characterInventoryService)
     {
-        $this->gemsTransformer = $gemsTransformer;
-        $this->manager = $manager;
-        $this->characterInventoryService = $characterInventoryService;
     }
 
     public function getGemsFromItem(Character $character, Item $item): array
@@ -40,6 +42,9 @@ class AttachedGemService
         if ($item->sockets->isNotEmpty()) {
             foreach ($item->sockets as $socket) {
                 $gemData = new FractalItem($socket->gem, $this->gemsTransformer);
+
+                $this->manager->setSerializer($this->plainDataSerializer);
+
                 $gemData = $this->manager->createData($gemData)->toArray();
 
                 $socketData[] = $gemData;

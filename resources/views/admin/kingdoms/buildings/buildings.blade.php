@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-core.page-title
+    <x-core.page.title
         title="Kingdom Buildings"
         route="{{route('home')}}"
         color="success"
@@ -13,6 +13,6 @@
         >
             Create Building
         </x-core.buttons.link-buttons.primary-button>
-    </x-core.page-title>
+    </x-core.page.title>
     @livewire('admin.kingdoms.buildings.buildings-table')
 @endsection

@@ -32,11 +32,16 @@ class CharacterGemBagControllerTest extends TestCase
         $character = $this->character->gemBagManagement()->assignGemsToBag()->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/'.$character->id.'/gem-bag');
+            ->call('GET', '/api/character/'.$character->id.'/gem-bag',
+            [
+                'per_page' => 10,
+                'page' => 1,
+                'search_text' => '',
+            ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertCount(1, $jsonData);
+        $this->assertCount(1, $jsonData['data']);
     }
 
     public function testGetGem()

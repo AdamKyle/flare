@@ -4,11 +4,15 @@ namespace App\Game\Character\CharacterInventory\Providers;
 
 use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Flare\Transformers\CharacterGemSlotsTransformer;
+use App\Flare\Transformers\CharacterGemsTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\InventoryTransformer;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Builders\EquipManyBuilder;
+use App\Game\Character\CharacterInventory\Services\CharacterGemBagService;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
@@ -105,6 +109,16 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterInventoryService::class),
                 $app->make(UpdateCharacterAttackTypesHandler::class),
             );
+        });
+
+        $this->app->bind(CharacterGemBagService::class, function ($app) {
+           return new CharacterGemBagService(
+               $app->make(Manager::class),
+               $app->make(PlainDataSerializer::class),
+               $app->make(CharacterGemSlotsTransformer::class),
+               $app->make(CharacterGemsTransformer::class),
+               $app->make(Pagination::class),
+           );
         });
     }
 

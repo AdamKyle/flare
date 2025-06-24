@@ -79,23 +79,15 @@ class EnchantingService
         $enchantingSkill = $this->getEnchantingSkill($character);
 
         $characterInventoryService = $this->characterInventoryService->setCharacter($character);
-        $inventory = $characterInventoryService->getInventoryForType('inventory');
+        $inventory = $characterInventoryService->getInventoryCollection();
 
         if ($ignoreTrinkets) {
-            $inventory = array_values(array_filter($inventory, function ($item) {
-                return $item['type'] !== 'trinket' && $item['type'] !== 'artifact';
-            }));
+            $inventory = $inventory->reject(fn($item) => in_array($item['type'], ['trinket', 'artifact']));
         }
 
-        $newInventory = [];
+        [$noAffix, $withAffix] = $inventory->partition(fn($item) => $item['affix_count'] === 0);
 
-        foreach ($inventory as $item) {
-            if ($item['affix_count'] === 0) {
-                array_unshift($newInventory, $item);
-            } else {
-                $newInventory[] = $item;
-            }
-        }
+        $newInventory = $noAffix->merge($withAffix);
 
         return [
             'affixes' => $this->getAvailableAffixes($characterInfo, $enchantingSkill, $showMerchantMessage),

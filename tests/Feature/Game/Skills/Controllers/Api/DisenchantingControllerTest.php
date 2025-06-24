@@ -87,6 +87,6 @@ class DisenchantingControllerTest extends TestCase
 
         $this->assertGreaterThan(0, $character->gold_dust);
         $this->assertEquals('Disenchanted item ' . $item->affix_name . ' Check server message tab for Gold Dust output.', $jsonData['message']);
-        $this->assertEmpty($jsonData['inventory']['inventory']);
+        $this->assertEmpty($jsonData['inventory']['data']);
     }
 }

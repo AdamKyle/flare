@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-core.page-title
+    <x-core.page.title
         title="Info Pages"
         route="{{route('home')}}"
         color="success"
@@ -29,6 +29,6 @@
             <i class="fas fa-file-upload"></i>
             Import
         </x-core.buttons.link-buttons.primary-button>
-    </x-core.page-title>
+    </x-core.page.title>
     @livewire('admin.info-section.info-pages-table')
 @endsection

@@ -1,7 +1,7 @@
-@extends('layouts.releases-layout')
+@extends('layouts.app')
 
 @section('content')
-    <x-core.layout.smaller-container>
+    <x-core.layout.info-container>
         @forelse ($releases as $release)
             <x-release-note :releaseNote="$release" />
         @empty
@@ -13,5 +13,5 @@
         <div class="pb-5">
             {{ $releases->links() }}
         </div>
-    </x-core.layout.smaller-container>
+    </x-core.layout.info-container>
 @endsection

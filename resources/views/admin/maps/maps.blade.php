@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container-fluid">
-        <x-core.page-title
+        <x-core.page.title
             title="Game Maps"
             route="{{route('home')}}"
             color="success"
@@ -14,7 +14,7 @@
             >
                 Upload New Map
             </x-core.buttons.link-buttons.primary-button>
-        </x-core.page-title>
+        </x-core.page.title>
         @livewire('admin.maps.maps-table')
     </div>
 @endsection

@@ -7,6 +7,7 @@ use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
 use App\Flare\Pagination\Requests\PaginationRequest;
 use App\Flare\Transformers\ItemTransformer;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Requests\EquipItemValidation;
 use App\Game\Character\CharacterInventory\Requests\MoveItemRequest;
@@ -87,18 +88,21 @@ class CharacterInventoryController extends Controller
         );
     }
 
-    public function itemDetails(Character $character, Item $item, Manager $manager, ItemTransformer $itemTransformer): JsonResponse
+    public function itemDetails(Character $character, Item $item, Manager $manager, PlainDataSerializer $plainDataSerializer, ItemTransformer $itemTransformer): JsonResponse
     {
 
         $slot = $this->characterInventoryService->getSlotForItemDetails($character, $item);
 
         if (is_null($slot)) {
             return response()->json([
-                'message' => 'You cannot do that.',
+                'message' => "There's nothing here for that slot.",
             ]);
         }
 
         $item = new FractalItem($slot->item, $itemTransformer);
+
+        $manager->setSerializer($plainDataSerializer);
+
         $item = $manager->createData($item)->toArray();
 
         return response()->json($item);

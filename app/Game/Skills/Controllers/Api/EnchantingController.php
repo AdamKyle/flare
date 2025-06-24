@@ -9,7 +9,9 @@ use App\Game\Skills\Requests\EnchantingValidation;
 use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\EnchantingService;
 use App\Http\Controllers\Controller;
+use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use Illuminate\Http\JsonResponse;
 
 class EnchantingController extends Controller
 {
@@ -22,9 +24,9 @@ class EnchantingController extends Controller
 
     /**
      * @param Character $character
-     * @return void
+     * @return JsonResponse
      */
-    public function fetchAffixes(Character $character)
+    public function fetchAffixes(Character $character): JsonResponse
     {
         return response()->json([
             'affixes' => $this->enchantingService->fetchAffixes($character, true),
@@ -36,9 +38,10 @@ class EnchantingController extends Controller
     /**
      * @param EnchantingValidation $request
      * @param Character $character
-     * @return void
+     * @return JsonResponse
+     * @throws Exception
      */
-    public function enchant(EnchantingValidation $request, Character $character)
+    public function enchant(EnchantingValidation $request, Character $character): JsonResponse
     {
         if (!$character->can_craft) {
             return response()->json(['message' => 'You must wait to enchant again.'], 422);

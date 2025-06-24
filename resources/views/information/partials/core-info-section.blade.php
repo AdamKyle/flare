@@ -1,5 +1,5 @@
 <x-core.layout.info-container>
-    <x-core.page-title
+    <x-core.page.title
         title="{{$pageTitle}}"
         route="{{url()->previous()}}"
         color="success"
@@ -15,7 +15,7 @@
                 </x-core.buttons.link-buttons.primary-button>
             @endif
         @endauth
-    </x-core.page-title>
+    </x-core.page.title>
 
     <div class="min-w-full m-auto pb-10">
         @foreach ($sections as $section)

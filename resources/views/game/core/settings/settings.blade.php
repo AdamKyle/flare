@@ -2,11 +2,11 @@
 
 @section('content')
     <div class="w-full md:w-[75%] m-auto">
-        <x-core.page-title
+        <x-core.page.title
             title="Account Settings"
             route="{{route('game')}}"
             link="Home"
-        ></x-core.page-title>
+        ></x-core.page.title>
         <div
             class="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"
         ></div>

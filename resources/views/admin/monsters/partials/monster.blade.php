@@ -16,7 +16,7 @@
     @endphp
 
     <div class="pb-5">
-        <x-core.page-title
+        <x-core.page.title
             title="{{$monster->name}} on {{$monster->gameMap->name}}"
             route="{{$backUrl}}"
             color="success"
@@ -32,7 +32,7 @@
                     </x-core.buttons.link-buttons.primary-button>
                 @endif
             @endauth
-        </x-core.page-title>
+        </x-core.page.title>
 
         @if ($monster->is_raid_boss)
             <x-core.alerts.info-alert title="ATTN!">

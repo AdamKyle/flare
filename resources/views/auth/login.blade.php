@@ -64,13 +64,17 @@
                     @enderror
                 </div>
 
+                <div class="text-center">
+                    <span class="text-gray-600">Don't have an account?</span>
+                    <a href="{{ route('register') }}" class="ml-1 text-blue-600 hover:underline font-medium">
+                        Register
+                    </a>
+                </div>
+
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-                    <button
-                      type="submit"
-                      class="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    >
-                        {{ __('Login!') }}
-                    </button>
+                    <x-core.buttons.primary-button type="submit">
+                        Login
+                    </x-core.buttons.primary-button>
 
                     <div class="flex flex-col space-y-2 text-center sm:text-right">
                         <a

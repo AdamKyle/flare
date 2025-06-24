@@ -3,6 +3,7 @@
 namespace App\Game\Character\Builders\AttackBuilders\Providers;
 
 use App\Flare\Transformers\CharacterAttackDataTransformer;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Character\Builders\AttackBuilders\AttackDetails\CharacterAttackBuilder;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
@@ -23,6 +24,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(CharacterCacheData::class, function ($app) {
             return new CharacterCacheData(
                 $app->make(Manager::class),
+                $app->make(PlainDataSerializer::class),
                 $app->make(CharacterAttackDataTransformer::class),
                 $app->make(CharacterStatBuilder::class)
             );

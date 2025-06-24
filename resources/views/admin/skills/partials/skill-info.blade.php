@@ -1,5 +1,5 @@
 <x-core.layout.info-container>
-    <x-core.page-title
+    <x-core.page.title
         title="{{$skill->name}}"
         route="{{url()->previous()}}"
         color="success"
@@ -15,7 +15,7 @@
                 </x-core.buttons.link-buttons.primary-button>
             @endif
         @endauth
-    </x-core.page-title>
+    </x-core.page.title>
 
     <x-core.cards.card>
         <p class="mb-4 mt-4">{!! nl2br(e($skill->description)) !!}</p>
