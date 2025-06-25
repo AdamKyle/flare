@@ -21,7 +21,7 @@
             editUrl="{{route('location.edit', ['location' => $location->id])}}"
         >
             @include(
-                'admin.locations.partials.location',
+                'information.locations.partials.location',
                 [
                     'location' => $location,
                 ]

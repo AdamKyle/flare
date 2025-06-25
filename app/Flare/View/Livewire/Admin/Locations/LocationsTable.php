@@ -4,12 +4,22 @@ namespace App\Flare\View\Livewire\Admin\Locations;
 
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
+use App\Flare\Values\LocationType;
+use App\Flare\View\Livewire\Admin\Locations\Values\LocationTableSelectOptions;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
+use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
 class LocationsTable extends DataTableComponent
 {
+    private array $weeklyFightLocations = [
+        LocationType::LORDS_STRONG_HOLD,
+        LocationType::BROKEN_ANVIL,
+        LocationType::TWSITED_MAIDENS_DUNGEONS,
+        LocationType::ALCHEMY_CHURCH,
+    ];
+
     public array $locationIds = [];
 
     public function configure(): void
@@ -25,6 +35,23 @@ class LocationsTable extends DataTableComponent
         }
 
         return Location::query();
+    }
+
+
+    public function filters(): array {
+
+        return [
+            SelectFilter::make('Location Types')
+                ->options(LocationTableSelectOptions::getLabels())
+                ->filter(function(Builder $builder, string $value) {
+                    return match ($value) {
+                        LocationTableSelectOptions::INCREASES_ENEMY_STRENGTH->value   => $builder->whereNotNull('enemy_strength_increase'),
+                        LocationTableSelectOptions::REGULAR_LOCATIONS->value          => $builder->whereNull('enemy_strength_increase'),
+                        LocationTableSelectOptions::WEEKLY_FIGHT_LOCATIONS->value     => $builder->whereIn('type', $this->weeklyFightLocations),
+                        default                                                       => $builder,
+                    };
+                }),
+        ];
     }
 
     public function columns(): array

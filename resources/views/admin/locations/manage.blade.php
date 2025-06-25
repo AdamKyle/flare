@@ -77,12 +77,11 @@
                   name="type"
                   :options="$locationTypes"
                 />
-                <x-form-elements.key-value-select
+                <x-form-elements.input
                   :model="$location"
-                  label="Enemy Strength Increase(%):"
-                  modelKey="enemy_strength_type"
-                  name="enemy_strength_type"
-                  :options="$locationEffects"
+                  label="Enemy Strength Increase %:"
+                  modelKey="enemy_strength_increase"
+                  name="enemy_strength_increase"
                 />
                 <x-form-elements.key-value-select
                   :model="$location"

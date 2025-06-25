@@ -8,7 +8,6 @@ use App\Admin\Requests\LocationsImportRequest;
 use App\Admin\Services\LocationService;
 use App\Flare\Models\Location;
 use App\Flare\Models\Quest;
-use App\Flare\Values\LocationEffectValue;
 use App\Flare\Values\LocationType;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -50,15 +49,8 @@ class LocationsController extends Controller
     public function show(Location $location)
     {
 
-        $increasesEnemyStrengthBy = null;
         $locationType = null;
-        $increasesDropChanceBy = 0.0;
         $usedInQuest = null;
-
-        if (! is_null($location->enemy_strength_type)) {
-            $increasesEnemyStrengthBy = LocationEffectValue::getIncreaseName($location->enemy_strength_type);
-            $increasesDropChanceBy = (new LocationEffectValue($location->enemy_strength_type))->fetchDropRate();
-        }
 
         if (! is_null($location->type)) {
             $locationType = (new LocationType($location->type));
@@ -75,8 +67,6 @@ class LocationsController extends Controller
 
         return view('information.locations.location', [
             'location' => $location,
-            'increasesEnemyStrengthBy' => $increasesEnemyStrengthBy,
-            'increasesDropChanceBy' => $increasesDropChanceBy,
             'locationType' => $locationType,
             'usedInQuest' => $usedInQuest,
         ]);

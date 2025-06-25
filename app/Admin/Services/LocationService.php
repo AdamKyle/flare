@@ -6,7 +6,6 @@ use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
-use App\Flare\Values\LocationEffectValue;
 use App\Flare\Values\LocationType;
 
 class LocationService
@@ -26,7 +25,6 @@ class LocationService
         return [
             'coordinates' => $this->coordinatesCache->getFromCache(),
             'gameMaps' => GameMap::pluck('name', 'id')->toArray(),
-            'locationEffects' => LocationEffectValue::getNamedValues(),
             'questItems' => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
             'locationTypes' => LocationType::getNamedValues(),
             'location' => $location,

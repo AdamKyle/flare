@@ -8,7 +8,7 @@
             <th>description</th>
             <th>is_port</th>
             <th>can_players_enter</th>
-            <th>enemy_strength_type</th>
+            <th>enemy_strength_increase</th>
             <th>can_auto_battle</th>
             <th>x</th>
             <th>y</th>
@@ -33,7 +33,7 @@
                 <td>{{ $location->description }}</td>
                 <td>{{ $location->is_port }}</td>
                 <td>{{ $location->can_players_enter }}</td>
-                <td>{{ $location->enemy_strength_type }}</td>
+                <td>{{ $location->enemy_strength_increase }}</td>
                 <td>{{ $location->can_auto_battle }}</td>
                 <td>{{ $location->x }}</td>
                 <td>{{ $location->y }}</td>
