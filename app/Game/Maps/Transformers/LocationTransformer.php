@@ -20,6 +20,7 @@ class LocationTransformer extends TransformerAbstract {
             'can_auto_battle' => $location->can_auto_battle,
             'location_type' => !is_null($location->location_type) ? $location->locationType()->getNamedValue() : null,
             'is_corrupted' => $location->is_corrupted,
+            'enemy_strength_increase' => $location->enemy_strength_increase,
             'x' => $location->x,
             'y' => $location->y,
         ];

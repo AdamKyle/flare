@@ -36,7 +36,7 @@
 
 @if (! is_null($locationType))
     <div class="w-3/4 mx-auto border-b border-gray-300 dark:border-gray-600 my-8"></div>
-    
+
     <div class="mt-4 space-y-6">
         @if ($locationType->isGoldMines())
             @include ('information.locations.partials.gold-mines')

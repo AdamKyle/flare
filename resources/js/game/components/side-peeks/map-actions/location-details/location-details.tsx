@@ -53,8 +53,6 @@ const LocationDetails = ({
         character_gold: character_gold,
       });
 
-      console.log('calculatedCostOfTeleport', calculatedCostOfTeleport);
-
       setCostOfTeleport(calculatedCostOfTeleport.cost);
       setTimeOutvalue(calculatedCostOfTeleport.time);
       setCanAffordToTeleport(calculatedCostOfTeleport.can_afford);
@@ -90,7 +88,7 @@ const LocationDetails = ({
 
   return (
     <div className={'p-2'}>
-      <p>{data.description}</p>
+      <p className={'text-gray-800 dark:text-gray-300'}>{data.description}</p>
       <div className={'my-4'}>
         <TeleportSection
           character_gold={character_gold}
@@ -100,6 +98,7 @@ const LocationDetails = ({
           time_out_value={timeOutValue}
         />
       </div>
+
     </div>
   );
 };
