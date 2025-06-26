@@ -18,7 +18,7 @@
   <div
     x-cloak
     x-show="dropdownOpen"
-    class="shadow-theme-lg dark:bg-gray-dark absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-800"
+    class="shadow-theme-lg absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white dark:bg-gray-700 p-3 dark:border-gray-800"
   >
 
     @if ($user->hasRole('Admin'))

@@ -55,7 +55,7 @@
 
       <div>
         <a
-          href="#"
+          href="{{route('releases.list')}}"
           aria-label="Version 2.0.0 release notes"
           class="text-danube-500 dark:text-danube-300 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-danube px-4"
         >
