@@ -14,6 +14,9 @@ import Button from 'ui/buttons/button';
 import ProgressButton from 'ui/buttons/button-progress';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import LinkButton from 'ui/buttons/link-button';
+import Dd from 'ui/dl/dd';
+import Dl from 'ui/dl/dl';
+import Dt from 'ui/dl/dt';
 import Separator from 'ui/seperatror/separator';
 
 const CharacterCardDetails = ({
@@ -38,8 +41,8 @@ const CharacterCardDetails = ({
         <div>
           <h4 className="text-danube-500 dark:text-danube-700">Stats</h4>
           <Separator />
-          <dl className="text-gray-600 dark:text-gray-700">
-            <dt className="font-bold">
+          <Dl>
+            <Dt>
               <LinkButton
                 label={'Str:'}
                 variant={ButtonVariant.PRIMARY}
@@ -47,9 +50,9 @@ const CharacterCardDetails = ({
                 aria_label={'Str Breakdown Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{shortenNumber(characterData.str_modded)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{shortenNumber(characterData.str_modded)}</Dd>
+            <Dt>
               <LinkButton
                 label={'Dex:'}
                 variant={ButtonVariant.PRIMARY}
@@ -57,9 +60,9 @@ const CharacterCardDetails = ({
                 aria_label={'Dex Breakdown Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{shortenNumber(characterData.dex_modded)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{shortenNumber(characterData.dex_modded)}</Dd>
+            <Dt>
               <LinkButton
                 label={'Int:'}
                 variant={ButtonVariant.PRIMARY}
@@ -67,9 +70,9 @@ const CharacterCardDetails = ({
                 aria_label={'Int Breakdown Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{shortenNumber(characterData.int_modded)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{shortenNumber(characterData.int_modded)}</Dd>
+            <Dt>
               <LinkButton
                 label={'Dur:'}
                 variant={ButtonVariant.PRIMARY}
@@ -77,9 +80,9 @@ const CharacterCardDetails = ({
                 aria_label={'Dur Breakdown Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{shortenNumber(characterData.dur_modded)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{shortenNumber(characterData.dur_modded)}</Dd>
+            <Dt>
               <LinkButton
                 label={'Agi:'}
                 variant={ButtonVariant.PRIMARY}
@@ -87,9 +90,9 @@ const CharacterCardDetails = ({
                 aria_label={'Agi Breakdown Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{shortenNumber(characterData.agi_modded)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{shortenNumber(characterData.agi_modded)}</Dd>
+            <Dt>
               <LinkButton
                 label={'Chr:'}
                 variant={ButtonVariant.PRIMARY}
@@ -97,9 +100,9 @@ const CharacterCardDetails = ({
                 aria_label={'Chr Breakdown Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{shortenNumber(characterData.chr_modded)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{shortenNumber(characterData.chr_modded)}</Dd>
+            <Dt>
               <LinkButton
                 label={'Focus:'}
                 variant={ButtonVariant.PRIMARY}
@@ -107,15 +110,15 @@ const CharacterCardDetails = ({
                 aria_label={'Focus Breakdown Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
+            </Dt>
             <dd>{shortenNumber(characterData.focus_modded)}</dd>
-          </dl>
+          </Dl>
         </div>
         <div>
           <h4 className="text-danube-500 dark:text-danube-700">Attack Stats</h4>
           <Separator />
-          <dl className="text-gray-600 dark:text-gray-700">
-            <dt className="font-bold">
+          <Dl>
+            <Dt>
               <LinkButton
                 label={'HP:'}
                 variant={ButtonVariant.PRIMARY}
@@ -123,9 +126,9 @@ const CharacterCardDetails = ({
                 aria_label={'HP Breakdown Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{shortenNumber(characterData.health)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{shortenNumber(characterData.health)}</Dd>
+            <Dt>
               <LinkButton
                 label={'AC (Defence):'}
                 variant={ButtonVariant.PRIMARY}
@@ -133,9 +136,9 @@ const CharacterCardDetails = ({
                 aria_label={'Ac (Defence) Breakdown Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{shortenNumber(characterData.ac)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{shortenNumber(characterData.ac)}</Dd>
+            <Dt>
               <LinkButton
                 label={'Weapon:'}
                 variant={ButtonVariant.PRIMARY}
@@ -143,9 +146,9 @@ const CharacterCardDetails = ({
                 aria_label={'Weapon Damage Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{shortenNumber(characterData.weapon_attack)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{shortenNumber(characterData.weapon_attack)}</Dd>
+            <Dt>
               <LinkButton
                 label={'Healing:'}
                 variant={ButtonVariant.PRIMARY}
@@ -153,9 +156,9 @@ const CharacterCardDetails = ({
                 aria_label={'Healing Amount Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{shortenNumber(characterData.healing_amount)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{shortenNumber(characterData.healing_amount)}</Dd>
+            <Dt>
               <LinkButton
                 label={'Spell:'}
                 variant={ButtonVariant.PRIMARY}
@@ -163,9 +166,9 @@ const CharacterCardDetails = ({
                 aria_label={'Spell Damage Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{shortenNumber(characterData.spell_damage)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{shortenNumber(characterData.spell_damage)}</Dd>
+            <Dt>
               {' '}
               <LinkButton
                 label={'Ring:'}
@@ -174,24 +177,24 @@ const CharacterCardDetails = ({
                 aria_label={'Ring Damage Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{shortenNumber(characterData.ring_damage)}</dd>
-          </dl>
+            </Dt>
+            <Dd>{shortenNumber(characterData.ring_damage)}</Dd>
+          </Dl>
         </div>
       </div>
       <div className="my-4">
         <h4 className="text-danube-500 dark:text-danube-700">Currencies</h4>
         <Separator />
-        <dl className="text-gray-600 dark:text-gray-700">
-          <dt className="font-bold">Gold:</dt>
-          <dd>{shortenNumber(characterData.gold)}</dd>
-          <dt className="font-bold">Gold Dust:</dt>
-          <dd>{shortenNumber(characterData.gold_dust)}</dd>
-          <dt className="font-bold">Shards:</dt>
-          <dd>{shortenNumber(characterData.shards)}</dd>
-          <dt className="font-bold">Copper Coins:</dt>
-          <dd>{shortenNumber(characterData.copper_coins)}</dd>
-        </dl>
+        <Dl>
+          <Dt>Gold:</Dt>
+          <Dd>{shortenNumber(characterData.gold)}</Dd>
+          <Dt>Gold Dust:</Dt>
+          <Dd>{shortenNumber(characterData.gold_dust)}</Dd>
+          <Dt>Shards:</Dt>
+          <Dd>{shortenNumber(characterData.shards)}</Dd>
+          <Dt>Copper Coins:</Dt>
+          <Dd>{shortenNumber(characterData.copper_coins)}</Dd>
+        </Dl>
       </div>
       <Separator />
       <ProgressButton

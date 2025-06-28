@@ -3,8 +3,10 @@
 namespace App\Game\Maps\Providers;
 
 use App\Flare\Cache\CoordinatesCache;
+use App\Flare\Pagination\Pagination;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Transformers\MonsterTransformer;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Battle\Services\ConjureService;
@@ -112,8 +114,10 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CoordinatesCache::class),
                 $app->make(CharacterCacheData::class),
                 $app->make(UpdateCharacterAttackTypesHandler::class),
+                $app->make(ItemTransformer::class),
                 $app->make(LocationsTransformer::class),
                 $app->make(PlainDataSerializer::class),
+                $app->make(Pagination::class),
                 $app->make(Manager::class)
             );
         });

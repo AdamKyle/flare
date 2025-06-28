@@ -2,6 +2,8 @@ import BaseInventoryItemDefinition from '../../../character-inventory/api-defini
 import { LocationTypes } from '../../location-details/enums/location-types';
 
 export default interface LocationDetailsApi {
+  id: number;
+  name: string;
   description: string;
   can_players_enter: false;
   can_auto_battle: false;

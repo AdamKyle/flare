@@ -5,6 +5,7 @@ import React, { ReactNode, useMemo } from 'react';
 import SetChoices from './set-choices';
 import SetsProps from './types/sets-props';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
+import { ItemTypeToView } from '../../components/items/enums/item-type-to-view';
 import GenericItemList from '../../components/items/generic-item-list';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
 import BaseInventoryItemDefinition from '../api-definitions/base-inventory-item-definition';
@@ -72,6 +73,7 @@ const Sets = ({ character_id }: SetsProps): ReactNode => {
           items={data}
           is_quest_items={false}
           on_scroll_to_end={handleSetScrolling}
+          items_view_type={ItemTypeToView.EQUIPPABLE}
         />
       </div>
     </div>

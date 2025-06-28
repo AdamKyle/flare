@@ -6,4 +6,6 @@ export default interface LocationDetailsProps extends SidePeekProps {
   character_x: number;
   character_y: number;
   character_gold: number;
+  go_back?: () => void;
+  show_title?: boolean;
 }

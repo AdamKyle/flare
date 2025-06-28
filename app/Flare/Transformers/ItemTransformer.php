@@ -4,14 +4,19 @@ namespace App\Flare\Transformers;
 
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
+use App\Flare\Models\Location;
 use App\Flare\Traits\IsItemUnique;
 use App\Game\Gems\Traits\GetItemAtonements;
+use App\Game\Maps\Transformers\LocationTransformer;
 use Facades\App\Flare\Calculators\SellItemCalculator;
+use League\Fractal\Resource\Item as ItemResource;
 use League\Fractal\TransformerAbstract;
 
 class ItemTransformer extends TransformerAbstract
 {
     use GetItemAtonements, IsItemUnique;
+
+    protected array $defaultIncludes = ['drop_location'];
 
     /**
      * Gets the response data for the character sheet
@@ -95,5 +100,17 @@ class ItemTransformer extends TransformerAbstract
             'socket_amount' => $item->socket_count,
             'item_atonements' => $this->getElementAtonement($item),
         ];
+    }
+
+    public function includeDropLocation(Item $item): ItemResource | null
+    {
+
+       $location = $item->dropLocation;
+
+       if (is_null($location)) {
+           return null;
+       }
+
+       return $this->item($location, new LocationTransformer());
     }
 }

@@ -3,6 +3,7 @@ import { debounce } from 'lodash';
 import React, { useMemo } from 'react';
 
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
+import { ItemTypeToView } from '../../components/items/enums/item-type-to-view';
 import GenericItemList from '../../components/items/generic-item-list';
 import GenericItemProps from '../../components/items/types/generic-item-props';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
@@ -62,6 +63,7 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
           items={data}
           is_quest_items={false}
           on_scroll_to_end={handleInventoryScroll}
+          items_view_type={ItemTypeToView.EQUIPPABLE}
         />
       </div>
     </div>

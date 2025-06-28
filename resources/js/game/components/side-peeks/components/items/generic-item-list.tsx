@@ -11,7 +11,17 @@ const GenericItemList = ({
   items,
   is_quest_items,
   on_scroll_to_end,
+  items_view_type,
+  on_click,
 }: GenericItemListProps): ReactNode => {
+  const handleOnClick = (item: BaseInventoryItemDefinition) => {
+    if (!on_click) {
+      return;
+    }
+
+    return on_click(items_view_type, item);
+  };
+
   const renderBackPackItems = () => {
     if (isEmpty(items) && is_quest_items) {
       return (
@@ -36,7 +46,7 @@ const GenericItemList = ({
     }
 
     return items.map((item: BaseInventoryItemDefinition) => (
-      <GenericItem key={item.slot_id} item={item} />
+      <GenericItem key={item.slot_id} item={item} on_click={handleOnClick} />
     ));
   };
 

@@ -51,20 +51,20 @@ readonly class Pagination {
     /**
      * Transforms for the data and paginates it.
      *
-     * @param EloquentCollection $slots
+     * @param EloquentCollection $databaseCollection
      * @param TransformerAbstract $transformer
      * @param int $perPage
      * @param int $page
      * @return array
      */
-    public function buildPaginatedDate(EloquentCollection $slots, TransformerAbstract $transformer, int $perPage, int $page): array {
-        $paginator = $this->paginateCollection($slots, $perPage, $page);
+    public function buildPaginatedDate(EloquentCollection $databaseCollection, TransformerAbstract $transformer, int $perPage, int $page): array {
+        $paginator = $this->paginateCollection($databaseCollection, $perPage, $page);
 
-        $slots = new LeagueCollection($paginator->items(), $transformer);
+        $databaseCollection = new LeagueCollection($paginator->items(), $transformer);
 
-        $slots->setPaginator(new IlluminatePaginatorAdapter($paginator));
+        $databaseCollection->setPaginator(new IlluminatePaginatorAdapter($paginator));
 
-        $data = $this->manager->createData($slots)->toArray();
+        $data = $this->manager->createData($databaseCollection)->toArray();
 
         $data['meta']['can_load_more'] = $paginator->hasMorePages();
 

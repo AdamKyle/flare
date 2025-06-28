@@ -11,8 +11,16 @@ import {
 } from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
 import BackpackItemProps from '../../../character-sheet/partials/character-inventory/types/backpack-item-props';
 
-const GenericItem = ({ item }: BackpackItemProps): ReactNode => {
+const GenericItem = ({ item, on_click }: BackpackItemProps): ReactNode => {
   const itemColor = backpackItemTextColors(item);
+
+  const handleViewItem = () => {
+    if (!on_click) {
+      return;
+    }
+
+    return on_click(item);
+  };
 
   const renderItemDetails = (): ReactNode => {
     if (item.type === InventoryItemTypes.QUEST) {
@@ -52,6 +60,7 @@ const GenericItem = ({ item }: BackpackItemProps): ReactNode => {
         backpackBorderStyles(item),
         backpackButtonBackground(item)
       )}
+      onClick={handleViewItem}
     >
       <i className="ra ra-bone-knife text-2xl text-gray-800 dark:text-gray-600"></i>
       <div className="text-left">

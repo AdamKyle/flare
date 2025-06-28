@@ -5,6 +5,7 @@ namespace App\Game\Maps\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Flare\Models\Quest;
+use App\Flare\Pagination\Requests\PaginationRequest;
 use App\Game\Maps\Requests\MoveRequest;
 use App\Game\Maps\Requests\QuestDataRequest;
 use App\Game\Maps\Requests\SetSailValidation;
@@ -48,6 +49,10 @@ class MapController extends Controller
 
     public function getLocationInformation(Location $location): JsonResponse {
         return response()->json($this->locationService->getLocationData($location));
+    }
+
+    public function getLocationDroppableQuestItems(PaginationRequest $request, Location $location): JsonResponse {
+        return response()->json($this->locationService->getDroppableItems($location, $request->per_page, $request->page, $request->search_text));
     }
 
     public function move(MoveRequest $request, Character $character): JsonResponse

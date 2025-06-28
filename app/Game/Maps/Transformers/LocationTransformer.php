@@ -15,6 +15,8 @@ class LocationTransformer extends TransformerAbstract {
 
     public function transform(Location $location): array {
         return [
+            'id' => $location->id,
+            'name' => $location->name,
             'description' => $location->description,
             'can_players_enter' => $location->can_players_enter,
             'can_auto_battle' => $location->can_auto_battle,

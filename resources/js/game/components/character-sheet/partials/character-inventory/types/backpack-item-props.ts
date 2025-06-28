@@ -2,4 +2,5 @@ import BaseInventoryItemDefinition from '../../../../side-peeks/character-invent
 
 export default interface BackpackItemProps {
   item: BaseInventoryItemDefinition;
+  on_click?: (item: BaseInventoryItemDefinition) => void;
 }

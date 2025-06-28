@@ -7,7 +7,7 @@ const InfiniteScroll = (props: InfiniteScrollProps) => {
   return (
     <div
       className={clsx(
-        'h-full overflow-y-scroll px-2',
+        'h-full overflow-y-auto px-2',
         'scrollbar-thin scrollbar-thumb-primary-300 scrollbar-track-primary-100',
         'dark:scrollbar-thumb-primary-400 dark:scrollbar-track-primary-200',
         'scrollbar-thumb-rounded-md',
