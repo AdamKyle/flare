@@ -1,6 +1,9 @@
 import React, { ReactNode } from 'react';
 
 import Actions from './actions/partials/actions/actions';
+import { useManageMarketVisibility } from './actions/partials/floating-cards/map-section/hooks/use-manage-market-visibility';
+import { useManagePlayerKingdomManagementVisibility } from './actions/partials/floating-cards/map-section/hooks/use-manage-player-kingdom-management-visibility';
+import { useManageShopVisibility } from './actions/partials/floating-cards/map-section/hooks/use-manage-shop-visibility';
 import { useManageMonsterStatSectionVisibility } from './actions/partials/monster-stat-section/hooks/use-manage-monster-stat-section-visibility';
 import { MonsterStatSection } from './actions/partials/monster-stat-section/monster-stat-section';
 import CharacterSheet from './character-sheet/character-sheet';
@@ -15,8 +18,11 @@ import { useGameLoaderVisibility } from './hooks/use-game-loader-visibility';
 import { useManageCharacterSheetVisibility } from './hooks/use-manage-character-sheet-visibility';
 import FullMap from './map-section/full-map';
 import { useToggleFullMapVisibility } from './map-section/hooks/use-toggle-full-map-visibility';
+import Market from './market/market';
 import CharacterAttackTypeBreakdown from './partials/character-attack-type-breakdown';
 import CharacterInventory from './partials/character-inventory';
+import PlayerKingdoms from './player-kingdoms/player-kingdoms';
+import Shop from './shop/shop';
 
 export const GameCard = (): ReactNode => {
   const { closeCharacterSheet } = useManageCharacterSheetVisibility();
@@ -39,8 +45,25 @@ export const GameCard = (): ReactNode => {
 
   const { showFullMap, closeMap } = useToggleFullMapVisibility();
 
+  const { showShop, closeShop } = useManageShopVisibility();
+  const { showMarket, closeMarket } = useManageMarketVisibility();
+  const { showPlayerKingdoms, closePlayerKingdoms } =
+    useManagePlayerKingdomManagementVisibility();
+
   if (showGameLoader) {
     return <GameLoader />;
+  }
+
+  if (showPlayerKingdoms) {
+    return <PlayerKingdoms close_shop={closePlayerKingdoms} />;
+  }
+
+  if (showMarket) {
+    return <Market close_shop={closeMarket} />;
+  }
+
+  if (showShop) {
+    return <Shop close_shop={closeShop} />;
   }
 
   if (showCharacterSheet) {

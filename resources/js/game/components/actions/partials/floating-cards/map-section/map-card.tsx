@@ -6,7 +6,10 @@ import { useDirectionallyMoveCharacter } from './hooks/use-directionally-move-ch
 import { useFetchMovementTimeoutData } from './hooks/use-fetch-movement-timeout-data';
 import { useManageMapMovementErrorState } from './hooks/use-manage-map-movement-error-state';
 import { useManageMapSectionVisibility } from './hooks/use-manage-map-section-visibility';
+import { useManageMarketVisibility } from './hooks/use-manage-market-visibility';
+import { useManagePlayerKingdomManagementVisibility } from './hooks/use-manage-player-kingdom-management-visibility';
 import { useManageSetSailButtonState } from './hooks/use-manage-set-sail-button-state';
+import { useManageShopVisibility } from './hooks/use-manage-shop-visibility';
 import { useManageViewLocationState } from './hooks/use-manage-view-location-state';
 import { MapMovementTypes } from './map-movement-types/map-movement-types';
 import { CharacterPosition } from '../../../../map-section/api/hooks/definitions/base-map-api-definition';
@@ -46,7 +49,9 @@ const MapCard = () => {
   const { openLocationDetails } = useOpenLocationInfoSidePeek({
     characterData: gameData?.character,
   });
-
+  const { openShop } = useManageShopVisibility();
+  const { openMarket } = useManageMarketVisibility();
+  const { openPlayerKingdoms } = useManagePlayerKingdomManagementVisibility();
   useEffect(() => {
     if (isNil(gameData)) {
       return;
@@ -209,6 +214,23 @@ const MapCard = () => {
           variant={ButtonVariant.SUCCESS}
           additional_css={'w-full'}
           disabled={!isViewLocationEnabled}
+        />
+      </div>
+      <div className="my-2 p-2 flex flex-col gap-2 md:flex-row justify-center">
+        <Button
+          on_click={openShop}
+          label={'Shop'}
+          variant={ButtonVariant.PRIMARY}
+        />
+        <Button
+          on_click={openMarket}
+          label={'Market'}
+          variant={ButtonVariant.SUCCESS}
+        />
+        <Button
+          on_click={openPlayerKingdoms}
+          label={'My Kingdoms'}
+          variant={ButtonVariant.PRIMARY}
         />
       </div>
     </FloatingCard>
