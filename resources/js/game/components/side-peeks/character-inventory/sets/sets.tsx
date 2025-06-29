@@ -48,18 +48,26 @@ const Sets = ({ character_id }: SetsProps): ReactNode => {
   };
 
   if (error) {
-    return <GameDataError />;
+    return (
+      <div className={'p-4'}>
+        <GameDataError />
+      </div>
+    );
   }
 
   if (loading) {
-    return <InfiniteLoader />;
+    return (
+      <div className={'p-4'}>
+        <InfiniteLoader />
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <hr className="w-full border-t border-gray-300 dark:border-gray-600" />
       <div className="pt-2 px-4">
-        <Input on_change={onSearch} clearable />
+        <Input on_change={onSearch} place_holder={'Search items'} clearable />
       </div>
       <div className="pt-2 px-4">
         <SetChoices

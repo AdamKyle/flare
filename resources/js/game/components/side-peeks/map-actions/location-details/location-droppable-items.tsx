@@ -64,11 +64,19 @@ const LocationDroppableItems = ({
   };
 
   if (error) {
-    return <GameDataError />;
+    return (
+      <div className={'p-4'}>
+        <GameDataError />
+      </div>
+    );
   }
 
   if (loading) {
-    return <InfiniteLoader />;
+    return (
+      <div className={'p-4'}>
+        <InfiniteLoader />
+      </div>
+    );
   }
 
   if (isQuestItemDetailsOpen && !isNil(itemToView) && !isNil(itemTypeToView)) {
@@ -93,7 +101,7 @@ const LocationDroppableItems = ({
       </div>
       <hr className="w-full border-t border-gray-300 dark:border-gray-600" />
       <div className="pt-2 px-4">
-        <Input on_change={onSearch} clearable />
+        <Input on_change={onSearch} place_holder={'Search items'} clearable />
       </div>
       <div className="flex-1 min-h-0">
         <GenericItemList

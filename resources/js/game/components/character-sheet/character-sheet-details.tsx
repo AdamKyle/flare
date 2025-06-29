@@ -26,6 +26,9 @@ import Button from 'ui/buttons/button';
 import ProgressButton from 'ui/buttons/button-progress';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import LinkButton from 'ui/buttons/link-button';
+import Dd from 'ui/dl/dd';
+import Dl from 'ui/dl/dl';
+import Dt from 'ui/dl/dt';
 import Separator from 'ui/seperatror/separator';
 
 const CharacterSheetDetails = (
@@ -72,39 +75,41 @@ const CharacterSheetDetails = (
     );
   }
 
+  console.log(characterData);
+
   return (
     <>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
         <div>
-          <dl>
-            <dt className="font-bold">Character Name:</dt>
-            <dd>{characterData.name}</dd>
-            <dt className="font-bold">Race:</dt>
-            <dd>{characterData.race}</dd>
-            <dt className="font-bold">Class:</dt>
-            <dd>{characterData.class}</dd>
-            <dt className="font-bold">Level:</dt>
-            <dd>
+          <Dl>
+            <Dt>Character Name:</Dt>
+            <Dd>{characterData.name}</Dd>
+            <Dt>Race:</Dt>
+            <Dd>{characterData.race}</Dd>
+            <Dt>Class:</Dt>
+            <Dd>{characterData.class}</Dd>
+            <Dt>Level:</Dt>
+            <Dd>
               {formatNumberWithCommas(characterData.level)} /{' '}
               {formatNumberWithCommas(characterData.max_level)}
-            </dd>
-          </dl>
+            </Dd>
+          </Dl>
         </div>
         <div>
-          <dl>
-            <dt className="font-bold">Gold:</dt>
-            <dd>{formatNumberWithCommas(characterData.gold)}</dd>
-            <dt className="font-bold">Gold Dust:</dt>
-            <dd>{formatNumberWithCommas(characterData.gold_dust)}</dd>
-            <dt className="font-bold">Shards:</dt>
-            <dd>{formatNumberWithCommas(characterData.shards)}</dd>
-            <dt className="font-bold">Copper Coins:</dt>
-            <dd>{formatNumberWithCommas(characterData.copper_coins)}</dd>
-          </dl>
+          <Dl>
+            <Dt>Gold:</Dt>
+            <Dd>{formatNumberWithCommas(characterData.gold)}</Dd>
+            <Dt>Gold Dust:</Dt>
+            <Dd>{formatNumberWithCommas(characterData.gold_dust)}</Dd>
+            <Dt>Shards:</Dt>
+            <Dd>{formatNumberWithCommas(characterData.shards)}</Dd>
+            <Dt>Copper Coins:</Dt>
+            <Dd>{formatNumberWithCommas(characterData.copper_coins)}</Dd>
+          </Dl>
         </div>
         <div>
-          <dl>
-            <dt className="font-bold">
+          <Dl>
+            <Dt>
               <LinkButton
                 label={'Health:'}
                 variant={ButtonVariant.PRIMARY}
@@ -112,9 +117,9 @@ const CharacterSheetDetails = (
                 aria_label={'Health Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{formatNumberWithCommas(characterData.health)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{formatNumberWithCommas(characterData.health)}</Dd>
+            <Dt>
               <LinkButton
                 label={'Weapon Damage:'}
                 variant={ButtonVariant.PRIMARY}
@@ -122,9 +127,9 @@ const CharacterSheetDetails = (
                 aria_label={'Weapon Damage Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{formatNumberWithCommas(characterData.weapon_attack)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{formatNumberWithCommas(characterData.weapon_attack)}</Dd>
+            <Dt>
               <LinkButton
                 label={'Healing Amount:'}
                 variant={ButtonVariant.PRIMARY}
@@ -132,9 +137,9 @@ const CharacterSheetDetails = (
                 aria_label={'Healing Amount Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{formatNumberWithCommas(characterData.healing_amount)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{formatNumberWithCommas(characterData.healing_amount)}</Dd>
+            <Dt>
               <LinkButton
                 label={'Spell Damage:'}
                 variant={ButtonVariant.PRIMARY}
@@ -142,9 +147,9 @@ const CharacterSheetDetails = (
                 aria_label={'Spell Damage Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{formatNumberWithCommas(characterData.spell_damage)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{formatNumberWithCommas(characterData.spell_damage)}</Dd>
+            <Dt>
               <LinkButton
                 label={'Ring Damage:'}
                 variant={ButtonVariant.PRIMARY}
@@ -152,9 +157,9 @@ const CharacterSheetDetails = (
                 aria_label={'Ring Damage Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{formatNumberWithCommas(characterData.ring_damage)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{formatNumberWithCommas(characterData.ring_damage)}</Dd>
+            <Dt>
               <LinkButton
                 label={'AC (Defence):'}
                 variant={ButtonVariant.PRIMARY}
@@ -162,17 +167,17 @@ const CharacterSheetDetails = (
                 aria_label={'Armour Class (Defence) Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{formatNumberWithCommas(characterData.ac)}</dd>
-          </dl>
+            </Dt>
+            <Dd>{formatNumberWithCommas(characterData.ac)}</Dd>
+          </Dl>
         </div>
         <div>
-          <dl>
-            <dt className="font-bold">To Hit Stat:</dt>
-            <dd>{capitalize(characterData.to_hit_stat)}</dd>
-            <dt className="font-bold">Class Bonus:</dt>
-            <dd>{(characterData.class_bonus_chance * 100).toFixed(2)}%</dd>
-          </dl>
+          <Dl>
+            <Dt>To Hit Stat:</Dt>
+            <Dd>{capitalize(characterData.to_hit_stat)}</Dd>
+            <Dt>Class Bonus:</Dt>
+            <Dd>{(characterData.class_bonus_chance * 100).toFixed(2)}%</Dd>
+          </Dl>
         </div>
       </div>
       <Separator />
@@ -182,23 +187,23 @@ const CharacterSheetDetails = (
       <Separator />
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
         <div>
-          <dl>
-            <dt className="font-bold">Raw STR:</dt>
-            <dd>{formatNumberWithCommas(characterData.str_raw)}</dd>
-            <dt className="font-bold">Raw DEX:</dt>
-            <dd>{formatNumberWithCommas(characterData.dex_raw)}</dd>
-            <dt className="font-bold">Raw INT:</dt>
-            <dd>{formatNumberWithCommas(characterData.int_raw)}</dd>
-            <dt className="font-bold">Raw DUR:</dt>
-            <dd>{formatNumberWithCommas(characterData.dur_raw)}</dd>
-            <dt className="font-bold">Raw AGI:</dt>
-            <dd>{formatNumberWithCommas(characterData.agi_raw)}</dd>
-            <dt className="font-bold">Raw CHR:</dt>
-            <dd>{formatNumberWithCommas(characterData.chr_raw)}</dd>
-            <dt className="font-bold">Raw FOCUS:</dt>
-            <dd>{formatNumberWithCommas(characterData.focus_raw)}</dd>
-          </dl>
-          <h3 className="text-danube-500 dark:text-danube-700 mt-5">
+          <Dl>
+            <Dt>Raw STR:</Dt>
+            <Dd>{formatNumberWithCommas(characterData.str_raw)}</Dd>
+            <Dt>Raw DEX:</Dt>
+            <Dd>{formatNumberWithCommas(characterData.dex_raw)}</Dd>
+            <Dt>Raw INT:</Dt>
+            <Dd>{formatNumberWithCommas(characterData.int_raw)}</Dd>
+            <Dt>Raw DUR:</Dt>
+            <Dd>{formatNumberWithCommas(characterData.dur_raw)}</Dd>
+            <Dt>Raw AGI:</Dt>
+            <Dd>{formatNumberWithCommas(characterData.agi_raw)}</Dd>
+            <Dt>Raw CHR:</Dt>
+            <Dd>{formatNumberWithCommas(characterData.chr_raw)}</Dd>
+            <Dt>Raw FOCUS:</Dt>
+            <Dd>{formatNumberWithCommas(characterData.focus_raw)}</Dd>
+          </Dl>
+          <h3 className="text-danube-700 dark:text-danube-300 mt-5">
             Resistances & Reductions
           </h3>
           <Separator />
@@ -206,29 +211,32 @@ const CharacterSheetDetails = (
             Resistances and reductions help against stronger enemies, allowing
             for quicker take downs. Specific enchantments will raise these.
           </p>
-          <dl>
-            <dt className="font-bold">Spell Evasion:</dt>
-            <dd>
-              {(characterData.resistance_info.spell_evasion * 100).toFixed(2)}%
-            </dd>
-            <dt className="font-bold">Affix Damage Reduction:</dt>
-            <dd>
-              {(
-                characterData.resistance_info.affix_damage_reduction * 100
-              ).toFixed(2)}
-              %
-            </dd>
-            <dt className="font-bold">Enemy Healing Reduction:</dt>
-            <dd>
-              {(characterData.resistance_info.healing_reduction * 100).toFixed(
+          <Dl>
+            <Dt>Spell Evasion:</Dt>
+            <Dd>
+              {(characterData.resistance_info.data.spell_evasion * 100).toFixed(
                 2
               )}
-            </dd>
-          </dl>
+              %
+            </Dd>
+            <Dt>Affix Damage Reduction:</Dt>
+            <Dd>
+              {(
+                characterData.resistance_info.data.affix_damage_reduction * 100
+              ).toFixed(2)}
+              %
+            </Dd>
+            <Dt>Enemy Healing Reduction:</Dt>
+            <Dd>
+              {(
+                characterData.resistance_info.data.healing_reduction * 100
+              ).toFixed(2)}
+            </Dd>
+          </Dl>
         </div>
         <div>
-          <dl>
-            <dt className="font-bold">
+          <Dl>
+            <Dt>
               <LinkButton
                 label={'Modded STR:'}
                 variant={ButtonVariant.PRIMARY}
@@ -236,9 +244,9 @@ const CharacterSheetDetails = (
                 aria_label={'Modded Str Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{shortenNumber(characterData.str_modded)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{shortenNumber(characterData.str_modded)}</Dd>
+            <Dt>
               <LinkButton
                 label={'Modded DEX:'}
                 variant={ButtonVariant.PRIMARY}
@@ -246,9 +254,9 @@ const CharacterSheetDetails = (
                 aria_label={'Modded Dex Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{shortenNumber(characterData.dex_modded)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{shortenNumber(characterData.dex_modded)}</Dd>
+            <Dt>
               <LinkButton
                 label={'Modded INT:'}
                 variant={ButtonVariant.PRIMARY}
@@ -256,9 +264,9 @@ const CharacterSheetDetails = (
                 aria_label={'Modded Int Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{shortenNumber(characterData.int_modded)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{shortenNumber(characterData.int_modded)}</Dd>
+            <Dt>
               <LinkButton
                 label={'Modded DUR:'}
                 variant={ButtonVariant.PRIMARY}
@@ -266,9 +274,9 @@ const CharacterSheetDetails = (
                 aria_label={'Modded Dur Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{shortenNumber(characterData.dur_modded)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{shortenNumber(characterData.dur_modded)}</Dd>
+            <Dt>
               <LinkButton
                 label={'Modded AGI:'}
                 variant={ButtonVariant.PRIMARY}
@@ -276,9 +284,9 @@ const CharacterSheetDetails = (
                 aria_label={'Modded Agi Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{shortenNumber(characterData.agi_modded)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{shortenNumber(characterData.agi_modded)}</Dd>
+            <Dt>
               <LinkButton
                 label={'Modded CHR:'}
                 variant={ButtonVariant.PRIMARY}
@@ -286,9 +294,9 @@ const CharacterSheetDetails = (
                 aria_label={'Modded Chr Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{shortenNumber(characterData.chr_modded)}</dd>
-            <dt className="font-bold">
+            </Dt>
+            <Dd>{shortenNumber(characterData.chr_modded)}</Dd>
+            <Dt>
               <LinkButton
                 label={'Modded FOCUS:'}
                 variant={ButtonVariant.PRIMARY}
@@ -296,10 +304,10 @@ const CharacterSheetDetails = (
                 aria_label={'Modded Focus Link'}
                 additional_css={'font-bold'}
               />
-            </dt>
-            <dd>{shortenNumber(characterData.focus_modded)}</dd>
-          </dl>
-          <h3 className="text-danube-500 dark:text-danube-700 mt-5">
+            </Dt>
+            <Dd>{shortenNumber(characterData.focus_modded)}</Dd>
+          </Dl>
+          <h3 className="text-danube-700 dark:text-danube-300 mt-5">
             Elemental Atonement
           </h3>
           <Separator />
@@ -307,16 +315,16 @@ const CharacterSheetDetails = (
             Gems boost elemental power, aiding in battles against stronger
             enemies, including raid bosses and weekly events.
           </p>
-          <dl>
-            <dt className="font-bold">Fire:</dt>
-            <dd>{characterData.elemental_atonements.atonements.fire * 100}%</dd>
-            <dt className="font-bold">Ice:</dt>
-            <dd>{characterData.elemental_atonements.atonements.ice * 100}%</dd>
-            <dt className="font-bold">Water:</dt>
-            <dd>
+          <Dl>
+            <Dt>Fire:</Dt>
+            <Dd>{characterData.elemental_atonements.atonements.fire * 100}%</Dd>
+            <Dt>Ice:</Dt>
+            <Dd>{characterData.elemental_atonements.atonements.ice * 100}%</Dd>
+            <Dt>Water:</Dt>
+            <Dd>
               {characterData.elemental_atonements.atonements.water * 100}%
-            </dd>
-          </dl>
+            </Dd>
+          </Dl>
         </div>
         <div>
           <ProgressButton

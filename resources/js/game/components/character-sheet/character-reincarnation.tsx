@@ -8,6 +8,9 @@ import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import LinkButton from 'ui/buttons/link-button';
+import Dd from 'ui/dl/dd';
+import Dl from 'ui/dl/dl';
+import Dt from 'ui/dl/dt';
 
 const CharacterReincarnation = ({
   reincarnation_info,
@@ -23,22 +26,22 @@ const CharacterReincarnation = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
-        <dl>
-          <dt>Times Reincarnated:</dt>
-          <dd>{reincarnation_info.reincarnated_times}</dd>
-          <dt>Stat Bonus (pts.):</dt>
-          <dd>
+        <Dl>
+          <Dt>Times Reincarnated:</Dt>
+          <Dd>{reincarnation_info.reincarnated_times}</Dd>
+          <Dt>Stat Bonus (pts.):</Dt>
+          <Dd>
             {formatNumberWithCommas(
               reincarnation_info.reincarnated_stat_increase
             )}
-          </dd>
-          <dt>Base Stat Mod:</dt>
-          <dd>{(reincarnation_info.base_damage_stat_mod * 100).toFixed(2)}%</dd>
-          <dt>base Damage Mod:</dt>
-          <dd>{(reincarnation_info.base_damage_stat_mod * 100).toFixed(2)}%</dd>
-          <dt>XP Penalty:</dt>
-          <dd>{(reincarnation_info.xp_penalty * 100).toFixed(2)}%</dd>
-        </dl>
+          </Dd>
+          <Dt>Base Stat Mod:</Dt>
+          <Dd>{(reincarnation_info.base_damage_stat_mod * 100).toFixed(2)}%</Dd>
+          <Dt>base Damage Mod:</Dt>
+          <Dd>{(reincarnation_info.base_damage_stat_mod * 100).toFixed(2)}%</Dd>
+          <Dt>XP Penalty:</Dt>
+          <Dd>{(reincarnation_info.xp_penalty * 100).toFixed(2)}%</Dd>
+        </Dl>
       </div>
       <div>
         <Alert variant={AlertVariant.INFO}>

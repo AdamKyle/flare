@@ -38,11 +38,19 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
   });
 
   if (error) {
-    return <GameDataError />;
+    return (
+      <div className={'p-4'}>
+        <GameDataError />
+      </div>
+    );
   }
 
   if (loading) {
-    return <InfiniteLoader />;
+    return (
+      <div className={'p-4'}>
+        <InfiniteLoader />
+      </div>
+    );
   }
 
   return (
@@ -56,7 +64,7 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
       </div>
       <hr className="w-full border-t border-gray-300 dark:border-gray-600" />
       <div className="pt-2 px-4">
-        <Input on_change={onSearch} clearable />
+        <Input on_change={onSearch} place_holder={'Search items'} clearable />
       </div>
       <div className="flex-1 min-h-0">
         <GenericItemList

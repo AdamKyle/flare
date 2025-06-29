@@ -39,7 +39,7 @@ const CharacterCardDetails = ({
       <XpBar current_xp={characterData.xp} max_xp={characterData.xp_next} />
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <h4 className="text-danube-500 dark:text-danube-700">Stats</h4>
+          <h4 className="text-danube-700 dark:text-danube-300">Stats</h4>
           <Separator />
           <Dl>
             <Dt>
@@ -115,7 +115,7 @@ const CharacterCardDetails = ({
           </Dl>
         </div>
         <div>
-          <h4 className="text-danube-500 dark:text-danube-700">Attack Stats</h4>
+          <h4 className="text-danube-700 dark:text-danube-300">Attack Stats</h4>
           <Separator />
           <Dl>
             <Dt>
@@ -183,7 +183,7 @@ const CharacterCardDetails = ({
         </div>
       </div>
       <div className="my-4">
-        <h4 className="text-danube-500 dark:text-danube-700">Currencies</h4>
+        <h4 className="text-danube-700 dark:text-danube-300">Currencies</h4>
         <Separator />
         <Dl>
           <Dt>Gold:</Dt>

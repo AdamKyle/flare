@@ -10,6 +10,9 @@ import { GameDataError } from 'game-data/components/game-data-error';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
+import Dd from 'ui/dl/dd';
+import Dl from 'ui/dl/dl';
+import Dt from 'ui/dl/dt';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import Separator from 'ui/seperatror/separator';
 
@@ -41,14 +44,14 @@ export const CharacterStatTypeDetails = ({
 
   return (
     <div>
-      <dl>
-        <dt>Base Stat Value:</dt>
-        <dd>{formatNumberWithCommas(data.base_value)}</dd>
-        <dt>Modded Stat Value:</dt>
-        <dd>
+      <Dl>
+        <Dt>Base Stat Value:</Dt>
+        <Dd>{formatNumberWithCommas(data.base_value)}</Dd>
+        <Dt>Modded Stat Value:</Dt>
+        <Dd>
           {formatNumberWithCommas(parseInt(data.modded_value.toFixed(0)))}
-        </dd>
-      </dl>
+        </Dd>
+      </Dl>
       <p className="my-4">
         Below is a break down of everything that takes your base stat value and
         makes it your modded stat value. When it comes to fighting, we only care

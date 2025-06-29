@@ -92,31 +92,31 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
       .with({ showInventory: true }, () => `${characterData.name} Inventory`)
       .with(
         { showAttackType: true, attackType: AttackTypes.WEAPON },
-        () => `${characterData.name} Weapon Attack Details`
+        () => `${characterData.name}: Weapon Attack Details`
       )
       .with(
         { showAttackType: true, attackType: AttackTypes.SPELL_DAMAGE },
-        () => `${characterData.name} Spell Damage Details`
+        () => `${characterData.name}: Spell Damage Details`
       )
       .with(
         { showAttackType: true, attackType: AttackTypes.HEALING },
-        () => `${characterData.name} Healing Details`
+        () => `${characterData.name}: Healing Details`
       )
       .with(
         { showAttackType: true, attackType: AttackTypes.RING_DAMAGE },
-        () => `${characterData.name} Ring Damage`
+        () => `${characterData.name}: Ring Damage`
       )
       .with(
         { showAttackType: true, attackType: AttackTypes.HEALTH },
-        () => `${characterData.name} Health Breakdown`
+        () => `${characterData.name}: Health Breakdown`
       )
       .with(
         { showAttackType, attackType: AttackTypes.DEFENCE },
-        () => `${characterData.name} Defence Breakdown`
+        () => `${characterData.name}: Defence Breakdown`
       )
       .with(
         { showStatDetails: true },
-        () => `${characterData.name} ${getStatName(statType)} break down`
+        () => `${characterData.name}: ${getStatName(statType)} break down`
       )
       .otherwise(() => `${characterData.name}`);
   };

@@ -70,7 +70,7 @@ const Actions = (props: ActionsProps): ReactNode => {
   };
 
   return (
-    <div className="w-full xl:w-3/4 mx-auto">
+    <div className="w-full xl:w-3/4 mx-auto mt-[20px]">
       <Card>
         <div
           className={clsx('grid grid-cols-1 gap-4 p-4 items-start', {
