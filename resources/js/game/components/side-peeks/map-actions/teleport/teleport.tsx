@@ -21,7 +21,7 @@ import { GameDataError } from 'game-data/components/game-data-error';
 
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
-import Separator from 'ui/seperatror/separator';
+import Separator from 'ui/separator/separator';
 
 const Teleport = ({ character_data, x, y }: TeleportProps) => {
   const { data, error, loading } = useFetchTeleportCoordinatesApi({

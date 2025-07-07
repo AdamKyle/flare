@@ -17,7 +17,7 @@ import LinkButton from 'ui/buttons/link-button';
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
-import Separator from 'ui/seperatror/separator';
+import Separator from 'ui/separator/separator';
 
 const CharacterCardDetails = ({
   characterData,

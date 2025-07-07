@@ -4,6 +4,7 @@ namespace App\Game\Shop\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
+use App\Flare\Pagination\Requests\PaginationRequest;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
 use App\Game\Shop\Events\BuyItemEvent;
@@ -30,19 +31,18 @@ class ShopController extends Controller
         $this->shopService = $shopService;
     }
 
-    public function fetchItemsForShop(Character $character, Request $request): JsonResponse
+    public function fetchItemsForShop(PaginationRequest $paginationRequest, Character $character): JsonResponse
     {
 
-        $type = $request->get('filter');
-        $searchText = $request->get('search_text');
-
-        return response()->json([
-            'items' => $this->shopService->getItemsForShop($character, $type, $searchText),
-            'gold' => $character->gold,
-            'inventory_count' => $character->getInventoryCount(),
-            'inventory_max' => $character->inventory_max,
-            'is_merchant' => $character->classType()->isMerchant(),
-        ]);
+        return response()->json(
+            $this->shopService->getItemsForShop(
+                $character,
+                $paginationRequest->per_page,
+                $paginationRequest->page,
+                $paginationRequest->search_text,
+                $paginationRequest->filters
+            ),
+        );
     }
 
     public function shopCompare(Request $request, Character $character,

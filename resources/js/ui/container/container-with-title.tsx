@@ -3,7 +3,7 @@ import React, { ReactNode } from 'react';
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import ContainerProps from 'ui/container/types/container-props';
-import Separator from 'ui/seperatror/separator';
+import Separator from 'ui/separator/separator';
 
 const ContainerWithTitle = (props: ContainerProps): ReactNode => {
   return (

@@ -22,7 +22,7 @@ import Market from './market/market';
 import CharacterAttackTypeBreakdown from './partials/character-attack-type-breakdown';
 import CharacterInventory from './partials/character-inventory';
 import PlayerKingdoms from './player-kingdoms/player-kingdoms';
-import Shop from './shop/shop';
+import ShopScreen from './shop/shop-screen';
 
 export const GameCard = (): ReactNode => {
   const { closeCharacterSheet } = useManageCharacterSheetVisibility();
@@ -63,7 +63,7 @@ export const GameCard = (): ReactNode => {
   }
 
   if (showShop) {
-    return <Shop close_shop={closeShop} />;
+    return <ShopScreen close_shop={closeShop} />;
   }
 
   if (showCharacterSheet) {

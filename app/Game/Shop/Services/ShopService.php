@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
+use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
@@ -28,64 +29,24 @@ class ShopService
 {
     use ResponseBuilder;
 
-    private EquipItemService $equipItemService;
+    /**
+     * @param EquipItemService $equipItemService
+     * @param CharacterInventoryService $characterInventoryService
+     * @param Pagination $pagination
+     * @param ItemTransformer $itemTransformer
+     * @param Manager $manager
+     */
+    public function __construct(private readonly EquipItemService $equipItemService,
+                                private readonly CharacterInventoryService $characterInventoryService,
+                                private readonly Pagination $pagination,
+                                private readonly ItemTransformer $itemTransformer,
+                                private readonly Manager $manager
+    ){}
 
-    private ItemTransformer $itemTransformer;
+    public function getItemsForShop(Character $character, int $perPage, int $page, ?string $searchText, ?array $filters): array {
+        $items = $this->fetchItemsForShopBasedOnCharacterClass($character, $searchText, $filters);
 
-    private CharacterInventoryService $characterInventoryService;
-
-    private Manager $manager;
-
-    public function __construct(EquipItemService $equipItemService, CharacterInventoryService $characterInventoryService, ItemTransformer $itemTransformer, Manager $manager)
-    {
-        $this->equipItemService = $equipItemService;
-        $this->itemTransformer = $itemTransformer;
-        $this->manager = $manager;
-
-        $this->characterInventoryService = $characterInventoryService;
-    }
-
-    public function getItemsForShop(Character $character, ?string $type, ?string $searchText): array
-    {
-        $items = $this->fetchItemsForShopBasedOnCharacterClass($character, $type, $searchText);
-
-        $items = new Collection($items, $this->itemTransformer);
-
-        return $this->manager->createData($items)->toArray();
-    }
-
-    public function sellSpecificItem(Character $character, int $slotId): array
-    {
-        $inventorySlot = $character->inventory->slots->filter(function ($slot) use ($slotId) {
-            return $slot->id === $slotId && ! $slot->equipped;
-        })->first();
-
-        if (is_null($inventorySlot)) {
-            return $this->errorResult('Item not found.');
-        }
-
-        $item = $inventorySlot->item;
-
-        if ($item->type === 'trinket' || $item->type === 'artifact') {
-            return $this->errorResult('The shop keeper will not accept this item (Trinkets/Artifacts cannot be sold to the shop).');
-        }
-
-        $totalSoldFor = SellItemCalculator::fetchSalePriceWithAffixes($item);
-
-        $character = $character->refresh();
-
-        event(new SellItemEvent($inventorySlot, $character));
-
-        $inventory = $this->characterInventoryService->setCharacter($character);
-
-        return $this->successResult([
-            'item_name' => $item->affix_name,
-            'sold_for' => $totalSoldFor,
-            'message' => 'Sold: '.$item->affix_name.' for: '.number_format($totalSoldFor).' gold.',
-            'inventory' => [
-                'inventory' => $inventory->getInventoryForType('inventory'),
-            ],
-        ]);
+        return $this->pagination->buildPaginatedDate($items, $this->itemTransformer, $perPage, $page);
     }
 
     public function sellAllItems(Character $character): array
@@ -238,10 +199,13 @@ class ShopService
         return floor($cost - ($cost * 0.05));
     }
 
-    private function fetchItemsForShopBasedOnCharacterClass(Character $character, ?string $type, ?string $searchText): EloquentCollection {
+    private function fetchItemsForShopBasedOnCharacterClass(Character $character, ?string $searchText, ?array $filters): EloquentCollection {
         $className = $character->class->name;
 
-        $types = is_null($type) ? ItemTypeMapping::getForClass($className) : $type;
+        dump($filters);
+
+        $types = !isset($filters['type']) ? ItemTypeMapping::getForClass($className) : $filters['type'];
+        $costOrder = !isset($filters['sort_cost']) ? 'asc' : $filters['sort_cost'];
 
         $items = Item::where('cost', '<=', 2000000000)
             ->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
@@ -263,7 +227,7 @@ class ShopService
 
         return $items
             ->orderBy('type', 'desc')
-            ->orderBy('cost', 'asc')
+            ->orderBy('cost', $costOrder)
             ->get();
     }
 

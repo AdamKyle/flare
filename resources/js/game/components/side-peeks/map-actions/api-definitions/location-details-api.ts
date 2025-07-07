@@ -1,5 +1,5 @@
-import BaseInventoryItemDefinition from '../../../character-inventory/api-definitions/base-inventory-item-definition';
-import { LocationTypes } from '../../location-details/enums/location-types';
+import BaseInventoryItemDefinition from '../../character-inventory/api-definitions/base-inventory-item-definition';
+import { LocationTypes } from '../teleport/enums/location-types';
 
 export default interface LocationDetailsApi {
   id: number;

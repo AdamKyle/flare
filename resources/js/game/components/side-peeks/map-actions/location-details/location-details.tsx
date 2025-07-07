@@ -23,7 +23,7 @@ import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Dl from 'ui/dl/dl';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
-import Separator from 'ui/seperatror/separator';
+import Separator from 'ui/separator/separator';
 
 const LocationDetails = ({
   location_id,

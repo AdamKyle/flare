@@ -6,7 +6,7 @@ import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Card from 'ui/cards/card';
 import ContainerWithTitle from 'ui/container/container-with-title';
-import Separator from 'ui/seperatror/separator';
+import Separator from 'ui/separator/separator';
 
 export const MonsterStatSection = (): ReactNode => {
   const { closeMonsterStats } = useManageMonsterStatSectionVisibility();

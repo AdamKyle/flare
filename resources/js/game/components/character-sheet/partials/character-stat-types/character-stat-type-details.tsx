@@ -14,7 +14,7 @@ import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
-import Separator from 'ui/seperatror/separator';
+import Separator from 'ui/separator/separator';
 
 export const CharacterStatTypeDetails = ({
   stat_type,

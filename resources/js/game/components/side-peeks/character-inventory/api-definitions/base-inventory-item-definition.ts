@@ -2,7 +2,7 @@ import { BaseItemDetails } from '../../../../api-definitions/items/base-item-det
 import { BaseUsableItemDetails } from '../../../../api-definitions/items/base-usable-item-details';
 import { InventoryPositionDefinition } from '../../../character-sheet/partials/character-inventory/enums/equipment-positions';
 import { InventoryItemTypes } from '../../../character-sheet/partials/character-inventory/enums/inventory-item-types';
-import LocationDetailsApi from '../../map-actions/api/definitions/location-details-api';
+import LocationDetailsApi from '../../map-actions/api-definitions/location-details-api';
 
 export default interface BaseInventoryItemDefinition
   extends BaseItemDetails,
@@ -29,4 +29,7 @@ export default interface BaseInventoryItemDefinition
   stat_increase: number | null;
   holy_level: number | null;
   drop_location: LocationDetailsApi;
+  cost: number;
+  skill_level_req: number;
+  skill_level_trivial: number;
 }
