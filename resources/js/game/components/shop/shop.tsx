@@ -119,7 +119,13 @@ const Shop = ({ close_shop }: ShopProps) => {
   };
 
   if (!isNil(itemToView)) {
-    return <SimpleItemDetails item={itemToView} on_close={closeItemView} />;
+    return (
+      <SimpleItemDetails
+        item={itemToView}
+        on_close={closeItemView}
+        show_shop_actions
+      />
+    );
   }
 
   return (

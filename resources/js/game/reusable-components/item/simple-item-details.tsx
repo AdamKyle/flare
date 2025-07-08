@@ -22,6 +22,7 @@ const SimpleItemDetails = ({
   item,
   on_close,
   show_advanced_button,
+  show_shop_actions,
 }: SimpleItemDetailsProps) => {
   const isArmour = armourPositions.includes(item.type as InventoryItemTypes);
   const isSpell =
@@ -97,12 +98,41 @@ const SimpleItemDetails = ({
   };
 
   const renderAdvancedButton = () => {
-    if (!show_advanced_button) return null;
+    if (!show_advanced_button) {
+      return null;
+    }
+
     return (
       <div className="mt-6">
         <Button
           on_click={() => {}}
           label="Advanced Details"
+          variant={ButtonVariant.PRIMARY}
+        />
+      </div>
+    );
+  };
+
+  const renderShopActions = () => {
+    if (!show_shop_actions) {
+      return null;
+    }
+
+    return (
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Button
+          on_click={() => {}}
+          label="Compare"
+          variant={ButtonVariant.SUCCESS}
+        />
+        <Button
+          on_click={() => {}}
+          label="Buy"
+          variant={ButtonVariant.PRIMARY}
+        />
+        <Button
+          on_click={() => {}}
+          label="Buy Multiple"
           variant={ButtonVariant.PRIMARY}
         />
       </div>
@@ -154,6 +184,7 @@ const SimpleItemDetails = ({
           </div>
         </div>
         {renderAdvancedButton()}
+        {renderShopActions()}
       </Card>
     </ContainerWithTitle>
   );
