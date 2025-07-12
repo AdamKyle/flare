@@ -1,12 +1,11 @@
 import React from 'react';
 
+import { ItemBaseTypes } from './enums/item-base-type';
 import SimpleItemDetailsProps from './types/simple-item-details-props';
-import {
-  armourPositions,
-  InventoryItemTypes,
-} from '../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
+import { armourPositions } from '../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
 import { formatNumberWithCommas } from '../../util/format-number';
 import { decodeHtmlEntities } from '../util/decode-string';
+import { getType } from './utils/get-type';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
@@ -22,21 +21,8 @@ const SimpleItemDetails = ({
   item,
   on_close,
   show_advanced_button,
-  show_shop_actions,
 }: SimpleItemDetailsProps) => {
-  const isArmour = armourPositions.includes(item.type as InventoryItemTypes);
-  const isSpell =
-    item.type === InventoryItemTypes.SPELL_HEALING ||
-    item.type === InventoryItemTypes.SPELL_DAMAGE;
-  const isRing = item.type === InventoryItemTypes.RING;
-
-  const craftCategory = isArmour
-    ? 'Armour'
-    : isSpell
-      ? 'Spell'
-      : isRing
-        ? 'Ring'
-        : 'Weapon';
+  const itemType = getType(item, armourPositions);
 
   const statEntries = [
     { label: 'Strength', value: item.str_modifier, isPercent: true },
@@ -53,9 +39,9 @@ const SimpleItemDetails = ({
       case 'Cost':
         return `This costs ${display} gold.`;
       case 'Crafting (Req.)':
-        return `Requires ${craftCategory.toLowerCase()} crafting skill at level: ${display}.`;
+        return `Requires ${itemType.toLowerCase()} crafting skill at level: ${display}.`;
       case 'Crafting (Trivial)':
-        return `${craftCategory} crafting becomes trivial at level: ${display}.`;
+        return `${itemType} crafting becomes trivial at level: ${display}.`;
       case 'Damage':
         return `Increases damage by ${display}.`;
       case 'AC':
@@ -113,32 +99,6 @@ const SimpleItemDetails = ({
     );
   };
 
-  const renderShopActions = () => {
-    if (!show_shop_actions) {
-      return null;
-    }
-
-    return (
-      <div className="mt-4 flex flex-wrap gap-2">
-        <Button
-          on_click={() => {}}
-          label="Compare"
-          variant={ButtonVariant.SUCCESS}
-        />
-        <Button
-          on_click={() => {}}
-          label="Buy"
-          variant={ButtonVariant.PRIMARY}
-        />
-        <Button
-          on_click={() => {}}
-          label="Buy Multiple"
-          variant={ButtonVariant.PRIMARY}
-        />
-      </div>
-    );
-  };
-
   return (
     <ContainerWithTitle manageSectionVisibility={on_close} title={item.name}>
       <Card>
@@ -179,12 +139,12 @@ const SimpleItemDetails = ({
             <Separator />
             <Dl>
               {renderItem('Damage', item.base_damage)}
-              {isArmour && renderItem('AC', item.base_ac!)}
+              {itemType === ItemBaseTypes.Armour &&
+                renderItem('AC', item.base_ac!)}
             </Dl>
           </div>
         </div>
         {renderAdvancedButton()}
-        {renderShopActions()}
       </Card>
     </ContainerWithTitle>
   );

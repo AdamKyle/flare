@@ -1,13 +1,34 @@
 import React from 'react';
 
+import { ItemBaseTypes } from '../../../reusable-components/item/enums/item-base-type';
+import { getType } from '../../../reusable-components/item/utils/get-type';
 import { formatNumberWithCommas } from '../../../util/format-number';
+import { armourPositions } from '../../character-sheet/partials/character-inventory/enums/inventory-item-types';
 import ShopCardProps from '../types/shop-card-props';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import LinkButton from 'ui/buttons/link-button';
 
-const ShopCard = ({ item, view_item }: ShopCardProps) => {
+const ShopCard = ({ item, view_item, compare_item }: ShopCardProps) => {
+  const itemType = getType(item, armourPositions);
+
+  const renderAttackOrDefence = () => {
+    if (itemType === ItemBaseTypes.Armour) {
+      return (
+        <span>
+          <strong>AC:</strong> {`+${item.base_ac}`}
+        </span>
+      );
+    }
+
+    return (
+      <span>
+        <strong>Damage:</strong> {`+${item.base_damage}`}
+      </span>
+    );
+  };
+
   return (
     <>
       <div className="flex items-start justify-between">
@@ -24,14 +45,14 @@ const ShopCard = ({ item, view_item }: ShopCardProps) => {
         />
       </div>
       <p className="mt-2 text-gray-700 dark:text-gray-300">
-        Restores 50 HP over 10 seconds.
+        {renderAttackOrDefence()}
       </p>
       <p className="mt-1 font-medium text-yellow-600 dark:text-yellow-400">
         Cost: {formatNumberWithCommas(item.cost)} g
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
         <Button
-          on_click={() => {}}
+          on_click={() => compare_item(item.id)}
           label="Compare"
           variant={ButtonVariant.SUCCESS}
         />

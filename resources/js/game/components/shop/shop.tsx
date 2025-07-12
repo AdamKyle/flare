@@ -3,6 +3,7 @@ import { isNil } from 'lodash';
 import React, { useMemo, useState, useEffect } from 'react';
 
 import ShopCard from './components/shop-card';
+import ShopComparison from './components/shop-comparison';
 import { ShopContext } from './context/shop-context';
 import ShopProps from './types/shop-props';
 import { buildShopItemTypeSelection } from './utils/build-shop-item-type-selection';
@@ -36,6 +37,7 @@ const Shop = ({ close_shop }: ShopProps) => {
   } = useCustomContext(ShopContext, 'Shop');
 
   const [itemToView, setItemToView] = useState<ItemDetails | null>(null);
+  const [itemToCompare, setItemToCompare] = useState<ItemDetails | null>(null);
   const [localSearch, setLocalSearch] = useState<string>(searchText);
 
   useEffect(() => {
@@ -98,8 +100,19 @@ const Shop = ({ close_shop }: ShopProps) => {
     }
   };
 
+  const handleCompareItem = (item_id: number) => {
+    const found = data.find((it) => it.id === item_id);
+    if (found) {
+      setItemToCompare(found);
+    }
+  };
+
   const closeItemView = () => {
     setItemToView(null);
+  };
+
+  const closeItemComparison = () => {
+    setItemToCompare(null);
   };
 
   const renderContent = () => {
@@ -112,20 +125,29 @@ const Shop = ({ close_shop }: ShopProps) => {
     return (
       <InfiniteRow handle_scroll={handleScroll} additional_css="max-h-[500px]">
         {data.map((item) => (
-          <ShopCard key={item.id} item={item} view_item={handleViewItem} />
+          <ShopCard
+            key={item.id}
+            item={item}
+            view_item={handleViewItem}
+            compare_item={handleCompareItem}
+          />
         ))}
       </InfiniteRow>
     );
   };
 
-  if (!isNil(itemToView)) {
+  if (!isNil(itemToCompare)) {
     return (
-      <SimpleItemDetails
-        item={itemToView}
-        on_close={closeItemView}
-        show_shop_actions
+      <ShopComparison
+        close_comparison={closeItemComparison}
+        item_name={itemToCompare.name}
+        item_type={itemToCompare.type}
       />
     );
+  }
+
+  if (!isNil(itemToView)) {
+    return <SimpleItemDetails item={itemToView} on_close={closeItemView} />;
   }
 
   return (
