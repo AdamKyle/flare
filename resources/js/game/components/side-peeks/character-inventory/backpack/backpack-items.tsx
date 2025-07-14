@@ -1,6 +1,6 @@
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
-import { debounce } from 'lodash';
-import React, { useMemo } from 'react';
+import { debounce, isNil } from 'lodash';
+import React, { useMemo, useState } from 'react';
 
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
 import { ItemTypeToView } from '../../components/items/enums/item-type-to-view';
@@ -8,6 +8,7 @@ import GenericItemList from '../../components/items/generic-item-list';
 import GenericItemProps from '../../components/items/types/generic-item-props';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
 import BaseInventoryItemDefinition from '../api-definitions/base-inventory-item-definition';
+import InventoryItem from '../inventory-item/inventory-item';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
@@ -17,6 +18,9 @@ import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
+  const [itemToView, setItemToView] =
+    useState<BaseInventoryItemDefinition | null>(null);
+
   const { data, error, loading, setSearchText, onEndReached } =
     UsePaginatedApiHandler<BaseInventoryItemDefinition>({
       url: CharacterInventoryApiUrls.CHARACTER_INVENTORY,
@@ -37,6 +41,15 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
     on_end_reached: onEndReached,
   });
 
+  const handleOnItemClick = (
+    typeOfItem: ItemTypeToView,
+    item: BaseInventoryItemDefinition
+  ) => {
+    console.log(typeOfItem);
+
+    setItemToView(item);
+  };
+
   if (error) {
     return (
       <div className={'p-4'}>
@@ -50,6 +63,16 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
       <div className={'p-4'}>
         <InfiniteLoader />
       </div>
+    );
+  }
+
+  if (!isNil(itemToView)) {
+    return (
+      <InventoryItem
+        item_id={itemToView.item_id}
+        character_id={character_id}
+        type_of_item={ItemTypeToView.EQUIPPABLE}
+      />
     );
   }
 
@@ -72,6 +95,7 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
           is_quest_items={false}
           on_scroll_to_end={handleInventoryScroll}
           items_view_type={ItemTypeToView.EQUIPPABLE}
+          on_click={handleOnItemClick}
         />
       </div>
     </div>
