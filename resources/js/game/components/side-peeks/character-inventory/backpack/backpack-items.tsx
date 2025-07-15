@@ -18,8 +18,7 @@ import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
-  const [itemToView, setItemToView] =
-    useState<BaseInventoryItemDefinition | null>(null);
+  const [itemId, setItemId] = useState<number | null>(null);
 
   const { data, error, loading, setSearchText, onEndReached } =
     UsePaginatedApiHandler<BaseInventoryItemDefinition>({
@@ -41,13 +40,14 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
     on_end_reached: onEndReached,
   });
 
-  const handleOnItemClick = (
-    typeOfItem: ItemTypeToView,
-    item: BaseInventoryItemDefinition
-  ) => {
+  const handleOnItemClick = (typeOfItem: ItemTypeToView, item_id: number) => {
     console.log(typeOfItem);
 
-    setItemToView(item);
+    setItemId(item_id);
+  };
+
+  const closeItemView = () => {
+    setItemId(null);
   };
 
   if (error) {
@@ -66,12 +66,13 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
     );
   }
 
-  if (!isNil(itemToView)) {
+  if (!isNil(itemId)) {
     return (
       <InventoryItem
-        item_id={itemToView.item_id}
+        item_id={itemId}
         character_id={character_id}
         type_of_item={ItemTypeToView.EQUIPPABLE}
+        close_item_view={closeItemView}
       />
     );
   }

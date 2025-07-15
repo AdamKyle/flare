@@ -1,40 +1,19 @@
 import React from 'react';
 
-import ItemDetailSection from './item-detail-section';
-import { armourPositions } from '../../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
-import { ItemBaseTypes } from '../enums/item-base-type';
+import DamageAcSection from './item-detail-sections/damage-ac-section';
+import StatsSection from './item-detail-sections/stats-section';
 import ItemDetailsProps from '../types/partials/item-details-props';
-import { getType } from '../utils/get-type';
-import { getBaseItemStats } from '../utils/item-stats';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
-import Dl from 'ui/dl/dl';
 import Separator from 'ui/separator/separator';
 
-const ItemDetails = ({ item, show_advanced_button }: ItemDetailsProps) => {
-  const renderDamageOrAcValue = () => {
-    const type = getType(item, armourPositions);
-
-    if (type === ItemBaseTypes.Armour) {
-      return (
-        <ItemDetailSection
-          label={'AC'}
-          item_type={item.type}
-          value={item.base_ac}
-        />
-      );
-    }
-
-    return (
-      <ItemDetailSection
-        label={'Damage'}
-        item_type={item.type}
-        value={item.base_damage}
-      />
-    );
-  };
-
+const ItemDetails = ({
+  item,
+  show_advanced_button,
+  show_in_between_separator,
+  damage_ac_on_top,
+}: ItemDetailsProps) => {
   const renderAdvancedButton = () => {
     if (!show_advanced_button) {
       return null;
@@ -51,33 +30,45 @@ const ItemDetails = ({ item, show_advanced_button }: ItemDetailsProps) => {
     );
   };
 
+  const renderInBetweenSeparator = () => {
+    if (show_in_between_separator) {
+      return <Separator />;
+    }
+
+    return <Separator additional_css={'block md:hidden'} />;
+  };
+
+  const renderDamageOnTop = () => {
+    const statsSection = <StatsSection item={item} />;
+
+    const damageSection = <DamageAcSection item={item} />;
+
+    const sep = renderInBetweenSeparator();
+
+    if (damage_ac_on_top) {
+      return (
+        <>
+          {damageSection}
+          {sep}
+          {statsSection}
+        </>
+      );
+    }
+
+    return (
+      <>
+        {statsSection}
+        {sep}
+        {damageSection}
+      </>
+    );
+  };
+
+  console.log(item);
+
   return (
     <>
-      <div>
-        <h4 className="mb-2 text-sm font-semibold text-danube-600 dark:text-danube-300">
-          Stats
-        </h4>
-        <Separator />
-        <Dl>
-          {getBaseItemStats(item).map((entry, index) => (
-            <ItemDetailSection
-              item_type={item.type}
-              label={entry.label}
-              value={entry.value}
-              is_percent={entry.isPercent}
-              key={`${item.id}-${index}`}
-            />
-          ))}
-        </Dl>
-      </div>
-
-      <div>
-        <h4 className="mb-2 text-sm font-semibold text-danube-600 dark:text-danube-300">
-          Damage / AC
-        </h4>
-        <Separator />
-        <Dl>{renderDamageOrAcValue()}</Dl>
-      </div>
+      {renderDamageOnTop()}
 
       {renderAdvancedButton()}
     </>

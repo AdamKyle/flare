@@ -23,11 +23,11 @@ export const useGetInventoryItemDetails = ({
   const fetchInventoryItemDetails = useCallback(async () => {
     try {
       const result = await apiHandler.get<
-        { data: ItemDetails },
-        AxiosRequestConfig<AxiosResponse<{ data: ItemDetails }>>
+        ItemDetails,
+        AxiosRequestConfig<AxiosResponse<ItemDetails>>
       >(apiUrl);
 
-      setData(result.data);
+      setData(result);
     } catch (err) {
       if (err instanceof AxiosError) {
         setError(err.response?.data || null);

@@ -1,6 +1,7 @@
 import { match } from 'ts-pattern';
 
 import { BaseItemDetails } from '../../../../../api-definitions/items/base-item-details';
+import ItemDetails from '../../../../../api-definitions/items/item-details';
 
 export const backpackBaseItemStyles = () => {
   return (
@@ -130,7 +131,9 @@ export const backpackButtonBackground = (item: BaseItemDetails) => {
     );
 };
 
-export const backpackItemTextColors = (item: BaseItemDetails): string => {
+export const backpackItemTextColors = (
+  item: BaseItemDetails | ItemDetails
+): string => {
   return match(item)
     .with(
       { is_cosmic: true },

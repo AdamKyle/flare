@@ -19,7 +19,7 @@ const GenericItemList = ({
       return;
     }
 
-    return on_click(items_view_type, item);
+    return on_click(items_view_type, item.item_id);
   };
 
   const renderBackPackItems = () => {

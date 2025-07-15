@@ -50,8 +50,14 @@ const LocationDroppableItems = ({
 
   const onOpenQuestItemDetails = (
     itemTypeToView: ItemTypeToView,
-    item: BaseInventoryItemDefinition
+    itemId: number
   ) => {
+    const item = data.find((item) => item.item_id === itemId);
+
+    if (!item) {
+      return;
+    }
+
     setIsQuestItemDetailsOpen(true);
     setItemTypeToView(itemTypeToView);
     setItemToView(item);

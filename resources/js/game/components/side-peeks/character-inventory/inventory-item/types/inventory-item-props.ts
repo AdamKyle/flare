@@ -4,4 +4,5 @@ export default interface InventoryItemProps {
   item_id: number;
   character_id: number;
   type_of_item: ItemTypeToView;
+  close_item_view: () => void;
 }
