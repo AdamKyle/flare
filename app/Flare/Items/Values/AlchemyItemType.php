@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Character\CharacterInventory\Values;
+namespace App\Flare\Items\Values;
 
 enum AlchemyItemType: string {
     case INCREASE_STATS = 'increase-stats';
