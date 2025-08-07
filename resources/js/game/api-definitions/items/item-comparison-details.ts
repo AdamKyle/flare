@@ -17,6 +17,7 @@ export default interface ItemComparisonDetails {
 }
 
 export interface Detail {
+  id: number;
   damage_adjustment: number;
   base_damage_adjustment: number;
   base_damage_mod_adjustment: number;

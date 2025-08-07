@@ -5,7 +5,6 @@ namespace App\Console\AfterDeployment;
 use App\Flare\Models\FactionLoyaltyNpcTask;
 use App\Flare\Models\Item;
 use App\Flare\Values\MapNameValue;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use Illuminate\Console\Command;
 
 class FixFactionLoyaltyCraftingTasks extends Command

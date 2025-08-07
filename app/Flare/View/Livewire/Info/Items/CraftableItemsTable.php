@@ -2,8 +2,8 @@
 
 namespace App\Flare\View\Livewire\Info\Items;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Item;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;

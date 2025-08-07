@@ -43,6 +43,8 @@ class MassImportCustomData extends Command
         }
 
         Artisan::call('break:maps-into-pieces');
+        Artisan::call('import:game-data Armour');
+        Artisan::call('import:game-data Weapons');
 
         $this->importSurveys();
     }

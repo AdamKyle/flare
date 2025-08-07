@@ -1,7 +1,9 @@
 import React from 'react';
 
-import DamageAcSection from './item-detail-sections/damage-ac-section';
+import ArmourClassSection from './item-detail-sections/armour-class-section';
+import DamageSection from './item-detail-sections/damage-section';
 import StatsSection from './item-detail-sections/stats-section';
+import { ItemDetailsSectionLabels } from '../enums/item-details-section-labels';
 import ItemDetailsProps from '../types/partials/item-details-props';
 
 import Button from 'ui/buttons/button';
@@ -41,7 +43,29 @@ const ItemDetails = ({
   const renderDamageOnTop = () => {
     const statsSection = <StatsSection item={item} />;
 
-    const damageSection = <DamageAcSection item={item} />;
+    const damageSection = (
+      <DamageSection
+        item={item}
+        attributes={[
+          {
+            label: ItemDetailsSectionLabels.DAMAGE,
+            attribute: 'base_damage',
+          },
+        ]}
+      />
+    );
+
+    const armourClassSection = (
+      <ArmourClassSection
+        item={item}
+        attributes={[
+          {
+            label: ItemDetailsSectionLabels.AC,
+            attribute: 'base_ac',
+          },
+        ]}
+      />
+    );
 
     const sep = renderInBetweenSeparator();
 
@@ -49,6 +73,7 @@ const ItemDetails = ({
       return (
         <>
           {damageSection}
+          {armourClassSection}
           {sep}
           {statsSection}
         </>
@@ -60,11 +85,10 @@ const ItemDetails = ({
         {statsSection}
         {sep}
         {damageSection}
+        {armourClassSection}
       </>
     );
   };
-
-  console.log(item);
 
   return (
     <>

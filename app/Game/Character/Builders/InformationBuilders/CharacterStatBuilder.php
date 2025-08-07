@@ -2,6 +2,7 @@
 
 namespace App\Game\Character\Builders\InformationBuilders;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
@@ -14,7 +15,6 @@ use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ElementalA
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HealingBuilder;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilder;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Character\Concerns\Boons;
 use App\Game\Character\Concerns\FetchEquipped;
 use Exception;

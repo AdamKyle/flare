@@ -2,13 +2,13 @@
 
 namespace Tests\Unit\Game\Character\Builders\StatDetailsBuilder;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameMap;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MapNameValue;
 use App\Game\Character\Builders\StatDetailsBuilder\StatModifierDetails;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;

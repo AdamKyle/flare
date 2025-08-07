@@ -7,7 +7,7 @@ import ItemDetailSection from '../item-detail-section';
 import Dl from 'ui/dl/dl';
 import Separator from 'ui/separator/separator';
 
-const StatsSection = ({ item, is_adjustment }: BaseSectionProps) => {
+const EnemyStatsReduction = ({ item, is_adjustment }: BaseSectionProps) => {
   return (
     <div>
       <h4 className="mb-2 text-sm font-semibold text-danube-600 dark:text-danube-300">
@@ -30,4 +30,4 @@ const StatsSection = ({ item, is_adjustment }: BaseSectionProps) => {
   );
 };
 
-export default StatsSection;
+export default EnemyStatsReduction;

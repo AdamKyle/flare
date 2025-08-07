@@ -2,6 +2,9 @@
 
 namespace App\Game\Character\CharacterInventory\Providers;
 
+use App\Flare\Items\Enricher\ItemEnricherFactory;
+use App\Flare\Items\Transformers\EquippableItemTransformer;
+use App\Flare\Items\Transformers\QuestItemTransformer;
 use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterGemSlotsTransformer;
@@ -67,8 +70,11 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CharacterInventoryService::class, function ($app) {
             return new CharacterInventoryService(
-                $app->make(InventoryTransformer::class),
+                $app->make(ItemEnricherFactory::class),
+                $app->make(EquippableItemTransformer::class),
+                $app->make(QuestItemTransformer::class),
                 $app->make(UsableItemTransformer::class),
+                $app->make(InventoryTransformer::class),
                 $app->make(MassDisenchantService::class),
                 $app->make(UpdateCharacterSkillsService::class),
                 $app->make(UpdateCharacterAttackTypesHandler::class),

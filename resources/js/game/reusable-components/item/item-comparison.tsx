@@ -1,39 +1,23 @@
 import React, { useState } from 'react';
 
+import { ItemDetailsSectionLabels } from './enums/item-details-section-labels';
 import ExpandedItemComparison from './partials/expanded-item-comparison';
+import ArmourClassSection from './partials/item-detail-sections/armour-class-section';
+import DamageSection from './partials/item-detail-sections/damage-section';
+import StatsSection from './partials/item-detail-sections/stats-section';
 import ItemComparisonProps from './types/item-comparison-props';
-import {
-  armourPositions,
-  InventoryItemTypes,
-} from '../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
 
+import { Alert } from 'ui/alerts/alert';
+import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
-import Dd from 'ui/dl/dd';
-import Dl from 'ui/dl/dl';
-import Dt from 'ui/dl/dt';
 import Separator from 'ui/separator/separator';
 
-const ItemComparison = ({ comparisonDetails }: ItemComparisonProps) => {
+const ItemComparison = ({
+  comparisonDetails,
+  item_name,
+}: ItemComparisonProps) => {
   const [expanded, setExpanded] = useState(false);
-
-  const renderField = (label: string, value: number, isPercent = true) => {
-    if (value === 0) return null;
-    const display = isPercent ? `${(value * 100).toFixed(2)}%` : `${value}`;
-    const color =
-      value > 0
-        ? 'text-emerald-500 dark:text-emerald-300'
-        : 'text-rose-500 dark:text-rose-300';
-    const prefix = value > 0 ? '+' : '';
-    return (
-      <React.Fragment key={label}>
-        <Dt>{label}</Dt>
-        <Dd>
-          <span className={color}>{`${prefix}${display}`}</span>
-        </Dd>
-      </React.Fragment>
-    );
-  };
 
   const renderExpandedDetails = (
     detail: (typeof comparisonDetails.details)[0]
@@ -52,52 +36,46 @@ const ItemComparison = ({ comparisonDetails }: ItemComparisonProps) => {
     <div>
       <div className={`grid grid-cols-1 ${columnsClass} gap-6`}>
         {comparisonDetails.details.map((detail) => {
-          const isArmour = armourPositions.includes(
-            detail.type as InventoryItemTypes
-          );
-          const statFields: Array<[string, number]> = [
-            ['Strength', detail.str_adjustment],
-            ['Dexterity', detail.dex_adjustment],
-            ['Intelligence', detail.int_adjustment],
-            ['Durability', detail.dur_adjustment],
-            ['Charisma', detail.chr_adjustment],
-            ['Agility', detail.agi_adjustment],
-            ['Focus', detail.focus_adjustment],
-          ];
-
           return (
             <div key={detail.name} className="space-y-6 p-4 md:p-6">
-              <h3 className="text-lg font-semibold text-primary-700 dark:text-primary-300">
+              <h3 className="text-lg font-semibold text-danube-600 dark:text-danube-300">
                 {detail.name}
               </h3>
               <Separator />
-              <Dl>
-                <Dt>Equipped Position</Dt>
-                <Dd>{detail.position}</Dd>
-                {isArmour ? (
-                  <>
-                    <Dt>AC</Dt>
-                    <Dd>{detail.ac_adjustment}</Dd>
-                  </>
-                ) : (
-                  <>
-                    <Dt>Damage</Dt>
-                    <Dd>{detail.damage_adjustment}</Dd>
-                  </>
-                )}
-              </Dl>
+              <Alert variant={AlertVariant.INFO}>
+                The adjustments you see below are in relation to you replacing
+                this item with the one you want to buy from the shop:{' '}
+                {item_name}
+              </Alert>
               <Separator />
-              <div>
-                <h4 className="text-sm font-medium text-danube-600 dark:text-danube-300 mb-2">
-                  Stats
-                </h4>
-                <Separator />
-                <Dl>
-                  {statFields.map(([label, val]) =>
-                    renderField(label, val, true)
-                  )}
-                </Dl>
-              </div>
+              <DamageSection
+                item={detail}
+                attributes={[
+                  {
+                    label: ItemDetailsSectionLabels.DAMAGE,
+                    attribute: 'damage_adjustment',
+                  },
+                  {
+                    label: ItemDetailsSectionLabels.BONUS_DAMAGE_MOD,
+                    attribute: 'base_damage_mod_adjustment',
+                    expanded_only: true,
+                  },
+                ]}
+                is_adjustment
+                is_expanded={expanded}
+              />
+              <ArmourClassSection
+                item={detail}
+                attributes={[
+                  {
+                    label: ItemDetailsSectionLabels.AC,
+                    attribute: 'ac_adjustment',
+                  },
+                ]}
+                is_adjustment
+              />
+              <Separator />
+              <StatsSection item={detail} is_adjustment />
               {renderExpandedDetails(detail)}
             </div>
           );

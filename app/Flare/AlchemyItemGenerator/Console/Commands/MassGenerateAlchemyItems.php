@@ -7,7 +7,7 @@ use App\Flare\AlchemyItemGenerator\DTO\AlchemyItemDTO;
 use App\Flare\AlchemyItemGenerator\Generator\GenerateAlchemyItem;
 use App\Flare\ExponentialCurve\Curve\ExponentialAttributeCurve;
 use App\Flare\ExponentialCurve\Curve\ExponentialLevelCurve;
-use App\Game\Character\CharacterInventory\Values\AlchemyItemType;
+use App\Flare\Items\Values\AlchemyItemType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Exception;
 use Illuminate\Console\Command;

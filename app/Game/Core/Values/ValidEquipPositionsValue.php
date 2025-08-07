@@ -2,9 +2,9 @@
 
 namespace App\Game\Core\Values;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Item;
 use App\Flare\Values\ArmourTypes;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 
 class ValidEquipPositionsValue
 {

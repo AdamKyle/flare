@@ -2,6 +2,7 @@
 
 namespace App\Game\ClassRanks\Services;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterClassRank;
 use App\Flare\Models\CharacterClassSpecialtiesEquipped;
@@ -9,7 +10,6 @@ use App\Flare\Models\GameClassSpecial;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\ClassRanks\Values\ClassRankValue;
 use App\Game\ClassRanks\Values\ClassSpecialValue;

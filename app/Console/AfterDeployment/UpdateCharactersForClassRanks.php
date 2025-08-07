@@ -2,13 +2,13 @@
 
 namespace App\Console\AfterDeployment;
 
-use Illuminate\Console\Command;
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterClassRank;
 use App\Flare\Models\GameClass;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\ClassRanks\Values\ClassRankValue;
+use Illuminate\Console\Command;
 
 class UpdateCharactersForClassRanks extends Command
 {

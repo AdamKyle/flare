@@ -2,11 +2,11 @@
 
 namespace App\Game\Core\Comparison;
 
+use App\Flare\Items\Values\ArmourType;
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Traits\IsItemUnique;
-use App\Game\Character\CharacterInventory\Values\ArmourType;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use Illuminate\Database\Eloquent\Collection;
 
 class ItemComparison
@@ -25,9 +25,6 @@ class ItemComparison
         'focus',
     ];
 
-    /**
-     * Fetch Comparison Details for an item of the same type currently equipped.
-     */
     public function fetchDetails(Item $toCompare, Collection $inventorySlots, Character $character): array
     {
         $this->character = $character;
@@ -42,12 +39,10 @@ class ItemComparison
             default => null
         };
 
-        // Find valid weapon
         if (is_null($positions)) {
             $positions = in_array($toCompare->type, ItemType::validWeapons()) ? ['left-hand', 'right-hand'] : null;
         }
 
-        // Find valid armour
         if (is_null($positions)) {
             $armourPositions = ArmourType::getArmourPositions();
 
@@ -59,11 +54,9 @@ class ItemComparison
         });
 
         foreach ($foundInventorySlots as $slot) {
-
             $result = $this->fetchHandComparison($toCompare, $inventorySlots, $slot->position);
 
             if (! empty($result)) {
-
                 $result['position'] = $slot->position;
                 $result['is_unique'] = $this->isUnique($slot->item);
                 $result['is_mythic'] = $slot->item->is_mythic;
@@ -116,29 +109,24 @@ class ItemComparison
         return $toCompare->resurrection_chance - $equipped->resurrection_chance;
     }
 
-    public function getBaseDamageAdjustment(Item $toCompare, Item $equipped): float
+    public function getBaseDamageModAdjustment(Item $toCompare, Item $equipped): float
     {
-        return $toCompare->base_damage_mod - $equipped->base_damage_mod;
+        return $toCompare->getTotalBaseDamageMod() - $equipped->getTotalBaseDamageMod();
     }
 
-    public function getBaseHealingAdjustment(Item $toCompare, Item $equipped): float
+    public function getBaseHealingModAdjustment(Item $toCompare, Item $equipped): float
     {
-        return $toCompare->base_healing_mod - $equipped->base_healing_mod;
+        return $toCompare->getTotalBaseHealingMod() - $equipped->getTotalBasehealingMod();
     }
 
-    public function getBaseAcAdjustment(Item $toCompare, Item $equipped): float
+    public function getBaseAcModAdjustment(Item $toCompare, Item $equipped): float
     {
-        return $toCompare->base_ac_mod - $equipped->base_ac_mod;
+        return $toCompare->getTotalBaseAcMod() - $equipped->getTotalBaseAcMod();
     }
 
     public function getFightTimeOutModAdjustment(Item $toCompare, Item $equipped): float
     {
         return $toCompare->getTotalFightTimeOutMod() - $equipped->getTotalFightTimeOutMod();
-    }
-
-    public function getBaseDamageModAdjustment(Item $toCompare, Item $equipped): float
-    {
-        return $toCompare->getTotalBaseDamageMod() - $equipped->getTotalBaseDamageMod();
     }
 
     public function getSpellEvasionAdjustment(Item $toCompare, Item $equipped): float
@@ -170,12 +158,11 @@ class ItemComparison
     {
         $adjustments = [
             'damage_adjustment',
-            'base_damage_adjustment',
             'base_damage_mod_adjustment',
             'ac_adjustment',
-            'base_ac_adjustment',
+            'base_ac_mod_adjustment',
             'healing_adjustment',
-            'base_healing_adjustment',
+            'base_healing_mod_adjustment',
             'str_adjustment',
             'dur_adjustment',
             'dex_adjustment',
@@ -233,16 +220,12 @@ class ItemComparison
         return $this->fetchItemComparisonDetails($toCompare, $foundPosition->item);
     }
 
-    /**
-     * Compares skills on attached affixes.
-     */
     protected function addSkillComparison(Item $toCompare, Item $equippedItem, array $result): array
     {
         $toCompareSkills = $toCompare->getItemSkills();
         $equippedItemSkills = $equippedItem->getItemSkills();
 
         if (empty($toCompareSkills) && ! empty($equippedItemSkills)) {
-
             foreach ($equippedItemSkills as $index => $skill) {
                 $equippedItemSkills[$index]['skill_training_bonus'] = -$equippedItemSkills[$index]['skill_training_bonus'];
                 $equippedItemSkills[$index]['skill_bonus'] = -$equippedItemSkills[$index]['skill_bonus'];
@@ -276,9 +259,6 @@ class ItemComparison
         return $comparison;
     }
 
-    /**
-     * Get Affix Comparisons.
-     */
     protected function getAffixComparisons(Item $toCompare, Item $equippedItem, array $result): array
     {
         $attributes = [

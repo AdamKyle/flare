@@ -2,13 +2,13 @@
 
 namespace App\Flare\Values;
 
+use App\Flare\Items\Values\ArmourType;
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
-use App\Game\Character\CharacterInventory\Values\ArmourType;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 

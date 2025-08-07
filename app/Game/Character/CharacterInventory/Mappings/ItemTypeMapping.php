@@ -2,7 +2,7 @@
 
 namespace App\Game\Character\CharacterInventory\Mappings;
 
-use App\Game\Character\CharacterInventory\Values\ItemType;
+use App\Flare\Items\Values\ItemType;
 
 final class ItemTypeMapping
 {

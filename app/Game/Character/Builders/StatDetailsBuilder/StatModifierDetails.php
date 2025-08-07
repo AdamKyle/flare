@@ -2,12 +2,12 @@
 
 namespace App\Game\Character\Builders\StatDetailsBuilder;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\Builders\StatDetailsBuilder\Concerns\BasicItemDetails;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Character\Concerns\FetchEquipped;
 use Facades\App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;
 use Illuminate\Support\Collection;

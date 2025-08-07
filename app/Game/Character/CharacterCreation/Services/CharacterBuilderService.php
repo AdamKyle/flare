@@ -2,6 +2,7 @@
 
 namespace App\Game\Character\CharacterCreation\Services;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterClassRank;
 use App\Flare\Models\CharacterPassiveSkill;
@@ -17,7 +18,6 @@ use App\Flare\Values\BaseSkillValue;
 use App\Flare\Values\BaseStatValue;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\ClassRanks\Values\ClassRankValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use App\Game\Core\Values\FactionLevel;

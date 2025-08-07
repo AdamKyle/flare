@@ -6,7 +6,8 @@ export const variantStyle = (variant: AlertVariant) => {
   return match(variant)
     .with(
       AlertVariant.INFO,
-      () => 'border-danube-400 dark:border-danube-500 dark:bg-danube-700'
+      () =>
+        'border-danube-400 dark:border-danube-500 bg-danube-100 dark:bg-danube-700'
     )
     .with(
       AlertVariant.SUCCESS,

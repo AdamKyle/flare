@@ -2,12 +2,12 @@
 
 namespace App\Game\Character\Builders\InformationBuilders\AttributeBuilders;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\Item;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Character\Builders\StatDetailsBuilder\Concerns\BasicItemDetails;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use Illuminate\Support\Collection;
 
 class BaseAttribute

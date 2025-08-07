@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Game\ClassRanks\Services;
 
-use App\Game\Character\CharacterInventory\Values\ItemType;
+use App\Flare\Items\Values\ItemType;
 use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\ClassRanks\Values\ClassRankValue;
 use App\Game\ClassRanks\Values\ClassSpecialValue;

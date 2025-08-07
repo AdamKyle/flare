@@ -61,7 +61,7 @@ class ItemTransformer extends TransformerAbstract
             'base_damage_mod_bonus' => $item->getTotalBaseDamageMod(),
             'base_healing_mod_bonus' => $item->base_healing_mod_bonus,
             'base_ac_mod_bonus' => $item->base_ac_mod_bonus,
-            'fight_time_out_mod_bonus' => $item->getTotalFightTimeOutMod(),
+            'fight_time_out_mod_bonus' => $item->fight_time_out_mod_bonus ?? 0,
             'move_time_out_mod_bonus' => $item->move_time_out_mod_bonus,
             'damages_kingdoms' => $item->damages_kingdoms,
             'kingdom_damage' => $item->kingdom_damage,

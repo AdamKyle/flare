@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Game\Skills\Controllers\Api;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;

@@ -2,4 +2,5 @@ import ItemComparisonDetails from '../../../api-definitions/items/item-compariso
 
 export default interface ItemComparisonProps {
   comparisonDetails: ItemComparisonDetails;
+  item_name: string;
 }

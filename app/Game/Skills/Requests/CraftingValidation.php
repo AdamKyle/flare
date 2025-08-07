@@ -2,7 +2,7 @@
 
 namespace App\Game\Skills\Requests;
 
-use App\Game\Character\CharacterInventory\Values\ItemType;
+use App\Flare\Items\Values\ItemType;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CraftingValidation extends FormRequest

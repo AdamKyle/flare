@@ -3,4 +3,5 @@ export default interface ItemDetailSectionProps {
   value?: number;
   is_percent?: boolean;
   item_type: string;
+  is_adjustment?: boolean;
 }

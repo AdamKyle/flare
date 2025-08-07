@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;

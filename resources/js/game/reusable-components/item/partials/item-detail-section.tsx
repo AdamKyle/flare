@@ -15,8 +15,9 @@ const ItemDetailSection = ({
   value,
   is_percent,
   item_type,
+  is_adjustment,
 }: ItemDetailSectionProps) => {
-  if (isNil(value) || value <= 0) {
+  if (isNil(value)) {
     return null;
   }
 
@@ -26,13 +27,21 @@ const ItemDetailSection = ({
 
   const isCrafting = label.startsWith('Crafting');
 
-  const display = `+${amount}`;
+  const displayValue = () => {
+    if (is_adjustment) {
+      return value < 0 ? `${amount}` : `+${amount}`;
+    }
+
+    return amount;
+  };
 
   return (
     <React.Fragment key={label}>
       <Dt>
         <div className="flex items-center space-x-2">
-          <InfoToolTip info_text={getItemInfoText(label, amount, item_type)} />
+          <InfoToolTip
+            info_text={getItemInfoText(label, amount, item_type, value)}
+          />
           <span
             className={clsx({
               'text-mango-tango-500 dark:text-mango-tango-300': isCrafting,
@@ -48,10 +57,14 @@ const ItemDetailSection = ({
           <span
             className={clsx({
               'text-mango-tango-500 dark:text-mango-tango-300': isCrafting,
-              'text-emerald-500 dark:text-emerald-300': !isCrafting,
+              'text-emerald-500 dark:text-emerald-300':
+                !isCrafting && is_adjustment && value > 0,
+              'text-rose-500 dark:text-rose-300':
+                !isCrafting && is_adjustment && value < 0,
+              'text-gray-800 dark:text-gray-300': !isCrafting && !is_adjustment,
             })}
           >
-            {display}
+            {displayValue()}
           </span>
         </div>
       </Dd>

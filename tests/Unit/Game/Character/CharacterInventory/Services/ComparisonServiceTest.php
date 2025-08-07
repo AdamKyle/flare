@@ -2,11 +2,10 @@
 
 namespace Tests\Unit\Game\Character\CharacterInventory\Services;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\SpellTypes;
-use App\Flare\Values\WeaponTypes;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;

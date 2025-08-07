@@ -2,6 +2,7 @@
 
 namespace Tests\Setup\Character;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameClass;
@@ -13,8 +14,6 @@ use App\Flare\Models\User;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
-use App\Game\Character\CharacterInventory\Values\ItemType;
-use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;

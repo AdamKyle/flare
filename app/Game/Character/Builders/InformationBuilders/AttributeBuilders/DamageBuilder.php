@@ -2,12 +2,11 @@
 
 namespace App\Game\Character\Builders\InformationBuilders\AttributeBuilders;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
-use App\Flare\ServerFight\Fight\CharacterAttacks\Types\WeaponType;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\WeaponTypes;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use Exception;
 use Illuminate\Support\Collection;
 

@@ -2,6 +2,10 @@
 
 namespace App\Game\Character\CharacterInventory\Services;
 
+use App\Flare\Items\Enricher\ItemEnricherFactory;
+use App\Flare\Items\Transformers\EquippableItemTransformer;
+use App\Flare\Items\Transformers\QuestItemTransformer;
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySet;
@@ -14,7 +18,6 @@ use App\Flare\Transformers\UsableItemTransformer;
 use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -25,7 +28,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use League\Fractal\Manager;
-use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use League\Fractal\Resource\Collection as LeagueCollection;
 
 class CharacterInventoryService
@@ -63,8 +65,11 @@ class CharacterInventoryService
     private string $inventorySetEquippedName = '';
 
     /**
-     * @param InventoryTransformer $inventoryTransformer
+     * @param ItemEnricherFactory $itemEnricherFactory
+     * @param EquippableItemTransformer $equippableItemTransformer
+     * @param QuestItemTransformer $questItemTransformer
      * @param UsableItemTransformer $usableItemTransformer
+     * @param InventoryTransformer $inventoryTransformer
      * @param MassDisenchantService $massDisenchantService
      * @param UpdateCharacterSkillsService $updateCharacterSkillsService
      * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler
@@ -72,8 +77,11 @@ class CharacterInventoryService
      * @param Manager $manager
      */
     public function __construct(
-        private readonly InventoryTransformer $inventoryTransformer,
+        private readonly ItemEnricherFactory    $itemEnricherFactory,
+        private readonly EquippableItemTransformer $equippableItemTransformer,
+        private readonly QuestItemTransformer $questItemTransformer,
         private readonly UsableItemTransformer $usableItemTransformer,
+        private readonly InventoryTransformer $inventoryTransformer,
         private readonly MassDisenchantService $massDisenchantService,
         private readonly UpdateCharacterSkillsService $updateCharacterSkillsService,
         private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler,
@@ -428,8 +436,13 @@ class CharacterInventoryService
             });
         }
 
+        $slots = $slots->map(function ($slot) {
+            $slot->item = $this->itemEnricherFactory->buildItem($slot->item, $this->character->damage_stat);
+            return $slot;
+        });
+
         return $slots->sortByDesc(
-            fn($slot) => (float) $slot->item->getTotalPercentageForStat($this->character->damage_stat)
+            fn($slot) => (float) $slot->item->total_damage_stat_bonus
         );
     }
 
@@ -448,19 +461,36 @@ class CharacterInventoryService
     {
         $slots = $this->getInventoryCollection($searchText);
 
-        return $this->pagination->buildPaginatedDate($slots, $this->inventoryTransformer, $perPage, $page);
+        return $this->pagination->buildPaginatedDate($slots, $this->equippableItemTransformer, $perPage, $page);
     }
 
+    /**
+     * Returns all quest items - paginated.
+     *
+     * @param int $perPage
+     * @param int $page
+     * @param string $searchText
+     * @return array
+     */
     public function fetchCharacterQuestItems(int $perPage = 10, int $page = 1, string $searchText = ''): array {
         $slots = $this->getQuestItems($searchText);
 
-        return $this->pagination->buildPaginatedDate($slots, $this->inventoryTransformer, $perPage, $page);
+        return $this->pagination->buildPaginatedDate($slots, $this->questItemTransformer, $perPage, $page);
     }
 
+    /**
+     * Returns all usable items - paginated
+     *
+     * @param int $perPage
+     * @param int $page
+     * @param string $searchText
+     * @param array $filter
+     * @return array
+     */
     public function fetchCharacterUsableItems(int $perPage = 10, int $page = 1, string $searchText = '', array $filter = []): array {
         $slots = $this->getUsableItems($searchText, $filter);
 
-        return $this->pagination->buildPaginatedDate($slots, $this->inventoryTransformer, $perPage, $page);
+        return $this->pagination->buildPaginatedDate($slots, $this->usableItemTransformer, $perPage, $page);
     }
 
     /**

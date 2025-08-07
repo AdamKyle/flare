@@ -5,7 +5,6 @@ namespace App\Game\Character\CharacterInventory\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
-use App\Flare\Transformers\ItemComparisonTransfromer;
 use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Core\Values\ValidEquipPositionsValue;
@@ -131,11 +130,7 @@ class ComparisonService
 
     protected function buildItemDetails(InventorySlot $slot): array
     {
-        if ($slot->item->type === 'quest') {
-            $item = new FractalItem($slot->item, new ItemTransformer);
-        } else {
-            $item = new FractalItem($slot->item, new ItemComparisonTransfromer);
-        }
+        $item = new FractalItem($slot->item, new ItemTransformer);
 
         $item = (new Manager)->createData($item)->toArray()['data'];
 
@@ -158,7 +153,7 @@ class ComparisonService
 
     protected function itemDetails(Item $item): array
     {
-        $item = new FractalItem($item, new ItemComparisonTransfromer);
+        $item = new FractalItem($item, new ItemTransformer());
 
         $item = (new Manager)->createData($item)->toArray()['data'];
 

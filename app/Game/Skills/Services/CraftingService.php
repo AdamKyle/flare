@@ -2,6 +2,7 @@
 
 namespace App\Game\Skills\Services;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
@@ -9,7 +10,6 @@ use App\Flare\Models\Skill;
 use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;

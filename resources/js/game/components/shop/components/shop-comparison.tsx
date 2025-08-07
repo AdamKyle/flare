@@ -41,7 +41,7 @@ const ShopComparison = ({
       return <ApiErrorAlert apiError={error.message} />;
     }
 
-    return <ItemComparison comparisonDetails={data} />;
+    return <ItemComparison comparisonDetails={data} item_name={item_name} />;
   };
 
   return (

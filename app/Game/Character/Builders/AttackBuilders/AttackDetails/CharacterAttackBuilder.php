@@ -2,12 +2,12 @@
 
 namespace App\Game\Character\Builders\AttackBuilders\AttackDetails;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Map;
 use App\Flare\Values\AttackTypeValue;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Character\Concerns\FetchEquipped;
 use Exception;
 

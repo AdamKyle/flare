@@ -1,14 +1,18 @@
 import ItemStatDefinition from './definitions/item-stat-definition';
+import { STAT_DEFINITIONS } from './definitions/stat-definitions';
+import { Detail } from '../../../api-definitions/items/item-comparison-details';
 import ItemDetails from '../../../api-definitions/items/item-details';
 
-export const getBaseItemStats = (item: ItemDetails): ItemStatDefinition[] => {
-  return [
-    { label: 'Strength', value: item.str_modifier, isPercent: true },
-    { label: 'Durability', value: item.dur_modifier, isPercent: true },
-    { label: 'Intelligence', value: item.int_modifier, isPercent: true },
-    { label: 'Dexterity', value: item.dex_modifier, isPercent: true },
-    { label: 'Charisma', value: item.chr_modifier, isPercent: true },
-    { label: 'Agility', value: item.agi_modifier, isPercent: true },
-    { label: 'Focus', value: item.focus_modifier, isPercent: true },
-  ];
-};
+export function getItemStats(
+  item: ItemDetails | Detail,
+  isAdjustment = false
+): ItemStatDefinition[] {
+  return STAT_DEFINITIONS.map(({ label, baseKey, adjKey, isPercent }) => ({
+    label,
+
+    value: isAdjustment
+      ? (item as Detail)[adjKey]
+      : (item as ItemDetails)[baseKey],
+    isPercent,
+  }));
+}

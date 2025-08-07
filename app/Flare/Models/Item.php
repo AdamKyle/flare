@@ -12,11 +12,6 @@ class Item extends Model
 {
     use CalculateSkillBonus, Cloneable, HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'name',
         'item_suffix_id',
@@ -48,9 +43,6 @@ class Item extends Model
         'skill_name',
         'skill_training_bonus',
         'skill_bonus',
-        'base_damage_mod_bonus',
-        'base_healing_mod_bonus',
-        'base_ac_mod_bonus',
         'fight_time_out_mod_bonus',
         'move_time_out_mod_bonus',
         'skill_level_required',
@@ -98,11 +90,6 @@ class Item extends Model
         'item_skill_id',
     ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
     protected $casts = [
         'base_damage' => 'integer',
         'base_healing' => 'integer',
@@ -117,9 +104,6 @@ class Item extends Model
         'gold_bars_cost' => 'integer',
         'unlocks_class_id' => 'integer',
         'socket_count' => 'integer',
-        'base_damage_mod' => 'float',
-        'base_healing_mod' => 'float',
-        'base_ac_mod' => 'float',
         'str_mod' => 'float',
         'dur_mod' => 'float',
         'dex_mod' => 'float',
@@ -184,400 +168,135 @@ class Item extends Model
         'is_unique',
     ];
 
-    public function itemSkill()
-    {
+    public function itemSkill() {
         return $this->hasOne(ItemSkill::class, 'id', 'item_skill_id')->with('children');
     }
 
-    public function itemSkillProgressions()
-    {
+    public function itemSkillProgressions() {
         return $this->hasMany(ItemSkillProgression::class, 'item_id', 'id');
     }
 
-    public function inventorySlots()
-    {
+    public function inventorySlots() {
         return $this->hasMany(InventorySlot::class, 'item_id', 'id');
     }
 
-    public function inventorySetSlots()
-    {
+    public function inventorySetSlots() {
         return $this->hasMany(SetSlot::class, 'item_id', 'id');
     }
 
-    public function marketListings()
-    {
+    public function marketListings() {
         return $this->hasMany(MarketBoard::class, 'item_id', 'id');
     }
 
-    public function marketHistory()
-    {
+    public function marketHistory() {
         return $this->hasMany(MarketHistory::class, 'item_id', 'id');
     }
 
-    public function itemSuffix()
-    {
+    public function itemSuffix() {
         return $this->hasOne(ItemAffix::class, 'id', 'item_suffix_id');
     }
 
-    public function itemPrefix()
-    {
+    public function itemPrefix() {
         return $this->hasOne(ItemAffix::class, 'id', 'item_prefix_id');
     }
 
-    public function appliedHolyStacks()
-    {
+    public function appliedHolyStacks() {
         return $this->hasMany(HolyStack::class, 'item_id', 'id');
     }
 
-    public function sockets()
-    {
+    public function sockets() {
         return $this->hasMany(ItemSocket::class, 'item_id', 'id');
     }
 
-    public function dropLocation()
-    {
+    public function dropLocation() {
         return $this->hasOne(Location::class, 'id', 'drop_location_id')->with('map');
     }
 
-    public function unlocksClass()
-    {
+    public function unlocksClass() {
         return $this->hasOne(GameClass::class, 'id', 'unlocks_class_id');
     }
 
-    public function children()
-    {
+    public function children() {
         return $this->hasMany($this, 'parent_id')->with('children');
     }
 
-    public function parent()
-    {
+    public function parent() {
         return $this->belongsTo($this, 'parent_id');
     }
 
-    /**
-     * Gets the affix name attribute.
-     *
-     * When calling affix_name on the item, it will return the name with all affixes applied.
-     */
-    public function getAffixNameAttribute()
-    {
+    public function getAffixNameAttribute() {
         $itemPrefix = ItemAffix::find($this->item_prefix_id);
         $itemSuffix = ItemAffix::find($this->item_suffix_id);
         $itemName = '';
 
-        if (! is_null($itemPrefix)) {
+        if (!is_null($itemPrefix)) {
             $itemName = '*' . $itemPrefix->name . '* ' . $this->name;
         }
 
-        if (! is_null($itemSuffix)) {
-            if ($itemName !== '') {
-                $itemName .= ' *' . $itemSuffix->name . '*';
-            } else {
-                $itemName = $this->name . ' *' . $itemSuffix->name . '*';
-            }
+        if (!is_null($itemSuffix)) {
+            $itemName .= $itemName !== '' ? ' *' . $itemSuffix->name . '*' : $this->name . ' *' . $itemSuffix->name . '*';
         }
 
-        if ($itemName === '') {
-            return $this->name;
-        }
-
-        return $itemName;
+        return $itemName === '' ? $this->name : $itemName;
     }
 
-    public function getAffixCountAttribute()
-    {
-        if (! is_null($this->item_prefix_id) && ! is_null($this->item_suffix_id)) {
-            return 2;
-        }
-
-        if (is_null($this->item_prefix_id) && ! is_null($this->item_suffix_id)) {
-            return 1;
-        }
-
-        if (! is_null($this->item_prefix_id) && is_null($this->item_suffix_id)) {
-            return 1;
-        }
-
+    public function getAffixCountAttribute() {
+        if (!is_null($this->item_prefix_id) && !is_null($this->item_suffix_id)) return 2;
+        if (!is_null($this->item_prefix_id) || !is_null($this->item_suffix_id)) return 1;
         return 0;
     }
 
-    public function getIsUniqueAttribute()
-    {
-        $value = false;
-
-        if (! is_null($this->itemPrefix)) {
-            $value = $this->itemPrefix->randomly_generated;
-        }
-
-        if ($value) {
-            return $value;
-        }
-
-        if (! is_null($this->itemSuffix)) {
-            $value = $this->itemSuffix->randomly_generated;
-        }
-
-        return $value;
+    public function getIsUniqueAttribute() {
+        return $this->itemPrefix?->randomly_generated || $this->itemSuffix?->randomly_generated;
     }
 
-    public function getRequiredMonsterAttribute()
-    {
-        if ($this->type === 'quest') {
-            return Monster::where('quest_item_id', $this->id)->with('gameMap')->first();
-        }
-
-        return null;
+    public function getRequiredMonsterAttribute() {
+        return $this->type === 'quest' ? Monster::where('quest_item_id', $this->id)->with('gameMap')->first() : null;
     }
 
-    public function getRequiredQuestAttribute()
-    {
-        if ($this->type === 'quest') {
-            return Quest::where('reward_item', $this->id)->with('npc', 'npc.gameMap', 'item')->first();
-        }
-
-        return null;
+    public function getRequiredQuestAttribute() {
+        return $this->type === 'quest' ? Quest::where('reward_item', $this->id)->with('npc', 'npc.gameMap', 'item')->first() : null;
     }
 
-    public function getLocationsAttribute()
-    {
-        if ($this->type === 'quest') {
-            return Location::where('quest_reward_item_id', $this->id)->with('map')->get();
-        }
-
-        return [];
+    public function getLocationsAttribute() {
+        return $this->type === 'quest' ? Location::where('quest_reward_item_id', $this->id)->with('map')->get() : [];
     }
 
-    public function getHolyStackDevouringDarknessAttribute()
-    {
-        if ($this->appliedHolyStacks->isNotEmpty()) {
-            return $this->appliedHolyStacks->sum('devouring_darkness_bonus');
-        }
-
-        return 0.0;
+    public function getHolyStackDevouringDarknessAttribute() {
+        return $this->appliedHolyStacks->sum('devouring_darkness_bonus') ?? 0.0;
     }
 
-    public function getHolyStackStatBonusAttribute()
-    {
-        if ($this->appliedHolyStacks->isNotEmpty()) {
-            return $this->appliedHolyStacks->sum('stat_increase_bonus');
-        }
-
-        return 0.0;
+    public function getHolyStackStatBonusAttribute() {
+        return $this->appliedHolyStacks->sum('stat_increase_bonus') ?? 0.0;
     }
 
-    public function getHolyStacksAppliedAttribute()
-    {
-        if ($this->appliedHolyStacks->isNotEmpty()) {
-            return $this->appliedHolyStacks->count();
-        }
-
-        return 0;
+    public function getHolyStacksAppliedAttribute() {
+        return $this->appliedHolyStacks->count() ?? 0;
     }
 
-    /**
-     * Gets the total damage value for the item.
-     *
-     * In some cases an item might not have a base_damage value.
-     * however, might have either prefix or suffix or both.
-     *
-     * In this case we will set the damage variable to one.
-     * this will allow the damage modifiers to be applied to the item.
-     *
-     * Which in turns allows the player to their total damage increased when
-     * attacking.
-     *
-     * @return int.
-     */
-    public function scopeGetTotalDamage(): int
-    {
-        $baseDamage = is_null($this->base_damage) ? 0 : $this->base_damage;
-        $damage = $baseDamage;
-
-        if (! is_null($this->itemPrefix)) {
-            $damage += ($damage * $this->itemPrefix->base_damage_mod);
-        }
-
-        if (! is_null($this->itemSuffix)) {
-            $damage += ($damage * $this->itemSuffix->base_damage_mod);
-        }
-
-        if (! is_null($this->base_damage_mod)) {
-            $damage += ($damage * $this->base_damage_mod);
-        }
-
-        return round($damage);
-    }
-
-    /**
-     * Gets the total defence value for the item.
-     *
-     * In some cases an item might not have a base_ac value.
-     * however, might have either prefix or suffix or both.
-     *
-     * In this case we will set the ac variable to one.
-     * this will allow the ac modifiers to be applied to the item.
-     *
-     * Which in turns allows the player to their total ac increased when
-     * defending from attacks.
-     *
-     * @return int.
-     */
-    public function scopeGetTotalDefence(): int
-    {
-        $baseAc = is_null($this->base_ac) ? 0 : $this->base_ac;
-        $ac = $baseAc;
-
-        if (! is_null($this->itemPrefix)) {
-            $ac += $ac * $this->itemPrefix->base_ac_mod;
-        }
-
-        if (! is_null($this->itemSuffix)) {
-            $ac += $ac * $this->itemSuffix->base_ac_mod;
-        }
-
-        $ac += $ac * $this->base_ac_mod;
-
-        return ceil($ac);
-    }
-
-    /**
-     * Gets the total healing value for the item.
-     *
-     * In some cases an item might not have a base_healing value,
-     * however, it might have either prefix or suffix or both.
-     *
-     * In this case we will set the healFor variable to one.
-     * this will allow the healing modifiers to be applied to the item.
-     *
-     * Which in turns allows the player to their total healing increased when
-     * attacking.
-     *
-     * @return int.
-     */
-    public function scopeGetTotalHealing(): int
-    {
-        $baseHealing = is_null($this->base_healing) ? 0 : $this->base_healing;
-        $healFor = $baseHealing;
-
-        if (! is_null($this->itemPrefix)) {
-            $healFor += ($healFor * $this->itemPrefix->base_healing_mod);
-        }
-
-        if (! is_null($this->itemSuffix)) {
-            $healFor += ($healFor * $this->itemSuffix->base_healing_mod);
-        }
-
-        return ceil($healFor);
-    }
-
-    public function scopeGetTotalFightTimeOutMod(): float
-    {
-        return is_null($this->fight_time_out_mod_bonus) ? 0.0 : $this->fight_time_out_mod_bonus;
-    }
-
-    /**
-     * Get the total Base Damage Mode
-     */
-    public function scopeGetTotalBaseDamageMod(): float
-    {
-        return is_null($this->base_damage_mod_bonus) ? 0.0 : $this->base_damage_mod_bonus;
-    }
-
-    /**
-     * Can get attributes off the attached affix.
-     */
-    public function getAffixAttribute(string $attribute): float
-    {
+    public function getAffixAttribute(string $attribute): float {
         $base = 0.0;
 
-        if (! is_null($this->itemPrefix)) {
+        if (!is_null($this->itemPrefix)) {
             $base += $this->itemPrefix->{$attribute};
         }
 
-        if (! is_null($this->itemSuffix)) {
+        if (!is_null($this->itemSuffix)) {
             $base += $this->itemSuffix->{$attribute};
         }
 
         return $base;
     }
 
-    /**
-     * Gets the total percentage increase for a stat.
-     */
-    public function getTotalPercentageForStat(string $stat): float
-    {
-        $baseStat = is_null($this->{$stat . '_mod'}) ? 0.0 : $this->{$stat . '_mod'};
-
-        if (! is_null($this->itemPrefix)) {
-            $statBonus = $this->itemPrefix->{$stat . '_mod'};
-            $baseStat += ! is_null($statBonus) ? $statBonus : 0.0;
-        }
-
-        if (! is_null($this->itemSuffix)) {
-            $statBonus = $this->itemSuffix->{$stat . '_mod'};
-            $baseStat += ! is_null($statBonus) ? $statBonus : 0.0;
-        }
-
-        if ($this->holy_stack_stat_bonus > 0) {
-            $baseStat += $this->holy_stack_stat_bonus;
-        }
-
-        return $baseStat;
-    }
-
-    /**
-     * Gets the total skill training bonus (XP bonus)
-     */
-    public function getSkillTrainingBonus(GameSkill $gameSkill): float
-    {
+    public function getSkillTrainingBonus(GameSkill $gameSkill): float {
         return $this->calculateTrainingBonus($this, $gameSkill);
     }
 
-    public function scopeGetItemSkills($query): array
-    {
-        $skills = [];
-
-        if (! is_null($this->itemPrefix)) {
-            if (! is_null($this->itemPrefix->skill_name)) {
-                $skills[] = [
-                    'skill_name' => $this->itemPrefix->skill_name,
-                    'skill_training_bonus' => $this->itemPrefix->skill_training_bonus,
-                    'skill_bonus' => $this->itemPrefix->skill_bonus,
-                ];
-            }
-        }
-
-        if (! is_null($this->itemSuffix)) {
-            if (! is_null($this->itemSuffix->skill_name)) {
-                $skills[] = [
-                    'skill_name' => $this->itemSuffix->skill_name,
-                    'skill_training_bonus' => $this->itemSuffix->skill_training_bonus,
-                    'skill_bonus' => $this->itemSuffix->skill_bonus,
-                ];
-            }
-        }
-
-        if (! is_null($this->skill_name)) {
-            $skills[] = [
-                'skill_name' => $this->skill_name,
-                'skill_training_bonus' => $this->skill_training_bonus,
-                'skill_bonus' => $this->skill_bonus,
-            ];
-        }
-
-        return $skills;
-    }
-
-    /**
-     * Gets the total skill training bonus (Bonus when using)
-     */
-    public function getSkillBonus(GameSkill $gameSkill): float
-    {
+    public function getSkillBonus(GameSkill $gameSkill): float {
         return $this->calculateBonus($this, $gameSkill);
     }
 
-    protected static function newFactory()
-    {
+    protected static function newFactory() {
         return ItemFactory::new();
     }
 }

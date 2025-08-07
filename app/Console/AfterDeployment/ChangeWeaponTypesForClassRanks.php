@@ -2,9 +2,9 @@
 
 namespace App\Console\AfterDeployment;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterClassRankWeaponMastery;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;

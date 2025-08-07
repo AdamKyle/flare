@@ -2,11 +2,11 @@
 
 namespace App\Flare\AlchemyItemGenerator\Generator;
 
-use Illuminate\Support\Str;
 use App\Flare\AlchemyItemGenerator\DTO\AlchemyItemCurvesDTO;
 use App\Flare\AlchemyItemGenerator\DTO\AlchemyItemDTO;
+use App\Flare\Items\Values\AlchemyItemType;
 use App\Flare\Models\Item;
-use App\Game\Character\CharacterInventory\Values\AlchemyItemType;
+use Illuminate\Support\Str;
 
 
 class GenerateAlchemyItem

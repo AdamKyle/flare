@@ -2,9 +2,9 @@
 
 namespace App\Console\AfterDeployment;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\CharacterClassRank;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
