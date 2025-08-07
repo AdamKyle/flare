@@ -2,11 +2,11 @@ import React from 'react';
 
 import CounterAndAmbushSection from './item-detail-sections/counter-and-ambush-section';
 import { ItemDetailsSectionLabels } from '../enums/item-details-section-labels';
+import EnemyStatsReduction from './item-detail-sections/enemy-stats-reduction';
 import SkillSection from './item-detail-sections/skill-section';
 import ExpandedItemComparisonProps from '../types/partials/expanded-item-comparison-props';
 
 import Separator from 'ui/separator/separator';
-import EnemyStatsReduction from "./item-detail-sections/enemy-stats-reduction";
 
 const ExpandedItemComparison = ({
   expandedDetails,

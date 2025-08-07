@@ -58,6 +58,7 @@
     "resources/vendor/theme/assets/js/components/toggle-darkmode.js",
     "resources/vendor/theme/assets/js/dark-mode/dark-mode.js",
     "resources/vendor/theme/assets/js/extras.js",
-    "resources/vendor/theme/assets/js/script.js"
+    "resources/vendor/theme/assets/js/script.js",
+    "resources/js/game/components/side-peeks/map-actions/location-details/enums/location-types.ts"
   ]
 }
