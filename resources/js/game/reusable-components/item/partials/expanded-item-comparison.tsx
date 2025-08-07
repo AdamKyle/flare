@@ -6,6 +6,7 @@ import SkillSection from './item-detail-sections/skill-section';
 import ExpandedItemComparisonProps from '../types/partials/expanded-item-comparison-props';
 
 import Separator from 'ui/separator/separator';
+import EnemyStatsReduction from "./item-detail-sections/enemy-stats-reduction";
 
 const ExpandedItemComparison = ({
   expandedDetails,
@@ -36,6 +37,8 @@ const ExpandedItemComparison = ({
       />
       <Separator />
       <SkillSection item={expandedDetails} is_adjustment />
+      <Separator />
+      <EnemyStatsReduction item={expandedDetails} />
     </>
   );
 };
