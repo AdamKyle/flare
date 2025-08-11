@@ -6,11 +6,16 @@ use App\Flare\Github\Commands\GetReleaseData;
 use App\Flare\Github\Components\ReleaseNote;
 use App\Flare\Github\Services\Github;
 use App\Flare\Github\Services\Markdown;
+use App\Flare\Items\Comparison\Comparator;
+use App\Flare\Items\Comparison\ItemComparison;
 use App\Flare\Items\Enricher\EquippableEnricher;
 use App\Flare\Items\Enricher\ItemEnricherFactory;
+use App\Flare\Items\Enricher\Manifest\Concerns\ManifestSchema;
+use App\Flare\Items\Enricher\Manifest\EquippableManifest;
 use App\Flare\Items\Transformers\EquippableItemTransformer;
 use App\Flare\Items\Transformers\QuestItemTransformer;
 use App\Flare\Items\Transformers\UsableItemTransformer;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
@@ -41,14 +46,25 @@ class ServiceProvider extends ApplicationServiceProvider
             return new UsableItemTransformer;
         });
 
+        $this->app->bind(ManifestSchema::class, EquippableManifest::class);
+
         $this->app->singleton(ItemEnricherFactory::class, function ($app) {
             return new ItemEnricherFactory(
                 $app->make(EquippableEnricher::class),
                 $app->make(EquippableItemTransformer::class),
                 $app->make(UsableItemTransformer::class),
                 $app->make(QuestItemTransformer::class),
+                $app->make(PlainDataSerializer::class),
                 $app->make(Manager::class),
             );
         });
+
+        $this->app->bind(ItemComparison::class, function ($app) {
+            return new ItemComparison(
+                $app->make(EquippableEnricher::class),
+                $app->make(Comparator::class)
+            );
+        });
+
     }
 }

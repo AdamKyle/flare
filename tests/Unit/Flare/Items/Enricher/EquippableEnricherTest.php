@@ -3,6 +3,9 @@
 namespace Tests\Unit\Flare\Items\Enricher;
 
 use App\Flare\Items\Enricher\EquippableEnricher;
+use App\Flare\Items\Enricher\Manifest\AutoManifest;
+use App\Flare\Items\Enricher\Manifest\EquippableManifest;
+use App\Flare\Items\Enricher\Manifest\Values\ManifestSchemaId;
 use App\Flare\Models\HolyStack;
 use App\Flare\Models\Item;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -204,4 +207,100 @@ class EquippableEnricherTest extends TestCase
         $this->assertEquals(9.0, $enriched->total_non_stacking_affix_damage);
         $this->assertEquals(0.0, $enriched->total_irresistible_affix_damage);
     }
+
+    public function testEnrichMethodHasAutoManifestAndResolvesEquippableSchema(): void
+    {
+        $ref   = new \ReflectionMethod(EquippableEnricher::class, 'enrich');
+        $attrs = $ref->getAttributes(AutoManifest::class);
+
+        $this->assertCount(1, $attrs, 'Expected exactly one AutoManifest attribute on enrich().');
+
+        /** @var AutoManifest $meta */
+        $meta = $attrs[0]->newInstance();
+
+        // Enum is correct:
+        $this->assertSame(
+            ManifestSchemaId::EQUIPPABLE,
+            $meta->schema
+        );
+
+        // Resolve concrete schema:
+        $schema = $meta->schema->schema();
+
+        $this->assertSame(
+            EquippableManifest::class,
+            $schema::class
+        );
+
+        $this->assertContains('/^total_.+$/', $schema->includes());
+        $this->assertSame('totals.damage', $schema->map('total_damage'));
+    }
+
+    public function testSchemaMapsEnrichedItemIntoDotPaths(): void
+    {
+        // Arrange: make sure enrichment actually sets several props.
+        $this->item->update([
+            'base_damage'      => 100,
+            'base_healing'     => 50,
+            'base_ac'          => 25,
+            'base_damage_mod'  => 0.10,
+            'base_healing_mod' => 0.20,
+            'base_ac_mod'      => 0.30,
+            'devouring_light'  => 0.05,
+        ]);
+
+        // Enrich (existing tests already assert the numbers; here we care about mapping)
+        $enriched = $this->enricher->enrich($this->item->fresh());
+
+        // Resolve the schema via the attribute on the method:
+        $ref   = new \ReflectionMethod(\App\Flare\Items\Enricher\EquippableEnricher::class, 'enrich');
+
+        /** @var AutoManifest $meta */
+        $meta  = $ref->getAttributes(AutoManifest::class)[0]->newInstance();
+        $schema = $meta->schema->schema();
+
+        // Build a minimal "mapped bag" like the builder would (only for a few fields).
+        $propsToMap = [
+            'total_damage',
+            'total_healing',
+            'total_defence',
+            'base_damage_mod',
+            'devouring_light',
+        ];
+
+        $bag = [];
+        foreach ($propsToMap as $prop) {
+            $path = $schema->map($prop);
+            $this->assertNotNull($path, "Schema should map {$prop} to a path.");
+
+            $this->setDot($bag, $path, $enriched->{$prop});
+        }
+
+        // Assert the dot paths exist and contain the enriched values:
+        $this->assertSame(110, $bag['totals']['damage']);
+        $this->assertSame(60,  $bag['totals']['healing']);
+        $this->assertSame(33,  $bag['totals']['defence']);
+
+        $this->assertSame(0.10, $bag['mods']['base']['damage_mod']);
+        $this->assertSame(0.05, $bag['devouring']['light']);
+    }
+
+    /**
+     * Minimal dot-path setter for this test.
+     */
+    private function setDot(array &$arr, string $path, mixed $value): void
+    {
+        $parts = explode('.', $path);
+        $ref =& $arr;
+
+        foreach ($parts as $segment) {
+            if (!array_key_exists($segment, $ref) || !is_array($ref[$segment])) {
+                $ref[$segment] = [];
+            }
+            $ref =& $ref[$segment];
+        }
+
+        $ref = $value;
+    }
+
 }

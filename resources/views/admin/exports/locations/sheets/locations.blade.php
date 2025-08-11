@@ -39,7 +39,7 @@
                 <td>{{ $location->y }}</td>
                 <td>{{ $location->type }}</td>
                 <td>
-                    {{ ! is_null($location->enemy_strength_type) ? 'Yes' : 'No' }}
+                    {{ ! is_null($location->enemy_strength_increase) ? 'Yes' : 'No' }}
                 </td>
                 <td>{{ $location->pin_css_class }}</td>
             </tr>

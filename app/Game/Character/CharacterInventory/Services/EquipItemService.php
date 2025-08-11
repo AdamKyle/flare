@@ -2,6 +2,7 @@
 
 namespace App\Game\Character\CharacterInventory\Services;
 
+use App\Flare\Items\Comparison\ItemComparison;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySet;
@@ -11,7 +12,6 @@ use App\Flare\Models\SetSlot;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
-use App\Game\Core\Comparison\ItemComparison;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use Exception;

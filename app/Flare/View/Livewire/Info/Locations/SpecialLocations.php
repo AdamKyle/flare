@@ -17,7 +17,7 @@ class SpecialLocations extends DataTableComponent
 
     public function builder(): Builder
     {
-        return Location::whereNotNull('enemy_strength_type');
+        return Location::whereNotNull('enemy_strength_increase');
     }
 
     public function columns(): array

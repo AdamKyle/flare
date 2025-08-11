@@ -8,6 +8,7 @@ use App\Flare\Models\Item;
 use App\Flare\Items\Transformers\EquippableItemTransformer;
 use App\Flare\Items\Transformers\UsableItemTransformer;
 use App\Flare\Items\Transformers\QuestItemTransformer;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as FractalItem;
 
@@ -18,6 +19,7 @@ class ItemEnricherFactory
         private readonly EquippableItemTransformer $equippableTransformer,
         private readonly UsableItemTransformer $usableTransformer,
         private readonly QuestItemTransformer $questTransformer,
+        private readonly PlainDataSerializer $plainDataSerializer,
         private readonly Manager $manager,
     ) {}
 
@@ -72,7 +74,7 @@ class ItemEnricherFactory
     {
         $resource = new FractalItem($item->refresh(), $transformer);
 
-        return $this->manager->createData($resource)->toArray();
+        return $this->manager->setSerializer($this->plainDataSerializer)->createData($resource)->toArray();
     }
 
     /**

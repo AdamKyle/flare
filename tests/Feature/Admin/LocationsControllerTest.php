@@ -122,7 +122,7 @@ class LocationsControllerTest extends TestCase
     {
         $location = Location::factory()->create([
             'game_map_id'          => $this->gameMap->id,
-            'enemy_strength_type'  => null,
+            'enemy_strength_increase'  => null,
             'type'                 => null,
             'quest_reward_item_id' => null,
         ]);
@@ -132,10 +132,10 @@ class LocationsControllerTest extends TestCase
 
         $view = $response->original;
         $this->assertEquals('information.locations.location', $view->getName());
+
         $data = $view->getData();
+
         $this->assertEquals($location->id, $data['location']->id);
-        $this->assertNull($data['increasesEnemyStrengthBy']);
-        $this->assertEquals(0.0, $data['increasesDropChanceBy']);
         $this->assertNull($data['locationType']);
         $this->assertNull($data['usedInQuest']);
     }

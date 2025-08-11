@@ -3,8 +3,10 @@
 namespace App\Game\Core\Providers;
 
 use App\Flare\Builders\BuildMythicItem;
+use App\Flare\Items\Comparison\Comparator;
+use App\Flare\Items\Comparison\ItemComparison;
+use App\Flare\Items\Enricher\EquippableEnricher;
 use App\Game\Battle\Services\BattleDrop;
-use App\Game\Core\Comparison\ItemComparison;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\Core\Services\CharactersOnline;
 use App\Game\Core\Services\DropCheckService;
@@ -38,10 +40,6 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(BattleDrop::class),
                 $app->make(BuildMythicItem::class)
             );
-        });
-
-        $this->app->bind(ItemComparison::class, function ($app) {
-            return new ItemComparison;
         });
 
         $this->app->bind(CharactersOnline::class, function($app) {

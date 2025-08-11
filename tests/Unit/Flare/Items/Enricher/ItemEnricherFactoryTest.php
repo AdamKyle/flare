@@ -113,8 +113,8 @@ class ItemEnricherFactoryTest extends TestCase
 
         $result = $this->factory->buildItemData($item);
 
-        $this->assertArrayHasKey('data', $result);
-        $this->assertEquals($item->id, $result['data']['id']);
+        $this->assertIsArray($result);
+        $this->assertEquals($item->id, $result['id']);
     }
 
     public function testReturnsTransformedUsableItemData(): void
@@ -126,8 +126,8 @@ class ItemEnricherFactoryTest extends TestCase
 
         $result = $this->factory->buildItemData($item);
 
-        $this->assertArrayHasKey('data', $result);
-        $this->assertEquals($item->id, $result['data']['id']);
+        $this->assertIsArray($result);
+        $this->assertEquals($item->id, $result['id']);
     }
 
     public function testReturnsTransformedQuestItemData(): void
@@ -139,8 +139,8 @@ class ItemEnricherFactoryTest extends TestCase
 
         $result = $this->factory->buildItemData($item);
 
-        $this->assertArrayHasKey('data', $result);
-        $this->assertEquals($item->id, $result['data']['id']);
+        $this->assertIsArray($result);
+        $this->assertEquals($item->id, $result['id']);
     }
 
     public function testReturnsEmptyArrayForUnknownType(): void
@@ -166,7 +166,7 @@ class ItemEnricherFactoryTest extends TestCase
             'drop_location_id' => $location->id,
         ]);
 
-        $data = $this->factory->buildItemData($item)['data'];
+        $data = $this->factory->buildItemData($item);
 
         $this->assertNotNull($data['drop_location']);
         $this->assertEquals($location->id, $data['drop_location']['id']);
@@ -183,7 +183,7 @@ class ItemEnricherFactoryTest extends TestCase
             'quest_item_id' => $item->id,
         ]);
 
-        $data = $this->factory->buildItemData($item)['data'];
+        $data = $this->factory->buildItemData($item);
 
         $this->assertNotNull($data['required_monster']);
         $this->assertEquals($monster->id, $data['required_monster']['id']);
@@ -201,7 +201,7 @@ class ItemEnricherFactoryTest extends TestCase
             'reward_item' => $item->id,
         ]);
 
-        $data = $this->factory->buildItemData($item)['data'];
+        $data = $this->factory->buildItemData($item);
 
         $this->assertNotNull($data['reward_quests']);
         $this->assertEquals($quest->id, $data['reward_quests'][0]['id']);
@@ -214,7 +214,7 @@ class ItemEnricherFactoryTest extends TestCase
         $item = $this->createItem(['type' => 'quest', 'usable' => false]);
         $rewardLocation = $this->createLocation(['game_map_id' => $map->id, 'quest_reward_item_id' => $item->id]);
 
-        $data = $this->factory->buildItemData($item)['data'];
+        $data = $this->factory->buildItemData($item);
 
         $this->assertCount(1, $data['reward_locations']);
         $this->assertEquals($rewardLocation->id, $data['reward_locations'][0]['id']);
@@ -229,7 +229,7 @@ class ItemEnricherFactoryTest extends TestCase
         $quest1 = $this->createQuest(['npc_id' => $npc->id, 'item_id' => $item->id]);
         $quest2 = $this->createQuest(['npc_id' => $npc->id, 'secondary_required_item' => $item->id]);
 
-        $data = $this->factory->buildItemData($item)['data'];
+        $data = $this->factory->buildItemData($item);
 
         $this->assertCount(2, $data['required_quests']);
         $this->assertEqualsCanonicalizing(
@@ -246,7 +246,7 @@ class ItemEnricherFactoryTest extends TestCase
 
         $quest = $this->createQuest(['npc_id' => $npc->id, 'reward_item' => $item->id]);
 
-        $data = $this->factory->buildItemData($item)['data'];
+        $data = $this->factory->buildItemData($item);
 
         $this->assertCount(1, $data['reward_quests']);
         $this->assertEquals($quest->id, $data['reward_quests'][0]['id']);
@@ -263,7 +263,7 @@ class ItemEnricherFactoryTest extends TestCase
             'required_quest_item_id' => $item->id,
         ]);
 
-        $data = $this->factory->buildItemData($item)['data'];
+        $data = $this->factory->buildItemData($item);
 
         $this->assertCount(1, $data['required_locations']);
         $this->assertEquals($location->id, $data['required_locations'][0]['id']);

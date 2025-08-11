@@ -143,9 +143,9 @@ class InfoPageController extends Controller
         $increasesDropChanceBy = 0.0;
         $locationType = null;
 
-        if (! is_null($location->enemy_strength_type)) {
-            $increasesEnemyStrengthBy = LocationEffectValue::getIncreaseName($location->enemy_strength_type);
-            $increasesDropChanceBy = (new LocationEffectValue($location->enemy_strength_type))->fetchDropRate();
+        if (! is_null($location->enemy_strength_increase)) {
+            $increasesEnemyStrengthBy = LocationEffectValue::getIncreaseName($location->enemy_strength_increase);
+            $increasesDropChanceBy = (new LocationEffectValue($location->enemy_strength_increase))->fetchDropRate();
         }
 
         $questItemDetails = [];

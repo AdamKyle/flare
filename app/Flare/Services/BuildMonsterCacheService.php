@@ -189,7 +189,7 @@ class BuildMonsterCacheService
      */
     protected function manageMonsters(array $monstersCache): array
     {
-        foreach (Location::whereNotNull('enemy_strength_type')->get() as $location) {
+        foreach (Location::whereNotNull('enemy_strength_increase')->get() as $location) {
             $monsters = Monster::where('is_celestial_entity', false)
                 ->where('game_map_id', $location->game_map_id)
                 ->where('is_raid_monster', false)
@@ -198,8 +198,8 @@ class BuildMonsterCacheService
 
             $monsters = $this->transformMonsterForLocation(
                 $monsters,
-                LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type),
-                LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type)
+                LocationEffectValue::getIncreaseByAmount($location->enemy_strength_increase),
+                LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_increase)
             );
 
             $monsterTransformer = $this->monster->setIsMonsterSpecial(true);

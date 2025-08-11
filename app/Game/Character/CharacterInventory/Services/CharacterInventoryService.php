@@ -167,31 +167,29 @@ class CharacterInventoryService
         }
     }
 
-    /**
-     * Gets the slot that holds the item, for its details.
-     */
     public function getSlotForItemDetails(Character $character, Item $item): InventorySlot|SetSlot|null
     {
+        $inventory = Inventory::where('character_id', $character->id)->first();
 
-        $slot = Inventory::where('character_id', $character->id)->first()->slots()->where('item_id', $item->id)->first();
-
-        if (is_null($slot)) {
-
-            $desiredSlot = $character->inventorySets()
-                ->whereHas('slots', function ($query) use ($item) {
-                    $query->where('item_id', $item->id);
-                })->first();
-
-            if (is_null($desiredSlot)) {
-                return null;
+        if ($inventory) {
+            $slot = $inventory->slots()->where('item_id', $item->id)->first();
+            if ($slot) {
+                return $slot;
             }
-
-            $slot = $desiredSlot->slots->filter(function ($slot) use ($item) {
-                return $slot->item_id === $item->id;
-            })->first();
         }
 
-        return $slot;
+        $desiredSet = $character->inventorySets()
+            ->whereHas('slots', function ($query) use ($item) {
+                $query->where('item_id', $item->id);
+            })->first();
+
+        if (!$desiredSet) {
+            return null;
+        }
+
+        return $desiredSet->slots->first(function ($slot) use ($item) {
+            return (int)$slot->item_id === (int)$item->id;
+        });
     }
 
     /**
@@ -413,7 +411,7 @@ class CharacterInventoryService
      * @param string $searchText
      * @return Collection
      */
-    public function getInventoryCollection(string $searchText = ''): Collection
+    public function getInventorySlotsCollection(string $searchText = ''): Collection
     {
         $slotsToIgnore = Cache::get('character-slots-to-disenchant-' . $this->character->id, []);
 
@@ -424,26 +422,30 @@ class CharacterInventoryService
             ->whereNotIn('id', $slotsToIgnore)
             ->where('equipped', false);
 
-        if (!empty($searchText)) {
+        if ($searchText !== '') {
             $search = Str::lower($searchText);
 
             $slots = $slots->filter(function ($slot) use ($search) {
                 $item = $slot->item;
 
-                return Str::contains(Str::lower($item->name), $search) ||
-                    ($item->itemPrefix && Str::contains(Str::lower($item->itemPrefix->name), $search)) ||
-                    ($item->itemSuffix && Str::contains(Str::lower($item->itemSuffix->name), $search));
+                return Str::contains(Str::lower($item->name), $search)
+                    || ($item->itemPrefix && Str::contains(Str::lower($item->itemPrefix->name), $search))
+                    || ($item->itemSuffix && Str::contains(Str::lower($item->itemSuffix->name), $search));
             });
         }
 
-        $slots = $slots->map(function ($slot) {
-            $slot->item = $this->itemEnricherFactory->buildItem($slot->item, $this->character->damage_stat);
-            return $slot;
-        });
+        return $slots->values();
+    }
 
-        return $slots->sortByDesc(
-            fn($slot) => (float) $slot->item->total_damage_stat_bonus
-        );
+    public function getInventoryCollection(string $searchText = ''): Collection
+    {
+        return $this->getInventorySlotsCollection($searchText)
+            ->map(function ($slot) {
+                $slot->item = $this->itemEnricherFactory->buildItem($slot->item, $this->character->damage_stat);
+                return $slot->item;
+            })
+            ->sortByDesc(fn($item) => (float) $item->total_damage_stat_bonus)
+            ->values();
     }
 
     /**
@@ -520,12 +522,20 @@ class CharacterInventoryService
 
         $inventory = Inventory::where('character_id', $this->character->id)->first();
 
-        $slots = InventorySlot::where('inventory_id', $inventory->id)->where('equipped', true)->get();
+        $items = InventorySlot::query()
+            ->where('inventory_id', $inventory->id)
+            ->where('equipped', true)
+            ->with('item')
+            ->get()
+            ->pluck('item')
+            ->filter()
+            ->map(fn ($item) => $this->itemEnricherFactory->buildItem($item))
+            ->values();
 
-        if ($slots->isNotEmpty()) {
-            $slots = new LeagueCollection($slots, $this->inventoryTransformer);
+        if ($items->isNotEmpty()) {
+            $items = new LeagueCollection($items, $this->equippableItemTransformer);
 
-            return $this->manager->createData($slots)->toArray();
+            return $this->manager->createData($items)->toArray();
         }
 
         $inventorySet = InventorySet::where('character_id', $this->character->id)->where('is_equipped', true)->first();
@@ -548,11 +558,18 @@ class CharacterInventoryService
             }
         }
 
-        $slots = SetSlot::where('inventory_set_id', $inventorySet->id)->get();
+        $items = SetSlot::query()
+            ->where('inventory_set_id', $inventorySet->id)
+            ->with('item')
+            ->get()
+            ->pluck('item')
+            ->filter()
+            ->map(fn ($item) => $this->itemEnricherFactory->buildItem($item))
+            ->values();
 
-        $slots = new LeagueCollection($slots, $this->inventoryTransformer);
+        $items = new LeagueCollection($items, $this->equippableItemTransformer);
 
-        return $this->manager->createData($slots)->toArray();
+        return $this->manager->createData($items)->toArray();
     }
 
     /**
@@ -675,23 +692,35 @@ class CharacterInventoryService
         ]);
     }
 
-    /**
-     * Disenchant all items in the characters inventory.
-     */
     public function disenchantAllItemsInInventory(): array
     {
-        $slots = $this->getInventoryCollection()->filter(function ($slot) {
-            return ! is_null($slot->item->item_prefix_id) || ! is_null($slot->item->item_suffix_id);
-        })->values();
+        // Work with SLOTS, not items.
+        $slots = $this->character->inventory->slots
+            ->where('equipped', false)
+            ->filter(function ($slot) {
+                // Slot may be dangling (unlikely, but safe guard):
+                if (!$slot->item) {
+                    return false;
+                }
 
-        if ($slots->isNotEmpty()) {
+                // Ignore types we never disenchant:
+                if (in_array($slot->item->type, ['quest', 'alchemy', 'artifact'], true)) {
+                    return false;
+                }
 
-            return $this->disenchantAllItems($slots, $this->character);
+                // Only disenchant items that actually have an affix:
+                return !is_null($slot->item->item_prefix_id) || !is_null($slot->item->item_suffix_id);
+            })
+            ->values();
+
+        if ($slots->isEmpty()) {
+            return $this->successResult([
+                'message' => 'You have nothing to disenchant.',
+            ]);
         }
 
-        return $this->successResult([
-            'message' => 'You have nothing to disenchant.',
-        ]);
+        // Mass disenchanter expects a collection of SLOTS.
+        return $this->disenchantAllItems($slots, $this->character);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Game\Character\CharacterInventory\Controllers\Api;
 
+use App\Flare\Items\Enricher\ItemEnricherFactory;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
@@ -88,7 +89,7 @@ class CharacterInventoryController extends Controller
         );
     }
 
-    public function itemDetails(Character $character, Item $item, Manager $manager, PlainDataSerializer $plainDataSerializer, ItemTransformer $itemTransformer): JsonResponse
+    public function itemDetails(Character $character, Item $item, Manager $manager, PlainDataSerializer $plainDataSerializer, ItemEnricherFactory $itemEnricherFactory): JsonResponse
     {
 
         $slot = $this->characterInventoryService->getSlotForItemDetails($character, $item);
@@ -99,11 +100,7 @@ class CharacterInventoryController extends Controller
             ]);
         }
 
-        $item = new FractalItem($slot->item, $itemTransformer);
-
-        $manager->setSerializer($plainDataSerializer);
-
-        $item = $manager->createData($item)->toArray();
+        $item = $itemEnricherFactory->buildItemData($slot->item);
 
         return response()->json($item);
     }

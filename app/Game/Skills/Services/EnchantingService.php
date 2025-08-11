@@ -79,7 +79,7 @@ class EnchantingService
         $enchantingSkill = $this->getEnchantingSkill($character);
 
         $characterInventoryService = $this->characterInventoryService->setCharacter($character);
-        $inventory = $characterInventoryService->getInventoryCollection();
+        $inventory = $characterInventoryService->getInventorySlotsCollection();
 
         if ($ignoreTrinkets) {
             $inventory = $inventory->reject(fn($item) => in_array($item['type'], ['trinket', 'artifact']));

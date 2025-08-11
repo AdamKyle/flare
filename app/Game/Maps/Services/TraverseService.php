@@ -398,7 +398,7 @@ class TraverseService
 
     protected function getMonstersForMap(Map $characterMap, int $mapId): array
     {
-        $locationWithEffect = Location::whereNotNull('enemy_strength_type')
+        $locationWithEffect = Location::whereNotNull('enemy_strength_increase')
             ->where('x', $characterMap->character_position_x)
             ->where('y', $characterMap->character_position_y)
             ->where('game_map_id', $characterMap->game_map_id)

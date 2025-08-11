@@ -195,6 +195,7 @@ return [
         App\Flare\GameImporter\Providers\ServiceProvider::class,
         App\Flare\ExponentialCurve\Providers\ServiceProvider::class,
         App\Flare\Pagination\Providers\ServiceProvider::class,
+        App\Flare\Items\Providers\ServiceProvider::class,
 
         /**
          * Component Related

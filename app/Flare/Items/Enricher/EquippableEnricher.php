@@ -2,6 +2,8 @@
 
 namespace App\Flare\Items\Enricher;
 
+use App\Flare\Items\Enricher\Manifest\AutoManifest;
+use App\Flare\Items\Enricher\Manifest\Values\ManifestSchemaId;
 use App\Flare\Models\Item;
 
 class EquippableEnricher
@@ -20,6 +22,7 @@ class EquippableEnricher
      * @param string | null $damageStat
      * @return Item The enriched item instance (mutated in place)
      */
+    #[AutoManifest(ManifestSchemaId::EQUIPPABLE)]
     public function enrich(Item $item, ?string $damageStat = null): Item
     {
         $item->total_damage   = $this->calculateTotalDamage($item);

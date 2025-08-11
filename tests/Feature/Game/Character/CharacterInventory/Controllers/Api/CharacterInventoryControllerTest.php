@@ -65,7 +65,9 @@ class CharacterInventoryControllerTest extends TestCase
 
     public function testGetItemDetails()
     {
-        $item = $this->createItem();
+        $item = $this->createItem([
+            'type' => 'sword'
+        ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
