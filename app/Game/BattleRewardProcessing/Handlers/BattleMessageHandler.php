@@ -65,7 +65,10 @@ class BattleMessageHandler
     /**
      * Handle message for gaining xp for faction loyalty
      *
-     * @param User $user.
+     * @param User $user .
+     * @param int $totalXp
+     * @param int $newFameLevel
+     * @param string $npcName
      * @return void
      */
     public function handleFactionLoyaltyXp(User $user, int $totalXp, int $newFameLevel, string $npcName): void
@@ -152,10 +155,10 @@ class BattleMessageHandler
 
 
     /**
-     * Uhandles messages for class ranks when they gain XP.
+     * Handles messages for class ranks when they gain XP.
      *
      * This includes:
-     *   - Class Masteries (wespon masteries)
+     *   - Class Masteries (weapon masteries)
      *   - Class Ranks
      *   - Class Specials
      *

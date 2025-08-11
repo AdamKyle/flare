@@ -2,19 +2,21 @@
 
 namespace Tests\Unit\Game\BattleRewardProcessing\Handlers;
 
+use App\Flare\Models\User;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\ClassRanksMessageTypes;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
-use Tests\Setup\Character\CharacterFactory;
+use Illuminate\Support\Str;
 use Tests\TestCase;
+use Tests\Traits\CreateUser;
 
 class BattleMessageHandlerTest extends TestCase
 {
-
-    use RefreshDatabase;
+    use RefreshDatabase, CreateUser;
 
     private ?BattleMessageHandler $battleMessageHandler;
 
@@ -22,7 +24,7 @@ class BattleMessageHandlerTest extends TestCase
     {
         parent::setUp();
 
-        Event::fake();
+        Event::fake([ServerMessageEvent::class]);
 
         $this->battleMessageHandler = resolve(BattleMessageHandler::class);
     }
@@ -36,7 +38,7 @@ class BattleMessageHandlerTest extends TestCase
 
     public function testHandleXpForExplorationMessageWhenUserNotLoggedIn()
     {
-        $user = $this->createCharacterWithUserAttributes()->getCharacter()->user;
+        $user = $this->createUserWithOptionalSession();
 
         $this->battleMessageHandler->handleMessageForExplorationXp($user, 10, 1_000);
 
@@ -45,9 +47,9 @@ class BattleMessageHandlerTest extends TestCase
 
     public function testHandleXpForExplorationMessageWhenUserLoggedInAndTurnedOffSetting()
     {
-        $user = $this->createCharacterWithUserAttributes([
-            'show_xp_for_exploration' => false
-        ], true)->getCharacter()->user;
+        $user = $this->createUserWithOptionalSession([
+            'show_xp_for_exploration' => false,
+        ], true);
 
         $this->battleMessageHandler->handleMessageForExplorationXp($user, 10, 1_000);
 
@@ -56,20 +58,22 @@ class BattleMessageHandlerTest extends TestCase
 
     public function testHandleXPForExplorationMessageWhenUserLoggedInAndEnabledSetting()
     {
-        $user = $this->createCharacterWithUserAttributes([
-            'show_xp_for_exploration' => true
-        ], true)->getCharacter()->user;
+        $user = $this->createUserWithOptionalSession([
+            'show_xp_for_exploration' => true,
+        ], true);
 
         $this->battleMessageHandler->handleMessageForExplorationXp($user, 10, 1_000);
 
-        Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message = 'You slaughtered: 10 creatures and gained a total of: 1,000 XP.';
-        });
+        Event::assertDispatched(
+            ServerMessageEvent::class,
+            fn (ServerMessageEvent $event) =>
+                $event->message === 'You slaughtered: 10 creatures and gained a total of: 1,000 XP.'
+        );
     }
 
     public function testHandleFactionLoyaltyXpMessageWhenNotLoggedIn()
     {
-        $user = $this->createCharacterWithUserAttributes()->getCharacter()->user;
+        $user = $this->createUserWithOptionalSession();
 
         $this->battleMessageHandler->handleFactionLoyaltyXp($user, 10, 1, 'npc name');
 
@@ -78,31 +82,33 @@ class BattleMessageHandlerTest extends TestCase
 
     public function testHandleFactionLoyaltyXpMessageWhenLoggedInAndSettingIsTurnedOff()
     {
-        $user = $this->createCharacterWithUserAttributes([
-            'show_faction_loyalty_xp_gain' => false
-        ], true)->getCharacter()->user;
+        $user = $this->createUserWithOptionalSession([
+            'show_faction_loyalty_xp_gain' => false,
+        ], true);
 
         $this->battleMessageHandler->handleFactionLoyaltyXp($user, 10, 1, 'npc name');
 
         Event::assertNotDispatched(ServerMessageEvent::class);
     }
 
-    public function testHandleFactionLoyaltyXpMessageWhenLoggedInAndSettingIsrnabled()
+    public function testHandleFactionLoyaltyXpMessageWhenLoggedInAndSettingIsEnabled()
     {
-        $user = $this->createCharacterWithUserAttributes([
-            'show_faction_loyalty_xp_gain' => true
-        ], true)->getCharacter()->user;
+        $user = $this->createUserWithOptionalSession([
+            'show_faction_loyalty_xp_gain' => true,
+        ], true);
 
         $this->battleMessageHandler->handleFactionLoyaltyXp($user, 10, 1, 'npc name');
 
-        Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message = 'For gaining a new fame level (1) for helping: npc name with their tasks you were rewarded with: 10 XP.';
-        });
+        Event::assertDispatched(
+            ServerMessageEvent::class,
+            fn (ServerMessageEvent $event) =>
+                $event->message === 'For gaining a new fame level (1) for helping: npc name with their tasks you were rewarded with: 10 XP.'
+        );
     }
 
     public function testHandleFactionPointGainWhenNotLoggedIn()
     {
-        $user = $this->createCharacterWithUserAttributes()->getCharacter()->user;
+        $user = $this->createUserWithOptionalSession();
 
         $this->battleMessageHandler->handleFactionPointGain($user, 10, 10, 100);
 
@@ -111,9 +117,9 @@ class BattleMessageHandlerTest extends TestCase
 
     public function testHandleFactionPointGainWhenLoggedInAndSettingIsDisabled()
     {
-        $user = $this->createCharacterWithUserAttributes([
-            'show_faction_point_message' => false
-        ], true)->getCharacter()->user;
+        $user = $this->createUserWithOptionalSession([
+            'show_faction_point_message' => false,
+        ], true);
 
         $this->battleMessageHandler->handleFactionPointGain($user, 10, 10, 100);
 
@@ -122,20 +128,22 @@ class BattleMessageHandlerTest extends TestCase
 
     public function testHandleFactionPointGainWhenLoggedInAndSettingIsEnabled()
     {
-        $user = $this->createCharacterWithUserAttributes([
-            'show_faction_point_message' => true
-        ], true)->getCharacter()->user;
+        $user = $this->createUserWithOptionalSession([
+            'show_faction_point_message' => true,
+        ], true);
 
         $this->battleMessageHandler->handleFactionPointGain($user, 10, 10, 100);
 
-        Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message = 'You gained: 10 Faction Points, which puts you at: 10 points. You need: 90 more points to gain a new level!';
-        });
+        Event::assertDispatched(
+            ServerMessageEvent::class,
+            fn (ServerMessageEvent $event) =>
+                $event->message === 'You gained: 10 Faction Points, which puts you at: 10 points. You need: 90 more points to gain a new level!'
+        );
     }
 
     public function testHandleCurrencyGainMessageAndNotLoggedIn()
     {
-        $user = $this->createCharacterWithUserAttributes([])->getCharacter()->user;
+        $user = $this->createUserWithOptionalSession([]);
 
         $this->battleMessageHandler->handleCurrencyGainMessage($user, CurrenciesMessageTypes::COPPER_COINS, 10, 10);
 
@@ -144,31 +152,33 @@ class BattleMessageHandlerTest extends TestCase
 
     public function testHandleCurrencyGainMessageAndLoggedInWithSettingDisabled()
     {
-        $user = $this->createCharacterWithUserAttributes([
-            'show_copper_coins_per_kill' => false
-        ], true)->getCharacter()->user;
+        $user = $this->createUserWithOptionalSession([
+            'show_copper_coins_per_kill' => false,
+        ], true);
 
         $this->battleMessageHandler->handleCurrencyGainMessage($user, CurrenciesMessageTypes::COPPER_COINS, 10, 10);
 
         Event::assertNotDispatched(ServerMessageEvent::class);
     }
 
-    public function testHandleCurrencyGainMessageAndNotLoggedInWithSettingEnabled()
+    public function testHandleCurrencyGainMessageAndLoggedInWithSettingEnabled()
     {
-        $user = $this->createCharacterWithUserAttributes([
-            'show_copper_coins_per_kill' => true
-        ], true)->getCharacter()->user;
+        $user = $this->createUserWithOptionalSession([
+            'show_copper_coins_per_kill' => true,
+        ], true);
 
         $this->battleMessageHandler->handleCurrencyGainMessage($user, CurrenciesMessageTypes::COPPER_COINS, 10, 10);
 
-        Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message = 'You gained: 10 Copper Coins! Your new total is: 10.';
-        });
+        Event::assertDispatched(
+            ServerMessageEvent::class,
+            fn (ServerMessageEvent $event) =>
+                $event->message === 'You gained: 10 Copper Coins! Your new total is: 10.'
+        );
     }
 
     public function testHandleClassRankMessageWhileLoggedOut()
     {
-        $user = $this->createCharacterWithUserAttributes([])->getCharacter()->user;
+        $user = $this->createUserWithOptionalSession([]);
 
         $this->battleMessageHandler->handleClassRankMessage($user, ClassRanksMessageTypes::XP_FOR_CLASS_MASTERIES, 'Sample', 10, 10, 'Staves');
 
@@ -177,31 +187,33 @@ class BattleMessageHandlerTest extends TestCase
 
     public function testHandleClassRankMessageWhileLoggedInAndSettingIsDisabled()
     {
-        $user = $this->createCharacterWithUserAttributes([
-            'show_xp_for_class_masteries' => false
-        ], true)->getCharacter()->user;
+        $user = $this->createUserWithOptionalSession([
+            'show_xp_for_class_masteries' => false,
+        ], true);
 
         $this->battleMessageHandler->handleClassRankMessage($user, ClassRanksMessageTypes::XP_FOR_CLASS_MASTERIES, 'Sample', 10, 10, 'Staves');
 
         Event::assertNotDispatched(ServerMessageEvent::class);
     }
 
-    public function testHandleClassRankMessageWhileLoggedinAndSettingIsEnabled()
+    public function testHandleClassRankMessageWhileLoggedInAndSettingIsEnabled()
     {
-        $user = $this->createCharacterWithUserAttributes([
-            'show_xp_for_class_masteries' => true
-        ], true)->getCharacter()->user;
+        $user = $this->createUserWithOptionalSession([
+            'show_xp_for_class_masteries' => true,
+        ], true);
 
         $this->battleMessageHandler->handleClassRankMessage($user, ClassRanksMessageTypes::XP_FOR_CLASS_MASTERIES, 'Sample', 10, 10, 'Staves');
 
-        Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message = 'Your class: Sample has gained experience in a weapon mastery: Staves of: 10 XP and now has a total of: 10 XP.';
-        });
+        Event::assertDispatched(
+            ServerMessageEvent::class,
+            fn (ServerMessageEvent $event) =>
+                $event->message === 'Your class: Sample has gained experience in a weapon mastery: Staves of: 10 XP and now has a total of: 10 XP.'
+        );
     }
 
     public function testHandleItemKillCountMessageWhenLoggedOut()
     {
-        $user = $this->createCharacterWithUserAttributes([])->getCharacter()->user;
+        $user = $this->createUserWithOptionalSession([]);
 
         $this->battleMessageHandler->handleItemKillCountMessage($user, 'item', 'skill name', 1, 100);
 
@@ -210,9 +222,9 @@ class BattleMessageHandlerTest extends TestCase
 
     public function testHandleItemKillCountMessageWhenLoggedInAndSettingIsDisabled()
     {
-        $user = $this->createCharacterWithUserAttributes([
-            'show_item_skill_kill_count' => false
-        ], true)->getCharacter()->user;
+        $user = $this->createUserWithOptionalSession([
+            'show_item_skill_kill_count' => false,
+        ], true);
 
         $this->battleMessageHandler->handleItemKillCountMessage($user, 'item', 'skill name', 1, 100);
 
@@ -221,20 +233,22 @@ class BattleMessageHandlerTest extends TestCase
 
     public function testHandleItemKillCountMessageWhenLoggedInAndSettingIsEnabled()
     {
-        $user = $this->createCharacterWithUserAttributes([
-            'show_item_skill_kill_count' => true
-        ], true)->getCharacter()->user;
+        $user = $this->createUserWithOptionalSession([
+            'show_item_skill_kill_count' => true,
+        ], true);
 
         $this->battleMessageHandler->handleItemKillCountMessage($user, 'item', 'skill name', 1, 100);
 
-        Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message = 'A item skill: skill name Attached to an item: item has gained one point towards its kill count and is now at: 1 points out of: 100. Only: 99 points left to go!';
-        });
+        Event::assertDispatched(
+            ServerMessageEvent::class,
+            fn (ServerMessageEvent $event) =>
+                $event->message === 'A item skill: skill name Attached to an item: item has gained one point towards its kill count and is now at: 1 points out of: 100. Only: 99 points left to go!'
+        );
     }
 
     public function testHandleSkillMessageWhenLoggedOut()
     {
-        $user = $this->createCharacterWithUserAttributes([])->getCharacter()->user;
+        $user = $this->createUserWithOptionalSession([]);
 
         $this->battleMessageHandler->handleSkillXpUpdate($user, 'skill', 100);
 
@@ -243,9 +257,9 @@ class BattleMessageHandlerTest extends TestCase
 
     public function testHandleSkillMessageWhenLoggedInAndSettingDisabled()
     {
-        $user = $this->createCharacterWithUserAttributes([
-            'show_skill_xp_per_kill' => false
-        ], true)->getCharacter()->user;
+        $user = $this->createUserWithOptionalSession([
+            'show_skill_xp_per_kill' => false,
+        ], true);
 
         $this->battleMessageHandler->handleSkillXpUpdate($user, 'skill', 100);
 
@@ -254,25 +268,34 @@ class BattleMessageHandlerTest extends TestCase
 
     public function testHandleSkillMessageWhenLoggedInAndSettingEnabled()
     {
-        $user = $this->createCharacterWithUserAttributes([
-            'show_skill_xp_per_kill' => true
-        ], true)->getCharacter()->user;
+        $user = $this->createUserWithOptionalSession([
+            'show_skill_xp_per_kill' => true,
+        ], true);
 
         $this->battleMessageHandler->handleSkillXpUpdate($user, 'skill', 100);
 
-        Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message = 'Your skill: skill has gained: 100 XP! Killing is the key to gaining skill experience child! kill more!';
-        });
+        Event::assertDispatched(
+            ServerMessageEvent::class,
+            fn (ServerMessageEvent $event) =>
+                $event->message === 'Your skill: skill has gained: 100 XP! Killing is the key to gaining skill experience child! kill more!'
+        );
     }
 
-    private function createCharacterWithUserAttributes(array $attributes = [], bool $createSesion = false): CharacterFactory
+    private function createUserWithOptionalSession(array $attributes = [], bool $createSession = false): User
     {
-        $characterFactory = (new CharacterFactory())->setAttributesOnUserForCreation($attributes)->createBaseCharacter()->givePlayerLocation();
+        $user = $this->createUser($attributes);
 
-        if ($createSesion) {
-            $characterFactory->createSessionForCharacter();
+        if ($createSession) {
+            DB::table('sessions')->insert([
+                'id' => (string) Str::uuid(),
+                'user_id' => $user->id,
+                'ip_address' => '127.0.0.1',
+                'user_agent' => 'testing',
+                'payload' => '',
+                'last_activity' => time(),
+            ]);
         }
 
-        return $characterFactory;
+        return $user->fresh();
     }
 }
