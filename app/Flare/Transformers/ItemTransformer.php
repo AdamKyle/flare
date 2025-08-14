@@ -4,11 +4,9 @@ namespace App\Flare\Transformers;
 
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
-use App\Flare\Models\Location;
 use App\Flare\Traits\IsItemUnique;
 use App\Game\Gems\Traits\GetItemAtonements;
 use App\Game\Maps\Transformers\LocationTransformer;
-use Facades\App\Flare\Calculators\SellItemCalculator;
 use League\Fractal\Resource\Item as ItemResource;
 use League\Fractal\TransformerAbstract;
 

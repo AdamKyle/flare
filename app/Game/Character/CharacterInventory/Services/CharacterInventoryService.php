@@ -357,20 +357,17 @@ class CharacterInventoryService
      */
     public function getQuestItems(string $searchText = ''): Collection
     {
-        $inventory = Inventory::where('character_id', $this->character->id)->first();
+        $slots = $this->character->inventory->slots->where('item.type', 'quest');
 
-        $query = InventorySlot::where('inventory_slots.inventory_id', $inventory->id)
-            ->join('items', function ($join) {
-                $join->on('inventory_slots.item_id', '=', 'items.id')
-                    ->where('items.type', 'quest');
-            })
-            ->select('inventory_slots.*');
-
-        if (!empty($searchText)) {
-            $query->where('items.name', 'LIKE', '%' . $searchText . '%');
+        if ($searchText !== '') {
+            $slots = $slots->filter(function ($slot) use ($searchText) {
+                return Str::contains(Str::lower($slot->item->name), $searchText);
+            });
         }
 
-        return $query->with('item')->get();
+        return $slots->map(function($slot) {
+            return $slot->item;
+        });
     }
 
 
@@ -437,7 +434,7 @@ class CharacterInventoryService
         return $slots->values();
     }
 
-    public function getInventoryCollection(string $searchText = ''): Collection
+    public function getInventoryCollection(string $searchText = ''): \Illuminate\Support\Collection
     {
         return $this->getInventorySlotsCollection($searchText)
             ->map(function ($slot) {
@@ -475,9 +472,9 @@ class CharacterInventoryService
      * @return array
      */
     public function fetchCharacterQuestItems(int $perPage = 10, int $page = 1, string $searchText = ''): array {
-        $slots = $this->getQuestItems($searchText);
+        $items = $this->getQuestItems($searchText);
 
-        return $this->pagination->buildPaginatedDate($slots, $this->questItemTransformer, $perPage, $page);
+        return $this->pagination->buildPaginatedDate($items, $this->questItemTransformer, $perPage, $page);
     }
 
     /**

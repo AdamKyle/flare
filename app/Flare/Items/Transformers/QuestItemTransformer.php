@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Flare\Items\Transformers;
 
+use Facades\App\Flare\Items\Presenters\QuestItemEffectsPresenter;
 use App\Flare\Models\Item;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Quest;
@@ -24,7 +25,7 @@ class QuestItemTransformer extends TransformerAbstract
             'craft_only'          => $item->craft_only,
             'move_time_out_mod_bonus' => $item->move_time_out_mod_bonus,
             'fight_time_out_mod_bonus' => $item->fight_time_out_mod_bonus,
-            'effect'              => $item->effect,
+            'effect'              => QuestItemEffectsPresenter::getEffect($item->effect),
             'drop_location'       => $this->getDropLocation($item),
             'required_monster'    => $this->getRequiredMonster($item),
             'required_quest'      => $this->getRequiredQuest($item),
