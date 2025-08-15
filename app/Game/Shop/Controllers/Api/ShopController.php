@@ -51,9 +51,9 @@ class ShopController extends Controller
 
         $viewData = $comparisonService->buildShopData($character, Item::where('name', $request->item_name)->first(), $request->item_type);
 
-        return response()->json([
-            'comparison_data' => $viewData,
-        ]);
+        return response()->json(
+            $viewData,
+        );
     }
 
     public function buy(Request $request, Character $character)

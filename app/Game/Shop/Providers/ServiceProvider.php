@@ -2,6 +2,7 @@
 
 namespace App\Game\Shop\Providers;
 
+use App\Flare\Items\Transformers\EquippableItemTransformer;
 use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\ItemTransformer;
 use App\Game\Character\CharacterInventory\Services\CharacterGemBagService;
@@ -28,7 +29,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(EquipItemService::class),
                 $app->make(CharacterInventoryService::class),
                 $app->make(Pagination::class),
-                $app->make(ItemTransformer::class),
+                $app->make(EquippableItemTransformer::class),
                 $app->make(Manager::class)
             );
         });

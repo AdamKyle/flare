@@ -102,9 +102,9 @@ class ItemComparison
      * Filter inventory slots to those whose position is in the allowed list,
      * and are actually equipped. Assumes `equipped` is always present on slots.
      *
-     * @param \Illuminate\Database\Eloquent\Collection $inventorySlots
+     * @param Collection $inventorySlots
      * @param array<int,string>                         $equipPositions
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection
      */
     private function filterSlotsByPositions(Collection $inventorySlots, array $equipPositions): Collection
     {
@@ -137,8 +137,8 @@ class ItemComparison
             'holy_stacks_applied'  => $equippedSlot->item->holy_stacks_applied,
             'type'                 => $equippedSlot->item->type,
             'comparison'           => [
-                'name'                => $comparisonSummary['name'],
-                'description'         => $comparisonSummary['description'],
+                'to_equip_name'       => $comparisonSummary['name'],
+                'to_equip_description'         => $comparisonSummary['description'],
                 'adjustments'         => $comparisonSummary['adjustments'],
                 'equipped_affix_name' => $equippedSlot->item->affix_name,
             ],

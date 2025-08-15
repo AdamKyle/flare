@@ -167,7 +167,7 @@ class Comparator
     /**
      * Build adjustments for scalar fields.
      *
-     * @param  array<string, array{type:?string, compare:?string}> $fieldMeta
+     * @param  array<string, array{type $fieldMeta :?string, compare:?string}> $fieldMeta
      * @param  array<string, mixed> $leftData
      * @param  array<string, mixed> $rightData
      * @return array<string, mixed>

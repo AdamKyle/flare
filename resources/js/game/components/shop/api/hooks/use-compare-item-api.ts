@@ -4,7 +4,8 @@ import { useCallback, useEffect, useState } from 'react';
 
 import UseCompareItemApiDefinition from './definitions/use-compare-item-api-definition';
 import UseCompareItemApiRequestParameters from './definitions/use-compare-item-api-request-params';
-import ItemComparisonDetails from '../../../../api-definitions/items/item-comparison-details';
+import { UseCompareItemApiResponseDefinition } from './definitions/use-compare-item-api-response-definition';
+import { ItemComparisonRow } from '../../../../api-definitions/items/item-comparison-details';
 
 export const useCompareItemApi = (
   params: UseCompareItemApiRequestParameters
@@ -12,7 +13,7 @@ export const useCompareItemApi = (
   const { apiHandler, getUrl } = useApiHandler();
 
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<ItemComparisonDetails | null>(null);
+  const [data, setData] = useState<ItemComparisonRow[] | [] | null>(null);
   const [error, setError] =
     useState<UseCompareItemApiDefinition['error']>(null);
 
@@ -30,10 +31,8 @@ export const useCompareItemApi = (
 
       try {
         const result = await apiHandler.get<
-          { comparison_data: ItemComparisonDetails },
-          AxiosRequestConfig<
-            AxiosResponse<{ comparison_data: ItemComparisonDetails }>
-          >
+          UseCompareItemApiResponseDefinition,
+          AxiosRequestConfig<AxiosResponse<UseCompareItemApiResponseDefinition>>
         >(url, {
           params: {
             item_type: params.item_type,
@@ -41,7 +40,7 @@ export const useCompareItemApi = (
           },
         });
 
-        setData(result.comparison_data);
+        setData(result.details);
       } catch (err) {
         if (err instanceof AxiosError) {
           setError(err.response?.data || null);

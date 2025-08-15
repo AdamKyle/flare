@@ -275,7 +275,11 @@ class CharacterInventoryService
             });
         }
 
-        return $this->pagination->buildPaginatedDate($slots, $this->inventoryTransformer, $perPage, $page);
+        $items = $slots->map(function($slot) {
+            return $this->itemEnricherFactory->buildItem($slot->item);
+        });
+
+        return $this->pagination->buildPaginatedDate($items, $this->equippableItemTransformer, $perPage, $page);
     }
 
     /**

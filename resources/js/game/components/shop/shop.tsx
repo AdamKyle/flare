@@ -9,7 +9,6 @@ import ShopProps from './types/shop-props';
 import { buildShopItemTypeSelection } from './utils/build-shop-item-type-selection';
 import { useCustomContext } from '../../../utils/hooks/use-custom-context';
 import ItemDetails from '../../api-definitions/items/item-details';
-import SimpleItemDetails from '../../reusable-components/item/simple-item-details';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
@@ -144,10 +143,6 @@ const Shop = ({ close_shop }: ShopProps) => {
         item_type={itemToCompare.type}
       />
     );
-  }
-
-  if (!isNil(itemToView)) {
-    return <SimpleItemDetails item={itemToView} on_close={closeItemView} />;
   }
 
   return (

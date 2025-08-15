@@ -1,9 +1,9 @@
 import { AxiosErrorDefinition } from 'api-handler/definitions/axios-error-definition';
 
-import ItemComparisonDetails from '../../../../../api-definitions/items/item-comparison-details';
+import { ItemComparisonRow } from '../../../../../api-definitions/items/item-comparison-details';
 
 export default interface UseCompareItemApiDefinition {
   loading: boolean;
-  data: ItemComparisonDetails | null;
+  data: ItemComparisonRow[] | [] | null;
   error: AxiosErrorDefinition | null;
 }

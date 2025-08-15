@@ -2,6 +2,7 @@
 
 namespace App\Game\Shop\Services;
 
+use App\Flare\Items\Transformers\EquippableItemTransformer;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
@@ -20,9 +21,7 @@ use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Shop\Events\SellItemEvent;
 use Facades\App\Flare\Calculators\SellItemCalculator;
-use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 class ShopService
@@ -33,20 +32,20 @@ class ShopService
      * @param EquipItemService $equipItemService
      * @param CharacterInventoryService $characterInventoryService
      * @param Pagination $pagination
-     * @param ItemTransformer $itemTransformer
+     * @param EquippableItemTransformer $equippableItemTransformer
      * @param Manager $manager
      */
     public function __construct(private readonly EquipItemService $equipItemService,
                                 private readonly CharacterInventoryService $characterInventoryService,
                                 private readonly Pagination $pagination,
-                                private readonly ItemTransformer $itemTransformer,
+                                private readonly EquippableItemTransformer $equippableItemTransformer,
                                 private readonly Manager $manager
     ){}
 
     public function getItemsForShop(Character $character, int $perPage, int $page, ?string $searchText, ?array $filters): array {
         $items = $this->fetchItemsForShopBasedOnCharacterClass($character, $searchText, $filters);
 
-        return $this->pagination->buildPaginatedDate($items, $this->itemTransformer, $perPage, $page);
+        return $this->pagination->buildPaginatedDate($items, $this->equippableItemTransformer, $perPage, $page);
     }
 
     public function sellAllItems(Character $character): array
@@ -201,8 +200,6 @@ class ShopService
 
     private function fetchItemsForShopBasedOnCharacterClass(Character $character, ?string $searchText, ?array $filters): EloquentCollection {
         $className = $character->class->name;
-
-        dump($filters);
 
         $types = !isset($filters['type']) ? ItemTypeMapping::getForClass($className) : $filters['type'];
         $costOrder = !isset($filters['sort_cost']) ? 'asc' : $filters['sort_cost'];

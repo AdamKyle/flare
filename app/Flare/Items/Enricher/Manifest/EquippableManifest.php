@@ -28,6 +28,7 @@ class EquippableManifest extends BaseManifest
             '/^.*_chance$/',
             '/^.*_reduction$/',
             '/^total_.*_affix_damage$/',
+            '/^(str|dur|dex|chr|int|agi|focus)_mod$/',
         ];
     }
 
@@ -76,6 +77,10 @@ class EquippableManifest extends BaseManifest
 
         if (preg_match('/^total_(stackable|non_stacking|irresistible)_affix_damage$/', $prop, $m)) {
             return "affix_damage.$m[1]";
+        }
+
+        if (preg_match('/^(str|dur|dex|chr|int|agi|focus)_mod$/', $prop, $m)) {
+            return "stats.{$m[1]}_mod";
         }
 
         // Fallback: keep as-is (appears at top level in data bag)

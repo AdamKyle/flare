@@ -4,10 +4,6 @@ import React from 'react';
 
 import { useGetInventoryItemDetails } from './api/hooks/use-get-inventory-item-details';
 import InventoryItemProps from './types/inventory-item-props';
-import { ItemBaseTypes } from '../../../../reusable-components/item/enums/item-base-type';
-import ItemDetails from '../../../../reusable-components/item/partials/item-details';
-import { getType } from '../../../../reusable-components/item/utils/get-type';
-import { armourPositions } from '../../../character-sheet/partials/character-inventory/enums/inventory-item-types';
 import { backpackItemTextColors } from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
 
@@ -54,30 +50,6 @@ const InventoryItem = ({
 
   const item = data;
 
-  const renderItemViewScreen = () => {
-    const type = getType(item, armourPositions);
-
-    const types = [
-      ItemBaseTypes.Armour,
-      ItemBaseTypes.Weapon,
-      ItemBaseTypes.Spell,
-      ItemBaseTypes.Ring,
-    ];
-
-    if (!types.includes(type)) {
-      return;
-    }
-
-    return (
-      <ItemDetails
-        item={item}
-        show_in_between_separator
-        damage_ac_on_top
-        show_advanced_button
-      />
-    );
-  };
-
   return (
     <>
       <div className={'text-center p-4'}>
@@ -98,7 +70,6 @@ const InventoryItem = ({
           </p>
           <Separator />
         </div>
-        {renderItemViewScreen()}
       </div>
     </>
   );

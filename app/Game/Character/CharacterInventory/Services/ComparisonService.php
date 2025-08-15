@@ -108,18 +108,18 @@ class ComparisonService
 
         return [
             'details'       => $this->equipItemService->getItemStats($item, $inventory, $character),
-            'atonement'     => $this->itemAtonements->getAtonements($item, $inventory),
-            'itemToEquip'   => $this->itemDetails($item), // guarantees 'affix_name'
-            'type'          => $service->getType($item),
-            'slotId'        => $item->id,
-            'slotPosition'  => null,
-            'characterId'   => $character->id,
-            'bowEquipped'   => $this->hasTypeEquipped($character, 'bow'),
-            'hammerEquipped'=> $this->hasTypeEquipped($character, 'hammer'),
-            'staveEquipped' => $this->hasTypeEquipped($character, 'stave'),
-            'setEquipped'   => $hasSet,
-            'setIndex'      => $setIndex,
-            'setName'       => !is_null($setEquipped) ? $setEquipped->name : null,
+//            'atonement'     => $this->itemAtonements->getAtonements($item, $inventory),
+//            'itemToEquip'   => $this->itemDetails($item), // guarantees 'affix_name'
+//            'type'          => $service->getType($item),
+//            'slotId'        => $item->id,
+//            'slotPosition'  => null,
+//            'characterId'   => $character->id,
+//            'bowEquipped'   => $this->hasTypeEquipped($character, 'bow'),
+//            'hammerEquipped'=> $this->hasTypeEquipped($character, 'hammer'),
+//            'staveEquipped' => $this->hasTypeEquipped($character, 'stave'),
+//            'setEquipped'   => $hasSet,
+//            'setIndex'      => $setIndex,
+//            'setName'       => !is_null($setEquipped) ? $setEquipped->name : null,
         ];
     }
 

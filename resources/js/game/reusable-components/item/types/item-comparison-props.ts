@@ -1,6 +1,6 @@
-import ItemComparisonDetails from '../../../api-definitions/items/item-comparison-details';
+import { ItemComparisonRow } from '../../../api-definitions/items/item-comparison-details';
 
 export default interface ItemComparisonProps {
-  comparisonDetails: ItemComparisonDetails;
+  comparisonDetails: ItemComparisonRow[] | [];
   item_name: string;
 }

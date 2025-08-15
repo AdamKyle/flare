@@ -17,14 +17,14 @@ const ShopCard = ({ item, view_item, compare_item }: ShopCardProps) => {
     if (itemType === ItemBaseTypes.Armour) {
       return (
         <span>
-          <strong>AC:</strong> {`+${item.base_ac}`}
+          <strong>AC:</strong> {`+${item.raw_ac}`}
         </span>
       );
     }
 
     return (
       <span>
-        <strong>Damage:</strong> {`+${item.base_damage}`}
+        <strong>Damage:</strong> {`+${item.raw_damage}`}
       </span>
     );
   };
