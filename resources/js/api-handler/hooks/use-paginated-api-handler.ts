@@ -49,6 +49,19 @@ const UsePaginatedApiHandler = <
         setCanLoadMore(result.meta.can_load_more);
       } catch (error) {
         if (error instanceof AxiosError) {
+          const response = error.response;
+
+          if (!response) {
+            return;
+          }
+
+          /**
+           * If we are not logged in, reload to put them back on the login screen.
+           */
+          if (response.status === 401) {
+            window.location.reload();
+          }
+
           setError(error.response?.data || null);
         } else {
           setError(null);

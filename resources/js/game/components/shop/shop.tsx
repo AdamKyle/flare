@@ -4,11 +4,12 @@ import React, { useMemo, useState, useEffect } from 'react';
 
 import ShopCard from './components/shop-card';
 import ShopComparison from './components/shop-comparison';
+import ShopItemView from './components/shop-item-view';
 import { ShopContext } from './context/shop-context';
 import ShopProps from './types/shop-props';
 import { buildShopItemTypeSelection } from './utils/build-shop-item-type-selection';
 import { useCustomContext } from '../../../utils/hooks/use-custom-context';
-import ItemDetails from '../../api-definitions/items/item-details';
+import { EquippableItemWithBase } from '../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
@@ -35,8 +36,11 @@ const Shop = ({ close_shop }: ShopProps) => {
     setSelectedType,
   } = useCustomContext(ShopContext, 'Shop');
 
-  const [itemToView, setItemToView] = useState<ItemDetails | null>(null);
-  const [itemToCompare, setItemToCompare] = useState<ItemDetails | null>(null);
+  const [itemToView, setItemToView] = useState<EquippableItemWithBase | null>(
+    null
+  );
+  const [itemToCompare, setItemToCompare] =
+    useState<EquippableItemWithBase | null>(null);
   const [localSearch, setLocalSearch] = useState<string>(searchText);
 
   useEffect(() => {
@@ -143,6 +147,10 @@ const Shop = ({ close_shop }: ShopProps) => {
         item_type={itemToCompare.type}
       />
     );
+  }
+
+  if (!isNil(itemToView)) {
+    return <ShopItemView item={itemToView} close_view={closeItemView} />;
   }
 
   return (

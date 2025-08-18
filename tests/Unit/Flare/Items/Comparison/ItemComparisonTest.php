@@ -40,7 +40,7 @@ class ItemComparisonTest extends TestCase
         $character = $this->characterFactory->getCharacter()->refresh();
 
         $unknownTypeItem = $this->createItem([
-            'type'        => 'artifact', // not a weapon, not ring/shield/spell, and not in ArmourType map
+            'type'        => 'artifact',
             'name'        => 'Mystery Rock',
             'description' => '???',
         ]);
@@ -88,7 +88,7 @@ class ItemComparisonTest extends TestCase
 
         $this->assertArrayHasKey('comparison', $rows[0]);
         $this->assertArrayHasKey('adjustments', $rows[0]['comparison']);
-        $this->assertSame('Candidate Spell', $rows[0]['comparison']['name']);
+        $this->assertSame('Candidate Spell', $rows[0]['comparison']['to_equip_name']);
     }
 
     public function testTwoHandedWeaponTypesCompareAgainstBothHandsAndReverseOrder(): void
@@ -245,7 +245,6 @@ class ItemComparisonTest extends TestCase
     {
         $character = $this->characterFactory->getCharacter()->refresh();
 
-        // Put rings in matching positions, but NOT equipped.
         $character = $this->characterFactory->inventoryManagement()
             ->giveItem($this->createItem(['type' => 'ring', 'name' => 'Ring One']),  false, 'ring-one')
             ->giveItem($this->createItem(['type' => 'ring', 'name' => 'Ring Two']),  false, 'ring-two')

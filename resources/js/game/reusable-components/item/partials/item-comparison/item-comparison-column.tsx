@@ -1,15 +1,21 @@
 import React, { Fragment } from 'react';
 
+import AdjustmentChangeDisplay from './adjustment-change-display';
 import AdjustmentGroup from './adjustment-group';
 import SkillSummary from './skill-summary';
 import { ItemAdjustments } from '../../../../api-definitions/items/item-comparison-details';
+import { InventoryItemTypes } from '../../../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
 import {
   AFFIX_ADJUSTMENT_FIELDS,
   DEVOURING_FIELDS,
   STAT_FIELDS,
   TOP_FIELDS,
 } from '../../constants/item-comparison-constants';
-import { NumericAdjustmentKey } from '../../types/item-comparison-types';
+import StatInfoToolTip from '../../stat-info-tool-tip';
+import type {
+  FieldDef,
+  NumericAdjustmentKey,
+} from '../../types/item-comparison-types';
 import ItemComparisonColumnProps from '../../types/partials/item-comparison/item-comparison-column';
 import {
   getPositionLabel,
@@ -64,28 +70,24 @@ const ItemComparisonColumn = ({
 
   const renderTitle = () => {
     return (
-      <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-gray-200">
+      <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-gray-200 break-words">
         {computedTitle}
       </h3>
     );
   };
 
   const renderDescription = () => {
-    if (!description) {
-      return null;
-    }
+    if (!description) return null;
 
     return (
-      <p className="mb-2 text-sm text-gray-700 dark:text-gray-300">
+      <p className="mb-2 text-sm text-gray-700 dark:text-gray-300 break-words">
         {description}
       </p>
     );
   };
 
   const renderType = () => {
-    if (!row.type) {
-      return null;
-    }
+    if (!row.type) return null;
 
     return (
       <>
@@ -97,9 +99,7 @@ const ItemComparisonColumn = ({
   };
 
   const renderTwoHanded = () => {
-    if (!isTwoHanded) {
-      return null;
-    }
+    if (!isTwoHanded) return null;
 
     return (
       <>
@@ -111,7 +111,7 @@ const ItemComparisonColumn = ({
 
   const renderReplacementLine = () => {
     return (
-      <div className="mb-3 text-sm leading-snug text-gray-900 dark:text-gray-100">
+      <div className="mb-3 text-sm leading-snug text-gray-900 dark:text-gray-100 break-words">
         <span className="font-medium">
           Replacing {getPositionLabel(row.position)}:
         </span>{' '}
@@ -148,10 +148,7 @@ const ItemComparisonColumn = ({
 
   const renderCoreImpact = () => {
     const shouldShowCore = hasCoreTotals || forceCoreZeroKeys.length > 0;
-
-    if (!shouldShowCore) {
-      return null;
-    }
+    if (!shouldShowCore) return null;
 
     return (
       <Fragment>
@@ -169,10 +166,138 @@ const ItemComparisonColumn = ({
     );
   };
 
-  const renderAttributes = () => {
-    if (!hasAttributes) {
+  // --- NEW SECTION: Resurrection Chance (spell-healing only) ---
+  const renderResurrectionChance = () => {
+    if (row?.comparison?.to_equip_type !== InventoryItemTypes.SPELL_HEALING) {
       return null;
     }
+
+    const raw = adjustments.resurrection_chance_adjustment;
+    if (raw == null) {
+      return null;
+    }
+
+    const value = Number(raw);
+    if (value === 0) {
+      return null;
+    }
+
+    const direction = value > 0 ? 'increases' : 'decreases';
+    const amountPct = `${(Math.abs(value) * 100).toFixed(2)}%`;
+    const customMessage =
+      `This ${direction} your chance by ${amountPct} to be resurrected on death, ` +
+      `having two healing spells stacks the chance.`;
+
+    return (
+      <Fragment>
+        <h4 className="mt-3 mb-1 text-xs font-semibold uppercase tracking-wide text-mango-tango-500 dark:text-mango-tango-300">
+          Resurrection Chance
+        </h4>
+        <Separator />
+        <dl className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1">
+          <dt className="font-medium text-gray-900 dark:text-gray-100">
+            <div className="flex items-center">
+              <StatInfoToolTip
+                label={customMessage}
+                value={value}
+                renderAsPercent
+                align="left"
+                size="sm"
+                custom_message
+              />
+              <span className="min-w-0 break-words">Chance</span>
+            </div>
+          </dt>
+          <dd>
+            <AdjustmentChangeDisplay
+              value={value}
+              label="Chance"
+              renderAsPercent
+            />
+          </dd>
+        </dl>
+      </Fragment>
+    );
+  };
+  // ------------------------------------------------------------
+
+  // --- Existing: Resistance Adjustments (rings only) ---
+  const RESISTANCE_FIELDS: FieldDef[] = [
+    { key: 'spell_evasion_adjustment', label: 'Spell Evasion' },
+    { key: 'healing_reduction_adjustment', label: 'Healing Reduction' },
+    {
+      key: 'affix_damage_reduction_adjustment',
+      label: 'Affix Damage Reduction',
+    },
+  ];
+
+  const renderResistanceAdjustments = () => {
+    if (row?.comparison?.to_equip_type !== InventoryItemTypes.RING) {
+      return null;
+    }
+
+    const hasAnyResistance = hasAnyNonZeroAdjustment(
+      adjustments,
+      RESISTANCE_FIELDS
+    );
+
+    if (!hasAnyResistance) {
+      return null;
+    }
+
+    const renderRow = (label: string, raw: number | null | undefined) => {
+      const value = Number(raw ?? 0);
+      if (value === 0) return null;
+
+      return (
+        <Fragment key={label}>
+          <dt className="font-medium text-gray-900 dark:text-gray-100">
+            <div className="flex items-center">
+              <StatInfoToolTip
+                label={label.toLowerCase()}
+                value={value}
+                renderAsPercent
+                align="left"
+                size="sm"
+              />
+              <span className="min-w-0 break-words">{label}</span>
+            </div>
+          </dt>
+          <dd>
+            <AdjustmentChangeDisplay
+              value={value}
+              label={label}
+              renderAsPercent
+            />
+          </dd>
+        </Fragment>
+      );
+    };
+
+    return (
+      <Fragment>
+        <h4 className="mt-3 mb-1 text-xs font-semibold uppercase tracking-wide text-mango-tango-500 dark:text-mango-tango-300">
+          Resistance Adjustments
+        </h4>
+        <Separator />
+        <dl className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1">
+          {renderRow('Spell Evasion', adjustments.spell_evasion_adjustment)}
+          {renderRow(
+            'Healing Reduction',
+            adjustments.healing_reduction_adjustment
+          )}
+          {renderRow(
+            'Affix Damage Reduction',
+            adjustments.affix_damage_reduction_adjustment
+          )}
+        </dl>
+      </Fragment>
+    );
+  };
+  // -------------------------------------------------------
+
+  const renderAttributes = () => {
+    if (!hasAttributes) return null;
 
     return (
       <Fragment>
@@ -186,9 +311,7 @@ const ItemComparisonColumn = ({
   };
 
   const renderAffixAdjustments = () => {
-    if (!shouldShowAffixSection) {
-      return null;
-    }
+    if (!shouldShowAffixSection) return null;
 
     return (
       <Fragment>
@@ -205,6 +328,13 @@ const ItemComparisonColumn = ({
   };
 
   const renderSkills = () => {
+    if (
+      !Array.isArray(adjustments.skill_summary) ||
+      adjustments.skill_summary.length <= 0
+    ) {
+      return null;
+    }
+
     return (
       <Fragment>
         <h4 className="mt-3 mb-1 text-xs font-semibold uppercase tracking-wide text-mango-tango-500 dark:text-mango-tango-300">
@@ -217,9 +347,7 @@ const ItemComparisonColumn = ({
   };
 
   const renderDevouring = () => {
-    if (!shouldShowDevouringSection) {
-      return null;
-    }
+    if (!shouldShowDevouringSection) return null;
 
     return (
       <Fragment>
@@ -246,6 +374,8 @@ const ItemComparisonColumn = ({
       {renderReplacementLine()}
       {renderLegend()}
       {renderCoreImpact()}
+      {renderResurrectionChance()}
+      {renderResistanceAdjustments()}
       {renderAttributes()}
       {renderAffixAdjustments()}
       {renderSkills()}

@@ -58,18 +58,17 @@ const ItemComparison = ({
         />
       </div>
 
-      <div
-        className={`grid gap-4 ${comparisonRows.length === 2 ? 'md:grid-cols-2' : 'grid-cols-1'}`}
-      >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {comparisonRows.map((row, index) => (
-          <ItemComparisonColumn
-            key={index}
-            row={row}
-            heading={item_name}
-            index={index}
-            showAdvanced={showAdvanced}
-            showAdvancedChildUnderTop={showAdvancedChildUnderTop}
-          />
+          <div key={index} className="min-w-0">
+            <ItemComparisonColumn
+              row={row}
+              heading={item_name}
+              index={index}
+              showAdvanced={showAdvanced}
+              showAdvancedChildUnderTop={showAdvancedChildUnderTop}
+            />
+          </div>
         ))}
       </div>
     </div>

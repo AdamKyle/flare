@@ -31,9 +31,7 @@ const AdjustmentGroup = ({
     fieldKey: NumericAdjustmentKey,
     rawValue: number | null | undefined
   ): boolean => {
-    if (rawValue == null) {
-      return false;
-    }
+    if (rawValue == null) return false;
 
     if (Number(rawValue) === 0) {
       return !!forceShowZeroKeys?.includes(fieldKey);
@@ -43,82 +41,86 @@ const AdjustmentGroup = ({
   };
 
   const isBaseModKey = (key: NumericAdjustmentKey): boolean => {
-    if (key === 'base_damage_mod_adjustment') {
-      return true;
-    }
-
-    if (key === 'base_healing_mod_adjustment') {
-      return true;
-    }
-
-    if (key === 'base_ac_mod_adjustment') {
-      return true;
-    }
-
+    if (key === 'base_damage_mod_adjustment') return true;
+    if (key === 'base_healing_mod_adjustment') return true;
+    if (key === 'base_ac_mod_adjustment') return true;
     return false;
   };
 
+  /**
+   * Common DT renderer with optional:
+   *  - customMessage: overrides the tooltip sentence (uses StatInfoToolTip.custom_message)
+   *  - indent: indents the row (used for advanced children)
+   */
   const renderDtWithInfo = (
     id: string,
-    label: string,
+    displayLabel: string,
     numericValue: number,
-    forcePercent?: boolean
+    forcePercent?: boolean,
+    opts?: {
+      customMessage?: string;
+      indent?: boolean;
+    }
   ) => {
-    const handleOpen = () => {
-      setOpenId(id);
+    const handleOpen = () => setOpenId(id);
+    const handleClose = () => {
+      if (openId === id) setOpenId(null);
     };
 
-    const handleClose = () => {
-      if (openId === id) {
-        setOpenId(null);
-      }
-    };
+    const indentClass = opts?.indent ? ' ml-4' : '';
+    const useCustom = typeof opts?.customMessage === 'string';
 
     return (
       <Dt>
-        <StatInfoToolTip
-          label={label}
-          value={numericValue}
-          renderAsPercent={forcePercent}
-          align="left"
-          size="sm"
-          is_open={openId === id}
-          on_open={handleOpen}
-          on_close={handleClose}
-        />
-        <span className="min-w-0 break-words">{label}</span>
+        <div className={`flex items-center${indentClass}`}>
+          <StatInfoToolTip
+            label={useCustom ? (opts!.customMessage as string) : displayLabel}
+            value={numericValue}
+            renderAsPercent={!!forcePercent}
+            align="left"
+            size="sm"
+            is_open={openId === id}
+            on_open={handleOpen}
+            on_close={handleClose}
+            custom_message={useCustom}
+          />
+          <span className="min-w-0 break-words">{displayLabel}</span>
+        </div>
       </Dt>
     );
   };
 
+  /**
+   * Advanced children under Core Impact
+   * (Base Damage Mod, Base Healing Mod, Base AC Mod)
+   * - Indented
+   * - Tooltip says: “This will increase/decrease the items {label} by X%.”
+   */
   const renderAdvancedChildFor = (parentKey: NumericAdjustmentKey) => {
-    if (!showAdvancedChild) {
-      return null;
-    }
+    if (!showAdvancedChild) return null;
 
     const child = TOP_ADVANCED_CHILD[parentKey];
-
-    if (!child) {
-      return null;
-    }
+    if (!child) return null;
 
     const rawChildValue = adjustments[child.key] as number | null | undefined;
-
-    if (rawChildValue == null) {
-      return null;
-    }
-
-    if (Number(rawChildValue) === 0) {
-      return null;
-    }
+    if (rawChildValue == null) return null;
+    if (Number(rawChildValue) === 0) return null;
 
     const numericChildValue = Number(rawChildValue);
     const forcePercent = isBaseModKey(child.key);
     const id = `child-${String(parentKey)}-${String(child.key)}`;
 
+    // Build the exact sentence you asked for:
+    const dir = numericChildValue > 0 ? 'increase' : 'decrease';
+    const amount = `${(Math.abs(numericChildValue) * 100).toFixed(2)}%`;
+    const customMessage = `This will ${dir} the items ${child.label.toLowerCase()} by ${amount}.`;
+
     return (
       <Fragment>
-        {renderDtWithInfo(id, child.label, numericChildValue, forcePercent)}
+        {renderDtWithInfo(id, child.label, numericChildValue, forcePercent, {
+          customMessage,
+          indent: true,
+        })}
         <Dd>
           <div className="ml-4">
             <AdjustmentChangeDisplay
@@ -136,10 +138,7 @@ const AdjustmentGroup = ({
     <Dl>
       {fields.map(({ key, label }) => {
         const rawValue = adjustments[key] as number | null | undefined;
-
-        if (!shouldRenderField(key, rawValue)) {
-          return null;
-        }
+        if (!shouldRenderField(key, rawValue)) return null;
 
         const numericValue = Number(rawValue);
         const id = `field-${String(key)}`;

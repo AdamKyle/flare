@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace Tests\Unit\Flare\Items\Enricher\Manifest;
 
 use App\Flare\Items\Enricher\Manifest\EquippableManifest;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 final class EquippableManifestTest extends TestCase
 {
     private ?EquippableManifest $schema = null;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
-        $this->schema = new EquippableManifest();
+        $this->schema = $this->app->make(EquippableManifest::class);
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         $this->schema = null;
         parent::tearDown();
@@ -32,6 +32,7 @@ final class EquippableManifestTest extends TestCase
             '/^.*_chance$/',
             '/^.*_reduction$/',
             '/^total_.*_affix_damage$/',
+            '/^(str|dur|dex|chr|int|agi|focus)_mod$/',
         ];
 
         $this->assertSame($expected, $this->schema->includes());
@@ -43,6 +44,7 @@ final class EquippableManifestTest extends TestCase
             'ambush_chance',
             'str_reduction',
             'total_irresistible_affix_damage',
+            'str_mod',
         ];
 
         foreach ($samples as $prop) {
@@ -110,7 +112,7 @@ final class EquippableManifestTest extends TestCase
         $this->assertSame('delta', $this->schema->compareFor('totals.damage', 'number'));
         $this->assertSame('flag-diff', $this->schema->compareFor('some.flag', 'boolean'));
         $this->assertSame('noop', $this->schema->compareFor('label', 'string'));
-        $this->assertSame('noop', $this->schema->compareFor('path', 'unknown')); // fallback
+        $this->assertSame('noop', $this->schema->compareFor('path', 'unknown'));
     }
 
     public function testCollectionsShapeAndValues(): void

@@ -3,7 +3,7 @@ import React, { createContext, useState, useEffect } from 'react';
 
 import ShopContextDefinition from './definitions/shop-context-definition';
 import ShopProviderProps from './types/shop-provider-props';
-import ItemDetails from '../../../api-definitions/items/item-details';
+import { EquippableItemWithBase } from '../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import { useInfiniteScroll } from '../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
 import { ShopApiUrls } from '../api/enums/shop-api-urls';
 
@@ -23,7 +23,7 @@ const ShopProvider = ({ characterId, children }: ShopProviderProps) => {
     onEndReached,
     setSearchText: hookSetSearchText,
     setFilters: hookSetFilters,
-  } = UsePaginatedApiHandler<ItemDetails>({
+  } = UsePaginatedApiHandler<EquippableItemWithBase>({
     url: ShopApiUrls.VISIT_SHOP,
     urlParams: { character: characterId },
   });

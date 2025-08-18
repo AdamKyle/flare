@@ -2,6 +2,7 @@ import isNil from 'lodash/isNil';
 import some from 'lodash/some';
 
 import { ItemAdjustments } from '../../../api-definitions/items/item-comparison-details';
+import { InventoryItemTypes } from '../../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
 import type {
   FieldDef,
   NumericAdjustmentKey,
@@ -226,21 +227,18 @@ export const getPositionLabel = (position?: string): string => {
  * @example
  * isTwoHandedType('stave') // true
  */
-export const isTwoHandedType = (type?: string): boolean => {
+export const isTwoHandedType = (type?: InventoryItemTypes): boolean => {
   if (!type) {
     return false;
   }
 
   const twoHanded = [
-    'stave',
-    'bow',
-    'greatsword',
-    'polearm',
-    'two-handed',
-    'two handed',
+    InventoryItemTypes.STAVE,
+    InventoryItemTypes.BOW,
+    InventoryItemTypes.HAMMER,
   ];
 
-  return twoHanded.includes(type.toLowerCase());
+  return twoHanded.includes(type.toLowerCase() as InventoryItemTypes);
 };
 
 /**

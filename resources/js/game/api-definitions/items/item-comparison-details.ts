@@ -1,3 +1,5 @@
+import { InventoryItemTypes } from '../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
+
 export interface SkillSummaryAdjustment {
   skill_name: string;
   skill_training_bonus_adjustment: number;
@@ -29,11 +31,13 @@ export interface ItemAdjustments {
   non_stacking_adjustment: number;
   irresistible_adjustment: number;
   skill_summary: SkillSummaryAdjustment[];
+  spell_evasion_adjustment: number;
 }
 
 export interface ComparisonPayload {
   to_equip_name: string;
   to_equip_description: string;
+  to_equip_type: InventoryItemTypes;
   adjustments: ItemAdjustments;
   equipped_affix_name: string;
 }
@@ -45,6 +49,6 @@ export interface ItemComparisonRow {
   is_cosmic: boolean;
   affix_count: number;
   holy_stacks_applied: number;
-  type: string;
+  type: InventoryItemTypes;
   comparison: ComparisonPayload;
 }

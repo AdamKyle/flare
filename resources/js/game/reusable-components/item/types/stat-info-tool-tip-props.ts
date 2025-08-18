@@ -7,4 +7,5 @@ export default interface StatInfoToolTipProps {
   on_close?: () => void;
   align?: 'left' | 'right' | 'auto';
   size?: 'sm' | 'md';
+  custom_message?: boolean;
 }

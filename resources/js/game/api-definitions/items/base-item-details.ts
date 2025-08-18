@@ -1,3 +1,5 @@
+import { InventoryItemTypes } from '../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
+
 export interface BaseItemDetails {
   affix_count: number;
   max_holy_stacks: number;
@@ -11,5 +13,5 @@ export interface BaseItemDetails {
   damages_kingdoms: boolean;
   name: string;
   description: string;
-  type: string;
+  type: InventoryItemTypes;
 }

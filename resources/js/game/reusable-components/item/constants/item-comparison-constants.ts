@@ -79,22 +79,6 @@ export const STAT_FIELDS: FieldDef[] = [
  * <AdjustmentGroup adjustments={a} fields={AFFIX_ADJUSTMENT_FIELDS} />
  */
 export const AFFIX_ADJUSTMENT_FIELDS: FieldDef[] = [
-  {
-    key: 'resurrection_chance_adjustment',
-    label: 'Resurrection Chance Adjustment',
-  },
-  { key: 'ambush_chance_adjustment', label: 'Ambush Chance Adjustment' },
-  { key: 'counter_chance_adjustment', label: 'Counter Chance Adjustment' },
-
-  {
-    key: 'healing_reduction_adjustment',
-    label: 'Healing Reduction Adjustment',
-  },
-  {
-    key: 'affix_damage_reduction_adjustment',
-    label: 'Affix Damage Reduction Adjustment',
-  },
-
   { key: 'stackable_adjustment', label: 'Stackable Adjustment' },
   { key: 'non_stacking_adjustment', label: 'Non-Stacking Adjustment' },
   { key: 'irresistible_adjustment', label: 'Irresistible Adjustment' },

@@ -85,6 +85,10 @@ class EquippableItemTransformer extends TransformerAbstract
             'sockets'         => $item->sockets,
             'socket_amount'   => $item->socket_count,
             'item_atonements' => $this->getElementAtonement($item),
+            'spell_evasion' => $item->spell_evasion,
+            'healing_reduction' => $item->healing_reduction,
+            'affix_damage_reduction' => $item->affix_damage_reduction,
+            'resurrection_chance' => $item->resurrection_chance,
         ];
     }
 }

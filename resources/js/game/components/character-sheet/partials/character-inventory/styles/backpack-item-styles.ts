@@ -2,6 +2,7 @@ import { match } from 'ts-pattern';
 
 import { BaseItemDetails } from '../../../../../api-definitions/items/base-item-details';
 import ItemDetails from '../../../../../api-definitions/items/item-details';
+import { InventoryItemTypes } from '../enums/inventory-item-types';
 
 export const backpackBaseItemStyles = () => {
   return (
@@ -23,9 +24,12 @@ export const backpackFocusRingStyles = (item: BaseItemDetails) => {
     .with({ affix_count: 1 }, () => 'focus:ring-blue-800')
     .with({ affix_count: 2 }, () => 'focus:ring-fuchsia-800')
 
-    .with({ type: 'trinket' }, () => 'focus:ring-red-800')
-    .with({ type: 'artifact' }, () => 'focus:ring-artifact-colors-800')
-    .with({ type: 'quest' }, () => 'focus:ring-marigold-800')
+    .with({ type: InventoryItemTypes.TRINKET }, () => 'focus:ring-red-800')
+    .with(
+      { type: InventoryItemTypes.ARTIFACT },
+      () => 'focus:ring-artifact-colors-800'
+    )
+    .with({ type: InventoryItemTypes.QUEST }, () => 'focus:ring-marigold-800')
 
     .when(
       (item) =>
@@ -53,13 +57,16 @@ export const backpackBorderStyles = (item: BaseItemDetails) => {
       () => 'border-fuchsia-800 dark:border-fuchsia-300'
     )
 
-    .with({ type: 'trinket' }, () => 'border-red-800 dark:border-red-500')
     .with(
-      { type: 'artifact' },
+      { type: InventoryItemTypes.TRINKET },
+      () => 'border-red-800 dark:border-red-500'
+    )
+    .with(
+      { type: InventoryItemTypes.ARTIFACT },
       () => 'border-artifact-colors-800 dark:border-artifact-colors-500'
     )
     .with(
-      { type: 'quest' },
+      { type: InventoryItemTypes.QUEST },
       () => 'border-marigold-800 dark:border-marigold-500'
     )
 
@@ -105,16 +112,16 @@ export const backpackButtonBackground = (item: BaseItemDetails) => {
     )
 
     .with(
-      { type: 'trinket' },
+      { type: InventoryItemTypes.TRINKET },
       () => 'bg-red-200 dark:bg-red-100 hover:bg-red-300 dark:hover:bg-red-200'
     )
     .with(
-      { type: 'artifact' },
+      { type: InventoryItemTypes.ARTIFACT },
       () =>
         'bg-artifact-colors-200 dark:bg-artifact-colors-100 hover:bg-artifact-colors-300 dark:hover:bg-artifact-colors-200'
     )
     .with(
-      { type: 'quest' },
+      { type: InventoryItemTypes.QUEST },
       () =>
         'bg-marigold-200 dark:bg-marigold-100 hover:bg-marigold-300 dark:hover:bg-marigold-200'
     )

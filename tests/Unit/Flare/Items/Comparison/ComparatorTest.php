@@ -607,4 +607,88 @@ final class ComparatorTest extends TestCase
 
         return $this->createItem(array_merge($defaults, $attributes));
     }
+
+    public function testRingResistancesAdjustmentsAreCompared(): void
+    {
+        $equipped = $this->createItem([
+            'type'                     => 'ring',
+            'name'                     => 'Equipped Ring',
+            'spell_evasion'            => 0.00,
+            'healing_reduction'        => 0.00,
+            'affix_damage_reduction'   => 0.00,
+        ]);
+
+        $candidate = $this->createItem([
+            'type'                     => 'ring',
+            'name'                     => 'Candidate Ring',
+            'spell_evasion'            => 0.25,
+            'healing_reduction'        => 0.05,
+            'affix_damage_reduction'   => 0.11,
+        ]);
+
+        $equipped  = $this->enricher->enrich($equipped->fresh());
+        $candidate = $this->enricher->enrich($candidate->fresh());
+
+        $out  = $this->comparator->compare($candidate, $equipped);
+        $adj  = $out['comparison']['adjustments'];
+
+        $this->assertArrayHasKey('spell_evasion_adjustment', $adj);
+        $this->assertArrayHasKey('healing_reduction_adjustment', $adj);
+        $this->assertArrayHasKey('affix_damage_reduction_adjustment', $adj);
+
+        $this->assertEqualsWithDelta(0.25, $adj['spell_evasion_adjustment'], 1e-9);
+        $this->assertEqualsWithDelta(0.05, $adj['healing_reduction_adjustment'], 1e-9);
+        $this->assertEqualsWithDelta(0.11, $adj['affix_damage_reduction_adjustment'], 1e-9);
+    }
+
+    public function testHealingSpellResurrectionChanceAdjustmentIsCompared(): void
+    {
+        $equipped = $this->createItem([
+            'type'                  => 'spell-healing',
+            'name'                  => 'Equipped Heal',
+            'resurrection_chance'   => 0.10,
+        ]);
+
+        $candidate = $this->createItem([
+            'type'                  => 'spell-healing',
+            'name'                  => 'Candidate Heal',
+            'resurrection_chance'   => 0.15,
+        ]);
+
+        $equipped  = $this->enricher->enrich($equipped->fresh());
+        $candidate = $this->enricher->enrich($candidate->fresh());
+
+        $out  = $this->comparator->compare($candidate, $equipped);
+        $adj  = $out['comparison']['adjustments'];
+
+        $this->assertArrayHasKey('resurrection_chance_adjustment', $adj);
+        $this->assertEqualsWithDelta(0.05, $adj['resurrection_chance_adjustment'], 1e-9);
+    }
+
+    public function testNumericStringResistancesAreTreatedAsNumbers(): void
+    {
+        $equipped = $this->createItem([
+            'type'                     => 'ring',
+            'name'                     => 'Equipped Ring',
+            'affix_damage_reduction'   => '1.0000',
+            'healing_reduction'        => '0.1000',
+        ]);
+
+        $candidate = $this->createItem([
+            'type'                     => 'ring',
+            'name'                     => 'Candidate Ring',
+            'affix_damage_reduction'   => 0.11,
+            'healing_reduction'        => 0.00,
+        ]);
+
+        $equipped  = $this->enricher->enrich($equipped->fresh());
+        $candidate = $this->enricher->enrich($candidate->fresh());
+
+        $out  = $this->comparator->compare($candidate, $equipped);
+        $adj  = $out['comparison']['adjustments'];
+
+        $this->assertEqualsWithDelta(-0.89, $adj['affix_damage_reduction_adjustment'], 1e-9);
+        $this->assertEqualsWithDelta(-0.10, $adj['healing_reduction_adjustment'], 1e-9);
+    }
+
 }

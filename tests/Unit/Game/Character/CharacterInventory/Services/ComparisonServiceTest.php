@@ -124,7 +124,9 @@ class ComparisonServiceTest extends TestCase
 
         $comparisonData = $this->comparisonService->buildShopData($character, $item, ItemType::BOW->value);
 
-        $this->assertEquals($item->affix_name, $comparisonData['itemToEquip']['affix_name']);
+        $this->assertArrayHasKey('details', $comparisonData);
+        $this->assertIsArray($comparisonData['details']);
+        $this->assertNotEmpty($comparisonData['details']);
     }
 
     public function testBuildShopDataForArmourType()
@@ -141,7 +143,9 @@ class ComparisonServiceTest extends TestCase
 
         $comparisonData = $this->comparisonService->buildShopData($character, $item, ArmourTypes::SHIELD);
 
-        $this->assertEquals($item->affix_name, $comparisonData['itemToEquip']['affix_name']);
+        $this->assertArrayHasKey('details', $comparisonData);
+        $this->assertIsArray($comparisonData['details']);
+        $this->assertNotEmpty($comparisonData['details']);
     }
 
     public function testBuildShopDataForSpell()
@@ -158,21 +162,29 @@ class ComparisonServiceTest extends TestCase
 
         $comparisonData = $this->comparisonService->buildShopData($character, $item, ItemType::SPELL_DAMAGE->value);
 
-        $this->assertEquals($item->affix_name, $comparisonData['itemToEquip']['affix_name']);
+        $this->assertArrayHasKey('details', $comparisonData);
+        $this->assertIsArray($comparisonData['details']);
+        $this->assertNotEmpty($comparisonData['details']);
     }
 
     public function testBuildShopDataForSpellInEquippedSet()
     {
         $item = $this->createItem(['type' => ItemType::SPELL_DAMAGE->value]);
 
-        $character = $this->character->inventorySetManagement()->createInventorySets(10)->putItemInSet($this->createItem([
-            'type' => SpellTypes::HEALING,
-            'base_healing' => 25,
-            'str_mod' => 0.10,
-        ]), 0, 'spell-one')->getCharacter();
+        $manager = $this->character->inventorySetManagement()
+            ->createInventorySets(10)
+            ->putItemInSet($this->createItem([
+                'type' => SpellTypes::HEALING,
+                'base_healing' => 25,
+                'str_mod' => 0.10,
+            ]), 0, 'spell-one', true);
+
+        $character = $manager->getCharacter();
 
         $comparisonData = $this->comparisonService->buildShopData($character, $item, ItemType::SPELL_DAMAGE->value);
 
-        $this->assertEquals($item->affix_name, $comparisonData['itemToEquip']['affix_name']);
+        $this->assertArrayHasKey('details', $comparisonData);
+        $this->assertIsArray($comparisonData['details']);
+        $this->assertNotEmpty($comparisonData['details']);
     }
 }

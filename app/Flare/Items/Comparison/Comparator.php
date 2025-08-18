@@ -29,6 +29,9 @@ use Illuminate\Support\Collection;
  */
 class Comparator
 {
+    /**
+     * @param ManifestSchema $schema
+     */
     public function __construct(private readonly ManifestSchema $schema) {}
 
     /**
@@ -73,6 +76,7 @@ class Comparator
             'item_to_equip' => $itemToEquip,
             'item_equipped' => $itemEquipped,
             'comparison'    => [
+                'type'  => $itemToEquip->type,
                 'name'        => $itemToEquip->name ?? null,
                 'description' => $itemToEquip->description ?? null,
                 'adjustments' => $adjustments,

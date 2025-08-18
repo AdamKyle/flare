@@ -4,6 +4,7 @@ namespace App\Flare\Items\Comparison;
 
 use App\Flare\Items\Enricher\EquippableEnricher;
 use App\Flare\Items\Values\ArmourType;
+use App\Flare\Items\Values\EquippablePositionType;
 use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
@@ -15,8 +16,8 @@ class ItemComparison
     use IsItemUnique;
 
     /**
-     * @param EquippableEnricher $enricher   Enriches raw Item models with computed fields required by the Comparator.
-     * @param Comparator         $comparator Computes deltas/adjustments between two enriched items.
+     * @param EquippableEnricher $enricher
+     * @param Comparator $comparator
      */
     public function __construct(
         private readonly EquippableEnricher $enricher,
@@ -24,20 +25,19 @@ class ItemComparison
     ) {}
 
     /**
-     * Build comparison rows for each equipped slot that could hold the given item.
+     * Build ordered comparison rows for each equipped slot that can hold the given item.
      *
      * Flow:
-     * 1) Resolve positions the item can occupy.
-     * 2) Filter inventory slots to those positions (and, if present, equipped=true).
-     * 3) Sort positions descending to match UI: right-hand before left-hand, spell-two before spell-one, ring-two before ring-one.
-     * 4) Dedupe by position so we only compare once per hand/slot.
-     * 5) Enrich candidate item once; enrich each equipped slot item; compare.
+     * 1) Resolve valid positions for the item type.
+     * 2) Filter inventory slots to those positions and equipped=true.
+     * 3) Sort by resolved order (e.g., ring-one before ring-two).
+     * 4) Dedupe by position.
+     * 5) Enrich the candidate item, compare against each equipped slot item, and return rows.
      *
-     * @param Item        $itemToCompare
-     * @param Collection  $inventorySlots  Eloquent collection of slot models with ->position and ->item
-     * @param Character   $character       Not used here; kept for signature parity.
-     *
-     * @return array<int, array<string, mixed>>
+     * @param Item $itemToCompare The item the player is considering equipping; enriched prior to compare.
+     * @param Collection<int, object> $inventorySlots Slot models/records with at least: ->position(string), ->equipped(bool), ->item(Item)
+     * @param Character $character Unused placeholder for future needs/signature parity.
+     * @return array<int, array<string, mixed>> A list of comparison row payloads ready for the frontend.
      */
     public function fetchDetails(Item $itemToCompare, Collection $inventorySlots, Character $character): array
     {
@@ -46,51 +46,58 @@ class ItemComparison
             return [];
         }
 
-        $matchingSlots = $this->filterSlotsByPositions($inventorySlots, $equipPositions);
-        if ($matchingSlots->isEmpty()) {
+        $matching = $this->filterSlotsByPositions($inventorySlots, $equipPositions);
+        if ($matching->isEmpty()) {
             return [];
         }
 
-        // Sort for expected UI order, then dedupe by position.
-        $matchingSlots = $matchingSlots
-            ->sortByDesc(fn ($slot) => $slot->position, SORT_NATURAL)
+        $rank = array_flip($equipPositions);
+
+        $matching = $matching
+            ->sortBy(fn ($slot) => $rank[$slot->position] ?? PHP_INT_MAX)
             ->unique('position')
             ->values();
 
-        $enrichedItemToCompare = $this->enricher->enrich($itemToCompare->fresh());
+        $enrichedItem = $this->enricher->enrich($itemToCompare->fresh());
 
-        return $matchingSlots
-            ->map(fn ($slot) => $this->buildComparisonRow($enrichedItemToCompare, $slot))
+        return $matching
+            ->map(fn ($slot) => $this->buildComparisonRow($enrichedItem, $slot))
             ->values()
             ->all();
     }
 
     /**
-     * Determine which inventory positions an item type can occupy.
+     * Determine the ordered list of inventory positions the given item can occupy.
      *
-     * @param Item $item
-     * @return array<int, string>
+     * Spells → ['spell-one','spell-two']
+     * Rings  → ['ring-one','ring-two']
+     * Weapons (non-spell, non-ring) → ['left-hand','right-hand']
+     * Armour → Positions provided by ArmourType::getArmourPositions()
+     *
+     * @param Item $item The raw item model whose type determines valid positions.
+     * @return array<int, string> Ordered positions used for filtering and sorting.
      */
     private function resolveEquipPositions(Item $item): array
     {
-        $explicitPositions = match ($item->type) {
-            'spell-damage', 'spell-healing' => ['spell-one', 'spell-two'],
-            'shield'                         => ['left-hand', 'right-hand'],
-            'ring'                           => ['ring-one', 'ring-two'],
-            default                          => null,
-        };
-
-        if ($explicitPositions !== null) {
-            return $explicitPositions;
+        $typeEnum = ItemType::tryFrom((string) $item->type);
+        if ($typeEnum === null) {
+            return [];
         }
 
-        if (in_array($item->type, ItemType::validWeapons(), true)) {
-            return ['left-hand', 'right-hand'];
+        if ($typeEnum === ItemType::SPELL_DAMAGE || $typeEnum === ItemType::SPELL_HEALING) {
+            return EquippablePositionType::values(EquippablePositionType::orderForType($typeEnum));
+        }
+
+        if ($typeEnum === ItemType::RING) {
+            return EquippablePositionType::values(EquippablePositionType::orderForType($typeEnum));
+        }
+
+        if (in_array($typeEnum->value, ItemType::validWeapons(), true)) {
+            return EquippablePositionType::values([EquippablePositionType::LEFT_HAND, EquippablePositionType::RIGHT_HAND]);
         }
 
         $armourPositionsMap = ArmourType::getArmourPositions();
         $armourPositions    = $armourPositionsMap[$item->type] ?? null;
-
         if ($armourPositions !== null) {
             return $armourPositions;
         }
@@ -99,12 +106,13 @@ class ItemComparison
     }
 
     /**
-     * Filter inventory slots to those whose position is in the allowed list,
-     * and are actually equipped. Assumes `equipped` is always present on slots.
+     * Filter the provided inventory slots to those which:
+     * - Have a position included in the allowed positions list, and
+     * - Are currently equipped.
      *
-     * @param Collection $inventorySlots
-     * @param array<int,string>                         $equipPositions
-     * @return Collection
+     * @param Collection<int, object> $inventorySlots Slot records with ->position and ->equipped.
+     * @param array<int, string> $equipPositions Allowed slot position identifiers.
+     * @return Collection<int, object> Filtered, still-indexed slot collection.
      */
     private function filterSlotsByPositions(Collection $inventorySlots, array $equipPositions): Collection
     {
@@ -113,34 +121,34 @@ class ItemComparison
             ->filter(fn ($slot) => (bool) $slot->equipped === true);
     }
 
-
     /**
-     * Build a single comparison row for a slot.
+     * Build a single comparison row for a matched equipped slot.
      *
-     * @param Item   $enrichedItemToCompare
-     * @param object $equippedSlot          Must have ->position and ->item
-     * @return array<string, mixed>
+     * @param Item $enrichedItemToCompare The candidate item after enrichment.
+     * @param object $equippedSlot Slot record containing ->position(string) and ->item(Item Eloquent model).
+     * @return array<string, mixed> Comparison row payload including metadata and computed adjustments.
      */
     private function buildComparisonRow(Item $enrichedItemToCompare, $equippedSlot): array
     {
         $equippedItem         = $equippedSlot->item->fresh();
         $enrichedEquippedItem = $this->enricher->enrich($equippedItem);
-        $comparisonPayload    = $this->comparator->compare($enrichedItemToCompare, $enrichedEquippedItem);
-        $comparisonSummary    = $comparisonPayload['comparison'];
+        $payload              = $this->comparator->compare($enrichedItemToCompare, $enrichedEquippedItem);
+        $summary              = $payload['comparison'];
 
         return [
-            'position'             => $equippedSlot->position,
-            'is_unique'            => $this->isUnique($equippedSlot->item),
-            'is_mythic'            => $equippedSlot->item->is_mythic,
-            'is_cosmic'            => $equippedSlot->item->is_cosmic,
-            'affix_count'          => $equippedSlot->item->affix_count,
-            'holy_stacks_applied'  => $equippedSlot->item->holy_stacks_applied,
-            'type'                 => $equippedSlot->item->type,
-            'comparison'           => [
-                'to_equip_name'       => $comparisonSummary['name'],
-                'to_equip_description'         => $comparisonSummary['description'],
-                'adjustments'         => $comparisonSummary['adjustments'],
-                'equipped_affix_name' => $equippedSlot->item->affix_name,
+            'position'            => $equippedSlot->position,
+            'is_unique'           => $this->isUnique($equippedSlot->item),
+            'is_mythic'           => $equippedSlot->item->is_mythic,
+            'is_cosmic'           => $equippedSlot->item->is_cosmic,
+            'affix_count'         => $equippedSlot->item->affix_count,
+            'holy_stacks_applied' => $equippedSlot->item->holy_stacks_applied,
+            'type'                => $equippedSlot->item->type,
+            'comparison'          => [
+                'to_equip_name'        => $summary['name'],
+                'to_equip_description' => $summary['description'],
+                'to_equip_type'        => $summary['type'],
+                'adjustments'          => $summary['adjustments'],
+                'equipped_affix_name'  => $equippedSlot->item->affix_name,
             ],
         ];
     }

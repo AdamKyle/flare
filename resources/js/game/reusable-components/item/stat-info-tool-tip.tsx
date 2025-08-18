@@ -14,6 +14,7 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
     is_open,
     on_open,
     on_close,
+    custom_message,
   } = props;
 
   const localId = useId();
@@ -52,6 +53,10 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
   };
 
   const getMessage = () => {
+    if (custom_message) {
+      return label;
+    }
+
     const direction = getDirection(value);
 
     if (direction === 'no-change') {
@@ -74,13 +79,11 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
       return;
     }
 
-    // Preferred side from prop
-    const preferred: 'left' | 'right' = align === 'left' ? 'left' : 'right';
+    const preferred: 'left' | 'right' | 'auto' =
+      align === 'left' || align === 'right' ? align : 'auto';
 
-    // Estimate width the bubble might need (matches CSS max width: 28rem,
-    // but also caps to viewport minus margins so it never overflows).
-    const viewportCap = Math.max(0, window.innerWidth - 48); // 24px margin on each side
-    const estimatedWidth = Math.min(448 /* 28rem */, viewportCap);
+    const viewportCap = Math.max(0, window.innerWidth - 48);
+    const estimatedWidth = Math.min(448, viewportCap);
 
     const rect = buttonRef.current.getBoundingClientRect();
     const spaceLeft = rect.left;
@@ -89,7 +92,6 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
     const hasRoomOnLeft = spaceLeft >= estimatedWidth;
     const hasRoomOnRight = spaceRight >= estimatedWidth;
 
-    // Choose preferred side if it has room, otherwise flip.
     if (preferred === 'right') {
       if (hasRoomOnRight) {
         setPlacement('right');
@@ -101,23 +103,26 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
         return;
       }
 
-      // Neither side has full room: choose the side with more space.
       setPlacement(spaceRight >= spaceLeft ? 'right' : 'left');
       return;
     }
 
-    // preferred === 'left'
-    if (hasRoomOnLeft) {
-      setPlacement('left');
+    if (preferred === 'left') {
+      if (hasRoomOnLeft) {
+        setPlacement('left');
+        return;
+      }
+
+      if (hasRoomOnRight) {
+        setPlacement('right');
+        return;
+      }
+
+      setPlacement(spaceLeft >= spaceRight ? 'left' : 'right');
       return;
     }
 
-    if (hasRoomOnRight) {
-      setPlacement('right');
-      return;
-    }
-
-    setPlacement(spaceLeft >= spaceRight ? 'left' : 'right');
+    setPlacement(spaceRight >= spaceLeft ? 'right' : 'left');
   };
 
   const openTip = () => {
@@ -138,10 +143,6 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
     }
 
     setInternalOpen(false);
-
-    if (buttonRef.current) {
-      buttonRef.current.focus();
-    }
   };
 
   const toggleTip = () => {
@@ -197,7 +198,6 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
         aria-live="polite"
         className={clsx(
           'absolute top-0 translate-y-[-4px] z-50 rounded-md border bg-white p-3 shadow-lg',
-          // Keep your exact width rules — no squishing, clamps on tiny screens
           'min-w-[16rem] max-w-[min(28rem,calc(100vw-3rem))] whitespace-normal break-words',
           'border-gray-200 text-gray-800',
           'dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100',
@@ -229,8 +229,8 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
         onClick={toggleTip}
         className={clsx(
           'mr-2 inline-flex h-7 w-7 items-center justify-center rounded',
-          'text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500',
-          'dark:text-gray-400 dark:hover:text-gray-200'
+          'text-gray-500',
+          'dark:text-gray-400'
         )}
       >
         <i className="fas fa-info-circle" aria-hidden="true" />
