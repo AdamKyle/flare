@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Fragment } from 'react';
 
 import { TOP_ADVANCED_CHILD_FIELDS } from './constants/item-comparison-constants';
 import ItemComparisonColumn from './partials/item-comparison/item-comparison-column';
@@ -8,6 +8,7 @@ import type { ItemComparisonRow } from '../../api-definitions/items/item-compari
 
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import IconButton from 'ui/buttons/icon-button';
+import Separator from 'ui/separator/separator';
 
 const ItemComparison = ({
   comparisonDetails,
@@ -36,6 +37,11 @@ const ItemComparison = ({
       )
     );
 
+  const isSingle = comparisonRows.length === 1;
+  const gridClasses = isSingle
+    ? 'grid grid-cols-1'
+    : 'grid grid-cols-1 md:grid-cols-2 gap-4';
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-end">
@@ -58,17 +64,25 @@ const ItemComparison = ({
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className={gridClasses}>
         {comparisonRows.map((row, index) => (
-          <div key={index} className="min-w-0">
-            <ItemComparisonColumn
-              row={row}
-              heading={item_name}
-              index={index}
-              showAdvanced={showAdvanced}
-              showAdvancedChildUnderTop={showAdvancedChildUnderTop}
-            />
-          </div>
+          <Fragment key={index}>
+            <div className="min-w-0">
+              <ItemComparisonColumn
+                row={row}
+                heading={item_name}
+                index={index}
+                showAdvanced={showAdvanced}
+                showAdvancedChildUnderTop={showAdvancedChildUnderTop}
+              />
+            </div>
+
+            {index < comparisonRows.length - 1 && (
+              <div className="block md:hidden my-6 px-2">
+                <Separator />
+              </div>
+            )}
+          </Fragment>
         ))}
       </div>
     </div>

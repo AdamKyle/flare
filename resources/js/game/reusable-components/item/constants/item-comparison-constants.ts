@@ -94,3 +94,9 @@ export const DEVOURING_FIELDS: FieldDef[] = [
   { key: 'devouring_light_adjustment', label: 'Devouring Light' },
   { key: 'devouring_darkness_adjustment', label: 'Devouring Darkness' },
 ];
+
+export const RESISTANCE_FIELDS: FieldDef[] = [
+  { key: 'spell_evasion_adjustment', label: 'Spell Evasion' },
+  { key: 'healing_reduction_adjustment', label: 'Healing Reduction' },
+  { key: 'affix_damage_reduction_adjustment', label: 'Affix Damage Reduction' },
+];
