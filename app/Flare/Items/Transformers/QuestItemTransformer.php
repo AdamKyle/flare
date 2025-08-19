@@ -13,6 +13,7 @@ use League\Fractal\TransformerAbstract;
 
 class QuestItemTransformer extends TransformerAbstract
 {
+
     public function transform(Item $item): array
     {
         return [
@@ -35,6 +36,7 @@ class QuestItemTransformer extends TransformerAbstract
             'required_locations'  => $this->getRequiredLocations($item),
         ];
     }
+
 
     private function getDropLocation(Item $item): ?array
     {

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import QuestItemDetails from './quest-item-details';
+import BaseQuestItemDefinition from '../../../../../api-definitions/items/quest-item-definitions/base-quest-item-definition';
 import QuestItemDetailsProps from '../types/details/quest-item-details-props';
 
 import Button from 'ui/buttons/button';
@@ -24,7 +25,7 @@ export const QuestItem = ({
       <hr className="w-full border-t border-gray-300 dark:border-gray-600" />
       <div className="pt-2 px-4">
         <QuestItemDetails
-          item={item}
+          item={item as BaseQuestItemDefinition}
           is_found_at_location={is_found_at_location}
           location_props={location_props}
         />

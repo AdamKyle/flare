@@ -18,8 +18,7 @@ const GenericItem = ({ item, on_click }: BackpackItemProps): ReactNode => {
     if (!on_click) {
       return;
     }
-
-    return on_click(item);
+    on_click(item);
   };
 
   const renderItemDetails = (): ReactNode => {
@@ -31,25 +30,28 @@ const GenericItem = ({ item, on_click }: BackpackItemProps): ReactNode => {
           </span>
         );
       }
-
       return null;
     }
 
-    return (
-      <>
-        <span>
-          <strong>Type</strong>: {item.type}
-        </span>{' '}
-        |{' '}
-        <span>
-          <strong>Damage</strong>: {item.attack}
-        </span>{' '}
-        |{' '}
-        <span>
-          <strong>AC</strong>: {item.ac}
-        </span>
-      </>
-    );
+    if ('attack' in item && 'ac' in item) {
+      return (
+        <>
+          <span>
+            <strong>Type</strong>: {item.type}
+          </span>{' '}
+          |{' '}
+          <span>
+            <strong>Damage</strong>: {item.attack}
+          </span>{' '}
+          |{' '}
+          <span>
+            <strong>AC</strong>: {item.ac}
+          </span>
+        </>
+      );
+    }
+
+    return null;
   };
 
   return (
@@ -62,7 +64,7 @@ const GenericItem = ({ item, on_click }: BackpackItemProps): ReactNode => {
       )}
       onClick={handleViewItem}
     >
-      <i className="ra ra-bone-knife text-2xl text-gray-800 dark:text-gray-600"></i>
+      <i className="ra ra-bone-knife text-2xl text-gray-800 dark:text-gray-600" />
       <div className="text-left">
         <div className={clsx('text-lg font-semibold', itemColor)}>
           {item.name}

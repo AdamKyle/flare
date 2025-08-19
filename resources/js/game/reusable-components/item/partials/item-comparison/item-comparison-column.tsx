@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 
+import AffixAdjustmentsSection from './comparison-column-sections/affix-adjustment-section';
 import AttributesSection from './comparison-column-sections/attributes-section';
 import CoreImpactSection from './comparison-column-sections/core-impact-section';
 import CurrentlyEquippedPanel from './comparison-column-sections/currently-equipped-panel';
@@ -22,13 +23,6 @@ import {
   hasAnyNonZeroAdjustment,
   isTwoHandedType,
 } from '../../utils/item-comparison';
-
-function AffixAdjustmentsSection(props: {
-  adjustments: ItemAdjustments;
-  show: boolean;
-}) {
-  return null;
-}
 
 const ItemComparisonColumn = ({
   row,

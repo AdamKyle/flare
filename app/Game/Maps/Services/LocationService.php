@@ -2,8 +2,8 @@
 
 namespace App\Game\Maps\Services;
 
+use App\Flare\Items\Transformers\QuestItemTransformer;
 use App\Flare\Pagination\Pagination;
-use App\Flare\Transformers\ItemTransformer;
 use App\Game\Maps\Transformers\LocationTransformer;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\CelestialFight;
@@ -43,7 +43,7 @@ class LocationService
     public function __construct(private readonly CoordinatesCache                  $coordinatesCache,
                                 private readonly CharacterCacheData                $characterCacheData,
                                 private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
-                                private readonly ItemTransformer                   $itemTransformer,
+                                private readonly QuestItemTransformer              $questItemTransformer,
                                 private readonly LocationsTransformer              $locationTransformer,
                                 private readonly PlainDataSerializer               $plainArraySerializer,
                                 private readonly Pagination                        $pagination,
@@ -92,7 +92,7 @@ class LocationService
     public function getDroppableItems(Location $location, int $perPage = 10, int $page = 1, string $searchText = ''): array {
         $items = ItemModel::where('drop_location_id', $location->id)->where('name', 'LIKE', '%' . $searchText . '%')->get();
 
-        return $this->pagination->buildPaginatedDate($items, $this->itemTransformer, $perPage, $page);
+        return $this->pagination->buildPaginatedDate($items, $this->questItemTransformer, $perPage, $page);
     }
 
     public function getTeleportLocations(Character $character): array {

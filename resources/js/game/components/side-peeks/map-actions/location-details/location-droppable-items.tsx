@@ -3,8 +3,8 @@ import { debounce, isNil } from 'lodash';
 import React, { useMemo, useState } from 'react';
 
 import LocationDroppableItemProps from './types/location-droppable-items-props';
+import BaseQuestItemDefinition from '../../../../api-definitions/items/quest-item-definitions/base-quest-item-definition';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
-import BaseInventoryItemDefinition from '../../character-inventory/api-definitions/base-inventory-item-definition';
 import ItemDetailsContainer from '../../components/items/details/item-details-container';
 import { ItemTypeToView } from '../../components/items/enums/item-type-to-view';
 import GenericItemList from '../../components/items/generic-item-list';
@@ -25,11 +25,12 @@ const LocationDroppableItems = ({
   const [itemTypeToView, setItemTypeToView] = useState<ItemTypeToView | null>(
     null
   );
-  const [itemToView, setItemToView] =
-    useState<BaseInventoryItemDefinition | null>(null);
+  const [itemToView, setItemToView] = useState<BaseQuestItemDefinition | null>(
+    null
+  );
 
   const { data, error, loading, setSearchText, onEndReached } =
-    UsePaginatedApiHandler<BaseInventoryItemDefinition>({
+    UsePaginatedApiHandler<BaseQuestItemDefinition>({
       url: LocationApiUrls.LOCATION_DROPPABLE_ITEMS,
       urlParams: { location: location_id },
     });
@@ -52,7 +53,7 @@ const LocationDroppableItems = ({
     itemTypeToView: ItemTypeToView,
     itemId: number
   ) => {
-    const item = data.find((item) => item.item_id === itemId);
+    const item = data.find((item) => item.id === itemId);
 
     if (!item) {
       return;

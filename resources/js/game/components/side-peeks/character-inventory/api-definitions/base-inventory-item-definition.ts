@@ -7,6 +7,7 @@ import LocationDetailsApi from '../../map-actions/api-definitions/location-detai
 export default interface BaseInventoryItemDefinition
   extends BaseItemDetails,
     BaseUsableItemDetails {
+  id: number;
   item_id: number;
   slot_id: number;
   ac: number;

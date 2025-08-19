@@ -3,6 +3,7 @@ import React, { ReactNode } from 'react';
 
 import GenericItem from './generic-item';
 import GenericItemListProps from './types/generic-item-list-props';
+import BaseQuestItemDefinition from '../../../../api-definitions/items/quest-item-definitions/base-quest-item-definition';
 import BaseInventoryItemDefinition from '../../character-inventory/api-definitions/base-inventory-item-definition';
 
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
@@ -14,12 +15,14 @@ const GenericItemList = ({
   items_view_type,
   on_click,
 }: GenericItemListProps): ReactNode => {
-  const handleOnClick = (item: BaseInventoryItemDefinition) => {
+  const handleOnClick = (
+    item: BaseInventoryItemDefinition | BaseQuestItemDefinition
+  ) => {
     if (!on_click) {
       return;
     }
 
-    return on_click(items_view_type, item.item_id);
+    return on_click(items_view_type, item.id);
   };
 
   const renderBackPackItems = () => {
@@ -45,9 +48,11 @@ const GenericItemList = ({
       );
     }
 
-    return items.map((item: BaseInventoryItemDefinition) => (
-      <GenericItem key={item.slot_id} item={item} on_click={handleOnClick} />
-    ));
+    return items.map(
+      (item: BaseInventoryItemDefinition | BaseQuestItemDefinition) => (
+        <GenericItem key={item.id} item={item} on_click={handleOnClick} />
+      )
+    );
   };
 
   return (

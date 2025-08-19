@@ -52,6 +52,7 @@ const MapCard = () => {
   const { openShop } = useManageShopVisibility();
   const { openMarket } = useManageMarketVisibility();
   const { openPlayerKingdoms } = useManagePlayerKingdomManagementVisibility();
+
   useEffect(() => {
     if (isNil(gameData)) {
       return;
@@ -226,6 +227,8 @@ const MapCard = () => {
           on_click={openMarket}
           label={'Market'}
           variant={ButtonVariant.SUCCESS}
+          // If were not at a port, we cant set sail, nor can we visit the market.
+          disabled={isSetSailDisabled()}
         />
         <Button
           on_click={openPlayerKingdoms}
