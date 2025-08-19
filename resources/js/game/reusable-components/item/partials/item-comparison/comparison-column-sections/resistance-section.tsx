@@ -13,7 +13,6 @@ const ResistanceSection = ({
   adjustments,
   toEquipType,
 }: ResistanceSectionProps) => {
-
   const hasAny = hasAnyNonZeroAdjustment(adjustments, RESISTANCE_FIELDS);
 
   if (toEquipType !== InventoryItemTypes.RING) {
