@@ -1,4 +1,4 @@
 export default interface TitleAndDescriptionProps {
   title: string;
-  description?: string | null;
+  description: string;
 }

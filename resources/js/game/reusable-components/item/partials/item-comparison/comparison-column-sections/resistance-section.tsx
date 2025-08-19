@@ -13,14 +13,23 @@ const ResistanceSection = ({
   adjustments,
   toEquipType,
 }: ResistanceSectionProps) => {
-  if (toEquipType !== InventoryItemTypes.RING) return null;
 
   const hasAny = hasAnyNonZeroAdjustment(adjustments, RESISTANCE_FIELDS);
-  if (!hasAny) return null;
+
+  if (toEquipType !== InventoryItemTypes.RING) {
+    return null;
+  }
+
+  if (!hasAny) {
+    return null;
+  }
 
   const Row = (label: string, raw: number | null | undefined) => {
     const value = Number(raw ?? 0);
-    if (value === 0) return null;
+
+    if (value === 0) {
+      return null;
+    }
 
     return (
       <Fragment key={label}>

@@ -11,10 +11,15 @@ const ResurrectionChanceSection = ({
   adjustments,
   toEquipType,
 }: ResurrectionChanceSectionProps) => {
-  if (toEquipType !== InventoryItemTypes.SPELL_HEALING) return null;
+  if (toEquipType !== InventoryItemTypes.SPELL_HEALING) {
+    return null;
+  }
 
   const raw = adjustments.resurrection_chance_adjustment;
-  if (raw == null || Number(raw) === 0) return null;
+
+  if (raw == null || Number(raw) === 0) {
+    return null;
+  }
 
   const value = Number(raw);
 

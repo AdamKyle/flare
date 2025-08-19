@@ -7,7 +7,9 @@ import AdjustmentGroup from '../adjustment-group';
 import Separator from 'ui/separator/separator';
 
 const DevouringSection = ({ adjustments, show }: DevouringSectionProps) => {
-  if (!show) return null;
+  if (!show) {
+    return null;
+  }
 
   return (
     <Fragment>

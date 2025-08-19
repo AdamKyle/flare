@@ -13,7 +13,10 @@ const CoreImpactSection = ({
   forceCoreZeroKeys = [],
 }: CoreImpactSectionProps) => {
   const shouldShow = hasCoreTotals || forceCoreZeroKeys.length > 0;
-  if (!shouldShow) return null;
+
+  if (!shouldShow) {
+    return null;
+  }
 
   return (
     <Fragment>

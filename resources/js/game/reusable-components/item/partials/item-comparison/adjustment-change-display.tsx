@@ -44,11 +44,16 @@ const AdjustmentChangeDisplay = ({
   const icon = getChangeIcon(value);
   const valueClassName = getValueClassName(value);
   const isZero = value === 0;
-  const displayText = isZero
-    ? '0'
-    : renderAsPercent
-      ? formatSignedPercent(value)
-      : formatSignedAuto(value);
+
+  let displayText: string;
+
+  if (isZero) {
+    displayText = '0';
+  } else if (renderAsPercent) {
+    displayText = formatSignedPercent(value);
+  } else {
+    displayText = formatSignedAuto(value);
+  }
 
   return (
     <span className="flex items-center justify-end gap-1 tabular-nums">

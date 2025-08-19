@@ -10,7 +10,9 @@ const AttributesSection = ({
   adjustments,
   hasAttributes,
 }: AttributesSectionProps) => {
-  if (!hasAttributes) return null;
+  if (!hasAttributes) {
+    return null;
+  }
 
   return (
     <Fragment>
