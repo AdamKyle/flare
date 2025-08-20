@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Tests\Unit\Flare\Items\Enricher\Manifest;
 
 use App\Flare\Items\Enricher\Manifest\EquippableManifest;
@@ -31,6 +29,7 @@ final class EquippableManifestTest extends TestCase
             '/^devouring_.+$/',
             '/^.*_chance$/',
             '/^.*_reduction$/',
+            '/^.*_evasion$/',
             '/^total_.*_affix_damage$/',
             '/^(str|dur|dex|chr|int|agi|focus)_mod$/',
         ];
@@ -43,6 +42,7 @@ final class EquippableManifestTest extends TestCase
             'devouring_light',
             'ambush_chance',
             'str_reduction',
+            'dodge_evasion',
             'total_irresistible_affix_damage',
             'str_mod',
         ];

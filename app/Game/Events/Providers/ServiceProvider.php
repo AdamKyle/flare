@@ -10,13 +10,17 @@ use App\Game\Events\Console\Commands\RestartGlobalEventGoal;
 use App\Game\Events\Registry\EventEnderRegistry;
 use App\Game\Events\Services\AnnouncementCleanupService;
 use App\Game\Events\Services\DelusionalMemoriesEventEnderService;
+use App\Game\Events\Services\EventGoalRestartGuardService;
 use App\Game\Events\Services\EventGoalsService;
+use App\Game\Events\Services\EventParticipantNotifierService;
 use App\Game\Events\Services\FactionLoyaltyPledgeCleanupService;
 use App\Game\Events\Services\FeedbackEventEnderService;
 use App\Game\Events\Services\GlobalEventGoalCleanupService;
+use App\Game\Events\Services\GlobalEventStepRotatorService;
 use App\Game\Events\Services\KingdomEventService;
 use App\Game\Events\Services\MoveCharacterAfterEventService;
 use App\Game\Events\Services\RaidEventEnderService;
+use App\Game\Events\Services\RegularEventGoalResetService;
 use App\Game\Events\Services\WeeklyCelestialEventEnderService;
 use App\Game\Events\Services\WeeklyCurrencyEventEnderService;
 use App\Game\Events\Services\WeeklyFactionLoyaltyEnderService;
@@ -141,6 +145,26 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(DelusionalMemoriesEventEnderService::class),
                 $app->make(FeedbackEventEnderService::class),
             );
+        });
+
+        $this->app->bind(EventParticipantNotifierService::class, function ($app) {
+            return new EventParticipantNotifierService(
+                $app->make(EventGoalsService::class),
+            );
+        });
+
+        $this->app->bind(GlobalEventStepRotatorService::class, function ($app) {
+            return new GlobalEventStepRotatorService(
+                $app->make(GlobalEventGoalCleanupService::class),
+            );
+        });
+
+        $this->app->bind(EventGoalRestartGuardService::class, function () {
+            return new EventGoalRestartGuardService;
+        });
+
+        $this->app->bind(RegularEventGoalResetService::class, function ($app) {
+            return new RegularEventGoalResetService;
         });
     }
 

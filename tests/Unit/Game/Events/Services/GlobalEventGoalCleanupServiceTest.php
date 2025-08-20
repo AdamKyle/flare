@@ -34,7 +34,8 @@ class GlobalEventGoalCleanupServiceTest extends TestCase
 
     public function testTruncateAll(): void
     {
-        $this->service->truncateAll();
+        $this->service->purgeEnchantInventories();
+        $this->service->purgeCoreAndGoal();
 
         $this->assertSame(0, GlobalEventParticipation::count());
         $this->assertSame(0, GlobalEventGoal::count());

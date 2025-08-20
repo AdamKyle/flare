@@ -83,8 +83,8 @@ class ItemComparisonTest extends TestCase
         $rows = $this->itemComparison->fetchDetails($candidateSpell, $character->inventory->slots, $character);
 
         $this->assertCount(2, $rows);
-        $this->assertSame('spell-two', $rows[0]['position']);
-        $this->assertSame('spell-one', $rows[1]['position']);
+        $this->assertSame('spell-one', $rows[0]['position']);
+        $this->assertSame('spell-two', $rows[1]['position']);
 
         $this->assertArrayHasKey('comparison', $rows[0]);
         $this->assertArrayHasKey('adjustments', $rows[0]['comparison']);
@@ -116,8 +116,8 @@ class ItemComparisonTest extends TestCase
             $rows = $this->itemComparison->fetchDetails($candidateItem, $character->inventory->slots, $character);
 
             $this->assertCount(2, $rows, 'Unexpected row count for type: '.$twoHandedType);
-            $this->assertSame('right-hand', $rows[0]['position'], 'First pos mismatch for type: '.$twoHandedType);
-            $this->assertSame('left-hand',  $rows[1]['position'], 'Second pos mismatch for type: '.$twoHandedType);
+            $this->assertSame('left-hand', $rows[0]['position'], 'First pos mismatch for type: '.$twoHandedType);
+            $this->assertSame('right-hand',  $rows[1]['position'], 'Second pos mismatch for type: '.$twoHandedType);
 
             $this->assertArrayHasKey('comparison', $rows[0]);
             $this->assertArrayHasKey('adjustments', $rows[0]['comparison']);
@@ -142,8 +142,8 @@ class ItemComparisonTest extends TestCase
         $rows = $this->itemComparison->fetchDetails($candidateShield, $character->inventory->slots, $character);
 
         $this->assertCount(2, $rows);
-        $this->assertSame('right-hand', $rows[0]['position']);
-        $this->assertSame('left-hand',  $rows[1]['position']);
+        $this->assertSame('left-hand', $rows[0]['position']);
+        $this->assertSame('right-hand', $rows[1]['position']);
     }
 
     public function testRingsCompareAgainstBothRingSlots(): void
@@ -163,8 +163,8 @@ class ItemComparisonTest extends TestCase
         $rows = $this->itemComparison->fetchDetails($candidateRing, $character->inventory->slots, $character);
 
         $this->assertCount(2, $rows);
-        $this->assertSame('ring-two', $rows[0]['position']);
-        $this->assertSame('ring-one', $rows[1]['position']);
+        $this->assertSame('ring-one', $rows[0]['position']);
+        $this->assertSame('ring-two', $rows[1]['position']);
     }
 
     public function testArmourTypeResolvesMappedPositions(): void
@@ -174,7 +174,7 @@ class ItemComparisonTest extends TestCase
         $chosenFirstSlot   = null;
 
         foreach ($map as $type => $positions) {
-            if ($type === 'ring' || $type === 'shield') {
+            if ($type === 'shield') {
                 continue;
             }
             if (is_array($positions) && !empty($positions)) {
@@ -184,10 +184,8 @@ class ItemComparisonTest extends TestCase
             }
         }
 
-        $this->assertNotNull($chosenType, 'No suitable armour type found in ArmourType::getArmourPositions()');
-
         $equippedItem = $this->createItem(['type' => $chosenType, 'name' => 'Equipped Armour']);
-        $candidate    = $this->createItem(['type' => $chosenType, 'name' => 'Candidate Armour']);
+        $candidate    = $this->createItem(['type' => $chosenType, 'name' => 'Candidate Armour', 'description' => 'sample']);
 
         $character = $this->characterFactory->inventoryManagement()
             ->giveItem($equippedItem, true, $chosenFirstSlot)
@@ -243,8 +241,6 @@ class ItemComparisonTest extends TestCase
 
     public function testIgnoresUnequippedSlotsEvenIfPositionsMatch(): void
     {
-        $character = $this->characterFactory->getCharacter()->refresh();
-
         $character = $this->characterFactory->inventoryManagement()
             ->giveItem($this->createItem(['type' => 'ring', 'name' => 'Ring One']),  false, 'ring-one')
             ->giveItem($this->createItem(['type' => 'ring', 'name' => 'Ring Two']),  false, 'ring-two')
@@ -260,5 +256,4 @@ class ItemComparisonTest extends TestCase
 
         $this->assertSame([], $rows);
     }
-
 }

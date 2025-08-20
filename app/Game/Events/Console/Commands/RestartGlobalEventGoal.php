@@ -2,222 +2,100 @@
 
 namespace App\Game\Events\Console\Commands;
 
-use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
-use App\Flare\Models\GlobalEventCraft;
-use App\Flare\Models\GlobalEventCraftingInventory;
-use App\Flare\Models\GlobalEventCraftingInventorySlot;
-use App\Flare\Models\GlobalEventEnchant;
 use App\Flare\Models\GlobalEventGoal;
-use App\Flare\Models\GlobalEventKill;
-use App\Flare\Models\GlobalEventParticipation;
-use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Events\Events\UpdateEventGoalProgress;
-use App\Game\Events\Services\EventGoalsService;
-use App\Game\Events\Values\GlobalEventForEventTypeValue;
-use App\Game\Events\Values\GlobalEventSteps;
+use App\Game\Events\Services\EventGoalRestartGuardService;
+use App\Game\Events\Services\EventParticipantNotifierService;
+use App\Game\Events\Services\GlobalEventStepRotatorService;
+use App\Game\Events\Services\RegularEventGoalResetService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class RestartGlobalEventGoal extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'restart:global-event-goal';
 
-    /**
-     * The console command description.Set the battle event.
-     *
-     * @var string
-     */
     protected $description = 'restarts the global event goal if it\'s been finished.';
 
     /**
-     * Handle restarting the global event.
-     *
-     * @param EventGoalsService $eventGoalsService
+     * @param GlobalEventStepRotatorService   $rotator
+     * @param EventParticipantNotifierService $notifier
+     * @param EventGoalRestartGuardService    $guard
+     * @param RegularEventGoalResetService    $regularResetter
      * @return void
      */
-    public function handle(EventGoalsService $eventGoalsService): void
-    {
-
+    public function handle(
+        GlobalEventStepRotatorService   $rotator,
+        EventParticipantNotifierService $notifier,
+        EventGoalRestartGuardService    $guard,
+        RegularEventGoalResetService    $regularResetter,
+    ): void {
         $globalEvent = GlobalEventGoal::first();
-
         if (is_null($globalEvent)) {
             return;
         }
 
-        if (! is_null($globalEvent->max_kills)) {
-            if ($globalEvent->total_kills < $globalEvent->max_kills) {
-                return;
-            }
-        }
-
-        if (! is_null($globalEvent->max_crafts)) {
-            if ($globalEvent->total_crafts < $globalEvent->max_crafts) {
-                return;
-            }
-        }
-
-        if (! is_null($globalEvent->max_enchants)) {
-            if ($globalEvent->total_enchants < $globalEvent->max_enchants) {
-                return;
-            }
+        // Use guard to decide if we should restart at all.
+        if (! $guard->shouldRestart($globalEvent)) {
+            return;
         }
 
         $event = Event::where('type', $globalEvent->event_type)->first();
-
         if (is_null($event)) {
             return;
         }
 
-        $characterParticipationIds = GlobalEventParticipation::pluck('character_id')->toArray();
-
+        // Step-based seasonal event path:
         if (! is_null($event->event_goal_steps)) {
-
-            $this->handleStepBaseGlobalEvent($event);
-
-            $this->updateCharactersGlobalMapEvents($eventGoalsService, $globalEvent, $characterParticipationIds);
-
-            return;
-        }
-
-        $this->handleRegularGlobalEvent($globalEvent);
-
-        $this->updateCharactersGlobalMapEvents($eventGoalsService, $globalEvent, $characterParticipationIds);
-    }
-
-    /**
-     * Update the characters global map events
-     *
-     * @param EventGoalsService $eventGoalsService
-     * @param GlobalEventGoal $globalEventGoal
-     * @param array $characterIds
-     * @return void
-     */
-    private function updateCharactersGlobalMapEvents(EventGoalsService $eventGoalsService, GlobalEventGoal $globalEventGoal, array $characterIds): void
-    {
-        $gameMap = GameMap::where('only_during_event_type', $globalEventGoal->event_type)->first();
-
-        if (is_null($gameMap)) {
-            return;
-        }
-
-        Character::whereIn('id', $characterIds)->chunkById(250, function ($characters) use ($eventGoalsService) {
-            foreach ($characters as $character) {
-                event(
-                    new UpdateEventGoalProgress(
-                        $eventGoalsService->getEventGoalData($character)
-                    )
-                );
-
-                event(new UpdateCharacterStatus($character));
+            try {
+                $result = $rotator->rotate($event);
+            } catch (\Throwable $e) {
+                Log::error('Failed to rotate global event step', [
+                    'event_type'   => $event->type,
+                    'current_step' => $event->current_event_goal_step,
+                    'message'      => $e->getMessage(),
+                ]);
+                return;
             }
-        });
-    }
 
-    /**
-     * Handle regular global event
-     *
-     * @param GlobalEventGoal $globalEventGoal
-     * @return void
-     */
-    private function handleRegularGlobalEvent(GlobalEventGoal $globalEventGoal): void
-    {
-        $globalEventGoal->update([
-            'next_reward_at' => $globalEventGoal->reward_every,
-        ]);
+            if ($result === null) {
+                return;
+            }
 
-        $globalEvent = $globalEventGoal->refresh();
+            $newStep = $result['new_step'];
+            $newGoal = $result['new_goal'];
 
-        $globalEvent->globalEventParticipation()->truncate();
-        $globalEvent->globalEventKills()->truncate();
+            $gameMap = GameMap::where('only_during_event_type', $event->type)->first();
+
+            event(new GlobalMessageEvent(
+                'Global Event Goal for: ' . $event->type .
+                ' Players can now participate in the new step: ' . strtoupper($newStep) . '! How exciting!'
+            ));
+
+            if (! is_null($gameMap)) {
+                event(new GlobalMessageEvent(
+                    'Players can participate by going to the map: ' . $gameMap->name .
+                    ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile) ' .
+                    'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items. ' .
+                    'You can see the event goal for the map specified by being on the map and clicking the Event Goal tab from the map.'
+                ));
+            }
+
+            // Notify participants (no-ops if count is 0, which it will be after rotation).
+            $notifier->notifyForGoal($newGoal, $newGoal->globalEventParticipation()->count());
+            return;
+        }
+
+        // Regular (non-step) event path:
+        $regularResetter->reset($globalEvent);
 
         event(new GlobalMessageEvent(
-            'Global Event Goal for: ' . $globalEvent->eventType()->getNameForEvent() . ' Players can now participate again and earn
-            Rewards for meeting the various phases! How exciting!'
+            'Global Event Goal for: ' . $globalEvent->eventType()->getNameForEvent() .
+            ' Players can now participate again and earn Rewards for meeting the various phases! How exciting!'
         ));
-    }
 
-    /**
-     * USet up the base global event
-     *
-     * @param Event $event
-     * @return void
-     */
-    private function handleStepBaseGlobalEvent(Event $event): void
-    {
-        $steps = $event->event_goal_steps;
-        $currentStep = $event->current_event_goal_step;
-
-        $index = array_search($currentStep, $steps);
-
-        if ($index === false) {
-            return;
-        }
-
-        $newIndex = $index + 1;
-
-        if (! isset($steps[$newIndex])) {
-            $newStep = $steps[0];
-        } else {
-            $newStep = $steps[$newIndex];
-        }
-
-        if ($currentStep === GlobalEventSteps::ENCHANT) {
-            GlobalEventCraftingInventorySlot::truncate();
-            GlobalEventCraftingInventory::truncate();
-        }
-
-        GlobalEventParticipation::truncate();
-        GlobalEventKill::truncate();
-        GlobalEventCraft::truncate();
-        GlobalEventEnchant::truncate();
-        GlobalEventGoal::truncate();
-
-        $event->update([
-            'current_event_goal_step' => $newStep,
-        ]);
-
-        $event = $event->refresh();
-
-        $globalEventGoalData = GlobalEventForEventTypeValue::returnGlobalEventInfoForSeasonalEvents($event->type);
-
-        $globalEventGoalData = $this->setUpDelusionalMemoriesAdditionalEventGoals($newStep, $globalEventGoalData);
-
-        $globalEventGoal = GlobalEventGoal::create($globalEventGoalData);
-
-        $gameMap = GameMap::where('only_during_event_type', $event->type)->first();
-
-        event(new GlobalMessageEvent('Global Event Goal for: ' . $globalEventGoal->eventType()->getNameForEvent() .
-            ' Players can now participate in the new step: ' . strtoupper($newStep) . '! How exciting!'));
-        event(new GlobalMessageEvent('Players can participate by going to the map: ' . $gameMap->name .
-            ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile)' . ' ' .
-            'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items.' .
-            ' You can see the event goal for the map specified by being on the map and clicking the Event Goal tab from the map.'));
-    }
-
-    /**
-     * Setup delusional memories additional event goals.
-     *
-     * @param string $newStep
-     * @param array $globalEventGoalData
-     * @return array
-     */
-    private function setUpDelusionalMemoriesAdditionalEventGoals(string $newStep, array $globalEventGoalData): array
-    {
-        if ($newStep === GlobalEventSteps::CRAFT) {
-            $globalEventGoalData = GlobalEventForEventTypeValue::returnDelusionalMemoriesCraftingEventGoal();
-        }
-
-        if ($newStep === GlobalEventSteps::ENCHANT) {
-            $globalEventGoalData = GlobalEventForEventTypeValue::returnDelusionalMemoriesEnchantingEventGoal();
-        }
-
-        return $globalEventGoalData;
+        $notifier->notifyForGoal($globalEvent, $globalEvent->globalEventParticipation()->count());
     }
 }

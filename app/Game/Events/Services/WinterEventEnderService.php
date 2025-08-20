@@ -87,7 +87,8 @@ class WinterEventEnderService implements EventEnder
 
         $current->delete();
 
-        $this->goalCleanup->truncateAll();
+        $this->goalCleanup->purgeCoreAndGoal();
+        $this->goalCleanup->purgeEnchantInventories();
 
         $this->updateAllCharacterStatuses();
 

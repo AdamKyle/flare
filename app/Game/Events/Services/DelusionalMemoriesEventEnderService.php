@@ -2,13 +2,16 @@
 
 namespace App\Game\Events\Services;
 
+use App\Flare\Models\Character;
 use App\Flare\Models\Event as ActiveEvent;
 use App\Flare\Models\Faction;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\ScheduledEvent;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Events\Services\Concerns\EventEnder;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Quests\Services\BuildQuestCacheService;
 
 class DelusionalMemoriesEventEnderService implements EventEnder
 {
@@ -84,12 +87,13 @@ class DelusionalMemoriesEventEnderService implements EventEnder
 
         $current->delete();
 
-        $this->goalCleanup->truncateAll();
+        $this->goalCleanup->purgeCoreAndGoal();
+        $this->goalCleanup->purgeEnchantInventories();
 
         $this->updateAllCharacterStatuses();
 
-        app(\App\Game\Quests\Services\BuildQuestCacheService::class)->buildQuestCache(true);
-        app(\App\Game\Quests\Services\BuildQuestCacheService::class)->buildRaidQuestCache(true);
+        app(BuildQuestCacheService::class)->buildQuestCache(true);
+        app(BuildQuestCacheService::class)->buildRaidQuestCache(true);
     }
 
     /**
@@ -97,9 +101,9 @@ class DelusionalMemoriesEventEnderService implements EventEnder
      */
     private function updateAllCharacterStatuses(): void
     {
-        \App\Flare\Models\Character::chunkById(250, function ($characters) {
+        Character::chunkById(250, function ($characters) {
             foreach ($characters as $character) {
-                event(new \App\Game\Battle\Events\UpdateCharacterStatus($character));
+                event(new UpdateCharacterStatus($character));
             }
         });
     }

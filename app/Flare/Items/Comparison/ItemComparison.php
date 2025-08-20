@@ -47,6 +47,7 @@ class ItemComparison
         }
 
         $matching = $this->filterSlotsByPositions($inventorySlots, $equipPositions);
+
         if ($matching->isEmpty()) {
             return [];
         }
@@ -80,9 +81,6 @@ class ItemComparison
     private function resolveEquipPositions(Item $item): array
     {
         $typeEnum = ItemType::tryFrom((string) $item->type);
-        if ($typeEnum === null) {
-            return [];
-        }
 
         if ($typeEnum === ItemType::SPELL_DAMAGE || $typeEnum === ItemType::SPELL_HEALING) {
             return EquippablePositionType::values(EquippablePositionType::orderForType($typeEnum));
@@ -92,14 +90,18 @@ class ItemComparison
             return EquippablePositionType::values(EquippablePositionType::orderForType($typeEnum));
         }
 
-        if (in_array($typeEnum->value, ItemType::validWeapons(), true)) {
+        if ($typeEnum !== null && in_array($typeEnum->value, ItemType::validWeapons(), true)) {
             return EquippablePositionType::values([EquippablePositionType::LEFT_HAND, EquippablePositionType::RIGHT_HAND]);
         }
 
+        dump('Am I ever getting here?');
+
         $armourPositionsMap = ArmourType::getArmourPositions();
         $armourPositions    = $armourPositionsMap[$item->type] ?? null;
+
         if ($armourPositions !== null) {
-            return $armourPositions;
+            $list = is_array($armourPositions) ? $armourPositions : [$armourPositions];
+            return array_values(array_map(fn($p) => (string) $p, $list));
         }
 
         return [];
