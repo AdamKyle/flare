@@ -2,12 +2,12 @@ import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler'
 import { debounce } from 'lodash';
 import React, { ReactNode, useMemo } from 'react';
 
+import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
 import { ItemTypeToView } from '../../components/items/enums/item-type-to-view';
 import GenericItemList from '../../components/items/generic-item-list';
 import GenericItemProps from '../../components/items/types/generic-item-props';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
-import BaseInventoryItemDefinition from '../api-definitions/base-inventory-item-definition';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
@@ -21,7 +21,7 @@ const QuestItems = ({
   on_switch_view,
 }: GenericItemProps): ReactNode => {
   const { data, error, loading, setSearchText, onEndReached } =
-    UsePaginatedApiHandler<BaseInventoryItemDefinition>({
+    UsePaginatedApiHandler<EquippableItemWithBase>({
       url: CharacterInventoryApiUrls.CHARACTER_QUEST_ITEMS,
       urlParams: { character: character_id },
     });

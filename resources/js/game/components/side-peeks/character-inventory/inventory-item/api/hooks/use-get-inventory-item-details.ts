@@ -2,6 +2,7 @@ import { useApiHandler } from 'api-handler/hooks/use-api-handler';
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 
+import { EquippableItemWithBase } from '../../../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import ItemDetails from '../../../../../../api-definitions/items/item-details';
 import UseGetInventoryItemDetailsApiDefinition from '../definitions/use-get-inventory-item-details-api-request-definition';
 import UseGetInventoryItemDetailsResponse from '../definitions/use-get-inventory-item-details-response-definition';
@@ -13,7 +14,7 @@ export const useGetInventoryItemDetails = ({
 }: UseGetInventoryItemDetailsApiDefinition): UseGetInventoryItemDetailsResponse => {
   const { apiHandler, getUrl } = useApiHandler();
 
-  const [data, setData] = useState<ItemDetails | null>(null);
+  const [data, setData] = useState<EquippableItemWithBase | null>(null);
   const [error, setError] =
     useState<UseGetInventoryItemDetailsResponse['error']>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -23,7 +24,7 @@ export const useGetInventoryItemDetails = ({
   const fetchInventoryItemDetails = useCallback(async () => {
     try {
       const result = await apiHandler.get<
-        ItemDetails,
+        EquippableItemWithBase,
         AxiosRequestConfig<AxiosResponse<ItemDetails>>
       >(apiUrl);
 

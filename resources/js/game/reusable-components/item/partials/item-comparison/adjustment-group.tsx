@@ -1,4 +1,5 @@
 import React, { Fragment, useState } from 'react';
+import { match } from 'ts-pattern';
 
 import AdjustmentChangeDisplay from './adjustment-change-display';
 import { TOP_ADVANCED_CHILD } from '../../constants/item-comparison-constants';
@@ -41,10 +42,11 @@ const AdjustmentGroup = ({
   };
 
   const isBaseModKey = (key: NumericAdjustmentKey): boolean => {
-    if (key === 'base_damage_mod_adjustment') return true;
-    if (key === 'base_healing_mod_adjustment') return true;
-    if (key === 'base_ac_mod_adjustment') return true;
-    return false;
+    return [
+      'base_damage_mod_adjustment',
+      'base_healing_mod_adjustment',
+      'base_ac_mod_adjustment',
+    ].includes(key);
   };
 
   /**
@@ -110,10 +112,18 @@ const AdjustmentGroup = ({
     const forcePercent = isBaseModKey(child.key);
     const id = `child-${String(parentKey)}-${String(child.key)}`;
 
-    // Build the exact sentence you asked for:
     const dir = numericChildValue > 0 ? 'increase' : 'decrease';
     const amount = `${(Math.abs(numericChildValue) * 100).toFixed(2)}%`;
-    const customMessage = `This will ${dir} the items ${child.label.toLowerCase()} by ${amount}.`;
+
+    const type = match(child.key)
+      .with('base_damage_mod_adjustment', () => 'Damage')
+      .with('base_ac_mod_adjustment', () => 'Defence')
+      .with('base_healing_mod_adjustment', () => 'Healing')
+      .otherwise(() => parentKey);
+
+    console.log(type, parentKey, child);
+
+    const customMessage = `This will ${dir} the over all ${child.label.toLowerCase()} by ${amount}. This can stack with other gear which contains this modifier to affect your over all ${type}, even if that gear doesnt increase your ${type}.`;
 
     return (
       <Fragment>

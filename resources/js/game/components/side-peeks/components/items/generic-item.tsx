@@ -1,7 +1,8 @@
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
-import { InventoryItemTypes } from '../../../character-sheet/partials/character-inventory/enums/inventory-item-types';
+import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
+import BaseQuestItemDefinition from '../../../../api-definitions/items/quest-item-definitions/base-quest-item-definition';
 import {
   backpackBaseItemStyles,
   backpackBorderStyles,
@@ -15,43 +16,50 @@ const GenericItem = ({ item, on_click }: BackpackItemProps): ReactNode => {
   const itemColor = backpackItemTextColors(item);
 
   const handleViewItem = () => {
-    if (!on_click) {
-      return;
-    }
+    if (!on_click) return;
     on_click(item);
   };
 
+  const getAttack = (i: EquippableItemWithBase): number =>
+    i.raw_damage ?? i.base_damage ?? 0;
+
+  const getAc = (i: EquippableItemWithBase): number =>
+    i.raw_ac ?? i.base_ac ?? 0;
+
+  const renderQuestDetails = (i: BaseQuestItemDefinition): ReactNode => {
+    if (i.effect === null) return null;
+
+    return (
+      <span>
+        <strong>Effects</strong>: {i.effect}
+      </span>
+    );
+  };
+
+  const renderEquippableDetails = (i: EquippableItemWithBase): ReactNode => {
+    return (
+      <>
+        <span>
+          <strong>Type</strong>: {i.type}
+        </span>{' '}
+        |{' '}
+        <span>
+          <strong>Damage</strong>: {getAttack(i)}
+        </span>{' '}
+        |{' '}
+        <span>
+          <strong>AC</strong>: {getAc(i)}
+        </span>
+      </>
+    );
+  };
+
   const renderItemDetails = (): ReactNode => {
-    if (item.type === InventoryItemTypes.QUEST) {
-      if (item.effect !== null) {
-        return (
-          <span>
-            <strong>Effects</strong>: {item.effect}
-          </span>
-        );
-      }
-      return null;
+    if ('effect' in item) {
+      return renderQuestDetails(item as BaseQuestItemDefinition);
     }
 
-    if ('attack' in item && 'ac' in item) {
-      return (
-        <>
-          <span>
-            <strong>Type</strong>: {item.type}
-          </span>{' '}
-          |{' '}
-          <span>
-            <strong>Damage</strong>: {item.attack}
-          </span>{' '}
-          |{' '}
-          <span>
-            <strong>AC</strong>: {item.ac}
-          </span>
-        </>
-      );
-    }
-
-    return null;
+    return renderEquippableDetails(item as EquippableItemWithBase);
   };
 
   return (

@@ -3,8 +3,8 @@ import React, { ReactNode } from 'react';
 
 import GenericItem from './generic-item';
 import GenericItemListProps from './types/generic-item-list-props';
+import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import BaseQuestItemDefinition from '../../../../api-definitions/items/quest-item-definitions/base-quest-item-definition';
-import BaseInventoryItemDefinition from '../../character-inventory/api-definitions/base-inventory-item-definition';
 
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 
@@ -16,7 +16,7 @@ const GenericItemList = ({
   on_click,
 }: GenericItemListProps): ReactNode => {
   const handleOnClick = (
-    item: BaseInventoryItemDefinition | BaseQuestItemDefinition
+    item: EquippableItemWithBase | BaseQuestItemDefinition
   ) => {
     if (!on_click) {
       return;
@@ -49,7 +49,7 @@ const GenericItemList = ({
     }
 
     return items.map(
-      (item: BaseInventoryItemDefinition | BaseQuestItemDefinition) => (
+      (item: EquippableItemWithBase | BaseQuestItemDefinition) => (
         <GenericItem key={item.id} item={item} on_click={handleOnClick} />
       )
     );
