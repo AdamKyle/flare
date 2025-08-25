@@ -41,8 +41,6 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
   });
 
   const handleOnItemClick = (typeOfItem: ItemTypeToView, item_id: number) => {
-    console.log(typeOfItem);
-
     setItemId(item_id);
   };
 

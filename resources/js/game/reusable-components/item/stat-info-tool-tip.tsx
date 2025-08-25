@@ -21,8 +21,14 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
   const tooltipId = `stat-info-${label.replace(/\s+/g, '-').toLowerCase()}-${localId}`;
 
   const [internalOpen, setInternalOpen] = useState(false);
+
+  let initialPlacement: 'left' | 'right' = 'right';
+  if (align === 'left') {
+    initialPlacement = 'left';
+  }
+
   const [placement, setPlacement] = useState<'left' | 'right'>(
-    align === 'left' ? 'left' : 'right'
+    initialPlacement
   );
 
   const open = typeof is_open === 'boolean' ? is_open : internalOpen;
@@ -66,24 +72,27 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
     return `This will ${direction} your ${label} by ${getAmountText(value)}.`;
   };
 
-  const getSizeClasses = () => {
-    if (size === 'md') {
-      return 'text-base';
-    }
-
-    return 'text-sm';
-  };
-
   const computePlacement = () => {
     if (!buttonRef.current) {
       return;
     }
 
-    const preferred: 'left' | 'right' | 'auto' =
-      align === 'left' || align === 'right' ? align : 'auto';
+    let preferred: 'left' | 'right' | 'auto' = 'auto';
 
-    const viewportCap = Math.max(0, window.innerWidth - 48);
-    const estimatedWidth = Math.min(448, viewportCap);
+    if (align === 'left') {
+      preferred = 'left';
+    }
+
+    if (align === 'right') {
+      preferred = 'right';
+    }
+
+    if (preferred !== 'auto') {
+      setPlacement(preferred);
+      return;
+    }
+
+    const estimatedWidth = 256;
 
     const rect = buttonRef.current.getBoundingClientRect();
     const spaceLeft = rect.left;
@@ -92,37 +101,22 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
     const hasRoomOnLeft = spaceLeft >= estimatedWidth;
     const hasRoomOnRight = spaceRight >= estimatedWidth;
 
-    if (preferred === 'right') {
-      if (hasRoomOnRight) {
-        setPlacement('right');
-        return;
-      }
-
-      if (hasRoomOnLeft) {
-        setPlacement('left');
-        return;
-      }
-
-      setPlacement(spaceRight >= spaceLeft ? 'right' : 'left');
+    if (hasRoomOnRight && spaceRight >= spaceLeft) {
+      setPlacement('right');
       return;
     }
 
-    if (preferred === 'left') {
-      if (hasRoomOnLeft) {
-        setPlacement('left');
-        return;
-      }
-
-      if (hasRoomOnRight) {
-        setPlacement('right');
-        return;
-      }
-
-      setPlacement(spaceLeft >= spaceRight ? 'left' : 'right');
+    if (hasRoomOnLeft && spaceLeft >= spaceRight) {
+      setPlacement('left');
       return;
     }
 
-    setPlacement(spaceRight >= spaceLeft ? 'right' : 'left');
+    if (spaceRight >= spaceLeft) {
+      setPlacement('right');
+      return;
+    }
+
+    setPlacement('left');
   };
 
   const openTip = () => {
@@ -206,7 +200,14 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
             : 'right-full mr-2 origin-right'
         )}
       >
-        <p className={clsx('leading-snug', getSizeClasses())}>{getMessage()}</p>
+        <p
+          className={clsx('leading-snug', {
+            'text-base': size === 'md',
+            'text-sm': size !== 'md',
+          })}
+        >
+          {getMessage()}
+        </p>
       </div>
     );
   };

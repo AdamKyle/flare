@@ -1,6 +1,6 @@
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
 import { debounce } from 'lodash';
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 
 import SetChoices from './set-choices';
 import SetsProps from './types/sets-props';
@@ -9,6 +9,7 @@ import { useInfiniteScroll } from '../../../character-sheet/partials/character-i
 import { ItemTypeToView } from '../../components/items/enums/item-type-to-view';
 import GenericItemList from '../../components/items/generic-item-list';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
+import InventoryItem from '../inventory-item/inventory-item';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
@@ -17,6 +18,8 @@ import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const Sets = ({ character_id }: SetsProps): ReactNode => {
+  const [itemId, setItemId] = useState<number | null>(null);
+
   const { data, error, loading, onEndReached, setSearchText, setFilters } =
     UsePaginatedApiHandler<EquippableItemWithBase>({
       url: CharacterInventoryApiUrls.CHARACTER_SET_ITEMS,
@@ -47,6 +50,14 @@ const Sets = ({ character_id }: SetsProps): ReactNode => {
     setFilters({});
   };
 
+  const handleOnItemClick = (typeOfItem: ItemTypeToView, item_id: number) => {
+    setItemId(item_id);
+  };
+
+  const closeItemView = () => {
+    setItemId(null);
+  };
+
   if (error) {
     return (
       <div className={'p-4'}>
@@ -60,6 +71,17 @@ const Sets = ({ character_id }: SetsProps): ReactNode => {
       <div className={'p-4'}>
         <InfiniteLoader />
       </div>
+    );
+  }
+
+  if (itemId) {
+    return (
+      <InventoryItem
+        item_id={itemId}
+        character_id={character_id}
+        type_of_item={ItemTypeToView.EQUIPPABLE}
+        close_item_view={closeItemView}
+      />
     );
   }
 
@@ -82,6 +104,7 @@ const Sets = ({ character_id }: SetsProps): ReactNode => {
           is_quest_items={false}
           on_scroll_to_end={handleSetScrolling}
           items_view_type={ItemTypeToView.EQUIPPABLE}
+          on_click={handleOnItemClick}
         />
       </div>
     </div>
