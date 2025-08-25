@@ -32,12 +32,12 @@ const AdjustmentGroup = ({
     fieldKey: NumericAdjustmentKey,
     rawValue: number | null | undefined
   ): boolean => {
-    if (rawValue == null) return false;
-
+    if (rawValue == null) {
+      return false;
+    }
     if (Number(rawValue) === 0) {
       return !!forceShowZeroKeys?.includes(fieldKey);
     }
-
     return true;
   };
 
@@ -49,11 +49,16 @@ const AdjustmentGroup = ({
     ].includes(key);
   };
 
-  /**
-   * Common DT renderer with optional:
-   *  - customMessage: overrides the tooltip sentence (uses StatInfoToolTip.custom_message)
-   *  - indent: indents the row (used for advanced children)
-   */
+  const handleOpen = (id: string) => {
+    setOpenId(id);
+  };
+
+  const handleClose = (id: string) => {
+    if (openId === id) {
+      setOpenId(null);
+    }
+  };
+
   const renderDtWithInfo = (
     id: string,
     displayLabel: string,
@@ -64,11 +69,6 @@ const AdjustmentGroup = ({
       indent?: boolean;
     }
   ) => {
-    const handleOpen = () => setOpenId(id);
-    const handleClose = () => {
-      if (openId === id) setOpenId(null);
-    };
-
     const indentClass = opts?.indent ? ' ml-4' : '';
     const useCustom = typeof opts?.customMessage === 'string';
 
@@ -82,8 +82,8 @@ const AdjustmentGroup = ({
             align="left"
             size="sm"
             is_open={openId === id}
-            on_open={handleOpen}
-            on_close={handleClose}
+            on_open={() => handleOpen(id)}
+            on_close={() => handleClose(id)}
             custom_message={useCustom}
           />
           <span className="min-w-0 break-words">{displayLabel}</span>
@@ -92,21 +92,24 @@ const AdjustmentGroup = ({
     );
   };
 
-  /**
-   * Advanced children under Core Impact
-   * (Base Damage Mod, Base Healing Mod, Base AC Mod)
-   * - Indented
-   * - Tooltip says: “This will increase/decrease the items {label} by X%.”
-   */
   const renderAdvancedChildFor = (parentKey: NumericAdjustmentKey) => {
-    if (!showAdvancedChild) return null;
+    if (!showAdvancedChild) {
+      return null;
+    }
 
     const child = TOP_ADVANCED_CHILD[parentKey];
-    if (!child) return null;
+
+    if (!child) {
+      return null;
+    }
 
     const rawChildValue = adjustments[child.key] as number | null | undefined;
-    if (rawChildValue == null) return null;
-    if (Number(rawChildValue) === 0) return null;
+    if (rawChildValue == null) {
+      return null;
+    }
+    if (Number(rawChildValue) === 0) {
+      return null;
+    }
 
     const numericChildValue = Number(rawChildValue);
     const forcePercent = isBaseModKey(child.key);
@@ -120,8 +123,6 @@ const AdjustmentGroup = ({
       .with('base_ac_mod_adjustment', () => 'Defence')
       .with('base_healing_mod_adjustment', () => 'Healing')
       .otherwise(() => parentKey);
-
-    console.log(type, parentKey, child);
 
     const customMessage = `This will ${dir} the over all ${child.label.toLowerCase()} by ${amount}. This can stack with other gear which contains this modifier to affect your over all ${type}, even if that gear doesnt increase your ${type}.`;
 
@@ -148,7 +149,10 @@ const AdjustmentGroup = ({
     <Dl>
       {fields.map(({ key, label }) => {
         const rawValue = adjustments[key] as number | null | undefined;
-        if (!shouldRenderField(key, rawValue)) return null;
+
+        if (!shouldRenderField(key, rawValue)) {
+          return null;
+        }
 
         const numericValue = Number(rawValue);
         const id = `field-${String(key)}`;

@@ -30,54 +30,71 @@ const AdjustmentGroup = ({
   const shouldRenderField = (
     fieldKey: NumericAdjustmentKey,
     rawValue: number | null | undefined
-  ) => {
-    if (rawValue == null) return false;
-    if (Number(rawValue) === 0) return !!forceShowZeroKeys?.includes(fieldKey);
+  ): boolean => {
+    if (rawValue == null) {
+      return false;
+    }
+
+    if (Number(rawValue) === 0) {
+      return !!forceShowZeroKeys?.includes(fieldKey);
+    }
+
     return true;
   };
 
-  const isBaseModKey = (key: NumericAdjustmentKey) =>
-    key === 'base_damage_mod_adjustment' ||
-    key === 'base_healing_mod_adjustment' ||
-    key === 'base_ac_mod_adjustment';
+  const isBaseModKey = (key: NumericAdjustmentKey): boolean => {
+    return (
+      key === 'base_damage_mod_adjustment' ||
+      key === 'base_healing_mod_adjustment' ||
+      key === 'base_ac_mod_adjustment'
+    );
+  };
 
-  const buildCustomMessage = (label: string, value: number) => {
+  const buildCustomMessage = (label: string, value: number): string => {
     const direction =
       value > 0 ? 'increase' : value < 0 ? 'decrease' : 'not change';
     const pct = `${(Math.abs(value) * 100).toFixed(2)}%`;
-    if (direction === 'not change') return `${label} will not change.`;
+
+    if (direction === 'not change') {
+      return `${label} will not change.`;
+    }
+
     return `This will ${direction} the items ${label} by ${pct}.`;
+  };
+
+  const handleOpen = (id: string) => {
+    setOpenId(id);
+  };
+
+  const handleClose = (id: string) => {
+    if (openId === id) {
+      setOpenId(null);
+    }
   };
 
   const renderDtWithInfo = (
     id: string,
     label: string,
     numericValue: number,
-    forcePercent?: boolean,
-    isCustomForBaseMod?: boolean
+    renderAsPercent?: boolean,
+    useCustomMessage?: boolean
   ) => {
-    const handleOpen = () => setOpenId(id);
-    const handleClose = () => {
-      if (openId === id) setOpenId(null);
-    };
-
-    const useCustom = !!isCustomForBaseMod;
-    const customText = useCustom
+    const customText = useCustomMessage
       ? buildCustomMessage(label, numericValue)
       : undefined;
 
     return (
       <Dt>
         <StatInfoToolTip
-          label={useCustom ? customText! : label}
+          label={useCustomMessage ? (customText as string) : label}
           value={numericValue}
-          renderAsPercent={forcePercent}
+          renderAsPercent={renderAsPercent}
           align="left"
           size="sm"
           is_open={openId === id}
-          on_open={handleOpen}
-          on_close={handleClose}
-          custom_message={useCustom}
+          on_open={() => handleOpen(id)}
+          on_close={() => handleClose(id)}
+          custom_message={!!useCustomMessage}
         />
         <span className="min-w-0 break-words">{label}</span>
       </Dt>
@@ -85,17 +102,28 @@ const AdjustmentGroup = ({
   };
 
   const renderAdvancedChildFor = (parentKey: NumericAdjustmentKey) => {
-    if (!showAdvancedChild) return null;
+    if (!showAdvancedChild) {
+      return null;
+    }
 
     const child = TOP_ADVANCED_CHILD[parentKey];
-    if (!child) return null;
+
+    if (!child) {
+      return null;
+    }
 
     const rawChildValue = adjustments[child.key] as number | null | undefined;
-    if (rawChildValue == null) return null;
-    if (Number(rawChildValue) === 0) return null;
+
+    if (rawChildValue == null) {
+      return null;
+    }
+
+    if (Number(rawChildValue) === 0) {
+      return null;
+    }
 
     const numericChildValue = Number(rawChildValue);
-    const forcePercent = isBaseModKey(child.key as NumericAdjustmentKey);
+    const renderAsPercent = isBaseModKey(child.key as NumericAdjustmentKey);
     const id = `child-${String(parentKey)}-${String(child.key)}`;
 
     return (
@@ -104,15 +132,15 @@ const AdjustmentGroup = ({
           id,
           child.label,
           numericChildValue,
-          forcePercent,
-          forcePercent
+          renderAsPercent,
+          renderAsPercent
         )}
         <Dd>
           <div className="ml-4">
             <AdjustmentChangeDisplay
               value={numericChildValue}
               label={child.label}
-              renderAsPercent={forcePercent}
+              renderAsPercent={renderAsPercent}
             />
           </div>
         </Dd>
@@ -123,32 +151,34 @@ const AdjustmentGroup = ({
   return (
     <Dl>
       {fields.map(({ key, label }) => {
-        const rawValue = adjustments[key] as number | null | undefined;
-        if (!shouldRenderField(key as NumericAdjustmentKey, rawValue)) {
+        const numericKey = key as NumericAdjustmentKey;
+        const rawValue = adjustments[numericKey] as number | null | undefined;
+
+        if (!shouldRenderField(numericKey, rawValue)) {
           return null;
         }
 
         const numericValue = Number(rawValue);
-        const id = `field-${String(key)}`;
-        const forcePercent = isBaseModKey(key as NumericAdjustmentKey);
+        const id = `field-${String(numericKey)}`;
+        const renderAsPercent = isBaseModKey(numericKey);
 
         return (
-          <Fragment key={String(key)}>
+          <Fragment key={String(numericKey)}>
             {renderDtWithInfo(
               id,
               label,
               numericValue,
-              forcePercent,
-              forcePercent
+              renderAsPercent,
+              renderAsPercent
             )}
             <Dd>
               <AdjustmentChangeDisplay
                 value={numericValue}
                 label={label}
-                renderAsPercent={forcePercent}
+                renderAsPercent={renderAsPercent}
               />
             </Dd>
-            {renderAdvancedChildFor(key as NumericAdjustmentKey)}
+            {renderAdvancedChildFor(numericKey)}
           </Fragment>
         );
       })}

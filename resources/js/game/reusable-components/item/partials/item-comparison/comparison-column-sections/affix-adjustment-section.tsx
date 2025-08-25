@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 
 import AdjustmentGroup from './adjustment-group';
 import { AFFIX_ADJUSTMENT_FIELDS } from '../../../constants/item-comparison-constants';
-import AffixAdjustmentsSectionProps from '../../../types/partials/item-comparison/comparison-column-sections/affix-adjustment-section-props';
+import type AffixAdjustmentsSectionProps from '../../../types/partials/item-comparison/comparison-column-sections/affix-adjustment-section-props';
 import { hasAnyNonZeroAdjustment } from '../../../utils/item-comparison';
 
 import Separator from 'ui/separator/separator';
@@ -11,10 +11,15 @@ const AffixAdjustmentsSection = ({
   adjustments,
   show,
 }: AffixAdjustmentsSectionProps) => {
-  if (!show) return null;
+  if (!show) {
+    return null;
+  }
 
   const hasAny = hasAnyNonZeroAdjustment(adjustments, AFFIX_ADJUSTMENT_FIELDS);
-  if (!hasAny) return null;
+
+  if (!hasAny) {
+    return null;
+  }
 
   return (
     <Fragment>

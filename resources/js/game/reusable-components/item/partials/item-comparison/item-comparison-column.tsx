@@ -35,14 +35,39 @@ const ItemComparisonColumn = ({
     | ItemAdjustments
     | undefined;
 
-  if (!adjustments) return null;
+  if (!adjustments) {
+    return null;
+  }
 
-  const computedTitle =
-    heading ||
-    row?.comparison?.to_equip_name ||
-    `${row?.position ?? ''} ${row?.type ?? ''}`.trim() ||
-    `Item ${index + 1}`;
+  const getComputedTitle = (): string => {
+    if (heading) {
+      return heading;
+    }
 
+    const toEquipName = row?.comparison?.to_equip_name;
+    if (toEquipName && toEquipName.trim().length > 0) {
+      return toEquipName;
+    }
+
+    const composed = `${row?.position ?? ''} ${row?.type ?? ''}`.trim();
+    if (composed) {
+      return composed;
+    }
+
+    return `Item ${index + 1}`;
+  };
+
+  const getForceCoreZeroKeys = (): NumericAdjustmentKey[] => {
+    if (!showAdvancedChildUnderTop) {
+      return [];
+    }
+    return [
+      'total_defence_adjustment',
+      'total_healing_adjustment',
+    ] as NumericAdjustmentKey[];
+  };
+
+  const computedTitle = getComputedTitle();
   const description = row?.comparison?.to_equip_description;
 
   const hasCoreTotals = hasAnyNonZeroAdjustment(adjustments, TOP_FIELDS);
@@ -54,13 +79,7 @@ const ItemComparisonColumn = ({
     showAdvanced && hasAnyNonZeroAdjustment(adjustments, DEVOURING_FIELDS);
 
   const isTwoHanded = isTwoHandedType(row?.type);
-
-  const forceCoreZeroKeys: NumericAdjustmentKey[] = showAdvancedChildUnderTop
-    ? ([
-        'total_defence_adjustment',
-        'total_healing_adjustment',
-      ] as NumericAdjustmentKey[])
-    : [];
+  const forceCoreZeroKeys = getForceCoreZeroKeys();
 
   return (
     <Fragment>
