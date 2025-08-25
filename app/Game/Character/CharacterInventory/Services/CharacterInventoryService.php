@@ -173,23 +173,18 @@ class CharacterInventoryService
 
         if ($inventory) {
             $slot = $inventory->slots()->where('item_id', $item->id)->first();
+
             if ($slot) {
                 return $slot;
             }
         }
 
-        $desiredSet = $character->inventorySets()
-            ->whereHas('slots', function ($query) use ($item) {
-                $query->where('item_id', $item->id);
-            })->first();
-
-        if (!$desiredSet) {
-            return null;
-        }
-
-        return $desiredSet->slots->first(function ($slot) use ($item) {
-            return (int)$slot->item_id === (int)$item->id;
-        });
+        return SetSlot::query()
+            ->join('inventory_sets', 'inventory_sets.id', '=', 'set_slots.inventory_set_id')
+            ->where('inventory_sets.character_id', $character->id)
+            ->where('set_slots.item_id', $item->id)
+            ->select('set_slots.*')
+            ->first();
     }
 
     /**
@@ -260,7 +255,7 @@ class CharacterInventoryService
         if (isset($filters['set_id'])) {
             $set = $sets->where('id', $filters['set_id'])->first();
         } else {
-            $set = $sets->first();
+            $set = $sets->where('is_equipped', true)->first();
         }
 
         $slots = $set->slots;

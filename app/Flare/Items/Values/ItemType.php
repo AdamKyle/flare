@@ -18,6 +18,7 @@ enum ItemType: string {
     case SPELL_HEALING = 'spell-healing';
     case SPELL_DAMAGE = 'spell-damage';
     case RING = 'ring';
+    case TRINKET = 'trinket';
 
     /**
      * Gets a list of all valid weapon types.

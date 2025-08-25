@@ -475,6 +475,7 @@ const InventoryItem = ({
 
     const allZero =
       ambush <= 0 && ambushResist <= 0 && counter <= 0 && counterResist <= 0;
+
     if (allZero) {
       return null;
     }
@@ -498,7 +499,17 @@ const InventoryItem = ({
               <span className="min-w-0 break-words">{label}</span>
             </span>
           </Dt>
-          <Dd>{formatPercent(value)}</Dd>
+          <Dd>
+            <span className="inline-flex items-center gap-2">
+              <i
+                className="fas fa-chevron-up text-emerald-600"
+                aria-hidden="true"
+              />
+              <span className="font-semibold text-emerald-700">
+                {formatPercent(value)}
+              </span>
+            </span>
+          </Dd>
         </>
       );
     };
@@ -583,9 +594,9 @@ const InventoryItem = ({
           {renderWithSeparator(renderAttackSection())}
           {renderWithSeparator(renderDefenceSection())}
           {renderWithSeparator(renderHealingSection())}
+          {renderWithSeparator(renderAmbushCounterSection())}
           {renderWithSeparator(renderStatsSection())}
           {renderWithSeparator(renderHolyStacksSection())}
-          {renderWithSeparator(renderAmbushCounterSection())}
         </div>
       </div>
     </>

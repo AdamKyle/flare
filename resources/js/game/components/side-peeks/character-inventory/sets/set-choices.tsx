@@ -27,11 +27,21 @@ const SetChoices = ({
     on_end_reached: onEndReached,
   });
 
-  const setOptions = useMemo(() => {
+  const setOptions = useMemo((): DropdownItem[] => {
     return data.map((set: SetOptionDefinition) => ({
       label: set.name,
       value: set.set_id,
     }));
+  }, [data]);
+
+  const preSelectedSetOption = useMemo((): DropdownItem | undefined => {
+    const equippedSet = data.find((set: SetOptionDefinition) => set.equipped);
+
+    if (!equippedSet) {
+      return undefined;
+    }
+
+    return { label: equippedSet.name, value: equippedSet.set_id };
   }, [data]);
 
   const handleSetSelection = (selectedSet: DropdownItem) => {
@@ -56,8 +66,8 @@ const SetChoices = ({
       on_select={handleSetSelection}
       on_clear={handleClearSection}
       handle_scroll={handleSetSelectionScroll}
-      selection_placeholder={'Select a set'}
-      pre_selected_item={setOptions[0]}
+      selection_placeholder="Select a set"
+      pre_selected_item={preSelectedSetOption ?? setOptions[0]}
       use_pagination
       all_click_outside
     />
