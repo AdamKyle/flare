@@ -17,9 +17,10 @@ class EquippableEnricher
      * - Devouring effects
      * - Affix-based skill summary
      * - Affix-based categorized damage (stackable, non-stacking, irresistible)
+     * - Item-skill progression bonuses applied to stats and base_*_mod values
      *
      * @param Item $item The item to enrich
-     * @param string | null $damageStat
+     * @param string|null $damageStat Optional stat key (e.g., 'str') used to compute total_base_damage_stat
      * @return Item The enriched item instance (mutated in place)
      */
     #[AutoManifest(ManifestSchemaId::EQUIPPABLE)]
@@ -53,6 +54,7 @@ class EquippableEnricher
 
     /**
      * Calculate total item damage including base and modifiers.
+     * Includes: item base, affix base_damage_mod, item base_damage_mod, and item-skill base_damage_mod.
      *
      * @param Item $item
      * @return int
@@ -60,13 +62,17 @@ class EquippableEnricher
     private function calculateTotalDamage(Item $item): int
     {
         $base = $item->base_damage ?? 0;
-        $totalMod = $item->getAffixAttribute('base_damage_mod') + ($item->base_damage_mod ?? 0.0);
+        $totalMod =
+            $item->getAffixAttribute('base_damage_mod')
+            + ($item->base_damage_mod ?? 0.0)
+            + $this->calculateSkillBaseMod($item, 'base_damage_mod');
 
         return round($base * (1 + $totalMod));
     }
 
     /**
      * Calculate total item defense (AC) including modifiers.
+     * Includes: item base, affix base_ac_mod, item base_ac_mod, and item-skill base_ac_mod.
      *
      * @param Item $item
      * @return int
@@ -74,13 +80,17 @@ class EquippableEnricher
     private function calculateTotalDefence(Item $item): int
     {
         $base = $item->base_ac ?? 0;
-        $totalMod = $item->getAffixAttribute('base_ac_mod') + ($item->base_ac_mod ?? 0.0);
+        $totalMod =
+            $item->getAffixAttribute('base_ac_mod')
+            + ($item->base_ac_mod ?? 0.0)
+            + $this->calculateSkillBaseMod($item, 'base_ac_mod');
 
         return ceil($base * (1 + $totalMod));
     }
 
     /**
      * Calculate total healing output of the item.
+     * Includes: item base, affix base_healing_mod, item base_healing_mod, and item-skill base_healing_mod.
      *
      * @param Item $item
      * @return int
@@ -88,13 +98,17 @@ class EquippableEnricher
     private function calculateTotalHealing(Item $item): int
     {
         $base = $item->base_healing ?? 0;
-        $totalMod = $item->getAffixAttribute('base_healing_mod') + ($item->base_healing_mod ?? 0.0);
+        $totalMod =
+            $item->getAffixAttribute('base_healing_mod')
+            + ($item->base_healing_mod ?? 0.0)
+            + $this->calculateSkillBaseMod($item, 'base_healing_mod');
 
         return ceil($base * (1 + $totalMod));
     }
 
     /**
      * Apply all core stat modifiers (str, dex, int, etc.) directly to the item.
+     * Aggregates base item values, affix values, holy stack bonuses, and item-skill progression bonuses.
      *
      * @param Item $item
      * @return void
@@ -107,10 +121,10 @@ class EquippableEnricher
     }
 
     /**
-     * Calculate a single stat modifier from base, affix, and holy stack values.
+     * Calculate a single stat modifier from base, affix, holy stacks, and item-skill progression.
      *
      * @param Item $item
-     * @param string $stat
+     * @param string $stat One of: str, dex, dur, chr, int, agi, focus
      * @return float
      */
     private function calculateSingleStatMod(Item $item, string $stat): float
@@ -118,8 +132,9 @@ class EquippableEnricher
         $base  = $item->{$stat . '_mod'} ?? 0.0;
         $affix = $item->getAffixAttribute($stat . '_mod');
         $holy  = $item->holy_stack_stat_bonus ?? 0.0;
+        $skill = $this->calculateSkillStatBonus($item, $stat);
 
-        return $base + $affix + $holy;
+        return $base + $affix + $holy + $skill;
     }
 
     /**
@@ -149,19 +164,20 @@ class EquippableEnricher
 
     /**
      * Calculates the total base mod for damage, healing, or AC.
+     * Aggregates item base value, affix contribution, and item-skill progression contribution.
      *
      * @param Item $item
-     * @param string $attribute
+     * @param string $attribute One of: base_damage_mod, base_healing_mod, base_ac_mod
      * @return float
      */
     private function calculateBaseMod(Item $item, string $attribute): float
     {
-        $base  = $item->{$attribute} ?? 0.0;
-        $affix = $item->getAffixAttribute($attribute);
+        $base   = $item->{$attribute} ?? 0.0;
+        $affix  = $item->getAffixAttribute($attribute);
+        $skills = $this->calculateSkillBaseMod($item, $attribute);
 
-        return $base + $affix;
+        return $base + $affix + $skills;
     }
-
 
     /**
      * Calculate total affix damage from stackable affixes only.
@@ -171,7 +187,6 @@ class EquippableEnricher
      */
     private function calculateTotalStackableDamage(Item $item): float
     {
-
         $total = 0.0;
 
         if ($item->itemPrefix && $item->itemPrefix->damage_can_stack) {
@@ -227,7 +242,6 @@ class EquippableEnricher
         return $total;
     }
 
-
     /**
      * Build a summary of skill bonuses from item and affixes.
      *
@@ -263,5 +277,42 @@ class EquippableEnricher
         }
 
         return $skills;
+    }
+
+    /**
+     * Sum item-skill progression bonuses for a given core stat.
+     *
+     * @param Item $item
+     * @param string $stat One of: str, dex, dur, chr, int, agi, focus
+     * @return float
+     */
+    private function calculateSkillStatBonus(Item $item, string $stat): float
+    {
+        $total = 0.0;
+
+        foreach ($item->itemSkillProgressions as $progression) {
+            $field = $stat . '_mod';
+            $total += (float) ($progression->{$field} ?? 0.0);
+        }
+
+        return $total;
+    }
+
+    /**
+     * Sum item-skill progression bonuses for a given base_*_mod attribute.
+     *
+     * @param Item $item
+     * @param string $attribute One of: base_damage_mod, base_healing_mod, base_ac_mod
+     * @return float
+     */
+    private function calculateSkillBaseMod(Item $item, string $attribute): float
+    {
+        $total = 0.0;
+
+        foreach ($item->itemSkillProgressions as $progression) {
+            $total += (float) ($progression->{$attribute} ?? 0.0);
+        }
+
+        return $total;
     }
 }

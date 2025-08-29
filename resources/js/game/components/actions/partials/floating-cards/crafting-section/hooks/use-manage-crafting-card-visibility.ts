@@ -40,9 +40,15 @@ export const useManageCraftingCardVisibility =
         [key: string]: boolean;
       }>(ActionCardEvents.OPEN_MAP_SECTION);
 
+      const closeShopCard = eventSystem.getEventEmitter<{
+        [key: string]: boolean;
+      }>(ActionCardEvents.OPEN_SHOP);
+
       closeMapCardEvent.emit(ActionCardEvents.OPEN_MAP_SECTION, false);
 
       closeCharacterCardEvent.emit(ActionCardEvents.OPEN_CHARACTER_CARD, false);
+
+      closeShopCard.emit(ActionCardEvents.OPEN_SHOP, false);
 
       openCardEventEmitter.emit(ActionCardEvents.OPEN_CRATING_CARD, true);
     };

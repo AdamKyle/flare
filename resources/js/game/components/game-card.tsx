@@ -3,7 +3,6 @@ import React, { ReactNode } from 'react';
 import Actions from './actions/partials/actions/actions';
 import { useManageMarketVisibility } from './actions/partials/floating-cards/map-section/hooks/use-manage-market-visibility';
 import { useManagePlayerKingdomManagementVisibility } from './actions/partials/floating-cards/map-section/hooks/use-manage-player-kingdom-management-visibility';
-import { useManageShopVisibility } from './actions/partials/floating-cards/map-section/hooks/use-manage-shop-visibility';
 import { useManageMonsterStatSectionVisibility } from './actions/partials/monster-stat-section/hooks/use-manage-monster-stat-section-visibility';
 import { MonsterStatSection } from './actions/partials/monster-stat-section/monster-stat-section';
 import CharacterSheet from './character-sheet/character-sheet';
@@ -22,6 +21,7 @@ import Market from './market/market';
 import CharacterAttackTypeBreakdown from './partials/character-attack-type-breakdown';
 import CharacterInventory from './partials/character-inventory';
 import PlayerKingdoms from './player-kingdoms/player-kingdoms';
+import { useManageShopSectionVisibility } from './shop/hooks/use-manage-shop-section-visibility';
 import ShopScreen from './shop/shop-screen';
 
 export const GameCard = (): ReactNode => {
@@ -45,10 +45,12 @@ export const GameCard = (): ReactNode => {
 
   const { showFullMap, closeMap } = useToggleFullMapVisibility();
 
-  const { showShop, closeShop } = useManageShopVisibility();
   const { showMarket, closeMarket } = useManageMarketVisibility();
   const { showPlayerKingdoms, closePlayerKingdoms } =
     useManagePlayerKingdomManagementVisibility();
+
+  const { closeShopSection, showShopSection } =
+    useManageShopSectionVisibility();
 
   if (showGameLoader) {
     return <GameLoader />;
@@ -62,8 +64,8 @@ export const GameCard = (): ReactNode => {
     return <Market close_shop={closeMarket} />;
   }
 
-  if (showShop) {
-    return <ShopScreen close_shop={closeShop} />;
+  if (showShopSection) {
+    return <ShopScreen close_shop={closeShopSection} />;
   }
 
   if (showCharacterSheet) {

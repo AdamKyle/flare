@@ -5,7 +5,7 @@ import React from 'react';
 import { useGetInventoryItemDetails } from './api/hooks/use-get-inventory-item-details';
 import InventoryItemProps from './types/inventory-item-props';
 import StatInfoToolTip from '../../../../reusable-components/item/stat-info-tool-tip';
-import { backpackItemTextColors } from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
+import { planeTextItemColors } from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
 
 import { GameDataError } from 'game-data/components/game-data-error';
@@ -156,8 +156,12 @@ const InventoryItem = ({
     );
   };
 
-  const renderNumberRow = (label: string, value: number) => {
-    if (value === 0) {
+  const renderNumberRow = (
+    label: string,
+    value: number,
+    forceShowZero?: boolean
+  ) => {
+    if (value === 0 && !forceShowZero) {
       return null;
     }
 
@@ -245,6 +249,7 @@ const InventoryItem = ({
 
   const renderAttackSection = () => {
     const attack = item.raw_damage ?? item.base_damage ?? 0;
+
     const hasChild = Number(item.base_damage_mod ?? 0) > 0;
 
     if (attack === 0 && !hasChild) {
@@ -257,7 +262,7 @@ const InventoryItem = ({
           Attack
         </h4>
         <Dl>
-          {renderNumberRow('Attack', attack)}
+          {renderNumberRow('Attack', attack, hasChild)}
           {renderBaseModRow('Damage', 'Base Damage Mod', item.base_damage_mod)}
         </Dl>
       </div>
@@ -266,6 +271,7 @@ const InventoryItem = ({
 
   const renderDefenceSection = () => {
     const ac = item.raw_ac ?? item.base_ac ?? 0;
+
     const hasChild = Number(item.base_ac_mod ?? 0) > 0;
 
     if (ac === 0 && !hasChild) {
@@ -278,7 +284,7 @@ const InventoryItem = ({
           Defence
         </h4>
         <Dl>
-          {renderNumberRow('AC', ac)}
+          {renderNumberRow('AC', ac, hasChild)}
           {renderBaseModRow('Defence', 'Base AC Mod', item.base_ac_mod)}
         </Dl>
       </div>
@@ -287,6 +293,7 @@ const InventoryItem = ({
 
   const renderHealingSection = () => {
     const healing = item.raw_healing ?? item.base_healing ?? 0;
+
     const hasChild = Number(item.base_healing_mod ?? 0) > 0;
 
     if (healing === 0 && !hasChild) {
@@ -299,7 +306,7 @@ const InventoryItem = ({
           Healing
         </h4>
         <Dl>
-          {renderNumberRow('Healing', healing)}
+          {renderNumberRow('Healing', healing, hasChild)}
           {renderBaseModRow(
             'Healing',
             'Base Healing Mod',
@@ -570,7 +577,7 @@ const InventoryItem = ({
 
       <div className="px-4 flex flex-col gap-4">
         <div>
-          <h2 className={clsx(backpackItemTextColors(item), 'text-lg my-2')}>
+          <h2 className={clsx(planeTextItemColors(item), 'text-lg my-2')}>
             {item.name}
           </h2>
           <Separator />

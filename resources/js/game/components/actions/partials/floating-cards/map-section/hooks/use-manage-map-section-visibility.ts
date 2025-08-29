@@ -39,9 +39,15 @@ export const useManageMapSectionVisibility =
         [key: string]: boolean;
       }>(ActionCardEvents.OPEN_CRATING_CARD);
 
+      const closeShopCard = eventSystem.getEventEmitter<{
+        [key: string]: boolean;
+      }>(ActionCardEvents.OPEN_SHOP);
+
       closeCraftingCardEvent.emit(ActionCardEvents.OPEN_CRATING_CARD, false);
 
       closeCharacterCardEvent.emit(ActionCardEvents.OPEN_CHARACTER_CARD, false);
+
+      closeShopCard.emit(ActionCardEvents.OPEN_SHOP, false);
 
       openMapEventEmitter.emit(ActionCardEvents.OPEN_MAP_SECTION, true);
     };

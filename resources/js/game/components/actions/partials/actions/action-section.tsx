@@ -5,7 +5,9 @@ import { useManageCharacterCardVisibility } from '../floating-cards/character-de
 import CraftingCard from '../floating-cards/crafting-section/crafting-card';
 import { useManageCraftingCardVisibility } from '../floating-cards/crafting-section/hooks/use-manage-crafting-card-visibility';
 import { useManageMapSectionVisibility } from '../floating-cards/map-section/hooks/use-manage-map-section-visibility';
+import { useManageShopVisibility } from '../floating-cards/map-section/hooks/use-manage-shop-visibility';
 import MapCard from '../floating-cards/map-section/map-card';
+import ShopCard from '../floating-cards/shop-section/shop-card';
 
 const ActionSection = () => {
   const { showCharacterCard } = useManageCharacterCardVisibility();
@@ -13,6 +15,8 @@ const ActionSection = () => {
   const { showCraftingCard } = useManageCraftingCardVisibility();
 
   const { showMapCard } = useManageMapSectionVisibility();
+
+  const { showShopCard } = useManageShopVisibility();
 
   const renderCharacterSheetSection = () => {
     if (!showCharacterCard) {
@@ -38,11 +42,20 @@ const ActionSection = () => {
     return <MapCard />;
   };
 
+  const renderShopSection = () => {
+    if (!showShopCard) {
+      return;
+    }
+
+    return <ShopCard />;
+  };
+
   return (
     <aside className="w-full md:w-auto p-4 flex justify-center">
       {renderCharacterSheetSection()}
       {renderCraftingSection()}
       {renderShowMapSection()}
+      {renderShopSection()}
     </aside>
   );
 };

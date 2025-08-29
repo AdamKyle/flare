@@ -146,11 +146,11 @@ export const backpackItemTextColors = (
       { is_cosmic: true },
       () => 'text-cosmic-colors-700 dark:text-cosmic-colors-600'
     )
-    .with({ is_mythic: true }, () => 'text-amber-600 dark:text-amber-500')
+    .with({ is_mythic: true }, () => 'text-amber-600 dark:text-amber-700')
     .with({ is_unique: true }, () => 'text-green-700 dark:text-green-600')
     .when(
       (item) => item.holy_stacks_applied > 0,
-      () => 'text-sky-700 dark:text-sky-300'
+      () => 'text-sky-700 dark:text-sky-700'
     )
     .with({ affix_count: 1 }, () => 'text-blue-500')
     .with({ affix_count: 2 }, () => 'text-fuchsia-800 dark:text-fuchsia-600')
@@ -158,9 +158,9 @@ export const backpackItemTextColors = (
     .with({ type: 'trinket' }, () => 'text-red-700 dark:text-red-500')
     .with(
       { type: 'artifact' },
-      () => 'text-artifact-colors-800 dark:text-artifact-colors-200'
+      () => 'text-artifact-colors-800 dark:text-artifact-colors-800'
     )
-    .with({ type: 'quest' }, () => 'text-marigold-800 dark:text-marigold-400')
+    .with({ type: 'quest' }, () => 'text-marigold-800 dark:text-marigold-700')
 
     .when(
       (item) =>
@@ -168,4 +168,36 @@ export const backpackItemTextColors = (
       () => 'text-wisp-pink-700 dark:text-wisp-pink-600'
     )
     .otherwise(() => 'text-gray-600 dark:text-gray-700');
+};
+
+export const planeTextItemColors = (
+  item: BaseItemDetails | ItemDetails
+): string => {
+  return match(item)
+    .with(
+      { is_cosmic: true },
+      () => 'text-cosmic-colors-700 dark:text-cosmic-colors-500'
+    )
+    .with({ is_mythic: true }, () => 'text-amber-600 dark:text-amber-500')
+    .with({ is_unique: true }, () => 'text-green-700 dark:text-green-500')
+    .when(
+      (item) => item.holy_stacks_applied > 0,
+      () => 'text-sky-700 dark:text-sky-500'
+    )
+    .with({ affix_count: 1 }, () => 'text-blue-500')
+    .with({ affix_count: 2 }, () => 'text-fuchsia-800 dark:text-fuchsia-500')
+
+    .with({ type: 'trinket' }, () => 'text-red-700 dark:text-red-400')
+    .with(
+      { type: 'artifact' },
+      () => 'text-artifact-colors-800 dark:text-artifact-colors-500'
+    )
+    .with({ type: 'quest' }, () => 'text-marigold-800 dark:text-marigold-500')
+
+    .when(
+      (item) =>
+        item.usable || (item.holy_level ?? 0) > 0 || item.damages_kingdoms,
+      () => 'text-wisp-pink-700 dark:text-wisp-pink-500'
+    )
+    .otherwise(() => 'text-gray-600 dark:text-gray-400');
 };

@@ -12,10 +12,10 @@ export const useManageShopVisibility =
       [key: string]: boolean;
     }>(ActionCardEvents.OPEN_SHOP);
 
-    const [showShop, setShowShop] = useState<boolean>(false);
+    const [showShopCard, setShowShopCard] = useState<boolean>(false);
 
     useEffect(() => {
-      const openShopListener = (visible: boolean) => setShowShop(visible);
+      const openShopListener = (visible: boolean) => setShowShopCard(visible);
 
       openShopEmitter.on(ActionCardEvents.OPEN_SHOP, openShopListener);
 
@@ -26,6 +26,24 @@ export const useManageShopVisibility =
 
     const openShop = () => {
       openShopEmitter.emit(ActionCardEvents.OPEN_SHOP, true);
+
+      const closeCharacterCardEvent = eventSystem.getEventEmitter<{
+        [key: string]: boolean;
+      }>(ActionCardEvents.OPEN_CHARACTER_CARD);
+
+      const closeCraftingCardEvent = eventSystem.getEventEmitter<{
+        [key: string]: boolean;
+      }>(ActionCardEvents.OPEN_CRATING_CARD);
+
+      const closeMapCard = eventSystem.getEventEmitter<{
+        [key: string]: boolean;
+      }>(ActionCardEvents.OPEN_MAP_SECTION);
+
+      closeCraftingCardEvent.emit(ActionCardEvents.OPEN_CRATING_CARD, false);
+
+      closeCharacterCardEvent.emit(ActionCardEvents.OPEN_CHARACTER_CARD, false);
+
+      closeMapCard.emit(ActionCardEvents.OPEN_MAP_SECTION, false);
     };
 
     const closeShop = () => {
@@ -33,7 +51,7 @@ export const useManageShopVisibility =
     };
 
     return {
-      showShop,
+      showShopCard,
       openShop,
       closeShop,
     };

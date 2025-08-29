@@ -12,6 +12,7 @@ import { AttackMessageType } from '../../components/fight-section/enums/attack-m
 import { useManageCharacterCardVisibility } from '../floating-cards/character-details/hooks/use-manage-character-card-visibility';
 import { useManageCraftingCardVisibility } from '../floating-cards/crafting-section/hooks/use-manage-crafting-card-visibility';
 import { useManageMapSectionVisibility } from '../floating-cards/map-section/hooks/use-manage-map-section-visibility';
+import { useManageShopVisibility } from '../floating-cards/map-section/hooks/use-manage-shop-visibility';
 
 import Card from 'ui/cards/card';
 
@@ -25,12 +26,16 @@ const Actions = (props: ActionsProps): ReactNode => {
 
   const { showMapCard } = useManageMapSectionVisibility();
 
+  const { showShopCard } = useManageShopVisibility();
+
   const isShowingSideSection = (): boolean => {
-    return showCharacterCard || showCraftingCard || showMapCard;
+    return showCharacterCard || showCraftingCard || showMapCard || showShopCard;
   };
 
   const isNotShowingSideSection = (): boolean => {
-    return !showCraftingCard && !showCharacterCard && !showMapCard;
+    return (
+      !showCraftingCard && !showCharacterCard && !showMapCard && !showShopCard
+    );
   };
 
   const messages: AttackMessageDefinition[] = [

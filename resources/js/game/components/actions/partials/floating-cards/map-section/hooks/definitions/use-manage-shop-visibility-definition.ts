@@ -1,5 +1,5 @@
 export default interface UseManageShopVisibilityDefinition {
-  showShop: boolean;
+  showShopCard: boolean;
   openShop: () => void;
   closeShop: () => void;
 }
