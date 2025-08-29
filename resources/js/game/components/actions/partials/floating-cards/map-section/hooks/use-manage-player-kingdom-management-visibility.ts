@@ -33,11 +33,17 @@ export const useManagePlayerKingdomManagementVisibility =
     }, [openPlayerKingdomsEmitter]);
 
     const openPlayerKingdoms = () => {
-      openPlayerKingdomsEmitter.emit(ActionCardEvents.OPEN_SHOP, true);
+      openPlayerKingdomsEmitter.emit(
+        ActionCardEvents.OPEN_PLAYER_KINGDOMS,
+        true
+      );
     };
 
     const closePlayerKingdoms = () => {
-      openPlayerKingdomsEmitter.emit(ActionCardEvents.OPEN_SHOP, false);
+      openPlayerKingdomsEmitter.emit(
+        ActionCardEvents.OPEN_PLAYER_KINGDOMS,
+        false
+      );
     };
 
     return {
