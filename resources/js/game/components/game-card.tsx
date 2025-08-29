@@ -9,11 +9,8 @@ import CharacterSheet from './character-sheet/character-sheet';
 import { useAttackDetailsVisibility } from './character-sheet/hooks/use-attack-details-visibility';
 import { useStatDetailsVisibility } from './character-sheet/hooks/use-stat-details-visibility';
 import CharacterStatTypeBreakDown from './character-sheet/partials/character-stat-types/character-stat-type-breakdown';
-import Chat from './chat-section/chat';
-import GameLoader from './game-loader/game-loader';
 import { useCharacterInventoryVisibility } from './hooks/use-character-inventory-visibility';
 import { useCharacterSheetVisibility } from './hooks/use-character-sheet-visibility';
-import { useGameLoaderVisibility } from './hooks/use-game-loader-visibility';
 import { useManageCharacterSheetVisibility } from './hooks/use-manage-character-sheet-visibility';
 import FullMap from './map-section/full-map';
 import { useToggleFullMapVisibility } from './map-section/hooks/use-toggle-full-map-visibility';
@@ -41,8 +38,6 @@ export const GameCard = (): ReactNode => {
 
   const { showCharacterSheet } = useCharacterSheetVisibility();
 
-  const { showGameLoader } = useGameLoaderVisibility();
-
   const { showFullMap, closeMap } = useToggleFullMapVisibility();
 
   const { showMarket, closeMarket } = useManageMarketVisibility();
@@ -51,10 +46,6 @@ export const GameCard = (): ReactNode => {
 
   const { closeShopSection, showShopSection } =
     useManageShopSectionVisibility();
-
-  if (showGameLoader) {
-    return <GameLoader />;
-  }
 
   if (showPlayerKingdoms) {
     return <PlayerKingdoms close_shop={closePlayerKingdoms} />;
@@ -107,7 +98,6 @@ export const GameCard = (): ReactNode => {
   return (
     <div>
       <Actions showMonsterStats={showMonsterStats} />
-      <Chat />
     </div>
   );
 };

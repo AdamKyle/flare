@@ -24,6 +24,8 @@ class ItemTypeTest extends TestCase
             ItemType::CENSER->value,
             ItemType::CLAW->value,
             ItemType::SWORD->value,
+            ItemType::TRINKET->value,
+            ItemType::ARTIFACT->value,
         ];
 
         $this->assertEqualsCanonicalizing($expected, $valid);

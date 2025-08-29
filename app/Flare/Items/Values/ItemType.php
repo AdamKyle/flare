@@ -30,14 +30,20 @@ enum ItemType: string {
      * @return array
      */
     public static function validWeapons(): array {
-        return array_map(
-            fn(self $type) => $type->value,
-            array_filter(self::cases(), fn(self $type) => !in_array($type, [
+        $filtered = array_filter(
+            self::cases(),
+            fn(self $type) => !in_array($type, [
                 self::SPELL_DAMAGE,
                 self::SPELL_HEALING,
                 self::RING,
-            ]))
+            ], true)
         );
+
+        // Map to string values and reindex to 0..N for stable comparisons in tests.
+        return array_values(array_map(
+            fn(self $type) => $type->value,
+            $filtered
+        ));
     }
 
     /**
@@ -52,7 +58,7 @@ enum ItemType: string {
             fn(self $type) => $type->value,
             array_filter(self::cases(), fn(self $type) => !in_array($type, [
                 self::RING,
-            ]))
+            ], true))
         );
     }
 
@@ -80,9 +86,11 @@ enum ItemType: string {
      * @return array
      */
     public static function getValidWeaponsAsOptions(): array {
+        $valid = self::validWeapons();
+
         return array_combine(
-            self::validWeapons(),
-            array_map(fn($type) => ucwords(str_replace('-', ' ', $type)), self::validWeapons())
+            $valid,
+            array_map(fn($type) => ucwords(str_replace('-', ' ', $type)), $valid)
         );
     }
 }
