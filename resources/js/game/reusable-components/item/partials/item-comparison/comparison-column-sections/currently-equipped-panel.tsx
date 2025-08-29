@@ -1,24 +1,21 @@
+import clsx from 'clsx';
 import React from 'react';
 
+import { planeTextItemColors } from '../../../../../components/character-sheet/partials/character-inventory/styles/backpack-item-styles';
 import CurrentlyEquippedPanelProps from '../../../types/partials/item-comparison/comparison-column-sections/currently-equipped-panel-props';
 import { getPositionLabel } from '../../../utils/item-comparison';
 
 const CurrentlyEquippedPanel = ({
   position,
-  equippedAffixName,
-  type,
+  equippedItem,
   isTwoHanded,
 }: CurrentlyEquippedPanelProps) => {
   const renderType = () => {
-    if (!type) {
-      return null;
-    }
-
     return (
       <>
         <span className="mx-2 text-gray-500 dark:text-gray-400">•</span>
         <span className="font-medium">Type:</span>{' '}
-        <span className="capitalize">{type}</span>
+        <span className="capitalize">{equippedItem.type}</span>
       </>
     );
   };
@@ -46,7 +43,9 @@ const CurrentlyEquippedPanel = ({
         <span className="font-medium">
           Replacing {getPositionLabel(position)}:
         </span>{' '}
-        <span className="italic">{equippedAffixName}</span>
+        <span className={clsx('italic', planeTextItemColors(equippedItem))}>
+          {equippedItem.name}
+        </span>
         {renderType()}
         {renderTwoHanded()}
       </div>

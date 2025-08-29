@@ -6,6 +6,9 @@ import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Card from 'ui/cards/card';
 import ContainerWithTitle from 'ui/container/container-with-title';
+import Dd from 'ui/dl/dd';
+import Dl from 'ui/dl/dl';
+import Dt from 'ui/dl/dt';
 import Separator from 'ui/separator/separator';
 
 export const MonsterStatSection = (): ReactNode => {
@@ -35,117 +38,117 @@ export const MonsterStatSection = (): ReactNode => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
           <div>
-            <dl>
-              <dt className="font-semibold">Monster Name:</dt>
-              <dd>Name</dd>
-              <dt className="font-semibold">Receive 1/3 Xp at level:</dt>
-              <dd>10</dd>
-              <dt className="font-semibold">Conjuration Cost (Shards):</dt>
-              <dd>1,000</dd>
-            </dl>
+            <Dl>
+              <Dt>Monster Name:</Dt>
+              <Dd>Name</Dd>
+              <Dt>Receive 1/3 Xp at level:</Dt>
+              <Dd>10</Dd>
+              <Dt>Conjuration Cost (Shards):</Dt>
+              <Dd>1,000</Dd>
+            </Dl>
 
             <h3 className="text-danube-500 dark:text-danube-700 mt-5">
               Basic Stats
             </h3>
             <Separator />
-            <dl>
-              <dt className="font-semibold">Health Range:</dt>
-              <dd>100 - 200</dd>
-              <dt className="font-semibold">Attack Range:</dt>
-              <dd>100 - 200</dd>
-              <dt className="font-semibold">Max Spell Damage:</dt>
-              <dd>350</dd>
-              <dt className="font-semibold">Entrancing Chance:</dt>
-              <dd>8%</dd>
-              <dt className="font-semibold">Armour Class (Defence):</dt>
-              <dd>150</dd>
-            </dl>
+            <Dl>
+              <Dt>Health Range:</Dt>
+              <Dd>100 - 200</Dd>
+              <Dt>Attack Range:</Dt>
+              <Dd>100 - 200</Dd>
+              <Dt>Max Spell Damage:</Dt>
+              <Dd>350</Dd>
+              <Dt>Entrancing Chance:</Dt>
+              <Dd>8%</Dd>
+              <Dt>Armour Class (Defence):</Dt>
+              <Dd>150</Dd>
+            </Dl>
 
             <h3 className="text-danube-500 dark:text-danube-700 mt-5">
               Ambush and Counter
             </h3>
             <Separator />
-            <dl>
-              <dt className="font-semibold">Ambush Chance:</dt>
-              <dd>8%</dd>
-              <dt className="font-semibold">Ambush Resistance:</dt>
-              <dd>2%</dd>
-              <dt className="font-semibold">Counter Chance:</dt>
-              <dd>10%</dd>
-              <dt className="font-semibold">Counter Resistance:</dt>
-              <dd>10%</dd>
-            </dl>
+            <Dl>
+              <Dt>Ambush Chance:</Dt>
+              <Dd>8%</Dd>
+              <Dt>Ambush Resistance:</Dt>
+              <Dd>2%</Dd>
+              <Dt>Counter Chance:</Dt>
+              <Dd>10%</Dd>
+              <Dt>Counter Resistance:</Dt>
+              <Dd>10%</Dd>
+            </Dl>
 
             <h3 className="text-danube-500 dark:text-danube-700 mt-5">
               Rewards
             </h3>
             <Separator />
-            <dl>
-              <dt className="font-semibold">XP:</dt>
-              <dd>100</dd>
-              <dt className="font-semibold">Gold:</dt>
-              <dd>500</dd>
-              <dt className="font-semibold">Drop Chance:</dt>
-              <dd>10%</dd>
-            </dl>
+            <Dl>
+              <Dt>XP:</Dt>
+              <Dd>100</Dd>
+              <Dt>Gold:</Dt>
+              <Dd>500</Dd>
+              <Dt>Drop Chance:</Dt>
+              <Dd>10%</Dd>
+            </Dl>
           </div>
 
           <div>
             <h3 className="text-danube-500 dark:text-danube-700">Core Stats</h3>
             <Separator />
-            <dl>
-              <dt className="font-semibold">Str:</dt>
-              <dd>100</dd>
-              <dt className="font-semibold">Dex:</dt>
-              <dd>100</dd>
-              <dt className="font-semibold">Int:</dt>
-              <dd>100</dd>
-              <dt className="font-semibold">Chr:</dt>
-              <dd>100</dd>
-              <dt className="font-semibold">Agi:</dt>
-              <dd>100</dd>
-              <dt className="font-semibold">Focus:</dt>
-              <dd>100</dd>
-            </dl>
+            <Dl>
+              <Dt>Str:</Dt>
+              <Dd>100</Dd>
+              <Dt>Dex:</Dt>
+              <Dd>100</Dd>
+              <Dt>Int:</Dt>
+              <Dd>100</Dd>
+              <Dt>Chr:</Dt>
+              <Dd>100</Dd>
+              <Dt>Agi:</Dt>
+              <Dd>100</Dd>
+              <Dt>Focus:</Dt>
+              <Dd>100</Dd>
+            </Dl>
 
             <h3 className="text-danube-500 dark:text-danube-700 mt-5">
               Skills
             </h3>
             <Separator />
-            <dl>
-              <dt className="font-semibold">Accuracy:</dt>
-              <dd>1.5%</dd>
-              <dt className="font-semibold">Casting Accuracy:</dt>
-              <dd>2.8%</dd>
-              <dt className="font-semibold">Dodge:</dt>
-              <dd>10%</dd>
-              <dt className="font-semibold">Criticality:</dt>
-              <dd>10%</dd>
-            </dl>
+            <Dl>
+              <Dt>Accuracy:</Dt>
+              <Dd>1.5%</Dd>
+              <Dt>Casting Accuracy:</Dt>
+              <Dd>2.8%</Dd>
+              <Dt>Dodge:</Dt>
+              <Dd>10%</Dd>
+              <Dt>Criticality:</Dt>
+              <Dd>10%</Dd>
+            </Dl>
 
             <h3 className="text-danube-500 dark:text-danube-700 mt-5">
               Resistances
             </h3>
             <Separator />
-            <dl>
-              <dt className="font-semibold">Affix:</dt>
-              <dd>1.5%</dd>
-              <dt className="font-semibold">Spells:</dt>
-              <dd>2.8%</dd>
-              <dt className="font-semibold">Life Stealing:</dt>
-              <dd>10%</dd>
-            </dl>
+            <Dl>
+              <Dt>Affix:</Dt>
+              <Dd>1.5%</Dd>
+              <Dt>Spells:</Dt>
+              <Dd>2.8%</Dd>
+              <Dt>Life Stealing:</Dt>
+              <Dd>10%</Dd>
+            </Dl>
 
             <h3 className="text-danube-500 dark:text-danube-700 mt-5">
               Devouring Light / Darkness
             </h3>
             <Separator />
-            <dl>
-              <dt className="font-semibold">Devouring Light:</dt>
-              <dd>1.5%</dd>
-              <dt className="font-semibold">Devouring Darkness:</dt>
-              <dd>2.8%</dd>
-            </dl>
+            <Dl>
+              <Dt>Devouring Light:</Dt>
+              <Dd>1.5%</Dd>
+              <Dt>Devouring Darkness:</Dt>
+              <Dd>2.8%</Dd>
+            </Dl>
           </div>
         </div>
       </Card>

@@ -44,12 +44,13 @@ const ItemComparisonColumn = ({
       return heading;
     }
 
-    const toEquipName = row?.comparison?.to_equip_name;
+    const toEquipName = row.equipped_item.name;
     if (toEquipName && toEquipName.trim().length > 0) {
       return toEquipName;
     }
 
-    const composed = `${row?.position ?? ''} ${row?.type ?? ''}`.trim();
+    const composed =
+      `${row?.position ?? ''} ${row.equipped_item.type ?? ''}`.trim();
     if (composed) {
       return composed;
     }
@@ -68,7 +69,7 @@ const ItemComparisonColumn = ({
   };
 
   const computedTitle = getComputedTitle();
-  const description = row?.comparison?.to_equip_description;
+  const description = row.equipped_item.description;
 
   const hasCoreTotals = hasAnyNonZeroAdjustment(adjustments, TOP_FIELDS);
   const hasAttributes = hasAnyNonZeroAdjustment(adjustments, STAT_FIELDS);
@@ -78,7 +79,7 @@ const ItemComparisonColumn = ({
   const showDevouring =
     showAdvanced && hasAnyNonZeroAdjustment(adjustments, DEVOURING_FIELDS);
 
-  const isTwoHanded = isTwoHandedType(row?.type);
+  const isTwoHanded = isTwoHandedType(row.equipped_item.type);
   const forceCoreZeroKeys = getForceCoreZeroKeys();
 
   return (
@@ -87,8 +88,7 @@ const ItemComparisonColumn = ({
 
       <CurrentlyEquippedPanel
         position={row.position}
-        equippedAffixName={row.comparison.equipped_affix_name}
-        type={row.type}
+        equippedItem={row.equipped_item}
         isTwoHanded={isTwoHanded}
       />
 
@@ -103,12 +103,12 @@ const ItemComparisonColumn = ({
 
       <ResurrectionChanceSection
         adjustments={adjustments}
-        toEquipType={row.comparison.to_equip_type}
+        toEquipType={row.equipped_item.type}
       />
 
       <ResistanceSection
         adjustments={adjustments}
-        toEquipType={row.comparison.to_equip_type}
+        toEquipType={row.equipped_item.type}
       />
 
       <AttributesSection

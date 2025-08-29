@@ -1,8 +1,7 @@
-import { InventoryItemTypes } from '../../../../../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
+import { BaseItemDetails } from '../../../../../../api-definitions/items/base-item-details';
 
 export default interface CurrentlyEquippedPanelProps {
   position: string;
-  equippedAffixName: string;
-  type?: InventoryItemTypes;
-  isTwoHanded?: boolean;
+  equippedItem: BaseItemDetails;
+  isTwoHanded: boolean;
 }

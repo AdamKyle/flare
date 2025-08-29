@@ -94,8 +94,6 @@ class ItemComparison
             return EquippablePositionType::values([EquippablePositionType::LEFT_HAND, EquippablePositionType::RIGHT_HAND]);
         }
 
-        dump('Am I ever getting here?');
-
         $armourPositionsMap = ArmourType::getArmourPositions();
         $armourPositions    = $armourPositionsMap[$item->type] ?? null;
 
@@ -138,19 +136,24 @@ class ItemComparison
         $summary              = $payload['comparison'];
 
         return [
-            'position'            => $equippedSlot->position,
-            'is_unique'           => $this->isUnique($equippedSlot->item),
-            'is_mythic'           => $equippedSlot->item->is_mythic,
-            'is_cosmic'           => $equippedSlot->item->is_cosmic,
-            'affix_count'         => $equippedSlot->item->affix_count,
-            'holy_stacks_applied' => $equippedSlot->item->holy_stacks_applied,
-            'type'                => $equippedSlot->item->type,
-            'comparison'          => [
-                'to_equip_name'        => $summary['name'],
-                'to_equip_description' => $summary['description'],
-                'to_equip_type'        => $summary['type'],
-                'adjustments'          => $summary['adjustments'],
-                'equipped_affix_name'  => $equippedSlot->item->affix_name,
+            'position'      => $equippedSlot->position,
+            'equipped_item' => [
+                'affix_count'                     => $enrichedEquippedItem->affix_count,
+                'max_holy_stacks'                 => $enrichedEquippedItem->holy_stacks,
+                'holy_stacks_applied'             => $enrichedEquippedItem->holy_stacks_applied,
+                'holy_stacks_total_stat_increase' => $enrichedEquippedItem->holy_stack_stat_bonus,
+                'is_cosmic'                       => $enrichedEquippedItem->is_cosmic,
+                'is_mythic'                       => $enrichedEquippedItem->is_mythic,
+                'is_unique'                       => $this->isUnique($enrichedEquippedItem),
+                'usable'                          => $enrichedEquippedItem->usable,
+                'holy_level'                      => $enrichedEquippedItem->holy_level,
+                'damages_kingdoms'                => $enrichedEquippedItem->damages_kingdoms,
+                'name'                            => $enrichedEquippedItem->affix_name,
+                'description'                     => $enrichedEquippedItem->description,
+                'type'                            => $enrichedEquippedItem->type,
+            ],
+            'comparison'    => [
+                'adjustments' => $summary['adjustments'],
             ],
         ];
     }

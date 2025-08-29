@@ -1,4 +1,4 @@
-import { InventoryItemTypes } from '../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
+import { BaseItemDetails } from './base-item-details';
 
 export interface SkillSummaryAdjustment {
   skill_name: string;
@@ -35,20 +35,11 @@ export interface ItemAdjustments {
 }
 
 export interface ComparisonPayload {
-  to_equip_name: string;
-  to_equip_description: string;
-  to_equip_type: InventoryItemTypes;
   adjustments: ItemAdjustments;
-  equipped_affix_name: string;
 }
 
 export interface ItemComparisonRow {
   position: string;
-  is_unique: boolean;
-  is_mythic: boolean;
-  is_cosmic: boolean;
-  affix_count: number;
-  holy_stacks_applied: number;
-  type: InventoryItemTypes;
+  equipped_item: BaseItemDetails;
   comparison: ComparisonPayload;
 }

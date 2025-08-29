@@ -88,7 +88,8 @@ class ItemComparisonTest extends TestCase
 
         $this->assertArrayHasKey('comparison', $rows[0]);
         $this->assertArrayHasKey('adjustments', $rows[0]['comparison']);
-        $this->assertSame('Candidate Spell', $rows[0]['comparison']['to_equip_name']);
+        $this->assertArrayHasKey('equipped_item', $rows[0]);
+        $this->assertArrayHasKey('name', $rows[0]['equipped_item']);
     }
 
     public function testTwoHandedWeaponTypesCompareAgainstBothHandsAndReverseOrder(): void
@@ -121,6 +122,7 @@ class ItemComparisonTest extends TestCase
 
             $this->assertArrayHasKey('comparison', $rows[0]);
             $this->assertArrayHasKey('adjustments', $rows[0]['comparison']);
+            $this->assertArrayHasKey('equipped_item', $rows[0]);
         }
     }
 
@@ -198,9 +200,10 @@ class ItemComparisonTest extends TestCase
         $this->assertSame($chosenFirstSlot, $rows[0]['position']);
         $this->assertArrayHasKey('comparison', $rows[0]);
         $this->assertArrayHasKey('adjustments', $rows[0]['comparison']);
+        $this->assertArrayHasKey('equipped_item', $rows[0]);
     }
 
-    public function testComparisonRowIncludesSlotFlagsAndEquippedAffixNameKey(): void
+    public function testComparisonRowIncludesSlotFlagsAndEquippedDetailsBlock(): void
     {
         $equipped = $this->createItem(['type' => WeaponTypes::STAVE, 'base_damage' => 5, 'name' => 'Equipped Staff']);
         $candidate = $this->createItem(['type' => WeaponTypes::STAVE, 'base_damage' => 12, 'name' => 'Candidate Staff']);
@@ -215,13 +218,20 @@ class ItemComparisonTest extends TestCase
         $this->assertCount(1, $rows);
         $row = $rows[0];
 
-        $this->assertArrayHasKey('is_unique', $row);
-        $this->assertArrayHasKey('is_mythic', $row);
-        $this->assertArrayHasKey('is_cosmic', $row);
-        $this->assertArrayHasKey('affix_count', $row);
-        $this->assertArrayHasKey('holy_stacks_applied', $row);
-        $this->assertArrayHasKey('type', $row);
-        $this->assertArrayHasKey('equipped_affix_name', $row['comparison']);
+        $this->assertArrayHasKey('equipped_item', $row);
+        $this->assertArrayHasKey('affix_count', $row['equipped_item']);
+        $this->assertArrayHasKey('max_holy_stacks', $row['equipped_item']);
+        $this->assertArrayHasKey('holy_stacks_applied', $row['equipped_item']);
+        $this->assertArrayHasKey('holy_stacks_total_stat_increase', $row['equipped_item']);
+        $this->assertArrayHasKey('is_cosmic', $row['equipped_item']);
+        $this->assertArrayHasKey('is_mythic', $row['equipped_item']);
+        $this->assertArrayHasKey('is_unique', $row['equipped_item']);
+        $this->assertArrayHasKey('usable', $row['equipped_item']);
+        $this->assertArrayHasKey('holy_level', $row['equipped_item']);
+        $this->assertArrayHasKey('damages_kingdoms', $row['equipped_item']);
+        $this->assertArrayHasKey('name', $row['equipped_item']);
+        $this->assertArrayHasKey('description', $row['equipped_item']);
+        $this->assertArrayHasKey('type', $row['equipped_item']);
     }
 
     public function testNoMatchingSlotsEvenWithUnrelatedItemsEquipped(): void
