@@ -19,7 +19,7 @@ import GradientButton from 'ui/buttons/gradient-button';
 
 const MonsterSection = ({
   show_monster_stats,
-  on_initiate_monster_fight,
+  has_initiate_monster_fight,
 }: MonsterSectionProps): ReactNode => {
   const { gameData } = useGameData();
 
@@ -51,7 +51,7 @@ const MonsterSection = ({
     const monsterToFight = monsters[currentIndex] as MonsterDefinition;
 
     setMonsterToFight(monsterToFight.id);
-    on_initiate_monster_fight(true);
+    has_initiate_monster_fight(true);
   };
 
   const handleNextIndex = (index: number) => {
@@ -66,8 +66,9 @@ const MonsterSection = ({
     const selectedMonster = monsters[index] as MonsterDefinition;
 
     setCurrentIndex(index);
-
+    setMonsterToFight(null);
     setMonsterName(selectedMonster.name);
+    has_initiate_monster_fight(false);
   };
 
   const handlePreviousAction = (index: number) => {
@@ -84,8 +85,9 @@ const MonsterSection = ({
     const selectedMonster = monsters[index] as MonsterDefinition;
 
     setCurrentIndex(index);
-
+    setMonsterToFight(null);
     setMonsterName(selectedMonster.name);
+    has_initiate_monster_fight(false);
   };
 
   if (!monsters) {

@@ -49,7 +49,7 @@ const MonsterActions = ({
       >
         <MonsterSection
           show_monster_stats={show_monster_section}
-          on_initiate_monster_fight={setHasInitiatedFight}
+          has_initiate_monster_fight={setHasInitiatedFight}
         />
         {renderAttackMessages()}
       </div>
