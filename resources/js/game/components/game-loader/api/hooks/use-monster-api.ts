@@ -19,6 +19,7 @@ export const useMonsterApi = (params: ApiParametersDefinitions) => {
       if (error instanceof AxiosError) {
         throw error.response?.data || new Error('Unknown API error');
       }
+
       throw error;
     }
   }, [apiHandler, url]);

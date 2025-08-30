@@ -12,6 +12,7 @@ const GameDataProvider = (props: GameDataProviderProps): React.ReactNode => {
   useEffect(() => {
     const playerIdMeta = document.querySelector('meta[name="player"]');
     const characterIdContent = playerIdMeta?.getAttribute('content');
+
     if (characterIdContent) {
       setCharacterId(parseInt(characterIdContent, 10) || 0);
     }

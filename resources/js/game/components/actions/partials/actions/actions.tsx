@@ -2,17 +2,14 @@ import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
 import ActionSection from './action-section';
-import NavigationActionsComponent from './navigation-actions';
-import AttackMessages from '../../components/fight-section/attack-messages';
-import MonsterSection from '../monster-section/monster-section';
 import { useIsMobile } from './hooks/use-is-mobile';
+import NavigationActionsComponent from './navigation-actions';
 import ActionsProps from './types/actions-props';
-import AttackMessageDefinition from '../../components/fight-section/deffinitions/attack-message-definition';
-import { AttackMessageType } from '../../components/fight-section/enums/attack-message-type';
 import { useManageCharacterCardVisibility } from '../floating-cards/character-details/hooks/use-manage-character-card-visibility';
 import { useManageCraftingCardVisibility } from '../floating-cards/crafting-section/hooks/use-manage-crafting-card-visibility';
 import { useManageMapSectionVisibility } from '../floating-cards/map-section/hooks/use-manage-map-section-visibility';
 import { useManageShopVisibility } from '../floating-cards/map-section/hooks/use-manage-shop-visibility';
+import MonsterActions from '../monster-section/monster-actions';
 
 import Card from 'ui/cards/card';
 
@@ -38,39 +35,16 @@ const Actions = (props: ActionsProps): ReactNode => {
     );
   };
 
-  const messages: AttackMessageDefinition[] = [
-    {
-      message: 'You Attack for 150,000 Damage!',
-      type: AttackMessageType.PLAYER_ATTACK,
-    },
-    {
-      message: 'Your spells charge and magic crackles in the air!',
-      type: AttackMessageType.REGULAR,
-    },
-    {
-      message: 'The enemy stops your spells and attack you for 125,000 Damage',
-      type: AttackMessageType.ENEMY_ATTACK,
-    },
-  ];
-
   const renderActionSection = () => {
     if (isMobile && isShowingSideSection()) {
       return null;
     }
 
     return (
-      <div className="flex flex-col items-center space-y-4">
-        <div
-          className={clsx('w-full lg:w-1/2 mx-auto', {
-            'lg:w-full': isShowingSideSection(),
-          })}
-        >
-          <MonsterSection show_monster_stats={showMonsterStats} />
-          <div className="mt-4 rounded-lg bg-gray-100 dark:bg-gray-700 p-4 text-sm border border-solid border-gray-200 dark:border-gray-800 ">
-            <AttackMessages messages={messages} />
-          </div>
-        </div>
-      </div>
+      <MonsterActions
+        is_showing_side_section={isShowingSideSection()}
+        show_monster_section={showMonsterStats}
+      />
     );
   };
 
