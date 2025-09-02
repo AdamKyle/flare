@@ -25,6 +25,38 @@ const GenericItemList = ({
     return on_click(items_view_type, item.id);
   };
 
+  const renderSelectAllHeader = () => {
+    if (is_quest_items) {
+      return null;
+    }
+
+    return (
+      <div className="sticky top-0 z-10 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 px-2 py-2 rounded">
+        <div className="flex items-center justify-between">
+          <label
+            htmlFor="select-all-visible"
+            className="inline-flex items-center gap-2 text-gray-900 dark:text-gray-100"
+          >
+            <input
+              id="select-all-visible"
+              type="checkbox"
+              className="h-5 w-5 rounded-md border-2 border-gray-700 dark:border-gray-300 accent-danube-600 dark:accent-danube-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danube-500 dark:focus-visible:ring-danube-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900"
+            />
+            <span className="font-medium">Select all (visible)</span>
+          </label>
+
+          <output
+            role="status"
+            aria-live="polite"
+            className="text-sm text-gray-600 dark:text-gray-400"
+          >
+            0 selected
+          </output>
+        </div>
+      </div>
+    );
+  };
+
   const renderBackPackItems = () => {
     if (isEmpty(items) && is_quest_items) {
       return (
@@ -58,7 +90,13 @@ const GenericItemList = ({
   return (
     <div className="w-full h-full text-gray-800 dark:text-gray-200">
       <InfiniteScroll handle_scroll={on_scroll_to_end} additional_css={'my-2'}>
-        {renderBackPackItems()}
+        {renderSelectAllHeader()}
+        <h2 id="inventory-heading" className="sr-only">
+          Inventory items
+        </h2>
+        <div role="group" aria-labelledby="inventory-heading">
+          {renderBackPackItems()}
+        </div>
       </InfiniteScroll>
     </div>
   );

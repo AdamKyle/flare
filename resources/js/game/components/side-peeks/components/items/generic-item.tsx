@@ -3,6 +3,7 @@ import React, { ReactNode } from 'react';
 
 import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import BaseQuestItemDefinition from '../../../../api-definitions/items/quest-item-definitions/base-quest-item-definition';
+import { InventoryItemTypes } from '../../../character-sheet/partials/character-inventory/enums/inventory-item-types';
 import {
   backpackBaseItemStyles,
   backpackBorderStyles,
@@ -19,7 +20,9 @@ const GenericItem = ({ item, on_click }: BackpackItemProps): ReactNode => {
   const detailsId = 'item-details-' + item.id;
 
   const handleViewItem = () => {
-    if (!on_click) return;
+    if (!on_click) {
+      return;
+    }
     on_click(item);
   };
 
@@ -30,7 +33,9 @@ const GenericItem = ({ item, on_click }: BackpackItemProps): ReactNode => {
     i.raw_ac ?? i.base_ac ?? 0;
 
   const renderQuestDetails = (i: BaseQuestItemDefinition): ReactNode => {
-    if (i.effect === null) return null;
+    if (i.effect === null) {
+      return null;
+    }
 
     return (
       <span>
@@ -65,22 +70,31 @@ const GenericItem = ({ item, on_click }: BackpackItemProps): ReactNode => {
     return renderEquippableDetails(item as EquippableItemWithBase);
   };
 
-  return (
-    <div className="grid grid-cols-[auto_1fr] items-start gap-3">
+  const renderCheckbox = () => {
+    if (item.type === InventoryItemTypes.QUEST) {
+      return null;
+    }
+
+    return (
       <div className="self-start mt-6">
         <input
           id={checkboxId}
           type="checkbox"
-          className="h-6 w-6 shrink-0 rounded-md border-2 border-gray-700 dark:border-gray-300
-            accent-danube-600 dark:accent-danube-500 focus-visible:outline-none focus-visible:ring-2
-            focus-visible:ring-danube-500 dark:focus-visible:ring-danube-400 focus-visible:ring-offset-2
-            focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900"
+          className="h-6 w-6 shrink-0 rounded-md border-2 border-gray-700 dark:border-gray-300 accent-danube-600 dark:accent-danube-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danube-500 dark:focus-visible:ring-danube-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900"
           aria-describedby={detailsId}
         />
         <label htmlFor={checkboxId} className="sr-only">
           Select {item.name}
         </label>
       </div>
+    );
+  };
+
+  const isQuest = item.type === InventoryItemTypes.QUEST;
+
+  return (
+    <div className="grid grid-cols-[auto_1fr] items-start gap-3">
+      {renderCheckbox()}
 
       <button
         className={clsx(
@@ -88,7 +102,8 @@ const GenericItem = ({ item, on_click }: BackpackItemProps): ReactNode => {
           backpackFocusRingStyles(item),
           backpackBorderStyles(item),
           backpackButtonBackground(item),
-          'w-full'
+          'w-full',
+          isQuest && 'col-span-2'
         )}
         onClick={handleViewItem}
         aria-labelledby={titleId}
