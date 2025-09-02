@@ -96,7 +96,7 @@ export const GameCard = (): ReactNode => {
   }
 
   return (
-    <div>
+    <div className="relative z-10">
       <Actions showMonsterStats={showMonsterStats} />
     </div>
   );

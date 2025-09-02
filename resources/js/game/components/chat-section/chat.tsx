@@ -6,7 +6,7 @@ import Card from 'ui/cards/card';
 
 const Chat = () => {
   return (
-    <div className="w-full lg:w-3/4 mx-auto my-4">
+    <div className="w-full lg:w-3/4 mx-auto my-4 position-relative">
       <Card>
         <div className="flex items-center mb-2">
           <Button

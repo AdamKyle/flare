@@ -1,6 +1,7 @@
 import { isNil } from 'lodash';
 import React, { ReactNode, useEffect, useState } from 'react';
 
+import MonsterExplorationConfiguration from './monster-exploration-configuration';
 import MonsterSectionProps from './types/monster-section-props';
 import AttackButtonsContainer from '../../components/fight-section/attack-buttons-container';
 import { HealthBarType } from '../../components/fight-section/enums/health-bar-type';
@@ -28,6 +29,9 @@ const MonsterSection = ({
   const [monsterName, setMonsterName] = useState<string | null>(null);
 
   const [monsterToFight, setMonsterToFight] = useState<number | null>(null);
+
+  const [showExplorationConfiguration, setShowExplorationConfiguration] =
+    useState(false);
 
   const monsters = gameData?.monsters;
 
@@ -94,7 +98,15 @@ const MonsterSection = ({
     return <GameDataError />;
   }
 
+  const handleSetupExploration = () => {
+    setShowExplorationConfiguration(true);
+  };
+
   const renderMonsterFightSection = () => {
+    if (showExplorationConfiguration) {
+      return <MonsterExplorationConfiguration />;
+    }
+
     if (isNil(monsterToFight)) {
       return (
         <div className={'text-center my-4'}>
@@ -102,6 +114,13 @@ const MonsterSection = ({
             on_click={handelMonsterSelection}
             label={'Initiate Fight'}
             variant={ButtonVariant.PRIMARY}
+            additional_css={'block mx-auto w-48'}
+          />
+          <Button
+            on_click={handleSetupExploration}
+            label={'Setup Exploration'}
+            variant={ButtonVariant.SUCCESS}
+            additional_css={'block mx-auto w-48 mt-4'}
           />
         </div>
       );
