@@ -14,6 +14,9 @@ import BackpackItemProps from '../../../character-sheet/partials/character-inven
 
 const GenericItem = ({ item, on_click }: BackpackItemProps): ReactNode => {
   const itemColor = backpackItemTextColors(item);
+  const checkboxId = 'select-' + item.id;
+  const titleId = 'item-title-' + item.id;
+  const detailsId = 'item-details-' + item.id;
 
   const handleViewItem = () => {
     if (!on_click) return;
@@ -63,24 +66,49 @@ const GenericItem = ({ item, on_click }: BackpackItemProps): ReactNode => {
   };
 
   return (
-    <button
-      className={clsx(
-        backpackBaseItemStyles(),
-        backpackFocusRingStyles(item),
-        backpackBorderStyles(item),
-        backpackButtonBackground(item)
-      )}
-      onClick={handleViewItem}
-    >
-      <i className="ra ra-bone-knife text-2xl text-gray-800 dark:text-gray-600" />
-      <div className="text-left">
-        <div className={clsx('text-lg font-semibold', itemColor)}>
-          {item.name}
-        </div>
-        <p className={clsx('my-2', itemColor)}>{item.description}</p>
-        <div className={clsx('text-sm', itemColor)}>{renderItemDetails()}</div>
+    <div className="grid grid-cols-[auto_1fr] items-start gap-3">
+      <div className="self-start mt-6">
+        <input
+          id={checkboxId}
+          type="checkbox"
+          className="h-6 w-6 shrink-0 rounded-md border-2 border-gray-700 dark:border-gray-300
+            accent-danube-600 dark:accent-danube-500 focus-visible:outline-none focus-visible:ring-2
+            focus-visible:ring-danube-500 dark:focus-visible:ring-danube-400 focus-visible:ring-offset-2
+            focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900"
+          aria-describedby={detailsId}
+        />
+        <label htmlFor={checkboxId} className="sr-only">
+          Select {item.name}
+        </label>
       </div>
-    </button>
+
+      <button
+        className={clsx(
+          backpackBaseItemStyles(),
+          backpackFocusRingStyles(item),
+          backpackBorderStyles(item),
+          backpackButtonBackground(item),
+          'w-full'
+        )}
+        onClick={handleViewItem}
+        aria-labelledby={titleId}
+        aria-describedby={detailsId}
+      >
+        <i className="ra ra-bone-knife text-2xl text-gray-800 dark:text-gray-600" />
+        <div className="text-left">
+          <div
+            id={titleId}
+            className={clsx('text-lg font-semibold', itemColor)}
+          >
+            {item.name}
+          </div>
+          <p className={clsx('my-2', itemColor)}>{item.description}</p>
+          <div id={detailsId} className={clsx('text-sm', itemColor)}>
+            {renderItemDetails()}
+          </div>
+        </div>
+      </button>
+    </div>
   );
 };
 
