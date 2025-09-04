@@ -49,10 +49,7 @@ const LocationDroppableItems = ({
     debouncedSetSearchText(value.trim());
   };
 
-  const onOpenQuestItemDetails = (
-    itemTypeToView: ItemTypeToView,
-    itemId: number
-  ) => {
+  const onOpenQuestItemDetails = (itemId: number) => {
     const item = data.find((item) => item.id === itemId);
 
     if (!item) {
@@ -115,7 +112,6 @@ const LocationDroppableItems = ({
           items={data}
           is_quest_items={true}
           on_scroll_to_end={handleQuestItemsScroll}
-          items_view_type={ItemTypeToView.QUEST}
           on_click={onOpenQuestItemDetails}
         />
       </div>

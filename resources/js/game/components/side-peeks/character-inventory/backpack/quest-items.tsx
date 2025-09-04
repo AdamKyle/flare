@@ -4,7 +4,6 @@ import React, { ReactNode, useMemo } from 'react';
 
 import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
-import { ItemTypeToView } from '../../components/items/enums/item-type-to-view';
 import GenericItemList from '../../components/items/generic-item-list';
 import GenericItemProps from '../../components/items/types/generic-item-props';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
@@ -73,7 +72,6 @@ const QuestItems = ({
         <GenericItemList
           items={data}
           is_quest_items={true}
-          items_view_type={ItemTypeToView.QUEST}
           on_scroll_to_end={handleQuestItemsScroll}
         />
       </div>

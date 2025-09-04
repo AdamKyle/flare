@@ -4,4 +4,6 @@ import BaseQuestItemDefinition from '../../../../../api-definitions/items/quest-
 export default interface BackpackItemProps {
   item: EquippableItemWithBase | BaseQuestItemDefinition;
   on_click?: (item: EquippableItemWithBase | BaseQuestItemDefinition) => void;
+  is_selected?: boolean;
+  on_item_selected?: (id: number, checked: boolean) => void;
 }

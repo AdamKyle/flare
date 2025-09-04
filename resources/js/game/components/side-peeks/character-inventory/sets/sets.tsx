@@ -50,7 +50,7 @@ const Sets = ({ character_id }: SetsProps): ReactNode => {
     setFilters({});
   };
 
-  const handleOnItemClick = (typeOfItem: ItemTypeToView, item_id: number) => {
+  const handleOnItemClick = (item_id: number) => {
     setItemId(item_id);
   };
 
@@ -103,7 +103,6 @@ const Sets = ({ character_id }: SetsProps): ReactNode => {
           items={data}
           is_quest_items={false}
           on_scroll_to_end={handleSetScrolling}
-          items_view_type={ItemTypeToView.EQUIPPABLE}
           on_click={handleOnItemClick}
         />
       </div>

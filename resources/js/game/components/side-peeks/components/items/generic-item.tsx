@@ -13,7 +13,15 @@ import {
 } from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
 import BackpackItemProps from '../../../character-sheet/partials/character-inventory/types/backpack-item-props';
 
-const GenericItem = ({ item, on_click }: BackpackItemProps): ReactNode => {
+const GenericItem = ({
+  item,
+  on_click,
+  is_selected,
+  on_item_selected,
+}: BackpackItemProps & {
+  is_selected?: boolean;
+  on_item_selected?: (id: number, checked: boolean) => void;
+}): ReactNode => {
   const itemColor = backpackItemTextColors(item);
   const checkboxId = 'select-' + item.id;
   const titleId = 'item-title-' + item.id;
@@ -23,6 +31,7 @@ const GenericItem = ({ item, on_click }: BackpackItemProps): ReactNode => {
     if (!on_click) {
       return;
     }
+
     on_click(item);
   };
 
@@ -80,6 +89,8 @@ const GenericItem = ({ item, on_click }: BackpackItemProps): ReactNode => {
         <input
           id={checkboxId}
           type="checkbox"
+          checked={!!is_selected}
+          onChange={(e) => on_item_selected?.(item.id, e.target.checked)}
           className="h-6 w-6 shrink-0 rounded-md border-2 border-gray-700 dark:border-gray-300 accent-danube-600 dark:accent-danube-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danube-500 dark:focus-visible:ring-danube-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900"
           aria-describedby={detailsId}
         />
