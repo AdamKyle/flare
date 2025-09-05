@@ -3,10 +3,10 @@ import { debounce } from 'lodash';
 import React, { useMemo } from 'react';
 
 import UsableItemsProps from './types/usable-items-props';
+import BaseUsableItemDefinition from '../../../../api-definitions/items/usable-item-definitions/base-usable-item-definition';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
 import UsableItemsList from '../../components/items/usable-items-list';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
-import BaseInventoryItemDefinition from '../api-definitions/base-inventory-item-definition';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
@@ -17,7 +17,7 @@ import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const UsableItems = ({ character_id }: UsableItemsProps) => {
   const { data, error, loading, setSearchText, setFilters, onEndReached } =
-    UsePaginatedApiHandler<BaseInventoryItemDefinition>({
+    UsePaginatedApiHandler<BaseUsableItemDefinition>({
       url: CharacterInventoryApiUrls.CHARACTER_USABLE_ITEMS,
       urlParams: { character: character_id },
     });

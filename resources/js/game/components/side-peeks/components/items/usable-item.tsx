@@ -30,170 +30,143 @@ type BaseModKey = keyof typeof baseModifiersLabels;
 const UsableItem = ({ item }: UsableItemProps) => {
   const itemColor = backpackItemTextColors(item);
 
+  const joinWithPipes = (parts: ReactNode[]): ReactNode[] =>
+    parts
+      .filter(Boolean)
+      .flatMap((part, index) => (index > 0 ? [' | ', part] : [part]));
+
   const renderSkillDetails = (): ReactNode => {
     const miscSkillModifiers = Object.keys(
       miscSkillModifierLabels
     ) as MiscSkillModKey[];
+    if (isEmpty(miscSkillModifiers)) return null;
 
-    if (isEmpty(miscSkillModifiers)) {
-      return null;
-    }
-
-    const visibleModifiers = miscSkillModifiers.filter(
+    const visible = miscSkillModifiers.filter(
       (mod) => item[mod] != null && item[mod]! > 0
     );
+    if (isEmpty(visible)) return null;
 
-    if (isEmpty(visibleModifiers)) {
-      return null;
-    }
+    const parts: ReactNode[] = [
+      <span key="label-effects-train">
+        <strong>Effects</strong>: Training Skills
+      </span>,
+      ...visible.map((mod) => (
+        <span key={mod}>
+          <strong>{miscSkillModifierLabels[mod]}</strong>:{' '}
+          {((item[mod] ?? 0) * 100).toFixed(2)}%
+        </span>
+      )),
+    ];
 
-    return (
-      <>
-        <span>
-          <strong>Effects</strong>: Training Skills
-        </span>{' '}
-        |{' '}
-        {visibleModifiers.map((mod) => (
-          <span key={mod}>
-            <strong>{miscSkillModifierLabels[mod]}</strong>:{' '}
-            {((item[mod] ?? 0) * 100).toFixed(2)}%
-          </span>
-        ))}{' '}
-        |{' '}
-      </>
-    );
+    return <>{joinWithPipes(parts)}</>;
   };
 
   const renderBaseModifierDetails = (): ReactNode => {
-    const baseModifiers = Object.keys(baseModifiersLabels) as BaseModKey[];
+    const baseMods = Object.keys(baseModifiersLabels) as BaseModKey[];
+    if (isEmpty(baseMods)) return null;
 
-    if (isEmpty(baseModifiers)) {
-      return null;
-    }
-
-    const visibleModifiers = baseModifiers.filter(
+    const visible = baseMods.filter(
       (mod) => item[mod] != null && item[mod]! > 0
     );
+    if (isEmpty(visible)) return null;
 
-    if (isEmpty(visibleModifiers)) {
-      return null;
-    }
+    const parts: ReactNode[] = [
+      <span key="label-effects-base">
+        <strong>Effects</strong>: Base Modifiers
+      </span>,
+      ...visible.map((mod) => (
+        <span key={mod}>
+          <strong>{baseModifiersLabels[mod]}</strong>:{' '}
+          {((item[mod] ?? 0) * 100).toFixed(2)}%
+        </span>
+      )),
+    ];
 
-    return (
-      <>
-        <span>
-          <strong>Effects</strong>: Base Modifiers
-        </span>{' '}
-        |{' '}
-        {visibleModifiers.map((mod) => (
-          <span key={mod}>
-            <strong>{baseModifiersLabels[mod]}</strong>:{' '}
-            {((item[mod] ?? 0) * 100).toFixed(2)}%
-          </span>
-        ))}{' '}
-        |{' '}
-      </>
-    );
+    return <>{joinWithPipes(parts)}</>;
   };
 
   const renderStatModifierDetails = (): ReactNode => {
-    if (!item.stat_increase || item.stat_increase <= 0) {
-      return null;
-    }
+    if (!item.stat_increase || item.stat_increase <= 0) return null;
 
-    return (
-      <>
-        <span>
-          <strong>Effects</strong>: All Stats Modifier
-        </span>{' '}
-        |{' '}
-        <span>
-          <strong>Increase by:</strong>: {(item.stat_increase * 100).toFixed(2)}
-          %
-        </span>{' '}
-        |{' '}
-      </>
-    );
+    const parts: ReactNode[] = [
+      <span key="label-effects-stats">
+        <strong>Effects</strong>: All Stats Modifier
+      </span>,
+      <span key="inc-by">
+        <strong>Increase by</strong>: {(item.stat_increase * 100).toFixed(2)}%
+      </span>,
+    ];
+
+    return <>{joinWithPipes(parts)}</>;
   };
 
   const renderLastsFor = (): ReactNode => {
-    if (item.lasts_for <= 0) {
-      return null;
-    }
+    if (!item.lasts_for) return null;
 
-    return (
-      <>
-        <span>
-          <strong>Lasts For: </strong>: {item.lasts_for} Minutes
-        </span>{' '}
-        |{' '}
-        <span>
-          <strong>Can Stack?: </strong>: {item.can_stack ? 'Yes' : 'No'}
-        </span>{' '}
-        |{' '}
-      </>
-    );
+    const parts: ReactNode[] = [
+      <span key="lasts-for">
+        <strong>Lasts For</strong>: {item.lasts_for} Minutes
+      </span>,
+      <span key="can-stack">
+        <strong>Can Stack?</strong>: {item.can_stack ? 'Yes' : 'No'}
+      </span>,
+    ];
+
+    return <>{joinWithPipes(parts)}</>;
   };
 
   const renderHolyLevel = (): ReactNode => {
-    if (item.holy_level == null || item.holy_level <= 0) {
-      return null;
-    }
+    if (item.holy_level == null || item.holy_level <= 0) return null;
 
-    return (
-      <>
-        <span>
-          <strong>Apply To Items?: </strong>: Yes
-        </span>{' '}
-        |{' '}
-        <span>
-          <strong>Holy Level: </strong>: {item.holy_level}
-        </span>
-      </>
-    );
+    const parts: ReactNode[] = [
+      <span key="apply-to-items">
+        <strong>Apply To Items?</strong>: Yes
+      </span>,
+      <span key="holy-level">
+        <strong>Holy Level</strong>: {item.holy_level}
+      </span>,
+    ];
+
+    return <>{joinWithPipes(parts)}</>;
   };
 
   const renderDamagesKingdoms = (): ReactNode => {
-    if (!item.damages_kingdoms) {
-      return null;
-    }
+    if (!item.damages_kingdoms || !item.kingdom_damage) return null;
 
     return (
-      <>
-        <span>
-          <strong>Kingdom Damage: </strong>:{' '}
-          {(item.kingdom_damage * 100).toFixed(2)}%
-        </span>
-      </>
+      <span>
+        <strong>Kingdom Damage</strong>:{' '}
+        {(item.kingdom_damage * 100).toFixed(2)}%
+      </span>
     );
   };
 
   const renderUsableDetails = (): ReactNode => {
-    if (item.lasts_for <= 0) {
-      return null;
-    }
+    if (!item.lasts_for) return null;
 
-    return (
-      <>
-        {renderSkillDetails()}
-        {renderBaseModifierDetails()}
-        {renderStatModifierDetails()}
-      </>
-    );
+    const parts: ReactNode[] = [
+      renderSkillDetails(),
+      renderBaseModifierDetails(),
+      renderStatModifierDetails(),
+    ].filter(Boolean) as ReactNode[];
+
+    if (isEmpty(parts)) return null;
+
+    return <>{joinWithPipes(parts)}</>;
   };
 
   const renderItemDetails = (): ReactNode => {
-    return (
-      <>
-        <span>
-          <strong>Type</strong>: {item.type}
-        </span>{' '}
-        | {renderLastsFor()}
-        {renderUsableDetails()}
-        {renderHolyLevel()}
-        {renderDamagesKingdoms()}
-      </>
-    );
+    const parts: ReactNode[] = [
+      <span key="type">
+        <strong>Type</strong>: {item.type}
+      </span>,
+      renderLastsFor(),
+      renderUsableDetails(),
+      renderHolyLevel(),
+      renderDamagesKingdoms(),
+    ].filter(Boolean) as ReactNode[];
+
+    return <>{joinWithPipes(parts)}</>;
   };
 
   return (

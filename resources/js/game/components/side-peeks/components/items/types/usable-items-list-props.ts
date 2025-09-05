@@ -1,8 +1,8 @@
 import React from 'react';
 
-import BaseInventoryItemDefinition from '../../../character-inventory/api-definitions/base-inventory-item-definition';
+import BaseUsableItemDefinition from '../../../../../api-definitions/items/usable-item-definitions/base-usable-item-definition';
 
 export default interface UsableItemsListProps {
-  items: BaseInventoryItemDefinition[];
+  items: BaseUsableItemDefinition[];
   on_scroll_to_end: (e: React.UIEvent<HTMLDivElement>) => void;
 }

@@ -1,5 +1,5 @@
-import BaseInventoryItemDefinition from '../../../character-inventory/api-definitions/base-inventory-item-definition';
+import BaseUsableItemDefinition from '../../../../../api-definitions/items/usable-item-definitions/base-usable-item-definition';
 
 export default interface UsableItemProps {
-  item: BaseInventoryItemDefinition;
+  item: BaseUsableItemDefinition;
 }

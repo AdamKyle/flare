@@ -3,7 +3,7 @@ import React from 'react';
 
 import UsableItemsListProps from './types/usable-items-list-props';
 import UsableItem from './usable-item';
-import BaseInventoryItemDefinition from '../../character-inventory/api-definitions/base-inventory-item-definition';
+import BaseUsableItemDefinition from '../../../../api-definitions/items/usable-item-definitions/base-usable-item-definition';
 
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 
@@ -20,7 +20,7 @@ const UsableItemsList = ({ items, on_scroll_to_end }: UsableItemsListProps) => {
       );
     }
 
-    return items.map((item: BaseInventoryItemDefinition) => (
+    return items.map((item: BaseUsableItemDefinition) => (
       <UsableItem key={item.slot_id} item={item} />
     ));
   };
