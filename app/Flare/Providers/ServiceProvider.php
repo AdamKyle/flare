@@ -2,7 +2,6 @@
 
 namespace App\Flare\Providers;
 
-use App\Admin\Services\SiteStatisticsService;
 use App\Flare\Builders\AffixAttributeBuilder;
 use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Builders\RandomAffixGenerator;

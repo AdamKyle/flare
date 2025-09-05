@@ -190,10 +190,7 @@ return [
         App\Flare\Providers\ServiceProvider::class,
         App\Flare\Providers\EventsProvider::class,
         App\Flare\MapGenerator\Providers\ServiceProvider::class,
-        App\Flare\AffixGenerator\Providers\ServiceProvider::class,
-        App\Flare\AlchemyItemGenerator\Providers\ServiceProvider::class,
         App\Flare\GameImporter\Providers\ServiceProvider::class,
-        App\Flare\ExponentialCurve\Providers\ServiceProvider::class,
         App\Flare\Pagination\Providers\ServiceProvider::class,
         App\Flare\Items\Providers\ServiceProvider::class,
 
