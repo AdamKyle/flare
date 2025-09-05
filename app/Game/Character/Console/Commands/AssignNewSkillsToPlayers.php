@@ -3,7 +3,8 @@
 namespace App\Game\Character\Console\Commands;
 
 use App\Flare\Models\Character;
-use App\Game\Character\CharacterCreation\Services\CharacterBuilderService;
+use App\Game\Character\CharacterCreation\Pipeline\Steps\SkillAssigner;
+use App\Game\Character\CharacterCreation\State\CharacterBuildState;
 use Illuminate\Console\Command;
 
 class AssignNewSkillsToPlayers extends Command
@@ -23,43 +24,34 @@ class AssignNewSkillsToPlayers extends Command
     protected $description = 'Assign new skills';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      *
      * @return int
      */
-    public function handle()
+    public function handle(SkillAssigner $skillAssigner): int
     {
+        $progressBar = $this->output->createProgressBar(Character::count());
+        $progressBar->start();
 
-        $bar = $this->output->createProgressBar(Character::count());
-        $bar->start();
-
-        Character::chunkById(100, function ($characters) use ($bar) {
+        Character::chunkById(100, function ($characters) use ($progressBar, $skillAssigner) {
             foreach ($characters as $character) {
-                $this->assignNewSkills($character);
-
-                $bar->advance();
+                $this->assignNewSkills($character, $skillAssigner);
+                $progressBar->advance();
             }
         });
 
-        $bar->finish();
+        $progressBar->finish();
+
+        return self::SUCCESS;
     }
 
-    public function assignNewSkills(Character $character)
+    private function assignNewSkills(Character $character, SkillAssigner $skillAssigner): void
     {
+        $state = new CharacterBuildState();
+        $state->setCharacter($character);
 
-        $characterBuilder = resolve(CharacterBuilderService::class);
-
-        $characterBuilder->setCharacter($character)->assignSkills();
-        $characterBuilder->setCharacter($character)->assignPassiveSkills();
+        $skillAssigner->process($state, function (CharacterBuildState $s) {
+            return $s;
+        });
     }
 }

@@ -6,7 +6,15 @@ use App\Flare\Models\GameClass;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\User;
+use App\Flare\Models\Character;
+use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
+use App\Game\Character\CharacterCreation\Events\CreateCharacterEvent;
+use App\Http\Middleware\GameAuthentication;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Queue;
+use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacter;
@@ -32,8 +40,20 @@ class RegistrationControllerTest extends TestCase
     {
         parent::setUp();
 
-        // The default class for the factory is fighter,
-        // Fighters use swords by default.
+        $this->withoutMiddleware(GameAuthentication::class);
+
+        Hash::setRounds(4);
+
+        Queue::fake();
+
+        Event::fakeExcept([
+            CreateCharacterEvent::class,
+        ]);
+
+        $this->app->instance(BuildCharacterAttackTypes::class, tap(Mockery::mock(BuildCharacterAttackTypes::class), function ($m) {
+            $m->shouldReceive('buildCache')->andReturn([]);
+        }));
+
         $this->createItem([
             'name' => 'Rusty blade',
             'type' => 'sword',
@@ -42,14 +62,20 @@ class RegistrationControllerTest extends TestCase
         ]);
 
         $this->createPassiveSkill();
+
+        $this->createGameSkill([
+            'name' => 'General A',
+            'game_class_id' => null,
+        ]);
     }
 
     public function tearDown(): void
     {
+        Mockery::close();
         parent::tearDown();
     }
 
-    public function testCanSeeRegistration()
+    public function testCanSeeRegistration(): void
     {
         $this->visit('/login')
             ->click('Register')
@@ -64,7 +90,7 @@ class RegistrationControllerTest extends TestCase
             ->see('Register');
     }
 
-    public function testCanRegister()
+    public function testCanRegister(): void
     {
         GameMap::create([
             'name' => 'Surface',
@@ -98,9 +124,10 @@ class RegistrationControllerTest extends TestCase
         $this->assertEquals('bobtest', $user->character->name);
         $this->assertEquals($race->name, $user->character->race->name);
         $this->assertEquals($class->name, $user->character->class->name);
+        $this->assertGreaterThanOrEqual(1, $user->character->skills()->count());
     }
 
-    public function testCannotRegisterWhenBanned()
+    public function testCannotRegisterWhenBanned(): void
     {
         GameMap::create([
             'name' => 'Surface',
@@ -132,9 +159,8 @@ class RegistrationControllerTest extends TestCase
             ])->see('You have been banned until: ');
     }
 
-    public function testCannotRegisterWhenNoMap()
+    public function testCannotRegisterWhenNoMap(): void
     {
-
         $race = $this->createRace([
             'dex_mod' => 2,
         ]);
@@ -156,7 +182,7 @@ class RegistrationControllerTest extends TestCase
             ])->see('No game map has been set as default or created. Registration is disabled.');
     }
 
-    public function testCannotRegisterWhenCharacterExists()
+    public function testCannotRegisterWhenCharacterExists(): void
     {
         GameMap::create([
             'name' => 'Surface',
@@ -188,7 +214,7 @@ class RegistrationControllerTest extends TestCase
             ])->see('The name has already been taken.');
     }
 
-    public function testCannotRegisterAnyMore()
+    public function testCannotRegisterAnyMore(): void
     {
         GameMap::create([
             'name' => 'Surface',
@@ -197,7 +223,16 @@ class RegistrationControllerTest extends TestCase
             'kingdom_color' => '#ffffff',
         ]);
 
-        $this->setupCharacters();
+        $this->createUsersWithSameIp(10, '127.0.0.1');
+
+        $race = $this->createRace([
+            'dex_mod' => 2,
+        ]);
+
+        $class = $this->createClass([
+            'str_mod' => 2,
+            'damage_stat' => 'str',
+        ]);
 
         $this->visit('/login')
             ->click('Register')
@@ -206,15 +241,15 @@ class RegistrationControllerTest extends TestCase
                 'password' => 'TestExamplePassword',
                 'password_confirmation' => 'TestExamplePassword',
                 'name' => 'bobtest',
-                'race' => GameRace::first()->id,
-                'class' => GameClass::first()->id,
+                'race' => $race->id,
+                'class' => $class->id,
             ])->see('You cannot register anymore characters.');
     }
 
-    protected function setupCharacters()
+    private function createUsersWithSameIp(int $count, string $ip): void
     {
-        for ($i = 1; $i <= 10; $i++) {
-            (new CharacterFactory)->createBaseCharacter();
+        for ($i = 0; $i < $count; $i++) {
+            $this->createUser(['ip_address' => $ip]);
         }
     }
 }

@@ -3,37 +3,27 @@
 namespace App\Game\Character\CharacterCreation\Listeners;
 
 use App\Game\Character\CharacterCreation\Events\CreateCharacterEvent;
-use App\Game\Character\CharacterCreation\Services\CharacterBuilderService;
-use Exception;
+use App\Game\Character\CharacterCreation\Pipeline\CharacterCreationPipeline;
+use App\Game\Character\CharacterCreation\State\CharacterBuildState;
 
 class CreateCharacterListener
 {
-    private CharacterBuilderService $characterBuilder;
-
-    /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct(CharacterBuilderService $characterBuilder)
-    {
-        $this->characterBuilder = $characterBuilder;
+    public function __construct(
+        private readonly CharacterCreationPipeline $pipeline,
+        private readonly CharacterBuildState $state
+    ) {
     }
 
-    /**
-     * Handle the event.
-     *
-     * @return void
-     *
-     * @throws Exception
-     */
-    public function handle(CreateCharacterEvent $event)
+    public function handle(CreateCharacterEvent $event): void
     {
-        $this->characterBuilder->setRace($event->race)
+        $this->state
+            ->setUser($event->user)
+            ->setRace($event->race)
             ->setClass($event->class)
-            ->createCharacter($event->user, $event->map, $event->characterName)
-            ->assignSkills()
-            ->assignPassiveSkills()
-            ->buildCharacterCache();
+            ->setMap($event->map)
+            ->setCharacterName($event->characterName)
+            ->setNow(now());
+
+        $this->pipeline->run($this->state);
     }
 }
