@@ -10,6 +10,7 @@
   ],
   "ignoreUnused": [
     "@headlessui/react",
+    "@tailwindcss/vite",
     "@types/node",
     "@types/react-resizable",
     "framer-motion",
@@ -20,7 +21,6 @@
     "rpg-awesome",
     "tailwind-scrollbar",
     "tailwindcss-classnames",
-    "@tailwindcss/vite",
     "tippy.js"
   ],
   "ignorePatterns": [
@@ -38,27 +38,7 @@
   ],
   "ignoreUnresolved": [],
   "ignoreUnimported": [
-    "resources/vendor/theme/assets/js/components/alerts.js",
-    "resources/vendor/theme/assets/js/components/cards.js",
-    "resources/vendor/theme/assets/js/components/charts.js",
-    "resources/vendor/theme/assets/js/components/collapse.js",
-    "resources/vendor/theme/assets/js/components/customizer.js",
-    "resources/vendor/theme/assets/js/components/extras-charts.js",
-    "resources/vendor/theme/assets/js/components/file-input.js",
-    "resources/vendor/theme/assets/js/components/fullscreen.js",
-    "resources/vendor/theme/assets/js/components/menu.js",
-    "resources/vendor/theme/assets/js/components/modal.js",
-    "resources/vendor/theme/assets/js/components/overlay.js",
-    "resources/vendor/theme/assets/js/components/rating-stars.js",
-    "resources/vendor/theme/assets/js/components/show-password.js",
-    "resources/vendor/theme/assets/js/components/sidebar.js",
-    "resources/vendor/theme/assets/js/components/tabs.js",
-    "resources/vendor/theme/assets/js/components/tippy.js",
-    "resources/vendor/theme/assets/js/components/toasts.js",
-    "resources/vendor/theme/assets/js/components/toggle-darkmode.js",
-    "resources/vendor/theme/assets/js/dark-mode/dark-mode.js",
-    "resources/vendor/theme/assets/js/extras.js",
-    "resources/vendor/theme/assets/js/script.js",
+    "resources/js/game/components/side-peeks/character-inventory/types/item-selected-type.ts",
     "resources/js/game/components/side-peeks/map-actions/location-details/enums/location-types.ts"
   ]
 }
