@@ -1,10 +1,12 @@
+type ItemAffixType = 'prefix' | 'suffix';
+
 export default interface ItemAffixDefinition {
   id: number;
   name: string;
   description: string;
-  base_damage_mod: number | string | null;
-  base_healing_mod: number | string | null;
-  base_ac_mod: number | string | null;
+  base_damage_mod: number | null;
+  base_healing_mod: number | null;
+  base_ac_mod: number | null;
   str_mod: number | null;
   dur_mod: number | null;
   dex_mod: number | null;
@@ -17,9 +19,7 @@ export default interface ItemAffixDefinition {
   skill_bonus: number | null;
   skill_training_bonus: number | null;
   cost: number;
-  type: 'prefix' | 'suffix';
-  created_at: string;
-  updated_at: string;
+  type: ItemAffixType;
   can_drop: boolean;
   agi_mod: number;
   focus_mod: number;

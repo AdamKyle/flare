@@ -1,8 +1,10 @@
 import clsx from 'clsx';
 import { capitalize, isNil } from 'lodash';
-import React from 'react';
+import React, { useState } from 'react';
+import { match } from 'ts-pattern';
 
 import { useGetInventoryItemDetails } from './api/hooks/use-get-inventory-item-details';
+import AttachedAffixDetails from './attached-affix/attached-affix-details';
 import InventoryItemProps from './types/inventory-item-props';
 import StatInfoToolTip from '../../../../reusable-components/item/stat-info-tool-tip';
 import { planeTextItemColors } from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
@@ -24,6 +26,8 @@ const InventoryItem = ({
   character_id,
   close_item_view,
 }: InventoryItemProps) => {
+  const [itemAffixToView, setItemAffixToView] = useState<number | null>(null);
+
   const { error, loading, data } = useGetInventoryItemDetails({
     character_id,
     item_id,
@@ -85,6 +89,39 @@ const InventoryItem = ({
     return Number(value).toLocaleString('en-US', { maximumFractionDigits: 2 });
   };
 
+  const handleClickItemAffix = (affixId?: number) => {
+    if (!affixId) {
+      return;
+    }
+
+    setItemAffixToView(affixId);
+  };
+
+  const handleCloseItemAffixView = () => {
+    setItemAffixToView(null);
+  };
+
+  if (itemAffixToView) {
+    let itemAffix = null;
+
+    if (item?.item_suffix?.id === itemAffixToView) {
+      itemAffix = item?.item_suffix;
+    }
+
+    if (item?.item_prefix?.id === itemAffixToView) {
+      itemAffix = item?.item_prefix;
+    }
+
+    if (itemAffix) {
+      return (
+        <AttachedAffixDetails
+          affix={itemAffix}
+          on_close={handleCloseItemAffixView}
+        />
+      );
+    }
+  }
+
   const renderPrefixRow = () => {
     if (!item.item_prefix) {
       return null;
@@ -97,7 +134,7 @@ const InventoryItem = ({
           <LinkButton
             label={item.item_prefix.name}
             variant={ButtonVariant.SUCCESS}
-            on_click={() => console.log(item.item_prefix!.name)}
+            on_click={() => handleClickItemAffix(item?.item_prefix?.id)}
           />
         </Dd>
       </>
@@ -116,7 +153,7 @@ const InventoryItem = ({
           <LinkButton
             label={item.item_suffix.name}
             variant={ButtonVariant.SUCCESS}
-            on_click={() => console.log(item.item_suffix!.name)}
+            on_click={() => handleClickItemAffix(item?.item_suffix?.id)}
           />
         </Dd>
       </>
@@ -200,7 +237,19 @@ const InventoryItem = ({
     const dir = value > 0 ? 'increase' : 'decrease';
     const amount = `${(Math.abs(value) * 100).toFixed(2)}%`;
     const typeLower = type.toLowerCase();
-    return `This will ${dir} the overall ${label.toLowerCase()} by ${amount}. This can stack with other gear that contains this modifier to affect your overall ${typeLower}, even if that gear doesn’t increase your ${typeLower}.`;
+
+    const itemType = match(type)
+      .with('Damage', () => {
+        return 'weapon or spell';
+      })
+      .with('Defence', () => {
+        return 'armour';
+      })
+      .with('Healing', () => {
+        return 'spell';
+      });
+
+    return `This will ${dir} the ${itemType} ${label.toLowerCase()} by ${amount}. This can stack with other gear that contains this modifier to affect your overall ${typeLower}, even if that gear doesn’t increase your ${typeLower}.`;
   };
 
   const renderBaseModRow = (
@@ -552,7 +601,10 @@ const InventoryItem = ({
     );
   };
 
-  const renderWithSeparator = (section: React.ReactNode) => {
+  const renderWithSeparator = (
+    section: React.ReactNode,
+    isLastSection?: boolean
+  ) => {
     if (!section) {
       return null;
     }
@@ -560,7 +612,7 @@ const InventoryItem = ({
     return (
       <>
         {section}
-        <Separator />
+        {!isLastSection && <Separator />}
       </>
     );
   };
@@ -603,7 +655,7 @@ const InventoryItem = ({
           {renderWithSeparator(renderHealingSection())}
           {renderWithSeparator(renderAmbushCounterSection())}
           {renderWithSeparator(renderStatsSection())}
-          {renderWithSeparator(renderHolyStacksSection())}
+          {renderWithSeparator(renderHolyStacksSection(), true)}
         </div>
       </div>
     </>

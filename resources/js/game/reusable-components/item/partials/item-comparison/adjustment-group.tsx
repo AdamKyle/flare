@@ -124,7 +124,12 @@ const AdjustmentGroup = ({
       .with('base_healing_mod_adjustment', () => 'Healing')
       .otherwise(() => parentKey);
 
-    const customMessage = `This will ${dir} the over all ${child.label.toLowerCase()} by ${amount}. This can stack with other gear which contains this modifier to affect your over all ${type}, even if that gear doesnt increase your ${type}.`;
+    const itemType = match(type)
+      .with('Damage', () => 'weapon or spell')
+      .with('Defence', () => 'armour')
+      .with('Healing', () => 'spell');
+
+    const customMessage = `This will ${dir} the ${itemType} ${child.label.toLowerCase()} by ${amount}. This can stack with other gear which contains this modifier to affect your over all ${type}, even if that gear doesnt increase your ${type}.`;
 
     return (
       <Fragment>
