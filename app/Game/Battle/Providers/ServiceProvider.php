@@ -2,8 +2,7 @@
 
 namespace App\Game\Battle\Providers;
 
-use App\Flare\Builders\BuildMythicItem;
-use App\Flare\Builders\RandomItemDropBuilder;
+use App\Flare\Items\Builders\RandomItemDropBuilder;
 use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Services\BuildMonsterCacheService;
@@ -15,7 +14,6 @@ use App\Game\Battle\Services\ConjureService;
 use App\Game\Battle\Services\FactionLoyaltyFightService;
 use App\Game\Battle\Services\RaidBattleService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
-use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Services\GoldRush;

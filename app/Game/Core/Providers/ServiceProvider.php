@@ -2,10 +2,7 @@
 
 namespace App\Game\Core\Providers;
 
-use App\Flare\Builders\BuildMythicItem;
-use App\Flare\Items\Comparison\Comparator;
-use App\Flare\Items\Comparison\ItemComparison;
-use App\Flare\Items\Enricher\EquippableEnricher;
+use App\Flare\Items\Builders\BuildMythicItem;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\Core\Services\CharactersOnline;

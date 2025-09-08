@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Flare\Builders\RandomAffixGenerator;
+use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\Models\Item;

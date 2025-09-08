@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Unit\Flare\Builders;
+namespace Tests\Unit\Flare\Items\Builders;
 
-use App\Flare\Builders\AffixAttributeBuilder;
-use App\Flare\Builders\RandomAffixGenerator;
+use App\Flare\Items\Builders\AffixAttributeBuilder;
+use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Values\RandomAffixDetails;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;

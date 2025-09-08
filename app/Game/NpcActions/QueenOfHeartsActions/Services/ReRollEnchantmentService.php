@@ -2,7 +2,7 @@
 
 namespace App\Game\NpcActions\QueenOfHeartsActions\Services;
 
-use App\Flare\Builders\AffixAttributeBuilder;
+use App\Flare\Items\Builders\AffixAttributeBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;

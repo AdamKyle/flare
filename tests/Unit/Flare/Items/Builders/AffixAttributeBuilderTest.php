@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\Unit\Flare\Builders;
+namespace Tests\Unit\Flare\Items\Builders;
 
-use App\Flare\Builders\AffixAttributeBuilder;
+use App\Flare\Items\Builders\AffixAttributeBuilder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

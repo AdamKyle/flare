@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Flare\Builders;
+namespace App\Flare\Items\Builders;
 
 use App\Flare\Values\RandomAffixDetails;
 use Illuminate\Support\Collection;

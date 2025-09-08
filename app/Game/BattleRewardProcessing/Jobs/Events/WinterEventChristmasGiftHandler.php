@@ -2,14 +2,8 @@
 
 namespace App\Game\BattleRewardProcessing\Jobs\Events;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
-use App\Flare\Builders\RandomAffixGenerator;
-use App\Flare\Builders\RandomItemDropBuilder;
+use App\Flare\Items\Builders\RandomAffixGenerator;
+use App\Flare\Items\Builders\RandomItemDropBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\ScheduledEvent;
@@ -18,6 +12,12 @@ use App\Flare\Values\RandomAffixDetails;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class WinterEventChristmasGiftHandler implements ShouldQueue
 {

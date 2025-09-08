@@ -2,7 +2,7 @@
 
 namespace App\Game\Skills\Handlers;
 
-use App\Flare\Builders\RandomAffixGenerator;
+use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\GlobalEventCraftingInventory;

@@ -2,9 +2,8 @@
 
 namespace App\Game\BattleRewardProcessing\Providers;
 
-use App\Flare\Builders\RandomAffixGenerator;
+use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Models\GlobalEventParticipation;
-use App\Flare\ServerFight\BattleMessages;
 use App\Flare\Services\CharacterRewardService;
 use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;

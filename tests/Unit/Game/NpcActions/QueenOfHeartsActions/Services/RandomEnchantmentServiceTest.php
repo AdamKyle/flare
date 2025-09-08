@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Game\NpcActions\QueenOfHeartsActions\Services;
 
-use App\Flare\Builders\RandomAffixGenerator;
+use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Models\Item;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;

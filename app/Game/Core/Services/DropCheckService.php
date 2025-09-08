@@ -2,7 +2,7 @@
 
 namespace App\Game\Core\Services;
 
-use App\Flare\Builders\BuildMythicItem;
+use App\Flare\Items\Builders\BuildMythicItem;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Flare\Models\Map;

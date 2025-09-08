@@ -2,13 +2,12 @@
 
 namespace App\Game\Battle\Services;
 
-use App\Flare\Builders\RandomItemDropBuilder;
+use App\Flare\Items\Builders\RandomItemDropBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Quest;
-use App\Flare\Models\User;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Traits\CanHaveQuestItem;

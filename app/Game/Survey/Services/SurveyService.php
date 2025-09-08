@@ -2,7 +2,7 @@
 
 namespace App\Game\Survey\Services;
 
-use App\Flare\Builders\RandomAffixGenerator;
+use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\SubmittedSurvey;

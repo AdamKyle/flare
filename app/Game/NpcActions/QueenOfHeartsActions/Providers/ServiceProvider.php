@@ -2,8 +2,8 @@
 
 namespace App\Game\NpcActions\QueenOfHeartsActions\Providers;
 
-use App\Flare\Builders\AffixAttributeBuilder;
-use App\Flare\Builders\RandomAffixGenerator;
+use App\Flare\Items\Builders\AffixAttributeBuilder;
+use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\QueenOfHeartsService;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\ReRollEnchantmentService;

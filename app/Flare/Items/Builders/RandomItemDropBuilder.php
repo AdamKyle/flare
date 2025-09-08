@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Flare\Builders;
+namespace App\Flare\Items\Builders;
 
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
@@ -39,7 +39,7 @@ class RandomItemDropBuilder
             ->doesntHave('itemPrefix')
             ->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
             ->whereNull('specialty_type')
-            ->where('skill_level_required', '<=', rand(1, $level));
+            ->where('skill_level_required', '<=', $this->rollLevel($level));
 
         return $query->first();
     }
@@ -51,10 +51,10 @@ class RandomItemDropBuilder
     {
         $affixes = [];
 
-        $affixes[] = ItemAffix::inRandomOrder()->where('type', 'prefix')->where('skill_Level_required', '<=', rand(1, $level))->first();
+        $affixes[] = ItemAffix::inRandomOrder()->where('type', 'prefix')->where('skill_Level_required', '<=', $this->rollLevel($level))->first();
 
-        if (rand(1, 100) > 50) {
-            $affix = ItemAffix::inRandomOrder()->where('type', 'suffix')->where('skill_Level_required', '<=', rand(1, $level))->first();
+        if ($this->rollPercent() > 50) {
+            $affix = ItemAffix::inRandomOrder()->where('type', 'suffix')->where('skill_Level_required', '<=', $this->rollLevel($level))->first();
 
             if (! is_null($affix)) {
                 $affixes[] = $affix;
@@ -95,5 +95,30 @@ class RandomItemDropBuilder
         $item->update($updates);
 
         return $item;
+    }
+
+    /**
+     * Roll a number between 1 and the provided level.
+     *
+     * @param int $level
+     * @return int
+     *
+     * @codeCoverageIgnore
+     */
+    protected function rollLevel(int $level): int
+    {
+        return rand(1, $level);
+    }
+
+    /**
+     * Roll a percentage between 1 and 100.
+     *
+     * @return int
+     *
+     * @codeCoverageIgnore
+     */
+    protected function rollPercent(): int
+    {
+        return rand(1, 100);
     }
 }

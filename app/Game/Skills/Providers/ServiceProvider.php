@@ -2,7 +2,7 @@
 
 namespace App\Game\Skills\Providers;
 
-use App\Flare\Builders\RandomAffixGenerator;
+use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Flare\Transformers\SkillsTransformer;

@@ -17,8 +17,6 @@ import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
 import Separator from 'ui/separator/separator';
 
-const LABEL_WIDTH = 'w-56 sm:w-64';
-
 const AttachedAffixDetails = ({
   affix,
   on_close,
@@ -48,7 +46,7 @@ const AttachedAffixDetails = ({
     return (
       <>
         <Dt>
-          <span className={`inline-flex items-center gap-2 ${LABEL_WIDTH}`}>
+          <span className="inline-flex items-center gap-2">
             <StatInfoToolTip
               label={buildAttributeTooltip(label)}
               value={value}
@@ -62,10 +60,10 @@ const AttachedAffixDetails = ({
         <Dd>
           <span className="inline-flex items-center gap-2 whitespace-nowrap">
             <i
-              className="fas fa-chevron-up text-emerald-600"
+              className="fas fa-chevron-up text-emerald-600 shrink-0"
               aria-hidden="true"
             />
-            <span className="font-semibold text-emerald-700">
+            <span className="font-semibold text-emerald-700 tabular-nums">
               {formatSignedPercent(value)}
             </span>
           </span>
@@ -80,7 +78,6 @@ const AttachedAffixDetails = ({
     }
 
     const numericValue = Number(value);
-
     if (numericValue <= 0) {
       return null;
     }
@@ -88,7 +85,7 @@ const AttachedAffixDetails = ({
     return (
       <>
         <Dt>
-          <span className={`inline-flex items-center gap-2 ${LABEL_WIDTH}`}>
+          <span className="inline-flex items-center gap-2">
             <StatInfoToolTip
               label={buildAttributeTooltip(label)}
               value={numericValue}
@@ -102,10 +99,10 @@ const AttachedAffixDetails = ({
         <Dd>
           <span className="inline-flex items-center gap-2 whitespace-nowrap">
             <i
-              className="fas fa-chevron-up text-emerald-600"
+              className="fas fa-chevron-up text-emerald-600 shrink-0"
               aria-hidden="true"
             />
-            <span className="font-semibold text-emerald-700">
+            <span className="font-semibold text-emerald-700 tabular-nums">
               {formatSignedPercent(numericValue)}
             </span>
           </span>
@@ -119,14 +116,12 @@ const AttachedAffixDetails = ({
     attributeLabel: string,
     value: number
   ) => {
-    if (value <= 0) {
-      return null;
-    }
+    if (value <= 0) return null;
 
     return (
       <>
         <Dt>
-          <span className={`inline-flex items-center gap-2 ${LABEL_WIDTH}`}>
+          <span className="inline-flex items-center gap-2">
             <StatInfoToolTip
               label={`Reduces the enemy's ${attributeLabel.toLowerCase()} by ${formatPercent(
                 value
@@ -142,10 +137,10 @@ const AttachedAffixDetails = ({
         <Dd>
           <span className="inline-flex items-center gap-2 whitespace-nowrap">
             <i
-              className="fas fa-chevron-down text-rose-600"
+              className="fas fa-chevron-down text-rose-600 shrink-0"
               aria-hidden="true"
             />
-            <span className="font-semibold text-rose-600">
+            <span className="font-semibold text-rose-600 tabular-nums">
               -{formatPercent(value)}
             </span>
           </span>
@@ -159,14 +154,12 @@ const AttachedAffixDetails = ({
     tooltip: string,
     value: number
   ) => {
-    if (value <= 0) {
-      return null;
-    }
+    if (value <= 0) return null;
 
     return (
       <>
         <Dt>
-          <span className={`inline-flex items-center gap-2 ${LABEL_WIDTH}`}>
+          <span className="inline-flex items-center gap-2">
             <StatInfoToolTip
               label={tooltip}
               value={value}
@@ -180,10 +173,10 @@ const AttachedAffixDetails = ({
         <Dd>
           <span className="inline-flex items-center gap-2 whitespace-nowrap">
             <i
-              className="fas fa-chevron-up text-emerald-600"
+              className="fas fa-chevron-up text-emerald-600 shrink-0"
               aria-hidden="true"
             />
-            <span className="font-semibold text-emerald-700">
+            <span className="font-semibold text-emerald-700 tabular-nums">
               {formatPercent(value)}
             </span>
           </span>
@@ -197,14 +190,12 @@ const AttachedAffixDetails = ({
     tooltip: string,
     value: number
   ) => {
-    if (value <= 0) {
-      return null;
-    }
+    if (value <= 0) return null;
 
     return (
       <>
         <Dt>
-          <span className={`inline-flex items-center gap-2 ${LABEL_WIDTH}`}>
+          <span className="inline-flex items-center gap-2">
             <StatInfoToolTip
               label={tooltip}
               value={value}
@@ -217,10 +208,10 @@ const AttachedAffixDetails = ({
         <Dd>
           <span className="inline-flex items-center gap-2 whitespace-nowrap">
             <i
-              className="fas fa-chevron-up text-emerald-600"
+              className="fas fa-chevron-up text-emerald-600 shrink-0"
               aria-hidden="true"
             />
-            <span className="font-semibold text-emerald-700">
+            <span className="font-semibold text-emerald-700 tabular-nums">
               {formatIntWithPlus(value)}
             </span>
           </span>
@@ -243,10 +234,7 @@ const AttachedAffixDetails = ({
     const allStatModifiersZero = statModifiers.every(
       ({ value }) => Number(value ?? 0) === 0
     );
-
-    if (allStatModifiersZero) {
-      return null;
-    }
+    if (allStatModifiersZero) return null;
 
     return (
       <div>
@@ -267,10 +255,7 @@ const AttachedAffixDetails = ({
 
     const allCoreAttributesZero =
       baseDamageMod <= 0 && baseAcMod <= 0 && baseHealingMod <= 0;
-
-    if (allCoreAttributesZero) {
-      return null;
-    }
+    if (allCoreAttributesZero) return null;
 
     return (
       <div>
@@ -290,9 +275,15 @@ const AttachedAffixDetails = ({
     const skillBonus = Number(affix.skill_bonus ?? 0);
     const skillTrainingBonus = Number(affix.skill_training_bonus ?? 0);
 
-    if (skillBonus <= 0 && skillTrainingBonus <= 0) {
-      return null;
-    }
+    if (skillBonus <= 0 && skillTrainingBonus <= 0) return null;
+
+    const skillBonusTooltip = `This is applied directly to the specified skill when you use it. It increases your chance of success for that skill by ${formatPercent(
+      skillBonus
+    )}. This stacks additively with other affixes that affect the same skill.`;
+
+    const skillTrainingBonusTooltip = `This is applied directly to the XP you gain from training or using the skill. Whenever you earn XP for the skill, you gain ${formatPercent(
+      skillTrainingBonus
+    )} more. This stacks additively with other affixes that affect this skill.`;
 
     return (
       <div>
@@ -300,129 +291,14 @@ const AttachedAffixDetails = ({
           Skill Modifiers
         </h4>
         <Dl>
-          {renderSimplePercentRow(
-            'Skill Bonus',
-            buildAttributeTooltip('Skill Bonus'),
-            skillBonus
-          )}
+          <Dt>Skill Name:</Dt>
+          <Dd>{affix.skill_name}</Dd>
+          {renderSimplePercentRow('Skill Bonus', skillBonusTooltip, skillBonus)}
           {renderSimplePercentRow(
             'Skill Training Bonus',
-            buildAttributeTooltip('Skill Training Bonus'),
+            skillTrainingBonusTooltip,
             skillTrainingBonus
           )}
-        </Dl>
-      </div>
-    );
-  };
-
-  const renderEnemyStateReductionSection = () => {
-    const reductions = [
-      {
-        displayLabel: 'Strength Reduction',
-        attributeLabel: 'Strength',
-        value: Number(affix.str_reduction ?? 0),
-      },
-      {
-        displayLabel: 'Dexterity Reduction',
-        attributeLabel: 'Dexterity',
-        value: Number(affix.dex_reduction ?? 0),
-      },
-      {
-        displayLabel: 'Intelligence Reduction',
-        attributeLabel: 'Intelligence',
-        value: Number(affix.int_reduction ?? 0),
-      },
-      {
-        displayLabel: 'Charisma Reduction',
-        attributeLabel: 'Charisma',
-        value: Number(affix.chr_reduction ?? 0),
-      },
-      {
-        displayLabel: 'Agility Reduction',
-        attributeLabel: 'Agility',
-        value: Number(affix.agi_reduction ?? 0),
-      },
-      {
-        displayLabel: 'Durability Reduction',
-        attributeLabel: 'Durability',
-        value: Number(affix.dur_reduction ?? 0),
-      },
-      {
-        displayLabel: 'Focus Reduction',
-        attributeLabel: 'Focus',
-        value: Number(affix.focus_reduction ?? 0),
-      },
-      {
-        displayLabel: 'Skill Reduction',
-        attributeLabel: 'Skill',
-        value: Number(affix.skill_reduction ?? 0),
-      },
-    ];
-
-    const activeReductions = reductions.filter(({ value }) => value > 0);
-
-    if (activeReductions.length === 0) {
-      return null;
-    }
-
-    return (
-      <div>
-        <h4 className="mt-3 mb-1 text-xs font-semibold uppercase tracking-wide text-mango-tango-500 dark:text-mango-tango-300">
-          Enemy State Reduction
-        </h4>
-        <p className="text-xs mb-2 text-gray-700 dark:text-gray-300">
-          These stack additively and affect the enemy’s stats when initiating a
-          fight.
-        </p>
-        <Dl>
-          {activeReductions.map(({ displayLabel, attributeLabel, value }) =>
-            renderNegativePercentRow(displayLabel, attributeLabel, value)
-          )}
-        </Dl>
-      </div>
-    );
-  };
-
-  const renderResistanceReductionSection = () => {
-    const resistanceReduction = Number(affix.resistance_reduction ?? 0);
-
-    if (resistanceReduction <= 0) {
-      return null;
-    }
-
-    return (
-      <div>
-        <h4 className="mt-3 mb-1 text-xs font-semibold uppercase tracking-wide text-mango-tango-500 dark:text-mango-tango-300">
-          Resistance Reduction
-        </h4>
-        <Dl>
-          <>
-            <Dt>
-              <span className={`inline-flex items-center gap-2 ${LABEL_WIDTH}`}>
-                <StatInfoToolTip
-                  label="Reduces the enemy's resistances to your attack. Stacks additively across all items."
-                  value={resistanceReduction}
-                  renderAsPercent
-                  align="right"
-                  custom_message
-                />
-                <span className="min-w-0 break-words">
-                  Resistance Reduction
-                </span>
-              </span>
-            </Dt>
-            <Dd>
-              <span className="inline-flex items-center gap-2 whitespace-nowrap">
-                <i
-                  className="fas fa-chevron-down text-rose-600"
-                  aria-hidden="true"
-                />
-                <span className="font-semibold text-rose-600">
-                  -{formatPercent(resistanceReduction)}
-                </span>
-              </span>
-            </Dd>
-          </>
         </Dl>
       </div>
     );
@@ -432,10 +308,17 @@ const AttachedAffixDetails = ({
     const lifeStealAmount = Number(affix.steal_life_amount ?? 0);
     const devouringLight = Number(affix.devouring_light ?? 0);
     const entrancedChance = Number(affix.entranced_chance ?? 0);
+    const skillReduction = Number(affix.skill_reduction ?? 0);
+    const resistanceReduction = Number(affix.resistance_reduction ?? 0);
 
-    if (lifeStealAmount <= 0 && devouringLight <= 0 && entrancedChance <= 0) {
-      return null;
-    }
+    const everyZero =
+      lifeStealAmount <= 0 &&
+      devouringLight <= 0 &&
+      entrancedChance <= 0 &&
+      skillReduction <= 0 &&
+      resistanceReduction <= 0;
+
+    if (everyZero) return null;
 
     return (
       <div>
@@ -445,20 +328,30 @@ const AttachedAffixDetails = ({
         <Dl>
           {renderSimpleNumberRow(
             'Life Stealing',
-            `Life Stealing: Steals ${formatFloat(
+            `This steals ${formatFloat(
               lifeStealAmount
             )} life from the enemy during your attack phase. Non-vampire classes can steal up to 50% of the enemy's health, while Vampires can steal up to 99%. This stacks additively with other affixes.`,
             lifeStealAmount
           )}
+
           {renderSimplePercentRow(
             'Devouring Light',
-            "Devouring Light: Stacks additively and reduces the enemy's chance to void you, which would render you weak and vulnerable. (If an enemy voids you, all enchantments on your gear fail.)",
+            "This stacks additively and reduces the enemy's chance to void you, which would render you weak and vulnerable. (If an enemy voids you, all enchantments on your gear fail.)",
             devouringLight
           )}
+
           {renderSimplePercentRow(
             'Entrancing',
-            'Entrancing: Stacks additively and increases the chance to entrance an enemy, preventing them from attacking you, ambushing, or countering you. This does not prevent their ability to void or devoid you.',
+            'This stacks additively and increases the chance to entrance an enemy, preventing them from attacking you, ambushing, or countering you. This does not prevent their ability to void or devoid you.',
             entrancedChance
+          )}
+
+          {renderNegativePercentRow('Skill Reduction', 'Skill', skillReduction)}
+
+          {renderNegativePercentRow(
+            'Resistance Reduction',
+            'Resistance',
+            resistanceReduction
           )}
         </Dl>
       </div>
@@ -469,9 +362,7 @@ const AttachedAffixDetails = ({
     section: React.ReactNode,
     isLastSection?: boolean
   ) => {
-    if (!section) {
-      return null;
-    }
+    if (!section) return null;
 
     return (
       <>
@@ -498,8 +389,6 @@ const AttachedAffixDetails = ({
           {renderWithSeparator(renderStatsSection())}
           {renderWithSeparator(renderCoreAttributesSection())}
           {renderWithSeparator(renderSkillModifiersSection())}
-          {renderWithSeparator(renderEnemyStateReductionSection())}
-          {renderWithSeparator(renderResistanceReductionSection())}
           {renderWithSeparator(renderMiscSection(), true)}
         </div>
       </div>

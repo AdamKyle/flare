@@ -2,7 +2,7 @@
 
 namespace App\Game\BattleRewardProcessing\Handlers;
 
-use App\Flare\Builders\RandomAffixGenerator;
+use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Faction;
 use App\Flare\Models\GameMap;

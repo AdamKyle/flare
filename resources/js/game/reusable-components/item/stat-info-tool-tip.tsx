@@ -4,6 +4,9 @@ import React, { useId, useRef, useState } from 'react';
 import StatInfoToolTipProps from './types/stat-info-tool-tip-props';
 import { formatNumberWithCommas } from './utils/item-comparison';
 
+type Horizontal = 'left' | 'right';
+type Vertical = 'above' | 'below';
+
 const StatInfoToolTip = (props: StatInfoToolTipProps) => {
   const {
     label,
@@ -21,30 +24,24 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
   const tooltipId = `stat-info-${label.replace(/\s+/g, '-').toLowerCase()}-${localId}`;
 
   const [internalOpen, setInternalOpen] = useState(false);
-
-  let initialPlacement: 'left' | 'right' = 'right';
-  if (align === 'left') {
-    initialPlacement = 'left';
-  }
-
-  const [placement, setPlacement] = useState<'left' | 'right'>(
-    initialPlacement
-  );
-
   const open = typeof is_open === 'boolean' ? is_open : internalOpen;
+
+  const [horizontal, setHorizontal] = useState<Horizontal>(
+    align === 'left' ? 'left' : 'right'
+  );
+  const [vertical, setVertical] = useState<Vertical>('below');
 
   const containerRef = useRef<HTMLSpanElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const popoverRef = useRef<HTMLDivElement | null>(null);
 
   const getDirection = (signedValue: number) => {
     if (signedValue > 0) {
       return 'increase';
     }
-
     if (signedValue < 0) {
       return 'decrease';
     }
-
     return 'no-change';
   };
 
@@ -72,71 +69,93 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
     return `This will ${direction} your ${label} by ${getAmountText(value)}.`;
   };
 
-  const computePlacement = () => {
-    if (!buttonRef.current) {
+  const getScrollParent = (node: HTMLElement | null): HTMLElement | null => {
+    let element: HTMLElement | null = node ? node.parentElement : null;
+
+    while (element) {
+      const style = getComputedStyle(element);
+      const overflowY = style.overflowY;
+      const overflow = style.overflow;
+
+      if (
+        overflowY === 'auto' ||
+        overflowY === 'scroll' ||
+        overflow === 'auto' ||
+        overflow === 'scroll'
+      ) {
+        return element;
+      }
+
+      element = element.parentElement;
+    }
+
+    return null;
+  };
+
+  const place = () => {
+    const triggerEl = buttonRef.current;
+    const tooltipEl = popoverRef.current;
+
+    if (!triggerEl || !tooltipEl) {
       return;
     }
 
-    let preferred: 'left' | 'right' | 'auto' = 'auto';
+    const scrollParent = getScrollParent(containerRef.current);
+    const parentRect = scrollParent
+      ? scrollParent.getBoundingClientRect()
+      : new DOMRect(0, 0, window.innerWidth, window.innerHeight);
 
-    if (align === 'left') {
-      preferred = 'left';
+    const triggerRect = triggerEl.getBoundingClientRect();
+
+    const tooltipWidth = tooltipEl.offsetWidth || 256;
+    const tooltipHeight = tooltipEl.offsetHeight || 120;
+
+    const spaceRight = parentRect.right - triggerRect.right;
+    const spaceLeft = triggerRect.left - parentRect.left;
+    const spaceBelow = parentRect.bottom - triggerRect.bottom;
+    const spaceAbove = triggerRect.top - parentRect.top;
+
+    const preferRight = align !== 'left';
+
+    if (preferRight && spaceRight >= tooltipWidth + 4) {
+      setHorizontal('right');
+    } else if (!preferRight && spaceLeft >= tooltipWidth + 4) {
+      setHorizontal('left');
+    } else if (spaceRight >= spaceLeft) {
+      setHorizontal('right');
+    } else {
+      setHorizontal('left');
     }
 
-    if (align === 'right') {
-      preferred = 'right';
+    if (spaceBelow >= tooltipHeight + 4) {
+      setVertical('below');
+    } else if (spaceAbove >= tooltipHeight + 4) {
+      setVertical('above');
+    } else {
+      setVertical(spaceBelow >= spaceAbove ? 'below' : 'above');
     }
+  };
 
-    if (preferred !== 'auto') {
-      setPlacement(preferred);
-      return;
+  const setOpen = (next: boolean) => {
+    if (typeof is_open !== 'boolean') {
+      setInternalOpen(next);
     }
-
-    const estimatedWidth = 256;
-
-    const rect = buttonRef.current.getBoundingClientRect();
-    const spaceLeft = rect.left;
-    const spaceRight = window.innerWidth - rect.right;
-
-    const hasRoomOnLeft = spaceLeft >= estimatedWidth;
-    const hasRoomOnRight = spaceRight >= estimatedWidth;
-
-    if (hasRoomOnRight && spaceRight >= spaceLeft) {
-      setPlacement('right');
-      return;
-    }
-
-    if (hasRoomOnLeft && spaceLeft >= spaceRight) {
-      setPlacement('left');
-      return;
-    }
-
-    if (spaceRight >= spaceLeft) {
-      setPlacement('right');
-      return;
-    }
-
-    setPlacement('left');
   };
 
   const openTip = () => {
-    computePlacement();
+    setOpen(true);
 
     if (on_open) {
       on_open();
-      return;
     }
-
-    setInternalOpen(true);
   };
 
   const closeTip = () => {
+    setOpen(false);
+
     if (on_close) {
       on_close();
-      return;
     }
-
-    setInternalOpen(false);
   };
 
   const toggleTip = () => {
@@ -147,6 +166,32 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
 
     openTip();
   };
+
+  React.useLayoutEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    place();
+
+    const parent = getScrollParent(containerRef.current);
+    const onScroll = () => place();
+    const onResize = () => place();
+
+    window.addEventListener('resize', onResize);
+    parent?.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('scroll', onScroll, {
+      passive: true,
+      capture: true,
+    });
+
+    return () => {
+      window.removeEventListener('resize', onResize);
+      parent?.removeEventListener('scroll', onScroll);
+      window.removeEventListener('scroll', onScroll, true);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, align, label, value]);
 
   const handlePointerEnter = (event: React.PointerEvent) => {
     if (event.pointerType === 'mouse') {
@@ -187,17 +232,20 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
 
     return (
       <div
+        ref={popoverRef}
         id={tooltipId}
         role="tooltip"
         aria-live="polite"
         className={clsx(
-          'absolute top-0 translate-y-[-4px] z-50 rounded-md border bg-white p-3 shadow-lg',
+          'absolute z-50 rounded-md border bg-white p-3 shadow-lg',
           'min-w-[16rem] max-w-[min(28rem,calc(100vw-3rem))] whitespace-normal break-words',
+          'max-h-[min(70vh,28rem)] overflow-auto',
           'border-gray-200 text-gray-800',
           'dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100',
-          placement === 'right'
-            ? 'left-full ml-2 origin-left'
-            : 'right-full mr-2 origin-right'
+          horizontal === 'right' ? 'left-full ml-1' : 'right-full mr-1',
+          vertical === 'below'
+            ? 'top-0 translate-y-[-6px] origin-top'
+            : 'bottom-full mb-1 origin-bottom'
         )}
       >
         <p

@@ -2,7 +2,7 @@
 
 namespace App\Game\Survey\Providers;
 
-use App\Flare\Builders\RandomAffixGenerator;
+use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Game\Survey\Console\Commands\StartSurvey;
 use App\Game\Survey\Services\SurveyService;
 use App\Game\Survey\Validator\SurveyValidator;
