@@ -3,8 +3,6 @@ import React from 'react';
 
 import StatInfoToolTip from '../../../../../reusable-components/item/stat-info-tool-tip';
 import {
-  formatFloat,
-  formatIntWithPlus,
   formatPercent,
   formatSignedPercent,
 } from '../../../../../util/format-number';
@@ -28,7 +26,9 @@ const AttachedAffixDetails = ({
   const renderAffixHeader = () => {
     return (
       <div>
-        <h2 className="text-lg my-2">{affix.name}</h2>
+        <h2 className="text-lg my-2 text-gray-800 dark:text-gray-300">
+          {affix.name}
+        </h2>
         <Separator />
         <p className="my-4 text-gray-800 dark:text-gray-300">
           {affix.description}
@@ -185,20 +185,14 @@ const AttachedAffixDetails = ({
     );
   };
 
-  const renderSimpleNumberRow = (
-    label: string,
-    tooltip: string,
-    value: number
-  ) => {
-    if (value <= 0) return null;
-
+  const renderInfoRow = (label: string, tooltip: string, valueText: string) => {
     return (
       <>
         <Dt>
           <span className="inline-flex items-center gap-2">
             <StatInfoToolTip
               label={tooltip}
-              value={value}
+              value={0}
               align="right"
               custom_message
             />
@@ -207,12 +201,8 @@ const AttachedAffixDetails = ({
         </Dt>
         <Dd>
           <span className="inline-flex items-center gap-2 whitespace-nowrap">
-            <i
-              className="fas fa-chevron-up text-emerald-600 shrink-0"
-              aria-hidden="true"
-            />
-            <span className="font-semibold text-emerald-700 tabular-nums">
-              {formatIntWithPlus(value)}
+            <span className="font-semibold text-gray-700 dark:text-gray-200">
+              {valueText}
             </span>
           </span>
         </Dd>
@@ -271,6 +261,46 @@ const AttachedAffixDetails = ({
     );
   };
 
+  const renderAffixDamageSection = () => {
+    const damageAmount = Number(affix.damage_amount ?? 0);
+    if (damageAmount <= 0) {
+      return null;
+    }
+
+    const damageTooltip = `When you attack an enemy with any attack option, we use ${formatPercent(
+      damageAmount
+    )} of your weapon damage to deal additional damage. This is known as affix damage.`;
+
+    const stackingTooltip = affix.damage_can_stack
+      ? 'The damage value above stacks additively with other affixes that also provide stackable damage, increasing the percent of your weapon damage applied. This can exceed 100%.'
+      : 'This damage does not stack with other affixes that provide damage. We take the highest value among your non-stacking damage affixes.';
+
+    const irresistibleTooltip = affix.irresistible_damage
+      ? 'This damage is irresistible; the enemy cannot resist it.'
+      : 'This damage is resistible; the enemy can resist it.';
+
+    return (
+      <div>
+        <h4 className="mt-3 mb-1 text-xs font-semibold uppercase tracking-wide text-mango-tango-500 dark:text-mango-tango-300">
+          Affix Damage
+        </h4>
+        <Dl>
+          {renderSimplePercentRow('Affix Damage', damageTooltip, damageAmount)}
+          {renderInfoRow(
+            'Damage Stacking',
+            stackingTooltip,
+            affix.damage_can_stack ? 'Stacks' : 'Does Not Stack'
+          )}
+          {renderInfoRow(
+            'Irresistible',
+            irresistibleTooltip,
+            affix.irresistible_damage ? 'Yes' : 'No'
+          )}
+        </Dl>
+      </div>
+    );
+  };
+
   const renderSkillModifiersSection = () => {
     const skillBonus = Number(affix.skill_bonus ?? 0);
     const skillTrainingBonus = Number(affix.skill_training_bonus ?? 0);
@@ -320,17 +350,19 @@ const AttachedAffixDetails = ({
 
     if (everyZero) return null;
 
+    const lifeStealTooltip = `This steals ${formatPercent(
+      lifeStealAmount
+    )} of the enemy's health during your attack phase. Stacks additively across items up to 50% for non-vampire classes and up to 99% for Vampires.`;
+
     return (
       <div>
         <h4 className="mt-3 mb-1 text-xs font-semibold uppercase tracking-wide text-mango-tango-500 dark:text-mango-tango-300">
           Misc. Modifiers
         </h4>
         <Dl>
-          {renderSimpleNumberRow(
+          {renderSimplePercentRow(
             'Life Stealing',
-            `This steals ${formatFloat(
-              lifeStealAmount
-            )} life from the enemy during your attack phase. Non-vampire classes can steal up to 50% of the enemy's health, while Vampires can steal up to 99%. This stacks additively with other affixes.`,
+            lifeStealTooltip,
             lifeStealAmount
           )}
 
@@ -388,6 +420,7 @@ const AttachedAffixDetails = ({
         <div className="space-y-4">
           {renderWithSeparator(renderStatsSection())}
           {renderWithSeparator(renderCoreAttributesSection())}
+          {renderWithSeparator(renderAffixDamageSection())}
           {renderWithSeparator(renderSkillModifiersSection())}
           {renderWithSeparator(renderMiscSection(), true)}
         </div>
