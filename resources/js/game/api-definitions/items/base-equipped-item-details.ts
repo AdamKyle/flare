@@ -1,8 +1,8 @@
-import BaseAttachedAffixesDetails from './base-attached-affixes-details';
 import { BaseItemDetails } from './base-item-details';
+import ItemAffixDefinition from './equippable-item-definitions/item-affix-definition';
 
 export default interface BaseEquippedItemDetails {
   item_base_stat: number;
   item_details: BaseItemDetails;
-  attached_affixes: BaseAttachedAffixesDetails[] | [];
+  attached_affixes: ItemAffixDefinition[] | [];
 }

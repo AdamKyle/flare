@@ -5,6 +5,7 @@ import { planeTextItemColors } from '../../../character-sheet/partials/character
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
 import { useGetInventoryItemDetails } from './api/hooks/use-get-inventory-item-details';
 import AttachedAffixDetails from './attached-affix/attached-affix-details';
+import AttachedHolyStacks from './attached-holy-stacks/attached-holy-stacks';
 import AffixesSection from './partials/item-view/affixes-section';
 import AmbushCounterSection from './partials/item-view/ambush-and-counter-section';
 import AttackSection from './partials/item-view/attack-section';
@@ -28,6 +29,7 @@ const InventoryItem = ({
   close_item_view,
 }: InventoryItemProps) => {
   const [itemAffixToView, setItemAffixToView] = useState<number | null>(null);
+  const [shouldViewHolyStacks, setShouldViewHolyStacks] = useState(false);
 
   const { error, loading, data } = useGetInventoryItemDetails({
     character_id,
@@ -90,6 +92,15 @@ const InventoryItem = ({
     }
   }
 
+  if (shouldViewHolyStacks && item.applied_stacks) {
+    return (
+      <AttachedHolyStacks
+        stacks={item.applied_stacks}
+        on_close={() => setShouldViewHolyStacks(false)}
+      />
+    );
+  }
+
   const attack = Number(item.raw_damage ?? item.base_damage ?? 0);
   const ac = Number(item.raw_ac ?? item.base_ac ?? 0);
   const healing = Number(item.raw_healing ?? item.base_healing ?? 0);
@@ -126,6 +137,7 @@ const InventoryItem = ({
       applied={Number(item.holy_stacks_applied ?? 0)}
       attributeBonus={Number(item.holy_stack_stat_bonus ?? 0)}
       devouringDarknessBonus={Number(item.holy_stack_devouring_darkness ?? 0)}
+      onClickApplied={() => setShouldViewHolyStacks(true)}
     />,
   ];
 

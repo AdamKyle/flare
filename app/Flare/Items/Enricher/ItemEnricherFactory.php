@@ -49,6 +49,7 @@ class ItemEnricherFactory
     {
         if ($this->isEquippable($item)) {
             $enriched = $this->equippableEnricher->enrich($item);
+
             return $this->transform($enriched, $this->equippableTransformer);
         }
 
@@ -72,7 +73,7 @@ class ItemEnricherFactory
      */
     private function transform(Item $item, mixed $transformer): array
     {
-        $resource = new FractalItem($item->refresh(), $transformer);
+        $resource = new FractalItem($item, $transformer);
 
         return $this->manager->setSerializer($this->plainDataSerializer)->createData($resource)->toArray();
     }

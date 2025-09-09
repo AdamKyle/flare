@@ -102,10 +102,6 @@ class CharacterInventoryController extends Controller
 
         $item = $itemEnricherFactory->buildItemData($slot->item);
 
-        dump(
-            $item
-        );
-
         return response()->json($item);
     }
 

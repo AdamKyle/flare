@@ -1,23 +1,22 @@
 import React, { ReactNode } from 'react';
 
 import AttachedAffixesProps from './types/attached-affixes-props';
-import BaseAttachedAffixesDetails from '../../../../../api-definitions/items/base-attached-affixes-details';
+import ItemAffixDefinition from '../../../../../api-definitions/items/equippable-item-definitions/item-affix-definition';
 import { getStatAbbreviation } from '../../../enums/stat-types';
 
 const AttachedAffixes = ({
   attached_affixes,
   stat_type,
 }: AttachedAffixesProps): ReactNode => {
-  return attached_affixes.map((attachedAffix: BaseAttachedAffixesDetails) => {
+  return attached_affixes.map((attachedAffix: ItemAffixDefinition) => {
     const abbreviatedStat = getStatAbbreviation(stat_type);
-    const modifierKey =
-      `${abbreviatedStat}_mod` as keyof BaseAttachedAffixesDetails;
+    const modifierKey = `${abbreviatedStat}_mod` as keyof ItemAffixDefinition;
 
     const modifierValue = Number(attachedAffix[modifierKey] ?? 0);
     return (
       <li>
         <span className="text-slate-700 dark:text-slate-400">
-          {attachedAffix.affix_name}
+          {attachedAffix.name}
         </span>{' '}
         <span className="text-green-700 dark:text-green-500">
           (+
