@@ -1,8 +1,8 @@
 import React from 'react';
 
-import AmbushCounterSectionProps from '../../../../components/side-peeks/character-inventory/inventory-item/types/partials/item-view/ambush-and-counter-section-props';
-import Section from '../../section';
-import StatRowPercent from '../../stat-row-percent';
+import Section from '../../../../../../reusable-components/viewable-sections/section';
+import StatRowPercent from '../../../../../../reusable-components/viewable-sections/stat-row-percent';
+import AmbushCounterSectionProps from '../../types/partials/item-view/ambush-and-counter-section-props';
 
 const AmbushCounterSection = ({
   ambushChance,

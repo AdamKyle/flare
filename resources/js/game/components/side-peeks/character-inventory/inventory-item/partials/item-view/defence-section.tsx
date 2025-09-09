@@ -1,13 +1,13 @@
 import React from 'react';
 
-import DefenceSectionProps from '../../../../components/side-peeks/character-inventory/inventory-item/types/partials/item-view/defence-section-props';
+import DefinitionRow from '../../../../../../reusable-components/viewable-sections/definition-row';
+import InfoLabel from '../../../../../../reusable-components/viewable-sections/info-label';
+import Section from '../../../../../../reusable-components/viewable-sections/section';
 import {
   formatIntWithPlus,
   formatSignedPercent,
-} from '../../../../util/format-number';
-import DefinitionRow from '../../definition-row';
-import InfoLabel from '../../info-label';
-import Section from '../../section';
+} from '../../../../../../util/format-number';
+import DefenceSectionProps from '../../types/partials/item-view/defence-section-props';
 
 const DefenceSection = ({ ac, baseAcMod }: DefenceSectionProps) => {
   const baseMod = Number(baseAcMod ?? 0);

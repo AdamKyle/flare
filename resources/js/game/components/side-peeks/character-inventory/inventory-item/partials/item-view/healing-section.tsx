@@ -1,28 +1,28 @@
 import React from 'react';
 
-import AttackSectionProps from '../../../../components/side-peeks/character-inventory/inventory-item/types/partials/item-view/attack-section-props';
+import DefinitionRow from '../../../../../../reusable-components/viewable-sections/definition-row';
+import InfoLabel from '../../../../../../reusable-components/viewable-sections/info-label';
+import Section from '../../../../../../reusable-components/viewable-sections/section';
 import {
   formatIntWithPlus,
   formatSignedPercent,
-} from '../../../../util/format-number';
-import DefinitionRow from '../../definition-row';
-import InfoLabel from '../../info-label';
-import Section from '../../section';
+} from '../../../../../../util/format-number';
+import HealingSectionProps from '../../types/partials/item-view/healing-section-props';
 
-const AttackSection = ({ attack, baseDamageMod }: AttackSectionProps) => {
-  const baseMod = Number(baseDamageMod ?? 0);
+const HealingSection = ({ healing, baseHealingMod }: HealingSectionProps) => {
+  const baseMod = Number(baseHealingMod ?? 0);
   const hasChild = baseMod > 0;
 
-  if (attack === 0 && !hasChild) {
+  if (healing === 0 && !hasChild) {
     return null;
   }
 
   const dir = baseMod > 0 ? 'increase' : 'decrease';
   const amount = formatSignedPercent(baseMod).replace(/^[+-]/, '');
   const baseModTooltip =
-    `This will ${dir} the weapon or spell base damage by ${amount}. ` +
-    `This can stack with other gear that contains this modifier to affect your overall damage, ` +
-    `even if that gear doesn’t increase your damage.`;
+    `This will ${dir} the spell base healing by ${amount}. ` +
+    `This can stack with other gear that contains this modifier to affect your overall healing, ` +
+    `even if that gear doesn’t increase your healing.`;
 
   const renderUpIcon = (value: number) => {
     if (value <= 0) {
@@ -44,7 +44,7 @@ const AttackSection = ({ attack, baseDamageMod }: AttackSectionProps) => {
         left={
           <div className="ml-4 inline-flex items-center gap-2">
             <InfoLabel
-              label="Base Damage Mod"
+              label="Base Healing Mod"
               tooltip={baseModTooltip}
               tooltipValue={baseMod}
               tooltipAlign="right"
@@ -66,21 +66,21 @@ const AttackSection = ({ attack, baseDamageMod }: AttackSectionProps) => {
   };
 
   return (
-    <Section title="Attack">
+    <Section title="Healing">
       <DefinitionRow
         left={
           <InfoLabel
-            label="Attack"
-            tooltip="Attack"
-            tooltipValue={attack}
+            label="Healing"
+            tooltip="Healing"
+            tooltipValue={healing}
             tooltipAlign="right"
           />
         }
         right={
           <span className="inline-flex items-center gap-2">
-            {renderUpIcon(attack)}
+            {renderUpIcon(healing)}
             <span className="font-semibold tabular-nums">
-              {formatIntWithPlus(attack)}
+              {formatIntWithPlus(healing)}
             </span>
           </span>
         }
@@ -91,4 +91,4 @@ const AttackSection = ({ attack, baseDamageMod }: AttackSectionProps) => {
   );
 };
 
-export default AttackSection;
+export default HealingSection;
