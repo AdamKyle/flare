@@ -3,8 +3,8 @@ import React from 'react';
 
 import DefinitionRow from './definition-row';
 import InfoLabel from './info-label';
-import { formatPercent } from '../../../../../../util/format-number';
-import StatRowPercentProps from '../../types/partials/item-view/stat-row-percent-props';
+import StatRowPercentProps from './types/stat-row-percent-props';
+import { formatPercent } from '../../util/format-number';
 
 const StatRowPercent = ({
   label,

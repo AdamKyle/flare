@@ -5,15 +5,15 @@ import { planeTextItemColors } from '../../../character-sheet/partials/character
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
 import { useGetInventoryItemDetails } from './api/hooks/use-get-inventory-item-details';
 import AttachedAffixDetails from './attached-affix/attached-affix-details';
-import AffixesSection from './partials/item-view/affixes-section';
-import AmbushCounterSection from './partials/item-view/ambush-and-counter-section';
-import AttackSection from './partials/item-view/attack-section';
-import DefenceSection from './partials/item-view/defence-section';
-import HealingSection from './partials/item-view/healing-section';
-import HolyStacksSection from './partials/item-view/holy-stacks-section';
-import ItemMetaSection from './partials/item-view/item-meta-tsx';
-import StatsSection from './partials/item-view/stats-section';
 import InventoryItemProps from './types/inventory-item-props';
+import AffixesSection from '../../../../reusable-components/viewable-sections/types/item-view/affixes-section';
+import AmbushCounterSection from '../../../../reusable-components/viewable-sections/types/item-view/ambush-and-counter-section';
+import AttackSection from '../../../../reusable-components/viewable-sections/types/item-view/attack-section';
+import DefenceSection from '../../../../reusable-components/viewable-sections/types/item-view/defence-section';
+import HealingSection from '../../../../reusable-components/viewable-sections/types/item-view/healing-section';
+import HolyStacksSection from '../../../../reusable-components/viewable-sections/types/item-view/holy-stacks-section';
+import ItemMetaSection from '../../../../reusable-components/viewable-sections/types/item-view/item-meta-tsx';
+import StatsSection from '../../../../reusable-components/viewable-sections/types/item-view/stats-section';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 

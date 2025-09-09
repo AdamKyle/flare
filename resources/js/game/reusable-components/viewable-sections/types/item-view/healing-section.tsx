@@ -1,28 +1,28 @@
 import React from 'react';
 
-import DefinitionRow from './definition-row';
-import InfoLabel from './info-label';
-import Section from './section';
+import HealingSectionProps from '../../../../components/side-peeks/character-inventory/inventory-item/types/partials/item-view/healing-section-props';
 import {
   formatIntWithPlus,
   formatSignedPercent,
-} from '../../../../../../util/format-number';
-import DefenceSectionProps from '../../types/partials/item-view/defence-section-props';
+} from '../../../../util/format-number';
+import DefinitionRow from '../../definition-row';
+import InfoLabel from '../../info-label';
+import Section from '../../section';
 
-const DefenceSection = ({ ac, baseAcMod }: DefenceSectionProps) => {
-  const baseMod = Number(baseAcMod ?? 0);
+const HealingSection = ({ healing, baseHealingMod }: HealingSectionProps) => {
+  const baseMod = Number(baseHealingMod ?? 0);
   const hasChild = baseMod > 0;
 
-  if (ac === 0 && !hasChild) {
+  if (healing === 0 && !hasChild) {
     return null;
   }
 
   const dir = baseMod > 0 ? 'increase' : 'decrease';
   const amount = formatSignedPercent(baseMod).replace(/^[+-]/, '');
   const baseModTooltip =
-    `This will ${dir} the armour base AC by ${amount}. ` +
-    `This can stack with other gear that contains this modifier to affect your overall defence, ` +
-    `even if that gear doesn’t increase your defence.`;
+    `This will ${dir} the spell base healing by ${amount}. ` +
+    `This can stack with other gear that contains this modifier to affect your overall healing, ` +
+    `even if that gear doesn’t increase your healing.`;
 
   const renderUpIcon = (value: number) => {
     if (value <= 0) {
@@ -44,7 +44,7 @@ const DefenceSection = ({ ac, baseAcMod }: DefenceSectionProps) => {
         left={
           <div className="ml-4 inline-flex items-center gap-2">
             <InfoLabel
-              label="Base AC Mod"
+              label="Base Healing Mod"
               tooltip={baseModTooltip}
               tooltipValue={baseMod}
               tooltipAlign="right"
@@ -66,21 +66,21 @@ const DefenceSection = ({ ac, baseAcMod }: DefenceSectionProps) => {
   };
 
   return (
-    <Section title="Defence">
+    <Section title="Healing">
       <DefinitionRow
         left={
           <InfoLabel
-            label="AC"
-            tooltip="AC"
-            tooltipValue={ac}
+            label="Healing"
+            tooltip="Healing"
+            tooltipValue={healing}
             tooltipAlign="right"
           />
         }
         right={
           <span className="inline-flex items-center gap-2">
-            {renderUpIcon(ac)}
+            {renderUpIcon(healing)}
             <span className="font-semibold tabular-nums">
-              {formatIntWithPlus(ac)}
+              {formatIntWithPlus(healing)}
             </span>
           </span>
         }
@@ -91,4 +91,4 @@ const DefenceSection = ({ ac, baseAcMod }: DefenceSectionProps) => {
   );
 };
 
-export default DefenceSection;
+export default HealingSection;

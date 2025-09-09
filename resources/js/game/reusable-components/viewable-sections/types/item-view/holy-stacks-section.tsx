@@ -1,10 +1,10 @@
 import React from 'react';
 
-import DefinitionRow from './definition-row';
-import InfoLabel from './info-label';
-import Section from './section';
-import { formatFloat } from '../../../../../../util/format-number';
-import HolyStacksSectionProps from '../../types/partials/item-view/holy-stacks-section-props';
+import HolyStacksSectionProps from '../../../../components/side-peeks/character-inventory/inventory-item/types/partials/item-view/holy-stacks-section-props';
+import { formatFloat } from '../../../../util/format-number';
+import DefinitionRow from '../../definition-row';
+import InfoLabel from '../../info-label';
+import Section from '../../section';
 
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import LinkButton from 'ui/buttons/link-button';

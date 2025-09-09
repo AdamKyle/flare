@@ -1,7 +1,7 @@
 import React from 'react';
 
-import StatInfoToolTip from '../../../../../../reusable-components/item/stat-info-tool-tip';
-import InfoLabelProps from '../../types/partials/item-view/info-label-props';
+import StatInfoToolTip from '../item/stat-info-tool-tip';
+import InfoLabelProps from './types/info-label-props';
 
 const InfoLabel = ({
   label,

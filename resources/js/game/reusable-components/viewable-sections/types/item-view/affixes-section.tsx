@@ -1,9 +1,9 @@
 import React from 'react';
 
-import DefinitionRow from './definition-row';
-import InfoLabel from './info-label';
-import Section from './section';
-import AffixesSectionProps from '../../types/partials/item-view/affixes-section-props';
+import AffixesSectionProps from '../../../../components/side-peeks/character-inventory/inventory-item/types/partials/item-view/affixes-section-props';
+import DefinitionRow from '../../definition-row';
+import InfoLabel from '../../info-label';
+import Section from '../../section';
 
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import LinkButton from 'ui/buttons/link-button';

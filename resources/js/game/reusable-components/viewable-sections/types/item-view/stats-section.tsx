@@ -1,11 +1,11 @@
 import React from 'react';
 
-import DefinitionRow from './definition-row';
-import InfoLabel from './info-label';
-import Section from './section';
-import { formatSignedPercent } from '../../../../../../util/format-number';
-import { STAT_FIELDS } from '../../types/partials/constants/stat-fields';
-import StatsSectionProps from '../../types/partials/item-view/stats-section-props';
+import { STAT_FIELDS } from '../../../../components/side-peeks/character-inventory/inventory-item/types/partials/constants/stat-fields';
+import StatsSectionProps from '../../../../components/side-peeks/character-inventory/inventory-item/types/partials/item-view/stats-section-props';
+import { formatSignedPercent } from '../../../../util/format-number';
+import DefinitionRow from '../../definition-row';
+import InfoLabel from '../../info-label';
+import Section from '../../section';
 
 const StatsSection = ({ item }: StatsSectionProps) => {
   const rows = STAT_FIELDS.map(({ key, label }) => ({

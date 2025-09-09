@@ -2,9 +2,9 @@ import clsx from 'clsx';
 import { capitalize } from 'lodash';
 import React from 'react';
 
-import DefinitionRow from './definition-row';
-import InfoLabel from './info-label';
-import ItemMetaProps from '../../types/partials/item-view/item-meta-props';
+import ItemMetaProps from '../../../../components/side-peeks/character-inventory/inventory-item/types/partials/item-view/item-meta-props';
+import DefinitionRow from '../../definition-row';
+import InfoLabel from '../../info-label';
 
 import Dl from 'ui/dl/dl';
 import Separator from 'ui/separator/separator';

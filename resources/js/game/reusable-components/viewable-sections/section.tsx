@@ -1,6 +1,6 @@
 import React from 'react';
 
-import SectionProps from '../../types/partials/item-view/section-props';
+import SectionProps from './types/section-props';
 
 import Dl from 'ui/dl/dl';
 import Separator from 'ui/separator/separator';

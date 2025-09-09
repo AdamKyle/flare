@@ -1,4 +1,4 @@
-import StatInfoToolTipProps from '../../../../../../../reusable-components/item/types/stat-info-tool-tip-props';
+import StatInfoToolTipProps from '../../item/types/stat-info-tool-tip-props';
 
 export default interface InfoLabelProps {
   label: string;
