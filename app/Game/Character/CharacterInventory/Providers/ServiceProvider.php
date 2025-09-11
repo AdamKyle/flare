@@ -26,6 +26,7 @@ use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
 use App\Game\Core\Values\ValidEquipPositionsValue;
 use App\Game\Gems\Services\ItemAtonements;
 use App\Game\Shop\Services\ShopService;
+use App\Game\Skills\Services\DisenchantManyService;
 use App\Game\Skills\Services\DisenchantService;
 use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
@@ -111,9 +112,9 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(EquipItemService::class),
                 $app->make(EquipManyBuilder::class),
                 $app->make(ShopService::class),
-                $app->make(DisenchantService::class),
                 $app->make(CharacterInventoryService::class),
                 $app->make(UpdateCharacterAttackTypesHandler::class),
+                $app->make(DisenchantManyService::class),
             );
         });
 

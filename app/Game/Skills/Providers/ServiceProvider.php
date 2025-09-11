@@ -20,6 +20,7 @@ use App\Game\Skills\Handlers\UpdateCraftingTasksForFactionLoyalty;
 use App\Game\Skills\Handlers\UpdateItemSkill;
 use App\Game\Skills\Services\AlchemyService;
 use App\Game\Skills\Services\CraftingService;
+use App\Game\Skills\Services\DisenchantManyService;
 use App\Game\Skills\Services\DisenchantService;
 use App\Game\Skills\Services\EnchantingService;
 use App\Game\Skills\Services\EnchantItemService;
@@ -153,6 +154,12 @@ class ServiceProvider extends ApplicationServiceProvider
             return new UpdateItemSkill(
                 $app->make(UpdateCharacterAttackTypesHandler::class),
                 $app->make(BattleMessageHandler::class),
+            );
+        });
+
+        $this->app->bind(DisenchantManyService::class, function ($app) {
+            return new DisenchantManyService(
+                $app->make(SkillCheckService::class),
             );
         });
     }
