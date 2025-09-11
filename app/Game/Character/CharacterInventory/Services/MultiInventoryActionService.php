@@ -90,16 +90,23 @@ class MultiInventoryActionService
         ]);
     }
 
-    public function sellManyItems(Character $character, array $slotIds): array
+    public function sellManyItems(Character $character, array $params): array
     {
-
-        $slots = $character->inventory->slots()
-            ->whereIn('id', $slotIds)
-            ->whereHas('item', function ($query) {
-                return $query->whereNotIn('type', ['alchemy', 'quest', 'artifact', 'trinket']);
+        $slotsQuery = $character->inventory->slots()
+            ->whereHas('item', static function ($query) {
+                $query->whereNotIn('type', ['alchemy', 'quest', 'artifact', 'trinket']);
             })
-            ->where('equipped', false)
-            ->get();
+            ->where('equipped', false);
+
+        if (isset($params['exclude'])) {
+            $excludeIds = array_map(static fn ($id): int => (int) $id, (array) $params['exclude']);
+            $slotsQuery->whereNotIn('item_id', $excludeIds);
+        } elseif (isset($params['ids'])) {
+            $includeIds = array_map(static fn ($id): int => (int) $id, (array) $params['ids']);
+            $slotsQuery->whereIn('item_id', $includeIds);
+        }
+
+        $slots = $slotsQuery->get();
 
         $totalSoldFor = 0;
 
@@ -107,28 +114,30 @@ class MultiInventoryActionService
             $totalSoldFor += $this->sellItem($character, $slot);
         }
 
-        $character = $character->refresh();
-
-        event(new UpdateCharacterInventoryCountEvent($character));
-
         return $this->successResult([
-            'message' => 'Sold all items for: ' . number_format($totalSoldFor) . ' Gold (Minus 5% on each sale), With the exception of Trinkets and Artifacts to the shop. Check your server messages (below - select Server Messsages tab, or for mobile select Server Messages from the dropw down) for details!',
-            'inventory' => $this->characterInventoryService->setCharacter($character)->getInventoryForApi(),
+            'message' => 'Sold all items for: ' . number_format($totalSoldFor) . ' Gold (Minus 5% on each sale)',
         ]);
     }
 
+
     public function disenchantManyItems(Character $character, array $slotIds): array
     {
-        $filteredSlots = $character->inventory->slots
-            ->whereIn('id', $slotIds)
-            ->whereNotIn('item.type', ['alchemy', 'quest', 'trinket', 'artifact'])
-            ->where('equipped', false)
-            ->filter(function ($slot) {
-                return !is_null($slot->item->item_prefix_id) || !is_null($slot->item->item_suffix_id);
-            });
+        $slotsQuery = $character->inventory->slots()
+            ->whereHas('item', static function ($query) {
+                $query->whereNotIn('type', ['alchemy', 'quest', 'artifact', 'trinket']);
+            })
+            ->where('equipped', false);
 
-        $itemIdsToDisenchant = $filteredSlots->pluck('item_id')->toArray();
-        $filteredSlotIds = $filteredSlots->pluck('id')->toArray();
+        if (isset($params['exclude'])) {
+            $excludeIds = array_map(static fn ($id): int => (int) $id, (array) $params['exclude']);
+            $slotsQuery->whereNotIn('item_id', $excludeIds);
+        } elseif (isset($params['ids'])) {
+            $includeIds = array_map(static fn ($id): int => (int) $id, (array) $params['ids']);
+            $slotsQuery->whereIn('item_id', $includeIds);
+        }
+
+        $itemIdsToDisenchant = $slotsQuery->pluck('item_id')->toArray();
+        $filteredSlotIds = $slotIds->pluck('id')->toArray();
 
         $character->inventory->slots()->whereIn('id', $filteredSlotIds)->delete();
 
@@ -144,24 +153,27 @@ class MultiInventoryActionService
         ]);
     }
 
-    public function destroyManyItems(Character $character, array $slotIds): array
+    public function destroyManyItems(Character $character, array $params): array
     {
 
-        $character->inventory->slots()
-            ->whereIn('id', $slotIds)
-            ->whereHas('item', function ($query) {
-                return $query->whereNotIn('type', ['alchemy', 'quest', 'artifact']);
+        $slotsQuery = $character->inventory->slots()
+            ->whereHas('item', static function ($query) {
+                $query->whereNotIn('type', ['alchemy', 'quest', 'artifact', 'trinket']);
             })
-            ->where('equipped', false)
-            ->delete();
+            ->where('equipped', false);
 
-        $character = $character->refresh();
+        if (isset($params['exclude'])) {
+            $excludeIds = $params['exclude'];
+            $slotsQuery->whereNotIn('item_id', $excludeIds);
+        } elseif (isset($params['ids'])) {
+            $includeIds = $params['ids'];
+            $slotsQuery->whereIn('item_id', $includeIds);
+        }
 
-        event(new UpdateCharacterInventoryCountEvent($character));
+        $slotsQuery->delete();
 
         return $this->successResult([
-            'message' => 'Destroyed all selected selected items (with exception of artifacts. You must manually delete these powerful items. Click the name, click delete and confirm you want to do this, if you have the item.)',
-            'inventory' => $this->characterInventoryService->setCharacter($character)->getInventoryForApi(),
+            'message' => 'Destroyed all selected selected items (with exception of artifacts. You must manually delete these powerful items. Click the item, click delete and confirm you want to do this, if you have the item.)',
         ]);
     }
 

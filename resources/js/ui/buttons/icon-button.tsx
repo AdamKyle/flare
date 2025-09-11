@@ -6,6 +6,8 @@ import { variantStyles } from './styles/button/variant-styles';
 import IconButtonProps from './types/icon-button-props';
 
 const IconButton = (props: IconButtonProps): ReactNode => {
+  const hasIcon = Boolean(props.icon);
+
   return (
     <button
       onClick={props.on_click}
@@ -15,17 +17,19 @@ const IconButton = (props: IconButtonProps): ReactNode => {
         'py-3',
         props.additional_css
       )}
-      aria-label={props.aria_lebel || props.label || 'Icon Button'}
+      aria-label={props.aria_label || props.label || 'Icon Button'}
       disabled={props.disabled}
       role="button"
       type="button"
     >
-      <div className="flex flex-col lg:flex-row items-center">
-        {props.icon}
-        {props.label && (
-          <span className="text-sm mt-1 lg:mt-0 lg:ml-1 text-center">
-            {props.label}
+      <div className={clsx('flex items-center', hasIcon && 'gap-2')}>
+        {hasIcon && (
+          <span className="inline-flex w-4 shrink-0 justify-center">
+            {props.icon}
           </span>
+        )}
+        {props.label && (
+          <span className="text-sm text-left">{props.label}</span>
         )}
       </div>
     </button>

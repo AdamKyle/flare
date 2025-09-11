@@ -11,7 +11,7 @@ class InventoryMultiRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -21,19 +21,26 @@ class InventoryMultiRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'slot_ids' => 'array|required',
-            'slot_ids.*' => 'integer',
+            'mode' => 'required|in:include,all_except',
+            'ids' => 'nullable|array',
+            'ids.*' => 'integer',
+            'exclude' => 'nullable|array',
+            'exclude.*' => 'integer',
         ];
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
-            'slot_ids.*.integer' => 'must be a set of slot ids',
-            'slot_ids.required' => 'missing slot ids array',
+            'mode.required' => 'The selection mode is required.',
+            'mode.in' => 'The selection mode must be either include or all_except.',
+            'ids.array' => 'The ids field must be an array of integers.',
+            'ids.*.integer' => 'Each value in ids must be an integer.',
+            'exclude.array' => 'The exclude field must be an array of integers.',
+            'exclude.*.integer' => 'Each value in exclude must be an integer.',
         ];
     }
 }

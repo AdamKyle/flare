@@ -26,17 +26,22 @@ const Dropdown = ({
   pre_selected_item,
   is_in_modal,
   force_clear,
+  disabled,
 }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string | number>('');
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
+
+  const isDisabled = Boolean(disabled);
 
   const handleBlur = (event: FocusEvent<HTMLDivElement>) => {
     if (!all_click_outside) {
       return;
     }
+
     if (!event.currentTarget.contains(event.relatedTarget)) {
       setIsOpen(false);
       setFocusedIndex(null);
@@ -44,7 +49,13 @@ const Dropdown = ({
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (!isOpen) return;
+    if (isDisabled) {
+      return;
+    }
+
+    if (!isOpen) {
+      return;
+    }
 
     match(event.key as string)
       .with('ArrowDown', () => {
@@ -115,16 +126,27 @@ const Dropdown = ({
   };
 
   const handleClearSelection = (e: MouseEvent<HTMLElement>) => {
+    if (isDisabled) {
+      return;
+    }
+
     e.stopPropagation();
     setSelectedValue('');
     setIsOpen(false);
+
     if (on_clear) {
       on_clear();
     }
   };
 
-  const renderIcon = (): ReactNode =>
-    selectedValue === '' ? (
+  const renderIcon = (): ReactNode => {
+    if (isDisabled) {
+      return (
+        <i className="fas fa-chevron-down text-gray-400 dark:text-gray-500" />
+      );
+    }
+
+    return selectedValue === '' ? (
       <i className="fas fa-chevron-down text-gray-500 dark:text-gray-300" />
     ) : (
       <i
@@ -132,6 +154,7 @@ const Dropdown = ({
         onClick={handleClearSelection}
       />
     );
+  };
 
   const renderItems = (): ReactNode =>
     items.map((item, index) => (
@@ -161,19 +184,27 @@ const Dropdown = ({
   const renderSelectionText = (): ReactNode => {
     if (selectedValue) {
       const found = items.find((it) => it.value === selectedValue);
+
       return (
         <div className="text-gray-900 dark:text-white">{found?.label}</div>
       );
     }
+
     return (
-      <div className="text-gray-400">
+      <div
+        className={clsx(
+          isDisabled ? 'text-gray-400 dark:text-gray-500' : 'text-gray-400'
+        )}
+      >
         {selection_placeholder || 'Select an option'}
       </div>
     );
   };
 
   const renderDropdownList = (): ReactNode => {
-    if (!isOpen) return null;
+    if (isDisabled || !isOpen) {
+      return null;
+    }
 
     const listMarkup = (
       <ul
@@ -225,24 +256,31 @@ const Dropdown = ({
     <div
       ref={containerRef}
       onBlur={handleBlur}
-      tabIndex={0}
-      onKeyDown={handleKeyDown}
+      tabIndex={isDisabled ? -1 : 0}
+      onKeyDown={isDisabled ? undefined : handleKeyDown}
       className={clsx('relative w-full', is_in_modal && 'overflow-visible')}
     >
       <div
-        tabIndex={0}
+        tabIndex={isDisabled ? -1 : 0}
         role="button"
         aria-haspopup="listbox"
-        aria-expanded={isOpen}
-        aria-controls="dropdown-listbox"
-        onClick={() => setIsOpen((prev) => !prev)}
-        className="w-full p-2 pr-10 pl-3 rounded-md border border-gray-500 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center relative"
+        aria-disabled={isDisabled || undefined}
+        aria-expanded={isDisabled ? false : isOpen}
+        aria-controls={isDisabled ? undefined : 'dropdown-listbox'}
+        onClick={isDisabled ? undefined : () => setIsOpen((prev) => !prev)}
+        className={clsx(
+          'w-full p-2 pr-10 pl-3 rounded-md border flex items-center relative',
+          isDisabled
+            ? 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-80'
+            : 'bg-white dark:bg-gray-800 border-gray-500 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500'
+        )}
       >
         <span className="flex-1 truncate">{renderSelectionText()}</span>
         <span className="absolute right-3 top-1/2 -translate-y-1/2">
           {renderIcon()}
         </span>
       </div>
+
       {renderDropdownList()}
     </div>
   );

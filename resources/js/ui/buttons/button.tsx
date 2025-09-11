@@ -14,7 +14,7 @@ const Button = (props: ButtonProps): ReactNode => {
         variantStyles(props.variant),
         props.additional_css
       )}
-      aria-label={props.aria_lebel || props.label}
+      aria-label={props.aria_label || props.label}
       disabled={props.disabled}
       role="button"
       type="button"

@@ -103,6 +103,7 @@ const UsePaginatedApiHandler = <
     setSearchText,
     setFilters,
     setPage,
+    setRefresh,
   };
 };
 

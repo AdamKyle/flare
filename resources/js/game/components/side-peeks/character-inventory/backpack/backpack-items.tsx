@@ -1,7 +1,9 @@
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
 import { debounce, isNil } from 'lodash';
 import React, { useMemo, useState } from 'react';
+import { match } from 'ts-pattern';
 
+import BackPackSelectionActions from './back-pack-selection-actions';
 import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
 import { ItemTypeToView } from '../../components/items/enums/item-type-to-view';
@@ -9,9 +11,13 @@ import GenericItemList from '../../components/items/generic-item-list';
 import GenericItemProps from '../../components/items/types/generic-item-props';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
 import InventoryItem from '../inventory-item/inventory-item';
+import { SelectedEquippableItemsOptions } from './enums/selected-equippable-items-options';
+import { useManageMultipleSelectedItemsApi } from '../hooks/use-manage-multiple-selected-items-api';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
+import { Alert } from 'ui/alerts/alert';
+import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Dropdown from 'ui/drop-down/drop-down';
@@ -22,12 +28,23 @@ import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
   const [itemId, setItemId] = useState<number | null>(null);
   const [selection, setSelection] = useState<ItemSelectedType | null>(null);
+  const [actionSelected, setActionSelected] =
+    useState<SelectedEquippableItemsOptions | null>(null);
+  const [isSelectionDisabled, setIsSelectionDisabled] = useState(false);
+  const [closeSuccessMessage, setCloseSuccessMessage] = useState(false);
 
-  const { data, error, loading, setSearchText, onEndReached } =
+  const { data, error, loading, setSearchText, onEndReached, setRefresh } =
     UsePaginatedApiHandler<EquippableItemWithBase>({
       url: CharacterInventoryApiUrls.CHARACTER_INVENTORY,
       urlParams: { character: character_id },
     });
+
+  const {
+    successMessage,
+    error: multipleSelectionError,
+    handleSelection,
+    loading: multipleSelectionLoading,
+  } = useManageMultipleSelectedItemsApi();
 
   const debouncedSetSearchText = useMemo(
     () => debounce((value: string) => setSearchText(value), 300),
@@ -43,23 +60,75 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
     setSelection(update);
   };
 
+  const handleMultiActionApiSuccess = () => {
+    setActionSelected(null);
+    setIsSelectionDisabled(false);
+    setCloseSuccessMessage(false);
+
+    setRefresh((prev) => !prev);
+  };
+
+  const handleActionSectionSubmission = () => {
+    if (!selection) {
+      return;
+    }
+
+    const url = match(actionSelected)
+      .with(
+        SelectedEquippableItemsOptions.SELL,
+        () => CharacterInventoryApiUrls.CHARACTER_SELL_SELECTED
+      )
+      .with(
+        SelectedEquippableItemsOptions.DESSTROY,
+        () => CharacterInventoryApiUrls.CHARACTER_DESTROY_SELECTED
+      )
+      .with(
+        SelectedEquippableItemsOptions.DISENCHANT,
+        () => CharacterInventoryApiUrls.CHARACTER_DISENCHANT_SELECTED
+      )
+      .otherwise(() => null);
+
+    if (!url) {
+      return;
+    }
+
+    setCloseSuccessMessage(true);
+
+    handleSelection({
+      character_id: character_id,
+      onSuccess: handleMultiActionApiSuccess,
+      apiParams: selection,
+      url: url,
+    });
+  };
+
+  const onActionBarClose = () => {
+    setActionSelected(null);
+    setIsSelectionDisabled(false);
+    setCloseSuccessMessage(true);
+  };
+
   const onSearch = (value: string) => {
     debouncedSetSearchText(value.trim());
+    setCloseSuccessMessage(true);
   };
 
   const closeItemView = () => {
     setItemId(null);
+    setCloseSuccessMessage(true);
   };
 
   const onMultiActionSelected = (actionSelected: DropdownItem) => {
-    console.log(selection, actionSelected);
+    setActionSelected(actionSelected.value as SelectedEquippableItemsOptions);
+    setIsSelectionDisabled(true);
+    setCloseSuccessMessage(true);
   };
 
   const { handleScroll: handleInventoryScroll } = useInfiniteScroll({
     on_end_reached: onEndReached,
   });
 
-  if (error) {
+  if (error || multipleSelectionError) {
     return (
       <div className={'p-4'}>
         <GameDataError />
@@ -86,6 +155,39 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
     );
   }
 
+  const renderMultipleActionSuccess = () => {
+    if (!successMessage) {
+      return;
+    }
+
+    return (
+      <div className="my-2">
+        <Alert
+          variant={AlertVariant.SUCCESS}
+          closable
+          force_close={closeSuccessMessage}
+        >
+          {successMessage}
+        </Alert>
+      </div>
+    );
+  };
+
+  const renderActionBarForSelection = () => {
+    if (isNil(actionSelected)) {
+      return null;
+    }
+
+    return (
+      <BackPackSelectionActions
+        action_type={actionSelected}
+        on_action_bar_close={onActionBarClose}
+        on_submit_action={handleActionSectionSubmission}
+        is_loading={multipleSelectionLoading}
+      />
+    );
+  };
+
   const renderSelectionActions = () => {
     if (selection === null) {
       return null;
@@ -100,15 +202,15 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
     const options = [
       {
         label: 'Sell All',
-        value: 'sell-all',
+        value: SelectedEquippableItemsOptions.SELL,
       },
       {
         label: 'Destroy All',
-        value: 'destroy-all',
+        value: SelectedEquippableItemsOptions.DESSTROY,
       },
       {
         label: 'Disenchant All',
-        value: 'disenchant-all',
+        value: SelectedEquippableItemsOptions.DISENCHANT,
       },
     ];
 
@@ -118,7 +220,9 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
           items={options}
           on_select={onMultiActionSelected}
           selection_placeholder={'Select an action'}
+          disabled={isSelectionDisabled}
         />
+        {renderActionBarForSelection()}
       </div>
     );
   };
@@ -133,6 +237,7 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
         />
       </div>
       <hr className="w-full border-t border-gray-300 dark:border-gray-600" />
+      {renderMultipleActionSuccess()}
       <div className="pt-2 px-4">
         <Input on_change={onSearch} place_holder={'Search items'} clearable />
       </div>
@@ -144,6 +249,7 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
           on_scroll_to_end={handleInventoryScroll}
           on_click={handleOnItemClick}
           on_selection_change={handleSelectionChange}
+          is_selection_disabled={isSelectionDisabled}
         />
       </div>
     </div>

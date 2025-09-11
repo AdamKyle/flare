@@ -6,5 +6,5 @@ export default interface GradientButtonProps<T extends unknown[] = []> {
   gradient: ButtonGradientVarient;
   disabled?: boolean;
   additional_css?: string;
-  aria_lebel?: string;
+  aria_label?: string;
 }

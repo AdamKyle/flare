@@ -7,4 +7,5 @@ export default interface AlertProps {
   children: React.ReactNode;
   closable?: boolean;
   on_close?: () => void;
+  force_close?: boolean;
 }

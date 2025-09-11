@@ -48,21 +48,22 @@ class LocationsController extends Controller
 
     public function show(Location $location)
     {
-
         $locationType = null;
         $usedInQuest = null;
 
-        if (! is_null($location->type)) {
+        if (!is_null($location->type)) {
             $locationType = (new LocationType($location->type));
         }
 
-        if (! is_null($location->questRewardItem)) {
+        if (!is_null($location->questRewardItem)) {
+            $questItemId = $location->quest_reward_item_id;
 
-            $usedInQuest = Quest::where('item_id', $location->quest_reward_item_id)->first();
-
-            if (is_null($usedInQuest)) {
-                $usedInQuest = Quest::where('secondary_required_item', $location->quest_reward_item_id)->first();
-            }
+            $usedInQuest = Quest::where(function ($q) use ($questItemId) {
+                $q->where('item_id', $questItemId)
+                    ->orWhere('secondary_required_item', $questItemId);
+            })
+                ->orderByRaw('CASE WHEN item_id = ? THEN 0 ELSE 1 END', [$questItemId])
+                ->first();
         }
 
         return view('information.locations.location', [

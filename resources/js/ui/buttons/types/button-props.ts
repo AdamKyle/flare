@@ -6,5 +6,5 @@ export default interface ButtonProps<T extends unknown[] = []> {
   variant: ButtonVariant;
   disabled?: boolean;
   additional_css?: string;
-  aria_lebel?: string;
+  aria_label?: string;
 }

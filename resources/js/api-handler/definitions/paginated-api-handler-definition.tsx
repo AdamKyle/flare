@@ -16,4 +16,5 @@ export default interface PaginatedApiHandlerDefinition<
   setSearchText: StateSetter<string>;
   setFilters: StateSetter<F>;
   onEndReached: () => void;
+  setRefresh: StateSetter<boolean>;
 }

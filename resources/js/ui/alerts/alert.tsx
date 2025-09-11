@@ -1,13 +1,22 @@
-// ui/alerts/Alert.tsx
 import clsx from 'clsx';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { baseStyle } from 'ui/alerts/styles/base-style';
 import { variantStyle } from 'ui/alerts/styles/variant-style';
 import AlertProps from 'ui/alerts/types/alert-props';
 
-export const Alert = (props: AlertProps): React.ReactNode => {
+export const Alert = (props: AlertProps) => {
   const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    if (props.force_close) {
+      setVisible(false);
+
+      if (props.on_close) {
+        props.on_close();
+      }
+    }
+  }, [props.force_close, props.on_close]);
 
   const handleClose = (): void => {
     setVisible(false);
@@ -17,9 +26,9 @@ export const Alert = (props: AlertProps): React.ReactNode => {
     }
   };
 
-  const renderCloseButton = (): React.ReactNode => {
+  const renderCloseButton = () => {
     if (!props.closable) {
-      return null;
+      return;
     }
 
     return (

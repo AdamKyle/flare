@@ -36,7 +36,7 @@ class CharacterInventoryMultiController extends Controller
 
     public function destroySelected(InventoryMultiRequest $request, Character $character)
     {
-        $result = $this->multiInventoryActionService->destroyManyItems($character, $request->slot_ids);
+        $result = $this->multiInventoryActionService->destroyManyItems($character, $request->all());
 
         $status = $result['status'];
         unset($result['status']);
@@ -46,7 +46,7 @@ class CharacterInventoryMultiController extends Controller
 
     public function disenchantSelected(InventoryMultiRequest $request, Character $character)
     {
-        $result = $this->multiInventoryActionService->disenchantManyItems($character, $request->slot_ids);
+        $result = $this->multiInventoryActionService->disenchantManyItems($character, $request->all());
 
         $status = $result['status'];
         unset($result['status']);
@@ -56,7 +56,7 @@ class CharacterInventoryMultiController extends Controller
 
     public function sellSelected(InventoryMultiRequest $request, Character $character)
     {
-        $result = $this->multiInventoryActionService->sellManyItems($character, $request->slot_ids);
+        $result = $this->multiInventoryActionService->sellManyItems($character, $request->all());
 
         $status = $result['status'];
         unset($result['status']);

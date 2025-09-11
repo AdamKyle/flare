@@ -14,4 +14,5 @@ export default interface DropdownProps {
   additional_scroll_css?: string;
   pre_selected_item?: DropdownItem;
   force_clear?: boolean;
+  disabled?: boolean;
 }

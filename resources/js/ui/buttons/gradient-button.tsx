@@ -14,7 +14,7 @@ const GradientButton = (props: GradientButtonProps): ReactNode => {
         variantStyles(props.gradient),
         props.additional_css
       )}
-      aria-label={props.aria_lebel || props.label}
+      aria-label={props.aria_label || props.label}
       disabled={props.disabled}
       role="button"
       type="button"

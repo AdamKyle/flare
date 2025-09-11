@@ -58,7 +58,7 @@ const ItemComparison = ({
             showAdvanced ? 'Hide advanced details' : 'Show advanced details'
           }
           additional_css="px-3"
-          aria_lebel={
+          aria_label={
             showAdvanced ? 'Hide advanced details' : 'Show advanced details'
           }
         />

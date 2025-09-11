@@ -15,6 +15,7 @@ const GenericItemList = ({
   on_scroll_to_end,
   on_click,
   on_selection_change,
+  is_selection_disabled,
 }: GenericItemListProps): ReactNode => {
   const [selectedItems, setSelectedItems] = useState<ItemSelectedType>([]);
   const [excludedIds, setExcludedIds] = useState<Set<number>>(new Set());
@@ -154,6 +155,7 @@ const GenericItemList = ({
               dark:focus-visible:ring-offset-gray-900"
               checked={headerChecked}
               onChange={(e) => handleSelectAllChange(e.target.checked)}
+              disabled={is_selection_disabled}
             />
             <span className="font-medium">Select all (visible)</span>
           </label>
@@ -201,6 +203,7 @@ const GenericItemList = ({
           on_click={handleClick}
           is_selected={isItemSelected(item.id)}
           on_item_selected={handleSelectItem}
+          is_selection_disabled={is_selection_disabled}
         />
       )
     );
