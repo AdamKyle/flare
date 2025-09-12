@@ -16,6 +16,7 @@ use App\Game\Character\CharacterInventory\Requests\RemoveItemRequest;
 use App\Game\Character\CharacterInventory\Requests\RenameSetRequest;
 use App\Game\Character\CharacterInventory\Requests\SaveEquipmentAsSet;
 use App\Game\Character\CharacterInventory\Requests\UseManyItemsValidation;
+use App\Game\Character\CharacterInventory\Requests\ViewInventoryItemRequest;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Character\CharacterInventory\Services\InventorySetService;
@@ -43,13 +44,11 @@ class CharacterInventoryController extends Controller
         UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
         UseItemService $useItemService,
     ) {
-
         $this->characterInventoryService = $characterInventoryService;
         $this->inventorySetService = $inventorySetService;
         $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
         $this->useItemService = $useItemService;
     }
-
 
     public function inventory(PaginationRequest $request, Character $character): JsonResponse
     {
@@ -58,41 +57,44 @@ class CharacterInventoryController extends Controller
         );
     }
 
-    public function questItems(PaginationRequest $request, Character $character): JsonResponse {
+    public function questItems(PaginationRequest $request, Character $character): JsonResponse
+    {
         return response()->json(
             $this->characterInventoryService->setCharacter($character)->fetchCharacterQuestItems($request->per_page, $request->page, $request->search_text)
         );
     }
 
-    public function usableItems(PaginationRequest $request, Character $character): JsonResponse {
+    public function usableItems(PaginationRequest $request, Character $character): JsonResponse
+    {
         return response()->json(
             $this->characterInventoryService->setCharacter($character)->fetchCharacterUsableItems($request->per_page, $request->page, $request->search_text, $request->filters)
         );
     }
 
-    public function equippedItems(Character $character): JsonResponse {
-
+    public function equippedItems(Character $character): JsonResponse
+    {
         return response()->json([
             'equipped' => $this->characterInventoryService->setCharacter($character)->fetchEquipped(),
         ]);
     }
 
-    public function currentSets(PaginationRequest $request, Character $character): JsonResponse {
+    public function currentSets(PaginationRequest $request, Character $character): JsonResponse
+    {
         return response()->json(
             $this->characterInventoryService->setCharacter($character)->getCharacterInventorySets($request->per_page, $request->page),
         );
     }
 
-    public function getSetItems(PaginationRequest $request, Character $character): JsonResponse {
+    public function getSetItems(PaginationRequest $request, Character $character): JsonResponse
+    {
         return response()->json(
             $this->characterInventoryService->setCharacter($character)->getSetItems($request->per_page, $request->page, $request->search_text, $request->filters),
         );
     }
 
-    public function itemDetails(Character $character, Item $item, Manager $manager, PlainDataSerializer $plainDataSerializer, ItemEnricherFactory $itemEnricherFactory): JsonResponse
+    public function itemDetails(ViewInventoryItemRequest $request, Character $character, ItemEnricherFactory $itemEnricherFactory): JsonResponse
     {
-
-        $slot = $this->characterInventoryService->getSlotForItemDetails($character, $item);
+        $slot = $this->characterInventoryService->getSlotForItemDetails($character, $request->slot_id);
 
         if (is_null($slot)) {
             return response()->json([
@@ -100,14 +102,13 @@ class CharacterInventoryController extends Controller
             ]);
         }
 
-        $item = $itemEnricherFactory->buildItemData($slot->item);
+        $payload = $itemEnricherFactory->buildItemData($slot->item, $slot);
 
-        return response()->json($item);
+        return response()->json($payload);
     }
 
     public function destroy(Request $request, Character $character): JsonResponse
     {
-
         $result = $this->characterInventoryService->setCharacter($character)->deleteItem($request->slot_id);
 
         $status = $result['status'];
@@ -168,7 +169,6 @@ class CharacterInventoryController extends Controller
 
     public function removeFromSet(RemoveItemRequest $request, Character $character): JsonResponse
     {
-
         $result = $this->inventorySetService->removeItemFromInventorySet($character, $request->inventory_set_id, $request->slot_id);
 
         $status = $result['status'];
@@ -179,7 +179,6 @@ class CharacterInventoryController extends Controller
 
     public function emptySet(Character $character, InventorySet $inventorySet): JsonResponse
     {
-
         $result = $this->inventorySetService->emptySet($character, $inventorySet);
 
         $status = $result['status'];
@@ -193,7 +192,6 @@ class CharacterInventoryController extends Controller
      */
     public function equipItem(EquipItemValidation $request, Character $character, EquipItemService $equipItemService): JsonResponse
     {
-
         $result = $equipItemService->equipItem($character, $request->all());
 
         $status = $result['status'];
@@ -207,7 +205,6 @@ class CharacterInventoryController extends Controller
      */
     public function unequipItem(Request $request, Character $character): JsonResponse
     {
-
         if ($request->inventory_set_equipped) {
             $result = $this->inventorySetService->unequipSet($character);
 
@@ -230,7 +227,6 @@ class CharacterInventoryController extends Controller
      */
     public function unequipAll(Request $request, Character $character): JsonResponse
     {
-
         if ($request->is_set_equipped) {
             $result = $this->inventorySetService->unequipSet($character);
 
@@ -263,7 +259,6 @@ class CharacterInventoryController extends Controller
      */
     public function useManyItems(UseManyItemsValidation $request, Character $character): JsonResponse
     {
-
         $result = $this->useItemService->useManyItemsFromInventory($character, $request->items_to_use);
 
         $status = $result['status'];

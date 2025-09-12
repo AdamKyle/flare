@@ -179,6 +179,31 @@ const LocationDetails = ({
     );
   };
 
+  const renderViewQuestItemReward = () => {
+    if (isNil(data.quest_reward_item)) {
+      return null;
+    }
+
+    return (
+      <>
+        <Separator />
+        <div className={'prose dark:prose-dark dark:text-white'}>
+          <h3>Quest Item Reward</h3>
+          <p>
+            This location Drops a quest item! By simply visiting this location the quest item will drop for you!
+          </p>
+          <Separator />
+          <Button
+            on_click={openItemsList}
+            label={'Quest Item Reward'}
+            variant={ButtonVariant.PRIMARY}
+            additional_css={'w-full'}
+          />
+        </div>
+      </>
+    );
+  }
+
   const renderTitle = () => {
     if (!show_title) {
       return;

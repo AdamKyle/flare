@@ -28,7 +28,7 @@ const GenericItemList = ({
       return;
     }
 
-    return on_click(item.id);
+    return on_click(item.slot_id);
   };
 
   const handleSelectAllChange = (checked: boolean) => {
@@ -107,7 +107,7 @@ const GenericItemList = ({
       return null;
     }
 
-    const visibleIds = items.map((i) => i.id);
+    const visibleIds = items.map((i) => i.slot_id);
 
     const visibleSelectedCount = visibleIds.reduce((acc, id) => {
       if (isItemSelected(id)) {
@@ -198,10 +198,10 @@ const GenericItemList = ({
     return items.map(
       (item: EquippableItemWithBase | BaseQuestItemDefinition) => (
         <GenericItem
-          key={item.id}
+          key={item.slot_id}
           item={item}
           on_click={handleClick}
-          is_selected={isItemSelected(item.id)}
+          is_selected={isItemSelected(item.slot_id)}
           on_item_selected={handleSelectItem}
           is_selection_disabled={is_selection_disabled}
         />

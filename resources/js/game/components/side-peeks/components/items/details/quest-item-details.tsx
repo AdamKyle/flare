@@ -1,5 +1,4 @@
-import { isNil } from 'lodash';
-import React from 'react';
+import React, { useState } from 'react';
 
 import LocationDetails from '../../../map-actions/location-details/location-details';
 import QuestItemProps from '../types/details/quest-item-props';
@@ -15,19 +14,19 @@ const QuestItemDetails = ({
   item,
   location_props,
 }: QuestItemProps) => {
-  const [isLocationDetailsOpen, setIsLocationDetailsOpen] =
-    React.useState(false);
+  const [isLocationDetailsVisible, setIsLocationDetailsVisible] =
+    useState(false);
 
   const handleOpenLocationDetails = () => {
-    setIsLocationDetailsOpen(true);
+    setIsLocationDetailsVisible(true);
   };
 
   const handleCloseLocationDetails = () => {
-    setIsLocationDetailsOpen(false);
+    setIsLocationDetailsVisible(false);
   };
 
-  const renderHowToFind = () => {
-    if (is_found_at_location && !isNil(item.drop_location)) {
+  const renderHowToFindSection = () => {
+    if (is_found_at_location) {
       return null;
     }
 
@@ -49,31 +48,61 @@ const QuestItemDetails = ({
     );
   };
 
-  const renderRequirements = () => {
-    const quests = [
-      ...(item.required_quest ? [item.required_quest] : []),
-      ...(Array.isArray(item.required_quests) ? item.required_quests : []),
-    ];
+  const renderRequiredMonsterSection = () => {
+    const requiredMonster = item.required_monster;
 
-    if (quests.length === 0) {
+    if (!requiredMonster) {
       return null;
     }
 
-    const renderQuest = (q: (typeof quests)[number]) => {
+    return (
+      <Dl>
+        <Dt>Monster</Dt>
+        <Dd>{requiredMonster.name}</Dd>
+        {requiredMonster.map ? (
+          <>
+            <Dt>On Map</Dt>
+            <Dd>{requiredMonster.map}</Dd>
+          </>
+        ) : null}
+      </Dl>
+    );
+  };
+
+  const renderRequiredQuestsSection = () => {
+    const requiredQuests =
+      !item.required_quest &&
+      (!Array.isArray(item.required_quests) ||
+        item.required_quests.length === 0)
+        ? null
+        : [
+            ...(item.required_quest ? [item.required_quest] : []),
+            ...(Array.isArray(item.required_quests)
+              ? item.required_quests
+              : []),
+          ];
+
+    if (!requiredQuests) {
+      return null;
+    }
+
+    const renderRequiredQuest = (
+      requiredQuest: (typeof requiredQuests)[number]
+    ) => {
       return (
-        <Dl key={`req-quest-${q.id}`}>
+        <Dl key={`req-quest-${requiredQuest.id}`}>
           <Dt>Quest</Dt>
-          <Dd>{q.name}</Dd>
-          {q.npc ? (
+          <Dd>{requiredQuest.name}</Dd>
+          {requiredQuest.npc ? (
             <>
               <Dt>For NPC</Dt>
-              <Dd>{q.npc}</Dd>
+              <Dd>{requiredQuest.npc}</Dd>
             </>
           ) : null}
-          {q.map ? (
+          {requiredQuest.map ? (
             <>
               <Dt>On Map</Dt>
-              <Dd>{q.map}</Dd>
+              <Dd>{requiredQuest.map}</Dd>
             </>
           ) : null}
         </Dl>
@@ -82,20 +111,40 @@ const QuestItemDetails = ({
 
     return (
       <>
-        <h4 className="mt-4 mb-1 text-xs font-semibold uppercase tracking-wide text-mango-tango-500 dark:text-mango-tango-300">
-          Requirements
-        </h4>
-        <hr className="w-full border-t border-gray-300 dark:border-gray-600 mb-2" />
         <p className="italic text-gray-800 dark:text-gray-300 mb-2">
           this quest item is used in the following quest
-          {quests.length > 1 ? 's' : ''}:
+          {requiredQuests.length > 1 ? 's' : ''}:
         </p>
-        <div className="space-y-2">{quests.map(renderQuest)}</div>
+        <div className="space-y-2">
+          {requiredQuests.map(renderRequiredQuest)}
+        </div>
       </>
     );
   };
 
-  if (isLocationDetailsOpen && location_props) {
+  const renderRequirementsSection = () => {
+    const hasAnyRequirement =
+      Boolean(item.required_monster) ||
+      Boolean(item.required_quest) ||
+      (Array.isArray(item.required_quests) && item.required_quests.length > 0);
+
+    if (!hasAnyRequirement) {
+      return null;
+    }
+
+    return (
+      <>
+        <h4 className="mt-4 mb-1 text-xs font-semibold uppercase tracking-wide text-mango-tango-500 dark:text-mango-tango-300">
+          Requirements
+        </h4>
+        <hr className="w-full border-t border-gray-300 dark:border-gray-600 mb-2" />
+        {renderRequiredMonsterSection()}
+        {renderRequiredQuestsSection()}
+      </>
+    );
+  };
+
+  if (isLocationDetailsVisible && location_props && item.drop_location) {
     return (
       <LocationDetails
         character_id={location_props.character_id}
@@ -120,8 +169,8 @@ const QuestItemDetails = ({
         {item.description}
       </p>
       <hr className="w-full border-t border-gray-300 dark:border-gray-600" />
-      {renderRequirements()}
-      {renderHowToFind()}
+      {renderRequirementsSection()}
+      {renderHowToFindSection()}
     </>
   );
 };

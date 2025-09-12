@@ -24,7 +24,7 @@ import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import Separator from 'ui/separator/separator';
 
 const InventoryItem = ({
-  item_id,
+  slot_id,
   character_id,
   close_item_view,
 }: InventoryItemProps) => {
@@ -33,7 +33,7 @@ const InventoryItem = ({
 
   const { error, loading, data } = useGetInventoryItemDetails({
     character_id,
-    item_id,
+    slot_id,
     url: CharacterInventoryApiUrls.CHARACTER_INVENTORY_ITEM,
   });
 

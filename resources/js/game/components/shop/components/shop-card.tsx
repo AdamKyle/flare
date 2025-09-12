@@ -33,7 +33,7 @@ const ShopCard = ({ item, view_item, compare_item }: ShopCardProps) => {
     <>
       <div className="flex items-start justify-between">
         <h3
-          id={`item-${item.id}-name`}
+          id={`item-${item.item_id}-name`}
           className="flex-1 text-lg font-semibold text-danube-600 dark:text-danube-300 break-words"
         >
           {item.name}
@@ -41,7 +41,7 @@ const ShopCard = ({ item, view_item, compare_item }: ShopCardProps) => {
         <LinkButton
           label="view"
           variant={ButtonVariant.PRIMARY}
-          on_click={() => view_item(item.id)}
+          on_click={() => view_item(item.item_id)}
         />
       </div>
       <p className="mt-2 text-gray-700 dark:text-gray-300">
@@ -52,7 +52,7 @@ const ShopCard = ({ item, view_item, compare_item }: ShopCardProps) => {
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
         <Button
-          on_click={() => compare_item(item.id)}
+          on_click={() => compare_item(item.item_id)}
           label="Compare"
           variant={ButtonVariant.SUCCESS}
         />

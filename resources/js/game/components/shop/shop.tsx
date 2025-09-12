@@ -97,14 +97,14 @@ const Shop = ({ close_shop }: ShopProps) => {
   };
 
   const handleViewItem = (item_id: number) => {
-    const found = data.find((it) => it.id === item_id);
+    const found = data.find((item) => item.item_id === item_id);
     if (found) {
       setItemToView(found);
     }
   };
 
   const handleCompareItem = (item_id: number) => {
-    const found = data.find((it) => it.id === item_id);
+    const found = data.find((item) => item.item_id === item_id);
     if (found) {
       setItemToCompare(found);
     }
@@ -129,7 +129,7 @@ const Shop = ({ close_shop }: ShopProps) => {
       <InfiniteRow handle_scroll={handleScroll} additional_css="max-h-[500px]">
         {data.map((item) => (
           <ShopCard
-            key={item.id}
+            key={item.item_id}
             item={item}
             view_item={handleViewItem}
             compare_item={handleCompareItem}

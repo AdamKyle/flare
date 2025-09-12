@@ -2,13 +2,11 @@
 
 namespace App\Game\Shop\Services;
 
-use App\Flare\Items\Transformers\EquippableItemTransformer;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Pagination\Pagination;
-use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
@@ -20,6 +18,7 @@ use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Shop\Events\SellItemEvent;
+use App\Game\Shop\Transformers\ShopTransformer;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use League\Fractal\Manager;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -32,20 +31,20 @@ class ShopService
      * @param EquipItemService $equipItemService
      * @param CharacterInventoryService $characterInventoryService
      * @param Pagination $pagination
-     * @param EquippableItemTransformer $equippableItemTransformer
+     * @param ShopTransformer $shopTransformer
      * @param Manager $manager
      */
     public function __construct(private readonly EquipItemService $equipItemService,
                                 private readonly CharacterInventoryService $characterInventoryService,
                                 private readonly Pagination $pagination,
-                                private readonly EquippableItemTransformer $equippableItemTransformer,
+                                private readonly ShopTransformer $shopTransformer,
                                 private readonly Manager $manager
     ){}
 
     public function getItemsForShop(Character $character, int $perPage, int $page, ?string $searchText, ?array $filters): array {
         $items = $this->fetchItemsForShopBasedOnCharacterClass($character, $searchText, $filters);
 
-        return $this->pagination->buildPaginatedDate($items, $this->equippableItemTransformer, $perPage, $page);
+        return $this->pagination->buildPaginatedDate($items, $this->shopTransformer, $perPage, $page);
     }
 
     public function sellAllItems(Character $character): array

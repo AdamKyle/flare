@@ -6,7 +6,8 @@ import SkillSummaryDefinition from './skill-summary-definition';
 import { SocketDefinition } from './socket-definition';
 
 export default interface EquippableItemDefinition {
-  id: number;
+  item_id: number;
+  slot_id: number;
 
   raw_damage: number | null;
   raw_ac: number | null;

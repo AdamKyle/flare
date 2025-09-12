@@ -50,7 +50,7 @@ const LocationDroppableItems = ({
   };
 
   const onOpenQuestItemDetails = (itemId: number) => {
-    const item = data.find((item) => item.id === itemId);
+    const item = data.find((item) => item.item_id === itemId);
 
     if (!item) {
       return;

@@ -13,7 +13,7 @@ Route::get('/character/{character}/gem-bag', ['uses' => 'Api\CharacterGemBagCont
 Route::get('/character/{character}/gem-details/{gemBagSlot}', ['uses' => 'Api\CharacterGemBagController@getGem']);
 
 Route::group(['middleware' => ['is.character.dead']], function () {
-    Route::get('/character/{character}/inventory/item/{item}', ['uses' => 'Api\CharacterInventoryController@itemDetails']);
+    Route::get('/character/{character}/inventory/item', ['uses' => 'Api\CharacterInventoryController@itemDetails']);
 
     Route::middleware(['is.character.exploring'])->group(function () {
 

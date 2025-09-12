@@ -26,7 +26,7 @@ import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
-  const [itemId, setItemId] = useState<number | null>(null);
+  const [slotId, setSlotId] = useState<number | null>(null);
   const [selection, setSelection] = useState<ItemSelectedType | null>(null);
   const [actionSelected, setActionSelected] =
     useState<SelectedEquippableItemsOptions | null>(null);
@@ -52,8 +52,8 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
     []
   );
 
-  const handleOnItemClick = (item_id: number) => {
-    setItemId(item_id);
+  const handleOnItemClick = (slot_id: number) => {
+    setSlotId(slot_id);
   };
 
   const handleSelectionChange = (update: ItemSelectedType) => {
@@ -114,7 +114,7 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
   };
 
   const closeItemView = () => {
-    setItemId(null);
+    setSlotId(null);
     setCloseSuccessMessage(true);
   };
 
@@ -144,10 +144,10 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
     );
   }
 
-  if (!isNil(itemId)) {
+  if (!isNil(slotId)) {
     return (
       <InventoryItem
-        item_id={itemId}
+        slot_id={slotId}
         character_id={character_id}
         type_of_item={ItemTypeToView.EQUIPPABLE}
         close_item_view={closeItemView}

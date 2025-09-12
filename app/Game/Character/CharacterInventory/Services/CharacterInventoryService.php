@@ -34,50 +34,20 @@ class CharacterInventoryService
 {
     use ResponseBuilder;
 
-    /**
-     * @var Character
-     */
     private Character $character;
 
-    /**
-     * @var InventorySlot
-     */
     private InventorySlot $inventorySlot;
 
-    /**
-     * @var Collection
-     */
     private Collection $inventory;
 
-    /**
-     * @var array
-     */
     private array $positions;
 
-    /**
-     * @var bool
-     */
     private bool $isInventorySetIsEquipped = false;
 
-    /**
-     * @var string
-     */
     private string $inventorySetEquippedName = '';
 
-    /**
-     * @param ItemEnricherFactory $itemEnricherFactory
-     * @param EquippableItemTransformer $equippableItemTransformer
-     * @param QuestItemTransformer $questItemTransformer
-     * @param UsableItemTransformer $usableItemTransformer
-     * @param InventoryTransformer $inventoryTransformer
-     * @param MassDisenchantService $massDisenchantService
-     * @param UpdateCharacterSkillsService $updateCharacterSkillsService
-     * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler
-     * @param Pagination $pagination
-     * @param Manager $manager
-     */
     public function __construct(
-        private readonly ItemEnricherFactory    $itemEnricherFactory,
+        private readonly ItemEnricherFactory $itemEnricherFactory,
         private readonly EquippableItemTransformer $equippableItemTransformer,
         private readonly QuestItemTransformer $questItemTransformer,
         private readonly UsableItemTransformer $usableItemTransformer,
@@ -87,7 +57,6 @@ class CharacterInventoryService
         private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler,
         private readonly Pagination $pagination,
         private readonly Manager $manager,
-
     ) {}
 
     /**
@@ -167,12 +136,12 @@ class CharacterInventoryService
         }
     }
 
-    public function getSlotForItemDetails(Character $character, Item $item): InventorySlot|SetSlot|null
+    public function getSlotForItemDetails(Character $character, int $slotId): InventorySlot|SetSlot|null
     {
         $inventory = Inventory::where('character_id', $character->id)->first();
 
         if ($inventory) {
-            $slot = $inventory->slots()->where('item_id', $item->id)->first();
+            $slot = $inventory->slots()->where('id', $slotId)->first();
 
             if ($slot) {
                 return $slot;
@@ -182,7 +151,7 @@ class CharacterInventoryService
         return SetSlot::query()
             ->join('inventory_sets', 'inventory_sets.id', '=', 'set_slots.inventory_set_id')
             ->where('inventory_sets.character_id', $character->id)
-            ->where('set_slots.item_id', $item->id)
+            ->where('set_slots.id', $slotId)
             ->select('set_slots.*')
             ->first();
     }
@@ -192,7 +161,6 @@ class CharacterInventoryService
      */
     public function disenchantAllItems(Collection $slots, Character $character): array
     {
-
         $maxedOutGoldDust = $character->gold_dust >= MaxCurrenciesValue::MAX_GOLD_DUST;
 
         $this->massDisenchantService->setUp($character)->disenchantItems($slots);
@@ -226,7 +194,6 @@ class CharacterInventoryService
         $sets = [];
 
         foreach ($this->character->inventorySets as $index => $inventorySet) {
-
             if (is_null($inventorySet->name)) {
                 $sets[] = [
                     'name' => 'Set ' . $index + 1,
@@ -249,7 +216,8 @@ class CharacterInventoryService
         return $this->pagination->paginateCollectionResponse($setCollection, $perPage, $page);
     }
 
-    public function getSetItems(int $perPage = 10, int $page = 1, string $search = '', array $filters = []): array {
+    public function getSetItems(int $perPage = 10, int $page = 1, string $search = '', array $filters = []): array
+    {
         $sets = $this->character->inventorySets();
 
         if (isset($filters['set_id'])) {
@@ -270,11 +238,15 @@ class CharacterInventoryService
             });
         }
 
-        $items = $slots->map(function($slot) {
-            return $this->itemEnricherFactory->buildItem($slot->item);
-        });
+        $slots = $slots
+            ->map(function ($slot) {
+                $slot->item = $this->itemEnricherFactory->buildItem($slot->item);
+                return $slot;
+            })
+            ->sortByDesc(fn ($slot) => (float) $slot->item->total_damage_stat_bonus)
+            ->values();
 
-        return $this->pagination->buildPaginatedDate($items, $this->equippableItemTransformer, $perPage, $page);
+        return $this->pagination->buildPaginatedDate($slots, $this->equippableItemTransformer, $perPage, $page);
     }
 
     /**
@@ -297,8 +269,8 @@ class CharacterInventoryService
         }
 
         return 'Set ' . $this->character->inventorySets->search(function ($set) use ($equippedSet) {
-            return $set->id === $equippedSet->id;
-        }) + 1;
+                return $set->id === $equippedSet->id;
+            }) + 1;
     }
 
     /**
@@ -327,7 +299,7 @@ class CharacterInventoryService
 
                 if (isset($filters['effects-skills'])) {
                     $join->whereNotNull('items.increase_skill_bonus_by')
-                         ->whereNotNull('items.increase_skill_training_bonus_by');
+                        ->whereNotNull('items.increase_skill_training_bonus_by');
                 }
 
                 if (isset($filters['effects-base-modifiers'])) {
@@ -364,11 +336,10 @@ class CharacterInventoryService
             });
         }
 
-        return $slots->map(function($slot) {
+        return $slots->map(function ($slot) {
             return $slot->item;
         });
     }
-
 
     /**
      * Gets a list of usable slot's
@@ -438,9 +409,9 @@ class CharacterInventoryService
         return $this->getInventorySlotsCollection($searchText)
             ->map(function ($slot) {
                 $slot->item = $this->itemEnricherFactory->buildItem($slot->item, $this->character->damage_stat);
-                return $slot->item;
+                return $slot;
             })
-            ->sortByDesc(fn($item) => (float) $item->total_damage_stat_bonus)
+            ->sortByDesc(fn ($slot) => (float) $slot->item->total_damage_stat_bonus)
             ->values();
     }
 
@@ -470,7 +441,8 @@ class CharacterInventoryService
      * @param string $searchText
      * @return array
      */
-    public function fetchCharacterQuestItems(int $perPage = 10, int $page = 1, string $searchText = ''): array {
+    public function fetchCharacterQuestItems(int $perPage = 10, int $page = 1, string $searchText = ''): array
+    {
         $items = $this->getQuestItems($searchText);
 
         return $this->pagination->buildPaginatedDate($items, $this->questItemTransformer, $perPage, $page);
@@ -485,7 +457,8 @@ class CharacterInventoryService
      * @param array $filter
      * @return array
      */
-    public function fetchCharacterUsableItems(int $perPage = 10, int $page = 1, string $searchText = '', array $filter = []): array {
+    public function fetchCharacterUsableItems(int $perPage = 10, int $page = 1, string $searchText = '', array $filter = []): array
+    {
         $slots = $this->getUsableItems($searchText, $filter);
 
         return $this->pagination->buildPaginatedDate($slots, $this->usableItemTransformer, $perPage, $page);
@@ -499,7 +472,6 @@ class CharacterInventoryService
      */
     public function findCharacterInventorySlotIds(): array
     {
-
         return $this->character
             ->inventory
             ->slots
@@ -511,30 +483,34 @@ class CharacterInventoryService
     }
 
     /**
-     * Fetch equipped items.
+     * Fetch equipped slots (InventorySlot or SetSlot) with each slot’s item enriched for the transformer.
+     *
+     * @return array
      */
     public function fetchEquipped(): array
     {
-
         $inventory = Inventory::where('character_id', $this->character->id)->first();
 
-        $items = InventorySlot::query()
+        $slots = InventorySlot::query()
             ->where('inventory_id', $inventory->id)
             ->where('equipped', true)
             ->with('item')
             ->get()
-            ->pluck('item')
-            ->filter()
-            ->map(fn ($item) => $this->itemEnricherFactory->buildItem($item))
+            ->filter(fn ($slot) => ! is_null($slot->item))
+            ->map(function ($slot) {
+                $slot->setRelation('item', $this->itemEnricherFactory->buildItem($slot->item));
+                return $slot;
+            })
             ->values();
 
-        if ($items->isNotEmpty()) {
-            $items = new LeagueCollection($items, $this->equippableItemTransformer);
-
-            return $this->manager->createData($items)->toArray();
+        if ($slots->isNotEmpty()) {
+            $resource = new LeagueCollection($slots, $this->equippableItemTransformer);
+            return $this->manager->createData($resource)->toArray();
         }
 
-        $inventorySet = InventorySet::where('character_id', $this->character->id)->where('is_equipped', true)->first();
+        $inventorySet = InventorySet::where('character_id', $this->character->id)
+            ->where('is_equipped', true)
+            ->first();
 
         if (is_null($inventorySet)) {
             return [];
@@ -550,22 +526,24 @@ class CharacterInventoryService
             });
 
             if ($index !== false) {
-                $this->inventorySetEquippedName = 'Set ' . $index + 1;
+                $this->inventorySetEquippedName = 'Set ' . ($index + 1);
             }
         }
 
-        $items = SetSlot::query()
+        $setSlots = SetSlot::query()
             ->where('inventory_set_id', $inventorySet->id)
             ->with('item')
             ->get()
-            ->pluck('item')
-            ->filter()
-            ->map(fn ($item) => $this->itemEnricherFactory->buildItem($item))
+            ->filter(fn ($slot) => ! is_null($slot->item))
+            ->map(function ($slot) {
+                $slot->setRelation('item', $this->itemEnricherFactory->buildItem($slot->item));
+                return $slot;
+            })
             ->values();
 
-        $items = new LeagueCollection($items, $this->equippableItemTransformer);
+        $resource = new LeagueCollection($setSlots, $this->equippableItemTransformer);
 
-        return $this->manager->createData($items)->toArray();
+        return $this->manager->createData($resource)->toArray();
     }
 
     /**
@@ -583,7 +561,6 @@ class CharacterInventoryService
      */
     protected function getInventory(): Collection
     {
-
         $inventory = $this->character->inventory->slots()->whereIn('position', $this->positions)->get();
 
         if (! $inventory->isEmpty()) {
@@ -683,28 +660,24 @@ class CharacterInventoryService
         event(new UpdateCharacterInventoryCountEvent($character));
 
         return $this->successResult([
-            'message'   => 'Destroyed all items.',
-            'inventory' => $this->getInventoryCollection(),
+            'message' => 'Destroyed all items.',
+            'inventory' => $this->getInventoryForType('inventory'),
         ]);
     }
 
     public function disenchantAllItemsInInventory(): array
     {
-        // Work with SLOTS, not items.
         $slots = $this->character->inventory->slots
             ->where('equipped', false)
             ->filter(function ($slot) {
-                // Slot may be dangling (unlikely, but safe guard):
                 if (!$slot->item) {
                     return false;
                 }
 
-                // Ignore types we never disenchant:
                 if (in_array($slot->item->type, ['quest', 'alchemy', 'artifact'], true)) {
                     return false;
                 }
 
-                // Only disenchant items that actually have an affix:
                 return !is_null($slot->item->item_prefix_id) || !is_null($slot->item->item_suffix_id);
             })
             ->values();
@@ -715,7 +688,6 @@ class CharacterInventoryService
             ]);
         }
 
-        // Mass disenchanter expects a collection of SLOTS.
         return $this->disenchantAllItems($slots, $this->character);
     }
 
@@ -727,7 +699,6 @@ class CharacterInventoryService
     public function unequipItem(int $inventorySlotId): array
     {
         if ($this->character->isInventoryFull()) {
-
             return $this->errorResult('Your inventory is full. Cannot unequip items. You have no room in your inventory.');
         }
 
@@ -806,7 +777,6 @@ class CharacterInventoryService
         })->first();
 
         if (is_null($slot)) {
-
             return $this->errorResult('No alchemy item found to destroy.');
         }
 
@@ -870,7 +840,6 @@ class CharacterInventoryService
      */
     protected function fetchType(string $type): string
     {
-
         if (in_array($type, ArmourTypes::armourTypes())) {
             $type = 'armour';
         }
@@ -886,7 +855,6 @@ class CharacterInventoryService
             'quest',
         ];
 
-        // Spells do not have the tye spell - they are differentiated by damage or healing suffix.
         if ($type === 'spell-damage' || $type === 'spell-healing') {
             $type = 'spell';
         }

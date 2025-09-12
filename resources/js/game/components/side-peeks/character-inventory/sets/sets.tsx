@@ -18,7 +18,7 @@ import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const Sets = ({ character_id }: SetsProps): ReactNode => {
-  const [itemId, setItemId] = useState<number | null>(null);
+  const [slotId, setSlotId] = useState<number | null>(null);
 
   const { data, error, loading, onEndReached, setSearchText, setFilters } =
     UsePaginatedApiHandler<EquippableItemWithBase>({
@@ -50,12 +50,12 @@ const Sets = ({ character_id }: SetsProps): ReactNode => {
     setFilters({});
   };
 
-  const handleOnItemClick = (item_id: number) => {
-    setItemId(item_id);
+  const handleOnItemClick = (slot_id: number) => {
+    setSlotId(slot_id);
   };
 
   const closeItemView = () => {
-    setItemId(null);
+    setSlotId(null);
   };
 
   if (error) {
@@ -74,10 +74,10 @@ const Sets = ({ character_id }: SetsProps): ReactNode => {
     );
   }
 
-  if (itemId) {
+  if (slotId) {
     return (
       <InventoryItem
-        item_id={itemId}
+        slot_id={slotId}
         character_id={character_id}
         type_of_item={ItemTypeToView.EQUIPPABLE}
         close_item_view={closeItemView}

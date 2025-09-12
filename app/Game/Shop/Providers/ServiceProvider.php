@@ -11,6 +11,7 @@ use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Shop\Services\GemShopService;
 use App\Game\Shop\Services\GoblinShopService;
 use App\Game\Shop\Services\ShopService;
+use App\Game\Shop\Transformers\ShopTransformer;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 
@@ -29,7 +30,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(EquipItemService::class),
                 $app->make(CharacterInventoryService::class),
                 $app->make(Pagination::class),
-                $app->make(EquippableItemTransformer::class),
+                $app->make(ShopTransformer::class),
                 $app->make(Manager::class)
             );
         });

@@ -2,12 +2,14 @@
 
 namespace App\Flare\Items\Enricher;
 
+use App\Flare\Items\Transformers\EquippableItemTransformer;
+use App\Flare\Items\Transformers\QuestItemTransformer;
+use App\Flare\Items\Transformers\UsableItemTransformer;
 use App\Flare\Items\Values\ArmourType;
 use App\Flare\Items\Values\ItemType;
+use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
-use App\Flare\Items\Transformers\EquippableItemTransformer;
-use App\Flare\Items\Transformers\UsableItemTransformer;
-use App\Flare\Items\Transformers\QuestItemTransformer;
+use App\Flare\Models\SetSlot;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as FractalItem;
@@ -27,7 +29,7 @@ class ItemEnricherFactory
      * Returns the appropriate item model, enriched if necessary.
      *
      * @param Item $item
-     * @param string | null $damageStat
+     * @param string|null $damageStat
      * @return Item
      */
     public function buildItem(Item $item, ?string $damageStat = null): Item
@@ -40,17 +42,44 @@ class ItemEnricherFactory
     }
 
     /**
-     * Returns a transformed array version of the item.
+     * Returns a transformed array version of the item, or the slot when provided and the item is equippable.
      *
      * @param Item $item
+     * @param InventorySlot|SetSlot|null $slot
      * @return array
      */
-    public function buildItemData(Item $item): array
+    public function buildItemData(Item $item, InventorySlot|SetSlot|null $slot = null): array
     {
+        if (!is_null($slot) && $this->isEquippable($slot->item)) {
+            $enriched = $this->equippableEnricher->enrich($slot->item);
+
+            $slot->setRelation('item', $enriched);
+
+            return $this->transform($slot, $this->equippableTransformer);
+        }
+
         if ($this->isEquippable($item)) {
             $enriched = $this->equippableEnricher->enrich($item);
 
             return $this->transform($enriched, $this->equippableTransformer);
+        }
+
+        if (!is_null($slot) && $this->isUsable($item)) {
+            $transformedItem = $this->transform($item, $this->usableTransformer);
+
+            $slotArray = $slot->toArray();
+            $slotArray['item'] = $transformedItem;
+
+            return $slotArray;
+        }
+
+        if (!is_null($slot) && $this->isQuest($item)) {
+            $transformedItem = $this->transform($item, $this->questTransformer);
+
+            $slotArray = $slot->toArray();
+            $slotArray['item'] = $transformedItem;
+
+            return $slotArray;
         }
 
         if ($this->isUsable($item)) {
@@ -65,15 +94,15 @@ class ItemEnricherFactory
     }
 
     /**
-     * Transforms an item using League Fractal.
+     * Transforms a resource using League Fractal.
      *
-     * @param Item $item
+     * @param mixed $resource
      * @param mixed $transformer
      * @return array
      */
-    private function transform(Item $item, mixed $transformer): array
+    private function transform(mixed $resource, mixed $transformer): array
     {
-        $resource = new FractalItem($item, $transformer);
+        $resource = new FractalItem($resource, $transformer);
 
         return $this->manager->setSerializer($this->plainDataSerializer)->createData($resource)->toArray();
     }
@@ -86,7 +115,6 @@ class ItemEnricherFactory
      */
     private function isEquippable(Item $item): bool
     {
-
         $isEquippable = !$item->usable && (
                 in_array($item->type, ItemType::allTypes()) ||
                 in_array($item->type, ArmourType::allTypes())
@@ -94,7 +122,6 @@ class ItemEnricherFactory
 
         return $isEquippable;
     }
-
 
     /**
      * Can we use the item on our self?
