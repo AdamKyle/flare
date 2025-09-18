@@ -1,12 +1,9 @@
 import React from 'react';
 
+import DefinitionRowProps from './types/definition-row-props';
+
 import Dd from 'ui/dl/dd';
 import Dt from 'ui/dl/dt';
-
-type DefinitionRowProps = {
-  left: React.ReactNode;
-  right: React.ReactNode;
-};
 
 const DefinitionRow = ({ left, right }: DefinitionRowProps) => {
   return (
