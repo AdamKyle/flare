@@ -1,12 +1,13 @@
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
 import { debounce } from 'lodash';
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 
-import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
+import BaseQuestItemDefinition from '../../../../api-definitions/items/quest-item-definitions/base-quest-item-definition';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
 import GenericItemList from '../../components/items/generic-item-list';
 import GenericItemProps from '../../components/items/types/generic-item-props';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
+import QuestItem from '../inventory-item/quest-item';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
@@ -19,8 +20,12 @@ const QuestItems = ({
   character_id,
   on_switch_view,
 }: GenericItemProps): ReactNode => {
+  const [itemToView, setItemToView] = useState<BaseQuestItemDefinition | null>(
+    null
+  );
+
   const { data, error, loading, setSearchText, onEndReached } =
-    UsePaginatedApiHandler<EquippableItemWithBase>({
+    UsePaginatedApiHandler<BaseQuestItemDefinition>({
       url: CharacterInventoryApiUrls.CHARACTER_QUEST_ITEMS,
       urlParams: { character: character_id },
     });
@@ -39,6 +44,24 @@ const QuestItems = ({
     debouncedSetSearchText(value.trim());
   };
 
+  const handleOnItemClick = (item_id: number) => {
+    if (!data) {
+      return;
+    }
+
+    const foundItem = data.find((item) => item.item_id === item_id);
+
+    if (!foundItem) {
+      return;
+    }
+
+    setItemToView(foundItem);
+  };
+
+  const handleCloseQuestDetails = () => {
+    setItemToView(null);
+  };
+
   if (error) {
     return (
       <div className={'p-4'}>
@@ -52,6 +75,12 @@ const QuestItems = ({
       <div className={'p-4'}>
         <InfiniteLoader />
       </div>
+    );
+  }
+
+  if (itemToView) {
+    return (
+      <QuestItem quest_item={itemToView} on_close={handleCloseQuestDetails} />
     );
   }
 
@@ -73,6 +102,8 @@ const QuestItems = ({
           items={data}
           is_quest_items={true}
           on_scroll_to_end={handleQuestItemsScroll}
+          on_click={handleOnItemClick}
+          use_item_id
         />
       </div>
     </div>

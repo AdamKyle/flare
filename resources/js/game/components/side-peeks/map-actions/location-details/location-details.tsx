@@ -7,6 +7,8 @@ import LocationDroppableItems from './location-droppable-items';
 import CorruptedLocationDetails from './partials/corrupted-location';
 import CorruptedLocationInfo from './partials/corrupted-location-info.tsx';
 import LocationDetailsProps from './types/location-details-props';
+import QuestItemDetails from '../../../../reusable-components/quest-item/quest-item-details';
+import { planeTextItemColors } from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
 import TeleportSection from '../../components/map-actions/teleport-section';
 import { LocationApiUrls } from '../api/enums/location-api-urls';
 import { useFetchLocationDetailsApi } from '../api/hooks/use-fetch-location-details-api';
@@ -16,6 +18,7 @@ import { calculateCostOfTeleport } from '../util/calculate-cost-of-teleport';
 import { LocationInfoTypes } from './enums/location-info-types';
 import EnemyStrengthIncrease from './partials/enemy-strength-increase';
 import EnemyStrengthIncreaseInfo from './partials/enemy-strength-increase-info';
+import ItemMetaSection from '../../character-inventory/inventory-item/partials/item-view/item-meta-tsx';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
@@ -180,29 +183,39 @@ const LocationDetails = ({
   };
 
   const renderViewQuestItemReward = () => {
-    if (isNil(data.quest_reward_item)) {
+    if (!data?.quest_reward_item || isNil(data.quest_reward_item.data)) {
       return null;
     }
+
+    const questItem = data.quest_reward_item.data;
 
     return (
       <>
         <Separator />
-        <div className={'prose dark:prose-dark dark:text-white'}>
-          <h3>Quest Item Reward</h3>
-          <p>
-            This location Drops a quest item! By simply visiting this location the quest item will drop for you!
+        <div>
+          <h3 className="my-2 text-gray-800 dark:text-gray-200">
+            Quest Item Reward
+          </h3>
+          <p className="text-gray-800 dark:text-gray-200">
+            This location drops a quest item! By simply visiting this location
+            the quest item will drop for you!
           </p>
           <Separator />
-          <Button
-            on_click={openItemsList}
-            label={'Quest Item Reward'}
-            variant={ButtonVariant.PRIMARY}
-            additional_css={'w-full'}
-          />
+          <div className="px-4 flex flex-col gap-2">
+            <ItemMetaSection
+              name={questItem.name}
+              description={questItem.description}
+              type={questItem.type}
+              effect={questItem.effect}
+              titleClassName={planeTextItemColors(questItem)}
+            />
+            <Separator />
+            <QuestItemDetails item={questItem} />
+          </div>
         </div>
       </>
     );
-  }
+  };
 
   const renderTitle = () => {
     if (!show_title) {
@@ -253,6 +266,7 @@ const LocationDetails = ({
       </Dl>
 
       {renderViewDroppableItems()}
+      {renderViewQuestItemReward()}
     </div>
   );
 };

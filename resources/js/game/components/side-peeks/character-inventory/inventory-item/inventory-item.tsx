@@ -1,3 +1,4 @@
+import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import { isNil } from 'lodash';
 import React, { Fragment, ReactNode, useState } from 'react';
 
@@ -15,6 +16,7 @@ import HolyStacksSection from './partials/item-view/holy-stacks-section';
 import ItemMetaSection from './partials/item-view/item-meta-tsx';
 import StatsSection from './partials/item-view/stats-section';
 import InventoryItemProps from './types/inventory-item-props';
+import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
@@ -46,7 +48,7 @@ const InventoryItem = ({
   }
 
   if (error) {
-    return null;
+    return <ApiErrorAlert apiError={error.message} />;
   }
 
   if (isNil(data)) {
@@ -57,7 +59,7 @@ const InventoryItem = ({
     );
   }
 
-  const item = data;
+  const item = data as EquippableItemWithBase;
 
   const handleClickItemAffix = (affixId?: number) => {
     if (!affixId) {

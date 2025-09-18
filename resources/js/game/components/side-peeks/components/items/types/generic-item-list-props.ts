@@ -10,4 +10,5 @@ export default interface GenericItemListProps {
   on_scroll_to_end: (e: React.UIEvent<HTMLDivElement>) => void;
   on_selection_change?: (update: ItemSelectedType) => void;
   is_selection_disabled?: boolean;
+  use_item_id?: boolean;
 }

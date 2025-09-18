@@ -6,7 +6,6 @@ import { match } from 'ts-pattern';
 import BackPackSelectionActions from './back-pack-selection-actions';
 import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
-import { ItemTypeToView } from '../../components/items/enums/item-type-to-view';
 import GenericItemList from '../../components/items/generic-item-list';
 import GenericItemProps from '../../components/items/types/generic-item-props';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
@@ -149,7 +148,6 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
       <InventoryItem
         slot_id={slotId}
         character_id={character_id}
-        type_of_item={ItemTypeToView.EQUIPPABLE}
         close_item_view={closeItemView}
       />
     );

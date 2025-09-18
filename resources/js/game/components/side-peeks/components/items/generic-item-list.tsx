@@ -16,6 +16,7 @@ const GenericItemList = ({
   on_click,
   on_selection_change,
   is_selection_disabled,
+  use_item_id,
 }: GenericItemListProps): ReactNode => {
   const [selectedItems, setSelectedItems] = useState<ItemSelectedType>([]);
   const [excludedIds, setExcludedIds] = useState<Set<number>>(new Set());
@@ -26,6 +27,10 @@ const GenericItemList = ({
   ) => {
     if (!on_click) {
       return;
+    }
+
+    if (use_item_id) {
+      return on_click(item.item_id);
     }
 
     return on_click(item.slot_id);

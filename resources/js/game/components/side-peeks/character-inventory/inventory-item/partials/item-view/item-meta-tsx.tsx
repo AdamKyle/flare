@@ -14,7 +14,20 @@ const ItemMetaSection = ({
   description,
   type,
   titleClassName,
+  effect,
 }: ItemMetaProps) => {
+  const renderEffect = () => {
+    if (!effect || effect === 'N/A') {
+      return null;
+    }
+
+    return (
+      <p className="mb-4 text-gray-800 dark:text-gray-300">
+        <strong>Item effect</strong>: {effect}
+      </p>
+    );
+  };
+
   return (
     <>
       <div>
@@ -23,7 +36,7 @@ const ItemMetaSection = ({
         <Separator />
 
         <p className="my-4 text-gray-800 dark:text-gray-300">{description}</p>
-
+        {renderEffect()}
         <Separator />
       </div>
 

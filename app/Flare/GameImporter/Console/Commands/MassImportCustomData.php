@@ -42,9 +42,11 @@ class MassImportCustomData extends Command
             $this->importGameMaps();
         }
 
+        Artisan::call('import:game-data Locations');
         Artisan::call('break:maps-into-pieces');
         Artisan::call('import:game-data Armour');
         Artisan::call('import:game-data Weapons');
+
 
         $this->importSurveys();
     }

@@ -6,7 +6,6 @@ import SetChoices from './set-choices';
 import SetsProps from './types/sets-props';
 import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
-import { ItemTypeToView } from '../../components/items/enums/item-type-to-view';
 import GenericItemList from '../../components/items/generic-item-list';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
 import InventoryItem from '../inventory-item/inventory-item';
@@ -79,7 +78,6 @@ const Sets = ({ character_id }: SetsProps): ReactNode => {
       <InventoryItem
         slot_id={slotId}
         character_id={character_id}
-        type_of_item={ItemTypeToView.EQUIPPABLE}
         close_item_view={closeItemView}
       />
     );

@@ -3,6 +3,7 @@ import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 
 import { EquippableItemWithBase } from '../../../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
+import BaseQuestItemDefinition from '../../../../../../api-definitions/items/quest-item-definitions/base-quest-item-definition';
 import UseGetInventoryItemDetailsApiDefinition from '../definitions/use-get-inventory-item-details-api-request-definition';
 import UseGetInventoryItemDetailsResponse from '../definitions/use-get-inventory-item-details-response-definition';
 
@@ -13,7 +14,9 @@ export const useGetInventoryItemDetails = ({
 }: UseGetInventoryItemDetailsApiDefinition): UseGetInventoryItemDetailsResponse => {
   const { apiHandler, getUrl } = useApiHandler();
 
-  const [data, setData] = useState<EquippableItemWithBase | null>(null);
+  const [data, setData] = useState<
+    EquippableItemWithBase | BaseQuestItemDefinition | null
+  >(null);
   const [error, setError] =
     useState<UseGetInventoryItemDetailsResponse['error']>(null);
   const [loading, setLoading] = useState<boolean>(true);

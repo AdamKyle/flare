@@ -5,8 +5,7 @@ import React, { useMemo, useState } from 'react';
 import LocationDroppableItemProps from './types/location-droppable-items-props';
 import BaseQuestItemDefinition from '../../../../api-definitions/items/quest-item-definitions/base-quest-item-definition';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
-import ItemDetailsContainer from '../../components/items/details/item-details-container';
-import { ItemTypeToView } from '../../components/items/enums/item-type-to-view';
+import QuestItem from '../../character-inventory/inventory-item/quest-item';
 import GenericItemList from '../../components/items/generic-item-list';
 import { LocationApiUrls } from '../api/enums/location-api-urls';
 
@@ -22,9 +21,6 @@ const LocationDroppableItems = ({
   go_back,
 }: LocationDroppableItemProps) => {
   const [isQuestItemDetailsOpen, setIsQuestItemDetailsOpen] = useState(false);
-  const [itemTypeToView, setItemTypeToView] = useState<ItemTypeToView | null>(
-    null
-  );
   const [itemToView, setItemToView] = useState<BaseQuestItemDefinition | null>(
     null
   );
@@ -52,19 +48,19 @@ const LocationDroppableItems = ({
   const onOpenQuestItemDetails = (itemId: number) => {
     const item = data.find((item) => item.item_id === itemId);
 
+    console.log(itemId, item);
+
     if (!item) {
       return;
     }
 
     setIsQuestItemDetailsOpen(true);
-    setItemTypeToView(itemTypeToView);
     setItemToView(item);
   };
 
   const close_quest_item_details = () => {
     setIsQuestItemDetailsOpen(false);
     setItemToView(null);
-    setItemTypeToView(null);
   };
 
   if (error) {
@@ -83,14 +79,9 @@ const LocationDroppableItems = ({
     );
   }
 
-  if (isQuestItemDetailsOpen && !isNil(itemToView) && !isNil(itemTypeToView)) {
+  if (isQuestItemDetailsOpen && !isNil(itemToView)) {
     return (
-      <ItemDetailsContainer
-        item={itemToView}
-        is_found_at_location
-        item_type_to_view={itemTypeToView}
-        on_close={close_quest_item_details}
-      />
+      <QuestItem quest_item={itemToView} on_close={close_quest_item_details} />
     );
   }
 
@@ -113,6 +104,7 @@ const LocationDroppableItems = ({
           is_quest_items={true}
           on_scroll_to_end={handleQuestItemsScroll}
           on_click={onOpenQuestItemDetails}
+          use_item_id
         />
       </div>
     </div>

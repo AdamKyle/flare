@@ -49,7 +49,6 @@ export const useManageMultipleSelectedItemsApi =
 
         setLoading(false);
       } catch (err) {
-        console.log('Any errors?', err);
         setLoading(false);
 
         if (err instanceof AxiosError) {
