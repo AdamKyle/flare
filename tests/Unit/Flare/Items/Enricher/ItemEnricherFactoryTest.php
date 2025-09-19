@@ -5,6 +5,7 @@ namespace Tests\Unit\Flare\Items\Enricher;
 use App\Flare\Items\Enricher\ItemEnricherFactory;
 use App\Flare\Models\Item;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateItem;
@@ -106,15 +107,31 @@ class ItemEnricherFactoryTest extends TestCase
 
     public function testReturnsTransformedEquippableItemData(): void
     {
+        // Create an equippable item and place it in an actual inventory slot
         $item = $this->createItem([
             'type' => 'sword',
             'usable' => false,
         ]);
 
-        $result = $this->factory->buildItemData($item);
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+
+        $slot = $character->inventory->slots()
+            ->where('item_id', $item->id)
+            ->first()
+            ->fresh()
+            ->load('item');
+
+        // Pass both the item and the slot so the equippable transformer receives a Slot
+        $result = $this->factory->buildItemData($item, $slot);
 
         $this->assertIsArray($result);
-        $this->assertEquals($item->id, $result['id']);
+        $this->assertArrayHasKey('slot_id', $result);
+        $this->assertArrayHasKey('item_id', $result);
+        $this->assertEquals($item->id, $result['item_id']);
     }
 
     public function testReturnsTransformedUsableItemData(): void
@@ -140,7 +157,8 @@ class ItemEnricherFactoryTest extends TestCase
         $result = $this->factory->buildItemData($item);
 
         $this->assertIsArray($result);
-        $this->assertEquals($item->id, $result['id']);
+        // QuestItemTransformer uses 'item_id' as the identifier
+        $this->assertEquals($item->id, $result['item_id']);
     }
 
     public function testReturnsEmptyArrayForUnknownType(): void

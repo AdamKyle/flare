@@ -136,12 +136,15 @@ class CharacterInventoryService
         }
     }
 
-    public function getSlotForItemDetails(Character $character, int $slotId): InventorySlot|SetSlot|null
+    public function getSlotForItemDetails(Character $character, int|Item $slotIdOrItem): InventorySlot|SetSlot|null
     {
         $inventory = Inventory::where('character_id', $character->id)->first();
 
         if ($inventory) {
-            $slot = $inventory->slots()->where('id', $slotId)->first();
+            $slot = $inventory->slots()
+                ->when($slotIdOrItem instanceof Item, fn ($q) => $q->where('item_id', $slotIdOrItem->id))
+                ->when(!($slotIdOrItem instanceof Item), fn ($q) => $q->where('id', $slotIdOrItem))
+                ->first();
 
             if ($slot) {
                 return $slot;
@@ -151,7 +154,8 @@ class CharacterInventoryService
         return SetSlot::query()
             ->join('inventory_sets', 'inventory_sets.id', '=', 'set_slots.inventory_set_id')
             ->where('inventory_sets.character_id', $character->id)
-            ->where('set_slots.id', $slotId)
+            ->when($slotIdOrItem instanceof Item, fn ($q) => $q->where('set_slots.item_id', $slotIdOrItem->id))
+            ->when(!($slotIdOrItem instanceof Item), fn ($q) => $q->where('set_slots.id', $slotIdOrItem))
             ->select('set_slots.*')
             ->first();
     }

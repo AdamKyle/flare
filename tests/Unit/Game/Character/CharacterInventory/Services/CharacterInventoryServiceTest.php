@@ -349,8 +349,8 @@ class CharacterInventoryServiceTest extends TestCase
         ]);
 
         $regularItem = $this->createItem();
-        $questItem = $this->createItem(['type' => 'quest']);
-        $alchemy = $this->createItem(['type' => 'alchemy']);
+        $questItem   = $this->createItem(['type' => 'quest']);
+        $alchemy     = $this->createItem(['type' => 'alchemy']);
 
         $character = $this->character->inventoryManagement()
             ->giveItem($artifact)
@@ -359,13 +359,19 @@ class CharacterInventoryServiceTest extends TestCase
             ->giveItem($alchemy)
             ->getCharacter();
 
-        $result = $this->characterInventoryService->setCharacter($character)->destroyAllItemsInInventory();
+        $result = $this->characterInventoryService
+            ->setCharacter($character)
+            ->destroyAllItemsInInventory();
 
         $character = $character->refresh();
 
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Destroyed all items.', $result['message']);
-        $this->assertCount(1, $result['inventory']);
+
+        $this->assertArrayHasKey('data', $result['inventory']);
+        $this->assertCount(1, $result['inventory']['data']);
+        $this->assertEquals('artifact', $result['inventory']['data'][0]['type']);
+
         $this->assertCount(1, $character->inventory->slots->where('item.type', 'alchemy'));
     }
 

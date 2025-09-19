@@ -45,7 +45,6 @@ class CharacterInventoryControllerTest extends TestCase
 
         $jsonData = json_decode($response->getContent(), true);
 
-
         $this->assertNotEmpty($jsonData['data']);
     }
 
@@ -53,10 +52,10 @@ class CharacterInventoryControllerTest extends TestCase
     {
         $character = $this->character->inventoryManagement()->giveItem($this->createItem())->getCharacter();
 
-        $item = $this->createItem();
-
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/'.$character->id.'/inventory/item/'.$item->id);
+            ->call('GET', '/api/character/'.$character->id.'/inventory/item', [
+                'slot_id' => 999999,
+            ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -66,13 +65,17 @@ class CharacterInventoryControllerTest extends TestCase
     public function testGetItemDetails()
     {
         $item = $this->createItem([
-            'type' => 'sword'
+            'type' => 'sword',
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
+        $slotId = $character->inventory->slots->first()->id;
+
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/'.$character->id.'/inventory/item/'.$item->id);
+            ->call('GET', '/api/character/'.$character->id.'/inventory/item', [
+                'slot_id' => $slotId,
+            ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -298,7 +301,6 @@ class CharacterInventoryControllerTest extends TestCase
 
     public function testUnequipSet()
     {
-
         $character = $this->character->inventorySetManagement()
             ->createInventorySets(1, true)
             ->putItemInSet($this->createItem(), 0, 'left-hand', true)
@@ -317,7 +319,6 @@ class CharacterInventoryControllerTest extends TestCase
 
     public function testUnequipItem()
     {
-
         $character = $this->character->equipStartingEquipment()
             ->getCharacter();
 
@@ -385,7 +386,6 @@ class CharacterInventoryControllerTest extends TestCase
 
     public function testUseManyItems()
     {
-
         Queue::fake();
 
         $item = $this->createItem([
