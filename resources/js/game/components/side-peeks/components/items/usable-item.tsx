@@ -27,13 +27,17 @@ const baseModifiersLabels = {
 type MiscSkillModKey = keyof typeof miscSkillModifierLabels;
 type BaseModKey = keyof typeof baseModifiersLabels;
 
-const UsableItem = ({ item }: UsableItemProps) => {
+const UsableItem = ({ item, on_click }: UsableItemProps) => {
   const itemColor = backpackItemTextColors(item);
 
   const joinWithPipes = (parts: ReactNode[]): ReactNode[] =>
     parts
       .filter(Boolean)
       .flatMap((part, index) => (index > 0 ? [' | ', part] : [part]));
+
+  const handleClickItem = () => {
+    on_click(item.item_id);
+  };
 
   const renderSkillDetails = (): ReactNode => {
     const miscSkillModifiers = Object.keys(
@@ -177,6 +181,7 @@ const UsableItem = ({ item }: UsableItemProps) => {
         backpackBorderStyles(item),
         backpackButtonBackground(item)
       )}
+      onClick={handleClickItem}
     >
       <i className="ra ra-bone-knife text-2xl text-gray-800 dark:text-gray-600"></i>
       <div className="text-left">

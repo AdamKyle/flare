@@ -7,7 +7,11 @@ import BaseUsableItemDefinition from '../../../../api-definitions/items/usable-i
 
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 
-const UsableItemsList = ({ items, on_scroll_to_end }: UsableItemsListProps) => {
+const UsableItemsList = ({
+  items,
+  on_scroll_to_end,
+  on_item_clicked,
+}: UsableItemsListProps) => {
   const renderUsableItemSlots = () => {
     if (isEmpty(items)) {
       return (
@@ -21,7 +25,7 @@ const UsableItemsList = ({ items, on_scroll_to_end }: UsableItemsListProps) => {
     }
 
     return items.map((item: BaseUsableItemDefinition) => (
-      <UsableItem key={item.slot_id} item={item} />
+      <UsableItem key={item.slot_id} item={item} on_click={on_item_clicked} />
     ));
   };
 

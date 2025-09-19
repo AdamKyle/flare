@@ -1,8 +1,9 @@
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
 import { debounce } from 'lodash';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import UsableItemsProps from './types/usable-items-props';
+import UsableItem from './usable-item';
 import BaseUsableItemDefinition from '../../../../api-definitions/items/usable-item-definitions/base-usable-item-definition';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
 import UsableItemsList from '../../components/items/usable-items-list';
@@ -16,6 +17,10 @@ import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const UsableItems = ({ character_id }: UsableItemsProps) => {
+  const [itemToView, setItemToView] = useState<BaseUsableItemDefinition | null>(
+    null
+  );
+
   const { data, error, loading, setSearchText, setFilters, onEndReached } =
     UsePaginatedApiHandler<BaseUsableItemDefinition>({
       url: CharacterInventoryApiUrls.CHARACTER_USABLE_ITEMS,
@@ -30,6 +35,20 @@ const UsableItems = ({ character_id }: UsableItemsProps) => {
 
   const onSearch = (value: string) => {
     debouncedSetSearchText(value.trim());
+  };
+
+  const onViewItem = (itemId: number) => {
+    const foundItem = data.find((item) => item.item_id === itemId);
+
+    if (!foundItem) {
+      return;
+    }
+
+    setItemToView(foundItem);
+  };
+
+  const onCloseViewItem = () => {
+    setItemToView(null);
   };
 
   const { handleScroll: handleInventoryScroll } = useInfiniteScroll({
@@ -62,6 +81,10 @@ const UsableItems = ({ character_id }: UsableItemsProps) => {
     );
   }
 
+  if (itemToView) {
+    return <UsableItem item={itemToView} on_close={onCloseViewItem} />;
+  }
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <hr className="w-full border-t border-gray-300 dark:border-gray-600" />
@@ -89,6 +112,7 @@ const UsableItems = ({ character_id }: UsableItemsProps) => {
         <UsableItemsList
           items={data}
           on_scroll_to_end={handleInventoryScroll}
+          on_item_clicked={onViewItem}
         />
       </div>
     </div>

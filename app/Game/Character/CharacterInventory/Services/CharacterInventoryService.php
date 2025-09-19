@@ -307,9 +307,11 @@ class CharacterInventoryService
                 }
 
                 if (isset($filters['effects-base-modifiers'])) {
-                    $join->whereNotNull('items.base_damage_mod')
-                        ->orWhereNotNull('items.base_healing_mod')
-                        ->orWhereNotNull('items.base_attack_mod');
+                    $join->where(function ($q) {
+                        $q->whereNotNull('items.base_damage_mod')
+                            ->orWhereNotNull('items.base_healing_mod')
+                            ->orWhereNotNull('items.base_ac_mod');
+                    });
                 }
 
                 if (isset($filters['damages-kingdoms'])) {

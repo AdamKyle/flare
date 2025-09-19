@@ -19,13 +19,6 @@ export default interface BaseUsableItemDefinition extends BaseItemDetails {
   base_damage_mod: number | null;
   base_ac_mod: number | null;
   base_healing_mod: number | null;
-  str_mod: number | null;
-  dur_mod: number | null;
-  int_mod: number | null;
-  chr_mod: number | null;
-  dex_mod: number | null;
-  agi_mod: number;
-  focus_mod: number;
   usable: boolean;
   stat_increase: number;
   holy_level: number | null;

@@ -5,4 +5,5 @@ import BaseUsableItemDefinition from '../../../../../api-definitions/items/usabl
 export default interface UsableItemsListProps {
   items: BaseUsableItemDefinition[];
   on_scroll_to_end: (e: React.UIEvent<HTMLDivElement>) => void;
+  on_item_clicked: (itemId: number) => void;
 }
