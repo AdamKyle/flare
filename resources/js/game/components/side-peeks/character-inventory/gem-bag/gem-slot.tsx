@@ -10,8 +10,12 @@ import {
 } from '../../../character-sheet/partials/character-inventory/styles/gem-slot-styles';
 import GemSlotProps from '../../../character-sheet/partials/character-inventory/types/gem-slot-props';
 
-const GemSlot = ({ gem_slot }: GemSlotProps): ReactNode => {
+const GemSlot = ({ gem_slot, on_view_gem }: GemSlotProps): ReactNode => {
   const itemColor = gemSlotTextColor(gem_slot);
+
+  const handleViewGem = () => {
+    on_view_gem(gem_slot.slot_id);
+  };
 
   const renderGemSlotDetails = (): ReactNode => {
     return (
@@ -48,6 +52,7 @@ const GemSlot = ({ gem_slot }: GemSlotProps): ReactNode => {
         gemSlotBorderStyles(gem_slot),
         gemSlotButtonBackgroundColor(gem_slot)
       )}
+      onClick={handleViewGem}
     >
       <i className="ra ra-bone-knife text-2xl text-gray-800 dark:text-gray-600"></i>
       <div className="text-left">

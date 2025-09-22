@@ -48,3 +48,11 @@ export const gemSlotTextColor = (gem: BaseGemDetails): string => {
     .with({ tier: 4 }, () => 'text-marigold-800 dark:text-marigold-400')
     .otherwise(() => 'text-gray-600 dark:text-gray-700');
 };
+
+export const getGemSlotTitleTextColor = (gem: BaseGemDetails): string => {
+  return match(gem)
+    .with({ tier: 2 }, () => 'text-green-700 dark:text-green-600')
+    .with({ tier: 3 }, () => 'text-amber-600 dark:text-amber-500')
+    .with({ tier: 4 }, () => 'text-marigold-800 dark:text-marigold-400')
+    .otherwise(() => 'text-gray-600 dark:text-gray-300');
+};

@@ -7,4 +7,10 @@ export default interface BaseGemDetails {
   strong_against: string;
   element_atoned_to: string;
   element_atoned_to_amount: number;
+  primary_atonement_type: string;
+  primary_atonement_amount: number;
+  secondary_atonement_type: string;
+  secondary_atonement_amount: number;
+  tertiary_atonement_type: string;
+  tertiary_atonement_amount: number;
 }

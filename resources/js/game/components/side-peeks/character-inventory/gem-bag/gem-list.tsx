@@ -7,7 +7,11 @@ import BaseGemDetails from '../../../../api-definitions/items/base-gem-details';
 
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 
-const GemList = ({ gems, on_scroll_to_end }: GemListProps): ReactNode => {
+const GemList = ({
+  gems,
+  on_scroll_to_end,
+  on_view_gem,
+}: GemListProps): ReactNode => {
   const renderGemSlots = () => {
     if (isEmpty(gems)) {
       return (
@@ -20,7 +24,7 @@ const GemList = ({ gems, on_scroll_to_end }: GemListProps): ReactNode => {
     }
 
     return gems.map((gem: BaseGemDetails) => (
-      <GemSlot key={gem.slot_id} gem_slot={gem} />
+      <GemSlot key={gem.slot_id} gem_slot={gem} on_view_gem={on_view_gem} />
     ));
   };
 

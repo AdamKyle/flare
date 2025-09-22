@@ -41,6 +41,12 @@ class CharacterGemSlotsTransformer extends TransformerAbstract
             'strong_against' => GemTypeValue::getOppsiteForDoubleDamage($highestValueName),
             'element_atoned_to' => $highestValueName,
             'element_atoned_to_amount' => $highestValue,
+            'primary_atonement_type' => $primaryAtonementName,
+            'secondary_atonement_type' => $secondaryAtonementName,
+            'tertiary_atonement_type' => $tertiaryAtonementName,
+            'primary_atonement_amount' => $gemBagSlot->gem->primary_atonement_amount,
+            'secondary_atonement_amount' => $gemBagSlot->gem->secondary_atonement_amount,
+            'tertiary_atonement_amount' => $gemBagSlot->gem->tertiary_atonement_amount,
         ];
     }
 }

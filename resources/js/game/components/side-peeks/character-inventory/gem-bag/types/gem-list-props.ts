@@ -5,4 +5,5 @@ import BaseGemDetails from '../../../../../api-definitions/items/base-gem-detail
 export default interface GemListProps {
   gems: BaseGemDetails[];
   on_scroll_to_end: (e: React.UIEvent<HTMLDivElement>) => void;
+  on_view_gem: (slotId: number) => void;
 }

@@ -2,4 +2,5 @@ import BaseGemDetails from '../../../../../api-definitions/items/base-gem-detail
 
 export default interface GemSlotProps {
   gem_slot: BaseGemDetails;
+  on_view_gem: (slotId: number) => void;
 }
