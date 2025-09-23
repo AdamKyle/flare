@@ -45,8 +45,8 @@ class ItemSpecialtyType
     public function __construct(string $value)
     {
 
-        if (! in_array($value, self::$values)) {
-            throw new Exception($value.' does not exist.');
+        if (!in_array($value, self::$values)) {
+            throw new Exception($value . ' does not exist.');
         }
 
         $this->value = $value;
@@ -126,5 +126,24 @@ class ItemSpecialtyType
     public function isFaithlessPlate(): bool
     {
         return $this->value === self::FAITHLESS_PLATE;
+    }
+
+    /**
+     * Get the gold cost for types that have one.
+     *
+     * Returns null when the type has no defined cost.
+     *
+     * @return int|null
+     */
+    public function getCost(): ?int
+    {
+        return match ($this->value) {
+            self::PIRATE_LORD_LEATHER => 75_000_000_000,
+            self::CORRUPTED_ICE => 275_000_000_000,
+            self::DELUSIONAL_SILVER => 280_000_000_000,
+            self::FAITHLESS_PLATE => 300_000_000_000,
+            default => null,
+
+        };
     }
 }

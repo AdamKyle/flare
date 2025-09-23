@@ -3,9 +3,9 @@ import React, { ReactNode, useRef, useState } from 'react';
 
 import GenericItem from './generic-item';
 import GenericItemListProps from './types/generic-item-list-props';
-import { ItemSelectedType } from './types/item-selection-type';
 import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import BaseQuestItemDefinition from '../../../../api-definitions/items/quest-item-definitions/base-quest-item-definition';
+import { ItemSelectedType } from '../../character-inventory/types/item-selected-type';
 
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 
@@ -18,8 +18,12 @@ const GenericItemList = ({
   is_selection_disabled,
   use_item_id,
 }: GenericItemListProps): ReactNode => {
-  const [selectedItems, setSelectedItems] = useState<ItemSelectedType>([]);
-  const [excludedIds, setExcludedIds] = useState<Set<number>>(new Set());
+  const [selection, setSelection] = useState<ItemSelectedType>({
+    mode: 'include',
+    ids: [],
+    exclude: [],
+  });
+
   const selectAllRef = useRef<HTMLInputElement | null>(null);
 
   const handleClick = (
@@ -38,73 +42,58 @@ const GenericItemList = ({
 
   const handleSelectAllChange = (checked: boolean) => {
     if (checked) {
-      setSelectedItems('all');
-      setExcludedIds(new Set());
+      const next: ItemSelectedType = { mode: 'all_except', exclude: [] };
 
-      if (on_selection_change) {
-        on_selection_change({ mode: 'all_except', exclude: [] });
-      }
+      setSelection(next);
+      on_selection_change?.(next);
 
       return;
     }
 
-    setSelectedItems([]);
-    setExcludedIds(new Set());
+    const next: ItemSelectedType = { mode: 'include', ids: [] };
 
-    if (on_selection_change) {
-      on_selection_change({ mode: 'include', ids: [] });
-    }
+    setSelection(next);
+    on_selection_change?.(next);
   };
 
   const handleSelectItem = (itemId: number, checked: boolean) => {
-    if (selectedItems === 'all') {
-      setExcludedIds((prev) => {
-        const next = new Set(prev);
+    setSelection((previous) => {
+      const isAllExcept = previous.mode === 'all_except';
 
-        if (checked) {
-          next.delete(itemId);
-        } else {
-          next.add(itemId);
-        }
+      const ids = new Set(
+        isAllExcept ? (previous.exclude ?? []) : (previous.ids ?? [])
+      );
 
-        if (on_selection_change) {
-          on_selection_change({
-            mode: 'all_except',
-            exclude: Array.from(next),
-          });
-        }
-
-        return next;
-      });
-
-      return;
-    }
-
-    setSelectedItems((prev) => {
-      const next = new Set(prev as number[]);
-
-      if (checked) {
-        next.add(itemId);
+      if (checked && isAllExcept) {
+        ids.delete(itemId);
+      } else if (checked && !isAllExcept) {
+        ids.add(itemId);
+      } else if (!checked && isAllExcept) {
+        ids.add(itemId);
       } else {
-        next.delete(itemId);
+        ids.delete(itemId);
       }
 
-      const nextArray = Array.from(next);
+      const next: ItemSelectedType = isAllExcept
+        ? { mode: 'all_except', exclude: Array.from(ids) }
+        : { mode: 'include', ids: Array.from(ids) };
 
-      if (on_selection_change) {
-        on_selection_change({ mode: 'include', ids: nextArray });
-      }
+      on_selection_change?.(next);
 
-      return nextArray;
+      return next;
     });
   };
 
   const isItemSelected = (id: number) => {
-    if (selectedItems === 'all') {
-      return !excludedIds.has(id);
+    if (selection.mode === 'all_except') {
+      const excluded = selection.exclude ?? [];
+
+      return !excluded.includes(id);
     }
 
-    return (selectedItems as number[]).includes(id);
+    const included = selection.ids ?? [];
+
+    return included.includes(id);
   };
 
   const renderSelectAllHeader = () => {
@@ -112,32 +101,20 @@ const GenericItemList = ({
       return null;
     }
 
-    const visibleIds = items.map((i) => i.slot_id);
+    const visibleSlotIds = items.map((item) => item.slot_id);
 
-    const visibleSelectedCount = visibleIds.reduce((acc, id) => {
-      if (isItemSelected(id)) {
-        return acc + 1;
-      }
+    const hasAllSelected =
+      visibleSlotIds.length > 0 &&
+      visibleSlotIds.every((slotId) => isItemSelected(slotId));
 
-      return acc;
-    }, 0);
+    const hasAnySelected = visibleSlotIds.some((slotId) =>
+      isItemSelected(slotId)
+    );
 
-    const allVisibleChecked =
-      visibleIds.length > 0 && visibleSelectedCount === visibleIds.length;
-
-    const noneVisibleChecked = visibleSelectedCount === 0;
-
-    const isIndeterminate = !allVisibleChecked && !noneVisibleChecked;
-
-    const headerChecked = selectedItems === 'all' && excludedIds.size === 0;
-
-    const selectedCount =
-      selectedItems === 'all'
-        ? Math.max(0, items.length - excludedIds.size)
-        : (selectedItems as number[]).length;
+    const isSelectAllIndeterminate = hasAnySelected && !hasAllSelected;
 
     if (selectAllRef.current) {
-      selectAllRef.current.indeterminate = isIndeterminate;
+      selectAllRef.current.indeterminate = isSelectAllIndeterminate;
     }
 
     return (
@@ -156,22 +133,14 @@ const GenericItemList = ({
               type="checkbox"
               className="h-5 w-5 rounded-md border-2 border-gray-700 dark:border-gray-300 accent-danube-600
               dark:accent-danube-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danube-500
-              dark:focus-visible:ring-danube-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white
+              dark:accent-danube-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white
               dark:focus-visible:ring-offset-gray-900"
-              checked={headerChecked}
+              checked={hasAllSelected}
               onChange={(e) => handleSelectAllChange(e.target.checked)}
               disabled={is_selection_disabled}
             />
             <span className="font-medium">Select all (visible)</span>
           </label>
-
-          <output
-            role="status"
-            aria-live="polite"
-            className="text-sm text-gray-600 dark:text-gray-400"
-          >
-            {selectedCount} selected
-          </output>
         </div>
       </div>
     );

@@ -4,7 +4,9 @@ namespace App\Flare\Calculators;
 
 use App\Flare\Models\Item;
 use App\Flare\Traits\IsItemUnique;
+use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\RandomAffixDetails;
+use Exception;
 
 class SellItemCalculator
 {
@@ -17,6 +19,7 @@ class SellItemCalculator
      *
      * Minus a 5% tax.
      *
+     * @param Item $item
      * @return int
      */
     public function fetchTotalSalePrice(Item $item): int
@@ -33,11 +36,21 @@ class SellItemCalculator
     /**
      * Fetch the cost of the item with its affixes.
      *
+     * @param Item $item
      * @return int
+     * @throws Exception
      */
     public function fetchSalePriceWithAffixes(Item $item): int
     {
         $cost = $item->cost;
+
+        if ($cost <= 0 && !is_null($item->specialty_type)) {
+            $cost = (new ItemSpecialtyType($item->specialty_type))->getCost();
+        }
+
+        if ($cost <= 0) {
+            throw new Exception('Cannot determine cost of item for item: ' . $item->affix_name . ' item ID: ' . $item->id);
+        }
 
         if ($this->isItemUnique($item)) {
             return self::MAX_AFFIX_COST - (self::MAX_AFFIX_COST * 0.05);
@@ -78,6 +91,7 @@ class SellItemCalculator
     /**
      * Fetch min sale price.
      *
+     * @param Item $item
      * @return int
      */
     public function fetchMinPrice(Item $item): int
@@ -114,6 +128,7 @@ class SellItemCalculator
      * - Mythic
      * - Cosmic
      *
+     * @param Item $item
      * @return bool
      */
     private function isItemUnique(Item $item): bool
@@ -145,6 +160,7 @@ class SellItemCalculator
     /**
      * Is the item considered holy?
      *
+     * @param Item $item
      * @return bool
      */
     private function isItemHoly(Item $item): bool
@@ -153,8 +169,9 @@ class SellItemCalculator
     }
 
     /**
-     * Whats the minimum sale price of the unique?
+     * What's the minimum sale price of the unique?
      *
+     * @param Item $item
      * @return int
      */
     private function fetchMinimumSalePriceOfUnique(Item $item): int

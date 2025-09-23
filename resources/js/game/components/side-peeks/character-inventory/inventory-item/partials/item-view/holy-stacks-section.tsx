@@ -129,7 +129,7 @@ const HolyStacksSection = ({
   };
 
   return (
-    <Section title="Holy Stacks">
+    <Section title="Holy Stacks" showSeparator={false}>
       {renderTotalRow()}
       {renderAppliedRow()}
       {renderAttributeBonusRow()}

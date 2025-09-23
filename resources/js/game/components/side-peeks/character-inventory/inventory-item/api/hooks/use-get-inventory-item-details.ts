@@ -42,7 +42,7 @@ export const useGetInventoryItemDetails = ({
     } finally {
       setLoading(false);
     }
-  }, [apiHandler, apiUrl]);
+  }, [apiHandler, apiUrl, slot_id]);
 
   useEffect(() => {
     fetchInventoryItemDetails().catch(() => {});

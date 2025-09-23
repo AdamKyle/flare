@@ -21,9 +21,9 @@ const GenericItem = ({
   is_selection_disabled,
 }: BackpackItemProps): ReactNode => {
   const itemColor = backpackItemTextColors(item);
-  const checkboxId = 'select-' + item.item_id;
-  const titleId = 'item-title-' + item.item_id;
-  const detailsId = 'item-details-' + item.item_id;
+  const checkboxId = 'select-' + item.slot_id;
+  const titleId = 'item-title-' + item.slot_id;
+  const detailsId = 'item-details-' + item.slot_id;
 
   const handleViewItem = () => {
     if (!on_click) {
@@ -33,37 +33,41 @@ const GenericItem = ({
     on_click(item);
   };
 
-  const getAttack = (i: EquippableItemWithBase): number =>
-    i.raw_damage ?? i.base_damage ?? 0;
+  const getAttack = (equippableItem: EquippableItemWithBase): number =>
+    equippableItem.raw_damage ?? equippableItem.base_damage ?? 0;
 
-  const getAc = (i: EquippableItemWithBase): number =>
-    i.raw_ac ?? i.base_ac ?? 0;
+  const getAc = (equippableItem: EquippableItemWithBase): number =>
+    equippableItem.raw_ac ?? equippableItem.base_ac ?? 0;
 
-  const renderQuestDetails = (i: BaseQuestItemDefinition): ReactNode => {
-    if (i.effect === null) {
+  const renderQuestDetails = (
+    questItem: BaseQuestItemDefinition
+  ): ReactNode => {
+    if (questItem.effect === null) {
       return null;
     }
 
     return (
       <span>
-        <strong>Effects</strong>: {i.effect}
+        <strong>Effects</strong>: {questItem.effect}
       </span>
     );
   };
 
-  const renderEquippableDetails = (i: EquippableItemWithBase): ReactNode => {
+  const renderEquippableDetails = (
+    equippableItem: EquippableItemWithBase
+  ): ReactNode => {
     return (
       <>
         <span>
-          <strong>Type</strong>: {i.type}
+          <strong>Type</strong>: {equippableItem.type}
         </span>{' '}
         |{' '}
         <span>
-          <strong>Damage</strong>: {getAttack(i)}
+          <strong>Damage</strong>: {getAttack(equippableItem)}
         </span>{' '}
         |{' '}
         <span>
-          <strong>AC</strong>: {getAc(i)}
+          <strong>AC</strong>: {getAc(equippableItem)}
         </span>
       </>
     );
@@ -88,7 +92,9 @@ const GenericItem = ({
           id={checkboxId}
           type="checkbox"
           checked={!!is_selected}
-          onChange={(e) => on_item_selected?.(item.item_id, e.target.checked)}
+          onChange={(event) =>
+            on_item_selected?.(item.slot_id, event.target.checked)
+          }
           className="h-6 w-6 shrink-0 rounded-md border-2 border-gray-700 dark:border-gray-300 accent-danube-600 dark:accent-danube-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danube-500 dark:focus-visible:ring-danube-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900"
           aria-describedby={detailsId}
           disabled={is_selection_disabled}

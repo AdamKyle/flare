@@ -3,7 +3,7 @@ import React from 'react';
 import QuestMapRow from './quest-map-row';
 import DefinitionRow from '../../viewable-sections/definition-row';
 import InfoLabel from '../../viewable-sections/info-label';
-import TextRow from '../../viewable-sections/test-row';
+import TextRow from '../../viewable-sections/text-row';
 import QuestRowsProps from '../types/partials/quest-rows-props';
 
 const QuestRows = ({ heading, name, npc, map }: QuestRowsProps) => {

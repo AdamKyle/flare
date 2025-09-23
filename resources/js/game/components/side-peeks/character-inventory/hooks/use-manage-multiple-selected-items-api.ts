@@ -5,6 +5,7 @@ import { useState } from 'react';
 import UseManageMultipleSelectedItemsApiParams from './deffinitions/use-manage-multiple-selected-items-api-params';
 import UseManageMultipleSelectedItemsDefinition from './deffinitions/use-manage-multiple-selected-items-definition';
 import UseManageMultipleSelectedItemsResponse from './deffinitions/use-manage-multiple-selected-items-response';
+import { ItemSelectedType } from '../types/item-selected-type';
 
 export const useManageMultipleSelectedItemsApi =
   (): UseManageMultipleSelectedItemsDefinition => {

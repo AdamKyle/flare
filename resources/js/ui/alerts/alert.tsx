@@ -11,12 +11,19 @@ export const Alert = (props: AlertProps) => {
   useEffect(() => {
     if (props.force_close) {
       setVisible(false);
-
-      if (props.on_close) {
-        props.on_close();
-      }
     }
+
+    if (props.force_close && props.on_close) {
+      props.on_close();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.force_close, props.on_close]);
+
+  useEffect(() => {
+    if (!props.force_close) {
+      setVisible(true);
+    }
+  }, [props.children, props.force_close]);
 
   const handleClose = (): void => {
     setVisible(false);
@@ -28,7 +35,7 @@ export const Alert = (props: AlertProps) => {
 
   const renderCloseButton = () => {
     if (!props.closable) {
-      return;
+      return null;
     }
 
     return (
@@ -38,20 +45,24 @@ export const Alert = (props: AlertProps) => {
     );
   };
 
-  return (
-    <>
-      {visible && (
-        <div
-          className={clsx(
-            baseStyle(),
-            variantStyle(props.variant),
-            'flex justify-between items-start'
-          )}
-        >
-          <div className="flex-1">{props.children}</div>
-          {renderCloseButton()}
-        </div>
-      )}
-    </>
-  );
+  const renderAlert = () => {
+    if (!visible) {
+      return null;
+    }
+
+    return (
+      <div
+        className={clsx(
+          baseStyle(),
+          variantStyle(props.variant),
+          'flex justify-between items-start'
+        )}
+      >
+        <div className="flex-1">{props.children}</div>
+        {renderCloseButton()}
+      </div>
+    );
+  };
+
+  return <>{renderAlert()}</>;
 };

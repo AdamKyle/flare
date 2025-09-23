@@ -124,10 +124,10 @@ class MultiInventoryActionService
 
         if (isset($params['exclude'])) {
             $excludeIds = array_map(static fn ($id): int => (int) $id, (array) $params['exclude']);
-            $slotsQuery->whereNotIn('item_id', $excludeIds);
+            $slotsQuery->whereNotIn('id', $excludeIds);
         } elseif (isset($params['ids'])) {
             $includeIds = array_map(static fn ($id): int => (int) $id, (array) $params['ids']);
-            $slotsQuery->whereIn('item_id', $includeIds);
+            $slotsQuery->whereIn('id', $includeIds);
         }
 
         $slots = $slotsQuery->get();

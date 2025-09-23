@@ -12,6 +12,7 @@ import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-
 import InventoryItem from '../inventory-item/inventory-item';
 import { SelectedEquippableItemsOptions } from './enums/selected-equippable-items-options';
 import { useManageMultipleSelectedItemsApi } from '../hooks/use-manage-multiple-selected-items-api';
+import { ItemSelectedType } from '../types/item-selected-type';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
@@ -154,6 +155,7 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
   }
 
   const renderMultipleActionSuccess = () => {
+    console.log(successMessage);
     if (!successMessage) {
       return;
     }
@@ -199,15 +201,15 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
 
     const options = [
       {
-        label: 'Sell All',
+        label: 'Sell Selected',
         value: SelectedEquippableItemsOptions.SELL,
       },
       {
-        label: 'Destroy All',
+        label: 'Destroy Selected',
         value: SelectedEquippableItemsOptions.DESSTROY,
       },
       {
-        label: 'Disenchant All',
+        label: 'Disenchant Selected',
         value: SelectedEquippableItemsOptions.DISENCHANT,
       },
     ];
