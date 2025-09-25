@@ -2,6 +2,7 @@ import { debounce } from 'lodash';
 import { isNil } from 'lodash';
 import React, { useMemo, useState, useEffect } from 'react';
 
+import ShopBuyMany from './components/shop-buy-many';
 import ShopCard from './components/shop-card';
 import ShopComparison from './components/shop-comparison';
 import ShopItemView from './components/shop-item-view';
@@ -37,6 +38,9 @@ const Shop = ({ close_shop }: ShopProps) => {
   } = useCustomContext(ShopContext, 'Shop');
 
   const [itemToView, setItemToView] = useState<EquippableItemWithBase | null>(
+    null
+  );
+  const [buyManyItem, setBuyManyItem] = useState<EquippableItemWithBase | null>(
     null
   );
   const [itemToCompare, setItemToCompare] =
@@ -98,13 +102,23 @@ const Shop = ({ close_shop }: ShopProps) => {
 
   const handleViewItem = (item_id: number) => {
     const found = data.find((item) => item.item_id === item_id);
+
     if (found) {
       setItemToView(found);
     }
   };
 
+  const handleViewBuyMany = (item_id: number) => {
+    const found = data.find((item) => item.item_id === item_id);
+
+    if (found) {
+      setBuyManyItem(found);
+    }
+  };
+
   const handleCompareItem = (item_id: number) => {
     const found = data.find((item) => item.item_id === item_id);
+
     if (found) {
       setItemToCompare(found);
     }
@@ -116,6 +130,10 @@ const Shop = ({ close_shop }: ShopProps) => {
 
   const closeItemComparison = () => {
     setItemToCompare(null);
+  };
+
+  const closeBuyMany = () => {
+    setBuyManyItem(null);
   };
 
   const renderContent = () => {
@@ -133,6 +151,7 @@ const Shop = ({ close_shop }: ShopProps) => {
             item={item}
             view_item={handleViewItem}
             compare_item={handleCompareItem}
+            view_buy_many={handleViewBuyMany}
           />
         ))}
       </InfiniteRow>
@@ -151,6 +170,10 @@ const Shop = ({ close_shop }: ShopProps) => {
 
   if (!isNil(itemToView)) {
     return <ShopItemView item={itemToView} close_view={closeItemView} />;
+  }
+
+  if (!isNil(buyManyItem)) {
+    return <ShopBuyMany on_close={closeBuyMany} item={buyManyItem} />;
   }
 
   return (

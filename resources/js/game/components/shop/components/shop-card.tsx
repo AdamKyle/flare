@@ -10,7 +10,12 @@ import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import LinkButton from 'ui/buttons/link-button';
 
-const ShopCard = ({ item, view_item, compare_item }: ShopCardProps) => {
+const ShopCard = ({
+  item,
+  view_item,
+  compare_item,
+  view_buy_many,
+}: ShopCardProps) => {
   const itemType = getType(item, armourPositions);
 
   const renderAttackOrDefence = () => {
@@ -62,7 +67,7 @@ const ShopCard = ({ item, view_item, compare_item }: ShopCardProps) => {
           variant={ButtonVariant.PRIMARY}
         />
         <Button
-          on_click={() => {}}
+          on_click={() => view_buy_many(item.item_id)}
           label="Buy Multiple"
           variant={ButtonVariant.PRIMARY}
         />
