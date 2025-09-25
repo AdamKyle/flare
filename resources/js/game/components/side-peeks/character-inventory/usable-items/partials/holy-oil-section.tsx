@@ -5,9 +5,13 @@ import InfoLabel from '../../../../../reusable-components/viewable-sections/info
 import Section from '../../../../../reusable-components/viewable-sections/section';
 import HolyOilSectionProps from '../types/partials/holy-oil-section-props';
 
-const HolyOilSection = ({ item }: HolyOilSectionProps) => {
+const HolyOilSection = ({ item, showTitleSeparator }: HolyOilSectionProps) => {
   return (
-    <Section title="Holy Blessing" showSeparator={false}>
+    <Section
+      title="Holy Blessing"
+      showSeparator={false}
+      showTitleSeparator={showTitleSeparator}
+    >
       <DefinitionRow
         left={<InfoLabel label="Holy Level" />}
         right={

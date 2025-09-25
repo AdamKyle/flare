@@ -6,6 +6,9 @@ Route::group(['middleware' => [
     'is.player.banned',
 ]], function () {
     Route::get('/character/{character}/visit-shop', ['uses' => 'Api\ShopController@fetchItemsForShop']);
+    Route::get('/shop/view/comparison/{character}', ['uses' => 'Api\ShopController@shopCompare']);
+
+    Route::get('/goblin-shop/list-items/{character}', ['uses' => 'Api\GoblinShopController@fetchItems']);
 });
 
 Route::group(['middleware' => [
@@ -14,8 +17,6 @@ Route::group(['middleware' => [
     'is.player.banned',
     'is.character.dead',
 ]], function () {
-
-    Route::get('/shop/view/comparison/{character}', ['uses' => 'Api\ShopController@shopCompare']);
 
     Route::post('/character/{character}/inventory/sell-item', ['uses' => 'Api\ShopController@sellItem']);
     Route::post('/character/{character}/inventory/sell-all', ['uses' => 'Api\ShopController@sellAll']);
@@ -26,4 +27,7 @@ Route::group(['middleware' => [
     Route::post('/shop/buy/item/{character}', ['uses' => 'Api\ShopController@buy']);
     Route::post('/shop/purchase/multiple/{character}', ['uses' => 'Api\ShopController@buyMultiple']);
     Route::post('/shop/buy-and-replace/{character}', ['uses' => 'Api\ShopController@buyAndReplace']);
+
+
+    Route::post('/goblin-shop/buy-item/{character}/{item}', ['uses' => 'Api\GoblinShopController@purchaseItem']);
 });

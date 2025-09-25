@@ -9,9 +9,14 @@ import MiscModifiersSectionProps from '../types/partials/misc-modifier-section-p
 const MiscModifiersSection = ({
   item,
   showSeparator,
+  showTitleSeparator,
 }: MiscModifiersSectionProps) => {
   return (
-    <Section title="Misc Modifiers" showSeparator={showSeparator}>
+    <Section
+      title="Misc Modifiers"
+      showSeparator={showSeparator}
+      showTitleSeparator={showTitleSeparator}
+    >
       <DefinitionRow
         left={<InfoLabel label="Fight Timeout Modifier" />}
         right={

@@ -9,6 +9,8 @@ import CharacterSheet from './character-sheet/character-sheet';
 import { useAttackDetailsVisibility } from './character-sheet/hooks/use-attack-details-visibility';
 import { useStatDetailsVisibility } from './character-sheet/hooks/use-stat-details-visibility';
 import CharacterStatTypeBreakDown from './character-sheet/partials/character-stat-types/character-stat-type-breakdown';
+import GoblinShopScreen from './goblin-shop/goblin-shop-screen';
+import { useManageGoblinShopVisibility } from './goblin-shop/hooks/use-manage-goblin-shop-visibility';
 import { useCharacterInventoryVisibility } from './hooks/use-character-inventory-visibility';
 import { useCharacterSheetVisibility } from './hooks/use-character-sheet-visibility';
 import { useManageCharacterSheetVisibility } from './hooks/use-manage-character-sheet-visibility';
@@ -47,6 +49,8 @@ export const GameCard = (): ReactNode => {
   const { closeShopSection, showShopSection } =
     useManageShopSectionVisibility();
 
+  const { closeGoblinShop, showGoblinShop } = useManageGoblinShopVisibility();
+
   if (showPlayerKingdoms) {
     return <PlayerKingdoms close_shop={closePlayerKingdoms} />;
   }
@@ -57,6 +61,10 @@ export const GameCard = (): ReactNode => {
 
   if (showShopSection) {
     return <ShopScreen close_shop={closeShopSection} />;
+  }
+
+  if (showGoblinShop) {
+    return <GoblinShopScreen on_close={closeGoblinShop} />;
   }
 
   if (showCharacterSheet) {

@@ -5,5 +5,6 @@ export default interface SectionProps {
   children: ReactNode;
   className?: string;
   showSeparator?: boolean;
+  showTitleSeparator?: boolean;
   lead?: ReactNode;
 }

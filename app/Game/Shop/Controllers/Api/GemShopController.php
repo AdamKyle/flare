@@ -10,12 +10,9 @@ use Illuminate\Http\JsonResponse;
 
 class GemShopController extends Controller
 {
-    private GemShopService $gemShopService;
 
-    public function __construct(GemShopService $gemShopService)
-    {
-        $this->gemShopService = $gemShopService;
-    }
+    public function __construct(private readonly GemShopService $gemShopService)
+    {}
 
     public function sellSingleGem(Character $character, GemBagSlot $gemBagSlot): JsonResponse
     {

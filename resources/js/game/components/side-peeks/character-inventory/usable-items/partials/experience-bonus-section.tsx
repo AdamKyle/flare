@@ -9,6 +9,7 @@ import ExperienceBonusesSectionProps from '../types/partials/experience-bonus-se
 const ExperienceBonusesSection = ({
   item,
   showSeparator,
+  showTitleSeparator,
 }: ExperienceBonusesSectionProps) => {
   const renderExperienceBonus = () => {
     if (!item.xp_bonus) {
@@ -28,7 +29,11 @@ const ExperienceBonusesSection = ({
   };
 
   return (
-    <Section title="Experience Bonuses" showSeparator={showSeparator}>
+    <Section
+      title="Experience Bonuses"
+      showSeparator={showSeparator}
+      showTitleSeparator={showTitleSeparator}
+    >
       <DefinitionRow
         left={<InfoLabel label="Gains Additional Levels on Level Up" />}
         right={

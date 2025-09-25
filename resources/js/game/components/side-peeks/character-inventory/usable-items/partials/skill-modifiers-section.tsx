@@ -9,9 +9,14 @@ import SkillModifiersSectionProps from '../types/partials/skill-modifiers-sectio
 const SkillModifiersSection = ({
   item,
   showSeparator,
+  showTitleSeparator,
 }: SkillModifiersSectionProps) => {
   return (
-    <Section title="Skill Modifiers" showSeparator={showSeparator}>
+    <Section
+      title="Skill Modifiers"
+      showSeparator={showSeparator}
+      showTitleSeparator={showTitleSeparator}
+    >
       <DefinitionRow
         left={<InfoLabel label="Skill" />}
         right={

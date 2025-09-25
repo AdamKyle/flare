@@ -3,4 +3,5 @@ import BaseUsableItemDefinition from '../../../../../../api-definitions/items/us
 export default interface SkillModifiersSectionProps {
   item: BaseUsableItemDefinition;
   showSeparator: boolean;
+  showTitleSeparator?: boolean;
 }

@@ -5,9 +5,17 @@ import InfoLabel from '../../../../../reusable-components/viewable-sections/info
 import Section from '../../../../../reusable-components/viewable-sections/section';
 import ModifiersSectionProps from '../types/partials/modifier-section-props';
 
-const ModifiersSection = ({ item, showSeparator }: ModifiersSectionProps) => {
+const ModifiersSection = ({
+  item,
+  showSeparator,
+  showTitleSeparator,
+}: ModifiersSectionProps) => {
   return (
-    <Section title="Modifiers" showSeparator={showSeparator}>
+    <Section
+      title="Modifiers"
+      showSeparator={showSeparator}
+      showTitleSeparator={showTitleSeparator}
+    >
       <DefinitionRow
         left={<InfoLabel label="Base Damage Mod" />}
         right={

@@ -25,4 +25,8 @@ export default interface BaseUsableItemDefinition extends BaseItemDetails {
   can_stack: boolean;
   gain_additional_level: boolean;
   xp_bonus: number | null;
+  gold_bars_cost: number | null;
+  shards_cost: number | null;
+  gold_dust_cost: number | null;
+  copper_coin_cost: number | null;
 }

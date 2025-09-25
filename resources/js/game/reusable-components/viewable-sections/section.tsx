@@ -10,6 +10,7 @@ const Section = ({
   children,
   className,
   showSeparator = true,
+  showTitleSeparator = false,
   lead,
 }: SectionProps) => {
   const renderSeparator = () => {
@@ -28,6 +29,14 @@ const Section = ({
     return <div className="mb-2 space-y-2">{lead}</div>;
   };
 
+  const renderTitleSeparator = () => {
+    if (!showTitleSeparator) {
+      return null;
+    }
+
+    return <Separator />;
+  };
+
   return (
     <>
       <div className={className}>
@@ -35,6 +44,7 @@ const Section = ({
           {title}
         </h4>
         {renderLead()}
+        {renderTitleSeparator()}
         <Dl>{children}</Dl>
       </div>
       {renderSeparator()}

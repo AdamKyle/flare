@@ -5,6 +5,7 @@ namespace App\Game\Shop\Providers;
 use App\Flare\Items\Transformers\EquippableItemTransformer;
 use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\ItemTransformer;
+use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Character\CharacterInventory\Services\CharacterGemBagService;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
@@ -35,8 +36,11 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(GoblinShopService::class, function () {
-            return new GoblinShopService;
+        $this->app->bind(GoblinShopService::class, function ($app) {
+            return new GoblinShopService(
+                $app->make(Pagination::class),
+                $app->make(UsableItemTransformer::class),
+            );
         });
 
         $this->app->bind(GemShopService::class, function ($app) {

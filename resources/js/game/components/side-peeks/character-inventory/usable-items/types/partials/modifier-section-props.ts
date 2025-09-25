@@ -3,4 +3,5 @@ import BaseUsableItemDefinition from '../../../../../../api-definitions/items/us
 export default interface ModifiersSectionProps {
   item: BaseUsableItemDefinition;
   showSeparator: boolean;
+  showTitleSeparator?: boolean;
 }

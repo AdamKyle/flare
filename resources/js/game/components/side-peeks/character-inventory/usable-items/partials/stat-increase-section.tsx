@@ -9,9 +9,14 @@ import StatIncreaseSectionProps from '../types/partials/stat-increase-section-pr
 const StatIncreaseSection = ({
   item,
   showSeparator,
+  showTitleSeparator,
 }: StatIncreaseSectionProps) => {
   return (
-    <Section title="Stat Increase" showSeparator={showSeparator}>
+    <Section
+      title="Stat Increase"
+      showSeparator={showSeparator}
+      showTitleSeparator={showTitleSeparator}
+    >
       <DefinitionRow
         left={<InfoLabel label="Increases Stat by" />}
         right={

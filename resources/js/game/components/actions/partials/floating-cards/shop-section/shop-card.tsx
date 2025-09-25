@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 
+import { useManageGoblinShopVisibility } from '../../../../goblin-shop/hooks/use-manage-goblin-shop-visibility';
 import { useManageShopSectionVisibility } from '../../../../shop/hooks/use-manage-shop-section-visibility';
 import FloatingCard from '../../../components/icon-section/floating-card';
 import { useManageMarketVisibility } from '../map-section/hooks/use-manage-market-visibility';
@@ -15,6 +16,7 @@ const ShopCard = (): ReactNode => {
   const { isSetSailEnabled } = useManageSetSailButtonState();
   const { openMarket } = useManageMarketVisibility();
   const { openShopSection } = useManageShopSectionVisibility();
+  const { openGoblinShop } = useManageGoblinShopVisibility();
 
   return (
     <FloatingCard title="Shops" close_action={closeShop}>
@@ -33,7 +35,7 @@ const ShopCard = (): ReactNode => {
       />
       <Button
         label="Goblin Shop"
-        on_click={() => {}}
+        on_click={openGoblinShop}
         variant={ButtonVariant.PRIMARY}
         additional_css="w-full my-2"
       />

@@ -5,9 +5,16 @@ import InfoLabel from '../../../../../reusable-components/viewable-sections/info
 import Section from '../../../../../reusable-components/viewable-sections/section';
 import KingdomEffectsSectionProps from '../types/partials/kingdom-effects-section-props';
 
-const KingdomEffectsSection = ({ item }: KingdomEffectsSectionProps) => {
+const KingdomEffectsSection = ({
+  item,
+  showTitleSeparator,
+}: KingdomEffectsSectionProps) => {
   return (
-    <Section title="Kingdom Effects" showSeparator={false}>
+    <Section
+      title="Kingdom Effects"
+      showSeparator={false}
+      showTitleSeparator={showTitleSeparator}
+    >
       <DefinitionRow
         left={<InfoLabel label="Damages Kingdoms" />}
         right={

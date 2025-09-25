@@ -2,4 +2,5 @@ import BaseUsableItemDefinition from '../../../../../../api-definitions/items/us
 
 export default interface HolyOilSectionProps {
   item: BaseUsableItemDefinition;
+  showTitleSeparator?: boolean;
 }
