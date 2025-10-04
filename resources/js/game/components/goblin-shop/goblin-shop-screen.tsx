@@ -1,4 +1,3 @@
-import { isNil } from 'lodash';
 import React from 'react';
 
 import { GoblinShopProvider } from './context/goblin-shop-context';
@@ -15,7 +14,10 @@ const GoblinShopScreen = ({ on_close }: GoblinShopProps) => {
   }
 
   return (
-    <GoblinShopProvider character={gameData.character} update_character={updateCharacter}>
+    <GoblinShopProvider
+      character={gameData.character}
+      update_character={updateCharacter}
+    >
       <GoblinShop on_close={on_close} />
     </GoblinShopProvider>
   );

@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
-import CharacterSheetDefinition from "game-data/api-data-definitions/character/character-sheet-definition";
+
+import CharacterSheetDefinition from 'game-data/api-data-definitions/character/character-sheet-definition';
 
 export default interface GoblinShopProviderProps {
   character: CharacterSheetDefinition;

@@ -3,10 +3,7 @@ import some from 'lodash/some';
 
 import { ItemAdjustments } from '../../../api-definitions/items/item-comparison-details';
 import { InventoryItemTypes } from '../../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
-import type {
-  FieldDef,
-  NumericAdjustmentKey,
-} from '../types/item-comparison-types';
+import type { FieldDef } from '../types/item-comparison-types';
 
 /**
  * True when a numeric value is null/undefined or exactly 0.
@@ -24,11 +21,7 @@ export const isNilOrZeroValue = (value: number | null | undefined): boolean => {
     return true;
   }
 
-  if (value === 0) {
-    return true;
-  }
-
-  return false;
+  return value === 0;
 };
 
 /**
@@ -239,32 +232,4 @@ export const isTwoHandedType = (type?: InventoryItemTypes): boolean => {
   ];
 
   return twoHanded.includes(type.toLowerCase() as InventoryItemTypes);
-};
-
-/**
- * Keys in a field list that are present and exactly zero (not null/undefined).
- * Useful to force-render zeros in Advanced mode.
- *
- * @param adjustments - Item adjustments
- * @param fields - Candidate fields to check
- * @returns Array of keys that are exactly zero
- *
- * @example
- * const zeroKeys = getZeroPresentKeys(adjustments, AFFIX_ADJUSTMENT_FIELDS);
- */
-export const getZeroPresentKeys = (
-  adjustments: ItemAdjustments,
-  fields: { key: NumericAdjustmentKey }[]
-): NumericAdjustmentKey[] => {
-  const zeroKeys: NumericAdjustmentKey[] = [];
-
-  for (const { key } of fields) {
-    const value = adjustments[key] as number | null | undefined;
-
-    if (!isNil(value) && Number(value) === 0) {
-      zeroKeys.push(key);
-    }
-  }
-
-  return zeroKeys;
 };

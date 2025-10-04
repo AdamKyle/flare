@@ -256,7 +256,8 @@ const Shop = ({ close_shop }: ShopProps) => {
 
     return (
       <Alert variant={AlertVariant.WARNING}>
-        You have no gold. You cannot buy anything. There is a great saddness in the air.
+        You have no gold. You cannot buy anything. There is a great saddness in
+        the air.
       </Alert>
     );
   };

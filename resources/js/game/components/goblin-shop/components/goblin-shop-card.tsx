@@ -9,7 +9,11 @@ import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import LinkButton from 'ui/buttons/link-button';
 
-const GoblinShopCard = ({ item, view_item, action_disabled }: GoblinShopCardProps) => {
+const GoblinShopCard = ({
+  item,
+  view_item,
+  action_disabled,
+}: GoblinShopCardProps) => {
   const itemColor = backpackItemTextColors(item);
 
   return (
