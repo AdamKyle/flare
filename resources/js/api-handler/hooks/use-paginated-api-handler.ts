@@ -1,9 +1,12 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+import { AxiosError, AxiosRequestConfig } from 'axios';
+
 import ApiParametersDefinitions from 'api-handler/definitions/api-parameters-definitions';
 import PaginatedApiHandlerDefinition from 'api-handler/definitions/paginated-api-handler-definition';
 import { PaginatedApiResponseDefinition } from 'api-handler/definitions/paginated-api-response-definition';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
-import { AxiosError, AxiosRequestConfig } from 'axios';
-import { useCallback, useEffect, useState } from 'react';
+import {shallowEqual} from "api-handler/utils/shallow-equal";
 
 const UsePaginatedApiHandler = <
   T,
@@ -26,9 +29,14 @@ const UsePaginatedApiHandler = <
   const [filters, setFilters] = useState<F>({} as F);
   const [refresh, setRefresh] = useState(false);
 
+  const previousSearchTextRef = useRef(searchText);
+  const previousFiltersRef = useRef<F>(filters);
+
   const fetchPaginatedData = useCallback(
     async () => {
-      if (page > 1) setIsLoadingMore(true);
+      if (page > 1) {
+        setIsLoadingMore(true);
+      }
 
       try {
         const result = await apiHandler.get<
@@ -43,13 +51,13 @@ const UsePaginatedApiHandler = <
           },
         });
 
-        setData((prev) =>
-          page === 1 ? result.data : [...prev, ...result.data]
+        setData((previousData) =>
+          page === 1 ? result.data : [...previousData, ...result.data]
         );
         setCanLoadMore(result.meta.can_load_more);
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          const response = error.response;
+      } catch (errorInstance) {
+        if (errorInstance instanceof AxiosError) {
+          const response = errorInstance.response;
 
           if (!response) {
             return;
@@ -62,7 +70,7 @@ const UsePaginatedApiHandler = <
             window.location.reload();
           }
 
-          setError(error.response?.data || null);
+          setError(errorInstance.response?.data || null);
         } else {
           setError(null);
         }
@@ -80,8 +88,20 @@ const UsePaginatedApiHandler = <
   }, [fetchPaginatedData]);
 
   useEffect(() => {
+    const isSameSearch = previousSearchTextRef.current === searchText;
+
+    const isSameFilters = shallowEqual(previousFiltersRef.current, filters);
+
+    if (isSameSearch && isSameFilters) {
+      return;
+    }
+
+    previousSearchTextRef.current = searchText;
+
+    previousFiltersRef.current = filters;
+
     setPage(1);
-    setRefresh((prevValue) => !prevValue);
+    setRefresh((previousValue) => !previousValue);
   }, [searchText, filters]);
 
   const onEndReached = () => {
@@ -89,7 +109,7 @@ const UsePaginatedApiHandler = <
       return;
     }
 
-    setPage((prevValue) => prevValue + 1);
+    setPage((previousValue) => previousValue + 1);
   };
 
   return {
