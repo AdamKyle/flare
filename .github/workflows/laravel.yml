@@ -44,6 +44,8 @@ jobs:
           yarn type-check
           yarn cleanup
           yarn unused-files-check
+      - name: Run Laravel Pint Test
+        run: vendor/bin/pint --test
       - name: Execute tests (Unit and Feature tests) via PHPUnit
         env:
           DB_CONNECTION: mysql
