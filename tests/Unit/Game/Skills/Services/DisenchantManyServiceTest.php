@@ -10,8 +10,9 @@ use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use League\Fractal\Manager;
+use App\Flare\Transformers\CharacterInventoryCountTransformer;
 use Mockery;
-use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameSkill;
@@ -27,6 +28,8 @@ class DisenchantManyServiceTest extends TestCase
     private ?GameSkill $disenchantingSkill = null;
     private ?DisenchantManyService $service = null;
     private $skillCheckServiceMock = null;
+    private ?Manager $manager = null;
+    private ?CharacterInventoryCountTransformer $inventoryCountTransformer = null;
 
     public function setUp(): void
     {
@@ -52,6 +55,9 @@ class DisenchantManyServiceTest extends TestCase
         $this->instance(SkillCheckService::class, $this->skillCheckServiceMock);
 
         $this->service = $this->app->make(DisenchantManyService::class);
+
+        $this->manager = $this->app->make(Manager::class);
+        $this->inventoryCountTransformer = $this->app->make(CharacterInventoryCountTransformer::class);
     }
 
     public function tearDown(): void
@@ -63,13 +69,15 @@ class DisenchantManyServiceTest extends TestCase
         $this->disenchantingSkill = null;
         $this->service = null;
         $this->skillCheckServiceMock = null;
+        $this->manager = null;
+        $this->inventoryCountTransformer = null;
     }
 
     public function testReturnsNoEligibleItemsToDisenchant(): void
     {
         $character = $this->characterFactory->getCharacter();
 
-        $result = $this->service->disenchantMany($character, []);
+        $result = $this->service->disenchantMany($this->manager, $this->inventoryCountTransformer, $character, []);
 
         $this->assertEquals('No eligible items to disenchant.', $result['message']);
         $this->assertEquals([], $result['disenchanted_item']);
@@ -100,7 +108,7 @@ class DisenchantManyServiceTest extends TestCase
         $this->skillCheckServiceMock
             ->shouldReceive('characterRoll')->once()->andReturn(100);
 
-        $result = $this->service->disenchantMany($character, ['ids' => [$itemIncluded->id]]);
+        $result = $this->service->disenchantMany($this->manager, $this->inventoryCountTransformer, $character, ['ids' => [$itemIncluded->id]]);
 
         $character = $character->refresh();
 
@@ -137,7 +145,7 @@ class DisenchantManyServiceTest extends TestCase
         $this->skillCheckServiceMock
             ->shouldReceive('characterRoll')->once()->andReturn(1);
 
-        $result = $this->service->disenchantMany($character, ['exclude' => [$itemExcluded->id]]);
+        $result = $this->service->disenchantMany($this->manager, $this->inventoryCountTransformer, $character, ['exclude' => [$itemExcluded->id]]);
 
         $character = $character->refresh();
 
@@ -174,7 +182,7 @@ class DisenchantManyServiceTest extends TestCase
         $this->skillCheckServiceMock
             ->shouldReceive('characterRoll')->twice()->andReturn(100, 100);
 
-        $result = $this->service->disenchantMany($character, ['exclude' => []]);
+        $result = $this->service->disenchantMany($this->manager, $this->inventoryCountTransformer, $character, ['exclude' => []]);
 
         $character = $character->refresh();
 
@@ -207,7 +215,7 @@ class DisenchantManyServiceTest extends TestCase
         $this->skillCheckServiceMock
             ->shouldReceive('characterRoll')->once()->andReturn(100);
 
-        $result = $this->service->disenchantMany($character, []);
+        $result = $this->service->disenchantMany($this->manager, $this->inventoryCountTransformer, $character, []);
 
         $character = $character->refresh();
 
@@ -237,7 +245,7 @@ class DisenchantManyServiceTest extends TestCase
         $this->skillCheckServiceMock
             ->shouldReceive('characterRoll')->once()->andReturn(100);
 
-        $result = $this->service->disenchantMany($characterNoSkill, []);
+        $result = $this->service->disenchantMany($this->manager, $this->inventoryCountTransformer, $characterNoSkill, []);
 
         $this->assertCount(1, $result['disenchanted_item']);
         $this->assertEquals('passed', $result['disenchanted_item'][0]['status']);
@@ -268,7 +276,7 @@ class DisenchantManyServiceTest extends TestCase
 
         $service->shouldReceive('passesInterest')->once()->andReturn(true);
 
-        $result = $service->disenchantMany($character, []);
+        $result = $service->disenchantMany($this->manager, $this->inventoryCountTransformer, $character, []);
 
         $character = $character->refresh();
 
@@ -304,7 +312,7 @@ class DisenchantManyServiceTest extends TestCase
 
         $service->shouldReceive('passesInterest')->once()->andReturn(false);
 
-        $result = $service->disenchantMany($character, []);
+        $result = $service->disenchantMany($this->manager, $this->inventoryCountTransformer, $character, []);
 
         $this->assertCount(1, $result['disenchanted_item']);
         $this->assertEquals('passed', $result['disenchanted_item'][0]['status']);
