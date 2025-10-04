@@ -37,7 +37,7 @@
         "beyondcode/laravel-dump-server": "^2.1.0",
         "fakerphp/faker": "^1.21.0",
         "laravel/browser-kit-testing": "^7.2.4",
-        "laravel/pint": "^1.17",
+        "laravel/pint": "^1.25",
         "mockery/mockery": "^1.6.6",
         "nunomaduro/collision": "^8.1",
         "phpunit/phpunit": "^12.0",
