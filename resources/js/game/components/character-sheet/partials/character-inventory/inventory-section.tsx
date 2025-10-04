@@ -13,7 +13,7 @@ import { MobileIconContainer } from 'ui/icon-container/mobile-icon-container';
 const InventorySection = ({
   character_id,
 }: InventorySectionProps): ReactNode => {
-  const { openBackpack } = useOpenCharacterBackpack({ character_id });
+  const { openBackpack } = useOpenCharacterBackpack();
   const { openUsableInventory } = useOpenCharacterUsableInventory({
     character_id,
   });

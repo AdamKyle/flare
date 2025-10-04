@@ -5,6 +5,7 @@ namespace App\Game\Shop\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Pagination\Requests\PaginationRequest;
+use App\Flare\Transformers\CharacterInventoryCountTransformer;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
 use App\Game\Shop\Events\BuyItemEvent;
@@ -18,17 +19,18 @@ use App\Http\Controllers\Controller;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item as FractalItem;
 
 class ShopController extends Controller
 {
-    private CharacterInventoryService $characterInventoryService;
 
-    private ShopService $shopService;
-
-    public function __construct(CharacterInventoryService $characterInventoryService, ShopService $shopService)
+    public function __construct(private readonly CharacterInventoryService $characterInventoryService,
+                                private readonly ShopService $shopService,
+                                private readonly CharacterInventoryCountTransformer $characterInventoryCountTransformer,
+                                private readonly Manager $manager,
+    )
     {
-        $this->characterInventoryService = $characterInventoryService;
-        $this->shopService = $shopService;
     }
 
     public function fetchItemsForShop(PaginationRequest $paginationRequest, Character $character): JsonResponse
@@ -87,10 +89,13 @@ class ShopController extends Controller
 
         event(new BuyItemEvent($item, $character));
 
-        event(new UpdateShopEvent($character->user, $character->gold, $character->getInventoryCount()));
+        $data = new FractalItem($character, $this->characterInventoryCountTransformer);
+        $data = $this->manager->createData($data)->toArray();
 
         return response()->json([
             'message' => 'Purchased: '.$item->affix_name.'.',
+            'inventory_count' => $data,
+            'gold' => $character->gold,
         ]);
     }
 
@@ -117,10 +122,13 @@ class ShopController extends Controller
 
         $character = $character->refresh();
 
-        event(new UpdateShopEvent($character->user, $character->gold, $character->getInventoryCount()));
+        $data = new FractalItem($character, $this->characterInventoryCountTransformer);
+        $data = $this->manager->createData($data)->toArray();
 
         return response()->json([
             'message' => 'You purchased: '.$amount.' of '.$item->name,
+            'inventory_count' => $data,
+            'gold' => $character->gold,
         ]);
     }
 

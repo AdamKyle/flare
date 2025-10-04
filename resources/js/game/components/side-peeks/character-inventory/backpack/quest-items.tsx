@@ -17,7 +17,7 @@ import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const QuestItems = ({
-  character_id,
+  character,
   on_switch_view,
 }: GenericItemProps): ReactNode => {
   const [itemToView, setItemToView] = useState<BaseQuestItemDefinition | null>(
@@ -27,7 +27,7 @@ const QuestItems = ({
   const { data, error, loading, setSearchText, onEndReached } =
     UsePaginatedApiHandler<BaseQuestItemDefinition>({
       url: CharacterInventoryApiUrls.CHARACTER_QUEST_ITEMS,
-      urlParams: { character: character_id },
+      urlParams: { character: character.id },
     });
 
   const { handleScroll: handleQuestItemsScroll } = useInfiniteScroll({

@@ -5,11 +5,14 @@ namespace App\Game\Skills\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Skill;
+use App\Flare\Transformers\CharacterInventoryCountTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
 
 class DisenchantManyService
 {
@@ -26,6 +29,8 @@ class DisenchantManyService
     /**
      * Disenchant many items and return a summary payload.
      *
+     * @param Manager $manager
+     * @param CharacterInventoryCountTransformer $characterInventoryCountTransformer
      * @param Character $character
      * @param array{ids?: array<int|string>, exclude?: array<int|string>} $params
      * @return array{
@@ -34,7 +39,7 @@ class DisenchantManyService
      *   disenchanted_item: array<int, array{name:string,status:string,gold_dust:int}>
      * }
      */
-    public function disenchantMany(Character $character, array $params): array
+    public function disenchantMany(Manager $manager, CharacterInventoryCountTransformer $characterInventoryCountTransformer, Character $character, array $params): array
     {
         $slots = $this->fetchEligibleSlots($character, $params);
 
@@ -78,9 +83,14 @@ class DisenchantManyService
 
         $this->finalize($character, $processedSlotIds, $runningGoldDustTotal, $maxGoldDust);
 
+        $character = $character->refresh();
+
+        $data = new Item($character, $characterInventoryCountTransformer);
+
         return $this->successResult([
             'message' => 'Disenchanted items for: ' . number_format($totalGoldDustAwarded) . ' Gold Dust',
             'disenchanted_item' => $perItemSummaries,
+            'inventory_count' => $data,
         ]);
     }
 

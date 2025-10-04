@@ -14,6 +14,7 @@ import { SelectedEquippableItemsOptions } from './enums/selected-equippable-item
 import { useManageMultipleSelectedItemsApi } from '../hooks/use-manage-multiple-selected-items-api';
 import { ItemSelectedType } from '../types/item-selected-type';
 
+import InventoryCountDefinition from 'game-data/api-data-definitions/character/inventory-count-definition';
 import { GameDataError } from 'game-data/components/game-data-error';
 
 import { Alert } from 'ui/alerts/alert';
@@ -25,7 +26,11 @@ import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
-const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
+const BackpackItems = ({
+  character,
+  on_switch_view,
+  update_character,
+}: GenericItemProps) => {
   const [slotId, setSlotId] = useState<number | null>(null);
   const [selection, setSelection] = useState<ItemSelectedType | null>(null);
   const [actionSelected, setActionSelected] =
@@ -36,7 +41,7 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
   const { data, error, loading, setSearchText, onEndReached, setRefresh } =
     UsePaginatedApiHandler<EquippableItemWithBase>({
       url: CharacterInventoryApiUrls.CHARACTER_INVENTORY,
-      urlParams: { character: character_id },
+      urlParams: { character: character.id },
     });
 
   const {
@@ -60,10 +65,18 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
     setSelection(update);
   };
 
-  const handleMultiActionApiSuccess = () => {
+  const handleMultiActionApiSuccess = (
+    inventory_count: InventoryCountDefinition
+  ) => {
     setActionSelected(null);
     setIsSelectionDisabled(false);
     setCloseSuccessMessage(false);
+
+    console.log('After Api Success', update_character, inventory_count);
+
+    if (update_character) {
+      update_character({ inventory_count: inventory_count });
+    }
 
     setRefresh((prev) => !prev);
   };
@@ -95,7 +108,7 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
     setCloseSuccessMessage(true);
 
     handleSelection({
-      character_id: character_id,
+      character_id: character.id,
       onSuccess: handleMultiActionApiSuccess,
       apiParams: selection,
       url: url,
@@ -148,14 +161,13 @@ const BackpackItems = ({ character_id, on_switch_view }: GenericItemProps) => {
     return (
       <InventoryItem
         slot_id={slotId}
-        character_id={character_id}
+        character_id={character.id}
         close_item_view={closeItemView}
       />
     );
   }
 
   const renderMultipleActionSuccess = () => {
-    console.log(successMessage);
     if (!successMessage) {
       return;
     }

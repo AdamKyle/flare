@@ -48,8 +48,6 @@ const LocationDroppableItems = ({
   const onOpenQuestItemDetails = (itemId: number) => {
     const item = data.find((item) => item.item_id === itemId);
 
-    console.log(itemId, item);
-
     if (!item) {
       return;
     }

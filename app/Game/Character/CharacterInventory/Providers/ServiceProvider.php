@@ -9,6 +9,7 @@ use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterGemSlotsTransformer;
 use App\Flare\Transformers\CharacterGemsTransformer;
+use App\Flare\Transformers\CharacterInventoryCountTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
@@ -115,6 +116,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterInventoryService::class),
                 $app->make(UpdateCharacterAttackTypesHandler::class),
                 $app->make(DisenchantManyService::class),
+                $app->make(Manager::class),
+                $app->make(CharacterInventoryCountTransformer::class),
             );
         });
 

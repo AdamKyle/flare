@@ -7,6 +7,8 @@ import UseManageMultipleSelectedItemsDefinition from './deffinitions/use-manage-
 import UseManageMultipleSelectedItemsResponse from './deffinitions/use-manage-multiple-selected-items-response';
 import { ItemSelectedType } from '../types/item-selected-type';
 
+import InventoryCountDefinition from 'game-data/api-data-definitions/character/inventory-count-definition';
+
 export const useManageMultipleSelectedItemsApi =
   (): UseManageMultipleSelectedItemsDefinition => {
     const { apiHandler, getUrl } = useApiHandler();
@@ -27,7 +29,7 @@ export const useManageMultipleSelectedItemsApi =
     const processApiCall = async (
       url: string,
       params: ItemSelectedType,
-      onSuccess: () => void
+      onSuccess: (inventory_count: InventoryCountDefinition) => void
     ) => {
       setLoading(true);
 
@@ -43,13 +45,14 @@ export const useManageMultipleSelectedItemsApi =
           ids: params.ids,
           exclude: params.exclude,
         });
-
-        onSuccess();
+        console.log('result response', result);
+        onSuccess(result.inventory_count);
 
         setSuccessMessage(result.message);
 
         setLoading(false);
       } catch (err) {
+        console.log('result error', error);
         setLoading(false);
 
         if (err instanceof AxiosError) {

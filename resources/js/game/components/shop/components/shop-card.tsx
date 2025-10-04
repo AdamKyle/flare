@@ -15,6 +15,8 @@ const ShopCard = ({
   view_item,
   compare_item,
   view_buy_many,
+  on_purchase_item,
+  is_actions_disabled,
 }: ShopCardProps) => {
   const itemType = getType(item, armourPositions);
 
@@ -60,16 +62,19 @@ const ShopCard = ({
           on_click={() => compare_item(item.item_id)}
           label="Compare"
           variant={ButtonVariant.SUCCESS}
+          disabled={is_actions_disabled}
         />
         <Button
-          on_click={() => {}}
+          on_click={() => on_purchase_item(item.item_id)}
           label="Buy"
           variant={ButtonVariant.PRIMARY}
+          disabled={is_actions_disabled}
         />
         <Button
           on_click={() => view_buy_many(item.item_id)}
           label="Buy Multiple"
           variant={ButtonVariant.PRIMARY}
+          disabled={is_actions_disabled}
         />
       </div>
     </>

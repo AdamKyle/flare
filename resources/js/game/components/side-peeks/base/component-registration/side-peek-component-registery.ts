@@ -1,6 +1,5 @@
 import { SidePeekComponentRegistrationEnum } from './side-peek-component-registration-enum';
 import BackPack from '../../character-inventory/backpack/backpack';
-import BackPackProps from '../../character-inventory/backpack/types/backpack-props';
 import GemBag from '../../character-inventory/gem-bag/gem-bag';
 import GemBagProps from '../../character-inventory/gem-bag/types/gem-bag-props';
 import Sets from '../../character-inventory/sets/sets';
@@ -14,10 +13,12 @@ import LocationDetailsProps from '../../map-actions/location-details/types/locat
 import Teleport from '../../map-actions/teleport/teleport';
 import TeleportProps from '../../map-actions/teleport/types/teleport-props';
 
+import SidePeekProps from 'ui/side-peek/types/side-peek-props';
+
 export const SidePeekComponentRegistry = {
   [SidePeekComponentRegistrationEnum.BACKPACK]: {
     component: BackPack,
-    props: {} as BackPackProps,
+    props: {} as SidePeekProps,
   },
   [SidePeekComponentRegistrationEnum.GEM_BAG]: {
     component: GemBag,

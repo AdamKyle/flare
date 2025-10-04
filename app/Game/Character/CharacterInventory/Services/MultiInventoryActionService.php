@@ -2,6 +2,7 @@
 
 namespace App\Game\Character\CharacterInventory\Services;
 
+use App\Flare\Transformers\CharacterInventoryCountTransformer;
 use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
 use Exception;
 use Facades\App\Flare\Calculators\SellItemCalculator;
@@ -15,6 +16,8 @@ use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Shop\Events\SellItemEvent;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\DisenchantManyService;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
 
 class MultiInventoryActionService
 {
@@ -28,6 +31,8 @@ class MultiInventoryActionService
      * @param CharacterInventoryService $characterInventoryService
      * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler
      * @param DisenchantManyService $disenchantManyService
+     * @param Manager $manager
+     * @param CharacterInventoryCountTransformer $characterInventoryCountTransformer
      */
     public function __construct(
         private readonly InventorySetService $inventorySetService,
@@ -37,6 +42,8 @@ class MultiInventoryActionService
         private readonly CharacterInventoryService $characterInventoryService,
         private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler,
         private readonly DisenchantManyService $disenchantManyService,
+        private readonly Manager $manager,
+        private readonly CharacterInventoryCountTransformer $characterInventoryCountTransformer,
     ) {}
 
     /**
@@ -113,6 +120,7 @@ class MultiInventoryActionService
      * @param Character $character
      * @param array{ids?:array<int|string>,exclude?:array<int|string>} $params
      * @return array{status:int,message:string}
+     * @throws Exception
      */
     public function sellManyItems(Character $character, array $params): array
     {
@@ -138,8 +146,14 @@ class MultiInventoryActionService
             $totalSoldFor += $this->sellItem($character, $slot);
         }
 
+        $character = $character->refresh();
+
+        $data = new Item($character, $this->characterInventoryCountTransformer);
+        $data = $this->manager->createData($data)->toArray();
+
         return $this->successResult([
             'message' => 'Sold all items for: ' . number_format($totalSoldFor) . ' Gold (Minus 5% on each sale)',
+            'inventory_count' => $data,
         ]);
     }
 
@@ -152,7 +166,7 @@ class MultiInventoryActionService
      */
     public function disenchantManyItems(Character $character, array $params): array
     {
-        return $this->disenchantManyService->disenchantMany($character, $params);
+        return $this->disenchantManyService->disenchantMany($this->manager, $this->characterInventoryCountTransformer, $character, $params);
     }
 
     /**
@@ -180,8 +194,14 @@ class MultiInventoryActionService
 
         $slotsQuery->delete();
 
+        $character = $character->refresh();
+
+        $data = new Item($character, $this->characterInventoryCountTransformer);
+        $data = $this->manager->createData($data)->toArray();
+
         return $this->successResult([
             'message' => 'Destroyed all selected selected items (with exception of artifacts. You must manually delete these powerful items. Click the item, click delete and confirm you want to do this, if you have the item.)',
+            'inventory_count' => $data,
         ]);
     }
 
@@ -206,6 +226,7 @@ class MultiInventoryActionService
      * @param Character $character
      * @param InventorySlot $slot
      * @return int
+     * @throws Exception
      */
     private function sellItem(Character $character, InventorySlot $slot): int
     {

@@ -1,6 +1,5 @@
-import { debounce } from 'lodash';
-import { isNil } from 'lodash';
-import React, { useMemo, useState, useEffect } from 'react';
+import { debounce, isNil } from 'lodash';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import ShopBuyMany from './components/shop-buy-many';
 import ShopCard from './components/shop-card';
@@ -11,6 +10,9 @@ import ShopProps from './types/shop-props';
 import { buildShopItemTypeSelection } from './utils/build-shop-item-type-selection';
 import { useCustomContext } from '../../../utils/hooks/use-custom-context';
 import { EquippableItemWithBase } from '../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
+import { formatNumberWithCommas } from '../../util/format-number';
+
+import { useGameData } from 'game-data/hooks/use-game-data';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
@@ -24,6 +26,8 @@ import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import Separator from 'ui/separator/separator';
 
 const Shop = ({ close_shop }: ShopProps) => {
+  const { gameData } = useGameData();
+
   const {
     data,
     loading,
@@ -35,6 +39,11 @@ const Shop = ({ close_shop }: ShopProps) => {
     setSelectedCost,
     selectedType,
     setSelectedType,
+    setShopPurchaseRequestParams,
+    purchaseLoading,
+    purchaseError,
+    purchaseSuccessMessage,
+    inventoryIsFull,
   } = useCustomContext(ShopContext, 'Shop');
 
   const [itemToView, setItemToView] = useState<EquippableItemWithBase | null>(
@@ -124,6 +133,12 @@ const Shop = ({ close_shop }: ShopProps) => {
     }
   };
 
+  const handleBuyItem = (item_id: number) => {
+    setShopPurchaseRequestParams({
+      item_id: item_id,
+    });
+  };
+
   const closeItemView = () => {
     setItemToView(null);
   };
@@ -140,9 +155,11 @@ const Shop = ({ close_shop }: ShopProps) => {
     if (loading) {
       return <InfiniteLoader />;
     }
+
     if (error) {
       return <Alert variant={AlertVariant.DANGER}>{error.message}</Alert>;
     }
+
     return (
       <InfiniteRow handle_scroll={handleScroll} additional_css="max-h-[500px]">
         {data.map((item) => (
@@ -152,9 +169,79 @@ const Shop = ({ close_shop }: ShopProps) => {
             view_item={handleViewItem}
             compare_item={handleCompareItem}
             view_buy_many={handleViewBuyMany}
+            on_purchase_item={handleBuyItem}
+            is_actions_disabled={purchaseLoading || inventoryIsFull}
           />
         ))}
       </InfiniteRow>
+    );
+  };
+
+  const renderCharacterGold = () => {
+    if (!gameData?.character) {
+      return null;
+    }
+
+    return (
+      <p className="mb-4 text-gray-800 dark:text-gray-300">
+        <strong>
+          <span className="text-marigold-600 dark:text-mango-tango-400">
+            Your Gold:
+          </span>
+        </strong>{' '}
+        {formatNumberWithCommas(gameData.character.gold)}
+      </p>
+    );
+  };
+
+  const renderPurchaseLoading = () => {
+    if (!purchaseLoading) {
+      return null;
+    }
+
+    return (
+      <>
+        <Separator />
+        <InfiniteLoader />
+        <Separator />
+      </>
+    );
+  };
+
+  const renderPurchaseError = () => {
+    if (!purchaseError) {
+      return null;
+    }
+
+    return (
+      <Alert variant={AlertVariant.DANGER} closable>
+        {purchaseError.message}
+      </Alert>
+    );
+  };
+
+  const renderPurchaseSuccess = () => {
+    if (!purchaseSuccessMessage) {
+      return null;
+    }
+
+    return (
+      <Alert variant={AlertVariant.SUCCESS} closable>
+        {purchaseSuccessMessage}
+      </Alert>
+    );
+  };
+
+  const renderInventoryIsFullError = () => {
+    if (!inventoryIsFull) {
+      return null;
+    }
+
+    return (
+      <Alert variant={AlertVariant.WARNING}>
+        Your inventory is currently full. You cannot purchase any items, the
+        shop keeper is sad.
+      </Alert>
     );
   };
 
@@ -180,8 +267,13 @@ const Shop = ({ close_shop }: ShopProps) => {
     <ContainerWithTitle manageSectionVisibility={close_shop} title="Shop">
       <Card>
         <p className="my-4 italic text-gray-800 dark:text-gray-300">
-          Welcome to mu humble shop. What can I get you?
+          Welcome to my humble shop. What can I get you?
         </p>
+        {renderCharacterGold()}
+        {renderInventoryIsFullError()}
+        {renderPurchaseError()}
+        {renderPurchaseSuccess()}
+        {renderPurchaseLoading()}
         <div className="flex flex-col md:flex-row md:items-center gap-4 pt-2 px-4">
           <div className="flex-1">
             <Input
@@ -189,6 +281,7 @@ const Shop = ({ close_shop }: ShopProps) => {
               on_change={handleSearch}
               place_holder="Search shop items"
               clearable
+              disabled={purchaseLoading}
             />
           </div>
           <div className="w-full md:w-48">
@@ -199,6 +292,7 @@ const Shop = ({ close_shop }: ShopProps) => {
               on_clear={handleClearCost}
               selection_placeholder="Sort by cost"
               all_click_outside
+              disabled={purchaseLoading}
             />
           </div>
           <div className="w-full md:w-48">
@@ -209,6 +303,7 @@ const Shop = ({ close_shop }: ShopProps) => {
               on_clear={handleClearType}
               selection_placeholder="Filter by type"
               all_click_outside
+              disabled={purchaseLoading}
             />
           </div>
         </div>

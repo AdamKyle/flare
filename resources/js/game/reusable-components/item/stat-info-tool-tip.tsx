@@ -18,6 +18,7 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
     on_open,
     on_close,
     custom_message,
+    message,
   } = props;
 
   const localId = useId();
@@ -39,9 +40,11 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
     if (signedValue > 0) {
       return 'increase';
     }
+
     if (signedValue < 0) {
       return 'decrease';
     }
+
     return 'no-change';
   };
 
@@ -57,7 +60,7 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
 
   const getMessage = () => {
     if (custom_message) {
-      return label;
+      return typeof message !== 'undefined' ? message : label;
     }
 
     const direction = getDirection(value);
@@ -161,6 +164,7 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
   const toggleTip = () => {
     if (open) {
       closeTip();
+
       return;
     }
 
@@ -190,7 +194,6 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
       parent?.removeEventListener('scroll', onScroll);
       window.removeEventListener('scroll', onScroll, true);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, align, label, value]);
 
   const handlePointerEnter = (event: React.PointerEvent) => {
@@ -230,6 +233,8 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
       return null;
     }
 
+    const content = getMessage();
+
     return (
       <div
         ref={popoverRef}
@@ -248,14 +253,25 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
             : 'bottom-full mb-1 origin-bottom'
         )}
       >
-        <p
-          className={clsx('leading-snug', {
-            'text-base': size === 'md',
-            'text-sm': size !== 'md',
-          })}
-        >
-          {getMessage()}
-        </p>
+        {typeof content === 'string' ? (
+          <p
+            className={clsx('leading-snug', {
+              'text-base': size === 'md',
+              'text-sm': size !== 'md',
+            })}
+          >
+            {content}
+          </p>
+        ) : (
+          <div
+            className={clsx('leading-snug', {
+              'text-base': size === 'md',
+              'text-sm': size !== 'md',
+            })}
+          >
+            {content}
+          </div>
+        )}
       </div>
     );
   };

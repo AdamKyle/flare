@@ -1,3 +1,5 @@
+import React from 'react';
+
 export default interface StatInfoToolTipProps {
   label: string;
   value: number;
@@ -8,4 +10,5 @@ export default interface StatInfoToolTipProps {
   align?: 'left' | 'right' | 'auto';
   size?: 'sm' | 'md';
   custom_message?: boolean;
+  message?: string | React.ReactNode;
 }

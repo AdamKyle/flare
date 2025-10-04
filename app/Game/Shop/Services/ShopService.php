@@ -19,6 +19,7 @@ use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Shop\Events\SellItemEvent;
 use App\Game\Shop\Transformers\ShopTransformer;
+use Exception;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use League\Fractal\Manager;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -146,6 +147,7 @@ class ShopService
      * @param Character $character
      * @param Item $item
      * @return Character
+     * @throws Exception
      */
     public function autoSellItem(Character $character, Item $item): Character {
         $totalSoldFor = SellItemCalculator::fetchSalePriceWithAffixes($item);

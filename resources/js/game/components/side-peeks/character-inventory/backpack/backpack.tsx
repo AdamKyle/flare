@@ -2,15 +2,23 @@ import React, { ReactNode, useState } from 'react';
 
 import BackpackItems from './backpack-items';
 import QuestItems from './quest-items';
-import BackPackProps from './types/backpack-props';
 
-const BackPack = ({ character_id }: BackPackProps): ReactNode => {
+import { useGameData } from 'game-data/hooks/use-game-data';
+
+const BackPack = (): ReactNode => {
+  const { gameData, updateCharacter } = useGameData();
+
   const [isShowingInventory, setIsShowingInventory] = useState(true);
+
+  if (!gameData?.character) {
+    return null;
+  }
 
   if (isShowingInventory) {
     return (
       <BackpackItems
-        character_id={character_id}
+        character={gameData.character}
+        update_character={updateCharacter}
         on_switch_view={setIsShowingInventory}
       />
     );
@@ -18,7 +26,7 @@ const BackPack = ({ character_id }: BackPackProps): ReactNode => {
 
   return (
     <QuestItems
-      character_id={character_id}
+      character={gameData.character}
       on_switch_view={setIsShowingInventory}
     />
   );
