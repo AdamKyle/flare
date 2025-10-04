@@ -115,14 +115,14 @@ class SeerService
 
         HandleGoldBarsAsACurrency::subtractCostFromKingdoms($character->kingdoms, self::SOCKET_COST);
 
-        $message = 'The Seer attaches the sockets to: ' . $slot->item->affix_name . ' with their dark magics';
+        $message = 'The Seer attaches the sockets to: '.$slot->item->affix_name.' with their dark magics';
 
         ServerMessageHandler::handleMessage($character->user, NpcMessageTypes::SEER_ACTIONS, $message, $slot->id);
 
         if ($oldSocketCount === $newSocketCount) {
             $message = 'Failed to attach new sockets. "Sorry child. I tried." He takes your money anyways ...';
         } else {
-            $message = 'Attached sockets to item! (Old Socket Count: ' . $oldSocketCount . ', New Count: ' . $newSocketCount . ').';
+            $message = 'Attached sockets to item! (Old Socket Count: '.$oldSocketCount.', New Count: '.$newSocketCount.').';
         }
 
         return $this->successResult([
@@ -184,7 +184,7 @@ class SeerService
             return $this->errorResult('Item does not have specified gem.');
         }
 
-        $message = 'The Seer removes the gem from: ' . $slot->item->affix_name . '. The air crackles with magic.';
+        $message = 'The Seer removes the gem from: '.$slot->item->affix_name.'. The air crackles with magic.';
 
         ServerMessageHandler::handleMessage($character->user, NpcMessageTypes::SEER_ACTIONS, $message, $slot->id);
 
@@ -234,7 +234,7 @@ class SeerService
 
         $character = $character->refresh();
 
-        $message = 'The Seer removes all gems from: ' . $slot->item->affix_name . '. The seer is exhausted!';
+        $message = 'The Seer removes all gems from: '.$slot->item->affix_name.'. The seer is exhausted!';
 
         ServerMessageHandler::handleMessage($character->user, NpcMessageTypes::SEER_ACTIONS, $message, $slot->id);
 
@@ -310,7 +310,7 @@ class SeerService
 
         $gemSlot->delete();
 
-        $message = 'The Seer replaces a gem for: ' . $slot->item->affix_name . '. The seer sees all.';
+        $message = 'The Seer replaces a gem for: '.$slot->item->affix_name.'. The seer sees all.';
 
         ServerMessageHandler::handleMessage($character->user, NpcMessageTypes::SEER_ACTIONS, $message, $slot->id);
 
@@ -359,7 +359,7 @@ class SeerService
 
         $character = $character->refresh();
 
-        $message = 'The Seer adds a gem to: ' . $slot->item->affix_name . '. The seer smiles as he hands you the item.';
+        $message = 'The Seer adds a gem to: '.$slot->item->affix_name.'. The seer smiles as he hands you the item.';
 
         ServerMessageHandler::handleMessage($character->user, NpcMessageTypes::SEER_ACTIONS, $message, $slot->id);
 

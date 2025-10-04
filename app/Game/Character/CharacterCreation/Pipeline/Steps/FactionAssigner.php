@@ -13,10 +13,6 @@ class FactionAssigner
 {
     /**
      * Assign one faction per non-purgatory map to the character using a single bulk insert.
-     *
-     * @param CharacterBuildState $state
-     * @param Closure $next
-     * @return CharacterBuildState
      */
     public function process(CharacterBuildState $state, Closure $next): CharacterBuildState
     {
@@ -34,7 +30,7 @@ class FactionAssigner
             $now
         );
 
-        if (!empty($rows)) {
+        if (! empty($rows)) {
             $character->factions()->getRelated()->newQuery()->insert($rows);
         }
 
@@ -43,16 +39,11 @@ class FactionAssigner
 
     /**
      * Build faction insert rows for non-purgatory maps.
-     *
-     * @param Collection $maps
-     * @param int $characterId
-     * @param DateTimeInterface $timestamp
-     * @return array
      */
     private function buildFactionRows(Collection $maps, int $characterId, DateTimeInterface $timestamp): array
     {
         return $maps->filter(function (GameMap $map) {
-            return !$map->mapType()->isPurgatory();
+            return ! $map->mapType()->isPurgatory();
         })->map(function (GameMap $map) use ($characterId, $timestamp) {
             return [
                 'character_id' => $characterId,

@@ -34,7 +34,7 @@ class RandomAffixDetails
     public function __construct(int $value)
     {
         if (! in_array($value, self::$values)) {
-            throw new Exception($value . ' does not exist.');
+            throw new Exception($value.' does not exist.');
         }
 
         $this->value = $value;
@@ -89,7 +89,7 @@ class RandomAffixDetails
             'Burst of Precision',
             'Gift of Subtlety',
             'Pledge of Mysteries',
-            'Pledge of Demolition'
+            'Pledge of Demolition',
         ];
     }
 
@@ -116,7 +116,7 @@ class RandomAffixDetails
             'Crest of the Full Moon',
             'Mantra of Greater Anxiety',
             'Grace of Absorption',
-            'Elite Chant of Grace'
+            'Elite Chant of Grace',
         ];
     }
 
@@ -142,7 +142,7 @@ class RandomAffixDetails
             'Radiant Aurora Shroud',
             'Solarbind Sigil',
             'Mystic Aether Pulse',
-            'Heaven\'s Fragment Incantation'
+            'Heaven\'s Fragment Incantation',
         ];
     }
 }

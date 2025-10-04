@@ -26,19 +26,19 @@ use Tests\Traits\CreateScheduledEvent;
 
 class RaidEventEnderServiceTest extends TestCase
 {
-    use RefreshDatabase,
+    use CreateAnnouncement,
+        CreateEvent,
         CreateGameMap,
+        CreateItem,
         CreateLocation,
         CreateMonster,
         CreateRaid,
         CreateScheduledEvent,
-        CreateEvent,
-        CreateAnnouncement,
-        CreateItem;
+        RefreshDatabase;
 
     private ?RaidEventEnderService $service = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -50,13 +50,13 @@ class RaidEventEnderServiceTest extends TestCase
         $this->service = $this->app->make(RaidEventEnderService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->service = null;
         parent::tearDown();
     }
 
-    public function testSupportsReturnsTrueOnlyForRaidEvent(): void
+    public function test_supports_returns_true_only_for_raid_event(): void
     {
         $this->assertTrue($this->service->supports(new EventType(EventType::RAID_EVENT)));
         $this->assertFalse($this->service->supports(new EventType(EventType::WINTER_EVENT)));
@@ -64,7 +64,7 @@ class RaidEventEnderServiceTest extends TestCase
         $this->assertFalse($this->service->supports(new EventType(EventType::WEEKLY_CELESTIALS)));
     }
 
-    public function testEndReturnsEarlyWhenScheduledHasNoRaidAndCleansUp(): void
+    public function test_end_returns_early_when_scheduled_has_no_raid_and_cleans_up(): void
     {
         $surface = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
 
@@ -97,7 +97,7 @@ class RaidEventEnderServiceTest extends TestCase
         EventFacade::assertNotDispatched(CorruptLocations::class);
     }
 
-    public function testEndWithRaidUncorruptsLocationsPurgesRaidDataUpdatesMonstersAndCleansUp(): void
+    public function test_end_with_raid_uncorrupts_locations_purges_raid_data_updates_monsters_and_cleans_up(): void
     {
         $surface = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
 

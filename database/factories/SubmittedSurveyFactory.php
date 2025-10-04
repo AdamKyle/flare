@@ -30,10 +30,8 @@ class SubmittedSurveyFactory extends Factory
                     'Some Radio Label' => ['value' => 'Option 1', 'type' => 'radio'],
                     'Some Checkbox Label' => ['value' => ['Option 1'], 'type' => 'checkbox'],
                     'Some markdown Label' => ['value' => 'Some content', 'type' => 'markdown'],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 }
-
-

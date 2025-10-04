@@ -3,8 +3,8 @@
 namespace App\Game\Kingdoms\Console\Commands;
 
 use App\Flare\Models\Kingdom;
-use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Jobs\CapitalCityUpdateAutoWalkedKingdoms;
+use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use Illuminate\Console\Command;
 use League\Fractal\Manager;
 

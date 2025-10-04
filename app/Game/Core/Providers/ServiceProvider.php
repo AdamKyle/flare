@@ -39,7 +39,7 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(CharactersOnline::class, function($app) {
+        $this->app->bind(CharactersOnline::class, function ($app) {
             return new CharactersOnline;
         });
     }

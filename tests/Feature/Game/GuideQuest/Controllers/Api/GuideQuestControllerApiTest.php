@@ -17,7 +17,7 @@ class GuideQuestControllerApiTest extends TestCase
 
     private ?Item $item = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -26,7 +26,7 @@ class GuideQuestControllerApiTest extends TestCase
         $this->item = $this->createItem(['type' => 'quest']);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -34,7 +34,7 @@ class GuideQuestControllerApiTest extends TestCase
         $this->item = null;
     }
 
-    public function testNextGuideQuestHasOneOfTheRequirementsWhenCompletingThePreviousQuest()
+    public function test_next_guide_quest_has_one_of_the_requirements_when_completing_the_previous_quest()
     {
         $guideQuestToHandIn = $this->createGuideQuest([
             'name' => 'hand in',
@@ -53,7 +53,7 @@ class GuideQuestControllerApiTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/guide-quests/hand-in/' . $character->user->id . '/' . $guideQuestToHandIn->id, [
+            ->call('POST', '/api/guide-quests/hand-in/'.$character->user->id.'/'.$guideQuestToHandIn->id, [
                 '_token' => csrf_token(),
             ]);
 
@@ -67,7 +67,7 @@ class GuideQuestControllerApiTest extends TestCase
         }
     }
 
-    public function testGetCurrentQuest()
+    public function test_get_current_quest()
     {
         $this->createGuideQuest([
             'name' => 'hand in',
@@ -77,7 +77,7 @@ class GuideQuestControllerApiTest extends TestCase
         $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/guide-quest/' . $character->user->id, [
+            ->call('GET', '/api/character/guide-quest/'.$character->user->id, [
                 '_token' => csrf_token(),
             ]);
 
@@ -91,7 +91,7 @@ class GuideQuestControllerApiTest extends TestCase
         }
     }
 
-    public function testFailToHandInGuideQuest()
+    public function test_fail_to_hand_in_guide_quest()
     {
         $guideQuestToHandIn = $this->createGuideQuest([
             'name' => 'hand in',
@@ -101,7 +101,7 @@ class GuideQuestControllerApiTest extends TestCase
         $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/guide-quests/hand-in/' . $character->user->id . '/' . $guideQuestToHandIn->id, [
+            ->call('POST', '/api/guide-quests/hand-in/'.$character->user->id.'/'.$guideQuestToHandIn->id, [
                 '_token' => csrf_token(),
             ]);
 

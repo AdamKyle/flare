@@ -2,9 +2,7 @@
 
 namespace App\Game\Shop\Providers;
 
-use App\Flare\Items\Transformers\EquippableItemTransformer;
 use App\Flare\Pagination\Pagination;
-use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Character\CharacterInventory\Services\CharacterGemBagService;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;

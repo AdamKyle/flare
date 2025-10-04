@@ -34,7 +34,7 @@ class GivePlayerAncenstorItem extends Command
         $character = Character::where('name', $this->argument('characterName'))->first();
 
         if (is_null($character)) {
-            return $this->error('No character found for name: ' . $this->argument('characterName'));
+            return $this->error('No character found for name: '.$this->argument('characterName'));
         }
 
         $selectedArfitfactName = $this->choice('Which item?', Item::where('type', 'artifact')->whereDoesntHave('inventorySlots')->whereDoesntHave('inventorySetSlots')->pluck('name')->toArray());

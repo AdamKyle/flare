@@ -23,7 +23,7 @@ class GamblerServiceTest extends TestCase
 
     private ?GamblerService $gamblerService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -31,7 +31,7 @@ class GamblerServiceTest extends TestCase
         $this->gamblerService = resolve(GamblerService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -39,7 +39,7 @@ class GamblerServiceTest extends TestCase
         $this->gamblerService = null;
     }
 
-    public function testHasEnoughGoldToSpin()
+    public function test_has_enough_gold_to_spin()
     {
         $character = $this->character->getCharacter();
 
@@ -55,7 +55,7 @@ class GamblerServiceTest extends TestCase
         $this->assertEquals(200, $response['status']);
     }
 
-    public function testDoesNotHasEnoughGoldToSpin()
+    public function test_does_not_has_enough_gold_to_spin()
     {
         $character = $this->character->getCharacter();
 
@@ -71,7 +71,7 @@ class GamblerServiceTest extends TestCase
         $this->assertEquals(422, $response['status']);
     }
 
-    public function testFailedToMatchAny()
+    public function test_failed_to_match_any()
     {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
@@ -96,7 +96,7 @@ class GamblerServiceTest extends TestCase
         $this->assertEquals('Darn! Better luck next time child! Spin again!', $response['message']);
     }
 
-    public function testRolledAllThreeOfGoldDust()
+    public function test_rolled_all_three_of_gold_dust()
     {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
@@ -122,7 +122,7 @@ class GamblerServiceTest extends TestCase
         $this->assertEquals(5000, $character->gold_dust);
     }
 
-    public function testRolledAllThreeOfShards()
+    public function test_rolled_all_three_of_shards()
     {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
@@ -148,7 +148,7 @@ class GamblerServiceTest extends TestCase
         $this->assertEquals(5000, $character->shards);
     }
 
-    public function testRolledAllThreeOfCopperCoinsWithItem()
+    public function test_rolled_all_three_of_copper_coins_with_item()
     {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
@@ -180,7 +180,7 @@ class GamblerServiceTest extends TestCase
         $this->assertEquals(5000, $character->copper_coins);
     }
 
-    public function testRolledAllThreeOfCopperCoinsWithItemAndQuestItemThatGivesBonus()
+    public function test_rolled_all_three_of_copper_coins_with_item_and_quest_item_that_gives_bonus()
     {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
@@ -217,7 +217,7 @@ class GamblerServiceTest extends TestCase
         $this->assertGreaterThan(5000, $character->copper_coins);
     }
 
-    public function testRolledAllThreeOfCopperCoinsWithItemAndWeeklyCurrencyEvent()
+    public function test_rolled_all_three_of_copper_coins_with_item_and_weekly_currency_event()
     {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
@@ -252,7 +252,7 @@ class GamblerServiceTest extends TestCase
         $this->assertGreaterThan(5000, $character->copper_coins);
     }
 
-    public function testRolledAllThreeOfCopperCoinsWithoutItem()
+    public function test_rolled_all_three_of_copper_coins_without_item()
     {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
@@ -278,7 +278,7 @@ class GamblerServiceTest extends TestCase
         $this->assertEquals(0, $character->copper_coins);
     }
 
-    public function testRolledTwoOfGoldDust()
+    public function test_rolled_two_of_gold_dust()
     {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
@@ -304,7 +304,7 @@ class GamblerServiceTest extends TestCase
         $this->assertEquals(1000, $character->gold_dust);
     }
 
-    public function testRolledTwoOfShards()
+    public function test_rolled_two_of_shards()
     {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
@@ -330,7 +330,7 @@ class GamblerServiceTest extends TestCase
         $this->assertEquals(1000, $character->shards);
     }
 
-    public function testRolledTwoOfCopperCoinsWithItem()
+    public function test_rolled_two_of_copper_coins_with_item()
     {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
@@ -362,7 +362,7 @@ class GamblerServiceTest extends TestCase
         $this->assertEquals(1000, $character->copper_coins);
     }
 
-    public function testRolledTwoOfGoldDustWithMaxGoldDust()
+    public function test_rolled_two_of_gold_dust_with_max_gold_dust()
     {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
@@ -388,7 +388,7 @@ class GamblerServiceTest extends TestCase
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
     }
 
-    public function testRolledTwoOfShardsWithMaxShards()
+    public function test_rolled_two_of_shards_with_max_shards()
     {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 
@@ -414,7 +414,7 @@ class GamblerServiceTest extends TestCase
         $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
     }
 
-    public function testRolledTwoOfCopperCoinsWithItemWithMaxCopperCoins()
+    public function test_rolled_two_of_copper_coins_with_item_with_max_copper_coins()
     {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 

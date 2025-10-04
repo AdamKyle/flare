@@ -23,7 +23,7 @@ class PublicEntityCommandTest extends TestCase
 
     private ?PublicEntityCommand $publicEntityCommand;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -31,7 +31,7 @@ class PublicEntityCommandTest extends TestCase
         $this->publicEntityCommand = resolve(PublicEntityCommand::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -39,7 +39,7 @@ class PublicEntityCommandTest extends TestCase
         $this->publicEntityCommand = null;
     }
 
-    public function testBailWhenNoCharacterSet()
+    public function test_bail_when_no_character_set()
     {
         Event::fake();
 
@@ -48,7 +48,7 @@ class PublicEntityCommandTest extends TestCase
         Event::assertNotDispatched(ServerMessageEvent::class);
     }
 
-    public function testNoCelestials()
+    public function test_no_celestials()
     {
         Event::fake();
 
@@ -61,7 +61,7 @@ class PublicEntityCommandTest extends TestCase
         });
     }
 
-    public function testUsePcCommand()
+    public function test_use_pc_command()
     {
         Event::fake();
 
@@ -88,7 +88,7 @@ class PublicEntityCommandTest extends TestCase
         });
     }
 
-    public function testBailWhenNoCharacterSetForPCTCommand()
+    public function test_bail_when_no_character_set_for_pct_command()
     {
         Event::fake();
 
@@ -97,7 +97,7 @@ class PublicEntityCommandTest extends TestCase
         Event::assertNotDispatched(ServerMessageEvent::class);
     }
 
-    public function testErrorOutWhenInvalidQuestItemGiven()
+    public function test_error_out_when_invalid_quest_item_given()
     {
         Event::fake();
 
@@ -113,7 +113,7 @@ class PublicEntityCommandTest extends TestCase
         });
     }
 
-    public function testBailWhenYouDontHaveTheQuestItemForPCt()
+    public function test_bail_when_you_dont_have_the_quest_item_for_p_ct()
     {
         Event::fake();
 
@@ -126,7 +126,7 @@ class PublicEntityCommandTest extends TestCase
         });
     }
 
-    public function testBailWhenNoCelestials()
+    public function test_bail_when_no_celestials()
     {
         Event::fake();
 
@@ -142,7 +142,7 @@ class PublicEntityCommandTest extends TestCase
         });
     }
 
-    public function testUseThePctCommand()
+    public function test_use_the_pct_command()
     {
         Event::fake();
 

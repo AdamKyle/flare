@@ -5,9 +5,10 @@ namespace App\Admin\Services;
 use App\Flare\Models\SuggestionAndBugs;
 use App\Game\Core\Values\FeedbackType;
 
-class FeedbackService {
-
-    public function gatherFeedbackData(): array {
+class FeedbackService
+{
+    public function gatherFeedbackData(): array
+    {
         $today = now()->startOfDay();
         $yesterday = now()->subDay()->startOfDay();
 
@@ -23,7 +24,6 @@ class FeedbackService {
         $bugsDifference = $this->calculatePercentageDifference($bugsCountToday, $bugsCountYesterday);
         $suggestionDifference = $this->calculatePercentageDifference($suggestionCountToday, $suggestionCountYesterday);
 
-
         return [
             'bugsCount' => $totalBugCount,
             'bugsDifference' => abs($bugsDifference),
@@ -32,7 +32,8 @@ class FeedbackService {
         ];
     }
 
-    private function calculatePercentageDifference(int $countToday, int $countYesterday): float {
+    private function calculatePercentageDifference(int $countToday, int $countYesterday): float
+    {
         if ($countYesterday === 0) {
             return $countToday > 0 ? ($countToday / 100) : 0.0;
         }

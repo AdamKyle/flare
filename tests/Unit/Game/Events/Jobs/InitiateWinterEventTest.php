@@ -22,19 +22,19 @@ use Tests\Traits\CreateScheduledEvent;
 
 class InitiateWinterEventTest extends TestCase
 {
-    use CreateGameMap, CreateScheduledEvent, RefreshDatabase, CreateRaid, CreateItem, CreateLocation, CreateMonster;
+    use CreateGameMap, CreateItem, CreateLocation, CreateMonster, CreateRaid, CreateScheduledEvent, RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
 
-    public function testWinterEventDoesNotTrigger()
+    public function test_winter_event_does_not_trigger()
     {
         Event::fake();
 
@@ -46,7 +46,7 @@ class InitiateWinterEventTest extends TestCase
         $this->assertEmpty(GlobalEventGoal::all());
     }
 
-    public function testWinterEventDoesTriggerWhenScheduledEventExists()
+    public function test_winter_event_does_trigger_when_scheduled_event_exists()
     {
 
         $this->createGameMap([
@@ -68,7 +68,7 @@ class InitiateWinterEventTest extends TestCase
         $this->assertNotEmpty(GlobalEventGoal::all());
     }
 
-    public function testScheduleTheEventForNextYear()
+    public function test_schedule_the_event_for_next_year()
     {
         $this->createGameMap([
             'name' => MapNameValue::ICE_PLANE,
@@ -98,7 +98,7 @@ class InitiateWinterEventTest extends TestCase
         $this->assertNull($eventForNextYear->raids_for_event);
     }
 
-    public function testScheduleTheEventAndAssociatedRaidsForNextYear()
+    public function test_schedule_the_event_and_associated_raids_for_next_year()
     {
 
         $monster = $this->createMonster();
@@ -112,7 +112,7 @@ class InitiateWinterEventTest extends TestCase
             'raid_boss_location_id' => $location->id,
             'corrupted_location_ids' => [$location->id],
             'artifact_item_id' => $item->id,
-            'scheduled_event_description' => 'test description'
+            'scheduled_event_description' => 'test description',
         ]);
 
         $now = now();
@@ -132,9 +132,8 @@ class InitiateWinterEventTest extends TestCase
                 'selected_raid' => $raid->id,
                 'start_date' => $now,
                 'end_date' => $now,
-            ]]
+            ]],
         ]);
-
 
         InitiateWinterEvent::dispatch($event->id);
 
@@ -142,7 +141,6 @@ class InitiateWinterEventTest extends TestCase
         $this->assertNotEmpty(Announcement::all());
         $this->assertNotEmpty(ModelsEvent::all());
         $this->assertNotEmpty(GlobalEventGoal::all());
-
 
         $eventForNextYear = ScheduledEvent::where('start_date', $now->clone()->addYear())->where('event_type', EventType::WINTER_EVENT)->first();
 

@@ -40,7 +40,7 @@ class DisenchantServiceTest extends TestCase
 
     private ?GameSkill $disenchantingSkill;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -77,7 +77,7 @@ class DisenchantServiceTest extends TestCase
         ]);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -88,7 +88,7 @@ class DisenchantServiceTest extends TestCase
         $this->enchantingSkill = null;
     }
 
-    public function testDisenchantTheItemAndRemoveTheItemFromTheInventory()
+    public function test_disenchant_the_item_and_remove_the_item_from_the_inventory()
     {
         Event::fake();
 
@@ -105,7 +105,7 @@ class DisenchantServiceTest extends TestCase
         Event::assertDispatched(UpdateCharacterEnchantingList::class);
     }
 
-    public function testDisenchantTheItemAndRemoveTheItemFromTheInventoryWithQuestItemForGoldDustRush()
+    public function test_disenchant_the_item_and_remove_the_item_from_the_inventory_with_quest_item_for_gold_dust_rush()
     {
         Event::fake();
 
@@ -137,7 +137,7 @@ class DisenchantServiceTest extends TestCase
         Event::assertDispatched(UpdateCharacterEnchantingList::class);
     }
 
-    public function testDisenchantItemSuccessfully()
+    public function test_disenchant_item_successfully()
     {
         Event::fake();
 
@@ -165,7 +165,7 @@ class DisenchantServiceTest extends TestCase
         Event::assertDispatched(UpdateCharacterEnchantingList::class);
     }
 
-    public function testDisenchantItemSuccessfullyAndGetMaxGoldDustFromARush()
+    public function test_disenchant_item_successfully_and_get_max_gold_dust_from_a_rush()
     {
         Event::fake();
 
@@ -207,7 +207,7 @@ class DisenchantServiceTest extends TestCase
         Event::assertDispatched(UpdateCharacterEnchantingList::class);
     }
 
-    public function testDisenchantItemSuccessfullyAndDoNotGetAGoldRushButDoMaxGoldDust()
+    public function test_disenchant_item_successfully_and_do_not_get_a_gold_rush_but_do_max_gold_dust()
     {
         Event::fake();
 
@@ -249,7 +249,7 @@ class DisenchantServiceTest extends TestCase
         Event::assertDispatched(UpdateCharacterEnchantingList::class);
     }
 
-    public function testDisenchantFailToItem()
+    public function test_disenchant_fail_to_item()
     {
         Event::fake();
 
@@ -281,7 +281,7 @@ class DisenchantServiceTest extends TestCase
         });
     }
 
-    public function testGivePlayerGoldDustRush()
+    public function test_give_player_gold_dust_rush()
     {
         Event::fake();
 
@@ -320,7 +320,7 @@ class DisenchantServiceTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testDoNotGivePlayerGoldDustRushWhenGoldDustCapped()
+    public function test_do_not_give_player_gold_dust_rush_when_gold_dust_capped()
     {
         Event::fake();
 
@@ -358,7 +358,7 @@ class DisenchantServiceTest extends TestCase
         Event::assertDispatched(UpdateSkillEvent::class);
     }
 
-    public function testCallDisenchantItemAndSucceed()
+    public function test_call_disenchant_item_and_succeed()
     {
         Event::fake();
 
@@ -381,7 +381,7 @@ class DisenchantServiceTest extends TestCase
         $this->assertGreaterThan(0, $character->gold_dust);
     }
 
-    public function testCallDisenchantItemAndSucceedButGetNoGoldDustWhenMaxed()
+    public function test_call_disenchant_item_and_succeed_but_get_no_gold_dust_when_maxed()
     {
         Event::fake();
 
@@ -408,7 +408,7 @@ class DisenchantServiceTest extends TestCase
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
     }
 
-    public function testCallDisenchantItemAndFail()
+    public function test_call_disenchant_item_and_fail()
     {
         Event::fake();
 
@@ -436,7 +436,7 @@ class DisenchantServiceTest extends TestCase
         });
     }
 
-    public function testCannotDisentchantItemThatDoesNotExist()
+    public function test_cannot_disentchant_item_that_does_not_exist()
     {
         $character = $this->character->getCharacter();
 
@@ -446,11 +446,11 @@ class DisenchantServiceTest extends TestCase
 
         $result = $disenchantingService->disenchantItem($character, $item);
 
-        $this->assertEquals($item->affix_name . ' Cannot be disenchanted. Not found in inventory.', $result['message']);
+        $this->assertEquals($item->affix_name.' Cannot be disenchanted. Not found in inventory.', $result['message']);
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testCannotDisentchantItemThatIsNotEnchanted()
+    public function test_cannot_disentchant_item_that_is_not_enchanted()
     {
         $item = $this->createItem();
 
@@ -460,11 +460,11 @@ class DisenchantServiceTest extends TestCase
 
         $result = $disenchantingService->disenchantItem($character, $item);
 
-        $this->assertEquals($item->affix_name . ' Cannot be disenchanted. Has no enchantments attached.', $result['message']);
+        $this->assertEquals($item->affix_name.' Cannot be disenchanted. Has no enchantments attached.', $result['message']);
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testCannotDisentchantItemIsAQuestItem()
+    public function test_cannot_disentchant_item_is_a_quest_item()
     {
         $item = $this->createItem([
             'item_prefix_id' => $this->createItemAffix([
@@ -486,7 +486,7 @@ class DisenchantServiceTest extends TestCase
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testDisenchantItemAndDoNotReturnResponse()
+    public function test_disenchant_item_and_do_not_return_response()
     {
         $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->getCharacter();
 
@@ -496,7 +496,7 @@ class DisenchantServiceTest extends TestCase
         $this->assertEquals(200, $result['status']);
     }
 
-    public function testDisenchantItemAndReturnResponse()
+    public function test_disenchant_item_and_return_response()
     {
         $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->getCharacter();
 
@@ -504,7 +504,7 @@ class DisenchantServiceTest extends TestCase
 
         $result = $disenchantingService->disenchantItem($character, $this->itemToDisenchant);
 
-        $this->assertEquals('Disenchanted item ' . $this->itemToDisenchant->affix_name . ' Check server message tab for Gold Dust output.', $result['message']);
+        $this->assertEquals('Disenchanted item '.$this->itemToDisenchant->affix_name.' Check server message tab for Gold Dust output.', $result['message']);
         $this->assertEmpty($result['inventory']['data']);
         $this->assertEquals(200, $result['status']);
     }

@@ -23,7 +23,8 @@ class NpcQuestsHandler
         $this->npcQuestRewardHandler = $npcQuestRewardHandler;
     }
 
-    public function questRewardHandler(): NpcQuestRewardHandler {
+    public function questRewardHandler(): NpcQuestRewardHandler
+    {
         return $this->npcQuestRewardHandler;
     }
 

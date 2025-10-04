@@ -10,8 +10,7 @@ use App\Game\Messages\Events\GlobalMessageEvent;
 
 class WeeklyCelestialEventEnderService implements EventEnder
 {
-    public function __construct(private readonly AnnouncementCleanupService $announcementCleanup)
-    {}
+    public function __construct(private readonly AnnouncementCleanupService $announcementCleanup) {}
 
     public function supports(EventType $type): bool
     {

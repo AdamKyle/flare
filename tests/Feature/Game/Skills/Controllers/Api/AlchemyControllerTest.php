@@ -20,7 +20,7 @@ class AlchemyControllerTest extends TestCase
 
     private ?Character $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -39,14 +39,14 @@ class AlchemyControllerTest extends TestCase
             ->getCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testGetAlchemyItems()
+    public function test_get_alchemy_items()
     {
         $item = $this->createItem([
             'crafting_type' => 'alchemy',
@@ -56,7 +56,7 @@ class AlchemyControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('GET', '/api/alchemy/' . $this->character->id, [
+            ->call('GET', '/api/alchemy/'.$this->character->id, [
                 'crafting_type' => $item->crafting_type,
             ]);
 
@@ -66,7 +66,7 @@ class AlchemyControllerTest extends TestCase
         $this->assertEquals(0, $jsonData['skill_xp']['current_xp']);
     }
 
-    public function testCannotTransmute()
+    public function test_cannot_transmute()
     {
         $item = $this->createItem([
             'crafting_type' => 'alchemy',
@@ -76,13 +76,13 @@ class AlchemyControllerTest extends TestCase
         ]);
 
         $this->character->update([
-            'can_craft' => false
+            'can_craft' => false,
         ]);
 
         $character = $this->character->refresh();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/transmute/' . $character->id, [
+            ->call('POST', '/api/transmute/'.$character->id, [
                 'item_to_craft' => $item->id,
                 'type' => $item->crafting_type,
                 'craft_for_npc' => false,
@@ -95,7 +95,7 @@ class AlchemyControllerTest extends TestCase
         $this->assertEquals(422, $response->status());
     }
 
-    public function testTransumteItem()
+    public function test_transumte_item()
     {
         $item = $this->createItem([
             'crafting_type' => 'alchemy',
@@ -103,7 +103,7 @@ class AlchemyControllerTest extends TestCase
             'skill_level_required' => 1,
             'skill_level_trivial' => 25,
             'gold_dust_cost' => 100,
-            'shards_cost' => 50
+            'shards_cost' => 50,
         ]);
 
         $this->instance(
@@ -122,7 +122,7 @@ class AlchemyControllerTest extends TestCase
         $character = $this->character->refresh();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/transmute/' . $character->id, [
+            ->call('POST', '/api/transmute/'.$character->id, [
                 'item_to_craft' => $item->id,
                 'type' => $item->crafting_type,
                 'craft_for_npc' => false,

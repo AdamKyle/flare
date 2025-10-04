@@ -12,8 +12,7 @@ use Tests\Traits\CreateKingdom;
 
 trait CreateKingdomHelper
 {
-
-    use CreateKingdom, CreateGameBuilding, CreateGameUnit;
+    use CreateGameBuilding, CreateGameUnit, CreateKingdom;
 
     protected function createKingdomForCharacter(?CharacterFactory $character): ?Kingdom
     {

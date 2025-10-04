@@ -2,33 +2,24 @@
 
 namespace App\Game\BattleRewardProcessing\Jobs;
 
+use App\Flare\Models\Character;
+use App\Flare\Models\Monster;
+use App\Flare\Services\CharacterRewardService;
+use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Models\Character;
-use App\Flare\Models\Monster;
-use App\Flare\Services\CharacterRewardService;
-use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 
 class ExplorationXpHandler implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * @param integer $characterId
-     * @param integer $numberOfCreatures
-     * @param integer $xp
-     */
     public function __construct(private int $characterId, private int $numberOfCreatures, private int $xp) {}
 
     /**
      * Handle the job
-     *
-     * @param CharacterRewardService $characterRewardService
-     * @param BattleMessageHandler $battleMessageHandler
-     * @return void
      */
     public function handle(CharacterRewardService $characterRewardService, BattleMessageHandler $battleMessageHandler): void
     {
@@ -47,10 +38,7 @@ class ExplorationXpHandler implements ShouldQueue
      * - Includes character XP
      * - Includes Skill XP
      *
-     * @param Character $character
-     * @param Monster $monster
-     * @param CharacterRewardService $characterRewardService
-     * @return void
+     * @param  Monster  $monster
      */
     private function processXpReward(Character $character, CharacterRewardService $characterRewardService, BattleMessageHandler $battleMessageHandler): void
     {

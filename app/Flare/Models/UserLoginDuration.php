@@ -38,7 +38,8 @@ class UserLoginDuration extends Model
         'last_activity' => 'datetime',
     ];
 
-    public function user(): BelongsTo {
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class);
     }
 
@@ -46,5 +47,4 @@ class UserLoginDuration extends Model
     {
         return UserLoginDurationFactory::new();
     }
-
 }

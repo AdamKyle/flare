@@ -47,11 +47,7 @@ class BattleEventHandler
      *
      * - Handles rewarding the player
      *
-     * @param integer $characterId
-     * @param integer $monsterId
-     * @param boolean $includeXp
-     * @param boolean $includeEventReward
-     * @return void
+     * @param  bool  $includeEventReward
      */
     public function processMonsterDeath(int $characterId, int $monsterId, bool $includeXp = true, $includeEventReward = true): void
     {
@@ -76,12 +72,12 @@ class BattleEventHandler
             ]);
         }
 
-        $monsterFightCache = Cache::get('monster-fight-' . $character->id);
+        $monsterFightCache = Cache::get('monster-fight-'.$character->id);
 
         if (! is_null($monsterFightCache)) {
             $monsterFightCache['health']['current_character_health'] = $characterHealth;
 
-            Cache::put('monster-fight-' . $character->id, $monsterFightCache, 900);
+            Cache::put('monster-fight-'.$character->id, $monsterFightCache, 900);
         }
 
         event(new CharacterRevive($character->user, $characterHealth));

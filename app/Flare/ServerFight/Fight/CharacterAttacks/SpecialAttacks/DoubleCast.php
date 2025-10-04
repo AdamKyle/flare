@@ -43,6 +43,6 @@ class DoubleCast extends BattleBase
     {
         $this->monsterHealth -= $damage;
 
-        $this->addMessage('Your spell(s) hits for: ' . number_format($damage), 'player-action');
+        $this->addMessage('Your spell(s) hits for: '.number_format($damage), 'player-action');
     }
 }

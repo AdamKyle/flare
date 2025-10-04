@@ -40,11 +40,17 @@ class PassiveSkillTypeValue
     const CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION = 13;
 
     const RESOURCE_REQUEST_TIME_REDUCTION = 14;
+
     const MASTER_FARMER = 15;
+
     const MASTER_STONE_MASON = 16;
+
     const MASTER_WOOD_WORKER = 17;
+
     const MASTER_IRON_MINER = 18;
+
     const MASTER_POTTER = 19;
+
     const MASTER_STEEL_SMITH = 20;
 
     /**
@@ -111,7 +117,7 @@ class PassiveSkillTypeValue
     public function __construct(int $value)
     {
         if (! in_array($value, self::$values)) {
-            throw new Exception($value . ' does not exist.');
+            throw new Exception($value.' does not exist.');
         }
 
         $this->value = $value;

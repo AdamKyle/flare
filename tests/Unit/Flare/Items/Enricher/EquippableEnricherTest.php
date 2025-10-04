@@ -15,12 +15,13 @@ use Tests\Traits\CreateItemAffix;
 
 class EquippableEnricherTest extends TestCase
 {
-    use RefreshDatabase, CreateItem, CreateItemAffix;
+    use CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?EquippableEnricher $enricher = null;
+
     private ?Item $item = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -37,7 +38,7 @@ class EquippableEnricherTest extends TestCase
         $this->enricher = $this->app->make(EquippableEnricher::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->item = null;
         $this->enricher = null;
@@ -45,7 +46,7 @@ class EquippableEnricherTest extends TestCase
         parent::tearDown();
     }
 
-    public function testEnrichesBaseItemStats(): void
+    public function test_enriches_base_item_stats(): void
     {
         $this->item->update([
             'base_damage' => 100,
@@ -63,7 +64,7 @@ class EquippableEnricherTest extends TestCase
         $this->assertEquals(33, $enriched->total_defence);
     }
 
-    public function testIncludesAffixModifiersInEnrichment(): void
+    public function test_includes_affix_modifiers_in_enrichment(): void
     {
         $prefix = $this->createItemAffix([
             'base_damage_mod' => 0.10,
@@ -89,7 +90,7 @@ class EquippableEnricherTest extends TestCase
         $this->assertEquals(0.20, $enriched->devouring_light);
     }
 
-    public function testCalculatesDevouringDarknessFromBaseAndHoly(): void
+    public function test_calculates_devouring_darkness_from_base_and_holy(): void
     {
         $this->item->update([
             'devouring_darkness' => 0.05,
@@ -100,7 +101,7 @@ class EquippableEnricherTest extends TestCase
         $this->assertEqualsWithDelta(0.15, $enriched->devouring_darkness, 0.00001);
     }
 
-    public function testCategorizedDamageFromAffixes(): void
+    public function test_categorized_damage_from_affixes(): void
     {
         $prefix = $this->createItemAffix([
             'damage_amount' => 10,
@@ -126,7 +127,7 @@ class EquippableEnricherTest extends TestCase
         $this->assertEquals(15, $enriched->total_irresistible_affix_damage);
     }
 
-    public function testEnrichesDamageStatIfGiven(): void
+    public function test_enriches_damage_stat_if_given(): void
     {
         $this->item->update([
             'str_mod' => 0.2,
@@ -137,7 +138,7 @@ class EquippableEnricherTest extends TestCase
         $this->assertEquals(0.2, $enriched->total_base_damage_stat);
     }
 
-    public function testBuildsSkillSummaryFromAffixesAndItem(): void
+    public function test_builds_skill_summary_from_affixes_and_item(): void
     {
         $prefix = $this->createItemAffix([
             'skill_name' => 'Alchemy',
@@ -168,7 +169,7 @@ class EquippableEnricherTest extends TestCase
      * NEW: Cover the suffix branch in calculateTotalStackableDamage().
      * Only a suffix provides stackable damage.
      */
-    public function testStackableDamageFromSuffixOnly(): void
+    public function test_stackable_damage_from_suffix_only(): void
     {
         $suffix = $this->createItemAffix([
             'damage_amount' => 7,
@@ -188,7 +189,7 @@ class EquippableEnricherTest extends TestCase
         $this->assertEquals(0.0, $enriched->total_irresistible_affix_damage);
     }
 
-    public function testNonStackingDamageFromPrefixOnly(): void
+    public function test_non_stacking_damage_from_prefix_only(): void
     {
         $prefix = $this->createItemAffix([
             'damage_amount' => 9,
@@ -208,9 +209,9 @@ class EquippableEnricherTest extends TestCase
         $this->assertEquals(0.0, $enriched->total_irresistible_affix_damage);
     }
 
-    public function testEnrichMethodHasAutoManifestAndResolvesEquippableSchema(): void
+    public function test_enrich_method_has_auto_manifest_and_resolves_equippable_schema(): void
     {
-        $ref   = new \ReflectionMethod(EquippableEnricher::class, 'enrich');
+        $ref = new \ReflectionMethod(EquippableEnricher::class, 'enrich');
         $attrs = $ref->getAttributes(AutoManifest::class);
 
         $this->assertCount(1, $attrs, 'Expected exactly one AutoManifest attribute on enrich().');
@@ -236,27 +237,27 @@ class EquippableEnricherTest extends TestCase
         $this->assertSame('totals.damage', $schema->map('total_damage'));
     }
 
-    public function testSchemaMapsEnrichedItemIntoDotPaths(): void
+    public function test_schema_maps_enriched_item_into_dot_paths(): void
     {
         // Arrange: make sure enrichment actually sets several props.
         $this->item->update([
-            'base_damage'      => 100,
-            'base_healing'     => 50,
-            'base_ac'          => 25,
-            'base_damage_mod'  => 0.10,
+            'base_damage' => 100,
+            'base_healing' => 50,
+            'base_ac' => 25,
+            'base_damage_mod' => 0.10,
             'base_healing_mod' => 0.20,
-            'base_ac_mod'      => 0.30,
-            'devouring_light'  => 0.05,
+            'base_ac_mod' => 0.30,
+            'devouring_light' => 0.05,
         ]);
 
         // Enrich (existing tests already assert the numbers; here we care about mapping)
         $enriched = $this->enricher->enrich($this->item->fresh());
 
         // Resolve the schema via the attribute on the method:
-        $ref   = new \ReflectionMethod(\App\Flare\Items\Enricher\EquippableEnricher::class, 'enrich');
+        $ref = new \ReflectionMethod(\App\Flare\Items\Enricher\EquippableEnricher::class, 'enrich');
 
         /** @var AutoManifest $meta */
-        $meta  = $ref->getAttributes(AutoManifest::class)[0]->newInstance();
+        $meta = $ref->getAttributes(AutoManifest::class)[0]->newInstance();
         $schema = $meta->schema->schema();
 
         // Build a minimal "mapped bag" like the builder would (only for a few fields).
@@ -278,8 +279,8 @@ class EquippableEnricherTest extends TestCase
 
         // Assert the dot paths exist and contain the enriched values:
         $this->assertSame(110, $bag['totals']['damage']);
-        $this->assertSame(60,  $bag['totals']['healing']);
-        $this->assertSame(33,  $bag['totals']['defence']);
+        $this->assertSame(60, $bag['totals']['healing']);
+        $this->assertSame(33, $bag['totals']['defence']);
 
         $this->assertSame(0.10, $bag['mods']['base']['damage_mod']);
         $this->assertSame(0.05, $bag['devouring']['light']);
@@ -291,16 +292,15 @@ class EquippableEnricherTest extends TestCase
     private function setDot(array &$arr, string $path, mixed $value): void
     {
         $parts = explode('.', $path);
-        $ref =& $arr;
+        $ref = &$arr;
 
         foreach ($parts as $segment) {
-            if (!array_key_exists($segment, $ref) || !is_array($ref[$segment])) {
+            if (! array_key_exists($segment, $ref) || ! is_array($ref[$segment])) {
                 $ref[$segment] = [];
             }
-            $ref =& $ref[$segment];
+            $ref = &$ref[$segment];
         }
 
         $ref = $value;
     }
-
 }

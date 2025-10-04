@@ -79,7 +79,7 @@ class CraftingService
 
         if (
             (is_array($craftingType) && empty(array_diff($craftingType, $defaultToWeapon))) ||
-            (!is_array($craftingType) && in_array($craftingType, $defaultToWeapon))
+            (! is_array($craftingType) && in_array($craftingType, $defaultToWeapon))
         ) {
             $craftingType = 'weapon';
         }
@@ -99,7 +99,7 @@ class CraftingService
 
         if (
             (is_array($type) && empty(array_diff($type, $defaultToWeapon))) ||
-            (!is_array($type) && in_array($type, $defaultToWeapon))
+            (! is_array($type) && in_array($type, $defaultToWeapon))
         ) {
             $type = 'weapon';
         }
@@ -267,7 +267,7 @@ class CraftingService
             $craftingType = 'weapon';
         }
 
-        $gameSkill = GameSkill::where('name', ucfirst($craftingType) . ' Crafting')->first();
+        $gameSkill = GameSkill::where('name', ucfirst($craftingType).' Crafting')->first();
 
         return Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
     }
@@ -294,9 +294,9 @@ class CraftingService
 
         $craftingTypeArray = is_array($craftingType) ? $craftingType : [$craftingType];
 
-        if (!empty(array_intersect($craftingTypeArray, $twoHandedWeapons))) {
+        if (! empty(array_intersect($craftingTypeArray, $twoHandedWeapons))) {
             $items->whereIn('default_position', array_map('strtolower', $craftingTypeArray));
-        } elseif (!empty(array_intersect($craftingTypeArray, $craftingTypes))) {
+        } elseif (! empty(array_intersect($craftingTypeArray, $craftingTypes))) {
             $items->whereIn('crafting_type', array_map('strtolower', $craftingTypeArray));
         } else {
             $items->whereIn('type', array_map('strtolower', $craftingTypeArray));

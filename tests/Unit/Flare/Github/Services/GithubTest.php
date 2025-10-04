@@ -16,21 +16,21 @@ class GithubTest extends TestCase
 {
     private ?Github $github;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->github = resolve(Github::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->github = null;
     }
 
-    public function testInitializeGitHUbWithOutAuthorization()
+    public function test_initialize_git_h_ub_with_out_authorization()
     {
         Mockery::mock(Client::class);
 
@@ -39,7 +39,7 @@ class GithubTest extends TestCase
         $this->assertInstanceOf(Github::class, $result);
     }
 
-    public function testInitializeGitHUbWithAuthorization()
+    public function test_initialize_git_h_ub_with_authorization()
     {
         Config::set('github.token', 1234567890);
 
@@ -52,7 +52,7 @@ class GithubTest extends TestCase
         $this->assertInstanceOf(Github::class, $result);
     }
 
-    public function testBailWhenClientNotSet()
+    public function test_bail_when_client_not_set()
     {
 
         $this->expectException(Exception::class);
@@ -60,7 +60,7 @@ class GithubTest extends TestCase
         $this->github->fetchLatestRelease();
     }
 
-    public function testGetReleaseDataFromGithub()
+    public function test_get_release_data_from_github()
     {
         $mock = Mockery::mock(Client::class);
         $repo = Mockery::mock(Repo::class);

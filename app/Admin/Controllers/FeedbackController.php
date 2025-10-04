@@ -9,14 +9,15 @@ use App\Http\Controllers\Controller;
 
 class FeedbackController extends Controller
 {
-
     public function __construct(private readonly Markdown $markdown) {}
 
-    public function bugs() {
+    public function bugs()
+    {
         return view('admin.feedback.bugs-list');
     }
 
-    public function bug(int $bug) {
+    public function bug(int $bug)
+    {
 
         $foundBug = SuggestionAndBugs::where('type', FeedbackType::BUG)->where('id', $bug)->first();
 
@@ -27,11 +28,13 @@ class FeedbackController extends Controller
         return view('admin.feedback.bug', compact('foundBug', 'renderedHtml'));
     }
 
-    public function suggestions() {
+    public function suggestions()
+    {
         return view('admin.feedback.suggestions-list');
     }
 
-    public function suggestion(int $suggestion) {
+    public function suggestion(int $suggestion)
+    {
         $foundBug = SuggestionAndBugs::where('type', FeedbackType::SUGGESTION)->where('id', $suggestion)->first();
 
         $cleanedUpDescription = $this->markdown->cleanMarkdown($foundBug->description);
@@ -41,7 +44,8 @@ class FeedbackController extends Controller
         return view('admin.feedback.suggestion', compact('foundBug', 'renderedHtml'));
     }
 
-    public function deleteFeedback(int $feedbackId) {
+    public function deleteFeedback(int $feedbackId)
+    {
         $foundFeedback = SuggestionAndBugs::find($feedbackId);
 
         if (is_null($foundFeedback)) {

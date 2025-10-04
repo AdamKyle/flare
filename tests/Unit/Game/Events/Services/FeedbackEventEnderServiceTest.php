@@ -5,8 +5,8 @@ namespace Tests\Unit\Game\Events\Services;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event as ActiveEventModel;
-use App\Flare\Models\SurveySnapshot;
 use App\Flare\Models\SubmittedSurvey;
+use App\Flare\Models\SurveySnapshot;
 use App\Game\Events\Services\FeedbackEventEnderService;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -18,21 +18,21 @@ use Tests\TestCase;
 use Tests\Traits\CreateAnnouncement;
 use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateScheduledEvent;
-use Tests\Traits\CreateSurvey;
 use Tests\Traits\CreateSubmittedSurvey;
+use Tests\Traits\CreateSurvey;
 
 class FeedbackEventEnderServiceTest extends TestCase
 {
-    use RefreshDatabase,
+    use CreateAnnouncement,
         CreateEvent,
         CreateScheduledEvent,
-        CreateSurvey,
         CreateSubmittedSurvey,
-        CreateAnnouncement;
+        CreateSurvey,
+        RefreshDatabase;
 
     private ?FeedbackEventEnderService $service = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -44,27 +44,27 @@ class FeedbackEventEnderServiceTest extends TestCase
         $this->service = $this->app->make(FeedbackEventEnderService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->service = null;
 
         parent::tearDown();
     }
 
-    public function testSupportsReturnsTrueOnlyForFeedbackEvent(): void
+    public function test_supports_returns_true_only_for_feedback_event(): void
     {
         $this->assertTrue($this->service->supports(new EventType(EventType::FEEDBACK_EVENT)));
         $this->assertFalse($this->service->supports(new EventType(EventType::WEEKLY_CELESTIALS)));
     }
 
-    public function testEndGeneratesSnapshotTruncatesSurveysDispatchesEventsCleansAnnouncementsAndDeletesEvent(): void
+    public function test_end_generates_snapshot_truncates_surveys_dispatches_events_cleans_announcements_and_deletes_event(): void
     {
         $survey = $this->createSurvey();
 
         $charA = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $charB = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
-        Character::query()->each(fn($c) => $c->user()->update(['is_showing_survey' => true]));
+        Character::query()->each(fn ($c) => $c->user()->update(['is_showing_survey' => true]));
 
         $this->createSubmittedSurvey([
             'character_id' => $charA->id,
@@ -83,9 +83,9 @@ class FeedbackEventEnderServiceTest extends TestCase
         ]);
 
         $current = $this->createEvent([
-            'type'       => EventType::FEEDBACK_EVENT,
+            'type' => EventType::FEEDBACK_EVENT,
             'started_at' => now()->subHour(),
-            'ends_at'    => now()->subMinute(),
+            'ends_at' => now()->subMinute(),
         ]);
 
         $this->createAnnouncement([

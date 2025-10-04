@@ -38,6 +38,6 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('update-map-' . $this->user->id);
+        return new PrivateChannel('update-map-'.$this->user->id);
     }
 }

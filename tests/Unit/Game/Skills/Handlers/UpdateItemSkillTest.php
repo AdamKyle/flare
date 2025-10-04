@@ -22,7 +22,7 @@ class UpdateItemSkillTest extends TestCase
 
     private ?UpdateItemSkill $updateItemSkill;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -33,7 +33,7 @@ class UpdateItemSkillTest extends TestCase
         $this->updateItemSkill = resolve(UpdateItemSkill::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -44,7 +44,7 @@ class UpdateItemSkillTest extends TestCase
         $this->updateItemSkill = null;
     }
 
-    public function testDoesNotUpdateItemSkillWhenItDoesNotExist()
+    public function test_does_not_update_item_skill_when_it_does_not_exist()
     {
         Event::fake();
 
@@ -55,7 +55,7 @@ class UpdateItemSkillTest extends TestCase
         Event::assertNotDispatched(ServerMessageEvent::class);
     }
 
-    public function testDoesNotUpdateItemSkillWhenItIsMaxedLevel()
+    public function test_does_not_update_item_skill_when_it_is_maxed_level()
     {
         Event::fake();
 
@@ -84,7 +84,7 @@ class UpdateItemSkillTest extends TestCase
         Event::assertNotDispatched(ServerMessageEvent::class);
     }
 
-    public function testDoesUpdateItemSkill()
+    public function test_does_update_item_skill()
     {
         Event::fake();
 
@@ -117,7 +117,7 @@ class UpdateItemSkillTest extends TestCase
         Event::assertNotDispatched(ServerMessageEvent::class);
     }
 
-    public function testDoesLevelItemSkill()
+    public function test_does_level_item_skill()
     {
         Event::fake();
 

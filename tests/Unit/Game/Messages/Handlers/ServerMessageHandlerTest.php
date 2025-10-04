@@ -2,12 +2,12 @@
 
 namespace Tests\Unit\Game\Messages\Handlers;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Game\Messages\Types\CharacterMessageTypes;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 
@@ -17,21 +17,21 @@ class ServerMessageHandlerTest extends TestCase
 
     private ?ServerMessageHandler $serverMessageHandler;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->serverMessageHandler = resolve(ServerMessageHandler::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->serverMessageHandler = null;
     }
 
-    public function testHandleMessage()
+    public function test_handle_message()
     {
         $user = $this->createUser();
 
@@ -42,7 +42,7 @@ class ServerMessageHandlerTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testSendBasicMessage()
+    public function test_send_basic_message()
     {
         $user = $this->createUser();
 
@@ -53,7 +53,7 @@ class ServerMessageHandlerTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testHandleMessageWithNewValue()
+    public function test_handle_message_with_new_value()
     {
         $user = $this->createUser();
 

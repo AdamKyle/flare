@@ -2,9 +2,6 @@
 
 namespace App\Flare\Services;
 
-use Exception;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Inventory;
@@ -29,9 +26,11 @@ use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
 use App\Game\Skills\Services\SkillService;
+use Exception;
 use Facades\App\Flare\Calculators\XPCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
-
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
 
 class CharacterRewardService
 {
@@ -70,8 +69,6 @@ class CharacterRewardService
 
     /**
      * Set the character.
-     *
-     * @return CharacterRewardService
      */
     public function setCharacter(Character $character): CharacterRewardService
     {
@@ -100,9 +97,6 @@ class CharacterRewardService
 
     /**
      * Distribute a specific amount of XP
-     *
-     * @param integer $xp
-     * @return CharacterRewardService
      */
     public function distributeSpecifiedXp(int $xp): CharacterRewardService
     {
@@ -143,7 +137,7 @@ class CharacterRewardService
 
         $this->currencyEventReward($monster);
 
-        if (!$this->character->is_auto_battling && $this->character->isLoggedIn()) {
+        if (! $this->character->is_auto_battling && $this->character->isLoggedIn()) {
             event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
         }
 
@@ -217,8 +211,6 @@ class CharacterRewardService
      * Handle possible level up.
      *
      * Takes into account XP over flow.
-     *
-     * @return void
      */
     public function handleLevelUp(): void
     {
@@ -290,9 +282,6 @@ class CharacterRewardService
 
     /**
      * Assigns XP to the character.
-     *
-     * @param Monster $monster
-     * @return void
      */
     private function distributeXP(Monster $monster): void
     {
@@ -315,15 +304,12 @@ class CharacterRewardService
      * - Can return 0 if the xp we would gain is 0.
      * - Takes into account skills in training
      * - Takes into account Xp Bonuses such as items (Alchemy and quest)
-     *
-     * @param Monster $monster
-     * @return integer
      */
     public function fetchXpForMonster(Monster $monster): int
     {
         $addBonus = true;
 
-        if (!$this->characterXpService->canCharacterGainXP($this->character)) {
+        if (! $this->characterXpService->canCharacterGainXP($this->character)) {
             return 0;
         }
 
@@ -331,7 +317,7 @@ class CharacterRewardService
         $xp = XPCalculator::fetchXPFromMonster($monster, $this->character->level);
 
         if ($this->character->level >= $monster->max_level && $this->character->user->show_monster_to_low_level_message) {
-            ServerMessageHandler::sendBasicMessage($this->character->user, $monster->name . ' has a max level of: ' . number_format($monster->max_level) . '. You are only getting 1/3rd of: ' . number_format($monster->xp) . ' XP before all bonuses. Move down the list child.');
+            ServerMessageHandler::sendBasicMessage($this->character->user, $monster->name.' has a max level of: '.number_format($monster->max_level).'. You are only getting 1/3rd of: '.number_format($monster->xp).' XP before all bonuses. Move down the list child.');
 
             $addBonus = false;
         }
@@ -348,7 +334,7 @@ class CharacterRewardService
         if ($addBonus) {
             if ($this->character->times_reincarnated > 0) {
                 $xp += 500;
-            } else if ($this->character->level > 1000 && $this->character->level <= 5000) {
+            } elseif ($this->character->level > 1000 && $this->character->level <= 5000) {
                 $xp += 150;
             } else {
                 $xp += 75;

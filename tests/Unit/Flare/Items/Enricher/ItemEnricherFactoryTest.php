@@ -17,32 +17,32 @@ use Tests\Traits\CreateQuest;
 
 class ItemEnricherFactoryTest extends TestCase
 {
-    use RefreshDatabase,
+    use CreateGameMap,
         CreateItem,
         CreateItemAffix,
-        CreateGameMap,
         CreateLocation,
         CreateMonster,
         CreateNpc,
-        CreateQuest;
+        CreateQuest,
+        RefreshDatabase;
 
     private ?ItemEnricherFactory $factory = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->factory = app()->make(ItemEnricherFactory::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->factory = null;
     }
 
-    public function testReturnsEnrichedEquippableItem(): void
+    public function test_returns_enriched_equippable_item(): void
     {
         $item = $this->createItem([
             'type' => 'weapon',
@@ -57,7 +57,7 @@ class ItemEnricherFactoryTest extends TestCase
         $this->assertEquals(0.15, $result->affix_damage_reduction);
     }
 
-    public function testEquippableBranchActuallyEnrichesItem(): void
+    public function test_equippable_branch_actually_enriches_item(): void
     {
         $item = $this->createItem([
             'type' => 'sword',
@@ -81,7 +81,7 @@ class ItemEnricherFactoryTest extends TestCase
         $this->assertEquals(0.30, $result->base_ac_mod);
     }
 
-    public function testReturnsUnmodifiedUsableItem(): void
+    public function test_returns_unmodified_usable_item(): void
     {
         $item = $this->createItem([
             'type' => 'alchemy',
@@ -93,7 +93,7 @@ class ItemEnricherFactoryTest extends TestCase
         $this->assertSame($item->id, $result->id);
     }
 
-    public function testReturnsUnmodifiedQuestItem(): void
+    public function test_returns_unmodified_quest_item(): void
     {
         $item = $this->createItem([
             'type' => 'quest',
@@ -105,7 +105,7 @@ class ItemEnricherFactoryTest extends TestCase
         $this->assertSame($item->id, $result->id);
     }
 
-    public function testReturnsTransformedEquippableItemData(): void
+    public function test_returns_transformed_equippable_item_data(): void
     {
         // Create an equippable item and place it in an actual inventory slot
         $item = $this->createItem([
@@ -134,7 +134,7 @@ class ItemEnricherFactoryTest extends TestCase
         $this->assertEquals($item->id, $result['item_id']);
     }
 
-    public function testReturnsTransformedUsableItemData(): void
+    public function test_returns_transformed_usable_item_data(): void
     {
         $item = $this->createItem([
             'type' => 'alchemy',
@@ -147,7 +147,7 @@ class ItemEnricherFactoryTest extends TestCase
         $this->assertEquals($item->id, $result['id']);
     }
 
-    public function testReturnsTransformedQuestItemData(): void
+    public function test_returns_transformed_quest_item_data(): void
     {
         $item = $this->createItem([
             'type' => 'quest',
@@ -161,7 +161,7 @@ class ItemEnricherFactoryTest extends TestCase
         $this->assertEquals($item->id, $result['item_id']);
     }
 
-    public function testReturnsEmptyArrayForUnknownType(): void
+    public function test_returns_empty_array_for_unknown_type(): void
     {
         $item = $this->createItem([
             'type' => 'some-cursed-type',
@@ -173,7 +173,7 @@ class ItemEnricherFactoryTest extends TestCase
         $this->assertEquals([], $result);
     }
 
-    public function testQuestItemIncludesDropLocation(): void
+    public function test_quest_item_includes_drop_location(): void
     {
         $map = $this->createGameMap(['name' => 'Surface']);
         $location = $this->createLocation(['game_map_id' => $map->id]);
@@ -191,7 +191,7 @@ class ItemEnricherFactoryTest extends TestCase
         $this->assertEquals('Surface', $data['drop_location']['map']);
     }
 
-    public function testQuestItemIncludesRequiredMonster(): void
+    public function test_quest_item_includes_required_monster(): void
     {
         $map = $this->createGameMap(['name' => 'Surface']);
         $item = $this->createItem(['type' => 'quest', 'usable' => false]);
@@ -208,7 +208,7 @@ class ItemEnricherFactoryTest extends TestCase
         $this->assertEquals('Surface', $data['required_monster']['map']);
     }
 
-    public function testQuestItemIncludesRequiredQuest(): void
+    public function test_quest_item_includes_required_quest(): void
     {
         $map = $this->createGameMap(['name' => 'Surface']);
         $npc = $this->createNpc(['game_map_id' => $map->id]);
@@ -226,7 +226,7 @@ class ItemEnricherFactoryTest extends TestCase
         $this->assertEquals($npc->real_name, $data['reward_quests'][0]['npc']);
     }
 
-    public function testQuestItemIncludesRewardLocations(): void
+    public function test_quest_item_includes_reward_locations(): void
     {
         $map = $this->createGameMap(['name' => 'Surface']);
         $item = $this->createItem(['type' => 'quest', 'usable' => false]);
@@ -238,7 +238,7 @@ class ItemEnricherFactoryTest extends TestCase
         $this->assertEquals($rewardLocation->id, $data['reward_locations'][0]['id']);
     }
 
-    public function testQuestItemIncludesAllRequiredQuests(): void
+    public function test_quest_item_includes_all_required_quests(): void
     {
         $map = $this->createGameMap(['name' => 'Surface']);
         $npc = $this->createNpc(['game_map_id' => $map->id]);
@@ -256,7 +256,7 @@ class ItemEnricherFactoryTest extends TestCase
         );
     }
 
-    public function testQuestItemIsRewardedByQuest(): void
+    public function test_quest_item_is_rewarded_by_quest(): void
     {
         $map = $this->createGameMap(['name' => 'Surface']);
         $npc = $this->createNpc(['game_map_id' => $map->id]);
@@ -270,7 +270,7 @@ class ItemEnricherFactoryTest extends TestCase
         $this->assertEquals($quest->id, $data['reward_quests'][0]['id']);
     }
 
-    public function testQuestItemIsRequiredByLocation(): void
+    public function test_quest_item_is_required_by_location(): void
     {
         $map = $this->createGameMap(['name' => 'Surface']);
 

@@ -33,7 +33,7 @@ class MassDisenchantServiceTest extends TestCase
 
     private ?GameSkill $disenchantingSkill;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -63,7 +63,7 @@ class MassDisenchantServiceTest extends TestCase
         ]);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -74,7 +74,7 @@ class MassDisenchantServiceTest extends TestCase
         $this->enchantingSkill = null;
     }
 
-    public function testDisenchantAllItems()
+    public function test_disenchant_all_items()
     {
         $character = $this->character->inventoryManagement()->giveItemMultipleTimes($this->itemToDisenchant, 10)->getCharacter();
 
@@ -85,7 +85,7 @@ class MassDisenchantServiceTest extends TestCase
         $this->assertEmpty($character->inventory->slots->toArray());
     }
 
-    public function testDisenchantAllItemsWithOverFlowOfXp()
+    public function test_disenchant_all_items_with_over_flow_of_xp()
     {
         $character = $this->character->inventoryManagement()->giveItemMultipleTimes($this->itemToDisenchant, 10)->getCharacter();
 
@@ -118,7 +118,7 @@ class MassDisenchantServiceTest extends TestCase
         $this->assertGreaterThan(1, $enchantingSkill->level);
     }
 
-    public function testGetSkillXpForDisenchantingItems()
+    public function test_get_skill_xp_for_disenchanting_items()
     {
         $character = $this->character->inventoryManagement()->giveItemMultipleTimes($this->itemToDisenchant, 10)->getCharacter();
 
@@ -151,7 +151,7 @@ class MassDisenchantServiceTest extends TestCase
         $this->assertGreaterThan(1, $enchantingSkill->level);
     }
 
-    public function testGetGoldDustRushDisenchantingItems()
+    public function test_get_gold_dust_rush_disenchanting_items()
     {
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([
@@ -194,7 +194,7 @@ class MassDisenchantServiceTest extends TestCase
         $this->assertGreaterThan(1, $enchantingSkill->level);
     }
 
-    public function testGetGoldDustRushDisenchantingItemsDoesNotGoAbovemax()
+    public function test_get_gold_dust_rush_disenchanting_items_does_not_go_abovemax()
     {
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([
@@ -242,7 +242,7 @@ class MassDisenchantServiceTest extends TestCase
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
     }
 
-    public function testGetSkillXpForDisenchantingItemsWhenMapBonusApplied()
+    public function test_get_skill_xp_for_disenchanting_items_when_map_bonus_applied()
     {
         $character = $this->character->inventoryManagement()->giveItemMultipleTimes($this->itemToDisenchant, 25)->getCharacter();
 
@@ -275,7 +275,7 @@ class MassDisenchantServiceTest extends TestCase
         $this->assertGreaterThan(1, $enchantingSkill->level);
     }
 
-    public function testDoNotGoAboveMaxGoldDust()
+    public function test_do_not_go_above_max_gold_dust()
     {
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([
@@ -329,7 +329,7 @@ class MassDisenchantServiceTest extends TestCase
         $this->assertGreaterThan(0, $massDisenchantService->getTotalGoldDust());
     }
 
-    public function testAttemptGoldDustRush()
+    public function test_attempt_gold_dust_rush()
     {
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([

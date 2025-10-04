@@ -8,19 +8,11 @@ use Closure;
 
 class BuildCache
 {
-
-    /**
-     * @param BuildCharacterAttackTypes $buildCharacterAttackTypes
-     */
-    public function __construct(private readonly  BuildCharacterAttackTypes $buildCharacterAttackTypes)
-    {}
+    public function __construct(private readonly BuildCharacterAttackTypes $buildCharacterAttackTypes) {}
 
     /**
      * Build the character's attack-type cache.
      *
-     * @param CharacterBuildState $state
-     * @param Closure $next
-     * @return CharacterBuildState
      * @throws \Exception
      */
     public function process(CharacterBuildState $state, Closure $next): CharacterBuildState

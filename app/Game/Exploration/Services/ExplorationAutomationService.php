@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Cache;
 
 class ExplorationAutomationService
 {
-
     private int $timeDelay = 0;
 
     public function __construct(
@@ -42,7 +41,7 @@ class ExplorationAutomationService
 
         event(new UpdateCharacterStatus($character));
 
-        event(new ExplorationLogUpdate($character->user->id, 'The exploration will begin in ' . $this->timeDelay . ' minutes. Every ' . $this->timeDelay . ' minutes you will encounter the enemy up to a maximum of 50 times in a single "encounter"'));
+        event(new ExplorationLogUpdate($character->user->id, 'The exploration will begin in '.$this->timeDelay.' minutes. Every '.$this->timeDelay.' minutes you will encounter the enemy up to a maximum of 50 times in a single "encounter"'));
 
         event(new ExplorationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
 
@@ -65,7 +64,7 @@ class ExplorationAutomationService
 
         $character = $character->refresh();
 
-        Cache::delete('can-character-survive-' . $character->id);
+        Cache::delete('can-character-survive-'.$character->id);
 
         event(new ExplorationTimeOut($character->user, 0));
         event(new ExplorationStatus($character->user, false));

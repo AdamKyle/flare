@@ -66,7 +66,7 @@ class HolyItemService
 
         $character = $character->refresh();
 
-        event(new ServerMessageEvent($character->user, 'Applied Holy Oil to: ' . $slot->item->affix_name, $slot->id));
+        event(new ServerMessageEvent($character->user, 'Applied Holy Oil to: '.$slot->item->affix_name, $slot->id));
 
         event(new UpdateCharacterCurrenciesEvent($character));
 

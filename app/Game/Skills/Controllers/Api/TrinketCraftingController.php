@@ -13,13 +13,8 @@ use Illuminate\Http\JsonResponse;
 
 class TrinketCraftingController extends Controller
 {
-
     public function __construct(private TrinketCraftingService $trinketCraftingService, private CraftingService $craftingService) {}
 
-    /**
-     * @param Character $character
-     * @return JsonResponse
-     */
     public function fetchItemsToCraft(Character $character): JsonResponse
     {
 
@@ -30,11 +25,6 @@ class TrinketCraftingController extends Controller
         ]);
     }
 
-    /**
-     * @param TrinketCraftingValidation $request
-     * @param Character $character
-     * @return JsonResponse
-     */
     public function craftTrinket(TrinketCraftingValidation $request, Character $character): JsonResponse
     {
         event(new CraftedItemTimeOutEvent($character));

@@ -24,7 +24,7 @@ class ElementalAtonementTest extends TestCase
 
     private ?ElementalAtonement $elementalAtonement;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -40,7 +40,7 @@ class ElementalAtonementTest extends TestCase
         $this->elementalAtonement = resolve(ElementalAtonement::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -49,7 +49,7 @@ class ElementalAtonementTest extends TestCase
         $this->elementalAtonement = null;
     }
 
-    public function testCharacterWithMaxedOutElementalAtonement()
+    public function test_character_with_maxed_out_elemental_atonement()
     {
         $item = $this->createItem([
             'type' => 'weapon',
@@ -79,7 +79,7 @@ class ElementalAtonementTest extends TestCase
         $this->assertNotEmpty($elementalData['atonements']);
     }
 
-    public function testCharacterGetsNothingBackForElementalAtonement()
+    public function test_character_gets_nothing_back_for_elemental_atonement()
     {
 
         $character = $this->character->getCharacter();

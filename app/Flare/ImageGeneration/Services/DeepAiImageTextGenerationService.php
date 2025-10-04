@@ -9,14 +9,14 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use Storage;
 
-class DeepAiImageTextGenerationService {
-
+class DeepAiImageTextGenerationService
+{
     private string $apiKey = '';
 
-    public function __construct(private readonly DeepAiImageGeneration $deepAiImageGeneration) {
-    }
+    public function __construct(private readonly DeepAiImageGeneration $deepAiImageGeneration) {}
 
-    public function setApiKey(string $apiKey): DeepAiImageTextGenerationService {
+    public function setApiKey(string $apiKey): DeepAiImageTextGenerationService
+    {
         $this->apiKey = $apiKey;
 
         return $this;
@@ -37,12 +37,10 @@ class DeepAiImageTextGenerationService {
     /**
      * Download and Save the image.
      *
-     * @param string $url
-     * @param string $path
-     * @return bool
      * @throws Exception|GuzzleException
      */
-    public function downloadAndSaveImage(string $url, string $path): bool {
+    public function downloadAndSaveImage(string $url, string $path): bool
+    {
 
         $imageClient = new Client();
 
@@ -65,7 +63,8 @@ class DeepAiImageTextGenerationService {
         }
     }
 
-    public function imageAlreadyGeneratedForMonster(string $path): bool {
+    public function imageAlreadyGeneratedForMonster(string $path): bool
+    {
         return Storage::disk('generated-monsters-and-bugs')->exists($path);
     }
 }

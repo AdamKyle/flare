@@ -90,7 +90,8 @@ class LocationType
         return self::$namedValues;
     }
 
-    public function getNamedValue(): string {
+    public function getNamedValue(): string
+    {
         return self::$namedValues[$this->value];
     }
 
@@ -160,11 +161,13 @@ class LocationType
         return $this->value === self::BROKEN_ANVIL;
     }
 
-    public function isTwistedMaidensDungeons(): bool {
+    public function isTwistedMaidensDungeons(): bool
+    {
         return $this->value === self::TWSITED_MAIDENS_DUNGEONS;
     }
 
-    public function isCaveOfMemories(): bool {
+    public function isCaveOfMemories(): bool
+    {
         return $this->value === self::CAVE_OF_MEMORIES;
     }
 }

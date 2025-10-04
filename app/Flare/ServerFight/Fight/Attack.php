@@ -110,7 +110,7 @@ class Attack
         }
 
         if ($this->monsterHealth <= 0) {
-            $this->battleMessages[] = ['message' => $serverMonster->getName() . ' has been defeated!', 'type' => 'enemy-action'];
+            $this->battleMessages[] = ['message' => $serverMonster->getName().' has been defeated!', 'type' => 'enemy-action'];
 
             return;
         }

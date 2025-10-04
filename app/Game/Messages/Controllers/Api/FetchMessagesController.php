@@ -10,15 +10,11 @@ use Illuminate\Http\JsonResponse;
 
 class FetchMessagesController extends Controller
 {
-
     public function __construct(private FetchMessages $fetchMessages)
     {
         $this->fetchMessages = $fetchMessages;
     }
 
-    /**
-     * @return JsonResponse
-     */
     public function fetchChatMessages(): JsonResponse
     {
         return response()->json([

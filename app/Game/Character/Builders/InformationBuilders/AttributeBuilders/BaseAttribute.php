@@ -181,7 +181,7 @@ class BaseAttribute
     protected function getDamageFromWeapons(string $position): int
     {
 
-        $itemTypes = array_map(fn($case) => $case->value, ItemType::cases());
+        $itemTypes = array_map(fn ($case) => $case->value, ItemType::cases());
 
         if ($position === 'both') {
             return $this->inventory->whereIn('item.type', $itemTypes)->sum('item.base_damage');

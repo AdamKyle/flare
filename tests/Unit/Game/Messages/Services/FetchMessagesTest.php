@@ -21,7 +21,7 @@ class FetchMessagesTest extends TestCase
 
     private ?FetchMessages $fetchMessagesService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -29,7 +29,7 @@ class FetchMessagesTest extends TestCase
         $this->fetchMessagesService = new FetchMessages;
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -37,7 +37,7 @@ class FetchMessagesTest extends TestCase
         $this->fetchMessagesService = null;
     }
 
-    public function testMessageMapNameIsSur()
+    public function test_message_map_name_is_sur()
     {
         $character = $this->character->getCharacter();
 
@@ -48,7 +48,7 @@ class FetchMessagesTest extends TestCase
         $this->assertEquals('SUR', $message->map);
     }
 
-    public function testMessageMapNameIsLaby()
+    public function test_message_map_name_is_laby()
     {
         $character = $this->character->getCharacter();
 
@@ -59,7 +59,7 @@ class FetchMessagesTest extends TestCase
         $this->assertEquals('LABY', $message->map);
     }
 
-    public function testMessageMapNameIsDUN()
+    public function test_message_map_name_is_dun()
     {
         $character = $this->character->getCharacter();
 
@@ -70,7 +70,7 @@ class FetchMessagesTest extends TestCase
         $this->assertEquals('DUN', $message->map);
     }
 
-    public function testMessageMapNameIsHELL()
+    public function test_message_map_name_is_hell()
     {
         $character = $this->character->getCharacter();
 
@@ -81,7 +81,7 @@ class FetchMessagesTest extends TestCase
         $this->assertEquals('HELL', $message->map);
     }
 
-    public function testMessageMapNameIsShp()
+    public function test_message_map_name_is_shp()
     {
         $character = $this->character->getCharacter();
 
@@ -92,7 +92,7 @@ class FetchMessagesTest extends TestCase
         $this->assertEquals('SHP', $message->map);
     }
 
-    public function testMessageMapNameIsPURG()
+    public function test_message_map_name_is_purg()
     {
         $character = $this->character->getCharacter();
 
@@ -103,7 +103,7 @@ class FetchMessagesTest extends TestCase
         $this->assertEquals('PURG', $message->map);
     }
 
-    public function testMessageMapNameIsICE()
+    public function test_message_map_name_is_ice()
     {
         $character = $this->character->getCharacter();
 
@@ -114,7 +114,7 @@ class FetchMessagesTest extends TestCase
         $this->assertEquals('ICE', $message->map);
     }
 
-    public function testMessageMapNameIsDefaultSurface()
+    public function test_message_map_name_is_default_surface()
     {
         $character = $this->character->getCharacter();
 
@@ -125,7 +125,7 @@ class FetchMessagesTest extends TestCase
         $this->assertEquals('SUR', $message->map);
     }
 
-    public function testMessageIsAdmin()
+    public function test_message_is_admin()
     {
         $user = $this->createAdmin($this->createAdminRole());
 

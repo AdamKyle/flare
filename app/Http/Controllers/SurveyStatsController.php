@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Flare\Github\Services\Markdown;
 use App\Flare\Models\Character;
 use App\Flare\Models\ScheduledEvent;
-use App\Flare\Models\SubmittedSurvey;
 use App\Flare\Models\SurveySnapshot;
 use App\Flare\Services\CreateSurveySnapshot;
 use App\Game\Events\Values\EventType;
@@ -13,15 +12,13 @@ use Illuminate\Http\Request;
 
 class SurveyStatsController extends Controller
 {
-
-    public function __construct(private readonly CreateSurveySnapshot $createSurveySnapshot, private readonly Markdown $markdown) {
-    }
+    public function __construct(private readonly CreateSurveySnapshot $createSurveySnapshot, private readonly Markdown $markdown) {}
 
     public function getLatestSurveyData()
     {
         $scheduledEvent = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
 
-        if (!is_null($scheduledEvent)) {
+        if (! is_null($scheduledEvent)) {
             return view('survey.stats', ['surveyExists' => false]);
         }
 
@@ -39,7 +36,8 @@ class SurveyStatsController extends Controller
         return view('survey.stats', ['survey' => $surveySnapShotData, 'characterWhoCompleted' => $totalCharactersWhoCompleted, 'surveySnapShotId' => $this->createSurveySnapshot->getSurveySnapShotId(), 'dateGenerated' => $surveySnapShot->created_at, 'surveyExists' => true]);
     }
 
-    public function getResponseDataForQuestion(Request $request, SurveySnapshot $surveySnapshot) {
+    public function getResponseDataForQuestion(Request $request, SurveySnapshot $surveySnapshot)
+    {
         $label = $request->get('survey_question');
 
         $values = $surveySnapshot->whereRaw(
@@ -69,7 +67,8 @@ class SurveyStatsController extends Controller
         return view('survey.responses', ['responses' => $values, 'questionLabel' => $label]);
     }
 
-    public function getCreatorResponse() {
+    public function getCreatorResponse()
+    {
         return view('survey.creators-response');
     }
 }

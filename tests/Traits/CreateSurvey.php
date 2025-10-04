@@ -11,5 +11,4 @@ trait CreateSurvey
 
         return Survey::factory()->create($options);
     }
-
 }

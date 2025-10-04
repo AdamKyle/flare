@@ -15,12 +15,6 @@ class ItemSkillController extends Controller
 
     public function __construct(private ItemSkillService $itemSkillService) {}
 
-    /**
-     * @param Character $character
-     * @param integer $itemId
-     * @param integer $itemSkillProgressionId
-     * @return JsonResponse
-     */
     public function trainSkill(Character $character, int $itemId, int $itemSkillProgressionId): JsonResponse
     {
 
@@ -32,12 +26,6 @@ class ItemSkillController extends Controller
         return response()->json($result, $status);
     }
 
-    /**
-     * @param Character $character
-     * @param integer $itemId
-     * @param integer $itemSkillProgressionId
-     * @return JsonResponse
-     */
     public function stopTrainingSkill(Character $character, int $itemId, int $itemSkillProgressionId): JsonResponse
     {
         $result = $this->itemSkillService->stopTrainingSkill($character, $itemId, $itemSkillProgressionId);

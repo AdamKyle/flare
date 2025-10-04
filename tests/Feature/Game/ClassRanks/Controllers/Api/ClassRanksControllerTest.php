@@ -13,21 +13,21 @@ class ClassRanksControllerTest extends TestCase
 
     private ?CharacterFactory $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testGetCharacterClassRanks()
+    public function test_get_character_class_ranks()
     {
 
         $character = $this->character->getCharacter();
@@ -40,7 +40,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertCount(1, $jsonData['class_ranks']);
     }
 
-    public function testGetCharacterClassSpecials()
+    public function test_get_character_class_specials()
     {
 
         $character = $this->character->getCharacter();
@@ -60,7 +60,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertCount(0, $jsonData['other_class_specials']);
     }
 
-    public function testEquipSpecial()
+    public function test_equip_special()
     {
 
         $character = $this->character->getCharacter();
@@ -79,7 +79,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertEquals('Equipped class special: '.$classSpecial->name, $jsonData['message']);
     }
 
-    public function testUnequipSpecial()
+    public function test_unequip_special()
     {
         $character = $this->character->getCharacter();
 

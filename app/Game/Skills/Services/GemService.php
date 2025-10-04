@@ -53,7 +53,7 @@ class GemService
             return $this->successResult();
         }
 
-        if (!$this->canCraft($characterSkill, (new GemTierValue($tier))->maxForTier()['chance'])) {
+        if (! $this->canCraft($characterSkill, (new GemTierValue($tier))->maxForTier()['chance'])) {
             ServerMessageHandler::sendBasicMessage($character->user, 'You failed to craft the gem, the item explodes before you into a pile of wasted effort and time.');
 
             return $this->successResult();
@@ -232,7 +232,7 @@ class GemService
         $skill = $character->skills()->where('game_skill_id', $gameSkill->id)->first();
 
         if (is_null($skill)) {
-            throw new Exception('Character is missing required game skill: ' . $name);
+            throw new Exception('Character is missing required game skill: '.$name);
         }
 
         return $skill;

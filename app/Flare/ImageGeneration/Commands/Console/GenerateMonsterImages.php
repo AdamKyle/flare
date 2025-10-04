@@ -10,13 +10,16 @@ use Illuminate\Console\Command;
 class GenerateMonsterImages extends Command
 {
     protected $signature = 'generate:monster-images {gameMapName}';
+
     protected $description = 'Generates an image based on a prompt';
 
-    public function handle(DeepAiImageTextGenerationService $deepAiImageTextGenerationService) {
+    public function handle(DeepAiImageTextGenerationService $deepAiImageTextGenerationService)
+    {
         $forGameMap = $this->argument('gameMapName');
 
         if (empty($forGameMap)) {
             $this->error('Missing game Map Name');
+
             return;
         }
 
@@ -24,13 +27,15 @@ class GenerateMonsterImages extends Command
 
         if (empty($apiKey)) {
             $this->error('Missing APi Key for Deep AI');
+
             return;
         }
 
         $gameMap = GameMap::where('name', $forGameMap)->first();
 
         if (is_null($gameMap)) {
-            $this->error('Unknown game map for name: ' . $forGameMap);
+            $this->error('Unknown game map for name: '.$forGameMap);
+
             return;
         }
 
@@ -40,7 +45,7 @@ class GenerateMonsterImages extends Command
 
         foreach ($monsters as $monster) {
 
-            $pathForImage = '/' . $gameMap->name . '/' . $monster->name . '.jpg';
+            $pathForImage = '/'.$gameMap->name.'/'.$monster->name.'.jpg';
 
             if ($deepAiImageTextGenerationService->imageAlreadyGeneratedForMonster($pathForImage)) {
 
@@ -50,14 +55,14 @@ class GenerateMonsterImages extends Command
                 continue;
             }
 
-            $response = $deepAiImageTextGenerationService->setApiKey($apiKey)->generateImage('Generate an Epic High Fantasy: ' . $monster->name . ' without any additional text, just the image.');
+            $response = $deepAiImageTextGenerationService->setApiKey($apiKey)->generateImage('Generate an Epic High Fantasy: '.$monster->name.' without any additional text, just the image.');
 
             if ($response) {
                 $outputUrl = $response['output_url'];
                 $saved = $deepAiImageTextGenerationService->downloadAndSaveImage($outputUrl, $pathForImage);
 
                 if ($saved) {
-                    $this->line(' Saved image for monster: ' . $monster->name . ' who belongs to game map: ' . $gameMap->name);
+                    $this->line(' Saved image for monster: '.$monster->name.' who belongs to game map: '.$gameMap->name);
                 } else {
                     $this->error('Something went wrong saving the image');
                 }

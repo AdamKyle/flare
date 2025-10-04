@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Cache;
 
 class CleanUpDuplicateWeapons extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -39,7 +38,6 @@ class CleanUpDuplicateWeapons extends Command
 
     /**
      * Execute the console command.
-     *
      */
     public function handle(): void
     {
@@ -50,7 +48,8 @@ class CleanUpDuplicateWeapons extends Command
         $this->rebuildCraftingTableCache();
     }
 
-    private function rebuildCraftingTableCache() {
+    private function rebuildCraftingTableCache()
+    {
         $items = Item::whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
             ->whereNull('item_suffix_id')
             ->whereNull('item_prefix_id')
@@ -63,7 +62,8 @@ class CleanUpDuplicateWeapons extends Command
         Cache::put('crafting-table-data', $items);
     }
 
-    private function cleanWeapons(): void {
+    private function cleanWeapons(): void
+    {
         $weaponTypes = ItemType::allTypes();
 
         foreach ($weaponTypes as $weaponType) {
@@ -79,11 +79,12 @@ class CleanUpDuplicateWeapons extends Command
         }
     }
 
-    private function cleanUpItems(Collection $items, string $weaponType): void {
+    private function cleanUpItems(Collection $items, string $weaponType): void
+    {
 
         if ($items->count() <= 1) {
 
-            $this->info('Nothing to do, we only have one 1 item for item type: ' . $weaponType);
+            $this->info('Nothing to do, we only have one 1 item for item type: '.$weaponType);
 
             return;
         }
@@ -104,6 +105,6 @@ class CleanUpDuplicateWeapons extends Command
             $item->delete();
         }
 
-        $this->info('Cleaned: ' . $originalCount . ' of type: ' . $weaponType);
+        $this->info('Cleaned: '.$originalCount.' of type: '.$weaponType);
     }
 }

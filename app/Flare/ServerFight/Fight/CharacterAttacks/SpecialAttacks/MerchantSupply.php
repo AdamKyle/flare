@@ -36,7 +36,7 @@ class MerchantSupply extends BattleBase
                     $damage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
                 }
 
-                $this->addMessage('You flip the coin: Heads! You do 4x the damage for a total of: ' . number_format($damage), 'player-action');
+                $this->addMessage('You flip the coin: Heads! You do 4x the damage for a total of: '.number_format($damage), 'player-action');
             } else {
                 $damage = $damage * 2;
 
@@ -46,9 +46,8 @@ class MerchantSupply extends BattleBase
                     $damage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
                 }
 
-                $this->addMessage('You flip the coin: Tails! You do 2x the damage for a total of: ' . number_format($damage), 'player-action');
+                $this->addMessage('You flip the coin: Tails! You do 2x the damage for a total of: '.number_format($damage), 'player-action');
             }
-
 
             $this->monsterHealth -= $damage;
         }

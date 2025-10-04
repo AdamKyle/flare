@@ -20,7 +20,7 @@ class DefenceBuilderTest extends TestCase
 
     private ?CharacterStatBuilder $characterStatBuilder;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -32,7 +32,7 @@ class DefenceBuilderTest extends TestCase
         $this->characterStatBuilder = resolve(CharacterStatBuilder::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -40,7 +40,7 @@ class DefenceBuilderTest extends TestCase
         $this->characterStatBuilder = null;
     }
 
-    public function testBuildDefenceWithNoArmour()
+    public function test_build_defence_with_no_armour()
     {
         $character = $this->character->equipStartingEquipment()->getCharacter();
 
@@ -49,7 +49,7 @@ class DefenceBuilderTest extends TestCase
         $this->assertEquals($character->ac, $defence);
     }
 
-    public function testBuildDefenceWithArmour()
+    public function test_build_defence_with_armour()
     {
         $item = $this->createItem([
             'type' => 'armour',
@@ -64,7 +64,7 @@ class DefenceBuilderTest extends TestCase
         $this->assertEquals($character->ac + 10, $defence);
     }
 
-    public function testBuildDefenceWithArmourVoided()
+    public function test_build_defence_with_armour_voided()
     {
         $itemPrefix = $this->createItemAffix([
             'name' => 'Sample',

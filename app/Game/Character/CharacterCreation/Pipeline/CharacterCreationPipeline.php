@@ -15,15 +15,10 @@ use Illuminate\Pipeline\Pipeline;
 
 class CharacterCreationPipeline
 {
-    public function __construct(private readonly Pipeline $pipeline)
-    {
-    }
+    public function __construct(private readonly Pipeline $pipeline) {}
 
     /**
      * Run the character creation pipeline and return the final state.
-     *
-     * @param CharacterBuildState $state
-     * @return CharacterBuildState
      */
     public function run(CharacterBuildState $state): CharacterBuildState
     {

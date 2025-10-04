@@ -28,18 +28,21 @@ class SubmittedSurvey extends Model
      * @var array
      */
     protected $casts = [
-        'survey_response' => 'array'
+        'survey_response' => 'array',
     ];
 
-    public function character(): BelongsTo {
+    public function character(): BelongsTo
+    {
         return $this->belongsTo(Character::class);
     }
 
-    public function survey(): BelongsTo {
+    public function survey(): BelongsTo
+    {
         return $this->belongsTo(Survey::class);
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return SubmittedSurveyFactory::new();
     }
 }

@@ -46,7 +46,7 @@ class BloodyPuke extends BattleBase
     {
         $this->monsterHealth -= $damage;
 
-        $this->addMessage('You cannot hold it in, you vomit blood and bile so acidic your enemy cannot handle it! (You dealt: ' . number_format($damage) . ')', 'player-action');
-        $this->addMessage('You lost a lot of blood in your attack. (You took: ' . number_format($damageToSuffer) . ')', 'enemy-action');
+        $this->addMessage('You cannot hold it in, you vomit blood and bile so acidic your enemy cannot handle it! (You dealt: '.number_format($damage).')', 'player-action');
+        $this->addMessage('You lost a lot of blood in your attack. (You took: '.number_format($damageToSuffer).')', 'enemy-action');
     }
 }

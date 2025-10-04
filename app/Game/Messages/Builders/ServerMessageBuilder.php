@@ -11,28 +11,23 @@ class ServerMessageBuilder
      *
      * - forMessage can be treated as a single value or as a you gained x amount
      * - newValue is treated as a "you now have x amount of y" and should accompany a forValue
-     *
-     * @param BaseMessageType $type
-     * @param string|integer|null|null $forMessage
-     * @param string|integer|null|null $newValue
-     * @return string
      */
     public function buildWithAdditionalInformation(BaseMessageType $type, string|int|null $forMessage = null, string|int|null $newValue = null): string
     {
         return match ($type->getValue()) {
-            'level_up' => 'You are now level: ' . $forMessage . '!',
-            'gold' => 'You gained: ' . $forMessage . ' Gold! Your new total amount is: ' . $newValue . '.',
-            'gold_dust' => 'You gained: ' . $forMessage . ' Gold Dust! Your new total is: ' . $newValue . '.',
-            'shards' => 'You gained: ' . $forMessage . ' Shards! Your new total is: ' . $newValue . '.',
-            'copper_coins' => 'You gained: ' . $forMessage . ' Copper Coins! Your new total is: ' . $newValue . '.',
-            'gold_rush' => 'Gold Rush! Your gold has increased by: ' . $forMessage . ' Gold! 5% of your total gold has been awarded to you. You now have: ' . $newValue . ' Gold!',
-            'crafted' => 'You crafted a: ' . $forMessage . '!',
-            'new_damage_stat' => 'The Creator has changed your classes damage stat to: ' . $forMessage . '. Please adjust your gear accordingly for maximum damage.',
-            'disenchanted' => 'Disenchanted the item and got: ' . $forMessage . ' Gold Dust.',
-            'lotto_max' => 'You won the daily Gold Dust Lottery! Congrats! You won: ' . $forMessage . ' Gold Dust',
-            'daily_lottery' => 'You got: ' . $forMessage . ' Gold Dust from the daily lottery',
-            'transmuted' => 'You transmuted a new: ' . $forMessage . ' It shines with a powerful glow!',
-            'crafted_gem' => 'You buff, polish, cut, inspect and are finally proud to call this gem your own! You created a: ' . $forMessage,
+            'level_up' => 'You are now level: '.$forMessage.'!',
+            'gold' => 'You gained: '.$forMessage.' Gold! Your new total amount is: '.$newValue.'.',
+            'gold_dust' => 'You gained: '.$forMessage.' Gold Dust! Your new total is: '.$newValue.'.',
+            'shards' => 'You gained: '.$forMessage.' Shards! Your new total is: '.$newValue.'.',
+            'copper_coins' => 'You gained: '.$forMessage.' Copper Coins! Your new total is: '.$newValue.'.',
+            'gold_rush' => 'Gold Rush! Your gold has increased by: '.$forMessage.' Gold! 5% of your total gold has been awarded to you. You now have: '.$newValue.' Gold!',
+            'crafted' => 'You crafted a: '.$forMessage.'!',
+            'new_damage_stat' => 'The Creator has changed your classes damage stat to: '.$forMessage.'. Please adjust your gear accordingly for maximum damage.',
+            'disenchanted' => 'Disenchanted the item and got: '.$forMessage.' Gold Dust.',
+            'lotto_max' => 'You won the daily Gold Dust Lottery! Congrats! You won: '.$forMessage.' Gold Dust',
+            'daily_lottery' => 'You got: '.$forMessage.' Gold Dust from the daily lottery',
+            'transmuted' => 'You transmuted a new: '.$forMessage.' It shines with a powerful glow!',
+            'crafted_gem' => 'You buff, polish, cut, inspect and are finally proud to call this gem your own! You created a: '.$forMessage,
             'enchantment_failed', 'silenced', 'deleted_affix', 'building_repair_finished', 'building_upgrade_finished',
             'sold_item_on_market', 'new_building', 'kingdom_resources_update', 'unit_recruitment_finished',
             'plane_transfer', 'enchanted', 'moved_location', 'seer_actions' => $forMessage,
@@ -42,9 +37,6 @@ class ServerMessageBuilder
 
     /**
      * Build strickly based on type.
-     *
-     * @param BaseMessageType $type
-     * @return string
      */
     public function build(BaseMessageType $type): string
     {

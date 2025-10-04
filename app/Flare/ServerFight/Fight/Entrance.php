@@ -36,12 +36,12 @@ class Entrance extends BattleBase
         if ($attackType['affixes']['entrancing_chance'] > 0.0 && ! $isAttackerVoided) {
             if ($this->canAttackerEntranceDefender($attackType)) {
                 $this->addMessage('You managed to entrance the enemy in your mesmerizing stare! (Entranced!)', 'player-action');
-                $this->addMessage($attacker->name . ' has caught you in their web of magics! (Entranced!)', 'enemy-action');
+                $this->addMessage($attacker->name.' has caught you in their web of magics! (Entranced!)', 'enemy-action');
 
                 $this->enemyEntranced = true;
             } else {
                 $this->addMessage('The enemy is dazed by your enchantments!', 'enemy-action');
-                $this->addMessage('You evade ' . $attacker->name . ' entrancing enchantments!', 'player-action');
+                $this->addMessage('You evade '.$attacker->name.' entrancing enchantments!', 'player-action');
             }
         }
     }
@@ -62,7 +62,7 @@ class Entrance extends BattleBase
     public function monsterEntrancesPlayer(Character $character, ServerMonster $monster, bool $isPlayerVoided)
     {
         if ($this->canMonsterEntrancePlayer($character, $monster, $isPlayerVoided)) {
-            $this->addMessage($monster->getName() . ' has trapped you in a trance-like state with their enchantments!', 'enemy-action');
+            $this->addMessage($monster->getName().' has trapped you in a trance-like state with their enchantments!', 'enemy-action');
 
             $this->isCharacterEntranced = true;
         } else {

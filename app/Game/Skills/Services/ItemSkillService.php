@@ -51,7 +51,7 @@ class ItemSkillService
         $foundSkill = $foundSkill->refresh();
 
         return $this->successResult([
-            'message' => 'You are now training: ' . $foundSkill->itemSkill->name,
+            'message' => 'You are now training: '.$foundSkill->itemSkill->name,
         ]);
     }
 
@@ -76,11 +76,10 @@ class ItemSkillService
             'is_training' => false,
         ]);
 
-
         event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'equipped'));
 
         return $this->successResult([
-            'message' => 'You stopped training: ' . $foundSkill->itemSkill->name,
+            'message' => 'You stopped training: '.$foundSkill->itemSkill->name,
         ]);
     }
 

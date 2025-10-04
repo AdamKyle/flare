@@ -3,10 +3,6 @@
 namespace App\Game\Kingdoms\Providers;
 
 use App\Flare\Transformers\CapitalCityKingdomBuildingTransformer;
-use App\Game\Kingdoms\Transformers\KingdomAttackLogsTransformer;
-use App\Game\Kingdoms\Transformers\KingdomBuildingTransformer;
-use App\Game\Kingdoms\Transformers\KingdomTransformer;
-use App\Game\Kingdoms\Transformers\UnitMovementTransformer;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
 use App\Game\Kingdoms\Console\Commands\DeleteKingdomLogs;
 use App\Game\Kingdoms\Console\Commands\ResetCapitalCityWalkingStatus;
@@ -54,8 +50,11 @@ use App\Game\Kingdoms\Service\UnitRecallService;
 use App\Game\Kingdoms\Service\UnitReturnService;
 use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Service\UpdateKingdom;
+use App\Game\Kingdoms\Transformers\KingdomAttackLogsTransformer;
 use App\Game\Kingdoms\Transformers\KingdomTableTransformer;
+use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Transformers\SelectedKingdom;
+use App\Game\Kingdoms\Transformers\UnitMovementTransformer;
 use App\Game\Kingdoms\Validation\KingdomBuildingResourceValidation;
 use App\Game\Kingdoms\Validation\KingdomUnitResourceValidation;
 use App\Game\Kingdoms\Validators\MoveUnitsValidator;
@@ -191,7 +190,6 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CapitalCityKingdomLogHandler::class),
             );
         });
-
 
         $this->app->bind(KingdomBuilder::class, function () {
             return new KingdomBuilder;

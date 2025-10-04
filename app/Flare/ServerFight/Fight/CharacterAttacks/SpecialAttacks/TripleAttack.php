@@ -45,6 +45,6 @@ class TripleAttack extends BattleBase
     {
         $this->monsterHealth -= $damage;
 
-        $this->addMessage('You hit for (weapon - triple attack) ' . number_format($damage), 'player-action');
+        $this->addMessage('You hit for (weapon - triple attack) '.number_format($damage), 'player-action');
     }
 }

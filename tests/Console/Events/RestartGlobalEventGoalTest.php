@@ -25,7 +25,7 @@ class RestartGlobalEventGoalTest extends TestCase
 
     private ?Character $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
 
         parent::setUp();
@@ -33,7 +33,7 @@ class RestartGlobalEventGoalTest extends TestCase
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
 
         parent::tearDown();
@@ -41,7 +41,7 @@ class RestartGlobalEventGoalTest extends TestCase
         $this->character = null;
     }
 
-    public function testResetEventGoal()
+    public function test_reset_event_goal()
     {
 
         $event = $this->createEvent([
@@ -86,7 +86,7 @@ class RestartGlobalEventGoalTest extends TestCase
         $this->assertEmpty($eventGoal->globalEventKills);
     }
 
-    public function testDoNotResetEventGoalWhenMaxKillsDoMatchCurrentKills()
+    public function test_do_not_reset_event_goal_when_max_kills_do_match_current_kills()
     {
 
         $event = $this->createEvent([
@@ -131,7 +131,7 @@ class RestartGlobalEventGoalTest extends TestCase
         $this->assertNotEmpty($eventGoal->globalEventKills);
     }
 
-    public function testDoNotRestEventGoalWhenNoGlobalEventGoalExists()
+    public function test_do_not_rest_event_goal_when_no_global_event_goal_exists()
     {
 
         $this->createEvent([
@@ -143,7 +143,7 @@ class RestartGlobalEventGoalTest extends TestCase
         $this->assertNull(GlobalEventGoal::first());
     }
 
-    public function testDoNotRestEventGoal()
+    public function test_do_not_rest_event_goal()
     {
 
         $event = $this->createEvent([
@@ -181,7 +181,7 @@ class RestartGlobalEventGoalTest extends TestCase
         $this->assertNotEmpty($eventGoal->globalEventKills);
     }
 
-    public function testDoNotResetCraftingGoal()
+    public function test_do_not_reset_crafting_goal()
     {
 
         $event = $this->createEvent([
@@ -219,7 +219,7 @@ class RestartGlobalEventGoalTest extends TestCase
         $this->assertNotEmpty($eventGoal->globalEventCrafts);
     }
 
-    public function testDoNotResetEnchantingGoal()
+    public function test_do_not_reset_enchanting_goal()
     {
 
         $event = $this->createEvent([
@@ -257,7 +257,7 @@ class RestartGlobalEventGoalTest extends TestCase
         $this->assertNotEmpty($eventGoal->globalEventEnchants);
     }
 
-    public function testFailToMoveToNextStepWhenEventDoesNotExist()
+    public function test_fail_to_move_to_next_step_when_event_does_not_exist()
     {
 
         $eventGoal = $this->createGlobalEventGoal([
@@ -306,7 +306,7 @@ class RestartGlobalEventGoalTest extends TestCase
         $this->assertNotEmpty(GlobalEventCraftingInventorySlot::all());
     }
 
-    public function testCannotMoveToNextStepWhenNextStepIsNotAValidStep()
+    public function test_cannot_move_to_next_step_when_next_step_is_not_a_valid_step()
     {
 
         $event = $this->createEvent([
@@ -365,7 +365,7 @@ class RestartGlobalEventGoalTest extends TestCase
         $this->assertNotEmpty(GlobalEventCraftingInventorySlot::all());
     }
 
-    public function testHandleMovingToTheNextStepFromEnchantingToBattling()
+    public function test_handle_moving_to_the_next_step_from_enchanting_to_battling()
     {
 
         $this->createGameMap([
@@ -428,7 +428,7 @@ class RestartGlobalEventGoalTest extends TestCase
         $this->assertEmpty(GlobalEventCraftingInventorySlot::all());
     }
 
-    public function testHandleMovingFromCraftEventStepToEnchantingStep()
+    public function test_handle_moving_from_craft_event_step_to_enchanting_step()
     {
         $this->createGameMap([
             'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
@@ -490,7 +490,7 @@ class RestartGlobalEventGoalTest extends TestCase
         $this->assertNotEmpty(GlobalEventCraftingInventorySlot::all());
     }
 
-    public function testHandleMovingToCraftingStepOfEventGoal()
+    public function test_handle_moving_to_crafting_step_of_event_goal()
     {
         $this->createGameMap([
             'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,

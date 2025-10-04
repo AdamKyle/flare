@@ -18,7 +18,7 @@ class GemShopServiceTest extends TestCase
 
     private ?GemShopService $shopService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -37,7 +37,7 @@ class GemShopServiceTest extends TestCase
         $this->shopService = resolve(GemShopService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -45,7 +45,7 @@ class GemShopServiceTest extends TestCase
         $this->shopService = null;
     }
 
-    public function testCannotSellGemYouDoNotHave()
+    public function test_cannot_sell_gem_you_do_not_have()
     {
         $result = $this->shopService->sellGem($this->character, 10);
 
@@ -53,7 +53,7 @@ class GemShopServiceTest extends TestCase
         $this->assertEquals('Gem not found. Nothing to sell.', $result['message']);
     }
 
-    public function testSellGem()
+    public function test_sell_gem()
     {
         $gemSlot = $this->character->gemBag->gemSlots->first();
 
@@ -68,7 +68,7 @@ class GemShopServiceTest extends TestCase
         $this->assertGreaterThan(0, $character->copper_coins);
     }
 
-    public function testSellGemWhenCurrencyCapped()
+    public function test_sell_gem_when_currency_capped()
     {
 
         $this->character->update([
@@ -92,7 +92,7 @@ class GemShopServiceTest extends TestCase
         $this->assertEquals(MaxCurrenciesValue::MAX_COPPER, $character->copper_coins);
     }
 
-    public function testSellAllGems()
+    public function test_sell_all_gems()
     {
         $result = $this->shopService->sellAllGems($this->character);
 
@@ -105,7 +105,7 @@ class GemShopServiceTest extends TestCase
         $this->assertGreaterThan(0, $character->copper_coins);
     }
 
-    public function testSellAllGemsWhenCurrencyCapped()
+    public function test_sell_all_gems_when_currency_capped()
     {
         $this->character->update([
             'copper_coins' => MaxCurrenciesValue::MAX_COPPER,

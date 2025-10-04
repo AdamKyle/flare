@@ -21,7 +21,7 @@ class ItemSkillAttributeTest extends TestCase
 
     private ?ItemSkillAttribute $itemSkillAttribute;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -29,7 +29,7 @@ class ItemSkillAttributeTest extends TestCase
         $this->itemSkillAttribute = resolve(ItemSkillAttribute::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -37,7 +37,7 @@ class ItemSkillAttributeTest extends TestCase
         $this->itemSkillAttribute = null;
     }
 
-    public function testGetItemSkillAttributeFromArtifactItem()
+    public function test_get_item_skill_attribute_from_artifact_item()
     {
 
         $item = $this->createItem([

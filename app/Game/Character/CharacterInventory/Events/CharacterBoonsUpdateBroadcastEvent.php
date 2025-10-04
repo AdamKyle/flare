@@ -40,6 +40,6 @@ class CharacterBoonsUpdateBroadcastEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('update-boons-' . $this->user->id);
+        return new PrivateChannel('update-boons-'.$this->user->id);
     }
 }

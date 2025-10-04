@@ -3,7 +3,6 @@
 namespace App\Flare\ServerFight\Fight\CharacterAttacks\Types;
 
 use App\Flare\Models\Character;
-
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;

@@ -7,7 +7,6 @@ use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 
 class CharacterTopBarTransformer extends BaseTransformer
 {
-
     protected array $defaultIncludes = [
         'inventory_count',
     ];

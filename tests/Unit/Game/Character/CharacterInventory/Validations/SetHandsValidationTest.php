@@ -19,7 +19,7 @@ class SetHandsValidationTest extends TestCase
 
     private ?SetHandsValidation $setHandsValidation;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -28,7 +28,7 @@ class SetHandsValidationTest extends TestCase
         $this->setHandsValidation = resolve(SetHandsValidation::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -37,7 +37,7 @@ class SetHandsValidationTest extends TestCase
         $this->setHandsValidation = null;
     }
 
-    public function testValidationIsValidForSingleWeapon()
+    public function test_validation_is_valid_for_single_weapon()
     {
         $itemTypes = [
             WeaponTypes::WEAPON,
@@ -58,7 +58,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertTrue($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationIsValidForDuelHandedWeapon()
+    public function test_validation_is_valid_for_duel_handed_weapon()
     {
         $itemTypes = [
             WeaponTypes::STAVE,
@@ -79,7 +79,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertTrue($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationIsValidForSingleWeaponAndShield()
+    public function test_validation_is_valid_for_single_weapon_and_shield()
     {
         $itemTypes = [
             WeaponTypes::WEAPON,
@@ -101,7 +101,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertTrue($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationIsValidForSingleWeaponAndMace()
+    public function test_validation_is_valid_for_single_weapon_and_mace()
     {
         $itemTypes = [
             WeaponTypes::WEAPON,
@@ -123,7 +123,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertTrue($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationIsValidForSingleWeaponAndFan()
+    public function test_validation_is_valid_for_single_weapon_and_fan()
     {
         $itemTypes = [
             WeaponTypes::WEAPON,
@@ -145,7 +145,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertTrue($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationIsValidForSingleWeaponAndGun()
+    public function test_validation_is_valid_for_single_weapon_and_gun()
     {
         $itemTypes = [
             WeaponTypes::WEAPON,
@@ -167,7 +167,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertTrue($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationIsValidForSingleWeaponAndScratchAwl()
+    public function test_validation_is_valid_for_single_weapon_and_scratch_awl()
     {
         $itemTypes = [
             WeaponTypes::WEAPON,
@@ -189,7 +189,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertTrue($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationIsValidForDuelWeapons()
+    public function test_validation_is_valid_for_duel_weapons()
     {
         $itemTypes = [
             WeaponTypes::WEAPON,
@@ -211,7 +211,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertTrue($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForMultipleWeapons()
+    public function test_validation_fails_for_multiple_weapons()
     {
         $itemTypes = [
             WeaponTypes::WEAPON,
@@ -234,7 +234,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForSingleWeaponAndMultipleSecondaryWeapons()
+    public function test_validation_fails_for_single_weapon_and_multiple_secondary_weapons()
     {
 
         $itemTypes = [
@@ -258,7 +258,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForMultipleWeaponsAndShield()
+    public function test_validation_fails_for_multiple_weapons_and_shield()
     {
         $itemTypes = [
             ArmourTypes::SHIELD,
@@ -281,7 +281,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForMultipleWeaponsAndGun()
+    public function test_validation_fails_for_multiple_weapons_and_gun()
     {
         $itemTypes = [
             WeaponTypes::GUN,
@@ -304,7 +304,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForMultipleWeaponsAndFan()
+    public function test_validation_fails_for_multiple_weapons_and_fan()
     {
         $itemTypes = [
             WeaponTypes::FAN,
@@ -327,7 +327,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForMultipleWeaponsAndMace()
+    public function test_validation_fails_for_multiple_weapons_and_mace()
     {
         $itemTypes = [
             WeaponTypes::MACE,
@@ -350,7 +350,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForMultipleWeaponsAndScratchAwl()
+    public function test_validation_fails_for_multiple_weapons_and_scratch_awl()
     {
         $itemTypes = [
             WeaponTypes::SCRATCH_AWL,
@@ -373,7 +373,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForMultipleWeaponsAndStave()
+    public function test_validation_fails_for_multiple_weapons_and_stave()
     {
         $itemTypes = [
             WeaponTypes::STAVE,
@@ -396,7 +396,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForMultipleWeaponsAndBow()
+    public function test_validation_fails_for_multiple_weapons_and_bow()
     {
         $itemTypes = [
             WeaponTypes::BOW,
@@ -419,7 +419,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForMultipleWeaponsAndHammer()
+    public function test_validation_fails_for_multiple_weapons_and_hammer()
     {
         $itemTypes = [
             WeaponTypes::HAMMER,
@@ -442,7 +442,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForSingleWeaponAndStave()
+    public function test_validation_fails_for_single_weapon_and_stave()
     {
         $itemTypes = [
             WeaponTypes::STAVE,
@@ -464,7 +464,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForSingleWeaponAndBow()
+    public function test_validation_fails_for_single_weapon_and_bow()
     {
         $itemTypes = [
             WeaponTypes::BOW,
@@ -486,7 +486,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForSingleWeaponsAndHammer()
+    public function test_validation_fails_for_single_weapons_and_hammer()
     {
         $itemTypes = [
             WeaponTypes::HAMMER,
@@ -508,7 +508,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForSingleWeaponsAndMixed()
+    public function test_validation_fails_for_single_weapons_and_mixed()
     {
         $itemTypes = [
             WeaponTypes::FAN,
@@ -531,7 +531,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForStaveAndWeapon()
+    public function test_validation_fails_for_stave_and_weapon()
     {
         $itemTypes = [
             WeaponTypes::STAVE,
@@ -553,7 +553,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForStaveAndGun()
+    public function test_validation_fails_for_stave_and_gun()
     {
         $itemTypes = [
             WeaponTypes::STAVE,
@@ -575,7 +575,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForStaveAndMace()
+    public function test_validation_fails_for_stave_and_mace()
     {
         $itemTypes = [
             WeaponTypes::STAVE,
@@ -597,7 +597,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForStaveAndFan()
+    public function test_validation_fails_for_stave_and_fan()
     {
         $itemTypes = [
             WeaponTypes::STAVE,
@@ -619,7 +619,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForStaveAndScratchAwl()
+    public function test_validation_fails_for_stave_and_scratch_awl()
     {
         $itemTypes = [
             WeaponTypes::STAVE,
@@ -641,7 +641,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForStaveAndStave()
+    public function test_validation_fails_for_stave_and_stave()
     {
         $itemTypes = [
             WeaponTypes::STAVE,
@@ -663,7 +663,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForStaveAndBow()
+    public function test_validation_fails_for_stave_and_bow()
     {
         $itemTypes = [
             WeaponTypes::STAVE,
@@ -685,7 +685,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForStaveAndHammer()
+    public function test_validation_fails_for_stave_and_hammer()
     {
         $itemTypes = [
             WeaponTypes::STAVE,
@@ -707,7 +707,7 @@ class SetHandsValidationTest extends TestCase
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
 
-    public function testValidationFailsForStaveAndShield()
+    public function test_validation_fails_for_stave_and_shield()
     {
         $itemTypes = [
             WeaponTypes::STAVE,

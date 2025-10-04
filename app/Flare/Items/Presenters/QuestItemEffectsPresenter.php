@@ -4,13 +4,10 @@ namespace App\Flare\Items\Presenters;
 
 use App\Flare\Items\Values\QuestItemEffectsType;
 
-final class QuestItemEffectsPresenter {
-
+final class QuestItemEffectsPresenter
+{
     /**
      * Returns human-readable string of the quest item effect.
-     *
-     * @param string|null $rawEffect
-     * @return string
      */
     public function getEffect(?string $rawEffect): string
     {

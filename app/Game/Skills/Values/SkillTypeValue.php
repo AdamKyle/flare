@@ -81,8 +81,6 @@ enum SkillTypeValue: int
 
     /**
      * Returns whether this skill type is Training.
-     *
-     * @return bool
      */
     public function isTraining(): bool
     {
@@ -91,8 +89,6 @@ enum SkillTypeValue: int
 
     /**
      * Returns whether this skill type is Crafting.
-     *
-     * @return bool
      */
     public function isCrafting(): bool
     {
@@ -101,8 +97,6 @@ enum SkillTypeValue: int
 
     /**
      * Returns whether this skill type is Enchanting.
-     *
-     * @return bool
      */
     public function isEnchanting(): bool
     {
@@ -111,8 +105,6 @@ enum SkillTypeValue: int
 
     /**
      * Returns whether this skill type is Disenchanting.
-     *
-     * @return bool
      */
     public function isDisenchanting(): bool
     {
@@ -121,8 +113,6 @@ enum SkillTypeValue: int
 
     /**
      * Returns whether this skill type is Alchemy.
-     *
-     * @return bool
      */
     public function isAlchemy(): bool
     {
@@ -131,8 +121,6 @@ enum SkillTypeValue: int
 
     /**
      * Returns whether this skill type is Battle Timer.
-     *
-     * @return bool
      */
     public function isBattleTimer(): bool
     {
@@ -141,8 +129,6 @@ enum SkillTypeValue: int
 
     /**
      * Returns whether this skill type is Directional Movement Timer.
-     *
-     * @return bool
      */
     public function isDirectionalMovementTimer(): bool
     {
@@ -151,8 +137,6 @@ enum SkillTypeValue: int
 
     /**
      * Returns whether this skill type is Movement Timer.
-     *
-     * @return bool
      */
     public function isMovementTimer(): bool
     {
@@ -161,8 +145,6 @@ enum SkillTypeValue: int
 
     /**
      * Returns whether this skill type is Kingdom Building Timer.
-     *
-     * @return bool
      */
     public function isKingdomBuildingTimer(): bool
     {
@@ -171,8 +153,6 @@ enum SkillTypeValue: int
 
     /**
      * Returns whether this skill type is Unit Recruitment Timer.
-     *
-     * @return bool
      */
     public function isUnitRecruitmentTimer(): bool
     {
@@ -181,8 +161,6 @@ enum SkillTypeValue: int
 
     /**
      * Returns whether this skill type is Unit Movement Timer.
-     *
-     * @return bool
      */
     public function isUnitMovementTimer(): bool
     {
@@ -191,8 +169,6 @@ enum SkillTypeValue: int
 
     /**
      * Returns whether this skill type affects Spell Evasion.
-     *
-     * @return bool
      */
     public function isSpellEvasion(): bool
     {
@@ -201,8 +177,6 @@ enum SkillTypeValue: int
 
     /**
      * Returns whether this skill type is Gem Crafting.
-     *
-     * @return bool
      */
     public function isGemCrafting(): bool
     {
@@ -211,8 +185,6 @@ enum SkillTypeValue: int
 
     /**
      * Returns whether this skill type affects Kingdom.
-     *
-     * @return bool
      */
     public function effectsKingdom(): bool
     {
@@ -221,8 +193,6 @@ enum SkillTypeValue: int
 
     /**
      * Returns whether this skill type affects Class Skills.
-     *
-     * @return bool
      */
     public function effectsClassSkills(): bool
     {
@@ -231,8 +201,6 @@ enum SkillTypeValue: int
 
     /**
      * Returns the named value associated with this skill type.
-     *
-     * @return string
      */
     public function getNamedValue(): string
     {
@@ -241,8 +209,6 @@ enum SkillTypeValue: int
 
     /**
      * Returns an array of all skill type named values.
-     *
-     * @return array
      */
     public static function getValues(): array
     {
@@ -253,16 +219,16 @@ enum SkillTypeValue: int
      * @var array $NAMED_VALUES
      */
     private const NAMED_VALUES = [
-        0  => 'Training',
-        1  => 'Crafting',
-        2  => 'Enchanting',
-        3  => 'Disenchanting',
-        4  => 'Alchemy',
-        5  => 'Effects Battle Timer',
-        6  => 'Effects Directional Move Timer',
-        7  => 'Effects Movement Timer',
-        8  => 'Effects Kingdom Building Timers',
-        9  => 'Effects Unit Recruitment Timers',
+        0 => 'Training',
+        1 => 'Crafting',
+        2 => 'Enchanting',
+        3 => 'Disenchanting',
+        4 => 'Alchemy',
+        5 => 'Effects Battle Timer',
+        6 => 'Effects Directional Move Timer',
+        7 => 'Effects Movement Timer',
+        8 => 'Effects Kingdom Building Timers',
+        9 => 'Effects Unit Recruitment Timers',
         10 => 'Effects Unit Movement Timers',
         11 => 'Effects Spell Evasion',
         12 => 'Effects Kingdoms',

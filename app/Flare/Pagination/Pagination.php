@@ -2,25 +2,20 @@
 
 namespace App\Flare\Pagination;
 
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use League\Fractal\Manager;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use League\Fractal\Resource\Collection as LeagueCollection;
 use League\Fractal\TransformerAbstract;
 
-readonly class Pagination {
-
+readonly class Pagination
+{
     public function __construct(private Manager $manager) {}
 
     /**
      * Responsible for paginating a Support Collection.
-     *
-     * @param Collection $items
-     * @param int $perPage
-     * @param int $currentPage
-     * @return array
      */
     public function paginateCollectionResponse(Collection $items, int $perPage = 15, int $currentPage = 1): array
     {
@@ -50,14 +45,9 @@ readonly class Pagination {
 
     /**
      * Transforms for the data and paginates it.
-     *
-     * @param EloquentCollection $databaseCollection
-     * @param TransformerAbstract $transformer
-     * @param int $perPage
-     * @param int $page
-     * @return array
      */
-    public function buildPaginatedDate(EloquentCollection $databaseCollection, TransformerAbstract $transformer, int $perPage, int $page): array {
+    public function buildPaginatedDate(EloquentCollection $databaseCollection, TransformerAbstract $transformer, int $perPage, int $page): array
+    {
         $paginator = $this->paginateCollection($databaseCollection, $perPage, $page);
 
         $databaseCollection = new LeagueCollection($paginator->items(), $transformer);
@@ -73,13 +63,9 @@ readonly class Pagination {
 
     /**
      * paginate a collection of objects.
-     *
-     * @param Collection $collection
-     * @param int $perPage
-     * @param int $page
-     * @return LengthAwarePaginator
      */
-    private function paginateCollection(Collection $collection, int $perPage = 10, int $page = 1): LengthAwarePaginator {
+    private function paginateCollection(Collection $collection, int $perPage = 10, int $page = 1): LengthAwarePaginator
+    {
         $items = $collection->forPage($page, $perPage);
 
         return new LengthAwarePaginator(

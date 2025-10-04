@@ -3,10 +3,7 @@
 namespace App\Flare\Transformers;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\FactionLoyalty;
 use App\Flare\Models\GameClass;
-use App\Flare\Models\Survey;
-use App\Flare\Values\AutomationType;
 use App\Flare\Values\ClassAttackValue;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use Exception;
@@ -90,15 +87,18 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         return $this->item($character, new CharacterInventoryCountTransformer);
     }
 
-    public function includeResistanceInfo(Character $character) {
+    public function includeResistanceInfo(Character $character)
+    {
         return $this->item($character, new CharacterResistanceInfoTransformer);
     }
 
-    public function includereincarnationInfo(Character $character) {
+    public function includereincarnationInfo(Character $character)
+    {
         return $this->item($character, new CharacterReincarnationInfoTransformer);
     }
 
-    private function fetchGoldBarsAmount(Character $character): int {
+    private function fetchGoldBarsAmount(Character $character): int
+    {
         return $character->kingdoms->sum('gold_bars');
     }
 }

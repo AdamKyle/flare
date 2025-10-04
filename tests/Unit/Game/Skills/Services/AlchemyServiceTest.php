@@ -33,7 +33,7 @@ class AlchemyServiceTest extends TestCase
 
     private ?Item $alchemyItem;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -52,7 +52,7 @@ class AlchemyServiceTest extends TestCase
         ]);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -61,7 +61,7 @@ class AlchemyServiceTest extends TestCase
         $this->alchemyItem = null;
     }
 
-    public function testGetAlchemyItemsForCrafting()
+    public function test_get_alchemy_items_for_crafting()
     {
         $character = $this->character->getCharacter();
 
@@ -70,7 +70,7 @@ class AlchemyServiceTest extends TestCase
         $this->assertNotEmpty($result);
     }
 
-    public function testGetAlchemyItemsAsAlchemistForTheCostReduction()
+    public function test_get_alchemy_items_as_alchemist_for_the_cost_reduction()
     {
         Event::fake();
 
@@ -89,7 +89,7 @@ class AlchemyServiceTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testGetAlchemyItemsAsMerchantForTheCostReduction()
+    public function test_get_alchemy_items_as_merchant_for_the_cost_reduction()
     {
         Event::fake();
 
@@ -108,7 +108,7 @@ class AlchemyServiceTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testCannotTransmuteItemThatDoesntExist()
+    public function test_cannot_transmute_item_that_doesnt_exist()
     {
         Event::fake();
 
@@ -119,7 +119,7 @@ class AlchemyServiceTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testCannotTransmuteItemNotEnoughGoldDust()
+    public function test_cannot_transmute_item_not_enough_gold_dust()
     {
         Event::fake();
 
@@ -132,7 +132,7 @@ class AlchemyServiceTest extends TestCase
         });
     }
 
-    public function testCannotTransmuteItemNotEnoughShards()
+    public function test_cannot_transmute_item_not_enough_shards()
     {
         Event::fake();
 
@@ -151,7 +151,7 @@ class AlchemyServiceTest extends TestCase
         });
     }
 
-    public function testCannotTransmuteItemLevelToHigh()
+    public function test_cannot_transmute_item_level_to_high()
     {
         Event::fake();
 
@@ -175,7 +175,7 @@ class AlchemyServiceTest extends TestCase
         });
     }
 
-    public function testTransmuteWhenLevelTrivialTooLow()
+    public function test_transmute_when_level_trivial_too_low()
     {
         Event::fake();
 
@@ -203,7 +203,7 @@ class AlchemyServiceTest extends TestCase
         $this->assertCount(1, $character->inventory->slots);
     }
 
-    public function testTransmute()
+    public function test_transmute()
     {
         $character = $this->character->getCharacter();
 
@@ -222,7 +222,7 @@ class AlchemyServiceTest extends TestCase
         $this->assertLessThan(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
     }
 
-    public function testTransmuteAndFail()
+    public function test_transmute_and_fail()
     {
         Event::fake();
 
@@ -252,7 +252,7 @@ class AlchemyServiceTest extends TestCase
         });
     }
 
-    public function testTransmuteAndSucceed()
+    public function test_transmute_and_succeed()
     {
         $this->instance(
             SkillCheckService::class,
@@ -278,7 +278,7 @@ class AlchemyServiceTest extends TestCase
         $this->assertCount(1, $character->inventory->slots);
     }
 
-    public function testTransmuteAndSucceedButInventoryIsFull()
+    public function test_transmute_and_succeed_but_inventory_is_full()
     {
         Event::fake();
 
@@ -311,7 +311,7 @@ class AlchemyServiceTest extends TestCase
         $this->assertCount(0, $character->inventory->slots);
     }
 
-    public function testTransmuteAsAlchemist()
+    public function test_transmute_as_alchemist()
     {
         $this->instance(
             SkillCheckService::class,
@@ -346,7 +346,7 @@ class AlchemyServiceTest extends TestCase
         $this->assertGreaterThan($shardsAfterOriginalCost, $character->shards);
     }
 
-    public function testTransmuteAsMerchant()
+    public function test_transmute_as_merchant()
     {
         $this->instance(
             SkillCheckService::class,
@@ -381,7 +381,7 @@ class AlchemyServiceTest extends TestCase
         $this->assertGreaterThan($shardsAfterOriginalCost, $character->shards);
     }
 
-    public function testFetchCharacterAlchemyCraftingXP()
+    public function test_fetch_character_alchemy_crafting_xp()
     {
         $character = $this->character->getCharacter();
 

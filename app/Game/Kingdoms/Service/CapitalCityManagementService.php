@@ -2,12 +2,6 @@
 
 namespace App\Game\Kingdoms\Service;
 
-use DB;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Support\Collection as SupportCollection;
-use Carbon\Carbon;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityUnitCancellation;
 use App\Flare\Models\CapitalCityUnitQueue;
@@ -19,6 +13,11 @@ use App\Flare\Transformers\CapitalCityKingdomBuildingTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection as SupportCollection;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
 
 class CapitalCityManagementService
 {
@@ -175,12 +174,8 @@ class CapitalCityManagementService
         return array_values($unitQueueData->toArray());
     }
 
-
     /**
      * Reorder the unit requests
-     *
-     * @param array $requestData
-     * @return array
      */
     private function reorderBuildingRequests(array $requestData): array
     {
@@ -202,9 +197,6 @@ class CapitalCityManagementService
 
     /**
      * Reorder the unit requests
-     *
-     * @param array $requestData
-     * @return array
      */
     private function reorderUnitRequests(array $requestData): array
     {
@@ -246,7 +238,7 @@ class CapitalCityManagementService
             }
 
             $data[] = [
-                'kingdom_name' => $queue->kingdom->name . '(X/Y: ' . $queue->kingdom->x_position . '/' . $queue->kingdom->y_position . ')',
+                'kingdom_name' => $queue->kingdom->name.'(X/Y: '.$queue->kingdom->x_position.'/'.$queue->kingdom->y_position.')',
                 'status' => $queue->status,
                 'unit_name' => $unit->name,
                 'secondary_status' => $queue->status === CapitalCityQueueStatus::CANCELLATION_REJECTED ? 'Cancellation was rejected. Building is either close to or has already finished.' : 'Cancellation request',
@@ -271,7 +263,7 @@ class CapitalCityManagementService
             ->count();
 
         if ($otherCapitalCitiesCount > 0) {
-            $this->errorResult('Cannot have more than one Capital city on plane: ' . $kingdom->gameMap->name);
+            $this->errorResult('Cannot have more than one Capital city on plane: '.$kingdom->gameMap->name);
         }
     }
 
@@ -292,10 +284,6 @@ class CapitalCityManagementService
      *
      * - Where isnt the capital city
      * - Where does have capital city queue
-     *
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @return EloquentCollection
      */
     private function getOtherKingdoms(Character $character, Kingdom $kingdom): EloquentCollection
     {
@@ -329,9 +317,6 @@ class CapitalCityManagementService
      *
      * - Not locked
      * - Not currently in queue from manual upgrade
-     *
-     * @param Kingdom $kingdom
-     * @return SupportCollection
      */
     private function fetchBuildings(Kingdom $kingdom): SupportCollection
     {
@@ -349,7 +334,6 @@ class CapitalCityManagementService
 
         return $this->filterOutCapitalCityBuildingsInQueue($buildings);
     }
-
 
     /**
      * Filters out buildings who are currently in the Capital City Building Queue.
@@ -450,8 +434,8 @@ class CapitalCityManagementService
      */
     private function getCapitalCityMessage(Kingdom $kingdom): string
     {
-        return 'Your kingdom: ' . $kingdom->name . ' on plane: ' . $kingdom->gameMap->name . ' is now a capital city. ' .
-            'You can manage all your cities on this plane from this kingdom. This kingdom will also appear at the top ' .
+        return 'Your kingdom: '.$kingdom->name.' on plane: '.$kingdom->gameMap->name.' is now a capital city. '.
+            'You can manage all your cities on this plane from this kingdom. This kingdom will also appear at the top '.
             'of your kingdom list with a special icon.';
     }
 }

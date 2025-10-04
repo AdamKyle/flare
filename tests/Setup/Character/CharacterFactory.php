@@ -57,9 +57,6 @@ class CharacterFactory
 
     /**
      * Set a series of user attributes for use during the user creation of character creation.
-     *
-     * @param array $attributes
-     * @return CharacterFactory
      */
     public function setAttributesOnUserForCreation(array $attributes): CharacterFactory
     {
@@ -137,7 +134,7 @@ class CharacterFactory
 
         $character = $this->character->refresh();
 
-        Cache::put('character-attack-data-' . $character->id, (new AttackDataCacheSetUp)->getCacheObject());
+        Cache::put('character-attack-data-'.$character->id, (new AttackDataCacheSetUp)->getCacheObject());
 
         return $this;
     }
@@ -185,7 +182,7 @@ class CharacterFactory
             'level' => 0,
         ]);
 
-        $itemTypes = array_map(fn($case) => $case->value, ItemType::cases());
+        $itemTypes = array_map(fn ($case) => $case->value, ItemType::cases());
 
         foreach ($itemTypes as $type) {
             $classRank->weaponMasteries()->create([
@@ -204,7 +201,7 @@ class CharacterFactory
 
     public function addAdditionalClassRanks(array $gameClassIds): CharacterFactory
     {
-        $itemTypes = array_map(fn($case) => $case->value, ItemType::cases());
+        $itemTypes = array_map(fn ($case) => $case->value, ItemType::cases());
 
         foreach ($gameClassIds as $gameClassId) {
             $classRank = $this->character->classRanks()->create([
@@ -550,7 +547,7 @@ class CharacterFactory
         $skill = $this->character->skills->where('name', $name)->first();
 
         if (is_null($skill)) {
-            throw new Exception($name . ' not found.');
+            throw new Exception($name.' not found.');
         }
 
         $skill->update($changes);

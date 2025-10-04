@@ -20,7 +20,7 @@ class ComparisonServiceTest extends TestCase
 
     private ?ComparisonService $comparisonService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -29,7 +29,7 @@ class ComparisonServiceTest extends TestCase
         $this->comparisonService = resolve(ComparisonService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -38,7 +38,7 @@ class ComparisonServiceTest extends TestCase
         $this->comparisonService = null;
     }
 
-    public function testItemComparisonDetailsIsEmptyWhenNothingEquipped()
+    public function test_item_comparison_details_is_empty_when_nothing_equipped()
     {
         $item = $this->createItem(['type' => ItemType::WAND->value]);
 
@@ -51,7 +51,7 @@ class ComparisonServiceTest extends TestCase
         $this->assertEmpty($comparisonData['details']);
     }
 
-    public function testItemComparisonDetailsIsEmptyWhenSomethingEquippedButComparingForQuest()
+    public function test_item_comparison_details_is_empty_when_something_equipped_but_comparing_for_quest()
     {
         $item = $this->createItem(['type' => 'quest']);
 
@@ -71,7 +71,7 @@ class ComparisonServiceTest extends TestCase
         $this->assertEquals($item->affix_name, $comparisonData['itemToEquip']['name']);
     }
 
-    public function testItemComparisonDetailsIsEmptyWhenSomethingEquippedButComparingForUsableItem()
+    public function test_item_comparison_details_is_empty_when_something_equipped_but_comparing_for_usable_item()
     {
         $item = $this->createItem(['type' => 'alchemy']);
 
@@ -91,7 +91,7 @@ class ComparisonServiceTest extends TestCase
         $this->assertEquals($item->affix_name, $comparisonData['itemToEquip']['affix_name']);
     }
 
-    public function testItemComparisonDetailsIsNotEmptyWhenSomethingEquipped()
+    public function test_item_comparison_details_is_not_empty_when_something_equipped()
     {
         $item = $this->createItem(['type' => ItemType::SWORD->value]);
 
@@ -110,7 +110,7 @@ class ComparisonServiceTest extends TestCase
         $this->assertNotEmpty($comparisonData['details']);
     }
 
-    public function testBuildShopDataForBow()
+    public function test_build_shop_data_for_bow()
     {
         $item = $this->createItem(['type' => ItemType::BOW->value]);
 
@@ -129,7 +129,7 @@ class ComparisonServiceTest extends TestCase
         $this->assertNotEmpty($comparisonData['details']);
     }
 
-    public function testBuildShopDataForArmourType()
+    public function test_build_shop_data_for_armour_type()
     {
         $item = $this->createItem(['type' => ArmourTypes::SHIELD]);
 
@@ -148,7 +148,7 @@ class ComparisonServiceTest extends TestCase
         $this->assertNotEmpty($comparisonData['details']);
     }
 
-    public function testBuildShopDataForSpell()
+    public function test_build_shop_data_for_spell()
     {
         $item = $this->createItem(['type' => ItemType::SPELL_DAMAGE->value]);
 
@@ -167,7 +167,7 @@ class ComparisonServiceTest extends TestCase
         $this->assertNotEmpty($comparisonData['details']);
     }
 
-    public function testBuildShopDataForSpellInEquippedSet()
+    public function test_build_shop_data_for_spell_in_equipped_set()
     {
         $item = $this->createItem(['type' => ItemType::SPELL_DAMAGE->value]);
 

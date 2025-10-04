@@ -94,15 +94,15 @@ class GuideQuestService
         $character = $character->refresh();
 
         if ($quest->gold_reward > 0) {
-            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->gold_reward) . ' Gold. You now have: ' . number_format($character->gold)));
+            event(new ServerMessageEvent($character->user, 'Rewarded with: '.number_format($quest->gold_reward).' Gold. You now have: '.number_format($character->gold)));
         }
 
         if ($quest->gold_dust_reward > 0) {
-            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->gold_dust_reward) . ' Gold Dust. You now have: ' . number_format($character->gold_dust)));
+            event(new ServerMessageEvent($character->user, 'Rewarded with: '.number_format($quest->gold_dust_reward).' Gold Dust. You now have: '.number_format($character->gold_dust)));
         }
 
         if ($quest->shards_reward > 0) {
-            event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($quest->shards_reward) . ' Shards. You now have: ' . number_format($character->shards)));
+            event(new ServerMessageEvent($character->user, 'Rewarded with: '.number_format($quest->shards_reward).' Shards. You now have: '.number_format($character->shards)));
         }
 
         event(new UpdateTopBarEvent($character));
@@ -188,7 +188,7 @@ class GuideQuestService
 
         $this->handlePossibleLevelUp($character);
 
-        event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($guideQuest->xp_reward) . ' XP.'));
+        event(new ServerMessageEvent($character->user, 'Rewarded with: '.number_format($guideQuest->xp_reward).' XP.'));
 
         return $character;
     }
@@ -221,7 +221,7 @@ class GuideQuestService
             }
         }
 
-        if (!is_null($delusionalEvent) && is_null($nextGuideQuest)) {
+        if (! is_null($delusionalEvent) && is_null($nextGuideQuest)) {
             $delusionalEventQuest = GuideQuest::where('only_during_event', EventType::DELUSIONAL_MEMORIES_EVENT)->whereNull('parent_id')->first();
 
             if (! is_null($delusionalEventQuest)) {
@@ -234,11 +234,11 @@ class GuideQuestService
 
         $guideQuests = [];
 
-        if (!is_null($regularGuideQuest)) {
+        if (! is_null($regularGuideQuest)) {
             $guideQuests[] = $regularGuideQuest;
         }
 
-        if (!is_null($newFeatureGuideQuest)) {
+        if (! is_null($newFeatureGuideQuest)) {
             $guideQuests[] = $newFeatureGuideQuest;
         }
 

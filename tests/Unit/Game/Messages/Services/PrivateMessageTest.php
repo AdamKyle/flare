@@ -28,7 +28,7 @@ class PrivateMessageTest extends TestCase
 
     private ?User $user;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -37,7 +37,7 @@ class PrivateMessageTest extends TestCase
         $this->admin = $this->createAdmin($this->createAdminRole());
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -46,7 +46,7 @@ class PrivateMessageTest extends TestCase
         $this->admin = null;
     }
 
-    public function testSendPrivateMessageToCharacter()
+    public function test_send_private_message_to_character()
     {
         $character = $this->character->getCharacter();
 
@@ -57,7 +57,7 @@ class PrivateMessageTest extends TestCase
         $this->assertCount(1, Message::all());
     }
 
-    public function testSendMessageToConjurerNPC()
+    public function test_send_message_to_conjurer_npc()
     {
         Event::fake();
 
@@ -74,7 +74,7 @@ class PrivateMessageTest extends TestCase
         Event::assertDispatched(NPCMessageEvent::class);
     }
 
-    public function testSendMessageToKingdomHolder()
+    public function test_send_message_to_kingdom_holder()
     {
         Event::fake();
 
@@ -91,7 +91,7 @@ class PrivateMessageTest extends TestCase
         Event::assertDispatched(NPCMessageEvent::class);
     }
 
-    public function testSendMessageToEntrancetress()
+    public function test_send_message_to_entrancetress()
     {
         Event::fake();
 
@@ -108,7 +108,7 @@ class PrivateMessageTest extends TestCase
         Event::assertDispatched(NPCMessageEvent::class);
     }
 
-    public function testSendMessageToQuestGiver()
+    public function test_send_message_to_quest_giver()
     {
         Event::fake();
 
@@ -125,7 +125,7 @@ class PrivateMessageTest extends TestCase
         Event::assertDispatched(NPCMessageEvent::class);
     }
 
-    public function testHaveNoIdeaWhoToSendTo()
+    public function test_have_no_idea_who_to_send_to()
     {
         Event::fake();
 

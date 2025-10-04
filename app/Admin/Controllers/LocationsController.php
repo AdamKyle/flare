@@ -43,7 +43,7 @@ class LocationsController extends Controller
     {
         Location::updateOrCreate(['id' => $request->id], $request->all());
 
-        return response()->redirectToRoute('locations.list')->with('success', 'Saved Location Details for: ' . $request->name);
+        return response()->redirectToRoute('locations.list')->with('success', 'Saved Location Details for: '.$request->name);
     }
 
     public function show(Location $location)
@@ -51,11 +51,11 @@ class LocationsController extends Controller
         $locationType = null;
         $usedInQuest = null;
 
-        if (!is_null($location->type)) {
+        if (! is_null($location->type)) {
             $locationType = (new LocationType($location->type));
         }
 
-        if (!is_null($location->questRewardItem)) {
+        if (! is_null($location->questRewardItem)) {
             $questItemId = $location->quest_reward_item_id;
 
             $usedInQuest = Quest::where(function ($q) use ($questItemId) {

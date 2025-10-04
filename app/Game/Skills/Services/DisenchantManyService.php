@@ -18,21 +18,14 @@ class DisenchantManyService
 {
     use ResponseBuilder;
 
-    /**
-     * @param SkillCheckService $skillCheckService
-     */
     public function __construct(
         private readonly SkillCheckService $skillCheckService,
-    ) {
-    }
+    ) {}
 
     /**
      * Disenchant many items and return a summary payload.
      *
-     * @param Manager $manager
-     * @param CharacterInventoryCountTransformer $characterInventoryCountTransformer
-     * @param Character $character
-     * @param array{ids?: array<int|string>, exclude?: array<int|string>} $params
+     * @param  array{ids?: array<int|string>, exclude?: array<int|string>}  $params
      * @return array{
      *   status:int,
      *   message:string,
@@ -50,13 +43,13 @@ class DisenchantManyService
             ]);
         }
 
-        $disenchantingSkill   = $this->getDisenchantingSkill($character);
-        $maxGoldDust          = MaxCurrenciesValue::MAX_GOLD_DUST;
-        $interestDcThreshold  = 500 - (int) (500 * 0.10);
+        $disenchantingSkill = $this->getDisenchantingSkill($character);
+        $maxGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
+        $interestDcThreshold = 500 - (int) (500 * 0.10);
         $runningGoldDustTotal = (int) $character->gold_dust;
 
-        $processedSlotIds     = [];
-        $perItemSummaries     = [];
+        $processedSlotIds = [];
+        $perItemSummaries = [];
         $totalGoldDustAwarded = 0;
 
         foreach ($slots as $slot) {
@@ -88,7 +81,7 @@ class DisenchantManyService
         $data = new Item($character, $characterInventoryCountTransformer);
 
         return $this->successResult([
-            'message' => 'Disenchanted items for: ' . number_format($totalGoldDustAwarded) . ' Gold Dust',
+            'message' => 'Disenchanted items for: '.number_format($totalGoldDustAwarded).' Gold Dust',
             'disenchanted_item' => $perItemSummaries,
             'inventory_count' => $data,
         ]);
@@ -97,8 +90,7 @@ class DisenchantManyService
     /**
      * Fetch eligible inventory slots based on filters and constraints.
      *
-     * @param Character $character
-     * @param array{ids?: array<int|string>, exclude?: array<int|string>} $params
+     * @param  array{ids?: array<int|string>, exclude?: array<int|string>}  $params
      * @return EloquentCollection<int, InventorySlot>
      */
     private function fetchEligibleSlots(Character $character, array $params): EloquentCollection
@@ -116,7 +108,6 @@ class DisenchantManyService
     /**
      * Build the base query for eligible inventory slots.
      *
-     * @param Character $character
      * @return Builder<InventorySlot>
      */
     private function baseSlotsQuery(Character $character): Builder
@@ -136,9 +127,7 @@ class DisenchantManyService
     /**
      * Apply to include/exclude item_id filters on the base query.
      *
-     * @param Builder $query
-     * @param array{ids?: array<int|string>, exclude?: array<int|string>} $params
-     * @return void
+     * @param  array{ids?: array<int|string>, exclude?: array<int|string>}  $params
      */
     private function applyIncludeExcludeFilters(Builder $query, array $params): void
     {
@@ -153,7 +142,7 @@ class DisenchantManyService
         }
 
         if (isset($params['ids'])) {
-            $includeIds =  $params['ids'];
+            $includeIds = $params['ids'];
 
             if (! empty($includeIds)) {
                 $query->whereIn('item_id', $includeIds);
@@ -163,14 +152,11 @@ class DisenchantManyService
 
     /**
      * Determine pass/fail via character roll vs. DC check.
-     *
-     * @param Skill $skill
-     * @return bool
      */
     private function rollOutcome(Skill $skill): bool
     {
         $characterRoll = $this->skillCheckService->characterRoll($skill);
-        $dcCheck       = $this->skillCheckService->getDCCheck($skill);
+        $dcCheck = $this->skillCheckService->getDCCheck($skill);
 
         if ($characterRoll >= $dcCheck) {
             return true;
@@ -181,20 +167,13 @@ class DisenchantManyService
 
     /**
      * Award and apply gold dust for a single item, mutating the running total (capped).
-     *
-     * @param bool $passed
-     * @param int &$runningGoldDustTotal
-     * @param int $maxGoldDust
-     * @param Skill $skill
-     * @param int $interestDcThreshold
-     * @return int
      */
     private function awardForItem(
         bool $passed,
-        int  &$runningGoldDustTotal,
-        int  $maxGoldDust,
+        int &$runningGoldDustTotal,
+        int $maxGoldDust,
         Skill $skill,
-        int  $interestDcThreshold
+        int $interestDcThreshold
     ): int {
         if ($runningGoldDustTotal >= $maxGoldDust) {
             return 0;
@@ -221,10 +200,6 @@ class DisenchantManyService
 
     /**
      * Cap a value at the provided maximum.
-     *
-     * @param int $value
-     * @param int $cap
-     * @return int
      */
     private function capAt(int $value, int $cap): int
     {
@@ -237,9 +212,6 @@ class DisenchantManyService
 
     /**
      * Compute base gold dust for a pass, including skill bonus.
-     *
-     * @param Skill $skill
-     * @return int
      */
     private function computeBaseGoldDust(Skill $skill): int
     {
@@ -252,9 +224,6 @@ class DisenchantManyService
     /**
      * Check if the interest roll passes (to award +5%).
      * Made protected to allow Mockery stubbing in tests.
-     *
-     * @param int $interestDcThreshold
-     * @return bool
      */
     protected function passesInterest(int $interestDcThreshold): bool
     {
@@ -270,9 +239,6 @@ class DisenchantManyService
     /**
      * Build the per-item summary array for the response.
      *
-     * @param InventorySlot $slot
-     * @param bool $passed
-     * @param int $awarded
      * @return array{name:string,status:string,gold_dust:int}
      */
     private function buildItemSummary(InventorySlot $slot, bool $passed, int $awarded): array
@@ -287,11 +253,7 @@ class DisenchantManyService
     /**
      * Persist final state and clean up processed slots.
      *
-     * @param Character $character
-     * @param array<int,int> $processedSlotIds
-     * @param int $finalGoldDustTotal
-     * @param int $maxGoldDust
-     * @return void
+     * @param  array<int,int>  $processedSlotIds
      */
     private function finalize(
         Character $character,
@@ -310,9 +272,6 @@ class DisenchantManyService
 
     /**
      * Resolve the character's Disenchanting skill; returns an empty Skill if missing.
-     *
-     * @param Character $character
-     * @return Skill
      */
     private function getDisenchantingSkill(Character $character): Skill
     {

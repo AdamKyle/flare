@@ -25,7 +25,7 @@ class UseItemServiceTest extends TestCase
 
     private ?UseItemService $useItemService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -34,7 +34,7 @@ class UseItemServiceTest extends TestCase
         $this->useItemService = resolve(UseItemService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -43,7 +43,7 @@ class UseItemServiceTest extends TestCase
         $this->useItemService = null;
     }
 
-    public function testUseItemOnCharacter()
+    public function test_use_item_on_character()
     {
         Event::fake();
         Queue::fake();
@@ -75,7 +75,7 @@ class UseItemServiceTest extends TestCase
         $this->assertNull($character->inventory->slots->where('item.type', 'alchemy')->first());
     }
 
-    public function testDoNotGoOverMaxAmount()
+    public function test_do_not_go_over_max_amount()
     {
         Event::fake();
         Queue::fake();
@@ -118,7 +118,7 @@ class UseItemServiceTest extends TestCase
         $this->assertNotNull($character->inventory->slots->where('item.type', 'alchemy')->first());
     }
 
-    public function testDoNotUseItemWhenWouldGoAboveMaxEightHours()
+    public function test_do_not_use_item_when_would_go_above_max_eight_hours()
     {
         Event::fake();
         Queue::fake();
@@ -162,7 +162,7 @@ class UseItemServiceTest extends TestCase
         $this->assertNotNull($character->inventory->slots->where('item.type', 'alchemy')->first());
     }
 
-    public function testDoNotUseItemWhenItemDoesNotStack()
+    public function test_do_not_use_item_when_item_does_not_stack()
     {
         Event::fake();
         Queue::fake();
@@ -206,7 +206,7 @@ class UseItemServiceTest extends TestCase
         $this->assertNotNull($character->inventory->slots->where('item.type', 'alchemy')->first());
     }
 
-    public function testPlayerDoesNotHaveItem()
+    public function test_player_does_not_have_item()
     {
         Event::fake();
         Queue::fake();
@@ -236,7 +236,7 @@ class UseItemServiceTest extends TestCase
         $this->assertEmpty($character->boons);
     }
 
-    public function testRemoveBoonFromCharacter()
+    public function test_remove_boon_from_character()
     {
         Queue::fake();
 
@@ -263,7 +263,7 @@ class UseItemServiceTest extends TestCase
         $this->assertNull($character->inventory->slots->where('item.type', 'alchemy')->first());
     }
 
-    public function testUpdateCharacterBasedOnItemUsed()
+    public function test_update_character_based_on_item_used()
     {
         Queue::fake();
         Event::fake();
@@ -291,7 +291,7 @@ class UseItemServiceTest extends TestCase
         Event::assertDispatched(CharacterBoonsUpdateBroadcastEvent::class);
     }
 
-    public function testUpdateCharacterBasedOnItemUsedWhenItemDoesNotAffectSkills()
+    public function test_update_character_based_on_item_used_when_item_does_not_affect_skills()
     {
         Queue::fake();
         Event::fake();
@@ -318,7 +318,7 @@ class UseItemServiceTest extends TestCase
         Event::assertDispatched(CharacterBoonsUpdateBroadcastEvent::class);
     }
 
-    public function testCharacterBoonsStackWhenTheSameItemIsFoundAndUsed()
+    public function test_character_boons_stack_when_the_same_item_is_found_and_used()
     {
         Queue::fake();
         Event::fake();
@@ -351,7 +351,7 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals(60, $character->boons->first()->last_for_minutes);
     }
 
-    public function testDoNotGoAboveTheMaxTime()
+    public function test_do_not_go_above_the_max_time()
     {
         Queue::fake();
         Event::fake();
@@ -393,7 +393,7 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals(480, $boons[0]->last_for_minutes);
     }
 
-    public function testDoNotGoAboveTheMaxAmount()
+    public function test_do_not_go_above_the_max_amount()
     {
         Queue::fake();
         Event::fake();
@@ -435,7 +435,7 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals(10, $boons[0]->last_for_minutes);
     }
 
-    public function testTakesExistingBoonsIntoConsideration()
+    public function test_takes_existing_boons_into_consideration()
     {
         Queue::fake();
         Event::fake();
@@ -489,7 +489,7 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals(2, $character->inventory->slots->where('item.type', 'alchemy')->count());
     }
 
-    public function testCannotAssignBoonsWhenYouAreMax()
+    public function test_cannot_assign_boons_when_you_are_max()
     {
         Queue::fake();
         Event::fake();
@@ -537,7 +537,7 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals(10, $character->boons->sum('amount_used'));
     }
 
-    public function testCannotApplyBoonsThatDoNotExist()
+    public function test_cannot_apply_boons_that_do_not_exist()
     {
         Queue::fake();
         Event::fake();
@@ -557,7 +557,7 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals(0, $character->boons->sum('amount_used'));
     }
 
-    public function testCanApplyMultipleStacks()
+    public function test_can_apply_multiple_stacks()
     {
         Queue::fake();
         Event::fake();

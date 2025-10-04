@@ -24,21 +24,21 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
 
     private ?FactionLoyaltyBountyHandler $factionLoyaltyBountyHandler;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->factionLoyaltyBountyHandler = resolve(FactionLoyaltyBountyHandler::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->factionLoyaltyBountyHandler = null;
     }
 
-    public function testDoesNotHandleBountyWhenAutomationIsRunning()
+    public function test_does_not_handle_bounty_when_automation_is_running()
     {
 
         $monster = $this->createMonster();
@@ -57,7 +57,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         Event::assertNotDispatched(UpdateTopBarEvent::class);
     }
 
-    public function testDoesNotHandleBountyWhenCharacterIsNotPledgedToAFaction()
+    public function test_does_not_handle_bounty_when_character_is_not_pledged_to_a_faction()
     {
         $monster = $this->createMonster();
 
@@ -80,7 +80,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         Event::assertNotDispatched(UpdateTopBarEvent::class);
     }
 
-    public function testDoesNotHandleBountyWhenCharacterIsNotHelpingAnNpc()
+    public function test_does_not_handle_bounty_when_character_is_not_helping_an_npc()
     {
         $monster = $this->createMonster();
 
@@ -115,7 +115,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         Event::assertNotDispatched(UpdateTopBarEvent::class);
     }
 
-    public function testDoesNotUpdateLoyaltyTasksWhenNoBountyTaskFound()
+    public function test_does_not_update_loyalty_tasks_when_no_bounty_task_found()
     {
         $monster = $this->createMonster();
 
@@ -156,7 +156,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         Event::assertNotDispatched(UpdateTopBarEvent::class);
     }
 
-    public function testDoesNotUpdateLoyaltyTasksWhenPlayerIsNotOnTheSameMap()
+    public function test_does_not_update_loyalty_tasks_when_player_is_not_on_the_same_map()
     {
         $monster = $this->createMonster();
 
@@ -203,7 +203,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         Event::assertNotDispatched(UpdateTopBarEvent::class);
     }
 
-    public function testDoesNotHandleBountyWhenMonsterIsNotApartOfTheBountyList()
+    public function test_does_not_handle_bounty_when_monster_is_not_apart_of_the_bounty_list()
     {
         $monster = $this->createMonster();
 
@@ -252,7 +252,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $this->assertEquals(0, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->factionLoyaltyNpcTasks->fame_tasks[0]['current_amount']);
     }
 
-    public function testUpdatesTheCurrentAmountOnABountyButDoesNotLevelUpTheFame()
+    public function test_updates_the_current_amount_on_a_bounty_but_does_not_level_up_the_fame()
     {
         $monster = $this->createMonster();
 
@@ -306,7 +306,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         );
     }
 
-    public function testUpdatesTheCurrentAmountOnABountyButDoesNotLevelUpTheFameDuringTheWeeklyEvent()
+    public function test_updates_the_current_amount_on_a_bounty_but_does_not_level_up_the_fame_during_the_weekly_event()
     {
         $monster = $this->createMonster();
 
@@ -364,7 +364,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         );
     }
 
-    public function testLevelUpFame()
+    public function test_level_up_fame()
     {
         $monster = $this->createMonster();
 
@@ -454,7 +454,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $this->assertEquals(100, $character->shards);
     }
 
-    public function testLevelUpFameDuringTheWeeklyEvent()
+    public function test_level_up_fame_during_the_weekly_event()
     {
         $monster = $this->createMonster();
 
@@ -548,7 +548,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $this->assertEquals(100, $character->shards);
     }
 
-    public function testDoNotGiveMoreCurrenciesThenMaxAllowed()
+    public function test_do_not_give_more_currencies_then_max_allowed()
     {
         $monster = $this->createMonster();
 
@@ -640,7 +640,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
     }
 
-    public function testDoNotAssignTasksForMaxLevelFame()
+    public function test_do_not_assign_tasks_for_max_level_fame()
     {
         $monster = $this->createMonster();
 
@@ -725,7 +725,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $this->assertCount(0, $character->factionLoyalties()->first()->factionLoyaltyNpcs->first()->factionLoyaltyNpcTasks->fame_tasks);
     }
 
-    public function testCannotLevelFameAnyMore()
+    public function test_cannot_level_fame_any_more()
     {
         $monster = $this->createMonster();
 

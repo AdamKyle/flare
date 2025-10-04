@@ -2,13 +2,13 @@
 
 namespace Tests\Unit\Game\GuideQuests\Services;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Item;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Events\Values\EventType;
 use App\Game\GuideQuests\Services\GuideQuestService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateEvent;
@@ -18,7 +18,7 @@ use Tests\Traits\CreateMonster;
 
 class GuideQuestServiceTest extends TestCase
 {
-    use CreateGuideQuest, CreateItem, CreateMonster, CreateEvent, RefreshDatabase;
+    use CreateEvent, CreateGuideQuest, CreateItem, CreateMonster, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -26,7 +26,7 @@ class GuideQuestServiceTest extends TestCase
 
     private ?Item $item;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -37,7 +37,7 @@ class GuideQuestServiceTest extends TestCase
         $this->item = $this->createItem(['type' => 'quest']);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -46,7 +46,7 @@ class GuideQuestServiceTest extends TestCase
         $this->guideQuestService = null;
     }
 
-    public function testHasNoGuideQues()
+    public function test_has_no_guide_ques()
     {
         $character = $this->character->updateUser(['guide_enabled' => true])
             ->getCharacter();
@@ -58,7 +58,7 @@ class GuideQuestServiceTest extends TestCase
         $this->assertEmpty($questDetails['can_hand_in']);
     }
 
-    public function testHasQuestForWinterEventWithUnlocksAtLevel()
+    public function test_has_quest_for_winter_event_with_unlocks_at_level()
     {
         $this->createGuideQuest([
             'required_quest_item_id' => $this->item->id,
@@ -67,7 +67,7 @@ class GuideQuestServiceTest extends TestCase
         ]);
 
         $this->createEvent([
-            'type' => EventType::WINTER_EVENT
+            'type' => EventType::WINTER_EVENT,
         ]);
 
         $character = $this->character->updateUser(['guide_enabled' => true])
@@ -82,8 +82,7 @@ class GuideQuestServiceTest extends TestCase
         $this->assertCount(1, $questDetails['quests']);
     }
 
-
-    public function testHasQuestForWinterEventWithoutUnlocksAtLevel()
+    public function test_has_quest_for_winter_event_without_unlocks_at_level()
     {
         $this->createGuideQuest([
             'required_quest_item_id' => $this->item->id,
@@ -91,7 +90,7 @@ class GuideQuestServiceTest extends TestCase
         ]);
 
         $this->createEvent([
-            'type' => EventType::WINTER_EVENT
+            'type' => EventType::WINTER_EVENT,
         ]);
 
         $character = $this->character->updateUser(['guide_enabled' => true])
@@ -106,7 +105,7 @@ class GuideQuestServiceTest extends TestCase
         $this->assertCount(1, $questDetails['quests']);
     }
 
-    public function testHasQuestForDelusionalMemoriesEventWithUnlocksAtLevel()
+    public function test_has_quest_for_delusional_memories_event_with_unlocks_at_level()
     {
         $this->createGuideQuest([
             'required_quest_item_id' => $this->item->id,
@@ -115,7 +114,7 @@ class GuideQuestServiceTest extends TestCase
         ]);
 
         $this->createEvent([
-            'type' => EventType::DELUSIONAL_MEMORIES_EVENT
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
         ]);
 
         $character = $this->character->updateUser(['guide_enabled' => true])
@@ -130,7 +129,7 @@ class GuideQuestServiceTest extends TestCase
         $this->assertCount(1, $questDetails['quests']);
     }
 
-    public function testHasQuestForDelusionalMemoriesEventWitouthUnlocksAtLevel()
+    public function test_has_quest_for_delusional_memories_event_witouth_unlocks_at_level()
     {
         $this->createGuideQuest([
             'required_quest_item_id' => $this->item->id,
@@ -138,7 +137,7 @@ class GuideQuestServiceTest extends TestCase
         ]);
 
         $this->createEvent([
-            'type' => EventType::DELUSIONAL_MEMORIES_EVENT
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
         ]);
 
         $character = $this->character->updateUser(['guide_enabled' => true])
@@ -153,7 +152,7 @@ class GuideQuestServiceTest extends TestCase
         $this->assertCount(1, $questDetails['quests']);
     }
 
-    public function testHasQuestThatUnlocksAtSpecificLevel()
+    public function test_has_quest_that_unlocks_at_specific_level()
     {
         $this->createGuideQuest([
             'required_quest_item_id' => $this->item->id,
@@ -172,7 +171,7 @@ class GuideQuestServiceTest extends TestCase
         $this->assertCount(1, $questDetails['quests']);
     }
 
-    public function testCharacterCannotHandInGuideQuest()
+    public function test_character_cannot_hand_in_guide_quest()
     {
 
         $quest = $this->createGuideQuest([
@@ -187,7 +186,7 @@ class GuideQuestServiceTest extends TestCase
         $this->assertFalse($handedIn);
     }
 
-    public function testCharacterHasARequirementFromTheGuideQuest()
+    public function test_character_has_a_requirement_from_the_guide_quest()
     {
         $this->createGuideQuest([
             'required_quest_item_id' => $this->item->id,
@@ -203,7 +202,7 @@ class GuideQuestServiceTest extends TestCase
         $this->assertNotEmpty($questDetails['completed_requirements']);
     }
 
-    public function testHandInGuideQuestAndAlreadyHaveOneOfTheRequirements()
+    public function test_hand_in_guide_quest_and_already_have_one_of_the_requirements()
     {
 
         $guideQuestToHandIn = $this->createGuideQuest([
@@ -228,7 +227,7 @@ class GuideQuestServiceTest extends TestCase
         }
     }
 
-    public function testHandInGuideQuestAndGetsNextChildQuest()
+    public function test_hand_in_guide_quest_and_gets_next_child_quest()
     {
 
         $guideQuestToHandIn = $this->createGuideQuest([
@@ -254,7 +253,7 @@ class GuideQuestServiceTest extends TestCase
         $this->assertCount(1, $questDetails['quests']);
     }
 
-    public function testHandInUnlockAtLevelGuideQuestAndGetsRegularGuideQuest()
+    public function test_hand_in_unlock_at_level_guide_quest_and_gets_regular_guide_quest()
     {
 
         $guideQuestToHandIn = $this->createGuideQuest([
@@ -283,7 +282,7 @@ class GuideQuestServiceTest extends TestCase
         $this->assertCount(1, $questDetails['quests']);
     }
 
-    public function testCharacterCanHandInWithMaxedCurrencies()
+    public function test_character_can_hand_in_with_maxed_currencies()
     {
 
         $quest = $this->createGuideQuest([
@@ -321,11 +320,11 @@ class GuideQuestServiceTest extends TestCase
         $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
     }
 
-    public function testCharacterIsNotRewardedWithXPWhenGuidequestProvidesNone()
+    public function test_character_is_not_rewarded_with_xp_when_guidequest_provides_none()
     {
         $quest = $this->createGuideQuest([
             'required_quest_item_id' => $this->item->id,
-            'xp_reward' => 0
+            'xp_reward' => 0,
         ]);
 
         $character = $this->character->updateUser(['guide_enabled' => true])
@@ -334,7 +333,7 @@ class GuideQuestServiceTest extends TestCase
             ->getCharacter();
 
         $character->update([
-            'xp' => 10
+            'xp' => 10,
         ]);
 
         $character = $character->refresh();
@@ -354,7 +353,7 @@ class GuideQuestServiceTest extends TestCase
         $this->assertEquals(10, $character->xp);
     }
 
-    public function testDoNotHandInAQuestThatWasAlreadyCompleted()
+    public function test_do_not_hand_in_a_quest_that_was_already_completed()
     {
         $quest = $this->createGuideQuest([
             'required_quest_item_id' => $this->item->id,
@@ -386,7 +385,7 @@ class GuideQuestServiceTest extends TestCase
         $this->assertFalse($canHandIn);
     }
 
-    public function testCannotHandInWhenAutomationIsRunning()
+    public function test_cannot_hand_in_when_automation_is_running()
     {
         $quest = $this->createGuideQuest([
             'required_quest_item_id' => $this->item->id,

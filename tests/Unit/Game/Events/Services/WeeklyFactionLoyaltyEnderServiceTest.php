@@ -16,11 +16,11 @@ use Tests\Traits\CreateScheduledEvent;
 
 class WeeklyFactionLoyaltyEnderServiceTest extends TestCase
 {
-    use RefreshDatabase, CreateEvent, CreateScheduledEvent, CreateAnnouncement;
+    use CreateAnnouncement, CreateEvent, CreateScheduledEvent, RefreshDatabase;
 
     private ?WeeklyFactionLoyaltyEnderService $service = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -31,21 +31,21 @@ class WeeklyFactionLoyaltyEnderServiceTest extends TestCase
         $this->service = $this->app->make(WeeklyFactionLoyaltyEnderService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->service = null;
 
         parent::tearDown();
     }
 
-    public function testSupportsReturnsTrueOnlyForWeeklyFactionLoyalty(): void
+    public function test_supports_returns_true_only_for_weekly_faction_loyalty(): void
     {
         $this->assertTrue($this->service->supports(new EventType(EventType::WEEKLY_FACTION_LOYALTY_EVENT)));
         $this->assertFalse($this->service->supports(new EventType(EventType::WEEKLY_CELESTIALS)));
         $this->assertFalse($this->service->supports(new EventType(EventType::WEEKLY_CURRENCY_DROPS)));
     }
 
-    public function testEndAnnouncesCleansAnnouncementsAndDeletesActiveEvent(): void
+    public function test_end_announces_cleans_announcements_and_deletes_active_event(): void
     {
         $activeEvent = $this->createEvent([
             'type' => EventType::WEEKLY_FACTION_LOYALTY_EVENT,

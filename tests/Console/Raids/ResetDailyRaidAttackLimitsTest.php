@@ -21,7 +21,7 @@ class ResetDailyRaidAttackLimitsTest extends TestCase
 {
     use CreateEvent, CreateItem, CreateItem, CreateItemAffix, CreateLocation, CreateMonster, CreateRaid, RefreshDatabase;
 
-    public function testResetRaidFight()
+    public function test_reset_raid_fight()
     {
         Event::fake();
 
@@ -60,7 +60,7 @@ class ResetDailyRaidAttackLimitsTest extends TestCase
         Event::assertDispatched(GlobalMessageEvent::class);
     }
 
-    public function testDoNotResetRaidFightWhenNoEvent()
+    public function test_do_not_reset_raid_fight_when_no_event()
     {
         Event::fake();
 
@@ -69,7 +69,7 @@ class ResetDailyRaidAttackLimitsTest extends TestCase
         Event::assertNotDispatched(GlobalMessageEvent::class);
     }
 
-    public function testDoNotresetRaidFightWhenRaidBossIsDead()
+    public function test_do_notreset_raid_fight_when_raid_boss_is_dead()
     {
         Event::fake();
 

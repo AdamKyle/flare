@@ -2,7 +2,8 @@
 
 namespace App\Flare\View\Livewire\Admin\Locations\Values;
 
-enum LocationTableSelectOptions: string {
+enum LocationTableSelectOptions: string
+{
     case PLEASE_SELECT = '';
     case INCREASES_ENEMY_STRENGTH = 'increase-enemy-strength';
     case REGULAR_LOCATIONS = 'regular-locations';

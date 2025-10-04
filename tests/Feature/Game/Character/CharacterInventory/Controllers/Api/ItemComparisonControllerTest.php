@@ -14,21 +14,21 @@ class ItemComparisonControllerTest extends TestCase
 
     private ?CharacterFactory $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testGetErrorForTryingToCompareItemYouDoNotHave()
+    public function test_get_error_for_trying_to_compare_item_you_do_not_have()
     {
         $character = $this->character->getCharacter();
 
@@ -43,7 +43,7 @@ class ItemComparisonControllerTest extends TestCase
         $this->assertEquals('Item not found in your inventory.', $jsonData['message']);
     }
 
-    public function testGetComparisonForSpellDamageForSetEquippedItem()
+    public function test_get_comparison_for_spell_damage_for_set_equipped_item()
     {
         $spellForEquipment = $this->createItem([
             'type' => 'spell-damage',
@@ -76,7 +76,7 @@ class ItemComparisonControllerTest extends TestCase
         $this->assertNotEmpty($jsonData['details']);
     }
 
-    public function testFailToCompareItemFromChatWhenEquipped()
+    public function test_fail_to_compare_item_from_chat_when_equipped()
     {
         $spellForEquipment = $this->createItem([
             'type' => 'spell-damage',
@@ -108,7 +108,7 @@ class ItemComparisonControllerTest extends TestCase
         $this->assertEquals('Item is no longer in your inventory.', $jsonData['message']);
     }
 
-    public function testFailToCompareItemFromChatWhenDoesNotExist()
+    public function test_fail_to_compare_item_from_chat_when_does_not_exist()
     {
         $spellForEquipment = $this->createItem([
             'type' => 'spell-damage',
@@ -140,7 +140,7 @@ class ItemComparisonControllerTest extends TestCase
         $this->assertEquals('Item does not exist  ...', $jsonData['message']);
     }
 
-    public function testGetChatComparisonDataForItemInInventory()
+    public function test_get_chat_comparison_data_for_item_in_inventory()
     {
         $spellForEquipment = $this->createItem([
             'type' => 'spell-damage',
@@ -172,7 +172,7 @@ class ItemComparisonControllerTest extends TestCase
         $this->assertNotEmpty($jsonData['comparison_data']['details']);
     }
 
-    public function testCompareTwoGems()
+    public function test_compare_two_gems()
     {
         $gemInInventory = $this->createGem(['primary_atonement_amount' => 0.4]);
         $gemInInventoryToCompare = $this->createGem(['primary_atonement_amount' => 0.5]);

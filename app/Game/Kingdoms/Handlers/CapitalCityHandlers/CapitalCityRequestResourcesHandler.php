@@ -17,17 +17,8 @@ use Illuminate\Support\Facades\Log;
 
 class CapitalCityRequestResourcesHandler
 {
-
-    /**
-     * @var array $messages
-     */
     private array $messages = [];
 
-    /**
-     * @param ResourceTransferService $resourceTransferService
-     * @param KingdomMovementTimeCalculationService $kingdomMovementTimeCalculationService
-     * @param CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler
-     */
     public function __construct(
         private readonly ResourceTransferService $resourceTransferService,
         private readonly KingdomMovementTimeCalculationService $kingdomMovementTimeCalculationService,
@@ -36,17 +27,9 @@ class CapitalCityRequestResourcesHandler
 
     /**
      * Handle the request for the resources.
-     *
-     * @param CapitalCityUnitQueue|CapitalCityBuildingQueue $queue
-     * @param Character $character
-     * @param array $summedMissingCosts
-     * @param array $requestData
-     * @param Kingdom $kingdom
-     * @param string $type
-     * @return void
      */
     public function handleResourceRequests(
-        CapitalCityUnitQueue | CapitalCityBuildingQueue $queue,
+        CapitalCityUnitQueue|CapitalCityBuildingQueue $queue,
         Character $character,
         array $summedMissingCosts,
         array $requestData,
@@ -72,42 +55,42 @@ class CapitalCityRequestResourcesHandler
             return;
         }
 
-        if (!$this->resourceTransferService->bothKingdomsHaveAMarketPlace($kingdom, $kingdomWhoCanAfford)) {
+        if (! $this->resourceTransferService->bothKingdomsHaveAMarketPlace($kingdom, $kingdomWhoCanAfford)) {
             $requestData = $this->markRequestsAsRejected($requestData);
-            $this->messages[] = 'Resource Request Rejected: Your kingdoms: ' . $kingdom->name . ' and ' . $kingdomWhoCanAfford->name . ' both must have a Market Place at level 5 or higher.';
+            $this->messages[] = 'Resource Request Rejected: Your kingdoms: '.$kingdom->name.' and '.$kingdomWhoCanAfford->name.' both must have a Market Place at level 5 or higher.';
 
             $queue = $this->updateQueueData($queue, $requestData, CapitalCityQueueStatus::REJECTED);
 
             $this->logAndTriggerEvents($queue);
 
-            Log::channel('capital_city_building_upgrades')->info('Requests were rejected because: Resource Request Rejected: Your kingdoms: ' . $kingdom->name . ' and ' . $kingdomWhoCanAfford->name . ' both must have a Market Place at level 5 or higher.');
+            Log::channel('capital_city_building_upgrades')->info('Requests were rejected because: Resource Request Rejected: Your kingdoms: '.$kingdom->name.' and '.$kingdomWhoCanAfford->name.' both must have a Market Place at level 5 or higher.');
 
             return;
         }
 
-        if (!$this->resourceTransferService->canAffordPopulationCost($kingdomWhoCanAfford)) {
+        if (! $this->resourceTransferService->canAffordPopulationCost($kingdomWhoCanAfford)) {
             $requestData = $this->markRequestsAsRejected($requestData);
-            $this->messages[] = 'Resource Request Rejected: When asking ' . $kingdomWhoCanAfford->name . ' For the resources to fulfill each request, the kingdom told us they do not have the population (need 50) to send a caravan of resources.';
+            $this->messages[] = 'Resource Request Rejected: When asking '.$kingdomWhoCanAfford->name.' For the resources to fulfill each request, the kingdom told us they do not have the population (need 50) to send a caravan of resources.';
 
             $queue = $this->updateQueueData($queue, $requestData, CapitalCityQueueStatus::REJECTED);
 
             $this->logAndTriggerEvents($queue);
 
-            Log::channel('capital_city_building_upgrades')->info('Requests were rejected because: Resource Request Rejected: Resource Request Rejected: When asking ' . $kingdomWhoCanAfford->name . ' For the resources to fulfill each request, the kingdom told us they do not have the population (need 50) to send a caravan of resources.');
+            Log::channel('capital_city_building_upgrades')->info('Requests were rejected because: Resource Request Rejected: Resource Request Rejected: When asking '.$kingdomWhoCanAfford->name.' For the resources to fulfill each request, the kingdom told us they do not have the population (need 50) to send a caravan of resources.');
 
             return;
         }
 
-        if (!$this->resourceTransferService->hasRequiredSpearmen($kingdomWhoCanAfford)) {
+        if (! $this->resourceTransferService->hasRequiredSpearmen($kingdomWhoCanAfford)) {
             $requestData = $this->markRequestsAsRejected($requestData);
 
-            $this->messages[] = 'Resource Request Rejected: When asking ' . $kingdomWhoCanAfford->name . ' For the resources to fulfill each request, the kingdom told us they do not have enough spearmen (need 75) to go with the caravan and guard them.';
+            $this->messages[] = 'Resource Request Rejected: When asking '.$kingdomWhoCanAfford->name.' For the resources to fulfill each request, the kingdom told us they do not have enough spearmen (need 75) to go with the caravan and guard them.';
 
             $queue = $this->updateQueueData($queue, $requestData, CapitalCityQueueStatus::REJECTED);
 
             $this->logAndTriggerEvents($queue);
 
-            Log::channel('capital_city_building_upgrades')->info('Requests were rejected because: Resource Request Rejected: When asking ' . $kingdomWhoCanAfford->name . ' For the resources to fulfill each request, the kingdom told us they do not have enough spearmen (need 75) to go with the caravan and guard them.');
+            Log::channel('capital_city_building_upgrades')->info('Requests were rejected because: Resource Request Rejected: When asking '.$kingdomWhoCanAfford->name.' For the resources to fulfill each request, the kingdom told us they do not have enough spearmen (need 75) to go with the caravan and guard them.');
 
             return;
         }
@@ -127,12 +110,12 @@ class CapitalCityRequestResourcesHandler
         $this->logAndTriggerEvents($queue);
     }
 
-    private function updateQueueData(CapitalCityBuildingQueue | CapitalCityUnitQueue $queue, array $requestData, string $type): CapitalCityBuildingQueue | CapitalCityUnitQueue
+    private function updateQueueData(CapitalCityBuildingQueue|CapitalCityUnitQueue $queue, array $requestData, string $type): CapitalCityBuildingQueue|CapitalCityUnitQueue
     {
 
         $requestData = collect($requestData)
             ->map(function ($item) use ($type) {
-                if (!in_array($item['secondary_status'], [CapitalCityQueueStatus::REJECTED, CapitalCityQueueStatus::CANCELLED])) {
+                if (! in_array($item['secondary_status'], [CapitalCityQueueStatus::REJECTED, CapitalCityQueueStatus::CANCELLED])) {
                     return array_merge($item, ['secondary_status' => $type]);
                 }
 
@@ -151,15 +134,10 @@ class CapitalCityRequestResourcesHandler
     /**
      * Create and send off the resource request.
      *
-     * @param CapitalCityUnitQueue|CapitalCityBuildingQueue $queue
-     * @param Kingdom $requestingKingdom
-     * @param Kingdom $requestingFromKingdom
-     * @param array $missingResources
-     * @param string $type
      * @return void
      */
     private function createResourceRequest(
-        CapitalCityUnitQueue | CapitalCityBuildingQueue $queue,
+        CapitalCityUnitQueue|CapitalCityBuildingQueue $queue,
         Kingdom $requestingKingdom,
         Kingdom $requestingFromKingdom,
         array $missingResources,
@@ -197,18 +175,13 @@ class CapitalCityRequestResourcesHandler
 
     /**
      * Find the first kingdom who can afford the costs.
-     *
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @param array $missingCosts
-     * @return Kingdom|null
      */
     private function getKingdomWhoCanAffordCosts(Character $character, Kingdom $kingdom, array $missingCosts): ?Kingdom
     {
         return $character->kingdoms()->where('id', '!=', $kingdom->id)->where(function ($q) use ($missingCosts) {
             foreach ($missingCosts as $resource => $amount) {
                 if ($resource !== 'population') {
-                    $q->where('current_' . $resource, '>=', $amount);
+                    $q->where('current_'.$resource, '>=', $amount);
                 }
             }
         })->where('game_map_id', $kingdom->game_map_id)->first();
@@ -216,22 +189,15 @@ class CapitalCityRequestResourcesHandler
 
     /**
      * Mark all requests as rejected where secondary status is REQUESTING.
-     *
-     * @param array $requestData
-     * @return array
      */
     private function markRequestsAsRejected(array $requestData): array
     {
         return collect($requestData)
-            ->map(fn($item) => array_merge($item, ['secondary_status' => CapitalCityQueueStatus::REJECTED]))
+            ->map(fn ($item) => array_merge($item, ['secondary_status' => CapitalCityQueueStatus::REJECTED]))
             ->toArray();
     }
 
-    /**
-     * @param CapitalCityUnitQueue|CapitalCityBuildingQueue $queue
-     * @return void
-     */
-    private function logAndTriggerEvents(CapitalCityUnitQueue | CapitalCityBuildingQueue $queue): void
+    private function logAndTriggerEvents(CapitalCityUnitQueue|CapitalCityBuildingQueue $queue): void
     {
 
         if ($queue instanceof CapitalCityUnitQueue) {

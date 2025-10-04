@@ -13,24 +13,24 @@ use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Survey\Events\ShowSurvey;
 use App\Game\Survey\Validator\SurveyValidator;
 
-class SurveyService {
-
+class SurveyService
+{
     use ResponseBuilder;
 
-    public function __construct(private readonly SurveyValidator $surveyValidator, private readonly RandomAffixGenerator $randomAffixGenerator) {
-    }
+    public function __construct(private readonly SurveyValidator $surveyValidator, private readonly RandomAffixGenerator $randomAffixGenerator) {}
 
-    public function saveSurvey(Character $character, Survey $survey, array $params): array {
+    public function saveSurvey(Character $character, Survey $survey, array $params): array
+    {
 
         $isValid = $this->surveyValidator->setSurveySections($survey)->validate($params);
 
-        if (!$isValid) {
+        if (! $isValid) {
             return $this->errorResult('All fields, except editor fields, must be filled in. Please review your survey.');
         }
 
         SubmittedSurvey::create([
-            'character_id'    => $character->id,
-            'survey_id'       => $survey->id,
+            'character_id' => $character->id,
+            'survey_id' => $survey->id,
             'survey_response' => $params,
         ]);
 
@@ -49,7 +49,7 @@ class SurveyService {
         return $this->successResult([
             'message' => 'Survey submitted. Thank you and enjoy your new mythical item! You can find it in your character inventory.
             Click character sheet and either select inventory management for mobile or see inventory bottom right. This item has been
-            rewarded regardless of your current inventory amount.'
+            rewarded regardless of your current inventory amount.',
         ]);
     }
 
@@ -71,7 +71,7 @@ class SurveyService {
         $newItem->update([
             'item_prefix_id' => $randomAffixGenerator->generateAffix('prefix')->id,
             'item_suffix_id' => $randomAffixGenerator->generateAffix('suffix')->id,
-            'is_mythic'      => true,
+            'is_mythic' => true,
         ]);
 
         $slot = $character->inventory->slots()->create([

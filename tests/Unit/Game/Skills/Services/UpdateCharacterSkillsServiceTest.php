@@ -22,7 +22,7 @@ class UpdateCharacterSkillsServiceTest extends TestCase
 
     private ?GameSkill $skill;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -39,7 +39,7 @@ class UpdateCharacterSkillsServiceTest extends TestCase
         $this->updateCharacterSkills = resolve(UpdateCharacterSkillsService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -48,7 +48,7 @@ class UpdateCharacterSkillsServiceTest extends TestCase
         $this->updateCharacterSkills = null;
     }
 
-    public function testUpdateCharacterTrainingSkills()
+    public function test_update_character_training_skills()
     {
         Event::fake();
 
@@ -59,7 +59,7 @@ class UpdateCharacterSkillsServiceTest extends TestCase
         Event::assertDispatched(UpdateCharacterSkills::class);
     }
 
-    public function testUpdateCharactercraftingSkills()
+    public function test_update_charactercrafting_skills()
     {
         Event::fake();
 

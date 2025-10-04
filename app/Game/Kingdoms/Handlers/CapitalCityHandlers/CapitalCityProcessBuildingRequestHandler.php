@@ -16,21 +16,10 @@ use Illuminate\Support\Facades\Log;
 
 class CapitalCityProcessBuildingRequestHandler
 {
-
     use CanAffordPopulationCost;
 
-    /**
-     * @var array $messages
-     */
     private array $messages = [];
 
-    /**
-     * @param CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler
-     * @param DistanceCalculation $distanceCalculation
-     * @param CapitalCityRequestResourcesHandler $capitalCityRequestResourcesHandler
-     * @param CapitalCityBuildingRequestHandler $capitalCityBuildingRequestHandler
-     * @param KingdomBuildingResourceValidation $kingdomBuildingResourceValidation
-     */
     public function __construct(
         private readonly CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler,
         private readonly DistanceCalculation $distanceCalculation,
@@ -41,10 +30,6 @@ class CapitalCityProcessBuildingRequestHandler
 
     /**
      * Handle the building requests.
-     *
-     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
-     * @param bool $shouldFailForMissingCosts
-     * @return void
      */
     public function handleBuildingRequests(CapitalCityBuildingQueue $capitalCityBuildingQueue, bool $shouldFailForMissingCosts = false): void
     {
@@ -60,30 +45,30 @@ class CapitalCityProcessBuildingRequestHandler
             '$requestData' => $requestData,
             '$kingdom' => $kingdom->id,
             '$character' => $character->id,
-            '$summedMissingCosts' => $summedMissingCosts
+            '$summedMissingCosts' => $summedMissingCosts,
         ]);
 
-        if (!empty($summedMissingCosts) && $shouldFailForMissingCosts) {
+        if (! empty($summedMissingCosts) && $shouldFailForMissingCosts) {
             $requestData = collect($requestData)
-                ->map(fn($item) => array_merge($item, ['secondary_status' => CapitalCityQueueStatus::REJECTED]))
+                ->map(fn ($item) => array_merge($item, ['secondary_status' => CapitalCityQueueStatus::REJECTED]))
                 ->toArray();
-
 
             $capitalCityBuildingQueue->update([
                 'building_request_data' => $requestData,
                 'messages' => array_merge($capitalCityBuildingQueue->messages, [
-                    'Buildings were rejected because even after requesting resources, you still do not have enough resources for one or more buildings so the entire request was canceled out of frustration.'
-                ])
+                    'Buildings were rejected because even after requesting resources, you still do not have enough resources for one or more buildings so the entire request was canceled out of frustration.',
+                ]),
             ]);
 
             $capitalCityBuildingQueue = $capitalCityBuildingQueue->refresh();
 
             $this->capitalCityKingdomLogHandler->possiblyCreateLogForBuildingQueue($capitalCityBuildingQueue);
             Log::channel('capital_city_building_upgrades')->info('All buildings were rejected because: Buildings were rejected because even after requesting resources, you still do not have enough resources for one or more buildings so the entire request was canceled out of frustration.');
+
             return;
         }
 
-        if (!empty($summedMissingCosts)) {
+        if (! empty($summedMissingCosts)) {
             Log::channel('capital_city_building_upgrades')->info('Summed missing costs were not empty.');
             $this->handleResourceRequests($capitalCityBuildingQueue, $character, $summedMissingCosts, $requestData, $kingdom);
         } else {
@@ -94,10 +79,6 @@ class CapitalCityProcessBuildingRequestHandler
 
     /**
      * Process each building request.
-     *
-     * @param Kingdom $kingdom
-     * @param array $requestData
-     * @return array
      */
     private function processBuildingRequests(
         Kingdom $kingdom,
@@ -125,11 +106,6 @@ class CapitalCityProcessBuildingRequestHandler
 
     /**
      * Process potential resource requests for building upgrades.
-     *
-     * @param Kingdom $kingdom
-     * @param KingdomBuilding $building
-     * @param array $buildingUpgradeRequest
-     * @return array
      */
     private function processPotentialResourceRequests(
         Kingdom $kingdom,
@@ -142,21 +118,23 @@ class CapitalCityProcessBuildingRequestHandler
 
             if (empty($missingResources)) {
                 $buildingUpgradeRequest['secondary_status'] = CapitalCityQueueStatus::BUILDING;
+
                 return $buildingUpgradeRequest;
             }
 
-            $canAffordPopulation = !isset($missingResources['population']) || $missingResources['population'] === 0;
+            $canAffordPopulation = ! isset($missingResources['population']) || $missingResources['population'] === 0;
 
             if (isset($missingResources['population'])) {
                 $canAffordPopulation = $this->canAffordPopulationCost($kingdom, $missingResources['population']);
             }
 
-            if (!$canAffordPopulation) {
-                $this->messages[] = $building->name . ' has been rejected for reason of: Cannot afford to use: ' .
-                    $kingdom->name . '\'s treasury to purchase an extra: ' .
-                    $missingResources['population'] . ' population.';
+            if (! $canAffordPopulation) {
+                $this->messages[] = $building->name.' has been rejected for reason of: Cannot afford to use: '.
+                    $kingdom->name.'\'s treasury to purchase an extra: '.
+                    $missingResources['population'].' population.';
 
                 $buildingUpgradeRequest['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
                 return $buildingUpgradeRequest;
             }
 
@@ -178,27 +156,17 @@ class CapitalCityProcessBuildingRequestHandler
 
     /**
      * Calculate the total missing costs.
-     *
-     * @param array $requestData
-     * @return array
      */
     private function calculateSummedMissingCosts(array $requestData): array
     {
         return collect($requestData)
-            ->map(fn($costs) => collect($costs['missing_costs'])->except('population'))
-            ->reduce(fn($carry, $costs) => $carry->merge($costs)->map(fn($value, $key) => $carry->get($key, 0) + $value), collect())
+            ->map(fn ($costs) => collect($costs['missing_costs'])->except('population'))
+            ->reduce(fn ($carry, $costs) => $carry->merge($costs)->map(fn ($value, $key) => $carry->get($key, 0) + $value), collect())
             ->toArray();
     }
 
     /**
      * Handle resource requests if needed.processPotentialResourceRequests
-     *
-     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
-     * @param Character $character
-     * @param array $summedMissingCosts
-     * @param array $requestData
-     * @param Kingdom $kingdom
-     * @return void
      */
     private function handleResourceRequests(
         CapitalCityBuildingQueue $capitalCityBuildingQueue,
@@ -219,20 +187,16 @@ class CapitalCityProcessBuildingRequestHandler
 
     /**
      * Handle the case where no resource requests are needed.
-     *
-     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
-     * @param array $requestData
-     * @return void
      */
     private function handleNoResourceRequests(CapitalCityBuildingQueue $capitalCityBuildingQueue, array $requestData): void
     {
-        $hasBuildingOrRepairing = collect($requestData)->contains(fn($item) => in_array($item['secondary_status'], [
+        $hasBuildingOrRepairing = collect($requestData)->contains(fn ($item) => in_array($item['secondary_status'], [
             CapitalCityQueueStatus::BUILDING,
             CapitalCityQueueStatus::REPAIRING,
-            CapitalCityQueueStatus::REQUESTING
+            CapitalCityQueueStatus::REQUESTING,
         ]));
 
-        if (!$hasBuildingOrRepairing) {
+        if (! $hasBuildingOrRepairing) {
             Log::channel('capital_city_building_upgrades')->info('We have no buildings in BUILDING, REPAIRING or REQUESTING status');
             $this->createLogAndTriggerEvents($capitalCityBuildingQueue);
         } else {
@@ -244,9 +208,6 @@ class CapitalCityProcessBuildingRequestHandler
 
     /**
      * Create a log and trigger events if no building or repairing requests are present.
-     *
-     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
-     * @return void
      */
     private function createLogAndTriggerEvents(CapitalCityBuildingQueue $capitalCityBuildingQueue): void
     {
@@ -263,9 +224,6 @@ class CapitalCityProcessBuildingRequestHandler
 
     /**
      * Refresh queue and trigger events.
-     *
-     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
-     * @return void
      */
     private function sendOffEvents(CapitalCityBuildingQueue $capitalCityBuildingQueue): void
     {
@@ -274,11 +232,6 @@ class CapitalCityProcessBuildingRequestHandler
 
     /**
      * Create upgrade requests for buildings.
-     *
-     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
-     * @param Kingdom $kingdom
-     * @param array $buildingsToUpgradeOrRepair
-     * @return void
      */
     private function createUpgradeOrRepairRequest(
         CapitalCityBuildingQueue $capitalCityBuildingQueue,

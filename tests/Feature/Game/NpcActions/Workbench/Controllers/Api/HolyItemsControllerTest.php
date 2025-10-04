@@ -14,21 +14,21 @@ class HolyItemsControllerTest extends TestCase
 
     private ?CharacterFactory $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testGetSmithingItems()
+    public function test_get_smithing_items()
     {
         $character = $this->character->givePlayerLocation()
             ->inventoryManagement()
@@ -55,7 +55,7 @@ class HolyItemsControllerTest extends TestCase
         $this->assertCount(1, $jsonData['alchemy_items']);
     }
 
-    public function testApplyOil()
+    public function test_apply_oil()
     {
 
         $item = $this->createItem([

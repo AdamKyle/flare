@@ -2,8 +2,8 @@
 
 namespace App\Game\Character\CharacterCreation\Pipeline\Steps;
 
-use App\Flare\Models\Item;
 use App\Flare\Models\InventorySet;
+use App\Flare\Models\Item;
 use App\Game\Character\CharacterCreation\State\CharacterBuildState;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
 use Closure;
@@ -13,10 +13,6 @@ class StarterWeaponAndInventory
 {
     /**
      * Create gem bag and inventory, equip a starter weapon, and create 10 inventory sets.
-     *
-     * @param CharacterBuildState $state
-     * @param Closure $next
-     * @return CharacterBuildState
      */
     public function process(CharacterBuildState $state, Closure $next): CharacterBuildState
     {
@@ -64,9 +60,6 @@ class StarterWeaponAndInventory
     /**
      * Resolve a starter weapon id for a class name, preferring the first mapped type and
      * falling back to any valid starter item. Throws if none exist.
-     *
-     * @param string $className
-     * @return int
      */
     private function resolveStarterWeaponItemId(string $className): int
     {
@@ -94,8 +87,7 @@ class StarterWeaponAndInventory
     /**
      * Find a starter item id limited to specific weapon types.
      *
-     * @param array<int, string> $types
-     * @return int|null
+     * @param  array<int, string>  $types
      */
     private function findStarterItemIdByTypes(array $types): ?int
     {
@@ -111,8 +103,6 @@ class StarterWeaponAndInventory
 
     /**
      * Find any valid starter item id regardless of type.
-     *
-     * @return int|null
      */
     private function findAnyStarterItemId(): ?int
     {
@@ -123,8 +113,6 @@ class StarterWeaponAndInventory
 
     /**
      * Base query for a starter item: no affixes, no specialty, no holy stacks, no sockets, and skill level 1.
-     *
-     * @return Builder
      */
     private function baseStarterItemQuery(): Builder
     {

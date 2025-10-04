@@ -40,6 +40,6 @@ class UpdateCapitalCityUnitRecruitments implements ShouldBroadcastNow
      */
     public function broadcastOn(): Channel|array
     {
-        return new PrivateChannel('capital-city-update-kingdom-unit-data-' . $this->user->id);
+        return new PrivateChannel('capital-city-update-kingdom-unit-data-'.$this->user->id);
     }
 }

@@ -39,7 +39,7 @@ class Affixes extends BattleBase
             if ($cantBeResisted) {
                 $this->addMessage('The enemy cannot resist your enchantments! They are so glowy!', 'regular');
 
-                $this->addMessage('Your enchantments glow with rage. Your enemy cowers. (non resisted dmg): ' . number_format($weaponDamage), 'player-action');
+                $this->addMessage('Your enchantments glow with rage. Your enemy cowers. (non resisted dmg): '.number_format($weaponDamage), 'player-action');
 
                 return $weaponDamage;
             } else {
@@ -47,7 +47,7 @@ class Affixes extends BattleBase
                 if ($nonStackingWeaponDamage > 0) {
                     return $this->doAffixDamage($nonStackingWeaponDamage, $weaponDamage, $monsterResistance);
                 } else {
-                    $this->addMessage('Your (non resistible) enchantments glow with rage. Your enemy cowers: ' . number_format($weaponDamage), 'player-action');
+                    $this->addMessage('Your (non resistible) enchantments glow with rage. Your enemy cowers: '.number_format($weaponDamage), 'player-action');
 
                     return $weaponDamage;
                 }
@@ -74,7 +74,7 @@ class Affixes extends BattleBase
             return 0;
         }
 
-        if (!$character->classType()->isVampire()) {
+        if (! $character->classType()->isVampire()) {
             $this->addMessage('One of your life stealing enchantments causes the enemy to fall to their knees in agony!', 'player-action');
         } else {
             $this->addMessage('The enemy screams in pain as you siphon large amounts of their health towards you!', 'player-action');
@@ -88,7 +88,7 @@ class Affixes extends BattleBase
 
         if ($cantBeResisted || $this->isEnemyEntranced) {
 
-            $this->addMessage('The enemy\'s blood flows through the air and gives you life: ' . number_format($damage), 'player-action');
+            $this->addMessage('The enemy\'s blood flows through the air and gives you life: '.number_format($damage), 'player-action');
 
             return $damage;
         }
@@ -99,7 +99,7 @@ class Affixes extends BattleBase
         if ($roll < $dc) {
             $this->addMessage('The enemy resists your attempt to steal it\'s life.', 'enemy-action');
         } else {
-            $this->addMessage('The enemy\'s blood flows through the air and gives you life: ' . number_format($damage), 'player-action');
+            $this->addMessage('The enemy\'s blood flows through the air and gives you life: '.number_format($damage), 'player-action');
 
             return $damage;
         }
@@ -114,12 +114,12 @@ class Affixes extends BattleBase
         if ($dc <= 0 || rand(1, 100) > $dc) {
             $this->addMessage('Your damaging enchantments (resistible) have been resisted. However ...', 'enemy-action');
 
-            $this->addMessage('Your (non resistible) enchantments glow with rage. Your enemy cowers: ' . number_format($totalDamage), 'player-action');
+            $this->addMessage('Your (non resistible) enchantments glow with rage. Your enemy cowers: '.number_format($totalDamage), 'player-action');
 
             return $totalDamage;
         } else {
 
-            $this->addMessage('Your enchantments glow with rage. Your enemy cowers: ' . number_format($nonStackingDamage), 'player-action');
+            $this->addMessage('Your enchantments glow with rage. Your enemy cowers: '.number_format($nonStackingDamage), 'player-action');
 
             return $nonStackingDamage;
         }

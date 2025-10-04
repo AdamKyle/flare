@@ -12,7 +12,7 @@ class UpdateKingdomTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testIncreaseKingdomTreasury()
+    public function test_increase_kingdom_treasury()
     {
         Queue::fake();
 

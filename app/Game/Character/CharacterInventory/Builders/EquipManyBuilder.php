@@ -71,13 +71,13 @@ class EquipManyBuilder
             $item = $slot->item;
             $type = $item->type;
 
-            if (!isset($this->itemsByType[$type])) {
+            if (! isset($this->itemsByType[$type])) {
                 continue;
             }
 
             $position = $this->findAvailablePosition($equippableItems, $type);
 
-            if (!$position) {
+            if (! $position) {
                 continue;
             }
 
@@ -98,7 +98,7 @@ class EquipManyBuilder
     private function findAvailablePosition(array &$equippableItems, string $type): ?string
     {
         foreach ($this->itemsByType[$type] as $position) {
-            if (!$this->hasPosition($equippableItems, $position)) {
+            if (! $this->hasPosition($equippableItems, $position)) {
                 return $position;
             }
         }
@@ -123,7 +123,7 @@ class EquipManyBuilder
         $positions = [];
 
         foreach ($equippableItems as $item) {
-            if (!in_array($item['position'], $positions)) {
+            if (! in_array($item['position'], $positions)) {
                 $positions[] = $item['position'];
                 $uniqueItems[] = $item;
             }

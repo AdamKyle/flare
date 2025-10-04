@@ -18,21 +18,21 @@ class ReincarnateControllerTest extends TestCase
 
     private ?CharacterFactory $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testReincarnate()
+    public function test_reincarnate()
     {
 
         MaxLevelConfiguration::create([

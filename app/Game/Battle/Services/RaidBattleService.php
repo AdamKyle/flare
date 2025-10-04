@@ -224,7 +224,7 @@ class RaidBattleService
 
         $raid = Raid::where('raid_boss_id', $monsterId)->first();
 
-        if (!is_null($raid)) {
+        if (! is_null($raid)) {
             RaidBossRewardHandler::dispatch($character->id, $monsterId, is_null($raid) ? null : $raid->id);
         }
 
@@ -411,8 +411,6 @@ class RaidBattleService
             'damage_dealt' => $damageDealt,
             'killed_boss' => $killedRaidBoss,
         ]);
-
-
 
         if ($killedRaidBoss) {
             event(new UpdateRaidAttacksLeft($character->user_id, 0, $raidBossParticipation->damage_dealt));

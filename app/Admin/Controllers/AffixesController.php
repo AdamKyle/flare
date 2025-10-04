@@ -2,8 +2,6 @@
 
 namespace App\Admin\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use App\Admin\Exports\Affixes\AffixesExport;
 use App\Admin\Import\Affixes\AffixesImport;
 use App\Admin\Requests\AffixesImport as AffixesImportRequest;
@@ -12,6 +10,8 @@ use App\Admin\Services\ItemAffixService;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Values\ItemAffixType;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
 class AffixesController extends Controller
@@ -59,10 +59,10 @@ class AffixesController extends Controller
 
         $affix = ItemAffix::updateOrCreate(['id' => $data['id']], $data);
 
-        $message = 'Created: ' . $affix['name'];
+        $message = 'Created: '.$affix['name'];
 
         if ($affix['id'] !== 0) {
-            $message = 'Updated: ' . $affix['name'];
+            $message = 'Updated: '.$affix['name'];
         }
 
         return response()->redirectToRoute('affixes.affix', ['affix' => $affix->id])->with('success', $message);
@@ -74,7 +74,7 @@ class AffixesController extends Controller
 
         $itemAffixService->deleteAffix($affix);
 
-        return redirect()->back()->with('success', $name . ' was deleted successfully.');
+        return redirect()->back()->with('success', $name.' was deleted successfully.');
     }
 
     public function exportItems()
@@ -103,7 +103,7 @@ class AffixesController extends Controller
 
         $fileName = Str::snake(preg_replace('/[^a-zA-Z0-9\s]/', '', ItemAffixType::$dropDownValues[$type]));
 
-        $response = Excel::download(new AffixesExport($type), $fileName . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        $response = Excel::download(new AffixesExport($type), $fileName.'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 
         return $response;

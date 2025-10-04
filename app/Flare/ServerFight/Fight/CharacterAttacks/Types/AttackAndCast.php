@@ -11,7 +11,6 @@ use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
 class AttackAndCast extends BattleBase
 {
-
     private string $castAttackType;
 
     public function __construct(

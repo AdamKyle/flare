@@ -60,7 +60,8 @@ class InformationController extends Controller
         ]);
     }
 
-    public function addSection(InformationManagementAddSectionRequest $request) {
+    public function addSection(InformationManagementAddSectionRequest $request)
+    {
         $page = InfoPage::find($request->page_id);
 
         if (is_null($page)) {

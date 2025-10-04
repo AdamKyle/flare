@@ -36,9 +36,6 @@ class GemBuilder
 
     /**
      * Build or return the found gem.
-     *
-     * @param integer $tier
-     * @return Gem
      */
     public function buildGem(int $tier): Gem
     {
@@ -67,9 +64,6 @@ class GemBuilder
 
     /**
      * Find an existing gem based on data
-     *
-     * @param array $data
-     * @return Gem|null
      */
     protected function findExistingGem(array $data): ?Gem
     {
@@ -85,10 +79,6 @@ class GemBuilder
 
     /**
      * Build the data for either finding or building a gem.
-     *
-     * @param array $rolls
-     * @param integer $tier
-     * @return array
      */
     protected function buildDataForGem(array $rolls, int $tier): array
     {

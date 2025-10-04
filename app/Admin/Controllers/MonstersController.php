@@ -86,7 +86,7 @@ class MonstersController extends Controller
     public function export(Request $request)
     {
 
-        $fileName = $request->monster_type . '.xlsx';
+        $fileName = $request->monster_type.'.xlsx';
 
         $response = Excel::download(new MonstersExport($request->monster_type), $fileName, \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
@@ -118,10 +118,10 @@ class MonstersController extends Controller
 
         $monster = Monster::updateOrCreate(['id' => $data['id']], $data);
 
-        $message = 'Created: ' . $monster->name;
+        $message = 'Created: '.$monster->name;
 
         if ($data['id'] !== 0) {
-            $message = 'Updated: ' . $monster->name;
+            $message = 'Updated: '.$monster->name;
         }
 
         return response()->redirectToRoute('monsters.monster', ['monster' => $monster->id])->with('success', $message);

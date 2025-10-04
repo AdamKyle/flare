@@ -90,7 +90,7 @@ class UseItemService
         $inventory = $this->characterInventoryService->setCharacter($character);
 
         return $this->successResult([
-            'message' => 'Used selected items.' . ($removedSomeItems ? ' Some items were not able to be used because of the amount of boons you have. You can check your usable items section to see which ones are left.' : ''),
+            'message' => 'Used selected items.'.($removedSomeItems ? ' Some items were not able to be used because of the amount of boons you have. You can check your usable items section to see which ones are left.' : ''),
             'inventory' => [
                 'usable_items' => $inventory->getInventoryForType('usable_items'),
             ],
@@ -220,7 +220,7 @@ class UseItemService
         event(new UpdateTopBarEvent($character));
 
         if (! is_null($item)) {
-            event(new ServerMessageEvent($character->user, 'You used: ' . $item->name));
+            event(new ServerMessageEvent($character->user, 'You used: '.$item->name));
         }
 
         $boons = $character->boons->toArray();

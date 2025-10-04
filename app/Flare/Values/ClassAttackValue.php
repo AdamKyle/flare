@@ -319,8 +319,9 @@ class ClassAttackValue
         return $this->getItemCollection($type)->isNotEmpty();
     }
 
-    private function hasAnyWeaponEquipped(): bool {
-        $itemTypes = array_map(fn($case) => $case->value, ItemType::cases());
+    private function hasAnyWeaponEquipped(): bool
+    {
+        $itemTypes = array_map(fn ($case) => $case->value, ItemType::cases());
 
         foreach ($itemTypes as $type) {
             if ($this->getItemCollection($type)->isNotEmpty()) {
@@ -331,8 +332,9 @@ class ClassAttackValue
         return false;
     }
 
-    private function hasNoWeaponEquipped(): bool {
-        $itemTypes = array_map(fn($case) => $case->value, ItemType::cases());
+    private function hasNoWeaponEquipped(): bool
+    {
+        $itemTypes = array_map(fn ($case) => $case->value, ItemType::cases());
         $typeIsNotEquipped = false;
 
         foreach ($itemTypes as $type) {
@@ -351,8 +353,9 @@ class ClassAttackValue
         return $this->getItemCollection($type)->count() === $amountNeeded;
     }
 
-    private function getItemCollectionCountForAnyType(): int {
-        $itemTypes = array_map(fn($case) => $case->value, ItemType::cases());
+    private function getItemCollectionCountForAnyType(): int
+    {
+        $itemTypes = array_map(fn ($case) => $case->value, ItemType::cases());
         $count = 0;
 
         foreach ($itemTypes as $type) {
@@ -366,7 +369,8 @@ class ClassAttackValue
         return $count;
     }
 
-    private function getItemCollectionCountForTypes(array $types): int {
+    private function getItemCollectionCountForTypes(array $types): int
+    {
         $count = 0;
 
         foreach ($types as $type) {

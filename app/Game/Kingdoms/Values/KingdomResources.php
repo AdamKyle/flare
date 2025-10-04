@@ -13,6 +13,6 @@ enum KingdomResources: string
 
     public static function kingdomResources(): array
     {
-        return array_map(fn($resource) => $resource->value, self::cases());
+        return array_map(fn ($resource) => $resource->value, self::cases());
     }
 }

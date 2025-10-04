@@ -119,7 +119,7 @@ class Quest extends Model
 
         return $result->map(function ($quest) use ($questNameMap) {
             $quest->required_quest_chain_names = collect($quest->required_quest_chain ?? [])
-                ->map(fn($id) => $questNameMap[$id] ?? null)
+                ->map(fn ($id) => $questNameMap[$id] ?? null)
                 ->filter()
                 ->values()
                 ->all();
@@ -240,8 +240,9 @@ class Quest extends Model
         return null;
     }
 
-    public function getUnlocksPassiveNameAttribute() {
-        if (!is_null($this->unlocks_passive_id)) {
+    public function getUnlocksPassiveNameAttribute()
+    {
+        if (! is_null($this->unlocks_passive_id)) {
             return $this->passive->name;
         }
     }
@@ -264,7 +265,8 @@ class Quest extends Model
         return null;
     }
 
-    public function getRequiredQuestChainDetailsAttribute() {
+    public function getRequiredQuestChainDetailsAttribute()
+    {
 
         if (is_null($this->required_quest_chain)) {
             return null;

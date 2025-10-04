@@ -8,9 +8,6 @@ class RegularEventGoalResetService
 {
     /**
      * Reset a non-step-based goal and clear progress rows.
-     *
-     * @param GlobalEventGoal $goal
-     * @return void
      */
     public function reset(GlobalEventGoal $goal): void
     {

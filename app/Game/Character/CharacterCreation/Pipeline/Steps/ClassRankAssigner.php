@@ -17,10 +17,6 @@ class ClassRankAssigner
 {
     /**
      * Create a class rank for every class and seed weapon masteries for each rank.
-     *
-     * @param CharacterBuildState $state
-     * @param Closure $next
-     * @return CharacterBuildState
      */
     public function process(CharacterBuildState $state, Closure $next): CharacterBuildState
     {
@@ -55,10 +51,6 @@ class ClassRankAssigner
 
     /**
      * Build weapon mastery insert rows for a given class rank.
-     *
-     * @param CharacterClassRank $classRank
-     * @param DateTimeInterface $timestamp
-     * @return array
      */
     private function buildWeaponMasteryRows(CharacterClassRank $classRank, DateTimeInterface $timestamp): array
     {
@@ -77,10 +69,6 @@ class ClassRankAssigner
 
     /**
      * Get default level for weapon mastery based on class and mapping.
-     *
-     * @param CharacterClassRank $classRank
-     * @param string $type
-     * @return int
      */
     private function getDefaultLevel(CharacterClassRank $classRank, string $type): int
     {

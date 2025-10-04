@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class ItemTypeTest extends TestCase
 {
-    public function testValidWeapons(): void
+    public function test_valid_weapons(): void
     {
         $valid = ItemType::validWeapons();
 
@@ -35,14 +35,14 @@ class ItemTypeTest extends TestCase
         $this->assertNotContains(ItemType::RING->value, $valid);
     }
 
-    public function testAllWeaponTypes(): void
+    public function test_all_weapon_types(): void
     {
         $allWeapons = ItemType::allWeaponTypes();
 
         // Expected: all except ring
-        $expected = array_map(fn(ItemType $t) => $t->value, array_filter(
+        $expected = array_map(fn (ItemType $t) => $t->value, array_filter(
             ItemType::cases(),
-            fn(ItemType $t) => $t !== ItemType::RING
+            fn (ItemType $t) => $t !== ItemType::RING
         ));
 
         $this->assertEqualsCanonicalizing($expected, $allWeapons);
@@ -52,29 +52,29 @@ class ItemTypeTest extends TestCase
         $this->assertContains(ItemType::SPELL_HEALING->value, $allWeapons);
     }
 
-    public function testAllTypes(): void
+    public function test_all_types(): void
     {
         $all = ItemType::allTypes();
         $this->assertEqualsCanonicalizing(
-            array_map(fn(ItemType $t) => $t->value, ItemType::cases()),
+            array_map(fn (ItemType $t) => $t->value, ItemType::cases()),
             $all
         );
     }
 
-    public function testGetProperNameForType(): void
+    public function test_get_proper_name_for_type(): void
     {
         $this->assertSame('Scratch Awl', ItemType::getProperNameForType('scratch-awl'));
         $this->assertSame('Spell Damage', ItemType::getProperNameForType('spell-damage'));
         $this->assertSame('Ring', ItemType::getProperNameForType('ring'));
     }
 
-    public function testGetValidWeaponsAsOptions(): void
+    public function test_get_valid_weapons_as_options(): void
     {
         $options = ItemType::getValidWeaponsAsOptions();
 
         $valid = ItemType::validWeapons();
         $expectedLabels = array_map(
-            fn($type) => ucwords(str_replace('-', ' ', $type)),
+            fn ($type) => ucwords(str_replace('-', ' ', $type)),
             $valid
         );
 

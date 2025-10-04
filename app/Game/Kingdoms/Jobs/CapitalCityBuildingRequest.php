@@ -34,7 +34,7 @@ class CapitalCityBuildingRequest implements ShouldQueue
             return;
         }
 
-        if (!$queueData->completed_at->lessThanOrEqualTo(now())) {
+        if (! $queueData->completed_at->lessThanOrEqualTo(now())) {
             $timeLeft = $queueData->completed_at->diffInMinutes(now());
 
             if ($timeLeft >= 1) {
@@ -93,7 +93,7 @@ class CapitalCityBuildingRequest implements ShouldQueue
 
         $queueData->update([
             'building_request_data' => $buildingRequestData,
-            'status' => CapitalCityQueueStatus::FINISHED
+            'status' => CapitalCityQueueStatus::FINISHED,
         ]);
 
         $queueData = $queueData->refresh();
@@ -107,7 +107,7 @@ class CapitalCityBuildingRequest implements ShouldQueue
         if ($building->gives_resources) {
             $type = $this->getResourceType($building);
 
-            $building->kingdom->{'max_' . $type} += 1000;
+            $building->kingdom->{'max_'.$type} += 1000;
             $building->kingdom->save();
         }
 
@@ -116,10 +116,10 @@ class CapitalCityBuildingRequest implements ShouldQueue
         $building = $building->refresh();
 
         $building->update([
-            'current_defence'    => $building->defence,
+            'current_defence' => $building->defence,
             'current_durability' => $building->durability,
-            'max_defence'        => $building->defence,
-            'max_durability'     => $building->durability,
+            'max_defence' => $building->defence,
+            'max_durability' => $building->durability,
         ]);
 
         if ($building->is_farm) {
@@ -150,9 +150,8 @@ class CapitalCityBuildingRequest implements ShouldQueue
         }
     }
 
-
     private function getResourceType(KingdomBuilding $building)
     {
-        return collect($this->resourceTypes)->first(fn($type) => $building->{'increase_in_' . $type} !== 0.0);
+        return collect($this->resourceTypes)->first(fn ($type) => $building->{'increase_in_'.$type} !== 0.0);
     }
 }

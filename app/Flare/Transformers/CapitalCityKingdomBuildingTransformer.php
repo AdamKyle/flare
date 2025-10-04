@@ -75,7 +75,7 @@ class CapitalCityKingdomBuildingTransformer extends TransformerAbstract
         })->toArray();
     }
 
-    private function fetchPassiveNameRequiredForBuilding(KingdomBuilding $building): array | null
+    private function fetchPassiveNameRequiredForBuilding(KingdomBuilding $building): ?array
     {
         $passiveDetails = null;
         $passiveSkill = $building->gameBuilding->passive;
@@ -85,7 +85,6 @@ class CapitalCityKingdomBuildingTransformer extends TransformerAbstract
             $character = $building->kingdom->character;
 
             $characterPassive = CharacterPassiveSkill::where('character_id', $character->id)->where('passive_skill_id', $passiveSkill->id)->first();
-
 
             if (is_null($characterPassive)) {
                 return [];

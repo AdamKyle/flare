@@ -45,13 +45,13 @@ class GlobalEventGoalCleanupService
     {
         $query = $modelClass::query()->select('id')->orderBy('id');
 
-        if (!is_null($goalId) && $this->hasGoalScope($modelClass)) {
+        if (! is_null($goalId) && $this->hasGoalScope($modelClass)) {
             $query->where('global_event_goal_id', $goalId);
         }
 
         $query->chunkById($size, function ($rows) use ($modelClass) {
             $ids = $rows->pluck('id')->all();
-            if (!empty($ids)) {
+            if (! empty($ids)) {
                 $modelClass::whereIn('id', $ids)->delete();
             }
         });

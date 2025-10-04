@@ -168,135 +168,167 @@ class Item extends Model
         'is_unique',
     ];
 
-    public function itemSkill() {
+    public function itemSkill()
+    {
         return $this->hasOne(ItemSkill::class, 'id', 'item_skill_id')->with('children');
     }
 
-    public function itemSkillProgressions() {
+    public function itemSkillProgressions()
+    {
         return $this->hasMany(ItemSkillProgression::class, 'item_id', 'id');
     }
 
-    public function inventorySlots() {
+    public function inventorySlots()
+    {
         return $this->hasMany(InventorySlot::class, 'item_id', 'id');
     }
 
-    public function inventorySetSlots() {
+    public function inventorySetSlots()
+    {
         return $this->hasMany(SetSlot::class, 'item_id', 'id');
     }
 
-    public function marketListings() {
+    public function marketListings()
+    {
         return $this->hasMany(MarketBoard::class, 'item_id', 'id');
     }
 
-    public function marketHistory() {
+    public function marketHistory()
+    {
         return $this->hasMany(MarketHistory::class, 'item_id', 'id');
     }
 
-    public function itemSuffix() {
+    public function itemSuffix()
+    {
         return $this->hasOne(ItemAffix::class, 'id', 'item_suffix_id');
     }
 
-    public function itemPrefix() {
+    public function itemPrefix()
+    {
         return $this->hasOne(ItemAffix::class, 'id', 'item_prefix_id');
     }
 
-    public function appliedHolyStacks() {
+    public function appliedHolyStacks()
+    {
         return $this->hasMany(HolyStack::class, 'item_id', 'id');
     }
 
-    public function sockets() {
+    public function sockets()
+    {
         return $this->hasMany(ItemSocket::class, 'item_id', 'id');
     }
 
-    public function dropLocation() {
+    public function dropLocation()
+    {
         return $this->hasOne(Location::class, 'id', 'drop_location_id')->with('map');
     }
 
-    public function unlocksClass() {
+    public function unlocksClass()
+    {
         return $this->hasOne(GameClass::class, 'id', 'unlocks_class_id');
     }
 
-    public function children() {
+    public function children()
+    {
         return $this->hasMany($this, 'parent_id')->with('children');
     }
 
-    public function parent() {
+    public function parent()
+    {
         return $this->belongsTo($this, 'parent_id');
     }
 
-    public function getAffixNameAttribute() {
+    public function getAffixNameAttribute()
+    {
         $itemPrefix = ItemAffix::find($this->item_prefix_id);
         $itemSuffix = ItemAffix::find($this->item_suffix_id);
         $itemName = '';
 
-        if (!is_null($itemPrefix)) {
-            $itemName = '*' . $itemPrefix->name . '* ' . $this->name;
+        if (! is_null($itemPrefix)) {
+            $itemName = '*'.$itemPrefix->name.'* '.$this->name;
         }
 
-        if (!is_null($itemSuffix)) {
-            $itemName .= $itemName !== '' ? ' *' . $itemSuffix->name . '*' : $this->name . ' *' . $itemSuffix->name . '*';
+        if (! is_null($itemSuffix)) {
+            $itemName .= $itemName !== '' ? ' *'.$itemSuffix->name.'*' : $this->name.' *'.$itemSuffix->name.'*';
         }
 
         return $itemName === '' ? $this->name : $itemName;
     }
 
-    public function getAffixCountAttribute() {
-        if (!is_null($this->item_prefix_id) && !is_null($this->item_suffix_id)) return 2;
-        if (!is_null($this->item_prefix_id) || !is_null($this->item_suffix_id)) return 1;
+    public function getAffixCountAttribute()
+    {
+        if (! is_null($this->item_prefix_id) && ! is_null($this->item_suffix_id)) {
+            return 2;
+        }
+        if (! is_null($this->item_prefix_id) || ! is_null($this->item_suffix_id)) {
+            return 1;
+        }
+
         return 0;
     }
 
-    public function getIsUniqueAttribute() {
+    public function getIsUniqueAttribute()
+    {
         return $this->itemPrefix?->randomly_generated || $this->itemSuffix?->randomly_generated;
     }
 
-    public function getRequiredMonsterAttribute() {
+    public function getRequiredMonsterAttribute()
+    {
         return $this->type === 'quest' ? Monster::where('quest_item_id', $this->id)->with('gameMap')->first() : null;
     }
 
-    public function getRequiredQuestAttribute() {
+    public function getRequiredQuestAttribute()
+    {
         return $this->type === 'quest' ? Quest::where('reward_item', $this->id)->with('npc', 'npc.gameMap', 'item')->first() : null;
     }
 
-    public function getLocationsAttribute() {
+    public function getLocationsAttribute()
+    {
         return $this->type === 'quest' ? Location::where('quest_reward_item_id', $this->id)->with('map')->get() : [];
     }
 
-    public function getHolyStackDevouringDarknessAttribute() {
+    public function getHolyStackDevouringDarknessAttribute()
+    {
         return $this->appliedHolyStacks->sum('devouring_darkness_bonus') ?? 0.0;
     }
 
-    public function getHolyStackStatBonusAttribute() {
+    public function getHolyStackStatBonusAttribute()
+    {
         return $this->appliedHolyStacks->sum('stat_increase_bonus') ?? 0.0;
     }
 
-    public function getHolyStacksAppliedAttribute() {
+    public function getHolyStacksAppliedAttribute()
+    {
         return $this->appliedHolyStacks->count() ?? 0;
     }
 
-    public function getAffixAttribute(string $attribute): float {
+    public function getAffixAttribute(string $attribute): float
+    {
         $base = 0.0;
 
-        if (!is_null($this->itemPrefix)) {
+        if (! is_null($this->itemPrefix)) {
             $base += $this->itemPrefix->{$attribute};
         }
 
-        if (!is_null($this->itemSuffix)) {
+        if (! is_null($this->itemSuffix)) {
             $base += $this->itemSuffix->{$attribute};
         }
 
         return $base;
     }
 
-    public function getSkillTrainingBonus(GameSkill $gameSkill): float {
+    public function getSkillTrainingBonus(GameSkill $gameSkill): float
+    {
         return $this->calculateTrainingBonus($this, $gameSkill);
     }
 
-    public function getSkillBonus(GameSkill $gameSkill): float {
+    public function getSkillBonus(GameSkill $gameSkill): float
+    {
         return $this->calculateBonus($this, $gameSkill);
     }
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return ItemFactory::new();
     }
 }

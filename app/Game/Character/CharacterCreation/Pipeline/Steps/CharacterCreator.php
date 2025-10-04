@@ -18,10 +18,6 @@ class CharacterCreator
 
     /**
      * Create the Character with base stats and store it on the state.
-     *
-     * @param CharacterBuildState $state
-     * @param Closure $next
-     * @return CharacterBuildState
      */
     public function process(CharacterBuildState $state, Closure $next): CharacterBuildState
     {

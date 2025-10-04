@@ -79,9 +79,9 @@ class InitiateWinterEvent implements ShouldQueue
 
         event(new GlobalMessageEvent('While on the The Ice Plane, characters who kill: ANY CREATURE in either manual or exploration, will increase the new: Global Event Goal. Players will be rewarded with random Corrupted Ice Gear when specific milestones are reached.'));
 
-        event(new GlobalMessageEvent('Players can participate by going to the map: ' . $gameMap->name .
-            ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile)' . ' ' .
-            'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items.' .
+        event(new GlobalMessageEvent('Players can participate by going to the map: '.$gameMap->name.
+            ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile)'.' '.
+            'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items.'.
             ' You can see the event goal for the map specified by being on the map and clicking the Event Goal tab from the map.'));
     }
 
@@ -132,7 +132,7 @@ class InitiateWinterEvent implements ShouldQueue
         }
 
         $scheduledEvent->update([
-            'raids_for_event' => $newRaidForEventData
+            'raids_for_event' => $newRaidForEventData,
         ]);
     }
 }

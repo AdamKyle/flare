@@ -24,7 +24,7 @@ class ServerMessageTest extends TestCase
 
     private ?ServerMessage $serverMessage;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -32,7 +32,7 @@ class ServerMessageTest extends TestCase
         $this->serverMessage = resolve(ServerMessage::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -40,7 +40,7 @@ class ServerMessageTest extends TestCase
         $this->serverMessage = null;
     }
 
-    public function testGenerateServerMessageForChattingTooMuch()
+    public function test_generate_server_message_for_chatting_too_much()
     {
 
         $user = $this->character->getUser();
@@ -54,7 +54,7 @@ class ServerMessageTest extends TestCase
         $this->assertEquals(1, $user->message_throttle_count);
     }
 
-    public function testGenerateServerMessageOfType()
+    public function test_generate_server_message_of_type()
     {
 
         $user = $this->character->getUser();
@@ -70,7 +70,7 @@ class ServerMessageTest extends TestCase
         });
     }
 
-    public function testGenerateCustomServerMessage()
+    public function test_generate_custom_server_message()
     {
 
         $user = $this->character->getUser();

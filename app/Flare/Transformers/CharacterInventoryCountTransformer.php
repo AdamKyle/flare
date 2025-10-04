@@ -11,9 +11,6 @@ class CharacterInventoryCountTransformer extends TransformerAbstract
 {
     /**
      * Undocumented function
-     *
-     * @param Character $character
-     * @return array
      */
     public function transform(Character $character): array
     {

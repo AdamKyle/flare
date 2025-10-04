@@ -7,7 +7,6 @@ use App\Flare\Items\Transformers\QuestItemTransformer;
 use App\Flare\Pagination\Pagination;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Transformers\MonsterTransformer;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Battle\Services\ConjureService;
@@ -137,7 +136,7 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(LocationsTransformer::class , function () {
+        $this->app->bind(LocationsTransformer::class, function () {
             return new LocationsTransformer;
         });
 

@@ -22,7 +22,6 @@ class SuggestionsList extends DataTableComponent
         return SuggestionAndBugs::where('type', FeedbackType::SUGGESTION);
     }
 
-
     public function columns(): array
     {
         return [

@@ -19,18 +19,18 @@ use Tests\TestCase;
 
 class EventEnderRegistryTest extends TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
     }
 
-    public function testEndCallsOnlySupportingEnder(): void
+    public function test_end_calls_only_supporting_ender(): void
     {
         $raid = Mockery::mock(RaidEventEnderService::class, function (MockInterface $m) {
             $m->shouldReceive('supports')->once()->andReturn(false);
@@ -84,7 +84,7 @@ class EventEnderRegistryTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testEndDoesNothingWhenNoEnderSupports(): void
+    public function test_end_does_nothing_when_no_ender_supports(): void
     {
         $raid = Mockery::mock(RaidEventEnderService::class, function (MockInterface $m) {
             $m->shouldReceive('supports')->once()->andReturn(false);

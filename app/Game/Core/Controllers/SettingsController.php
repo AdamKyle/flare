@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Cache;
 
 class SettingsController extends Controller
 {
-    public function __construct(private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler,)
+    public function __construct(private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler)
     {
         $this->middleware('auth');
     }
@@ -79,7 +79,7 @@ class SettingsController extends Controller
                 'auto_sell_item' => false,
                 'auto_disenchant_amount' => null,
             ]);
-        } else if (is_null($request->auto_disenchant_amount)) {
+        } elseif (is_null($request->auto_disenchant_amount)) {
             return redirect()->back()->with('error', 'You must select an disenchant amount.');
         }
 
@@ -125,7 +125,7 @@ class SettingsController extends Controller
                 'guide_enabled' => $request->guide_enabled,
             ]);
 
-            Cache::put('user-show-guide-initial-message-' . $user->id, 'true');
+            Cache::put('user-show-guide-initial-message-'.$user->id, 'true');
         }
 
         return redirect()->back()->with('success', 'Updated character guide setting.');
@@ -175,8 +175,8 @@ class SettingsController extends Controller
         $stats = ['str', 'dex', 'chr', 'int', 'agi', 'dur', 'focus'];
 
         foreach ($stats as $stat) {
-            if ($character->race->{$stat . '_mod'} > 0) {
-                $character->{$stat} -= $character->race->{$stat . '_mod'};
+            if ($character->race->{$stat.'_mod'} > 0) {
+                $character->{$stat} -= $character->race->{$stat.'_mod'};
             }
         }
 
@@ -187,8 +187,8 @@ class SettingsController extends Controller
         $gameRace = GameRace::find($request->race_id);
 
         foreach ($stats as $stat) {
-            if ($gameRace->{$stat . '_mod'} > 0) {
-                $character->{$stat} += $gameRace->{$stat . '_mod'};
+            if ($gameRace->{$stat.'_mod'} > 0) {
+                $character->{$stat} += $gameRace->{$stat.'_mod'};
             }
         }
 

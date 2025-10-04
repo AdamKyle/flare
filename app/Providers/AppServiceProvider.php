@@ -2,9 +2,6 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\ServiceProvider;
 use App\Console\AfterDeployment\AddHolyStacksToItems;
 use App\Console\AfterDeployment\AssignNewBuildingsToExistingKingdoms;
 use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
@@ -29,6 +26,9 @@ use App\Console\DevelopmentCommands\MaxOutCharactersPassiveSkills;
 use App\Console\DevelopmentCommands\ReincarnateCharacter;
 use App\Console\DevelopmentCommands\TestExploration;
 use App\Console\DevelopmentCommands\UpdateUsersForDevelopment;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -86,7 +86,7 @@ class AppServiceProvider extends ServiceProvider
 
             $headers = [
                 'Content-type' => 'text/json',
-                'Content-Disposition' => 'attachment; filename=' . $fileName . '.json',
+                'Content-Disposition' => 'attachment; filename='.$fileName.'.json',
             ];
 
             return \Response::make($content, 200, $headers);

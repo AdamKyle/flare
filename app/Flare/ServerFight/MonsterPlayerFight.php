@@ -246,8 +246,8 @@ class MonsterPlayerFight
             $this->attackType = $attackType;
         }
 
-        if (Cache::has('monster-fight-' . $this->character->id)) {
-            $data = Cache::get('monster-fight-' . $this->character->id);
+        if (Cache::has('monster-fight-'.$this->character->id)) {
+            $data = Cache::get('monster-fight-'.$this->character->id);
 
             $this->monster = $data['monster'];
         } else {
@@ -434,8 +434,8 @@ class MonsterPlayerFight
 
         $monstersForLocation = Cache::get('special-location-monsters');
 
-        if (isset($monstersForLocation['location-type-' . $locationWithType->type])) {
-            $monsters = $monstersForLocation['location-type-' . $locationWithType->type];
+        if (isset($monstersForLocation['location-type-'.$locationWithType->type])) {
+            $monsters = $monstersForLocation['location-type-'.$locationWithType->type];
 
             foreach ($monsters as $monster) {
                 if ($monster['id'] === $monsterId) {

@@ -32,7 +32,7 @@ class ViewInventoryItemRequest extends FormRequest
     {
         return [
             'slot_id.required' => 'You must pass in a slot id',
-            'slot_id.integer'  => 'slot ids must be integers.',
+            'slot_id.integer' => 'slot ids must be integers.',
         ];
     }
 }

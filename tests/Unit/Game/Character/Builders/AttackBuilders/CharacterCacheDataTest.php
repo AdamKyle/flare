@@ -21,7 +21,7 @@ class CharacterCacheDataTest extends TestCase
 
     private ?CharacterCacheData $characterCacheData;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -30,7 +30,7 @@ class CharacterCacheDataTest extends TestCase
         $this->characterCacheData = resolve(CharacterCacheData::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -56,7 +56,7 @@ class CharacterCacheDataTest extends TestCase
             ->getCharacter();
     }
 
-    public function testCachedAcIsSetUp()
+    public function test_cached_ac_is_set_up()
     {
 
         $character = $this->setUpCharacterForTests();
@@ -66,7 +66,7 @@ class CharacterCacheDataTest extends TestCase
         $this->assertEquals(10, $this->characterCacheData->getCharacterDefenceAc($character));
     }
 
-    public function testGetAttackDataForAttackType()
+    public function test_get_attack_data_for_attack_type()
     {
         $character = $this->setUpCharacterForTests();
 
@@ -75,7 +75,7 @@ class CharacterCacheDataTest extends TestCase
         $this->assertGreaterThan(0, $data['weapon_damage']);
     }
 
-    public function testGetStatFromCharacterSheetCacheWhenCacheDoesNotExist()
+    public function test_get_stat_from_character_sheet_cache_when_cache_does_not_exist()
     {
         $character = $this->setUpCharacterForTests();
 
@@ -84,7 +84,7 @@ class CharacterCacheDataTest extends TestCase
         $this->assertGreaterThan(0, $value);
     }
 
-    public function testGetStatFromCharacterSheetCacheDataWhenLevelDoesNotMatch()
+    public function test_get_stat_from_character_sheet_cache_data_when_level_does_not_match()
     {
         $character = $this->setUpCharacterForTests();
 
@@ -97,7 +97,7 @@ class CharacterCacheDataTest extends TestCase
         $this->assertGreaterThan(0, $value);
     }
 
-    public function testDeleteCharacterSheetData()
+    public function test_delete_character_sheet_data()
     {
         $character = $this->setUpCharacterForTests();
 
@@ -110,7 +110,7 @@ class CharacterCacheDataTest extends TestCase
         $this->assertNull(Cache::get('character-sheet-'.$character->id));
     }
 
-    public function testGetExistingCharacterSheetCache()
+    public function test_get_existing_character_sheet_cache()
     {
         $character = $this->setUpCharacterForTests();
 
@@ -125,7 +125,7 @@ class CharacterCacheDataTest extends TestCase
         $this->assertEquals($characterSheet, $data);
     }
 
-    public function testGetCharacterSheetWhenItDoesNotExist()
+    public function test_get_character_sheet_when_it_does_not_exist()
     {
         $character = $this->setUpCharacterForTests();
 
@@ -134,7 +134,7 @@ class CharacterCacheDataTest extends TestCase
         $this->assertNotEmpty($data);
     }
 
-    public function testUpdateExistingCharacterSheet()
+    public function test_update_existing_character_sheet()
     {
         $character = $this->setUpCharacterForTests();
 
@@ -153,7 +153,7 @@ class CharacterCacheDataTest extends TestCase
         $this->assertEquals('Hello', $data['name']);
     }
 
-    public function testUpdateNonExistentCharacterSheet()
+    public function test_update_non_existent_character_sheet()
     {
         $character = $this->setUpCharacterForTests();
 
@@ -166,7 +166,7 @@ class CharacterCacheDataTest extends TestCase
         $this->assertEquals('Hello', $data['name']);
     }
 
-    public function testGetCharacterSheetCache()
+    public function test_get_character_sheet_cache()
     {
         $character = $this->setUpCharacterForTests();
 

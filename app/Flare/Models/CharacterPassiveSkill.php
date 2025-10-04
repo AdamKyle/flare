@@ -42,7 +42,7 @@ class CharacterPassiveSkill extends Model
         'current_bonus',
         'resource_request_time_reduction',
         'capital_city_building_request_travel_time_reduction',
-        'capital_city_unit_request_travel_time_reduction'
+        'capital_city_unit_request_travel_time_reduction',
     ];
 
     public function character()

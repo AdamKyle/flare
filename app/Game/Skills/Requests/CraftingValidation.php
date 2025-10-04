@@ -26,7 +26,7 @@ class CraftingValidation extends FormRequest
     {
         return [
             'item_to_craft' => 'required|integer',
-            'type' => 'required|in:' . implode(',', ItemType::allWeaponTypes()) . ',armour,spell,' . ItemType::RING->value,
+            'type' => 'required|in:'.implode(',', ItemType::allWeaponTypes()).',armour,spell,'.ItemType::RING->value,
             'craft_for_npc' => 'required|bool',
             'craft_for_event' => 'required|bool',
         ];

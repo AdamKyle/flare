@@ -7,7 +7,6 @@ use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Transformers\ItemTransformer;
-use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Core\Values\ValidEquipPositionsValue;
 use App\Game\Gems\Services\ItemAtonements;
 use League\Fractal\Manager;
@@ -16,8 +15,11 @@ use League\Fractal\Resource\Item as FractalItem;
 class ComparisonService
 {
     private ValidEquipPositionsValue $validEquipPositionsValue;
+
     private CharacterInventoryService $characterInventoryService;
+
     private EquipItemService $equipItemService;
+
     private ItemAtonements $itemAtonements;
 
     public function __construct(
@@ -59,10 +61,10 @@ class ComparisonService
 
         if ($service->inventory()->isNotEmpty()) {
             $setEquipped = $character->inventorySets()->where('is_equipped', true)->first();
-            $hasSet = !is_null($setEquipped);
-            $setIndex = !is_null($setEquipped) ? $character->inventorySets->search(function ($set) {
-                    return $set->is_equipped;
-                }) + 1 : 0;
+            $hasSet = ! is_null($setEquipped);
+            $setIndex = ! is_null($setEquipped) ? $character->inventorySets->search(function ($set) {
+                return $set->is_equipped;
+            }) + 1 : 0;
 
             $viewData = [
                 'details' => $this->equipItemService->getItemStats($itemToEquip->item, $inventory, $character),
@@ -90,10 +92,10 @@ class ComparisonService
             ->setInventory();
 
         $setEquipped = $character->inventorySets()->where('is_equipped', true)->first();
-        $hasSet = !is_null($setEquipped);
-        $setIndex = !is_null($setEquipped) ? $character->inventorySets->search(function ($set) {
-                return $set->is_equipped;
-            }) + 1 : 0;
+        $hasSet = ! is_null($setEquipped);
+        $setIndex = ! is_null($setEquipped) ? $character->inventorySets->search(function ($set) {
+            return $set->is_equipped;
+        }) + 1 : 0;
 
         $inventory = $service->inventory();
 
@@ -122,6 +124,7 @@ class ComparisonService
     protected function itemDetails(Item $item): array
     {
         $resource = new FractalItem($item, new ItemTransformer());
+
         return (new Manager)->createData($resource)->toArray()['data'];
     }
 
@@ -130,7 +133,7 @@ class ComparisonService
         $resource = new FractalItem($slot, new EquippableItemTransformer());
         $data = (new Manager)->createData($resource)->toArray()['data'];
 
-        if (!array_key_exists('affix_name', $data)) {
+        if (! array_key_exists('affix_name', $data)) {
             $data['affix_name'] = $slot->item->affix_name;
         }
 

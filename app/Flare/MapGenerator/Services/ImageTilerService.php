@@ -8,22 +8,12 @@ use Intervention\Image\Interfaces\ImageInterface;
 
 class ImageTilerService
 {
-    /**
-     * @var int $tileSize
-     */
     private int $tileSize = 250;
 
-    /**
-     * @param ImageManager $imageManager
-     */
     public function __construct(private readonly ImageManager $imageManager) {}
 
     /**
      * Break image into pieces.
-     *
-     * @param string $imagePath
-     * @param string $folderName
-     * @return array
      */
     public function breakIntoTiles(string $imagePath, string $folderName): array
     {
@@ -41,12 +31,6 @@ class ImageTilerService
 
     /**
      * Chop up the image.
-     *
-     * @param ImageInterface $image
-     * @param int $width
-     * @param int $height
-     * @param string $folder
-     * @return array
      */
     private function chopImage(ImageInterface $image, int $width, int $height, string $folder): array
     {
@@ -69,12 +53,6 @@ class ImageTilerService
 
     /**
      * Save the file and return the public URL.
-     *
-     * @param ImageInterface $image
-     * @param int $x
-     * @param int $y
-     * @param string $folder
-     * @return string
      */
     private function saveTile(ImageInterface $image, int $x, int $y, string $folder): string
     {

@@ -8,11 +8,9 @@ use App\Flare\Models\Quest;
 use App\Flare\Models\UserLoginDuration;
 use Carbon\Carbon;
 use DB;
-use Exception;
 
 class SiteStatisticsService
 {
-
     private array $data = [];
 
     private array $labels = [];
@@ -33,10 +31,10 @@ class SiteStatisticsService
 
         $query = Character::query()
             ->whereHas('questsCompleted', function ($query) use ($type) {
-                $query->whereNotNull($type . '_id');
+                $query->whereNotNull($type.'_id');
             })
             ->withCount(['questsCompleted as quests_count' => function ($query) use ($type) {
-                $query->whereNotNull($type . '_id');
+                $query->whereNotNull($type.'_id');
             }]);
 
         if ($filter === 'most') {

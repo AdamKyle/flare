@@ -19,7 +19,7 @@ class EquipItemServiceTest extends TestCase
 
     private ?EquipItemService $equipItemService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -28,7 +28,7 @@ class EquipItemServiceTest extends TestCase
         $this->equipItemService = resolve(EquipItemService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -37,7 +37,7 @@ class EquipItemServiceTest extends TestCase
         $this->equipItemService = null;
     }
 
-    public function testThrowErrorWhenItemToReplaceDoesNotExistInInventory()
+    public function test_throw_error_when_item_to_replace_does_not_exist_in_inventory()
     {
         $character = $this->character->getCharacter();
 
@@ -51,7 +51,7 @@ class EquipItemServiceTest extends TestCase
         $equipItemService->replaceItem();
     }
 
-    public function testInventoryIsFullWhenTryingToReplaceInventorySetItem()
+    public function test_inventory_is_full_when_trying_to_replace_inventory_set_item()
     {
         $character = $this->character->inventoryManagement()
             ->giveItemMultipleTimes($this->createItem([
@@ -76,7 +76,7 @@ class EquipItemServiceTest extends TestCase
         $equipItemService->replaceItem();
     }
 
-    public function testCannotEquipAnotherUnique()
+    public function test_cannot_equip_another_unique()
     {
         $character = $this->character->inventoryManagement()
             ->giveItemMultipleTimes($this->createItem([
@@ -112,7 +112,7 @@ class EquipItemServiceTest extends TestCase
         $equipItemService->replaceItem();
     }
 
-    public function testReplaceItemInSet()
+    public function test_replace_item_in_set()
     {
         $character = $this->character->inventoryManagement()
             ->giveItemMultipleTimes($this->createItem([
@@ -142,7 +142,7 @@ class EquipItemServiceTest extends TestCase
         $this->assertEquals('To Replace', $character->inventorySets->first()->slots->first()->item->name);
     }
 
-    public function testCannotEquipUniqueForNonSet()
+    public function test_cannot_equip_unique_for_non_set()
     {
         $character = $this->character
             ->inventoryManagement()
@@ -174,7 +174,7 @@ class EquipItemServiceTest extends TestCase
         $equipItemService->replaceItem();
     }
 
-    public function testGetUniqueItemFromSetByPrefix()
+    public function test_get_unique_item_from_set_by_prefix()
     {
         $character = $this->character
             ->inventorySetManagement()
@@ -193,7 +193,7 @@ class EquipItemServiceTest extends TestCase
         )->item->type);
     }
 
-    public function testGetUniqueItemFromSetBySuffix()
+    public function test_get_unique_item_from_set_by_suffix()
     {
         $character = $this->character
             ->inventorySetManagement()
@@ -212,7 +212,7 @@ class EquipItemServiceTest extends TestCase
         )->item->type);
     }
 
-    public function testItemIsUniquePrefix()
+    public function test_item_is_unique_prefix()
     {
         $this->assertTrue(
             $this->equipItemService->isItemToEquipUnique(
@@ -227,7 +227,7 @@ class EquipItemServiceTest extends TestCase
         );
     }
 
-    public function testItemIsUniqueSuffix()
+    public function test_item_is_unique_suffix()
     {
         $this->assertTrue(
             $this->equipItemService->isItemToEquipUnique(
@@ -242,7 +242,7 @@ class EquipItemServiceTest extends TestCase
         );
     }
 
-    public function testItemToBeReplacedIsUniquePrefix()
+    public function test_item_to_be_replaced_is_unique_prefix()
     {
         $character = $this->character->inventoryManagement()
             ->giveItemMultipleTimes($this->createItem([
@@ -274,7 +274,7 @@ class EquipItemServiceTest extends TestCase
         ));
     }
 
-    public function testItemToBeReplacedIsUniqueSuffix()
+    public function test_item_to_be_replaced_is_unique_suffix()
     {
         $character = $this->character->inventoryManagement()
             ->giveItemMultipleTimes($this->createItem([
@@ -306,7 +306,7 @@ class EquipItemServiceTest extends TestCase
         ));
     }
 
-    public function testUnequipBow()
+    public function test_unequip_bow()
     {
         $character = $this->character
             ->inventoryManagement()
@@ -331,7 +331,7 @@ class EquipItemServiceTest extends TestCase
         $this->assertFalse($character->inventory->slots->first()->equipped);
     }
 
-    public function testUnequipHammer()
+    public function test_unequip_hammer()
     {
         $character = $this->character
             ->inventoryManagement()
@@ -356,7 +356,7 @@ class EquipItemServiceTest extends TestCase
         $this->assertFalse($character->inventory->slots->first()->equipped);
     }
 
-    public function testUnequipStave()
+    public function test_unequip_stave()
     {
         $character = $this->character
             ->inventoryManagement()
@@ -381,7 +381,7 @@ class EquipItemServiceTest extends TestCase
         $this->assertFalse($character->inventory->slots->first()->equipped);
     }
 
-    public function testUnequipStaveFromSet()
+    public function test_unequip_stave_from_set()
     {
         $character = $this->character
             ->inventoryManagement()

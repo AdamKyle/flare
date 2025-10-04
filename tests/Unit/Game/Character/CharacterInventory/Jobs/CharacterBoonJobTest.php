@@ -16,7 +16,7 @@ class CharacterBoonJobTest extends TestCase
 
     private ?CharacterFactory $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -25,21 +25,21 @@ class CharacterBoonJobTest extends TestCase
         Event::fake();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testNoBoonToRemove()
+    public function test_no_boon_to_remove()
     {
         CharacterBoonJob::dispatch(6764);
 
         Event::assertNotDispatched(ServerMessageEvent::class);
     }
 
-    public function testRemoveBoon()
+    public function test_remove_boon()
     {
         $character = $this->character->getCharacter();
 

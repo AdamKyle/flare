@@ -2,7 +2,8 @@
 
 namespace App\Flare\Items\Values;
 
-enum AlchemyItemType: string {
+enum AlchemyItemType: string
+{
     case INCREASE_STATS = 'increase-stats';
     case INCREASE_DAMAGE = 'increase-damage';
     case INCREASE_ARMOUR = 'increase-armour';
@@ -14,8 +15,6 @@ enum AlchemyItemType: string {
 
     /**
      * Returns whether this alchemy item type increases stats.
-     *
-     * @return bool
      */
     public function increasesStats(): bool
     {
@@ -24,8 +23,6 @@ enum AlchemyItemType: string {
 
     /**
      * Returns whether this alchemy item type increases damage.
-     *
-     * @return bool
      */
     public function increasesDamage(): bool
     {
@@ -34,8 +31,6 @@ enum AlchemyItemType: string {
 
     /**
      * Returns whether this alchemy item type increases armour.
-     *
-     * @return bool
      */
     public function increasesArmour(): bool
     {
@@ -44,8 +39,6 @@ enum AlchemyItemType: string {
 
     /**
      * Returns whether this alchemy item type increases healing.
-     *
-     * @return bool
      */
     public function increasesHealing(): bool
     {
@@ -54,8 +47,6 @@ enum AlchemyItemType: string {
 
     /**
      * Returns whether this alchemy item type increases a skill type.
-     *
-     * @return bool
      */
     public function increasesSkillType(): bool
     {
@@ -64,8 +55,6 @@ enum AlchemyItemType: string {
 
     /**
      * Returns whether this alchemy item type damages kingdoms.
-     *
-     * @return bool
      */
     public function damagesKingdoms(): bool
     {
@@ -74,8 +63,6 @@ enum AlchemyItemType: string {
 
     /**
      * Returns whether this alchemy item type is a holy oil type.
-     *
-     * @return bool
      */
     public function isHolyOilType(): bool
     {

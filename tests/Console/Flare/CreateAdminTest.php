@@ -13,14 +13,14 @@ class CreateAdminTest extends TestCase
         CreateUser,
         RefreshDatabase;
 
-    public function testCreateAdmin()
+    public function test_create_admin()
     {
         $this->createAdminRole();
 
         $this->assertEquals(0, $this->artisan('create:admin test@gmail.com'));
     }
 
-    public function testCreateAdminUserExists()
+    public function test_create_admin_user_exists()
     {
         $this->createAdminRole();
 

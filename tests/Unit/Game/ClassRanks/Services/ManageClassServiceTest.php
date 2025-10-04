@@ -18,7 +18,7 @@ class ManageClassServiceTest extends TestCase
 
     private ?ManageClassService $manageClassService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -30,7 +30,7 @@ class ManageClassServiceTest extends TestCase
         $this->manageClassService = resolve(ManageClassService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -38,7 +38,7 @@ class ManageClassServiceTest extends TestCase
         $this->manageClassService = null;
     }
 
-    public function testCannotSwitchToClassThatIsLocked()
+    public function test_cannot_switch_to_class_that_is_locked()
     {
         $heretic = $this->createClass([
             'name' => 'Heretic',
@@ -65,7 +65,7 @@ class ManageClassServiceTest extends TestCase
         $this->assertEquals('This class is locked. You must level this classes required classes to the specified levels.', $response['message']);
     }
 
-    public function testSwitchCharacterClass()
+    public function test_switch_character_class()
     {
         $character = $this->character->getCharacter();
         $skill = $this->createGameSkill(['name' => 'Class Skill', 'game_class_id' => $character->game_class_id]);
@@ -89,7 +89,7 @@ class ManageClassServiceTest extends TestCase
         $this->assertEquals($character->damage_stat, $gameClass->damage_stat);
     }
 
-    public function testReactivateSkill()
+    public function test_reactivate_skill()
     {
         $character = $this->character->getCharacter();
         $skill = $this->createGameSkill(['name' => 'Class Skill', 'game_class_id' => $character->game_class_id]);

@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 class GlobalEventForEventTypeValueTest extends TestCase
 {
-    public function testGetWinterEventGlobalEventGoalData()
+    public function test_get_winter_event_global_event_goal_data()
     {
         $expected = [
             'max_kills' => 20000,
@@ -26,7 +26,7 @@ class GlobalEventForEventTypeValueTest extends TestCase
         $this->assertEquals($expected, GlobalEventForEventTypeValue::returnGlobalEventInfoForSeasonalEvents(EventType::WINTER_EVENT));
     }
 
-    public function testGetDelusionalMemoriesBattleEventGoalData()
+    public function test_get_delusional_memories_battle_event_goal_data()
     {
         $expected = [
             'max_kills' => 20000,
@@ -42,7 +42,7 @@ class GlobalEventForEventTypeValueTest extends TestCase
         $this->assertEquals($expected, GlobalEventForEventTypeValue::returnGlobalEventInfoForSeasonalEvents(EventType::DELUSIONAL_MEMORIES_EVENT));
     }
 
-    public function testGetCraftingEventGoalData()
+    public function test_get_crafting_event_goal_data()
     {
         $expected = [
             'max_crafts' => 500,
@@ -58,7 +58,7 @@ class GlobalEventForEventTypeValueTest extends TestCase
         $this->assertEquals($expected, GlobalEventForEventTypeValue::returnDelusionalMemoriesCraftingEventGoal());
     }
 
-    public function testGetEnchantingEventGoalData()
+    public function test_get_enchanting_event_goal_data()
     {
         $expected = [
             'max_enchants' => 500,
@@ -74,7 +74,7 @@ class GlobalEventForEventTypeValueTest extends TestCase
         $this->assertEquals($expected, GlobalEventForEventTypeValue::returnDelusionalMemoriesEnchantingEventGoal());
     }
 
-    public function testGetDelusionalMemoriesGlobalEventSteps()
+    public function test_get_delusional_memories_global_event_steps()
     {
         $expected = [
             'battle',
@@ -85,7 +85,7 @@ class GlobalEventForEventTypeValueTest extends TestCase
         $this->assertEquals($expected, GlobalEventForEventTypeValue::fetchDelusionalMemoriesGlobalEventSteps());
     }
 
-    public function testGetNothingForGlobalEventGoals()
+    public function test_get_nothing_for_global_event_goals()
     {
         $this->assertEmpty(GlobalEventForEventTypeValue::returnGlobalEventInfoForSeasonalEvents(EventType::WEEKLY_CELESTIALS));
     }

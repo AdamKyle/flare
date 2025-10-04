@@ -10,14 +10,15 @@ use Illuminate\Http\Request;
 
 class SurveyController extends Controller
 {
-    public function __construct(private readonly SurveyService $surveyService) {
-    }
+    public function __construct(private readonly SurveyService $surveyService) {}
 
-    public function fetchSurvey(Survey $survey) {
+    public function fetchSurvey(Survey $survey)
+    {
         return response()->json($survey);
     }
 
-    public function saveAnswers(Survey $survey, Character $character, Request $request) {
+    public function saveAnswers(Survey $survey, Character $character, Request $request)
+    {
         $response = $this->surveyService->saveSurvey($character, $survey, $request->all());
 
         $status = $response['status'];

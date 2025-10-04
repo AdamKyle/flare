@@ -10,9 +10,6 @@ class InfoPageService
 {
     /**
      * Create a new info page.
-     *
-     * @param array $params
-     * @return InfoPage
      */
     public function createPage(array $params): InfoPage
     {
@@ -21,9 +18,6 @@ class InfoPageService
 
     /**
      * Format sections for the editor.
-     *
-     * @param array $sections
-     * @return array
      */
     public function formatForEditor(array $sections): array
     {
@@ -41,9 +35,6 @@ class InfoPageService
 
     /**
      * Create a new info page section and store its contents.
-     *
-     * @param array $params
-     * @return InfoPage
      */
     private function create(array $params): InfoPage
     {
@@ -54,10 +45,6 @@ class InfoPageService
 
     /**
      * Store page content in the database.
-     *
-     * @param string $pageName
-     * @param array $sections
-     * @return InfoPage
      */
     private function storeContents(string $pageName, array $sections): InfoPage
     {
@@ -80,10 +67,6 @@ class InfoPageService
 
     /**
      * Delete stored images for a page.
-     *
-     * @param array $sections
-     * @param string $pageName
-     * @return void
      */
     public function deleteStoredImages(array $sections, string $pageName): void
     {
@@ -96,10 +79,6 @@ class InfoPageService
 
     /**
      * Update an existing info page.
-     *
-     * @param InfoPage $page
-     * @param array $params
-     * @return void
      */
     public function updatePage(InfoPage $page, array $params): void
     {
@@ -120,7 +99,8 @@ class InfoPageService
         $page->update(['page_sections' => $pageSections]);
     }
 
-    public function addSections(InfoPage $page, array $section): void {
+    public function addSections(InfoPage $page, array $section): void
+    {
         $pageSections = $this->formatForEditor($page->page_sections);
 
         $params = ['page_name' => $page->page_name, ...$section];
@@ -138,10 +118,6 @@ class InfoPageService
 
     /**
      * Delete a section from an info page.
-     *
-     * @param InfoPage $page
-     * @param int $order
-     * @return InfoPage
      */
     public function deleteSectionFromPage(InfoPage $page, int $order): InfoPage
     {
@@ -162,11 +138,6 @@ class InfoPageService
 
     /**
      * Update an existing section.
-     *
-     * @param InfoPage $page
-     * @param array $section
-     * @param array $params
-     * @return array
      */
     private function updateExistingSection(InfoPage $page, array $section, array $params): array
     {
@@ -184,11 +155,6 @@ class InfoPageService
 
     /**
      * Upload a new image for a section.
-     *
-     * @param array $section
-     * @param array $params
-     * @param string $pageName
-     * @return array
      */
     private function uploadNewImage(array $section, array $params, string $pageName): array
     {
@@ -203,9 +169,6 @@ class InfoPageService
 
     /**
      * Reorder all sections after one section is deleted.
-     *
-     * @param array $sections
-     * @return array
      */
     private function reOrderSectionAfterSectionDeletion(array $sections): array
     {
@@ -224,9 +187,6 @@ class InfoPageService
 
     /**
      * Create a new section.
-     *
-     * @param array $params
-     * @return array
      */
     private function createSection(array $params): array
     {
@@ -239,7 +199,7 @@ class InfoPageService
 
         $content = '';
 
-        if (!is_null($params['content'])) {
+        if (! is_null($params['content'])) {
             $content = str_replace('<p><br></p>', '', $params['content']);
             $content = str_replace('<p>&nbsp;</p>', '', $content);
         }

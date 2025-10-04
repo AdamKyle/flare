@@ -75,6 +75,6 @@ class BookBindersFear extends BattleBase
             $this->characterHealth = $maxHealth;
         }
 
-        $this->addMessage('You hit for (Book Binders Fear) ' . number_format($damage), 'player-action');
+        $this->addMessage('You hit for (Book Binders Fear) '.number_format($damage), 'player-action');
     }
 }

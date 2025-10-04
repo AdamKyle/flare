@@ -33,7 +33,7 @@ class GemServiceTest extends TestCase
 
     private ?GameSkill $gemSkill;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -49,7 +49,7 @@ class GemServiceTest extends TestCase
         $this->gemService = resolve(GemService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -58,7 +58,7 @@ class GemServiceTest extends TestCase
         $this->gemService = null;
     }
 
-    public function testCannotAffordTier()
+    public function test_cannot_afford_tier()
     {
         $character = $this->character->getCharacter();
 
@@ -68,7 +68,7 @@ class GemServiceTest extends TestCase
         $this->assertEquals('You do not have the required currencies to craft this item.', $result['message']);
     }
 
-    public function testCannotCraftWhenInventoryIsFull()
+    public function test_cannot_craft_when_inventory_is_full()
     {
         $character = $this->character->getCharacter();
 
@@ -85,7 +85,7 @@ class GemServiceTest extends TestCase
         $this->assertEquals('You do not have enough space in your inventory.', $result['message']);
     }
 
-    public function testCannotCraftWhenSkillLevelRequiredToHigh()
+    public function test_cannot_craft_when_skill_level_required_to_high()
     {
 
         $character = $this->character->getCharacter();
@@ -101,7 +101,7 @@ class GemServiceTest extends TestCase
         $this->assertEquals(200, $result['status']);
     }
 
-    public function testFailToCraftTheGem()
+    public function test_fail_to_craft_the_gem()
     {
         Event::fake();
 
@@ -129,7 +129,7 @@ class GemServiceTest extends TestCase
         });
     }
 
-    public function testAttemptToCraftTheGem()
+    public function test_attempt_to_craft_the_gem()
     {
         Event::fake();
 
@@ -152,7 +152,7 @@ class GemServiceTest extends TestCase
         $this->assertEquals(200, $result['status']);
     }
 
-    public function testCraftTheGem()
+    public function test_craft_the_gem()
     {
         Event::fake();
 
@@ -187,15 +187,14 @@ class GemServiceTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testCraftTheGemWhenSkillLevelIsMaxed()
+    public function test_craft_the_gem_when_skill_level_is_maxed()
     {
         Event::fake();
-
 
         $character = $this->character->getCharacter();
 
         $character->skills()->where('game_skill_id', GameSkill::where('name', 'Gem Crafting')->first()->id)->update([
-            'level' => 400
+            'level' => 400,
         ]);
 
         $character->update([
@@ -216,7 +215,7 @@ class GemServiceTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testCraftTheGemButIncreaseTheAmount()
+    public function test_craft_the_gem_but_increase_the_amount()
     {
         Event::fake();
 
@@ -267,7 +266,7 @@ class GemServiceTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testGetCraftableGemsList()
+    public function test_get_craftable_gems_list()
     {
         $character = $this->character->getCharacter();
 
@@ -276,7 +275,7 @@ class GemServiceTest extends TestCase
         $this->assertNotEmpty($result);
     }
 
-    public function testThrowExceptionWhenThePlayerDoesNotHaveTheSkill()
+    public function test_throw_exception_when_the_player_does_not_have_the_skill()
     {
         $this->expectException(Exception::class);
 
@@ -285,7 +284,7 @@ class GemServiceTest extends TestCase
         $this->gemService->getCraftableTiers($character);
     }
 
-    public function testFetchCharacterGemCraftingXP()
+    public function test_fetch_character_gem_crafting_xp()
     {
         $character = $this->character->getCharacter();
 

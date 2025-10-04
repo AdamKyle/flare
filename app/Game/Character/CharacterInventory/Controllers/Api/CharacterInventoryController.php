@@ -7,8 +7,6 @@ use App\Flare\Models\Character;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
 use App\Flare\Pagination\Requests\PaginationRequest;
-use App\Flare\Transformers\ItemTransformer;
-use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Requests\EquipItemValidation;
 use App\Game\Character\CharacterInventory\Requests\MoveItemRequest;
@@ -25,8 +23,6 @@ use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item as FractalItem;
 
 class CharacterInventoryController extends Controller
 {

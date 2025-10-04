@@ -48,7 +48,7 @@ class AlchemistsRavenousDream extends BattleBase
 
                 $this->monsterHealth -= $damage;
 
-                $this->addMessage('You hit for (Arcane Alchemist Ravenous Dream): ' . number_format($damage), 'player-action');
+                $this->addMessage('You hit for (Arcane Alchemist Ravenous Dream): '.number_format($damage), 'player-action');
             } else {
                 $damage = $this->characterCacheData->getCachedCharacterData($character, 'int_modded') * $percent;
 
@@ -67,7 +67,7 @@ class AlchemistsRavenousDream extends BattleBase
 
                     $this->monsterHealth -= $damage;
 
-                    $this->addMessage('You hit for (Arcane Alchemist Ravenous Dream): ' . number_format($damage), 'player-action');
+                    $this->addMessage('You hit for (Arcane Alchemist Ravenous Dream): '.number_format($damage), 'player-action');
                 }
             }
 

@@ -27,10 +27,11 @@ class Survey extends Model
      * @var array
      */
     protected $casts = [
-        'sections' => 'array'
+        'sections' => 'array',
     ];
 
-    protected static function newFactory() {
+    protected static function newFactory()
+    {
         return SurveyFactory::new();
     }
 }

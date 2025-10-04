@@ -20,7 +20,7 @@ class DisenchantingControllerTest extends TestCase
 
     private ?Character $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -39,14 +39,14 @@ class DisenchantingControllerTest extends TestCase
             ->getCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testDisenchantItem()
+    public function test_disenchant_item()
     {
         $item = $this->createItem([
             'crafting_type' => 'weapon',
@@ -56,10 +56,10 @@ class DisenchantingControllerTest extends TestCase
             'gold_dust_cost' => 100,
             'shards_cost' => 50,
             'item_prefix_id' => $this->createItemAffix([
-                'type' => 'prefix'
+                'type' => 'prefix',
             ]),
             'item_suffix_id' => $this->createItemAffix([
-                'type' => 'suffix'
+                'type' => 'suffix',
             ]),
         ]);
 
@@ -79,14 +79,14 @@ class DisenchantingControllerTest extends TestCase
         $character = $this->character->refresh();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/disenchant/' . $item->id);
+            ->call('POST', '/api/disenchant/'.$item->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
         $character = $this->character->refresh();
 
         $this->assertGreaterThan(0, $character->gold_dust);
-        $this->assertEquals('Disenchanted item ' . $item->affix_name . ' Check server message tab for Gold Dust output.', $jsonData['message']);
+        $this->assertEquals('Disenchanted item '.$item->affix_name.' Check server message tab for Gold Dust output.', $jsonData['message']);
         $this->assertEmpty($jsonData['inventory']['data']);
     }
 }

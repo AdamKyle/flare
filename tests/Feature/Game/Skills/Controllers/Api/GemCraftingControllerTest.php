@@ -6,7 +6,6 @@ use App\Flare\Models\Character;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Gems\Builders\GemBuilder;
 use App\Game\Skills\Services\GemService;
-use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
@@ -21,7 +20,7 @@ class GemCraftingControllerTest extends TestCase
 
     private ?Character $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -41,17 +40,17 @@ class GemCraftingControllerTest extends TestCase
             ->getCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testGetCraftableGems()
+    public function test_get_craftable_gems()
     {
         $response = $this->actingAs($this->character->user)
-            ->call('GET', '/api/gem-crafting/craftable-tiers/' . $this->character->id);
+            ->call('GET', '/api/gem-crafting/craftable-tiers/'.$this->character->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -59,7 +58,7 @@ class GemCraftingControllerTest extends TestCase
         $this->assertEquals(0, $jsonData['skill_xp']['current_xp']);
     }
 
-    public function testCraftGem()
+    public function test_craft_gem()
     {
 
         $this->character->update([
@@ -78,7 +77,7 @@ class GemCraftingControllerTest extends TestCase
         $character = $this->character->refresh();
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/gem-crafting/craft/' . $this->character->id, [
+            ->call('POST', '/api/gem-crafting/craft/'.$this->character->id, [
                 'tier' => 1,
             ]);
 

@@ -26,11 +26,11 @@ use Tests\Traits\CreateScheduledEvent;
 
 class DelusionalMemoriesEventEnderServiceTest extends TestCase
 {
-    use RefreshDatabase, CreateGameMap, CreateEvent, CreateScheduledEvent, CreateAnnouncement;
+    use CreateAnnouncement, CreateEvent, CreateGameMap, CreateScheduledEvent, RefreshDatabase;
 
     private ?DelusionalMemoriesEventEnderService $service = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -43,20 +43,20 @@ class DelusionalMemoriesEventEnderServiceTest extends TestCase
         $this->service = app()->make(DelusionalMemoriesEventEnderService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->service = null;
 
         parent::tearDown();
     }
 
-    public function testSupportsReturnsTrueForDelusionalMemoriesEvent(): void
+    public function test_supports_returns_true_for_delusional_memories_event(): void
     {
         $this->assertTrue($this->service->supports(new EventType(EventType::DELUSIONAL_MEMORIES_EVENT)));
         $this->assertFalse($this->service->supports(new EventType(EventType::WINTER_EVENT)));
     }
 
-    public function testEndReturnsEarlyWhenDelusionalMapMissing(): void
+    public function test_end_returns_early_when_delusional_map_missing(): void
     {
         $this->createGameMap(['name' => MapNameValue::SURFACE]);
 
@@ -86,7 +86,7 @@ class DelusionalMemoriesEventEnderServiceTest extends TestCase
         $this->assertEquals(0, Announcement::count());
     }
 
-    public function testEndReturnsEarlyWhenSurfaceMapMissing(): void
+    public function test_end_returns_early_when_surface_map_missing(): void
     {
         $this->createGameMap(['name' => MapNameValue::DELUSIONAL_MEMORIES]);
 
@@ -109,7 +109,7 @@ class DelusionalMemoriesEventEnderServiceTest extends TestCase
         $this->assertEquals(0, Announcement::count());
     }
 
-    public function testEndMovesCharactersResetsProgressUnpledgesAndCleansUp(): void
+    public function test_end_moves_characters_resets_progress_unpledges_and_cleans_up(): void
     {
         $surface = $this->createGameMap(['name' => MapNameValue::SURFACE]);
         $delusional = $this->createGameMap(['name' => MapNameValue::DELUSIONAL_MEMORIES]);

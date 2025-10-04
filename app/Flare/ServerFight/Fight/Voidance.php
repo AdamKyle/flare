@@ -55,7 +55,7 @@ class Voidance extends BattleMessages
         }
 
         if ($monster->canMonsterDevoidPlayer($characterCacheData->getCachedCharacterData($character, 'devouring_darkness_res')) && ! $monsterDevoided) {
-            $this->addMessage($monster->getName() . ' has devoided your voidance! You feel fear start to build.', 'enemy-action');
+            $this->addMessage($monster->getName().' has devoided your voidance! You feel fear start to build.', 'enemy-action');
 
             $playerDevoided = true;
         }
@@ -69,7 +69,7 @@ class Voidance extends BattleMessages
         }
 
         if ($monster->canMonsterVoidPlayer($characterCacheData->getCachedCharacterData($character, 'devouring_light_res')) && (! $monsterVoided || ! $monsterDevoided)) {
-            $this->addMessage($monster->getName() . ' has voided your enchantments! You feel much weaker!', 'enemy-action');
+            $this->addMessage($monster->getName().' has voided your enchantments! You feel much weaker!', 'enemy-action');
 
             $this->characterIsVoided = true;
         }
@@ -81,7 +81,7 @@ class Voidance extends BattleMessages
         $playerDevoided = false;
 
         if ($monster->canMonsterDevoidPlayer($characterCacheData->getCachedCharacterData($character, 'devouring_darkness_res'))) {
-            $this->addMessage($monster->getName() . ' has devoided your voidance! You feel fear start to build.', 'enemy-action');
+            $this->addMessage($monster->getName().' has devoided your voidance! You feel fear start to build.', 'enemy-action');
 
             $playerDevoided = true;
         }
@@ -93,7 +93,7 @@ class Voidance extends BattleMessages
         }
 
         if ($monster->canMonsterVoidPlayer($characterCacheData->getCachedCharacterData($character, 'devouring_light_res')) && ! $monsterDevoided) {
-            $this->addMessage($monster->getName() . ' has voided your enchantments! You feel much weaker!', 'enemy-action');
+            $this->addMessage($monster->getName().' has voided your enchantments! You feel much weaker!', 'enemy-action');
 
             $this->characterIsVoided = true;
         }

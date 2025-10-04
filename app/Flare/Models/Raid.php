@@ -61,12 +61,12 @@ class Raid extends Model
                 continue;
             }
 
-            if (!in_array($monster['id'], $this->raid_monster_ids) && !$monster['is_raid_boss']) {
+            if (! in_array($monster['id'], $this->raid_monster_ids) && ! $monster['is_raid_boss']) {
                 continue;
             }
 
             if ($monster['is_raid_boss']) {
-                $monster['name'] = $monster['name'] . ' (RAID BOSS)';
+                $monster['name'] = $monster['name'].' (RAID BOSS)';
             }
 
             $newRaidMonsters[] = $monster;
@@ -107,7 +107,7 @@ class Raid extends Model
 
             if (in_array($this->raid_boss_location_id, $locationIds)) {
 
-                $raidBoss['name'] = $raidBoss['name'] . ' (RAID BOSS)';
+                $raidBoss['name'] = $raidBoss['name'].' (RAID BOSS)';
 
                 array_unshift($raidMonsters, $raidBoss);
             }

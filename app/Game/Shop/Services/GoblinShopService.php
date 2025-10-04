@@ -7,19 +7,16 @@ use App\Flare\Models\Item;
 use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Shop\Transformers\ShopTransformer;
 use Facades\App\Game\Core\Handlers\HandleGoldBarsAsACurrency;
-use Illuminate\Database\Eloquent\Collection;
 
 class GoblinShopService
 {
     use ResponseBuilder;
 
-    public function __construct(private readonly Pagination $pagination, private readonly UsableItemTransformer $usableItemTransformer) {
+    public function __construct(private readonly Pagination $pagination, private readonly UsableItemTransformer $usableItemTransformer) {}
 
-    }
-
-    public function fetchItemsForShop(Character $character, int $perPage = 10, int $page = 1): array {
+    public function fetchItemsForShop(Character $character, int $perPage = 10, int $page = 1): array
+    {
         $items = Item::whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
             ->where('gold_bars_cost', '>', 0)
@@ -51,7 +48,7 @@ class GoblinShopService
         $characterGoldBars = $character->refresh()->kingdoms->sum('gold_bars');
 
         return $this->successResult([
-            'message' => 'Purchased: ' . $item->affix_name,
+            'message' => 'Purchased: '.$item->affix_name,
             'character_gold_bars' => $characterGoldBars,
         ]);
     }

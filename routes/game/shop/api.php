@@ -28,6 +28,5 @@ Route::group(['middleware' => [
     Route::post('/shop/purchase/multiple/{character}', ['uses' => 'Api\ShopController@buyMultiple']);
     Route::post('/shop/buy-and-replace/{character}', ['uses' => 'Api\ShopController@buyAndReplace']);
 
-
     Route::post('/goblin-shop/buy-item/{character}/{item}', ['uses' => 'Api\GoblinShopController@purchaseItem']);
 });

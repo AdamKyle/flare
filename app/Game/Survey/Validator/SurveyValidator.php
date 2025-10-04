@@ -12,14 +12,9 @@ use Illuminate\Support\Collection;
  */
 class SurveyValidator
 {
-
-    /**
-     * @var Collection $sections
-     */
     private Collection $sections;
 
     /**
-     * @param Survey $survey
      * @return $this
      */
     public function setSurveySections(Survey $survey): SurveyValidator
@@ -31,20 +26,17 @@ class SurveyValidator
 
     /**
      * Validate the provided survey input data.
-     *
-     * @param array $input
-     * @return bool
      */
     public function validate(array $input): bool
     {
         foreach ($this->sections as $index => $section) {
-            if (!isset($input[$index])) {
+            if (! isset($input[$index])) {
                 return false;
             }
 
             $sectionInput = $input[$index];
 
-            if (!$this->validateSection($section, $sectionInput)) {
+            if (! $this->validateSection($section, $sectionInput)) {
                 return false;
             }
         }
@@ -54,10 +46,6 @@ class SurveyValidator
 
     /**
      * Validate an individual section of the survey.
-     *
-     * @param array $section
-     * @param array $sectionInput
-     * @return bool
      */
     private function validateSection(array $section, array $sectionInput): bool
     {
@@ -68,13 +56,13 @@ class SurveyValidator
 
             $label = $inputType['label'];
 
-            if (!isset($sectionInput[$label]['value'])) {
+            if (! isset($sectionInput[$label]['value'])) {
                 return false;
             }
 
             $value = $sectionInput[$label]['value'];
 
-            if (!$this->validateInputType($inputType, $value)) {
+            if (! $this->validateInputType($inputType, $value)) {
                 return false;
             }
         }
@@ -85,9 +73,7 @@ class SurveyValidator
     /**
      * Validate an individual input field.
      *
-     * @param array $inputType
-     * @param mixed $value
-     * @return bool
+     * @param  mixed  $value
      */
     private function validateInputType(array $inputType, $value): bool
     {
@@ -103,16 +89,12 @@ class SurveyValidator
 
     /**
      * Validate the options selected in a checkbox field.
-     *
-     * @param array $options
-     * @param array $selectedValues
-     * @return bool
      */
     private function validateCheckboxOptions(array $options, array $selectedValues): bool
     {
 
         foreach ($selectedValues as $selectedValue) {
-            if (!in_array($selectedValue, $options, true)) {
+            if (! in_array($selectedValue, $options, true)) {
                 return false;
             }
         }

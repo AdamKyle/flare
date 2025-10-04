@@ -21,7 +21,7 @@ class ItemAtonementsTest extends TestCase
 
     private ?CharacterFactory $characterFactory;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -52,7 +52,7 @@ class ItemAtonementsTest extends TestCase
         $this->characterFactory = (new CharacterFactory)->createBaseCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -63,7 +63,7 @@ class ItemAtonementsTest extends TestCase
         $this->characterFactory = null;
     }
 
-    public function testInventoryComparisonIsEmpty()
+    public function test_inventory_comparison_is_empty()
     {
         $result = $this->itemAtonements->getAtonements($this->item, collect());
 
@@ -71,7 +71,7 @@ class ItemAtonementsTest extends TestCase
         $this->assertEmpty($result['inventory_atonements']);
     }
 
-    public function testInventoryComparisonIsNotEmpty()
+    public function test_inventory_comparison_is_not_empty()
     {
         $character = $this->characterFactory->inventoryManagement()->giveItem($this->item)->getCharacter();
 

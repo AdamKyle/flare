@@ -47,7 +47,7 @@ class CharacterAttackBuilder
     {
         $attack = $this->baseAttack(AttackTypeValue::ATTACK, $voided);
 
-        $attack['weapon_damage'] = $this->characterStatBuilder->buildDamage(array_map(fn($case) => $case->value, ItemType::cases()), $voided);
+        $attack['weapon_damage'] = $this->characterStatBuilder->buildDamage(array_map(fn ($case) => $case->value, ItemType::cases()), $voided);
 
         return $attack;
     }

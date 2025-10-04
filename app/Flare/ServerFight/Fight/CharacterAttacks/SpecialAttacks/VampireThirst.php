@@ -12,8 +12,8 @@ class VampireThirst extends BattleBase
         $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 
         if ($extraActionData['has_item']) {
-            if (!($extraActionData['chance'] >= 1)) {
-                if (!(rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
+            if (! ($extraActionData['chance'] >= 1)) {
+                if (! (rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
                     return;
                 }
             }
@@ -48,6 +48,6 @@ class VampireThirst extends BattleBase
             $this->characterHealth = $maxHealth;
         }
 
-        $this->addMessage('You hit for (thirst!) (and healed for) ' . number_format($damage), 'player-action');
+        $this->addMessage('You hit for (thirst!) (and healed for) '.number_format($damage), 'player-action');
     }
 }

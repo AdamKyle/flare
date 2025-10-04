@@ -4,31 +4,31 @@ namespace App\Flare\Items\Values;
 
 enum QuestItemEffectsType: string
 {
-    case WALK_ON_WATER                     = 'walk-on-water';
-    case WALK_ON_DEATH_WATER               = 'walk-on-death-water';
-    case LABYRINTH                         = 'labyrinth';
-    case DUNGEON                           = 'dungeon';
-    case SHADOW_PLANE                      = 'shadow-plane';
-    case HELL                              = 'hell';
-    case PURGATORY                         = 'purgatory';
-    case TELEPORT_TO_CELESTIAL             = 'teleport-to-celestial';
-    case AFFIXES_IRRESISTIBLE              = 'affixes-irresistible';
-    case CONTINUE_LEVELING                 = 'continue-leveling';
-    case GOLD_DUST_RUSH                    = 'gold-dust-rush';
-    case MASS_EMBEZZLE                     = 'mass-embezzle';
-    case WALK_ON_MAGMA                     = 'walk-on-magma';
-    case QUEEN_OF_HEARTS                   = 'speak-to-queen-of-hearts';
-    case FACTION_POINTS                    = 'effects-faction-points';
-    case GET_COPPER_COINS                  = 'get-copper-coins';
-    case ENTER_PURGATORY_HOUSE             = 'enter-purgatory-house';
-    case HIDE_CHAT_LOCATION                = 'hide-chat-location';
-    case WALK_ON_ICE                       = 'walk-on-ice';
-    case SETTLE_IN_ICE_PLANE               = 'settle-on-the-ice-plane';
-    case THE_OLD_CHURCH                    = 'the-old-church';
-    case MERCENARY_SLOT_BONUS              = 'mercenary-slot-bonus';
+    case WALK_ON_WATER = 'walk-on-water';
+    case WALK_ON_DEATH_WATER = 'walk-on-death-water';
+    case LABYRINTH = 'labyrinth';
+    case DUNGEON = 'dungeon';
+    case SHADOW_PLANE = 'shadow-plane';
+    case HELL = 'hell';
+    case PURGATORY = 'purgatory';
+    case TELEPORT_TO_CELESTIAL = 'teleport-to-celestial';
+    case AFFIXES_IRRESISTIBLE = 'affixes-irresistible';
+    case CONTINUE_LEVELING = 'continue-leveling';
+    case GOLD_DUST_RUSH = 'gold-dust-rush';
+    case MASS_EMBEZZLE = 'mass-embezzle';
+    case WALK_ON_MAGMA = 'walk-on-magma';
+    case QUEEN_OF_HEARTS = 'speak-to-queen-of-hearts';
+    case FACTION_POINTS = 'effects-faction-points';
+    case GET_COPPER_COINS = 'get-copper-coins';
+    case ENTER_PURGATORY_HOUSE = 'enter-purgatory-house';
+    case HIDE_CHAT_LOCATION = 'hide-chat-location';
+    case WALK_ON_ICE = 'walk-on-ice';
+    case SETTLE_IN_ICE_PLANE = 'settle-on-the-ice-plane';
+    case THE_OLD_CHURCH = 'the-old-church';
+    case MERCENARY_SLOT_BONUS = 'mercenary-slot-bonus';
     case WALK_ON_DELUSIONAL_MEMORIES_WATER = 'walk-on-delusional-memories-water';
-    case TWISTED_TREE_BRANCH               = 'access-twisted-memories';
-    case TWISTED_DUNGEONS                  = 'twisted-dungeons';
+    case TWISTED_TREE_BRANCH = 'access-twisted-memories';
+    case TWISTED_DUNGEONS = 'twisted-dungeons';
 
     public function label(): string
     {

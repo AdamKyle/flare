@@ -28,7 +28,7 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(SkillAssigner::class , function ($app) {
+        $this->app->bind(SkillAssigner::class, function ($app) {
             return new SkillAssigner(
                 $app->make(BaseSkillValue::class),
             );

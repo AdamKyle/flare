@@ -6,7 +6,7 @@ use App\Flare\Events\KingdomServerMessageEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
-use App\Flare\Models\Notification as Notification;
+use App\Flare\Models\Notification;
 use App\Flare\Models\UnitMovementQueue;
 use App\Game\Core\Events\UpdateNotificationsBroadcastEvent;
 use App\Game\Kingdoms\Events\UpdateKingdomLogs;

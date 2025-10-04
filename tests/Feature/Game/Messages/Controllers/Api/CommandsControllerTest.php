@@ -15,26 +15,25 @@ use Tests\Traits\CreateMonster;
 
 class CommandsControllerTest extends TestCase
 {
-    use RefreshDatabase, CreateMonster, CreateCelestials, CreateItem;
-
+    use CreateCelestials, CreateItem, CreateMonster, RefreshDatabase;
 
     private ?CharacterFactory $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testUsePcCommand()
+    public function test_use_pc_command()
     {
         Event::fake();
 
@@ -67,7 +66,7 @@ class CommandsControllerTest extends TestCase
         $this->assertEquals(200, $response->status());
     }
 
-    public function testUsePctCommand()
+    public function test_use_pct_command()
     {
         Event::fake();
 
@@ -101,7 +100,7 @@ class CommandsControllerTest extends TestCase
         $this->assertEquals(200, $response->status());
     }
 
-    public function testUsePctCommandWhenDead()
+    public function test_use_pct_command_when_dead()
     {
         Event::fake();
 

@@ -7,13 +7,13 @@ use PHPUnit\Framework\TestCase;
 
 class ArmourTypeTest extends TestCase
 {
-    public function testGetArmourPositions(): void
+    public function test_get_armour_positions(): void
     {
         $positions = ArmourType::getArmourPositions();
 
         $this->assertIsArray($positions);
 
-        $expectedKeys = array_map(fn(ArmourType $t) => $t->value, ArmourType::cases());
+        $expectedKeys = array_map(fn (ArmourType $t) => $t->value, ArmourType::cases());
         $this->assertEqualsCanonicalizing($expectedKeys, array_keys($positions));
 
         $this->assertEquals(['left-hand', 'right-hand'], $positions[ArmourType::SHIELD->value]);
@@ -25,13 +25,13 @@ class ArmourTypeTest extends TestCase
         $this->assertEquals(['helmet'], $positions[ArmourType::HELMET->value]);
     }
 
-    public function testAllTypes(): void
+    public function test_all_types(): void
     {
         $all = ArmourType::allTypes();
 
         $this->assertIsArray($all);
         $this->assertEqualsCanonicalizing(
-            array_map(fn(ArmourType $t) => $t->value, ArmourType::cases()),
+            array_map(fn (ArmourType $t) => $t->value, ArmourType::cases()),
             $all
         );
     }

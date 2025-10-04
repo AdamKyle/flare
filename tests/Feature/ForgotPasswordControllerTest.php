@@ -15,7 +15,7 @@ class ForgotPasswordControllerTest extends TestCase
         CreateUser,
         RefreshDatabase;
 
-    public function testCanSeeResetPasswordPage()
+    public function test_can_see_reset_password_page()
     {
 
         $this->visit('/login')
@@ -23,7 +23,7 @@ class ForgotPasswordControllerTest extends TestCase
             ->see('Reset Password');
     }
 
-    public function testAdminCanResetNoSecurityQuestions()
+    public function test_admin_can_reset_no_security_questions()
     {
 
         Mail::fake();
@@ -41,7 +41,7 @@ class ForgotPasswordControllerTest extends TestCase
             ])->see('Sent you an email to begin the reset process.');
     }
 
-    public function testUserGoesThroughSecurityQuestions()
+    public function test_user_goes_through_security_questions()
     {
 
         $user = $this->createUserWithCharacter()->getUser();
@@ -54,7 +54,7 @@ class ForgotPasswordControllerTest extends TestCase
             ])->see('Sent you an email to begin the reset process.');
     }
 
-    public function testFailWithUnknownEmail()
+    public function test_fail_with_unknown_email()
     {
 
         $this->visit('/login')

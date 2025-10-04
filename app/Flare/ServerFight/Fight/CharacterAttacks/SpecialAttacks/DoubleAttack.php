@@ -45,6 +45,6 @@ class DoubleAttack extends BattleBase
     {
         $this->monsterHealth -= $damage;
 
-        $this->addMessage('You hit for (weapon - double attack) ' . number_format($damage), 'player-action');
+        $this->addMessage('You hit for (weapon - double attack) '.number_format($damage), 'player-action');
     }
 }

@@ -16,17 +16,17 @@ class InitiateWeeklyCelestialSpawnEventTest extends TestCase
 {
     use CreateScheduledEvent, RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
 
-    public function testWeeklyCelestialEventDoesNotTrigger()
+    public function test_weekly_celestial_event_does_not_trigger()
     {
         Event::fake();
 
@@ -38,7 +38,7 @@ class InitiateWeeklyCelestialSpawnEventTest extends TestCase
         $this->assertEmpty(ModelsEvent::all());
     }
 
-    public function testWeeklyCelestialEventDoesTrigger()
+    public function test_weekly_celestial_event_does_trigger()
     {
         Event::fake();
 

@@ -41,16 +41,19 @@ class ManageKingdomResources extends Command
 
         if (is_null($character)) {
             $this->error('No character found for the provided ID.');
+
             return;
         }
 
         if ($character->kingdoms->isEmpty()) {
             $this->error('Character does not have any kingdoms to act on.');
+
             return;
         }
 
         if ($customAmount < 0) {
             $this->error('Custom amount must be 0 or higher.');
+
             return;
         }
 
@@ -63,6 +66,7 @@ class ManageKingdomResources extends Command
 
         if ($shouldSetMaxResources) {
             $this->setMaxResources($character);
+
             return;
         }
 
@@ -101,7 +105,6 @@ class ManageKingdomResources extends Command
         return (float) $fraction;
     }
 
-
     /**
      * Update only some kingdoms based on the chosen fraction.
      */
@@ -111,7 +114,7 @@ class ManageKingdomResources extends Command
         $totalKingdoms = $kingdoms->count();
         $kingdomsToUpdate = $kingdoms->random(round($totalKingdoms * $fraction));
 
-        if (!$shouldSetMaxResources && $customAmount <= 0) {
+        if (! $shouldSetMaxResources && $customAmount <= 0) {
             $this->error('When passing --some, you need to also pass customAmount so that the rest of the kingdoms use the custom amount, while the "some" uses 0');
             $this->info('Also note you may pass --setMaxResources in order to set most to mtheir max resources, while the rest you selected as some, will be set to 0.');
 
@@ -143,9 +146,9 @@ class ManageKingdomResources extends Command
             $kingdomNames[] = $kingdom->name;
         }
 
-        $this->info("Updated {$kingdomsToUpdate->count()} kingdoms to: " . ($shouldSetMaxResources ? 'Max Resources' : $customAmount));
+        $this->info("Updated {$kingdomsToUpdate->count()} kingdoms to: ".($shouldSetMaxResources ? 'Max Resources' : $customAmount));
         $this->info("Set the remaining {$remainingKingdoms->count()} kingdoms to 0.");
-        $this->info('Kingdoms who have 0 resources (excluding population): ' . implode(', ', $kingdomNames));
+        $this->info('Kingdoms who have 0 resources (excluding population): '.implode(', ', $kingdomNames));
     }
 
     /**

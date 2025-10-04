@@ -14,21 +14,21 @@ class AssignNewSkillsToPlayersTest extends TestCase
 
     private ?CharacterFactory $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testAssignNewSkillToPlayer()
+    public function test_assign_new_skill_to_player()
     {
         $gameSkill = $this->createGameSkill([
             'name' => 'Sample Skill',

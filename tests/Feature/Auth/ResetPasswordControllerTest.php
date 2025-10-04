@@ -13,7 +13,7 @@ class ResetPasswordControllerTest extends TestCase
         CreateUser,
         RefreshDatabase;
 
-    public function testCanSeeResetPasswordPage()
+    public function test_can_see_reset_password_page()
     {
         $user = $this->createUser();
 

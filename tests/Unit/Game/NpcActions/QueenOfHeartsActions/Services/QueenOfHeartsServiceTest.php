@@ -27,7 +27,7 @@ class QueenOfHeartsServiceTest extends TestCase
 
     private ?Item $queenOfHeartsQuestItem;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
 
         parent::setUp();
@@ -40,7 +40,7 @@ class QueenOfHeartsServiceTest extends TestCase
         ]);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
 
         parent::tearDown();
@@ -50,7 +50,7 @@ class QueenOfHeartsServiceTest extends TestCase
         $this->queenOfHeartsService = null;
     }
 
-    public function testCannotReRollForItemThatDoesntExist()
+    public function test_cannot_re_roll_for_item_that_doesnt_exist()
     {
         $gameMap = $this->createGameMap(['name' => 'Hell']);
 
@@ -66,7 +66,7 @@ class QueenOfHeartsServiceTest extends TestCase
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testCannotReRollWhenNotInHell()
+    public function test_cannot_re_roll_when_not_in_hell()
     {
         Event::fake();
 
@@ -78,11 +78,11 @@ class QueenOfHeartsServiceTest extends TestCase
 
         Event::assertDispatched(GlobalMessageEvent::class);
 
-        $this->assertEquals('You need to be in Hell to access The Queen of Hearts and have the quest item: ' . $this->queenOfHeartsQuestItem->affix_name . '.', $result['message']);
+        $this->assertEquals('You need to be in Hell to access The Queen of Hearts and have the quest item: '.$this->queenOfHeartsQuestItem->affix_name.'.', $result['message']);
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testCannotReRollWhenCantAfford()
+    public function test_cannot_re_roll_when_cant_afford()
     {
         $gameMap = $this->createGameMap(['name' => 'Hell']);
 
@@ -92,7 +92,7 @@ class QueenOfHeartsServiceTest extends TestCase
                 'item_suffix_id' => $this->createItemAffix([
                     'cost' => RandomAffixDetails::LEGENDARY,
                     'randomly_generated' => true,
-                ])
+                ]),
             ]))
             ->getCharacter();
 
@@ -112,7 +112,7 @@ class QueenOfHeartsServiceTest extends TestCase
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testCanReRoll()
+    public function test_can_re_roll()
     {
         Event::fake();
 
@@ -124,7 +124,7 @@ class QueenOfHeartsServiceTest extends TestCase
                 'item_suffix_id' => $this->createItemAffix([
                     'cost' => RandomAffixDetails::LEGENDARY,
                     'randomly_generated' => true,
-                ])
+                ]),
             ]))
             ->getCharacter();
 
@@ -145,7 +145,7 @@ class QueenOfHeartsServiceTest extends TestCase
         $this->assertEquals(200, $result['status']);
     }
 
-    public function testCannotMoveEnchantmentsWhenNotInHell()
+    public function test_cannot_move_enchantments_when_not_in_hell()
     {
         Event::fake();
 
@@ -155,11 +155,11 @@ class QueenOfHeartsServiceTest extends TestCase
 
         Event::assertDispatched(GlobalMessageEvent::class);
 
-        $this->assertEquals('You need to be in Hell to access The Queen of Hearts and have the quest item: ' . $this->queenOfHeartsQuestItem->affix_name . '.', $result['message']);
+        $this->assertEquals('You need to be in Hell to access The Queen of Hearts and have the quest item: '.$this->queenOfHeartsQuestItem->affix_name.'.', $result['message']);
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testCannotMoveEnchantmentsWhenItemsDoNotExist()
+    public function test_cannot_move_enchantments_when_items_do_not_exist()
     {
         $questItem = $this->queenOfHeartsQuestItem;
 
@@ -181,7 +181,7 @@ class QueenOfHeartsServiceTest extends TestCase
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testCannotMoveEnchantmentsWhenCannotAfford()
+    public function test_cannot_move_enchantments_when_cannot_afford()
     {
         $questItem = $this->queenOfHeartsQuestItem;
 
@@ -192,7 +192,7 @@ class QueenOfHeartsServiceTest extends TestCase
                 'item_suffix_id' => $this->createItemAffix([
                     'cost' => RandomAffixDetails::LEGENDARY,
                     'randomly_generated' => true,
-                ])
+                ]),
             ]))
             ->getCharacter();
 
@@ -226,7 +226,7 @@ class QueenOfHeartsServiceTest extends TestCase
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testCannotMoveEnchantmentsWhenInvalidItemTypeForItemToMoveTo()
+    public function test_cannot_move_enchantments_when_invalid_item_type_for_item_to_move_to()
     {
         $questItem = $this->queenOfHeartsQuestItem;
 
@@ -237,7 +237,7 @@ class QueenOfHeartsServiceTest extends TestCase
                 'item_suffix_id' => $this->createItemAffix([
                     'cost' => RandomAffixDetails::LEGENDARY,
                     'randomly_generated' => true,
-                ])
+                ]),
             ]))
             ->getCharacter();
 
@@ -267,7 +267,7 @@ class QueenOfHeartsServiceTest extends TestCase
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testCannotMoveEnchantmentsWhenInvalidItemTypeForItemToMoveFrom()
+    public function test_cannot_move_enchantments_when_invalid_item_type_for_item_to_move_from()
     {
         $questItem = $this->queenOfHeartsQuestItem;
 
@@ -278,7 +278,7 @@ class QueenOfHeartsServiceTest extends TestCase
                 'item_suffix_id' => $this->createItemAffix([
                     'cost' => RandomAffixDetails::LEGENDARY,
                     'randomly_generated' => true,
-                ])
+                ]),
             ]))
             ->getCharacter();
 
@@ -314,7 +314,7 @@ class QueenOfHeartsServiceTest extends TestCase
         $this->assertEquals(422, $result['status']);
     }
 
-    public function testCanMoveEnchantments()
+    public function test_can_move_enchantments()
     {
         $questItem = $this->queenOfHeartsQuestItem;
 
@@ -325,7 +325,7 @@ class QueenOfHeartsServiceTest extends TestCase
                 'item_suffix_id' => $this->createItemAffix([
                     'cost' => RandomAffixDetails::LEGENDARY,
                     'randomly_generated' => true,
-                ])
+                ]),
             ]))
             ->getCharacter();
 

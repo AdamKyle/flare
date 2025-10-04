@@ -21,7 +21,7 @@ class DeleteFlaggedUsersTest extends TestCase
 {
     use CreateGameSkill, CreateItem, CreateNpc, CreateRole, CreateUser, RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -57,7 +57,7 @@ class DeleteFlaggedUsersTest extends TestCase
         Queue::fake();
     }
 
-    public function testDeleteInactiveFlaggedUsers()
+    public function test_delete_inactive_flagged_users()
     {
         $this->character->user()->update([
             'will_be_deleted' => true,
@@ -68,7 +68,7 @@ class DeleteFlaggedUsersTest extends TestCase
         Queue::assertPushed(AccountDeletionJob::class);
     }
 
-    public function testDoNotDeletedNonFlaggedUsers()
+    public function test_do_not_deleted_non_flagged_users()
     {
         $this->assertEquals(0, $this->artisan('delete:flagged-users'));
 

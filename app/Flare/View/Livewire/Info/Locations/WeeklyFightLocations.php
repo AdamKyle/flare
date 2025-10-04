@@ -34,13 +34,13 @@ class WeeklyFightLocations extends DataTableComponent
             Column::make('Name')->searchable()->format(function ($value, $row) {
                 $locationId = Location::where('name', $value)->first()->id;
 
-                return '<a href="/information/locations/' . $locationId . '" >' . $row->name . '</a>';
+                return '<a href="/information/locations/'.$locationId.'" >'.$row->name.'</a>';
             })->html(),
 
             Column::make('Game Map', 'game_map_id')->searchable()->sortable()->format(function ($value, $row) {
                 $gameMap = GameMap::find($value);
 
-                return '<span>' . $gameMap->name . ($gameMap->only_during_event_type ? ' <i class="fas fa-star text-yellow-700 dark:text-yellow-500"></i> ' : '') . '</span>';
+                return '<span>'.$gameMap->name.($gameMap->only_during_event_type ? ' <i class="fas fa-star text-yellow-700 dark:text-yellow-500"></i> ' : '').'</span>';
             })->html(),
             Column::make('X Coordinate', 'x')->sortable(),
             Column::make('Y Coordinate', 'y')->sortable(),

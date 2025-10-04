@@ -20,7 +20,7 @@ class CharacterInventoryServiceTest extends TestCase
 
     private ?CharacterInventoryService $characterInventoryService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -29,7 +29,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->characterInventoryService = resolve(CharacterInventoryService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -52,7 +52,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertNotEmpty($result['savable_sets']);
     }
 
-    public function testGetInventoryForTypeSavableSets()
+    public function test_get_inventory_for_type_savable_sets()
     {
         $character = $this->character->inventorySetManagement()
             ->createInventorySets()
@@ -65,7 +65,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertNotEmpty($result);
     }
 
-    public function testGetInventoryForTypeEquipped()
+    public function test_get_inventory_for_type_equipped()
     {
         $character = $this->character->inventorySetManagement()
             ->createInventorySets()
@@ -78,7 +78,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertNotEmpty($result);
     }
 
-    public function testGetInventoryForTypeSets()
+    public function test_get_inventory_for_type_sets()
     {
         $character = $this->character->inventorySetManagement()
             ->createInventorySets(2)
@@ -93,7 +93,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertTrue($result['set_equipped']);
     }
 
-    public function testGetInventoryForQuestItems()
+    public function test_get_inventory_for_quest_items()
     {
         $character = $this->character->inventoryManagement()
             ->giveItem($this->createItem([
@@ -106,7 +106,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertNotEmpty($result);
     }
 
-    public function testGetInventoryForUsableItems()
+    public function test_get_inventory_for_usable_items()
     {
         $character = $this->character->inventoryManagement()
             ->giveItem($this->createItem([
@@ -120,7 +120,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertNotEmpty($result);
     }
 
-    public function testGetInventoryDataWhenNoValidTypePassedIn()
+    public function test_get_inventory_data_when_no_valid_type_passed_in()
     {
         $character = $this->character->inventorySetManagement()
             ->createInventorySets()
@@ -134,7 +134,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertNotEmpty($result['savable_sets']);
     }
 
-    public function testDisenchantAllItemsInInventory()
+    public function test_disenchant_all_items_in_inventory()
     {
         $character = $this->character->inventoryManagement()->giveItemMultipleTimes($this->createItem([
             'item_prefix_id' => $this->createItemAffix(['type' => 'prefix'])->id,
@@ -160,7 +160,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertTrue(str_contains($result['message'], 'Skill Levels in Enchanting.'));
     }
 
-    public function testGetItemFromInventorySet()
+    public function test_get_item_from_inventory_set()
     {
         $item = $this->createItem();
 
@@ -169,7 +169,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertEquals($item->id, $this->characterInventoryService->getSlotForItemDetails($character, $item)->item_id);
     }
 
-    public function testIncludeNamedSets()
+    public function test_include_named_sets()
     {
         $item = $this->createItem();
 
@@ -192,7 +192,7 @@ class CharacterInventoryServiceTest extends TestCase
         );
     }
 
-    public function testGetNoNameForNoEquippedSet()
+    public function test_get_no_name_for_no_equipped_set()
     {
         $character = $this->character->getCharacter();
 
@@ -201,7 +201,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertNull($name);
     }
 
-    public function testGetNameForNameEquippedSet()
+    public function test_get_name_for_name_equipped_set()
     {
         $item = $this->createItem();
 
@@ -218,7 +218,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertEquals('Sample', $name);
     }
 
-    public function testGetNameForNonNamedSetEquipped()
+    public function test_get_name_for_non_named_set_equipped()
     {
         $item = $this->createItem();
 
@@ -229,7 +229,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertEquals('Set 1', $name);
     }
 
-    public function testGetCharacterInventorySlotIds()
+    public function test_get_character_inventory_slot_ids()
     {
         $alchemyItem = $this->createItem(['type' => 'alchemy']);
         $questItem = $this->createItem(['type' => 'quest']);
@@ -240,7 +240,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertCount(1, $this->characterInventoryService->setCharacter($character)->findCharacterInventorySlotIds());
     }
 
-    public function testFetchEquippedSetWithName()
+    public function test_fetch_equipped_set_with_name()
     {
         $character = $this->character->inventorySetManagement()->createInventorySets()->putItemInSet($this->createItem(), 0, 'left-hand', true)->getCharacter();
 
@@ -253,21 +253,21 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertNotEmpty($this->characterInventoryService->setCharacter($character)->fetchEquipped());
     }
 
-    public function testFetchEquippedSetWithNoName()
+    public function test_fetch_equipped_set_with_no_name()
     {
         $character = $this->character->inventorySetManagement()->createInventorySets()->putItemInSet($this->createItem(), 0, 'left-hand', true)->getCharacter();
 
         $this->assertNotEmpty($this->characterInventoryService->setCharacter($character)->fetchEquipped());
     }
 
-    public function testFetchEquippedReturnsNull()
+    public function test_fetch_equipped_returns_null()
     {
         $character = $this->character->inventorySetManagement()->createInventorySets()->getCharacter();
 
         $this->assertEmpty($this->characterInventoryService->setCharacter($character)->fetchEquipped());
     }
 
-    public function testCannotDeleteItemThatDoesntExist()
+    public function test_cannot_delete_item_that_doesnt_exist()
     {
         $character = $this->character->getCharacter();
 
@@ -277,7 +277,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertEquals('You don\'t own that item.', $result['message']);
     }
 
-    public function testCannotDeleteItemThatIsEquipped()
+    public function test_cannot_delete_item_that_is_equipped()
     {
 
         $character = $this->character->inventoryManagement()->giveItem($this->createItem(), true, 'left_hand')->getCharacter();
@@ -288,7 +288,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertEquals('Cannot destroy equipped item.', $result['message']);
     }
 
-    public function testCanDeleteItemFromInventory()
+    public function test_can_delete_item_from_inventory()
     {
         $item = $this->createItem();
 
@@ -297,10 +297,10 @@ class CharacterInventoryServiceTest extends TestCase
         $result = $this->characterInventoryService->setCharacter($character)->deleteItem($character->inventory->slots->first()->id);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('Destroyed ' . $item->affix_name . '.', $result['message']);
+        $this->assertEquals('Destroyed '.$item->affix_name.'.', $result['message']);
     }
 
-    public function testCanDeleteArtifactWithItemSkillProgressionFromInventory()
+    public function test_can_delete_artifact_with_item_skill_progression_from_inventory()
     {
         $item = $this->createItem(['type' => 'artifact']);
 
@@ -325,10 +325,10 @@ class CharacterInventoryServiceTest extends TestCase
         $result = $this->characterInventoryService->setCharacter($character)->deleteItem($character->inventory->slots->first()->id);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('Destroyed ' . $item->affix_name . '.', $result['message']);
+        $this->assertEquals('Destroyed '.$item->affix_name.'.', $result['message']);
     }
 
-    public function testDeleteAllItemsInInventoryWithOutDestroyingUsableOrQuestItemsAllArtifacts()
+    public function test_delete_all_items_in_inventory_with_out_destroying_usable_or_quest_items_all_artifacts()
     {
         $artifact = $this->createItem(['type' => 'artifact']);
 
@@ -349,8 +349,8 @@ class CharacterInventoryServiceTest extends TestCase
         ]);
 
         $regularItem = $this->createItem();
-        $questItem   = $this->createItem(['type' => 'quest']);
-        $alchemy     = $this->createItem(['type' => 'alchemy']);
+        $questItem = $this->createItem(['type' => 'quest']);
+        $alchemy = $this->createItem(['type' => 'alchemy']);
 
         $character = $this->character->inventoryManagement()
             ->giveItem($artifact)
@@ -375,7 +375,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertCount(1, $character->inventory->slots->where('item.type', 'alchemy'));
     }
 
-    public function testDisenchantAllItemsHasNothingToDisenchant()
+    public function test_disenchant_all_items_has_nothing_to_disenchant()
     {
         $character = $this->character->getCharacter();
 
@@ -385,7 +385,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertEquals('You have nothing to disenchant.', $result['message']);
     }
 
-    public function testDisenchantAllItems()
+    public function test_disenchant_all_items()
     {
         $character = $this->character->inventoryManagement()->giveItem($this->createItem([
             'item_suffix_id' => $this->createItemAffix(['type' => 'suffix']),
@@ -400,7 +400,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertEmpty($character->inventory->slots);
     }
 
-    public function testCannotUnequipItemWhenInventoryIsFull()
+    public function test_cannot_unequip_item_when_inventory_is_full()
     {
         $character = $this->character->equipStartingEquipment()->getCharacter();
 
@@ -416,7 +416,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertEquals('Your inventory is full. Cannot unequip items. You have no room in your inventory.', $result['message']);
     }
 
-    public function testCannotUnequipItemWhenItemDoesNotExist()
+    public function test_cannot_unequip_item_when_item_does_not_exist()
     {
         $character = $this->character->equipStartingEquipment()->getCharacter();
 
@@ -426,7 +426,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertEquals('No item found to be unequipped.', $result['message']);
     }
 
-    public function testCanUnequipItem()
+    public function test_can_unequip_item()
     {
         $character = $this->character->equipStartingEquipment()->getCharacter();
 
@@ -435,12 +435,12 @@ class CharacterInventoryServiceTest extends TestCase
         $result = $this->characterInventoryService->setCharacter($character)->unequipItem($slot->id);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('Unequipped item: ' . $slot->item->affix_name, $result['message']);
+        $this->assertEquals('Unequipped item: '.$slot->item->affix_name, $result['message']);
 
         $this->assertFalse($slot->refresh()->equipped);
     }
 
-    public function testInventoryIsFullCannotUnequipItems()
+    public function test_inventory_is_full_cannot_unequip_items()
     {
         $character = $this->character->equipStartingEquipment()->getCharacter();
 
@@ -456,7 +456,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertEquals('Your inventory is full. Cannot unequip items. You have no room in your inventory.', $result['message']);
     }
 
-    public function testCanUnequipAllItems()
+    public function test_can_unequip_all_items()
     {
         $character = $this->character->equipStartingEquipment()->getCharacter();
 
@@ -472,7 +472,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertEmpty($character->inventory->slots()->where('equipped', true)->get());
     }
 
-    public function testCannotDestroyAlchemyItemYouDoNotHave()
+    public function test_cannot_destroy_alchemy_item_you_do_not_have()
     {
         $character = $this->character->getCharacter();
 
@@ -482,7 +482,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertEquals('No alchemy item found to destroy.', $result['message']);
     }
 
-    public function testCanDeleteAlchemyItem()
+    public function test_can_delete_alchemy_item()
     {
         $alchemyItem = $this->createItem([
             'type' => 'alchemy',
@@ -493,14 +493,14 @@ class CharacterInventoryServiceTest extends TestCase
         $result = $this->characterInventoryService->setCharacter($character)->destroyAlchemyItem($character->inventory->slots->where('item.type', '=', 'alchemy')->first()->id);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('Destroyed Alchemy Item: ' . $alchemyItem->name . '.', $result['message']);
+        $this->assertEquals('Destroyed Alchemy Item: '.$alchemyItem->name.'.', $result['message']);
 
         $character = $character->refresh();
 
         $this->assertEmpty($character->inventory->slots()->where('equipped', true)->get());
     }
 
-    public function testCanDeleteAllAlchemyItem()
+    public function test_can_delete_all_alchemy_item()
     {
         $alchemyItem = $this->createItem([
             'type' => 'alchemy',

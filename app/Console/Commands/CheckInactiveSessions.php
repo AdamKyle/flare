@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Flare\Models\UserLoginDuration;
 use Carbon\Carbon;
-use DB;
 use Illuminate\Console\Command;
 
 class CheckInactiveSessions extends Command
@@ -26,7 +25,8 @@ class CheckInactiveSessions extends Command
     /**
      * Execute the console command.
      */
-    public function handle() {
+    public function handle()
+    {
 
         $threshold = Carbon::now()->subMinutes(30); // example threshold, adjust as needed
 

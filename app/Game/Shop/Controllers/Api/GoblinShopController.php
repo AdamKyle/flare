@@ -2,17 +2,15 @@
 
 namespace App\Game\Shop\Controllers\Api;
 
-use App\Game\Shop\Services\GoblinShopService;
-use Illuminate\Http\JsonResponse;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
+use App\Game\Shop\Services\GoblinShopService;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 
 class GoblinShopController extends Controller
 {
-
-    public function __construct(private readonly GoblinShopService $goblinShopService)
-    {}
+    public function __construct(private readonly GoblinShopService $goblinShopService) {}
 
     public function fetchItems(Character $character): JsonResponse
     {

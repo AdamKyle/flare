@@ -2,48 +2,32 @@
 
 namespace App\Game\Events\Services;
 
+use App\Flare\Models\Event as ActiveEvent;
 use App\Flare\Models\Location;
 use App\Flare\Models\Raid;
 use App\Flare\Models\RaidBoss;
 use App\Flare\Models\RaidBossParticipation;
+use App\Flare\Models\ScheduledEvent;
 use App\Game\Events\Services\Concerns\EventEnder;
 use App\Game\Events\Values\EventType;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\UpdateRaidMonsters;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Raids\Events\CorruptLocations;
-use App\Flare\Models\Event as ActiveEvent;
-use App\Flare\Models\ScheduledEvent;
 
 class RaidEventEnderService implements EventEnder
 {
-
-    /**
-     * @param  LocationService  $locationService
-     * @param  UpdateRaidMonsters  $updateRaidMonsters
-     * @param  AnnouncementCleanupService  $announcementCleanup
-     */
     public function __construct(
         private readonly LocationService $locationService,
         private readonly UpdateRaidMonsters $updateRaidMonsters,
         private readonly AnnouncementCleanupService $announcementCleanup
     ) {}
 
-    /**
-     * @param  EventType  $type
-     * @return bool
-     */
     public function supports(EventType $type): bool
     {
         return $type->isRaidEvent();
     }
 
-    /**
-     * @param  EventType  $type
-     * @param  ScheduledEvent  $scheduled
-     * @param  ActiveEvent  $current
-     * @return void
-     */
     public function end(EventType $type, ScheduledEvent $scheduled, ActiveEvent $current): void
     {
         $raid = $scheduled->raid;
@@ -51,10 +35,11 @@ class RaidEventEnderService implements EventEnder
         if (is_null($raid)) {
             $this->announcementCleanup->deleteByEventId($current->id);
             $current->delete();
+
             return;
         }
 
-        event(new GlobalMessageEvent('The Raid: ' . $raid->name . ' is now ending! Don\'t worry, the raid will be back soon. Check the event calendar for the next time!'));
+        event(new GlobalMessageEvent('The Raid: '.$raid->name.' is now ending! Don\'t worry, the raid will be back soon. Check the event calendar for the next time!'));
 
         $this->unCorruptLocations($raid);
 
@@ -67,10 +52,6 @@ class RaidEventEnderService implements EventEnder
         $current->delete();
     }
 
-    /**
-     * @param  Raid  $raid
-     * @return void
-     */
     private function unCorruptLocations(Raid $raid): void
     {
         $ids = [...$raid->corrupted_location_ids, $raid->raid_boss_location_id];
@@ -86,10 +67,6 @@ class RaidEventEnderService implements EventEnder
         event(new CorruptLocations($this->locationService->fetchCorruptedLocationData($raid)));
     }
 
-    /**
-     * @param  Raid  $raid
-     * @return void
-     */
     private function purgeRaidData(Raid $raid): void
     {
         RaidBossParticipation::query()->where('raid_id', $raid->id)->delete();
@@ -97,10 +74,6 @@ class RaidEventEnderService implements EventEnder
         RaidBoss::query()->where('raid_id', $raid->id)->delete();
     }
 
-    /**
-     * @param  Raid  $raid
-     * @return void
-     */
     private function updateRaidMonstersForAffectedCharacters(Raid $raid): void
     {
         $ids = $raid->corrupted_location_ids;

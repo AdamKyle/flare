@@ -2,46 +2,42 @@
 
 namespace App\Game\Factions\FactionLoyalty\Services;
 
-use Illuminate\Support\Collection;
 use App\Flare\Models\Character;
 use App\Flare\Models\FactionLoyaltyNpc;
 use App\Flare\Models\FactionLoyaltyNpcTask;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
 use App\Flare\Values\MapNameValue;
+use Illuminate\Support\Collection;
 
-class UpdateFactionLoyaltyService {
-
+class UpdateFactionLoyaltyService
+{
     /**
      * Update faction loyalty bounty tasks for a character.
-     *
-     * @param Character $character
-     * @return void
      */
-    public function updateFactionLoyaltyBountyTasks(Character $character): void {
+    public function updateFactionLoyaltyBountyTasks(Character $character): void
+    {
         $gameMaps = GameMap::whereIn('name', [
             MapNameValue::DELUSIONAL_MEMORIES,
             MapNameValue::ICE_PLANE,
         ])->get();
 
-       $characterFactions = $character->factions()->whereIn('game_map_id', $gameMaps->pluck('id')->toArray())->get();
+        $characterFactions = $character->factions()->whereIn('game_map_id', $gameMaps->pluck('id')->toArray())->get();
 
-       $characterFactionLoyalties = $character->factionLoyalties()->whereIn('faction_id', $characterFactions->pluck('id')->toArray())->get();
+        $characterFactionLoyalties = $character->factionLoyalties()->whereIn('faction_id', $characterFactions->pluck('id')->toArray())->get();
 
-       foreach ($characterFactionLoyalties as $characterFactionLoyalty) {
-           $factionLoyaltyNpcs = $characterFactionLoyalty->factionLoyaltyNpcs;
+        foreach ($characterFactionLoyalties as $characterFactionLoyalty) {
+            $factionLoyaltyNpcs = $characterFactionLoyalty->factionLoyaltyNpcs;
 
-           $this->handleFactionLoyaltyNpcs($factionLoyaltyNpcs);
-       }
+            $this->handleFactionLoyaltyNpcs($factionLoyaltyNpcs);
+        }
     }
 
     /**
      * Handle the faction loyalty for npcs.
-     *
-     * @param Collection $factionLoyaltyNpcs
-     * @return void
      */
-    private function handleFactionLoyaltyNpcs(Collection $factionLoyaltyNpcs): void {
+    private function handleFactionLoyaltyNpcs(Collection $factionLoyaltyNpcs): void
+    {
         foreach ($factionLoyaltyNpcs as $factionLoyaltyNpc) {
             $task = $factionLoyaltyNpc->factionLoyaltyNpcTasks;
 
@@ -51,12 +47,9 @@ class UpdateFactionLoyaltyService {
 
     /**
      * Handle tasks for npc.
-     *
-     * @param FactionLoyaltyNpc $factionLoyaltyNpc
-     * @param FactionLoyaltyNpcTask $factionLoyaltyNpcTask
-     * @return void
      */
-    private function handleTasksForNpc(FactionLoyaltyNpc $factionLoyaltyNpc, FactionLoyaltyNpcTask $factionLoyaltyNpcTask): void {
+    private function handleTasksForNpc(FactionLoyaltyNpc $factionLoyaltyNpc, FactionLoyaltyNpcTask $factionLoyaltyNpcTask): void
+    {
         $tasks = $factionLoyaltyNpcTask->fame_tasks;
 
         $gameMapId = $factionLoyaltyNpc->factionLoyalty->faction->game_map_id;
@@ -67,7 +60,6 @@ class UpdateFactionLoyaltyService {
 
                 if ($monster->game_map_id !== $gameMapId) {
                     $newMonster = $this->fetchNewMonster($tasks, $gameMapId);
-
 
                     $task['monster_id'] = $newMonster->id;
                     $task['monster_name'] = $newMonster->name;
@@ -86,12 +78,9 @@ class UpdateFactionLoyaltyService {
 
     /**
      * Handle finding a new monster for the task.
-     *
-     * @param array $tasks
-     * @param int $gameMapId
-     * @return Monster
      */
-    private function fetchNewMonster(array $tasks, int $gameMapId): Monster {
+    private function fetchNewMonster(array $tasks, int $gameMapId): Monster
+    {
         $monster = Monster::where('game_map_id', $gameMapId)
             ->where('is_raid_monster', false)
             ->where('is_raid_boss', false)
@@ -109,11 +98,6 @@ class UpdateFactionLoyaltyService {
 
     /**
      * Check if the monster already has a task.
-     *
-     * @param array $tasks
-     * @param string $key
-     * @param int $id
-     * @return bool
      */
     private function hasTaskAlready(array $tasks, string $key, int $id): bool
     {

@@ -4,7 +4,6 @@ namespace App\Game\Core\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
 use Exception;
@@ -13,12 +12,9 @@ use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class GoldRush
 {
-
     /**
      * Process potential gold rush
      *
-     * @param Character $character
-     * @return void
      * @throws Exception
      */
     public function processPotentialGoldRush(Character $character): void

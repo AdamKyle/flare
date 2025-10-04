@@ -15,7 +15,7 @@ class ManageClassControllerTest extends TestCase
 
     private ?CharacterFactory $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -26,14 +26,14 @@ class ManageClassControllerTest extends TestCase
         )->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testSwitchClass()
+    public function test_switch_class()
     {
         $character = $this->character->getCharacter();
         $skill = $this->createGameSkill(['name' => 'Class Skill', 'game_class_id' => $character->game_class_id]);

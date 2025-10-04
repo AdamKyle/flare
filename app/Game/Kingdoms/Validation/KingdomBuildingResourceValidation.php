@@ -8,7 +8,6 @@ use App\Game\Kingdoms\Service\KingdomBuildingService;
 
 class KingdomBuildingResourceValidation
 {
-
     public function __construct(private KingdomBuildingService $kingdomBuildingService) {}
 
     public function getCostsForBuilding(KingdomBuilding $building): array
@@ -22,7 +21,7 @@ class KingdomBuildingResourceValidation
         $kingdom = $building->kingdom;
 
         foreach ($costs as $resource => $cost) {
-            if ($kingdom->{'current_' . $resource} < $cost) {
+            if ($kingdom->{'current_'.$resource} < $cost) {
                 return true;
             }
         }
@@ -35,7 +34,7 @@ class KingdomBuildingResourceValidation
         $missingCosts = [];
 
         foreach ($costs as $resource => $cost) {
-            $amountMissing = $cost - $kingdom->{'current_' . $resource};
+            $amountMissing = $cost - $kingdom->{'current_'.$resource};
 
             if ($amountMissing > 0) {
                 $missingCosts[$resource] = $amountMissing;

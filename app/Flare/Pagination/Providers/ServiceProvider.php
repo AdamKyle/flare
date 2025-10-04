@@ -2,8 +2,8 @@
 
 namespace App\Flare\Pagination\Providers;
 
-use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Pagination\Pagination;
+use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 
 class ServiceProvider extends ApplicationServiceProvider

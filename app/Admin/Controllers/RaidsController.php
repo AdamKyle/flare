@@ -45,8 +45,8 @@ class RaidsController extends Controller
                 ->orderBy('game_maps.name')
                 ->with('gameMap')
                 ->get()
-                ->map(fn($monster) => (object) [
-                    'name' => $monster->name . ' (' . $monster->gameMap->name . ')',
+                ->map(fn ($monster) => (object) [
+                    'name' => $monster->name.' ('.$monster->gameMap->name.')',
                     'id' => $monster->id,
                 ]),
             'locations' => Location::all(),
@@ -71,8 +71,8 @@ class RaidsController extends Controller
                 ->orderBy('game_maps.name')
                 ->with('gameMap')
                 ->get()
-                ->map(fn($monster) => (object) [
-                    'name' => $monster->name . ' (' . $monster->gameMap->name . ')',
+                ->map(fn ($monster) => (object) [
+                    'name' => $monster->name.' ('.$monster->gameMap->name.')',
                     'id' => $monster->id,
                 ]),
             'locations' => Location::all(),
@@ -134,6 +134,6 @@ class RaidsController extends Controller
 
         $raid = $raid->refresh();
 
-        return response()->redirectToRoute('admin.raids.show', ['raid' => $raid->id])->with('success', 'Saved raid: ' . $raid->name);
+        return response()->redirectToRoute('admin.raids.show', ['raid' => $raid->id])->with('success', 'Saved raid: '.$raid->name);
     }
 }

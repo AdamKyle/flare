@@ -2,13 +2,11 @@
 
 namespace App\Console\AfterDeployment;
 
-
 use App\Flare\Models\Item;
 use Illuminate\Console\Command;
 
 class CleanInvalidWeapons extends Command
 {
-
     const INVALID_TYPE = 'weapon';
 
     /**
@@ -37,7 +35,6 @@ class CleanInvalidWeapons extends Command
 
     /**
      * Execute the console command.
-     *
      */
     public function handle(): void
     {

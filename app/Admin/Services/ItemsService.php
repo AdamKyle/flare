@@ -178,6 +178,6 @@ class ItemsService
 
         $item->delete();
 
-        return $this->successResult(['message' => 'success', $name . ' was deleted successfully.']);
+        return $this->successResult(['message' => 'success', $name.' was deleted successfully.']);
     }
 }

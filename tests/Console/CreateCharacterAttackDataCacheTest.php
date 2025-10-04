@@ -12,7 +12,7 @@ class CreateCharacterAttackDataCacheTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testCreateAttackData()
+    public function test_create_attack_data()
     {
 
         Queue::fake();

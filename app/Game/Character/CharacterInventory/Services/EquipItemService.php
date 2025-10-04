@@ -89,7 +89,7 @@ class EquipItemService
                     'equipped' => $characterInventoryService->fetchEquipped(),
                     'sets' => $characterInventoryService->getCharacterInventorySets(),
                     'usable_sets' => $usableSets,
-                    'savable_sets' => $usableSets
+                    'savable_sets' => $usableSets,
                 ],
                 'message' => 'Equipped item.',
             ]);

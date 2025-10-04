@@ -15,7 +15,7 @@ class GiveKingdomsToNpcsTest extends TestCase
 
     private $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -35,7 +35,7 @@ class GiveKingdomsToNpcsTest extends TestCase
 
     }
 
-    public function testGiveBannedPlayerKingdomsToNPC()
+    public function test_give_banned_player_kingdoms_to_npc()
     {
         DB::table('users')->update([
             'updated_at' => now()->subDays(50),

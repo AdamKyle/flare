@@ -112,9 +112,9 @@ class RecruitUnits implements ShouldQueue
         if (UserOnlineValue::isOnline($user)) {
 
             if ($user->show_unit_recruitment_messages) {
-                $message = $this->unit->name . ' finished recruiting for kingdom: ' .
-                    $this->kingdom->name . ' on plane: ' . $plane . ' at: (X/Y) ' . $x . '/' . $y .
-                    '. You have a total of: ' . number_format($amount);
+                $message = $this->unit->name.' finished recruiting for kingdom: '.
+                    $this->kingdom->name.' on plane: '.$plane.' at: (X/Y) '.$x.'/'.$y.
+                    '. You have a total of: '.number_format($amount);
 
                 ServerMessageHandler::handleMessage($user, KingdomMessageTypes::UNIT_RECRUITMENT_FINISHED, $message);
             }

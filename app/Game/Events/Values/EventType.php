@@ -54,7 +54,7 @@ class EventType
         6 => 'The Old Church',
         7 => 'Delusional Memories Event',
         8 => 'Weekly Faction Loyalty Event',
-        9 => 'Tlessa\'s Feedback Event'
+        9 => 'Tlessa\'s Feedback Event',
     ];
 
     /**
@@ -65,7 +65,7 @@ class EventType
     public function __construct(int $value)
     {
         if (! in_array($value, self::$values)) {
-            throw new Exception($value . ' does not exist.');
+            throw new Exception($value.' does not exist.');
         }
 
         $this->value = $value;
@@ -161,8 +161,6 @@ class EventType
 
     /**
      * Are we a feedback based event?
-     *
-     * @return bool
      */
     public function isFeedbackEvent(): bool
     {

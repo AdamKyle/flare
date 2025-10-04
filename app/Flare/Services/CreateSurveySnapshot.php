@@ -8,18 +8,16 @@ use App\Flare\Models\SurveySnapshot;
 use Carbon\Carbon;
 use PHPUnit\Event\Telemetry\Snapshot;
 
-class CreateSurveySnapshot {
-
+class CreateSurveySnapshot
+{
     private array $survey = [];
 
     private int $surveySnapShotId = 0;
 
-    private Carbon|null $createdAt = null;
+    private ?Carbon $createdAt = null;
 
     /**
      * Execute the process of creating a survey snapshot.
-     *
-     * @return CreateSurveySnapshot
      */
     public function createSnapShop(): CreateSurveySnapshot
     {
@@ -50,35 +48,30 @@ class CreateSurveySnapshot {
 
     /**
      * get the survey results.
-     *
-     * @return array
      */
-    public function getSurvey(): array {
+    public function getSurvey(): array
+    {
         return $this->survey;
     }
 
     /**
      * Get the survey snapshot id.
-     *
-     * @return int
      */
-    public function getSurveySnapShotId(): int {
+    public function getSurveySnapShotId(): int
+    {
         return $this->surveySnapShotId;
     }
 
     /**
      * Get when the survey snapshot was created.
-     *
-     * @return Carbon|null
      */
-    public function getCreatedAt(): Carbon|null {
+    public function getCreatedAt(): ?Carbon
+    {
         return $this->createdAt;
     }
 
     /**
      * Get the latest survey.
-     *
-     * @return Survey
      */
     private function getLatestSurvey(): Survey
     {
@@ -88,7 +81,6 @@ class CreateSurveySnapshot {
     /**
      * Get responses for the given survey ID.
      *
-     * @param int $surveyId
      * @return \Illuminate\Support\Collection
      */
     private function getSurveyResponses(int $surveyId)
@@ -98,9 +90,6 @@ class CreateSurveySnapshot {
 
     /**
      * Initialize the results array.
-     *
-     * @param Survey $survey
-     * @return array
      */
     private function initializeResults(Survey $survey): array
     {
@@ -114,9 +103,7 @@ class CreateSurveySnapshot {
     /**
      * Process a section of the survey.
      *
-     * @param array $section
-     * @param \Illuminate\Support\Collection $responses
-     * @return array
+     * @param  \Illuminate\Support\Collection  $responses
      */
     private function processSection(array $section, $responses): array
     {
@@ -136,9 +123,7 @@ class CreateSurveySnapshot {
     /**
      * Process a field within a section.
      *
-     * @param array $field
-     * @param \Illuminate\Support\Collection $responses
-     * @return array
+     * @param  \Illuminate\Support\Collection  $responses
      */
     private function processField(array $field, $responses): array
     {
@@ -157,9 +142,6 @@ class CreateSurveySnapshot {
 
     /**
      * Initialize the field data array.
-     *
-     * @param array $field
-     * @return array
      */
     private function initializeFieldData(array $field): array
     {
@@ -174,9 +156,6 @@ class CreateSurveySnapshot {
 
     /**
      * Determine if the field is a selectable type (checkbox or radio).
-     *
-     * @param string $fieldType
-     * @return bool
      */
     private function isSelectableField(string $fieldType): bool
     {
@@ -186,9 +165,7 @@ class CreateSurveySnapshot {
     /**
      * Calculate the value percentage for selectable fields.
      *
-     * @param array $field
-     * @param \Illuminate\Support\Collection $responses
-     * @return array
+     * @param  \Illuminate\Support\Collection  $responses
      */
     private function calculateValuePercentage(array $field, $responses): array
     {
@@ -206,14 +183,10 @@ class CreateSurveySnapshot {
 
     /**
      * Get the count of responses that selected a given option.
-     *
-     * @param string $fieldLabel
-     * @param string $option
-     * @return int
      */
     private function getOptionSubmittedCount(string $fieldLabel, string $option): int
     {
-        return SubmittedSurvey::where(function($query) use ($fieldLabel, $option) {
+        return SubmittedSurvey::where(function ($query) use ($fieldLabel, $option) {
             $escapedOption = addslashes($option);
             $query->whereRaw(
                 "JSON_CONTAINS(
@@ -229,23 +202,16 @@ class CreateSurveySnapshot {
 
     /**
      * Format the percentage for an option.
-     *
-     * @param int $count
-     * @param int $total
-     * @return string
      */
     private function formatPercentage(int $count, int $total): string
     {
         return $total > 0
-            ? number_format(($count / $total) * 100, 2) . '%'
+            ? number_format(($count / $total) * 100, 2).'%'
             : '0%';
     }
 
     /**
      * Retrieve values for markdown fields.
-     *
-     * @param string $fieldLabel
-     * @return array
      */
     private function retrieveMarkdownValues(string $fieldLabel): array
     {
@@ -255,7 +221,7 @@ class CreateSurveySnapshot {
                 [
                     $fieldLabel => [
                         'type' => 'markdown',
-                    ]
+                    ],
                 ]
             );
         })->get();
@@ -267,17 +233,13 @@ class CreateSurveySnapshot {
 
     /**
      * Extract markdown values from the survey response.
-     *
-     * @param array $surveyResponse
-     * @param string $fieldLabel
-     * @return array
      */
     private function extractMarkdownValues(array $surveyResponse, string $fieldLabel): array
     {
         $values = [];
 
         foreach ($surveyResponse as $entry) {
-            if (!empty($entry[$fieldLabel]['value'])) {
+            if (! empty($entry[$fieldLabel]['value'])) {
                 $values[] = $entry[$fieldLabel]['value'];
             }
         }

@@ -16,7 +16,6 @@ use Facades\App\Flare\Calculators\DropCheckCalculator;
 
 class LocationSpecialtyHandler
 {
-
     use FetchEquipped;
 
     private RandomAffixGenerator $randomAffixGenerator;
@@ -45,7 +44,7 @@ class LocationSpecialtyHandler
         }
 
         for ($i = 1; $i <= 3; $i++) {
-            $character = $this->handOverAward($character, false, !$mainItemIsCosmic);
+            $character = $this->handOverAward($character, false, ! $mainItemIsCosmic);
         }
     }
 
@@ -53,7 +52,7 @@ class LocationSpecialtyHandler
     {
         $character = $this->handOverAward($character, $isCosmic);
 
-        event(new GlobalMessageEvent($character->name . ' Has slaughtered a beast beyond comprehension and been rewarded with an interesting gift!'));
+        event(new GlobalMessageEvent($character->name.' Has slaughtered a beast beyond comprehension and been rewarded with an interesting gift!'));
     }
 
     private function handOverAward(Character $character, bool $isCosmic = true, bool $secondaryIsLegendary = false): Character
@@ -77,11 +76,11 @@ class LocationSpecialtyHandler
         $slot = $character->inventory->slots->where('item_id', '=', $item->id)->first();
 
         if ($secondaryIsLegendary) {
-            event(new ServerMessageEvent($character->user, 'You have received a Legendary item! How exciting! Rewarded with: ' . $slot->item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You have received a Legendary item! How exciting! Rewarded with: '.$slot->item->affix_name, $slot->id));
         } elseif ($isCosmic) {
-            event(new ServerMessageEvent($character->user, 'You have received a Cosmic item! How exciting! Rewarded with: ' . $slot->item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You have received a Cosmic item! How exciting! Rewarded with: '.$slot->item->affix_name, $slot->id));
         } else {
-            event(new ServerMessageEvent($character->user, 'You have received a Mythical item! How exciting! Rewarded with: ' . $slot->item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You have received a Mythical item! How exciting! Rewarded with: '.$slot->item->affix_name, $slot->id));
         }
 
         return $character->refresh();

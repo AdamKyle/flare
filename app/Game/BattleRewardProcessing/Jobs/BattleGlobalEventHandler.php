@@ -2,11 +2,6 @@
 
 namespace App\Game\BattleRewardProcessing\Jobs;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
@@ -14,22 +9,20 @@ use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Values\MapNameValue;
 use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
 use App\Game\Events\Values\EventType;
-
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class BattleGlobalEventHandler implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * @param integer $characterId
-     */
     public function __construct(private int $characterId) {}
 
     /**
      * Handle the job
-     *
-     * @param BattleGlobalEventParticipationHandler $battleGlobalEventParticipationHandler
-     * @return void
      */
     public function handle(BattleGlobalEventParticipationHandler $battleGlobalEventParticipationHandler): void
     {
@@ -45,8 +38,6 @@ class BattleGlobalEventHandler implements ShouldQueue
     /**
      * Handle updating global events
      *
-     * @param Character $character
-     * @param BattleGlobalEventParticipationHandler $battleGlobalEventParticipationHandler
      * @return void
      */
     private function handleGlobalEventGoals(Character $character, BattleGlobalEventParticipationHandler $battleGlobalEventParticipationHandler)

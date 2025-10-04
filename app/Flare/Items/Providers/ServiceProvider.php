@@ -2,10 +2,6 @@
 
 namespace App\Flare\Items\Providers;
 
-use App\Flare\Github\Commands\GetReleaseData;
-use App\Flare\Github\Components\ReleaseNote;
-use App\Flare\Github\Services\Github;
-use App\Flare\Github\Services\Markdown;
 use App\Flare\Items\Comparison\Comparator;
 use App\Flare\Items\Comparison\ItemComparison;
 use App\Flare\Items\Enricher\EquippableEnricher;
@@ -16,7 +12,6 @@ use App\Flare\Items\Transformers\EquippableItemTransformer;
 use App\Flare\Items\Transformers\QuestItemTransformer;
 use App\Flare\Items\Transformers\UsableItemTransformer;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 

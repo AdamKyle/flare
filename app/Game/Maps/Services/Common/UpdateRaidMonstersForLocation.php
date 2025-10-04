@@ -115,11 +115,11 @@ trait UpdateRaidMonstersForLocation
 
         $cache = Cache::get('special-location-monsters');
 
-        if (! isset($cache['location-type-' . $location->type])) {
+        if (! isset($cache['location-type-'.$location->type])) {
             return false;
         }
 
-        $monsters = $cache['location-type-' . $location->type];
+        $monsters = $cache['location-type-'.$location->type];
 
         event(new UpdateMonsterList($monsters, $character->user));
         event(new UpdateRaidMonsters([], $character->user));

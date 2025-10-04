@@ -11,7 +11,6 @@ use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class UpdateItemSkill
 {
-
     public function __construct(private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes, private BattleMessageHandler $battleMessageHandler) {}
 
     public function updateItemSkill(Character $character, Item $item): void
@@ -52,7 +51,7 @@ class UpdateItemSkill
 
             ServerMessageHandler::sendBasicMessage(
                 $character->user,
-                'Your equipped artifacts: ' . $itemSkillProgression->item->affix_name . '\'s Skill: ' . $itemSkillProgression->itemSkill->name . ' has gained a new level and is now level: ' . $itemSkillProgression->current_level . '.'
+                'Your equipped artifacts: '.$itemSkillProgression->item->affix_name.'\'s Skill: '.$itemSkillProgression->itemSkill->name.' has gained a new level and is now level: '.$itemSkillProgression->current_level.'.'
             );
         }
     }

@@ -29,7 +29,7 @@ class StatModifierDetailsTest extends TestCase
 
     private ?GameClass $gameClass;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -43,7 +43,7 @@ class StatModifierDetailsTest extends TestCase
         $this->statModifierDetails = resolve(StatModifierDetails::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -52,7 +52,7 @@ class StatModifierDetailsTest extends TestCase
         $this->gameClass = null;
     }
 
-    public function testGetDetailsForStat()
+    public function test_get_details_for_stat()
     {
         $character = $this->createCharacterForData($this->character);
 
@@ -70,7 +70,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNotNull($data['map_reduction']);
     }
 
-    public function testGetDetailsForStatWhenOnEventMap()
+    public function test_get_details_for_stat_when_on_event_map()
     {
         $character = $this->createCharacterForData($this->character);
 
@@ -88,7 +88,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNotNull($data['map_reduction']);
     }
 
-    public function testGetDetailsForStatWhenOnNormalMapAndNaked()
+    public function test_get_details_for_stat_when_on_normal_map_and_naked()
     {
         $character = $this->character->getCharacter();
 
@@ -101,7 +101,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNull($data['map_reduction']);
     }
 
-    public function testGetHealthDetailsWhenNotVoided()
+    public function test_get_health_details_when_not_voided()
     {
         $character = $this->createCharacterForData($this->character);
 
@@ -111,7 +111,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNotNull($data['class_specialties']);
     }
 
-    public function testGetHealthDetailsWhenVoided()
+    public function test_get_health_details_when_voided()
     {
         $character = $this->createCharacterForData($this->character);
 
@@ -121,7 +121,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNotNull($data['class_specialties']);
     }
 
-    public function testGetACDetailsWhenNotVoided()
+    public function test_get_ac_details_when_not_voided()
     {
         $character = $this->createCharacterForData($this->character);
 
@@ -137,7 +137,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNotEmpty($data['attached_affixes']);
     }
 
-    public function testGetACDetailsWhenVoided()
+    public function test_get_ac_details_when_voided()
     {
         $character = $this->createCharacterForData($this->character);
 
@@ -152,7 +152,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNotEmpty($data['attached_affixes']);
     }
 
-    public function testGetACDetailsWhenNotVoidedAndNaked()
+    public function test_get_ac_details_when_not_voided_and_naked()
     {
         $character = $this->character->getCharacter();
 
@@ -167,7 +167,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertEmpty($data['attached_affixes']);
     }
 
-    public function testGetDamageForWeaponsWhenNotVoided()
+    public function test_get_damage_for_weapons_when_not_voided()
     {
         $character = $this->createCharacterForData($this->character);
 
@@ -189,7 +189,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNotEmpty($data['masteries']);
     }
 
-    public function testGetDamageForSpellDamageWhenNotVoided()
+    public function test_get_damage_for_spell_damage_when_not_voided()
     {
         $character = $this->createCharacterForData($this->character);
 
@@ -211,7 +211,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNotEmpty($data['masteries']);
     }
 
-    public function testGetDamageForSpellDamageWhenClassIsHereticAndNotVoided()
+    public function test_get_damage_for_spell_damage_when_class_is_heretic_and_not_voided()
     {
 
         $this->gameClass = $this->createClass([
@@ -242,7 +242,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNotEmpty($data['masteries']);
     }
 
-    public function testGetDamageForWeaponsWhenVoided()
+    public function test_get_damage_for_weapons_when_voided()
     {
         $character = $this->createCharacterForData($this->character);
 
@@ -264,7 +264,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNotEmpty($data['masteries']);
     }
 
-    public function testGetDamageForSpellDamageWhenVoided()
+    public function test_get_damage_for_spell_damage_when_voided()
     {
         $character = $this->createCharacterForData($this->character);
 
@@ -286,7 +286,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNotEmpty($data['masteries']);
     }
 
-    public function testGetDamageForSpellDamageWhenClassIsHereticAndVoided()
+    public function test_get_damage_for_spell_damage_when_class_is_heretic_and_voided()
     {
 
         $this->gameClass = $this->createClass([
@@ -317,7 +317,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNotEmpty($data['masteries']);
     }
 
-    public function testGetDamageForWeaponsWhenNotVoidedAndNaked()
+    public function test_get_damage_for_weapons_when_not_voided_and_naked()
     {
         $character = $this->character->getCharacter();
 
@@ -339,7 +339,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertEmpty($data['masteries']);
     }
 
-    public function testGetDamageForSpellDamageWhenNotVoidedAndNaked()
+    public function test_get_damage_for_spell_damage_when_not_voided_and_naked()
     {
         $character = $this->character->getCharacter();
 
@@ -361,7 +361,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertEmpty($data['masteries']);
     }
 
-    public function testGetDamageForSpellDamageWhenClassIsHereticAndNotVoidedAndNaked()
+    public function test_get_damage_for_spell_damage_when_class_is_heretic_and_not_voided_and_naked()
     {
 
         $this->gameClass = $this->createClass([
@@ -390,7 +390,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertEmpty($data['masteries']);
     }
 
-    public function testGetDamageForRingDamageWhenNotVoided()
+    public function test_get_damage_for_ring_damage_when_not_voided()
     {
 
         $character = $this->createCharacterForData($this->character);
@@ -413,7 +413,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertEmpty($data['masteries']);
     }
 
-    public function testGetDamageForRingDamageWhenNaked()
+    public function test_get_damage_for_ring_damage_when_naked()
     {
 
         $character = $this->character->getCharacter();
@@ -436,7 +436,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertEmpty($data['masteries']);
     }
 
-    public function testGetDamageForSpellHealingWhenNotVoided()
+    public function test_get_damage_for_spell_healing_when_not_voided()
     {
         $character = $this->createCharacterForData($this->character);
 
@@ -458,7 +458,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNotEmpty($data['masteries']);
     }
 
-    public function testGetDamageForSpellHealingWhenVoided()
+    public function test_get_damage_for_spell_healing_when_voided()
     {
         $character = $this->createCharacterForData($this->character);
 
@@ -480,7 +480,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNotEmpty($data['masteries']);
     }
 
-    public function testDamageWhenNotEquipped()
+    public function test_damage_when_not_equipped()
     {
         $this->gameClass = $this->createClass([
             'name' => 'Heretic',
@@ -502,7 +502,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
     }
 
-    public function testDamageWhenNotEquippedAndFighter()
+    public function test_damage_when_not_equipped_and_fighter()
     {
         $this->gameClass = $this->createClass([
             'name' => 'Fighter',
@@ -524,7 +524,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
     }
 
-    public function testDamageWhenNotEquippedAndAlcoholic()
+    public function test_damage_when_not_equipped_and_alcoholic()
     {
         $this->gameClass = $this->createClass([
             'name' => 'Alcoholic',

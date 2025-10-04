@@ -20,7 +20,7 @@ class TrinketCraftingControllerTest extends TestCase
 
     private ?Character $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -40,14 +40,14 @@ class TrinketCraftingControllerTest extends TestCase
             ->getCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testGetCraftableTrinkets()
+    public function test_get_craftable_trinkets()
     {
         $trinket = $this->createItem([
             'type' => 'trinket',
@@ -56,7 +56,7 @@ class TrinketCraftingControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('GET', '/api/trinket-crafting/' . $this->character->id);
+            ->call('GET', '/api/trinket-crafting/'.$this->character->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -64,13 +64,13 @@ class TrinketCraftingControllerTest extends TestCase
         $this->assertEquals(0, $jsonData['skill_xp']['current_xp']);
     }
 
-    public function testCraftTrinket()
+    public function test_craft_trinket()
     {
 
         $trinket = $this->createItem([
             'type' => 'trinket',
             'skill_level_required' => 1,
-            'skill_level_trivial' => 25
+            'skill_level_trivial' => 25,
         ]);
 
         $this->character->update([
@@ -89,7 +89,7 @@ class TrinketCraftingControllerTest extends TestCase
         $character = $this->character->refresh();
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/trinket-craft/' . $this->character->id, [
+            ->call('POST', '/api/trinket-craft/'.$this->character->id, [
                 'item_to_craft' => $trinket->id,
             ]);
 

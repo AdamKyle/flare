@@ -23,7 +23,6 @@ use Illuminate\Support\Facades\Cache;
 
 class MapController extends Controller
 {
-
     public function __construct(
         private readonly LocationService $locationService,
         private readonly MovementService $movementService,
@@ -47,11 +46,13 @@ class MapController extends Controller
         return response()->json([]);
     }
 
-    public function getLocationInformation(Location $location): JsonResponse {
+    public function getLocationInformation(Location $location): JsonResponse
+    {
         return response()->json($this->locationService->getLocationData($location));
     }
 
-    public function getLocationDroppableQuestItems(PaginationRequest $request, Location $location): JsonResponse {
+    public function getLocationDroppableQuestItems(PaginationRequest $request, Location $location): JsonResponse
+    {
         return response()->json($this->locationService->getDroppableItems($location, $request->per_page, $request->page, $request->search_text));
     }
 
@@ -95,7 +96,8 @@ class MapController extends Controller
         return response()->json($response, $status);
     }
 
-    public function fetchTeleportCoordinates(Character $character): JsonResponse {
+    public function fetchTeleportCoordinates(Character $character): JsonResponse
+    {
         $teleportCoordinates = $this->locationService->getTeleportLocations($character);
 
         return response()->json($teleportCoordinates);

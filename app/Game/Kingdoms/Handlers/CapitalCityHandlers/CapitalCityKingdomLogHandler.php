@@ -15,16 +15,12 @@ use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 
 class CapitalCityKingdomLogHandler
 {
-
     public function __construct(private readonly UpdateKingdom $updateKingdom) {}
 
     /**
      * Potentially create a kingdom log.
      *
      * - If the buildings are: Rejected, Finished or Cancelled we create a kingdom log.
-     *
-     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
-     * @return void
      */
     public function possiblyCreateLogForBuildingQueue(CapitalCityBuildingQueue $capitalCityBuildingQueue): void
     {
@@ -99,10 +95,6 @@ class CapitalCityKingdomLogHandler
 
     /**
      * Create building data for the log.
-     *
-     * @param Kingdom $kingdom
-     * @param array $requestData
-     * @return array
      */
     private function createBuildingDataForLog(Kingdom $kingdom, array $requestData): array
     {
@@ -112,7 +104,7 @@ class CapitalCityKingdomLogHandler
             if (in_array($data['secondary_status'], [
                 CapitalCityQueueStatus::REJECTED,
                 CapitalCityQueueStatus::CANCELLED,
-                CapitalCityQueueStatus::FINISHED
+                CapitalCityQueueStatus::FINISHED,
             ])) {
                 $building = KingdomBuilding::where('kingdom_id', $kingdom->id)->where('id', $data['building_id'])->first();
 
@@ -147,7 +139,7 @@ class CapitalCityKingdomLogHandler
             if (in_array($data['secondary_status'], [
                 CapitalCityQueueStatus::REJECTED,
                 CapitalCityQueueStatus::CANCELLED,
-                CapitalCityQueueStatus::FINISHED
+                CapitalCityQueueStatus::FINISHED,
             ])) {
                 $unitData[] = [
                     'unit_name' => $data['name'],

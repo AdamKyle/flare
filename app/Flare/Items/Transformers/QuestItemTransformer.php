@@ -4,39 +4,37 @@ declare(strict_types=1);
 
 namespace App\Flare\Items\Transformers;
 
-use Facades\App\Flare\Items\Presenters\QuestItemEffectsPresenter;
 use App\Flare\Models\Item;
+use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Quest;
-use App\Flare\Models\Location;
+use Facades\App\Flare\Items\Presenters\QuestItemEffectsPresenter;
 use League\Fractal\TransformerAbstract;
 
 class QuestItemTransformer extends TransformerAbstract
 {
-
     public function transform(Item $item): array
     {
         return [
-            'item_id'                  => $item->id,
-            'name'                     => $item->name,
-            'type'                     => $item->type,
-            'description'              => $item->description,
-            'can_drop'                 => $item->can_drop,
-            'usable'                   => $item->usable,
-            'craft_only'               => $item->craft_only,
-            'move_time_out_mod_bonus'  => $item->move_time_out_mod_bonus,
+            'item_id' => $item->id,
+            'name' => $item->name,
+            'type' => $item->type,
+            'description' => $item->description,
+            'can_drop' => $item->can_drop,
+            'usable' => $item->usable,
+            'craft_only' => $item->craft_only,
+            'move_time_out_mod_bonus' => $item->move_time_out_mod_bonus,
             'fight_time_out_mod_bonus' => $item->fight_time_out_mod_bonus,
-            'effect'                   => QuestItemEffectsPresenter::getEffect($item->effect),
-            'drop_location'            => $this->getDropLocation($item),
-            'required_monster'         => $this->getRequiredMonster($item),
-            'required_quest'           => $this->getRequiredQuest($item),
-            'reward_locations'         => $this->getRewardLocations($item),
-            'required_quests'          => $this->getRequiredQuests($item),
-            'reward_quests'            => $this->getRewardQuests($item),
-            'required_locations'       => $this->getRequiredLocations($item),
+            'effect' => QuestItemEffectsPresenter::getEffect($item->effect),
+            'drop_location' => $this->getDropLocation($item),
+            'required_monster' => $this->getRequiredMonster($item),
+            'required_quest' => $this->getRequiredQuest($item),
+            'reward_locations' => $this->getRewardLocations($item),
+            'required_quests' => $this->getRequiredQuests($item),
+            'reward_quests' => $this->getRewardQuests($item),
+            'required_locations' => $this->getRequiredLocations($item),
         ];
     }
-
 
     private function getDropLocation(Item $item): ?array
     {
@@ -49,9 +47,9 @@ class QuestItemTransformer extends TransformerAbstract
         }
 
         return [
-            'id'   => $item->dropLocation->id,
+            'id' => $item->dropLocation->id,
             'name' => $item->dropLocation->name,
-            'map'  => $item->dropLocation->map->name,
+            'map' => $item->dropLocation->map->name,
         ];
     }
 
@@ -64,9 +62,9 @@ class QuestItemTransformer extends TransformerAbstract
         }
 
         return [
-            'id'   => $monster->id,
+            'id' => $monster->id,
             'name' => $monster->name,
-            'map'  => $monster->gameMap->name,
+            'map' => $monster->gameMap->name,
         ];
     }
 
@@ -79,10 +77,10 @@ class QuestItemTransformer extends TransformerAbstract
         }
 
         return [
-            'id'   => $quest->id,
+            'id' => $quest->id,
             'name' => $quest->name,
-            'npc'  => $quest->npc->real_name,
-            'map'  => $quest->npc->gameMap->name,
+            'npc' => $quest->npc->real_name,
+            'map' => $quest->npc->gameMap->name,
         ];
     }
 
@@ -90,9 +88,9 @@ class QuestItemTransformer extends TransformerAbstract
     {
         return collect($item->locations)
             ->map(fn ($location) => [
-                'id'   => $location->id,
+                'id' => $location->id,
                 'name' => $location->name,
-                'map'  => $location->map->name,
+                'map' => $location->map->name,
             ])
             ->all();
     }
@@ -104,10 +102,10 @@ class QuestItemTransformer extends TransformerAbstract
             ->with('npc.gameMap')
             ->get()
             ->map(fn ($quest) => [
-                'id'   => $quest->id,
+                'id' => $quest->id,
                 'name' => $quest->name,
-                'npc'  => $quest->npc->real_name,
-                'map'  => $quest->npc->gameMap->name,
+                'npc' => $quest->npc->real_name,
+                'map' => $quest->npc->gameMap->name,
             ])
             ->toArray();
     }
@@ -118,10 +116,10 @@ class QuestItemTransformer extends TransformerAbstract
             ->with('npc.gameMap')
             ->get()
             ->map(fn ($quest) => [
-                'id'   => $quest->id,
+                'id' => $quest->id,
                 'name' => $quest->name,
-                'npc'  => $quest->npc->real_name,
-                'map'  => $quest->npc->gameMap->name,
+                'npc' => $quest->npc->real_name,
+                'map' => $quest->npc->gameMap->name,
             ])
             ->toArray();
     }
@@ -132,9 +130,9 @@ class QuestItemTransformer extends TransformerAbstract
             ->with('map')
             ->get()
             ->map(fn ($location) => [
-                'id'   => $location->id,
+                'id' => $location->id,
                 'name' => $location->name,
-                'map'  => $location->map->name,
+                'map' => $location->map->name,
             ])
             ->toArray();
     }

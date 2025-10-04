@@ -19,7 +19,7 @@ class ClearCelestialsTest extends TestCase
 
     private $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -29,7 +29,7 @@ class ClearCelestialsTest extends TestCase
         ]);
     }
 
-    public function testClearCelestials()
+    public function test_clear_celestials()
     {
 
         $monster = $this->createMonster([

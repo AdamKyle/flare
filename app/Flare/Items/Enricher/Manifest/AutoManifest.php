@@ -23,9 +23,7 @@ use App\Flare\Items\Enricher\Manifest\Values\ManifestSchemaId;
 final class AutoManifest
 {
     /**
-     * @param ManifestSchemaId $schema Fully-qualified schema class name
+     * @param  ManifestSchemaId  $schema  Fully-qualified schema class name
      */
-    public function __construct(public ManifestSchemaId $schema)
-    {
-    }
+    public function __construct(public ManifestSchemaId $schema) {}
 }

@@ -29,16 +29,11 @@ use Illuminate\Support\Collection;
  */
 class Comparator
 {
-    /**
-     * @param ManifestSchema $schema
-     */
     public function __construct(private readonly ManifestSchema $schema) {}
 
     /**
      * Compare two enriched items and return flattened adjustments plus skill-summary deltas.
      *
-     * @param  Item $itemToEquip
-     * @param  Item $itemEquipped
      * @return array{
      *   item_to_equip: Item,
      *   item_equipped: Item,
@@ -51,10 +46,10 @@ class Comparator
      */
     public function compare(Item $itemToEquip, Item $itemEquipped): array
     {
-        $leftMapped   = $this->mapItemToPaths($itemToEquip);
-        $rightMapped  = $this->mapItemToPaths($itemEquipped);
+        $leftMapped = $this->mapItemToPaths($itemToEquip);
+        $rightMapped = $this->mapItemToPaths($itemEquipped);
 
-        $mergedFieldMeta   = $leftMapped['fields'] + $rightMapped['fields'];
+        $mergedFieldMeta = $leftMapped['fields'] + $rightMapped['fields'];
         $mergedCollections = $leftMapped['collections'] + $rightMapped['collections'];
 
         $fieldAdjustments = $this->buildFieldAdjustments(
@@ -75,9 +70,9 @@ class Comparator
         return [
             'item_to_equip' => $itemToEquip,
             'item_equipped' => $itemEquipped,
-            'comparison'    => [
-                'type'  => $itemToEquip->type,
-                'name'        => $itemToEquip->name ?? null,
+            'comparison' => [
+                'type' => $itemToEquip->type,
+                'name' => $itemToEquip->name ?? null,
                 'description' => $itemToEquip->description ?? null,
                 'adjustments' => $adjustments,
             ],
@@ -87,7 +82,6 @@ class Comparator
     /**
      * Build a mapped data bag for an enriched item using the schema.
      *
-     * @param  Item $item
      * @return array{
      *   data: array<string, mixed>,
      *   fields: array<string, array{type:?string, compare:?string}>,
@@ -96,10 +90,10 @@ class Comparator
      */
     private function mapItemToPaths(Item $item): array
     {
-        $mappedData  = [];
-        $fieldMeta   = [];
+        $mappedData = [];
+        $fieldMeta = [];
 
-        $attributes      = $item->getAttributes();
+        $attributes = $item->getAttributes();
         $includePatterns = $this->schema->includes();
         $excludePatterns = $this->schema->excludes();
 
@@ -131,12 +125,12 @@ class Comparator
             }
 
             $fieldMeta[$mappedPath] = [
-                'type'    => $logicalType,
+                'type' => $logicalType,
                 'compare' => $strategy,
             ];
         }
 
-        $collectionsMeta       = [];
+        $collectionsMeta = [];
         $collectionDescriptors = $this->schema->collections();
 
         foreach ($collectionDescriptors as $descriptor) {
@@ -152,18 +146,18 @@ class Comparator
             $rows = $item->{$collectionProp} ?? null;
             $mappedData[$collectionPath] = $rows;
 
-            $keyName   = $descriptor['key']    ?? 'id';
+            $keyName = $descriptor['key'] ?? 'id';
             $fieldsMap = $descriptor['fields'] ?? [];
 
             $collectionsMeta[$collectionPath] = [
-                'key'    => $keyName,
+                'key' => $keyName,
                 'fields' => $fieldsMap,
             ];
         }
 
         return [
-            'data'        => $mappedData,
-            'fields'      => $fieldMeta,
+            'data' => $mappedData,
+            'fields' => $fieldMeta,
             'collections' => $collectionsMeta,
         ];
     }
@@ -172,20 +166,20 @@ class Comparator
      * Build adjustments for scalar fields.
      *
      * @param  array<string, array{type $fieldMeta :?string, compare:?string}> $fieldMeta
-     * @param  array<string, mixed> $leftData
-     * @param  array<string, mixed> $rightData
+     * @param  array<string, mixed>  $leftData
+     * @param  array<string, mixed>  $rightData
      * @return array<string, mixed>
      */
     private function buildFieldAdjustments(array $fieldMeta, array $leftData, array $rightData): array
     {
         return collect($fieldMeta)
             ->mapWithKeys(function (array $rules, string $path) use ($leftData, $rightData): array {
-                $strategy   = $rules['compare']; // non-null due to mapItemToPaths()
-                $leftValue  = Arr::get($leftData, $path);
+                $strategy = $rules['compare']; // non-null due to mapItemToPaths()
+                $leftValue = Arr::get($leftData, $path);
                 $rightValue = Arr::get($rightData, $path);
 
                 $adjustedValue = $this->compute($strategy, $leftValue, $rightValue);
-                $adjustedKey   = $this->adjustmentKeyFromPath($path);
+                $adjustedKey = $this->adjustmentKeyFromPath($path);
 
                 return [$adjustedKey => $adjustedValue];
             })
@@ -195,9 +189,9 @@ class Comparator
     /**
      * Build adjustments for collection rows (e.g., skill_summary).
      *
-     * @param  array<string, array{key:string, fields:array<string,string>}> $collectionsMeta
-     * @param  array<string, mixed> $leftData
-     * @param  array<string, mixed> $rightData
+     * @param  array<string, array{key:string, fields:array<string,string>}>  $collectionsMeta
+     * @param  array<string, mixed>  $leftData
+     * @param  array<string, mixed>  $rightData
      * @return array<int, array<string, mixed>>
      */
     private function buildCollectionAdjustments(array $collectionsMeta, array $leftData, array $rightData): array
@@ -208,10 +202,10 @@ class Comparator
 
         return collect($collectionsMeta)
             ->flatMap(function (array $rules, string $path) use ($leftData, $rightData): Collection {
-                $keyName         = $rules['key'] ?? 'id';
+                $keyName = $rules['key'] ?? 'id';
                 $fieldStrategies = (array) Arr::get($rules, 'fields', []);
 
-                $leftRowsIndexed  = $this->indexRowsByKey(Arr::get($leftData, $path), $keyName);
+                $leftRowsIndexed = $this->indexRowsByKey(Arr::get($leftData, $path), $keyName);
                 $rightRowsIndexed = $this->indexRowsByKey(Arr::get($rightData, $path), $keyName);
 
                 $allRowKeys = $leftRowsIndexed->keys()
@@ -221,7 +215,7 @@ class Comparator
                     ->values();
 
                 return $allRowKeys->map(function (string $rowKey) use ($leftRowsIndexed, $rightRowsIndexed, $keyName, $fieldStrategies): array {
-                    $leftRow  = $leftRowsIndexed->get($rowKey, []);
+                    $leftRow = $leftRowsIndexed->get($rowKey, []);
                     $rightRow = $rightRowsIndexed->get($rowKey, []);
 
                     return $this->buildCollectionRow($rowKey, $leftRow, $rightRow, $keyName, $fieldStrategies);
@@ -234,11 +228,9 @@ class Comparator
     /**
      * Build a single collection row with key + per-field "*_adjustment".
      *
-     * @param  string               $rowKey
      * @param  array<string,mixed>  $leftRow
      * @param  array<string,mixed>  $rightRow
-     * @param  string               $keyName
-     * @param  array<string,string> $fieldStrategies
+     * @param  array<string,string>  $fieldStrategies
      * @return array<string,mixed>
      */
     private function buildCollectionRow(
@@ -251,10 +243,10 @@ class Comparator
         $row = [$keyName => $rowKey];
 
         collect($fieldStrategies)->each(function (string $strategy, string $field) use (&$row, $leftRow, $rightRow): void {
-            $leftValue  = array_key_exists($field, $leftRow) ? $leftRow[$field] : null;
+            $leftValue = array_key_exists($field, $leftRow) ? $leftRow[$field] : null;
             $rightValue = array_key_exists($field, $rightRow) ? $rightRow[$field] : null;
 
-            $row[$field . '_adjustment'] = $this->compute($strategy, $leftValue, $rightValue);
+            $row[$field.'_adjustment'] = $this->compute($strategy, $leftValue, $rightValue);
         });
 
         return $row;
@@ -272,31 +264,30 @@ class Comparator
     private function adjustmentKeyFromPath(string $path): string
     {
         if (preg_match('/^totals\.(\w+)$/', $path, $match) === 1) {
-            return 'total_' . $match[1] . '_adjustment';
+            return 'total_'.$match[1].'_adjustment';
         }
 
         if (preg_match('/^mods\.base\.(\w+)$/', $path, $match) === 1) {
-            return 'base_' . $match[1] . '_adjustment';
+            return 'base_'.$match[1].'_adjustment';
         }
 
         if (preg_match('/^devouring\.(\w+)$/', $path, $match) === 1) {
-            return 'devouring_' . $match[1] . '_adjustment';
+            return 'devouring_'.$match[1].'_adjustment';
         }
 
         if (preg_match('/^affix_damage\.(\w+)$/', $path, $match) === 1) {
-            return $match[1] . '_adjustment';
+            return $match[1].'_adjustment';
         }
 
         $segments = explode('.', $path);
         $leaf = end($segments);
 
-        return $leaf . '_adjustment';
+        return $leaf.'_adjustment';
     }
 
     /**
      * Default comparison strategy by logical type.
      *
-     * @param  string|null $logicalType
      * @return string 'delta'|'flag-diff'|'noop'
      */
     private function defaultStrategyFor(?string $logicalType): string
@@ -315,10 +306,7 @@ class Comparator
     /**
      * Compute an adjustment using a named strategy.
      *
-     * @param  string $strategy 'delta'|'flag-diff'|'noop'
-     * @param  mixed  $leftValue
-     * @param  mixed  $rightValue
-     * @return mixed
+     * @param  string  $strategy  'delta'|'flag-diff'|'noop'
      */
     private function compute(string $strategy, mixed $leftValue, mixed $rightValue): mixed
     {
@@ -338,10 +326,10 @@ class Comparator
      */
     private function computeDelta(mixed $leftValue, mixed $rightValue): float
     {
-        $normalizedLeft  = $leftValue  ?? 0;
+        $normalizedLeft = $leftValue ?? 0;
         $normalizedRight = $rightValue ?? 0;
 
-        $leftFloat  = (float) $normalizedLeft;
+        $leftFloat = (float) $normalizedLeft;
         $rightFloat = (float) $normalizedRight;
 
         return $leftFloat - $rightFloat;
@@ -352,7 +340,7 @@ class Comparator
      */
     private function computeFlagDiff(mixed $leftValue, mixed $rightValue): bool
     {
-        $leftBool  = (bool) $leftValue;
+        $leftBool = (bool) $leftValue;
         $rightBool = (bool) $rightValue;
 
         return $leftBool !== $rightBool;
@@ -379,14 +367,14 @@ class Comparator
     private function setDot(array &$target, string $path, mixed $value): void
     {
         $segments = explode('.', $path);
-        $reference =& $target;
+        $reference = &$target;
 
         foreach ($segments as $segment) {
-            if (!array_key_exists($segment, $reference) || !is_array($reference[$segment])) {
+            if (! array_key_exists($segment, $reference) || ! is_array($reference[$segment])) {
                 $reference[$segment] = [];
             }
 
-            $reference =& $reference[$segment];
+            $reference = &$reference[$segment];
         }
 
         $reference = $value;
@@ -401,16 +389,16 @@ class Comparator
     {
         $indexed = collect();
 
-        if (!is_array($rows)) {
+        if (! is_array($rows)) {
             return $indexed;
         }
 
         foreach ($rows as $row) {
-            if (!is_array($row)) {
+            if (! is_array($row)) {
                 continue;
             }
 
-            if (!array_key_exists($keyName, $row)) {
+            if (! array_key_exists($keyName, $row)) {
                 continue;
             }
 

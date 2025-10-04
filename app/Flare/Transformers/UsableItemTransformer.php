@@ -15,15 +15,15 @@ class UsableItemTransformer extends TransformerAbstract
      */
     public function transform(InventorySlot|SetSlot|Item $slot): array
     {
-        
+
         $item = $slot;
         $slotId = null;
-        
-        if (!($slot instanceof Item)) {
+
+        if (! ($slot instanceof Item)) {
             $item = $slot->item;
             $slotId = $slot->id;
         }
-        
+
         return [
             'item_id' => $item->id,
             'slot_id' => $slotId,

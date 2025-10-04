@@ -20,8 +20,7 @@ class StatModifierDetails
 
     private ?Character $character = null;
 
-    public function __construct( private readonly CharacterStatBuilder $characterStatBuilder){
-    }
+    public function __construct(private readonly CharacterStatBuilder $characterStatBuilder) {}
 
     /**
      * Set the character.
@@ -167,7 +166,6 @@ class StatModifierDetails
             $type === ItemType::SPELL_HEALING->value => $this->character->getInformation()->getHealingBuilder()->getHealingBuilder($isVoided),
             default => [],
         };
-
 
         return array_merge($details, $typeAttributes);
     }

@@ -100,8 +100,6 @@ class RandomItemDropBuilder
     /**
      * Roll a number between 1 and the provided level.
      *
-     * @param int $level
-     * @return int
      *
      * @codeCoverageIgnore
      */
@@ -113,7 +111,6 @@ class RandomItemDropBuilder
     /**
      * Roll a percentage between 1 and 100.
      *
-     * @return int
      *
      * @codeCoverageIgnore
      */

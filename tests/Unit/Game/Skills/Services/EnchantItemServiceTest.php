@@ -22,7 +22,7 @@ use Tests\Traits\CreateItemAffix;
 
 class EnchantItemServiceTest extends TestCase
 {
-    use CreateClass, CreateGameSkill, CreateItem, CreateItemAffix, CreateGem, RefreshDatabase;
+    use CreateClass, CreateGameSkill, CreateGem, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -34,7 +34,7 @@ class EnchantItemServiceTest extends TestCase
 
     private ?GameSkill $enchantingSkill;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -64,7 +64,7 @@ class EnchantItemServiceTest extends TestCase
         ]);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -75,7 +75,7 @@ class EnchantItemServiceTest extends TestCase
         $this->itemToEnchant = null;
     }
 
-    public function testEnchantTheItemWhenTooEasy()
+    public function test_enchant_the_item_when_too_easy()
     {
 
         $character = $this->character->getCharacter();
@@ -89,7 +89,7 @@ class EnchantItemServiceTest extends TestCase
         $this->assertNotNull($item->item_suffix_id);
     }
 
-    public function testEnchantTheItemWithAPrefixWhenTooEasy()
+    public function test_enchant_the_item_with_a_prefix_when_too_easy()
     {
 
         $character = $this->character->getCharacter();
@@ -107,7 +107,7 @@ class EnchantItemServiceTest extends TestCase
         $this->assertNotNull($item->item_prefix_id);
     }
 
-    public function testEnchantTheItemWithAPrefixThatIsMythicAndExpectThePrefixToNotBeAttachedWhenTooEasy()
+    public function test_enchant_the_item_with_a_prefix_that_is_mythic_and_expect_the_prefix_to_not_be_attached_when_too_easy()
     {
 
         $character = $this->character->getCharacter();
@@ -117,8 +117,8 @@ class EnchantItemServiceTest extends TestCase
         $this->itemToEnchant->update([
             'item_prefix_id' => $this->createItemAffix([
                 'type' => 'prefix',
-                'name' => 'Non Mythical'
-            ])->id
+                'name' => 'Non Mythical',
+            ])->id,
         ]);
 
         $itemToEnchant = $this->itemToEnchant->refresh();
@@ -134,7 +134,7 @@ class EnchantItemServiceTest extends TestCase
         $this->assertNull($item->item_prefix_id);
     }
 
-    public function testEnchantTheItemWithAPrefixThatIsCosmicAndExpectThePrefixToNotBeAttachedWhenTooEasy()
+    public function test_enchant_the_item_with_a_prefix_that_is_cosmic_and_expect_the_prefix_to_not_be_attached_when_too_easy()
     {
 
         $character = $this->character->getCharacter();
@@ -144,8 +144,8 @@ class EnchantItemServiceTest extends TestCase
         $this->itemToEnchant->update([
             'item_prefix_id' => $this->createItemAffix([
                 'type' => 'prefix',
-                'name' => 'Non Cosmic'
-            ])->id
+                'name' => 'Non Cosmic',
+            ])->id,
         ]);
 
         $itemToEnchant = $this->itemToEnchant->refresh();
@@ -161,7 +161,7 @@ class EnchantItemServiceTest extends TestCase
         $this->assertNull($item->item_prefix_id);
     }
 
-    public function testEnchantTheItemWithASuffixThatIsMythicAndExpectThePrefixToNotBeAttachedWhenTooEasy()
+    public function test_enchant_the_item_with_a_suffix_that_is_mythic_and_expect_the_prefix_to_not_be_attached_when_too_easy()
     {
 
         $character = $this->character->getCharacter();
@@ -171,8 +171,8 @@ class EnchantItemServiceTest extends TestCase
         $this->itemToEnchant->update([
             'item_suffix_id' => $this->createItemAffix([
                 'type' => 'suffix',
-                'name' => 'Non Mythical'
-            ])->id
+                'name' => 'Non Mythical',
+            ])->id,
         ]);
 
         $itemToEnchant = $this->itemToEnchant->refresh();
@@ -188,7 +188,7 @@ class EnchantItemServiceTest extends TestCase
         $this->assertNull($item->item_suffix_id);
     }
 
-    public function testEnchantTheItemWithASuffixThatIsCosmicAndExpectThePrefixToNotBeAttachedWhenTooEasy()
+    public function test_enchant_the_item_with_a_suffix_that_is_cosmic_and_expect_the_prefix_to_not_be_attached_when_too_easy()
     {
 
         $character = $this->character->getCharacter();
@@ -198,8 +198,8 @@ class EnchantItemServiceTest extends TestCase
         $this->itemToEnchant->update([
             'item_suffix_id' => $this->createItemAffix([
                 'type' => 'suffix',
-                'name' => 'Non Mythical'
-            ])->id
+                'name' => 'Non Mythical',
+            ])->id,
         ]);
 
         $itemToEnchant = $this->itemToEnchant->refresh();
@@ -215,7 +215,7 @@ class EnchantItemServiceTest extends TestCase
         $this->assertNull($item->item_suffix_id);
     }
 
-    public function testEnchantTheItemWithDcCheck()
+    public function test_enchant_the_item_with_dc_check()
     {
         $this->instance(
             SkillCheckService::class,
@@ -238,7 +238,7 @@ class EnchantItemServiceTest extends TestCase
         $this->assertNotNull($item->item_suffix_id);
     }
 
-    public function testFailToEnchantTheItemWithDcCheck()
+    public function test_fail_to_enchant_the_item_with_dc_check()
     {
         $this->instance(
             SkillCheckService::class,
@@ -262,7 +262,7 @@ class EnchantItemServiceTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function testUpdateTheCharactersInventorySlot()
+    public function test_update_the_characters_inventory_slot()
     {
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
@@ -280,7 +280,7 @@ class EnchantItemServiceTest extends TestCase
         $this->assertEquals($slot->refresh()->item_id, $item->id);
     }
 
-    public function testUpdateTheCharactersInventorySlotWhenThereAreAttachedHolyStacks()
+    public function test_update_the_characters_inventory_slot_when_there_are_attached_holy_stacks()
     {
 
         $this->itemToEnchant->appliedHolyStacks()->create([
@@ -307,7 +307,7 @@ class EnchantItemServiceTest extends TestCase
         $this->assertCount(1, $item->appliedHolyStacks);
     }
 
-    public function testUpdateTheCharactersInventorySlotWhenThereAreSocketsAttached()
+    public function test_update_the_characters_inventory_slot_when_there_are_sockets_attached()
     {
 
         $this->itemToEnchant->sockets()->create([
@@ -337,7 +337,7 @@ class EnchantItemServiceTest extends TestCase
         $this->assertCount(1, $item->sockets);
     }
 
-    public function testUpdateTheCharactersInventorySlotWithMatchingItemWhenThereAreDuplicateItems()
+    public function test_update_the_characters_inventory_slot_with_matching_item_when_there_are_duplicate_items()
     {
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
@@ -363,7 +363,7 @@ class EnchantItemServiceTest extends TestCase
         $this->assertEquals($slot->refresh()->item_id, $duplicateItem->id);
     }
 
-    public function testUpdateCharacterSlotWithNonDuplicateWhenItemToEnchantHasHolyStacks()
+    public function test_update_character_slot_with_non_duplicate_when_item_to_enchant_has_holy_stacks()
     {
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
@@ -401,7 +401,7 @@ class EnchantItemServiceTest extends TestCase
         $this->assertEquals($slot->item_id, $item->id);
     }
 
-    public function testDeleteTheSlot()
+    public function test_delete_the_slot()
     {
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();

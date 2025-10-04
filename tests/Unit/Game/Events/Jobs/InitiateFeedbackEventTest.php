@@ -4,7 +4,6 @@ namespace Tests\Unit\Game\Events\Jobs;
 
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Event as ModelsEvent;
-use App\Game\Events\Jobs\InitiateDelusionalMemoriesEvent;
 use App\Game\Events\Jobs\InitiateFeedbackEvent;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -18,17 +17,17 @@ class InitiateFeedbackEventTest extends TestCase
 {
     use CreateGameMap, CreateScheduledEvent, RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
 
-    public function testFeedBackEventDoesNotTrigger()
+    public function test_feed_back_event_does_not_trigger()
     {
         Event::fake();
 
@@ -39,7 +38,7 @@ class InitiateFeedbackEventTest extends TestCase
         $this->assertEmpty(ModelsEvent::all());
     }
 
-    public function testFeedbackEventDoseTrigger()
+    public function test_feedback_event_dose_trigger()
     {
 
         Event::fake();

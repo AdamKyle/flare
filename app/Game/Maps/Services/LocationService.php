@@ -2,16 +2,16 @@
 
 namespace App\Game\Maps\Services;
 
-use App\Flare\Items\Transformers\QuestItemTransformer;
-use App\Flare\Pagination\Pagination;
-use App\Game\Maps\Transformers\LocationTransformer;
 use App\Flare\Cache\CoordinatesCache;
+use App\Flare\Items\Transformers\QuestItemTransformer;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
+use App\Flare\Models\Item as ItemModel;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Models\Map;
 use App\Flare\Models\Raid;
+use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
@@ -23,11 +23,10 @@ use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
 use App\Game\Maps\Services\Common\LiveCharacterCount;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 use App\Game\Maps\Transformers\LocationsTransformer;
-use League\Fractal\Resource\Item;
+use App\Game\Maps\Transformers\LocationTransformer;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection as LeagueCollection;
-use App\Flare\Models\Item as ItemModel;
-
+use League\Fractal\Resource\Item;
 
 class LocationService
 {
@@ -40,16 +39,14 @@ class LocationService
 
     private bool $isEventBasedUpdate = false;
 
-    public function __construct(private readonly CoordinatesCache                  $coordinatesCache,
-                                private readonly CharacterCacheData                $characterCacheData,
-                                private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
-                                private readonly QuestItemTransformer              $questItemTransformer,
-                                private readonly LocationsTransformer              $locationTransformer,
-                                private readonly PlainDataSerializer               $plainArraySerializer,
-                                private readonly Pagination                        $pagination,
-                                private readonly Manager                           $manager)
-    {
-    }
+    public function __construct(private readonly CoordinatesCache $coordinatesCache,
+        private readonly CharacterCacheData $characterCacheData,
+        private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
+        private readonly QuestItemTransformer $questItemTransformer,
+        private readonly LocationsTransformer $locationTransformer,
+        private readonly PlainDataSerializer $plainArraySerializer,
+        private readonly Pagination $pagination,
+        private readonly Manager $manager) {}
 
     /**
      * Get location data
@@ -69,33 +66,36 @@ class LocationService
             'time_out_details' => $this->getMapTimeOutDetails($character),
             'locations' => $this->fetchLocationData($character),
             'coordinates' => $this->coordinatesCache->getFromCache(),
-//            'celestial_id' => $this->getCelestialEntityId($character),
-//            'can_settle_kingdom' => $this->canSettle,
+            //            'celestial_id' => $this->getCelestialEntityId($character),
+            //            'can_settle_kingdom' => $this->canSettle,
             'character_kingdoms' => $this->getKingdoms($character),
             'npc_kingdoms' => $this->getNpcKingdoms($character),
             'enemy_kingdoms' => $this->getEnemyKingdoms($character),
-//            'characters_on_map' => $this->getActiveUsersCountForMap($character),
-//            'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type,
-//            'is_event_based' => $this->isEventBasedUpdate,
-//            'can_access_hell_forged_shop' => $character->map->gameMap->mapType()->isHell(),
-//            'can_access_purgatory_chains_shop' =>  $character->map->gameMap->mapType()->isPurgatory(),
-//            'can_access_twisted_earth_shop' => $character->map->gameMap->mapType()->isTwistedMemories(),
+            //            'characters_on_map' => $this->getActiveUsersCountForMap($character),
+            //            'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type,
+            //            'is_event_based' => $this->isEventBasedUpdate,
+            //            'can_access_hell_forged_shop' => $character->map->gameMap->mapType()->isHell(),
+            //            'can_access_purgatory_chains_shop' =>  $character->map->gameMap->mapType()->isPurgatory(),
+            //            'can_access_twisted_earth_shop' => $character->map->gameMap->mapType()->isTwistedMemories(),
         ];
     }
 
-    public function getLocationData(Location $location): array {
+    public function getLocationData(Location $location): array
+    {
         $locationData = new Item($location, new LocationTransformer());
 
         return $this->manager->createData($locationData)->toArray();
     }
 
-    public function getDroppableItems(Location $location, int $perPage = 10, int $page = 1, string $searchText = ''): array {
-        $items = ItemModel::where('drop_location_id', $location->id)->where('name', 'LIKE', '%' . $searchText . '%')->get();
+    public function getDroppableItems(Location $location, int $perPage = 10, int $page = 1, string $searchText = ''): array
+    {
+        $items = ItemModel::where('drop_location_id', $location->id)->where('name', 'LIKE', '%'.$searchText.'%')->get();
 
         return $this->pagination->buildPaginatedDate($items, $this->questItemTransformer, $perPage, $page);
     }
 
-    public function getTeleportLocations(Character $character): array {
+    public function getTeleportLocations(Character $character): array
+    {
         return [
             'character_kingdoms' => $this->getKingdoms($character),
             'npc_kingdoms' => $this->getNpcKingdoms($character),
@@ -105,7 +105,8 @@ class LocationService
         ];
     }
 
-    protected function getNpcKingdoms(Character $character): array {
+    protected function getNpcKingdoms(Character $character): array
+    {
         return Kingdom::select('id', 'x_position', 'y_position', 'name')
             ->whereNull('character_id')
             ->where('game_map_id', $character->map->game_map_id)
@@ -114,15 +115,16 @@ class LocationService
             ->toArray();
     }
 
-
-    public function getCharacterPositionData(Map $map): array {
+    public function getCharacterPositionData(Map $map): array
+    {
         return [
             'x_position' => $map->character_position_x,
             'y_position' => $map->character_position_y,
         ];
     }
 
-    private function getMapTimeOutDetails(Character $character): array {
+    private function getMapTimeOutDetails(Character $character): array
+    {
         $canMoveAgainAt = $character->can_move_again_at;
         $timeLeft = is_null($canMoveAgainAt) ? 0 : max(0, now()->diffInSeconds($character->can_move_again_at));
 
@@ -158,9 +160,6 @@ class LocationService
 
     /**
      * Fetch location data for a character based on their map.
-     *
-     * @param Character $character
-     * @return array
      */
     public function fetchLocationData(Character $character): array
     {
@@ -178,11 +177,9 @@ class LocationService
 
     /**
      * Find corrupted locations for a raid.
-     *
-     * @param Raid $raid
-     * @return array
      */
-    public function fetchCorruptedLocationData(Raid $raid): array {
+    public function fetchCorruptedLocationData(Raid $raid): array
+    {
         $locations = Location::where('is_corrupted', true)->whereIn('id', $raid->corrupted_location_ids)->get();
 
         $this->manager->setSerializer($this->plainArraySerializer);

@@ -2,25 +2,21 @@
 
 namespace App\Game\Messages\Factories;
 
-use Exception;
-use Illuminate\Support\Facades\Log;
 use App\Game\Messages\Types\ChatMessageTypes;
 use App\Game\Messages\Types\Concerns\BaseMessageType;
 use App\Game\Messages\Types\MapMessageTypes;
+use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 use ValueError;
 
 class AssignMessageType
 {
-
     /**
      * Assigne the string type to an enum
      *
      * - Enums are: ChatMessageTypes and MapMessageTypes
      *
-     * @param string $messageType
      * @throws InvalidArgumentException
-     * @return BaseMessageType
      */
     public function assignType(string $messageType): BaseMessageType
     {
@@ -34,8 +30,8 @@ class AssignMessageType
             }
         }
 
-        Log::error('Unknown message type to assign [AssignMessageType@assignType] for message: ' . $messageType . '.');
+        Log::error('Unknown message type to assign [AssignMessageType@assignType] for message: '.$messageType.'.');
 
-        throw new InvalidArgumentException('Unknown message type for: ' . $messageType);
+        throw new InvalidArgumentException('Unknown message type for: '.$messageType);
     }
 }

@@ -2,26 +2,26 @@
 
 namespace Tests\Unit\Game\Kingdoms\Services;
 
-use Illuminate\Support\Facades\Event;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Game\Kingdoms\Service\AbandonKingdomService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\Kingdoms\Service\AbandonKingdomService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameBuilding;
 use Tests\Unit\Game\Kingdoms\Helpers\CreateKingdomHelper;
 
-class AbandonKingdomServiceTest extends TestCase {
-
+class AbandonKingdomServiceTest extends TestCase
+{
     use CreateGameBuilding, CreateKingdomHelper, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?AbandonKingdomService $abandonKingdomService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -29,7 +29,7 @@ class AbandonKingdomServiceTest extends TestCase {
         $this->abandonKingdomService = resolve(AbandonKingdomService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -37,7 +37,8 @@ class AbandonKingdomServiceTest extends TestCase {
         $this->abandonKingdomService = null;
     }
 
-    public function testShouldAbandonKingdom() {
+    public function test_should_abandon_kingdom()
+    {
         Event::fake();
         Queue::fake();
 
@@ -56,20 +57,21 @@ class AbandonKingdomServiceTest extends TestCase {
         $this->assertEquals(0.01, $kingdom->current_morale);
 
         Event::assertDispatched(GlobalMessageEvent::class, function ($event) use ($kingdom) {
-            return $event->message === 'A kingdom has fallen into the rubble at (X/Y): ' .
-                $kingdom->x_position . '/' . $kingdom->y_position . ' on the: ' .
-                $kingdom->gameMap->name . ' plane.';
+            return $event->message === 'A kingdom has fallen into the rubble at (X/Y): '.
+                $kingdom->x_position.'/'.$kingdom->y_position.' on the: '.
+                $kingdom->gameMap->name.' plane.';
         });
 
         Event::assertDispatched(ServerMessageEvent::class, function ($event) use ($kingdom) {
-            return $event->message === $kingdom->name . ' Has been given to the NPC due to being abandoned, at Location (x/y): '
-                . $kingdom->x_position . '/' . $kingdom->y_position . ' on the: ' . $kingdom->gameMap->name . ' plane.';
+            return $event->message === $kingdom->name.' Has been given to the NPC due to being abandoned, at Location (x/y): '
+                .$kingdom->x_position.'/'.$kingdom->y_position.' on the: '.$kingdom->gameMap->name.' plane.';
         });
 
         $this->assertNotNull($character->can_settle_again_at);
     }
 
-    public function testShouldAbandonKingdomWhileCanSettleAgainAtIsNotNull() {
+    public function test_should_abandon_kingdom_while_can_settle_again_at_is_not_null()
+    {
         Event::fake();
         Queue::fake();
 
@@ -94,14 +96,14 @@ class AbandonKingdomServiceTest extends TestCase {
         $this->assertEquals(0.01, $kingdom->current_morale);
 
         Event::assertDispatched(GlobalMessageEvent::class, function ($event) use ($kingdom) {
-            return $event->message === 'A kingdom has fallen into the rubble at (X/Y): ' .
-                $kingdom->x_position . '/' . $kingdom->y_position . ' on the: ' .
-                $kingdom->gameMap->name . ' plane.';
+            return $event->message === 'A kingdom has fallen into the rubble at (X/Y): '.
+                $kingdom->x_position.'/'.$kingdom->y_position.' on the: '.
+                $kingdom->gameMap->name.' plane.';
         });
 
         Event::assertDispatched(ServerMessageEvent::class, function ($event) use ($kingdom) {
-            return $event->message === $kingdom->name . ' Has been given to the NPC due to being abandoned, at Location (x/y): '
-                . $kingdom->x_position . '/' . $kingdom->y_position . ' on the: ' . $kingdom->gameMap->name . ' plane.';
+            return $event->message === $kingdom->name.' Has been given to the NPC due to being abandoned, at Location (x/y): '
+                .$kingdom->x_position.'/'.$kingdom->y_position.' on the: '.$kingdom->gameMap->name.' plane.';
         });
 
         $this->assertGreaterThan(15, now()->diffInMinutes($character->can_settle_again_at));

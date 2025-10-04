@@ -36,7 +36,7 @@ class SurveyFactory extends Factory
                                 'Option 1',
                                 'Option 2',
                                 'Option 3',
-                            ]
+                            ],
                         ],
                         [
                             'type' => 'checkbox',
@@ -45,17 +45,15 @@ class SurveyFactory extends Factory
                                 'Option 1',
                                 'Option 2',
                                 'Option 3',
-                            ]
+                            ],
                         ],
                         [
                             'type' => 'markdown',
                             'label' => 'Some markdown Label',
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
         ];
     }
 }
-
-

@@ -14,11 +14,12 @@ class ResourceValidation
     public function hasEnoughResources(array $requiredResources, Kingdom $kingdom): bool
     {
         foreach ($requiredResources as $resourceType => $requiredAmount) {
-            $currentAmount = $kingdom->{'current_' . $resourceType};
+            $currentAmount = $kingdom->{'current_'.$resourceType};
             if ($currentAmount < $requiredAmount) {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -30,7 +31,7 @@ class ResourceValidation
         $missingResources = [];
 
         foreach ($requiredResources as $resourceType => $requiredAmount) {
-            $currentAmount = $kingdom->{'current_' . $resourceType};
+            $currentAmount = $kingdom->{'current_'.$resourceType};
             $difference = $requiredAmount - $currentAmount;
 
             if ($difference > 0) {
@@ -47,7 +48,8 @@ class ResourceValidation
     public function shouldRedirectKingdomBuilding(KingdomBuilding $building, Kingdom $kingdom): bool
     {
         $requiredResources = $this->getBuildingCosts($building, $kingdom);
-        return !$this->hasEnoughResources($requiredResources, $kingdom);
+
+        return ! $this->hasEnoughResources($requiredResources, $kingdom);
     }
 
     /**
@@ -56,6 +58,7 @@ class ResourceValidation
     public function getMissingBuildingCosts(KingdomBuilding $building, Kingdom $kingdom): array
     {
         $requiredResources = $this->getBuildingCosts($building, $kingdom);
+
         return $this->getMissingResources($requiredResources, $kingdom);
     }
 
@@ -80,7 +83,8 @@ class ResourceValidation
     public function shouldRedirectUnits(GameUnit $unit, Kingdom $kingdom, int $amount): bool
     {
         $requiredResources = $this->getUnitCosts($unit, $kingdom, $amount);
-        return !$this->hasEnoughResources($requiredResources, $kingdom);
+
+        return ! $this->hasEnoughResources($requiredResources, $kingdom);
     }
 
     /**
@@ -89,6 +93,7 @@ class ResourceValidation
     public function getMissingUnitResources(GameUnit $unit, Kingdom $kingdom, int $amount): array
     {
         $requiredResources = $this->getUnitCosts($unit, $kingdom, $amount);
+
         return $this->getMissingResources($requiredResources, $kingdom);
     }
 

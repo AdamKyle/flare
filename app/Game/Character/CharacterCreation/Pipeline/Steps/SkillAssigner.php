@@ -13,19 +13,10 @@ use Illuminate\Support\Collection;
 
 class SkillAssigner
 {
-
-    /**
-     * @param BaseSkillValue $baseSkillValue
-     */
-    public function __construct(private readonly BaseSkillValue $baseSkillValue)
-    {}
+    public function __construct(private readonly BaseSkillValue $baseSkillValue) {}
 
     /**
      * Assign all starting skills to the character using a single bulk insert.
-     *
-     * @param CharacterBuildState $state
-     * @param Closure $next
-     * @return CharacterBuildState
      */
     public function process(CharacterBuildState $state, Closure $next): CharacterBuildState
     {
@@ -53,11 +44,6 @@ class SkillAssigner
 
     /**
      * Build character skill rows for initial creation.
-     *
-     * @param Collection $skills
-     * @param Character $character
-     * @param DateTimeInterface $timestamp
-     * @return array
      */
     private function buildCharacterSkillRows(
         Collection $skills,

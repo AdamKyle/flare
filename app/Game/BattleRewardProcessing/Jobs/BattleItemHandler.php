@@ -2,15 +2,14 @@
 
 namespace App\Game\BattleRewardProcessing\Jobs;
 
+use App\Flare\Models\Character;
+use App\Flare\Models\Monster;
+use App\Game\Core\Services\DropCheckService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Models\Character;
-use App\Flare\Models\Monster;
-use App\Game\Core\Services\DropCheckService;
-
 
 class BattleItemHandler implements ShouldQueue
 {
@@ -22,9 +21,6 @@ class BattleItemHandler implements ShouldQueue
      * Handle the job.
      *
      * - Handle drops from the monster.
-     *
-     * @param DropCheckService $dropCheckService
-     * @return void
      */
     public function handle(DropCheckService $dropCheckService): void
     {

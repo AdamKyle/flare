@@ -37,7 +37,7 @@ class TrinketCraftingServiceTest extends TestCase
 
     private ?Item $trinket;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -62,7 +62,7 @@ class TrinketCraftingServiceTest extends TestCase
         $this->trinketCraftingService = resolve(TrinketCraftingService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -71,7 +71,7 @@ class TrinketCraftingServiceTest extends TestCase
         $this->trinketCraftingService = null;
     }
 
-    public function testGetTrinketsToCraft()
+    public function test_get_trinkets_to_craft()
     {
         $character = $this->character->getCharacter();
 
@@ -80,7 +80,7 @@ class TrinketCraftingServiceTest extends TestCase
         $this->assertNotEmpty($result);
     }
 
-    public function testGetTrinketsToCraftAsMerchant()
+    public function test_get_trinkets_to_craft_as_merchant()
     {
         Event::fake();
 
@@ -99,7 +99,7 @@ class TrinketCraftingServiceTest extends TestCase
         });
     }
 
-    public function testCannotAffordToCraftTrinket()
+    public function test_cannot_afford_to_craft_trinket()
     {
         Event::fake();
 
@@ -112,7 +112,7 @@ class TrinketCraftingServiceTest extends TestCase
         });
     }
 
-    public function testCannotAffordToCraftTrinketNotEnoughnCopperCoins()
+    public function test_cannot_afford_to_craft_trinket_not_enoughn_copper_coins()
     {
         Event::fake();
 
@@ -129,7 +129,7 @@ class TrinketCraftingServiceTest extends TestCase
         });
     }
 
-    public function testCannotCraftTrinketWhenTooHard()
+    public function test_cannot_craft_trinket_when_too_hard()
     {
         Event::fake();
 
@@ -153,7 +153,7 @@ class TrinketCraftingServiceTest extends TestCase
         });
     }
 
-    public function testCraftTrinketWhenTooEasy()
+    public function test_craft_trinket_when_too_easy()
     {
         Event::fake();
 
@@ -181,7 +181,7 @@ class TrinketCraftingServiceTest extends TestCase
         $this->assertCount(1, $character->inventory->slots->toArray());
     }
 
-    public function testFailToCraftTheTrinket()
+    public function test_fail_to_craft_the_trinket()
     {
         Event::fake();
 
@@ -216,7 +216,7 @@ class TrinketCraftingServiceTest extends TestCase
         $this->assertLessThan(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
     }
 
-    public function testCraftTheItem()
+    public function test_craft_the_item()
     {
         $character = $this->character->getCharacter();
 
@@ -235,7 +235,7 @@ class TrinketCraftingServiceTest extends TestCase
         $this->assertLessThan(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
     }
 
-    public function testCraftTheItemAndGiveitem()
+    public function test_craft_the_item_and_giveitem()
     {
         $character = $this->character->getCharacter();
 
@@ -265,7 +265,7 @@ class TrinketCraftingServiceTest extends TestCase
         $this->assertCount(1, $character->inventory->slots->toArray());
     }
 
-    public function testCraftTheItemAsMerchant()
+    public function test_craft_the_item_as_merchant()
     {
         $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
             'name' => CharacterClassValue::MERCHANT,
@@ -300,7 +300,7 @@ class TrinketCraftingServiceTest extends TestCase
         $this->assertCount(1, $character->inventory->slots->toArray());
     }
 
-    public function testCraftTheItemButInventoryIsFull()
+    public function test_craft_the_item_but_inventory_is_full()
     {
         Event::fake();
 
@@ -337,7 +337,7 @@ class TrinketCraftingServiceTest extends TestCase
         });
     }
 
-    public function testFetchCharacterTrinketCraftingXP()
+    public function test_fetch_character_trinket_crafting_xp()
     {
         $character = $this->character->getCharacter();
 

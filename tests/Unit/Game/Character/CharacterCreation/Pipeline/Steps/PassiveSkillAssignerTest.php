@@ -16,14 +16,14 @@ use Tests\Traits\CreateUser;
 
 class PassiveSkillAssignerTest extends TestCase
 {
-    use RefreshDatabase,
-        CreateUser,
-        CreateRace,
+    use CreateCharacter,
         CreateClass,
-        CreateCharacter,
-        CreatePassiveSkill;
+        CreatePassiveSkill,
+        CreateRace,
+        CreateUser,
+        RefreshDatabase;
 
-    public function testAssignsTopLevelAndChildPassives(): void
+    public function test_assigns_top_level_and_child_passives(): void
     {
         $user = $this->createUser();
         $race = $this->createRace();
@@ -89,7 +89,7 @@ class PassiveSkillAssignerTest extends TestCase
         $this->assertSame($parentRow->id, $childRow->parent_skill_id);
     }
 
-    public function testNoOpWhenStateHasNoCharacter(): void
+    public function test_no_op_when_state_has_no_character(): void
     {
         $this->createPassiveSkill();
 

@@ -16,7 +16,7 @@ class GoblinShopServiceTest extends TestCase
 
     private ?GoblinShopService $shopService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -31,7 +31,7 @@ class GoblinShopServiceTest extends TestCase
         $this->shopService = resolve(GoblinShopService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -39,7 +39,7 @@ class GoblinShopServiceTest extends TestCase
         $this->shopService = null;
     }
 
-    public function testBuyItemWhereKingdomAbsorbsTheCost()
+    public function test_buy_item_where_kingdom_absorbs_the_cost()
     {
         $item = $this->createItem(['gold_bars_cost' => 500]);
 
@@ -57,7 +57,7 @@ class GoblinShopServiceTest extends TestCase
         $this->assertNotNull($character->kingdoms->where('gold_bars', 500)->first());
     }
 
-    public function testBuyItemWhereAllKingdomsAbsorbTheCost()
+    public function test_buy_item_where_all_kingdoms_absorb_the_cost()
     {
         $item = $this->createItem(['gold_bars_cost' => 2000]);
 
@@ -75,7 +75,7 @@ class GoblinShopServiceTest extends TestCase
         $this->assertCount(3, $character->kingdoms->where('gold_bars', '>', 0)->toArray());
     }
 
-    public function testBuyReduceAllKingdomsToZero()
+    public function test_buy_reduce_all_kingdoms_to_zero()
     {
         $item = $this->createItem(['gold_bars_cost' => 1000]);
 
@@ -110,7 +110,7 @@ class GoblinShopServiceTest extends TestCase
         $this->assertCount(0, $character->kingdoms->where('gold_bars', '>', 0)->toArray());
     }
 
-    public function testPurchaseMultipleItemsTillAtFiftyRunesLeft()
+    public function test_purchase_multiple_items_till_at_fifty_runes_left()
     {
         $item = $this->createItem(['gold_bars_cost' => 2000]);
 
@@ -143,7 +143,7 @@ class GoblinShopServiceTest extends TestCase
         $this->assertEquals(150, $character->kingdoms->sum('gold_bars'));
     }
 
-    public function testPurchaseMultipleItemsThatCostOneThousandTillZeroGoldBarsLeft()
+    public function test_purchase_multiple_items_that_cost_one_thousand_till_zero_gold_bars_left()
     {
         $item = $this->createItem(['gold_bars_cost' => 2000]);
 
@@ -164,7 +164,7 @@ class GoblinShopServiceTest extends TestCase
         $this->assertEquals(0, $character->kingdoms->sum('gold_bars'));
     }
 
-    public function testPurchaseWhenMultipleKingdomsHaveVariableGoldBars()
+    public function test_purchase_when_multiple_kingdoms_have_variable_gold_bars()
     {
         $item = $this->createItem(['gold_bars_cost' => 1000]);
 
@@ -192,7 +192,7 @@ class GoblinShopServiceTest extends TestCase
         $this->assertEquals(400, $character->kingdoms->sum('gold_bars'));
     }
 
-    public function testPurchaseWhenMultipleKingdomsHaveVariableGoldBarsAndOneHasNoGoldBars()
+    public function test_purchase_when_multiple_kingdoms_have_variable_gold_bars_and_one_has_no_gold_bars()
     {
         $item = $this->createItem(['gold_bars_cost' => 1000]);
 

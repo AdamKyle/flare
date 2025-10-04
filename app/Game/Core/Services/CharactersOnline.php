@@ -4,15 +4,13 @@ namespace App\Game\Core\Services;
 
 use App\Flare\Models\UserLoginDuration;
 use App\Game\Core\Traits\ResponseBuilder;
+use Carbon\Carbon;
 use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Carbon\Carbon;
-
 
 class CharactersOnline
 {
-
     use ResponseBuilder;
 
     private int $filterType = 0;
@@ -71,7 +69,7 @@ class CharactersOnline
         foreach ($onlineLogins as $login) {
             $timeLoggedIn = $this->filterType > 0 ? $login->total_duration : 0;
 
-            if (!$this->filterType > 0) {
+            if (! $this->filterType > 0) {
                 $lastActivity = $login->last_activity;
                 $lastHeartbeat = $login->last_heart_beat;
                 $timeLoggedIn = $lastActivity->gt($lastHeartbeat) ? $lastActivity->diffInSeconds($login->logged_in_at) : $lastHeartbeat->diffInSeconds($login->logged_in_at);

@@ -61,8 +61,8 @@ class GemShopService
 
         $gemBagSlot->delete();
 
-        $message = 'You sold the gem for: ' . number_format($cost['gold_dust']) . ' Gold Dust, ' .
-            number_format($cost['shards']) . ' Shards and ' . number_format($cost['copper_coins']) . ' Copper Coins.';
+        $message = 'You sold the gem for: '.number_format($cost['gold_dust']).' Gold Dust, '.
+            number_format($cost['shards']).' Shards and '.number_format($cost['copper_coins']).' Copper Coins.';
 
         return $this->successResult([
             'gems' => $this->characterGemBagService->getGems($character->refresh()),
@@ -87,8 +87,8 @@ class GemShopService
             $slot->delete();
         }
 
-        $message = 'You sold the gems for: ' . number_format($newGoldDust) . ' Gold Dust, ' .
-            number_format($newShards) . ' Shards and ' . number_format($newCopperCoins) . ' Copper Coins.';
+        $message = 'You sold the gems for: '.number_format($newGoldDust).' Gold Dust, '.
+            number_format($newShards).' Shards and '.number_format($newCopperCoins).' Copper Coins.';
 
         $newGoldDust += $character->gold_dust;
         $newShards += $character->shards;

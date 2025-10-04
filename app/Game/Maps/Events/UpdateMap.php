@@ -2,27 +2,21 @@
 
 namespace App\Game\Maps\Events;
 
+use App\Flare\Models\User;
+use App\Game\Maps\Services\LocationService;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Models\User;
-use App\Game\Maps\Services\LocationService;
 
 class UpdateMap implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * @var array $map_locations
-     */
     public array $map_locations;
 
-    /**
-     * @var User $user
-     */
     private User $user;
 
     /**
@@ -40,6 +34,6 @@ class UpdateMap implements ShouldBroadcastNow
      */
     public function broadcastOn(): Channel|array
     {
-        return new PrivateChannel('update-plane-' . $this->user->id);
+        return new PrivateChannel('update-plane-'.$this->user->id);
     }
 }

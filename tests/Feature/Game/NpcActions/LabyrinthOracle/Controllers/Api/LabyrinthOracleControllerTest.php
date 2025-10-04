@@ -18,21 +18,21 @@ class LabyrinthOracleControllerTest extends TestCase
 
     private ?CharacterFactory $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testInventoryItems()
+    public function test_inventory_items()
     {
         $basicItem = $this->createItem([
             'name' => 'basic item',
@@ -68,7 +68,7 @@ class LabyrinthOracleControllerTest extends TestCase
         $this->assertCount(2, $jsonData['inventory']);
     }
 
-    public function testInventoryItemsWithOneOfEach()
+    public function test_inventory_items_with_one_of_each()
     {
         $basicItem = $this->createItem([
             'name' => 'basic item',
@@ -130,7 +130,7 @@ class LabyrinthOracleControllerTest extends TestCase
         $this->assertCount(4, $jsonData['inventory']);
     }
 
-    public function testUseLabyrinthOracleToTransferItem()
+    public function test_use_labyrinth_oracle_to_transfer_item()
     {
         Event::fake();
 

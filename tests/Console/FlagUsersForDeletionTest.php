@@ -11,7 +11,7 @@ class FlagUsersForDeletionTest extends TestCase
 {
     use CreateUser, RefreshDatabase;
 
-    public function testFlagsUsersForDeletion()
+    public function test_flags_users_for_deletion()
     {
 
         Mail::fake();
@@ -28,7 +28,7 @@ class FlagUsersForDeletionTest extends TestCase
 
     }
 
-    public function testDoesNotFlagValidUsers()
+    public function test_does_not_flag_valid_users()
     {
 
         Mail::fake();

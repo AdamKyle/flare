@@ -14,7 +14,7 @@ class SkillsControllerTest extends TestCase
 
     private ?CharacterFactory $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -22,14 +22,14 @@ class SkillsControllerTest extends TestCase
             ->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testGetSkillsForPlayer()
+    public function test_get_skills_for_player()
     {
         $trainingSkill = $this->createGameSkill([
             'name' => 'training skill',
@@ -46,7 +46,7 @@ class SkillsControllerTest extends TestCase
         $character = $this->character->assignSkill($trainingSkill)->assignSkill($craftingSkill)->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/skills/' . $character->id);
+            ->call('GET', '/api/character/skills/'.$character->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -54,12 +54,12 @@ class SkillsControllerTest extends TestCase
         $this->assertNotEmpty($jsonData['crafting_skills']);
     }
 
-    public function testFailToGetSkillInformation()
+    public function test_fail_to_get_skill_information()
     {
 
         $trainingSkill = $this->createGameSkill([
             'name' => 'training skill',
-            'type' => SkillTypeValue::TRAINING
+            'type' => SkillTypeValue::TRAINING,
         ]);
 
         $character = $this->character->getCharacter();
@@ -69,7 +69,7 @@ class SkillsControllerTest extends TestCase
         $skill = $secondaryCharacter->skills()->where('game_skill_id', $trainingSkill->id)->first();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/skill/' . $character->id . '/' . $skill->id);
+            ->call('GET', '/api/character/skill/'.$character->id.'/'.$skill->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -77,11 +77,11 @@ class SkillsControllerTest extends TestCase
         $this->assertEquals(422, $response->status());
     }
 
-    public function testGetSkillInformation()
+    public function test_get_skill_information()
     {
         $trainingSkill = $this->createGameSkill([
             'name' => 'training skill',
-            'type' => SkillTypeValue::TRAINING
+            'type' => SkillTypeValue::TRAINING,
         ]);
 
         $character = $this->character->assignSkill($trainingSkill)->getCharacter();
@@ -89,18 +89,18 @@ class SkillsControllerTest extends TestCase
         $skill = $character->skills()->where('game_skill_id', $trainingSkill->id)->first();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/skill/' . $character->id . '/' . $skill->id);
+            ->call('GET', '/api/character/skill/'.$character->id.'/'.$skill->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertEquals($jsonData['id'], $skill->id);
     }
 
-    public function testTrainSkill()
+    public function test_train_skill()
     {
         $trainingSkill = $this->createGameSkill([
             'name' => 'training skill',
-            'type' => SkillTypeValue::TRAINING
+            'type' => SkillTypeValue::TRAINING,
         ]);
 
         $character = $this->character->assignSkill($trainingSkill)->getCharacter();
@@ -108,14 +108,14 @@ class SkillsControllerTest extends TestCase
         $skill = $character->skills()->where('game_skill_id', $trainingSkill->id)->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/skill/train/' . $character->id, [
+            ->call('POST', '/api/skill/train/'.$character->id, [
                 'skill_id' => $skill->id,
                 'xp_percentage' => 0.10,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals('You are now training: ' . $skill->name, $jsonData['message']);
+        $this->assertEquals('You are now training: '.$skill->name, $jsonData['message']);
 
         $character = $character->refresh();
         $skill = $character->skills()->where('game_skill_id', $trainingSkill->id)->first();
@@ -124,12 +124,12 @@ class SkillsControllerTest extends TestCase
         $this->assertEquals(0.10, $skill->xp_towards);
     }
 
-    public function testFailToCancelSkillTraining()
+    public function test_fail_to_cancel_skill_training()
     {
 
         $trainingSkill = $this->createGameSkill([
             'name' => 'training skill',
-            'type' => SkillTypeValue::TRAINING
+            'type' => SkillTypeValue::TRAINING,
         ]);
 
         $character = $this->character->getCharacter();
@@ -139,7 +139,7 @@ class SkillsControllerTest extends TestCase
         $skill = $secondaryCharacter->skills()->where('game_skill_id', $trainingSkill->id)->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/skill/cancel-train/' . $character->id . '/' . $skill->id);
+            ->call('POST', '/api/skill/cancel-train/'.$character->id.'/'.$skill->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -147,11 +147,11 @@ class SkillsControllerTest extends TestCase
         $this->assertEquals(422, $response->status());
     }
 
-    public function testStopTrainingSkill()
+    public function test_stop_training_skill()
     {
         $trainingSkill = $this->createGameSkill([
             'name' => 'training skill',
-            'type' => SkillTypeValue::TRAINING
+            'type' => SkillTypeValue::TRAINING,
         ]);
 
         $character = $this->character->assignSkill($trainingSkill)->getCharacter();
@@ -166,11 +166,11 @@ class SkillsControllerTest extends TestCase
         $skill = $character->skills()->where('game_skill_id', $trainingSkill->id)->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/skill/cancel-train/' . $character->id . '/' . $skill->id);
+            ->call('POST', '/api/skill/cancel-train/'.$character->id.'/'.$skill->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals('You stopped training: ' . $skill->name, $jsonData['message']);
+        $this->assertEquals('You stopped training: '.$skill->name, $jsonData['message']);
 
         $character = $character->refresh();
         $skill = $character->skills()->where('game_skill_id', $trainingSkill->id)->first();

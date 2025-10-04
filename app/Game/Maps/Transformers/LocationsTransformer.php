@@ -7,7 +7,6 @@ use League\Fractal\TransformerAbstract;
 
 class LocationsTransformer extends TransformerAbstract
 {
-
     /**
      * Gets the response data for the character sheet
      */
@@ -15,12 +14,12 @@ class LocationsTransformer extends TransformerAbstract
     {
 
         return [
-            'id'           => $location->id,
-            'name'         => $location->name,
-            'x_position'   => $location->x,
-            'y_position'   => $location->y,
+            'id' => $location->id,
+            'name' => $location->name,
+            'x_position' => $location->x,
+            'y_position' => $location->y,
             'is_corrupted' => $location->is_corrupted,
-            'is_port'      => $location->is_port,
+            'is_port' => $location->is_port,
         ];
     }
 }

@@ -18,16 +18,11 @@ class GemComparison
 {
     use GetItemAtonements, ResponseBuilder;
 
-    /**
-     * @param CharacterGemsTransformer $characterGemsTransformer
-     * @param PlainDataSerializer $plainDataSerializer
-     * @param Manager $manager
-     */
     public function __construct(
         private readonly CharacterGemsTransformer $characterGemsTransformer,
         private readonly PlainDataSerializer $plainDataSerializer,
         private readonly Manager $manager
-    ){}
+    ) {}
 
     public function compareGemForItem(Character $character, int $inventorySlotId, int $gemSlotId): array
     {

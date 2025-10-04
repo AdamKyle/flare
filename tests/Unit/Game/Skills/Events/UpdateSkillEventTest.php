@@ -14,25 +14,25 @@ use Tests\Traits\CreateSkill;
 
 class UpdateSkillEventTest extends TestCase
 {
-    use CreateSkill, CreateGameSkill, CreateGameMap, CreateScheduledEvent;
+    use CreateGameMap, CreateGameSkill, CreateScheduledEvent, CreateSkill;
 
     private ?CharacterFactory $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory())->createBaseCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testDoNotUpdateSkill()
+    public function test_do_not_update_skill()
     {
         $gameSkill = $this->createGameSkill();
         $character = $this->character->getCharacter();
@@ -52,7 +52,7 @@ class UpdateSkillEventTest extends TestCase
         $this->assertEquals(999, $skill->xp);
     }
 
-    public function testUpdateSkill()
+    public function test_update_skill()
     {
         $gameSkill = $this->createGameSkill();
         $character = $this->character->getCharacter();
@@ -62,7 +62,7 @@ class UpdateSkillEventTest extends TestCase
         ]);
 
         $character->map()->create([
-            'game_map_id' => $gameMap->id
+            'game_map_id' => $gameMap->id,
         ]);
 
         $character = $character->refresh();
@@ -82,7 +82,7 @@ class UpdateSkillEventTest extends TestCase
         $this->assertEquals(0, $skill->xp);
     }
 
-    public function testUpdateSkillAndUpdateCharacterAttackData()
+    public function test_update_skill_and_update_character_attack_data()
     {
         $gameSkill = $this->createGameSkill([
             'base_damage_mod_bonus_per_level' => 0.10,
@@ -94,7 +94,7 @@ class UpdateSkillEventTest extends TestCase
         ]);
 
         $character->map()->create([
-            'game_map_id' => $gameMap->id
+            'game_map_id' => $gameMap->id,
         ]);
 
         $character = $character->refresh();
@@ -115,7 +115,7 @@ class UpdateSkillEventTest extends TestCase
         $this->assertEquals(0.50, $skill->base_damage_mod);
     }
 
-    public function testUpdateCraftingSkillWhenFeedBackScheduledEventIsRunning()
+    public function test_update_crafting_skill_when_feed_back_scheduled_event_is_running()
     {
         $gameSkill = $this->createGameSkill([
             'name' => 'Alchemy',
@@ -134,7 +134,7 @@ class UpdateSkillEventTest extends TestCase
         ]);
 
         $character->map()->create([
-            'game_map_id' => $gameMap->id
+            'game_map_id' => $gameMap->id,
         ]);
 
         $character = $character->refresh();
@@ -154,7 +154,7 @@ class UpdateSkillEventTest extends TestCase
         $this->assertEquals(0, $skill->xp);
     }
 
-    public function testUpdateNonCraftingSkillWhenFeedBackScheduledEventIsRunning()
+    public function test_update_non_crafting_skill_when_feed_back_scheduled_event_is_running()
     {
         $gameSkill = $this->createGameSkill([
             'name' => 'Accuracy',
@@ -174,7 +174,7 @@ class UpdateSkillEventTest extends TestCase
         ]);
 
         $character->map()->create([
-            'game_map_id' => $gameMap->id
+            'game_map_id' => $gameMap->id,
         ]);
 
         $character = $character->refresh();

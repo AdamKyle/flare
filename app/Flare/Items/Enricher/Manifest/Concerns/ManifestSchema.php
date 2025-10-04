@@ -52,8 +52,8 @@ interface ManifestSchema
      * Map a flat property name into a dot-path used in the manifest and data bag.
      * Return null to skip this property.
      *
-     * @param  string $prop The concrete property name on the item (e.g. "total_damage").
-     * @return string|null  Dot-path (e.g. "totals.damage") or null to exclude.
+     * @param  string  $prop  The concrete property name on the item (e.g. "total_damage").
+     * @return string|null Dot-path (e.g. "totals.damage") or null to exclude.
      *
      * @example
      *  if (preg_match('/^total_(damage|defence|healing)$/', $prop, $m)) {
@@ -73,8 +73,8 @@ interface ManifestSchema
      *  - 'string'  for strings
      *  - null      to let the builder infer or skip unknowns
      *
-     * @param  string $prop  The concrete property name (pre-mapping).
-     * @param  mixed  $value The PHP value taken from the item.
+     * @param  string  $prop  The concrete property name (pre-mapping).
+     * @param  mixed  $value  The PHP value taken from the item.
      * @return 'number'|'boolean'|'string'|null
      *
      * @example
@@ -95,8 +95,8 @@ interface ManifestSchema
      *  - 'noop'      (no comparison; informational only)
      *  - null        (builder will pick a default based on type)
      *
-     * @param  string $path Dot-path (post-mapping), e.g. "totals.damage".
-     * @param  string $type The logical type decided by typeFor() or the builder.
+     * @param  string  $path  Dot-path (post-mapping), e.g. "totals.damage".
+     * @param  string  $type  The logical type decided by typeFor() or the builder.
      * @return 'delta'|'flag-diff'|'noop'|null
      *
      * @example

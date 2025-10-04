@@ -2,46 +2,46 @@
 
 namespace Tests\Feature\Game\Core\Controllers\Api;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
 use App\Flare\Models\Character;
 use App\Game\GuideQuests\Events\OpenGuideQuestModal;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGuideQuest;
 
 class UpdateCharacterFlagsControllerTest extends TestCase
 {
-    use RefreshDatabase, CreateGuideQuest;
+    use CreateGuideQuest, RefreshDatabase;
 
     private ?Character $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testTurnOffIntroSlides()
+    public function test_turn_off_intro_slides()
     {
         Event::fake();
 
         $this->character->user()->update([
-            'show_intro_page' => true
+            'show_intro_page' => true,
         ]);
 
         $character = $this->character->refresh();
 
         $this->actingAs($this->character->user)
-            ->call('POST', '/api/update-player-flags/turn-off-intro/' . $character->id);
+            ->call('POST', '/api/update-player-flags/turn-off-intro/'.$character->id);
 
         $character = $this->character->refresh();
 
@@ -50,12 +50,12 @@ class UpdateCharacterFlagsControllerTest extends TestCase
         $this->assertFalse(($character->user->show_intro_page));
     }
 
-    public function testTurnOffIntroSlidesWhenWeHaveAGuideQuest()
+    public function test_turn_off_intro_slides_when_we_have_a_guide_quest()
     {
         Event::fake();
 
         $this->character->user()->update([
-            'show_intro_page' => true
+            'show_intro_page' => true,
         ]);
 
         $character = $this->character->refresh();
@@ -65,7 +65,7 @@ class UpdateCharacterFlagsControllerTest extends TestCase
         ]);
 
         $this->actingAs($this->character->user)
-            ->call('POST', '/api/update-player-flags/turn-off-intro/' . $character->id);
+            ->call('POST', '/api/update-player-flags/turn-off-intro/'.$character->id);
 
         $character = $this->character->refresh();
 
@@ -74,11 +74,11 @@ class UpdateCharacterFlagsControllerTest extends TestCase
         $this->assertFalse(($character->user->show_intro_page));
     }
 
-    public function testTurnOffIntroSlidesWhenWeHaveAGuideQuestAndDoNotFakeEvent()
+    public function test_turn_off_intro_slides_when_we_have_a_guide_quest_and_do_not_fake_event()
     {
 
         $this->character->user()->update([
-            'show_intro_page' => true
+            'show_intro_page' => true,
         ]);
 
         $character = $this->character->refresh();
@@ -88,7 +88,7 @@ class UpdateCharacterFlagsControllerTest extends TestCase
         ]);
 
         $this->actingAs($this->character->user)
-            ->call('POST', '/api/update-player-flags/turn-off-intro/' . $character->id);
+            ->call('POST', '/api/update-player-flags/turn-off-intro/'.$character->id);
 
         $character = $this->character->refresh();
 

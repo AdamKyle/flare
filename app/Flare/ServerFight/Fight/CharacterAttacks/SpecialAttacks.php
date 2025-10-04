@@ -37,9 +37,6 @@ class SpecialAttacks extends BattleMessages
 
     /**
      * set is raid boss
-     *
-     * @param boolean $isRaidBoss
-     * @return SpecialAttacks
      */
     public function setIsRaidBoss(bool $isRaidBoss): SpecialAttacks
     {
@@ -300,8 +297,6 @@ class SpecialAttacks extends BattleMessages
 
     /**
      * Double heal.
-     *
-     * @return int
      */
     public function doubleHeal(Character $character, array $attackData): int
     {

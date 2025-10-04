@@ -14,23 +14,12 @@ use App\Game\BattleRewardProcessing\Jobs\Events\WinterEventChristmasGiftHandler;
 
 class BattleRewardService
 {
-
-    /**
-     * @var integer $characterId
-     */
     private int $characterId;
 
-    /**
-     * @var integer $monsterId
-     */
     private int $monsterId;
 
     /**
      * Set up the battle reward service
-     *
-     * @param integer $characterId
-     * @param integer $monsterId
-     * @return BattleRewardService
      */
     public function setUp(int $characterId, int $monsterId): BattleRewardService
     {

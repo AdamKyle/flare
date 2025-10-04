@@ -4,8 +4,8 @@ namespace App\Admin\Jobs;
 
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\KingdomBuilding;
-use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Events\UpdateKingdom;
+use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

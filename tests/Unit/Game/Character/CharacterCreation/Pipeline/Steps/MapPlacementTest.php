@@ -17,14 +17,14 @@ use Tests\Traits\CreateUser;
 
 class MapPlacementTest extends TestCase
 {
-    use RefreshDatabase,
-        CreateUser,
-        CreateRace,
+    use CreateCharacter,
         CreateClass,
-        CreateCharacter,
-        CreateGameMap;
+        CreateGameMap,
+        CreateRace,
+        CreateUser,
+        RefreshDatabase;
 
-    public function testPlacesCharacterOnMap(): void
+    public function test_places_character_on_map(): void
     {
         $user = $this->createUser();
         $race = $this->createRace();
@@ -67,7 +67,7 @@ class MapPlacementTest extends TestCase
         $this->assertSame($map->id, $reloaded->map->game_map_id);
     }
 
-    public function testNoOpWhenStateHasNoCharacter(): void
+    public function test_no_op_when_state_has_no_character(): void
     {
         $map = $this->createGameMap(['name' => MapNameValue::SURFACE]);
 
@@ -85,7 +85,7 @@ class MapPlacementTest extends TestCase
         $this->assertSame(0, Character::query()->has('map')->count());
     }
 
-    public function testNoOpWhenStateHasNoMap(): void
+    public function test_no_op_when_state_has_no_map(): void
     {
         $user = $this->createUser();
         $race = $this->createRace();

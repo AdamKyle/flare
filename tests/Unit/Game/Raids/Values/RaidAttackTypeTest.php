@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class RaidAttackTypeTest extends TestCase
 {
-    public function testThrowsExceptionForInvalidType()
+    public function test_throws_exception_for_invalid_type()
     {
 
         $this->expectException(Exception::class);
@@ -16,17 +16,17 @@ class RaidAttackTypeTest extends TestCase
         new RaidAttackTypes(45);
     }
 
-    public function testIsFireAttack()
+    public function test_is_fire_attack()
     {
         $this->assertTrue((new RaidAttackTypes(RaidAttackTypes::FIRE_ATTACK))->isFireAttack());
     }
 
-    public function testIsIceAttack()
+    public function test_is_ice_attack()
     {
         $this->assertTrue((new RaidAttackTypes(RaidAttackTypes::ICE_ATTACK))->isIceAttack());
     }
 
-    public function testIsWaterAttack()
+    public function test_is_water_attack()
     {
         $this->assertTrue((new RaidAttackTypes(RaidAttackTypes::WATER_ATTACK))->isWaterAttack());
     }

@@ -11,8 +11,6 @@ class AlchemyKingdomItemsTable extends DataTableComponent
 {
     /**
      * Configures the data table by setting its primary key.
-     *
-     * @return void
      */
     public function configure(): void
     {
@@ -21,8 +19,6 @@ class AlchemyKingdomItemsTable extends DataTableComponent
 
     /**
      * Builds the query to retrieve alchemy kingdom items.
-     *
-     * @return Builder
      */
     public function builder(): Builder
     {
@@ -36,8 +32,6 @@ class AlchemyKingdomItemsTable extends DataTableComponent
 
     /**
      * Defines the columns to be displayed in the table.
-     *
-     * @return array
      */
     public function columns(): array
     {
@@ -46,7 +40,8 @@ class AlchemyKingdomItemsTable extends DataTableComponent
                 ->searchable()
                 ->format(function ($value, $row) {
                     $itemId = Item::where('name', $value)->first()->id;
-                    return '<a href="/items/' . $itemId . '">' . $row->name . '</a>';
+
+                    return '<a href="/items/'.$itemId.'">'.$row->name.'</a>';
                 })
                 ->html(),
             Column::make('Gold Dust Cost')

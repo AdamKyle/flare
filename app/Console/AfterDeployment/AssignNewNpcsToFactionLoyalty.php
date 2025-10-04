@@ -57,7 +57,6 @@ class AssignNewNpcsToFactionLoyalty extends Command
     /**
      * Update NPC's for faction loyalty
      *
-     * @param FactionLoyalty $factionLoyalty
      * @return void
      */
     private function updateNpcsForFactionLOyalty(FactionLoyalty $factionLoyalty)
@@ -92,7 +91,7 @@ class AssignNewNpcsToFactionLoyalty extends Command
                     'fame_tasks' => array_merge($bountyTasks, $craftingTasks),
                 ]);
 
-                $this->info('Created for: ' . $npc->real_name);
+                $this->info('Created for: '.$npc->real_name);
             }
         }
 
@@ -109,9 +108,6 @@ class AssignNewNpcsToFactionLoyalty extends Command
 
     /**
      * Create the crafting tasks
-     *
-     * @param string $gameMapName
-     * @return array
      */
     private function createCraftingTasks(string $gameMapName): array
     {
@@ -153,10 +149,6 @@ class AssignNewNpcsToFactionLoyalty extends Command
 
     /**
      * Create bounty tasks
-     *
-     * @param Character $character
-     * @param GameMap $gameMap
-     * @return array
      */
     private function createBountyTasks(Character $character, GameMap $gameMap): array
     {
@@ -216,11 +208,6 @@ class AssignNewNpcsToFactionLoyalty extends Command
 
     /**
      * Check if this task already exists
-     *
-     * @param array $tasks
-     * @param string $key
-     * @param integer $id
-     * @return boolean
      */
     private function hasTaskAlready(array $tasks, string $key, int $id): bool
     {
@@ -236,9 +223,6 @@ class AssignNewNpcsToFactionLoyalty extends Command
     /**
      * Get item for the crafting task.
      *
-     * @param string $type
-     * @param string $gamMapName
-     * @return Item
      * @throws Exception
      */
     private function getItemForCraftingTask(string $type, string $gamMapName): Item

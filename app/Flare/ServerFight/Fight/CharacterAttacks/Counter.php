@@ -44,7 +44,7 @@ class Counter extends BattleBase
         $monsterAttack = $monster->buildAttack();
 
         if ($monsterAttack > $characterAc) {
-            $this->addMessage('The enemy counters your attack for: ' . number_format($monsterAttack), 'enemy-action');
+            $this->addMessage('The enemy counters your attack for: '.number_format($monsterAttack), 'enemy-action');
 
             $this->characterHealth -= $monsterAttack;
         } else {
@@ -69,7 +69,7 @@ class Counter extends BattleBase
         if ($weaponDamage > $monsterAc) {
             $this->monsterHealth -= $weaponDamage;
 
-            $this->addMessage('You counter the enemies attack for: ' . number_format($weaponDamage), 'player-action');
+            $this->addMessage('You counter the enemies attack for: '.number_format($weaponDamage), 'player-action');
         } else {
             $this->addMessage('The enemy managed to block your counter!', 'enemy-action');
         }

@@ -22,7 +22,7 @@ class BaseGlobalEventGoalParticipationHandlerTest extends TestCase
 
     private ?BaseGlobalEventGoalParticipationHandler $baseGlobalEventGoalParticipationHandler;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -30,7 +30,7 @@ class BaseGlobalEventGoalParticipationHandlerTest extends TestCase
         $this->baseGlobalEventGoalParticipationHandler = resolve(BaseGlobalEventGoalParticipationHandler::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -38,7 +38,7 @@ class BaseGlobalEventGoalParticipationHandlerTest extends TestCase
         $this->baseGlobalEventGoalParticipationHandler = null;
     }
 
-    public function testDoesNotGivenItemToPlayerWhenItemDoesNotExist()
+    public function test_does_not_given_item_to_player_when_item_does_not_exist()
     {
         $character = $this->character->getCharacter();
 
@@ -67,7 +67,7 @@ class BaseGlobalEventGoalParticipationHandlerTest extends TestCase
         $this->assertCount(0, $character->inventory->slots);
     }
 
-    public function testPlayersInventoryIsFullWhenItComesToObtainingAReward()
+    public function test_players_inventory_is_full_when_it_comes_to_obtaining_a_reward()
     {
 
         Event::fake();
@@ -79,7 +79,7 @@ class BaseGlobalEventGoalParticipationHandlerTest extends TestCase
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
         $character->update([
-            'inventory_max' => 1
+            'inventory_max' => 1,
         ]);
 
         $character = $character->refresh();
@@ -109,7 +109,7 @@ class BaseGlobalEventGoalParticipationHandlerTest extends TestCase
         });
     }
 
-    public function testPlayerIsRewardedWithUniqueItem()
+    public function test_player_is_rewarded_with_unique_item()
     {
         $this->createItem([
             'specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER,
@@ -148,7 +148,7 @@ class BaseGlobalEventGoalParticipationHandlerTest extends TestCase
         $this->assertNotNull($foundSlot);
     }
 
-    public function testPlayerIsRewardedWithMythicItem()
+    public function test_player_is_rewarded_with_mythic_item()
     {
         $this->createItem([
             'specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER,

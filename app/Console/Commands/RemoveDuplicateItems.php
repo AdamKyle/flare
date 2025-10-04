@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\DB;
 
 class RemoveDuplicateItems extends Command
 {
-
     private $skillLevelRequiredForCraftableItems = [
         1,
         5,
@@ -76,7 +75,6 @@ class RemoveDuplicateItems extends Command
         389,
     ];
 
-
     /**
      * The name and signature of the console command.
      *
@@ -93,8 +91,6 @@ class RemoveDuplicateItems extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return void
      */
     public function handle(): void
     {
@@ -108,18 +104,18 @@ class RemoveDuplicateItems extends Command
         $this->info('All done.');
     }
 
-    private function cleanUpCraftableItems(): void {
+    private function cleanUpCraftableItems(): void
+    {
         foreach ($this->skillLevelRequiredForCraftableItems as $skillLevel) {
-            Artisan::call('clean:duplicate-craftable-items '. $skillLevel);
+            Artisan::call('clean:duplicate-craftable-items '.$skillLevel);
         }
     }
 
     /**
      * Clean up duplicate items.
-     *
-     * @return void
      */
-    private function cleanUpDuplicates(): void {
+    private function cleanUpDuplicates(): void
+    {
         $idsToRemove = [];
         $idsToCleanUp = [];
 
@@ -132,12 +128,13 @@ class RemoveDuplicateItems extends Command
 
             $mainItem = Item::find($mainItemId);
 
-            if (!$mainItem) {
+            if (! $mainItem) {
                 $this->warn("Skipping. Main item ID {$mainItemId} does not exist.");
+
                 continue;
             }
 
-            $this->info("[Duplicate items] Item Name: {$duplicate->name} has " . count($ids) . " duplicates => IDs: [" . implode(', ', $ids) . "]");
+            $this->info("[Duplicate items] Item Name: {$duplicate->name} has ".count($ids).' duplicates => IDs: ['.implode(', ', $ids).']');
 
             $this->updateRecordsForItemIds($ids, $mainItemId);
 
@@ -152,8 +149,6 @@ class RemoveDuplicateItems extends Command
 
     /**
      * Finds items that have duplicates based on name and type.
-     *
-     * @return \Illuminate\Support\Collection
      */
     private function findDuplicateItems(): \Illuminate\Support\Collection
     {
@@ -168,9 +163,6 @@ class RemoveDuplicateItems extends Command
 
     /**
      * Extracts item IDs from a comma-separated string.
-     *
-     * @param string $ids
-     * @return array
      */
     private function extractItemIds(string $ids): array
     {
@@ -179,10 +171,6 @@ class RemoveDuplicateItems extends Command
 
     /**
      * Updates various records where the item IDs are duplicates, setting them to the main item ID.
-     *
-     * @param array $ids
-     * @param int $mainItemId
-     * @return void
      */
     private function updateRecordsForItemIds(array $ids, int $mainItemId): void
     {
@@ -194,15 +182,10 @@ class RemoveDuplicateItems extends Command
 
     /**
      * Updates records of a given model where item IDs are found in the provided array.
-     *
-     * @param string $modelClass
-     * @param array $ids
-     * @param int $mainItemId
-     * @return void
      */
     private function updateRecord(string $modelClass, array $ids, int $mainItemId): void
     {
-        if (!Item::find($mainItemId)) {
+        if (! Item::find($mainItemId)) {
             $this->warn("Cannot update $modelClass: target item ID $mainItemId doesn't exist.");
 
             return;
@@ -213,10 +196,6 @@ class RemoveDuplicateItems extends Command
 
     /**
      * Cleans up duplicate items that do not have relations.
-     *
-     * @param array $idsToRemove
-     * @param array $idsToCleanUp
-     * @return void
      */
     private function cleanUpDuplicateItemsWithoutRelations(array &$idsToRemove, array &$idsToCleanUp): void
     {
@@ -237,7 +216,7 @@ class RemoveDuplicateItems extends Command
             $mainItemId = min($ids);
             $ids = array_diff($ids, [$mainItemId]);
 
-            $this->info("Item Name: {$duplicate->name} has " . count($ids) . " duplicates => IDs: [" . implode(', ', $ids) . "]");
+            $this->info("Item Name: {$duplicate->name} has ".count($ids).' duplicates => IDs: ['.implode(', ', $ids).']');
 
             $idsToRemove = array_merge($idsToRemove, $ids);
             $idsToCleanUp[] = $mainItemId;
@@ -246,9 +225,6 @@ class RemoveDuplicateItems extends Command
 
     /**
      * Deletes items and their related data.
-     *
-     * @param array $idsToRemove
-     * @return void
      */
     private function removeItems(array $idsToRemove): void
     {
@@ -263,16 +239,13 @@ class RemoveDuplicateItems extends Command
                 $itemToRemove->sockets()->delete();
             }
 
-            $this->info('Deleted: ' . $itemToRemove->affix_name);
+            $this->info('Deleted: '.$itemToRemove->affix_name);
             $itemToRemove->delete();
         }
     }
 
     /**
      * Cleans up items by deleting related data such as holy stacks and sockets.
-     *
-     * @param array $idsToCleanUp
-     * @return void
      */
     private function cleanUpItems(array $idsToCleanUp): void
     {
@@ -287,7 +260,7 @@ class RemoveDuplicateItems extends Command
                 $itemToCleanup->sockets()->delete();
             }
 
-            $this->info('Cleaned up: ' . $itemToCleanup->affix_name);
+            $this->info('Cleaned up: '.$itemToCleanup->affix_name);
         }
     }
 }

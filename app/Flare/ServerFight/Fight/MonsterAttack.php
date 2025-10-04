@@ -44,7 +44,7 @@ class MonsterAttack extends BattleBase
 
             $this->doPlayerCounterMonster($character, $monster);
         } else {
-            $this->addMessage($monster->getName() . ' misses!', 'enemy-action');
+            $this->addMessage($monster->getName().' misses!', 'enemy-action');
         }
 
         if ($this->monsterHealth <= 0) {
@@ -203,7 +203,7 @@ class MonsterAttack extends BattleBase
         $attack = $monster->buildAttack();
 
         if (rand(1, 100) > (100 - 100 * $monster->getMonsterStat('criticality'))) {
-            $this->addMessage($monster->getName() . ' grows enraged and lashes out with all fury! (Critical Strike!)', 'regular');
+            $this->addMessage($monster->getName().' grows enraged and lashes out with all fury! (Critical Strike!)', 'regular');
 
             $attack *= 2;
         }
@@ -231,11 +231,11 @@ class MonsterAttack extends BattleBase
 
         $attack -= $ac;
 
-        $this->addMessage('You reduced the incoming (Physical) damage with your armour by: ' . number_format($ac), 'player-action');
+        $this->addMessage('You reduced the incoming (Physical) damage with your armour by: '.number_format($ac), 'player-action');
 
         $this->characterHealth -= $attack;
 
-        $this->addMessage($monster->getName() . ' hits for: ' . number_format($attack), 'enemy-action');
+        $this->addMessage($monster->getName().' hits for: '.number_format($attack), 'enemy-action');
     }
 
     protected function fireEnchantments(ServerMonster $monster, Character $character)
@@ -253,14 +253,14 @@ class MonsterAttack extends BattleBase
         if ($maxAffixDamage > 0) {
             $this->characterHealth -= $maxAffixDamage;
 
-            $this->addMessage($monster->getName() . '\'s enchantments glow, lashing out for: ' . number_format($maxAffixDamage), 'enemy-action');
+            $this->addMessage($monster->getName().'\'s enchantments glow, lashing out for: '.number_format($maxAffixDamage), 'enemy-action');
         }
     }
 
     protected function castSpells(ServerMonster $monster, Character $character, string $previousAttackType)
     {
         if (! $this->canHit->canMonsterCastSpell($character, $monster, $this->isVoided)) {
-            $this->addMessage($monster->getName() . '\'s Spells fizzle and fail to fire.', 'regular');
+            $this->addMessage($monster->getName().'\'s Spells fizzle and fail to fire.', 'regular');
 
             return;
         }
@@ -281,7 +281,7 @@ class MonsterAttack extends BattleBase
             $criticality = $monster->getMonsterStat('criticality');
 
             if (rand(1, 100) > (100 - 100 * $criticality)) {
-                $this->addMessage($monster->getName() . ' With a fury of hatred their spells fly viciously at you! (Critical Strike!)', 'regular');
+                $this->addMessage($monster->getName().' With a fury of hatred their spells fly viciously at you! (Critical Strike!)', 'regular');
 
                 $spellDamage *= 2;
             }
@@ -294,7 +294,7 @@ class MonsterAttack extends BattleBase
 
             $this->characterHealth -= $spellDamage;
 
-            $this->addMessage($monster->getName() . '\'s spells burst toward you doing: ' . number_format($spellDamage), 'enemy-action');
+            $this->addMessage($monster->getName().'\'s spells burst toward you doing: '.number_format($spellDamage), 'enemy-action');
         }
     }
 }

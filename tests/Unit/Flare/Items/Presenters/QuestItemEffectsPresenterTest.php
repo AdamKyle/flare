@@ -8,28 +8,28 @@ use PHPUnit\Framework\TestCase;
 
 final class QuestItemEffectsPresenterTest extends TestCase
 {
-    public function testReturnsNAForNull(): void
+    public function test_returns_na_for_null(): void
     {
         $presenter = new QuestItemEffectsPresenter();
 
         $this->assertSame('N/A', $presenter->getEffect(null));
     }
 
-    public function testReturnsNAForEmptyString(): void
+    public function test_returns_na_for_empty_string(): void
     {
         $presenter = new QuestItemEffectsPresenter();
 
         $this->assertSame('N/A', $presenter->getEffect(''));
     }
 
-    public function testReturnsNAForInvalidValue(): void
+    public function test_returns_na_for_invalid_value(): void
     {
         $presenter = new QuestItemEffectsPresenter();
 
         $this->assertSame('N/A', $presenter->getEffect('not-a-real-effect'));
     }
 
-    public function testReturnsLabelForAllEnumCases(): void
+    public function test_returns_label_for_all_enum_cases(): void
     {
         $presenter = new QuestItemEffectsPresenter();
 

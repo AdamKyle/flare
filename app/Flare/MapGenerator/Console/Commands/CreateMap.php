@@ -45,7 +45,7 @@ class CreateMap extends Command
         // $land = new Color(97, 83, 61);
 
         // Labyrinth:
-        //$land = new Color(99, 70, 8);
+        // $land = new Color(99, 70, 8);
 
         // Dungeon:
         // $land = new Color(94, 74, 73);

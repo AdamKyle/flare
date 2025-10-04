@@ -27,7 +27,7 @@ class UpdateCharacterAttackTypesHandlerTest extends TestCase
 
     private ?UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -35,7 +35,7 @@ class UpdateCharacterAttackTypesHandlerTest extends TestCase
         $this->updateCharacterAttackTypesHandler = resolve(UpdateCharacterAttackTypesHandler::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -61,7 +61,7 @@ class UpdateCharacterAttackTypesHandlerTest extends TestCase
             ->getCharacter();
     }
 
-    public function testUpdateCharacterAttackCache()
+    public function test_update_character_attack_cache()
     {
         Event::fake();
 
@@ -72,7 +72,7 @@ class UpdateCharacterAttackTypesHandlerTest extends TestCase
         Event::assertDispatched(UpdateCharacterAttackEvent::class);
     }
 
-    public function testUpdateCharacterAttackCacheIsCreated()
+    public function test_update_character_attack_cache_is_created()
     {
 
         $character = $this->setUpCharacterForTests();

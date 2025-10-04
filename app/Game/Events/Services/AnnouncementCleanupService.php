@@ -7,10 +7,6 @@ use App\Game\Messages\Events\DeleteAnnouncementEvent;
 
 class AnnouncementCleanupService
 {
-    /**
-     * @param  int  $eventId
-     * @return void
-     */
     public function deleteByEventId(int $eventId): void
     {
         $announcementId = Announcement::query()

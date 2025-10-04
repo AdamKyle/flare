@@ -15,21 +15,21 @@ class GamblerControllerTest extends TestCase
 
     private ?Character $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testGetSlots()
+    public function test_get_slots()
     {
         $response = $this->actingAs($this->character->user)
             ->call('GET', '/api/character/gambler');
@@ -41,7 +41,7 @@ class GamblerControllerTest extends TestCase
         $this->assertEquals($icons, $jsonData['icons']);
     }
 
-    public function testRollSlots()
+    public function test_roll_slots()
     {
 
         $this->character->update(['gold' => MaxCurrenciesValue::MAX_GOLD]);

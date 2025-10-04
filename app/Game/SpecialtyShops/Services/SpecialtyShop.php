@@ -42,10 +42,10 @@ class SpecialtyShop
             $specialtyType = new ItemSpecialtyType($type);
 
             if ($specialtyType->isPurgatoryChains()) {
-                return $this->errorResult('You are missing an item of type: ' . $item->type . ' which must be of specialty type: ' . ItemSpecialtyType::HELL_FORGED . '. Item must be in your inventory.');
+                return $this->errorResult('You are missing an item of type: '.$item->type.' which must be of specialty type: '.ItemSpecialtyType::HELL_FORGED.'. Item must be in your inventory.');
             }
 
-            return $this->errorResult('You are missing an item of type: ' . $item->type . ' with a crafting level of 400. Item must be in your inventory.');
+            return $this->errorResult('You are missing an item of type: '.$item->type.' with a crafting level of 400. Item must be in your inventory.');
         }
 
         $slotToTrade = $this->getItemToTrade($character, $type, $item->type);
@@ -53,7 +53,7 @@ class SpecialtyShop
 
         // Only duplicate the item if we have either a prefix, suffix or holy stacks applied.
         // If not, use the item we want to buy and set its id, so we don't duplicate the item.
-        if (!is_null($itemToTrade->item_suffix_id) || !is_null($itemToTrade->item_prefix_id) || $itemToTrade->appliedHolyStacks->isNotEmpty()) {
+        if (! is_null($itemToTrade->item_suffix_id) || ! is_null($itemToTrade->item_prefix_id) || $itemToTrade->appliedHolyStacks->isNotEmpty()) {
             $newItemToBuy = $this->moveEnchantmentsAndHoly($itemToTrade, $item);
         } else {
             $newItemToBuy = $item;
@@ -72,7 +72,7 @@ class SpecialtyShop
 
         $slotToTrade->delete();
 
-        event(new ServerMessageEvent($character->user, 'You bought a new: ' . $item->name . ' (' . $item->type . ') from the ' . $item->specialty_type . ' shop.', $newItemToBuy->id));
+        event(new ServerMessageEvent($character->user, 'You bought a new: '.$item->name.' ('.$item->type.') from the '.$item->specialty_type.' shop.', $newItemToBuy->id));
 
         return $this->successResult();
     }

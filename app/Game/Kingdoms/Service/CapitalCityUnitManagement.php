@@ -23,7 +23,8 @@ class CapitalCityUnitManagement
         return $this->capitalCityUnitManagementRequestHandler->createUnitRequests($character, $kingdom, $requestData);
     }
 
-    public function processUnitRequest(CapitalCityUnitQueue $capitalCityUnitQueue): void {
+    public function processUnitRequest(CapitalCityUnitQueue $capitalCityUnitQueue): void
+    {
         $this->capitalCityProcessUnitRequestHandler->handleUnitRequests($capitalCityUnitQueue);
     }
 }

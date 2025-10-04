@@ -82,10 +82,10 @@ class EnchantingService
         $inventory = $characterInventoryService->getInventorySlotsCollection();
 
         if ($ignoreTrinkets) {
-            $inventory = $inventory->reject(fn($item) => in_array($item['type'], ['trinket', 'artifact']));
+            $inventory = $inventory->reject(fn ($item) => in_array($item['type'], ['trinket', 'artifact']));
         }
 
-        [$noAffix, $withAffix] = $inventory->partition(fn($item) => $item['affix_count'] === 0);
+        [$noAffix, $withAffix] = $inventory->partition(fn ($item) => $item['affix_count'] === 0);
 
         $newInventory = $noAffix->merge($withAffix);
 
@@ -133,7 +133,7 @@ class EnchantingService
         $cost = $itemAffixes->sum('cost');
 
         foreach ($itemAffixes as $itemAffix) {
-            if (! is_null($itemToEnchant->{'item_' . $itemAffix->type . '_id'})) {
+            if (! is_null($itemToEnchant->{'item_'.$itemAffix->type.'_id'})) {
                 $cost += 1000;
             }
         }
@@ -263,7 +263,7 @@ class EnchantingService
             }
 
             if ($enchantingSkill->level > $affix->skill_level_trivial) {
-                if (!$this->sentToEasyMessage) {
+                if (! $this->sentToEasyMessage) {
                     ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::TO_EASY_TO_CRAFT);
 
                     $this->sentToEasyMessage = true;
@@ -279,8 +279,8 @@ class EnchantingService
              *
              * If we fail to do this then we return from the loop.
              */
-            if (!$this->wasTooEasy) {
-                if (!$this->processedEnchant($slot, $affix, $character, $enchantingSkill)) {
+            if (! $this->wasTooEasy) {
+                if (! $this->processedEnchant($slot, $affix, $character, $enchantingSkill)) {
                     return;
                 }
             }
@@ -304,7 +304,7 @@ class EnchantingService
 
     protected function appliedEnchantment(InventorySlot|GlobalEventCraftingInventorySlot $slot, ItemAffix $affix, Character $character, Skill $enchantingSkill, bool $tooEasy = false)
     {
-        $message = 'Applied enchantment: ' . $affix->name . ' to: ' . $slot->item->refresh()->affix_name;
+        $message = 'Applied enchantment: '.$affix->name.' to: '.$slot->item->refresh()->affix_name;
 
         ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::ENCHANTED, $message, $slot->id);
 
@@ -315,7 +315,7 @@ class EnchantingService
 
     protected function failedToApplyEnchantment(InventorySlot|GlobalEventCraftingInventorySlot $slot, ItemAffix $affix, Character $character)
     {
-        $message = 'You failed to apply ' . $affix->name . ' to: ' . $slot->item->refresh()->affix_name . '. The item shatters before you. You lost the investment.';
+        $message = 'You failed to apply '.$affix->name.' to: '.$slot->item->refresh()->affix_name.'. The item shatters before you. You lost the investment.';
 
         ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::ENCHANTMENT_FAILED, $message);
 

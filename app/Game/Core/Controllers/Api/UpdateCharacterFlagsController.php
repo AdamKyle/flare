@@ -2,19 +2,15 @@
 
 namespace App\Game\Core\Controllers\Api;
 
-use Illuminate\Http\JsonResponse;
 use App\Flare\Models\Character;
 use App\Game\GuideQuests\Events\OpenGuideQuestModal;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 
 class UpdateCharacterFlagsController extends Controller
 {
-
     /**
      * Turn off the intro slides
-     *
-     * @param Character $character
-     * @return JsonResponse
      */
     public function turnOffIntro(Character $character): JsonResponse
     {

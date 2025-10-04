@@ -2,12 +2,11 @@
 
 namespace Tests\Console\Survey;
 
-
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
 use App\Game\Events\Values\EventType;
 use App\Game\Survey\Events\ShowSurvey;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateEvent;
@@ -18,26 +17,25 @@ use Tests\Traits\CreateUserLoginDuration;
 
 class StartSurveyTest extends TestCase
 {
-    use CreateEvent, RefreshDatabase, CreateScheduledEvent, CreateUserLoginDuration, CreateSubmittedSurvey, CreateSurvey;
+    use CreateEvent, CreateScheduledEvent, CreateSubmittedSurvey, CreateSurvey, CreateUserLoginDuration, RefreshDatabase;
 
     private ?CharacterFactory $characterFactory;
 
-
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->characterFactory = (new CharacterFactory())->createBaseCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->characterFactory = null;
     }
 
-    public function testCannotStartSurveyWhenNoScheduledEventIsRunning()
+    public function test_cannot_start_survey_when_no_scheduled_event_is_running()
     {
 
         Event::fake();
@@ -47,7 +45,7 @@ class StartSurveyTest extends TestCase
         Event::assertNotDispatched(ShowSurvey::class);
     }
 
-    public function testCannotStartSurveyWhenFlagIsAlreadyFlippedToShowTheSurvey()
+    public function test_cannot_start_survey_when_flag_is_already_flipped_to_show_the_survey()
     {
         Event::fake();
 
@@ -65,10 +63,9 @@ class StartSurveyTest extends TestCase
         Event::assertNotDispatched(ShowSurvey::class);
     }
 
-    public function testCannotStartSurveyWhenThereIsNoLoggedInDurationRecord()
+    public function test_cannot_start_survey_when_there_is_no_logged_in_duration_record()
     {
         Event::fake();
-
 
         $this->createScheduledEvent([
             'event_type' => EventType::FEEDBACK_EVENT,
@@ -80,13 +77,11 @@ class StartSurveyTest extends TestCase
         Event::assertNotDispatched(ShowSurvey::class);
     }
 
-    public function testCannotStartSurveyWhenUserLoginDurationIsBelowOneHour()
+    public function test_cannot_start_survey_when_user_login_duration_is_below_one_hour()
     {
         Event::fake();
 
-
         $character = $this->characterFactory->getCharacter();
-
 
         $this->createScheduledEvent([
             'event_type' => EventType::FEEDBACK_EVENT,
@@ -107,13 +102,11 @@ class StartSurveyTest extends TestCase
         Event::assertNotDispatched(ShowSurvey::class);
     }
 
-    public function testCannotStartSurveyWhenYouSubmittedASurvey()
+    public function test_cannot_start_survey_when_you_submitted_a_survey()
     {
         Event::fake();
 
-
         $character = $this->characterFactory->getCharacter();
-
 
         $this->createScheduledEvent([
             'event_type' => EventType::FEEDBACK_EVENT,
@@ -139,7 +132,7 @@ class StartSurveyTest extends TestCase
         Event::assertNotDispatched(ShowSurvey::class);
     }
 
-    public function testCanDoSurvey()
+    public function test_can_do_survey()
     {
 
         $character = $this->characterFactory->getCharacter();
@@ -160,7 +153,7 @@ class StartSurveyTest extends TestCase
             'last_heart_beat' => now()->addHours(3),
         ]);
 
-        Artisan::call('start:survey ' . $character->id);
+        Artisan::call('start:survey '.$character->id);
 
         $character = $character->refresh();
 

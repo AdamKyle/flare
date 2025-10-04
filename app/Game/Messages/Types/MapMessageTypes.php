@@ -6,7 +6,6 @@ use App\Game\Messages\Types\Concerns\BaseMessageType;
 
 enum MapMessageTypes: string implements BaseMessageType
 {
-
     case CANT_MOVE = 'cant_move';
     case CANNOT_MOVE_RIGHT = 'cannot_move_right';
     case CANNOT_MOVE_LEFT = 'cannot_move_left';

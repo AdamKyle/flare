@@ -121,7 +121,8 @@ class ItemTransferService
         ]);
     }
 
-    private function getProperItemFromAfterTransfer(Item $itemToMoveFrom): Item {
+    private function getProperItemFromAfterTransfer(Item $itemToMoveFrom): Item
+    {
         $isEmptyItem = is_null($itemToMoveFrom->item_suffix_id) &&
             is_null($itemToMoveFrom->item_prefix_id) &&
             is_null($itemToMoveFrom->specialty_type) &&

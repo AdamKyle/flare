@@ -11,143 +11,143 @@ class WeaponMasteryValueTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
 
-    public function testInitializeWeaponMasteryValueWithInProperValue()
+    public function test_initialize_weapon_mastery_value_with_in_proper_value()
     {
         $this->expectException(Exception::class);
 
         new WeaponMasteryValue(13);
     }
 
-    public function testFailToGetNumericValueForStringType()
+    public function test_fail_to_get_numeric_value_for_string_type()
     {
         $this->expectException(Exception::class);
 
         WeaponMasteryValue::getNumericValueForStringType('apples');
     }
 
-    public function testFailToGetTypeForInvalidNumericValue()
+    public function test_fail_to_get_type_for_invalid_numeric_value()
     {
         $this->expectException(Exception::class);
 
         WeaponMasteryValue::getTypeForNumericalValue(500);
     }
 
-    public function testGetNumericValueForWeaponType()
+    public function test_get_numeric_value_for_weapon_type()
     {
         $this->assertEquals(WeaponMasteryValue::WEAPON, WeaponMasteryValue::getNumericValueForStringType('weapon'));
     }
 
-    public function testGetNumericValueForHammerType()
+    public function test_get_numeric_value_for_hammer_type()
     {
         $this->assertEquals(WeaponMasteryValue::HAMMER, WeaponMasteryValue::getNumericValueForStringType('hammer'));
     }
 
-    public function testGetNumericValueForStaveType()
+    public function test_get_numeric_value_for_stave_type()
     {
         $this->assertEquals(WeaponMasteryValue::STAVE, WeaponMasteryValue::getNumericValueForStringType('stave'));
     }
 
-    public function testGetNumericValueForBowType()
+    public function test_get_numeric_value_for_bow_type()
     {
         $this->assertEquals(WeaponMasteryValue::BOW, WeaponMasteryValue::getNumericValueForStringType('bow'));
     }
 
-    public function testGetNumericValueForSpellDamageType()
+    public function test_get_numeric_value_for_spell_damage_type()
     {
         $this->assertEquals(WeaponMasteryValue::DAMAGE_SPELL, WeaponMasteryValue::getNumericValueForStringType('spell-damage'));
     }
 
-    public function testGetNumericValueForSpellHealingType()
+    public function test_get_numeric_value_for_spell_healing_type()
     {
         $this->assertEquals(WeaponMasteryValue::HEALING_SPELL, WeaponMasteryValue::getNumericValueForStringType('spell-healing'));
     }
 
-    public function testGetNumericValueForGunType()
+    public function test_get_numeric_value_for_gun_type()
     {
         $this->assertEquals(WeaponMasteryValue::GUN, WeaponMasteryValue::getNumericValueForStringType('gun'));
     }
 
-    public function testGetNumericValueForFanType()
+    public function test_get_numeric_value_for_fan_type()
     {
         $this->assertEquals(WeaponMasteryValue::FAN, WeaponMasteryValue::getNumericValueForStringType('fan'));
     }
 
-    public function testGetNumericValueForMaceType()
+    public function test_get_numeric_value_for_mace_type()
     {
         $this->assertEquals(WeaponMasteryValue::MACE, WeaponMasteryValue::getNumericValueForStringType('mace'));
     }
 
-    public function testGetNumericValueForScratchAwlType()
+    public function test_get_numeric_value_for_scratch_awl_type()
     {
         $this->assertEquals(WeaponMasteryValue::SCRATCH_AWL, WeaponMasteryValue::getNumericValueForStringType('scratch-awl'));
     }
 
-    public function testIsValidType()
+    public function test_is_valid_type()
     {
         $this->assertTrue(WeaponMasteryValue::isValidType('weapon'));
     }
 
-    public function testGetAttributeName()
+    public function test_get_attribute_name()
     {
         $this->assertEquals('Weapons', (new WeaponMasteryValue(WeaponMasteryValue::WEAPON))->getAttribute());
     }
 
-    public function testIsStave()
+    public function test_is_stave()
     {
         $this->assertTrue((new WeaponMasteryValue(WeaponMasteryValue::STAVE))->isStaff());
     }
 
-    public function testIsWeapon()
+    public function test_is_weapon()
     {
         $this->assertTrue((new WeaponMasteryValue(WeaponMasteryValue::WEAPON))->isWeapon());
     }
 
-    public function testIsBow()
+    public function test_is_bow()
     {
         $this->assertTrue((new WeaponMasteryValue(WeaponMasteryValue::BOW))->isBow());
     }
 
-    public function testIsHammer()
+    public function test_is_hammer()
     {
         $this->assertTrue((new WeaponMasteryValue(WeaponMasteryValue::HAMMER))->isHammer());
     }
 
-    public function testIsSpellDamage()
+    public function test_is_spell_damage()
     {
         $this->assertTrue((new WeaponMasteryValue(WeaponMasteryValue::DAMAGE_SPELL))->isDamageSpell());
     }
 
-    public function testIsSpellHealing()
+    public function test_is_spell_healing()
     {
         $this->assertTrue((new WeaponMasteryValue(WeaponMasteryValue::HEALING_SPELL))->isHealingSpell());
     }
 
-    public function testIsGun()
+    public function test_is_gun()
     {
         $this->assertTrue((new WeaponMasteryValue(WeaponMasteryValue::GUN))->isGun());
     }
 
-    public function testIsFan()
+    public function test_is_fan()
     {
         $this->assertTrue((new WeaponMasteryValue(WeaponMasteryValue::FAN))->isFan());
     }
 
-    public function testIsMace()
+    public function test_is_mace()
     {
         $this->assertTrue((new WeaponMasteryValue(WeaponMasteryValue::MACE))->isMace());
     }
 
-    public function testisScratchAwl()
+    public function testis_scratch_awl()
     {
         $this->assertTrue((new WeaponMasteryValue(WeaponMasteryValue::SCRATCH_AWL))->isScratchAwl());
     }

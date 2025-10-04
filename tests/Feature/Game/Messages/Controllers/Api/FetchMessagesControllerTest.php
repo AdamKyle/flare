@@ -10,25 +10,25 @@ use Tests\Traits\CreateMessage;
 
 class FetchMessagesControllerTest extends TestCase
 {
-    use RefreshDatabase, CreateMessage, CreateAnnouncement;
+    use CreateAnnouncement, CreateMessage, RefreshDatabase;
 
     private ?CharacterFactory $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testGetLastMessages()
+    public function test_get_last_messages()
     {
         $character = $this->character->getCharacter();
 

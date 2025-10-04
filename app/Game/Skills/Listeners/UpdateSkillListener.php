@@ -75,7 +75,7 @@ class UpdateSkillListener
 
         $event = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
 
-        if (!is_null($event)) {
+        if (! is_null($event)) {
 
             if ($skill->type()->isEnchanting() || $skill->type()->isCrafting() || $skill->type()->isAlchemy() || $skill->type()->isGemCrafting()) {
                 $newXp += 175;
@@ -83,7 +83,6 @@ class UpdateSkillListener
                 $newXp += 150;
             }
         }
-
 
         while ($newXp >= $skill->xp_max) {
             $level = $skill->level + 1;
@@ -127,9 +126,6 @@ class UpdateSkillListener
 
     /**
      * Check to see if we should update the skill based on prefined skill properties.
-     *
-     * @param GameSkill $skill
-     * @return boolean
      */
     protected function shouldUpdateCharacterAttackData(GameSkill $skill): bool
     {
@@ -149,7 +145,6 @@ class UpdateSkillListener
 
         return false;
     }
-
 
     protected function updateCharacterAttackDataCache(Character $character)
     {

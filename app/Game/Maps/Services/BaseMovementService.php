@@ -210,7 +210,7 @@ class BaseMovementService
             $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
 
             if (is_null($slot)) {
-                event(new ServerMessageEvent($character->user, 'Cannot enter this location without a ' . $item->name));
+                event(new ServerMessageEvent($character->user, 'Cannot enter this location without a '.$item->name));
 
                 return false;
             }

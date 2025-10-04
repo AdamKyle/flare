@@ -24,7 +24,7 @@ class SecondaryRewardServiceTest extends TestCase
 
     private ?CharacterFactory $characterFactory;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -33,7 +33,7 @@ class SecondaryRewardServiceTest extends TestCase
         $this->characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -42,7 +42,7 @@ class SecondaryRewardServiceTest extends TestCase
         $this->characterFactory = null;
     }
 
-    public function testUpdateTopBarIsNotCalledWhenNotLoggedIn()
+    public function test_update_top_bar_is_not_called_when_not_logged_in()
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -53,7 +53,7 @@ class SecondaryRewardServiceTest extends TestCase
         Event::assertNotDispatched(UpdateTopBarEvent::class);
     }
 
-    public function testUpdateTopBarIsCalledWhenLoggedIn()
+    public function test_update_top_bar_is_called_when_logged_in()
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -75,7 +75,7 @@ class SecondaryRewardServiceTest extends TestCase
         Event::assertDispatched(UpdateTopBarEvent::class);
     }
 
-    public function testItemSkillDoNotsGetUpdated()
+    public function test_item_skill_do_nots_get_updated()
     {
         $mock = Mockery::mock(UpdateItemSkill::class);
 
@@ -92,7 +92,7 @@ class SecondaryRewardServiceTest extends TestCase
         $mock->shouldNotReceive('updateItemSkill');
     }
 
-    public function testItemSkillsGetUpdated()
+    public function test_item_skills_get_updated()
     {
         UpdateItemSkillFacade::shouldReceive('updateItemSkill')->once()->andReturn(null);
 

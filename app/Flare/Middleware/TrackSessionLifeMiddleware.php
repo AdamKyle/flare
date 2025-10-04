@@ -6,8 +6,8 @@ use App\Flare\Models\UserLoginDuration;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
-class TrackSessionLifeMiddleware {
-
+class TrackSessionLifeMiddleware
+{
     /**
      * Handle an incoming request.
      *

@@ -22,7 +22,7 @@ class GemComparisonControllerTest extends TestCase
 
     private ?Gem $gem = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -51,14 +51,14 @@ class GemComparisonControllerTest extends TestCase
             ->inventoryManagement()->giveItem($this->item->refresh())->getCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testCompareGems()
+    public function test_compare_gems()
     {
         $slotId = $this->character->inventory->slots->filter(function ($slot) {
             return $slot->item_id === $this->item->id;

@@ -7,8 +7,8 @@ use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;
 use App\Flare\Models\UnitMovementQueue;
-use App\Game\Kingdoms\Transformers\UnitMovementTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Kingdoms\Transformers\UnitMovementTransformer;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 

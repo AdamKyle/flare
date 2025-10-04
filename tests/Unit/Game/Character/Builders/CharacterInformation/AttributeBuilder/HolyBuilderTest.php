@@ -20,7 +20,7 @@ class HolyBuilderTest extends TestCase
 
     private ?CharacterStatBuilder $characterStatBuilder;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -28,7 +28,7 @@ class HolyBuilderTest extends TestCase
         $this->characterStatBuilder = resolve(CharacterStatBuilder::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -36,7 +36,7 @@ class HolyBuilderTest extends TestCase
         $this->characterStatBuilder = null;
     }
 
-    public function testHolyBonusWithNoInventory()
+    public function test_holy_bonus_with_no_inventory()
     {
         $character = $this->character->getCharacter();
 
@@ -45,7 +45,7 @@ class HolyBuilderTest extends TestCase
         $this->assertEquals(0, $holyBonus);
     }
 
-    public function testHolyBonusWithInventory()
+    public function test_holy_bonus_with_inventory()
     {
         $item = $this->createItem([
             'name' => 'Weapon',
@@ -66,7 +66,7 @@ class HolyBuilderTest extends TestCase
         $this->assertGreaterThan(0, $holyBonus);
     }
 
-    public function testHolyBonusWithInventoryForTwoHandedClass()
+    public function test_holy_bonus_with_inventory_for_two_handed_class()
     {
         $item = $this->createItem([
             'name' => 'Weapon',
@@ -95,7 +95,7 @@ class HolyBuilderTest extends TestCase
         $this->assertGreaterThan(0, $holyBonus);
     }
 
-    public function testGetTotalStackAppliedWithNoInventory()
+    public function test_get_total_stack_applied_with_no_inventory()
     {
         $character = $this->character->getCharacter();
 
@@ -104,7 +104,7 @@ class HolyBuilderTest extends TestCase
         $this->assertEquals(0, $stacks);
     }
 
-    public function testGetTotalStacksAppliedWithInventory()
+    public function test_get_total_stacks_applied_with_inventory()
     {
         $item = $this->createItem([
             'name' => 'Weapon',
@@ -125,7 +125,7 @@ class HolyBuilderTest extends TestCase
         $this->assertEquals(1, $stacks);
     }
 
-    public function testGetDevouringResistanceForNoInventory()
+    public function test_get_devouring_resistance_for_no_inventory()
     {
         $character = $this->character->getCharacter();
 
@@ -134,7 +134,7 @@ class HolyBuilderTest extends TestCase
         $this->assertEquals(0, $stacks);
     }
 
-    public function testGetDevouringResistanceForInventory()
+    public function test_get_devouring_resistance_for_inventory()
     {
         $item = $this->createItem([
             'name' => 'Weapon',
@@ -155,7 +155,7 @@ class HolyBuilderTest extends TestCase
         $this->assertEquals(0.10, $stacks);
     }
 
-    public function testGetStatIncreaseForNoInventory()
+    public function test_get_stat_increase_for_no_inventory()
     {
         $character = $this->character->getCharacter();
 
@@ -164,7 +164,7 @@ class HolyBuilderTest extends TestCase
         $this->assertEquals(0, $stacks);
     }
 
-    public function testGetStatIncreaseForInventory()
+    public function test_get_stat_increase_for_inventory()
     {
         $item = $this->createItem([
             'name' => 'Weapon',
@@ -185,7 +185,7 @@ class HolyBuilderTest extends TestCase
         $this->assertEquals(0.10, $stacks);
     }
 
-    public function testFetchAttackBonusNoInventory()
+    public function test_fetch_attack_bonus_no_inventory()
     {
         $character = $this->character->getCharacter();
 
@@ -194,7 +194,7 @@ class HolyBuilderTest extends TestCase
         $this->assertEquals(0, $stacks);
     }
 
-    public function testFetchAttackBonusWithInventory()
+    public function test_fetch_attack_bonus_with_inventory()
     {
         $item = $this->createItem([
             'name' => 'Weapon',
@@ -215,7 +215,7 @@ class HolyBuilderTest extends TestCase
         $this->assertGreaterThan(0, $stacks);
     }
 
-    public function testFetchDefenceBonusNoInventory()
+    public function test_fetch_defence_bonus_no_inventory()
     {
         $character = $this->character->getCharacter();
 
@@ -224,7 +224,7 @@ class HolyBuilderTest extends TestCase
         $this->assertEquals(0, $stacks);
     }
 
-    public function testFetchDefenceBonusWithInventory()
+    public function test_fetch_defence_bonus_with_inventory()
     {
         $item = $this->createItem([
             'name' => 'Weapon',
@@ -245,7 +245,7 @@ class HolyBuilderTest extends TestCase
         $this->assertGreaterThan(0, $stacks);
     }
 
-    public function testFetchHealingBonusNoInventory()
+    public function test_fetch_healing_bonus_no_inventory()
     {
         $character = $this->character->getCharacter();
 
@@ -254,7 +254,7 @@ class HolyBuilderTest extends TestCase
         $this->assertEquals(0, $stacks);
     }
 
-    public function testFetchHealingBonusWithInventory()
+    public function test_fetch_healing_bonus_with_inventory()
     {
         $item = $this->createItem([
             'name' => 'Weapon',

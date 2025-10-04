@@ -11,7 +11,7 @@ class AddHolyStacksToItemsTest extends TestCase
 {
     use CreateItem, CreateItemAffix, RefreshDatabase;
 
-    public function testAddHolyStacks()
+    public function test_add_holy_stacks()
     {
 
         $highLevelItem = $this->createItem([

@@ -23,21 +23,21 @@ class RaidEventServiceTest extends TestCase
 
     private ?RaidEventService $raidEventService = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->raidEventService = resolve(RaidEventService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->raidEventService = null;
     }
 
-    public function testCreateRaid()
+    public function test_create_raid()
     {
         Event::fake();
 
@@ -78,7 +78,7 @@ class RaidEventServiceTest extends TestCase
         Event::assertDispatched(GlobalMessageEvent::class);
     }
 
-    public function testDoNotCreateRaid()
+    public function test_do_not_create_raid()
     {
         Event::fake();
 

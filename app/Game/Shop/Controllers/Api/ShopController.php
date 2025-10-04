@@ -24,14 +24,11 @@ use League\Fractal\Resource\Item as FractalItem;
 
 class ShopController extends Controller
 {
-
     public function __construct(private readonly CharacterInventoryService $characterInventoryService,
-                                private readonly ShopService $shopService,
-                                private readonly CharacterInventoryCountTransformer $characterInventoryCountTransformer,
-                                private readonly Manager $manager,
-    )
-    {
-    }
+        private readonly ShopService $shopService,
+        private readonly CharacterInventoryCountTransformer $characterInventoryCountTransformer,
+        private readonly Manager $manager,
+    ) {}
 
     public function fetchItemsForShop(PaginationRequest $paginationRequest, Character $character): JsonResponse
     {

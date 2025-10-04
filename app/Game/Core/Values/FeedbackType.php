@@ -2,7 +2,9 @@
 
 namespace App\Game\Core\Values;
 
-class FeedbackType {
+class FeedbackType
+{
     const BUG = 'bug';
+
     const SUGGESTION = 'suggestion';
 }

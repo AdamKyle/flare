@@ -10,7 +10,7 @@ class LevelCharacterTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testLevelCharacter()
+    public function test_level_character()
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false);
 
@@ -24,7 +24,7 @@ class LevelCharacterTest extends TestCase
         $this->assertEquals(3, $character->level);
     }
 
-    public function testCannotLevelCharacter()
+    public function test_cannot_level_character()
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false);
 

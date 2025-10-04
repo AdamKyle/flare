@@ -20,7 +20,7 @@ class EventGoalsControllerTest extends TestCase
 
     private ?GlobalEventGoal $eventGoal = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -50,7 +50,7 @@ class EventGoalsControllerTest extends TestCase
         ]);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -59,7 +59,7 @@ class EventGoalsControllerTest extends TestCase
         $this->eventGoal = null;
     }
 
-    public function testGetGlobalEventGoal()
+    public function test_get_global_event_goal()
     {
 
         $response = $this->actingAs($this->character->user)

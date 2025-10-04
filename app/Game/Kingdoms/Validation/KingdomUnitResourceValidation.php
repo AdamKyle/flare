@@ -8,21 +8,15 @@ use App\Game\Kingdoms\Values\KingdomResources;
 
 class KingdomUnitResourceValidation
 {
-
     /**
      * For the amount of units we want to recruit, are we missing resources?
-     *
-     * @param Kingdom $kingdom
-     * @param GameUnit $gameUnit
-     * @param integer $amount
-     * @return boolean
      */
     public function isMissingResources(Kingdom $kingdom, GameUnit $gameUnit, int $amount): bool
     {
         $costs = $this->getCostsRequired($kingdom, $gameUnit, $amount);
 
         foreach ($costs as $resource => $cost) {
-            if ($kingdom->{'current_' . $resource} < $cost) {
+            if ($kingdom->{'current_'.$resource} < $cost) {
                 return true;
             }
         }
@@ -32,17 +26,13 @@ class KingdomUnitResourceValidation
 
     /**
      * Get the amount of resources we are missing.
-     *
-     * @param Kingdom $kingdom
-     * @param array $costs
-     * @return array
      */
     public function getMissingCosts(Kingdom $kingdom, array $costs): array
     {
         $missingCosts = [];
 
         foreach ($costs as $resource => $cost) {
-            $amountMissing = $cost - $kingdom->{'current_' . $resource};
+            $amountMissing = $cost - $kingdom->{'current_'.$resource};
 
             if ($amountMissing > 0) {
                 $missingCosts[$resource] = $amountMissing;
@@ -54,11 +44,6 @@ class KingdomUnitResourceValidation
 
     /**
      * Get the cost required to recruit the amount of units for a kingdom
-     *
-     * @param Kingdom $kingdom
-     * @param GameUnit $gameUnit
-     * @param integer $amount
-     * @return array
      */
     public function getCostsRequired(Kingdom $kingdom, GameUnit $gameUnit, int $amount): array
     {
@@ -71,7 +56,7 @@ class KingdomUnitResourceValidation
 
             if ($resourceType === KingdomResources::POPULATION->value) {
 
-                $resourceAmountRequired = $gameUnit->{'required_' . $resourceType} * $amount;
+                $resourceAmountRequired = $gameUnit->{'required_'.$resourceType} * $amount;
 
                 $resourceAmountRequired -= $resourceAmountRequired * $kingdomUnitCostReduction;
 
@@ -80,7 +65,7 @@ class KingdomUnitResourceValidation
                 continue;
             }
 
-            $resourceAmountRequired = $gameUnit->{$resourceType . '_cost'} * $amount;
+            $resourceAmountRequired = $gameUnit->{$resourceType.'_cost'} * $amount;
 
             if ($resourceType === KingdomResources::IRON->value) {
                 $resourceAmountRequired -= $resourceAmountRequired * ($kingdomUnitCostReduction + $ironCostReduction);

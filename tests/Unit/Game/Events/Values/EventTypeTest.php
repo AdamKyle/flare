@@ -8,14 +8,14 @@ use Tests\TestCase;
 
 class EventTypeTest extends TestCase
 {
-    public function testInvalidEventType()
+    public function test_invalid_event_type()
     {
         $this->expectException(Exception::class);
 
         new EventType(905);
     }
 
-    public function testGetOptionsForSelect()
+    public function test_get_options_for_select()
     {
         $expected = [
             EventType::WEEKLY_CELESTIALS => 'Weekly Celestials',
@@ -34,47 +34,47 @@ class EventTypeTest extends TestCase
         $this->assertEquals($expected, EventType::getOptionsForSelect());
     }
 
-    public function testIsWeeklyCelestials()
+    public function test_is_weekly_celestials()
     {
         $this->assertTrue((new EventType(EventType::WEEKLY_CELESTIALS))->isWeeklyCelestials());
     }
 
-    public function testIsWeeklyCurrencies()
+    public function test_is_weekly_currencies()
     {
         $this->assertTrue((new EventType(EventType::WEEKLY_CURRENCY_DROPS))->isWeeklyCurrencyDrops());
     }
 
-    public function testIsRaidEvent()
+    public function test_is_raid_event()
     {
         $this->assertTrue((new EventType(EventType::RAID_EVENT))->isRaidEvent());
     }
 
-    public function testIsWinterEvent()
+    public function test_is_winter_event()
     {
         $this->assertTrue((new EventType(EventType::WINTER_EVENT))->isWinterEvent());
     }
 
-    public function testIsPurgatorySmithsHouse()
+    public function test_is_purgatory_smiths_house()
     {
         $this->assertTrue((new EventType(EventType::PURGATORY_SMITH_HOUSE))->isPurgatorySmithHouseEvent());
     }
 
-    public function testIsGoldMines()
+    public function test_is_gold_mines()
     {
         $this->assertTrue((new EventType(EventType::GOLD_MINES))->isGoldMinesEvent());
     }
 
-    public function testIsTheOldChurch()
+    public function test_is_the_old_church()
     {
         $this->assertTrue((new EventType(EventType::THE_OLD_CHURCH))->isTheOldChurchEvent());
     }
 
-    public function testIsWeeklyFactionLoyaltyEvent()
+    public function test_is_weekly_faction_loyalty_event()
     {
         $this->assertTrue((new EventType(EventType::WEEKLY_FACTION_LOYALTY_EVENT))->isWeeklyFactionLoyaltyEvent());
     }
 
-    public function testIsFeedBackEvent()
+    public function test_is_feed_back_event()
     {
         $this->assertTrue((new EventType(EventType::FEEDBACK_EVENT))->isFeedbackEvent());
     }

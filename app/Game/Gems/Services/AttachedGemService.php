@@ -15,19 +15,11 @@ class AttachedGemService
 {
     use ResponseBuilder;
 
-    /**
-     * @param CharacterGemsTransformer $gemsTransformer
-     * @param Manager $manager
-     * @param PlainDataSerializer $plainDataSerializer
-     * @param CharacterInventoryService $characterInventoryService
-     */
     public function __construct(
         private readonly CharacterGemsTransformer $gemsTransformer,
         private readonly Manager $manager,
         private readonly PlainDataSerializer $plainDataSerializer,
-        private readonly CharacterInventoryService $characterInventoryService)
-    {
-    }
+        private readonly CharacterInventoryService $characterInventoryService) {}
 
     public function getGemsFromItem(Character $character, Item $item): array
     {

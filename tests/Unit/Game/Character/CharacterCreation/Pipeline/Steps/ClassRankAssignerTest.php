@@ -20,13 +20,13 @@ use Tests\Traits\CreateUser;
 
 class ClassRankAssignerTest extends TestCase
 {
-    use RefreshDatabase,
-        CreateUser,
-        CreateRace,
+    use CreateCharacter,
         CreateClass,
-        CreateCharacter;
+        CreateRace,
+        CreateUser,
+        RefreshDatabase;
 
-    public function testCreatesClassRanksAndWeaponMasteriesForAllClasses(): void
+    public function test_creates_class_ranks_and_weapon_masteries_for_all_classes(): void
     {
         $user = $this->createUser();
         $race = $this->createRace();
@@ -93,7 +93,7 @@ class ClassRankAssignerTest extends TestCase
         $this->assertSame(5, (int) $fighterPrimary->level);
     }
 
-    public function testNoOpWhenStateHasNoCharacter(): void
+    public function test_no_op_when_state_has_no_character(): void
     {
         $this->createClass(['name' => 'Fighter']);
 

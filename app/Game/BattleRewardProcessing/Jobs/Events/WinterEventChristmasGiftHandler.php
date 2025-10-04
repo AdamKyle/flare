@@ -23,17 +23,10 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * @param integer $characterId
-     */
     public function __construct(private int $characterId) {}
 
     /**
      * Handle the job
-     *
-     * @param RandomAffixGenerator $randomAffixGenerator
-     * @param RandomItemDropBuilder $randomItemDropBuilder
-     * @return void
      */
     public function handle(RandomAffixGenerator $randomAffixGenerator, RandomItemDropBuilder $randomItemDropBuilder): void
     {
@@ -48,7 +41,7 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
             return;
         }
 
-        if (!$character->map->gameMap->mapType()->isTheIcePlane()) {
+        if (! $character->map->gameMap->mapType()->isTheIcePlane()) {
             return;
         }
 
@@ -88,8 +81,6 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
 
     /**
      * Can have winter gift?
-     *
-     * @return boolean
      */
     private function canHaveWinterGift(): bool
     {
@@ -100,8 +91,6 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
      * What type of gear do we generate?
      *
      * Null means base gear
-     *
-     * @return string|null
      */
     private function getType(): ?string
     {
@@ -128,9 +117,6 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
 
     /**
      * Fetch an item to reward
-     *
-     * @param string|null $type
-     * @return Item
      */
     private function fetchItemForReward(?string $type): Item
     {
@@ -151,8 +137,6 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
      * Get cost of affix to attach.
      *
      * - Anything less then legendary will be a regular affix.
-     *
-     * @return integer
      */
     private function getCostOfAffixToAttach(): int
     {
@@ -178,8 +162,6 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
      * How many affixes should we attach?
      *
      * - 1 or 2
-     *
-     * @return integer
      */
     private function howManyAffixesToAttach(): int
     {
@@ -188,13 +170,6 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
 
     /**
      * Attach affixes to item
-     *
-     * @param Character $character
-     * @param RandomAffixGenerator $randomAffixGenerator
-     * @param Item $item
-     * @param integer $costOfAffix
-     * @param integer $numberOfAffixes
-     * @return Item
      */
     private function attachAffixes(Character $character, RandomAffixGenerator $randomAffixGenerator, Item $item, int $costOfAffix, int $numberOfAffixes): Item
     {
@@ -206,7 +181,7 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
             $whichSide = rand(1, 100) > 50 ? 'suffix' : 'prefix';
 
             $item->update([
-                'item_' . $whichSide . '_id' => $randomAffixGenerator->generateAffix($whichSide)->id,
+                'item_'.$whichSide.'_id' => $randomAffixGenerator->generateAffix($whichSide)->id,
                 'is_mythic' => $costOfAffix === RandomAffixDetails::MYTHIC,
                 'is_cosmic' => $costOfAffix === RandomAffixDetails::COSMIC,
             ]);
@@ -228,11 +203,6 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
      * Give item to the player.
      *
      * - If cosmic announce to all chat.
-     *
-     * @param Character $character
-     * @param Item $item
-     * @param int $costOfAffix
-     * @return void
      */
     private function giveItemToPlayer(Character $character, Item $item, int $costOfAffix): void
     {
@@ -241,7 +211,7 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
         ]);
 
         if ($item->is_cosmic) {
-            event(new GlobalMessageEvent('Holy crap! Mr. Whiskers gave a COSMIC item to: ' . $character->name . ' what a rare find! Kill creatures in The Ice Plane to try and earn yours while The Winter Event is running! Free christmas gifts for all while slaughtering creatures down there. Exploration works too! Do not miss out!'));
+            event(new GlobalMessageEvent('Holy crap! Mr. Whiskers gave a COSMIC item to: '.$character->name.' what a rare find! Kill creatures in The Ice Plane to try and earn yours while The Winter Event is running! Free christmas gifts for all while slaughtering creatures down there. Exploration works too! Do not miss out!'));
         }
 
         $type = match (true) {
@@ -251,6 +221,6 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
             default => 'Normal'
         };
 
-        event(new ServerMessageEvent($character->user, 'Mr. Whiskers has given you an item child! How fun is that? You got this because it is christmas time. You unwrap your gift only to receive a (' . $type . '): ' . $item->affix_name, $slot->id));
+        event(new ServerMessageEvent($character->user, 'Mr. Whiskers has given you an item child! How fun is that? You got this because it is christmas time. You unwrap your gift only to receive a ('.$type.'): '.$item->affix_name, $slot->id));
     }
 }

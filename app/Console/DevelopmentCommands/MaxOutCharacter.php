@@ -36,7 +36,7 @@ class MaxOutCharacter extends Command
         $character = Character::where('name', $characterName)->first();
 
         if (is_null($character)) {
-            $this->error('No character found for name: ' . $characterName);
+            $this->error('No character found for name: '.$characterName);
 
             return;
         }
@@ -64,9 +64,9 @@ class MaxOutCharacter extends Command
 
         $character = $character->refresh();
 
-        Artisan::call('level:character ' . $character->id . ' ' . 4999);
+        Artisan::call('level:character '.$character->id.' '. 4999);
 
-        Artisan::call('assign:top-end-gear ' . $character->name);
+        Artisan::call('assign:top-end-gear '.$character->name);
     }
 
     protected function findItemsToGive(): array
@@ -95,7 +95,7 @@ class MaxOutCharacter extends Command
 
             if (is_null($item)) {
 
-                $this->error('Could not find item: ' . $itemName);
+                $this->error('Could not find item: '.$itemName);
 
                 return [];
             }

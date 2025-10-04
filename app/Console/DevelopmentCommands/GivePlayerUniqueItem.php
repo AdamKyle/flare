@@ -49,7 +49,7 @@ class GivePlayerUniqueItem extends Command
             15,
             20,
             50,
-            75
+            75,
         ]);
 
         $cost = match ($type) {
@@ -67,10 +67,9 @@ class GivePlayerUniqueItem extends Command
                 'item_id' => $item->id,
             ]);
 
-            $this->line('Gave: ' . $item->affix_name . ' To character.');
+            $this->line('Gave: '.$item->affix_name.' To character.');
         }
 
-        return;
     }
 
     protected function getUniqueForPlayer(RandomAffixGenerator $randomAffixGenerator, Character $character, int $paidAmount): Item

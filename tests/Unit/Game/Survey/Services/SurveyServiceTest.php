@@ -11,13 +11,14 @@ use Tests\Traits\CreateSurvey;
 
 class SurveyServiceTest extends TestCase
 {
-    use CreateSurvey, CreateItem, RefreshDatabase;
+    use CreateItem, CreateSurvey, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?SurveyService $surveyService;
 
-    public function setUp(): void {
+    protected function setUp(): void
+    {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter();
@@ -25,7 +26,8 @@ class SurveyServiceTest extends TestCase
 
     }
 
-    public function testSurveyIsMissingFields() {
+    public function test_survey_is_missing_fields()
+    {
         $character = $this->character->getCharacter();
         $survey = $this->createSurvey();
 
@@ -36,7 +38,8 @@ class SurveyServiceTest extends TestCase
 
     }
 
-    public function testSurveyIsSubmitted() {
+    public function test_survey_is_submitted()
+    {
         $character = $this->character->getCharacter();
         $survey = $this->createSurvey();
 
@@ -47,7 +50,7 @@ class SurveyServiceTest extends TestCase
                 'Some Radio Label' => ['value' => 'Option 1', 'type' => 'radio'],
                 'Some Checkbox Label' => ['value' => ['Option 1'], 'type' => 'checkbox'],
                 'Some markdown Label' => ['value' => 'Some content', 'type' => 'markdown'],
-            ]
+            ],
         ]);
 
         $this->assertEquals($result['status'], 200);

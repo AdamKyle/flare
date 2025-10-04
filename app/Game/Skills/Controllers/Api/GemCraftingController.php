@@ -11,13 +11,8 @@ use Illuminate\Http\JsonResponse;
 
 class GemCraftingController extends Controller
 {
-
     public function __construct(private GemService $gemService, private CraftingService $craftingService) {}
 
-    /**
-     * @param Character $character
-     * @return JsonResponse
-     */
     public function getCraftableItems(Character $character): JsonResponse
     {
         return response()->json([
@@ -27,11 +22,6 @@ class GemCraftingController extends Controller
         ]);
     }
 
-    /**
-     * @param Character $character
-     * @param GemCraftingValidation $request
-     * @return JsonResponse
-     */
     public function craftGem(Character $character, GemCraftingValidation $request): JsonResponse
     {
 

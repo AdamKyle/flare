@@ -11,16 +11,8 @@ use Illuminate\Http\JsonResponse;
 
 class AlchemyController extends Controller
 {
-
-    /**
-     * @param AlchemyService $alchemyService
-     */
     public function __construct(private AlchemyService $alchemyService, private CraftingService $craftingService) {}
 
-    /**
-     * @param Character $character
-     * @return JsonResponse
-     */
     public function alchemyItems(Character $character): JsonResponse
     {
         return response()->json([
@@ -30,11 +22,6 @@ class AlchemyController extends Controller
         ]);
     }
 
-    /**
-     * @param AlchemyValidation $request
-     * @param Character $character
-     * @return JsonResponse
-     */
     public function transmute(AlchemyValidation $request, Character $character): JsonResponse
     {
         if (! $character->can_craft) {

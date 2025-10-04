@@ -3,6 +3,7 @@
 namespace Tests\Unit\Game\Skills\Services;
 
 use App\Flare\Models\GameSkill;
+use App\Flare\Transformers\CharacterInventoryCountTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Services\DisenchantManyService;
@@ -11,7 +12,6 @@ use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use League\Fractal\Manager;
-use App\Flare\Transformers\CharacterInventoryCountTransformer;
 use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -24,14 +24,20 @@ class DisenchantManyServiceTest extends TestCase
     use CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $characterFactory = null;
+
     private ?GameSkill $enchantingSkill = null;
+
     private ?GameSkill $disenchantingSkill = null;
+
     private ?DisenchantManyService $service = null;
+
     private $skillCheckServiceMock = null;
+
     private ?Manager $manager = null;
+
     private ?CharacterInventoryCountTransformer $inventoryCountTransformer = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -60,7 +66,7 @@ class DisenchantManyServiceTest extends TestCase
         $this->inventoryCountTransformer = $this->app->make(CharacterInventoryCountTransformer::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -73,7 +79,7 @@ class DisenchantManyServiceTest extends TestCase
         $this->inventoryCountTransformer = null;
     }
 
-    public function testReturnsNoEligibleItemsToDisenchant(): void
+    public function test_returns_no_eligible_items_to_disenchant(): void
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -84,7 +90,7 @@ class DisenchantManyServiceTest extends TestCase
         $this->assertEquals(200, $result['status']);
     }
 
-    public function testProcessesOnlyIncludedIdsAndDispatchesSkillEventOnPass(): void
+    public function test_processes_only_included_ids_and_dispatches_skill_event_on_pass(): void
     {
         Event::fake();
 
@@ -121,7 +127,7 @@ class DisenchantManyServiceTest extends TestCase
         Event::assertDispatchedTimes(UpdateSkillEvent::class, 1);
     }
 
-    public function testProcessesExcludeIdsAndHandlesFailureAwardOfOne(): void
+    public function test_processes_exclude_ids_and_handles_failure_award_of_one(): void
     {
         Event::fake();
 
@@ -158,7 +164,7 @@ class DisenchantManyServiceTest extends TestCase
         Event::assertDispatchedTimes(UpdateSkillEvent::class, 0);
     }
 
-    public function testExcludeEmptyArrayProcessesAllItems(): void
+    public function test_exclude_empty_array_processes_all_items(): void
     {
         Event::fake();
 
@@ -191,7 +197,7 @@ class DisenchantManyServiceTest extends TestCase
         Event::assertDispatchedTimes(UpdateSkillEvent::class, 2);
     }
 
-    public function testGoldDustCappedPreventsAwardButStillDispatchesSkillOnPass(): void
+    public function test_gold_dust_capped_prevents_award_but_still_dispatches_skill_on_pass(): void
     {
         Event::fake();
 
@@ -224,7 +230,7 @@ class DisenchantManyServiceTest extends TestCase
         Event::assertDispatchedTimes(UpdateSkillEvent::class, 1);
     }
 
-    public function testFallbackWhenNoDisenchantingSkillPresent(): void
+    public function test_fallback_when_no_disenchanting_skill_present(): void
     {
         Event::fake();
 
@@ -252,7 +258,7 @@ class DisenchantManyServiceTest extends TestCase
         Event::assertDispatchedTimes(UpdateSkillEvent::class, 1);
     }
 
-    public function testAppliesInterestBranchWhenPassing(): void
+    public function test_applies_interest_branch_when_passing(): void
     {
         Event::fake();
 
@@ -288,7 +294,7 @@ class DisenchantManyServiceTest extends TestCase
         Event::assertDispatchedTimes(UpdateSkillEvent::class, 1);
     }
 
-    public function testSkipsInterestBranchWhenPassing(): void
+    public function test_skips_interest_branch_when_passing(): void
     {
         Event::fake();
 

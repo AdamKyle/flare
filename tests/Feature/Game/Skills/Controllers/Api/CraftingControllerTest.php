@@ -23,7 +23,7 @@ class CraftingControllerTest extends TestCase
 
     private ?Character $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -42,14 +42,14 @@ class CraftingControllerTest extends TestCase
             ->getCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testFetchItemsToCraftWithTheAbilityToShowCraftForNpc()
+    public function test_fetch_items_to_craft_with_the_ability_to_show_craft_for_npc()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -91,7 +91,7 @@ class CraftingControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('GET', '/api/crafting/' . $this->character->id, [
+            ->call('GET', '/api/crafting/'.$this->character->id, [
                 'crafting_type' => $item->crafting_type,
             ]);
 
@@ -102,7 +102,7 @@ class CraftingControllerTest extends TestCase
         $this->assertTrue($jsonData['show_craft_for_npc']);
     }
 
-    public function testFetchItemsToCraftWhileNotShowingCraftForNPCDueToNotHelpingThatNPC()
+    public function test_fetch_items_to_craft_while_not_showing_craft_for_npc_due_to_not_helping_that_npc()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -144,7 +144,7 @@ class CraftingControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('GET', '/api/crafting/' . $this->character->id, [
+            ->call('GET', '/api/crafting/'.$this->character->id, [
                 'crafting_type' => $item->crafting_type,
             ]);
 
@@ -155,7 +155,7 @@ class CraftingControllerTest extends TestCase
         $this->assertFalse($jsonData['show_craft_for_npc']);
     }
 
-    public function testGetCraftingItems()
+    public function test_get_crafting_items()
     {
         $item = $this->createItem([
             'crafting_type' => 'weapon',
@@ -165,7 +165,7 @@ class CraftingControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('GET', '/api/crafting/' . $this->character->id, [
+            ->call('GET', '/api/crafting/'.$this->character->id, [
                 'crafting_type' => $item->crafting_type,
             ]);
 
@@ -176,7 +176,7 @@ class CraftingControllerTest extends TestCase
         $this->assertFalse($jsonData['show_craft_for_npc']);
     }
 
-    public function testCannotCraft()
+    public function test_cannot_craft()
     {
         $item = $this->createItem([
             'crafting_type' => ItemType::DAGGER->value,
@@ -186,13 +186,13 @@ class CraftingControllerTest extends TestCase
         ]);
 
         $this->character->update([
-            'can_craft' => false
+            'can_craft' => false,
         ]);
 
         $character = $this->character->refresh();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/craft/' . $character->id, [
+            ->call('POST', '/api/craft/'.$character->id, [
                 'item_to_craft' => $item->id,
                 'type' => $item->crafting_type,
                 'craft_for_npc' => false,
@@ -205,7 +205,7 @@ class CraftingControllerTest extends TestCase
         $this->assertEquals(422, $response->status());
     }
 
-    public function testCraftItem()
+    public function test_craft_item()
     {
         $item = $this->createItem([
             'type' => ItemType::DAGGER->value,
@@ -224,13 +224,13 @@ class CraftingControllerTest extends TestCase
         );
 
         $this->character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
         ]);
 
         $character = $this->character->refresh();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/craft/' . $character->id, [
+            ->call('POST', '/api/craft/'.$character->id, [
                 'item_to_craft' => $item->id,
                 'type' => $item->crafting_type,
                 'craft_for_npc' => false,

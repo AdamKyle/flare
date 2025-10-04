@@ -63,13 +63,13 @@ class AbandonKingdomService
         $this->giveKingdomsToNpcHandler->giveKingdomToNPC($kingdom);
 
         event(new GlobalMessageEvent(
-            'A kingdom has fallen into the rubble at (X/Y): ' .
-                $kingdom->x_position . '/' . $kingdom->y_position . ' on the: ' .
-                $kingdom->gameMap->name . ' plane.'
+            'A kingdom has fallen into the rubble at (X/Y): '.
+                $kingdom->x_position.'/'.$kingdom->y_position.' on the: '.
+                $kingdom->gameMap->name.' plane.'
         ));
 
-        $message = $kingdom->name . ' Has been given to the NPC due to being abandoned, at Location (x/y): '
-            . $kingdom->x_position . '/' . $kingdom->y_position . ' on the: ' . $kingdom->gameMap->name . ' plane.';
+        $message = $kingdom->name.' Has been given to the NPC due to being abandoned, at Location (x/y): '
+            .$kingdom->x_position.'/'.$kingdom->y_position.' on the: '.$kingdom->gameMap->name.' plane.';
 
         ServerMessageHandler::handleMessage($this->character->user, KingdomMessageTypes::KINGDOM_RESOURCES_UPDATE, $message);
 
@@ -127,8 +127,8 @@ class AbandonKingdomService
 
         $minutes = now()->diffInMinutes($time);
 
-        event(new ServerMessageEvent($this->character->user, 'You have been locked out of settling or purchasing a new kingdom for: ' .
-            $minutes . ' Minutes. If you abandon another kingdom, we add 15 minutes to what ever time is left.
+        event(new ServerMessageEvent($this->character->user, 'You have been locked out of settling or purchasing a new kingdom for: '.
+            $minutes.' Minutes. If you abandon another kingdom, we add 15 minutes to what ever time is left.
             If you attempt to settle or purchase a king you will be told how much time you have left.'));
     }
 }

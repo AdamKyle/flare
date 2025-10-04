@@ -2,20 +2,20 @@
 
 namespace App\Game\Character\CharacterInventory\Services;
 
-use App\Flare\Transformers\CharacterInventoryCountTransformer;
-use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
-use Exception;
-use Facades\App\Flare\Calculators\SellItemCalculator;
-use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
+use App\Flare\Transformers\CharacterInventoryCountTransformer;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Builders\EquipManyBuilder;
+use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Shop\Events\SellItemEvent;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\DisenchantManyService;
+use Exception;
+use Facades\App\Flare\Calculators\SellItemCalculator;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 
@@ -23,17 +23,6 @@ class MultiInventoryActionService
 {
     use ResponseBuilder;
 
-    /**
-     * @param InventorySetService $inventorySetService
-     * @param EquipItemService $equipItemService
-     * @param EquipManyBuilder $equipManyBuilder
-     * @param ShopService $shopService
-     * @param CharacterInventoryService $characterInventoryService
-     * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler
-     * @param DisenchantManyService $disenchantManyService
-     * @param Manager $manager
-     * @param CharacterInventoryCountTransformer $characterInventoryCountTransformer
-     */
     public function __construct(
         private readonly InventorySetService $inventorySetService,
         private readonly EquipItemService $equipItemService,
@@ -49,9 +38,6 @@ class MultiInventoryActionService
     /**
      * Move multiple inventory slots to a specific set.
      *
-     * @param Character $character
-     * @param int $setId
-     * @param array $slotIds
      * @return array{status:int,message:string,inventory?:mixed,moved_to_set_name?:string}
      */
     public function moveManyItemsToSelectedSet(Character $character, int $setId, array $slotIds): array
@@ -75,7 +61,7 @@ class MultiInventoryActionService
         }
 
         return $this->successResult([
-            'message'   => 'Moved all selected items to: ' . $result['moved_to_set_name'] . '.',
+            'message' => 'Moved all selected items to: '.$result['moved_to_set_name'].'.',
             'inventory' => $result['inventory'],
         ]);
     }
@@ -83,9 +69,8 @@ class MultiInventoryActionService
     /**
      * Equip multiple items.
      *
-     * @param Character $character
-     * @param array $slotIds
      * @return array{status:int,message:string,inventory:mixed}
+     *
      * @throws EquipItemException
      */
     public function equipManyItems(Character $character, array $slotIds): array
@@ -109,7 +94,7 @@ class MultiInventoryActionService
         $characterInventoryService = $this->characterInventoryService->setCharacter($character);
 
         return $this->successResult([
-            'message'   => 'Equipped valid items to your character.',
+            'message' => 'Equipped valid items to your character.',
             'inventory' => $characterInventoryService->getInventoryForApi(),
         ]);
     }
@@ -117,9 +102,9 @@ class MultiInventoryActionService
     /**
      * Sell many items by include/exclude rules.
      *
-     * @param Character $character
-     * @param array{ids?:array<int|string>,exclude?:array<int|string>} $params
+     * @param  array{ids?:array<int|string>,exclude?:array<int|string>}  $params
      * @return array{status:int,message:string}
+     *
      * @throws Exception
      */
     public function sellManyItems(Character $character, array $params): array
@@ -152,7 +137,7 @@ class MultiInventoryActionService
         $data = $this->manager->createData($data)->toArray();
 
         return $this->successResult([
-            'message' => 'Sold all items for: ' . number_format($totalSoldFor) . ' Gold (Minus 5% on each sale)',
+            'message' => 'Sold all items for: '.number_format($totalSoldFor).' Gold (Minus 5% on each sale)',
             'inventory_count' => $data,
         ]);
     }
@@ -160,8 +145,7 @@ class MultiInventoryActionService
     /**
      * Disenchant many items via the DisenchantManyService.
      *
-     * @param Character $character
-     * @param array{ids?:array<int|string>,exclude?:array<int|string>} $params
+     * @param  array{ids?:array<int|string>,exclude?:array<int|string>}  $params
      * @return array{status:int,message:string,disenchanted_item:array<int,array{name:string,status:string,gold_dust:int}>}
      */
     public function disenchantManyItems(Character $character, array $params): array
@@ -172,8 +156,7 @@ class MultiInventoryActionService
     /**
      * Destroy items by include/exclude rules (artifacts excluded).
      *
-     * @param Character $character
-     * @param array{ids?:array<int|string>,exclude?:array<int|string>} $params
+     * @param  array{ids?:array<int|string>,exclude?:array<int|string>}  $params
      * @return array{status:int,message:string}
      */
     public function destroyManyItems(Character $character, array $params): array
@@ -208,9 +191,6 @@ class MultiInventoryActionService
     /**
      * Equip a single item with prepared parameters.
      *
-     * @param Character $character
-     * @param array $equipParams
-     * @return void
      * @throws EquipItemException
      */
     private function equipItem(Character $character, array $equipParams): void
@@ -223,9 +203,6 @@ class MultiInventoryActionService
     /**
      * Sell a single inventory slot and emit messages/events.
      *
-     * @param Character $character
-     * @param InventorySlot $slot
-     * @return int
      * @throws Exception
      */
     private function sellItem(Character $character, InventorySlot $slot): int
@@ -238,7 +215,7 @@ class MultiInventoryActionService
 
         ServerMessageHandler::sendBasicMessage(
             $character->user,
-            'Sold item: ' . $item->affix_name . ' for: ' . number_format($totalSoldFor) . ' (Minus 5% tax) Gold! (Selling to a shop can never go above 2 billion gold for an individual item)'
+            'Sold item: '.$item->affix_name.' for: '.number_format($totalSoldFor).' (Minus 5% tax) Gold! (Selling to a shop can never go above 2 billion gold for an individual item)'
         );
 
         return $totalSoldFor;

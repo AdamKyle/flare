@@ -2,11 +2,8 @@
 
 namespace Tests\Feature\Auth;
 
-use App\Flare\Models\GameClass;
 use App\Flare\Models\GameMap;
-use App\Flare\Models\GameRace;
 use App\Flare\Models\User;
-use App\Flare\Models\Character;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\CharacterCreation\Events\CreateCharacterEvent;
 use App\Http\Middleware\GameAuthentication;
@@ -36,7 +33,7 @@ class RegistrationControllerTest extends TestCase
         CreateUser,
         RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -69,13 +66,13 @@ class RegistrationControllerTest extends TestCase
         ]);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
     }
 
-    public function testCanSeeRegistration(): void
+    public function test_can_see_registration(): void
     {
         $this->visit('/login')
             ->click('Register')
@@ -90,7 +87,7 @@ class RegistrationControllerTest extends TestCase
             ->see('Register');
     }
 
-    public function testCanRegister(): void
+    public function test_can_register(): void
     {
         GameMap::create([
             'name' => 'Surface',
@@ -127,7 +124,7 @@ class RegistrationControllerTest extends TestCase
         $this->assertGreaterThanOrEqual(1, $user->character->skills()->count());
     }
 
-    public function testCannotRegisterWhenBanned(): void
+    public function test_cannot_register_when_banned(): void
     {
         GameMap::create([
             'name' => 'Surface',
@@ -159,7 +156,7 @@ class RegistrationControllerTest extends TestCase
             ])->see('You have been banned until: ');
     }
 
-    public function testCannotRegisterWhenNoMap(): void
+    public function test_cannot_register_when_no_map(): void
     {
         $race = $this->createRace([
             'dex_mod' => 2,
@@ -182,7 +179,7 @@ class RegistrationControllerTest extends TestCase
             ])->see('No game map has been set as default or created. Registration is disabled.');
     }
 
-    public function testCannotRegisterWhenCharacterExists(): void
+    public function test_cannot_register_when_character_exists(): void
     {
         GameMap::create([
             'name' => 'Surface',
@@ -214,7 +211,7 @@ class RegistrationControllerTest extends TestCase
             ])->see('The name has already been taken.');
     }
 
-    public function testCannotRegisterAnyMore(): void
+    public function test_cannot_register_any_more(): void
     {
         GameMap::create([
             'name' => 'Surface',

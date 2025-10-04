@@ -14,18 +14,10 @@ class CancelUnitRequestService
 {
     use ResponseBuilder;
 
-    /**
-     * @param CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler
-     */
     public function __construct(private readonly CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler) {}
 
     /**
      * Handle the cancelation of a unit recruitment request.
-     *
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @param array $requestData
-     * @return array
      */
     public function handleCancelRequest(Character $character, Kingdom $kingdom, array $requestData): array
     {
@@ -41,14 +33,14 @@ class CancelUnitRequestService
         }
 
         if ($queue->completed_at->diffInSeconds(now()) <= 60) {
-            return $this->errorResult('You cannot cancel this request because it is on the doorstep of: ' . $queue->kingdom->name);
+            return $this->errorResult('You cannot cancel this request because it is on the doorstep of: '.$queue->kingdom->name);
         }
 
         $unitToDelete = $requestData['unit_name'] ?? null;
 
         if ($queue->status === CapitalCityQueueStatus::TRAVELING) {
 
-            if (!is_null($unitToDelete)) {
+            if (! is_null($unitToDelete)) {
                 return $this->cancelUnitRequest($queue, $unitToDelete);
             }
 
@@ -60,10 +52,6 @@ class CancelUnitRequestService
 
     /**
      * Cancel a single unit.
-     *
-     * @param CapitalCityUnitQueue $capitalCityUnitQueue
-     * @param string $unitName
-     * @return array
      */
     private function cancelUnitRequest(CapitalCityUnitQueue $capitalCityUnitQueue, string $unitName): array
     {
@@ -74,7 +62,7 @@ class CancelUnitRequestService
             if ($unitData['name'] === $unitName) {
 
                 if ($unitData['secondary_status'] !== CapitalCityQueueStatus::TRAVELING) {
-                    return $this->errorResult('Cannot cancel: ' . $unitName . ' for kingdom: ' . $capitalCityUnitQueue->kingdom->name . ' because it is no longer Traveling.');
+                    return $this->errorResult('Cannot cancel: '.$unitName.' for kingdom: '.$capitalCityUnitQueue->kingdom->name.' because it is no longer Traveling.');
                 }
 
                 $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::CANCELLED;
@@ -83,13 +71,12 @@ class CancelUnitRequestService
 
         $messages = $capitalCityUnitQueue->messages ?? [];
 
-
         $capitalCityUnitQueue->update([
             'unit_request_data' => $requestData,
             'messages' => array_merge(
                 $messages,
                 [
-                    $unitName . ' Has been canceled at your request while the orders were still traveling.'
+                    $unitName.' Has been canceled at your request while the orders were still traveling.',
                 ]
             ),
         ]);
@@ -102,29 +89,26 @@ class CancelUnitRequestService
 
         return $this->successResult([
             'message' => 'Successfully canceled the '
-                . $unitName
-                . '. This will appear as canceled in your queue - assumign you have anything left for this kingdom: '
-                . $capitalCityUnitQueue->kingdom->name
-                .  ' If there is nothing left for this kingdom, check your log.'
+                .$unitName
+                .'. This will appear as canceled in your queue - assumign you have anything left for this kingdom: '
+                .$capitalCityUnitQueue->kingdom->name
+                .' If there is nothing left for this kingdom, check your log.',
         ]);
     }
 
     /**
      * Cancel all valid units in a request queue.
-     *
-     * @param CapitalCityUnitQueue $capitalCityUnitQueue
-     * @return array
      */
     private function cancelAllUnits(CapitalCityUnitQueue $capitalCityUnitQueue): array
     {
         $requestData = $capitalCityUnitQueue->unit_request_data;
 
         $hasUnitsTraveling = collect($requestData)
-            ->contains(fn($item) => $item['secondary_status'] === CapitalCityQueueStatus::TRAVELING);
+            ->contains(fn ($item) => $item['secondary_status'] === CapitalCityQueueStatus::TRAVELING);
 
-        if (!$hasUnitsTraveling) {
+        if (! $hasUnitsTraveling) {
             return $this->errorResult(
-                'Cannot cancel unit request(s) for kingdom: ' . $capitalCityUnitQueue->kingdom->name . ' because none of them are traveling. Are you trying to throw the kingdom into chaos?'
+                'Cannot cancel unit request(s) for kingdom: '.$capitalCityUnitQueue->kingdom->name.' because none of them are traveling. Are you trying to throw the kingdom into chaos?'
             );
         }
 
@@ -133,6 +117,7 @@ class CancelUnitRequestService
                 if ($item['secondary_status'] === CapitalCityQueueStatus::TRAVELING) {
                     return array_merge($item, ['secondary_status' => CapitalCityQueueStatus::CANCELLED]);
                 }
+
                 return $item;
             })
             ->toArray();
@@ -144,7 +129,7 @@ class CancelUnitRequestService
             'messages' => array_merge(
                 $messages,
                 [
-                    'All valid requests (those that were still taveling) for this order have been canceled.'
+                    'All valid requests (those that were still taveling) for this order have been canceled.',
                 ]
             ),
         ]);
@@ -157,7 +142,7 @@ class CancelUnitRequestService
 
         return $this->successResult([
             'message' => 'Successfully canceled the valid requests for: '
-                . $capitalCityUnitQueue->kingdom->name . '.'
+                .$capitalCityUnitQueue->kingdom->name.'.',
         ]);
     }
 }

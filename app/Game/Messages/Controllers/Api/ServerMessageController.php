@@ -2,27 +2,18 @@
 
 namespace App\Game\Messages\Controllers\Api;
 
-use Exception;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Log;
 use App\Game\Messages\Factories\AssignMessageType;
 use App\Game\Messages\Request\ServerMessageRequest;
 use App\Game\Messages\Services\ServerMessage;
 use App\Http\Controllers\Controller;
+use Exception;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class ServerMessageController extends Controller
 {
-
-    /**
-     * @param ServerMessage $serverMessage
-     * @param AssignMessageType $assignMessageType
-     */
     public function __construct(private ServerMessage $serverMessage, private AssignMessageType $assignMessageType) {}
 
-    /**
-     * @param ServerMessageRequest $request
-     * @return JsonResponse
-     */
     public function generateServerMessage(ServerMessageRequest $request): JsonResponse
     {
 
@@ -40,10 +31,10 @@ class ServerMessageController extends Controller
 
                 return response()->json();
             } catch (Exception $e) {
-                Log::error('[ServerMessageController@generateServerMessage] error: ' . $e->getmessage());
+                Log::error('[ServerMessageController@generateServerMessage] error: '.$e->getmessage());
 
                 return response()->json([
-                    'message' => 'Invalid message type was passed when trying to generate server message'
+                    'message' => 'Invalid message type was passed when trying to generate server message',
                 ], 422);
             }
         }

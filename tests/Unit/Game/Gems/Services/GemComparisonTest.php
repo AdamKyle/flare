@@ -24,7 +24,7 @@ class GemComparisonTest extends TestCase
 
     private ?GemComparison $gemComparisonService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -66,7 +66,7 @@ class GemComparisonTest extends TestCase
         $this->gemComparisonService = resolve(GemComparison::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -77,7 +77,7 @@ class GemComparisonTest extends TestCase
         $this->gemComparisonService = null;
     }
 
-    public function testReturnsErrorMessageWhenItemDoesNotExist()
+    public function test_returns_error_message_when_item_does_not_exist()
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -87,7 +87,7 @@ class GemComparisonTest extends TestCase
         $this->assertEquals($result['status'], 422);
     }
 
-    public function testReturnsErrorMessageWhenGemDoesNotExist()
+    public function test_returns_error_message_when_gem_does_not_exist()
     {
         $character = $this->characterFactory->inventoryManagement()->giveItem($this->item)->getCharacter();
 
@@ -97,7 +97,7 @@ class GemComparisonTest extends TestCase
         $this->assertEquals($result['status'], 422);
     }
 
-    public function testWhenComparingAGemToNoGemsOnItem()
+    public function test_when_comparing_a_gem_to_no_gems_on_item()
     {
         $item = $this->createItem();
         $gem = $this->createGem();
@@ -122,7 +122,7 @@ class GemComparisonTest extends TestCase
         $this->assertEmpty($result['if_replaced']);
     }
 
-    public function testWhenComparingGemsToGemsOnAnItem()
+    public function test_when_comparing_gems_to_gems_on_an_item()
     {
         $this->item->sockets()->create([
             'item_id' => $this->item->id,

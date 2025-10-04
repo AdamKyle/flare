@@ -28,11 +28,11 @@ use Tests\Traits\CreateScheduledEvent;
 
 class WinterEventEnderServiceTest extends TestCase
 {
-    use RefreshDatabase, CreateGameMap, CreateEvent, CreateScheduledEvent, CreateAnnouncement, CreateItem;
+    use CreateAnnouncement, CreateEvent, CreateGameMap, CreateItem, CreateScheduledEvent, RefreshDatabase;
 
     private ?WinterEventEnderService $service = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -44,20 +44,20 @@ class WinterEventEnderServiceTest extends TestCase
         $this->service = app()->make(WinterEventEnderService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->service = null;
 
         parent::tearDown();
     }
 
-    public function testSupportsReturnsTrueOnlyForWinterEvent(): void
+    public function test_supports_returns_true_only_for_winter_event(): void
     {
         $this->assertTrue($this->service->supports(new EventType(EventType::WINTER_EVENT)));
         $this->assertFalse($this->service->supports(new EventType(EventType::DELUSIONAL_MEMORIES_EVENT)));
     }
 
-    public function testEndReturnsEarlyWhenIceMapMissing(): void
+    public function test_end_returns_early_when_ice_map_missing(): void
     {
         $this->createGameMap(['name' => MapNameValue::SURFACE]);
 
@@ -90,7 +90,7 @@ class WinterEventEnderServiceTest extends TestCase
         EventFacade::assertDispatchedTimes(GlobalMessageEvent::class, 0);
     }
 
-    public function testEndReturnsEarlyWhenSurfaceMapMissing(): void
+    public function test_end_returns_early_when_surface_map_missing(): void
     {
         $this->createGameMap(['name' => MapNameValue::ICE_PLANE]);
 
@@ -123,7 +123,7 @@ class WinterEventEnderServiceTest extends TestCase
         EventFacade::assertDispatchedTimes(GlobalMessageEvent::class, 0);
     }
 
-    public function testEndMovesCharactersResetsProgressUnpledgesAndCleansUp(): void
+    public function test_end_moves_characters_resets_progress_unpledges_and_cleans_up(): void
     {
         $surfaceMap = $this->createGameMap(['name' => MapNameValue::SURFACE]);
         $iceMap = $this->createGameMap(['name' => MapNameValue::ICE_PLANE]);

@@ -19,17 +19,17 @@ class InitiateDelusionalMemoriesEventTest extends TestCase
 {
     use CreateGameMap, CreateScheduledEvent, RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
 
-    public function testDeslusionalMemoriesDoesNotTriggerForInvalidScheduledEvent()
+    public function test_deslusional_memories_does_not_trigger_for_invalid_scheduled_event()
     {
         Event::fake();
 
@@ -41,7 +41,7 @@ class InitiateDelusionalMemoriesEventTest extends TestCase
         $this->assertEmpty(GlobalEventGoal::all());
     }
 
-    public function testDelusionalMemoriesEventDoesTriggerScheduledEventExists()
+    public function test_delusional_memories_event_does_trigger_scheduled_event_exists()
     {
 
         $this->createGameMap([

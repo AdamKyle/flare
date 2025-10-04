@@ -8,11 +8,11 @@ use App\Flare\Models\Event;
 use App\Flare\Models\Raid;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Models\ScheduledEventConfiguration;
-use App\Game\Messages\Events\DeleteAnnouncementEvent;
-use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Events\Values\EventType;
+use App\Game\Messages\Events\DeleteAnnouncementEvent;
 use Carbon\Carbon;
+use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 
 class EventSchedulerService
 {
@@ -88,9 +88,9 @@ class EventSchedulerService
         if ($scheduledEvent->currently_running) {
             $event = Event::where('type', $params['selected_event_type'])->first();
 
-            if (!is_null($event)) {
+            if (! is_null($event)) {
                 $event->update([
-                    'ends_at' => $params['selected_end_date']
+                    'ends_at' => $params['selected_end_date'],
                 ]);
 
                 $announcement = Announcement::where('event_id', $event->id)->first();
@@ -198,7 +198,7 @@ class EventSchedulerService
         }
 
         if ($type->isWeeklyCurrencyDrops()) {
-            return 'For the next 24 hours you just have to kill creatures for Gold Dust,' .
+            return 'For the next 24 hours you just have to kill creatures for Gold Dust,'.
                 'Shards and Copper Coins (provided you have the quest item) will drop at a rate of 1-50 per kill! How fun!';
         }
 

@@ -50,7 +50,6 @@ class MapManagerController extends Controller
             ]);
         }
 
-
         return response()->json([
             'locations' => $this->locationService->fetchLocationsForMap($gameMap),
             'npcs' => Npc::where('game_map_id', $gameMap->id)->get(),

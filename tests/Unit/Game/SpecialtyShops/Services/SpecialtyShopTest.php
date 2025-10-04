@@ -20,7 +20,7 @@ class SpecialtyShopTest extends TestCase
 
     private ?SpecialtyShop $specialtyShop;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -29,7 +29,7 @@ class SpecialtyShopTest extends TestCase
         $this->specialtyShop = resolve(SpecialtyShop::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -37,7 +37,7 @@ class SpecialtyShopTest extends TestCase
         $this->specialtyShop = null;
     }
 
-    public function testCannotFindItemToPurchase()
+    public function test_cannot_find_item_to_purchase()
     {
         $character = $this->character->getCharacter();
 
@@ -47,7 +47,7 @@ class SpecialtyShopTest extends TestCase
         $this->assertEquals('Item is not found.', $response['message']);
     }
 
-    public function testDoesNotHaveTheCurrencyRequired()
+    public function test_does_not_have_the_currency_required()
     {
         $character = $this->character->getCharacter();
 
@@ -65,7 +65,7 @@ class SpecialtyShopTest extends TestCase
         $this->assertEquals('You do not have the currencies to purchase this.', $response['message']);
     }
 
-    public function testDoesNotHaveTheBaseItemRequiredForUpgrade()
+    public function test_does_not_have_the_base_item_required_for_upgrade()
     {
         $character = $this->character->getCharacter();
 
@@ -86,7 +86,7 @@ class SpecialtyShopTest extends TestCase
         $this->assertEquals('You are missing an item of type: weapon with a crafting level of 400. Item must be in your inventory.', $response['message']);
     }
 
-    public function testMissingPurgatoryChainGearToUpgrade()
+    public function test_missing_purgatory_chain_gear_to_upgrade()
     {
         $character = $this->character->getCharacter();
 
@@ -107,7 +107,7 @@ class SpecialtyShopTest extends TestCase
         $this->assertEquals('You are missing an item of type: weapon which must be of specialty type: '.ItemSpecialtyType::HELL_FORGED.'. Item must be in your inventory.', $response['message']);
     }
 
-    public function testPurchaseHellForgedItem()
+    public function test_purchase_hell_forged_item()
     {
         $item = $this->createItem([
             'skill_level_required' => 400,
@@ -138,7 +138,7 @@ class SpecialtyShopTest extends TestCase
         $this->assertCount(1, Item::where('name', $item->name)->where('specialty_type', ItemSpecialtyType::HELL_FORGED)->get());
     }
 
-    public function testPurchaseHellForgedItemAsMerchant()
+    public function test_purchase_hell_forged_item_as_merchant()
     {
         $item = $this->createItem([
             'skill_level_required' => 400,
@@ -175,7 +175,7 @@ class SpecialtyShopTest extends TestCase
         $this->assertCount(1, Item::where('name', $item->name)->where('specialty_type', ItemSpecialtyType::HELL_FORGED)->get());
     }
 
-    public function testPurchasePurgatoryChainItem()
+    public function test_purchase_purgatory_chain_item()
     {
         $item = $this->createItem([
             'skill_level_required' => 400,
@@ -207,7 +207,7 @@ class SpecialtyShopTest extends TestCase
         $this->assertCount(1, Item::where('name', $item->name)->where('specialty_type', ItemSpecialtyType::PURGATORY_CHAINS)->get());
     }
 
-    public function testMovesAffixesAndHolyOver()
+    public function test_moves_affixes_and_holy_over()
     {
         $item = $this->createItem([
             'skill_level_required' => 400,

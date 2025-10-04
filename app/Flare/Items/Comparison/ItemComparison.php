@@ -15,10 +15,6 @@ class ItemComparison
 {
     use IsItemUnique;
 
-    /**
-     * @param EquippableEnricher $enricher
-     * @param Comparator $comparator
-     */
     public function __construct(
         private readonly EquippableEnricher $enricher,
         private readonly Comparator $comparator,
@@ -34,9 +30,9 @@ class ItemComparison
      * 4) Dedupe by position.
      * 5) Enrich the candidate item, compare against each equipped slot item, and return rows.
      *
-     * @param Item $itemToCompare The item the player is considering equipping; enriched prior to compare.
-     * @param Collection<int, object> $inventorySlots Slot models/records with at least: ->position(string), ->equipped(bool), ->item(Item)
-     * @param Character $character Unused placeholder for future needs/signature parity.
+     * @param  Item  $itemToCompare  The item the player is considering equipping; enriched prior to compare.
+     * @param  Collection<int, object>  $inventorySlots  Slot models/records with at least: ->position(string), ->equipped(bool), ->item(Item)
+     * @param  Character  $character  Unused placeholder for future needs/signature parity.
      * @return array<int, array<string, mixed>> A list of comparison row payloads ready for the frontend.
      */
     public function fetchDetails(Item $itemToCompare, Collection $inventorySlots, Character $character): array
@@ -75,7 +71,7 @@ class ItemComparison
      * Weapons (non-spell, non-ring) → ['left-hand','right-hand']
      * Armour → Positions provided by ArmourType::getArmourPositions()
      *
-     * @param Item $item The raw item model whose type determines valid positions.
+     * @param  Item  $item  The raw item model whose type determines valid positions.
      * @return array<int, string> Ordered positions used for filtering and sorting.
      */
     private function resolveEquipPositions(Item $item): array
@@ -95,11 +91,12 @@ class ItemComparison
         }
 
         $armourPositionsMap = ArmourType::getArmourPositions();
-        $armourPositions    = $armourPositionsMap[$item->type] ?? null;
+        $armourPositions = $armourPositionsMap[$item->type] ?? null;
 
         if ($armourPositions !== null) {
             $list = is_array($armourPositions) ? $armourPositions : [$armourPositions];
-            return array_values(array_map(fn($p) => (string) $p, $list));
+
+            return array_values(array_map(fn ($p) => (string) $p, $list));
         }
 
         return [];
@@ -110,8 +107,8 @@ class ItemComparison
      * - Have a position included in the allowed positions list, and
      * - Are currently equipped.
      *
-     * @param Collection<int, object> $inventorySlots Slot records with ->position and ->equipped.
-     * @param array<int, string> $equipPositions Allowed slot position identifiers.
+     * @param  Collection<int, object>  $inventorySlots  Slot records with ->position and ->equipped.
+     * @param  array<int, string>  $equipPositions  Allowed slot position identifiers.
      * @return Collection<int, object> Filtered, still-indexed slot collection.
      */
     private function filterSlotsByPositions(Collection $inventorySlots, array $equipPositions): Collection
@@ -124,35 +121,35 @@ class ItemComparison
     /**
      * Build a single comparison row for a matched equipped slot.
      *
-     * @param Item $enrichedItemToCompare The candidate item after enrichment.
-     * @param object $equippedSlot Slot record containing ->position(string) and ->item(Item Eloquent model).
+     * @param  Item  $enrichedItemToCompare  The candidate item after enrichment.
+     * @param  object  $equippedSlot  Slot record containing ->position(string) and ->item(Item Eloquent model).
      * @return array<string, mixed> Comparison row payload including metadata and computed adjustments.
      */
     private function buildComparisonRow(Item $enrichedItemToCompare, $equippedSlot): array
     {
-        $equippedItem         = $equippedSlot->item->fresh();
+        $equippedItem = $equippedSlot->item->fresh();
         $enrichedEquippedItem = $this->enricher->enrich($equippedItem);
-        $payload              = $this->comparator->compare($enrichedItemToCompare, $enrichedEquippedItem);
-        $summary              = $payload['comparison'];
+        $payload = $this->comparator->compare($enrichedItemToCompare, $enrichedEquippedItem);
+        $summary = $payload['comparison'];
 
         return [
-            'position'      => $equippedSlot->position,
+            'position' => $equippedSlot->position,
             'equipped_item' => [
-                'affix_count'                     => $enrichedEquippedItem->affix_count,
-                'max_holy_stacks'                 => $enrichedEquippedItem->holy_stacks,
-                'holy_stacks_applied'             => $enrichedEquippedItem->holy_stacks_applied,
+                'affix_count' => $enrichedEquippedItem->affix_count,
+                'max_holy_stacks' => $enrichedEquippedItem->holy_stacks,
+                'holy_stacks_applied' => $enrichedEquippedItem->holy_stacks_applied,
                 'holy_stacks_total_stat_increase' => $enrichedEquippedItem->holy_stack_stat_bonus,
-                'is_cosmic'                       => $enrichedEquippedItem->is_cosmic,
-                'is_mythic'                       => $enrichedEquippedItem->is_mythic,
-                'is_unique'                       => $this->isUnique($enrichedEquippedItem),
-                'usable'                          => $enrichedEquippedItem->usable,
-                'holy_level'                      => $enrichedEquippedItem->holy_level,
-                'damages_kingdoms'                => $enrichedEquippedItem->damages_kingdoms,
-                'name'                            => $enrichedEquippedItem->affix_name,
-                'description'                     => $enrichedEquippedItem->description,
-                'type'                            => $enrichedEquippedItem->type,
+                'is_cosmic' => $enrichedEquippedItem->is_cosmic,
+                'is_mythic' => $enrichedEquippedItem->is_mythic,
+                'is_unique' => $this->isUnique($enrichedEquippedItem),
+                'usable' => $enrichedEquippedItem->usable,
+                'holy_level' => $enrichedEquippedItem->holy_level,
+                'damages_kingdoms' => $enrichedEquippedItem->damages_kingdoms,
+                'name' => $enrichedEquippedItem->affix_name,
+                'description' => $enrichedEquippedItem->description,
+                'type' => $enrichedEquippedItem->type,
             ],
-            'comparison'    => [
+            'comparison' => [
                 'adjustments' => $summary['adjustments'],
             ],
         ];

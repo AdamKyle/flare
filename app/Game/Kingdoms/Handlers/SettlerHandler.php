@@ -102,8 +102,8 @@ class SettlerHandler
         return $attackingKingdom->units()
             ->where('id', $unitId)
             ->first()
-                                ->gameUnit
-                                ->reduces_morale_by;
+            ->gameUnit
+            ->reduces_morale_by;
     }
 
     protected function updateAttackingUnits(array $attackingUnits): void

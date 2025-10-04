@@ -61,11 +61,11 @@ class DisenchantService
         $foundItem = InventorySlot::where('equipped', false)->where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
 
         if (is_null($foundItem)) {
-            return $this->errorResult($item->affix_name . ' Cannot be disenchanted. Not found in inventory.');
+            return $this->errorResult($item->affix_name.' Cannot be disenchanted. Not found in inventory.');
         }
 
         if (is_null($foundItem->item->item_suffix_id) && is_null($foundItem->item->item_prefix_id)) {
-            return $this->errorResult($item->affix_name . ' Cannot be disenchanted. Has no enchantments attached.');
+            return $this->errorResult($item->affix_name.' Cannot be disenchanted. Has no enchantments attached.');
         }
 
         if (! is_null($foundItem)) {
@@ -83,7 +83,7 @@ class DisenchantService
         }
 
         return $this->successResult([
-            'message' => 'Disenchanted item ' . $item->affix_name . ' Check server message tab for Gold Dust output.',
+            'message' => 'Disenchanted item '.$item->affix_name.' Check server message tab for Gold Dust output.',
             'inventory' => $this->characterInventoryService->setCharacter($character)->getInventoryForType('inventory'),
         ]);
     }
@@ -113,9 +113,9 @@ class DisenchantService
                 $affixData['character_inventory'],
             ));
 
-            $message = 'You are maxed on gold dust and ' . (
-                $disenchanted ? ' you still managed to disenchant the item: ' . $slot->item->affix_name :
-                'you failed to disenchant the item: ' . $slot->item->affix_name
+            $message = 'You are maxed on gold dust and '.(
+                $disenchanted ? ' you still managed to disenchant the item: '.$slot->item->affix_name :
+                'you failed to disenchant the item: '.$slot->item->affix_name
             );
 
             ServerMessageHandler::sendBasicMessage($this->character->user, $message);
@@ -214,7 +214,7 @@ class DisenchantService
 
                     event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. You are now capped!'));
                 } else {
-                    event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. Your new total is: ' . number_format($characterTotalGoldDust)));
+                    event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. Your new total is: '.number_format($characterTotalGoldDust)));
                 }
             }
         }

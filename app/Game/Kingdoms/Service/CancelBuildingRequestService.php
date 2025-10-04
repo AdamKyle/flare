@@ -14,10 +14,6 @@ class CancelBuildingRequestService
 {
     use ResponseBuilder;
 
-    /**
-     * @param UnitMovementService $unitMovementService
-     * @param CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler
-     */
     public function __construct(
         private readonly UnitMovementService $unitMovementService,
         private readonly CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler
@@ -25,11 +21,6 @@ class CancelBuildingRequestService
 
     /**
      * Handle the cancelation request
-     *
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @param array $requestData
-     * @return array
      */
     public function handleCancelRequest(Character $character, Kingdom $kingdom, array $requestData): array
     {
@@ -45,14 +36,14 @@ class CancelBuildingRequestService
         }
 
         if ($queue->completed_at->diffInSeconds(now()) <= 60) {
-            return $this->errorResult('You cannot cancel this request because it is on the doorstep of: ' . $queue->kingdom->name);
+            return $this->errorResult('You cannot cancel this request because it is on the doorstep of: '.$queue->kingdom->name);
         }
 
         $buildingToDelete = $requestData['building_id'] ?? null;
 
         if ($queue->status === CapitalCityQueueStatus::TRAVELING) {
 
-            if (!is_null($buildingToDelete)) {
+            if (! is_null($buildingToDelete)) {
                 return $this->cancelBuildingRequest($queue, $buildingToDelete);
             }
 
@@ -64,10 +55,6 @@ class CancelBuildingRequestService
 
     /**
      * Cancel a single building request
-     *
-     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
-     * @param integer $buildingId
-     * @return array
      */
     private function cancelBuildingRequest(CapitalCityBuildingQueue $capitalCityBuildingQueue, int $buildingId): array
     {
@@ -82,7 +69,7 @@ class CancelBuildingRequestService
                 $buildingNameToCancel = $buildingRequest['building_name'];
 
                 if ($buildingRequest['secondary_status'] !== CapitalCityQueueStatus::TRAVELING) {
-                    return $this->errorResult('Cannot cancel: ' . $buildingRequest['name'] . ' for kingdom: ' . $capitalCityBuildingQueue->kingdom->name . ' because it is no longer Traveling.');
+                    return $this->errorResult('Cannot cancel: '.$buildingRequest['name'].' for kingdom: '.$capitalCityBuildingQueue->kingdom->name.' because it is no longer Traveling.');
                 }
 
                 $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::CANCELLED;
@@ -96,7 +83,7 @@ class CancelBuildingRequestService
             'messages' => array_merge(
                 $messages,
                 [
-                    $buildingNameToCancel . ' Has been canceled at your request while the orders were still traveling.'
+                    $buildingNameToCancel.' Has been canceled at your request while the orders were still traveling.',
                 ]
             ),
         ]);
@@ -109,29 +96,26 @@ class CancelBuildingRequestService
 
         return $this->successResult([
             'message' => 'Successfully canceled the '
-                . $buildingNameToCancel
-                . '. This will appear as canceled in your queue - assumign you have anything left for this kingdom: '
-                . $capitalCityBuildingQueue->kingdom->name
-                .  ' If there is nothing left for this kingdom, check your log.'
+                .$buildingNameToCancel
+                .'. This will appear as canceled in your queue - assumign you have anything left for this kingdom: '
+                .$capitalCityBuildingQueue->kingdom->name
+                .' If there is nothing left for this kingdom, check your log.',
         ]);
     }
 
     /**
      * Cancel all buildings in a request
-     *
-     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
-     * @return array
      */
     private function cancelAllBuildings(CapitalCityBuildingQueue $capitalCityBuildingQueue): array
     {
         $requestData = $capitalCityBuildingQueue->building_request_data;
 
         $hasBuildingsTraveling = collect($requestData)
-            ->contains(fn($item) => $item['secondary_status'] === CapitalCityQueueStatus::TRAVELING);
+            ->contains(fn ($item) => $item['secondary_status'] === CapitalCityQueueStatus::TRAVELING);
 
-        if (!$hasBuildingsTraveling) {
+        if (! $hasBuildingsTraveling) {
             return $this->errorResult(
-                'Cannot cancel unit request(s) for kingdom: ' . $capitalCityBuildingQueue->kingdom->name . ' because none of them are traveling. Are you trying to throw the kingdom into chaos?'
+                'Cannot cancel unit request(s) for kingdom: '.$capitalCityBuildingQueue->kingdom->name.' because none of them are traveling. Are you trying to throw the kingdom into chaos?'
             );
         }
 
@@ -140,6 +124,7 @@ class CancelBuildingRequestService
                 if ($item['secondary_status'] === CapitalCityQueueStatus::TRAVELING) {
                     return array_merge($item, ['secondary_status' => CapitalCityQueueStatus::CANCELLED]);
                 }
+
                 return $item;
             })
             ->toArray();
@@ -151,7 +136,7 @@ class CancelBuildingRequestService
             'messages' => array_merge(
                 $messages,
                 [
-                    'All valid requests (those that were still taveling) for this order have been canceled.'
+                    'All valid requests (those that were still taveling) for this order have been canceled.',
                 ]
             ),
         ]);
@@ -164,7 +149,7 @@ class CancelBuildingRequestService
 
         return $this->successResult([
             'message' => 'Successfully canceled the valid requests for: '
-                . $capitalCityBuildingQueue->kingdom->name . '.'
+                .$capitalCityBuildingQueue->kingdom->name.'.',
         ]);
     }
 }

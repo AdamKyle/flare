@@ -28,7 +28,6 @@ class NameTags
 
     const FEARSOME_MAGI_OF_THE_MEMORY = 'fearsome-magi-of-the-memory';
 
-
     /**
      * @var string[]
      */
@@ -68,7 +67,7 @@ class NameTags
     public function __construct(string $value)
     {
         if (! in_array($value, self::$values)) {
-            throw new Exception($value . ' does not exist.');
+            throw new Exception($value.' does not exist.');
         }
     }
 }

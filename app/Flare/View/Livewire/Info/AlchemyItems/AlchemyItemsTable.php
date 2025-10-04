@@ -13,8 +13,6 @@ class AlchemyItemsTable extends DataTableComponent
 {
     /**
      * Configures the table's primary key.
-     *
-     * @return void
      */
     public function configure(): void
     {
@@ -23,8 +21,6 @@ class AlchemyItemsTable extends DataTableComponent
 
     /**
      * Builds the query for retrieving alchemy items.
-     *
-     * @return Builder
      */
     public function builder(): Builder
     {
@@ -36,8 +32,6 @@ class AlchemyItemsTable extends DataTableComponent
 
     /**
      * Defines filters for the table.
-     *
-     * @return array
      */
     public function filters(): array
     {
@@ -46,6 +40,7 @@ class AlchemyItemsTable extends DataTableComponent
                 ->options($this->buildOptions())
                 ->filter(function (Builder $builder, string $value) {
                     $builder->where('alchemy_type', $value);
+
                     return $builder;
                 }),
         ];
@@ -53,8 +48,6 @@ class AlchemyItemsTable extends DataTableComponent
 
     /**
      * Defines the columns displayed in the table.
-     *
-     * @return array
      */
     public function columns(): array
     {
@@ -63,7 +56,8 @@ class AlchemyItemsTable extends DataTableComponent
                 ->searchable()
                 ->format(function ($value, $row) {
                     $itemId = Item::where('name', $value)->first()->id;
-                    return '<a href="/items/' . $itemId . '">' . $row->name . '</a>';
+
+                    return '<a href="/items/'.$itemId.'">'.$row->name.'</a>';
                 })
                 ->html(),
             Column::make('Gold Dust Cost')
@@ -85,20 +79,18 @@ class AlchemyItemsTable extends DataTableComponent
 
     /**
      * Builds an array of alchemy item type options for the filter.
-     *
-     * @return array
      */
     private function buildOptions(): array
     {
         return [
-            AlchemyItemType::INCREASE_STATS->value         => 'Increases Stats',
-            AlchemyItemType::INCREASE_SKILL_TYPE->value    => 'Increases Training Skills',
-            AlchemyItemType::INCREASE_DAMAGE->value        => 'Increases Damage',
-            AlchemyItemType::INCREASE_ARMOUR->value        => 'Increases Armour',
-            AlchemyItemType::INCREASE_HEALING->value       => 'Increases Healing',
+            AlchemyItemType::INCREASE_STATS->value => 'Increases Stats',
+            AlchemyItemType::INCREASE_SKILL_TYPE->value => 'Increases Training Skills',
+            AlchemyItemType::INCREASE_DAMAGE->value => 'Increases Damage',
+            AlchemyItemType::INCREASE_ARMOUR->value => 'Increases Armour',
+            AlchemyItemType::INCREASE_HEALING->value => 'Increases Healing',
             AlchemyItemType::INCREASE_ALCHEMY_SKILL->value => 'Increases Alchemy Skill',
-            AlchemyItemType::DAMAGES_KINGDOMS->value       => 'Damages Kingdoms',
-            AlchemyItemType::HOLY_OILS->value              => 'Holy Oils',
+            AlchemyItemType::DAMAGES_KINGDOMS->value => 'Damages Kingdoms',
+            AlchemyItemType::HOLY_OILS->value => 'Holy Oils',
         ];
     }
 }

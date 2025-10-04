@@ -2,18 +2,14 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
-use App\Flare\Models\CapitalCityBuildingQueue;
-use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
 use App\Flare\Models\UnitMovementQueue;
 use App\Flare\Values\KingdomLogStatusValue;
-use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
 use App\Game\Kingdoms\Service\UpdateKingdom;
-use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Carbon\Carbon;

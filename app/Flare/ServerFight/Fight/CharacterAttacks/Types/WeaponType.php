@@ -4,7 +4,6 @@ namespace App\Flare\ServerFight\Fight\CharacterAttacks\Types;
 
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
-use App\Flare\ServerFight\Fight\Attack;
 use App\Flare\ServerFight\Fight\CanHit;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
 use App\Flare\ServerFight\Fight\Entrance;
@@ -42,8 +41,8 @@ class WeaponType extends BattleBase
             AttackTypeValue::VOIDED_DEFEND,
         ];
 
-        if ($isVoided && !in_array($type, $voidedTypes)) {
-            $attackType = 'voided_' . $type;
+        if ($isVoided && ! in_array($type, $voidedTypes)) {
+            $attackType = 'voided_'.$type;
         } else {
             $attackType = $type;
         }
@@ -143,7 +142,7 @@ class WeaponType extends BattleBase
 
         $this->monsterHealth -= $totalDamage;
 
-        $this->addMessage('Your weapon hits ' . $monsterName . ' for: ' . number_format($totalDamage), 'player-action');
+        $this->addMessage('Your weapon hits '.$monsterName.' for: '.number_format($totalDamage), 'player-action');
 
         $this->specialAttacks->setCharacterHealth($this->characterHealth)
             ->setMonsterHealth($this->monsterHealth)

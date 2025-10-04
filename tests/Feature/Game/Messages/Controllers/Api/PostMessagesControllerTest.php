@@ -11,25 +11,25 @@ use Tests\Traits\CreateUser;
 
 class PostMessagesControllerTest extends TestCase
 {
-    use RefreshDatabase, CreateUser, CreateRole;
+    use CreateRole, CreateUser, RefreshDatabase;
 
     private ?CharacterFactory $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testPostPublicMessage()
+    public function test_post_public_message()
     {
         $character = $this->character->getCharacter();
 
@@ -48,7 +48,7 @@ class PostMessagesControllerTest extends TestCase
         $this->assertNotNull($message);
     }
 
-    public function testPostPrivateMessage()
+    public function test_post_private_message()
     {
 
         $this->createAdmin($this->createAdminRole());

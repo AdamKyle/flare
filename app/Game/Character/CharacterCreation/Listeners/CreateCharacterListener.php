@@ -11,8 +11,7 @@ class CreateCharacterListener
     public function __construct(
         private readonly CharacterCreationPipeline $pipeline,
         private readonly CharacterBuildState $state
-    ) {
-    }
+    ) {}
 
     public function handle(CreateCharacterEvent $event): void
     {

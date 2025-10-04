@@ -12,13 +12,13 @@ use Tests\Traits\CreateSurvey;
 
 class SurveyControllerTest extends TestCase
 {
-    use CreateSurvey, CreateItem, RefreshDatabase;
+    use CreateItem, CreateSurvey, RefreshDatabase;
 
     private ?Character $character = null;
 
     private ?Survey $survey = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -27,7 +27,7 @@ class SurveyControllerTest extends TestCase
         $this->character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -35,9 +35,10 @@ class SurveyControllerTest extends TestCase
         $this->survey = null;
     }
 
-    public function testFetchSurvey() {
+    public function test_fetch_survey()
+    {
         $response = $this->actingAs($this->character->user)
-        ->call('GET', '/api/survey/'.$this->survey->id,);
+            ->call('GET', '/api/survey/'.$this->survey->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -46,18 +47,19 @@ class SurveyControllerTest extends TestCase
         $this->assertEquals($jsonData['sections'], $this->survey->sections);
     }
 
-    public function testSubmitSurveyResponse() {
+    public function test_submit_survey_response()
+    {
 
         $this->createItem();
 
         $response = $this->actingAs($this->character->user)
-        ->call('POST', '/api/survey/submit/'.$this->survey->id . '/' . $this->character->id, [
-            [
-                'Some Radio Label' => ['value' => 'Option 1', 'type' => 'radio'],
-                'Some Checkbox Label' => ['value' => ['Option 1'], 'type' => 'checkbox'],
-                'Some markdown Label' => ['value' => 'Some content', 'type' => 'markdown'],
-            ]
-        ]);
+            ->call('POST', '/api/survey/submit/'.$this->survey->id.'/'.$this->character->id, [
+                [
+                    'Some Radio Label' => ['value' => 'Option 1', 'type' => 'radio'],
+                    'Some Checkbox Label' => ['value' => ['Option 1'], 'type' => 'checkbox'],
+                    'Some markdown Label' => ['value' => 'Some content', 'type' => 'markdown'],
+                ],
+            ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -73,5 +75,4 @@ class SurveyControllerTest extends TestCase
 
         $this->assertNotNull($inventorySlot);
     }
-
 }

@@ -21,7 +21,7 @@ class AttachedGemServiceTest extends TestCase
 
     private ?AttachedGemService $attachedGemService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -52,7 +52,7 @@ class AttachedGemServiceTest extends TestCase
         $this->attachedGemService = resolve(AttachedGemService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -63,7 +63,7 @@ class AttachedGemServiceTest extends TestCase
         $this->attachedGemService = null;
     }
 
-    public function testGetErrorWhenCharacterDoesNotHaveItem()
+    public function test_get_error_when_character_does_not_have_item()
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -73,7 +73,7 @@ class AttachedGemServiceTest extends TestCase
         $this->assertEquals($result['status'], 422);
     }
 
-    public function testGetGemDataFromItemWhenCharacterHasItem()
+    public function test_get_gem_data_from_item_when_character_has_item()
     {
         $character = $this->characterFactory->inventoryManagement()->giveItem($this->item)->getCharacter();
 

@@ -22,7 +22,8 @@ class CapitalCityBuildingManagement
     /**
      * Create the requests
      */
-    public function createBuildingUpgradeRequestQueue(Character $character, Kingdom $kingdom, array $requests, string $type): array {
+    public function createBuildingUpgradeRequestQueue(Character $character, Kingdom $kingdom, array $requests, string $type): array
+    {
         return $this->capitalCityBuildingManagementRequestHandler->createRequestQueue($character, $kingdom, $requests, $type);
     }
 
@@ -31,7 +32,8 @@ class CapitalCityBuildingManagement
      *
      * - If we cannot afford the resources, then get the missing costs and send off the resource requests.
      */
-    public function processBuildingRequest(CapitalCityBuildingQueue $capitalCityBuildingQueue): void {
+    public function processBuildingRequest(CapitalCityBuildingQueue $capitalCityBuildingQueue): void
+    {
         $this->capitalCityProcessBuildingRequestHandler->handleBuildingRequests($capitalCityBuildingQueue);
     }
 }

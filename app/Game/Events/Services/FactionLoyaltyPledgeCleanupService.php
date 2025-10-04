@@ -8,18 +8,8 @@ use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 
 class FactionLoyaltyPledgeCleanupService
 {
+    public function __construct(private readonly FactionLoyaltyService $service) {}
 
-    /**
-     * @param  FactionLoyaltyService  $service
-     */
-    public function __construct(private readonly FactionLoyaltyService $service)
-    {}
-
-    /**
-     * @param  Character  $character
-     * @param  Faction|null  $faction
-     * @return void
-     */
     public function unpledgeIfOnFaction(Character $character, ?Faction $faction): void
     {
         if (is_null($faction)) {

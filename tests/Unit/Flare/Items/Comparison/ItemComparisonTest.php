@@ -14,34 +14,35 @@ use Tests\Traits\CreateItemAffix;
 
 class ItemComparisonTest extends TestCase
 {
-    use RefreshDatabase, CreateItem, CreateItemAffix;
+    use CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $characterFactory = null;
+
     private ?ItemComparison $itemComparison = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $this->itemComparison   = $this->app->make(ItemComparison::class);
+        $this->itemComparison = $this->app->make(ItemComparison::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->characterFactory = null;
-        $this->itemComparison   = null;
+        $this->itemComparison = null;
 
         parent::tearDown();
     }
 
-    public function testReturnsEmptyWhenNoEquipPositions(): void
+    public function test_returns_empty_when_no_equip_positions(): void
     {
         $character = $this->characterFactory->getCharacter()->refresh();
 
         $unknownTypeItem = $this->createItem([
-            'type'        => 'artifact',
-            'name'        => 'Mystery Rock',
+            'type' => 'artifact',
+            'name' => 'Mystery Rock',
             'description' => '???',
         ]);
 
@@ -50,13 +51,13 @@ class ItemComparisonTest extends TestCase
         $this->assertSame([], $rows);
     }
 
-    public function testReturnsEmptyWhenNoMatchingSlots(): void
+    public function test_returns_empty_when_no_matching_slots(): void
     {
         $character = $this->characterFactory->getCharacter()->refresh();
 
         $ring = $this->createItem([
-            'type'        => 'ring',
-            'name'        => 'Empty Finger',
+            'type' => 'ring',
+            'name' => 'Empty Finger',
             'description' => 'Lonely.',
         ]);
 
@@ -65,7 +66,7 @@ class ItemComparisonTest extends TestCase
         $this->assertSame([], $rows);
     }
 
-    public function testSpellsCompareAgainstBothSlotsAndReverseOrder(): void
+    public function test_spells_compare_against_both_slots_and_reverse_order(): void
     {
         $character = $this->characterFactory->inventoryManagement()
             ->giveItem($this->createItem(['type' => SpellTypes::DAMAGE, 'base_damage' => 5, 'name' => 'Equipped Spell One']), true, 'spell-one')
@@ -74,9 +75,9 @@ class ItemComparisonTest extends TestCase
             ->refresh();
 
         $candidateSpell = $this->createItem([
-            'type'        => SpellTypes::DAMAGE,
+            'type' => SpellTypes::DAMAGE,
             'base_damage' => 10,
-            'name'        => 'Candidate Spell',
+            'name' => 'Candidate Spell',
             'description' => 'Boom',
         ]);
 
@@ -92,7 +93,7 @@ class ItemComparisonTest extends TestCase
         $this->assertArrayHasKey('name', $rows[0]['equipped_item']);
     }
 
-    public function testTwoHandedWeaponTypesCompareAgainstBothHandsAndReverseOrder(): void
+    public function test_two_handed_weapon_types_compare_against_both_hands_and_reverse_order(): void
     {
         $twoHandedTypes = [
             WeaponTypes::STAVE,
@@ -102,15 +103,15 @@ class ItemComparisonTest extends TestCase
 
         foreach ($twoHandedTypes as $twoHandedType) {
             $character = $this->characterFactory->inventoryManagement()
-                ->giveItem($this->createItem(['type' => $twoHandedType, 'base_damage' => 10, 'name' => 'Left Equipped '.$twoHandedType]),  true, 'left-hand')
+                ->giveItem($this->createItem(['type' => $twoHandedType, 'base_damage' => 10, 'name' => 'Left Equipped '.$twoHandedType]), true, 'left-hand')
                 ->giveItem($this->createItem(['type' => $twoHandedType, 'base_damage' => 12, 'name' => 'Right Equipped '.$twoHandedType]), true, 'right-hand')
                 ->getCharacter()
                 ->refresh();
 
             $candidateItem = $this->createItem([
-                'type'        => $twoHandedType,
+                'type' => $twoHandedType,
                 'base_damage' => 15,
-                'name'        => 'Candidate '.$twoHandedType,
+                'name' => 'Candidate '.$twoHandedType,
                 'description' => 'Test',
             ]);
 
@@ -118,7 +119,7 @@ class ItemComparisonTest extends TestCase
 
             $this->assertCount(2, $rows, 'Unexpected row count for type: '.$twoHandedType);
             $this->assertSame('left-hand', $rows[0]['position'], 'First pos mismatch for type: '.$twoHandedType);
-            $this->assertSame('right-hand',  $rows[1]['position'], 'Second pos mismatch for type: '.$twoHandedType);
+            $this->assertSame('right-hand', $rows[1]['position'], 'Second pos mismatch for type: '.$twoHandedType);
 
             $this->assertArrayHasKey('comparison', $rows[0]);
             $this->assertArrayHasKey('adjustments', $rows[0]['comparison']);
@@ -126,18 +127,18 @@ class ItemComparisonTest extends TestCase
         }
     }
 
-    public function testShieldComparesAgainstBothHands(): void
+    public function test_shield_compares_against_both_hands(): void
     {
         $character = $this->characterFactory->inventoryManagement()
-            ->giveItem($this->createItem(['type' => 'shield', 'base_ac' => 5, 'name' => 'Left Shield']),  true, 'left-hand')
+            ->giveItem($this->createItem(['type' => 'shield', 'base_ac' => 5, 'name' => 'Left Shield']), true, 'left-hand')
             ->giveItem($this->createItem(['type' => 'shield', 'base_ac' => 7, 'name' => 'Right Shield']), true, 'right-hand')
             ->getCharacter()
             ->refresh();
 
         $candidateShield = $this->createItem([
-            'type'        => 'shield',
-            'base_ac'     => 10,
-            'name'        => 'Candidate Shield',
+            'type' => 'shield',
+            'base_ac' => 10,
+            'name' => 'Candidate Shield',
             'description' => 'Blocky',
         ]);
 
@@ -148,7 +149,7 @@ class ItemComparisonTest extends TestCase
         $this->assertSame('right-hand', $rows[1]['position']);
     }
 
-    public function testRingsCompareAgainstBothRingSlots(): void
+    public function test_rings_compare_against_both_ring_slots(): void
     {
         $character = $this->characterFactory->inventoryManagement()
             ->giveItem($this->createItem(['type' => 'ring', 'name' => 'Ring One']), true, 'ring-one')
@@ -157,8 +158,8 @@ class ItemComparisonTest extends TestCase
             ->refresh();
 
         $candidateRing = $this->createItem([
-            'type'        => 'ring',
-            'name'        => 'Candidate Ring',
+            'type' => 'ring',
+            'name' => 'Candidate Ring',
             'description' => 'Shiny',
         ]);
 
@@ -169,25 +170,25 @@ class ItemComparisonTest extends TestCase
         $this->assertSame('ring-two', $rows[1]['position']);
     }
 
-    public function testArmourTypeResolvesMappedPositions(): void
+    public function test_armour_type_resolves_mapped_positions(): void
     {
-        $map               = ArmourType::getArmourPositions();
-        $chosenType        = null;
-        $chosenFirstSlot   = null;
+        $map = ArmourType::getArmourPositions();
+        $chosenType = null;
+        $chosenFirstSlot = null;
 
         foreach ($map as $type => $positions) {
             if ($type === 'shield') {
                 continue;
             }
-            if (is_array($positions) && !empty($positions)) {
-                $chosenType      = $type;
+            if (is_array($positions) && ! empty($positions)) {
+                $chosenType = $type;
                 $chosenFirstSlot = $positions[0];
                 break;
             }
         }
 
         $equippedItem = $this->createItem(['type' => $chosenType, 'name' => 'Equipped Armour']);
-        $candidate    = $this->createItem(['type' => $chosenType, 'name' => 'Candidate Armour', 'description' => 'sample']);
+        $candidate = $this->createItem(['type' => $chosenType, 'name' => 'Candidate Armour', 'description' => 'sample']);
 
         $character = $this->characterFactory->inventoryManagement()
             ->giveItem($equippedItem, true, $chosenFirstSlot)
@@ -203,7 +204,7 @@ class ItemComparisonTest extends TestCase
         $this->assertArrayHasKey('equipped_item', $rows[0]);
     }
 
-    public function testComparisonRowIncludesSlotFlagsAndEquippedDetailsBlock(): void
+    public function test_comparison_row_includes_slot_flags_and_equipped_details_block(): void
     {
         $equipped = $this->createItem(['type' => WeaponTypes::STAVE, 'base_damage' => 5, 'name' => 'Equipped Staff']);
         $candidate = $this->createItem(['type' => WeaponTypes::STAVE, 'base_damage' => 12, 'name' => 'Candidate Staff']);
@@ -234,7 +235,7 @@ class ItemComparisonTest extends TestCase
         $this->assertArrayHasKey('type', $row['equipped_item']);
     }
 
-    public function testNoMatchingSlotsEvenWithUnrelatedItemsEquipped(): void
+    public function test_no_matching_slots_even_with_unrelated_items_equipped(): void
     {
         $equippedStave = $this->createItem(['type' => WeaponTypes::STAVE, 'name' => 'Equipped Staff']);
         $candidateRing = $this->createItem(['type' => 'ring', 'name' => 'Candidate Ring']);
@@ -249,11 +250,11 @@ class ItemComparisonTest extends TestCase
         $this->assertSame([], $rows);
     }
 
-    public function testIgnoresUnequippedSlotsEvenIfPositionsMatch(): void
+    public function test_ignores_unequipped_slots_even_if_positions_match(): void
     {
         $character = $this->characterFactory->inventoryManagement()
-            ->giveItem($this->createItem(['type' => 'ring', 'name' => 'Ring One']),  false, 'ring-one')
-            ->giveItem($this->createItem(['type' => 'ring', 'name' => 'Ring Two']),  false, 'ring-two')
+            ->giveItem($this->createItem(['type' => 'ring', 'name' => 'Ring One']), false, 'ring-one')
+            ->giveItem($this->createItem(['type' => 'ring', 'name' => 'Ring Two']), false, 'ring-two')
             ->getCharacter()
             ->refresh();
 

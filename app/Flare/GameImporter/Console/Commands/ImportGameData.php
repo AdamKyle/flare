@@ -49,10 +49,10 @@ class ImportGameData extends Command
 
             if (! isset($files[$dirNameForReImport])) {
 
-                return $this->error('No directory in data-imports for: ' . $dirNameForReImport);
+                return $this->error('No directory in data-imports for: '.$dirNameForReImport);
             }
 
-            $this->line('Re importing: ' . $dirNameForReImport);
+            $this->line('Re importing: '.$dirNameForReImport);
 
             $this->import($excelMapper, $files[$dirNameForReImport], $dirNameForReImport);
 
@@ -159,7 +159,7 @@ class ImportGameData extends Command
     protected function import(ExcelMapper $excelMapper, array $files, string $directoryName): void
     {
         foreach ($files as $index => $path) {
-            $path = resource_path('data-imports') . '/' . $path;
+            $path = resource_path('data-imports').'/'.$path;
 
             $excelMapper->importFile($directoryName, $path, $index);
         }
@@ -181,7 +181,7 @@ class ImportGameData extends Command
         $sourceDirectory = resource_path('backup/info-sections-images');
         $destinationDirectory = storage_path('app/public');
 
-        $command = 'cp -R ' . escapeshellarg($sourceDirectory) . ' ' . escapeshellarg($destinationDirectory);
+        $command = 'cp -R '.escapeshellarg($sourceDirectory).' '.escapeshellarg($destinationDirectory);
         exec($command, $output, $exitCode);
 
         if ($exitCode === 0) {
@@ -193,8 +193,6 @@ class ImportGameData extends Command
 
     /**
      * Import surveys.
-     *
-     * @return void
      */
     protected function importSurveys(): void
     {
@@ -241,7 +239,7 @@ class ImportGameData extends Command
         foreach ($files as $file) {
             $fileName = pathinfo($file, PATHINFO_FILENAME);
 
-            $path = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps') . '/' . $file));
+            $path = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps').'/'.$file));
 
             $mapValue = new MapNameValue($fileName);
 

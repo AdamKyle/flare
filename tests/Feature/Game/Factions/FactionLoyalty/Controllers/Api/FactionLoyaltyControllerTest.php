@@ -17,21 +17,21 @@ class FactionLoyaltyControllerTest extends TestCase
 
     private ?Character $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignFactionSystem()->getCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testGetFactionLoyalties()
+    public function test_get_faction_loyalties()
     {
 
         $this->character->factions()->first()->update(['maxed' => true]);
@@ -96,7 +96,7 @@ class FactionLoyaltyControllerTest extends TestCase
         $this->assertEquals($jsonData['map_name'], $character->map->gameMap->name);
     }
 
-    public function testPledgeLoyaltyControllerAction()
+    public function test_pledge_loyalty_controller_action()
     {
         $this->character->factions()->update(['maxed' => true]);
 
@@ -154,7 +154,7 @@ class FactionLoyaltyControllerTest extends TestCase
         $this->assertEquals('Pledged to: '.$this->character->map->gameMap->name.'.', $response['message']);
     }
 
-    public function testRemovePledgedLoyalty()
+    public function test_remove_pledged_loyalty()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -212,7 +212,7 @@ class FactionLoyaltyControllerTest extends TestCase
         $this->assertEquals('No longer pledged to: '.$this->character->map->gameMap->name.'.', $response['message']);
     }
 
-    public function testAssistNpcWithTasks()
+    public function test_assist_npc_with_tasks()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -250,7 +250,7 @@ class FactionLoyaltyControllerTest extends TestCase
         $this->assertEquals('You are now assisting '.$factionNpc->npc->real_name.' with their tasks!', $response['message']);
     }
 
-    public function testStopAssistingNpc()
+    public function test_stop_assisting_npc()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,

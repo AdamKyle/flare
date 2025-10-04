@@ -41,6 +41,6 @@ class CharacterInventoryCountUpdateBroadcaseEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('update-inventory-count-' . $this->user->id);
+        return new PrivateChannel('update-inventory-count-'.$this->user->id);
     }
 }

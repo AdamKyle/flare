@@ -12,7 +12,7 @@ class UpdateMapCountTest extends TestCase
 {
     use CreateGameMap, RefreshDatabase;
 
-    public function testUpdateMapCount()
+    public function test_update_map_count()
     {
 
         $this->createGameMap();

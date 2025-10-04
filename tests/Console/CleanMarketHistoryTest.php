@@ -12,7 +12,7 @@ class CleanMarketHistoryTest extends TestCase
 {
     use CreateItem, CreateMarketHistory, RefreshDatabase;
 
-    public function testCleanMarketHistory()
+    public function test_clean_market_history()
     {
 
         $item = $this->createItem();

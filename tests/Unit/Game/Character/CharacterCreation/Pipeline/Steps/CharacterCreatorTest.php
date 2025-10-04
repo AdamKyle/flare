@@ -13,9 +13,9 @@ use Tests\Traits\CreateUser;
 
 class CharacterCreatorTest extends TestCase
 {
-    use RefreshDatabase, CreateUser, CreateRace, CreateClass;
+    use CreateClass, CreateRace, CreateUser, RefreshDatabase;
 
-    public function testCreatesCharacterWithBaseStatsAndStoresOnState(): void
+    public function test_creates_character_with_base_stats_and_stores_on_state(): void
     {
         $state = app(CharacterBuildState::class);
 
@@ -84,7 +84,7 @@ class CharacterCreatorTest extends TestCase
         $this->assertSame(10, $character->ac);
     }
 
-    public function testNoOpWhenStateMissingData(): void
+    public function test_no_op_when_state_missing_data(): void
     {
         $state = app(CharacterBuildState::class);
 

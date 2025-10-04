@@ -208,7 +208,7 @@ class CastType extends BattleBase
 
         $this->monsterHealth -= $spellDamage;
 
-        $this->addMessage('Your damage spell(s) hits ' . $monster->getName() . ' for: ' . number_format($spellDamage), 'player-action');
+        $this->addMessage('Your damage spell(s) hits '.$monster->getName().' for: '.number_format($spellDamage), 'player-action');
 
         $this->specialAttacks->setCharacterHealth($this->characterHealth)
             ->setMonsterHealth($this->monsterHealth)
@@ -276,9 +276,9 @@ class CastType extends BattleBase
             }
 
             if ($healFor > 0) {
-                Cache::put('character-' . $character->id . '-healing-amount', $healFor);
+                Cache::put('character-'.$character->id.'-healing-amount', $healFor);
 
-                $this->addMessage('Your healing spell(s) heals you for: ' . number_format($healFor), 'player-action');
+                $this->addMessage('Your healing spell(s) heals you for: '.number_format($healFor), 'player-action');
             }
 
             $this->specialAttacks->clearMessages();
@@ -298,7 +298,7 @@ class CastType extends BattleBase
                 $healFor = $this->healForAllAmount($needToHealAmount, $cachedHealFor, $maxHealth);
                 $healFor = $this->partialHeal($needToHealAmount, $healFor, $maxHealth);
 
-                Cache::put('character-' . $character->id . '-healing-amount', min($healFor, 0));
+                Cache::put('character-'.$character->id.'-healing-amount', min($healFor, 0));
 
                 $this->addMessage('You reserved healing bursts forward and you feel life flowing through your veins.', 'player-action');
             }
@@ -307,7 +307,7 @@ class CastType extends BattleBase
 
     private function getCachedHealingAmount(Character $character): int
     {
-        return (int) Cache::get('character-' . $character->id . '-healing-amount', 0);
+        return (int) Cache::get('character-'.$character->id.'-healing-amount', 0);
     }
 
     private function doCacheHealing(Character $character, int $maxHealth, int $cachedHealFor): int
@@ -317,7 +317,7 @@ class CastType extends BattleBase
         $healFor = $this->healForAllAmount($needToHealAmount, $cachedHealFor, $maxHealth);
         $healFor = $this->partialHeal($needToHealAmount, $healFor, $maxHealth);
 
-        Cache::put('character-' . $character->id . '-healing-amount', $healFor);
+        Cache::put('character-'.$character->id.'-healing-amount', $healFor);
 
         return $healFor;
     }
@@ -330,7 +330,7 @@ class CastType extends BattleBase
 
         $this->monsterHealth -= $chrDamage;
 
-        $this->addMessage('Your prayers for health rage at the enemy as you lash out in a fevered holy pitch for: ' . number_format($chrDamage) . '!', 'player-action');
+        $this->addMessage('Your prayers for health rage at the enemy as you lash out in a fevered holy pitch for: '.number_format($chrDamage).'!', 'player-action');
     }
 
     private function getPotentialCriticalHealAmount(Character $character, int $healFor): int
@@ -343,7 +343,7 @@ class CastType extends BattleBase
             $healFor *= 2;
         }
 
-        $this->addMessage('Your healing spell(s) erupt around you for: ' . number_format($healFor), 'player-action');
+        $this->addMessage('Your healing spell(s) erupt around you for: '.number_format($healFor), 'player-action');
 
         return $healFor;
     }
@@ -366,7 +366,7 @@ class CastType extends BattleBase
 
             $this->characterHealth += min($healFor, $maxHealth);
 
-            $this->addMessage('Your healing spell(s) heals you completely for: ' . number_format($healFor), 'player-action');
+            $this->addMessage('Your healing spell(s) heals you completely for: '.number_format($healFor), 'player-action');
 
             return 0;
         }
@@ -381,7 +381,7 @@ class CastType extends BattleBase
 
             $this->characterHealth += $amountToHeal;
 
-            $this->addMessage('Your healing spell(s) partially heals you for: ' . number_format($amountToHeal), 'player-action');
+            $this->addMessage('Your healing spell(s) partially heals you for: '.number_format($amountToHeal), 'player-action');
 
             $healFor -= $amountToHeal;
         }

@@ -8,24 +8,24 @@ use Tests\TestCase;
 
 class GemTierValueTest extends TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
 
-    public function testThrowErrorForInvalidGemTierValue()
+    public function test_throw_error_for_invalid_gem_tier_value()
     {
         $this->expectException(Exception::class);
 
         new GemTierValue(105);
     }
 
-    public function testReturnNullForMaxTierOneAmount()
+    public function test_return_null_for_max_tier_one_amount()
     {
         $value = (new GemTierValue(GemTierValue::TIER_FOUR))->maxTierOneAmount();
 
@@ -34,7 +34,7 @@ class GemTierValueTest extends TestCase
         );
     }
 
-    public function testReturnNullForMaxTierTwoAmount()
+    public function test_return_null_for_max_tier_two_amount()
     {
         $value = (new GemTierValue(GemTierValue::TIER_FOUR))->maxTierTwoAmount();
 
@@ -43,7 +43,7 @@ class GemTierValueTest extends TestCase
         );
     }
 
-    public function testReturnNullForMaxTierThreeAmount()
+    public function test_return_null_for_max_tier_three_amount()
     {
         $value = (new GemTierValue(GemTierValue::TIER_FOUR))->maxTierThreeAmount();
 
@@ -52,7 +52,7 @@ class GemTierValueTest extends TestCase
         );
     }
 
-    public function testReturnNullForMaxTierFourAmount()
+    public function test_return_null_for_max_tier_four_amount()
     {
         $value = (new GemTierValue(GemTierValue::TIER_ONE))->maxTierFourAmount();
 

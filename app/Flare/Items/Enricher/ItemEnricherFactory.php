@@ -36,28 +36,32 @@ class ItemEnricherFactory
 
     public function buildItemData(Item $item, InventorySlot|SetSlot|null $slot = null): array
     {
-        if (!is_null($slot) && $this->isEquippable($slot->item)) {
+        if (! is_null($slot) && $this->isEquippable($slot->item)) {
             $enriched = $this->equippableEnricher->enrich($slot->item);
             $slot->setRelation('item', $enriched);
+
             return $this->transform($slot, $this->equippableTransformer);
         }
 
         if ($this->isEquippable($item)) {
             $enriched = $this->equippableEnricher->enrich($item);
+
             return $this->transform($enriched, $this->equippableTransformer);
         }
 
-        if (!is_null($slot) && $this->isUsable($item)) {
+        if (! is_null($slot) && $this->isUsable($item)) {
             $transformedItem = $this->transform($item, $this->usableTransformer);
             $slotArray = $slot->toArray();
             $slotArray['item'] = $transformedItem;
+
             return $slotArray;
         }
 
-        if (!is_null($slot) && $this->isQuest($item)) {
+        if (! is_null($slot) && $this->isQuest($item)) {
             $transformedItem = $this->transform($item, $this->questTransformer);
             $slotArray = $slot->toArray();
             $slotArray['item'] = $transformedItem;
+
             return $slotArray;
         }
 
@@ -75,15 +79,16 @@ class ItemEnricherFactory
     private function transform(mixed $resource, mixed $transformer): array
     {
         $resource = new FractalItem($resource, $transformer);
+
         return $this->manager->setSerializer($this->plainDataSerializer)->createData($resource)->toArray();
     }
 
     private function isEquippable(Item $item): bool
     {
-        return !$item->usable && (
-                in_array($item->type, ItemType::allTypes()) ||
-                in_array($item->type, ArmourType::allTypes())
-            );
+        return ! $item->usable && (
+            in_array($item->type, ItemType::allTypes()) ||
+            in_array($item->type, ArmourType::allTypes())
+        );
     }
 
     private function isUsable(Item $item): bool
@@ -93,6 +98,6 @@ class ItemEnricherFactory
 
     private function isQuest(Item $item): bool
     {
-        return !$item->usable && $item->type === 'quest';
+        return ! $item->usable && $item->type === 'quest';
     }
 }

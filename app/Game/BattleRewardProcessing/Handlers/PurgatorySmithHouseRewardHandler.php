@@ -24,7 +24,6 @@ use Illuminate\Support\Facades\Cache;
 
 class PurgatorySmithHouseRewardHandler
 {
-
     public function __construct(private RandomAffixGenerator $randomAffixGenerator, private BattleMessageHandler $battleMessageHandler) {}
 
     public function handleFightingAtPurgatorySmithHouse(Character $character, Monster $monster): Character
@@ -212,7 +211,7 @@ class PurgatorySmithHouseRewardHandler
                 'item_id' => $newItem->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You found something LEGENDARY in the basement child: ' . $item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You found something LEGENDARY in the basement child: '.$item->affix_name, $slot->id));
         }
 
         if ($isMythic) {
@@ -233,7 +232,7 @@ class PurgatorySmithHouseRewardHandler
                 'item_id' => $newItem->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You found something MYTHICAL in the basement child: ' . $item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You found something MYTHICAL in the basement child: '.$item->affix_name, $slot->id));
         }
     }
 
@@ -259,8 +258,8 @@ class PurgatorySmithHouseRewardHandler
             AnnouncementHandler::createAnnouncement('purgatory_house');
 
             event(new GlobalMessageEvent(
-                'The floor boards creak and the cries of the children trapped in their own misery wale across the lands. ' .
-                    '"Children of Tlessa, hear me as I lay bare my treasures for you to find in the depths of my own memories." echoes a familiar voice. ' .
+                'The floor boards creak and the cries of the children trapped in their own misery wale across the lands. '.
+                    '"Children of Tlessa, hear me as I lay bare my treasures for you to find in the depths of my own memories." echoes a familiar voice. '.
                     'You recognise it. The Creator ...'
             ));
         }

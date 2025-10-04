@@ -20,11 +20,11 @@ use Tests\Traits\CreateGameMap;
 
 class MoveCharacterAfterEventServiceTest extends TestCase
 {
-    use RefreshDatabase, CreateGameMap;
+    use CreateGameMap, RefreshDatabase;
 
     private ?MoveCharacterAfterEventService $service = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -57,21 +57,21 @@ class MoveCharacterAfterEventServiceTest extends TestCase
 
         // Seed monsters cache for maps used in the test:
         Cache::put('monsters', [
-            MapNameValue::SURFACE   => [],
+            MapNameValue::SURFACE => [],
             MapNameValue::LABYRINTH => [],
         ]);
 
         $this->service = $this->app->make(MoveCharacterAfterEventService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->service = null;
 
         parent::tearDown();
     }
 
-    public function testForCharactersOnMapInvokesCallbackWithCharacters(): void
+    public function test_for_characters_on_map_invokes_callback_with_characters(): void
     {
         $surfaceMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
 
@@ -93,14 +93,14 @@ class MoveCharacterAfterEventServiceTest extends TestCase
         $this->assertSame(1, $callbackInvocations);
     }
 
-    public function testStopExplorationForDoesNothingWithEmptyCollection(): void
+    public function test_stop_exploration_for_does_nothing_with_empty_collection(): void
     {
         $emptyCharacters = new EloquentCollection();
         $this->service->stopExplorationFor($emptyCharacters);
         $this->assertTrue(true);
     }
 
-    public function testStopExplorationForStopsExploration(): void
+    public function test_stop_exploration_for_stops_exploration(): void
     {
         $surfaceMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
 
@@ -118,7 +118,7 @@ class MoveCharacterAfterEventServiceTest extends TestCase
         $this->assertSame(0, $secondCharacter->refresh()->currentAutomations()->count());
     }
 
-    public function testResetFactionProgressForMapDoesNothingWithEmptyCollection(): void
+    public function test_reset_faction_progress_for_map_does_nothing_with_empty_collection(): void
     {
         $surfaceMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
 
@@ -127,7 +127,7 @@ class MoveCharacterAfterEventServiceTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testResetFactionProgressForMapResetsValues(): void
+    public function test_reset_faction_progress_for_map_resets_values(): void
     {
         $surfaceMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
 
@@ -151,7 +151,7 @@ class MoveCharacterAfterEventServiceTest extends TestCase
         $this->assertSame(\App\Game\Core\Values\FactionLevel::getPointsNeeded(0), (int) $factionAfterReset->points_needed);
     }
 
-    public function testMoveAllToSurfaceDoesNothingWithEmptyCollection(): void
+    public function test_move_all_to_surface_does_nothing_with_empty_collection(): void
     {
         $surfaceMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
 
@@ -160,7 +160,7 @@ class MoveCharacterAfterEventServiceTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testMoveAllToSurfaceMovesCharacters(): void
+    public function test_move_all_to_surface_moves_characters(): void
     {
         $surfaceMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
         $labyrinthMap = $this->createGameMap(['name' => MapNameValue::LABYRINTH, 'default' => false]);

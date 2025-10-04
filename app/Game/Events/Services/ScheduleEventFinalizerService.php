@@ -8,17 +8,8 @@ use App\Flare\Services\EventSchedulerService;
 
 class ScheduleEventFinalizerService
 {
+    public function __construct(private readonly EventSchedulerService $eventSchedulerService) {}
 
-    /**
-     * @param  EventSchedulerService  $eventSchedulerService
-     */
-    public function __construct(private readonly EventSchedulerService $eventSchedulerService)
-    {}
-
-    /**
-     * @param  ScheduledEvent  $scheduled
-     * @return void
-     */
     public function markNotRunningAndBroadcast(ScheduledEvent $scheduled): void
     {
         $scheduled->update(['currently_running' => false]);

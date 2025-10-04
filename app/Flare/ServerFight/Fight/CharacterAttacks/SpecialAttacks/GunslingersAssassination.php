@@ -67,6 +67,6 @@ class GunslingersAssassination extends BattleBase
             $this->characterHealth = $maxHealth;
         }
 
-        $this->addMessage('You hit for (Gunslingers Assassination!) ' . number_format($damage), 'player-action');
+        $this->addMessage('You hit for (Gunslingers Assassination!) '.number_format($damage), 'player-action');
     }
 }

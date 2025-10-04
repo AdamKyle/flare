@@ -17,9 +17,7 @@ use Illuminate\Support\Facades\DB;
 
 class SiteAccessStatisticsController extends Controller
 {
-
-    public function __construct(private readonly SiteStatisticsService $siteStatisticsService, private readonly SiteAccessStatisticService $siteAccessStatisticValue) {
-    }
+    public function __construct(private readonly SiteStatisticsService $siteStatisticsService, private readonly SiteAccessStatisticService $siteAccessStatisticValue) {}
 
     public function fetchLoggedInAllTime(SiteAccessStatisticsRequest $request)
     {
@@ -32,6 +30,7 @@ class SiteAccessStatisticsController extends Controller
     public function fetchRegisteredAllTime(SiteAccessStatisticsRequest $request)
     {
         $registrationDetails = $this->siteAccessStatisticValue->setAttribute('amount_registered')->setDaysPast($request->daysPast ?? 0);
+
         return response()->json(['stats' => $registrationDetails->getRegistered()], 200);
     }
 
@@ -132,7 +131,8 @@ class SiteAccessStatisticsController extends Controller
         ]);
     }
 
-    public function getLoginDurationDetails(Request $request) {
+    public function getLoginDurationDetails(Request $request)
+    {
         $filter = $request->daysPast ?? 0;
 
         $this->siteStatisticsService->getLogInDurationStatistics($filter);
@@ -145,7 +145,8 @@ class SiteAccessStatisticsController extends Controller
         ]);
     }
 
-    public function getUsersCurrentlyOnline(Request $request) {
+    public function getUsersCurrentlyOnline(Request $request)
+    {
 
         $filter = (int) $request->day_filter ?? 0;
 
@@ -153,7 +154,7 @@ class SiteAccessStatisticsController extends Controller
             $onlineLogins = UserLoginDuration::where('duration_in_seconds', '>', 0);
 
             $onlineLogins = $onlineLogins->selectRaw('user_id, SUM(duration_in_seconds) as total_duration')
-                                         ->groupBy('user_id');
+                ->groupBy('user_id');
         } else {
             $onlineLogins = UserLoginDuration::whereNull('duration_in_seconds');
         }
@@ -173,7 +174,7 @@ class SiteAccessStatisticsController extends Controller
         foreach ($onlineLogins as $login) {
             $timeLoggedIn = $filter > 0 ? $login->total_duration : 0;
 
-            if (!$filter > 0) {
+            if (! $filter > 0) {
                 $lastActivity = $login->last_activity;
                 $lastHeartbeat = $login->last_heart_beat;
                 $timeLoggedIn = $lastActivity->gt($lastHeartbeat) ? $lastActivity->diffInSeconds($login->logged_in_at) : $lastHeartbeat->diffInSeconds($login->logged_in_at);
@@ -194,6 +195,4 @@ class SiteAccessStatisticsController extends Controller
             'characters_online' => $onlineCharacters,
         ];
     }
-
-
 }

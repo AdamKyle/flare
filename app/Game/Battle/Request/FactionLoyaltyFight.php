@@ -35,7 +35,7 @@ class FactionLoyaltyFight extends FormRequest
         return [
             'monster_id.required' => 'What monster are you fighting?',
             'npc_id.required' => 'What npc are you helping?',
-            'attack_type.required' => 'What attack type do you want?'
+            'attack_type.required' => 'What attack type do you want?',
         ];
     }
 }

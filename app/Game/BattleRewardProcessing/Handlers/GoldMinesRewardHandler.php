@@ -22,7 +22,6 @@ use Illuminate\Support\Facades\Cache;
 
 class GoldMinesRewardHandler
 {
-
     public function __construct(private RandomAffixGenerator $randomAffixGenerator, private BattleMessageHandler $battleMessageHandler) {}
 
     public function handleFightingAtGoldMines(Character $character, Monster $monster): Character
@@ -187,7 +186,7 @@ class GoldMinesRewardHandler
                 'item_id' => $newItem->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'You found something unique, in the mines child: ' . $item->affix_name, $slot->id));
+            event(new ServerMessageEvent($character->user, 'You found something unique, in the mines child: '.$item->affix_name, $slot->id));
         }
     }
 

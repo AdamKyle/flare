@@ -22,7 +22,7 @@ class ItemTransferServiceTest extends TestCase
 
     private ?ItemTransferService $itemTransferService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -30,7 +30,7 @@ class ItemTransferServiceTest extends TestCase
         $this->itemTransferService = resolve(ItemTransferService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -38,7 +38,7 @@ class ItemTransferServiceTest extends TestCase
         $this->itemTransferService = null;
     }
 
-    public function testCannotAffordToTransfer()
+    public function test_cannot_afford_to_transfer()
     {
         $character = $this->character->getCharacter();
 
@@ -52,7 +52,7 @@ class ItemTransferServiceTest extends TestCase
         $this->assertEquals('You cannot afford to do this.', $result['message']);
     }
 
-    public function testItemsDoNotExistForTransfer()
+    public function test_items_do_not_exist_for_transfer()
     {
         $character = $this->character->getCharacter();
 
@@ -74,7 +74,7 @@ class ItemTransferServiceTest extends TestCase
         $this->assertEquals('You do not have one of these items.', $result['message']);
     }
 
-    public function testQuestItemCannotBeTransferedFrom()
+    public function test_quest_item_cannot_be_transfered_from()
     {
         $itemToTransferFrom = $this->createItem([
             'type' => 'quest',
@@ -105,11 +105,11 @@ class ItemTransferServiceTest extends TestCase
         $this->assertEquals('Not allowed to do this for this item type.', $result['message']);
     }
 
-    public function testQuestItemCannotBeTransferedTo()
+    public function test_quest_item_cannot_be_transfered_to()
     {
         $itemToTransferFrom = $this->createItem();
         $itemToTransferTo = $this->createItem([
-            'type' => 'quest'
+            'type' => 'quest',
         ]);
 
         $character = $this->character
@@ -136,7 +136,7 @@ class ItemTransferServiceTest extends TestCase
         $this->assertEquals('Not allowed to do this for this item type.', $result['message']);
     }
 
-    public function testItemHasNothingToTransfer()
+    public function test_item_has_nothing_to_transfer()
     {
         $itemToTransferFrom = $this->createItem();
         $itemToTransferTo = $this->createItem();
@@ -165,8 +165,7 @@ class ItemTransferServiceTest extends TestCase
         $this->assertEquals('This item has nothing on it to transfer from.', $result['message']);
     }
 
-
-    public function testNotEnoughInventoryWhenTheItemToMoveTooHasGemsAndYouDoNotHaveTheInventorySpace()
+    public function test_not_enough_inventory_when_the_item_to_move_too_has_gems_and_you_do_not_have_the_inventory_space()
     {
         $itemToTransferFrom = $this->createItem();
         $itemToTransferTo = $this->createItem();
@@ -214,10 +213,10 @@ class ItemTransferServiceTest extends TestCase
         );
 
         $this->assertEquals(422, $result['status']);
-        $this->assertEquals('You do not have the inventory room to move the gems attached to: ' . $itemToTransferTo->affix_name . ' back into your gem bag.', $result['message']);
+        $this->assertEquals('You do not have the inventory room to move the gems attached to: '.$itemToTransferTo->affix_name.' back into your gem bag.', $result['message']);
     }
 
-    public function testTransferItemAttributes()
+    public function test_transfer_item_attributes()
     {
 
         Event::fake();
@@ -305,7 +304,7 @@ class ItemTransferServiceTest extends TestCase
         $this->assertEquals($transferredToItem->sockets->first()->gem_id, $gemToAttach->id);
     }
 
-    public function testTransferItemAttributesWhenOneIsMythic()
+    public function test_transfer_item_attributes_when_one_is_mythic()
     {
 
         Event::fake();
@@ -395,7 +394,7 @@ class ItemTransferServiceTest extends TestCase
         $this->assertEquals($transferredToItem->sockets->first()->gem_id, $gemToAttach->id);
     }
 
-    public function testTransferItemAttributesWhenOneCosmic()
+    public function test_transfer_item_attributes_when_one_cosmic()
     {
 
         Event::fake();
@@ -485,7 +484,7 @@ class ItemTransferServiceTest extends TestCase
         $this->assertEquals($transferredToItem->sockets->first()->gem_id, $gemToAttach->id);
     }
 
-    public function testTransferItemAttributesWithGemsBeingReturned()
+    public function test_transfer_item_attributes_with_gems_being_returned()
     {
 
         Event::fake();
@@ -506,7 +505,7 @@ class ItemTransferServiceTest extends TestCase
         ]);
 
         $itemToTransferFrom = $this->createItem([
-            'name'  => $nameOfItToMoveFrom,
+            'name' => $nameOfItToMoveFrom,
             'item_suffix_id' => $attachedSuffix->id,
             'item_prefix_id' => $attachedPrefix->id,
             'socket_count' => 2,
@@ -597,7 +596,7 @@ class ItemTransferServiceTest extends TestCase
         $this->assertEquals(2, $character->gemBag->gemSlots()->where('gem_id', $gemToRemove->id)->first()->amount);
     }
 
-    public function testTransferItemAttributesWithGemsBeingReturnedAsNewEntries()
+    public function test_transfer_item_attributes_with_gems_being_returned_as_new_entries()
     {
 
         Event::fake();

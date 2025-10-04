@@ -49,7 +49,6 @@ class FeedbackEventEnderService implements EventEnder
         direction Tlessa goes in, in order for it be the best PBBG out there!'
         ));
 
-
         $this->announcementCleanup->deleteByEventId($current->id);
         $current->delete();
     }

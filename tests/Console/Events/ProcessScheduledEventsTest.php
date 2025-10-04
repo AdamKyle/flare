@@ -20,17 +20,17 @@ class ProcessScheduledEventsTest extends TestCase
 {
     use CreateGameMap, CreateItem, CreateLocation, CreateMonster, CreateRaid, CreateScheduledEvent, RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
 
-    public function testRaidEventTriggers()
+    public function test_raid_event_triggers()
     {
         $gameMap = $this->createGameMap();
 
@@ -64,7 +64,7 @@ class ProcessScheduledEventsTest extends TestCase
         $this->assertGreaterThan(0, Announcement::count());
     }
 
-    public function testWeeklyCurrencyEventTriggers()
+    public function test_weekly_currency_event_triggers()
     {
         $this->createScheduledEvent([
             'event_type' => EventType::WEEKLY_CURRENCY_DROPS,
@@ -77,7 +77,7 @@ class ProcessScheduledEventsTest extends TestCase
         $this->assertGreaterThan(0, Announcement::count());
     }
 
-    public function testWeeklyCelestialEventTriggers()
+    public function test_weekly_celestial_event_triggers()
     {
         $this->createScheduledEvent([
             'event_type' => EventType::WEEKLY_CELESTIALS,
@@ -90,7 +90,7 @@ class ProcessScheduledEventsTest extends TestCase
         $this->assertGreaterThan(0, Announcement::count());
     }
 
-    public function testWinterEvent()
+    public function test_winter_event()
     {
         $this->createGameMap([
             'name' => MapNameValue::ICE_PLANE,
@@ -108,7 +108,7 @@ class ProcessScheduledEventsTest extends TestCase
         $this->assertGreaterThan(0, GlobalEventGoal::count());
     }
 
-    public function testDelusionalMemoriesEvent()
+    public function test_delusional_memories_event()
     {
         $this->createGameMap([
             'name' => MapNameValue::DELUSIONAL_MEMORIES,
@@ -126,7 +126,7 @@ class ProcessScheduledEventsTest extends TestCase
         $this->assertGreaterThan(0, GlobalEventGoal::count());
     }
 
-    public function testWeeklyFactionEvent()
+    public function test_weekly_faction_event()
     {
 
         $this->createScheduledEvent([
@@ -140,7 +140,7 @@ class ProcessScheduledEventsTest extends TestCase
         $this->assertGreaterThan(0, Announcement::count());
     }
 
-    public function testWeeklyFeedBackEventEvent()
+    public function test_weekly_feed_back_event_event()
     {
 
         $this->createScheduledEvent([

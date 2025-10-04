@@ -29,12 +29,12 @@ class QueenOfHeartsService
     public function reRollUnique(Character $character, int $selectedSlotId, string $selectedReRollType, string $selectedAffix): array
     {
 
-        if (!$character->map->gameMap->mapType()->isHell()) {
-            event(new GlobalMessageEvent('The Queen of Hell is not happy that ' . $character->name . ' tried to talk to her while not in hell. "Hmmmp child, I do not like you right now!" As she pouts'));
+        if (! $character->map->gameMap->mapType()->isHell()) {
+            event(new GlobalMessageEvent('The Queen of Hell is not happy that '.$character->name.' tried to talk to her while not in hell. "Hmmmp child, I do not like you right now!" As she pouts'));
 
             $item = Item::where('type', 'quest')->where('effect', ItemEffectsValue::QUEEN_OF_HEARTS)->first();
 
-            return $this->errorResult('You need to be in Hell to access The Queen of Hearts and have the quest item: ' . $item->affix_name . '.');
+            return $this->errorResult('You need to be in Hell to access The Queen of Hearts and have the quest item: '.$item->affix_name.'.');
         }
 
         $slot = $character->inventory->slots->filter(function ($slot) use ($selectedSlotId) {
@@ -58,7 +58,7 @@ class QueenOfHeartsService
 
         $character = $character->refresh();
 
-        event(new ServerMessageEvent($character->user, 'The Queen has re-rolled: ' . $slot->item->affix_name, $slot->id));
+        event(new ServerMessageEvent($character->user, 'The Queen has re-rolled: '.$slot->item->affix_name, $slot->id));
 
         return $this->successResult($this->randomEnchantmentService->fetchDataForApi($character));
     }
@@ -69,12 +69,12 @@ class QueenOfHeartsService
     public function moveAffixes(Character $character, int $selectedSlotId, int $selectedSecondarySlotId, string $selectedAffix): array
     {
 
-        if (!$this->randomEnchantmentService->isPlayerInHell($character)) {
-            event(new GlobalMessageEvent('The Queen of Hell is not happy that ' . $character->name . ' tried to talk to her while not in hell. "Hmmmp child, I do not like you right now!" As she pouts'));
+        if (! $this->randomEnchantmentService->isPlayerInHell($character)) {
+            event(new GlobalMessageEvent('The Queen of Hell is not happy that '.$character->name.' tried to talk to her while not in hell. "Hmmmp child, I do not like you right now!" As she pouts'));
 
             $item = Item::where('type', 'quest')->where('effect', ItemEffectsValue::QUEEN_OF_HEARTS)->first();
 
-            return $this->errorResult('You need to be in Hell to access The Queen of Hearts and have the quest item: ' . $item->affix_name . '.');
+            return $this->errorResult('You need to be in Hell to access The Queen of Hearts and have the quest item: '.$item->affix_name.'.');
         }
 
         $slot = $character->inventory->slots->filter(function ($slot) use ($selectedSlotId) {

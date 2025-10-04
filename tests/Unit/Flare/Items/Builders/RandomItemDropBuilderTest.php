@@ -12,25 +12,25 @@ use Tests\Traits\CreateItemAffix;
 
 class RandomItemDropBuilderTest extends TestCase
 {
-    use RefreshDatabase, CreateItem, CreateItemAffix;
+    use CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?RandomItemDropBuilder $builder = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->builder = $this->app->make(RandomItemDropBuilder::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->builder = null;
 
         parent::tearDown();
     }
 
-    public function testGenerateItemCreatesItemWithPrefixOnly(): void
+    public function test_generate_item_creates_item_with_prefix_only(): void
     {
         $this->createItemAffix(['type' => 'prefix', 'name' => 'Sharp', 'skill_level_required' => 1]);
         $this->createItemAffix(['type' => 'suffix', 'name' => 'Of Power', 'skill_level_required' => 1]);
@@ -54,7 +54,7 @@ class RandomItemDropBuilderTest extends TestCase
         $this->assertNull($result->item_suffix_id);
     }
 
-    public function testGenerateItemCreatesItemWithPrefixAndSuffix(): void
+    public function test_generate_item_creates_item_with_prefix_and_suffix(): void
     {
         $this->createItemAffix(['type' => 'prefix', 'name' => 'Bright', 'skill_level_required' => 1]);
         $this->createItemAffix(['type' => 'suffix', 'name' => 'Of Stars', 'skill_level_required' => 1]);
@@ -78,7 +78,7 @@ class RandomItemDropBuilderTest extends TestCase
         $this->assertNotNull($result->item_suffix_id);
     }
 
-    public function testGetItemExcludesDisallowedTypesIndirectlyThroughResultType(): void
+    public function test_get_item_excludes_disallowed_types_indirectly_through_result_type(): void
     {
         $this->createItem(['type' => 'quest', 'name' => 'Questy', 'skill_level_required' => 1]);
         $this->createItem(['type' => 'alchemy', 'name' => 'Alchy', 'skill_level_required' => 1]);

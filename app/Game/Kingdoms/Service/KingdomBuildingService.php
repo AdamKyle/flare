@@ -17,27 +17,15 @@ use Carbon\Carbon;
 
 class KingdomBuildingService
 {
-    /**
-     * @var float
-     */
     private float $completed;
 
-    /**
-     * @var float
-     */
     private float $totalResources;
 
-    /**
-     * @param UpdateKingdomHandler $updateKingdomHandler
-     */
     public function __construct(private UpdateKingdomHandler $updateKingdomHandler) {}
 
     /**
      * Upgrades the building for a kingdom by dispatching a job with a BuildingInQueue record
      *
-     * @param KingdomBuilding $building
-     * @param Character $character
-     * @param integer|null $capitalCityQueueId
      * @return void always
      */
     public function upgradeKingdomBuilding(KingdomBuilding $building, Character $character, ?int $capitalCityQueueId = null): void
@@ -62,9 +50,6 @@ class KingdomBuildingService
     /**
      * Rebuild the kingdom by dispatching a job with a BuildingInQueue record
      *
-     * @param KingdomBuilding $building
-     * @param Character $character
-     * @param integer|null $capitalCityBuildingQueueId
      * @return void always
      */
     public function rebuildKingdomBuilding(KingdomBuilding $building, Character $character, ?int $capitalCityBuildingQueueId = null)
@@ -93,8 +78,6 @@ class KingdomBuildingService
     /**
      * Update the kingdom resources for a building that wants to upgrade.
      *
-     * @param KingdomBuilding $building
-     * @param boolean $ignorePop
      * @return Kingdom always
      */
     public function updateKingdomResourcesForKingdomBuildingUpgrade(KingdomBuilding $building, bool $ignorePop = false): Kingdom
@@ -110,19 +93,18 @@ class KingdomBuildingService
             'current_population' => $building->kingdom->current_population,
         ];
 
-
         foreach ($costs as $type => $cost) {
             if ($type === KingdomResources::POPULATION->value) {
-                if (!$ignorePop) {
+                if (! $ignorePop) {
                     $populationCost = $building->required_population - $building->required_population * $building->kingdom->fetchPopulationCostReduction();
                     $newResources['current_population'] -= $populationCost;
                 }
             } else {
-                $newResources['current_' . strtolower($type)] -= $cost;
+                $newResources['current_'.strtolower($type)] -= $cost;
             }
         }
 
-        $building->kingdom->update(array_map(fn($value) => max($value, 0), $newResources));
+        $building->kingdom->update(array_map(fn ($value) => max($value, 0), $newResources));
 
         return $building->kingdom->refresh();
     }
@@ -143,18 +125,18 @@ class KingdomBuildingService
         foreach (KingdomResources::kingdomResources() as $type) {
 
             if ($type === KingdomResources::IRON->value) {
-                $buildingCosts[$type] =  intVal($building->{$type . '_cost'} * ($buildingCostReduction + $ironCostReduction));
+                $buildingCosts[$type] = intval($building->{$type.'_cost'} * ($buildingCostReduction + $ironCostReduction));
 
                 continue;
             }
 
             if ($type === KingdomResources::POPULATION->value) {
-                $buildingCosts[$type] =  intVal($building->{$type . '_cost'} * ($buildingCostReduction + $populationCostReduction));
+                $buildingCosts[$type] = intval($building->{$type.'_cost'} * ($buildingCostReduction + $populationCostReduction));
 
                 continue;
             }
 
-            $buildingCosts[$type] =  intVal($building->{$type . '_cost'} * $buildingCostReduction);
+            $buildingCosts[$type] = intval($building->{$type.'_cost'} * $buildingCostReduction);
         }
 
         return $buildingCosts;
@@ -162,9 +144,6 @@ class KingdomBuildingService
 
     /**
      * Cancel a building upgrade
-     *
-     * @param BuildingInQueue $queue
-     * @return boolean
      */
     public function cancelKingdomBuildingUpgrade(BuildingInQueue $queue): bool
     {
@@ -190,10 +169,6 @@ class KingdomBuildingService
 
     /**
      * Calculate the building time reduction
-     *
-     * @param KingdomBuilding $building
-     * @param integer $toLevel
-     * @return int|float
      */
     private function calculateBuildingTimeReduction(KingdomBuilding $building, int $toLevel = 1): int|float
     {
@@ -212,9 +187,6 @@ class KingdomBuildingService
 
     /**
      * Calculate resource percentage
-     *
-     * @param BuildingInQueue $queue
-     * @return void
      */
     private function resourceCalculation(BuildingInQueue $queue): void
     {
@@ -233,20 +205,16 @@ class KingdomBuildingService
 
     /**
      * Update the kingdoms resources after we cancel based on the total % of resources to give back.
-     *
-     * @param Kingdom $kingdom
-     * @param KingdomBuilding $building
-     * @return Kingdom
      */
     private function updateKingdomAfterCancellation(Kingdom $kingdom, KingdomBuilding $building): Kingdom
     {
         $updateData = [];
 
         foreach (KingdomResources::kingdomResources() as $resource) {
-            $newAmount = $kingdom->{'current_' . $resource} + ($building->{$resource . '_cost'} * $this->totalResources);
-            $maxValue = 'max_' . $resource;
+            $newAmount = $kingdom->{'current_'.$resource} + ($building->{$resource.'_cost'} * $this->totalResources);
+            $maxValue = 'max_'.$resource;
 
-            $updateData['current_' . $resource] = min($newAmount, $kingdom->{$maxValue});
+            $updateData['current_'.$resource] = min($newAmount, $kingdom->{$maxValue});
         }
 
         $kingdom->update($updateData);

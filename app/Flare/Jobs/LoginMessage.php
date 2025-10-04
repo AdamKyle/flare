@@ -39,7 +39,7 @@ class LoginMessage implements ShouldQueue
         event(new ServerMessageEvent($user, 'Well hello there and welcome back my friend. I hope you are having a fantastic day. If you need help you can ask in chat and someone will see it and respond as soon as possible.
             I am so glad you came back :D'));
 
-        event(new GlobalMessageEvent('The Creator smiles as ' . $this->character->name . ' walks from the shadows of the abyss back into the land of Tlessa! Say Hi!'));
+        event(new GlobalMessageEvent('The Creator smiles as '.$this->character->name.' walks from the shadows of the abyss back into the land of Tlessa! Say Hi!'));
 
         $celestialEvent = Event::where('type', EventType::WEEKLY_CELESTIALS)->first();
 

@@ -90,7 +90,7 @@ class MarketBoard
             'gold' => $newGold,
         ]);
 
-        $message = 'Sold market listing: ' . $listing->item->affix_name . ' for: ' . number_format($gold) . ' After fees (5% tax). You now have: ' . number_format($listingCharacter->gold) . '';
+        $message = 'Sold market listing: '.$listing->item->affix_name.' for: '.number_format($gold).' After fees (5% tax). You now have: '.number_format($listingCharacter->gold).'';
 
         ServerMessageHandler::handleMessage($listingCharacter->user, CharacterMessageTypes::SOLD_ITEM_ON_MARKET, $message);
 

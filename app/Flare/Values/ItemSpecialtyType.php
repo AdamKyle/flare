@@ -45,8 +45,8 @@ class ItemSpecialtyType
     public function __construct(string $value)
     {
 
-        if (!in_array($value, self::$values)) {
-            throw new Exception($value . ' does not exist.');
+        if (! in_array($value, self::$values)) {
+            throw new Exception($value.' does not exist.');
         }
 
         $this->value = $value;
@@ -120,8 +120,6 @@ class ItemSpecialtyType
 
     /**
      * Is Faithless Plate
-     *
-     * @return boolean
      */
     public function isFaithlessPlate(): bool
     {
@@ -132,8 +130,6 @@ class ItemSpecialtyType
      * Get the gold cost for types that have one.
      *
      * Returns null when the type has no defined cost.
-     *
-     * @return int|null
      */
     public function getCost(): ?int
     {

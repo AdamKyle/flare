@@ -23,7 +23,7 @@ class DamageBuilderTest extends TestCase
 
     private ?DamageBuilder $damageBuilder;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -39,7 +39,7 @@ class DamageBuilderTest extends TestCase
         $this->damageBuilder = resolve(DamageBuilder::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -48,7 +48,7 @@ class DamageBuilderTest extends TestCase
         $this->damageBuilder = null;
     }
 
-    public function testArcaneAlchemistDoesMoreDamageWithStave()
+    public function test_arcane_alchemist_does_more_damage_with_stave()
     {
         $arcaneAlchemist = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
             'name' => CharacterClassValue::ARCANE_ALCHEMIST,

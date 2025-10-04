@@ -26,7 +26,7 @@ class CanHit
 
         $defenderAgi = $monster->getMonsterStat('agi');
         $characterToHit = $this->characterCacheData->getCachedCharacterData($character, 'to_hit_stat');
-        $statValue = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? $characterToHit : $characterToHit . '_modded');
+        $statValue = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? $characterToHit : $characterToHit.'_modded');
         $characterAccuracy = $this->characterCacheData->getCachedCharacterData($character, 'skills')['accuracy'];
         $enemyDodge = $monster->getMonsterStat('dodge');
 
@@ -106,7 +106,7 @@ class CanHit
 
         $defenderAgi = $monster->getMonsterStat('agi');
         $characterToHit = $this->characterCacheData->getCachedCharacterData($character, 'to_hit_stat');
-        $statValue = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? $characterToHit : $characterToHit . '_modded');
+        $statValue = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? $characterToHit : $characterToHit.'_modded');
         $characterAccuracy = $this->characterCacheData->getCachedCharacterData($character, 'skills')['casting_accuracy'];
         $enemyDodge = $monster->getMonsterStat('dodge');
 

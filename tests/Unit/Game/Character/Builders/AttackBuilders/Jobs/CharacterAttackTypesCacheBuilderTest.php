@@ -23,14 +23,14 @@ class CharacterAttackTypesCacheBuilderTest extends TestCase
 
     private ?UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -56,7 +56,7 @@ class CharacterAttackTypesCacheBuilderTest extends TestCase
             ->getCharacter();
     }
 
-    public function testUpdateCharacterAttackTypesHandlerAndExplorationLogUpdateEventIsCalled()
+    public function test_update_character_attack_types_handler_and_exploration_log_update_event_is_called()
     {
         Event::fake();
 
@@ -67,7 +67,7 @@ class CharacterAttackTypesCacheBuilderTest extends TestCase
         Event::assertDispatched(ExplorationLogUpdate::class);
     }
 
-    public function testUpdateCharacterAttackTypesCache()
+    public function test_update_character_attack_types_cache()
     {
         $character = $this->setUpCharacterForTests();
 

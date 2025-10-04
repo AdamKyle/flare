@@ -52,7 +52,7 @@ class HammerSmash extends BattleBase
 
         $this->monsterHealth -= $damage;
 
-        $this->addMessage('You hit for (Hammer): ' . number_format($damage), 'player-action');
+        $this->addMessage('You hit for (Hammer): '.number_format($damage), 'player-action');
     }
 
     /**
@@ -77,7 +77,7 @@ class HammerSmash extends BattleBase
                 if ($damage >= 1) {
                     $this->monsterHealth -= $damage;
 
-                    $this->addMessage('Aftershock hits for: ' . number_format($damage), 'player-action');
+                    $this->addMessage('Aftershock hits for: '.number_format($damage), 'player-action');
                 }
             }
         }

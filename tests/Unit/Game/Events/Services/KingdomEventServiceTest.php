@@ -20,21 +20,21 @@ class KingdomEventServiceTest extends TestCase
 
     private ?KingdomEventService $kingdomEventService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->kingdomEventService = resolve(KingdomEventService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->kingdomEventService = null;
     }
 
-    public function testGivesPlayerRewardAndDestroysAllKingdoms()
+    public function test_gives_player_reward_and_destroys_all_kingdoms()
     {
         $icePlane = $this->createGameMap([
             'name' => MapNameValue::ICE_PLANE,

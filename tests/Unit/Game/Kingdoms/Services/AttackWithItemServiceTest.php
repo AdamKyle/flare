@@ -2,12 +2,12 @@
 
 namespace Tests\Unit\Game\Kingdoms\Services;
 
-use App\Game\Messages\Events\GlobalMessageEvent;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
 use App\Flare\Models\Character;
 use App\Flare\Models\KingdomLog;
 use App\Game\Kingdoms\Service\AttackWithItemsService;
+use App\Game\Messages\Events\GlobalMessageEvent;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateFactionLoyalty;
@@ -19,8 +19,7 @@ use Tests\Unit\Game\Kingdoms\Helpers\CreateKingdomHelper;
 
 class AttackWithItemServiceTest extends TestCase
 {
-
-    use CreateGameBuilding, CreateKingdomHelper, RefreshDatabase, CreateItem, CreateGameMap, CreateNpc, CreateFactionLoyalty;
+    use CreateFactionLoyalty, CreateGameBuilding, CreateGameMap, CreateItem, CreateKingdomHelper, CreateNpc, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -28,7 +27,7 @@ class AttackWithItemServiceTest extends TestCase
 
     private ?AttackWithItemsService $attackWithItemService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -37,7 +36,7 @@ class AttackWithItemServiceTest extends TestCase
         $this->attackWithItemService = resolve(AttackWithItemsService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -46,7 +45,7 @@ class AttackWithItemServiceTest extends TestCase
         $this->attackWithItemService = null;
     }
 
-    public function testItemsDoNotExistInCharacterInventory()
+    public function test_items_do_not_exist_in_character_inventory()
     {
         $defendersKingdom = $this->createKingdomForCharacter($this->defendingKingdomCharacter);
 
@@ -56,7 +55,7 @@ class AttackWithItemServiceTest extends TestCase
         $this->assertEquals('You don\'t own these items.', $result['message']);
     }
 
-    public function testYouCannotAttackYourOwnKingdoms()
+    public function test_you_cannot_attack_your_own_kingdoms()
     {
 
         $slotIds = $this->character->inventoryManagement()->giveItemMultipleTimes($this->createItem([
@@ -72,7 +71,7 @@ class AttackWithItemServiceTest extends TestCase
         $this->assertEquals('You cannot attack your own kingdoms.', $result['message']);
     }
 
-    public function testCannotAttackProtectedKingdom()
+    public function test_cannot_attack_protected_kingdom()
     {
 
         $slotIds = $this->character->inventoryManagement()->giveItemMultipleTimes($this->createItem([
@@ -83,7 +82,7 @@ class AttackWithItemServiceTest extends TestCase
         $defendersKingdom = $this->createKingdomForCharacter($this->defendingKingdomCharacter);
 
         $defendersKingdom->update([
-            'protected_until' => now()->addDays(7)
+            'protected_until' => now()->addDays(7),
         ]);
 
         $defendersKingdom = $defendersKingdom->refresh();
@@ -94,7 +93,7 @@ class AttackWithItemServiceTest extends TestCase
         $this->assertEquals('This kingdom is currently under The Creators protection and cannot be targeted right now.', $result['message']);
     }
 
-    public function testCannotAttackKingdomNotOnTheSamePlane()
+    public function test_cannot_attack_kingdom_not_on_the_same_plane()
     {
 
         $slotIds = $this->character->inventoryManagement()->giveItemMultipleTimes($this->createItem([
@@ -107,7 +106,7 @@ class AttackWithItemServiceTest extends TestCase
         $differentMap = $this->createGameMap(['name' => 'far away place']);
 
         $defendersKingdom->update([
-            'game_map_id' => $differentMap->id
+            'game_map_id' => $differentMap->id,
         ]);
 
         $defendersKingdom = $defendersKingdom->refresh();
@@ -118,14 +117,14 @@ class AttackWithItemServiceTest extends TestCase
         $this->assertEquals('You need to be on the same plane as the kingdom you want to attack with items.', $result['message']);
     }
 
-    public function testDropItemOnKingdom()
+    public function test_drop_item_on_kingdom()
     {
 
         Event::fake();
 
         $slotIds = $this->character->inventoryManagement()->giveItemMultipleTimes($this->createItem([
             'damages_kingdoms' => true,
-            'kingdom_damage' => 0
+            'kingdom_damage' => 0,
         ]), 1)->getSlotIds();
 
         $this->defendingKingdomCharacter->assignFactionSystem();
@@ -151,7 +150,7 @@ class AttackWithItemServiceTest extends TestCase
         Event::assertDispatched(GlobalMessageEvent::class);
     }
 
-    public function testDropItemsOnKingdomAndMoraleBecomesZero()
+    public function test_drop_items_on_kingdom_and_morale_becomes_zero()
     {
 
         Event::fake();

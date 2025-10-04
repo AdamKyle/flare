@@ -20,7 +20,7 @@ class PassiveTrainingSkillServiceTest extends TestCase
 
     private ?PassiveSkillTrainingService $passiveSkillTrainingService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -28,7 +28,7 @@ class PassiveTrainingSkillServiceTest extends TestCase
         $this->passiveSkillTrainingService = resolve(PassiveSkillTrainingService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -36,7 +36,7 @@ class PassiveTrainingSkillServiceTest extends TestCase
         $this->passiveSkillTrainingService = null;
     }
 
-    public function testTrainAPassive()
+    public function test_train_a_passive()
     {
         Queue::fake();
 

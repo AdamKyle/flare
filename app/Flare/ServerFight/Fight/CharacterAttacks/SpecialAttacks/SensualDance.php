@@ -71,6 +71,6 @@ class SensualDance extends BattleBase
             $this->characterHealth = $maxHealth;
         }
 
-        $this->addMessage('You hit for (Sensual Dance) ' . number_format($damage), 'player-action');
+        $this->addMessage('You hit for (Sensual Dance) '.number_format($damage), 'player-action');
     }
 }

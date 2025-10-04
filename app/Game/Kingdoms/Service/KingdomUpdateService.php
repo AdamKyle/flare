@@ -374,7 +374,7 @@ class KingdomUpdateService
                 continue;
             }
 
-            if (!is_null($building)) {
+            if (! is_null($building)) {
                 $this->increaseResource($building, $resource);
             }
         }

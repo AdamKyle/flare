@@ -15,7 +15,7 @@ class BuyItemEventTest extends TestCase
 
     private ?CharacterFactory $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -26,14 +26,14 @@ class BuyItemEventTest extends TestCase
         $this->character = (new CharacterFactory)->createBaseCharacter([], $gameClass)->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testMerchantShouldGetADiscount()
+    public function test_merchant_should_get_a_discount()
     {
         $character = $this->character->getCharacter();
 

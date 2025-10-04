@@ -11,7 +11,6 @@ use App\Game\Quests\Services\BuildQuestCacheService;
 use App\Game\Quests\Services\QuestHandlerService;
 use App\Game\Skills\Values\SkillTypeValue;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Log;
 
 class QuestsController extends Controller
 {
@@ -98,7 +97,7 @@ class QuestsController extends Controller
 
         unset($response['status']);
 
-        $response['message'] = 'You completed the quest: ' . $quest->name . '. Above is the updated story for the quest.';
+        $response['message'] = 'You completed the quest: '.$quest->name.'. Above is the updated story for the quest.';
 
         return response()->json($response);
     }

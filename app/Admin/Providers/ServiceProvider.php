@@ -64,19 +64,19 @@ class ServiceProvider extends ApplicationServiceProvider
             return new LocationService($app->make(CoordinatesCache::class));
         });
 
-        $this->app->bind(SuggestionAndBugsService::class, function() {
+        $this->app->bind(SuggestionAndBugsService::class, function () {
             return new SuggestionAndBugsService;
         });
 
-        $this->app->bind(SurveyService::class, function() {
+        $this->app->bind(SurveyService::class, function () {
             return new SurveyService;
         });
 
-        $this->app->bind(FeedbackService::class, function() {
+        $this->app->bind(FeedbackService::class, function () {
             return new FeedbackService;
         });
 
-        $this->app->bind(SiteStatisticsService::class, function() {
+        $this->app->bind(SiteStatisticsService::class, function () {
             return new SiteStatisticsService;
         });
 

@@ -13,38 +13,38 @@ class CharacterGemBagControllerTest extends TestCase
 
     private ?CharacterFactory $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testGetGemSlot()
+    public function test_get_gem_slot()
     {
         $character = $this->character->gemBagManagement()->assignGemsToBag()->getCharacter();
 
         $response = $this->actingAs($character->user)
             ->call('GET', '/api/character/'.$character->id.'/gem-bag',
-            [
-                'per_page' => 10,
-                'page' => 1,
-                'search_text' => '',
-            ]);
+                [
+                    'per_page' => 10,
+                    'page' => 1,
+                    'search_text' => '',
+                ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertCount(1, $jsonData['data']);
     }
 
-    public function testGetGem()
+    public function test_get_gem()
     {
 
         $character = $this->character->gemBagManagement()->assignGemsToBag()->getCharacter();

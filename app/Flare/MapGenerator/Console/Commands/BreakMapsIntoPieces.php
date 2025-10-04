@@ -20,17 +20,19 @@ class BreakMapsIntoPieces extends Command
 
         foreach ($gameMaps as $gameMap) {
 
-            $folderName = Str::lower($gameMap->name) . '-pieces';
+            $folderName = Str::lower($gameMap->name).'-pieces';
 
             if (Storage::disk('maps')->exists($folderName)) {
                 $this->warn("Skipping {$gameMap->name}, pieces already exist.");
+
                 continue;
             }
 
             $imagePath = Storage::disk('maps')->path($gameMap->path);
 
-            if (!file_exists($imagePath)) {
+            if (! file_exists($imagePath)) {
                 $this->error("Image file for {$gameMap->name} not found at: {$imagePath}");
+
                 continue;
             }
 

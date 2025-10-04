@@ -2,10 +2,10 @@
 
 namespace App\Game\Exploration\Providers;
 
-use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Exploration\Middleware\IsCharacterExploring;
 use App\Game\Exploration\Services\ExplorationAutomationService;
+use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider
 {

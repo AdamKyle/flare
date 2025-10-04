@@ -18,21 +18,21 @@ class GlobalEventGoalCleanupServiceTest extends TestCase
 
     private ?GlobalEventGoalCleanupService $service = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->service = $this->app->make(GlobalEventGoalCleanupService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->service = null;
 
         parent::tearDown();
     }
 
-    public function testTruncateAll(): void
+    public function test_truncate_all(): void
     {
         $this->service->purgeEnchantInventories();
         $this->service->purgeCoreAndGoal();

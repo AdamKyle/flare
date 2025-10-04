@@ -48,7 +48,7 @@ class ItemAffixService
      */
     public function deleteAffix(ItemAffix $affix): void
     {
-        $column = 'item_' . $affix->type . '_id';
+        $column = 'item_'.$affix->type.'_id';
         $name = $affix->name;
         $itemsWithThisAffix = Item::where($column, $affix->id)->get();
 
@@ -121,7 +121,7 @@ class ItemAffixService
 
             $character = $character->refresh();
 
-            $forMessages = $name . ' has been removed from one or more of your items. You have been compensated the amount of: ' . $affix->cost;
+            $forMessages = $name.' has been removed from one or more of your items. You have been compensated the amount of: '.$affix->cost;
 
             ServerMessageHandler::handleMessage($character->user, AdminMessageTypes::DELETED_AFFIX, $forMessages);
 

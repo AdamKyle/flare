@@ -10,7 +10,6 @@ use App\Flare\Models\User;
 use App\Flare\Values\AutomationType;
 use App\Game\Events\Concerns\ShouldShowCraftingEventButton;
 use App\Game\Events\Concerns\ShouldShowEnchantingEventButton;
-use App\Game\Events\Values\EventType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -90,6 +89,6 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('update-character-status-' . $this->user->id);
+        return new PrivateChannel('update-character-status-'.$this->user->id);
     }
 }

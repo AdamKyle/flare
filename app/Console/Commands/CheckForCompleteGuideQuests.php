@@ -50,7 +50,8 @@ class CheckForCompleteGuideQuests extends Command
         });
     }
 
-    protected function canHandIn(GuideQuest $guideQuest, array $canHandIn) {
+    protected function canHandIn(GuideQuest $guideQuest, array $canHandIn)
+    {
         foreach ($canHandIn as $handIn) {
             if ($handIn['quest_id'] === $guideQuest['id']) {
                 return $handIn['can_hand_in'];

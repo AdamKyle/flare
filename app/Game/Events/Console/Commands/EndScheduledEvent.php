@@ -2,7 +2,6 @@
 
 namespace App\Game\Events\Console\Commands;
 
-
 use App\Flare\Models\Event;
 use App\Flare\Models\ScheduledEvent;
 use App\Game\Events\Registry\EventEnderRegistry;
@@ -18,10 +17,6 @@ class EndScheduledEvent extends Command
     protected $description = 'End all scheduled events';
 
     /**
-     * @param  EventEnderRegistry  $registry
-     * @param  ScheduleEventFinalizerService  $finalizer
-     * @return void
-     *
      * @throws Exception
      */
     public function handle(
@@ -45,6 +40,7 @@ class EndScheduledEvent extends Command
 
             if (is_null($currentEvent)) {
                 $finalizer->markNotRunningAndBroadcast($scheduledEvent);
+
                 continue;
             }
 

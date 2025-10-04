@@ -7,20 +7,15 @@ use App\Flare\Models\Kingdom;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 
-class KingdomMovementTimeCalculationService {
-
-
+class KingdomMovementTimeCalculationService
+{
     public function __construct(private readonly DistanceCalculation $distanceCalculation) {}
 
     /**
      * Get the time (seconds) from one kingdom to another.
-     *
-     * @param Character $character
-     * @param Kingdom $kingdomAskingForResources
-     * @param Kingdom $requestingFromKingdom
-     * @return int
      */
-    public function getTimeToKingdom(Character $character, Kingdom $kingdomAskingForResources, Kingdom $requestingFromKingdom):int {
+    public function getTimeToKingdom(Character $character, Kingdom $kingdomAskingForResources, Kingdom $requestingFromKingdom): int
+    {
         $pixelDistance = $this->distanceCalculation->calculatePixel(
             $kingdomAskingForResources->x_position,
             $kingdomAskingForResources->y_position,

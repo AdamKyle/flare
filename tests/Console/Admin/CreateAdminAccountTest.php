@@ -15,7 +15,7 @@ class CreateAdminAccountTest extends TestCase
 {
     use CreateRole, CreateUser, RefreshDatabase;
 
-    public function testCreateAdmin()
+    public function test_create_admin()
     {
         Mail::fake();
 
@@ -30,7 +30,7 @@ class CreateAdminAccountTest extends TestCase
         $this->assertTrue(User::first()->hasRole('Admin'));
     }
 
-    public function testFailToCreateAdmin()
+    public function test_fail_to_create_admin()
     {
 
         $this->expectException(RuntimeException::class);
@@ -46,7 +46,7 @@ class CreateAdminAccountTest extends TestCase
         $this->assertCount(0, User::all());
     }
 
-    public function testFailToCreateDuplicateAdmin()
+    public function test_fail_to_create_duplicate_admin()
     {
 
         $this->createAdmin($this->createAdminRole(), [

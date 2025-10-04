@@ -42,7 +42,7 @@ class ExcelMapper
         'Kingdom Passive Skills' => PassiveSkillsImport::class,
         'Quests' => [
             GuideQuests::class,
-            QuestsImport::class
+            QuestsImport::class,
         ],
         'Locations Give Items' => LocationsImport::class,
         'Locations' => LocationsImport::class,

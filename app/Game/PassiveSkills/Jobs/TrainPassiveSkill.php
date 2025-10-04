@@ -2,12 +2,6 @@
 
 namespace App\Game\PassiveSkills\Jobs;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use League\Fractal\Manager;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterPassiveSkill;
 use App\Flare\Models\GameBuilding;
@@ -16,6 +10,12 @@ use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\PassiveSkills\Events\UpdatePassiveTree;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 
 class TrainPassiveSkill implements ShouldQueue
@@ -148,7 +148,7 @@ class TrainPassiveSkill implements ShouldQueue
 
         $character = $this->character->Refresh();
 
-        event(new ServerMessageEvent($character->user, $newPassive->passiveSkill->name . ' skill has gained a new level! Check your character sheet!'));
+        event(new ServerMessageEvent($character->user, $newPassive->passiveSkill->name.' skill has gained a new level! Check your character sheet!'));
 
         event(new UpdatePassiveTree($character->user, $characterPassiveSkills->getPassiveSkills($character)));
     }

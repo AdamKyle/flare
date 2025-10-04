@@ -32,7 +32,7 @@ class DoubleHeal extends BattleBase
 
             $healFor = $healFor + $healFor * 0.15;
 
-            $this->addMessage('Your healing spell(s) heals for an additional: ' . number_format($healFor), 'player-action');
+            $this->addMessage('Your healing spell(s) heals for an additional: '.number_format($healFor), 'player-action');
 
             return $healFor;
         }

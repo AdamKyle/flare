@@ -18,7 +18,7 @@ class RandomAffixGeneratorTest extends TestCase
 
     private ?CharacterFactory $characterFactory;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -27,7 +27,7 @@ class RandomAffixGeneratorTest extends TestCase
         $this->characterFactory = (new CharacterFactory)->createBaseCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -36,7 +36,7 @@ class RandomAffixGeneratorTest extends TestCase
         $this->characterFactory = null;
     }
 
-    public function testShouldReturnTheSameAffixAndNotGenerateANewOne()
+    public function test_should_return_the_same_affix_and_not_generate_a_new_one()
     {
         $character = $this->characterFactory->getCharacter();
 

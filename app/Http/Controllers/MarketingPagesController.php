@@ -9,7 +9,8 @@ class MarketingPagesController extends Controller
         return view('marketing.features');
     }
 
-    public function whosPlaying() {
+    public function whosPlaying()
+    {
         return view('marketing.whos-playing');
     }
 }

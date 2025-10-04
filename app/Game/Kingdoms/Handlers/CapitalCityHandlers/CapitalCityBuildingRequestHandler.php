@@ -2,7 +2,6 @@
 
 namespace App\Game\Kingdoms\Handlers\CapitalCityHandlers;
 
-use Carbon\Carbon;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
@@ -14,12 +13,11 @@ use App\Game\Kingdoms\Service\PurchasePeopleService;
 use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Validation\KingdomBuildingResourceValidation;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
-use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class CapitalCityBuildingRequestHandler
 {
-
     use CanAffordPopulationCost;
 
     private array $messages = [];
@@ -34,12 +32,6 @@ class CapitalCityBuildingRequestHandler
 
     /**
      * Create an upgrade or repair request for a character.
-     *
-     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
-     * @param Kingdom $kingdom
-     * @param array $buildingsToUpgradeOrRepair
-     *
-     * @return void
      */
     public function createUpgradeOrRepairRequest(
         CapitalCityBuildingQueue $capitalCityBuildingQueue,
@@ -91,7 +83,7 @@ class CapitalCityBuildingRequestHandler
             'messages' => array_merge($messages, $this->messages),
             'started_at' => $timeToStart,
             'completed_at' => $timeToStart->clone()->addMinutes($timeTillFinished),
-            'status' => $upgrading ? CapitalCityQueueStatus::BUILDING : CapitalCityQueueStatus::REPAIRING
+            'status' => $upgrading ? CapitalCityQueueStatus::BUILDING : CapitalCityQueueStatus::REPAIRING,
         ]);
 
         $capitalCityBuildingQueue = $capitalCityBuildingQueue->refresh();
@@ -101,13 +93,6 @@ class CapitalCityBuildingRequestHandler
 
     /**
      * Determine if a building request should be rejected.
-     *
-     * @param array $buildingRequest
-     * @param Kingdom $kingdom
-     * @param int $index
-     * @param array $buildingsToUpgradeOrRepair
-     *
-     * @return bool
      */
     private function shouldRejectBuildingRequest(array $buildingRequest, Kingdom $kingdom, int $index, array &$buildingsToUpgradeOrRepair): bool
     {
@@ -118,9 +103,10 @@ class CapitalCityBuildingRequestHandler
             $missingResources = $this->kingdomBuildingResourceValidation->getMissingCosts($kingdom, $buildingCosts);
 
             if (array_key_exists('population', $missingResources)) {
-                if (!$this->canAffordPopulationCost($kingdom, $missingResources['population'])) {
-                    $this->messages[] = $building->name . ' has been rejected: Cannot afford ' . $missingResources['population'] . ' population.';
+                if (! $this->canAffordPopulationCost($kingdom, $missingResources['population'])) {
+                    $this->messages[] = $building->name.' has been rejected: Cannot afford '.$missingResources['population'].' population.';
                     $buildingsToUpgradeOrRepair[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
                     return true;
                 }
 
@@ -130,8 +116,9 @@ class CapitalCityBuildingRequestHandler
             }
 
             if (count($missingResources) > 0) {
-                $this->messages[] = $building->name . ' has been rejected: Not enough resources to upgrade or repair.';
+                $this->messages[] = $building->name.' has been rejected: Not enough resources to upgrade or repair.';
                 $buildingsToUpgradeOrRepair[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
                 return true;
             }
         }
@@ -141,10 +128,6 @@ class CapitalCityBuildingRequestHandler
 
     /**
      * Calculate the rebuild time for a building.
-     *
-     * @param KingdomBuilding $building
-     * @param string $secondaryStatus
-     * @return int
      */
     private function calculateRebuildTime(KingdomBuilding $building, string $secondaryStatus): int
     {
@@ -162,13 +145,6 @@ class CapitalCityBuildingRequestHandler
 
     /**
      * Dispatch or log the building request.
-     *
-     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
-     * @param array $buildingsToUpgradeOrRepair
-     * @param Carbon $timeToStart
-     * @param int $timeTillFinished
-     *
-     * @return void
      */
     private function dispatchOrLogBuildingRequest(
         CapitalCityBuildingQueue $capitalCityBuildingQueue,
@@ -176,12 +152,12 @@ class CapitalCityBuildingRequestHandler
         Carbon $timeToStart,
         int $timeTillFinished
     ): void {
-        $filteredRequestData = collect($buildingsToUpgradeOrRepair)->filter(fn($item) => in_array($item['secondary_status'], [
+        $filteredRequestData = collect($buildingsToUpgradeOrRepair)->filter(fn ($item) => in_array($item['secondary_status'], [
             CapitalCityQueueStatus::BUILDING,
-            CapitalCityQueueStatus::REPAIRING
+            CapitalCityQueueStatus::REPAIRING,
         ]))->values()->toArray();
 
-        if (!empty($filteredRequestData)) {
+        if (! empty($filteredRequestData)) {
 
             if (config('app.env') !== 'production') {
                 $timeTillFinished = 1;

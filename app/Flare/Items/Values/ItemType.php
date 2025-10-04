@@ -2,7 +2,8 @@
 
 namespace App\Flare\Items\Values;
 
-enum ItemType: string {
+enum ItemType: string
+{
     case STAVE = 'stave';
     case BOW = 'bow';
     case DAGGER = 'dagger';
@@ -26,13 +27,12 @@ enum ItemType: string {
      *
      * - Ignores spells
      * - Ignore rings
-     *
-     * @return array
      */
-    public static function validWeapons(): array {
+    public static function validWeapons(): array
+    {
         $filtered = array_filter(
             self::cases(),
-            fn(self $type) => !in_array($type, [
+            fn (self $type) => ! in_array($type, [
                 self::SPELL_DAMAGE,
                 self::SPELL_HEALING,
                 self::RING,
@@ -41,7 +41,7 @@ enum ItemType: string {
 
         // Map to string values and reindex to 0..N for stable comparisons in tests.
         return array_values(array_map(
-            fn(self $type) => $type->value,
+            fn (self $type) => $type->value,
             $filtered
         ));
     }
@@ -50,13 +50,12 @@ enum ItemType: string {
      * Gets all weapon types including spells.
      *
      * - ignores rings
-     *
-     * @return array
      */
-    public static function allWeaponTypes(): array {
+    public static function allWeaponTypes(): array
+    {
         return array_map(
-            fn(self $type) => $type->value,
-            array_filter(self::cases(), fn(self $type) => !in_array($type, [
+            fn (self $type) => $type->value,
+            array_filter(self::cases(), fn (self $type) => ! in_array($type, [
                 self::RING,
             ], true))
         );
@@ -64,33 +63,30 @@ enum ItemType: string {
 
     /**
      * Get all types as a string array
-     * @return array
      */
-    public static function allTypes(): array {
-        return array_map(fn(self $type) => $type->value, self::cases());
+    public static function allTypes(): array
+    {
+        return array_map(fn (self $type) => $type->value, self::cases());
     }
 
     /**
      * Returns the proper name of a weapon type.
-     *
-     * @param string $type
-     * @return string
      */
-    public static function getProperNameForType(string $type): string {
+    public static function getProperNameForType(string $type): string
+    {
         return ucwords(str_replace('-', ' ', $type));
     }
 
     /**
      * Get valid weapons as options.
-     *
-     * @return array
      */
-    public static function getValidWeaponsAsOptions(): array {
+    public static function getValidWeaponsAsOptions(): array
+    {
         $valid = self::validWeapons();
 
         return array_combine(
             $valid,
-            array_map(fn($type) => ucwords(str_replace('-', ' ', $type)), $valid)
+            array_map(fn ($type) => ucwords(str_replace('-', ' ', $type)), $valid)
         );
     }
 }

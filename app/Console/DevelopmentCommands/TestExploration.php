@@ -82,7 +82,7 @@ class TestExploration extends Command
         if ($numberOfCharacters > $characters->count()) {
             $charactersToCreate = $numberOfCharacters - $characters->count();
 
-            $this->line('Creating character amount: ' . $charactersToCreate);
+            $this->line('Creating character amount: '.$charactersToCreate);
 
             $this->createTheCharacters($characterBuilder, $charactersToCreate);
 
@@ -118,9 +118,9 @@ class TestExploration extends Command
     protected function createUser(): User
     {
         return User::create([
-            'email' => Str::random(8) . '@test.com',
+            'email' => Str::random(8).'@test.com',
             'password' => Hash::make(Str::random(8)),
-            'ip_address' => '0.0.0.' . rand(1, 100),
+            'ip_address' => '0.0.0.'.rand(1, 100),
             'last_logged_in' => now(),
             'guide_enabled' => false,
         ]);
@@ -139,7 +139,7 @@ class TestExploration extends Command
 
         $characterBuilder->setRace($race)
             ->setClass($class)
-            ->createCharacter($user, $map, Str::random(4) . str_replace(' ', '', $class->name))
+            ->createCharacter($user, $map, Str::random(4).str_replace(' ', '', $class->name))
             ->assignSkills()
             ->assignPassiveSkills()
             ->buildCharacterCache();

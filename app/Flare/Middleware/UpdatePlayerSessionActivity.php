@@ -3,11 +3,11 @@
 namespace App\Flare\Middleware;
 
 use App\Flare\Models\UserLoginDuration;
-use Illuminate\Support\Facades\Auth;
 use Closure;
+use Illuminate\Support\Facades\Auth;
 
-class UpdatePlayerSessionActivity {
-
+class UpdatePlayerSessionActivity
+{
     /**
      * Handle an incoming request.
      *

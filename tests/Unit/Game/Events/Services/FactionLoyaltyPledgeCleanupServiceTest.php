@@ -16,25 +16,25 @@ use Tests\Traits\CreateNpc;
 
 class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
 {
-    use RefreshDatabase, CreateGameMap, CreateFactionLoyalty, CreateNpc;
+    use CreateFactionLoyalty, CreateGameMap, CreateNpc, RefreshDatabase;
 
     private ?FactionLoyaltyPledgeCleanupService $service = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->service = app()->make(FactionLoyaltyPledgeCleanupService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->service = null;
 
         parent::tearDown();
     }
 
-    public function testUnpledgeIfOnFactionWithNullFactionDoesNothing(): void
+    public function test_unpledge_if_on_faction_with_null_faction_does_nothing(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
@@ -50,7 +50,7 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testUnpledgeIfOnFactionWhenNoLoyaltyRecordDoesNothing(): void
+    public function test_unpledge_if_on_faction_when_no_loyalty_record_does_nothing(): void
     {
         $surface = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
 
@@ -74,7 +74,7 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testUnpledgeIfOnFactionWhenLoyaltyExistsWithoutAssistingNpcRemovesPledgeOnly(): void
+    public function test_unpledge_if_on_faction_when_loyalty_exists_without_assisting_npc_removes_pledge_only(): void
     {
         $surface = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
 
@@ -87,9 +87,9 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
         $faction = $character->factions->where('game_map_id', $surface->id)->first();
 
         $this->createFactionLoyalty([
-            'faction_id'   => $faction->id,
+            'faction_id' => $faction->id,
             'character_id' => $character->id,
-            'is_pledged'   => true,
+            'is_pledged' => true,
         ]);
 
         $mock = Mockery::mock(FactionLoyaltyService::class, function (MockInterface $m) use ($character, $faction) {
@@ -106,7 +106,7 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testUnpledgeIfOnFactionWhenAssistingNpcStopsAssistanceThenRemovesPledge(): void
+    public function test_unpledge_if_on_faction_when_assisting_npc_stops_assistance_then_removes_pledge(): void
     {
         $surface = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
 
@@ -119,21 +119,21 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
         $faction = $character->factions->where('game_map_id', $surface->id)->first();
 
         $loyalty = $this->createFactionLoyalty([
-            'faction_id'   => $faction->id,
+            'faction_id' => $faction->id,
             'character_id' => $character->id,
-            'is_pledged'   => true,
+            'is_pledged' => true,
         ]);
 
         $npc = $this->createNpc(['game_map_id' => $surface->id]);
 
         $assistingNpc = $this->createFactionLoyaltyNpc([
-            'faction_loyalty_id'             => $loyalty->id,
-            'npc_id'                          => $npc->id,
-            'current_level'                   => 0,
-            'max_level'                       => 25,
-            'next_level_fame'                 => 100,
-            'currently_helping'               => true,
-            'kingdom_item_defence_bonus'      => 0.002,
+            'faction_loyalty_id' => $loyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
         ]);
 
         $mock = Mockery::mock(FactionLoyaltyService::class, function (MockInterface $m) use ($character, $assistingNpc, $faction) {

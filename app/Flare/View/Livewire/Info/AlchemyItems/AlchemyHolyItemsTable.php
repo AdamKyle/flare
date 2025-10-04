@@ -11,8 +11,6 @@ class AlchemyHolyItemsTable extends DataTableComponent
 {
     /**
      * Configures the table by setting its primary key.
-     *
-     * @return void
      */
     public function configure(): void
     {
@@ -21,8 +19,6 @@ class AlchemyHolyItemsTable extends DataTableComponent
 
     /**
      * Builds the query to retrieve holy alchemy items.
-     *
-     * @return Builder
      */
     public function builder(): Builder
     {
@@ -35,8 +31,6 @@ class AlchemyHolyItemsTable extends DataTableComponent
 
     /**
      * Defines the columns displayed in the table.
-     *
-     * @return array
      */
     public function columns(): array
     {
@@ -45,7 +39,8 @@ class AlchemyHolyItemsTable extends DataTableComponent
                 ->searchable()
                 ->format(function ($value, $row) {
                     $itemId = Item::where('name', $value)->first()->id;
-                    return '<a href="/items/' . $itemId . '">' . $row->name . '</a>';
+
+                    return '<a href="/items/'.$itemId.'">'.$row->name.'</a>';
                 })
                 ->html(),
             Column::make('Gold Dust Cost')

@@ -109,7 +109,7 @@ class ItemsTable extends DataTableComponent
                         ItemTableSelectOptions::QUEST->value => 'Quest items',
                         ItemTableSelectOptions::ALCHEMY->value => 'Alchemy items',
                         ItemTableSelectOptions::ARTIFACT->value => 'Artifacts',
-                    ]
+                    ],
                 ];
             }
         }

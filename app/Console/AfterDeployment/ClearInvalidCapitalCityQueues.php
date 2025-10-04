@@ -2,14 +2,14 @@
 
 namespace App\Console\AfterDeployment;
 
-use Carbon\Carbon;
-use Illuminate\Console\Command;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityResourceRequest;
 use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitMovementQueue;
+use Carbon\Carbon;
 use DB;
+use Illuminate\Console\Command;
 
 class ClearInvalidCapitalCityQueues extends Command
 {
@@ -39,7 +39,6 @@ class ClearInvalidCapitalCityQueues extends Command
         UnitMovementQueue::where('started_at', '=', DB::raw('completed_at'))
             ->where('resources_requested', true)
             ->delete();
-
 
         $this->updateKingdomsWithInvalidCurrentResources();
     }
@@ -72,7 +71,7 @@ class ClearInvalidCapitalCityQueues extends Command
                     $updates['current_steel'] = $kingdom->max_steel;
                 }
 
-                if (!empty($updates)) {
+                if (! empty($updates)) {
                     $kingdom->update($updates);
                 }
             }

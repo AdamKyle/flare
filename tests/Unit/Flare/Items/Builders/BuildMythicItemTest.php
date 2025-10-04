@@ -7,19 +7,20 @@ use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Models\Item;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
-use Tests\Setup\Character\CharacterFactory;
 
 class BuildMythicItemTest extends TestCase
 {
-    use RefreshDatabase, CreateItem, CreateItemAffix;
+    use CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?BuildMythicItem $builder = null;
+
     private ?CharacterFactory $characterFactory = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -31,7 +32,7 @@ class BuildMythicItemTest extends TestCase
         $this->builder = $this->app->make(BuildMythicItem::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->builder = null;
         $this->characterFactory = null;
@@ -39,7 +40,7 @@ class BuildMythicItemTest extends TestCase
         parent::tearDown();
     }
 
-    public function testFetchMythicItemBuildsDuplicateWithAffixesAndMythicFlag(): void
+    public function test_fetch_mythic_item_builds_duplicate_with_affixes_and_mythic_flag(): void
     {
         $character = $this->characterFactory->getCharacter()->refresh();
 
@@ -77,7 +78,7 @@ class BuildMythicItemTest extends TestCase
         $this->assertTrue((bool) $result->is_mythic);
     }
 
-    public function testFetchMythicItemThrowsWhenAffixGeneratorFails(): void
+    public function test_fetch_mythic_item_throws_when_affix_generator_fails(): void
     {
         $character = $this->characterFactory->getCharacter()->refresh();
 

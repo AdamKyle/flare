@@ -11,11 +11,11 @@ use Tests\Traits\CreateScheduledEvent;
 
 class ScheduleEventFinalizerServiceTest extends TestCase
 {
-    use RefreshDatabase, CreateScheduledEvent;
+    use CreateScheduledEvent, RefreshDatabase;
 
     private ?ScheduleEventFinalizerService $service = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -26,14 +26,14 @@ class ScheduleEventFinalizerServiceTest extends TestCase
         $this->service = $this->app->make(ScheduleEventFinalizerService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->service = null;
 
         parent::tearDown();
     }
 
-    public function testMarkNotRunningAndBroadcastUpdatesFlagAndDispatchesUpdate(): void
+    public function test_mark_not_running_and_broadcast_updates_flag_and_dispatches_update(): void
     {
         $scheduledEvent = $this->createScheduledEvent([
             'currently_running' => true,

@@ -85,9 +85,9 @@ class AttackWithItemsService
         }
 
         event(new GlobalMessageEvent(
-            $character->name . ' has done devastating damage to the kingdom: ' .
-                $kingdom->name . ' on the plane: ' . $kingdom->gameMap->name . ' At (X/Y): ' . $kingdom->x_position . '/' . $kingdom->y_position .
-                ' doing a total of: ' . number_format($damage * 100) . '% damage.'
+            $character->name.' has done devastating damage to the kingdom: '.
+                $kingdom->name.' on the plane: '.$kingdom->gameMap->name.' At (X/Y): '.$kingdom->x_position.'/'.$kingdom->y_position.
+                ' doing a total of: '.number_format($damage * 100).'% damage.'
         ));
 
         $this->createLogs($character, $kingdom, $damage, $moraleLoss);
@@ -124,9 +124,9 @@ class AttackWithItemsService
 
             KingdomLog::create($attributes);
 
-            event(new ServerMessageEvent($kingdom->character->user, $character->name . ' has dropped bombs on your kingdom: ' .
-                $kingdom->name . ' on the plane: ' . $kingdom->gameMap->name . ' At (X/Y): ' . $kingdom->x_position . '/' . $kingdom->y_position .
-                ' doing a total of: ' . number_format($damageDone * 100) . '% damage.'));
+            event(new ServerMessageEvent($kingdom->character->user, $character->name.' has dropped bombs on your kingdom: '.
+                $kingdom->name.' on the plane: '.$kingdom->gameMap->name.' At (X/Y): '.$kingdom->x_position.'/'.$kingdom->y_position.
+                ' doing a total of: '.number_format($damageDone * 100).'% damage.'));
 
             $kingdom = $kingdom->refresh();
 
@@ -138,9 +138,9 @@ class AttackWithItemsService
 
         KingdomLog::create($attributes);
 
-        event(new ServerMessageEvent($character->user, 'You have dropped bombs on a kingdom: ' .
-            $kingdom->name . ' on the plane: ' . $kingdom->gameMap->name . ' At (X/Y): ' . $kingdom->x_position . '/' . $kingdom->y_position .
-            ' doing a total of: ' . number_format($damageDone * 100) . '% damage.'));
+        event(new ServerMessageEvent($character->user, 'You have dropped bombs on a kingdom: '.
+            $kingdom->name.' on the plane: '.$kingdom->gameMap->name.' At (X/Y): '.$kingdom->x_position.'/'.$kingdom->y_position.
+            ' doing a total of: '.number_format($damageDone * 100).'% damage.'));
 
         $this->updateKingdom->updateKingdomLogs($character->refresh(), true);
     }

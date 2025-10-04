@@ -90,8 +90,8 @@ class RebuildBuilding implements ShouldQueue
             $y = $kingdom->y_position;
             $plane = $kingdom->gameMap->name;
 
-            $message = $this->building->name . ' finished being rebuilt for kingdom: ' .
-                $this->building->kingdom->name . ' on plane: ' . $plane . ' At: (X/Y) ' . $x . '/' . $y . '.';
+            $message = $this->building->name.' finished being rebuilt for kingdom: '.
+                $this->building->kingdom->name.' on plane: '.$plane.' At: (X/Y) '.$x.'/'.$y.'.';
 
             ServerMessageHandler::handleMessage($this->user, KingdomMessageTypes::BUILDING_REPAIR_FINISHED, $message);
         }

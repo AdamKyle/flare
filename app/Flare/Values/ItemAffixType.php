@@ -109,7 +109,7 @@ class ItemAffixType
     public function __construct(string $value)
     {
         if (! in_array($value, self::$values)) {
-            throw new \Exception($value . ' does not exist on ItemAffixType');
+            throw new \Exception($value.' does not exist on ItemAffixType');
         }
 
         $this->value = $value;
@@ -126,13 +126,13 @@ class ItemAffixType
             $value = array_search($name, self::$dropDownValues);
 
             if (! $value) {
-                throw new Exception($name . ' not found for ItemAffixType');
+                throw new Exception($name.' not found for ItemAffixType');
             }
 
             return $value;
         }
 
-        throw new Exception($name . ' not found for ItemAffixType');
+        throw new Exception($name.' not found for ItemAffixType');
     }
 
     /**

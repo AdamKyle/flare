@@ -15,7 +15,7 @@ class ItemSkillControllerTest extends TestCase
 
     private ?CharacterFactory $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -23,14 +23,14 @@ class ItemSkillControllerTest extends TestCase
             ->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testTrainItemSkill()
+    public function test_train_item_skill()
     {
         $itemSkill = ItemSkill::create([
             'name' => 'parent',
@@ -73,7 +73,7 @@ class ItemSkillControllerTest extends TestCase
         $character = $this->character->inventoryManagement()->giveItem($item, true, 'left-hand')->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/item-skills/train/' . $character->id . '/' . $item->id . '/' . $childItemSkillProgression->id);
+            ->call('POST', '/api/item-skills/train/'.$character->id.'/'.$item->id.'/'.$childItemSkillProgression->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -81,12 +81,12 @@ class ItemSkillControllerTest extends TestCase
 
         $itemSkill = $character->inventory->slots()->where('item_id', $item->id)->first()->item->itemSkillProgressions()->where('id', $childItemSkillProgression->id)->first();
 
-        $this->assertEquals('You are now training: ' . $childItemSkill->name, $jsonData['message']);
+        $this->assertEquals('You are now training: '.$childItemSkill->name, $jsonData['message']);
         $this->assertEquals(200, $response->status());
         $this->assertTrue($itemSkill->is_training);
     }
 
-    public function testStopTrainingItemSkill()
+    public function test_stop_training_item_skill()
     {
         $itemSkill = ItemSkill::create([
             'name' => 'parent',
@@ -129,13 +129,13 @@ class ItemSkillControllerTest extends TestCase
         $character = $this->character->inventoryManagement()->giveItem($item, true, 'right-hand')->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/item-skills/stop-training/' . $character->id . '/' . $item->id . '/' . $childItemSkillProgression->id);
+            ->call('POST', '/api/item-skills/stop-training/'.$character->id.'/'.$item->id.'/'.$childItemSkillProgression->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
         $itemSkill = $character->inventory->slots()->where('item_id', $item->id)->first()->item->itemSkillProgressions()->where('id', $childItemSkillProgression->id)->first();
 
-        $this->assertEquals('You stopped training: ' . $childItemSkill->name, $jsonData['message']);
+        $this->assertEquals('You stopped training: '.$childItemSkill->name, $jsonData['message']);
         $this->assertEquals(200, $response->status());
         $this->assertFalse($itemSkill->is_training);
     }

@@ -100,15 +100,15 @@ class ItemTransformer extends TransformerAbstract
         ];
     }
 
-    public function includeDropLocation(Item $item): ItemResource | null
+    public function includeDropLocation(Item $item): ?ItemResource
     {
 
-       $location = $item->dropLocation;
+        $location = $item->dropLocation;
 
-       if (is_null($location)) {
-           return null;
-       }
+        if (is_null($location)) {
+            return null;
+        }
 
-       return $this->item($location, new LocationTransformer());
+        return $this->item($location, new LocationTransformer());
     }
 }

@@ -14,7 +14,7 @@ class GemBuilderTest extends TestCase
 {
     use CreateGem, RefreshDatabase;
 
-    public function testCreateAGem()
+    public function test_create_a_gem()
     {
         $gemBuilder = resolve(GemBuilder::class);
 
@@ -27,7 +27,7 @@ class GemBuilderTest extends TestCase
         $this->assertEquals(1, $gem->tier);
     }
 
-    public function testFindExistingGem()
+    public function test_find_existing_gem()
     {
         $gem = $this->createGem();
 

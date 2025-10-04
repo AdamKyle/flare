@@ -18,14 +18,14 @@ use Tests\Traits\CreateUser;
 
 class FactionAssignerTest extends TestCase
 {
-    use RefreshDatabase,
-        CreateUser,
-        CreateRace,
+    use CreateCharacter,
         CreateClass,
-        CreateCharacter,
-        CreateGameMap;
+        CreateGameMap,
+        CreateRace,
+        CreateUser,
+        RefreshDatabase;
 
-    public function testCreatesFactionsForNonPurgatoryMaps(): void
+    public function test_creates_factions_for_non_purgatory_maps(): void
     {
         $user = $this->createUser();
         $race = $this->createRace();
@@ -81,7 +81,7 @@ class FactionAssignerTest extends TestCase
         $this->assertFalse($reloaded->factions->pluck('game_map_id')->contains($purgatory->id));
     }
 
-    public function testNoOpWhenStateHasNoCharacter(): void
+    public function test_no_op_when_state_has_no_character(): void
     {
         $user = $this->createUser();
         $race = $this->createRace();

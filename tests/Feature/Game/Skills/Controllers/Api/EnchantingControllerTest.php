@@ -23,7 +23,7 @@ class EnchantingControllerTest extends TestCase
 
     private ?Character $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -42,14 +42,14 @@ class EnchantingControllerTest extends TestCase
             ->getCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testGetEnchantingItems()
+    public function test_get_enchanting_items()
     {
         $affix = $this->createItemAffix([
             'type' => 'prefix',
@@ -58,7 +58,7 @@ class EnchantingControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('GET', '/api/enchanting/' . $this->character->id);
+            ->call('GET', '/api/enchanting/'.$this->character->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -66,7 +66,7 @@ class EnchantingControllerTest extends TestCase
         $this->assertEquals(0, $jsonData['skill_xp']['current_xp']);
     }
 
-    public function testCannotEnchantWhenCanEnchantIsFalse()
+    public function test_cannot_enchant_when_can_enchant_is_false()
     {
         $this->character->update([
             'can_craft' => false,
@@ -75,7 +75,7 @@ class EnchantingControllerTest extends TestCase
         $character = $this->character->refresh();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/enchant/' . $character->id, [
+            ->call('POST', '/api/enchant/'.$character->id, [
                 'slot_id' => 0,
                 'affix_ids' => [1],
                 'enchant_for_event' => false,
@@ -87,11 +87,11 @@ class EnchantingControllerTest extends TestCase
         $this->assertEquals('You must wait to enchant again.', $jsonData['message']);
     }
 
-    public function testCannotEnchantWhenInventorySlotDoesNotExist()
+    public function test_cannot_enchant_when_inventory_slot_does_not_exist()
     {
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/enchant/' . $this->character->id, [
+            ->call('POST', '/api/enchant/'.$this->character->id, [
                 'slot_id' => 0,
                 'affix_ids' => [1],
                 'enchant_for_event' => false,
@@ -103,7 +103,7 @@ class EnchantingControllerTest extends TestCase
         $this->assertEquals('Invalid Slot.', $jsonData['message']);
     }
 
-    public function testCannotEnchantQuestItems()
+    public function test_cannot_enchant_quest_items()
     {
 
         $item = $this->createItem([
@@ -124,7 +124,7 @@ class EnchantingControllerTest extends TestCase
         $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/enchant/' . $character->id, [
+            ->call('POST', '/api/enchant/'.$character->id, [
                 'slot_id' => $slot->id,
                 'affix_ids' => [$enchantment->id],
                 'enchant_for_event' => false,
@@ -136,7 +136,7 @@ class EnchantingControllerTest extends TestCase
         $this->assertEquals('You cannot enchant quest items.', $jsonData['message']);
     }
 
-    public function testCannotEnchantItemNotEnoughGold()
+    public function test_cannot_enchant_item_not_enough_gold()
     {
         Event::fake();
 
@@ -158,7 +158,7 @@ class EnchantingControllerTest extends TestCase
         $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/enchant/' . $character->id, [
+            ->call('POST', '/api/enchant/'.$character->id, [
                 'slot_id' => $slot->id,
                 'affix_ids' => [$enchantment->id],
                 'enchant_for_event' => false,
@@ -174,7 +174,7 @@ class EnchantingControllerTest extends TestCase
         $this->assertEquals(0, $jsonData['skill_xp']['current_xp']);
     }
 
-    public function testEnchantItem()
+    public function test_enchant_item()
     {
         $this->instance(
             SkillCheckService::class,
@@ -198,7 +198,7 @@ class EnchantingControllerTest extends TestCase
         ]);
 
         $this->character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD
+            'gold' => MaxCurrenciesValue::MAX_GOLD,
         ]);
 
         $character = $this->character->refresh();
@@ -206,7 +206,7 @@ class EnchantingControllerTest extends TestCase
         $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/enchant/' . $character->id, [
+            ->call('POST', '/api/enchant/'.$character->id, [
                 'slot_id' => $slot->id,
                 'affix_ids' => [$enchantment->id],
                 'enchant_for_event' => false,

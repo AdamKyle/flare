@@ -18,7 +18,7 @@ class CharacterXPServiceTest extends TestCase
 
     private ?CharacterXPService $characterXPService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -26,7 +26,7 @@ class CharacterXPServiceTest extends TestCase
         $this->characterXPService = new CharacterXPService;
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -34,21 +34,21 @@ class CharacterXPServiceTest extends TestCase
         $this->characterXPService = null;
     }
 
-    public function testGetXpValue()
+    public function test_get_xp_value()
     {
         $xp = $this->characterXPService->determineXPToAward($this->character->getCharacter(), 10);
 
         $this->assertEquals(10, $xp);
     }
 
-    public function testGetNoXpValue()
+    public function test_get_no_xp_value()
     {
         $xp = $this->characterXPService->determineXPToAward($this->character->getCharacter(), 0);
 
         $this->assertEquals(0, $xp);
     }
 
-    public function testGetHalfWayXpValue()
+    public function test_get_half_way_xp_value()
     {
 
         $character = $this->character->getCharacter();
@@ -60,7 +60,7 @@ class CharacterXPServiceTest extends TestCase
         $this->assertEquals(ceil(10 * 0.75), $xp);
     }
 
-    public function testGetThreeQuartersWayXpValue()
+    public function test_get_three_quarters_way_xp_value()
     {
 
         $character = $this->character->getCharacter();
@@ -72,7 +72,7 @@ class CharacterXPServiceTest extends TestCase
         $this->assertEquals(ceil(10 * 0.50), $xp);
     }
 
-    public function testGetLastLegXP()
+    public function test_get_last_leg_xp()
     {
 
         $character = $this->character->getCharacter();
@@ -84,7 +84,7 @@ class CharacterXPServiceTest extends TestCase
         $this->assertEquals(ceil(10 * 0.25), $xp);
     }
 
-    public function testGetLastLegXPWithItemThatIgnoresCaps()
+    public function test_get_last_leg_xp_with_item_that_ignores_caps()
     {
 
         $item = $this->createItem([
@@ -102,7 +102,7 @@ class CharacterXPServiceTest extends TestCase
         $this->assertEquals(ceil(10 + 10 * 0.50), $xp);
     }
 
-    public function testGetLastLegXPWithItemThatDoesNotIgnoresCaps()
+    public function test_get_last_leg_xp_with_item_that_does_not_ignores_caps()
     {
 
         $item = $this->createItem([
@@ -120,7 +120,7 @@ class CharacterXPServiceTest extends TestCase
         $this->assertGreaterThan(0, $xp);
     }
 
-    public function testGetLastLegXPWithItemsThatDoesAndDoesNotIgnoresCaps()
+    public function test_get_last_leg_xp_with_items_that_does_and_does_not_ignores_caps()
     {
 
         $itemDoesNotIgnoreCaps = $this->createItem([
@@ -145,7 +145,7 @@ class CharacterXPServiceTest extends TestCase
         $this->assertGreaterThan(0, $xp);
     }
 
-    public function testGetZeroXPWhenCannotLevelAnyFurther()
+    public function test_get_zero_xp_when_cannot_level_any_further()
     {
 
         $character = $this->character->getCharacter();
@@ -157,7 +157,7 @@ class CharacterXPServiceTest extends TestCase
         $this->assertEquals(0, $xp);
     }
 
-    public function testCanContinueLeveling()
+    public function test_can_continue_leveling()
     {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
@@ -180,7 +180,7 @@ class CharacterXPServiceTest extends TestCase
         $this->assertEquals(10, $xp);
     }
 
-    public function testCanContinueLevelingWithItemThatIgnoresCaps()
+    public function test_can_continue_leveling_with_item_that_ignores_caps()
     {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
@@ -210,7 +210,7 @@ class CharacterXPServiceTest extends TestCase
         $this->assertGreaterThan(0, $xp);
     }
 
-    public function testCanContinueLevelingWithItemThatDoesIgnoresCaps()
+    public function test_can_continue_leveling_with_item_that_does_ignores_caps()
     {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
@@ -240,7 +240,7 @@ class CharacterXPServiceTest extends TestCase
         $this->assertGreaterThan(0, $xp);
     }
 
-    public function testCanContinueLevelingWithItemThatDoesAndDoesNotIgnoresCaps()
+    public function test_can_continue_leveling_with_item_that_does_and_does_not_ignores_caps()
     {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
@@ -277,7 +277,7 @@ class CharacterXPServiceTest extends TestCase
         $this->assertGreaterThan(0, $xp);
     }
 
-    public function testCanContinueLevelingHalfWayMark()
+    public function test_can_continue_leveling_half_way_mark()
     {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
@@ -300,7 +300,7 @@ class CharacterXPServiceTest extends TestCase
         $this->assertEquals(ceil(10 * 0.75), $xp);
     }
 
-    public function testCanContinueLevelingThreeQuartersMark()
+    public function test_can_continue_leveling_three_quarters_mark()
     {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
@@ -323,7 +323,7 @@ class CharacterXPServiceTest extends TestCase
         $this->assertEquals(ceil(10 * 0.50), $xp);
     }
 
-    public function testCanContinueLevelingLastLegMark()
+    public function test_can_continue_leveling_last_leg_mark()
     {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
@@ -346,7 +346,7 @@ class CharacterXPServiceTest extends TestCase
         $this->assertEquals(ceil(10 * 0.25), $xp);
     }
 
-    public function testContinueLevelingWithNoConfig()
+    public function test_continue_leveling_with_no_config()
     {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
@@ -362,14 +362,14 @@ class CharacterXPServiceTest extends TestCase
         $this->assertEquals(0, $xp);
     }
 
-    public function testCharacterCanGainXP()
+    public function test_character_can_gain_xp()
     {
         $character = $this->character->getCharacter();
 
         $this->assertTrue($this->characterXPService->canCharacterGainXP($character));
     }
 
-    public function testCharacterWhoCanContinueLevelingGainsXP()
+    public function test_character_who_can_continue_leveling_gains_xp()
     {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
@@ -392,7 +392,7 @@ class CharacterXPServiceTest extends TestCase
         $this->assertTrue($this->characterXPService->canCharacterGainXP($character));
     }
 
-    public function testCharacterCannotGainXp()
+    public function test_character_cannot_gain_xp()
     {
         $character = $this->character->getCharacter();
 
@@ -403,7 +403,7 @@ class CharacterXPServiceTest extends TestCase
         $this->assertFalse($this->characterXPService->canCharacterGainXP($character));
     }
 
-    public function testCharacterWhoCanContinueLevelingCannotGainXPWhenNoConfig()
+    public function test_character_who_can_continue_leveling_cannot_gain_xp_when_no_config()
     {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
@@ -419,7 +419,7 @@ class CharacterXPServiceTest extends TestCase
         $this->assertFalse($this->characterXPService->canCharacterGainXP($character));
     }
 
-    public function testCharacterWhoCanContinueLevelingCannotGainXP()
+    public function test_character_who_can_continue_leveling_cannot_gain_xp()
     {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,

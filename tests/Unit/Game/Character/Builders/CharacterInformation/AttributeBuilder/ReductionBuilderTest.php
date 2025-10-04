@@ -20,7 +20,7 @@ class ReductionBuilderTest extends TestCase
 
     private ?CharacterStatBuilder $characterStatBuilder;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -28,7 +28,7 @@ class ReductionBuilderTest extends TestCase
         $this->characterStatBuilder = resolve(CharacterStatBuilder::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -36,7 +36,7 @@ class ReductionBuilderTest extends TestCase
         $this->characterStatBuilder = null;
     }
 
-    public function testNoRingReductionWithEmptyInventory()
+    public function test_no_ring_reduction_with_empty_inventory()
     {
 
         $character = $this->character->getCharacter();
@@ -46,7 +46,7 @@ class ReductionBuilderTest extends TestCase
         $this->assertEquals(0, $reduction);
     }
 
-    public function testGetRingReduction()
+    public function test_get_ring_reduction()
     {
 
         $item = $this->createItem([
@@ -61,7 +61,7 @@ class ReductionBuilderTest extends TestCase
         $this->assertEquals(0.10, $reduction);
     }
 
-    public function testGetAffixReductionNoInventory()
+    public function test_get_affix_reduction_no_inventory()
     {
 
         $character = $this->character->getCharacter();
@@ -71,7 +71,7 @@ class ReductionBuilderTest extends TestCase
         $this->assertEquals(0, $reduction);
     }
 
-    public function testGetAffixReduction()
+    public function test_get_affix_reduction()
     {
 
         $itemAffix = $this->createItemAffix([

@@ -25,7 +25,8 @@ class RewardPlayer extends Command
     /**
      * Execute the console command.
      */
-    public function handle() {
+    public function handle()
+    {
 
         $characterId = $this->argument('characterId');
 
@@ -56,7 +57,6 @@ class RewardPlayer extends Command
         $character = $character->refresh();
 
         $factionLoyalties = $character->factionLoyalties;
-
 
         foreach ($factionLoyalties as $factionLoyalty) {
 

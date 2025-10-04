@@ -47,7 +47,7 @@ class CraftingServiceTest extends TestCase
 
     private ?GameSkill $craftingSkill;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -73,7 +73,7 @@ class CraftingServiceTest extends TestCase
         ]);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -83,7 +83,7 @@ class CraftingServiceTest extends TestCase
         $this->craftingSkill = null;
     }
 
-    public function testFetchCraftableItems()
+    public function test_fetch_craftable_items()
     {
         $character = $this->character->getCharacter();
 
@@ -94,7 +94,7 @@ class CraftingServiceTest extends TestCase
         $this->assertNotEmpty($result);
     }
 
-    public function testFetchCraftableItemsForArmour()
+    public function test_fetch_craftable_items_for_armour()
     {
         $character = $this->character->assignSkill($this->createGameSkill([
             'name' => 'Armour Crafting',
@@ -116,7 +116,7 @@ class CraftingServiceTest extends TestCase
         $this->assertNotEmpty($result);
     }
 
-    public function testFetchCraftableItemsForRegularWeapon()
+    public function test_fetch_craftable_items_for_regular_weapon()
     {
         $character = $this->character->getCharacter();
 
@@ -135,7 +135,7 @@ class CraftingServiceTest extends TestCase
         $this->assertNotEmpty($result);
     }
 
-    public function testFetchCraftableItemsForRegularSpells()
+    public function test_fetch_craftable_items_for_regular_spells()
     {
         $character = $this->character->assignSkill($this->createGameSkill([
             'name' => 'Spell Crafting',
@@ -157,7 +157,7 @@ class CraftingServiceTest extends TestCase
         $this->assertNotEmpty($result);
     }
 
-    public function testFetchCraftableItemsAsBlackSmith()
+    public function test_fetch_craftable_items_as_black_smith()
     {
         Event::fake();
 
@@ -177,7 +177,7 @@ class CraftingServiceTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testFetchCraftableItemsAsMerhant()
+    public function test_fetch_craftable_items_as_merhant()
     {
         Event::fake();
 
@@ -197,7 +197,7 @@ class CraftingServiceTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testFetchCraftableItemsAsArcaneAlchemist()
+    public function test_fetch_craftable_items_as_arcane_alchemist()
     {
         Event::fake();
 
@@ -217,7 +217,7 @@ class CraftingServiceTest extends TestCase
         Event::assertNotDispatched(ServerMessageEvent::class);
     }
 
-    public function testFetchCraftableItemsAsArcaneAlchemistWhenCraftingSpells()
+    public function test_fetch_craftable_items_as_arcane_alchemist_when_crafting_spells()
     {
         Event::fake();
 
@@ -252,7 +252,7 @@ class CraftingServiceTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testFailToCraftForItemThatDoesNotExist()
+    public function test_fail_to_craft_for_item_that_does_not_exist()
     {
         Event::fake();
 
@@ -270,7 +270,7 @@ class CraftingServiceTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function testCannotAffordToCraftItem()
+    public function test_cannot_afford_to_craft_item()
     {
         Event::fake();
 
@@ -290,7 +290,7 @@ class CraftingServiceTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function testItemToHardToCraft()
+    public function test_item_to_hard_to_craft()
     {
         Event::fake();
 
@@ -320,7 +320,7 @@ class CraftingServiceTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function testItemToEasyToCraft()
+    public function test_item_to_easy_to_craft()
     {
         Event::fake();
 
@@ -350,7 +350,7 @@ class CraftingServiceTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testGeneralCraft()
+    public function test_general_craft()
     {
         $character = $this->character->getCharacter();
 
@@ -372,7 +372,7 @@ class CraftingServiceTest extends TestCase
         $this->assertLessThan(MaxCurrenciesValue::MAX_GOLD, $character->gold);
     }
 
-    public function testGeneralCraftInventoryIsFull()
+    public function test_general_craft_inventory_is_full()
     {
         Event::fake();
 
@@ -407,7 +407,7 @@ class CraftingServiceTest extends TestCase
         });
     }
 
-    public function testFailToCraft()
+    public function test_fail_to_craft()
     {
         Event::fake();
 
@@ -441,7 +441,7 @@ class CraftingServiceTest extends TestCase
         });
     }
 
-    public function testSucceedInCrafting()
+    public function test_succeed_in_crafting()
     {
         $this->instance(
             SkillCheckService::class,
@@ -471,7 +471,7 @@ class CraftingServiceTest extends TestCase
         $this->assertCount(1, $character->inventory->slots);
     }
 
-    public function testCraftAsBlackSmith()
+    public function test_craft_as_black_smith()
     {
         Event::fake();
 
@@ -505,7 +505,7 @@ class CraftingServiceTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testCraftSpellAsBlackSmith()
+    public function test_craft_spell_as_black_smith()
     {
         Event::fake();
 
@@ -550,7 +550,7 @@ class CraftingServiceTest extends TestCase
         });
     }
 
-    public function testCraftAsMerchant()
+    public function test_craft_as_merchant()
     {
         Event::fake();
 
@@ -584,7 +584,7 @@ class CraftingServiceTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testCraftSpellAsArcaneAlchemist()
+    public function test_craft_spell_as_arcane_alchemist()
     {
         Event::fake();
 
@@ -620,7 +620,7 @@ class CraftingServiceTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testCraftSpellAsArcaneAlchemsit()
+    public function test_craft_spell_as_arcane_alchemsit()
     {
         Event::fake();
 
@@ -665,7 +665,7 @@ class CraftingServiceTest extends TestCase
         });
     }
 
-    public function testFetchCharacterWeaponCraftingXP()
+    public function test_fetch_character_weapon_crafting_xp()
     {
         $character = $this->character->getCharacter();
 
@@ -683,7 +683,7 @@ class CraftingServiceTest extends TestCase
         $this->assertEquals($weaponCraftingXpData, $expected);
     }
 
-    public function testFetchCharacterInventoryCount()
+    public function test_fetch_character_inventory_count()
     {
         $character = $this->character->getCharacter();
 
@@ -697,7 +697,7 @@ class CraftingServiceTest extends TestCase
         $this->assertEquals($expected, $inventoryCount);
     }
 
-    public function testItemIsGivenToNpcWhenDoingFactionLoyaltyCrafting()
+    public function test_item_is_given_to_npc_when_doing_faction_loyalty_crafting()
     {
 
         $this->instance(
@@ -776,7 +776,7 @@ class CraftingServiceTest extends TestCase
         );
     }
 
-    public function testItemIsNotGivenToNpcWhenDoingFactionLoyaltyCrafting()
+    public function test_item_is_not_given_to_npc_when_doing_faction_loyalty_crafting()
     {
 
         $this->instance(
@@ -855,7 +855,7 @@ class CraftingServiceTest extends TestCase
         );
     }
 
-    public function testCraftWhileParticipatingInEventGoal()
+    public function test_craft_while_participating_in_event_goal()
     {
         $this->instance(
             SkillCheckService::class,
@@ -920,7 +920,7 @@ class CraftingServiceTest extends TestCase
         $this->assertEquals($this->craftingItem->id, $globalEventCraftingInventorySlot->item_id);
     }
 
-    public function testCraftWhileParticipatingInEventGoalWhenCurrentEventGoalIsNotCraft()
+    public function test_craft_while_participating_in_event_goal_when_current_event_goal_is_not_craft()
     {
         $this->instance(
             SkillCheckService::class,

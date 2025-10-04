@@ -28,7 +28,7 @@ class PublicMessageTest extends TestCase
 
     private ?User $admin;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -37,7 +37,7 @@ class PublicMessageTest extends TestCase
         $this->admin = $this->createAdmin($this->createAdminRole());
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -46,7 +46,7 @@ class PublicMessageTest extends TestCase
         $this->admin = null;
     }
 
-    public function testSendPublicMessage()
+    public function test_send_public_message()
     {
         Event::fake();
 
@@ -61,7 +61,7 @@ class PublicMessageTest extends TestCase
         $this->assertGreaterThan(0, Message::count());
     }
 
-    public function testSendPublicMessageForSurfaceColor()
+    public function test_send_public_message_for_surface_color()
     {
         Event::fake();
 
@@ -88,7 +88,7 @@ class PublicMessageTest extends TestCase
         $this->assertGreaterThan(0, Message::count());
     }
 
-    public function testSendPublicMessageForLabyrinthColor()
+    public function test_send_public_message_for_labyrinth_color()
     {
         Event::fake();
 
@@ -115,7 +115,7 @@ class PublicMessageTest extends TestCase
         $this->assertGreaterThan(0, Message::count());
     }
 
-    public function testSendPublicMessageForDungeonColor()
+    public function test_send_public_message_for_dungeon_color()
     {
         Event::fake();
 
@@ -142,7 +142,7 @@ class PublicMessageTest extends TestCase
         $this->assertGreaterThan(0, Message::count());
     }
 
-    public function testSendPublicMessageForHellColor()
+    public function test_send_public_message_for_hell_color()
     {
         Event::fake();
 
@@ -169,7 +169,7 @@ class PublicMessageTest extends TestCase
         $this->assertGreaterThan(0, Message::count());
     }
 
-    public function testSendPublicMessageForShadowPlaneColor()
+    public function test_send_public_message_for_shadow_plane_color()
     {
         Event::fake();
 
@@ -196,7 +196,7 @@ class PublicMessageTest extends TestCase
         $this->assertGreaterThan(0, Message::count());
     }
 
-    public function testSendPublicMessageForPurgatoryColor()
+    public function test_send_public_message_for_purgatory_color()
     {
         Event::fake();
 
@@ -223,7 +223,7 @@ class PublicMessageTest extends TestCase
         $this->assertGreaterThan(0, Message::count());
     }
 
-    public function testSendPublicMessageForTwistedMemoriesColor()
+    public function test_send_public_message_for_twisted_memories_color()
     {
         Event::fake();
 
@@ -250,7 +250,7 @@ class PublicMessageTest extends TestCase
         $this->assertGreaterThan(0, Message::count());
     }
 
-    public function testSendPublicMessageForDelusionalMemoriesColor()
+    public function test_send_public_message_for_delusional_memories_color()
     {
         Event::fake();
 
@@ -277,7 +277,7 @@ class PublicMessageTest extends TestCase
         $this->assertGreaterThan(0, Message::count());
     }
 
-    public function testSendPublicMessageForIcePlaneColor()
+    public function test_send_public_message_for_ice_plane_color()
     {
         Event::fake();
 
@@ -304,7 +304,7 @@ class PublicMessageTest extends TestCase
         $this->assertGreaterThan(0, Message::count());
     }
 
-    public function testSendPublicMessageDefaultToSurfaceColor()
+    public function test_send_public_message_default_to_surface_color()
     {
         Event::fake();
 
@@ -331,7 +331,7 @@ class PublicMessageTest extends TestCase
         $this->assertGreaterThan(0, Message::count());
     }
 
-    public function testSendPublicMessageWithLocationHidden()
+    public function test_send_public_message_with_location_hidden()
     {
         Event::fake();
 
@@ -354,7 +354,7 @@ class PublicMessageTest extends TestCase
         $this->assertNotNull($message);
     }
 
-    public function testSendAdminPublicMessage()
+    public function test_send_admin_public_message()
     {
         Event::fake();
 

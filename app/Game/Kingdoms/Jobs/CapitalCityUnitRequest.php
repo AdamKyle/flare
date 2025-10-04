@@ -2,7 +2,6 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
-use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
@@ -34,7 +33,7 @@ class CapitalCityUnitRequest implements ShouldQueue
             return;
         }
 
-        if (!$queueData->completed_at->lessThanOrEqualTo(now())) {
+        if (! $queueData->completed_at->lessThanOrEqualTo(now())) {
             $timeLeft = $queueData->completed_at->diffInMinutes(now());
 
             if ($timeLeft >= 1) {

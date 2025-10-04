@@ -24,7 +24,7 @@ class ClassRanksServiceTest extends TestCase
 
     private ?ClassRankService $classRankService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -38,7 +38,7 @@ class ClassRanksServiceTest extends TestCase
         $this->classRankService = resolve(ClassRankService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -46,7 +46,7 @@ class ClassRanksServiceTest extends TestCase
         $this->classRankService = null;
     }
 
-    public function testGetClassRanks()
+    public function test_get_class_ranks()
     {
         $response = $this->classRankService->getClassRanks($this->character->getCharacter());
 
@@ -54,7 +54,7 @@ class ClassRanksServiceTest extends TestCase
         $this->assertNotEmpty($response['class_ranks']);
     }
 
-    public function testOneOfTheClassesIsLocked()
+    public function test_one_of_the_classes_is_locked()
     {
         $heretic = $this->createClass([
             'name' => 'Heretic',
@@ -86,7 +86,7 @@ class ClassRanksServiceTest extends TestCase
         $this->assertNotFalse($index);
     }
 
-    public function testCannotEquipMoreThenThreeSpecialties()
+    public function test_cannot_equip_more_then_three_specialties()
     {
         $character = $this->character->getCharacter();
 
@@ -141,7 +141,7 @@ class ClassRanksServiceTest extends TestCase
         $this->assertEquals('You have the maximum amount of specials (3) equipped. You cannot equip anymore.', $response['message']);
     }
 
-    public function testCannotEquipAnotherDamageSpecial()
+    public function test_cannot_equip_another_damage_special()
     {
         $character = $this->character->getCharacter();
 
@@ -176,7 +176,7 @@ class ClassRanksServiceTest extends TestCase
         $this->assertEquals('You already have a damage specialty equipped and cannot equip another one.', $response['message']);
     }
 
-    public function testCannotEquipSpecialWhenLevelNotMet()
+    public function test_cannot_equip_special_when_level_not_met()
     {
         $character = $this->character->getCharacter();
 
@@ -194,7 +194,7 @@ class ClassRanksServiceTest extends TestCase
         $this->assertEquals('You do not have the required class rank level for this.', $response['message']);
     }
 
-    public function testEquipClassSpecial()
+    public function test_equip_class_special()
     {
         $character = $this->character->getCharacter();
 
@@ -212,7 +212,7 @@ class ClassRanksServiceTest extends TestCase
         $this->assertNotEmpty($response['specials_equipped']);
     }
 
-    public function testEquipAnotherClassSpecialty()
+    public function test_equip_another_class_specialty()
     {
         $character = $this->character->getCharacter();
 
@@ -251,7 +251,7 @@ class ClassRanksServiceTest extends TestCase
         $this->assertEquals(1, $character->classSpecialsEquipped->count());
     }
 
-    public function testRequipSpecialty()
+    public function test_requip_specialty()
     {
         $character = $this->character->getCharacter();
 
@@ -284,7 +284,7 @@ class ClassRanksServiceTest extends TestCase
         $this->assertEquals(1, $character->classSpecialsEquipped->count());
     }
 
-    public function testCannotUnequipSpecialtyYouDoNotOwn()
+    public function test_cannot_unequip_specialty_you_do_not_own()
     {
         $character = $this->character->getCharacter();
         $characterTwo = (new CharacterFactory)->createBaseCharacter()->getCharacter();
@@ -313,7 +313,7 @@ class ClassRanksServiceTest extends TestCase
         $this->assertEquals('You do not own that.', $response['message']);
     }
 
-    public function testCanUnequipSpecialty()
+    public function test_can_unequip_specialty()
     {
         $character = $this->character->getCharacter();
 
@@ -342,7 +342,7 @@ class ClassRanksServiceTest extends TestCase
         $this->assertEmpty($response['specials_equipped']);
     }
 
-    public function testNoXpForMaxLevel()
+    public function test_no_xp_for_max_level()
     {
         $character = $this->character->getCharacter();
 
@@ -359,7 +359,7 @@ class ClassRanksServiceTest extends TestCase
         }
     }
 
-    public function testNoExpForNoInventory()
+    public function test_no_exp_for_no_inventory()
     {
         $character = $this->character->getCharacter();
 
@@ -376,7 +376,7 @@ class ClassRanksServiceTest extends TestCase
         }
     }
 
-    public function testGainLevelInClassRank()
+    public function test_gain_level_in_class_rank()
     {
         $character = $this->character->getCharacter();
 
@@ -391,7 +391,7 @@ class ClassRanksServiceTest extends TestCase
         $this->assertNotEquals($currentlevel, $newLevel);
     }
 
-    public function testDoNotLevelUpSpecialtyWhenAtMax()
+    public function test_do_not_level_up_specialty_when_at_max()
     {
         $character = $this->character->getCharacter();
 
@@ -424,7 +424,7 @@ class ClassRanksServiceTest extends TestCase
         $this->assertEquals($currentLevel, $newlevel);
     }
 
-    public function testLevelUpSpecialty()
+    public function test_level_up_specialty()
     {
         $character = $this->character->getCharacter();
 
@@ -457,7 +457,7 @@ class ClassRanksServiceTest extends TestCase
         $this->assertNotequals($currentLevel, $newlevel);
     }
 
-    public function testDoNotLevelWeaponSpeacitlyWhenAtMaxLevel()
+    public function test_do_not_level_weapon_speacitly_when_at_max_level()
     {
         $character = $this->character->equipStartingEquipment()->getCharacter();
 
@@ -482,7 +482,7 @@ class ClassRanksServiceTest extends TestCase
         }
     }
 
-    public function testDoNotGiveXPToMasteriesWhenNoInventory()
+    public function test_do_not_give_xp_to_masteries_when_no_inventory()
     {
         $character = $this->character->equipStartingEquipment()->getCharacter();
 
@@ -501,7 +501,7 @@ class ClassRanksServiceTest extends TestCase
         }
     }
 
-    public function testLevelEquippedItemSpecialty()
+    public function test_level_equipped_item_specialty()
     {
         $character = $this->character->equipStartingEquipment()->getCharacter();
 

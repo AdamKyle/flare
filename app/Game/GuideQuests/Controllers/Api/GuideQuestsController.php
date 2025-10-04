@@ -2,7 +2,6 @@
 
 namespace App\Game\GuideQuests\Controllers\Api;
 
-use App\Flare\Models\Character;
 use App\Flare\Models\GuideQuest;
 use App\Flare\Models\User;
 use App\Game\GuideQuests\Services\GuideQuestService;
@@ -21,7 +20,7 @@ class GuideQuestsController extends Controller
     public function getCurrentQuest(User $user): JsonResponse
     {
         return response()->json([
-            ...$this->guideQuestService->fetchQuestForCharacter($user->character)
+            ...$this->guideQuestService->fetchQuestForCharacter($user->character),
         ]);
     }
 
@@ -30,12 +29,12 @@ class GuideQuestsController extends Controller
         $character = $user->character;
         $response = $this->guideQuestService->handInQuest($character, $guideQuest);
 
-        $message = 'You have completed the quest: "' . $guideQuest->name . '". On to the next! Below is the next quest for you to do!';
+        $message = 'You have completed the quest: "'.$guideQuest->name.'". On to the next! Below is the next quest for you to do!';
 
         if ($response) {
             return response()->json([
                 'message' => $message,
-                ...$this->guideQuestService->fetchQuestForCharacter($character)
+                ...$this->guideQuestService->fetchQuestForCharacter($character),
             ]);
         }
 

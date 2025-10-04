@@ -19,18 +19,11 @@ class RestartGlobalEventGoal extends Command
 
     protected $description = 'restarts the global event goal if it\'s been finished.';
 
-    /**
-     * @param GlobalEventStepRotatorService   $rotator
-     * @param EventParticipantNotifierService $notifier
-     * @param EventGoalRestartGuardService    $guard
-     * @param RegularEventGoalResetService    $regularResetter
-     * @return void
-     */
     public function handle(
-        GlobalEventStepRotatorService   $rotator,
+        GlobalEventStepRotatorService $rotator,
         EventParticipantNotifierService $notifier,
-        EventGoalRestartGuardService    $guard,
-        RegularEventGoalResetService    $regularResetter,
+        EventGoalRestartGuardService $guard,
+        RegularEventGoalResetService $regularResetter,
     ): void {
         $globalEvent = GlobalEventGoal::first();
         if (is_null($globalEvent)) {
@@ -53,10 +46,11 @@ class RestartGlobalEventGoal extends Command
                 $result = $rotator->rotate($event);
             } catch (\Throwable $e) {
                 Log::error('Failed to rotate global event step', [
-                    'event_type'   => $event->type,
+                    'event_type' => $event->type,
                     'current_step' => $event->current_event_goal_step,
-                    'message'      => $e->getMessage(),
+                    'message' => $e->getMessage(),
                 ]);
+
                 return;
             }
 
@@ -70,21 +64,22 @@ class RestartGlobalEventGoal extends Command
             $gameMap = GameMap::where('only_during_event_type', $event->type)->first();
 
             event(new GlobalMessageEvent(
-                'Global Event Goal for: ' . $event->type .
-                ' Players can now participate in the new step: ' . strtoupper($newStep) . '! How exciting!'
+                'Global Event Goal for: '.$event->type.
+                ' Players can now participate in the new step: '.strtoupper($newStep).'! How exciting!'
             ));
 
             if (! is_null($gameMap)) {
                 event(new GlobalMessageEvent(
-                    'Players can participate by going to the map: ' . $gameMap->name .
-                    ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile) ' .
-                    'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items. ' .
+                    'Players can participate by going to the map: '.$gameMap->name.
+                    ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile) '.
+                    'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items. '.
                     'You can see the event goal for the map specified by being on the map and clicking the Event Goal tab from the map.'
                 ));
             }
 
             // Notify participants (no-ops if count is 0, which it will be after rotation).
             $notifier->notifyForGoal($newGoal, $newGoal->globalEventParticipation()->count());
+
             return;
         }
 
@@ -92,7 +87,7 @@ class RestartGlobalEventGoal extends Command
         $regularResetter->reset($globalEvent);
 
         event(new GlobalMessageEvent(
-            'Global Event Goal for: ' . $globalEvent->eventType()->getNameForEvent() .
+            'Global Event Goal for: '.$globalEvent->eventType()->getNameForEvent().
             ' Players can now participate again and earn Rewards for meeting the various phases! How exciting!'
         ));
 

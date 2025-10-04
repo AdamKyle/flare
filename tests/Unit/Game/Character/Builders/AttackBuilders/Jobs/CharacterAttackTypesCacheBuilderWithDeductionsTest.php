@@ -20,14 +20,14 @@ class CharacterAttackTypesCacheBuilderWithDeductionsTest extends TestCase
 
     private ?CharacterFactory $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -52,7 +52,7 @@ class CharacterAttackTypesCacheBuilderWithDeductionsTest extends TestCase
             ->getCharacter();
     }
 
-    public function testCharacterAttackTypesCacheBuilderWithDeductionsAndEventIsDispatched()
+    public function test_character_attack_types_cache_builder_with_deductions_and_event_is_dispatched()
     {
         Event::fake();
 
@@ -63,7 +63,7 @@ class CharacterAttackTypesCacheBuilderWithDeductionsTest extends TestCase
         Event::assertDispatched(UpdateCharacterAttackEvent::class);
     }
 
-    public function testCharacterAttackTypesCacheBuilderWithDeductions()
+    public function test_character_attack_types_cache_builder_with_deductions()
     {
         $character = $this->setUpCharacterForTests();
 

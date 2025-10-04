@@ -15,7 +15,7 @@ class CharacterGemBagServiceTest extends TestCase
 
     private ?CharacterGemBagService $characterGemBagService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -24,7 +24,7 @@ class CharacterGemBagServiceTest extends TestCase
         $this->characterGemBagService = resolve(CharacterGemBagService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -33,7 +33,7 @@ class CharacterGemBagServiceTest extends TestCase
         $this->characterGemBagService = null;
     }
 
-    public function testGetCharacterGems()
+    public function test_get_character_gems()
     {
         $character = $this->character->gemBagManagement()->assignGemsToBag()->getCharacter();
 
@@ -43,7 +43,7 @@ class CharacterGemBagServiceTest extends TestCase
         $this->assertNotEmpty($result);
     }
 
-    public function testGetGemData()
+    public function test_get_gem_data()
     {
         $character = $this->character->gemBagManagement()->assignGemsToBag()->getCharacter();
 
@@ -53,7 +53,7 @@ class CharacterGemBagServiceTest extends TestCase
         $this->assertNotEmpty($result['gem']);
     }
 
-    public function testCannotGetGemData()
+    public function test_cannot_get_gem_data()
     {
         $character = $this->character->gemBagManagement()->assignGemsToBag()->getCharacter();
 

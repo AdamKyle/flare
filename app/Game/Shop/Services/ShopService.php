@@ -21,28 +21,22 @@ use App\Game\Shop\Events\SellItemEvent;
 use App\Game\Shop\Transformers\ShopTransformer;
 use Exception;
 use Facades\App\Flare\Calculators\SellItemCalculator;
-use League\Fractal\Manager;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use League\Fractal\Manager;
 
 class ShopService
 {
     use ResponseBuilder;
 
-    /**
-     * @param EquipItemService $equipItemService
-     * @param CharacterInventoryService $characterInventoryService
-     * @param Pagination $pagination
-     * @param ShopTransformer $shopTransformer
-     * @param Manager $manager
-     */
     public function __construct(private readonly EquipItemService $equipItemService,
-                                private readonly CharacterInventoryService $characterInventoryService,
-                                private readonly Pagination $pagination,
-                                private readonly ShopTransformer $shopTransformer,
-                                private readonly Manager $manager
-    ){}
+        private readonly CharacterInventoryService $characterInventoryService,
+        private readonly Pagination $pagination,
+        private readonly ShopTransformer $shopTransformer,
+        private readonly Manager $manager
+    ) {}
 
-    public function getItemsForShop(Character $character, int $perPage, int $page, ?string $searchText, ?array $filters): array {
+    public function getItemsForShop(Character $character, int $perPage, int $page, ?string $searchText, ?array $filters): array
+    {
         $items = $this->fetchItemsForShopBasedOnCharacterClass($character, $searchText, $filters);
 
         return $this->pagination->buildPaginatedDate($items, $this->shopTransformer, $perPage, $page);
@@ -144,12 +138,10 @@ class ShopService
     }
 
     /**
-     * @param Character $character
-     * @param Item $item
-     * @return Character
      * @throws Exception
      */
-    public function autoSellItem(Character $character, Item $item): Character {
+    public function autoSellItem(Character $character, Item $item): Character
+    {
         $totalSoldFor = SellItemCalculator::fetchSalePriceWithAffixes($item);
 
         $newGold = $character->gold + $totalSoldFor;
@@ -157,9 +149,9 @@ class ShopService
         if ($newGold > MaxCurrenciesValue::MAX_GOLD) {
             $newGold = MaxCurrenciesValue::MAX_GOLD;
 
-            event(new ServerMessageEvent($character->user, 'You are Gold Dust Capped so the item: ' . $item->affix_name . ' auto sold for: ' . number_format($totalSoldFor) . ' Gold. You are now gold capped at: ' . number_format($newGold) . ' Gold. Go spend some of it, or buy Gold Bars for your kingdoms.'));
+            event(new ServerMessageEvent($character->user, 'You are Gold Dust Capped so the item: '.$item->affix_name.' auto sold for: '.number_format($totalSoldFor).' Gold. You are now gold capped at: '.number_format($newGold).' Gold. Go spend some of it, or buy Gold Bars for your kingdoms.'));
         } else {
-            event(new ServerMessageEvent($character->user, 'You are Gold Dust Capped so the item: ' . $item->affix_name . ' auto sold for: ' . number_format($totalSoldFor) . ' Gold. You now have total amount of gold: ' . number_format($newGold) . ' Gold.'));
+            event(new ServerMessageEvent($character->user, 'You are Gold Dust Capped so the item: '.$item->affix_name.' auto sold for: '.number_format($totalSoldFor).' Gold. You now have total amount of gold: '.number_format($newGold).' Gold.'));
         }
 
         $character->update([
@@ -199,11 +191,12 @@ class ShopService
         return floor($cost - ($cost * 0.05));
     }
 
-    private function fetchItemsForShopBasedOnCharacterClass(Character $character, ?string $searchText, ?array $filters): EloquentCollection {
+    private function fetchItemsForShopBasedOnCharacterClass(Character $character, ?string $searchText, ?array $filters): EloquentCollection
+    {
         $className = $character->class->name;
 
-        $types = !isset($filters['type']) ? ItemTypeMapping::getForClass($className) : $filters['type'];
-        $costOrder = !isset($filters['sort_cost']) ? 'asc' : $filters['sort_cost'];
+        $types = ! isset($filters['type']) ? ItemTypeMapping::getForClass($className) : $filters['type'];
+        $costOrder = ! isset($filters['sort_cost']) ? 'asc' : $filters['sort_cost'];
 
         $items = Item::where('cost', '<=', 2000000000)
             ->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
@@ -211,7 +204,7 @@ class ShopService
             ->whereNull('item_prefix_id')
             ->whereNull('specialty_type');
 
-        if (!is_null($types)) {
+        if (! is_null($types)) {
             if (is_array($types)) {
                 $items = $items->whereIn('type', $types);
             } else {
@@ -219,8 +212,8 @@ class ShopService
             }
         }
 
-        if (!is_null($searchText)) {
-            $items = $items->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($searchText) . '%']);
+        if (! is_null($searchText)) {
+            $items = $items->whereRaw('LOWER(name) LIKE ?', ['%'.strtolower($searchText).'%']);
         }
 
         return $items
@@ -228,5 +221,4 @@ class ShopService
             ->orderBy('cost', $costOrder)
             ->get();
     }
-
 }

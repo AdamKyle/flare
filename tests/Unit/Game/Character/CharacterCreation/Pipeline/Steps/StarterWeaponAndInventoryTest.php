@@ -18,14 +18,14 @@ use Tests\Traits\CreateUser;
 
 class StarterWeaponAndInventoryTest extends TestCase
 {
-    use RefreshDatabase,
-        CreateUser,
-        CreateRace,
+    use CreateCharacter,
         CreateClass,
-        CreateCharacter,
-        CreateItem;
+        CreateItem,
+        CreateRace,
+        CreateUser,
+        RefreshDatabase;
 
-    public function testCreatesGemBagInventoryStarterWeaponAndInventorySets(): void
+    public function test_creates_gem_bag_inventory_starter_weapon_and_inventory_sets(): void
     {
         $user = $this->createUser();
         $race = $this->createRace();
@@ -86,7 +86,7 @@ class StarterWeaponAndInventoryTest extends TestCase
         $this->assertSame(10, InventorySet::query()->where('character_id', $character->id)->count());
     }
 
-    public function testNoOpWhenStateHasNoCharacter(): void
+    public function test_no_op_when_state_has_no_character(): void
     {
         $state = app(CharacterBuildState::class)->setNow(now());
 
@@ -102,7 +102,7 @@ class StarterWeaponAndInventoryTest extends TestCase
         $this->assertSame(0, InventorySet::query()->count());
     }
 
-    public function testThrowsWhenNoStarterItemsExist(): void
+    public function test_throws_when_no_starter_items_exist(): void
     {
         $user = $this->createUser();
         $race = $this->createRace();
@@ -141,7 +141,7 @@ class StarterWeaponAndInventoryTest extends TestCase
         });
     }
 
-    public function testPrefersFirstWeaponTypeWhenMultipleMapped(): void
+    public function test_prefers_first_weapon_type_when_multiple_mapped(): void
     {
         $user = $this->createUser();
         $race = $this->createRace();
@@ -196,7 +196,7 @@ class StarterWeaponAndInventoryTest extends TestCase
         $this->assertSame('wand', $chosenType);
     }
 
-    public function testUsesSingleMappedWeaponType(): void
+    public function test_uses_single_mapped_weapon_type(): void
     {
         $user = $this->createUser();
         $race = $this->createRace();
@@ -244,7 +244,7 @@ class StarterWeaponAndInventoryTest extends TestCase
         $this->assertSame('bow', $chosenType);
     }
 
-    public function testFallsBackToAnyStarterWeaponWhenNoMapping(): void
+    public function test_falls_back_to_any_starter_weapon_when_no_mapping(): void
     {
         $user = $this->createUser();
         $race = $this->createRace();

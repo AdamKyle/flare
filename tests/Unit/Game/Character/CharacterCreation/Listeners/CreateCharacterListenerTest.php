@@ -23,16 +23,16 @@ use Tests\Traits\CreateUser;
 
 class CreateCharacterListenerTest extends TestCase
 {
-    use RefreshDatabase,
-        CreateUser,
-        CreateRace,
-        CreateClass,
+    use CreateClass,
         CreateGameMap,
-        CreateItem,
         CreateGameSkill,
-        CreatePassiveSkill;
+        CreateItem,
+        CreatePassiveSkill,
+        CreateRace,
+        CreateUser,
+        RefreshDatabase;
 
-    public function testHandleCreatesCharacterThroughPipeline(): void
+    public function test_handle_creates_character_through_pipeline(): void
     {
         $surface = $this->createGameMap(['name' => MapNameValue::SURFACE]);
         $this->createGameMap(['name' => MapNameValue::HELL]);
@@ -57,8 +57,8 @@ class CreateCharacterListenerTest extends TestCase
         }));
 
         $request = Request::create('/register', 'POST', [
-            'name'  => 'ListenerUser',
-            'race'  => $race->id,
+            'name' => 'ListenerUser',
+            'race' => $race->id,
             'class' => $class->id,
         ]);
 
@@ -91,7 +91,7 @@ class CreateCharacterListenerTest extends TestCase
         $this->assertSame($surface->id, $character->map->game_map_id);
     }
 
-    public function testHandleUsesRaceAndClassFromRequestIds(): void
+    public function test_handle_uses_race_and_class_from_request_ids(): void
     {
         $surface = $this->createGameMap(['name' => MapNameValue::SURFACE]);
         $this->createGameMap(['name' => MapNameValue::HELL]);
@@ -121,8 +121,8 @@ class CreateCharacterListenerTest extends TestCase
         }));
 
         $request = Request::create('/register', 'POST', [
-            'name'  => 'ChosenCombo',
-            'race'  => $raceB->id,
+            'name' => 'ChosenCombo',
+            'race' => $raceB->id,
             'class' => $classB->id,
         ]);
 

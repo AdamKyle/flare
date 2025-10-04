@@ -29,17 +29,17 @@ use Tests\Traits\CreateUser;
 
 class CharacterCreationPipelineTest extends TestCase
 {
-    use RefreshDatabase,
-        CreateUser,
-        CreateRace,
+    use CreateCharacter,
         CreateClass,
-        CreateCharacter,
         CreateGameMap,
-        CreateItem,
         CreateGameSkill,
-        CreatePassiveSkill;
+        CreateItem,
+        CreatePassiveSkill,
+        CreateRace,
+        CreateUser,
+        RefreshDatabase;
 
-    public function testRunBuildsFullCharacter(): void
+    public function test_run_builds_full_character(): void
     {
         $surface = $this->createGameMap(['name' => MapNameValue::SURFACE]);
         $hell = $this->createGameMap(['name' => MapNameValue::HELL]);
@@ -152,7 +152,7 @@ class CharacterCreationPipelineTest extends TestCase
         $this->assertSame(5, (int) $fighterPrimary->level);
     }
 
-    public function testRunNoOpWithEmptyState(): void
+    public function test_run_no_op_with_empty_state(): void
     {
         $mock = Mockery::mock(BuildCharacterAttackTypes::class);
         $mock->shouldReceive('buildCache')->never();

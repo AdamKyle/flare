@@ -128,7 +128,7 @@ class EnchantItemService
     {
         $clonedItem = DuplicateItemHandler::duplicateItem($item);
 
-        $clonedItem->{'item_' . $affix->type . '_id'} = $affix->id;
+        $clonedItem->{'item_'.$affix->type.'_id'} = $affix->id;
         $clonedItem->market_sellable = true;
         $clonedItem->parent_id = $item->id;
         $clonedItem->is_mythic = false;

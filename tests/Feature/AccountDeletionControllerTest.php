@@ -27,7 +27,7 @@ class AccountDeletionControllerTest extends TestCase
 
     private $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -61,14 +61,14 @@ class AccountDeletionControllerTest extends TestCase
         Queue::fake();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testCanDeleteCharacter()
+    public function test_can_delete_character()
     {
         $user = $this->character->user;
 
@@ -79,7 +79,7 @@ class AccountDeletionControllerTest extends TestCase
         Queue::assertPushed(AccountDeletionJob::class);
     }
 
-    public function testCannotDeleteCharacter()
+    public function test_cannot_delete_character()
     {
         $user = $this->character->user;
 

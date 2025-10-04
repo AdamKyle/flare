@@ -21,7 +21,7 @@ class RandomEnchantmentServiceTest extends TestCase
 
     private ?RandomEnchantmentService $randomEnchantmentService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
 
         parent::setUp();
@@ -33,7 +33,7 @@ class RandomEnchantmentServiceTest extends TestCase
         $this->createItem(['type' => 'weapon']);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
 
         parent::tearDown();
@@ -42,7 +42,7 @@ class RandomEnchantmentServiceTest extends TestCase
         $this->randomEnchantmentService = null;
     }
 
-    public function testGenerateItemForEachType()
+    public function test_generate_item_for_each_type()
     {
         $character = $this->character->getCharacter();
 
@@ -57,7 +57,7 @@ class RandomEnchantmentServiceTest extends TestCase
         $this->assertInstanceOf(Item::class, $default);
     }
 
-    public function testGenerateWithBothSuffixAndPrefix()
+    public function test_generate_with_both_suffix_and_prefix()
     {
         $character = $this->character->getCharacter();
 
@@ -75,14 +75,14 @@ class RandomEnchantmentServiceTest extends TestCase
         $this->assertNotNull($basicItem->item_prefix_id);
     }
 
-    public function testGetCostForEachType()
+    public function test_get_cost_for_each_type()
     {
         $cost = $this->randomEnchantmentService->getCost();
 
         $this->assertEquals(RandomAffixDetails::LEGENDARY, $cost);
     }
 
-    public function testFetchAllUniqueItems()
+    public function test_fetch_all_unique_items()
     {
         $character = $this->character->inventoryManagement()->giveItem($this->createItem([
             'item_suffix_id' => $this->createItemAffix(['randomly_generated' => true])->id,
@@ -93,7 +93,7 @@ class RandomEnchantmentServiceTest extends TestCase
         $this->assertCount(2, $this->randomEnchantmentService->fetchUniquesFromCharactersInventory($character));
     }
 
-    public function testFetchDataForApiCall()
+    public function test_fetch_data_for_api_call()
     {
         $character = $this->character->inventoryManagement()->giveItem($this->createItem([
             'item_suffix_id' => $this->createItemAffix(['randomly_generated' => true])->id,
@@ -111,7 +111,7 @@ class RandomEnchantmentServiceTest extends TestCase
         $this->assertCount(2, $data['non_unique_slots']);
     }
 
-    public function testFetchNonUniqueItems()
+    public function test_fetch_non_unique_items()
     {
         $character = $this->character->inventoryManagement()->giveItem($this->createItem([
             'item_prefix_id' => $this->createItemAffix(['randomly_generated' => false])->id,

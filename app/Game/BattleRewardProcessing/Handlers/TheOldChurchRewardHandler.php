@@ -24,7 +24,6 @@ use Illuminate\Support\Facades\Cache;
 
 class TheOldChurchRewardHandler
 {
-
     public function __construct(private RandomAffixGenerator $randomAffixGenerator, private BattleMessageHandler $battleMessageHandler) {}
 
     public function handleFightingAtTheOldChurch(Character $character, Monster $monster): Character
@@ -198,7 +197,7 @@ class TheOldChurchRewardHandler
             'item_id' => $newItem->id,
         ]);
 
-        event(new ServerMessageEvent($character->user, 'You found something unique, in The Old Church child: ' . $item->affix_name, $slot->id));
+        event(new ServerMessageEvent($character->user, 'You found something unique, in The Old Church child: '.$item->affix_name, $slot->id));
     }
 
     /**

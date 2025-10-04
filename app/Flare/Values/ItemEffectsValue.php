@@ -293,10 +293,9 @@ class ItemEffectsValue
 
     /**
      * Is an item that allows one to access the twisted dungeons?
-     *
-     * @return boolean
      */
-    public function accessTwistedDungeons(): bool {
+    public function accessTwistedDungeons(): bool
+    {
         return $this->value === self::TWISTED_DUNGEONS;
     }
 }

@@ -2,12 +2,6 @@
 
 namespace App\Game\Exploration\Jobs;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Cache;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Monster;
@@ -24,6 +18,12 @@ use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
 use App\Game\Exploration\Events\ExplorationTimeOut;
 use App\Game\Skills\Services\SkillService;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 
 class Exploration implements ShouldQueue
 {
@@ -66,7 +66,7 @@ class Exploration implements ShouldQueue
         if ($this->shouldBail($automation)) {
             $this->endAutomation($automation, $characterCacheData);
 
-            Cache::delete('can-character-survive-' . $this->character->id);
+            Cache::delete('can-character-survive-'.$this->character->id);
 
             return;
         }
@@ -127,7 +127,7 @@ class Exploration implements ShouldQueue
 
             $enemies = rand(10, 25);
 
-            $this->sendOutEventLogUpdate('"Chirst, child there are: ' . $enemies . ' of them ..."
+            $this->sendOutEventLogUpdate('"Chirst, child there are: '.$enemies.' of them ..."
             The Guide hisses at you from the shadows. You ignore his words and prepare for battle. One right after the other ...', true);
 
             $monster = Monster::find($params['selected_monster_id']);
@@ -149,7 +149,7 @@ class Exploration implements ShouldQueue
 
             $this->sendOutEventLogUpdate('The last of the enemies fall. Covered in blood, exhausted, you look around for any signs of more of their friends. The area is silent. "Another day, another battle.
             We managed to survive." The Guide states as he walks from the shadows. The pair of you set off in search of the next adventure ...
-            (Exploration will begin again in ' . $timeDelay . ' minutes)', true);
+            (Exploration will begin again in '.$timeDelay.' minutes)', true);
 
             return true;
         }
@@ -160,7 +160,7 @@ class Exploration implements ShouldQueue
     private function canSurviveFight(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool
     {
 
-        if (Cache::has('can-character-survive-' . $this->character->id)) {
+        if (Cache::has('can-character-survive-'.$this->character->id)) {
             return true;
         }
 
@@ -172,9 +172,8 @@ class Exploration implements ShouldQueue
         $characterRewardService = $this->characterRewardService->setCharacter($this->character);
         $characterSkillService = $this->skillService->setSkillInTraining($this->character);
 
-
         for ($i = 1; $i <= 10; $i++) {
-            if (!$this->fightAutomationMonster($response, $automation, $battleEventHandler, $params)) {
+            if (! $this->fightAutomationMonster($response, $automation, $battleEventHandler, $params)) {
                 return false;
             }
 
@@ -186,7 +185,7 @@ class Exploration implements ShouldQueue
         ExplorationSkillXpHandler::dispatch($this->character->id, $totalSkillXpToReward)->onConnection('exploration_battle_skill_xp_reward')->onQueue('exploration_battle_skill_xp_reward')->delay(now()->addSeconds(2));
         WinterEventChristmasGiftHandler::dispatch($this->character->id)->onConnection('event_battle_reward')->onQueue('event_battle_reward')->delay(now()->addSeconds(2));
 
-        Cache::put('can-character-survive-' . $this->character->id, true);
+        Cache::put('can-character-survive-'.$this->character->id, true);
 
         return true;
     }

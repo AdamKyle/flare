@@ -16,14 +16,14 @@ use Tests\Traits\CreateUser;
 
 class SkillAssignerTest extends TestCase
 {
-    use RefreshDatabase,
-        CreateUser,
-        CreateRace,
+    use CreateCharacter,
         CreateClass,
-        CreateCharacter,
-        CreateGameSkill;
+        CreateGameSkill,
+        CreateRace,
+        CreateUser,
+        RefreshDatabase;
 
-    public function testAssignsGeneralAndClassSkills(): void
+    public function test_assigns_general_and_class_skills(): void
     {
         $user = $this->createUser();
         $race = $this->createRace();
@@ -71,7 +71,7 @@ class SkillAssignerTest extends TestCase
         $this->assertSame($expected, $skillIds);
     }
 
-    public function testNoOpWhenStateHasNoCharacter(): void
+    public function test_no_op_when_state_has_no_character(): void
     {
         $user = $this->createUser();
         $race = $this->createRace();

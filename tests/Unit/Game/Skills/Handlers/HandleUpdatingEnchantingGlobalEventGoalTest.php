@@ -26,7 +26,7 @@ class HandleUpdatingEnchantingGlobalEventGoalTest extends TestCase
 
     private ?CharacterFactory $characterFactory;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -38,7 +38,7 @@ class HandleUpdatingEnchantingGlobalEventGoalTest extends TestCase
         );
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -46,7 +46,7 @@ class HandleUpdatingEnchantingGlobalEventGoalTest extends TestCase
         $this->character = null;
     }
 
-    public function testDoNotParticipateInEnchantingGlobalEventWhenEventDoesNotExist()
+    public function test_do_not_participate_in_enchanting_global_event_when_event_does_not_exist()
     {
         $item = $this->createItem(['type' => WeaponTypes::WEAPON, 'item_prefix_id' => $this->createItemAffix(['type' => 'prefix'])->id]);
 
@@ -67,7 +67,7 @@ class HandleUpdatingEnchantingGlobalEventGoalTest extends TestCase
         $this->assertNotEmpty($character->inventory->slots);
     }
 
-    public function testDoNotParticipateInEnchantingGlobalEventWhenGlobalEventDoesNotExist()
+    public function test_do_not_participate_in_enchanting_global_event_when_global_event_does_not_exist()
     {
         $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
@@ -91,7 +91,7 @@ class HandleUpdatingEnchantingGlobalEventGoalTest extends TestCase
         $this->assertNotEmpty($character->inventory->slots);
     }
 
-    public function testParticipateInGlobalEnchantingEvent()
+    public function test_participate_in_global_enchanting_event()
     {
         $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
@@ -127,7 +127,7 @@ class HandleUpdatingEnchantingGlobalEventGoalTest extends TestCase
         $this->assertempty($character->inventory->slots);
     }
 
-    public function testParticipateInGlobalEnchantingEventWhenWeShouldBeRewarded()
+    public function test_participate_in_global_enchanting_event_when_we_should_be_rewarded()
     {
         $this->createItem(['name' => 'Delusional silver', 'specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER]);
 

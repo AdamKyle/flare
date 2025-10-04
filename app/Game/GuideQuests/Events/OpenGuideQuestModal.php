@@ -18,9 +18,6 @@ class OpenGuideQuestModal implements ShouldBroadcastNow
 
     public bool $openButton = false;
 
-    /**
-     * @param User $user
-     */
     public function __construct(private User $user)
     {
 
@@ -40,11 +37,9 @@ class OpenGuideQuestModal implements ShouldBroadcastNow
 
     /**
      * Get the channels the event should broadcast on.
-     *
-     * @return Channel|array
      */
-    public function broadcastOn(): Channel | array
+    public function broadcastOn(): Channel|array
     {
-        return new PrivateChannel('force-open-guide-quest-modal-' . $this->user->id);
+        return new PrivateChannel('force-open-guide-quest-modal-'.$this->user->id);
     }
 }

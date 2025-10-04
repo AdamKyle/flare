@@ -7,9 +7,13 @@ use Exception;
 class RaidType
 {
     const PIRATE_LORD = 'pirate-lord';
+
     const ICE_QUEEN = 'ice-queen';
+
     const JESTER_OF_TIME = 'jester-of-time';
+
     const FROZEN_KING = 'frozen-king';
+
     const CORRUPTED_BISHOP = 'corrupted-bishop';
 
     private string $value;
@@ -41,7 +45,7 @@ class RaidType
     public function __construct(string $value)
     {
         if (! in_array($value, self::$values)) {
-            throw new Exception($value . ' does not exist.');
+            throw new Exception($value.' does not exist.');
         }
 
         $this->value = $value;
@@ -64,7 +68,7 @@ class RaidType
 
     public function isFrozenKing(): bool
     {
-        return $this->value === self::FROZEN_KING;;
+        return $this->value === self::FROZEN_KING;
     }
 
     public function isCorruptedBishop(): bool

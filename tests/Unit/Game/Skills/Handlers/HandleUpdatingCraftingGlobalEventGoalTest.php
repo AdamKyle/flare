@@ -9,7 +9,6 @@ use App\Flare\Values\WeaponTypes;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\Messages\Services\ServerMessage;
 use App\Game\Skills\Handlers\HandleUpdatingCraftingGlobalEventGoal;
 use App\Game\Skills\Values\SkillTypeValue;
 use Event;
@@ -29,7 +28,7 @@ class HandleUpdatingCraftingGlobalEventGoalTest extends TestCase
 
     private ?CharacterFactory $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -41,7 +40,7 @@ class HandleUpdatingCraftingGlobalEventGoalTest extends TestCase
         );
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -49,7 +48,7 @@ class HandleUpdatingCraftingGlobalEventGoalTest extends TestCase
         $this->character = null;
     }
 
-    public function testDoNotParticipateInCraftingGlobalEventWhenEventDoesNotExist()
+    public function test_do_not_participate_in_crafting_global_event_when_event_does_not_exist()
     {
         $item = $this->createItem(['type' => WeaponTypes::WEAPON]);
         $character = $this->character->getCharacter();
@@ -65,7 +64,7 @@ class HandleUpdatingCraftingGlobalEventGoalTest extends TestCase
         $this->assertEmpty(GlobalEventCraftingInventory::all());
     }
 
-    public function testDoNotParticipateInCraftingGlobalEventWhenGlobalEventDoesNotExist()
+    public function test_do_not_participate_in_crafting_global_event_when_global_event_does_not_exist()
     {
         $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
@@ -86,7 +85,7 @@ class HandleUpdatingCraftingGlobalEventGoalTest extends TestCase
         $this->assertEmpty(GlobalEventCraftingInventory::all());
     }
 
-    public function testParticipateInGlobalCraftingEvent()
+    public function test_participate_in_global_crafting_event()
     {
         $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
@@ -120,7 +119,7 @@ class HandleUpdatingCraftingGlobalEventGoalTest extends TestCase
         $this->assertCount(1, GlobalEventCraftingInventorySlot::where('item_id', $item->id)->get());
     }
 
-    public function testParticipateInEventWhenMaxCraftsAreReached()
+    public function test_participate_in_event_when_max_crafts_are_reached()
     {
         Event::fake();
 
@@ -162,7 +161,7 @@ class HandleUpdatingCraftingGlobalEventGoalTest extends TestCase
         $this->assertEmpty(GlobalEventCraftingInventory::all());
     }
 
-    public function testParticipateInGlobalCraftingEventWhenWeShouldBeRewarded()
+    public function test_participate_in_global_crafting_event_when_we_should_be_rewarded()
     {
         $this->createItem(['specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER]);
 

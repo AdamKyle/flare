@@ -4,8 +4,8 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SuggestionAndBugs extends Model {
-
+class SuggestionAndBugs extends Model
+{
     protected $table = 'suggestion_and_bugs';
 
     /**
@@ -35,7 +35,8 @@ class SuggestionAndBugs extends Model {
         'uploaded_image_paths' => 'array',
     ];
 
-    public function character() {
+    public function character()
+    {
         return $this->belongsTo(Character::class, 'character_id', 'id');
     }
 }

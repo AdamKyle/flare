@@ -12,21 +12,21 @@ class AffixAttributeBuilderTest extends TestCase
 
     private ?AffixAttributeBuilder $affixAttributeBuilder;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->affixAttributeBuilder = resolve(AffixAttributeBuilder::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->affixAttributeBuilder = null;
     }
 
-    public function testBuildAffixAttributesWithOutSkillInfo()
+    public function test_build_affix_attributes_with_out_skill_info()
     {
         $attributes = $this->affixAttributeBuilder
             ->setPercentageRange([0.10, 0.90])

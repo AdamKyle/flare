@@ -16,13 +16,13 @@ use Tests\Traits\CreateUser;
 
 class BuildCacheTest extends TestCase
 {
-    use RefreshDatabase,
-        CreateUser,
-        CreateRace,
+    use CreateCharacter,
         CreateClass,
-        CreateCharacter;
+        CreateRace,
+        CreateUser,
+        RefreshDatabase;
 
-    public function testBuildsCacheWhenCharacterPresent(): void
+    public function test_builds_cache_when_character_present(): void
     {
         $user = $this->createUser();
         $race = $this->createRace();
@@ -62,7 +62,7 @@ class BuildCacheTest extends TestCase
         $this->assertInstanceOf(CharacterBuildState::class, $result);
     }
 
-    public function testNoOpWhenStateHasNoCharacter(): void
+    public function test_no_op_when_state_has_no_character(): void
     {
         $mock = Mockery::mock(BuildCharacterAttackTypes::class);
         $mock->shouldReceive('buildCache')->never();

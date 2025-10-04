@@ -45,9 +45,6 @@ class SecondaryRewardService
 
     /**
      * Handle item skill updates for artifacts that are equipped with skill trees.
-     *
-     * @param Character $character
-     * @return void
      */
     private function handleItemSkillUpdate(Character $character): void
     {

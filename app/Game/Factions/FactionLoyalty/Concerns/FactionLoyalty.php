@@ -57,7 +57,7 @@ trait FactionLoyalty
                     $amount = min($task['current_amount'] + 2, $task['required_amount']);
                 }
 
-               $tasks[$index]['current_amount'] = $amount;
+                $tasks[$index]['current_amount'] = $amount;
             }
         }
 

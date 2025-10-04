@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class AlchemyItemTypeTest extends TestCase
 {
-    public function testIncreasesStats(): void
+    public function test_increases_stats(): void
     {
         $this->assertTrue(AlchemyItemType::INCREASE_STATS->increasesStats());
 
@@ -18,7 +18,7 @@ class AlchemyItemTypeTest extends TestCase
         }
     }
 
-    public function testIncreasesDamage(): void
+    public function test_increases_damage(): void
     {
         $this->assertTrue(AlchemyItemType::INCREASE_DAMAGE->increasesDamage());
 
@@ -29,7 +29,7 @@ class AlchemyItemTypeTest extends TestCase
         }
     }
 
-    public function testIncreasesArmour(): void
+    public function test_increases_armour(): void
     {
         $this->assertTrue(AlchemyItemType::INCREASE_ARMOUR->increasesArmour());
 
@@ -40,7 +40,7 @@ class AlchemyItemTypeTest extends TestCase
         }
     }
 
-    public function testIncreasesHealing(): void
+    public function test_increases_healing(): void
     {
         $this->assertTrue(AlchemyItemType::INCREASE_HEALING->increasesHealing());
 
@@ -51,7 +51,7 @@ class AlchemyItemTypeTest extends TestCase
         }
     }
 
-    public function testIncreasesSkillType(): void
+    public function test_increases_skill_type(): void
     {
         $this->assertTrue(AlchemyItemType::INCREASE_SKILL_TYPE->increasesSkillType());
 
@@ -62,7 +62,7 @@ class AlchemyItemTypeTest extends TestCase
         }
     }
 
-    public function testDamagesKingdoms(): void
+    public function test_damages_kingdoms(): void
     {
         $this->assertTrue(AlchemyItemType::DAMAGES_KINGDOMS->damagesKingdoms());
 
@@ -73,7 +73,7 @@ class AlchemyItemTypeTest extends TestCase
         }
     }
 
-    public function testIsHolyOilType(): void
+    public function test_is_holy_oil_type(): void
     {
         $this->assertTrue(AlchemyItemType::HOLY_OILS->isHolyOilType());
 

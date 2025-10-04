@@ -16,20 +16,20 @@ use Tests\Traits\CreateScheduledEvent;
 
 class EndScheduledEventTest extends TestCase
 {
-    use RefreshDatabase, CreateScheduledEvent, CreateEvent;
+    use CreateEvent, CreateScheduledEvent, RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
     }
 
-    public function testReturnsEarlyWhenNoScheduledEvents(): void
+    public function test_returns_early_when_no_scheduled_events(): void
     {
         $registry = Mockery::mock(EventEnderRegistry::class);
         $registry->shouldNotReceive('end');
@@ -43,7 +43,7 @@ class EndScheduledEventTest extends TestCase
         $this->assertEquals(0, ScheduledEvent::count());
     }
 
-    public function testFinalizesWhenNoCurrentEvent(): void
+    public function test_finalizes_when_no_current_event(): void
     {
         $scheduled = $this->createScheduledEvent([
             'event_type' => EventType::WINTER_EVENT,
@@ -68,7 +68,7 @@ class EndScheduledEventTest extends TestCase
         $this->assertEquals($scheduled->id, ScheduledEvent::first()->id);
     }
 
-    public function testEndsViaRegistryThenFinalizes(): void
+    public function test_ends_via_registry_then_finalizes(): void
     {
         $scheduled = $this->createScheduledEvent([
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,

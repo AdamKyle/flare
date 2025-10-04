@@ -21,7 +21,7 @@ class WeeklyBattleServiceTest extends TestCase
 
     private ?CharacterFactory $characterFactory;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -55,7 +55,7 @@ class WeeklyBattleServiceTest extends TestCase
         ]);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
 
         parent::tearDown();
@@ -65,7 +65,7 @@ class WeeklyBattleServiceTest extends TestCase
         $this->characterFactory = null;
     }
 
-    public function testCreateRecordForCharacterDeath()
+    public function test_create_record_for_character_death()
     {
 
         $character = $this->characterFactory->getCharacter();
@@ -83,7 +83,7 @@ class WeeklyBattleServiceTest extends TestCase
         $this->assertEquals(1, $weeklyBattleFight->character_deaths);
     }
 
-    public function testDoesNotCreateRecordForCharacterDeathWhenMonsterLocationTypeIsInvalid()
+    public function test_does_not_create_record_for_character_death_when_monster_location_type_is_invalid()
     {
 
         $character = $this->characterFactory->getCharacter();
@@ -99,7 +99,7 @@ class WeeklyBattleServiceTest extends TestCase
         $this->assertNull($weeklyBattleFight);
     }
 
-    public function testUpdateRecordForCharacterDeath()
+    public function test_update_record_for_character_death()
     {
 
         $character = $this->characterFactory->getCharacter();
@@ -121,7 +121,7 @@ class WeeklyBattleServiceTest extends TestCase
         $this->assertEquals(11, $weeklyBattleFight->character_deaths);
     }
 
-    public function testDoesNotUpdateRecordForCharacterDeathWhenMonsterLocationTypeIsInvalid()
+    public function test_does_not_update_record_for_character_death_when_monster_location_type_is_invalid()
     {
 
         $character = $this->characterFactory->getCharacter();
@@ -143,12 +143,10 @@ class WeeklyBattleServiceTest extends TestCase
         $this->assertEquals(10, $weeklyBattleFight->character_deaths);
     }
 
-    public function testMarkMonsterAsKilled()
+    public function test_mark_monster_as_killed()
     {
 
         $character = $this->characterFactory->getCharacter();
-
-
 
         $monster = $this->createMonster([
             'only_for_location_type' => LocationType::ALCHEMY_CHURCH,
@@ -167,7 +165,7 @@ class WeeklyBattleServiceTest extends TestCase
         $this->assertTrue($weeklyBattleFight->monster_was_killed);
     }
 
-    public function testCreateRecordMonsterWasKilled()
+    public function test_create_record_monster_was_killed()
     {
 
         DropCheckCalculator::partialMock()->shouldReceive('fetchDifficultItemChance')->andReturn(true);
@@ -198,7 +196,7 @@ class WeeklyBattleServiceTest extends TestCase
         })->first());
     }
 
-    public function testDoNotCreateRecordMonsterWasKilledForInvalidLocationType()
+    public function test_do_not_create_record_monster_was_killed_for_invalid_location_type()
     {
 
         $character = $this->characterFactory->getCharacter();
@@ -216,7 +214,7 @@ class WeeklyBattleServiceTest extends TestCase
         $this->assertNull($weeklyBattleFight);
     }
 
-    public function testCanFightMonster()
+    public function test_can_fight_monster()
     {
         $character = $this->characterFactory->getCharacter();
         $monster = $this->createMonster();
@@ -224,7 +222,7 @@ class WeeklyBattleServiceTest extends TestCase
         $this->assertTrue($this->weeklyBattleService->canFightMonster($character, $monster));
     }
 
-    public function testCannotFightMonster()
+    public function test_cannot_fight_monster()
     {
         $character = $this->characterFactory->getCharacter();
         $monster = $this->createMonster([

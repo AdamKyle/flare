@@ -18,14 +18,14 @@ class CreateCharacterAttackDataTest extends TestCase
 
     private ?CharacterFactory $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -50,7 +50,7 @@ class CreateCharacterAttackDataTest extends TestCase
             ->getCharacter();
     }
 
-    public function testCreateCharacterAttackData()
+    public function test_create_character_attack_data()
     {
 
         $character = $this->setUpCharacterForTests();

@@ -46,8 +46,7 @@ class PaginationRequest extends FormRequest
             'search_text' => $this->has('search_text') && is_null($this->input('search_text'))
                 ? ''
                 : $this->input('search_text'),
-            'filters' => !$this->has('filters') ? [] : $this->input('filters'),
+            'filters' => ! $this->has('filters') ? [] : $this->input('filters'),
         ]);
     }
-
 }

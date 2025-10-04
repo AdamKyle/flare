@@ -2,8 +2,6 @@
 
 namespace App\Flare\Items\Enricher\Manifest;
 
-use App\Flare\Items\Enricher\Manifest\Concerns\ManifestSchema;
-
 class EquippableManifest extends BaseManifest
 {
     /**
@@ -67,8 +65,6 @@ class EquippableManifest extends BaseManifest
     /**
      * Determine logical type for comparison defaults.
      *
-     * @param string $prop
-     * @param mixed $value
      * @return 'number'|'boolean'|'string'|null
      */
     public function typeFor(string $prop, mixed $value): ?string
@@ -80,23 +76,21 @@ class EquippableManifest extends BaseManifest
 
         return match (true) {
             is_int($value), is_float($value) => 'number',
-            is_bool($value)                  => 'boolean',
-            is_string($value)                => 'string',
-            default                          => null,
+            is_bool($value) => 'boolean',
+            is_string($value) => 'string',
+            default => null,
         };
     }
 
     /**
-     * @param string $path
-     * @param string $type
      * @return 'delta'|'flag-diff'|'noop'|null
      */
     public function compareFor(string $path, string $type): ?string
     {
         return match ($type) {
-            'number'  => 'delta',
+            'number' => 'delta',
             'boolean' => 'flag-diff',
-            default   => 'noop',
+            default => 'noop',
         };
     }
 
@@ -106,12 +100,12 @@ class EquippableManifest extends BaseManifest
     public function collections(): array
     {
         return [[
-            'path'   => 'skill_summary',
-            'prop'   => 'skill_summary',
-            'key'    => 'skill_name',
+            'path' => 'skill_summary',
+            'prop' => 'skill_summary',
+            'key' => 'skill_name',
             'fields' => [
                 'skill_training_bonus' => 'delta',
-                'skill_bonus'          => 'delta',
+                'skill_bonus' => 'delta',
             ],
         ]];
     }

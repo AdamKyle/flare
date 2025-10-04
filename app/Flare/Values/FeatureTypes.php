@@ -57,7 +57,7 @@ class FeatureTypes
     public function __construct(int $value)
     {
         if (! in_array($value, self::$values)) {
-            throw new Exception($value . ' does not exist.');
+            throw new Exception($value.' does not exist.');
         }
 
         $this->value = $value;
@@ -93,7 +93,8 @@ class FeatureTypes
         return $this->value === self::EXTEND_SETS;
     }
 
-    public function isExtendedBackpack(): bool {
+    public function isExtendedBackpack(): bool
+    {
         return $this->value === self::EXTENDED_BACKPACK;
     }
 

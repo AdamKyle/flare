@@ -18,28 +18,28 @@ class CharacterInventoryControllerTest extends TestCase
 
     private ?CharacterFactory $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testGetCharacterInventoryApiRequest()
+    public function test_get_character_inventory_api_request()
     {
         $character = $this->character->inventoryManagement()->giveItem($this->createItem())->getCharacter();
 
         $response = $this->actingAs($character->user)
             ->call('GET', '/api/character/'.$character->id.'/inventory', [
                 'per_page' => 10,
-                'page'     => 1,
+                'page' => 1,
                 'search_text' => '',
             ]);
 
@@ -48,7 +48,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertNotEmpty($jsonData['data']);
     }
 
-    public function testFailToGetApiItemDetails()
+    public function test_fail_to_get_api_item_details()
     {
         $character = $this->character->inventoryManagement()->giveItem($this->createItem())->getCharacter();
 
@@ -62,7 +62,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEquals("There's nothing here for that slot.", $jsonData['message']);
     }
 
-    public function testGetItemDetails()
+    public function test_get_item_details()
     {
         $item = $this->createItem([
             'type' => 'sword',
@@ -82,7 +82,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEquals($item->name, $jsonData['name']);
     }
 
-    public function testDestroyItem()
+    public function test_destroy_item()
     {
         $item = $this->createItem();
 
@@ -98,7 +98,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEquals('Destroyed '.$item->affix_name.'.', $jsonData['message']);
     }
 
-    public function testDestroyAllItems()
+    public function test_destroy_all_items()
     {
         $item = $this->createItem();
 
@@ -112,7 +112,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEquals('Destroyed all items.', $jsonData['message']);
     }
 
-    public function testDisenchantAllItems()
+    public function test_disenchant_all_items()
     {
         $item = $this->createItem([
             'item_suffix_id' => $this->createItemAffix([
@@ -134,7 +134,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEmpty($character->inventory->slots);
     }
 
-    public function testMoveItemToSet()
+    public function test_move_item_to_set()
     {
         $item = $this->createItem();
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacterFactory()->inventorySetManagement()->createInventorySets(2, true)->getCharacter();
@@ -154,7 +154,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEmpty($character->inventory->slots);
     }
 
-    public function testRenameSet()
+    public function test_rename_set()
     {
         $character = $this->character->inventorySetManagement()->createInventorySets()->getCharacter();
 
@@ -175,7 +175,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEquals('Renamed set to: Apples', $jsonData['message']);
     }
 
-    public function testSaveEquippedAsSet()
+    public function test_save_equipped_as_set()
     {
         $character = $this->character->equipStartingEquipment()->inventorySetManagement()->createInventorySets(1, true)->getCharacter();
 
@@ -191,7 +191,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEquals($set->refresh()->name.' is now equipped (equipment has been moved to the set).', $jsonData['message']);
     }
 
-    public function testRemoveItemFromSet()
+    public function test_remove_item_from_set()
     {
         $itemToRemove = $this->createItem();
         $character = $this->character
@@ -217,7 +217,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEquals('Removed '.$itemToRemove->affix_name.' from '.$setName.' and placed back into your inventory.', $jsonData['message']);
     }
 
-    public function testEmptySet()
+    public function test_empty_set()
     {
         $character = $this->character
             ->inventorySetManagement()
@@ -241,7 +241,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEquals('Removed '. 2 .' of '. 2 .' items from '.$set->name.'. If all items were not moved over, it is because your inventory became full.', $jsonData['message']);
     }
 
-    public function testCannotEquipItem()
+    public function test_cannot_equip_item()
     {
         $character = $this->character->inventoryManagement()
             ->giveItemMultipleTimes($this->createItem([
@@ -270,7 +270,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEquals('The item you are trying to equip as a replacement, does not exist.', $jsonData['message']);
     }
 
-    public function testEquipItem()
+    public function test_equip_item()
     {
         $character = $this->character->inventoryManagement()
             ->giveItemMultipleTimes($this->createItem([
@@ -299,7 +299,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEquals('Equipped item.', $jsonData['message']);
     }
 
-    public function testUnequipSet()
+    public function test_unequip_set()
     {
         $character = $this->character->inventorySetManagement()
             ->createInventorySets(1, true)
@@ -317,7 +317,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEquals('Unequipped '.$character->inventorySets->first()->name.'.', $jsonData['message']);
     }
 
-    public function testUnequipItem()
+    public function test_unequip_item()
     {
         $character = $this->character->equipStartingEquipment()
             ->getCharacter();
@@ -335,7 +335,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEquals('Unequipped item: '.$slot->item->affix_name, $jsonData['message']);
     }
 
-    public function testWhenUnequipAllUnequipTheSet()
+    public function test_when_unequip_all_unequip_the_set()
     {
         $character = $this->character->inventorySetManagement()
             ->createInventorySets(1, true)
@@ -352,7 +352,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEquals('Unequipped '.$character->inventorySets->first()->name.'.', $jsonData['message']);
     }
 
-    public function testUnequipAllNonSetItems()
+    public function test_unequip_all_non_set_items()
     {
         $character = $this->character->equipStartingEquipment()
             ->getCharacter();
@@ -367,7 +367,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEquals('All items have been unequipped.', $jsonData['message']);
     }
 
-    public function testEquipAndItemSet()
+    public function test_equip_and_item_set()
     {
         $character = $this->character->inventorySetManagement()
             ->createInventorySets(1, true)
@@ -384,7 +384,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEquals($set->name.' is now equipped', $jsonData['message']);
     }
 
-    public function testUseManyItems()
+    public function test_use_many_items()
     {
         Queue::fake();
 
@@ -413,7 +413,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEquals('Used selected items.', $jsonData['message']);
     }
 
-    public function testUseSingleAlchemyItem()
+    public function test_use_single_alchemy_item()
     {
         Queue::fake();
 
@@ -438,7 +438,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEquals('Used selected item.', $jsonData['message']);
     }
 
-    public function testDestroyAlchemyItem()
+    public function test_destroy_alchemy_item()
     {
         $item = $this->createItem([
             'usable' => true,
@@ -463,7 +463,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEquals('Destroyed Alchemy Item: '.$item->name.'.', $jsonData['message']);
     }
 
-    public function testDestroyAllAlchemyItems()
+    public function test_destroy_all_alchemy_items()
     {
         $item = $this->createItem([
             'usable' => true,

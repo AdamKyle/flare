@@ -28,7 +28,7 @@ class UpdateCharactersForClassRanks extends Command
                 foreach ($gameClasses as $gameClass) {
                     $classRank = $character->classRanks->firstWhere('game_class_id', $gameClass->id);
 
-                    if (!$classRank) {
+                    if (! $classRank) {
                         $classRank = $character->classRanks()->create([
                             'character_id' => $character->id,
                             'game_class_id' => $gameClass->id,
@@ -74,6 +74,7 @@ class UpdateCharactersForClassRanks extends Command
             if ($misalignedIndex < $misaligned->count()) {
                 $misaligned->get($misalignedIndex)->update(['weapon_type' => $type]);
                 $misalignedIndex++;
+
                 continue;
             }
 

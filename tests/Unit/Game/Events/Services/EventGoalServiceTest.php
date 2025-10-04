@@ -17,21 +17,21 @@ class EventGoalServiceTest extends TestCase
 
     private ?EventGoalsService $eventGoalService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->eventGoalService = resolve(EventGoalsService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->eventGoalService = null;
     }
 
-    public function testFetchCurrentEventGoalDataForResponse()
+    public function test_fetch_current_event_goal_data_for_response()
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
@@ -66,7 +66,7 @@ class EventGoalServiceTest extends TestCase
         $this->assertEquals($expected, $this->eventGoalService->fetchCurrentEventGoal($character));
     }
 
-    public function testFetchCurrentEventGoalData()
+    public function test_fetch_current_event_goal_data()
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
@@ -100,7 +100,7 @@ class EventGoalServiceTest extends TestCase
         $this->assertEquals($expected, $this->eventGoalService->getEventGoalData($character));
     }
 
-    public function testFetchCurrentEventGoalDataWithCurrentKillCount()
+    public function test_fetch_current_event_goal_data_with_current_kill_count()
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
@@ -142,7 +142,7 @@ class EventGoalServiceTest extends TestCase
         $this->assertEquals($expected, $this->eventGoalService->getEventGoalData($character));
     }
 
-    public function testFetchCurrentEventGoalKillRequiredIsEqualToRewardEvery()
+    public function test_fetch_current_event_goal_kill_required_is_equal_to_reward_every()
     {
         $eventGoal = $this->createGlobalEventGoal([
             'event_type' => EventType::WINTER_EVENT,
@@ -155,7 +155,7 @@ class EventGoalServiceTest extends TestCase
         $this->assertEquals($eventGoal->reward_every, $this->eventGoalService->fetchAmountNeeded($eventGoal));
     }
 
-    public function testOnlyNeedsHalfOfRewardEveryAsCurrentKillCount()
+    public function test_only_needs_half_of_reward_every_as_current_kill_count()
     {
         $eventGoal = $this->createGlobalEventGoal([
             'event_type' => EventType::WINTER_EVENT,

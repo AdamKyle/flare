@@ -23,21 +23,21 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
 
     private ?UpdateCraftingTasksForFactionLoyalty $updateCraftingTasksForFactionLoyalty;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->updateCraftingTasksForFactionLoyalty = resolve(UpdateCraftingTasksForFactionLoyalty::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->updateCraftingTasksForFactionLoyalty = null;
     }
 
-    public function testNothingHappensWhenThePlayerIsNotPledgedToAFaction()
+    public function test_nothing_happens_when_the_player_is_not_pledged_to_a_faction()
     {
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
@@ -58,7 +58,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         Event::assertNotDispatched(UpdateTopBarEvent::class);
     }
 
-    public function testDoesNotHandleCraftingFactionLoyaltyWhenCharacterIsNotHelpingAnNpc()
+    public function test_does_not_handle_crafting_faction_loyalty_when_character_is_not_helping_an_npc()
     {
         $item = $this->createItem();
 
@@ -93,7 +93,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         Event::assertNotDispatched(UpdateTopBarEvent::class);
     }
 
-    public function testDoesNotUpdateLoyaltyTasksWhenNoCraftingTaskFound()
+    public function test_does_not_update_loyalty_tasks_when_no_crafting_task_found()
     {
         $item = $this->createItem();
 
@@ -134,7 +134,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         Event::assertNotDispatched(UpdateTopBarEvent::class);
     }
 
-    public function testDoesNotHandleCraftingFameWhenItemIsNotApartOfTheCraftingList()
+    public function test_does_not_handle_crafting_fame_when_item_is_not_apart_of_the_crafting_list()
     {
         $item = $this->createItem();
 
@@ -183,7 +183,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         $this->assertEquals(0, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->factionLoyaltyNpcTasks->fame_tasks[0]['current_amount']);
     }
 
-    public function testUpdatesTheCurrentAmountOnACraftingTaskButDoesNotLevelUpTheFame()
+    public function test_updates_the_current_amount_on_a_crafting_task_but_does_not_level_up_the_fame()
     {
         $item = $this->createItem();
 
@@ -239,7 +239,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         );
     }
 
-    public function testUpdatesTheCurrentAmountOnACraftingTaskButDoesNotLevelUpTheFameWhenTheWeeklyEventIsRunning()
+    public function test_updates_the_current_amount_on_a_crafting_task_but_does_not_level_up_the_fame_when_the_weekly_event_is_running()
     {
         $item = $this->createItem();
 
@@ -299,7 +299,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         );
     }
 
-    public function testLevelUpFameFromCrafting()
+    public function test_level_up_fame_from_crafting()
     {
 
         $item = $this->createItem();
@@ -400,7 +400,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
 
     }
 
-    public function testLevelUpFameFromCraftingWhenTheEventIsRunning()
+    public function test_level_up_fame_from_crafting_when_the_event_is_running()
     {
 
         $item = $this->createItem();
@@ -505,7 +505,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
 
     }
 
-    public function testDoNotGiveMoreCurrenciesThenMaxAllowedForCraftingTasks()
+    public function test_do_not_give_more_currencies_then_max_allowed_for_crafting_tasks()
     {
         $item = $this->createItem();
 
@@ -608,7 +608,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
     }
 
-    public function testDoNotAssignTasksForMaxLevelFame()
+    public function test_do_not_assign_tasks_for_max_level_fame()
     {
         $item = $this->createItem();
 
@@ -694,7 +694,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         $this->assertCount(0, $character->factionLoyalties()->first()->factionLoyaltyNpcs->first()->factionLoyaltyNpcTasks->fame_tasks);
     }
 
-    public function testCannotLevelFameAnyMore()
+    public function test_cannot_level_fame_any_more()
     {
         $item = $this->createItem();
 

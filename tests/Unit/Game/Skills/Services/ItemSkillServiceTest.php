@@ -17,7 +17,7 @@ class ItemSkillServiceTest extends TestCase
 
     private ?ItemSkillService $itemSkillService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -26,7 +26,7 @@ class ItemSkillServiceTest extends TestCase
         $this->itemSkillService = resolve(ItemSkillService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -35,7 +35,7 @@ class ItemSkillServiceTest extends TestCase
         $this->itemSkillService = null;
     }
 
-    public function testCannotFindItemForItemSkillToTrain()
+    public function test_cannot_find_item_for_item_skill_to_train()
     {
 
         $character = $this->character->getCharacter();
@@ -46,7 +46,7 @@ class ItemSkillServiceTest extends TestCase
         $this->assertEquals('No item found. Either it is not equipped, or it does not exist.', $result['message']);
     }
 
-    public function testCannotFindItemForItemSkillToTrainWhenYouHaveEquippedItems()
+    public function test_cannot_find_item_for_item_skill_to_train_when_you_have_equipped_items()
     {
 
         $character = $this->character->equipStartingEquipment()->getCharacter();
@@ -57,7 +57,7 @@ class ItemSkillServiceTest extends TestCase
         $this->assertEquals('No item found. Either it is not equipped, or it does not exist.', $result['message']);
     }
 
-    public function testCannotFindItemForItemSkillToStopTrainingWhenYouHaveNoItemEquipped()
+    public function test_cannot_find_item_for_item_skill_to_stop_training_when_you_have_no_item_equipped()
     {
 
         $character = $this->character->equipStartingEquipment()->getCharacter();
@@ -68,7 +68,7 @@ class ItemSkillServiceTest extends TestCase
         $this->assertEquals('Item must be equipped to manage the training of a skill.', $result['message']);
     }
 
-    public function testCannotFindItemSkillProgressionWhenYouHaveAnItemThatHasSkills()
+    public function test_cannot_find_item_skill_progression_when_you_have_an_item_that_has_skills()
     {
         $item = $this->createItem(['type' => 'artifact']);
 
@@ -96,7 +96,7 @@ class ItemSkillServiceTest extends TestCase
         $this->assertEquals('No skill found on said item.', $result['message']);
     }
 
-    public function testCannotStopTrainingSkillWhenThereIsNoProgressionData()
+    public function test_cannot_stop_training_skill_when_there_is_no_progression_data()
     {
 
         $itemSkill = ItemSkill::create([
@@ -117,7 +117,7 @@ class ItemSkillServiceTest extends TestCase
         $this->assertEquals('No skill found on said item.', $result['message']);
     }
 
-    public function testCannotFindItemSkillProgressionWhenYouHaveAnItemThatHasSkillsButNoProgression()
+    public function test_cannot_find_item_skill_progression_when_you_have_an_item_that_has_skills_but_no_progression()
     {
         $item = $this->createItem(['type' => 'artifact']);
 
@@ -137,7 +137,7 @@ class ItemSkillServiceTest extends TestCase
         $this->assertEquals('No skill found on said item.', $result['message']);
     }
 
-    public function testCannotTrainSkillWhenParentIsNotTrained()
+    public function test_cannot_train_skill_when_parent_is_not_trained()
     {
 
         $itemSkill = ItemSkill::create([
@@ -188,7 +188,7 @@ class ItemSkillServiceTest extends TestCase
         $this->assertEquals('You must train the parent skill first.', $result['message']);
     }
 
-    public function testCanTrainChildSkill()
+    public function test_can_train_child_skill()
     {
 
         $itemSkill = ItemSkill::create([
@@ -237,7 +237,7 @@ class ItemSkillServiceTest extends TestCase
         $this->assertEquals('You are now training: '.$childItemSkillProgression->itemSkill->name, $result['message']);
     }
 
-    public function testStartTrainingTheSkillOnTheItem()
+    public function test_start_training_the_skill_on_the_item()
     {
 
         $itemSkill = ItemSkill::create([
@@ -273,7 +273,7 @@ class ItemSkillServiceTest extends TestCase
         $this->assertTrue($itemSkillProgression->is_training);
     }
 
-    public function testStopTrainingTheSkillOnTheItem()
+    public function test_stop_training_the_skill_on_the_item()
     {
 
         $itemSkill = ItemSkill::create([
@@ -309,7 +309,7 @@ class ItemSkillServiceTest extends TestCase
         $this->assertFalse($itemSkillProgression->is_training);
     }
 
-    public function testStartTrainingOfParentSkillWhenTrainingParentSkill()
+    public function test_start_training_of_parent_skill_when_training_parent_skill()
     {
 
         $itemSkill = ItemSkill::create([

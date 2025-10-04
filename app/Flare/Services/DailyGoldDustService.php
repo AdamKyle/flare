@@ -46,7 +46,7 @@ class DailyGoldDustService
 
         if (! Cache::has('daily-gold-dust-lottery-won')) {
             event(new GlobalMessageEvent(
-                $character->name . ' has won the daily Gold Dust Lottery!
+                $character->name.' has won the daily Gold Dust Lottery!
             (Gold Dust is used in Alchemy and Quests - See Help section -> Click Help I\'m stuck, and see currencies under: Character Information -> Currencies)'
             ));
 

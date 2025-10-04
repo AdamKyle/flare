@@ -16,7 +16,7 @@ class SurveyValidatorTest extends TestCase
 
     private ?Survey $survey;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -25,7 +25,7 @@ class SurveyValidatorTest extends TestCase
         $this->survey = $this->createSurvey();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -34,7 +34,7 @@ class SurveyValidatorTest extends TestCase
         $this->survey = null;
     }
 
-    public function testSectionLabelDoesNotHaveAValue()
+    public function test_section_label_does_not_have_a_value()
     {
         $isValid = $this->surveryValidator->setSurveySections($this->survey)->validate([[
             'Some Radio Label' => ['type' => 'radio'],
@@ -45,11 +45,11 @@ class SurveyValidatorTest extends TestCase
         $this->assertFalse($isValid);
     }
 
-    public function testSectionIsInvalidWhenUsingInvalidType()
+    public function test_section_is_invalid_when_using_invalid_type()
     {
 
         $survey = $this->createSurvey([
-            'sections' =>  [[
+            'sections' => [[
                 'title' => 'Sample Section Title',
                 'description' => 'Sample Section Description',
                 'input_types' => [
@@ -60,10 +60,10 @@ class SurveyValidatorTest extends TestCase
                             'Option 1',
                             'Option 2',
                             'Option 3',
-                        ]
+                        ],
                     ],
-                ]
-            ]]
+                ],
+            ]],
         ]);
 
         $isValid = $this->surveryValidator->setSurveySections($survey)->validate([[
@@ -73,7 +73,7 @@ class SurveyValidatorTest extends TestCase
         $this->assertFalse($isValid);
     }
 
-    public function testSectionIsInvalidWhenCheckBoxOptionIsNotAValidSelection()
+    public function test_section_is_invalid_when_check_box_option_is_not_a_valid_selection()
     {
         $survey = $this->createSurvey([
             'sections' => [[
@@ -87,10 +87,10 @@ class SurveyValidatorTest extends TestCase
                             'Option 1',
                             'Option 2',
                             'Option 3',
-                        ]
+                        ],
                     ],
-                ]
-            ]]
+                ],
+            ]],
         ]);
 
         $isValid = $this->surveryValidator->setSurveySections($survey)->validate([[
@@ -100,7 +100,7 @@ class SurveyValidatorTest extends TestCase
         $this->assertFalse($isValid);
     }
 
-    public function testSectionsAreValid()
+    public function test_sections_are_valid()
     {
         $isValid = $this->surveryValidator->setSurveySections($this->survey)->validate([[
             'Some Radio Label' => ['value' => 'Option 1', 'type' => 'radio'],

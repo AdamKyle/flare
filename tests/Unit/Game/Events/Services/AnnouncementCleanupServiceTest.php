@@ -14,11 +14,11 @@ use Tests\Traits\CreateEvent;
 
 class AnnouncementCleanupServiceTest extends TestCase
 {
-    use RefreshDatabase, CreateEvent, CreateAnnouncement;
+    use CreateAnnouncement, CreateEvent, RefreshDatabase;
 
     private ?AnnouncementCleanupService $service = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -29,14 +29,14 @@ class AnnouncementCleanupServiceTest extends TestCase
         ]);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->service = null;
 
         parent::tearDown();
     }
 
-    public function testDeleteByEventIdRemovesAnnouncementAndDispatchesEvent(): void
+    public function test_delete_by_event_id_removes_announcement_and_dispatches_event(): void
     {
         $gameEvent = $this->createEvent([
             'type' => EventType::RAID_EVENT,
@@ -55,7 +55,7 @@ class AnnouncementCleanupServiceTest extends TestCase
         EventFacade::assertDispatched(DeleteAnnouncementEvent::class);
     }
 
-    public function testDeleteByEventIdWhenNoAnnouncementFoundDoesNothing(): void
+    public function test_delete_by_event_id_when_no_announcement_found_does_nothing(): void
     {
         $gameEvent = $this->createEvent([
             'type' => EventType::RAID_EVENT,

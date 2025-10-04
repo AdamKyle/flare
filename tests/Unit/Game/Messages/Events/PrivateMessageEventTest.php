@@ -17,21 +17,21 @@ class PrivateMessageEventTest extends TestCase
 
     private ?CharacterFactory $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testSendPrivateMessageWithPrivateMessageEvent()
+    public function test_send_private_message_with_private_message_event()
     {
         Event::fake();
 
@@ -53,7 +53,7 @@ class PrivateMessageEventTest extends TestCase
         Event::assertDispatched(PrivateMessageEvent::class);
     }
 
-    public function testSendPrivateMessageAsAdminWithPrivateMessageEvent()
+    public function test_send_private_message_as_admin_with_private_message_event()
     {
         Event::fake();
 

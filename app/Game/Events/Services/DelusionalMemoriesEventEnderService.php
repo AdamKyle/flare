@@ -15,38 +15,19 @@ use App\Game\Quests\Services\BuildQuestCacheService;
 
 class DelusionalMemoriesEventEnderService implements EventEnder
 {
-
-    /**
-     * @param  KingdomEventService  $kingdomEventService
-     * @param  MoveCharacterAfterEventService  $mover
-     * @param  FactionLoyaltyPledgeCleanupService  $pledgeService
-     * @param  AnnouncementCleanupService  $announcementCleanup
-     * @param  GlobalEventGoalCleanupService  $goalCleanup
-     */
     public function __construct(
         private readonly KingdomEventService $kingdomEventService,
         private readonly MoveCharacterAfterEventService $mover,
         private readonly FactionLoyaltyPledgeCleanupService $pledgeService,
         private readonly AnnouncementCleanupService $announcementCleanup,
         private readonly GlobalEventGoalCleanupService $goalCleanup
-    ) { }
+    ) {}
 
-
-    /**
-     * @param  EventType  $type
-     * @return bool
-     */
     public function supports(EventType $type): bool
     {
         return $type->isDelusionalMemoriesEvent();
     }
 
-    /**
-     * @param  EventType  $type
-     * @param  ScheduledEvent  $scheduled
-     * @param  ActiveEvent  $current
-     * @return void
-     */
     public function end(EventType $type, ScheduledEvent $scheduled, ActiveEvent $current): void
     {
         $this->kingdomEventService->handleKingdomRewardsForEvent(\App\Flare\Values\MapNameValue::DELUSIONAL_MEMORIES);
@@ -56,6 +37,7 @@ class DelusionalMemoriesEventEnderService implements EventEnder
         if (is_null($map)) {
             $this->announcementCleanup->deleteByEventId($current->id);
             $current->delete();
+
             return;
         }
 
@@ -64,6 +46,7 @@ class DelusionalMemoriesEventEnderService implements EventEnder
         if (is_null($surfaceMap)) {
             $this->announcementCleanup->deleteByEventId($current->id);
             $current->delete();
+
             return;
         }
 
@@ -96,9 +79,6 @@ class DelusionalMemoriesEventEnderService implements EventEnder
         app(BuildQuestCacheService::class)->buildRaidQuestCache(true);
     }
 
-    /**
-     * @return void
-     */
     private function updateAllCharacterStatuses(): void
     {
         Character::chunkById(250, function ($characters) {

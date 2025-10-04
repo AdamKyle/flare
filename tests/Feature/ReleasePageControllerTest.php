@@ -10,7 +10,7 @@ class ReleasePageControllerTest extends TestCase
 {
     use CreateReleaseNotes, RefreshDatabase;
 
-    public function testViewReleaseNotes()
+    public function test_view_release_notes()
     {
         $releaseNotes = $this->createReleaseNotes([
             'name' => 'Sample',

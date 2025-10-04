@@ -15,21 +15,21 @@ class MapChatColorTest extends TestCase
 
     private ?CharacterFactory $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testSurfaceColor()
+    public function test_surface_color()
     {
         $character = $this->character->getCharacter();
 
@@ -47,7 +47,7 @@ class MapChatColorTest extends TestCase
         $this->assertEquals($mapColor->getColor(), MapChatColor::SURFACE);
     }
 
-    public function testLabyrinthColor()
+    public function test_labyrinth_color()
     {
         $character = $this->character->getCharacter();
 
@@ -65,7 +65,7 @@ class MapChatColorTest extends TestCase
         $this->assertEquals($mapColor->getColor(), MapChatColor::LABYRINTH);
     }
 
-    public function testDungeonsColor()
+    public function test_dungeons_color()
     {
         $character = $this->character->getCharacter();
 
@@ -83,7 +83,7 @@ class MapChatColorTest extends TestCase
         $this->assertEquals($mapColor->getColor(), MapChatColor::DUNGEONS);
     }
 
-    public function testHellColor()
+    public function test_hell_color()
     {
         $character = $this->character->getCharacter();
 
@@ -101,7 +101,7 @@ class MapChatColorTest extends TestCase
         $this->assertEquals($mapColor->getColor(), MapChatColor::HELL);
     }
 
-    public function testShadowPlaneColor()
+    public function test_shadow_plane_color()
     {
         $character = $this->character->getCharacter();
 
@@ -119,7 +119,7 @@ class MapChatColorTest extends TestCase
         $this->assertEquals($mapColor->getColor(), MapChatColor::SHP);
     }
 
-    public function testPurgatoryColor()
+    public function test_purgatory_color()
     {
         $character = $this->character->getCharacter();
 
@@ -137,7 +137,7 @@ class MapChatColorTest extends TestCase
         $this->assertEquals($mapColor->getColor(), MapChatColor::PURGATORY);
     }
 
-    public function testTheIcePlaneColor()
+    public function test_the_ice_plane_color()
     {
         $character = $this->character->getCharacter();
 

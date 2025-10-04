@@ -13,7 +13,7 @@ class CleanChatTest extends TestCase
 {
     use CreateMessage, CreateUser, RefreshDatabase;
 
-    public function testClearChat()
+    public function test_clear_chat()
     {
         $this->createMessage($this->createUser());
 

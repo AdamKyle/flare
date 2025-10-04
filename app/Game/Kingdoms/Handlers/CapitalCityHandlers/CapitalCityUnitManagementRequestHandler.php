@@ -19,10 +19,8 @@ use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
-
 class CapitalCityUnitManagementRequestHandler
 {
-
     use ResponseBuilder;
 
     public function __construct(
@@ -35,10 +33,6 @@ class CapitalCityUnitManagementRequestHandler
     /**
      * Create unit requests for a character in a kingdom.
      *
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @param array $requestData
-     * @return array
      * @throws Exception
      */
     public function createUnitRequests(Character $character, Kingdom $kingdom, array $requestData): array
@@ -72,10 +66,6 @@ class CapitalCityUnitManagementRequestHandler
 
     /**
      * Find the target kingdom for the request.
-     *
-     * @param Character $character
-     * @param int $kingdomId
-     * @return Kingdom|null
      */
     private function findTargetKingdom(Character $character, int $kingdomId): ?Kingdom
     {
@@ -84,11 +74,6 @@ class CapitalCityUnitManagementRequestHandler
 
     /**
      * Determine the time required for unit movement.
-     *
-     * @param Character $character
-     * @param Kingdom|null $toKingdom
-     * @param Kingdom $fromKingdom
-     * @return int
      */
     private function determineTime(Character $character, ?Kingdom $toKingdom, Kingdom $fromKingdom): int
     {
@@ -102,12 +87,6 @@ class CapitalCityUnitManagementRequestHandler
 
     /**
      * Prepare the data for the unit queue.
-     *
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @param array $data
-     * @param int $time
-     * @return array
      */
     private function prepareQueueData(Character $character, Kingdom $kingdom, array $data, int $time): array
     {
@@ -126,10 +105,6 @@ class CapitalCityUnitManagementRequestHandler
 
     /**
      * Prepare the unit requests data.
-     *
-     * @param array $unitRequestsData
-     * @param Kingdom|null $toKingdom
-     * @return array
      */
     private function prepareUnitRequests(array $unitRequestsData, ?Kingdom $toKingdom): array
     {
@@ -147,12 +122,6 @@ class CapitalCityUnitManagementRequestHandler
 
     /**
      * Trigger events and dispatch jobs related to the unit queue.
-     *
-     * @param CapitalCityUnitQueue $queue
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @param int $time
-     * @return void
      */
     private function triggerEvents(CapitalCityUnitQueue $queue, Character $character, Kingdom $kingdom, int $time): void
     {
@@ -164,9 +133,6 @@ class CapitalCityUnitManagementRequestHandler
 
     /**
      * Update the status of the kingdom.
-     *
-     * @param Kingdom $kingdom
-     * @return void
      */
     private function updateKingdomStatus(Kingdom $kingdom): void
     {

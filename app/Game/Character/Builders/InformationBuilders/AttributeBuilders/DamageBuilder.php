@@ -78,7 +78,6 @@ class DamageBuilder extends BaseAttribute
         return $damage;
     }
 
-
     public function buildWeaponDamageBreakDown(float $damageStat, bool $voided): array
     {
         $details = [];
@@ -211,9 +210,6 @@ class DamageBuilder extends BaseAttribute
 
     /**
      * Build stacking affix damage.
-     *
-     * @param bool $voided
-     * @return float
      */
     public function buildAffixStackingDamage(bool $voided = false): float
     {
@@ -230,9 +226,6 @@ class DamageBuilder extends BaseAttribute
 
     /**
      * Build affix non stacking damage.
-     *
-     * @param bool $voided
-     * @return float
      */
     public function buildAffixNonStackingDamage(bool $voided = false): float
     {

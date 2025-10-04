@@ -16,17 +16,17 @@ class InitiateWeeklyCurrencyDropEventTest extends TestCase
 {
     use CreateScheduledEvent, RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
 
-    public function testWeeklyCurrencyEventDoesNotTrigger()
+    public function test_weekly_currency_event_does_not_trigger()
     {
         Event::fake();
 
@@ -37,7 +37,7 @@ class InitiateWeeklyCurrencyDropEventTest extends TestCase
         $this->assertEmpty(ModelsEvent::all());
     }
 
-    public function testWeeklyCurrencyEventDoesTrigger()
+    public function test_weekly_currency_event_does_trigger()
     {
         Event::fake();
 

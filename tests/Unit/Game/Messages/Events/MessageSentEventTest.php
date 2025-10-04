@@ -15,21 +15,21 @@ class MessageSentEventTest extends TestCase
 
     private ?CharacterFactory $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testSendMessageThroughMessageSentEvent()
+    public function test_send_message_through_message_sent_event()
     {
         Event::fake();
 

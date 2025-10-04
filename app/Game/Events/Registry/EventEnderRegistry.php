@@ -21,15 +21,6 @@ class EventEnderRegistry
      */
     private array $enders = [];
 
-    /**
-     * @param RaidEventEnderService $raid
-     * @param WeeklyCurrencyEventEnderService $weeklyCurrency
-     * @param WeeklyCelestialEventEnderService $weeklyCelestials
-     * @param WeeklyFactionLoyaltyEnderService $weeklyFaction
-     * @param WinterEventEnderService $winter
-     * @param DelusionalMemoriesEventEnderService $delusional
-     * @param FeedbackEventEnderService $feedback
-     */
     public function __construct(
         RaidEventEnderService $raid,
         WeeklyCurrencyEventEnderService $weeklyCurrency,
@@ -50,12 +41,6 @@ class EventEnderRegistry
         ];
     }
 
-    /**
-     * @param  EventType  $type
-     * @param  ScheduledEvent  $scheduled
-     * @param  Event  $current
-     * @return void
-     */
     public function end(EventType $type, ScheduledEvent $scheduled, Event $current): void
     {
         foreach ($this->enders as $ender) {

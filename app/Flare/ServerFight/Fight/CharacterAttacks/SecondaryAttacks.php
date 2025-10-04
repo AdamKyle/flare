@@ -96,7 +96,7 @@ class SecondaryAttacks extends BattleBase
 
             $this->monsterHealth -= $special['damage'];
 
-            $this->addMessage('Your class special: ' . $special['name'] . ' fires off and you do: ' . number_format($special['damage']) . ' damage to the enemy!', 'player-action');
+            $this->addMessage('Your class special: '.$special['name'].' fires off and you do: '.number_format($special['damage']).' damage to the enemy!', 'player-action');
         }
     }
 
@@ -134,7 +134,7 @@ class SecondaryAttacks extends BattleBase
             if ($damageResistance > 0) {
                 $lifeStealingDamage -= $lifeStealingDamage * $damageResistance;
 
-                $this->addMessage('The enemy manages to resist (' . ($damageResistance * 100) . '%) some of the life stealing damage!', 'enemy-action');
+                $this->addMessage('The enemy manages to resist ('.($damageResistance * 100).'%) some of the life stealing damage!', 'enemy-action');
             }
         }
 
@@ -165,7 +165,7 @@ class SecondaryAttacks extends BattleBase
         if ($ringDamage > 0) {
             $this->monsterHealth -= ($ringDamage - $ringDamage * $this->attackData['damage_deduction']);
 
-            $this->addMessage('Your rings hit for: ' . number_format($ringDamage), 'player-action');
+            $this->addMessage('Your rings hit for: '.number_format($ringDamage), 'player-action');
         }
     }
 

@@ -21,14 +21,14 @@ use Tests\Traits\CreateUser;
 
 class CharacterBuildStateTest extends TestCase
 {
-    use RefreshDatabase,
-        CreateUser,
-        CreateRace,
+    use CreateCharacter,
         CreateClass,
-        CreateCharacter,
-        CreateGameMap;
+        CreateGameMap,
+        CreateRace,
+        CreateUser,
+        RefreshDatabase;
 
-    public function testDefaultsAreNull(): void
+    public function test_defaults_are_null(): void
     {
         $state = app(CharacterBuildState::class);
 
@@ -40,7 +40,7 @@ class CharacterBuildStateTest extends TestCase
         $this->assertNull($state->getNow());
     }
 
-    public function testSettersStoreInstancesAndAreFluent(): void
+    public function test_setters_store_instances_and_are_fluent(): void
     {
         $state = app(CharacterBuildState::class);
 
@@ -93,7 +93,7 @@ class CharacterBuildStateTest extends TestCase
         $this->assertSame($now, $state->getNow());
     }
 
-    public function testIndividualSettersAndGetters(): void
+    public function test_individual_setters_and_getters(): void
     {
         $state = app(CharacterBuildState::class);
 

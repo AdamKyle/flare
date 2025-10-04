@@ -4,7 +4,6 @@ namespace App\Game\Kingdoms\Transformers;
 
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitMovementQueue;
-use App\Game\Kingdoms\Transformers\UnitMovementTransformer;
 use League\Fractal\Resource\Collection;
 use League\Fractal\TransformerAbstract;
 

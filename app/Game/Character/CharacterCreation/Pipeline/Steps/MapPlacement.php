@@ -9,10 +9,6 @@ class MapPlacement
 {
     /**
      * Create the character's map row for the chosen GameMap.
-     *
-     * @param CharacterBuildState $state
-     * @param Closure $next
-     * @return CharacterBuildState
      */
     public function process(CharacterBuildState $state, Closure $next): CharacterBuildState
     {

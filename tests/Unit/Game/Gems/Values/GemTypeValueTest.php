@@ -8,66 +8,66 @@ use Tests\TestCase;
 
 class GemTypeValueTest extends TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
 
-    public function testThrowErrorForInvalidGemTypeValue()
+    public function test_throw_error_for_invalid_gem_type_value()
     {
         $this->expectException(Exception::class);
 
         new GemTypeValue(105);
     }
 
-    public function testCannotGetOppositeNameForNameThatDoesntExist()
+    public function test_cannot_get_opposite_name_for_name_that_doesnt_exist()
     {
         $this->expectException(Exception::class);
 
         GemTypeValue::getOppsiteForHalfDamage('apples');
     }
 
-    public function testGetOppositeForHalfDamage()
+    public function test_get_opposite_for_half_damage()
     {
         $element = GemTypeValue::getOppsiteForHalfDamage('fire');
 
         $this->assertEquals('Water', $element);
     }
 
-    public function testFailsToGetOppositeForDoubleDamage()
+    public function test_fails_to_get_opposite_for_double_damage()
     {
         $this->expectException(Exception::class);
 
         GemTypeValue::getOppsiteForDoubleDamage('apples');
     }
 
-    public function testGetOppositeForDoubleDamage()
+    public function test_get_opposite_for_double_damage()
     {
         $element = GemTypeValue::getOppsiteForDoubleDamage('fire');
 
         $this->assertEquals('Ice', $element);
     }
 
-    public function testIsFire()
+    public function test_is_fire()
     {
         $gemTypeValue = new GemTypeValue(GemTypeValue::FIRE);
 
         $this->assertTrue($gemTypeValue->isFire());
     }
 
-    public function testIsWater()
+    public function test_is_water()
     {
         $gemTypeValue = new GemTypeValue(GemTypeValue::WATER);
 
         $this->assertTrue($gemTypeValue->isWater());
     }
 
-    public function testIsIce()
+    public function test_is_ice()
     {
         $gemTypeValue = new GemTypeValue(GemTypeValue::ICE);
 

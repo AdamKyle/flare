@@ -49,6 +49,6 @@ class PrisonerRage extends BattleBase
     {
         $this->monsterHealth -= $damage;
 
-        $this->addMessage('You slash, you thrash, you bash and you crash your way through! (You dealt: ' . number_format($damage) . ')', 'player-action');
+        $this->addMessage('You slash, you thrash, you bash and you crash your way through! (You dealt: '.number_format($damage).')', 'player-action');
     }
 }

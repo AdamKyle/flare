@@ -11,9 +11,6 @@ use Throwable;
 
 class GlobalEventStepRotatorService
 {
-    /**
-     * @param GlobalEventGoalCleanupService $cleanup
-     */
     public function __construct(private GlobalEventGoalCleanupService $cleanup) {}
 
     /**
@@ -21,13 +18,13 @@ class GlobalEventStepRotatorService
      *
      * Returns null if the current step cannot be found in the ordered steps.
      *
-     * @param Event $event
      * @return array{new_step:string,new_goal:GlobalEventGoal}|null
+     *
      * @throws Throwable
      */
     public function rotate(Event $event): ?array
     {
-        $steps       = $event->event_goal_steps;
+        $steps = $event->event_goal_steps;
         $currentStep = $event->current_event_goal_step;
 
         $index = is_array($steps) ? array_search($currentStep, $steps, true) : false;

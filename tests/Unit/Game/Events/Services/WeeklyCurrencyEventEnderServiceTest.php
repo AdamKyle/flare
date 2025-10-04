@@ -16,11 +16,11 @@ use Tests\Traits\CreateScheduledEvent;
 
 class WeeklyCurrencyEventEnderServiceTest extends TestCase
 {
-    use RefreshDatabase, CreateEvent, CreateScheduledEvent, CreateAnnouncement;
+    use CreateAnnouncement, CreateEvent, CreateScheduledEvent, RefreshDatabase;
 
     private ?WeeklyCurrencyEventEnderService $service = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -31,21 +31,21 @@ class WeeklyCurrencyEventEnderServiceTest extends TestCase
         $this->service = $this->app->make(WeeklyCurrencyEventEnderService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->service = null;
 
         parent::tearDown();
     }
 
-    public function testSupportsReturnsTrueOnlyForWeeklyCurrencyDrops(): void
+    public function test_supports_returns_true_only_for_weekly_currency_drops(): void
     {
         $this->assertTrue($this->service->supports(new EventType(EventType::WEEKLY_CURRENCY_DROPS)));
         $this->assertFalse($this->service->supports(new EventType(EventType::WEEKLY_CELESTIALS)));
         $this->assertFalse($this->service->supports(new EventType(EventType::WEEKLY_FACTION_LOYALTY_EVENT)));
     }
 
-    public function testEndAnnouncesCleansAnnouncementsAndDeletesActiveEvent(): void
+    public function test_end_announces_cleans_announcements_and_deletes_active_event(): void
     {
         $activeEvent = $this->createEvent([
             'type' => EventType::WEEKLY_CURRENCY_DROPS,

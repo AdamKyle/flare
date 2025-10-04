@@ -22,10 +22,6 @@ class EnchantingController extends Controller
      */
     public function __construct(private EnchantingService $enchantingService, private CraftingService $craftingService) {}
 
-    /**
-     * @param Character $character
-     * @return JsonResponse
-     */
     public function fetchAffixes(Character $character): JsonResponse
     {
         return response()->json([
@@ -36,14 +32,11 @@ class EnchantingController extends Controller
     }
 
     /**
-     * @param EnchantingValidation $request
-     * @param Character $character
-     * @return JsonResponse
      * @throws Exception
      */
     public function enchant(EnchantingValidation $request, Character $character): JsonResponse
     {
-        if (!$character->can_craft) {
+        if (! $character->can_craft) {
             return response()->json(['message' => 'You must wait to enchant again.'], 422);
         }
 

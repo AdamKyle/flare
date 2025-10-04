@@ -11,17 +11,17 @@ class CurrencyValueTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
 
-    public function testInitializeCurrencyValueWithInProperValue()
+    public function test_initialize_currency_value_with_in_proper_value()
     {
         $this->expectException(Exception::class);
 

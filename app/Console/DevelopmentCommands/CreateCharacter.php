@@ -9,7 +9,6 @@ use App\Flare\Models\User;
 use App\Game\Character\CharacterCreation\Services\CharacterBuilderService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 
 class CreateCharacter extends Command

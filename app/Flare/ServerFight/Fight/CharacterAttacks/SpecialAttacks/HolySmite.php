@@ -51,6 +51,6 @@ class HolySmite extends BattleBase
             $this->characterHealth = $maxHealth;
         }
 
-        $this->addMessage('You hit for (Holy Smite) ' . number_format($damage), 'player-action');
+        $this->addMessage('You hit for (Holy Smite) '.number_format($damage), 'player-action');
     }
 }

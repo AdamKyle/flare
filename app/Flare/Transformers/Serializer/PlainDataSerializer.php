@@ -1,6 +1,6 @@
 <?php
 
-namespace  App\Flare\Transformers\Serializer;
+namespace App\Flare\Transformers\Serializer;
 
 use League\Fractal\Serializer\SerializerAbstract;
 
@@ -23,12 +23,12 @@ class PlainDataSerializer extends SerializerAbstract
 
     public function includedData(\League\Fractal\Resource\ResourceInterface $resource, array $data): array
     {
-       return [];
+        return [];
     }
 
     public function meta(array $meta): array
     {
-       return [];
+        return [];
     }
 
     public function paginator(\League\Fractal\Pagination\PaginatorInterface $paginator): array
@@ -38,6 +38,6 @@ class PlainDataSerializer extends SerializerAbstract
 
     public function cursor(\League\Fractal\Pagination\CursorInterface $cursor): array
     {
-       return [];
+        return [];
     }
 }

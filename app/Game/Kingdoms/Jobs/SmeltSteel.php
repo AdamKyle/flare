@@ -83,9 +83,9 @@ class SmeltSteel implements ShouldQueue
         if (UserOnlineValue::isOnline($user)) {
 
             if ($user->show_unit_recruitment_messages) {
-                $message = 'kingdom: ' . $kingdom->name . ' on plane: ' . $plane . ' at: (X/Y) ' . $x . '/' . $y .
-                    ' has finished smelting: ' . number_format($amount) . ' of steel and now has: ' .
-                    number_format($kingdom->current_steel) . ' steel.';
+                $message = 'kingdom: '.$kingdom->name.' on plane: '.$plane.' at: (X/Y) '.$x.'/'.$y.
+                    ' has finished smelting: '.number_format($amount).' of steel and now has: '.
+                    number_format($kingdom->current_steel).' steel.';
 
                 ServerMessageHandler::handleMessage($user, KingdomMessageTypes::UNIT_RECRUITMENT_FINISHED, $message);
             }

@@ -12,13 +12,8 @@ use Illuminate\Http\JsonResponse;
 
 class SkillsController extends Controller
 {
-
     public function __construct(private SkillService $skillService) {}
 
-    /**
-     * @param Character $character
-     * @return JsonResponse
-     */
     public function fetchSkills(Character $character): JsonResponse
     {
         $trainableSkillIds = GameSkill::where('can_train', true)->pluck('id')->toArray();
@@ -30,11 +25,6 @@ class SkillsController extends Controller
         ]);
     }
 
-    /**
-     * @param Character $character
-     * @param Skill $skill
-     * @return JsonResponse
-     */
     public function skillInformation(Character $character, Skill $skill): JsonResponse
     {
 
@@ -47,11 +37,6 @@ class SkillsController extends Controller
         return response()->json($this->skillService->getSkill($skill));
     }
 
-    /**
-     * @param TrainSkillValidation $request
-     * @param Character $character
-     * @return JsonResponse
-     */
     public function train(TrainSkillValidation $request, Character $character): JsonResponse
     {
         $result = $this->skillService->trainSkill($character, $request->skill_id, $request->xp_percentage);
@@ -64,11 +49,6 @@ class SkillsController extends Controller
         ], $result['status']);
     }
 
-    /**
-     * @param Character $character
-     * @param Skill $skill
-     * @return JsonResponse
-     */
     public function cancelTrain(Character $character, Skill $skill): JsonResponse
     {
         if (is_null($character->skills()->find($skill->id))) {
@@ -81,7 +61,7 @@ class SkillsController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'You stopped training: ' . $skill->name,
+            'message' => 'You stopped training: '.$skill->name,
             'skills' => [
                 'training_skills' => $this->skillService->getSkills($character->refresh(), GameSkill::where('can_train', true)->pluck('id')->toArray()),
             ],

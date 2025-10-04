@@ -10,20 +10,13 @@ use Illuminate\Database\Eloquent\Collection;
 
 class MoveCharacterAfterEventService
 {
-
-    /**
-     * @param  TraverseService  $traverse
-     * @param  ExplorationAutomationService  $exploration
-     */
     public function __construct(
         private readonly TraverseService $traverse,
         private readonly ExplorationAutomationService $exploration
-    ) { }
+    ) {}
 
     /**
-     * @param  int  $mapId
      * @param  callable  $callback  function(Collection $characters): void
-     * @return void
      */
     public function forCharactersOnMap(int $mapId, callable $callback): void
     {
@@ -37,7 +30,6 @@ class MoveCharacterAfterEventService
 
     /**
      * @param  Collection<int, Character>  $characters
-     * @return void
      */
     public function stopExplorationFor(Collection $characters): void
     {
@@ -52,8 +44,6 @@ class MoveCharacterAfterEventService
 
     /**
      * @param  Collection<int, Character>  $characters
-     * @param  int  $mapId
-     * @return void
      */
     public function resetFactionProgressForMap(Collection $characters, int $mapId): void
     {
@@ -76,8 +66,6 @@ class MoveCharacterAfterEventService
 
     /**
      * @param  Collection<int, Character>  $characters
-     * @param  GameMap  $surface
-     * @return void
      */
     public function moveAllToSurface(Collection $characters, GameMap $surface): void
     {

@@ -44,12 +44,12 @@ class CreateCharacterAttackDataCache extends Command
 
         $character = Character::find($this->argument('characterId'));
 
-        if (!is_null($character)) {
-            $this->line('Creating attack data for character: ' . $character->name);
+        if (! is_null($character)) {
+            $this->line('Creating attack data for character: '.$character->name);
 
             CreateCharacterAttackData::dispatch($character->id)->onConnection('long_running');
 
-            $this->line('Created attack data for character: ' . $character->name);
+            $this->line('Created attack data for character: '.$character->name);
 
             return;
         }

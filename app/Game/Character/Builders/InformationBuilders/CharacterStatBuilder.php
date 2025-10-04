@@ -348,7 +348,7 @@ class CharacterStatBuilder
         $types = is_array($type) ? $type : [$type];
 
         if (is_null($this->equippedItems)) {
-            if (!empty(array_intersect($types, $validWeaponTypes))) {
+            if (! empty(array_intersect($types, $validWeaponTypes))) {
                 if ($this->character->classType()->isAlcoholic()) {
                     return $stat + ($stat * 0.25);
                 }
@@ -358,11 +358,13 @@ class CharacterStatBuilder
                 }
 
                 $value = $stat * 0.02;
+
                 return max($value, 5);
             }
 
             if (in_array(ItemType::SPELL_DAMAGE->value, $types) && $this->character->classType()->isHeretic()) {
                 $value = $stat * 0.15;
+
                 return max($value, 5);
             }
 
@@ -382,14 +384,15 @@ class CharacterStatBuilder
 
         $itemSkillBonus = 0;
 
-        if (!is_null($this->equippedItems)) {
+        if (! is_null($this->equippedItems)) {
             $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, 'base_damage');
         }
 
         return ceil($damage + ($damage * ($this->holyInfo()->fetchAttackBonus() + $classSpecialsBonus + $itemSkillBonus)));
     }
 
-    private function getRingDamage(array $types): int {
+    private function getRingDamage(array $types): int
+    {
         if (in_array(ItemType::RING->value, $types)) {
             return $this->damageBuilder->buildRingDamage();
         }
@@ -397,7 +400,8 @@ class CharacterStatBuilder
         return 0;
     }
 
-    private function getSpellDamage(array $types, bool $voided = false): int {
+    private function getSpellDamage(array $types, bool $voided = false): int
+    {
         if (in_array(ItemType::SPELL_DAMAGE->value, $types)) {
             return $this->spellDamageBonus(
                 $this->damageBuilder->buildSpellDamage($voided),
@@ -408,14 +412,14 @@ class CharacterStatBuilder
         return 0;
     }
 
-    private function getWeaponDamage(string $stat, array $types, array $validWeaponTypes, bool $voided = false): int {
-        if (!empty(array_intersect($types, $validWeaponTypes))) {
+    private function getWeaponDamage(string $stat, array $types, array $validWeaponTypes, bool $voided = false): int
+    {
+        if (! empty(array_intersect($types, $validWeaponTypes))) {
             return $this->damageBuilder->buildWeaponDamage($stat, $voided);
         }
 
         return 0;
     }
-
 
     /**
      * Add bonus to spell damage.

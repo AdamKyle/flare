@@ -24,7 +24,7 @@ class ReRollEnchantmentServiceTest extends TestCase
 
     private ?ReRollEnchantmentService $reRollEnchantmentService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
 
         parent::setUp();
@@ -33,7 +33,7 @@ class ReRollEnchantmentServiceTest extends TestCase
         $this->reRollEnchantmentService = resolve(ReRollEnchantmentService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -41,21 +41,21 @@ class ReRollEnchantmentServiceTest extends TestCase
         $this->reRollEnchantmentService = null;
     }
 
-    public function testCanAffordForAllEnchantments()
+    public function test_can_afford_for_all_enchantments()
     {
         $character = $this->character->getCharacter();
 
         $this->assertFalse($this->reRollEnchantmentService->canAfford($character, 'everything', 'all-enchantments'));
     }
 
-    public function testCanAffordForRegularReRoll()
+    public function test_can_afford_for_regular_re_roll()
     {
         $character = $this->character->getCharacter();
 
         $this->assertFalse($this->reRollEnchantmentService->canAfford($character, '', ''));
     }
 
-    public function testDoReRoll()
+    public function test_do_re_roll()
     {
         $character = $this->character->getCharacter();
         $item = $this->createItem([
@@ -76,7 +76,7 @@ class ReRollEnchantmentServiceTest extends TestCase
         $this->assertNotEquals(json_encode($originalAffix), json_encode($newItemAffix));
     }
 
-    public function testDoReRollWithOldCost()
+    public function test_do_re_roll_with_old_cost()
     {
         $character = $this->character->getCharacter();
         $item = $this->createItem([
@@ -97,7 +97,7 @@ class ReRollEnchantmentServiceTest extends TestCase
         $this->assertNotEquals(json_encode($originalAffix), json_encode($newItemAffix));
     }
 
-    public function testDoReRollForEverything()
+    public function test_do_re_roll_for_everything()
     {
         $character = $this->character->getCharacter();
         $item = $this->createItem([
@@ -122,7 +122,7 @@ class ReRollEnchantmentServiceTest extends TestCase
         $this->assertNotEquals(json_encode($originalAffix), json_encode($newItemAffix));
     }
 
-    public function testDoReRollForPrefix()
+    public function test_do_re_roll_for_prefix()
     {
         $character = $this->character->getCharacter();
         $item = $this->createItem([
@@ -147,7 +147,7 @@ class ReRollEnchantmentServiceTest extends TestCase
         $this->assertNotEquals(json_encode($originalAffix), json_encode($newItemAffix));
     }
 
-    public function testDoReRollForPrefixEffectingBaseStats()
+    public function test_do_re_roll_for_prefix_effecting_base_stats()
     {
         $character = $this->character->getCharacter();
         $item = $this->createItem([
@@ -172,7 +172,7 @@ class ReRollEnchantmentServiceTest extends TestCase
         $this->assertNotEquals(json_encode($originalAffix), json_encode($newItemAffix));
     }
 
-    public function testCanAffordTheMovementCost()
+    public function test_can_afford_the_movement_cost()
     {
         $item = $this->createItem([
             'type' => 'weapon',
@@ -190,14 +190,14 @@ class ReRollEnchantmentServiceTest extends TestCase
         $this->assertFalse($this->reRollEnchantmentService->canAffordMovementCost($character, $slot->item->id, 'all-enchantments'));
     }
 
-    public function testGetMovementCostForNonExistentItem()
+    public function test_get_movement_cost_for_non_existent_item()
     {
         $result = $this->reRollEnchantmentService->getMovementCosts(1, 'all-enchantments');
 
         $this->assertEmpty($result);
     }
 
-    public function testGetMovementFromCostsForAllEnchantments()
+    public function test_get_movement_from_costs_for_all_enchantments()
     {
         $item = $this->createItem([
             'type' => 'weapon',
@@ -214,7 +214,7 @@ class ReRollEnchantmentServiceTest extends TestCase
         $this->assertGreaterThan(0, $result['shards_cost']);
     }
 
-    public function testGetMovementFromCostsForPrefix()
+    public function test_get_movement_from_costs_for_prefix()
     {
         $item = $this->createItem([
             'type' => 'weapon',
@@ -231,7 +231,7 @@ class ReRollEnchantmentServiceTest extends TestCase
         $this->assertGreaterThan(0, $result['shards_cost']);
     }
 
-    public function testMoveAllAffixes()
+    public function test_move_all_affixes()
     {
         Event::fake();
 
@@ -276,7 +276,7 @@ class ReRollEnchantmentServiceTest extends TestCase
         Event::assertDispatched(GlobalMessageEvent::class);
     }
 
-    public function testMoveAllAffixesWhenOneItemHasGems()
+    public function test_move_all_affixes_when_one_item_has_gems()
     {
         Event::fake();
 
@@ -332,7 +332,7 @@ class ReRollEnchantmentServiceTest extends TestCase
         Event::assertDispatched(GlobalMessageEvent::class);
     }
 
-    public function testMoveAllAffixesWhenItemOnlyHasOneAffix()
+    public function test_move_all_affixes_when_item_only_has_one_affix()
     {
         Event::fake();
 
@@ -373,7 +373,7 @@ class ReRollEnchantmentServiceTest extends TestCase
         Event::assertDispatched(GlobalMessageEvent::class);
     }
 
-    public function testMoveSpecificAffix()
+    public function test_move_specific_affix()
     {
         Event::fake();
 
@@ -418,7 +418,7 @@ class ReRollEnchantmentServiceTest extends TestCase
         Event::assertDispatched(GlobalMessageEvent::class);
     }
 
-    public function testMoveSpecificAffixAndDeleteTheSlotWithTheUnique()
+    public function test_move_specific_affix_and_delete_the_slot_with_the_unique()
     {
         Event::fake();
 

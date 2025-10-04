@@ -13,7 +13,6 @@ use App\Flare\Values\AttackTypeValue;
 
 class CharacterAttack
 {
-
     private mixed $type;
 
     public function __construct(

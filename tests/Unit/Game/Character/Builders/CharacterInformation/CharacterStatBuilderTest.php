@@ -27,7 +27,7 @@ class CharacterStatBuilderTest extends TestCase
 
     private ?CharacterStatBuilder $characterStatBuilder;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -36,7 +36,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->characterStatBuilder = resolve(CharacterStatBuilder::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -44,7 +44,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->characterStatBuilder = null;
     }
 
-    public function testCharacterHasEquippeditems()
+    public function test_character_has_equippeditems()
     {
         $character = $this->character->equipStartingEquipment()->getCharacter();
 
@@ -53,7 +53,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertTrue($notEmpty);
     }
 
-    public function testGetCharacter()
+    public function test_get_character()
     {
         $character = $this->character->equipStartingEquipment()->getCharacter();
 
@@ -62,7 +62,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals($character->name, $characterStatBuilderCharacter->name);
     }
 
-    public function testCharacterHasNoEquippedItem()
+    public function test_character_has_no_equipped_item()
     {
         $character = $this->character->getCharacter();
 
@@ -71,7 +71,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertTrue($notEmpty);
     }
 
-    public function testClassBonusWithNoSkill()
+    public function test_class_bonus_with_no_skill()
     {
         $character = $this->character->getCharacter();
 
@@ -80,7 +80,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0, $value);
     }
 
-    public function testClassBonusWithSkill()
+    public function test_class_bonus_with_skill()
     {
         $character = $this->character->getCharacter();
 
@@ -110,7 +110,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0.1, $value);
     }
 
-    public function testClassBonusWithSkillDoesNotGoAboveOneHundredPercent()
+    public function test_class_bonus_with_skill_does_not_go_above_one_hundred_percent()
     {
         $character = $this->character->getCharacter();
 
@@ -140,7 +140,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(1.0, $value);
     }
 
-    public function testGetHolyInfo()
+    public function test_get_holy_info()
     {
         $character = $this->character->getCharacter();
 
@@ -149,7 +149,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertInstanceOf(HolyBuilder::class, $value);
     }
 
-    public function testGetReductionInfo()
+    public function test_get_reduction_info()
     {
         $character = $this->character->getCharacter();
 
@@ -158,7 +158,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertInstanceOf(ReductionsBuilder::class, $value);
     }
 
-    public function testAffixesCantBeResisted()
+    public function test_affixes_cant_be_resisted()
     {
         $character = $this->character->getCharacter();
 
@@ -167,7 +167,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertFalse($canBeResisted);
     }
 
-    public function testAffixesCannotBeResisted()
+    public function test_affixes_cannot_be_resisted()
     {
 
         $item = $this->createItem([
@@ -182,7 +182,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertTrue($canBeResisted);
     }
 
-    public function testModdedStatShouldBeTheSame()
+    public function test_modded_stat_should_be_the_same()
     {
         $character = $this->character->getCharacter();
 
@@ -192,7 +192,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals($str, $moddedStr);
     }
 
-    public function testModdedStatShouldBeTheSameWhenIgnoreReductionsIsTrue()
+    public function test_modded_stat_should_be_the_same_when_ignore_reductions_is_true()
     {
         $character = $this->character->getCharacter();
 
@@ -202,7 +202,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals($str, $moddedStr);
     }
 
-    public function testModdedStatShouldBeHalfWhenCharacterHasPurgatoryAccessAndIsOnTheIcePlane()
+    public function test_modded_stat_should_be_half_when_character_has_purgatory_access_and_is_on_the_ice_plane()
     {
         $character = $this->character->inventoryManagement()->giveItem($this->createItem([
             'type' => 'quest',
@@ -234,7 +234,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertLessThan($str, $moddedStr);
     }
 
-    public function testModdedStatShouldBeHigher()
+    public function test_modded_stat_should_be_higher()
     {
 
         $itemPrefixAffix = $this->createItemAffix([
@@ -262,7 +262,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(($str + $str * 0.30), $moddedStr);
     }
 
-    public function testModdedStatShouldBeHigherEvenVoided()
+    public function test_modded_stat_should_be_higher_even_voided()
     {
 
         $itemPrefixAffix = $this->createItemAffix([
@@ -291,7 +291,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(($str + $str * 0.15), $moddedStr);
     }
 
-    public function testModdedStatIsStillHigherThenRegularStatWhenOnStatReducingPlane()
+    public function test_modded_stat_is_still_higher_then_regular_stat_when_on_stat_reducing_plane()
     {
 
         $itemPrefixAffix = $this->createItemAffix([
@@ -338,7 +338,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan($str, $moddedStr);
     }
 
-    public function testModdedStatShouldBeHigherWithBoonsAndEquipment()
+    public function test_modded_stat_should_be_higher_with_boons_and_equipment()
     {
 
         $itemPrefixAffix = $this->createItemAffix([
@@ -395,7 +395,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan($str, $moddedStr);
     }
 
-    public function testModdedStatShouldBeHigherWithOnlyBoons()
+    public function test_modded_stat_should_be_higher_with_only_boons()
     {
 
         $character = $this->character->getCharacter();
@@ -435,7 +435,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan($str, $moddedStr);
     }
 
-    public function testWeaponDamageWithOutSkill()
+    public function test_weapon_damage_with_out_skill()
     {
 
         $itemPrefixAffix = $this->createItemAffix([
@@ -471,7 +471,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan(100, $damage);
     }
 
-    public function testWeaponDamageWithOutSkillVoided()
+    public function test_weapon_damage_with_out_skill_voided()
     {
 
         $itemPrefixAffix = $this->createItemAffix([
@@ -507,7 +507,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(100, $damage);
     }
 
-    public function testWeaponDamageWithSkill()
+    public function test_weapon_damage_with_skill()
     {
 
         $itemPrefixAffix = $this->createItemAffix([
@@ -548,7 +548,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan(100, $damage);
     }
 
-    public function testBuildRingDamage()
+    public function test_build_ring_damage()
     {
 
         $itemPrefixAffix = $this->createItemAffix([
@@ -578,7 +578,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(1000, $damage);
     }
 
-    public function testSpellDamageWithOutSkill()
+    public function test_spell_damage_with_out_skill()
     {
 
         $itemPrefixAffix = $this->createItemAffix([
@@ -614,7 +614,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan(100, $damage);
     }
 
-    public function testSpellDamageWithOutSkillVoided()
+    public function test_spell_damage_with_out_skill_voided()
     {
 
         $itemPrefixAffix = $this->createItemAffix([
@@ -650,7 +650,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(100, $damage);
     }
 
-    public function testSpellDamageWithSkill()
+    public function test_spell_damage_with_skill()
     {
 
         $itemPrefixAffix = $this->createItemAffix([
@@ -691,7 +691,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan(100, $damage);
     }
 
-    public function testSpellDamageForCasterWithNoInventory()
+    public function test_spell_damage_for_caster_with_no_inventory()
     {
 
         $character = $this->character->getCharacter();
@@ -709,7 +709,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan(0, $damage);
     }
 
-    public function testGetNoDamageForInvalidType()
+    public function test_get_no_damage_for_invalid_type()
     {
 
         $character = $this->character->equipStartingEquipment()->getCharacter();
@@ -719,7 +719,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0, $damage);
     }
 
-    public function testPositionalWeaponDamage()
+    public function test_positional_weapon_damage()
     {
         $item = $this->createItem(['name' => 'sample', 'type' => 'weapon']);
 
@@ -730,7 +730,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan(0, $damage);
     }
 
-    public function testPositionalWeaponDamageWithEmptyInventory()
+    public function test_positional_weapon_damage_with_empty_inventory()
     {
 
         $character = $this->character->getCharacter();
@@ -740,7 +740,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan(0, $damage);
     }
 
-    public function testPositionalSpellDamage()
+    public function test_positional_spell_damage()
     {
         $item = $this->createItem(['name' => 'sample', 'type' => 'spell-damage', 'base_damage' => 100]);
 
@@ -751,7 +751,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan(0, $damage);
     }
 
-    public function testPositionalSpellDamageWithEmptyInventory()
+    public function test_positional_spell_damage_with_empty_inventory()
     {
 
         $character = $this->character->getCharacter();
@@ -761,7 +761,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0, $damage);
     }
 
-    public function testPositionalSpellDamageWithEmptyInventoryAsCaster()
+    public function test_positional_spell_damage_with_empty_inventory_as_caster()
     {
 
         $character = $this->character->getCharacter();
@@ -781,7 +781,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan(0, $damage);
     }
 
-    public function testGetPositionalHealing()
+    public function test_get_positional_healing()
     {
         $item = $this->createItem(['name' => 'sample', 'type' => ItemType::SPELL_HEALING->value, 'base_healing' => 100]);
 
@@ -792,7 +792,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan(0, $damage);
     }
 
-    public function testGetPositionalHealingWhenClassIsCleric()
+    public function test_get_positional_healing_when_class_is_cleric()
     {
         $cleric = $this->createClass(['name' => CharacterClassValue::CLERIC]);
 
@@ -809,7 +809,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan(0, $damage);
     }
 
-    public function testGetPositionalHealingWithEmptyInventory()
+    public function test_get_positional_healing_with_empty_inventory()
     {
 
         $character = $this->character->getCharacter();
@@ -819,7 +819,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0, $damage);
     }
 
-    public function testGetPositionalHealingWithEmptyInventoryAsProphet()
+    public function test_get_positional_healing_with_empty_inventory_as_prophet()
     {
 
         $character = $this->character->getCharacter();
@@ -839,7 +839,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan(0, $damage);
     }
 
-    public function testHealingWithOutSkill()
+    public function test_healing_with_out_skill()
     {
 
         $itemPrefixAffix = $this->createItemAffix([
@@ -875,7 +875,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan(100, $healing);
     }
 
-    public function testHealingWithOutSkillVoided()
+    public function test_healing_with_out_skill_voided()
     {
 
         $itemPrefixAffix = $this->createItemAffix([
@@ -911,7 +911,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(100, $healing);
     }
 
-    public function testHealingWithSkill()
+    public function test_healing_with_skill()
     {
 
         $itemPrefixAffix = $this->createItemAffix([
@@ -952,7 +952,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan(100, $damage);
     }
 
-    public function testHealingWithNoEquipment()
+    public function test_healing_with_no_equipment()
     {
 
         $character = $this->character->getCharacter();
@@ -962,7 +962,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0, $damage);
     }
 
-    public function testHealingWithNoEquipmentAsAProphet()
+    public function test_healing_with_no_equipment_as_a_prophet()
     {
 
         $character = $this->character->getCharacter();
@@ -980,7 +980,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan(0, $damage);
     }
 
-    public function testDevouringWithOnlyQuestItem()
+    public function test_devouring_with_only_quest_item()
     {
         $item = $this->createItem([
             'name' => 'weapon',
@@ -995,7 +995,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(.20, $devouring);
     }
 
-    public function testDevouringWithOnlyQuestItemInPurgatory()
+    public function test_devouring_with_only_quest_item_in_purgatory()
     {
         $item = $this->createItem([
             'name' => 'weapon',
@@ -1016,7 +1016,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(.20, $devouring);
     }
 
-    public function testDevouringWithAffixes()
+    public function test_devouring_with_affixes()
     {
         $itemPrefixAffix = $this->createItemAffix([
             'name' => 'Sample',
@@ -1045,7 +1045,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(1.0, $devouring);
     }
 
-    public function testDevouringWithAffixesInPurgatory()
+    public function test_devouring_with_affixes_in_purgatory()
     {
         $itemPrefixAffix = $this->createItemAffix([
             'name' => 'Sample',
@@ -1080,7 +1080,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(.65, $devouring);
     }
 
-    public function testResurrectionChanceWithNoItems()
+    public function test_resurrection_chance_with_no_items()
     {
         $character = $this->character->getCharacter();
 
@@ -1089,7 +1089,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0, $resChance);
     }
 
-    public function testResurrectionChanceWithItems()
+    public function test_resurrection_chance_with_items()
     {
         $item = $this->createItem([
             'name' => 'weapon',
@@ -1108,7 +1108,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(.75, $resChance);
     }
 
-    public function testResurrectionChanceWithItemsAsProphet()
+    public function test_resurrection_chance_with_items_as_prophet()
     {
         $item = $this->createItem([
             'name' => 'weapon',
@@ -1135,7 +1135,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(1.0, $resChance);
     }
 
-    public function testResurrectionChanceWithItemsAsVampire()
+    public function test_resurrection_chance_with_items_as_vampire()
     {
         $item = $this->createItem([
             'name' => 'weapon',
@@ -1162,7 +1162,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(.95, $resChance);
     }
 
-    public function testResurrectionChanceWithItemsAsProphetInPurgatory()
+    public function test_resurrection_chance_with_items_as_prophet_in_purgatory()
     {
         $item = $this->createItem([
             'name' => 'weapon',
@@ -1195,7 +1195,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(.65, $resChance);
     }
 
-    public function testResurrectionChanceWithItemsInPurgatory()
+    public function test_resurrection_chance_with_items_in_purgatory()
     {
         $item = $this->createItem([
             'name' => 'weapon',
@@ -1220,7 +1220,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(.45, $resChance);
     }
 
-    public function testBuildAffixStackingDamage()
+    public function test_build_affix_stacking_damage()
     {
         $itemPrefixAffix = $this->createItemAffix([
             'name' => 'Sample',
@@ -1250,7 +1250,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(2.5, $damage);
     }
 
-    public function testBuildAffixStackingDamageVoided()
+    public function test_build_affix_stacking_damage_voided()
     {
         $itemPrefixAffix = $this->createItemAffix([
             'name' => 'Sample',
@@ -1280,7 +1280,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0, $damage);
     }
 
-    public function testBuildAffixNonStackingDamage()
+    public function test_build_affix_non_stacking_damage()
     {
         $itemPrefixAffix = $this->createItemAffix([
             'name' => 'Sample',
@@ -1310,7 +1310,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(1.5, $damage);
     }
 
-    public function testBuildAffixNonStackingDamageNoEnchantments()
+    public function test_build_affix_non_stacking_damage_no_enchantments()
     {
         $item = $this->createItem([
             'name' => 'weapon',
@@ -1324,7 +1324,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0, $damage);
     }
 
-    public function testBuildAffixNonStackingDamageVoided()
+    public function test_build_affix_non_stacking_damage_voided()
     {
         $itemPrefixAffix = $this->createItemAffix([
             'name' => 'Sample',
@@ -1354,7 +1354,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0, $damage);
     }
 
-    public function testBuildAffixLifeStealingNonStacking()
+    public function test_build_affix_life_stealing_non_stacking()
     {
         $itemPrefixAffix = $this->createItemAffix([
             'name' => 'Sample',
@@ -1384,7 +1384,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(.1, $amount);
     }
 
-    public function testBuildAffixLifeStealingNonStackingForVampire()
+    public function test_build_affix_life_stealing_non_stacking_for_vampire()
     {
         $itemPrefixAffix = $this->createItemAffix([
             'name' => 'Sample',
@@ -1421,7 +1421,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(.99, $amount);
     }
 
-    public function testBuildAffixLifeStealingNonStackingWithNoEnchantments()
+    public function test_build_affix_life_stealing_non_stacking_with_no_enchantments()
     {
         $item = $this->createItem([
             'name' => 'weapon',
@@ -1435,7 +1435,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0, $amount);
     }
 
-    public function testBuildAffixLifeStealingVoided()
+    public function test_build_affix_life_stealing_voided()
     {
         $itemPrefixAffix = $this->createItemAffix([
             'name' => 'Sample',
@@ -1466,7 +1466,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0, $amount);
     }
 
-    public function testBuildAffixLifeStealingVampire()
+    public function test_build_affix_life_stealing_vampire()
     {
         $itemPrefixAffix = $this->createItemAffix([
             'name' => 'Sample',
@@ -1503,7 +1503,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(.99, $amount);
     }
 
-    public function testBuildAffixLifeStealingVampireInPurgatory()
+    public function test_build_affix_life_stealing_vampire_in_purgatory()
     {
         $itemPrefixAffix = $this->createItemAffix([
             'name' => 'Sample',
@@ -1546,7 +1546,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals((.99 - (.99 * .20)), $amount);
     }
 
-    public function testBuildAffixLifeStealingVampireInHell()
+    public function test_build_affix_life_stealing_vampire_in_hell()
     {
         $itemPrefixAffix = $this->createItemAffix([
             'name' => 'Sample',
@@ -1589,7 +1589,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals((.99 - (.99 * .10)), $amount);
     }
 
-    public function testBuildAffixLifeStealingVampireInTwistedMemories()
+    public function test_build_affix_life_stealing_vampire_in_twisted_memories()
     {
         $itemPrefixAffix = $this->createItemAffix([
             'name' => 'Sample',
@@ -1632,7 +1632,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals((.99 - (.99 * .25)), $amount);
     }
 
-    public function testBuildAffixLifeStealingVampireInEventMapIcePlaneWithAccessToPurgatory()
+    public function test_build_affix_life_stealing_vampire_in_event_map_ice_plane_with_access_to_purgatory()
     {
         $itemPrefixAffix = $this->createItemAffix([
             'name' => 'Sample',
@@ -1680,7 +1680,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals((.99 - (.99 * .20)), $amount);
     }
 
-    public function testBuildAffixLifeStealingVampireInEventMapDelusionalMemoriesWithAccessToPurgatory()
+    public function test_build_affix_life_stealing_vampire_in_event_map_delusional_memories_with_access_to_purgatory()
     {
         $itemPrefixAffix = $this->createItemAffix([
             'name' => 'Sample',
@@ -1728,7 +1728,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals((.99 - (.99 * .25)), $amount);
     }
 
-    public function testBuildInvalidAffixDamage()
+    public function test_build_invalid_affix_damage()
     {
 
         $character = $this->character->getCharacter();
@@ -1738,7 +1738,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0, $amount);
     }
 
-    public function testEntrancingChangeWithNoInventory()
+    public function test_entrancing_change_with_no_inventory()
     {
         $character = $this->character->getCharacter();
 
@@ -1747,7 +1747,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0, $amount);
     }
 
-    public function testEntrancingChanceWithInventory()
+    public function test_entrancing_chance_with_inventory()
     {
         $itemPrefixAffix = $this->createItemAffix([
             'name' => 'Sample',
@@ -1777,7 +1777,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(1, $amount);
     }
 
-    public function testGetStatReducingAffix()
+    public function test_get_stat_reducing_affix()
     {
         $itemPrefixAffix = $this->createItemAffix([
             'name' => 'Sample',
@@ -1807,7 +1807,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals('Sample', $affix->name);
     }
 
-    public function testGetNoStatReducingAffixForNoInventory()
+    public function test_get_no_stat_reducing_affix_for_no_inventory()
     {
         $character = $this->character->getCharacter();
 
@@ -1816,7 +1816,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertNull($affix);
     }
 
-    public function testGetNoStatReducingAffixForNoSuchAffix()
+    public function test_get_no_stat_reducing_affix_for_no_such_affix()
     {
         $itemPrefixAffix = $this->createItemAffix([
             'name' => 'Sample',
@@ -1848,7 +1848,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertNull($affix);
     }
 
-    public function testGetStatReducingAffixForSuffixes()
+    public function test_get_stat_reducing_affix_for_suffixes()
     {
         $itemPrefixAffix = $this->createItemAffix([
             'name' => 'Sample',
@@ -1880,7 +1880,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertNotEmpty($affixes);
     }
 
-    public function testGetNoStatReducingAffixForSuffixes()
+    public function test_get_no_stat_reducing_affix_for_suffixes()
     {
 
         $character = $this->character->inventoryManagement()->getCharacter();
@@ -1889,7 +1889,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEmpty($affixes);
     }
 
-    public function testGetAmbushChance()
+    public function test_get_ambush_chance()
     {
         $item = $this->createItem([
             'name' => 'weapon',
@@ -1903,7 +1903,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0.15, $chance);
     }
 
-    public function testGetAmbushResistance()
+    public function test_get_ambush_resistance()
     {
         $item = $this->createItem([
             'name' => 'weapon',
@@ -1917,7 +1917,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0.15, $chance);
     }
 
-    public function testGetNoAmbushInfoForNoInventory()
+    public function test_get_no_ambush_info_for_no_inventory()
     {
         $character = $this->character->inventoryManagement()->getCharacter();
         $amount = $this->characterStatBuilder->setCharacter($character)->buildAmbush();
@@ -1925,7 +1925,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0, $amount);
     }
 
-    public function testGetCounterChance()
+    public function test_get_counter_chance()
     {
         $item = $this->createItem([
             'name' => 'weapon',
@@ -1939,7 +1939,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0.15, $chance);
     }
 
-    public function testGetCounterResistance()
+    public function test_get_counter_resistance()
     {
         $item = $this->createItem([
             'name' => 'weapon',
@@ -1953,7 +1953,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0.15, $chance);
     }
 
-    public function testGetNoCounterInfoForNoInventory()
+    public function test_get_no_counter_info_for_no_inventory()
     {
         $character = $this->character->getCharacter();
         $amount = $this->characterStatBuilder->setCharacter($character)->buildCounter();
@@ -1961,7 +1961,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0, $amount);
     }
 
-    public function testGetFightTimeOutModifier()
+    public function test_get_fight_time_out_modifier()
     {
         $gameSkill = $this->createGameSkill([
             'fight_time_out_mod_bonus_per_level' => 0.01,
@@ -1973,7 +1973,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0.25, $fightTimeOut);
     }
 
-    public function testGetMovementOutModifier()
+    public function test_get_movement_out_modifier()
     {
         $gameSkill = $this->createGameSkill([
             'move_time_out_mod_bonus_per_level' => 0.01,
@@ -1985,7 +1985,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0.25, $movementTimeOut);
     }
 
-    public function testWeaponDamageForAlcoholicShouldBeLowerThenFighter()
+    public function test_weapon_damage_for_alcoholic_should_be_lower_then_fighter()
     {
         $alcoholic = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
             'name' => CharacterClassValue::ALCOHOLIC,
@@ -2011,7 +2011,7 @@ class CharacterStatBuilderTest extends TestCase
             ->equipStartingEquipment()
             ->getCharacter();
 
-        $itemTypes = array_map(fn($case) => $case->value, ItemType::cases());
+        $itemTypes = array_map(fn ($case) => $case->value, ItemType::cases());
 
         $fighterDamage = $this->characterStatBuilder->setCharacter($fighter)->buildDamage($itemTypes);
         $alcoholicDamage = $this->characterStatBuilder->setCharacter($alcoholic)->buildDamage($itemTypes);
@@ -2019,7 +2019,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan($alcoholicDamage, $fighterDamage);
     }
 
-    public function testWeaponDamageForAlcoholicShouldBeHigherThenFighterWhenNoWeaponsEquipped()
+    public function test_weapon_damage_for_alcoholic_should_be_higher_then_fighter_when_no_weapons_equipped()
     {
         $alcoholic = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
             'name' => CharacterClassValue::ALCOHOLIC,
@@ -2045,7 +2045,7 @@ class CharacterStatBuilderTest extends TestCase
             ->levelCharacterUp(25)
             ->getCharacter();
 
-        $itemTypes = array_map(fn($case) => $case->value, ItemType::cases());
+        $itemTypes = array_map(fn ($case) => $case->value, ItemType::cases());
 
         $fighterDamage = $this->characterStatBuilder->setCharacter($fighter)->buildDamage($itemTypes);
         $alcoholicDamage = $this->characterStatBuilder->setCharacter($alcoholic)->buildDamage($itemTypes);
@@ -2053,7 +2053,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan($fighterDamage, $alcoholicDamage);
     }
 
-    public function testSpellDamageShouldBeHalfDamageForAlcoHolics()
+    public function test_spell_damage_should_be_half_damage_for_alco_holics()
     {
         $alcoholic = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
             'name' => CharacterClassValue::ALCOHOLIC,
@@ -2105,7 +2105,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan($alcoholicDamage, $fighterDamage);
     }
 
-    public function testSpellHealingShouldBeHalfDamageForAlcoHolics()
+    public function test_spell_healing_should_be_half_damage_for_alco_holics()
     {
         $alcoholic = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
             'name' => CharacterClassValue::ALCOHOLIC,
@@ -2157,7 +2157,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan($alcoholicDamage, $fighterDamage);
     }
 
-    public function testArcaneAlchemistHealingBonusIsLessThenProphets()
+    public function test_arcane_alchemist_healing_bonus_is_less_then_prophets()
     {
         $arcaneAlchemist = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
             'name' => CharacterClassValue::ARCANE_ALCHEMIST,
@@ -2211,7 +2211,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan($arcaneHealing, $prophetHealing);
     }
 
-    public function testRangerHealingBonusIsLessThenProphets()
+    public function test_ranger_healing_bonus_is_less_then_prophets()
     {
         $ranger = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
             'name' => CharacterClassValue::RANGER,
@@ -2265,7 +2265,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertGreaterThan($rangerHealing, $prophetHealing);
     }
 
-    public function testNoResistanceReductionForCharacterWhenCharacterIsVoided()
+    public function test_no_resistance_reduction_for_character_when_character_is_voided()
     {
         $character = $this->character->getCharacter();
 
@@ -2274,7 +2274,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0, $resistance);
     }
 
-    public function testCharacterHasResistanceReductionOnPrefixBasedItems()
+    public function test_character_has_resistance_reduction_on_prefix_based_items()
     {
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([
@@ -2292,7 +2292,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(0.10, $resistance);
     }
 
-    public function testCharacterHasResistanceReductionOnPrefixBasedItemsThatDoesNotGoAboveOneHundredPercent()
+    public function test_character_has_resistance_reduction_on_prefix_based_items_that_does_not_go_above_one_hundred_percent()
     {
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([

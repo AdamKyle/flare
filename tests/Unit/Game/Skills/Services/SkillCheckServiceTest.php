@@ -21,7 +21,7 @@ class SkillCheckServiceTest extends TestCase
 
     private ?GameSkill $gemSkill;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -37,7 +37,7 @@ class SkillCheckServiceTest extends TestCase
         $this->skillCheckService = resolve(SkillCheckService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -46,7 +46,7 @@ class SkillCheckServiceTest extends TestCase
         $this->skillCheckService = null;
     }
 
-    public function testReturnMaxRollForCharacterRollWhenSkillIsMaxed()
+    public function test_return_max_roll_for_character_roll_when_skill_is_maxed()
     {
 
         $skill = $this->character->getCharacter()->skills->where('game_skill_id', $this->gemSkill->id)->first();

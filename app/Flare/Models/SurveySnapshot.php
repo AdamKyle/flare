@@ -31,7 +31,8 @@ class SurveySnapshot extends Model
         'submitted_survey_count' => 'integer',
     ];
 
-    public function survey(): BelongsTo {
+    public function survey(): BelongsTo
+    {
         return $this->belongsTo(Survey::class);
     }
 }

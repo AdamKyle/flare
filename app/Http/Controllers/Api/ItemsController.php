@@ -29,7 +29,7 @@ class ItemsController extends Controller
 
         $cache = Cache::get('crafting-table-data');
 
-        if (!is_null($cache) && is_null($filter) && is_null($searchText)) {
+        if (! is_null($cache) && is_null($filter) && is_null($searchText)) {
             return response()->json([
                 'items' => $cache,
             ]);
@@ -43,12 +43,12 @@ class ItemsController extends Controller
             ->doesntHave('sockets')
             ->where('can_craft', true);
 
-        if (!is_null($filter)) {
+        if (! is_null($filter)) {
             $items = $items->where('type', $filter);
         }
 
-        if (!is_null($searchText)) {
-            $items = $items->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($searchText) . '%']);
+        if (! is_null($searchText)) {
+            $items = $items->whereRaw('LOWER(name) LIKE ?', ['%'.strtolower($searchText).'%']);
         }
 
         $items = $items->orderBy('cost', 'asc')->get();
@@ -64,7 +64,6 @@ class ItemsController extends Controller
             'items' => $itemsCollection,
         ]);
     }
-
 
     public function fetchSpecificSet(Request $request)
     {

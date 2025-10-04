@@ -2,29 +2,29 @@
 
 namespace Tests\Feature\Admin;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Location;
 use App\Flare\Models\Quest;
-use Tests\Traits\CreateUser;
-use Tests\Traits\CreateRole;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateNpc;
 use Tests\Traits\CreateQuest;
+use Tests\Traits\CreateRole;
+use Tests\Traits\CreateUser;
 
 class LocationsControllerTest extends TestCase
 {
-    use RefreshDatabase, CreateUser, CreateRole, CreateGameMap, CreateItem, CreateNpc, CreateQuest;
+    use CreateGameMap, CreateItem, CreateNpc, CreateQuest, CreateRole, CreateUser, RefreshDatabase;
 
     private $gameMap;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         // Create and act as admin
-        $role  = $this->createAdminRole();
+        $role = $this->createAdminRole();
         $admin = $this->createAdmin($role);
         $this->actingAs($admin);
 
@@ -32,7 +32,7 @@ class LocationsControllerTest extends TestCase
         $this->gameMap = $this->createGameMap();
     }
 
-    public function testIndexDisplaysAllLocations()
+    public function test_index_displays_all_locations()
     {
         Location::factory()->count(3)->create(['game_map_id' => $this->gameMap->id]);
 
@@ -45,7 +45,7 @@ class LocationsControllerTest extends TestCase
         $this->assertCount(3, $data['locations']);
     }
 
-    public function testCreateDisplaysManageView()
+    public function test_create_displays_manage_view()
     {
         $response = $this->call('GET', route('locations.create'));
         $this->assertEquals(200, $response->getStatusCode());
@@ -56,7 +56,7 @@ class LocationsControllerTest extends TestCase
         $this->assertArrayHasKey('gameMaps', $data);
     }
 
-    public function testEditDisplaysManageViewWithLocation()
+    public function test_edit_displays_manage_view_with_location()
     {
         $location = Location::factory()->create(['game_map_id' => $this->gameMap->id]);
 
@@ -70,18 +70,18 @@ class LocationsControllerTest extends TestCase
         $this->assertEquals($location->id, $data['location']->id);
     }
 
-    public function testStoreCreatesNewLocationAndRedirects()
+    public function test_store_creates_new_location_and_redirects()
     {
         $data = [
-            'name'                 => 'TestLocation',
-            'game_map_id'          => $this->gameMap->id,
-            'can_players_enter'    => true,
-            'can_auto_battle'      => false,
+            'name' => 'TestLocation',
+            'game_map_id' => $this->gameMap->id,
+            'can_players_enter' => true,
+            'can_auto_battle' => false,
             'quest_reward_item_id' => null,
-            'description'          => 'A test location',
-            'is_port'              => false,
-            'x'                    => 5,
-            'y'                    => 10,
+            'description' => 'A test location',
+            'is_port' => false,
+            'x' => 5,
+            'y' => 10,
         ];
 
         $response = $this->call('POST', route('locations.store'), $data);
@@ -96,15 +96,15 @@ class LocationsControllerTest extends TestCase
         );
     }
 
-    public function testStoreUpdatesExistingLocation()
+    public function test_store_updates_existing_location()
     {
         $location = Location::factory()->create([
-            'name'        => 'OldName',
+            'name' => 'OldName',
             'game_map_id' => $this->gameMap->id,
         ]);
 
         $response = $this->call('POST', route('locations.store'), [
-            'id'   => $location->id,
+            'id' => $location->id,
             'name' => 'NewName',
         ]);
         $this->assertEquals(302, $response->getStatusCode());
@@ -118,12 +118,12 @@ class LocationsControllerTest extends TestCase
         );
     }
 
-    public function testShowDefaultViewData()
+    public function test_show_default_view_data()
     {
         $location = Location::factory()->create([
-            'game_map_id'          => $this->gameMap->id,
-            'enemy_strength_increase'  => null,
-            'type'                 => null,
+            'game_map_id' => $this->gameMap->id,
+            'enemy_strength_increase' => null,
+            'type' => null,
             'quest_reward_item_id' => null,
         ]);
 
@@ -140,18 +140,18 @@ class LocationsControllerTest extends TestCase
         $this->assertNull($data['usedInQuest']);
     }
 
-    public function testShowWithQuestRewardItemUsesPrimaryQuest()
+    public function test_show_with_quest_reward_item_uses_primary_quest()
     {
-        $item     = $this->createItem();
+        $item = $this->createItem();
         $location = Location::factory()->create([
-            'game_map_id'          => $this->gameMap->id,
+            'game_map_id' => $this->gameMap->id,
             'quest_reward_item_id' => $item->id,
         ]);
 
-        $npc   = $this->createNpc(['game_map_id' => $this->gameMap->id]);
+        $npc = $this->createNpc(['game_map_id' => $this->gameMap->id]);
         $quest = $this->createQuest([
             'npc_id' => $npc->id,
-            'item_id'=> $item->id,
+            'item_id' => $item->id,
         ]);
 
         $response = $this->call('GET', route('locations.location', ['location' => $location->id]));
@@ -163,7 +163,7 @@ class LocationsControllerTest extends TestCase
         $this->assertEquals($quest->id, $data['usedInQuest']->id);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         \Mockery::close();
         parent::tearDown();

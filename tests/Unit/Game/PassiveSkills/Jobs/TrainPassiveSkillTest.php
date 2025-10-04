@@ -16,21 +16,21 @@ class TrainPassiveSkillTest extends TestCase
 
     private ?Character $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testDoNotLevelPassive()
+    public function test_do_not_level_passive()
     {
         $passive = $this->character->passiveSkills()->first();
 
@@ -41,7 +41,7 @@ class TrainPassiveSkillTest extends TestCase
         $this->assertEquals(0, $passive->current_level);
     }
 
-    public function testLevelUpPassive()
+    public function test_level_up_passive()
     {
         $passive = $this->character->passiveSkills()->first();
 
@@ -59,7 +59,7 @@ class TrainPassiveSkillTest extends TestCase
         $this->assertEquals(1, $passive->current_level);
     }
 
-    public function testDoNotOverLevelPassive()
+    public function test_do_not_over_level_passive()
     {
         $passive = $this->character->passiveSkills()->first();
 
@@ -78,7 +78,7 @@ class TrainPassiveSkillTest extends TestCase
         $this->assertEquals(5, $passive->current_level);
     }
 
-    public function testPassiveUnlocksKingdomBuilding()
+    public function test_passive_unlocks_kingdom_building()
     {
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()

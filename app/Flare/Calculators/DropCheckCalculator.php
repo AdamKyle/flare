@@ -38,7 +38,7 @@ class DropCheckCalculator
 
         $scheduledEvent = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
 
-        if (!is_null($scheduledEvent)) {
+        if (! is_null($scheduledEvent)) {
             $totalChance = .80;
 
             return $this->canGetReward(100, $totalChance);

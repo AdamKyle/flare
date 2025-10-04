@@ -15,10 +15,6 @@ class PassiveSkillAssigner
 {
     /**
      * Assign passive skills to the character in topological order using bulk inserts.
-     *
-     * @param CharacterBuildState $state
-     * @param Closure $next
-     * @return CharacterBuildState
      */
     public function process(CharacterBuildState $state, Closure $next): CharacterBuildState
     {
@@ -50,7 +46,7 @@ class PassiveSkillAssigner
             $completedQuestIds
         );
 
-        if (!empty($topRows)) {
+        if (! empty($topRows)) {
             CharacterPassiveSkill::query()->insert($topRows);
         }
 
@@ -70,8 +66,6 @@ class PassiveSkillAssigner
 
     /**
      * Load all passive skills required for initial seeding.
-     *
-     * @return Collection
      */
     private function loadAllPassives(): Collection
     {
@@ -86,13 +80,6 @@ class PassiveSkillAssigner
 
     /**
      * Build insert rows for top-level passive skills.
-     *
-     * @param Collection $topLevel
-     * @param Character $character
-     * @param DateTimeInterface $timestamp
-     * @param Collection $questGates
-     * @param Collection $completedQuestIds
-     * @return array
      */
     private function buildTopLevelRows(
         Collection $topLevel,
@@ -128,10 +115,6 @@ class PassiveSkillAssigner
 
     /**
      * Load the map of inserted CharacterPassiveSkill ids keyed by passive_skill_id.
-     *
-     * @param Character $character
-     * @param Collection $topLevel
-     * @return Collection
      */
     private function loadInsertedMapFor(Character $character, Collection $topLevel): Collection
     {
@@ -142,14 +125,6 @@ class PassiveSkillAssigner
 
     /**
      * Process child passive skills in waves once their parents exist.
-     *
-     * @param Collection $children
-     * @param Character $character
-     * @param DateTimeInterface $timestamp
-     * @param Collection $questGates
-     * @param Collection $completedQuestIds
-     * @param Collection $insertedMap
-     * @return void
      */
     private function processChildren(
         Collection $children,
@@ -214,9 +189,6 @@ class PassiveSkillAssigner
 
     /**
      * Build a map of quest gates keyed by the passive skill id.
-     *
-     * @param Collection $passives
-     * @return Collection
      */
     private function mapQuestGatesForPassives(Collection $passives): Collection
     {
@@ -231,13 +203,6 @@ class PassiveSkillAssigner
 
     /**
      * Determine the lock state for a new character before any leveling or quest completion.
-     *
-     * @param PassiveSkill $passiveSkill
-     * @param bool $hasParent
-     * @param int|null $unlocksAtLevel
-     * @param bool $hasQuestGate
-     * @param bool $questCompleted
-     * @return bool
      */
     private function determineLockedStateForNewCharacter(
         PassiveSkill $passiveSkill,

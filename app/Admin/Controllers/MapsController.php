@@ -78,12 +78,12 @@ class MapsController extends Controller
             'only_during_event_type' => $request->only_during_event_type,
         ]);
 
-        return redirect()->route('maps')->with('success', $request->name . ' uploaded successfully.');
+        return redirect()->route('maps')->with('success', $request->name.' uploaded successfully.');
     }
 
     public function manageBonuses(GameMap $gameMap)
     {
-        return view('admin.maps.manage-bonuses', ['gameMap' => $gameMap, 'locations' => Location::all(), 'eventTypes' => EventType::getOptionsForSelect(),]);
+        return view('admin.maps.manage-bonuses', ['gameMap' => $gameMap, 'locations' => Location::all(), 'eventTypes' => EventType::getOptionsForSelect()]);
     }
 
     public function postBonuses(Request $request, GameMap $gameMap)
@@ -106,7 +106,7 @@ class MapsController extends Controller
 
         $gameMap->update($data);
 
-        return redirect()->route('map', ['gameMap' => $gameMap->id])->with('success', $gameMap->name . ' now has bonuses.');
+        return redirect()->route('map', ['gameMap' => $gameMap->id])->with('success', $gameMap->name.' now has bonuses.');
     }
 
     public function manageMapLocations(GameMap $gameMap)

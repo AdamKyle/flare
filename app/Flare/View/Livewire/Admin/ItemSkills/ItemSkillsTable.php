@@ -60,14 +60,14 @@ class ItemSkillsTable extends DataTableComponent
 
                 if (! is_null(auth()->user())) {
                     if (auth()->user()->hasRole('Admin')) {
-                        return '<a href="/admin/item-skills/' . $skillId . '">' . $row->name . '</a>';
+                        return '<a href="/admin/item-skills/'.$skillId.'">'.$row->name.'</a>';
                     }
                 }
 
-                return '<a href="/information/item-skills/skill/' . $skillId . '" >' . $row->name . '</a>';
+                return '<a href="/information/item-skills/skill/'.$skillId.'" >'.$row->name.'</a>';
             })->html(),
             Column::make('Description', 'description')->searchable()->format(function ($value) {
-                return '<p class="md:w-full md:text-wrap">' . nl2br($value) . '</p>';
+                return '<p class="md:w-full md:text-wrap">'.nl2br($value).'</p>';
             })->html(),
 
             Column::make('Max level', 'max_level')->sortable()->format(function ($value) {

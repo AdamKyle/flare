@@ -14,6 +14,7 @@ class LevelUpValue
     use Boons;
 
     const BASE_STAT_DAMAGE_MODIFIER = 'base_damage_stat_mod';
+
     const BASE_STAT_MODIFIER = 'base_stat_mod';
 
     /**
@@ -84,7 +85,6 @@ class LevelUpValue
 
             return $damageStatBonus;
         }
-
 
         if ($character->str >= MaxReincarnationStats::MAX_STATS && $stat === self::BASE_STAT_MODIFIER) {
             $baseStatBonus = $character->{$stat} + ($gainAdditionalLevel ? 0.00024 : 0.00012);

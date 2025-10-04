@@ -20,7 +20,7 @@ class BuildCharacterAttackTypesTest extends TestCase
 
     private ?BuildCharacterAttackTypes $buildCharacterAttackTypes;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->useMockForAttackDataCache = false;
 
@@ -31,7 +31,7 @@ class BuildCharacterAttackTypesTest extends TestCase
         $this->buildCharacterAttackTypes = resolve(BuildCharacterAttackTypes::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -57,7 +57,7 @@ class BuildCharacterAttackTypesTest extends TestCase
             ->getCharacter();
     }
 
-    public function testBuildCharacterAttackTypesData()
+    public function test_build_character_attack_types_data()
     {
         $character = $this->setUpCharacterForTests();
 

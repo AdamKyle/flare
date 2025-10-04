@@ -52,7 +52,8 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down(): void {
+    public function down(): void
+    {
         Schema::table('events', function (Blueprint $table) {
             $table->dropIndex('events_type_idx');
         });

@@ -2,12 +2,6 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
-use Exception;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityResourceRequest as CapitalCityResourceRequestModel;
 use App\Flare\Models\CapitalCityUnitQueue;
@@ -17,6 +11,12 @@ use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessBuildingReq
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessUnitRequestHandler;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
+use Exception;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
 class CapitalCityResourceRequest implements ShouldQueue
@@ -76,13 +76,13 @@ class CapitalCityResourceRequest implements ShouldQueue
         $requestingKingdom = $capitalCityResourceRequestData->requestingKingdom;
 
         foreach ($resourcesForKingdom as $resourceName => $resourceAmount) {
-            $newAmount = $requestingKingdom->{'current_' . $resourceName} + $resourceAmount;
+            $newAmount = $requestingKingdom->{'current_'.$resourceName} + $resourceAmount;
 
-            if ($newAmount > $requestingKingdom->{'max_' . $resourceName}) {
-                $newAmount = $requestingKingdom->{'max_' . $resourceName};
+            if ($newAmount > $requestingKingdom->{'max_'.$resourceName}) {
+                $newAmount = $requestingKingdom->{'max_'.$resourceName};
             }
 
-            $requestingKingdom->{'current_' . $resourceName} = $newAmount;
+            $requestingKingdom->{'current_'.$resourceName} = $newAmount;
         }
 
         $requestingKingdom->save();
@@ -126,7 +126,6 @@ class CapitalCityResourceRequest implements ShouldQueue
 
                 return $buildingData;
             });
-
 
             $queueData->update([
                 'building_request_data' => $updatedBuildingRequestData,

@@ -20,7 +20,7 @@ class ServiceProvider extends ApplicationServiceProvider
             StartSurvey::class,
         ]);
 
-        $this->app->bind(SurveyValidator::class, function() {
+        $this->app->bind(SurveyValidator::class, function () {
             return new SurveyValidator;
         });
 

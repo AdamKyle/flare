@@ -13,7 +13,7 @@ class DeleteKingdomLogsTest extends TestCase
 {
     use CreateKingdom, RefreshDatabase;
 
-    public function testDeleteKingdomLogs()
+    public function test_delete_kingdom_logs()
     {
 
         $character = (new CharacterFactory)->createBaseCharacter()

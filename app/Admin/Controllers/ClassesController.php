@@ -13,9 +13,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ClassesController extends Controller
 {
-
-    public function __construct(private readonly ClassBonusInformation $classBonusInformation) {
-    }
+    public function __construct(private readonly ClassBonusInformation $classBonusInformation) {}
 
     public function index()
     {

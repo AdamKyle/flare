@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class RaitTypeTest extends TestCase
 {
-    public function testThrowsExceptionForInvalidType()
+    public function test_throws_exception_for_invalid_type()
     {
 
         $this->expectException(Exception::class);
@@ -16,35 +16,35 @@ class RaitTypeTest extends TestCase
         new RaidType(45);
     }
 
-    public function testIsPirateLordRaid()
+    public function test_is_pirate_lord_raid()
     {
         $this->assertTrue(
             (new RaidType(RaidType::PIRATE_LORD))->isPirateLordRaid()
         );
     }
 
-    public function testIsIceQueenRaid()
+    public function test_is_ice_queen_raid()
     {
         $this->assertTrue(
             (new RaidType(RaidType::ICE_QUEEN))->isIceQueenRaid()
         );
     }
 
-    public function testIsJesterOfTime()
+    public function test_is_jester_of_time()
     {
         $this->assertTrue(
             (new RaidType(RaidType::JESTER_OF_TIME))->isJesterOfTime()
         );
     }
 
-    public function testIsFrozenKing()
+    public function test_is_frozen_king()
     {
         $this->assertTrue(
             (new RaidType(RaidType::FROZEN_KING))->isFrozenKing()
         );
     }
 
-    public function testIsCorruptedBishop()
+    public function test_is_corrupted_bishop()
     {
         $this->assertTrue(
             (new RaidType(RaidType::CORRUPTED_BISHOP))->isCorruptedBishop()

@@ -57,7 +57,7 @@ class AssignNewKingdomBuildingsJob implements ShouldQueue
                     if (! is_null($kingdom->character)) {
                         $user = $kingdom->character->user;
 
-                        $message = 'Kingdom: ' . $kingdom->name . ' gained a new building: ' . $this->gameBuilding->name;
+                        $message = 'Kingdom: '.$kingdom->name.' gained a new building: '.$this->gameBuilding->name;
 
                         ServerMessageHandler::handleMessage($user, KingdomMessageTypes::NEW_BUILDING, $message);
                     }

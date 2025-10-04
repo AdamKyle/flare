@@ -12,35 +12,34 @@ use League\Fractal\Resource\Item;
 
 class CharacterCacheData
 {
-
     public function __construct(
-        private readonly Manager                        $manager,
-        private readonly PlainDataSerializer            $plainDataSerializer,
+        private readonly Manager $manager,
+        private readonly PlainDataSerializer $plainDataSerializer,
         private readonly CharacterAttackDataTransformer $characterAttackDataTransformer,
-        private readonly CharacterStatBuilder           $characterStatBuilder
+        private readonly CharacterStatBuilder $characterStatBuilder
     ) {}
 
     public function setCharacterDefendAc(Character $character, int $defence)
     {
-        Cache::put('character-defence-' . $character->id, $defence);
+        Cache::put('character-defence-'.$character->id, $defence);
     }
 
     public function getCharacterDefenceAc(Character $character)
     {
-        return Cache::get('character-defence-' . $character->id);
+        return Cache::get('character-defence-'.$character->id);
     }
 
     public function getDataFromAttackCache(Character $character, string $attackType): array
     {
-        $characterAttackData = Cache::get('character-attack-data-' . $character->id);
+        $characterAttackData = Cache::get('character-attack-data-'.$character->id);
 
         return $characterAttackData['attack_types'][$attackType];
     }
 
     public function getCachedCharacterData(Character $character, string $key): mixed
     {
-        if (Cache::has('character-sheet-' . $character->id)) {
-            $cache = Cache::get('character-sheet-' . $character->id);
+        if (Cache::has('character-sheet-'.$character->id)) {
+            $cache = Cache::get('character-sheet-'.$character->id);
             $cacheLevel = (int) str_replace(',', '', $cache['level']);
 
             if ($cacheLevel != $character->level) {
@@ -56,17 +55,17 @@ class CharacterCacheData
 
     public function deleteCharacterSheet(Character $character)
     {
-        Cache::delete('character-defence-' . $character->id);
+        Cache::delete('character-defence-'.$character->id);
 
-        if (Cache::has('character-sheet-' . $character->id)) {
-            Cache::delete('character-sheet-' . $character->id);
+        if (Cache::has('character-sheet-'.$character->id)) {
+            Cache::delete('character-sheet-'.$character->id);
         }
     }
 
     public function getCharacterSheetCache(Character $character): array
     {
-        if (Cache::has('character-sheet-' . $character->id)) {
-            return Cache::get('character-sheet-' . $character->id);
+        if (Cache::has('character-sheet-'.$character->id)) {
+            return Cache::get('character-sheet-'.$character->id);
         }
 
         return $this->characterSheetCache($character);
@@ -74,8 +73,8 @@ class CharacterCacheData
 
     public function updateCharacterSheetCache(Character $character, array $data)
     {
-        if (Cache::has('character-sheet-' . $character->id)) {
-            return Cache::put('character-sheet-' . $character->id, $data);
+        if (Cache::has('character-sheet-'.$character->id)) {
+            return Cache::put('character-sheet-'.$character->id, $data);
         }
 
         // If the cache doesn't exist, create it, set it.
@@ -121,7 +120,7 @@ class CharacterCacheData
         $characterSheet['spell_attack'] = $this->characterStatBuilder->buildDamage('spell-damage');
         $characterSheet['heal_for'] = $this->characterStatBuilder->buildHealing();
 
-        Cache::put('character-sheet-' . $characterId, $characterSheet);
+        Cache::put('character-sheet-'.$characterId, $characterSheet);
 
         return $characterSheet;
     }

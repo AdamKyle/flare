@@ -23,7 +23,7 @@ class CharacterReincarnationServiceTest extends TestCase
 
     private ?CharacterReincarnateService $reincarnationService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -43,7 +43,7 @@ class CharacterReincarnationServiceTest extends TestCase
         ]);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -51,7 +51,7 @@ class CharacterReincarnationServiceTest extends TestCase
         $this->reincarnationService = null;
     }
 
-    public function testCannotReincarnateWhenCannotLevelToMax()
+    public function test_cannot_reincarnate_when_cannot_level_to_max()
     {
         $character = $this->character->getCharacter();
 
@@ -61,7 +61,7 @@ class CharacterReincarnationServiceTest extends TestCase
         $this->assertEquals('You need to complete the quest: Reach for the stars (Labyrinth, one off quests) to be able to reincarnate', $result['message']);
     }
 
-    public function testCannotReincarnateWhenCannotLevelToMaxWhenNotMaxLevel()
+    public function test_cannot_reincarnate_when_cannot_level_to_max_when_not_max_level()
     {
         $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
 
@@ -73,7 +73,7 @@ class CharacterReincarnationServiceTest extends TestCase
         $this->assertEquals('You must be at max level to reincarnate. Max level is 5,000 which you can level to by obtaining the "Sash of the Heavens" from the "Reach for the stars" Labyrinth one off quest', $result['message']);
     }
 
-    public function testCannotReincarnateWhenQuestNotComplete()
+    public function test_cannot_reincarnate_when_quest_not_complete()
     {
         $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
 
@@ -89,7 +89,7 @@ class CharacterReincarnationServiceTest extends TestCase
         $this->assertEquals('You must complete: "The story of rebirth" quest line in Hell first.', $result['message']);
     }
 
-    public function testCannotReincarnateWhenCannotAfford()
+    public function test_cannot_reincarnate_when_cannot_afford()
     {
         $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
 
@@ -115,7 +115,7 @@ class CharacterReincarnationServiceTest extends TestCase
         $this->assertEquals('Reincarnation costs 50,000 Copper Coins', $result['message']);
     }
 
-    public function testCanReincarnate()
+    public function test_can_reincarnate()
     {
         $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
 
@@ -161,7 +161,7 @@ class CharacterReincarnationServiceTest extends TestCase
         $this->assertGreaterThan(0, $character->reincarnated_stat_increase);
     }
 
-    public function testReincarnationWillNotGoAboveMaxValue()
+    public function test_reincarnation_will_not_go_above_max_value()
     {
         $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
 
@@ -209,7 +209,7 @@ class CharacterReincarnationServiceTest extends TestCase
         $this->assertGreaterThan(0, $character->reincarnated_stat_increase);
     }
 
-    public function testCannotReincarnateWhenStatsAreMaxed()
+    public function test_cannot_reincarnate_when_stats_are_maxed()
     {
         $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
 

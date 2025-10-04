@@ -13,21 +13,21 @@ class MessageTest extends TestCase
 
     private ?CharacterFactory $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testCreateMessage()
+    public function test_create_message()
     {
         $user = $this->character->getUser();
         $character = $this->character->getCharacter();
@@ -50,7 +50,7 @@ class MessageTest extends TestCase
         $this->assertEquals(false, $message->hide_location);
     }
 
-    public function testSendMessageToAnotherUser()
+    public function test_send_message_to_another_user()
     {
         $user = $this->character->getUser();
         $character = $this->character->getCharacter();

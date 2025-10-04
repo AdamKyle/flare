@@ -2,14 +2,6 @@
 
 namespace App\Game\Character\CharacterInventory\Jobs;
 
-
-use Exception;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
@@ -17,6 +9,13 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Services\DisenchantService;
 use App\Game\Skills\Services\SkillCheckService;
+use Exception;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class DisenchantMany implements ShouldQueue
 {
@@ -25,8 +24,7 @@ class DisenchantMany implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param Character $character
-     * @param array $slotIds
+     * @param  array  $slotIds
      */
     public function __construct(protected readonly Character $character, protected readonly array $itemIds) {}
 
@@ -34,6 +32,7 @@ class DisenchantMany implements ShouldQueue
      * Execute the job.
      *
      * @return void
+     *
      * @throws Exception
      */
     public function handle(DisenchantService $disenchantService, SkillCheckService $skillCheckService)
@@ -70,9 +69,9 @@ class DisenchantMany implements ShouldQueue
 
     private function processCappedGoldDust(Character $character, Item $item, bool $disenchanted): void
     {
-        $message = 'You are maxed on gold dust and ' . (
-            $disenchanted ? ' you still managed to disenchant the item: ' . $item->affix_name :
-            'you failed to disenchant the item: ' . $item->affix_name
+        $message = 'You are maxed on gold dust and '.(
+            $disenchanted ? ' you still managed to disenchant the item: '.$item->affix_name :
+            'you failed to disenchant the item: '.$item->affix_name
         );
 
         ServerMessageHandler::sendBasicMessage($character->user, $message);
@@ -82,16 +81,16 @@ class DisenchantMany implements ShouldQueue
     {
         event(new UpdateSkillEvent($disenchantingSkill));
 
-        $message = 'You ' . (
-            $disenchanted ? 'disenchanted the item: ' . $item->affix_name :
-            'failed to disenchant the item: ' . $item->affix_name
+        $message = 'You '.(
+            $disenchanted ? 'disenchanted the item: '.$item->affix_name :
+            'failed to disenchant the item: '.$item->affix_name
         );
 
         ServerMessageHandler::sendBasicMessage($character->user, $message);
 
-        $goldDust = $disenchantService->setUp($character)->updateGoldDust($character, !$disenchanted);
+        $goldDust = $disenchantService->setUp($character)->updateGoldDust($character, ! $disenchanted);
 
-        $message = 'You also gained: ' . number_format($goldDust) . ' Gold Dust!';
+        $message = 'You also gained: '.number_format($goldDust).' Gold Dust!';
 
         ServerMessageHandler::sendBasicMessage($character->user, $message);
     }

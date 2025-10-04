@@ -38,7 +38,7 @@ class AssignTopEndGearToPlayer extends Command
         $character = Character::where('name', $characterName)->first();
 
         if (is_null($character)) {
-            $this->error('No character found for name: ' . $characterName);
+            $this->error('No character found for name: '.$characterName);
 
             return;
         }
@@ -57,13 +57,13 @@ class AssignTopEndGearToPlayer extends Command
 
         $prefix = ItemAffix::where('type', 'prefix')
             ->where('randomly_generated', false)
-            ->where($character->damage_stat . '_mod', '>', 0)
+            ->where($character->damage_stat.'_mod', '>', 0)
             ->orderBy('skill_level_required', 'desc')
             ->first();
 
         $suffix = ItemAffix::where('type', 'suffix')
             ->where('randomly_generated', false)
-            ->where($character->damage_stat . '_mod', '>', 0)
+            ->where($character->damage_stat.'_mod', '>', 0)
             ->orderBy('skill_level_required', 'desc')
             ->first();
 

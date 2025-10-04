@@ -312,8 +312,8 @@ class Skill extends Model
 
     protected function getCharacterSkillBonus(Character $character, string $name): float
     {
-        $raceSkillBonusValue = $character->race->{Str::snake($name . '_mod')};
-        $classSkillBonusValue = $character->class->{Str::snake($name . '_mod')};
+        $raceSkillBonusValue = $character->race->{Str::snake($name.'_mod')};
+        $classSkillBonusValue = $character->class->{Str::snake($name.'_mod')};
 
         return $raceSkillBonusValue + $classSkillBonusValue;
     }
@@ -363,7 +363,7 @@ class Skill extends Model
 
         foreach ($equippedSlots as $slot) {
 
-            $bonus =  $this->calculateBonus($slot->item, $skill, $skillAttribute);
+            $bonus = $this->calculateBonus($slot->item, $skill, $skillAttribute);
 
             if ($bonus > 0) {
                 $itemsThatEffectBonus[] = [
@@ -385,7 +385,7 @@ class Skill extends Model
         foreach ($slots as $slot) {
             if ($slot->item->type === 'quest' && $slot->item->skill_name === $this->baseSkill->name) {
 
-                $bonus =  $this->calculateBonus($slot->item, $skill, $skillAttribute);
+                $bonus = $this->calculateBonus($slot->item, $skill, $skillAttribute);
 
                 if ($bonus > 0) {
                     $itemsThatEffectBonus[] = [
@@ -413,7 +413,7 @@ class Skill extends Model
         $boons = CharacterBoon::where('character_id', $this->character->id)->get();
 
         if ($boons->isNotEmpty()) {
-            $newBonus += $boons->sum('itemUsed.' . $skillBonusAttribute);
+            $newBonus += $boons->sum('itemUsed.'.$skillBonusAttribute);
         }
 
         return $newBonus;

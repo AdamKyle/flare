@@ -10,28 +10,13 @@ use App\Game\Messages\Events\GlobalMessageEvent;
 
 class WeeklyCurrencyEventEnderService implements EventEnder
 {
+    public function __construct(private readonly AnnouncementCleanupService $announcementCleanup) {}
 
-    /**
-     * @param AnnouncementCleanupService $announcementCleanup
-     */
-    public function __construct(private readonly AnnouncementCleanupService $announcementCleanup)
-    {}
-
-    /**
-     * @param  EventType  $type
-     * @return bool
-     */
     public function supports(EventType $type): bool
     {
         return $type->isWeeklyCurrencyDrops();
     }
 
-    /**
-     * @param  EventType  $type
-     * @param  ScheduledEvent  $scheduled
-     * @param  ActiveEvent  $current
-     * @return void
-     */
     public function end(EventType $type, ScheduledEvent $scheduled, ActiveEvent $current): void
     {
         event(new GlobalMessageEvent('Weekly currency drops have come to an end! Come back next sunday for another chance!'));
