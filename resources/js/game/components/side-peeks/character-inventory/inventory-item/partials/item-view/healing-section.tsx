@@ -8,6 +8,10 @@ import {
   formatSignedPercent,
 } from '../../../../../../util/format-number';
 import HealingSectionProps from '../../types/partials/item-view/healing-section-props';
+import {
+  baseHealingModifierToolTipDescription,
+  baseHealingToolTipDescription,
+} from '../../utils/tool-tip-description-builder';
 
 const HealingSection = ({ healing, baseHealingMod }: HealingSectionProps) => {
   const baseMod = Number(baseHealingMod ?? 0);
@@ -16,13 +20,6 @@ const HealingSection = ({ healing, baseHealingMod }: HealingSectionProps) => {
   if (healing === 0 && !hasChild) {
     return null;
   }
-
-  const dir = baseMod > 0 ? 'increase' : 'decrease';
-  const amount = formatSignedPercent(baseMod).replace(/^[+-]/, '');
-  const baseModTooltip =
-    `This will ${dir} the spell base healing by ${amount}. ` +
-    `This can stack with other gear that contains this modifier to affect your overall healing, ` +
-    `even if that gear doesn’t increase your healing.`;
 
   const renderUpIcon = (value: number) => {
     if (value <= 0) {
@@ -45,8 +42,7 @@ const HealingSection = ({ healing, baseHealingMod }: HealingSectionProps) => {
           <div className="ml-4 inline-flex items-center gap-2">
             <InfoLabel
               label="Base Healing Mod"
-              tooltip={baseModTooltip}
-              tooltipValue={baseMod}
+              tooltip={baseHealingModifierToolTipDescription(baseMod)}
               tooltipAlign="right"
               tooltipRenderAsPercent
               tooltipSize="sm"
@@ -71,8 +67,7 @@ const HealingSection = ({ healing, baseHealingMod }: HealingSectionProps) => {
         left={
           <InfoLabel
             label="Healing"
-            tooltip="Healing"
-            tooltipValue={healing}
+            tooltip={baseHealingToolTipDescription(healing)}
             tooltipAlign="right"
           />
         }

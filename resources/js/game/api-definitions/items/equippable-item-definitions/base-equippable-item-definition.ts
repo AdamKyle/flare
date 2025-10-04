@@ -18,7 +18,7 @@ export default interface EquippableItemDefinition {
   base_healing: number | null;
 
   base_damage_mod: number | string | null;
-  base_ac_mod: number | string | null;
+  base_ac_mod: number | null;
   base_healing_mod: number | string | null;
 
   base_damage_mod_bonus: number;

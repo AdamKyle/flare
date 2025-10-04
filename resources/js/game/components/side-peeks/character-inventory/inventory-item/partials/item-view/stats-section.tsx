@@ -6,6 +6,7 @@ import Section from '../../../../../../reusable-components/viewable-sections/sec
 import { formatSignedPercent } from '../../../../../../util/format-number';
 import { STAT_FIELDS } from '../../types/partials/constants/stat-fields';
 import StatsSectionProps from '../../types/partials/item-view/stats-section-props';
+import { buildStatToolTip } from '../../utils/tool-tip-description-builder';
 
 const StatsSection = ({ item }: StatsSectionProps) => {
   const rows = STAT_FIELDS.map(({ key, label }) => ({
@@ -39,8 +40,7 @@ const StatsSection = ({ item }: StatsSectionProps) => {
         left={
           <InfoLabel
             label={label}
-            tooltip={label}
-            tooltipValue={value}
+            tooltip={buildStatToolTip(label, value)}
             tooltipAlign="right"
             tooltipRenderAsPercent
           />
