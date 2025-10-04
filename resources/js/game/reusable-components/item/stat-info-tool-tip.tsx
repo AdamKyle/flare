@@ -194,6 +194,7 @@ const StatInfoToolTip = (props: StatInfoToolTipProps) => {
       parent?.removeEventListener('scroll', onScroll);
       window.removeEventListener('scroll', onScroll, true);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, align, label, value]);
 
   const handlePointerEnter = (event: React.PointerEvent) => {
