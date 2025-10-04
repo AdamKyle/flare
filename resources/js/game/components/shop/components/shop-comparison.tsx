@@ -10,6 +10,8 @@ import ComparisonProps from '../types/comparison-props';
 import { GameDataError } from 'game-data/components/game-data-error';
 import { useGameData } from 'game-data/hooks/use-game-data';
 
+import { Alert } from 'ui/alerts/alert';
+import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Card from 'ui/cards/card';
 import ContainerWithTitle from 'ui/container/container-with-title';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
@@ -41,7 +43,7 @@ const ShopComparison = ({
       return <ApiErrorAlert apiError={error.message} />;
     }
 
-    return <ItemComparison comparisonDetails={data} item_name={item_name} />;
+    return <ItemComparison comparisonDetails={data} item_name={item_name} show_buy_an_replace />;
   };
 
   return (
@@ -49,7 +51,17 @@ const ShopComparison = ({
       manageSectionVisibility={close_comparison}
       title="Shop Comparison"
     >
-      <Card>{renderContent()}</Card>
+      <Card>
+        <Alert variant={AlertVariant.INFO}>
+          If the item your looking at is better click "Buy and replace". This will
+          allow you to decide which slot to equip it in, and it will replace
+          that item, even if the item is inside an equipped set. The item you
+          replace, will placed back into your inventory, assuming you have the
+          space. Should you not have the space, you will not be able to purchase
+          and thus replace.
+        </Alert>
+        {renderContent()}
+      </Card>
     </ContainerWithTitle>
   );
 };

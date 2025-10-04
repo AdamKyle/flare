@@ -284,7 +284,9 @@ const Shop = ({ close_shop }: ShopProps) => {
     <ContainerWithTitle manageSectionVisibility={close_shop} title="Shop">
       <Card>
         <p className="my-4 italic text-gray-800 dark:text-gray-300">
-          Welcome to my humble shop. What can I get you?
+          Welcome to my humble shop. What can I get you? If you are looking to
+          replace something, click Compare, you might find the item is better
+          and you can simply replace it, for a fee of course.
         </p>
         {renderCharacterGold()}
         {renderInventoryIsFullNotice()}

@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 
 import { TOP_ADVANCED_CHILD_FIELDS } from './constants/item-comparison-constants';
 import ItemComparisonColumn from './partials/item-comparison/item-comparison-column';
@@ -13,7 +13,9 @@ import Separator from 'ui/separator/separator';
 const ItemComparison = ({
   comparisonDetails,
   item_name,
+  show_buy_an_replace = false
 }: ItemComparisonProps) => {
+
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const handleToggleAdvanced = () => {
@@ -42,6 +44,22 @@ const ItemComparison = ({
     ? 'grid grid-cols-1'
     : 'grid grid-cols-1 md:grid-cols-2 gap-4';
 
+  const renderBuyAndReplaceAction = () => {
+    if (!show_buy_an_replace) {
+      return null;
+    }
+
+    return (
+      <IconButton
+        additional_css={'ml-4'}
+        on_click={() => {}}
+        variant={ButtonVariant.SUCCESS}
+        label={'But and replace'}
+        aria_label={'Purchase and Replace'}
+      />
+    )
+  }
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-end">
@@ -62,6 +80,7 @@ const ItemComparison = ({
             showAdvanced ? 'Hide advanced details' : 'Show advanced details'
           }
         />
+
       </div>
 
       <div className={gridClasses}>
@@ -75,6 +94,7 @@ const ItemComparison = ({
                 showAdvanced={showAdvanced}
                 showAdvancedChildUnderTop={showAdvancedChildUnderTop}
               />
+              {renderBuyAndReplaceAction()}
             </div>
 
             {index < comparisonRows.length - 1 && (

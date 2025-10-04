@@ -6,17 +6,12 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Pagination\Requests\PaginationRequest;
 use App\Flare\Transformers\CharacterInventoryCountTransformer;
-use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
 use App\Game\Shop\Events\BuyItemEvent;
-use App\Game\Shop\Events\SellItemEvent;
-use App\Game\Shop\Events\UpdateShopEvent;
 use App\Game\Shop\Requests\ShopPurchaseMultipleValidation;
 use App\Game\Shop\Requests\ShopReplaceItemValidation;
-use App\Game\Shop\Requests\ShopSellValidation;
 use App\Game\Shop\Services\ShopService;
 use App\Http\Controllers\Controller;
-use Facades\App\Flare\Calculators\SellItemCalculator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
@@ -24,7 +19,7 @@ use League\Fractal\Resource\Item as FractalItem;
 
 class ShopController extends Controller
 {
-    public function __construct(private readonly CharacterInventoryService $characterInventoryService,
+    public function __construct(
         private readonly ShopService $shopService,
         private readonly CharacterInventoryCountTransformer $characterInventoryCountTransformer,
         private readonly Manager $manager,
@@ -45,7 +40,7 @@ class ShopController extends Controller
     }
 
     public function shopCompare(Request $request, Character $character,
-        ComparisonService $comparisonService)
+        ComparisonService $comparisonService): JsonResponse
     {
 
         $viewData = $comparisonService->buildShopData($character, Item::where('name', $request->item_name)->first(), $request->item_type);
@@ -55,7 +50,7 @@ class ShopController extends Controller
         );
     }
 
-    public function buy(Request $request, Character $character)
+    public function buy(Request $request, Character $character): JsonResponse|\Illuminate\Http\RedirectResponse
     {
 
         if ($character->gold === 0) {
@@ -96,7 +91,7 @@ class ShopController extends Controller
         ]);
     }
 
-    public function buyMultiple(ShopPurchaseMultipleValidation $request, Character $character)
+    public function buyMultiple(ShopPurchaseMultipleValidation $request, Character $character): JsonResponse|\Illuminate\Http\RedirectResponse
     {
         $item = Item::find($request->item_id);
         $amount = $request->amount;
@@ -129,7 +124,7 @@ class ShopController extends Controller
         ]);
     }
 
-    public function buyAndReplace(ShopReplaceItemValidation $request, Character $character)
+    public function buyAndReplace(ShopReplaceItemValidation $request, Character $character): JsonResponse|\Illuminate\Http\RedirectResponse
     {
 
         $item = Item::find($request->item_id_to_buy);
@@ -158,56 +153,8 @@ class ShopController extends Controller
 
         $this->shopService->buyAndReplace($item, $character, $request->all());
 
-        $character = $character->refresh();
-
-        event(new UpdateShopEvent($character->user, $character->gold, $character->getInventoryCount()));
-
         return response()->json([
             'message' => 'Purchased and equipped: '.$item->affix_name.'.',
         ]);
-    }
-
-    public function sellItem(ShopSellValidation $request, Character $character)
-    {
-
-        $inventorySlot = $character->inventory->slots->filter(function ($slot) use ($request) {
-            return $slot->id === (int) $request->slot_id && ! $slot->equipped;
-        })->first();
-
-        if (is_null($inventorySlot)) {
-            return response()->json(['message' => 'Item not found.']);
-        }
-
-        $item = $inventorySlot->item;
-
-        if ($item->type === 'trinket' || $item->type === 'artifact') {
-            return response()->json(['message' => 'The shop keeper will not accept this item (Trinkets/Artifacts cannot be sold to the shop).']);
-        }
-
-        $totalSoldFor = SellItemCalculator::fetchSalePriceWithAffixes($item);
-
-        $character = $character->refresh();
-
-        event(new SellItemEvent($inventorySlot, $character));
-
-        $inventory = $this->characterInventoryService->setCharacter($character);
-
-        return response()->json([
-            'message' => 'Sold: '.$item->affix_name.' for: '.number_format($totalSoldFor).' gold.',
-            'inventory' => [
-                'inventory' => $inventory->getInventoryForType('inventory'),
-            ],
-        ]);
-    }
-
-    public function sellAll(Character $character)
-    {
-
-        $result = $this->shopService->sellAllItems($character);
-
-        $status = $result['status'];
-        unset($result['status']);
-
-        return response()->json($result, $status);
     }
 }
