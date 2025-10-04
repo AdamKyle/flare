@@ -14,16 +14,20 @@ import ContainerWithTitle from 'ui/container/container-with-title';
 import InfiniteRow from 'ui/infinite-scroll/components/infitnite-row';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import Separator from 'ui/separator/separator';
+import {formatNumberWithCommas} from "../../util/format-number";
 
 const GoblinShop = ({ on_close }: GoblinShopProps) => {
   const [itemToView, setItemToView] = useState<BaseUsableItemDefinition | null>(
     null
   );
 
-  const { data, loading, error, handleScroll } = useCustomContext(
+
+  const { data, loading, error, handleScroll, gold_bars, inventory_count, inventoryIsFull } = useCustomContext(
     GoblinShopContext,
     'GoblinShop'
   );
+
+
 
   const handleViewItem = (item_id: number) => {
     const foundItem = data.find((item) => item.item_id === item.item_id);
@@ -55,9 +59,52 @@ const GoblinShop = ({ on_close }: GoblinShopProps) => {
             key={item.item_id}
             item={item}
             view_item={handleViewItem}
+            action_disabled={inventoryIsFull || gold_bars <= 0}
           />
         ))}
       </InfiniteRow>
+    );
+  };
+
+  const renderCharacterGoldBars = () => {
+    if (!gold_bars) {
+      return null;
+    }
+
+    return (
+      <p className="mb-4 text-gray-800 dark:text-gray-300">
+        <strong>
+          <span className="text-marigold-600 dark:text-mango-tango-400">
+            Your Gold Bars:
+          </span>
+        </strong>{' '}
+        {formatNumberWithCommas(gold_bars)}
+      </p>
+    );
+  };
+
+  const renderInventoryIsFullNotice = () => {
+    if (!inventoryIsFull) {
+      return null;
+    }
+
+    return (
+      <Alert variant={AlertVariant.WARNING}>
+        Your inventory is currently full. You cannot purchase any items, the
+        shop keeper is sad.
+      </Alert>
+    );
+  };
+
+  const renderNoGoldBarsNotice = () => {
+    if (gold_bars <= 0) {
+      return null;
+    }
+
+    return (
+      <Alert variant={AlertVariant.WARNING}>
+        You have no gold bars. The goblin shop owner is displeased. "Don't you convert your treasure child?" he asks with a air aof disgust.
+      </Alert>
     );
   };
 
@@ -76,7 +123,10 @@ const GoblinShop = ({ on_close }: GoblinShopProps) => {
           look see.
         </p>
         <Separator />
-
+        {renderCharacterGoldBars()}
+        {renderNoGoldBarsNotice()}
+        {renderInventoryIsFullNotice()}
+        <Separator />
         {renderContent()}
       </Card>
     </ContainerWithTitle>

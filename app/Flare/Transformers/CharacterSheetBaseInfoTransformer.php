@@ -81,6 +81,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'voided_spell_damage' => $characterStatBuilder->buildDamage('spell-damage', true),
             'healing_amount' => $characterStatBuilder->buildHealing(),
             'voided_healing_amount' => $characterStatBuilder->buildHealing(true),
+            'gold_bars' => $this->fetchGoldBarsAmount($character),
         ];
     }
 
@@ -95,5 +96,9 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
 
     public function includereincarnationInfo(Character $character) {
         return $this->item($character, new CharacterReincarnationInfoTransformer);
+    }
+
+    private function fetchGoldBarsAmount(Character $character): int {
+        return $character->kingdoms->sum('gold_bars');
     }
 }

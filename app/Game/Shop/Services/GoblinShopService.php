@@ -26,8 +26,6 @@ class GoblinShopService
             ->orderBy('gold_bars_cost')
             ->get();
 
-        dump($items);
-
         return $this->pagination->buildPaginatedDate($items, $this->usableItemTransformer, $perPage, $page);
     }
 

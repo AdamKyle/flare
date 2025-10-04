@@ -232,7 +232,7 @@ const Shop = ({ close_shop }: ShopProps) => {
     );
   };
 
-  const renderInventoryIsFullError = () => {
+  const renderInventoryIsFullNotice = () => {
     if (!inventoryIsFull) {
       return null;
     }
@@ -241,6 +241,22 @@ const Shop = ({ close_shop }: ShopProps) => {
       <Alert variant={AlertVariant.WARNING}>
         Your inventory is currently full. You cannot purchase any items, the
         shop keeper is sad.
+      </Alert>
+    );
+  };
+
+  const renderNoGoldNotice = () => {
+    if (!gameData?.character) {
+      return null;
+    }
+
+    if (gameData.character.gold > 0) {
+      return null;
+    }
+
+    return (
+      <Alert variant={AlertVariant.WARNING}>
+        You have no gold. You cannot buy anything. There is a great saddness in the air.
       </Alert>
     );
   };
@@ -270,7 +286,8 @@ const Shop = ({ close_shop }: ShopProps) => {
           Welcome to my humble shop. What can I get you?
         </p>
         {renderCharacterGold()}
-        {renderInventoryIsFullError()}
+        {renderInventoryIsFullNotice()}
+        {renderNoGoldNotice()}
         {renderPurchaseError()}
         {renderPurchaseSuccess()}
         {renderPurchaseLoading()}

@@ -8,14 +8,14 @@ import GoblinShopProps from './types/goblin-shop-props';
 import { useGameData } from 'game-data/hooks/use-game-data';
 
 const GoblinShopScreen = ({ on_close }: GoblinShopProps) => {
-  const { gameData } = useGameData();
+  const { gameData, updateCharacter } = useGameData();
 
-  const characterId = !isNil(gameData?.character?.id)
-    ? gameData.character.id
-    : 0;
+  if (!gameData || !gameData.character) {
+    return null;
+  }
 
   return (
-    <GoblinShopProvider characterId={characterId}>
+    <GoblinShopProvider character={gameData.character} update_character={updateCharacter}>
       <GoblinShop on_close={on_close} />
     </GoblinShopProvider>
   );

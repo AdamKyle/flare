@@ -47,6 +47,7 @@ export default interface CharacterSheetDefinition {
   voided_spell_damage: number;
   healing_amount: number;
   voided_healing_amount: number;
+  gold_bars: number;
   inventory_count: InventoryCountDefinition;
   resistance_info: ResistanceInfoDefinition;
   elemental_atonements: ElementalAtonementDefinition;
