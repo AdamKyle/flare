@@ -43,7 +43,13 @@ const ShopComparison = ({
       return <ApiErrorAlert apiError={error.message} />;
     }
 
-    return <ItemComparison comparisonDetails={data} item_name={item_name} show_buy_an_replace />;
+    return (
+      <ItemComparison
+        comparisonDetails={data}
+        item_name={item_name}
+        show_buy_an_replace
+      />
+    );
   };
 
   return (
@@ -53,12 +59,12 @@ const ShopComparison = ({
     >
       <Card>
         <Alert variant={AlertVariant.INFO}>
-          If the item your looking at is better click "Buy and replace". This will
-          allow you to decide which slot to equip it in, and it will replace
-          that item, even if the item is inside an equipped set. The item you
-          replace, will placed back into your inventory, assuming you have the
-          space. Should you not have the space, you will not be able to purchase
-          and thus replace.
+          If the item your looking at is better click "Buy and replace". This
+          will allow you to decide which slot to equip it in, and it will
+          replace that item, even if the item is inside an equipped set. The
+          item you replace, will placed back into your inventory, assuming you
+          have the space. Should you not have the space, you will not be able to
+          purchase and thus replace.
         </Alert>
         {renderContent()}
       </Card>

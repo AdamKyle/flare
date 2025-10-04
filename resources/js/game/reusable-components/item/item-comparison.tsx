@@ -13,9 +13,8 @@ import Separator from 'ui/separator/separator';
 const ItemComparison = ({
   comparisonDetails,
   item_name,
-  show_buy_an_replace = false
+  show_buy_an_replace = false,
 }: ItemComparisonProps) => {
-
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const handleToggleAdvanced = () => {
@@ -57,8 +56,8 @@ const ItemComparison = ({
         label={'But and replace'}
         aria_label={'Purchase and Replace'}
       />
-    )
-  }
+    );
+  };
 
   return (
     <div className="space-y-3">
@@ -80,7 +79,6 @@ const ItemComparison = ({
             showAdvanced ? 'Hide advanced details' : 'Show advanced details'
           }
         />
-
       </div>
 
       <div className={gridClasses}>
