@@ -14,4 +14,6 @@ export interface BaseItemDetails {
   name: string;
   description: string;
   type: InventoryItemTypes;
+  cost: number;
+  item_id: number;
 }

@@ -91,12 +91,6 @@ class ComparisonService
             ->setPositions($this->validEquipPositionsValue->getPositions($item))
             ->setInventory();
 
-        $setEquipped = $character->inventorySets()->where('is_equipped', true)->first();
-        $hasSet = ! is_null($setEquipped);
-        $setIndex = ! is_null($setEquipped) ? $character->inventorySets->search(function ($set) {
-            return $set->is_equipped;
-        }) + 1 : 0;
-
         $inventory = $service->inventory();
 
         return [

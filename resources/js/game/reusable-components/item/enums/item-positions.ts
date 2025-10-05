@@ -1,0 +1,17 @@
+export enum ItemPositions {
+  LEFT_HAND = 'left-hand',
+  RIGHT_HAND = 'right-hand',
+  SPELL_ONE = 'spell-one',
+  SPELL_TWO = 'spell-two',
+  RING_ONE = 'ring-one',
+  RING_TWO = 'ring-two',
+  TRINKET_ONE = 'trinket-one',
+  TRINKET_TWO = 'trinket-two',
+  BODY = 'body',
+  HELMET = 'helmet',
+  LEGGINGS = 'leggings',
+  SLEEVES = 'sleeves',
+  GLOVES = 'gloves',
+  FEET = 'feet',
+  ARTIFACT = 'artifact',
+}

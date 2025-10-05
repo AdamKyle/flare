@@ -8,6 +8,7 @@ use App\Flare\Items\Enricher\EquippableEnricher;
 use App\Flare\Items\Enricher\ItemEnricherFactory;
 use App\Flare\Items\Enricher\Manifest\Concerns\ManifestSchema;
 use App\Flare\Items\Enricher\Manifest\EquippableManifest;
+use App\Flare\Items\Transformers\BaseEquippableItemTransformer;
 use App\Flare\Items\Transformers\EquippableItemTransformer;
 use App\Flare\Items\Transformers\QuestItemTransformer;
 use App\Flare\Items\Transformers\UsableItemTransformer;
@@ -31,6 +32,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(EquippableItemTransformer::class, function () {
             return new EquippableItemTransformer;
+        });
+
+        $this->app->bind(BaseEquippableItemTransformer::class, function () {
+            return new BaseEquippableItemTransformer;
         });
 
         $this->app->bind(QuestItemTransformer::class, function () {
@@ -57,7 +62,10 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(ItemComparison::class, function ($app) {
             return new ItemComparison(
                 $app->make(EquippableEnricher::class),
-                $app->make(Comparator::class)
+                $app->make(Comparator::class),
+                $app->make(BaseEquippableItemTransformer::class),
+                $app->make(PlainDataSerializer::class),
+                $app->make(Manager::class),
             );
         });
 

@@ -1,10 +1,13 @@
 import React, { Fragment, useState } from 'react';
 
 import { TOP_ADVANCED_CHILD_FIELDS } from './constants/item-comparison-constants';
+import { ItemPositions } from './enums/item-positions';
+import EquipItemActions from './equip-item-actions';
 import ItemComparisonColumn from './partials/item-comparison/item-comparison-column';
 import ItemComparisonProps from './types/item-comparison-props';
 import { hasAnyNonZeroAdjustment } from './utils/item-comparison';
 import type { ItemComparisonRow } from '../../api-definitions/items/item-comparison-details';
+import { InventoryItemTypes } from '../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
 
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import IconButton from 'ui/buttons/icon-button';
@@ -13,12 +16,26 @@ import Separator from 'ui/separator/separator';
 const ItemComparison = ({
   comparisonDetails,
   item_name,
-  show_buy_an_replace = false,
+  show_buy_and_replace = false,
 }: ItemComparisonProps) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showEquipActions, setShowEquipActions] = useState(false);
 
   const handleToggleAdvanced = () => {
     setShowAdvanced((previous) => !previous);
+  };
+
+  const handleShowEquipSection = () => {
+    setShowEquipActions(true);
+  };
+
+  const handleBuyAndReplace = (
+    position: ItemPositions,
+    slot_id: number,
+    type: InventoryItemTypes,
+    item_to_buy_id: number
+  ) => {
+    console.log(position, slot_id, type, item_to_buy_id);
   };
 
   const comparisonRows = (
@@ -44,18 +61,33 @@ const ItemComparison = ({
     : 'grid grid-cols-1 md:grid-cols-2 gap-4';
 
   const renderBuyAndReplaceAction = () => {
-    if (!show_buy_an_replace) {
+    if (!show_buy_and_replace) {
       return null;
     }
 
     return (
       <IconButton
         additional_css={'ml-4'}
-        on_click={() => {}}
+        on_click={handleShowEquipSection}
         variant={ButtonVariant.SUCCESS}
         label={'But and replace'}
         aria_label={'Purchase and Replace'}
       />
+    );
+  };
+
+  const renderEquipActions = () => {
+    if (!showEquipActions) {
+      return null;
+    }
+
+    return (
+      <div className="my-4">
+        <EquipItemActions
+          comparisonDetails={comparisonDetails}
+          on_buy_and_replace={handleBuyAndReplace}
+        />
+      </div>
     );
   };
 
@@ -79,7 +111,10 @@ const ItemComparison = ({
             showAdvanced ? 'Hide advanced details' : 'Show advanced details'
           }
         />
+        {renderBuyAndReplaceAction()}
       </div>
+
+      {renderEquipActions()}
 
       <div className={gridClasses}>
         {comparisonRows.map((row, index) => (
@@ -92,7 +127,6 @@ const ItemComparison = ({
                 showAdvanced={showAdvanced}
                 showAdvancedChildUnderTop={showAdvancedChildUnderTop}
               />
-              {renderBuyAndReplaceAction()}
             </div>
 
             {index < comparisonRows.length - 1 && (

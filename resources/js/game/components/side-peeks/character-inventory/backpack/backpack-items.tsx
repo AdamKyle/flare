@@ -72,8 +72,6 @@ const BackpackItems = ({
     setIsSelectionDisabled(false);
     setCloseSuccessMessage(false);
 
-    console.log('After Api Success', update_character, inventory_count);
-
     if (update_character) {
       update_character({ inventory_count: inventory_count });
     }

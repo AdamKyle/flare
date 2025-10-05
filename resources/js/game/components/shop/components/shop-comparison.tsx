@@ -47,7 +47,7 @@ const ShopComparison = ({
       <ItemComparison
         comparisonDetails={data}
         item_name={item_name}
-        show_buy_an_replace
+        show_buy_and_replace
       />
     );
   };

@@ -1,4 +1,5 @@
 import { BaseItemDetails } from './base-item-details';
+import { EquippableItemWithBase } from './equippable-item-definitions/base-equippable-item-definition';
 
 export interface SkillSummaryAdjustment {
   skill_name: string;
@@ -40,6 +41,7 @@ export interface ComparisonPayload {
 
 export interface ItemComparisonRow {
   position: string;
-  equipped_item: BaseItemDetails;
+  equipped_item: EquippableItemWithBase;
   comparison: ComparisonPayload;
+  item_to_equip: BaseItemDetails;
 }

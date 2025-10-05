@@ -21,7 +21,7 @@ export const topBgStyle = (variant: ActionBoxVariant): string => {
     .with(ActionBoxVariant.DANGER, () => 'bg-rose-100 dark:bg-rose-300')
     .with(ActionBoxVariant.SUCCESS, () => 'bg-emerald-100 dark:bg-emerald-700')
     .with(ActionBoxVariant.PRIMARY, () => 'bg-danube-100 dark:bg-danube-700')
-    .otherwise(() => 'bg-gray-50 dark:bg-gray-700');
+    .otherwise(() => 'bg-gray-50 dark:bg-gray-800');
 };
 
 export const bottomBgStyle = (variant: ActionBoxVariant): string => {
@@ -29,5 +29,5 @@ export const bottomBgStyle = (variant: ActionBoxVariant): string => {
     .with(ActionBoxVariant.DANGER, () => 'bg-rose-200 dark:bg-rose-400')
     .with(ActionBoxVariant.SUCCESS, () => 'bg-emerald-200 dark:bg-emerald-800')
     .with(ActionBoxVariant.PRIMARY, () => 'bg-danube-200 dark:bg-danube-800')
-    .otherwise(() => 'bg-gray-100 dark:bg-gray-800');
+    .otherwise(() => 'bg-gray-300 dark:bg-gray-900');
 };

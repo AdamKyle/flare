@@ -3,13 +3,17 @@
 namespace App\Flare\Items\Comparison;
 
 use App\Flare\Items\Enricher\EquippableEnricher;
+use App\Flare\Items\Transformers\BaseEquippableItemTransformer;
 use App\Flare\Items\Values\ArmourType;
 use App\Flare\Items\Values\EquippablePositionType;
 use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Traits\IsItemUnique;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use Illuminate\Database\Eloquent\Collection;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item as FractalItem;
 
 class ItemComparison
 {
@@ -18,6 +22,9 @@ class ItemComparison
     public function __construct(
         private readonly EquippableEnricher $enricher,
         private readonly Comparator $comparator,
+        private readonly BaseEquippableItemTransformer $baseEquippableItemTransformer,
+        private readonly PlainDataSerializer $plainDataSerializer,
+        private readonly Manager $manager,
     ) {}
 
     /**
@@ -132,6 +139,9 @@ class ItemComparison
         $payload = $this->comparator->compare($enrichedItemToCompare, $enrichedEquippedItem);
         $summary = $payload['comparison'];
 
+        $itemToCompareData = new FractalItem($enrichedItemToCompare, $this->baseEquippableItemTransformer);
+        $itemToCompareData = $this->manager->setSerializer($this->plainDataSerializer)->createData($itemToCompareData)->toArray();
+
         return [
             'position' => $equippedSlot->position,
             'equipped_item' => [
@@ -148,7 +158,9 @@ class ItemComparison
                 'name' => $enrichedEquippedItem->affix_name,
                 'description' => $enrichedEquippedItem->description,
                 'type' => $enrichedEquippedItem->type,
+                'slot_id' => $equippedSlot->id,
             ],
+            'item_to_equip' => $itemToCompareData,
             'comparison' => [
                 'adjustments' => $summary['adjustments'],
             ],

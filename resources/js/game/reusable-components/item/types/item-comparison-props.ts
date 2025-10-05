@@ -3,5 +3,5 @@ import { ItemComparisonRow } from '../../../api-definitions/items/item-compariso
 export default interface ItemComparisonProps {
   comparisonDetails: ItemComparisonRow[] | [];
   item_name: string;
-  show_buy_an_replace?: boolean;
+  show_buy_and_replace?: boolean;
 }

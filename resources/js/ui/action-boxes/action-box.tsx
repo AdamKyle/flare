@@ -1,11 +1,6 @@
-import clsx from 'clsx';
 import React from 'react';
 
-import {
-  borderStyle,
-  bottomBgStyle,
-  topBgStyle,
-} from 'ui/action-boxes/styles/action-boxes-styles';
+import ActionBoxBase from 'ui/action-boxes/action-box-base';
 import ActionBoxProps from 'ui/action-boxes/types/action-box-props';
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
@@ -19,19 +14,6 @@ const ActionBox = ({
   additional_css,
   is_loading,
 }: ActionBoxProps) => {
-  const containerClass = clsx(
-    'w-full rounded-md overflow-hidden border-2',
-    borderStyle(variant),
-    'text-gray-900 dark:text-gray-100'
-  );
-
-  const topClass = clsx('p-4', topBgStyle(variant));
-
-  const bottomClass = clsx(
-    'p-4 grid grid-cols-2 gap-2 items-stretch',
-    bottomBgStyle(variant)
-  );
-
   const renderLoadingIcon = () => {
     if (!is_loading) {
       return null;
@@ -40,11 +22,9 @@ const ActionBox = ({
     return <i className="fas fa-spinner fa-spin" aria-hidden="true"></i>;
   };
 
-  return (
-    <div className={clsx(containerClass, additional_css)}>
-      <div className={topClass}>{children}</div>
-
-      <div className={bottomClass}>
+  const renderActions = () => {
+    return (
+      <>
         <IconButton
           disabled={is_loading}
           on_click={on_submit}
@@ -61,8 +41,18 @@ const ActionBox = ({
           variant={ButtonVariant.DANGER}
           additional_css="w-full justify-center"
         />
-      </div>
-    </div>
+      </>
+    );
+  };
+
+  return (
+    <ActionBoxBase
+      variant={variant}
+      actions={renderActions()}
+      additional_css={additional_css}
+    >
+      <div className={'grid grid-cols-2 gap-2 items-stretch'}>{children}</div>
+    </ActionBoxBase>
   );
 };
 
