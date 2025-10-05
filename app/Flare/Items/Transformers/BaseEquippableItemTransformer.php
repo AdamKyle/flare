@@ -2,9 +2,7 @@
 
 namespace App\Flare\Items\Transformers;
 
-use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
-use App\Flare\Models\SetSlot;
 use App\Flare\Traits\IsItemUnique;
 use App\Game\Gems\Traits\GetItemAtonements;
 use League\Fractal\TransformerAbstract;
