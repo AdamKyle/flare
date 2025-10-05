@@ -22,8 +22,10 @@ import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 const EquipItemActions = ({
   comparisonDetails,
   on_buy_and_replace,
+  on_close_buy_and_equip,
 }: EquipItemActionProps) => {
   const [isLoading, setIsLoading] = useState(false);
+
   const [equippedPosition, setEquippedPosition] =
     useState<ItemPositions | null>(null);
 
@@ -41,7 +43,7 @@ const EquipItemActions = ({
     }
 
     if (baseType === ItemBaseTypes.Spell) {
-      return ['Spell Slot One', 'Spell Slot Two'];
+      return ['Spell One', 'Spell Two'];
     }
 
     if (
@@ -73,6 +75,40 @@ const EquipItemActions = ({
     );
   };
 
+  const handleTimeIconClick = () => {};
+
+  const handleCloseBuyAndReplace = () => {
+    setEquippedPosition(null);
+
+    on_close_buy_and_equip();
+  };
+
+  const renderHeader = () => {
+    if (!comparisonDetails) {
+      return null;
+    }
+
+    return (
+      <div className="mb-2 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <h4 className="text-gray-800 dark:text-gray-300 font-bold">
+            Equip Item Details
+          </h4>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleCloseBuyAndReplace}
+          aria-label="Close"
+          title="Close"
+          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500"
+        >
+          <i className="fas fa-times" aria-hidden="true"></i>
+        </button>
+      </div>
+    );
+  };
+
   const renderTwoHandedAction = () => {
     if (
       baseType !== ItemBaseTypes.Weapon &&
@@ -85,7 +121,7 @@ const EquipItemActions = ({
       return null;
     }
 
-    const label = `Equip as a two handed: ${capitalize(String(itemToEquip.type))}`;
+    const label = `Equip as a two handed: ${capitalize(String(itemToEquip.type).replace('-', ' '))}`;
 
     return (
       <div className="flex justify-center">
@@ -118,11 +154,11 @@ const EquipItemActions = ({
     const positions = getItemPositions(itemToEquip);
 
     if (!positions) {
-      return;
+      return null;
     }
 
     return (
-      <div className={'grid grid-cols-2 gap-2 items-stretch'}>
+      <div className="grid grid-cols-2 gap-2 items-stretch">
         <Button
           disabled={isLoading}
           on_click={() => handleBuyAndReplace(positions[0] as ItemPositions)}
@@ -151,7 +187,7 @@ const EquipItemActions = ({
       return null;
     }
 
-    const label = `Replace Equipped: ${capitalize(String(itemToEquip.type))}`;
+    const label = `Replace Equipped: ${capitalize(String(itemToEquip.type).replace('-', ' '))}`;
 
     const positions = getItemPositions(itemToEquip);
 
@@ -190,31 +226,36 @@ const EquipItemActions = ({
             Select one of the items listed below to replace this item with. The
             equipped item you choose will be placed in your backpack.
           </p>
-          <p className={'my-2'}>
+
+          <p className="my-2">
             If the item equipped is two handed you can pick any hand you want.
             If the item to equip is two handed and you have two items equipped,
             both will be placed in your inventory in favour of this item.
           </p>
         </div>
+
         <ul className="list-disc pl-5">
           {itemsToShow.map((detail, index) => {
             const equipped = detail.equipped_item;
+
             const equippedColor = planeTextItemColors(equipped);
-            const isTwoHanded = isTwoHandedType(equipped.type);
+
+            const isEquippedTwoHanded = isTwoHandedType(equipped.type);
 
             return (
               <li key={`${detail.position}-${index}`}>
                 <span className={equippedColor}>{equipped.name}</span> Type:{' '}
-                {capitalize(equipped.type.replace('-', ' '))}{' '}
-                {isTwoHanded ? ' and is two handed ' : ' '} and is equipped in:{' '}
-                {capitalize(detail.position.replace('-', ' '))}
+                <strong>{capitalize(equipped.type.replace('-', ' '))}</strong>{' '}
+                {isEquippedTwoHanded ? ' and is two handed ' : ' '} and is
+                equipped in:{' '}
+                <strong>{capitalize(detail.position.replace('-', ' '))}</strong>
               </li>
             );
           })}
         </ul>
 
         <div className="mt-4">
-          <span className={'text-mango-tango-500 dark:text-mango-tango-500'}>
+          <span className="text-mango-tango-500 dark:text-mango-tango-500">
             <strong>Cost of replacement</strong>
           </span>
           : {formatNumberWithCommas(itemToEquip.cost)}
@@ -240,9 +281,8 @@ const EquipItemActions = ({
       variant={ActionBoxVariant.DEFAULT}
       actions={renderEquipItemDetails()}
     >
-      <h4 className="mb-2 text-gray-800 dark:text-gray-300 font-bold">
-        Equip Item Details
-      </h4>
+      {renderHeader()}
+
       <div>{renderEquipSummary()}</div>
     </ActionBoxBase>
   );

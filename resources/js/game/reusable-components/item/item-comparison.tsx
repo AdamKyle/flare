@@ -29,6 +29,10 @@ const ItemComparison = ({
     setShowEquipActions(true);
   };
 
+  const handleCloseEquipSection = () => {
+    setShowEquipActions(false);
+  };
+
   const handleBuyAndReplace = (
     position: ItemPositions,
     slot_id: number,
@@ -86,6 +90,7 @@ const ItemComparison = ({
         <EquipItemActions
           comparisonDetails={comparisonDetails}
           on_buy_and_replace={handleBuyAndReplace}
+          on_close_buy_and_equip={handleCloseEquipSection}
         />
       </div>
     );

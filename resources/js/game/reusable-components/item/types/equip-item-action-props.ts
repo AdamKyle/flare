@@ -10,4 +10,5 @@ export default interface EquipItemActionProps {
     type: InventoryItemTypes,
     item_to_buy_id: number
   ) => void;
+  on_close_buy_and_equip: () => void;
 }
