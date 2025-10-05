@@ -16,8 +16,8 @@ import { formatNumberWithCommas } from '../../util/format-number';
 
 import ActionBoxBase from 'ui/action-boxes/action-box-base';
 import { ActionBoxVariant } from 'ui/action-boxes/enums/action-box-varient';
-import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import IconButton from 'ui/buttons/icon-button';
 
 const EquipItemActions = ({
   comparisonDetails,
@@ -75,12 +75,18 @@ const EquipItemActions = ({
     );
   };
 
-  const handleTimeIconClick = () => {};
-
   const handleCloseBuyAndReplace = () => {
     setEquippedPosition(null);
 
     on_close_buy_and_equip();
+  };
+
+  const renderLoadingIcon = (position: ItemPositions) => {
+    if (equippedPosition !== position) {
+      return null;
+    }
+
+    return <i className="fas fa-spinner fa-spin" aria-hidden="true"></i>;
   };
 
   const renderHeader = () => {
@@ -125,12 +131,13 @@ const EquipItemActions = ({
 
     return (
       <div className="flex justify-center">
-        <Button
+        <IconButton
           disabled={isLoading}
           on_click={() => handleBuyAndReplace(ItemPositions.LEFT_HAND)}
           label={label}
           variant={ButtonVariant.SUCCESS}
           additional_css={nameColorClass}
+          icon={renderLoadingIcon(ItemPositions.LEFT_HAND)}
         />
       </div>
     );
@@ -159,20 +166,22 @@ const EquipItemActions = ({
 
     return (
       <div className="grid grid-cols-2 gap-2 items-stretch">
-        <Button
+        <IconButton
           disabled={isLoading}
           on_click={() => handleBuyAndReplace(positions[0] as ItemPositions)}
           label={labels[0]}
           variant={ButtonVariant.SUCCESS}
           additional_css={`w-full justify-center ${nameColorClass}`}
+          icon={renderLoadingIcon(positions[0] as ItemPositions)}
         />
 
-        <Button
+        <IconButton
           disabled={isLoading}
           on_click={() => handleBuyAndReplace(positions[1] as ItemPositions)}
           label={labels[1]}
           variant={ButtonVariant.SUCCESS}
           additional_css={`w-full justify-center ${nameColorClass}`}
+          icon={renderLoadingIcon(positions[1] as ItemPositions)}
         />
       </div>
     );
@@ -197,12 +206,13 @@ const EquipItemActions = ({
 
     return (
       <div className="flex justify-center">
-        <Button
+        <IconButton
           disabled={isLoading}
           on_click={() => handleBuyAndReplace(positions[0] as ItemPositions)}
           label={label}
           variant={ButtonVariant.SUCCESS}
           additional_css={nameColorClass}
+          icon={renderLoadingIcon(positions[0] as ItemPositions)}
         />
       </div>
     );
