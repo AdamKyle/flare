@@ -153,8 +153,15 @@ class ShopController extends Controller
 
         $this->shopService->buyAndReplace($item, $character, $request->all());
 
+        $character = $character->refresh();
+
+        $data = new FractalItem($character, $this->characterInventoryCountTransformer);
+        $data = $this->manager->createData($data)->toArray();
+
         return response()->json([
             'message' => 'Purchased and equipped: '.$item->affix_name.'.',
+            'inventory_count' => $data,
+            'gold' => $character->gold,
         ]);
     }
 }

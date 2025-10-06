@@ -1,10 +1,8 @@
 import CharacterSheetDefinition from 'game-data/api-data-definitions/character/character-sheet-definition';
 
-export default interface ComparisonProps {
-  item_name: string;
-  item_type: string;
-  close_comparison: () => void;
-  on_purchase_and_replace_success: (
+export default interface UsePurchaseAndReplaceApiParams {
+  character_id: number;
+  on_success: (
     successMessage: string,
     character: Partial<CharacterSheetDefinition>
   ) => void;

@@ -100,6 +100,8 @@ const ShopProvider = ({ children }: ShopProviderProps) => {
         setSelectedType,
         setShopPurchaseRequestParams,
         inventoryIsFull,
+        character: gameData?.character,
+        updateCharacter,
       }}
     >
       {children}

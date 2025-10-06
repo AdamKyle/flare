@@ -5,6 +5,8 @@ import { StateSetter } from '../../../../../types/state-setter-type';
 import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import UsePurchaseItemRequestDefinition from '../../api/hooks/definitions/use-purchase-item-request-definition';
 
+import CharacterSheetDefinition from 'game-data/api-data-definitions/character/character-sheet-definition';
+
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
 export default interface ShopContextDefinition {
@@ -23,4 +25,6 @@ export default interface ShopContextDefinition {
   setSelectedType: (opt: DropdownItem | null) => void;
   setShopPurchaseRequestParams: StateSetter<UsePurchaseItemRequestDefinition>;
   inventoryIsFull: boolean;
+  character?: CharacterSheetDefinition | null;
+  updateCharacter: (character: Partial<CharacterSheetDefinition>) => void;
 }

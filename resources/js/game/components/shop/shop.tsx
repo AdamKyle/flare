@@ -12,7 +12,7 @@ import { useCustomContext } from '../../../utils/hooks/use-custom-context';
 import { EquippableItemWithBase } from '../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import { formatNumberWithCommas } from '../../util/format-number';
 
-import { useGameData } from 'game-data/hooks/use-game-data';
+import CharacterSheetDefinition from 'game-data/api-data-definitions/character/character-sheet-definition';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
@@ -26,8 +26,6 @@ import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import Separator from 'ui/separator/separator';
 
 const Shop = ({ close_shop }: ShopProps) => {
-  const { gameData } = useGameData();
-
   const {
     data,
     loading,
@@ -44,6 +42,8 @@ const Shop = ({ close_shop }: ShopProps) => {
     purchaseError,
     purchaseSuccessMessage,
     inventoryIsFull,
+    character,
+    updateCharacter,
   } = useCustomContext(ShopContext, 'Shop');
 
   const [itemToView, setItemToView] = useState<EquippableItemWithBase | null>(
@@ -55,6 +55,10 @@ const Shop = ({ close_shop }: ShopProps) => {
   const [itemToCompare, setItemToCompare] =
     useState<EquippableItemWithBase | null>(null);
   const [localSearch, setLocalSearch] = useState<string>(searchText);
+  const [
+    purchaseAndReplaceSuccessMessage,
+    setPurchaseAndReplaceSuccessMessage,
+  ] = useState<string | null>(null);
 
   useEffect(() => {
     setLocalSearch(searchText);
@@ -151,6 +155,17 @@ const Shop = ({ close_shop }: ShopProps) => {
     setBuyManyItem(null);
   };
 
+  const handleBuyAndReplaceSuccess = (
+    successMessage: string,
+    character: Partial<CharacterSheetDefinition>
+  ) => {
+    closeItemComparison();
+
+    updateCharacter(character);
+
+    setPurchaseAndReplaceSuccessMessage(successMessage);
+  };
+
   const renderContent = () => {
     if (loading) {
       return <InfiniteLoader />;
@@ -178,7 +193,7 @@ const Shop = ({ close_shop }: ShopProps) => {
   };
 
   const renderCharacterGold = () => {
-    if (!gameData?.character) {
+    if (!character) {
       return null;
     }
 
@@ -189,7 +204,7 @@ const Shop = ({ close_shop }: ShopProps) => {
             Your Gold:
           </span>
         </strong>{' '}
-        {formatNumberWithCommas(gameData.character.gold)}
+        {formatNumberWithCommas(character.gold)}
       </p>
     );
   };
@@ -232,6 +247,18 @@ const Shop = ({ close_shop }: ShopProps) => {
     );
   };
 
+  const renderPurchaseAndReplaceSuccess = () => {
+    if (!purchaseAndReplaceSuccessMessage) {
+      return null;
+    }
+
+    return (
+      <Alert variant={AlertVariant.SUCCESS} closable>
+        {purchaseAndReplaceSuccessMessage}
+      </Alert>
+    );
+  };
+
   const renderInventoryIsFullNotice = () => {
     if (!inventoryIsFull) {
       return null;
@@ -246,11 +273,11 @@ const Shop = ({ close_shop }: ShopProps) => {
   };
 
   const renderNoGoldNotice = () => {
-    if (!gameData?.character) {
+    if (!character) {
       return null;
     }
 
-    if (gameData.character.gold > 0) {
+    if (character.gold > 0) {
       return null;
     }
 
@@ -268,6 +295,7 @@ const Shop = ({ close_shop }: ShopProps) => {
         close_comparison={closeItemComparison}
         item_name={itemToCompare.name}
         item_type={itemToCompare.type}
+        on_purchase_and_replace_success={handleBuyAndReplaceSuccess}
       />
     );
   }
@@ -293,6 +321,7 @@ const Shop = ({ close_shop }: ShopProps) => {
         {renderNoGoldNotice()}
         {renderPurchaseError()}
         {renderPurchaseSuccess()}
+        {renderPurchaseAndReplaceSuccess()}
         {renderPurchaseLoading()}
         <div className="flex flex-col md:flex-row md:items-center gap-4 pt-2 px-4">
           <div className="flex-1">

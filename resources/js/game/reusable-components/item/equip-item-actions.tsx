@@ -23,9 +23,8 @@ const EquipItemActions = ({
   comparisonDetails,
   on_buy_and_replace,
   on_close_buy_and_equip,
+  is_purchasing,
 }: EquipItemActionProps) => {
-  const [isLoading, setIsLoading] = useState(false);
-
   const [equippedPosition, setEquippedPosition] =
     useState<ItemPositions | null>(null);
 
@@ -82,7 +81,7 @@ const EquipItemActions = ({
   };
 
   const renderLoadingIcon = (position: ItemPositions) => {
-    if (equippedPosition !== position) {
+    if (equippedPosition !== position && !is_purchasing) {
       return null;
     }
 
@@ -132,7 +131,7 @@ const EquipItemActions = ({
     return (
       <div className="flex justify-center">
         <IconButton
-          disabled={isLoading}
+          disabled={is_purchasing}
           on_click={() => handleBuyAndReplace(ItemPositions.LEFT_HAND)}
           label={label}
           variant={ButtonVariant.SUCCESS}
@@ -167,7 +166,7 @@ const EquipItemActions = ({
     return (
       <div className="grid grid-cols-2 gap-2 items-stretch">
         <IconButton
-          disabled={isLoading}
+          disabled={is_purchasing}
           on_click={() => handleBuyAndReplace(positions[0] as ItemPositions)}
           label={labels[0]}
           variant={ButtonVariant.SUCCESS}
@@ -176,7 +175,7 @@ const EquipItemActions = ({
         />
 
         <IconButton
-          disabled={isLoading}
+          disabled={is_purchasing}
           on_click={() => handleBuyAndReplace(positions[1] as ItemPositions)}
           label={labels[1]}
           variant={ButtonVariant.SUCCESS}
@@ -207,7 +206,7 @@ const EquipItemActions = ({
     return (
       <div className="flex justify-center">
         <IconButton
-          disabled={isLoading}
+          disabled={is_purchasing}
           on_click={() => handleBuyAndReplace(positions[0] as ItemPositions)}
           label={label}
           variant={ButtonVariant.SUCCESS}

@@ -8,7 +8,8 @@ export default interface EquipItemActionProps {
     position: ItemPositions,
     slot_id: number,
     type: InventoryItemTypes,
-    item_to_buy_id: number
+    item_id_to_buy: number
   ) => void;
   on_close_buy_and_equip: () => void;
+  is_purchasing: boolean;
 }

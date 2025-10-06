@@ -1,3 +1,4 @@
+import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import React, { Fragment, useState } from 'react';
 
 import { TOP_ADVANCED_CHILD_FIELDS } from './constants/item-comparison-constants';
@@ -17,6 +18,9 @@ const ItemComparison = ({
   comparisonDetails,
   item_name,
   show_buy_and_replace = false,
+  is_purchasing,
+  error_message,
+  set_request_params,
 }: ItemComparisonProps) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showEquipActions, setShowEquipActions] = useState(false);
@@ -37,9 +41,14 @@ const ItemComparison = ({
     position: ItemPositions,
     slot_id: number,
     type: InventoryItemTypes,
-    item_to_buy_id: number
+    item_id_to_buy: number
   ) => {
-    console.log(position, slot_id, type, item_to_buy_id);
+    set_request_params({
+      position: position,
+      slot_id: slot_id,
+      equip_type: type,
+      item_id_to_buy: item_id_to_buy,
+    });
   };
 
   const comparisonRows = (
@@ -85,12 +94,17 @@ const ItemComparison = ({
       return null;
     }
 
+    if (error_message) {
+      return <ApiErrorAlert apiError={error_message.message} />;
+    }
+
     return (
       <div className="my-4">
         <EquipItemActions
           comparisonDetails={comparisonDetails}
           on_buy_and_replace={handleBuyAndReplace}
           on_close_buy_and_equip={handleCloseEquipSection}
+          is_purchasing={is_purchasing}
         />
       </div>
     );
