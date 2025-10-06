@@ -151,7 +151,7 @@ const InventoryItem = ({
         <Button
           on_click={close_item_view}
           label="Close"
-          variant={ButtonVariant.SUCCESS}
+          variant={ButtonVariant.DANGER}
         />
       </div>
 
@@ -163,6 +163,14 @@ const InventoryItem = ({
           titleClassName={planeTextItemColors(item)}
         />
 
+        <Separator />
+        <div className="text-center p-4">
+          <Button
+            on_click={() => {}}
+            label="Equip Item"
+            variant={ButtonVariant.SUCCESS}
+          />
+        </div>
         <Separator />
 
         <div className="space-y-4">
