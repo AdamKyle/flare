@@ -7,6 +7,7 @@ import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-
 import { useGetInventoryItemDetails } from './api/hooks/use-get-inventory-item-details';
 import AttachedAffixDetails from './attached-affix/attached-affix-details';
 import AttachedHolyStacks from './attached-holy-stacks/attached-holy-stacks';
+import EquipItem from './partials/equip/equip-item';
 import AffixesSection from './partials/item-view/affixes-section';
 import AmbushCounterSection from './partials/item-view/ambush-and-counter-section';
 import AttackSection from './partials/item-view/attack-section';
@@ -32,6 +33,7 @@ const InventoryItem = ({
 }: InventoryItemProps) => {
   const [itemAffixToView, setItemAffixToView] = useState<number | null>(null);
   const [shouldViewHolyStacks, setShouldViewHolyStacks] = useState(false);
+  const [viewingEquip, setViewingEquip] = useState(false);
 
   const { error, loading, data } = useGetInventoryItemDetails({
     character_id,
@@ -72,6 +74,25 @@ const InventoryItem = ({
   const handleCloseItemAffixView = () => {
     setItemAffixToView(null);
   };
+
+  const handleViewEquip = () => {
+    setViewingEquip(true);
+  };
+
+  const handleCloseViewEquip = () => {
+    setViewingEquip(false);
+  };
+
+  if (viewingEquip) {
+    return (
+      <EquipItem
+        on_close={handleCloseViewEquip}
+        character_id={character_id}
+        slot_id={item.slot_id}
+        item_to_equip_type={item.type}
+      />
+    );
+  }
 
   if (itemAffixToView) {
     let itemAffix = null;
@@ -164,9 +185,9 @@ const InventoryItem = ({
         />
 
         <Separator />
-        <div className="text-center p-4">
+        <div className="text-center">
           <Button
-            on_click={() => {}}
+            on_click={handleViewEquip}
             label="Equip Item"
             variant={ButtonVariant.SUCCESS}
           />
