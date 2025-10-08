@@ -1,9 +1,11 @@
-import React from 'react';
+import { ReactNode } from 'react';
 
-import { TabItem } from 'ui/tabs/types/tab-item';
+import { TabTuple } from 'ui/tabs/types/tab-item';
 
-export default interface PillTabsProps {
-  tabs: ReadonlyArray<TabItem<React.ComponentType<object>>>;
+export default interface PillTabsProps<
+  Cs extends readonly ((props: object) => ReactNode)[],
+> {
+  tabs: Readonly<TabTuple<Cs>>;
   ariaLabel?: string;
   initialIndex?: number;
 }

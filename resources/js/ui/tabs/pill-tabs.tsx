@@ -4,11 +4,11 @@ import TabsList from 'ui/tabs/tabs-list';
 import TabsPanels from 'ui/tabs/tabs-panels';
 import PillTabsProps from 'ui/tabs/types/pill-tabs-props';
 
-const PillTabs = ({
+const PillTabs = <Cs extends readonly ((props: object) => React.ReactNode)[]>({
   tabs,
   ariaLabel = 'Tabs',
   initialIndex = 0,
-}: PillTabsProps) => {
+}: PillTabsProps<Cs>) => {
   const [activeIndex, setActiveIndex] = useState<number>(initialIndex);
 
   const groupId = useId();

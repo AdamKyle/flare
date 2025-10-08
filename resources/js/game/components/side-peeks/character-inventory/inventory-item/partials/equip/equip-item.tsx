@@ -1,10 +1,21 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
+import { isNil } from 'lodash';
 import React from 'react';
 
-import LeftHandComparison from './left-hand-comparison';
-import RightHandComparison from './right-hand-comparison';
+import EquipComparison from './equip-comparison';
+import { ItemBaseTypes } from '../../../../../../reusable-components/item/enums/item-base-type';
+import { getType } from '../../../../../../reusable-components/item/utils/get-type';
+import { isTwoHandedType } from '../../../../../../reusable-components/item/utils/item-comparison';
+import {
+  armourPositions,
+  InventoryItemTypes,
+} from '../../../../../character-sheet/partials/character-inventory/enums/inventory-item-types';
+import { planeTextItemColors } from '../../../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
 import { useGetInventoryItemComparisonDetails } from '../../api/hooks/use-get-inventory-item-comparison-details';
 import EquipItemProps from '../../types/partials/equip/equip-item-props';
+import ItemMetaSection from '../item-view/item-meta-tsx';
+
+import { GameDataError } from 'game-data/components/game-data-error';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
@@ -32,12 +43,70 @@ const EquipItem = ({
     return <ApiErrorAlert apiError={error.message} />;
   }
 
-  const tabs = [
-    { label: 'Hello', component: LeftHandComparison },
-    { label: 'Something', component: RightHandComparison },
-  ] as const;
+  if (isNil(data)) {
+    return <GameDataError />;
+  }
 
-  console.log('EquipItem data', data);
+  const itemToEquip = data[0].item_to_equip;
+
+  const resolveTabLabels = () => {
+    const hasData = Array.isArray(data) && data.length > 0;
+
+    if (!hasData) {
+      return null;
+    }
+
+    const baseType = getType(itemToEquip, armourPositions);
+
+    const isShield = itemToEquip.type === InventoryItemTypes.SHIELD;
+
+    const isTwoHanded = isTwoHandedType(itemToEquip.type);
+
+    if ((baseType === ItemBaseTypes.Weapon || isShield) && !isTwoHanded) {
+      return ['Left Hand', 'Right Hand'];
+    }
+
+    if ((baseType === ItemBaseTypes.Weapon || isShield) && isTwoHanded) {
+      return ['Right Hand', 'Left Hand'];
+    }
+
+    if (baseType === ItemBaseTypes.Ring) {
+      return ['Ring One', 'Ring Two'];
+    }
+
+    if (baseType === ItemBaseTypes.Spell) {
+      return ['Spell One', 'Spell Two'];
+    }
+
+    return null;
+  };
+
+  const renderTabsOrComparison = () => {
+    const labels = resolveTabLabels();
+
+    if (!labels) {
+      return (
+        <>
+          <Separator />
+          <EquipComparison />
+        </>
+      );
+    }
+
+    const tabs = labels.map((label, index) => {
+      return {
+        label: label,
+        component: EquipComparison,
+        props: { comparisonData: data[index] },
+      };
+    });
+
+    return (
+      <div className="flex justify-center">
+        <PillTabs tabs={tabs} />
+      </div>
+    );
+  };
 
   return (
     <>
@@ -49,9 +118,16 @@ const EquipItem = ({
         />
       </div>
       <Separator />
-      <div className="flex justify-center">
-        <PillTabs tabs={tabs} />
+      <div className="px-4">
+        <ItemMetaSection
+          name={itemToEquip.name}
+          description={itemToEquip.description}
+          type={itemToEquip.type}
+          titleClassName={planeTextItemColors(itemToEquip)}
+        />
+        <Separator />
       </div>
+      {renderTabsOrComparison()}
     </>
   );
 };

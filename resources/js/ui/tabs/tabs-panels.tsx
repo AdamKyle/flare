@@ -2,18 +2,28 @@ import React from 'react';
 
 import TabsPanelsProps from 'ui/tabs/types/tab-panel-props';
 
-const TabsPanels = ({
+type PropsOf<C> = C extends (props: infer P) => React.ReactNode
+  ? P
+  : Record<never, never>;
+
+const TabsPanels = <
+  Cs extends readonly ((props: object) => React.ReactNode)[],
+>({
   tabs,
   activeIndex,
   tabIds,
   panelIds,
-}: TabsPanelsProps) => {
-  const isObjectRecord = (value: unknown): value is Record<string, unknown> => {
-    if (typeof value === 'object' && value !== null) {
-      return true;
+}: TabsPanelsProps<Cs>) => {
+  const hasProps = <P extends object>(item: {
+    props?: P;
+  }): item is { props: P } => {
+    const exists = Object.prototype.hasOwnProperty.call(item, 'props');
+
+    if (!exists) {
+      return false;
     }
 
-    return false;
+    return item.props !== undefined;
   };
 
   const renderTabPanels = () => {
@@ -24,15 +34,23 @@ const TabsPanels = ({
     }
 
     const activeItem = tabs[activeIndex];
+
     const ActiveComponent = activeItem.component;
-    const maybeProps = (activeItem as { props?: unknown }).props;
 
-    let content;
+    type ActiveProps = PropsOf<typeof ActiveComponent>;
 
-    if (isObjectRecord(maybeProps)) {
-      content = <ActiveComponent {...maybeProps} />;
+    const maybeWithProps = activeItem as { props?: ActiveProps };
+
+    let content = null;
+
+    if (hasProps<ActiveProps>(maybeWithProps)) {
+      const provided = maybeWithProps.props;
+
+      content = <ActiveComponent {...provided} key={panelIds[activeIndex]} />;
     } else {
-      content = <ActiveComponent />;
+      const empty = {} as ActiveProps;
+
+      content = <ActiveComponent {...empty} key={panelIds[activeIndex]} />;
     }
 
     return (
