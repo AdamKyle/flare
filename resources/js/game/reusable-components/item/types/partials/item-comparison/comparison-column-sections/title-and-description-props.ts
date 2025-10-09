@@ -1,4 +1,5 @@
+import { BaseItemDetails } from '../../../../../../api-definitions/items/base-item-details';
+
 export default interface TitleAndDescriptionProps {
-  title: string;
-  description: string;
+  item: BaseItemDetails;
 }

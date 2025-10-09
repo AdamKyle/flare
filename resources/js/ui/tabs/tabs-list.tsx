@@ -3,14 +3,14 @@ import React from 'react';
 
 import TabsListProps from 'ui/tabs/types/tab-list-props';
 
-const TabsList = <Cs extends readonly ((props: object) => React.ReactNode)[]>({
+const TabsList = <PTuple extends readonly object[]>({
   tabs,
   ariaLabel,
   activeIndex,
   onSelect,
   tabIds,
   panelIds,
-}: TabsListProps<Cs>) => {
+}: TabsListProps<PTuple>) => {
   const handleTabListKeyDown = (
     event: React.KeyboardEvent<HTMLDivElement>
   ): void => {

@@ -1,5 +1,7 @@
 import { ItemComparisonRow } from '../../../../../../../api-definitions/items/item-comparison-details';
 
 export default interface EquipComparisonProps {
-  comparisonData?: ItemComparisonRow;
+  comparison_data?: ItemComparisonRow;
+  item_name: string;
+  comparison_index: number;
 }

@@ -1,11 +1,7 @@
-import { ReactNode } from 'react';
+import { TabTupleFromProps } from 'ui/tabs/types/tab-item';
 
-import { TabTuple } from 'ui/tabs/types/tab-item';
-
-export default interface TabsPanelsProps<
-  Cs extends readonly ((props: object) => ReactNode)[],
-> {
-  tabs: Readonly<TabTuple<Cs>>;
+export default interface TabsPanelsProps<PTuple extends readonly object[]> {
+  tabs: Readonly<TabTupleFromProps<PTuple>>;
   activeIndex: number;
   tabIds: string[];
   panelIds: string[];

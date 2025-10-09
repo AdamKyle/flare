@@ -6,14 +6,12 @@ type PropsOf<C> = C extends (props: infer P) => React.ReactNode
   ? P
   : Record<never, never>;
 
-const TabsPanels = <
-  Cs extends readonly ((props: object) => React.ReactNode)[],
->({
+const TabsPanels = <PTuple extends readonly object[]>({
   tabs,
   activeIndex,
   tabIds,
   panelIds,
-}: TabsPanelsProps<Cs>) => {
+}: TabsPanelsProps<PTuple>) => {
   const hasProps = <P extends object>(item: {
     props?: P;
   }): item is { props: P } => {

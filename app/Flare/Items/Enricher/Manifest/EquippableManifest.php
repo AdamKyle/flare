@@ -5,8 +5,8 @@ namespace App\Flare\Items\Enricher\Manifest;
 class EquippableManifest extends BaseManifest
 {
     /**
-     * List of PCRE regex patterns that an item property name must match
-     * to be considered for inclusion in the manifest.
+     * Return the list of PCRE include patterns that determine which flat item attributes
+     * are considered by the manifest and comparator.
      *
      * @return array<int, string>
      */
@@ -16,15 +16,20 @@ class EquippableManifest extends BaseManifest
             '/^total_.+$/',
             '/^base_.+_mod$/',
             '/^devouring_.+$/',
-            '/^.*_chance$/',       // e.g. resurrection_chance, ambush_chance
-            '/^.*_reduction$/',    // e.g. healing_reduction, affix_damage_reduction, counter_reduction
-            '/^.*_evasion$/',      // e.g. spell_evasion  <-- added
+            '/^.*_chance$/',
+            '/^.*_reduction$/',
+            '/^.*_evasion$/',
             '/^total_.*_affix_damage$/',
             '/^(str|dur|dex|chr|int|agi|focus)_mod$/',
+            '/^holy_stack_devouring_darkness$/',
+            '/^holy_stack_stat_bonus$/',
+            '/^holy_stacks_applied$/',
         ];
     }
 
     /**
+     * Return the list of PCRE exclude patterns for flat attributes that must be ignored.
+     *
      * @return array<int, string>
      */
     public function excludes(): array
@@ -33,8 +38,12 @@ class EquippableManifest extends BaseManifest
     }
 
     /**
-     * Map a flat property name into a grouped dot-path for the manifest.
-     * Return null to skip a property entirely.
+     * Map a flat attribute name to a grouped dot-path used by the comparator.
+     * Return null to skip an attribute entirely; falling back to the original name
+     * yields a "{leaf}_adjustment" key.
+     *
+     * @param string $prop
+     * @return string|null
      */
     public function map(string $prop): ?string
     {
@@ -58,18 +67,19 @@ class EquippableManifest extends BaseManifest
             return "stats.{$m[1]}_mod";
         }
 
-        // Fallback: keep as-is -> becomes "{leaf}_adjustment"
         return $prop;
     }
 
     /**
-     * Determine logical type for comparison defaults.
+     * Determine the logical type for a given attribute to select a default comparison strategy.
+     * Numeric strings are treated as numbers for delta comparisons.
      *
-     * @return 'number'|'boolean'|'string'|null
+     * @param string $prop
+     * @param mixed $value
+     * @return string|null
      */
     public function typeFor(string $prop, mixed $value): ?string
     {
-        // Treat numeric strings (e.g., "1.0000") as numbers so they compare with 'delta'
         if (is_string($value) && is_numeric($value)) {
             return 'number';
         }
@@ -83,7 +93,11 @@ class EquippableManifest extends BaseManifest
     }
 
     /**
-     * @return 'delta'|'flag-diff'|'noop'|null
+     * Select the comparison strategy for a mapped path and logical type.
+     *
+     * @param string $path
+     * @param string $type
+     * @return string|null
      */
     public function compareFor(string $path, string $type): ?string
     {
@@ -95,6 +109,8 @@ class EquippableManifest extends BaseManifest
     }
 
     /**
+     * Describe collections (arrays of rows) that should be diffed by key with field-level strategies.
+     *
      * @return array<int, array{path:string, prop:string, key:string, fields:array<string,string>}>
      */
     public function collections(): array

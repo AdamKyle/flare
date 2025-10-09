@@ -141,8 +141,6 @@ const ItemComparison = ({
             <div className="min-w-0">
               <ItemComparisonColumn
                 row={row}
-                heading={item_name}
-                index={index}
                 showAdvanced={showAdvanced}
                 showAdvancedChildUnderTop={showAdvancedChildUnderTop}
               />

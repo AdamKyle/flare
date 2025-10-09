@@ -26,10 +26,9 @@ import {
 
 const ItemComparisonColumn = ({
   row,
-  heading,
-  index,
   showAdvanced,
   showAdvancedChildUnderTop,
+  showHeaderSection = true,
 }: ItemComparisonColumnProps) => {
   const adjustments = row?.comparison?.adjustments as
     | ItemAdjustments
@@ -38,25 +37,6 @@ const ItemComparisonColumn = ({
   if (!adjustments) {
     return null;
   }
-
-  const getComputedTitle = (): string => {
-    if (heading) {
-      return heading;
-    }
-
-    const toEquipName = row.equipped_item.name;
-    if (toEquipName && toEquipName.trim().length > 0) {
-      return toEquipName;
-    }
-
-    const composed =
-      `${row?.position ?? ''} ${row.equipped_item.type ?? ''}`.trim();
-    if (composed) {
-      return composed;
-    }
-
-    return `Item ${index + 1}`;
-  };
 
   const getForceCoreZeroKeys = (): NumericAdjustmentKey[] => {
     if (!showAdvancedChildUnderTop) {
@@ -67,9 +47,6 @@ const ItemComparisonColumn = ({
       'total_healing_adjustment',
     ] as NumericAdjustmentKey[];
   };
-
-  const computedTitle = getComputedTitle();
-  const description = row.equipped_item.description;
 
   const hasCoreTotals = hasAnyNonZeroAdjustment(adjustments, TOP_FIELDS);
   const hasAttributes = hasAnyNonZeroAdjustment(adjustments, STAT_FIELDS);
@@ -82,15 +59,27 @@ const ItemComparisonColumn = ({
   const isTwoHanded = isTwoHandedType(row.equipped_item.type);
   const forceCoreZeroKeys = getForceCoreZeroKeys();
 
+  const renderHeader = () => {
+    if (!showHeaderSection) {
+      return null;
+    }
+
+    return (
+      <>
+        <TitleAndDescription item={row.equipped_item} />
+
+        <CurrentlyEquippedPanel
+          position={row.position}
+          equippedItem={row.equipped_item}
+          isTwoHanded={isTwoHanded}
+        />
+      </>
+    );
+  };
+
   return (
     <Fragment>
-      <TitleAndDescription title={computedTitle} description={description} />
-
-      <CurrentlyEquippedPanel
-        position={row.position}
-        equippedItem={row.equipped_item}
-        isTwoHanded={isTwoHanded}
-      />
+      {renderHeader()}
 
       <Legend />
 

@@ -1,24 +1,26 @@
 import { ReactNode } from 'react';
 
-type ComponentWithProps<P extends object> = (props: P) => ReactNode;
+/** A React component described by its props type. */
+export type ComponentFromProps<P extends object> = (props: P) => ReactNode;
 
-type PropsOf<C extends (props: object) => ReactNode> = C extends (
-  props: infer P
-) => ReactNode
-  ? P
-  : never;
-
+/** Keys in T that are required (not optional/undefined). */
 type RequiredKeys<T extends object> = keyof T extends never
   ? never
   : { [K in keyof T]-?: undefined extends T[K] ? never : K }[keyof T];
 
-export type TabItem<C extends (props: object) => ReactNode> =
-  keyof PropsOf<C> extends never
-    ? { label: string; component: C; props?: never }
-    : RequiredKeys<PropsOf<C>> extends never
-      ? { label: string; component: C; props?: PropsOf<C> }
-      : { label: string; component: C; props: PropsOf<C> };
+/**
+ * A single tab definition derived from a component's props.
+ * - If the component has no props -> props is forbidden.
+ * - If the component has only optional props -> props is optional.
+ * - If the component has required props -> props is required.
+ */
+export type TabItemFromProps<P extends object> = keyof P extends never
+  ? { label: string; component: ComponentFromProps<P>; props?: never }
+  : RequiredKeys<P> extends never
+    ? { label: string; component: ComponentFromProps<P>; props?: P }
+    : { label: string; component: ComponentFromProps<P>; props: P };
 
-export type TabTuple<Cs extends readonly ((props: object) => ReactNode)[]> = {
-  [I in keyof Cs]: TabItem<Cs[I]>;
+/** A tuple of tab items, one per props type in PTuple. */
+export type TabTupleFromProps<PTuple extends readonly object[]> = {
+  [I in keyof PTuple]: TabItemFromProps<PTuple[I]>;
 };

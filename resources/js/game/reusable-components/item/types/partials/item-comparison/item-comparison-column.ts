@@ -2,8 +2,7 @@ import { ItemComparisonRow } from '../../../../../api-definitions/items/item-com
 
 export default interface ItemComparisonColumnProps {
   row: ItemComparisonRow;
-  heading?: string;
-  index: number;
   showAdvanced: boolean;
   showAdvancedChildUnderTop: boolean;
+  showHeaderSection?: boolean;
 }

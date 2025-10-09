@@ -1,18 +1,23 @@
 import React, { useState } from 'react';
 
+import ItemComparisonColumn from '../../../../../../reusable-components/item/partials/item-comparison/item-comparison-column';
 import EquipComparisonProps from '../../types/partials/equip/equip-comparison-props';
 
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import IconButton from 'ui/buttons/icon-button';
 
-const EquipComparison = ({ comparisonData }: EquipComparisonProps) => {
+const EquipComparison = ({
+  comparison_data,
+  comparison_index,
+  item_name,
+}: EquipComparisonProps) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const handleToggleAdvanced = () => {
     setShowAdvanced((previous) => !previous);
   };
 
-  if (!comparisonData) {
+  if (!comparison_data) {
     return (
       <div className="text-center space-y-3">
         There is nothing equipped for this position.
@@ -41,7 +46,12 @@ const EquipComparison = ({ comparisonData }: EquipComparisonProps) => {
           }
         />
       </div>
-      Additional Content Here ....
+      <ItemComparisonColumn
+        row={comparison_data}
+        showAdvanced={showAdvanced}
+        showAdvancedChildUnderTop={false}
+        showHeaderSection={false}
+      />
     </div>
   );
 };

@@ -431,7 +431,6 @@ final class ComparatorTest extends TestCase
         $left = $this->newSword();
         $right = $this->newSword();
 
-        // Matches includes (/^total_.+$/) AND excludes (/_id$/) → must be skipped.
         $left->total_damage_id = 123;
         $right->total_damage_id = 456;
 
@@ -446,22 +445,17 @@ final class ComparatorTest extends TestCase
 
     public function test_default_strategy_runs_when_type_is_unknown(): void
     {
-        $comparator = $this->app->make(\App\Flare\Items\Comparison\Comparator::class);
+        $schema = $this->app->make(\App\Flare\Items\Comparison\Comparator::class);
 
         $left = $this->newSword(['name' => 'Left']);
         $right = $this->newSword(['name' => 'Right']);
 
-        // Force an included field to be a non-scalar so typeFor() returns null.
-        // '.*_chance' is included by the real EquippableManifest.
         $left->ambush_chance = ['not', 'a', 'number'];
         $right->ambush_chance = ['also', 'bad'];
 
-        // No enrichment required for this path; we’re just mapping attributes.
-        $result = $comparator->compare($left, $right);
+        $result = $this->comparator->compare($left, $right);
         $adjustments = $result['comparison']['adjustments'];
 
-        // We don’t care about the exact value; we just need the path to be present,
-        // which proves map() included it and defaultStrategyFor() ran (returns 'noop' -> null).
         $this->assertArrayHasKey('ambush_chance_adjustment', $adjustments);
         $this->assertNull($adjustments['ambush_chance_adjustment']);
     }
@@ -473,23 +467,19 @@ final class ComparatorTest extends TestCase
         $left = $this->newSword();
         $right = $this->newSword();
 
-        // Left: not an array -> hits early return in indexRowsByKey()
         $left->skill_summary = 'not-an-array';
 
-        // Right: three rows -> non-array row, row missing key, and a valid row
         $right->skill_summary = [
             123,
             ['wrong_key' => 'x'],
             ['skill_name' => 'Alchemy', 'skill_bonus' => 1, 'skill_training_bonus' => 0],
         ];
 
-        $result = $comparator->compare($left, $right);
+        $result = $this->comparator->compare($left, $right);
         $rows = $result['comparison']['adjustments']['skill_summary'];
 
-        // Only the valid keyed row should survive.
         $this->assertCount(1, $rows);
         $this->assertSame('Alchemy', $rows[0]['skill_name']);
-        // Left row is null -> treated as 0; 0 - 1 = -1
         $this->assertSame(-1.0, $rows[0]['skill_bonus_adjustment']);
     }
 
@@ -506,7 +496,7 @@ final class ComparatorTest extends TestCase
             return $prop === 'base_damage' ? 'number'
                 : ($prop === 'usable' ? 'boolean' : null);
         });
-        $schema->shouldReceive('compareFor')->andReturnNull(); // force fallback
+        $schema->shouldReceive('compareFor')->andReturnNull();
         $schema->shouldReceive('collections')->andReturn([]);
 
         $this->app->instance(ManifestSchema::class, $schema);
@@ -518,9 +508,7 @@ final class ComparatorTest extends TestCase
         $out = $comparator->compare($left, $right);
         $adj = $out['comparison']['adjustments'];
 
-        // defaultStrategyFor('number') => 'delta'
         $this->assertSame(6.0, $adj['total_damage_adjustment']);
-        // defaultStrategyFor('boolean') => 'flag-diff'
         $this->assertTrue($adj['usable_adjustment']);
     }
 
@@ -557,7 +545,6 @@ final class ComparatorTest extends TestCase
         $schema->shouldReceive('typeFor')->andReturnNull();
         $schema->shouldReceive('compareFor')->andReturnNull();
         $schema->shouldReceive('collections')->andReturn([[
-            // 'path' intentionally omitted to trigger the continue
             'prop' => 'skill_summary',
             'key' => 'skill_name',
             'fields' => ['skill_bonus' => 'delta'],
@@ -588,6 +575,44 @@ final class ComparatorTest extends TestCase
         $rows = $result['comparison']['adjustments']['skill_summary'];
 
         $this->assertSame([], $rows);
+    }
+
+    public function test_holy_stack_specific_adjustments_are_compared(): void
+    {
+        $left = $this->newSword();
+        $right = $this->newSword();
+
+        HolyStack::create([
+            'item_id' => $left->id,
+            'devouring_darkness_bonus' => 0.10,
+            'stat_increase_bonus' => 0.02,
+        ]);
+
+        HolyStack::create([
+            'item_id' => $left->id,
+            'devouring_darkness_bonus' => 0.05,
+            'stat_increase_bonus' => 0.01,
+        ]);
+
+        HolyStack::create([
+            'item_id' => $right->id,
+            'devouring_darkness_bonus' => 0.05,
+            'stat_increase_bonus' => 0.01,
+        ]);
+
+        $left = $this->enricher->enrich($left->fresh());
+        $right = $this->enricher->enrich($right->fresh());
+
+        $out = $this->comparator->compare($left, $right);
+        $adj = $out['comparison']['adjustments'];
+
+        $this->assertArrayHasKey('holy_stack_devouring_darkness_adjustment', $adj);
+        $this->assertArrayHasKey('holy_stack_stat_bonus_adjustment', $adj);
+        $this->assertArrayHasKey('holy_stacks_applied_adjustment', $adj);
+
+        $this->assertEqualsWithDelta(0.10, $adj['holy_stack_devouring_darkness_adjustment'], 1e-9);
+        $this->assertEqualsWithDelta(0.02, $adj['holy_stack_stat_bonus_adjustment'], 1e-9);
+        $this->assertSame(1.0, $adj['holy_stacks_applied_adjustment']);
     }
 
     private function newSword(array $attributes = []): Item

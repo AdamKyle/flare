@@ -32,6 +32,9 @@ final class EquippableManifestTest extends TestCase
             '/^.*_evasion$/',
             '/^total_.*_affix_damage$/',
             '/^(str|dur|dex|chr|int|agi|focus)_mod$/',
+            '/^holy_stack_devouring_darkness$/',
+            '/^holy_stack_stat_bonus$/',
+            '/^holy_stacks_applied$/',
         ];
 
         $this->assertSame($expected, $this->schema->includes());
@@ -45,6 +48,9 @@ final class EquippableManifestTest extends TestCase
             'dodge_evasion',
             'total_irresistible_affix_damage',
             'str_mod',
+            'holy_stack_devouring_darkness',
+            'holy_stack_stat_bonus',
+            'holy_stacks_applied',
         ];
 
         foreach ($samples as $prop) {
@@ -96,6 +102,13 @@ final class EquippableManifestTest extends TestCase
     public function test_map_fallback_keeps_original_prop(): void
     {
         $this->assertSame('weird_prop', $this->schema->map('weird_prop'));
+    }
+
+    public function test_map_holy_stack_fields_fallback(): void
+    {
+        $this->assertSame('holy_stack_devouring_darkness', $this->schema->map('holy_stack_devouring_darkness'));
+        $this->assertSame('holy_stack_stat_bonus', $this->schema->map('holy_stack_stat_bonus'));
+        $this->assertSame('holy_stacks_applied', $this->schema->map('holy_stacks_applied'));
     }
 
     public function test_type_for_covers_all_branches(): void

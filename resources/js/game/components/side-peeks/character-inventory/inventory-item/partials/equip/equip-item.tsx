@@ -88,7 +88,11 @@ const EquipItem = ({
       return (
         <>
           <Separator />
-          <EquipComparison />
+          <EquipComparison
+            comparison_data={data[0]}
+            item_name={itemToEquip.name}
+            comparison_index={0}
+          />
         </>
       );
     }
@@ -97,7 +101,11 @@ const EquipItem = ({
       return {
         label: label,
         component: EquipComparison,
-        props: { comparisonData: data[index] },
+        props: {
+          comparison_data: data[index],
+          item_name: itemToEquip.name,
+          comparison_index: index,
+        },
       };
     });
 
