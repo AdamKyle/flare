@@ -5,6 +5,7 @@ import AttributesSection from './comparison-column-sections/attributes-section';
 import CoreImpactSection from './comparison-column-sections/core-impact-section';
 import CurrentlyEquippedPanel from './comparison-column-sections/currently-equipped-panel';
 import DevouringSection from './comparison-column-sections/devouring-section';
+import HolyStackSection from './comparison-column-sections/holy-stack-section';
 import Legend from './comparison-column-sections/legend';
 import ResistanceSection from './comparison-column-sections/resistance-section';
 import ResurrectionChanceSection from './comparison-column-sections/resurrection-chance-section';
@@ -14,6 +15,7 @@ import { ItemAdjustments } from '../../../../api-definitions/items/item-comparis
 import {
   AFFIX_ADJUSTMENT_FIELDS,
   DEVOURING_FIELDS,
+  HOLY_STACK_FIELDS,
   STAT_FIELDS,
   TOP_FIELDS,
 } from '../../constants/item-comparison-constants';
@@ -55,6 +57,8 @@ const ItemComparisonColumn = ({
     hasAnyNonZeroAdjustment(adjustments, AFFIX_ADJUSTMENT_FIELDS);
   const showDevouring =
     showAdvanced && hasAnyNonZeroAdjustment(adjustments, DEVOURING_FIELDS);
+  const showHolyStacks =
+    showAdvanced && hasAnyNonZeroAdjustment(adjustments, HOLY_STACK_FIELDS);
 
   const isTwoHanded = isTwoHandedType(row.equipped_item.type);
   const forceCoreZeroKeys = getForceCoreZeroKeys();
@@ -110,6 +114,8 @@ const ItemComparisonColumn = ({
       <SkillsSection adjustments={adjustments} />
 
       <DevouringSection adjustments={adjustments} show={showDevouring} />
+
+      <HolyStackSection adjustments={adjustments} show={showHolyStacks} />
     </Fragment>
   );
 };

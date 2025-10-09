@@ -49,6 +49,17 @@ export const useGetInventoryItemComparisonDetails = ({
       setData(result.details);
     } catch (err) {
       if (err instanceof AxiosError) {
+        if (err.response?.status === 401) {
+          setError({
+            message:
+              'You have been logged out due to inactivity. One moment while we redirect you.',
+          });
+
+          window.location.reload();
+
+          return;
+        }
+
         setError(err.response?.data || null);
       }
     } finally {

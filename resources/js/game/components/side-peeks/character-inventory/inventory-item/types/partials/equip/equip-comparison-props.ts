@@ -2,6 +2,5 @@ import { ItemComparisonRow } from '../../../../../../../api-definitions/items/it
 
 export default interface EquipComparisonProps {
   comparison_data?: ItemComparisonRow;
-  item_name: string;
-  comparison_index: number;
+  show_advanced_child_under_top: boolean;
 }

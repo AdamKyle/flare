@@ -1,4 +1,5 @@
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
+import { AnimatePresence } from 'framer-motion';
 import { debounce, isNil } from 'lodash';
 import React, { useMemo, useState } from 'react';
 import { match } from 'ts-pattern';
@@ -21,6 +22,7 @@ import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import StackedCard from 'ui/cards/stacked-card';
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import Input from 'ui/input/input';
@@ -53,7 +55,6 @@ const BackpackItems = ({
 
   const debouncedSetSearchText = useMemo(
     () => debounce((value: string) => setSearchText(value), 300),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
@@ -124,7 +125,7 @@ const BackpackItems = ({
     setCloseSuccessMessage(true);
   };
 
-  const closeItemView = () => {
+  const handleCloseItemView = () => {
     setSlotId(null);
     setCloseSuccessMessage(true);
   };
@@ -152,16 +153,6 @@ const BackpackItems = ({
       <div className={'p-4'}>
         <InfiniteLoader />
       </div>
-    );
-  }
-
-  if (!isNil(slotId)) {
-    return (
-      <InventoryItem
-        slot_id={slotId}
-        character_id={character.id}
-        close_item_view={closeItemView}
-      />
     );
   }
 
@@ -237,8 +228,20 @@ const BackpackItems = ({
     );
   };
 
+  const renderInventoryOverlay = () => {
+    if (isNil(slotId)) {
+      return null;
+    }
+
+    return (
+      <StackedCard on_close={handleCloseItemView}>
+        <InventoryItem slot_id={slotId} character_id={character.id} />
+      </StackedCard>
+    );
+  };
+
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="relative flex flex-col h-full overflow-hidden">
       <div className="flex justify-center p-4">
         <Button
           on_click={() => on_switch_view(false)}
@@ -262,6 +265,7 @@ const BackpackItems = ({
           is_selection_disabled={isSelectionDisabled}
         />
       </div>
+      <AnimatePresence mode="wait">{renderInventoryOverlay()}</AnimatePresence>
     </div>
   );
 };

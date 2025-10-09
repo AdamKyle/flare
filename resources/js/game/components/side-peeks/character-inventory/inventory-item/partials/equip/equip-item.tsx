@@ -3,9 +3,13 @@ import { isNil } from 'lodash';
 import React from 'react';
 
 import EquipComparison from './equip-comparison';
+import { TOP_ADVANCED_CHILD_FIELDS } from '../../../../../../reusable-components/item/constants/item-comparison-constants';
 import { ItemBaseTypes } from '../../../../../../reusable-components/item/enums/item-base-type';
 import { getType } from '../../../../../../reusable-components/item/utils/get-type';
-import { isTwoHandedType } from '../../../../../../reusable-components/item/utils/item-comparison';
+import {
+  hasAnyNonZeroAdjustment,
+  isTwoHandedType,
+} from '../../../../../../reusable-components/item/utils/item-comparison';
 import {
   armourPositions,
   InventoryItemTypes,
@@ -17,14 +21,11 @@ import ItemMetaSection from '../item-view/item-meta-tsx';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
-import Button from 'ui/buttons/button';
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import Separator from 'ui/separator/separator';
 import PillTabs from 'ui/tabs/pill-tabs';
 
 const EquipItem = ({
-  on_close,
   character_id,
   item_to_equip_type,
   slot_id,
@@ -36,7 +37,11 @@ const EquipItem = ({
   });
 
   if (loading) {
-    return <InfiniteLoader />;
+    return (
+      <div className=" p-4">
+        <InfiniteLoader />
+      </div>
+    );
   }
 
   if (error) {
@@ -48,6 +53,13 @@ const EquipItem = ({
   }
 
   const itemToEquip = data[0].item_to_equip;
+
+  const showAdvancedChildUnderTop = data.some((row) =>
+    hasAnyNonZeroAdjustment(
+      row.comparison.adjustments,
+      TOP_ADVANCED_CHILD_FIELDS
+    )
+  );
 
   const resolveTabLabels = () => {
     const hasData = Array.isArray(data) && data.length > 0;
@@ -90,8 +102,7 @@ const EquipItem = ({
           <Separator />
           <EquipComparison
             comparison_data={data[0]}
-            item_name={itemToEquip.name}
-            comparison_index={0}
+            show_advanced_child_under_top={showAdvancedChildUnderTop}
           />
         </>
       );
@@ -103,8 +114,7 @@ const EquipItem = ({
         component: EquipComparison,
         props: {
           comparison_data: data[index],
-          item_name: itemToEquip.name,
-          comparison_index: index,
+          show_advanced_child_under_top: showAdvancedChildUnderTop,
         },
       };
     });
@@ -118,14 +128,6 @@ const EquipItem = ({
 
   return (
     <>
-      <div className="text-center p-4">
-        <Button
-          on_click={on_close}
-          label="Close"
-          variant={ButtonVariant.DANGER}
-        />
-      </div>
-      <Separator />
       <div className="px-4">
         <ItemMetaSection
           name={itemToEquip.name}

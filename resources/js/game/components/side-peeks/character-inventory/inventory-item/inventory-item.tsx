@@ -1,4 +1,5 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
+import { AnimatePresence } from 'framer-motion';
 import { isNil } from 'lodash';
 import React, { Fragment, ReactNode, useState } from 'react';
 
@@ -23,14 +24,11 @@ import { GameDataError } from 'game-data/components/game-data-error';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import StackedCard from 'ui/cards/stacked-card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import Separator from 'ui/separator/separator';
 
-const InventoryItem = ({
-  slot_id,
-  character_id,
-  close_item_view,
-}: InventoryItemProps) => {
+const InventoryItem = ({ slot_id, character_id }: InventoryItemProps) => {
   const [itemAffixToView, setItemAffixToView] = useState<number | null>(null);
   const [shouldViewHolyStacks, setShouldViewHolyStacks] = useState(false);
   const [viewingEquip, setViewingEquip] = useState(false);
@@ -83,16 +81,21 @@ const InventoryItem = ({
     setViewingEquip(false);
   };
 
-  if (viewingEquip) {
+  const renderEquipItem = () => {
+    if (!viewingEquip) {
+      return null;
+    }
+
     return (
-      <EquipItem
-        on_close={handleCloseViewEquip}
-        character_id={character_id}
-        slot_id={item.slot_id}
-        item_to_equip_type={item.type}
-      />
+      <StackedCard on_close={handleCloseViewEquip}>
+        <EquipItem
+          character_id={character_id}
+          slot_id={item.slot_id}
+          item_to_equip_type={item.type}
+        />
+      </StackedCard>
     );
-  }
+  };
 
   if (itemAffixToView) {
     let itemAffix = null;
@@ -168,14 +171,6 @@ const InventoryItem = ({
 
   return (
     <>
-      <div className="text-center p-4">
-        <Button
-          on_click={close_item_view}
-          label="Close"
-          variant={ButtonVariant.DANGER}
-        />
-      </div>
-
       <div className="px-4 flex flex-col gap-4">
         <ItemMetaSection
           name={item.name}
@@ -200,6 +195,7 @@ const InventoryItem = ({
           ))}
         </div>
       </div>
+      <AnimatePresence mode="wait">{renderEquipItem()}</AnimatePresence>
     </>
   );
 };

@@ -8,8 +8,7 @@ import IconButton from 'ui/buttons/icon-button';
 
 const EquipComparison = ({
   comparison_data,
-  comparison_index,
-  item_name,
+  show_advanced_child_under_top,
 }: EquipComparisonProps) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -24,6 +23,9 @@ const EquipComparison = ({
       </div>
     );
   }
+
+  const ShowAdvancedChildrenUnderTop =
+    show_advanced_child_under_top && showAdvanced;
 
   return (
     <div className="space-y-3">
@@ -49,7 +51,7 @@ const EquipComparison = ({
       <ItemComparisonColumn
         row={comparison_data}
         showAdvanced={showAdvanced}
-        showAdvancedChildUnderTop={false}
+        showAdvancedChildUnderTop={ShowAdvancedChildrenUnderTop}
         showHeaderSection={false}
       />
     </div>

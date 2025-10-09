@@ -1,4 +1,5 @@
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
+import { AnimatePresence } from 'framer-motion';
 import { debounce } from 'lodash';
 import React, { ReactNode, useMemo, useState } from 'react';
 
@@ -12,6 +13,7 @@ import InventoryItem from '../inventory-item/inventory-item';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
+import StackedCard from 'ui/cards/stacked-card';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
@@ -73,15 +75,17 @@ const Sets = ({ character_id }: SetsProps): ReactNode => {
     );
   }
 
-  if (slotId) {
+  const renderInventoryItemView = () => {
+    if (!slotId) {
+      return null;
+    }
+
     return (
-      <InventoryItem
-        slot_id={slotId}
-        character_id={character_id}
-        close_item_view={closeItemView}
-      />
+      <StackedCard on_close={closeItemView}>
+        <InventoryItem slot_id={slotId} character_id={character_id} />
+      </StackedCard>
     );
-  }
+  };
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -104,6 +108,10 @@ const Sets = ({ character_id }: SetsProps): ReactNode => {
           on_click={handleOnItemClick}
         />
       </div>
+
+      <AnimatePresence initial={false} mode="wait">
+        {renderInventoryItemView()}
+      </AnimatePresence>
     </div>
   );
 };

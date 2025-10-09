@@ -33,6 +33,9 @@ export interface ItemAdjustments {
   irresistible_adjustment: number;
   skill_summary: SkillSummaryAdjustment[];
   spell_evasion_adjustment: number;
+  holy_stack_devouring_darkness_adjustment: number;
+  holy_stack_stat_bonus_adjustment: number;
+  holy_stacks_applied_adjustment: number;
 }
 
 export interface ComparisonPayload {

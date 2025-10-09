@@ -100,3 +100,14 @@ export const RESISTANCE_FIELDS: FieldDef[] = [
   { key: 'healing_reduction_adjustment', label: 'Healing Reduction' },
   { key: 'affix_damage_reduction_adjustment', label: 'Affix Damage Reduction' },
 ];
+
+export const HOLY_STACK_FIELDS: FieldDef[] = [
+  {
+    key: 'holy_stack_devouring_darkness_adjustment',
+    label: 'Devouring Darkness',
+  },
+  {
+    key: 'holy_stack_stat_bonus_adjustment',
+    label: 'Stat Bonus',
+  },
+];
