@@ -19,6 +19,7 @@ export enum InventoryItemTypes {
   CLAW = 'claw',
   SWORD = 'Sword',
   RING = 'ring',
+  DAGGER = 'dagger',
   SPELL_HEALING = 'spell-healing',
   SPELL_DAMAGE = 'spell-damage',
   RING_ONE = 'ring-one',

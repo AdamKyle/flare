@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { capitalize } from 'lodash';
 import React, { useState } from 'react';
 
@@ -18,23 +19,23 @@ import ActionBoxBase from 'ui/action-boxes/action-box-base';
 import { ActionBoxVariant } from 'ui/action-boxes/enums/action-box-varient';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import IconButton from 'ui/buttons/icon-button';
+import LinkButton from 'ui/buttons/link-button';
 
 const EquipItemActions = ({
-  comparisonDetails,
-  on_buy_and_replace,
-  on_close_buy_and_equip,
-  is_purchasing,
+  comparison_details,
+  on_confirm_action,
+  on_close_equip_action,
+  is_processing,
+  is_equipping,
 }: EquipItemActionProps) => {
   const [equippedPosition, setEquippedPosition] =
     useState<ItemPositions | null>(null);
 
-  const itemToEquip = comparisonDetails[0].item_to_equip;
+  const itemToEquip = comparison_details[0].item_to_equip;
 
   const baseType = getType(itemToEquip, armourPositions);
 
   const isTwoHanded = isTwoHandedType(itemToEquip.type);
-
-  const nameColorClass = planeTextItemColors(itemToEquip);
 
   const getDualSlotLabels = () => {
     if (baseType === ItemBaseTypes.Ring) {
@@ -55,10 +56,10 @@ const EquipItemActions = ({
     return null;
   };
 
-  const handleBuyAndReplace = (position: ItemPositions) => {
+  const handleConfirmation = (position: ItemPositions) => {
     setEquippedPosition(position);
 
-    const foundComparison = comparisonDetails.find((detail) => {
+    const foundComparison = comparison_details.find((detail) => {
       return detail.position === position;
     });
 
@@ -66,30 +67,58 @@ const EquipItemActions = ({
       return;
     }
 
-    on_buy_and_replace(
+    on_confirm_action({
       position,
-      foundComparison.equipped_item.slot_id,
-      foundComparison.equipped_item.type,
-      itemToEquip.item_id
-    );
+      slot_id: is_equipping
+        ? itemToEquip.slot_id || 0
+        : foundComparison.equipped_item.slot_id,
+      equip_type: itemToEquip.type,
+      item_id_to_buy: itemToEquip.item_id,
+    });
   };
 
   const handleCloseBuyAndReplace = () => {
     setEquippedPosition(null);
 
-    on_close_buy_and_equip();
+    if (!on_close_equip_action) {
+      return;
+    }
+
+    on_close_equip_action();
   };
 
   const renderLoadingIcon = (position: ItemPositions) => {
-    if (equippedPosition !== position && !is_purchasing) {
+    if (!is_processing) {
+      return null;
+    }
+
+    if (equippedPosition !== position) {
       return null;
     }
 
     return <i className="fas fa-spinner fa-spin" aria-hidden="true"></i>;
   };
 
+  const renderHeaderClose = () => {
+    if (!on_close_equip_action) {
+      return null;
+    }
+
+    return (
+      <button
+        type="button"
+        onClick={handleCloseBuyAndReplace}
+        aria-label="Close"
+        title="Close"
+        className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500"
+      >
+        <i className="fas fa-times" aria-hidden="true"></i>
+      </button>
+    );
+  };
+
   const renderHeader = () => {
-    if (!comparisonDetails) {
+    if (!comparison_details) {
       return null;
     }
 
@@ -97,57 +126,17 @@ const EquipItemActions = ({
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <h4 className="text-gray-800 dark:text-gray-300 font-bold">
-            Equip Item Details
+            Equip Item Options
           </h4>
         </div>
 
-        <button
-          type="button"
-          onClick={handleCloseBuyAndReplace}
-          aria-label="Close"
-          title="Close"
-          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500"
-        >
-          <i className="fas fa-times" aria-hidden="true"></i>
-        </button>
-      </div>
-    );
-  };
-
-  const renderTwoHandedAction = () => {
-    if (
-      baseType !== ItemBaseTypes.Weapon &&
-      itemToEquip.type !== InventoryItemTypes.SHIELD
-    ) {
-      return null;
-    }
-
-    if (!isTwoHanded) {
-      return null;
-    }
-
-    const label = `Equip as a two handed: ${capitalize(String(itemToEquip.type).replace('-', ' '))}`;
-
-    return (
-      <div className="flex justify-center">
-        <IconButton
-          disabled={is_purchasing}
-          on_click={() => handleBuyAndReplace(ItemPositions.LEFT_HAND)}
-          label={label}
-          variant={ButtonVariant.SUCCESS}
-          additional_css={nameColorClass}
-          icon={renderLoadingIcon(ItemPositions.LEFT_HAND)}
-        />
+        {renderHeaderClose()}
       </div>
     );
   };
 
   const renderDualSlotActions = () => {
     if (baseType === ItemBaseTypes.Armour) {
-      return null;
-    }
-
-    if (isTwoHanded) {
       return null;
     }
 
@@ -166,20 +155,20 @@ const EquipItemActions = ({
     return (
       <div className="grid grid-cols-2 gap-2 items-stretch">
         <IconButton
-          disabled={is_purchasing}
-          on_click={() => handleBuyAndReplace(positions[0] as ItemPositions)}
+          disabled={is_processing}
+          on_click={() => handleConfirmation(positions[0] as ItemPositions)}
           label={labels[0]}
           variant={ButtonVariant.SUCCESS}
-          additional_css={`w-full justify-center ${nameColorClass}`}
+          additional_css={`w-full justify-center`}
           icon={renderLoadingIcon(positions[0] as ItemPositions)}
         />
 
         <IconButton
-          disabled={is_purchasing}
-          on_click={() => handleBuyAndReplace(positions[1] as ItemPositions)}
+          disabled={is_processing}
+          on_click={() => handleConfirmation(positions[1] as ItemPositions)}
           label={labels[1]}
           variant={ButtonVariant.SUCCESS}
-          additional_css={`w-full justify-center ${nameColorClass}`}
+          additional_css={`w-full justify-center`}
           icon={renderLoadingIcon(positions[1] as ItemPositions)}
         />
       </div>
@@ -206,27 +195,41 @@ const EquipItemActions = ({
     return (
       <div className="flex justify-center">
         <IconButton
-          disabled={is_purchasing}
-          on_click={() => handleBuyAndReplace(positions[0] as ItemPositions)}
+          disabled={is_processing}
+          on_click={() => handleConfirmation(positions[0] as ItemPositions)}
           label={label}
           variant={ButtonVariant.SUCCESS}
-          additional_css={nameColorClass}
           icon={renderLoadingIcon(positions[0] as ItemPositions)}
         />
       </div>
     );
   };
 
+  const renderCostOfReplacement = () => {
+    if (!on_close_equip_action) {
+      return null;
+    }
+
+    return (
+      <div className="mt-4">
+        <span className="text-mango-tango-500 dark:text-mango-tango-500">
+          <strong>Cost of replacement</strong>
+        </span>
+        : {formatNumberWithCommas(itemToEquip.cost)}
+      </div>
+    );
+  };
+
   const renderEquipSummary = () => {
-    if (!Array.isArray(comparisonDetails) || comparisonDetails.length === 0) {
+    if (!Array.isArray(comparison_details) || comparison_details.length === 0) {
       return null;
     }
 
     const isSingleLine = isTwoHanded || baseType === ItemBaseTypes.Armour;
 
     const itemsToShow = isSingleLine
-      ? [comparisonDetails[0]]
-      : comparisonDetails;
+      ? [comparison_details[0]]
+      : comparison_details;
 
     return (
       <div className="text-gray-800 dark:text-gray-300">
@@ -237,9 +240,17 @@ const EquipItemActions = ({
           </p>
 
           <p className="my-2">
-            If the item equipped is two handed you can pick any hand you want.
-            If the item to equip is two handed and you have two items equipped,
-            both will be placed in your inventory in favour of this item.
+            If the item is a weapon, regardless of two handed or not, picking
+            the right hand to equip it in can become vital if you plan to use
+            Attack and Cast or Cast and Attack. Attack and Cast will use the
+            weapon in your left hand while Cast and Attack will use the weapon
+            in your right hand. You can learn more{' '}
+            <LinkButton
+              label={'here'}
+              variant={ButtonVariant.PRIMARY}
+              is_external
+              on_click={() => {}}
+            />
           </p>
         </div>
 
@@ -253,7 +264,10 @@ const EquipItemActions = ({
 
             return (
               <li key={`${detail.position}-${index}`}>
-                <span className={equippedColor}>{equipped.name}</span> Type:{' '}
+                <span className={clsx(equippedColor, 'font-bold')}>
+                  {equipped.name}
+                </span>
+                . Type:{' '}
                 <strong>{capitalize(equipped.type.replace('-', ' '))}</strong>{' '}
                 {isEquippedTwoHanded ? ' and is two handed ' : ' '} and is
                 equipped in:{' '}
@@ -263,21 +277,12 @@ const EquipItemActions = ({
           })}
         </ul>
 
-        <div className="mt-4">
-          <span className="text-mango-tango-500 dark:text-mango-tango-500">
-            <strong>Cost of replacement</strong>
-          </span>
-          : {formatNumberWithCommas(itemToEquip.cost)}
-        </div>
+        {renderCostOfReplacement()}
       </div>
     );
   };
 
   const renderEquipItemDetails = () => {
-    if (isTwoHanded) {
-      return renderTwoHandedAction();
-    }
-
     if (baseType === ItemBaseTypes.Armour) {
       return renderArmourAction();
     }

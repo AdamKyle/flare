@@ -39,6 +39,9 @@ const BackpackItems = ({
     useState<SelectedEquippableItemsOptions | null>(null);
   const [isSelectionDisabled, setIsSelectionDisabled] = useState(false);
   const [closeSuccessMessage, setCloseSuccessMessage] = useState(false);
+  const [equippedItemSuccessMessage, setEquippedItemSuccessMessage] = useState<
+    string | null
+  >(null);
 
   const { data, error, loading, setSearchText, onEndReached, setRefresh } =
     UsePaginatedApiHandler<EquippableItemWithBase>({
@@ -114,6 +117,12 @@ const BackpackItems = ({
     });
   };
 
+  const onEquipSuccess = (successMessage: string) => {
+    setEquippedItemSuccessMessage(successMessage);
+    setSlotId(null);
+    setRefresh((prevState) => !prevState);
+  };
+
   const onActionBarClose = () => {
     setActionSelected(null);
     setIsSelectionDisabled(false);
@@ -156,9 +165,15 @@ const BackpackItems = ({
     );
   }
 
-  const renderMultipleActionSuccess = () => {
-    if (!successMessage) {
+  const renderSuccessMessage = () => {
+    if (!successMessage && !equippedItemSuccessMessage) {
       return;
+    }
+
+    let message = successMessage;
+
+    if (equippedItemSuccessMessage) {
+      message = equippedItemSuccessMessage;
     }
 
     return (
@@ -168,7 +183,7 @@ const BackpackItems = ({
           closable
           force_close={closeSuccessMessage}
         >
-          {successMessage}
+          {message}
         </Alert>
       </div>
     );
@@ -235,7 +250,11 @@ const BackpackItems = ({
 
     return (
       <StackedCard on_close={handleCloseItemView}>
-        <InventoryItem slot_id={slotId} character_id={character.id} />
+        <InventoryItem
+          slot_id={slotId}
+          character_id={character.id}
+          on_equip={onEquipSuccess}
+        />
       </StackedCard>
     );
   };
@@ -250,7 +269,7 @@ const BackpackItems = ({
         />
       </div>
       <hr className="w-full border-t border-gray-300 dark:border-gray-600" />
-      {renderMultipleActionSuccess()}
+      {renderSuccessMessage()}
       <div className="pt-2 px-4">
         <Input on_change={onSearch} place_holder={'Search items'} clearable />
       </div>

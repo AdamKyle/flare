@@ -4,4 +4,5 @@ export default interface EquipItemProps {
   character_id: number;
   slot_id: number;
   item_to_equip_type: InventoryItemTypes | null;
+  on_equip: (successMessage: string) => void;
 }

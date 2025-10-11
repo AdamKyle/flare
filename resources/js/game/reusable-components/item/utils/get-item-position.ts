@@ -12,10 +12,6 @@ export const getItemPositions = (
   const itemType = getType(item, armourPositions);
   const isTwoHanded = isTwoHandedType(item.type);
 
-  if (isTwoHanded) {
-    return ItemPositions.LEFT_HAND;
-  }
-
   if (itemType === ItemBaseTypes.Weapon) {
     return [ItemPositions.LEFT_HAND, ItemPositions.RIGHT_HAND];
   }

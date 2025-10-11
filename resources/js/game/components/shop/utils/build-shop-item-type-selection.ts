@@ -14,6 +14,7 @@ const shopTypes = [
   InventoryItemTypes.STAVE,
   InventoryItemTypes.CENSOR,
   InventoryItemTypes.SCRATCH_AWL,
+  InventoryItemTypes.DAGGER,
   InventoryItemTypes.RING,
   InventoryItemTypes.SPELL_HEALING,
   InventoryItemTypes.SPELL_DAMAGE,

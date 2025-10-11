@@ -26,7 +26,7 @@ class EquipItemValidation extends FormRequest
         return [
             'position' => 'required|in:left-hand,right-hand,body,shield,leggings,feet,sleeves,helmet,gloves,ring-one,ring-two,spell-one,spell-two,trinket,artifact',
             'slot_id' => 'required',
-            'equip_type' => 'required|in:artifact,weapon,hammer,bow,gun,fan,mace,scratch-awl,stave,body,shield,leggings,feet,sleeves,helmet,gloves,ring,spell-healing,spell-damage,trinket',
+            'equip_type' => 'required|in:artifact,weapon,wand,claw,dagger,hammer,bow,gun,fan,mace,scratch-awl,stave,body,shield,leggings,feet,sleeves,helmet,gloves,ring,spell-healing,spell-damage,trinket',
         ];
     }
 

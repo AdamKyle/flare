@@ -1,15 +1,12 @@
 import { ItemComparisonRow } from '../../../api-definitions/items/item-comparison-details';
-import { InventoryItemTypes } from '../../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
-import { ItemPositions } from '../enums/item-positions';
+import UsePurchaseAndReplaceApiRequestDefinition from '../../../components/shop/api/hooks/definitions/use-purchase-and-replace-api-request-definition';
 
 export default interface EquipItemActionProps {
-  comparisonDetails: ItemComparisonRow[] | [];
-  on_buy_and_replace: (
-    position: ItemPositions,
-    slot_id: number,
-    type: InventoryItemTypes,
-    item_id_to_buy: number
+  comparison_details: ItemComparisonRow[] | [];
+  on_confirm_action: (
+    requestParams: UsePurchaseAndReplaceApiRequestDefinition
   ) => void;
-  on_close_buy_and_equip: () => void;
-  is_purchasing: boolean;
+  on_close_equip_action?: () => void;
+  is_processing: boolean;
+  is_equipping?: boolean;
 }

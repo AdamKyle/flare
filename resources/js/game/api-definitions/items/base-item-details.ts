@@ -16,4 +16,5 @@ export interface BaseItemDetails {
   type: InventoryItemTypes;
   cost: number;
   item_id: number;
+  slot_id?: number | null;
 }

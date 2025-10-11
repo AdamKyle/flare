@@ -12,7 +12,7 @@ export const useOpenCharacterBackpack = () => {
       {
         is_open: true,
         title: 'Backpack',
-        allow_clicking_outside: true,
+        allow_clicking_outside: false,
       }
     );
   };

@@ -9,4 +9,5 @@ export default interface LinkButtonProps {
   aria_label?: string;
   additional_css?: string;
   disabled?: boolean;
+  is_external?: boolean;
 }

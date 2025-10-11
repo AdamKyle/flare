@@ -2,13 +2,12 @@ import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import React, { Fragment, useState } from 'react';
 
 import { TOP_ADVANCED_CHILD_FIELDS } from './constants/item-comparison-constants';
-import { ItemPositions } from './enums/item-positions';
 import EquipItemActions from './equip-item-actions';
 import ItemComparisonColumn from './partials/item-comparison/item-comparison-column';
 import ItemComparisonProps from './types/item-comparison-props';
 import { hasAnyNonZeroAdjustment } from './utils/item-comparison';
 import type { ItemComparisonRow } from '../../api-definitions/items/item-comparison-details';
-import { InventoryItemTypes } from '../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
+import UsePurchaseAndReplaceApiRequestDefinition from '../../components/shop/api/hooks/definitions/use-purchase-and-replace-api-request-definition';
 
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import IconButton from 'ui/buttons/icon-button';
@@ -16,7 +15,6 @@ import Separator from 'ui/separator/separator';
 
 const ItemComparison = ({
   comparisonDetails,
-  item_name,
   show_buy_and_replace = false,
   is_purchasing,
   error_message,
@@ -38,17 +36,9 @@ const ItemComparison = ({
   };
 
   const handleBuyAndReplace = (
-    position: ItemPositions,
-    slot_id: number,
-    type: InventoryItemTypes,
-    item_id_to_buy: number
+    requestParams: UsePurchaseAndReplaceApiRequestDefinition
   ) => {
-    set_request_params({
-      position: position,
-      slot_id: slot_id,
-      equip_type: type,
-      item_id_to_buy: item_id_to_buy,
-    });
+    set_request_params(requestParams);
   };
 
   const comparisonRows = (
@@ -101,10 +91,9 @@ const ItemComparison = ({
     return (
       <div className="my-4">
         <EquipItemActions
-          comparisonDetails={comparisonDetails}
-          on_buy_and_replace={handleBuyAndReplace}
-          on_close_buy_and_equip={handleCloseEquipSection}
-          is_purchasing={is_purchasing}
+          comparison_details={comparisonDetails}
+          on_confirm_action={handleBuyAndReplace}
+          is_processing={is_purchasing}
         />
       </div>
     );

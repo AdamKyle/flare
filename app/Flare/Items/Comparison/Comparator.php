@@ -34,8 +34,6 @@ class Comparator
     /**
      * Compare two enriched items and return flattened adjustments plus skill-summary deltas.
      *
-     * @param Item $itemToEquip
-     * @param Item $itemEquipped
      * @return array{
      *   item_to_equip: Item,
      *   item_equipped: Item,
@@ -88,7 +86,6 @@ class Comparator
     /**
      * Build a mapped data bag for an enriched item using the schema.
      *
-     * @param Item $item
      * @return array{
      *   data: array<string, mixed>,
      *   fields: array<string, array{type:?string, compare:?string}>,
@@ -185,7 +182,6 @@ class Comparator
     /**
      * Merge raw attributes with appended accessor attributes for comparison.
      *
-     * @param Item $item
      * @return array<string, mixed>
      */
     private function toComparableAttributes(Item $item): array
@@ -200,7 +196,6 @@ class Comparator
     /**
      * Extract appended accessors as a flat name => value array.
      *
-     * @param Item $item
      * @return array<string, mixed>
      */
     private function extractAppendedAttributes(Item $item): array
@@ -215,9 +210,9 @@ class Comparator
     /**
      * Build adjustments for scalar fields.
      *
-     * @param array<string, array{type:?string, compare:?string}> $fieldMeta
-     * @param array<string, mixed> $leftData
-     * @param array<string, mixed> $rightData
+     * @param  array<string, array{type:?string, compare:?string}>  $fieldMeta
+     * @param  array<string, mixed>  $leftData
+     * @param  array<string, mixed>  $rightData
      * @return array<string, mixed>
      */
     private function buildFieldAdjustments(array $fieldMeta, array $leftData, array $rightData): array
@@ -242,9 +237,9 @@ class Comparator
     /**
      * Build adjustments for collection rows (e.g., skill_summary).
      *
-     * @param array<string, array{key:string, fields:array<string,string>}> $collectionsMeta
-     * @param array<string, mixed> $leftData
-     * @param array<string, mixed> $rightData
+     * @param  array<string, array{key:string, fields:array<string,string>}>  $collectionsMeta
+     * @param  array<string, mixed>  $leftData
+     * @param  array<string, mixed>  $rightData
      * @return array<int, array<string, mixed>>
      */
     private function buildCollectionAdjustments(array $collectionsMeta, array $leftData, array $rightData): array
@@ -285,11 +280,9 @@ class Comparator
     /**
      * Build a single collection row with key + per-field "*_adjustment".
      *
-     * @param string $rowKey
-     * @param array<string, mixed> $leftRow
-     * @param array<string, mixed> $rightRow
-     * @param string $keyName
-     * @param array<string, string> $fieldStrategies
+     * @param  array<string, mixed>  $leftRow
+     * @param  array<string, mixed>  $rightRow
+     * @param  array<string, string>  $fieldStrategies
      * @return array<string, mixed>
      */
     private function buildCollectionRow(
@@ -306,7 +299,7 @@ class Comparator
 
             $rightValue = array_key_exists($field, $rightRow) ? $rightRow[$field] : null;
 
-            $row[$field . '_adjustment'] = $this->compute($strategy, $leftValue, $rightValue);
+            $row[$field.'_adjustment'] = $this->compute($strategy, $leftValue, $rightValue);
         });
 
         return $row;
@@ -314,40 +307,34 @@ class Comparator
 
     /**
      * Turn a schema path into a flattened "*_adjustment" key.
-     *
-     * @param string $path
-     * @return string
      */
     private function adjustmentKeyFromPath(string $path): string
     {
         if (preg_match('/^totals\.(\w+)$/', $path, $match) === 1) {
-            return 'total_' . $match[1] . '_adjustment';
+            return 'total_'.$match[1].'_adjustment';
         }
 
         if (preg_match('/^mods\.base\.(\w+)$/', $path, $match) === 1) {
-            return 'base_' . $match[1] . '_adjustment';
+            return 'base_'.$match[1].'_adjustment';
         }
 
         if (preg_match('/^devouring\.(\w+)$/', $path, $match) === 1) {
-            return 'devouring_' . $match[1] . '_adjustment';
+            return 'devouring_'.$match[1].'_adjustment';
         }
 
         if (preg_match('/^affix_damage\.(\w+)$/', $path, $match) === 1) {
-            return $match[1] . '_adjustment';
+            return $match[1].'_adjustment';
         }
 
         $segments = explode('.', $path);
 
         $leaf = end($segments);
 
-        return $leaf . '_adjustment';
+        return $leaf.'_adjustment';
     }
 
     /**
      * Default comparison strategy by logical type.
-     *
-     * @param string|null $logicalType
-     * @return string
      */
     private function defaultStrategyFor(?string $logicalType): string
     {
@@ -366,11 +353,6 @@ class Comparator
 
     /**
      * Compute an adjustment using a named strategy.
-     *
-     * @param string $strategy
-     * @param mixed $leftValue
-     * @param mixed $rightValue
-     * @return mixed
      */
     private function compute(string $strategy, mixed $leftValue, mixed $rightValue): mixed
     {
@@ -389,10 +371,6 @@ class Comparator
 
     /**
      * Numeric difference: (float)$leftValue - (float)$rightValue, nulls treated as 0.
-     *
-     * @param mixed $leftValue
-     * @param mixed $rightValue
-     * @return float
      */
     private function computeDelta(mixed $leftValue, mixed $rightValue): float
     {
@@ -409,10 +387,6 @@ class Comparator
 
     /**
      * Boolean inequality after (bool) cast.
-     *
-     * @param mixed $leftValue
-     * @param mixed $rightValue
-     * @return bool
      */
     private function computeFlagDiff(mixed $leftValue, mixed $rightValue): bool
     {
@@ -426,9 +400,7 @@ class Comparator
     /**
      * Does the given value match any of the PCRE patterns?
      *
-     * @param string $value
-     * @param array<int, string> $patterns
-     * @return bool
+     * @param  array<int, string>  $patterns
      */
     private function matchesAny(string $value, array $patterns): bool
     {
@@ -447,10 +419,7 @@ class Comparator
     /**
      * Set a value at a dot-path inside an array (creating arrays as needed).
      *
-     * @param array<string, mixed> $target
-     * @param string $path
-     * @param mixed $value
-     * @return void
+     * @param  array<string, mixed>  $target
      */
     private function setDot(array &$target, string $path, mixed $value): void
     {
@@ -472,8 +441,6 @@ class Comparator
     /**
      * Convert a list of rows into a key-indexed collection by $keyName.
      *
-     * @param mixed $rows
-     * @param string $keyName
      * @return Collection<string, array<string, mixed>>
      */
     private function indexRowsByKey(mixed $rows, string $keyName): Collection

@@ -5,6 +5,7 @@ import EquipComparisonProps from '../../types/partials/equip/equip-comparison-pr
 
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import IconButton from 'ui/buttons/icon-button';
+import Separator from 'ui/separator/separator';
 
 const EquipComparison = ({
   comparison_data,
@@ -29,6 +30,7 @@ const EquipComparison = ({
 
   return (
     <div className="space-y-3">
+      <Separator />
       <div className="flex items-center justify-end">
         <IconButton
           on_click={handleToggleAdvanced}

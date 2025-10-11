@@ -45,14 +45,13 @@ export const useManageMultipleSelectedItemsApi =
           ids: params.ids,
           exclude: params.exclude,
         });
-        console.log('result response', result);
+
         onSuccess(result.inventory_count);
 
         setSuccessMessage(result.message);
 
         setLoading(false);
       } catch (err) {
-        console.log('result error', error);
         setLoading(false);
 
         if (err instanceof AxiosError) {

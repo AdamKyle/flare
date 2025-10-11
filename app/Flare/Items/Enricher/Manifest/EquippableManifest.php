@@ -41,9 +41,6 @@ class EquippableManifest extends BaseManifest
      * Map a flat attribute name to a grouped dot-path used by the comparator.
      * Return null to skip an attribute entirely; falling back to the original name
      * yields a "{leaf}_adjustment" key.
-     *
-     * @param string $prop
-     * @return string|null
      */
     public function map(string $prop): ?string
     {
@@ -73,10 +70,6 @@ class EquippableManifest extends BaseManifest
     /**
      * Determine the logical type for a given attribute to select a default comparison strategy.
      * Numeric strings are treated as numbers for delta comparisons.
-     *
-     * @param string $prop
-     * @param mixed $value
-     * @return string|null
      */
     public function typeFor(string $prop, mixed $value): ?string
     {
@@ -94,10 +87,6 @@ class EquippableManifest extends BaseManifest
 
     /**
      * Select the comparison strategy for a mapped path and logical type.
-     *
-     * @param string $path
-     * @param string $type
-     * @return string|null
      */
     public function compareFor(string $path, string $type): ?string
     {

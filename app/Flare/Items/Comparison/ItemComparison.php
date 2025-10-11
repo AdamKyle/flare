@@ -8,7 +8,9 @@ use App\Flare\Items\Values\ArmourType;
 use App\Flare\Items\Values\EquippablePositionType;
 use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
+use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
+use App\Flare\Models\SetSlot;
 use App\Flare\Traits\IsItemUnique;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use Illuminate\Database\Eloquent\Collection;
@@ -64,8 +66,10 @@ class ItemComparison
 
         $enrichedItem = $this->enricher->enrich($itemToCompare->fresh());
 
+        $slotIdOfEnrichedItem = $character->inventory->slots->where('item.id', '=', $enrichedItem->id)->first()->id;
+
         return $matching
-            ->map(fn ($slot) => $this->buildComparisonRow($enrichedItem, $slot))
+            ->map(fn ($slot) => $this->buildComparisonRow($enrichedItem, $slot, $slotIdOfEnrichedItem))
             ->values()
             ->all();
     }
@@ -129,17 +133,17 @@ class ItemComparison
      * Build a single comparison row for a matched equipped slot.
      *
      * @param  Item  $enrichedItemToCompare  The candidate item after enrichment.
-     * @param  object  $equippedSlot  Slot record containing ->position(string) and ->item(Item Eloquent model).
+     * @param  InventorySlot|SetSlot  $equippedSlot  Slot record containing ->position(string) and ->item(Item Eloquent model).
      * @return array<string, mixed> Comparison row payload including metadata and computed adjustments.
      */
-    private function buildComparisonRow(Item $enrichedItemToCompare, $equippedSlot): array
+    private function buildComparisonRow(Item $enrichedItemToCompare, InventorySlot|SetSlot $equippedSlot, int $enrichedItemToCompareSlotId): array
     {
         $equippedItem = $equippedSlot->item->fresh();
         $enrichedEquippedItem = $this->enricher->enrich($equippedItem);
         $payload = $this->comparator->compare($enrichedItemToCompare, $enrichedEquippedItem);
         $summary = $payload['comparison'];
 
-        $itemToCompareData = new FractalItem($enrichedItemToCompare, $this->baseEquippableItemTransformer);
+        $itemToCompareData = new FractalItem($enrichedItemToCompare, $this->baseEquippableItemTransformer->setSlotId($enrichedItemToCompareSlotId));
         $itemToCompareData = $this->manager->setSerializer($this->plainDataSerializer)->createData($itemToCompareData)->toArray();
 
         return [

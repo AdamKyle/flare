@@ -17,6 +17,18 @@ class BaseEquippableItemTransformer extends TransformerAbstract
 {
     use GetItemAtonements, IsItemUnique;
 
+    private $slotId = null;
+
+    /**
+     * Optionally set the slot id.
+     */
+    public function setSlotId(int $slotId): self
+    {
+        $this->slotId = $slotId;
+
+        return $this;
+    }
+
     /**
      * Transforms an enriched Item model into an API-ready array.
      *
@@ -27,6 +39,7 @@ class BaseEquippableItemTransformer extends TransformerAbstract
     {
         return [
             'item_id' => $item->id,
+            'slot_id' => $this->slotId,
             'name' => $item->affix_name,
             'affix_count' => $item->affix_count,
             'holy_stack_stat_bonus' => $item->holy_stack_stat_bonus,

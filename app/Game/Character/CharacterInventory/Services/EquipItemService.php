@@ -79,19 +79,8 @@ class EquipItemService
 
             $this->updateCharacterAttackTypesHandler->updateCache($character);
 
-            $characterInventoryService = $this->characterInventoryService->setCharacter($character);
-
-            $usableSets = $this->characterInventoryService->getUsableSets();
-
             $response = $this->successResult([
-                'inventory' => [
-                    'inventory' => $characterInventoryService->fetchCharacterInventory(),
-                    'equipped' => $characterInventoryService->fetchEquipped(),
-                    'sets' => $characterInventoryService->getCharacterInventorySets(),
-                    'usable_sets' => $usableSets,
-                    'savable_sets' => $usableSets,
-                ],
-                'message' => 'Equipped item.',
+                'message' => 'Item has been equipped',
             ]);
         } catch (Exception $e) {
 

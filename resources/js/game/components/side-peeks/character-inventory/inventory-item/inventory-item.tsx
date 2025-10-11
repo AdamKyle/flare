@@ -28,7 +28,11 @@ import StackedCard from 'ui/cards/stacked-card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import Separator from 'ui/separator/separator';
 
-const InventoryItem = ({ slot_id, character_id }: InventoryItemProps) => {
+const InventoryItem = ({
+  slot_id,
+  character_id,
+  on_equip,
+}: InventoryItemProps) => {
   const [itemAffixToView, setItemAffixToView] = useState<number | null>(null);
   const [shouldViewHolyStacks, setShouldViewHolyStacks] = useState(false);
   const [viewingEquip, setViewingEquip] = useState(false);
@@ -92,6 +96,7 @@ const InventoryItem = ({ slot_id, character_id }: InventoryItemProps) => {
           character_id={character_id}
           slot_id={item.slot_id}
           item_to_equip_type={item.type}
+          on_equip={on_equip}
         />
       </StackedCard>
     );

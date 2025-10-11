@@ -82,7 +82,11 @@ const Sets = ({ character_id }: SetsProps): ReactNode => {
 
     return (
       <StackedCard on_close={closeItemView}>
-        <InventoryItem slot_id={slotId} character_id={character_id} />
+        <InventoryItem
+          slot_id={slotId}
+          character_id={character_id}
+          on_equip={() => {}}
+        />
       </StackedCard>
     );
   };
