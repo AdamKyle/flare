@@ -28,7 +28,8 @@
             "api-handler/*": ["resources/js/api-handler/*"],
             "ui/*": ["resources/js/ui/*"],
             "service-container/*": ["resources/js/service-container/*"],
-            "service-container-provider/*": ["resources/js/service-container-provider/*"]
+            "service-container-provider/*": ["resources/js/service-container-provider/*"],
+            "websockets": ["resources/js/websocket-handler/*"]
         }
     },
     "skipLibCheck": true,
