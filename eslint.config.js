@@ -2,7 +2,7 @@ import eslint from '@eslint/js';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import importPlugin from 'eslint-plugin-import';
-import stylisticJs from '@stylistic/eslint-plugin-js';
+import stylistic from '@stylistic/eslint-plugin'; // ⟵ changed
 import reactHooks from 'eslint-plugin-react-hooks';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import prettierPlugin from 'eslint-plugin-prettier';
@@ -26,7 +26,7 @@ export default [
     plugins: {
       import: importPlugin,
       '@typescript-eslint': tseslint,
-      '@stylistic/js': stylisticJs,
+      '@stylistic': stylistic, // ⟵ changed
       'react-hooks': reactHooks,
       'jsx-a11y': jsxA11y,
       'prettier': prettierPlugin,
@@ -57,18 +57,12 @@ export default [
       ...tseslint.configs.recommended.rules,
       ...prettierPlugin.configs.recommended.rules,
 
-
-      // remove TypeScript‑ESLint’s unused‑vars check
       '@typescript-eslint/no-unused-vars': 'off',
-
-      // auto‑remove unused imports and variables
       'unused-imports/no-unused-imports': 'warn',
 
-      // Validate hooks and dep
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
 
-      // Custom hook: No early returns before hook calls.
       'local-hooks/no-early-return-before-hook': 'error',
 
       'unused-imports/no-unused-vars': [
@@ -89,67 +83,20 @@ export default [
             ["internal", "parent", "sibling", "index"],
           ],
           pathGroups: [
-            {
-              pattern: "react",
-              group: "builtin",
-              position: "before",
-            },
-            {
-              pattern: "framer-motion",
-              group: "builtin",
-              position: "after",
-            },
-            {
-              pattern: "tsyringe",
-              group: "builtin",
-              position: "after",
-            },
-            {
-              pattern: "ts-pattern",
-              group: "builtin",
-              position: "after",
-            },
-            {
-              pattern: "configuration/**",
-              group: "internal",
-              position: "before",
-            },
-            {
-              pattern: "api-handler/**",
-              group: "internal",
-              position: "after",
-            },
-            {
-              pattern: "event-system/**",
-              group: "internal",
-              position: "after",
-            },
-            {
-              pattern: "game-data/**",
-              group: "internal",
-              position: "after",
-            },
-            {
-              pattern: "ui/**",
-              group: "internal",
-              position: "after",
-            },
-            {
-              pattern: "service-container/**",
-              group: "internal",
-              position: "after",
-            },
-            {
-              pattern: "service-container-provider/**",
-              group: "internal",
-              position: "after",
-            },
+            { pattern: "react", group: "builtin", position: "before" },
+            { pattern: "framer-motion", group: "builtin", position: "after" },
+            { pattern: "tsyringe", group: "builtin", position: "after" },
+            { pattern: "ts-pattern", group: "builtin", position: "after" },
+            { pattern: "configuration/**", group: "internal", position: "before" },
+            { pattern: "api-handler/**", group: "internal", position: "after" },
+            { pattern: "event-system/**", group: "internal", position: "after" },
+            { pattern: "game-data/**", group: "internal", position: "after" },
+            { pattern: "ui/**", group: "internal", position: "after" },
+            { pattern: "service-container/**", group: "internal", position: "after" },
+            { pattern: "service-container-provider/**", group: "internal", position: "after" },
           ],
           "newlines-between": "always",
-          alphabetize: {
-            order: "asc",
-            caseInsensitive: true,
-          },
+          alphabetize: { order: "asc", caseInsensitive: true },
         },
       ],
       'max-len': [
@@ -163,7 +110,7 @@ export default [
           ignoreComments: true
         }
       ],
-      '@stylistic/js/max-len': [
+      '@stylistic/max-len': [ // ⟵ changed key
         'warn',
         {
           code: 100,

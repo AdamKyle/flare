@@ -14,7 +14,7 @@
     "devDependencies": {
         "@eslint/js": "^9.7.0",
         "@glidejs/glide": "^3.4.1",
-        "@stylistic/eslint-plugin-js": "^4.2.0",
+        "@stylistic/eslint-plugin": "^5.4.0",
         "@tailwindcss/aspect-ratio": "^0.4.2",
         "@tailwindcss/jit": "^0.1.18",
         "@tailwindcss/postcss": "^4.1.8",
