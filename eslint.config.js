@@ -2,7 +2,7 @@ import eslint from '@eslint/js';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import importPlugin from 'eslint-plugin-import';
-import stylistic from '@stylistic/eslint-plugin'; // ⟵ changed
+import stylistic from '@stylistic/eslint-plugin';
 import reactHooks from 'eslint-plugin-react-hooks';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import prettierPlugin from 'eslint-plugin-prettier';
@@ -26,7 +26,7 @@ export default [
     plugins: {
       import: importPlugin,
       '@typescript-eslint': tseslint,
-      '@stylistic': stylistic, // ⟵ changed
+      '@stylistic': stylistic,
       'react-hooks': reactHooks,
       'jsx-a11y': jsxA11y,
       'prettier': prettierPlugin,
@@ -112,7 +112,7 @@ export default [
           ignoreComments: true
         }
       ],
-      '@stylistic/max-len': [ // ⟵ changed key
+      '@stylistic/max-len': [
         'warn',
         {
           code: 100,
