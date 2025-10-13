@@ -2,5 +2,4 @@ import BaseQuestItemDefinition from '../../../../../api-definitions/items/quest-
 
 export default interface QuestItemProps {
   quest_item: BaseQuestItemDefinition;
-  on_close: () => void;
 }

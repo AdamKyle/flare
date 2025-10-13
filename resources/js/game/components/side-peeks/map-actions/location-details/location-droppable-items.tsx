@@ -1,4 +1,5 @@
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
+import { AnimatePresence } from 'framer-motion';
 import { debounce, isNil } from 'lodash';
 import React, { useMemo, useState } from 'react';
 
@@ -13,6 +14,7 @@ import { GameDataError } from 'game-data/components/game-data-error';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import StackedCard from 'ui/cards/stacked-card';
 import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
@@ -77,35 +79,44 @@ const LocationDroppableItems = ({
     );
   }
 
-  if (isQuestItemDetailsOpen && !isNil(itemToView)) {
+  const renderQuestItemView = () => {
+    if (!isQuestItemDetailsOpen || isNil(itemToView)) {
+      return null;
+    }
+
     return (
-      <QuestItem quest_item={itemToView} on_close={close_quest_item_details} />
+      <StackedCard on_close={close_quest_item_details}>
+        <QuestItem quest_item={itemToView} />
+      </StackedCard>
     );
-  }
+  };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <div className="flex justify-center p-4">
-        <Button
-          on_click={() => go_back()}
-          label="Back to location"
-          variant={ButtonVariant.PRIMARY}
-        />
+    <>
+      <div className="flex flex-col h-full overflow-hidden">
+        <div className="flex justify-center p-4">
+          <Button
+            on_click={() => go_back()}
+            label="Back to location"
+            variant={ButtonVariant.PRIMARY}
+          />
+        </div>
+        <hr className="w-full border-t border-gray-300 dark:border-gray-600" />
+        <div className="pt-2 px-4">
+          <Input on_change={onSearch} place_holder={'Search items'} clearable />
+        </div>
+        <div className="flex-1 min-h-0">
+          <GenericItemList
+            items={data}
+            is_quest_items={true}
+            on_scroll_to_end={handleQuestItemsScroll}
+            on_click={onOpenQuestItemDetails}
+            use_item_id
+          />
+        </div>
       </div>
-      <hr className="w-full border-t border-gray-300 dark:border-gray-600" />
-      <div className="pt-2 px-4">
-        <Input on_change={onSearch} place_holder={'Search items'} clearable />
-      </div>
-      <div className="flex-1 min-h-0">
-        <GenericItemList
-          items={data}
-          is_quest_items={true}
-          on_scroll_to_end={handleQuestItemsScroll}
-          on_click={onOpenQuestItemDetails}
-          use_item_id
-        />
-      </div>
-    </div>
+      <AnimatePresence mode="wait">{renderQuestItemView()}</AnimatePresence>
+    </>
   );
 };
 

@@ -11,6 +11,7 @@ import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
+import StackedCard from 'ui/cards/stacked-card';
 import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
@@ -68,7 +69,11 @@ const GemBag = ({ character_id }: GemBagProps) => {
   }
 
   if (gemToView) {
-    return <GemDetails gem={gemToView} on_close={handleCloseGemView} />;
+    return (
+      <StackedCard on_close={handleCloseGemView}>
+        <GemDetails gem={gemToView} />
+      </StackedCard>
+    );
   }
 
   return (

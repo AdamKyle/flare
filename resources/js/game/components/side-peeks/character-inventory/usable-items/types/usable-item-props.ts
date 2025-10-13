@@ -2,5 +2,4 @@ import BaseUsableItemDefinition from '../../../../../api-definitions/items/usabl
 
 export default interface UsableItemProps {
   item: BaseUsableItemDefinition;
-  on_close: () => void;
 }

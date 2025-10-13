@@ -1,4 +1,5 @@
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
+import { AnimatePresence } from 'framer-motion';
 import { debounce } from 'lodash';
 import React, { useMemo, useState } from 'react';
 
@@ -11,6 +12,7 @@ import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
+import StackedCard from 'ui/cards/stacked-card';
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import Input from 'ui/input/input';
@@ -81,41 +83,52 @@ const UsableItems = ({ character_id }: UsableItemsProps) => {
     );
   }
 
-  if (itemToView) {
-    return <UsableItem item={itemToView} on_close={onCloseViewItem} />;
-  }
+  const renderUsableItemView = () => {
+    if (!itemToView) {
+      return null;
+    }
+
+    return (
+      <StackedCard on_close={onCloseViewItem}>
+        <UsableItem item={itemToView} />
+      </StackedCard>
+    );
+  };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <hr className="w-full border-t border-gray-300 dark:border-gray-600" />
-      <div className="pt-2 px-4">
-        <Input on_change={onSearch} place_holder={'Search items'} clearable />
+    <>
+      <div className="flex flex-col h-full overflow-hidden">
+        <hr className="w-full border-t border-gray-300 dark:border-gray-600" />
+        <div className="pt-2 px-4">
+          <Input on_change={onSearch} place_holder={'Search items'} clearable />
+        </div>
+        <div className="pb-4 px-4 mt-4">
+          <Dropdown
+            items={[
+              { label: 'Increase Stats', value: 'increase-stats' },
+              { label: 'Effects Skills', value: 'effects-skills' },
+              {
+                label: 'Effects Base Modifiers',
+                value: 'effects-base-modifiers',
+              },
+              { label: 'Damages Kingdoms', value: 'damages-kingdoms' },
+              { label: 'Holy Oils', value: 'holy-oils' },
+            ]}
+            selection_placeholder={'Filter items by'}
+            on_select={handleFilterChange}
+            on_clear={handleClearFilters}
+          />
+        </div>
+        <div className="flex-1 min-h-0">
+          <UsableItemsList
+            items={data}
+            on_scroll_to_end={handleInventoryScroll}
+            on_item_clicked={onViewItem}
+          />
+        </div>
       </div>
-      <div className="pb-4 px-4 mt-4">
-        <Dropdown
-          items={[
-            { label: 'Increase Stats', value: 'increase-stats' },
-            { label: 'Effects Skills', value: 'effects-skills' },
-            {
-              label: 'Effects Base Modifiers',
-              value: 'effects-base-modifiers',
-            },
-            { label: 'Damages Kingdoms', value: 'damages-kingdoms' },
-            { label: 'Holy Oils', value: 'holy-oils' },
-          ]}
-          selection_placeholder={'Filter items by'}
-          on_select={handleFilterChange}
-          on_clear={handleClearFilters}
-        />
-      </div>
-      <div className="flex-1 min-h-0">
-        <UsableItemsList
-          items={data}
-          on_scroll_to_end={handleInventoryScroll}
-          on_item_clicked={onViewItem}
-        />
-      </div>
-    </div>
+      <AnimatePresence mode="wait">{renderUsableItemView()}</AnimatePresence>
+    </>
   );
 };
 

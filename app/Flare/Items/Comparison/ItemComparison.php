@@ -21,13 +21,6 @@ class ItemComparison
 {
     use IsItemUnique;
 
-    /**
-     * @param EquippableEnricher $enricher
-     * @param Comparator $comparator
-     * @param BaseEquippableItemTransformer $baseEquippableItemTransformer
-     * @param PlainDataSerializer $plainDataSerializer
-     * @param Manager $manager
-     */
     public function __construct(
         private readonly EquippableEnricher $enricher,
         private readonly Comparator $comparator,

@@ -8,11 +8,9 @@ import Section from '../../../../reusable-components/viewable-sections/section';
 import { formatPercent } from '../../../../util/format-number';
 import { getGemSlotTitleTextColor } from '../../../character-sheet/partials/character-inventory/styles/gem-slot-styles';
 
-import Button from 'ui/buttons/button';
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Separator from 'ui/separator/separator';
 
-const GemDetails = ({ gem, on_close }: GemDetailsProps) => {
+const GemDetails = ({ gem }: GemDetailsProps) => {
   const itemColor = getGemSlotTitleTextColor(gem);
 
   const atonements: Record<string, number> = {
@@ -21,20 +19,8 @@ const GemDetails = ({ gem, on_close }: GemDetailsProps) => {
     [gem.tertiary_atonement_type]: gem.tertiary_atonement_amount,
   };
 
-  const handlePressClose = () => {
-    on_close();
-  };
-
   return (
     <>
-      <div className="text-center p-4">
-        <Button
-          on_click={handlePressClose}
-          label="Close"
-          variant={ButtonVariant.SUCCESS}
-        />
-      </div>
-
       <div className="px-4 flex flex-col gap-2">
         <h2 className={clsx('text-lg my-2', itemColor)}>{gem.name}</h2>
         <Separator />

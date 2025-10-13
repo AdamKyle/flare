@@ -12,11 +12,9 @@ import UsableItemProps from './types/usable-item-props';
 import { planeTextItemColors } from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
 import ItemMetaSection from '../inventory-item/partials/item-view/item-meta-tsx';
 
-import Button from 'ui/buttons/button';
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Separator from 'ui/separator/separator';
 
-const UsableItem = ({ item, on_close }: UsableItemProps) => {
+const UsableItem = ({ item }: UsableItemProps) => {
   const factories: Array<
     (showSeparator: boolean) => React.ReactElement | null
   > = [];
@@ -113,14 +111,6 @@ const UsableItem = ({ item, on_close }: UsableItemProps) => {
 
   return (
     <>
-      <div className="text-center p-4">
-        <Button
-          on_click={on_close}
-          label="Close"
-          variant={ButtonVariant.SUCCESS}
-        />
-      </div>
-
       <div className="px-4 flex flex-col gap-2">
         <ItemMetaSection
           name={item.name}

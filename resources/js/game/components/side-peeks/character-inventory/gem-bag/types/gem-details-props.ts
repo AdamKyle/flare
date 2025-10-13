@@ -2,5 +2,4 @@ import BaseGemDetails from '../../../../../api-definitions/items/base-gem-detail
 
 export default interface GemDetailsProps {
   gem: BaseGemDetails;
-  on_close: () => void;
 }
