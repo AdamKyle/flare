@@ -296,7 +296,7 @@ class CharacterInventoryControllerTest extends TestCase
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals('Equipped item.', $jsonData['message']);
+        $this->assertEquals('Item has been equipped.', $jsonData['message']);
     }
 
     public function test_unequip_set()

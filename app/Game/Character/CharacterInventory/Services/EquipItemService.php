@@ -80,7 +80,7 @@ class EquipItemService
             $this->updateCharacterAttackTypesHandler->updateCache($character);
 
             $response = $this->successResult([
-                'message' => 'Item has been equipped',
+                'message' => 'Item has been equipped.',
             ]);
         } catch (Exception $e) {
 

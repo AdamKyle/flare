@@ -21,6 +21,13 @@ class ItemComparison
 {
     use IsItemUnique;
 
+    /**
+     * @param EquippableEnricher $enricher
+     * @param Comparator $comparator
+     * @param BaseEquippableItemTransformer $baseEquippableItemTransformer
+     * @param PlainDataSerializer $plainDataSerializer
+     * @param Manager $manager
+     */
     public function __construct(
         private readonly EquippableEnricher $enricher,
         private readonly Comparator $comparator,
@@ -66,7 +73,8 @@ class ItemComparison
 
         $enrichedItem = $this->enricher->enrich($itemToCompare->fresh());
 
-        $slotIdOfEnrichedItem = $character->inventory->slots->where('item.id', '=', $enrichedItem->id)->first()->id;
+        $slot = $character->inventory->slots->firstWhere('item_id', $enrichedItem->id);
+        $slotIdOfEnrichedItem = is_null($slot) ? 0 : $slot->id;
 
         return $matching
             ->map(fn ($slot) => $this->buildComparisonRow($enrichedItem, $slot, $slotIdOfEnrichedItem))
