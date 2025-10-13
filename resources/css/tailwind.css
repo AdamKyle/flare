@@ -11,14 +11,14 @@
 
   /*— Breakpoints / Screens —*/
   --breakpoint-*: initial;
-  --breakpoint-2xsm: 375px;
-  --breakpoint-xsm: 425px;
-  --breakpoint-3xl: 2000px;
+  --breakpoint-2xsm: 360px;
+  --breakpoint-xsm: 375px;
   --breakpoint-sm: 640px;
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
   --breakpoint-2xl: 1536px;
+  --breakpoint-3xl: 1920px;
 
   /*— Core Colors —*/
   --color-transparent: transparent;
