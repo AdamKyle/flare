@@ -736,6 +736,7 @@ class CharacterInventoryService
             'shield',
             'artifact',
             'spell',
+            'trinket',
             'armour',
             'alchemy',
             'quest',
@@ -749,6 +750,7 @@ class CharacterInventoryService
         if (!in_array($type, $acceptedTypes)) {
             throw new Exception('Unknown Item type: ' . $type);
         }
+
         return $type;
     }
 }
