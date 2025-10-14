@@ -32,7 +32,6 @@ class MonsterFightService
 
     public function setupMonster(Character $character, array $params): array
     {
-
         Cache::delete('monster-fight-' . $character->id);
         Cache::delete('character-sheet-' . $character->id);
 
@@ -69,16 +68,22 @@ class MonsterFightService
     {
         $cache = Cache::get('monster-fight-' . $character->id);
 
-        if (! $this->isAtMonstersLocation($character, $cache['monster']['id'])) {
+        if (is_null($cache)) {
+            return $this->errorResult('The monster seems to have fled. Click attack again to start a new battle. You have 15 minutes from clicking attack to attack the creature.');
+        }
+
+        if (!isset($cache['monster']) || !is_array($cache['monster']) || !isset($cache['monster']['id'])) {
+            return $this->errorResult('The monster seems to have fled. Click attack again to start a new battle. You have 15 minutes from clicking attack to attack the creature.');
+        }
+
+        $monsterId = (int) $cache['monster']['id'];
+
+        if (! $this->isAtMonstersLocation($character, $monsterId)) {
             return $this->errorResult('You are too far away from the monster. Move back to it\'s location');
         }
 
-        if (! $this->isMonsterAlreadyDefeatedThisWeek($character, $cache['monster']['id'])) {
+        if (! $this->isMonsterAlreadyDefeatedThisWeek($character, $monsterId)) {
             return $this->errorResult('You already defeated this monster. Reset is on Sundays at 3am America/Edmonton.');
-        }
-
-        if (is_null($cache)) {
-            return $this->errorResult('The monster seems to have fled. Click attack again to start a new battle. You have 15 minutes from clicking attack to attack the creature.');
         }
 
         $this->monsterPlayerFight->setCharacter($character);
@@ -86,7 +91,6 @@ class MonsterFightService
         $this->monsterPlayerFight->fightMonster(true, $attackType);
 
         if ($this->monsterPlayerFight->getCharacterHealth() <= 0) {
-
             $monster = $this->monsterPlayerFight->getMonster();
 
             $monster = Monster::find($monster['id']);
@@ -113,11 +117,13 @@ class MonsterFightService
 
     public function isAtMonstersLocation(Character $character, int $monsterId): bool
     {
-
         $monster = Monster::find($monsterId);
 
-        if (! is_null($monster->only_for_location_type)) {
+        if (is_null($monster)) {
+            return false;
+        }
 
+        if (! is_null($monster->only_for_location_type)) {
             $location = Location::where('type', $monster->only_for_location_type)->where(
                 'game_map_id',
                 $character->map->game_map_id
@@ -134,6 +140,10 @@ class MonsterFightService
     public function isMonsterAlreadyDefeatedThisWeek(Character $character, int $monsterId): bool
     {
         $monster = Monster::find($monsterId);
+
+        if (is_null($monster)) {
+            return false;
+        }
 
         return $this->weeklyBattleService->canFightMonster($character, $monster);
     }
