@@ -33,7 +33,6 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
-
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {

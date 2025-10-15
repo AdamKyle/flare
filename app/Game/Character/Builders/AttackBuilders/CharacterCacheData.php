@@ -38,16 +38,16 @@ class CharacterCacheData
 
     public function getCachedCharacterData(Character $character, string $key): mixed
     {
-        if (Cache::has('character-sheet-'.$character->id)) {
-            $cache = Cache::get('character-sheet-'.$character->id);
+        $cache = Cache::get('character-sheet-' . $character->id);
+
+        if (is_null($cache)) {
+            $cache = $this->characterSheetCache($character);
+        } else {
             $cacheLevel = (int) str_replace(',', '', $cache['level']);
 
             if ($cacheLevel != $character->level) {
-
                 $cache = $this->characterSheetCache($character);
             }
-        } else {
-            $cache = $this->characterSheetCache($character);
         }
 
         return $cache[$key];
@@ -77,7 +77,6 @@ class CharacterCacheData
             return Cache::put('character-sheet-'.$character->id, $data);
         }
 
-        // If the cache doesn't exist, create it, set it.
         $this->characterSheetCache($character);
 
         $this->updateCharacterSheetCache($character, $data);
@@ -85,7 +84,7 @@ class CharacterCacheData
 
     public function characterSheetCache(Character $character, bool $ignoreReductions = false): array
     {
-        $this->deleteCharacterSheet($character);
+        Cache::delete('character-defence-' . $character->id);
 
         $characterId = $character->id;
 

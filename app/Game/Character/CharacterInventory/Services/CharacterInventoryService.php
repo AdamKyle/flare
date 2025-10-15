@@ -833,6 +833,7 @@ class CharacterInventoryService
             'shield',
             'artifact',
             'spell',
+            'trinket',
             'armour',
             'alchemy',
             'quest',
