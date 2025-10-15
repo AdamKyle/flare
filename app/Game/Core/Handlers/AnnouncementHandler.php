@@ -70,7 +70,7 @@ class AnnouncementHandler
 
         $endTime = Carbon::parse($event->ends_at)->setTimezone(env('TIME_ZONE'))->format('g A T');
 
-        $message = 'There is a riad (' . $raid->name . ') currently running that ends on: ' . $endTime .
+        $message = 'There is a raid (' . $raid->name . ') currently running that ends on: ' . $endTime .
             '. Corrupted location are at: ' . implode(', ', $locationNames) . ' on the planes: ' . implode(', ', $gameMapNames) .
             '. While the boss (' . $raid->raidBoss->name . ') is at: ' . $locationOfRaidBoss->name . ' At (X/Y): ' . $locationOfRaidBoss->x .
             '/' . $locationOfRaidBoss->y . ' on plane: ' . $locationOfRaidBoss->map->name . '.';

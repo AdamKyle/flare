@@ -9,6 +9,10 @@ export abstract class EquipPositions {
             case "gun":
             case "fan":
             case "mace":
+            case "dagger":
+            case "sword":
+            case "wand":
+            case "censer":
             case "scratch-awl":
                 return ["left-hand", "right-hand"];
             case "ring":
