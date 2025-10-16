@@ -192,7 +192,7 @@ class LocationService
     /**
      * Is there a celestial entity at the characters' location?
      */
-    protected function getCelestialEntityId(Character $character): ?int
+    private function getCelestialEntityId(Character $character): ?int
     {
 
         $fight = CelestialFight::with('monster')->join('monsters', function ($join) use ($character) {
@@ -216,7 +216,7 @@ class LocationService
      *
      * This includes port details and any relevant adventures the location might have.
      */
-    protected function processLocation(Character $character): void
+    private function processLocation(Character $character): void
     {
         $this->location = Location::where('x', $character->x_position)
             ->where('y', $character->y_position)
@@ -231,7 +231,7 @@ class LocationService
      * We determine the action the player can take. That is, can they settle?
      * Can they attack the kingdom or can they manage the kingdom?
      */
-    protected function kingdomManagement(Character $character): void
+    private function kingdomManagement(): void
     {
         if (is_null($this->location)) {
             $this->canSettle = true;

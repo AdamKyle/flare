@@ -23,11 +23,12 @@ use App\Flare\Models\Raid;
 use App\Flare\Traits\Controllers\ItemsShowInformation;
 use App\Flare\Traits\Controllers\MonstersShowInformation;
 use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\LocationEffectValue;
 use App\Flare\Values\LocationType;
 use App\Game\Core\Values\View\ClassBonusInformation;
 use Illuminate\Http\Request;
 use Storage;
+
+use Facades\App\Game\Maps\Calculations\LocationBasedEnemyDropChanceBonus;
 
 class InfoPageController extends Controller
 {
@@ -143,8 +144,8 @@ class InfoPageController extends Controller
         $locationType = null;
 
         if (! is_null($location->enemy_strength_increase)) {
-            $increasesEnemyStrengthBy = LocationEffectValue::getIncreaseName($location->enemy_strength_increase);
-            $increasesDropChanceBy = (new LocationEffectValue($location->enemy_strength_increase))->fetchDropRate();
+            $increasesEnemyStrengthBy = $location->enemy_strength_increase;
+            $increasesDropChanceBy = LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent($increasesEnemyStrengthBy);
         }
 
         $questItemDetails = [];

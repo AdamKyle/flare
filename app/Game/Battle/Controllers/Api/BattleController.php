@@ -89,7 +89,7 @@ class BattleController extends Controller
 
         event(new UpdateCharacterStatus($character));
 
-        $monsters = collect($monsters);
+        $monsters = collect($monsters['data']);
 
         return response()->json($monsters->map(function ($monster) {
             return [

@@ -6,7 +6,6 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Transformers\MonsterTransformer;
-use App\Flare\Values\LocationEffectValue;
 use Illuminate\Database\Eloquent\Collection as DBCollection;
 use Illuminate\Support\Collection as IlluminateCollection;
 use Illuminate\Support\Facades\Cache;
@@ -14,17 +13,13 @@ use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use Psr\SimpleCache\InvalidArgumentException;
 
+use Facades\App\Game\Maps\Calculations\LocationBasedEnemyDropChanceBonus;
+
 class BuildMonsterCacheService
 {
-    private Manager $manager;
 
-    private MonsterTransformer $monster;
-
-    public function __construct(Manager $manager, MonsterTransformer $monster)
-    {
-        $this->manager = $manager;
-        $this->monster = $monster;
-    }
+    public function __construct(private readonly Manager $manager, private MonsterTransformer $monster)
+    {}
 
     /**
      * Builds monster cache.
@@ -198,8 +193,8 @@ class BuildMonsterCacheService
 
             $monsters = $this->transformMonsterForLocation(
                 $monsters,
-                LocationEffectValue::getIncreaseByAmount($location->enemy_strength_increase),
-                LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_increase)
+                $location->enemy_strength_increase,
+                LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent($location->enemy_strength_increase),
             );
 
             $monsterTransformer = $this->monster->setIsMonsterSpecial(true);

@@ -9,3 +9,18 @@
  */
 [x-cloak] { display: none !important; }
 
+/* Hide the bottom bar and spacer when an editable control is focused.
+   Works on modern iOS Safari and Chromium (Android). */
+.mobile-shell:has(:is(input:focus, textarea:focus, [contenteditable="true"]:focus)) .mobile-bottom-nav,
+.mobile-shell:has(:is(input:focus, textarea:focus, [contenteditable="true"]:focus)) .mobile-bottom-nav-spacer {
+  display: none;
+}
+
+/* Progressive enhancement: if the browser supports safe-area env vars,
+   the bottom nav already uses pb: env(safe-area-inset-bottom).
+   No extra rules needed; this block is here only if you prefer explicit guarding. */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .mobile-bottom-nav { /* no-op guard; keep for clarity */ }
+}
+
+

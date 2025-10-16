@@ -18,11 +18,8 @@ const Actions = (props: ActionsProps): ReactNode => {
   const { showMonsterStats } = props;
 
   const { showCharacterCard } = useManageCharacterCardVisibility();
-
   const { showCraftingCard } = useManageCraftingCardVisibility();
-
   const { showMapCard } = useManageMapSectionVisibility();
-
   const { showShopCard } = useManageShopVisibility();
 
   const isShowingSideSection = (): boolean => {
@@ -49,12 +46,14 @@ const Actions = (props: ActionsProps): ReactNode => {
   };
 
   return (
-    <div className="w-full xl:w-3/4 mx-auto mt-[20px]">
+    <div className="w-full xl:max-w-[1280px] 2xl:max-w-[1400px] mx-auto mt-[20px]">
       <Card>
         <div
           className={clsx('grid grid-cols-1 gap-4 p-4 items-start', {
-            'lg:grid-cols-[6rem_1fr]': isNotShowingSideSection(),
-            'lg:grid-cols-[6rem_1fr_1fr]': isShowingSideSection(),
+            'lg:[grid-template-columns:6rem_minmax(0,1fr)]':
+              isNotShowingSideSection(),
+            'lg:[grid-template-columns:6rem_minmax(0,1fr)_clamp(26rem,38vw,40rem)]':
+              isShowingSideSection(),
           })}
         >
           <aside className="flex justify-between lg:flex-col lg:space-y-2 pb-2 lg:pb-0 mx-auto">
