@@ -25,11 +25,8 @@ const MonsterSection = ({
   const { gameData } = useGameData();
 
   const [currentIndex, setCurrentIndex] = useState(0);
-
   const [monsterName, setMonsterName] = useState<string | null>(null);
-
   const [monsterToFight, setMonsterToFight] = useState<number | null>(null);
-
   const [showExplorationConfiguration, setShowExplorationConfiguration] =
     useState(false);
 
@@ -100,6 +97,12 @@ const MonsterSection = ({
 
   const handleSetupExploration = () => {
     setShowExplorationConfiguration(true);
+  };
+
+  const getMonsterImage = () => {
+    const basePath: string = import.meta.env.VITE_BASE_IMAGE_URL;
+
+    return `${basePath}/monster-images/surface-monster-images/goblin.png`;
   };
 
   const renderMonsterFightSection = () => {
@@ -185,13 +188,15 @@ const MonsterSection = ({
   return (
     <>
       <MonsterTopSection
-        img_src="https://placecats.com/250/250"
+        img_src={getMonsterImage()}
         next_action={handleNextIndex}
         prev_action={handlePreviousAction}
         total_monsters={monsters.length - 1}
         current_index={currentIndex}
         view_monster_stats={show_monster_stats}
         monster_name={monsterName}
+        monsters={monsters.map((m, index) => ({ id: index, name: m.name }))}
+        select_action={handleNextIndex}
       />
       {renderMonsterFightSection()}
     </>

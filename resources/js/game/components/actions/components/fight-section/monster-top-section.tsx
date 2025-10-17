@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 
+import MonsterNamePicker from './partials/monster-name-picker';
 import MonsterTopSectionProps from './types/monster-top-section-props';
 
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
@@ -13,6 +14,8 @@ const MonsterTopSection = ({
   view_monster_stats,
   total_monsters,
   current_index,
+  monsters,
+  select_action,
 }: MonsterTopSectionProps): ReactNode => {
   const handleMoveNext = () => {
     let newIndex = current_index + 1;
@@ -38,7 +41,7 @@ const MonsterTopSection = ({
     <>
       <img
         src={img_src}
-        alt="A cute cat"
+        alt=""
         className="
                     mx-auto mt-4 rounded-md drop-shadow-md
                     sm:w-64 md:w-72 lg:w-80
@@ -57,14 +60,25 @@ const MonsterTopSection = ({
           className="text-xl transition-all duration-300 ease-in-out transform hover:scale-105 hover:text-gray-700 dark:hover:text-gray-500"
           aria-label="Previous"
           onClick={handleMovePrevious}
+          type="button"
         >
           <i className="fas fa-chevron-circle-left" aria-hidden="true"></i>
         </button>
-        <span className="font-semibold">{monster_name}</span>
+
+        <div className="min-w-[8rem]">
+          <MonsterNamePicker
+            display_name={monster_name || ''}
+            monsters={monsters}
+            current_index={current_index}
+            on_select={select_action}
+          />
+        </div>
+
         <button
           className="text-xl transition-all duration-300 ease-in-out transform hover:scale-105 hover:text-gray-700 dark:hover:text-gray-500"
           aria-label="Next"
           onClick={handleMoveNext}
+          type="button"
         >
           <i className="fas fa-chevron-circle-right" aria-hidden="true"></i>
         </button>
