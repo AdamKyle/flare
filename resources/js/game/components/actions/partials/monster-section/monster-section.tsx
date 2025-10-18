@@ -1,8 +1,10 @@
 import { isNil } from 'lodash';
 import React, { ReactNode, useEffect, useState } from 'react';
 
+import MonsterImageProgression from './enums/monster-images';
 import MonsterExplorationConfiguration from './monster-exploration-configuration';
 import MonsterSectionProps from './types/monster-section-props';
+import { getImageTierByIndex } from './util/monster-image-tier';
 import AttackButtonsContainer from '../../components/fight-section/attack-buttons-container';
 import { HealthBarType } from '../../components/fight-section/enums/health-bar-type';
 import HealthBar from '../../components/fight-section/health-bar';
@@ -33,7 +35,7 @@ const MonsterSection = ({
   const monsters = gameData?.monsters;
 
   useEffect(() => {
-    if (!monsters) {
+    if (!monsters || monsters.length === 0) {
       return;
     }
 
@@ -41,31 +43,21 @@ const MonsterSection = ({
   }, [monsters]);
 
   const handelMonsterSelection = () => {
-    if (!monsters) {
+    if (!monsters || !monsters[currentIndex]) {
       return;
     }
 
-    if (!monsters[currentIndex]) {
-      return;
-    }
-
-    const monsterToFight = monsters[currentIndex] as MonsterDefinition;
-
-    setMonsterToFight(monsterToFight.id);
+    const selectedMonster = monsters[currentIndex] as MonsterDefinition;
+    setMonsterToFight(selectedMonster.id);
     has_initiate_monster_fight(true);
   };
 
   const handleNextIndex = (index: number) => {
-    if (!monsters) {
-      return;
-    }
-
-    if (!monsters[index]) {
+    if (!monsters || !monsters[index]) {
       return;
     }
 
     const selectedMonster = monsters[index] as MonsterDefinition;
-
     setCurrentIndex(index);
     setMonsterToFight(null);
     setMonsterName(selectedMonster.name);
@@ -73,18 +65,11 @@ const MonsterSection = ({
   };
 
   const handlePreviousAction = (index: number) => {
-    if (!monsters) {
+    if (!monsters || !monsters[index]) {
       return;
     }
-
-    if (!monsters[index]) {
-      return;
-    }
-
-    setCurrentIndex(index);
 
     const selectedMonster = monsters[index] as MonsterDefinition;
-
     setCurrentIndex(index);
     setMonsterToFight(null);
     setMonsterName(selectedMonster.name);
@@ -100,9 +85,17 @@ const MonsterSection = ({
   };
 
   const getMonsterImage = () => {
-    const basePath: string = import.meta.env.VITE_BASE_IMAGE_URL;
+    if (!monsters || monsters.length === 0) {
+      return MonsterImageProgression[0];
+    }
 
-    return `${basePath}/monster-images/surface-monster-images/goblin.png`;
+    const tierIndex = getImageTierByIndex(
+      currentIndex,
+      monsters.length,
+      MonsterImageProgression.length
+    );
+
+    return MonsterImageProgression[tierIndex];
   };
 
   const renderMonsterFightSection = () => {
@@ -112,18 +105,18 @@ const MonsterSection = ({
 
     if (isNil(monsterToFight)) {
       return (
-        <div className={'text-center my-4'}>
+        <div className="text-center my-4">
           <Button
             on_click={handelMonsterSelection}
-            label={'Initiate Fight'}
+            label="Initiate Fight"
             variant={ButtonVariant.PRIMARY}
-            additional_css={'block mx-auto w-48'}
+            additional_css="block mx-auto w-48"
           />
           <Button
             on_click={handleSetupExploration}
-            label={'Setup Exploration'}
+            label="Setup Exploration"
             variant={ButtonVariant.SUCCESS}
-            additional_css={'block mx-auto w-48 mt-4'}
+            additional_css="block mx-auto w-48 mt-4"
           />
         </div>
       );
@@ -195,7 +188,7 @@ const MonsterSection = ({
         current_index={currentIndex}
         view_monster_stats={show_monster_stats}
         monster_name={monsterName}
-        monsters={monsters.map((m, index) => ({ id: index, name: m.name }))}
+        monsters={monsters}
         select_action={handleNextIndex}
       />
       {renderMonsterFightSection()}

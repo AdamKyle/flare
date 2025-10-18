@@ -65,7 +65,7 @@ const MonsterTopSection = ({
           <i className="fas fa-chevron-circle-left" aria-hidden="true"></i>
         </button>
 
-        <div className="min-w-[8rem]">
+        <div className="w-2/3 sm:w-full min-w-[16ch] max-w-[28ch]">
           <MonsterNamePicker
             display_name={monster_name || ''}
             monsters={monsters}

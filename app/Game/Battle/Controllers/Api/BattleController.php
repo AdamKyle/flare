@@ -95,6 +95,7 @@ class BattleController extends Controller
             return [
                 'id' => $monster['id'],
                 'name' => $monster['name'],
+                'max_level' => $monster['max_level'],
             ];
         }));
     }

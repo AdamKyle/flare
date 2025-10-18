@@ -15,4 +15,6 @@ export default interface DropdownProps {
   pre_selected_item?: DropdownItem;
   force_clear?: boolean;
   disabled?: boolean;
+  focus_selected_on_open?: boolean;
+  header_slot?: React.ReactNode;
 }

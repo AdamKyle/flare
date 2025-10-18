@@ -1,9 +1,9 @@
 import clsx from 'clsx';
 import React, {
-  ReactNode,
   useRef,
   useState,
   useEffect,
+  useMemo,
   KeyboardEvent,
   FocusEvent,
   UIEvent,
@@ -11,6 +11,7 @@ import React, {
 } from 'react';
 import { match } from 'ts-pattern';
 
+import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import DropdownProps from 'ui/drop-down/types/drop-down-props';
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 
@@ -27,15 +28,78 @@ const Dropdown = ({
   is_in_modal,
   force_clear,
   disabled,
+  focus_selected_on_open,
 }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string | number>('');
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
 
+  const [searchTerm, setSearchTerm] = useState('');
+
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
+  const prevForceClearRef = useRef<boolean | undefined>(undefined);
 
-  const isDisabled = Boolean(disabled);
+  const displayItems: DropdownItem[] = useMemo(() => {
+    const baseSearchTerm: string = String(searchTerm ?? '');
+    const normalizedSearchTerm: string = baseSearchTerm.trim().toLowerCase();
+
+    if (normalizedSearchTerm === '') {
+      return items;
+    }
+
+    const startsWithMatches = items.filter((item) => {
+      const labelText = String(item.label).toLowerCase();
+      return labelText.startsWith(normalizedSearchTerm);
+    });
+
+    const substringMatches = items.filter((item) => {
+      const labelText = String(item.label).toLowerCase();
+      return (
+        !labelText.startsWith(normalizedSearchTerm) &&
+        labelText.includes(normalizedSearchTerm)
+      );
+    });
+
+    return [...startsWithMatches, ...substringMatches];
+  }, [items, searchTerm]);
+
+  useEffect(() => {
+    if (isOpen && focusedIndex !== null && listRef.current) {
+      const element = listRef.current.children[focusedIndex] as HTMLElement;
+
+      element?.scrollIntoView({ block: 'nearest' });
+    }
+
+    if (pre_selected_item && selectedValue !== pre_selected_item.value) {
+      setSelectedValue(pre_selected_item.value);
+    }
+
+    if (focusedIndex !== null && focusedIndex > displayItems.length - 1) {
+      setFocusedIndex(displayItems.length > 0 ? displayItems.length - 1 : null);
+    }
+
+    const wasForceClear = prevForceClearRef.current === true;
+    const isForceClear = Boolean(force_clear);
+
+    if (!wasForceClear && isForceClear) {
+      setSelectedValue('');
+
+      if (on_clear) {
+        on_clear();
+      }
+    }
+
+    prevForceClearRef.current = isForceClear;
+  }, [
+    isOpen,
+    focusedIndex,
+    pre_selected_item,
+    selectedValue,
+    force_clear,
+    on_clear,
+    displayItems.length,
+  ]);
 
   const handleBlur = (event: FocusEvent<HTMLDivElement>) => {
     if (!all_click_outside) {
@@ -45,11 +109,12 @@ const Dropdown = ({
     if (!event.currentTarget.contains(event.relatedTarget)) {
       setIsOpen(false);
       setFocusedIndex(null);
+      setSearchTerm('');
     }
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (isDisabled) {
+    if (disabled) {
       return;
     }
 
@@ -61,63 +126,30 @@ const Dropdown = ({
       .with('ArrowDown', () => {
         event.preventDefault();
         setFocusedIndex((prev) =>
-          prev === null || prev === items.length - 1 ? 0 : prev + 1
+          prev === null || prev === displayItems.length - 1 ? 0 : prev + 1
         );
       })
       .with('ArrowUp', () => {
         event.preventDefault();
         setFocusedIndex((prev) =>
-          prev === null || prev === 0 ? items.length - 1 : prev - 1
+          prev === null || prev === 0 ? displayItems.length - 1 : prev - 1
         );
       })
       .with('Enter', ' ', () => {
         event.preventDefault();
         if (focusedIndex !== null) {
-          const item = items[focusedIndex];
-          setSelectedValue(item.value);
-          on_select(item);
-          setIsOpen(false);
-          setFocusedIndex(null);
+          const item = displayItems[focusedIndex];
+          handleSelectItem(item);
         }
       })
       .with('Escape', () => {
         event.preventDefault();
         setIsOpen(false);
         setFocusedIndex(null);
+        setSearchTerm('');
       })
       .otherwise(() => {});
   };
-
-  useEffect(() => {
-    if (isOpen && focusedIndex !== null && listRef.current) {
-      const element = listRef.current.children[focusedIndex] as HTMLElement;
-      element?.scrollIntoView({ block: 'nearest' });
-    }
-  }, [focusedIndex, isOpen]);
-
-  useEffect(() => {
-    if (!pre_selected_item) {
-      return;
-    }
-
-    setSelectedValue(pre_selected_item.value);
-  }, [pre_selected_item]);
-
-  useEffect(
-    () => {
-      if (!force_clear) {
-        return;
-      }
-
-      setSelectedValue('');
-
-      if (on_clear) {
-        on_clear();
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [force_clear]
-  );
 
   const onScroll = (event: UIEvent<HTMLDivElement>) => {
     if (handle_scroll) {
@@ -125,12 +157,12 @@ const Dropdown = ({
     }
   };
 
-  const handleClearSelection = (e: MouseEvent<HTMLElement>) => {
-    if (isDisabled) {
+  const handleClearSelection = (mouseEvent: MouseEvent<HTMLElement>) => {
+    if (disabled) {
       return;
     }
 
-    e.stopPropagation();
+    mouseEvent.stopPropagation();
     setSelectedValue('');
     setIsOpen(false);
 
@@ -139,8 +171,47 @@ const Dropdown = ({
     }
   };
 
-  const renderIcon = (): ReactNode => {
-    if (isDisabled) {
+  const handleTriggerClick = () => {
+    if (disabled) {
+      return;
+    }
+
+    setIsOpen((previousOpen) => {
+      const nextOpen = !previousOpen;
+
+      if (
+        nextOpen &&
+        focus_selected_on_open &&
+        (selectedValue !== '' || pre_selected_item)
+      ) {
+        const valueToFind =
+          selectedValue !== '' ? selectedValue : pre_selected_item?.value;
+
+        const indexToFocus = displayItems.findIndex(
+          (it) => it.value === valueToFind
+        );
+
+        setFocusedIndex(indexToFocus >= 0 ? indexToFocus : 0);
+      }
+
+      if (!nextOpen) {
+        setSearchTerm('');
+      }
+
+      return nextOpen;
+    });
+  };
+
+  const handleSelectItem = (item: DropdownItem) => {
+    setSelectedValue(item.value);
+    on_select(item);
+    setIsOpen(false);
+    setFocusedIndex(null);
+    setSearchTerm(''); // NEW: reset on select
+  };
+
+  const renderIcon = () => {
+    if (disabled) {
       return (
         <i className="fas fa-chevron-down text-gray-400 dark:text-gray-500" />
       );
@@ -156,20 +227,15 @@ const Dropdown = ({
     );
   };
 
-  const renderItems = (): ReactNode =>
-    items.map((item, index) => (
+  const renderItems = () =>
+    displayItems.map((item, index) => (
       <li
         key={item.value + '-' + index}
         id={`dropdown-item-${index}`}
         role="option"
         aria-selected={selectedValue === item.value}
         tabIndex={-1}
-        onClick={() => {
-          setSelectedValue(item.value);
-          on_select(item);
-          setIsOpen(false);
-          setFocusedIndex(null);
-        }}
+        onClick={() => handleSelectItem(item)}
         className={clsx(
           'mx-1 my-1 px-4 py-4 cursor-pointer rounded-lg transition-colors duration-100',
           focusedIndex === index
@@ -181,7 +247,7 @@ const Dropdown = ({
       </li>
     ));
 
-  const renderSelectionText = (): ReactNode => {
+  const renderSelectionText = () => {
     if (selectedValue) {
       const found = items.find((it) => it.value === selectedValue);
 
@@ -193,7 +259,7 @@ const Dropdown = ({
     return (
       <div
         className={clsx(
-          isDisabled ? 'text-gray-400 dark:text-gray-500' : 'text-gray-400'
+          disabled ? 'text-gray-400 dark:text-gray-500' : 'text-gray-400'
         )}
       >
         {selection_placeholder || 'Select an option'}
@@ -201,8 +267,8 @@ const Dropdown = ({
     );
   };
 
-  const renderDropdownList = (): ReactNode => {
-    if (isDisabled || !isOpen) {
+  const renderDropdownList = () => {
+    if (disabled || !isOpen) {
       return null;
     }
 
@@ -218,7 +284,8 @@ const Dropdown = ({
           'w-full text-black dark:text-white',
           !use_pagination && 'max-h-60 overflow-auto',
           !use_pagination &&
-            'border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 rounded-md scrollbar-thin scrollbar-thumb-primary-300 scrollbar-track-primary-100 dark:scrollbar-thumb-primary-400 dark:scrollbar-track-primary-200 scrollbar-thumb-rounded-md'
+            // neutral gray scrollbar to match borders
+            'scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 scrollbar-thumb-rounded-md'
         )}
       >
         {renderItems()}
@@ -226,21 +293,31 @@ const Dropdown = ({
     );
 
     const wrapperClasses = clsx(
-      'absolute w-full mt-1',
-      is_in_modal ? 'z-[9999]' : 'z-50',
-      use_pagination &&
-        'border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 rounded-md'
+      // doubled gap from trigger: mt-1 -> mt-2
+      'absolute w-full mt-2 border border-gray-500 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md',
+      is_in_modal ? 'z-[9999]' : 'z-50'
     );
 
     if (use_pagination) {
       return (
         <div className={wrapperClasses}>
+          <div className="p-2">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search..."
+              aria-label="Search"
+              className="w-full rounded-sm bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border-0"
+            />
+          </div>
           <InfiniteScroll
             handle_scroll={onScroll}
             additional_css={clsx(
               'max-h-60',
               additional_scroll_css,
-              'scrollbar-thin scrollbar-thumb-primary-300 scrollbar-track-primary-100 dark:scrollbar-thumb-primary-400 dark:scrollbar-track-primary-200 scrollbar-thumb-rounded-md'
+              // same scrollbar styling here for consistency
+              'scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 scrollbar-thumb-rounded-md'
             )}
           >
             {listMarkup}
@@ -249,28 +326,42 @@ const Dropdown = ({
       );
     }
 
-    return <div className={wrapperClasses}>{listMarkup}</div>;
+    return (
+      <div className={wrapperClasses}>
+        <div className="p-2">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search..."
+            aria-label="Search"
+            className="w-full rounded-md my-2 bg-transparent border-1 border-gray-500 dark:border-gray-600 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        {listMarkup}
+      </div>
+    );
   };
 
   return (
     <div
       ref={containerRef}
       onBlur={handleBlur}
-      tabIndex={isDisabled ? -1 : 0}
-      onKeyDown={isDisabled ? undefined : handleKeyDown}
+      tabIndex={disabled ? -1 : 0}
+      onKeyDown={disabled ? undefined : handleKeyDown}
       className={clsx('relative w-full', is_in_modal && 'overflow-visible')}
     >
       <div
-        tabIndex={isDisabled ? -1 : 0}
+        tabIndex={disabled ? -1 : 0}
         role="button"
         aria-haspopup="listbox"
-        aria-disabled={isDisabled || undefined}
-        aria-expanded={isDisabled ? false : isOpen}
-        aria-controls={isDisabled ? undefined : 'dropdown-listbox'}
-        onClick={isDisabled ? undefined : () => setIsOpen((prev) => !prev)}
+        aria-disabled={disabled || undefined}
+        aria-expanded={disabled ? false : isOpen}
+        aria-controls={disabled ? undefined : 'dropdown-listbox'}
+        onClick={disabled ? undefined : handleTriggerClick}
         className={clsx(
           'w-full p-2 pr-10 pl-3 rounded-md border flex items-center relative',
-          isDisabled
+          disabled
             ? 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-80'
             : 'bg-white dark:bg-gray-800 border-gray-500 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500'
         )}
