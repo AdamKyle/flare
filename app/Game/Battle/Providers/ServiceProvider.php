@@ -86,7 +86,7 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(MonsterListService::class, function() {
+        $this->app->bind(MonsterListService::class, function () {
             return new MonsterListService;
         });
 

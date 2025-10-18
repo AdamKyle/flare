@@ -32,8 +32,8 @@ class MonsterFightService
 
     public function setupMonster(Character $character, array $params): array
     {
-        Cache::delete('monster-fight-' . $character->id);
-        Cache::delete('character-sheet-' . $character->id);
+        Cache::delete('monster-fight-'.$character->id);
+        Cache::delete('character-sheet-'.$character->id);
 
         $data = $this->monsterPlayerFight->setUpFight($character, $params);
 
@@ -72,7 +72,7 @@ class MonsterFightService
             return $this->errorResult('The monster seems to have fled. Click attack again to start a new battle. You have 15 minutes from clicking attack to attack the creature.');
         }
 
-        if (!isset($cache['monster']) || !is_array($cache['monster']) || !isset($cache['monster']['id'])) {
+        if (! isset($cache['monster']) || ! is_array($cache['monster']) || ! isset($cache['monster']['id'])) {
             return $this->errorResult('The monster seems to have fled. Click attack again to start a new battle. You have 15 minutes from clicking attack to attack the creature.');
         }
 

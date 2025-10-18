@@ -25,10 +25,9 @@ use App\Flare\Traits\Controllers\MonstersShowInformation;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\LocationType;
 use App\Game\Core\Values\View\ClassBonusInformation;
+use Facades\App\Game\Maps\Calculations\LocationBasedEnemyDropChanceBonus;
 use Illuminate\Http\Request;
 use Storage;
-
-use Facades\App\Game\Maps\Calculations\LocationBasedEnemyDropChanceBonus;
 
 class InfoPageController extends Controller
 {

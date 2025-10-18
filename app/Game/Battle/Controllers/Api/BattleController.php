@@ -3,19 +3,14 @@
 namespace App\Game\Battle\Controllers\Api;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
-use App\Flare\Services\BuildMonsterCacheService;
-use App\Flare\Values\ItemEffectsValue;
 use App\Game\Battle\Events\AttackTimeOutEvent;
-use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Request\AttackTypeRequest;
 use App\Game\Battle\Services\MonsterFightService;
 use App\Game\Battle\Services\MonsterListService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cache;
 
 class BattleController extends Controller
 {
@@ -46,7 +41,8 @@ class BattleController extends Controller
         return response()->json($response, $status);
     }
 
-    public function getMonsterStats(Monster $monster): JsonResponse {
+    public function getMonsterStats(Monster $monster): JsonResponse
+    {
         return response()->json([]);
     }
 

@@ -3,10 +3,10 @@
 namespace Tests\Unit\Game\Battle\Services;
 
 use App\Flare\Models\Location;
+use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MapNameValue;
 use App\Game\Battle\Services\MonsterListService;
-use App\Flare\Services\BuildMonsterCacheService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -23,7 +23,7 @@ class MonsterListServiceTest extends TestCase
 
     private ?CharacterFactory $characterFactory;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -32,7 +32,7 @@ class MonsterListServiceTest extends TestCase
         $this->characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -98,7 +98,7 @@ class MonsterListServiceTest extends TestCase
                     ['id' => 1, 'name' => 'Map Base', 'max_level' => 10],
                 ],
                 'regular' => ['data' => [['id' => 21, 'name' => 'Map Regular', 'max_level' => 15]]],
-                'easier'  => ['data' => [['id' => 11, 'name' => 'Map Easier', 'max_level' => 8]]],
+                'easier' => ['data' => [['id' => 11, 'name' => 'Map Easier', 'max_level' => 8]]],
             ],
             'Volcano' => [
                 'data' => [
@@ -144,7 +144,7 @@ class MonsterListServiceTest extends TestCase
             $mapName => [
                 'data' => [['id' => 1, 'name' => 'Ice Base', 'max_level' => 10]],
                 'regular' => ['data' => [['id' => 21, 'name' => 'Ice Regular', 'max_level' => 15]]],
-                'easier'  => ['data' => [['id' => 11, 'name' => 'Ice Easier', 'max_level' => 8]]],
+                'easier' => ['data' => [['id' => 11, 'name' => 'Ice Easier', 'max_level' => 8]]],
             ],
             'Frost Rift' => [
                 'data' => [['id' => 31, 'name' => 'Frost Rift Brute', 'max_level' => 20]],
@@ -188,7 +188,7 @@ class MonsterListServiceTest extends TestCase
             $mapName => [
                 'data' => [['id' => 1, 'name' => 'Ice Base', 'max_level' => 10]],
                 'regular' => ['data' => [['id' => 21, 'name' => 'Ice Regular', 'max_level' => 15]]],
-                'easier'  => ['data' => [['id' => 11, 'name' => 'Ice Easier', 'max_level' => 8]]],
+                'easier' => ['data' => [['id' => 11, 'name' => 'Ice Easier', 'max_level' => 8]]],
             ],
             'Chilled Hollow' => [
                 'data' => [['id' => 31, 'name' => 'Chilled Wraith', 'max_level' => 22]],
@@ -232,7 +232,7 @@ class MonsterListServiceTest extends TestCase
             $mapName => [
                 'data' => [['id' => 1, 'name' => 'Ice Base', 'max_level' => 10]],
                 'regular' => ['data' => [['id' => 21, 'name' => 'Ice Regular', 'max_level' => 15]]],
-                'easier'  => ['data' => [['id' => 11, 'name' => 'Ice Easier', 'max_level' => 8]]],
+                'easier' => ['data' => [['id' => 11, 'name' => 'Ice Easier', 'max_level' => 8]]],
             ],
         ]);
 
@@ -263,7 +263,7 @@ class MonsterListServiceTest extends TestCase
             $mapName => [
                 'data' => [['id' => 1, 'name' => 'Ice Base', 'max_level' => 10]],
                 'regular' => ['data' => [['id' => 21, 'name' => 'Ice Regular', 'max_level' => 15]]],
-                'easier'  => ['data' => [['id' => 11, 'name' => 'Ice Easier', 'max_level' => 8]]],
+                'easier' => ['data' => [['id' => 11, 'name' => 'Ice Easier', 'max_level' => 8]]],
             ],
         ]);
 
@@ -294,7 +294,7 @@ class MonsterListServiceTest extends TestCase
             $mapName => [
                 'data' => [['id' => 1, 'name' => 'DM Base', 'max_level' => 10]],
                 'regular' => ['data' => [['id' => 21, 'name' => 'DM Regular', 'max_level' => 15]]],
-                'easier'  => ['data' => [['id' => 11, 'name' => 'DM Easier', 'max_level' => 8]]],
+                'easier' => ['data' => [['id' => 11, 'name' => 'DM Easier', 'max_level' => 8]]],
             ],
         ]);
 
@@ -325,7 +325,7 @@ class MonsterListServiceTest extends TestCase
             $mapName => [
                 'data' => [['id' => 1, 'name' => 'DM Base', 'max_level' => 10]],
                 'regular' => ['data' => [['id' => 21, 'name' => 'DM Regular', 'max_level' => 15]]],
-                'easier'  => ['data' => [['id' => 11, 'name' => 'DM Easier', 'max_level' => 8]]],
+                'easier' => ['data' => [['id' => 11, 'name' => 'DM Easier', 'max_level' => 8]]],
             ],
         ]);
 
@@ -350,7 +350,7 @@ class MonsterListServiceTest extends TestCase
             $mapName => [
                 'data' => [['id' => 1, 'name' => 'Map Base', 'max_level' => 10]],
                 'regular' => ['data' => [['id' => 21, 'name' => 'Map Regular', 'max_level' => 15]]],
-                'easier'  => ['data' => [['id' => 11, 'name' => 'Map Easier', 'max_level' => 8]]],
+                'easier' => ['data' => [['id' => 11, 'name' => 'Map Easier', 'max_level' => 8]]],
             ],
         ]);
 
@@ -395,7 +395,8 @@ class MonsterListServiceTest extends TestCase
             ['item' => ['effect' => ItemEffectsValue::PURGATORY]],
         ]);
 
-        $inventory = new class($slots) {
+        $inventory = new class($slots)
+        {
             public Collection $slots;
 
             public function __construct(Collection $slots)

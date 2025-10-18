@@ -38,7 +38,7 @@ class CharacterCacheData
 
     public function getCachedCharacterData(Character $character, string $key): mixed
     {
-        $cache = Cache::get('character-sheet-' . $character->id);
+        $cache = Cache::get('character-sheet-'.$character->id);
 
         if (is_null($cache)) {
             $cache = $this->characterSheetCache($character);
@@ -84,7 +84,7 @@ class CharacterCacheData
 
     public function characterSheetCache(Character $character, bool $ignoreReductions = false): array
     {
-        Cache::delete('character-defence-' . $character->id);
+        Cache::delete('character-defence-'.$character->id);
 
         $characterId = $character->id;
 

@@ -13,7 +13,7 @@ use Psr\SimpleCache\InvalidArgumentException;
 /**
  * Get monsters for the character's current position and map context.
  *
- * @param Character $character
+ * @param  Character  $character
  * @return array
  */
 class MonsterListService
@@ -21,8 +21,6 @@ class MonsterListService
     use ResponseBuilder;
 
     /**
-     * @param Character $character
-     * @return array
      * @throws InvalidArgumentException
      */
     public function getMonstersForCharacter(Character $character): array
@@ -37,29 +35,23 @@ class MonsterListService
             $characterMap->game_map_id
         );
 
-
         $locationWithType = $this->findLocationWithType(
             $characterMap->character_position_x,
             $characterMap->character_position_y,
             $characterMap->game_map_id
         );
 
-
         $isTheIcePlane = $character->map->gameMap->mapType()->isTheIcePlane();
-
 
         $isDelusionalMemories = $character->map->gameMap->mapType()->isDelusionalMemories();
 
-
         $hasPurgatoryAccess = $this->characterHasPurgatoryAccess($character);
-
 
         $monstersCache = Cache::get('monsters');
 
         $monstersKey = $character->map->gameMap->name;
 
         $monsters = $this->baseMonsters($monstersCache, $monstersKey);
-
 
         $monsters = $this->applyLocationEffectOverrides(
             $monstersCache,
@@ -70,7 +62,6 @@ class MonsterListService
             $monstersKey
         );
 
-
         $monsters = $this->applyMapTierOverrides(
             $monstersCache,
             $monsters,
@@ -79,7 +70,6 @@ class MonsterListService
             $hasPurgatoryAccess,
             $monstersKey
         );
-
 
         $monsters = $this->applySpecialLocationOverride(
             $monsters,
@@ -92,7 +82,6 @@ class MonsterListService
     }
 
     /**
-     * @return void
      * @throws InvalidArgumentException
      */
     private function ensureMonsterCache(): void
@@ -102,12 +91,6 @@ class MonsterListService
         }
     }
 
-    /**
-     * @param int $x
-     * @param int $y
-     * @param int $gameMapId
-     * @return Location|null
-     */
     private function findLocationWithEffect(int $x, int $y, int $gameMapId): ?Location
     {
         return Location::whereNotNull('enemy_strength_increase')
@@ -117,12 +100,6 @@ class MonsterListService
             ->first();
     }
 
-    /**
-     * @param int $x
-     * @param int $y
-     * @param int $gameMapId
-     * @return Location|null
-     */
     private function findLocationWithType(int $x, int $y, int $gameMapId): ?Location
     {
         return Location::whereNotNull('type')
@@ -132,25 +109,11 @@ class MonsterListService
             ->first();
     }
 
-    /**
-     * @param array $monstersCache
-     * @param string $monstersKey
-     * @return array
-     */
     private function baseMonsters(array $monstersCache, string $monstersKey): array
     {
         return $monstersCache[$monstersKey] ?? ['data' => []];
     }
 
-    /**
-     * @param array $monstersCache
-     * @param array $current
-     * @param Location|null $locationWithEffect
-     * @param bool $isTheIcePlane
-     * @param bool $hasPurgatoryAccess
-     * @param string $monstersKey
-     * @return array
-     */
     private function applyLocationEffectOverrides(
         array $monstersCache,
         array $current,
@@ -173,15 +136,6 @@ class MonsterListService
         return $current;
     }
 
-    /**
-     * @param array $monstersCache
-     * @param array $current
-     * @param bool $isTheIcePlane
-     * @param bool $isDelusionalMemories
-     * @param bool $hasPurgatoryAccess
-     * @param string $monstersKey
-     * @return array
-     */
     private function applyMapTierOverrides(
         array $monstersCache,
         array $current,
@@ -196,7 +150,6 @@ class MonsterListService
             $current = $monstersCache[$monstersKey]['easier'] ?? $current;
         }
 
-
         if ($isDelusionalMemories && $hasPurgatoryAccess) {
             $current = $monstersCache[$monstersKey]['regular'] ?? $current;
         } elseif ($isDelusionalMemories && ! $hasPurgatoryAccess) {
@@ -206,11 +159,6 @@ class MonsterListService
         return $current;
     }
 
-    /**
-     * @param array $current
-     * @param Location|null $locationWithType
-     * @return array
-     */
     private function applySpecialLocationOverride(
         array $current,
         ?Location $locationWithType
@@ -218,18 +166,14 @@ class MonsterListService
         if (! is_null($locationWithType)) {
             $monstersForLocation = Cache::get('special-location-monsters');
 
-            if (isset($monstersForLocation['location-type-' . $locationWithType->type])) {
-                $current = $monstersForLocation['location-type-' . $locationWithType->type];
+            if (isset($monstersForLocation['location-type-'.$locationWithType->type])) {
+                $current = $monstersForLocation['location-type-'.$locationWithType->type];
             }
         }
 
         return $current;
     }
 
-    /**
-     * @param array $monsters
-     * @return array
-     */
     private function buildPayload(array $monsters): array
     {
         return collect($monsters['data'] ?? [])->map(function ($monster) {
@@ -241,10 +185,6 @@ class MonsterListService
         })->values()->toArray();
     }
 
-    /**
-     * @param Character $character
-     * @return bool
-     */
     private function characterHasPurgatoryAccess(Character $character): bool
     {
         $slots = optional($character->inventory)->slots;

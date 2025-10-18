@@ -7,9 +7,6 @@ class LocationBasedEnemyDropChanceBonus
     /**
      * Calculate a bounded bonus drop-chance percentage from a location's enemy strength increase.
      * The curve begins at 5.00 when the strength increase is 0.00 and smoothly approaches 15.00 as the value grows.
-     *
-     * @param float $enemyStrengthIncrease
-     * @return float
      */
     public function calculateDropChanceBonusPercent(float $enemyStrengthIncrease): float
     {
