@@ -12,6 +12,7 @@ use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Request\AttackTypeRequest;
 use App\Game\Battle\Services\MonsterFightService;
+use App\Game\Battle\Services\MonsterListService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -22,82 +23,31 @@ class BattleController extends Controller
 
     private BattleEventHandler $battleEventHandler;
 
-    public function __construct(MonsterFightService $monsterFightService, BattleEventHandler $battleEventHandler)
+    private MonsterListService $monsterListService;
+
+    public function __construct(MonsterFightService $monsterFightService, BattleEventHandler $battleEventHandler, MonsterListService $monsterListService)
     {
         $this->middleware('is.character.dead')->except(['revive', 'index']);
 
         $this->monsterFightService = $monsterFightService;
 
         $this->battleEventHandler = $battleEventHandler;
+
+        $this->monsterListService = $monsterListService;
     }
 
     public function index(Character $character): JsonResponse
     {
-        $characterMap = $character->map;
+        $response = $this->monsterListService->getMonstersForCharacter($character);
 
-        $locationWithEffect = Location::whereNotNull('enemy_strength_increase')
-            ->where('x', $characterMap->character_position_x)
-            ->where('y', $characterMap->character_position_y)
-            ->where('game_map_id', $characterMap->game_map_id)
-            ->first();
+        $status = $response['status'];
+        unset($response['status']);
 
-        $locationWithType = Location::whereNotNull('type')
-            ->where('x', $characterMap->character_position_x)
-            ->where('y', $characterMap->character_position_y)
-            ->where('game_map_id', $characterMap->game_map_id)
-            ->first();
+        return response()->json($response, $status);
+    }
 
-        if (! Cache::has('monsters')) {
-            resolve(BuildMonsterCacheService::class)->buildCache();
-        }
-
-        $isTheIcePlane = $character->map->gameMap->mapType()->isTheIcePlane();
-        $isDelusionalMemories = $character->map->gameMap->mapType()->isDelusionalMemories();
-        $hasPurgatoryAccess = $character->inventory->slots->where('item.effect', ItemEffectsValue::PURGATORY)->count() > 0;
-        $monsters = Cache::get('monsters')[$character->map->gameMap->name];
-
-        if (! is_null($locationWithEffect) && ! $isTheIcePlane) {
-            $monsters = Cache::get('monsters')[$locationWithEffect->name];
-        } elseif (! is_null($locationWithEffect) && $isTheIcePlane) {
-
-            if ($hasPurgatoryAccess) {
-                $monsters = Cache::get('monsters')[$locationWithEffect->name];
-            } else {
-                $monsters = Cache::get('monsters')[$character->map->gameMap->name]['easier'];
-            }
-        }
-
-        if ($isTheIcePlane && $hasPurgatoryAccess) {
-            $monsters = Cache::get('monsters')[$character->map->gameMap->name]['regular'];
-        } elseif ($isTheIcePlane && ! $hasPurgatoryAccess) {
-            $monsters = Cache::get('monsters')[$character->map->gameMap->name]['easier'];
-        }
-
-        if ($isDelusionalMemories && $hasPurgatoryAccess) {
-            $monsters = Cache::get('monsters')[$character->map->gameMap->name]['regular'];
-        } elseif ($isDelusionalMemories && ! $hasPurgatoryAccess) {
-            $monsters = Cache::get('monsters')[$character->map->gameMap->name]['easier'];
-        }
-
-        if (! is_null($locationWithType)) {
-            $monstersForLocation = Cache::get('special-location-monsters');
-
-            if (isset($monstersForLocation['location-type-'.$locationWithType->type])) {
-                $monsters = $monstersForLocation['location-type-'.$locationWithType->type];
-            }
-        }
-
-        event(new UpdateCharacterStatus($character));
-
-        $monsters = collect($monsters['data']);
-
-        return response()->json($monsters->map(function ($monster) {
-            return [
-                'id' => $monster['id'],
-                'name' => $monster['name'],
-                'max_level' => $monster['max_level'],
-            ];
-        }));
+    public function getMonsterStats(Monster $monster): JsonResponse {
+        return response()->json([]);
     }
 
     public function setupMonster(AttackTypeRequest $attackTypeRequest, Character $character, Monster $monster): JsonResponse

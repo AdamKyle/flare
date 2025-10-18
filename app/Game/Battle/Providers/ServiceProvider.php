@@ -12,6 +12,7 @@ use App\Game\Battle\Services\BattleDrop;
 use App\Game\Battle\Services\CelestialFightService;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Battle\Services\FactionLoyaltyFightService;
+use App\Game\Battle\Services\MonsterListService;
 use App\Game\Battle\Services\RaidBattleService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
@@ -83,6 +84,10 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(BattleEventHandler::class),
                 $app->make(FactionLoyaltyService::class)
             );
+        });
+
+        $this->app->bind(MonsterListService::class, function() {
+            return new MonsterListService;
         });
 
         $this->commands([
