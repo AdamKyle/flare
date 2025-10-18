@@ -134,9 +134,6 @@ class MonsterTransformer extends TransformerAbstract
      */
     public function shouldIncreaseStats(Monster $monster): bool
     {
-
-        $increase = false;
-
         switch ($monster->gameMap->name) {
             case 'Shadow Plane':
             case 'Hell':

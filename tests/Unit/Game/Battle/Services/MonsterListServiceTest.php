@@ -6,7 +6,7 @@ use App\Flare\Models\Location;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MapNameValue;
 use App\Game\Battle\Services\MonsterListService;
-use App\Game\Monsters\Services\BuildMonsterCacheService;
+use App\Flare\Services\BuildMonsterCacheService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -23,7 +23,7 @@ class MonsterListServiceTest extends TestCase
 
     private ?CharacterFactory $characterFactory;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -32,7 +32,7 @@ class MonsterListServiceTest extends TestCase
         $this->characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         parent::tearDown();
 
@@ -418,7 +418,6 @@ class MonsterListServiceTest extends TestCase
         $arr = array_key_exists('data', $response) && is_array($response['data'])
             ? $response['data']
             : $response;
-
 
         $numericOnly = array_filter($arr, function ($key) {
             return is_int($key);
