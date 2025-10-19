@@ -107,7 +107,17 @@ class BuildMonsterCacheService
 
         foreach ($locations as $location) {
 
-            $this->monster = $this->monster->setIsMonsterSpecial(true);
+            $locationFlat = is_null($location->enemy_strength_increase) ? 0.0 : $location->enemy_strength_increase;
+            $locationPercent = is_null($location->enemy_strength_increase) ? 0.0 : LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent($location->enemy_strength_increase) / 100.0;
+
+            $mapDropBonus = $location->map ? ($location->map->drop_chance_bonus ?? 0.0) : 0.0;
+            $extraDropChance = $mapDropBonus + $locationPercent;
+
+            $transformer = (clone $this->monster)
+                ->setIsMonsterSpecial(true)
+                ->withLocationFlat($locationFlat)
+                ->withLocationPercent($locationPercent)
+                ->withExtraDropChance($extraDropChance);
 
             $monsters = new Collection(
                 Monster::where('is_celestial_entity', false)
@@ -115,7 +125,7 @@ class BuildMonsterCacheService
                     ->where('is_raid_boss', false)
                     ->where('only_for_location_type', $location->type)
                     ->get(),
-                $this->monster
+                $transformer
             );
 
             $monsters = $this->manager->createData($monsters)->toArray();
@@ -156,9 +166,12 @@ class BuildMonsterCacheService
         Cache::put('celestials', $monstersCache);
     }
 
+    /**
+     * @param \League\Fractal\Resource\Collection $monsters
+     * @return array
+     */
     protected function createMonstersForEventMaps(Collection $monsters): array
     {
-
         $surface = GameMap::where('default', true)->first();
 
         $easierMonsters = new Collection(
@@ -178,6 +191,9 @@ class BuildMonsterCacheService
 
     /**
      * Get monsters for special locations.
+     *
+     * @param array $monstersCache
+     * @return array
      */
     protected function manageMonsters(array $monstersCache): array
     {
@@ -206,6 +222,11 @@ class BuildMonsterCacheService
 
     /**
      * Transform monsters for special location.
+     *
+     * @param \Illuminate\Database\Eloquent\Collection $monsters
+     * @param int $increaseStatsBy
+     * @param float $increasePercentageBy
+     * @return \Illuminate\Support\Collection
      */
     protected function transformMonsterForLocation(DBCollection $monsters, int $increaseStatsBy, float $increasePercentageBy): IlluminateCollection
     {
@@ -235,6 +256,11 @@ class BuildMonsterCacheService
         });
     }
 
+    /**
+     * @param Monster $monster
+     * @param int $increaseStatsBy
+     * @return string
+     */
     protected function createNewHealthRange(Monster $monster, int $increaseStatsBy): string
     {
         $monsterHealthRangeParts = explode('-', $monster->health_range);
@@ -245,6 +271,11 @@ class BuildMonsterCacheService
         return $minHealth.'-'.$maxHealth;
     }
 
+    /**
+     * @param Monster $monster
+     * @param int $increaseStatsBy
+     * @return string
+     */
     protected function createNewAttackRange(Monster $monster, int $increaseStatsBy): string
     {
         $monsterAttackParts = explode('-', $monster->attack_range);
