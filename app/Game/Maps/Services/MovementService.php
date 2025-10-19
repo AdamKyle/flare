@@ -7,7 +7,6 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
-use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Battle\Events\UpdateCharacterStatus;
@@ -19,6 +18,7 @@ use App\Game\Maps\Services\Common\LiveCharacterCount;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
+use App\Game\Monsters\Services\BuildMonsterCacheService;
 use Illuminate\Database\Eloquent\Collection;
 use League\Fractal\Manager;
 

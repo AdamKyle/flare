@@ -5,9 +5,7 @@ namespace App\Game\Maps\Providers;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Items\Transformers\QuestItemTransformer;
 use App\Flare\Pagination\Pagination;
-use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Flare\Transformers\MonsterTransformer;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
@@ -26,6 +24,8 @@ use App\Game\Maps\Services\UpdateRaidMonsters;
 use App\Game\Maps\Services\WalkingService;
 use App\Game\Maps\Transformers\LocationsTransformer;
 use App\Game\Maps\Values\MapTileValue;
+use App\Game\Monsters\Services\BuildMonsterCacheService;
+use App\Game\Monsters\Transformers\MonsterTransformer;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 

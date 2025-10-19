@@ -76,11 +76,9 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapAdminRoutes();
         $this->mapQuestRoutes();
         $this->mapGuideQuestsRoutes();
-        $this->mapKingdomRoutes();
         $this->mapGameMarketRoutes();
         $this->mapCharacterPassiveSkillsRoutes();
         $this->mapGameCoreRoutes();
-        $this->mapShopRoutes();
         $this->mapGamblingRoutes();
         $this->mapEvents();
 
@@ -104,6 +102,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapGameCoreApiRoutes();
         $this->mapGameMarketApiRoutes();
         $this->mapGameMessageApiRoutes();
+        $this->mapMonstersApiRoutes();
         $this->mapGameBattleApiRoutes();
         $this->mapGameMapApiRoutes();
         $this->mapGameSkillsApiRoutes();
@@ -154,6 +153,14 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware(['api', 'update.player-activity'])
             ->namespace($this->namespace)
             ->group(base_path('routes/api.php'));
+    }
+
+    protected function mapMonstersApiRoutes()
+    {
+        Route::prefix('api')
+            ->middleware(['web', 'update.player-activity'])
+            ->namespace('App\Game\Monsters\Controllers')
+            ->group(base_path('routes/game/monsters/api.php'));
     }
 
     protected function mapCharacterSheetRoutes()
@@ -226,13 +233,6 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/web.php'));
     }
 
-    protected function mapKingdomRoutes()
-    {
-        Route::middleware('web')
-            ->namespace('App\Game\Kingdoms\Controllers')
-            ->group(base_path('routes/game/kingdoms/web.php'));
-    }
-
     protected function mapGameMarketRoutes()
     {
         Route::middleware('web')
@@ -252,13 +252,6 @@ class RouteServiceProvider extends ServiceProvider
         Route::middleware('web')
             ->namespace('App\Game\GuideQuests\Controllers')
             ->group(base_path('routes/game/guide-quests/web.php'));
-    }
-
-    protected function mapShopRoutes()
-    {
-        Route::middleware('web')
-            ->namespace('App\Game\Shop\Controllers')
-            ->group(base_path('routes/game/shop/web.php'));
     }
 
     protected function mapCharacterPassiveSkillsRoutes()

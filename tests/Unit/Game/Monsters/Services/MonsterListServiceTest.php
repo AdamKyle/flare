@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\Unit\Game\Battle\Services;
+namespace Tests\Unit\Game\Monsters\Services;
 
 use App\Flare\Models\Location;
-use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MapNameValue;
-use App\Game\Battle\Services\MonsterListService;
+use App\Game\Monsters\Services\BuildMonsterCacheService;
+use App\Game\Monsters\Services\MonsterListService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;

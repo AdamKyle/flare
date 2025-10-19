@@ -46,7 +46,7 @@ const Actions = (props: ActionsProps): ReactNode => {
   };
 
   return (
-    <div className="w-full xl:max-w-[1280px] 2xl:max-w-[1400px] mx-auto mt-[20px]">
+    <div className="w-full lg:w-3/4 mx-auto my-4 position-relative">
       <Card>
         <div
           className={clsx('grid grid-cols-1 gap-4 p-4 items-start', {

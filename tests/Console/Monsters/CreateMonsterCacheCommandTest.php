@@ -1,15 +1,15 @@
 <?php
 
-namespace Tests\Console;
+namespace Tests\Console\Monsters;
 
-use App\Flare\Services\BuildMonsterCacheService;
+use App\Game\Monsters\Services\BuildMonsterCacheService;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
 use Tests\TestCase;
 
 class CreateMonsterCacheCommandTest extends TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -32,7 +32,7 @@ class CreateMonsterCacheCommandTest extends TestCase
         $this->app->instance(BuildMonsterCacheService::class, $mock);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
         Cache::flush();

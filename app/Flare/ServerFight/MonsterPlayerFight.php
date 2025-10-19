@@ -11,10 +11,10 @@ use App\Flare\ServerFight\Fight\Attack;
 use App\Flare\ServerFight\Fight\Voidance;
 use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\ServerFight\Monster\ServerMonster;
-use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Monsters\Services\BuildMonsterCacheService;
 use Illuminate\Support\Facades\Cache;
 
 class MonsterPlayerFight

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Flare\Services;
+namespace App\Game\Monsters\Services;
 
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
-use App\Flare\Transformers\MonsterTransformer;
+use App\Game\Monsters\Transformers\MonsterTransformer;
 use Facades\App\Game\Maps\Calculations\LocationBasedEnemyDropChanceBonus;
 use Illuminate\Database\Eloquent\Collection as DBCollection;
 use Illuminate\Support\Collection as IlluminateCollection;
@@ -166,10 +166,6 @@ class BuildMonsterCacheService
         Cache::put('celestials', $monstersCache);
     }
 
-    /**
-     * @param \League\Fractal\Resource\Collection $monsters
-     * @return array
-     */
     protected function createMonstersForEventMaps(Collection $monsters): array
     {
         $surface = GameMap::where('default', true)->first();
@@ -191,9 +187,6 @@ class BuildMonsterCacheService
 
     /**
      * Get monsters for special locations.
-     *
-     * @param array $monstersCache
-     * @return array
      */
     protected function manageMonsters(array $monstersCache): array
     {
@@ -222,11 +215,6 @@ class BuildMonsterCacheService
 
     /**
      * Transform monsters for special location.
-     *
-     * @param \Illuminate\Database\Eloquent\Collection $monsters
-     * @param int $increaseStatsBy
-     * @param float $increasePercentageBy
-     * @return \Illuminate\Support\Collection
      */
     protected function transformMonsterForLocation(DBCollection $monsters, int $increaseStatsBy, float $increasePercentageBy): IlluminateCollection
     {
@@ -256,11 +244,6 @@ class BuildMonsterCacheService
         });
     }
 
-    /**
-     * @param Monster $monster
-     * @param int $increaseStatsBy
-     * @return string
-     */
     protected function createNewHealthRange(Monster $monster, int $increaseStatsBy): string
     {
         $monsterHealthRangeParts = explode('-', $monster->health_range);
@@ -271,11 +254,6 @@ class BuildMonsterCacheService
         return $minHealth.'-'.$maxHealth;
     }
 
-    /**
-     * @param Monster $monster
-     * @param int $increaseStatsBy
-     * @return string
-     */
     protected function createNewAttackRange(Monster $monster, int $increaseStatsBy): string
     {
         $monsterAttackParts = explode('-', $monster->attack_range);

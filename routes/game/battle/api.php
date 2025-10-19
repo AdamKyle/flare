@@ -2,8 +2,6 @@
 
 Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:150,2'])->group(function () {
 
-    Route::get('/monsters/{character}', ['uses' => 'Api\BattleController@index']);
-
     Route::middleware(['is.character.exploring'])->group(function () {
         Route::middleware(['is.character.dead', 'throttle:fighting'])->group(function () {
 

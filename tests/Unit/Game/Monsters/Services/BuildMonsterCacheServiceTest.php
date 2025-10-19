@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Unit\Flare\Services;
+namespace Tests\Unit\Game\Monsters\Services;
 
-use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Values\MapNameValue;
+use App\Game\Monsters\Services\BuildMonsterCacheService;
 use Facades\App\Game\Maps\Calculations\LocationBasedEnemyDropChanceBonus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -14,11 +14,11 @@ use Tests\Traits\CreateMonster;
 
 class BuildMonsterCacheServiceTest extends TestCase
 {
-    use RefreshDatabase, CreateGameMap, CreateMonster, CreateLocation;
+    use CreateGameMap, CreateLocation, CreateMonster, RefreshDatabase;
 
     private ?BuildMonsterCacheService $service;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -27,7 +27,7 @@ class BuildMonsterCacheServiceTest extends TestCase
         Cache::flush();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->service = null;
 

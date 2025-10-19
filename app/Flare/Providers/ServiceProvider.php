@@ -50,7 +50,6 @@ use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\ServerFight\Monster\MonsterSpecialAttack;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\ServerFight\MonsterPlayerFight;
-use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Services\CanUserEnterSiteService;
 use App\Flare\Services\CharacterDeletion;
 use App\Flare\Services\CharacterRewardService;
@@ -65,7 +64,6 @@ use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Transformers\MarketItemsTransformer;
-use App\Flare\Transformers\MonsterTransformer;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Flare\Values\BaseSkillValue;
@@ -84,6 +82,7 @@ use App\Game\Kingdoms\Transformers\KingdomBuildingTransformer;
 use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Transformers\OtherKingdomTransformer;
 use App\Game\Kingdoms\Transformers\UnitTransformer;
+use App\Game\Monsters\Transformers\MonsterTransformer;
 use App\Game\Quests\Services\BuildQuestCacheService;
 use App\Game\Quests\Transformers\QuestTransformer;
 use App\Game\Skills\Services\SkillService;
@@ -210,13 +209,6 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(MessageThrottledHandler::class, function ($app) {
             return new MessageThrottledHandler;
-        });
-
-        $this->app->bind(BuildMonsterCacheService::class, function ($app) {
-            return new BuildMonsterCacheService(
-                $app->make(Manager::class),
-                $app->make(MonsterTransformer::class),
-            );
         });
 
         $this->app->bind(CanUserEnterSiteService::class, function ($app) {

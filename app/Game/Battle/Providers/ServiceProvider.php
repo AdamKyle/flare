@@ -5,14 +5,12 @@ namespace App\Game\Battle\Providers;
 use App\Flare\Items\Builders\RandomItemDropBuilder;
 use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\ServerFight\MonsterPlayerFight;
-use App\Flare\Services\BuildMonsterCacheService;
 use App\Game\Battle\Console\Commands\ClearCelestials;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Battle\Services\CelestialFightService;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Battle\Services\FactionLoyaltyFightService;
-use App\Game\Battle\Services\MonsterListService;
 use App\Game\Battle\Services\RaidBattleService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
@@ -21,6 +19,7 @@ use App\Game\Core\Services\GoldRush;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
+use App\Game\Monsters\Services\BuildMonsterCacheService;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\DisenchantService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -84,10 +83,6 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(BattleEventHandler::class),
                 $app->make(FactionLoyaltyService::class)
             );
-        });
-
-        $this->app->bind(MonsterListService::class, function () {
-            return new MonsterListService;
         });
 
         $this->commands([

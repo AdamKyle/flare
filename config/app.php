@@ -243,6 +243,7 @@ return [
         App\Game\BattleRewardProcessing\Providers\ServiceProvider::class,
         App\Game\Messages\Providers\EventsProvider::class,
         App\Game\Messages\Providers\ServiceProvider::class,
+        App\Game\Monsters\Providers\ServiceProvider::class,
         App\Game\Maps\Providers\EventsProvider::class,
         App\Game\Maps\Providers\ServiceProvider::class,
         App\Game\Kingdoms\Providers\ServiceProvider::class,

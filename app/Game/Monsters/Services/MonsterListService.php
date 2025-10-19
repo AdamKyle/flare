@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Game\Battle\Services;
+namespace App\Game\Monsters\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
-use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Core\Traits\ResponseBuilder;
 use Illuminate\Support\Facades\Cache;
@@ -24,6 +23,20 @@ class MonsterListService
      * @throws InvalidArgumentException
      */
     public function getMonstersForCharacter(Character $character): array
+    {
+        $monsters = $this->resolveMonsterDataSetForCharacter($character);
+
+        $payload = $this->buildPayload($monsters);
+
+        return $this->successResult($payload);
+    }
+
+    /**
+     * Resolve and return the full monsters dataset for the character (same selection logic as list view).
+     *
+     * @throws InvalidArgumentException
+     */
+    public function resolveMonsterDataSetForCharacter(Character $character): array
     {
         $this->ensureMonsterCache();
 
@@ -71,14 +84,10 @@ class MonsterListService
             $monstersKey
         );
 
-        $monsters = $this->applySpecialLocationOverride(
+        return $this->applySpecialLocationOverride(
             $monsters,
             $locationWithType
         );
-
-        $payload = $this->buildPayload($monsters);
-
-        return $this->successResult($payload);
     }
 
     /**
@@ -188,10 +197,6 @@ class MonsterListService
     private function characterHasPurgatoryAccess(Character $character): bool
     {
         $slots = optional($character->inventory)->slots;
-
-        if (is_null($slots)) {
-            return false;
-        }
 
         return $slots->where('item.effect', ItemEffectsValue::PURGATORY)->count() > 0;
     }

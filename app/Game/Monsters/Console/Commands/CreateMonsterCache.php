@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Console\AfterDeployment;
+namespace App\Game\Monsters\Console\Commands;
 
-use App\Flare\Services\BuildMonsterCacheService;
+use App\Game\Monsters\Services\BuildMonsterCacheService;
 use Illuminate\Console\Command;
 use Psr\SimpleCache\InvalidArgumentException;
 

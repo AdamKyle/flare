@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Flare\Transformers;
+namespace App\Game\Monsters\Transformers;
 
 use App\Flare\Models\Monster;
 use App\Flare\Transformers\Traits\SkillsTransformerTrait;
@@ -10,31 +10,16 @@ class MonsterTransformer extends TransformerAbstract
 {
     use SkillsTransformerTrait;
 
-    /**
-     * @var bool $isSpecial
-     */
     private bool $isSpecial = false;
 
-    /**
-     * @var float $locationFlat
-     */
     private float $locationFlat = 0.0;
 
-    /**
-     * @var float $locationPercent
-     */
     private float $locationPercent = 0.0;
 
-    /**
-     * @var float $extraDropChance
-     */
     private float $extraDropChance = 0.0;
 
     /**
      * Sets whether the monster is special.
-     *
-     * @param bool $isSpecial
-     * @return MonsterTransformer
      */
     public function setIsMonsterSpecial(bool $isSpecial): MonsterTransformer
     {
@@ -45,9 +30,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Sets a flat increase used for location-based adjustments.
-     *
-     * @param float $flat
-     * @return MonsterTransformer
      */
     public function withLocationFlat(float $flat): MonsterTransformer
     {
@@ -58,9 +40,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Sets a percentage (fraction) used for location-based adjustments.
-     *
-     * @param float $percent
-     * @return MonsterTransformer
      */
     public function withLocationPercent(float $percent): MonsterTransformer
     {
@@ -71,9 +50,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Sets an extra drop chance (fraction) to add to the base drop chance, capped when computing final.
-     *
-     * @param float $drop
-     * @return MonsterTransformer
      */
     public function withExtraDropChance(float $drop): MonsterTransformer
     {
@@ -84,9 +60,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Fetches the monster response data.
-     *
-     * @param Monster $monster
-     * @return array
      */
     public function transform(Monster $monster): array
     {
@@ -216,10 +189,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Applies percentage to an integer-like stat (no flat).
-     *
-     * @param int|float|null $value
-     * @param float $percent
-     * @return int
      */
     private function applyPercentToIntegerStat(int|float|null $value, float $percent): int
     {
@@ -230,11 +199,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Applies flat and percentage to an integer-like stat.
-     *
-     * @param int|float|null $value
-     * @param float $flat
-     * @param float $percent
-     * @return int
      */
     private function applyFlatAndPercentToIntegerStat(int|float|null $value, float $flat, float $percent): int
     {
@@ -245,10 +209,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Applies percentage to a "min-max" range string (no flat).
-     *
-     * @param string $range
-     * @param float $percent
-     * @return string
      */
     private function applyPercentToRange(string $range, float $percent): string
     {
@@ -265,11 +225,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Applies flat and percentage to a "min-max" range string.
-     *
-     * @param string $range
-     * @param float $flat
-     * @param float $percent
-     * @return string
      */
     private function applyFlatAndPercentToRange(string $range, float $flat, float $percent): string
     {
@@ -289,9 +244,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Computes the final drop chance, using a capped base drop_check and capping final at 1.0.
-     *
-     * @param Monster $monster
-     * @return float
      */
     private function computeFinalDropChance(Monster $monster): float
     {
@@ -312,10 +264,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Clamps a probability-like value to a maximum.
-     *
-     * @param float|int $value
-     * @param float $max
-     * @return float
      */
     private function capTo(float|int $value, float $max): float
     {
@@ -324,9 +272,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Clamps a probability-like value to 1.0 maximum.
-     *
-     * @param float|int $value
-     * @return float
      */
     private function capAtOne(float|int $value): float
     {
@@ -335,10 +280,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Increase stat.
-     *
-     * @param int|float|null $statValue
-     * @param float|null $increaseBy
-     * @return int|float
      */
     public function increaseValue(int|float|null $statValue = null, ?float $increaseBy = null): int|float
     {
@@ -363,9 +304,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Determines if stats should increase based on the game map.
-     *
-     * @param Monster $monster
-     * @return bool
      */
     public function shouldIncreaseStats(Monster $monster): bool
     {
