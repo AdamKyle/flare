@@ -14,13 +14,13 @@ class LocationBasedEnemyDropChanceBonus
             $enemyStrengthIncrease = 0.0;
         }
 
-        $minimumDropChancePercent = 5.0;
-        $maximumDropChancePercent = 15.0;
-        $dropChanceRangePercent = $maximumDropChancePercent - $minimumDropChancePercent;
+        $minimumDropChanceFraction = 0.02;
+        $maximumDropChanceFraction = 0.15;
+        $dropChanceRange = $maximumDropChanceFraction - $minimumDropChanceFraction;
 
-        $progressBasedOnStrength = $enemyStrengthIncrease / (1.0 + $enemyStrengthIncrease);
-        $unroundedBonusPercent = $minimumDropChancePercent + ($dropChanceRangePercent * $progressBasedOnStrength);
+        $progress = $enemyStrengthIncrease / (1.0 + $enemyStrengthIncrease);
+        $unroundedBonusFraction = $minimumDropChanceFraction + ($dropChanceRange * $progress);
 
-        return round($unroundedBonusPercent, 2);
+        return round($unroundedBonusFraction, 2);
     }
 }

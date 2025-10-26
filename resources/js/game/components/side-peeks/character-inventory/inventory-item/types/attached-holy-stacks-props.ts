@@ -2,5 +2,4 @@ import { HolyStackDefinition } from '../../../../../api-definitions/items/equipp
 
 export default interface AppliedHolyStacksSectionProps {
   stacks: HolyStackDefinition[];
-  on_close: () => void;
 }

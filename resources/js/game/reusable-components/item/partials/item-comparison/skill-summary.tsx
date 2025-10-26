@@ -1,9 +1,10 @@
 import React, { Fragment, useState } from 'react';
 
 import AdjustmentChangeDisplay from './adjustment-change-display';
-import StatInfoToolTip from '../../stat-info-tool-tip';
+import StatToolTip from '../../tool-tips/stat-tool-tip';
 import type SkillSummaryProps from '../../types/partials/item-comparison/skill-summary-props';
-import { isNilOrZeroValue } from '../../utils/item-comparison';
+
+import { isNilOrZeroValue } from 'game-utils/general-util';
 
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
@@ -46,7 +47,7 @@ const SkillSummary = ({ adjustments }: SkillSummaryProps) => {
     return (
       <Fragment key={id}>
         <Dt>
-          <StatInfoToolTip
+          <StatToolTip
             label={label}
             value={numericValue}
             renderAsPercent

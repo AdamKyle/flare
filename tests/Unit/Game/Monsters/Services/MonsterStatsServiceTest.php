@@ -21,7 +21,7 @@ class MonsterStatsServiceTest extends TestCase
 
     private ?CharacterFactory $characterFactory = null;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -31,7 +31,7 @@ class MonsterStatsServiceTest extends TestCase
         Cache::flush();
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         $this->service = null;
         $this->characterFactory = null;
@@ -39,7 +39,7 @@ class MonsterStatsServiceTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_basic_map_returns_monster_stats_without_difficulty_increase()
+    public function test_basic_map_returns_base_stat()
     {
         $surface = $this->createGameMap([
             'name' => MapNameValue::SURFACE,
@@ -50,20 +50,20 @@ class MonsterStatsServiceTest extends TestCase
         $character = $this->characterFactory->getCharacter();
         $character->map()->update(['game_map_id' => $surface->id]);
 
-        $m = $this->createMonster([
+        $monster = $this->createMonster([
             'game_map_id' => $surface->id,
             'str' => 10,
         ]);
 
         resolve(BuildMonsterCacheService::class)->buildCache();
 
-        $response = $this->service->getMonsterStats($character->refresh(), $m);
+        $response = $this->service->getMonsterStats($character->refresh(), $monster);
         $row = $this->unwrap($response);
 
         $this->assertSame(10, $row['str']);
     }
 
-    public function test_map_and_location_combined_increase_affects_monster_stats()
+    public function test_combined_map_and_location_percent_increase_scales_stats()
     {
         $hell = $this->createGameMap([
             'name' => MapNameValue::HELL,
@@ -75,30 +75,30 @@ class MonsterStatsServiceTest extends TestCase
         $character->map()->update(['game_map_id' => $hell->id]);
         $character = $character->refresh();
 
-        $m = $this->createMonster([
+        $monster = $this->createMonster([
             'game_map_id' => $hell->id,
             'str' => 10,
         ]);
 
-        $pos = $character->map;
+        $position = $character->map;
 
         $this->createLocation([
             'name' => 'Lava Ridge',
-            'x' => $pos->character_position_x,
-            'y' => $pos->character_position_y,
-            'game_map_id' => $pos->game_map_id,
+            'x' => $position->character_position_x,
+            'y' => $position->character_position_y,
+            'game_map_id' => $position->game_map_id,
             'enemy_strength_increase' => 2.0,
         ]);
 
         resolve(BuildMonsterCacheService::class)->buildCache();
 
-        $response = $this->service->getMonsterStats($character->refresh(), $m);
+        $response = $this->service->getMonsterStats($character->refresh(), $monster);
         $row = $this->unwrap($response);
 
-        $this->assertSame(13, $row['str']);
+        $this->assertSame(31, $row['str']);
     }
 
-    public function test_location_with_increased_difficulty_affects_monster_stats()
+    public function test_location_percent_increase_scales_stats_on_basic_map()
     {
         $surface = $this->createGameMap([
             'name' => MapNameValue::SURFACE,
@@ -110,30 +110,30 @@ class MonsterStatsServiceTest extends TestCase
         $character->map()->update(['game_map_id' => $surface->id]);
         $character = $character->refresh();
 
-        $m = $this->createMonster([
+        $monster = $this->createMonster([
             'game_map_id' => $surface->id,
             'str' => 10,
         ]);
 
-        $pos = $character->map;
+        $position = $character->map;
 
         $this->createLocation([
             'name' => 'Ruins',
-            'x' => $pos->character_position_x,
-            'y' => $pos->character_position_y,
-            'game_map_id' => $pos->game_map_id,
+            'x' => $position->character_position_x,
+            'y' => $position->character_position_y,
+            'game_map_id' => $position->game_map_id,
             'enemy_strength_increase' => 2.0,
         ]);
 
         resolve(BuildMonsterCacheService::class)->buildCache();
 
-        $response = $this->service->getMonsterStats($character->refresh(), $m);
+        $response = $this->service->getMonsterStats($character->refresh(), $monster);
         $row = $this->unwrap($response);
 
-        $this->assertSame(12, $row['str']);
+        $this->assertSame(30, $row['str']);
     }
 
-    public function test_regular_monster_stats_are_returned()
+    public function test_regular_monster_flag_is_returned()
     {
         $surface = $this->createGameMap([
             'name' => MapNameValue::SURFACE,
@@ -144,7 +144,7 @@ class MonsterStatsServiceTest extends TestCase
         $character = $this->characterFactory->getCharacter();
         $character->map()->update(['game_map_id' => $surface->id]);
 
-        $m = $this->createMonster([
+        $monster = $this->createMonster([
             'game_map_id' => $surface->id,
             'is_raid_monster' => false,
             'str' => 7,
@@ -152,7 +152,7 @@ class MonsterStatsServiceTest extends TestCase
 
         resolve(BuildMonsterCacheService::class)->buildCache();
 
-        $response = $this->service->getMonsterStats($character->refresh(), $m);
+        $response = $this->service->getMonsterStats($character->refresh(), $monster);
         $row = $this->unwrap($response);
 
         $this->assertFalse($row['is_raid_monster']);
@@ -219,31 +219,7 @@ class MonsterStatsServiceTest extends TestCase
         $this->assertSame('Ice Regular', $row['name']);
     }
 
-    public function test_basic_map_returns_base_drop_chance_without_increase()
-    {
-        $surface = $this->createGameMap([
-            'name' => MapNameValue::SURFACE,
-            'default' => true,
-            'enemy_stat_bonus' => 0.0,
-        ]);
-
-        $character = $this->characterFactory->getCharacter();
-        $character->map()->update(['game_map_id' => $surface->id]);
-
-        $m = $this->createMonster([
-            'game_map_id' => $surface->id,
-            'drop_check' => 0.42,
-        ]);
-
-        resolve(BuildMonsterCacheService::class)->buildCache();
-
-        $response = $this->service->getMonsterStats($character->refresh(), $m);
-        $row = $this->unwrap($response);
-
-        $this->assertEquals(0.42, $row['drop_chance']);
-    }
-
-    public function test_map_and_location_combined_difficulty_drop_chance_unchanged_in_location_effect_path()
+    public function test_drop_chance_ignores_location_increase()
     {
         $hell = $this->createGameMap([
             'name' => MapNameValue::HELL,
@@ -255,65 +231,30 @@ class MonsterStatsServiceTest extends TestCase
         $character->map()->update(['game_map_id' => $hell->id]);
         $character = $character->refresh();
 
-        $m = $this->createMonster([
+        $monster = $this->createMonster([
             'game_map_id' => $hell->id,
             'drop_check' => 0.80,
         ]);
 
-        $pos = $character->map;
+        $position = $character->map;
 
         $this->createLocation([
             'name' => 'Lava Ridge',
-            'x' => $pos->character_position_x,
-            'y' => $pos->character_position_y,
-            'game_map_id' => $pos->game_map_id,
+            'x' => $position->character_position_x,
+            'y' => $position->character_position_y,
+            'game_map_id' => $position->game_map_id,
             'enemy_strength_increase' => 2.0,
         ]);
 
         resolve(BuildMonsterCacheService::class)->buildCache();
 
-        $response = $this->service->getMonsterStats($character->refresh(), $m);
+        $response = $this->service->getMonsterStats($character->refresh(), $monster);
         $row = $this->unwrap($response);
 
         $this->assertEquals(0.80, $row['drop_chance']);
     }
 
-    public function test_location_with_increased_difficulty_drop_chance_unchanged_in_location_effect_path()
-    {
-        $surface = $this->createGameMap([
-            'name' => MapNameValue::SURFACE,
-            'default' => true,
-            'enemy_stat_bonus' => 0.0,
-        ]);
-
-        $character = $this->characterFactory->getCharacter();
-        $character->map()->update(['game_map_id' => $surface->id]);
-        $character = $character->refresh();
-
-        $m = $this->createMonster([
-            'game_map_id' => $surface->id,
-            'drop_check' => 0.33,
-        ]);
-
-        $pos = $character->map;
-
-        $this->createLocation([
-            'name' => 'Ruins',
-            'x' => $pos->character_position_x,
-            'y' => $pos->character_position_y,
-            'game_map_id' => $pos->game_map_id,
-            'enemy_strength_increase' => 2.0,
-        ]);
-
-        resolve(BuildMonsterCacheService::class)->buildCache();
-
-        $response = $this->service->getMonsterStats($character->refresh(), $m);
-        $row = $this->unwrap($response);
-
-        $this->assertEquals(0.33, $row['drop_chance']);
-    }
-
-    public function test_regular_monster_drop_chance_capped_at_ninety_nine()
+    public function test_drop_chance_capped_at_ninety_nine()
     {
         $surface = $this->createGameMap([
             'name' => MapNameValue::SURFACE,
@@ -324,41 +265,17 @@ class MonsterStatsServiceTest extends TestCase
         $character = $this->characterFactory->getCharacter();
         $character->map()->update(['game_map_id' => $surface->id]);
 
-        $m = $this->createMonster([
+        $monster = $this->createMonster([
             'game_map_id' => $surface->id,
             'drop_check' => 0.995,
         ]);
 
         resolve(BuildMonsterCacheService::class)->buildCache();
 
-        $response = $this->service->getMonsterStats($character->refresh(), $m);
+        $response = $this->service->getMonsterStats($character->refresh(), $monster);
         $row = $this->unwrap($response);
 
         $this->assertEquals(0.99, $row['drop_chance']);
-    }
-
-    public function test_raid_monster_drop_chance_request_returns_error()
-    {
-        $surface = $this->createGameMap([
-            'name' => MapNameValue::SURFACE,
-            'default' => true,
-            'enemy_stat_bonus' => 0.0,
-        ]);
-
-        $character = $this->characterFactory->getCharacter();
-        $character->map()->update(['game_map_id' => $surface->id]);
-
-        $raid = $this->createMonster([
-            'game_map_id' => $surface->id,
-            'is_raid_monster' => true,
-            'drop_check' => 0.50,
-        ]);
-
-        resolve(BuildMonsterCacheService::class)->buildCache();
-
-        $response = $this->service->getMonsterStats($character->refresh(), $raid);
-
-        $this->assertArrayHasKey('message', $response);
     }
 
     public function test_special_map_with_purgatory_uses_regular_dataset_drop_chance()

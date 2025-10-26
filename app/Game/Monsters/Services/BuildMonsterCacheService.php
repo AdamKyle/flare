@@ -32,6 +32,13 @@ class BuildMonsterCacheService
         $this->monster = $this->monster->setIsMonsterSpecial(true);
 
         foreach (GameMap::all() as $gameMap) {
+
+            $enemyIncrease = $gameMap->enemy_stat_bonus ?? 0.0;
+            $enemyDropBonus = $gameMap->drop_chance_bonus ?? 0.0;
+
+            $this->monster->withEnemyIncrease($enemyIncrease)
+                          ->withDropChanceIncrease($enemyDropBonus);
+
             $monsters = new Collection(
                 Monster::where('is_celestial_entity', false)
                     ->where('is_raid_monster', false)
@@ -107,17 +114,21 @@ class BuildMonsterCacheService
 
         foreach ($locations as $location) {
 
-            $locationFlat = is_null($location->enemy_strength_increase) ? 0.0 : $location->enemy_strength_increase;
-            $locationPercent = is_null($location->enemy_strength_increase) ? 0.0 : LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent($location->enemy_strength_increase) / 100.0;
+            $locationEnemyIncrease = $location->enemy_strength_increase ?? 0.0;
+            $mapEnemyIncrease = $location->map->enemy_stat_bonus ?? 0.0;
 
-            $mapDropBonus = $location->map ? ($location->map->drop_chance_bonus ?? 0.0) : 0.0;
-            $extraDropChance = $mapDropBonus + $locationPercent;
 
-            $transformer = (clone $this->monster)
+            $enemyIncrease = $locationEnemyIncrease + $mapEnemyIncrease;
+
+            $locationDropChanceIncrease = LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent($locationEnemyIncrease);
+            $mapDropChanceBonus = $location->map->drop_chance_bonus ?? 0.0;
+
+            $dropChanceIncrease = $locationDropChanceIncrease + $mapDropChanceBonus;
+
+            $transformer = $this->monster
                 ->setIsMonsterSpecial(true)
-                ->withLocationFlat($locationFlat)
-                ->withLocationPercent($locationPercent)
-                ->withExtraDropChance($extraDropChance);
+                ->withEnemyIncrease($enemyIncrease)
+                ->withDropChanceIncrease($dropChanceIncrease);
 
             $monsters = new Collection(
                 Monster::where('is_celestial_entity', false)
@@ -131,12 +142,14 @@ class BuildMonsterCacheService
             $monsters = $this->manager->createData($monsters)->toArray();
 
             if (! empty($monsters)) {
-                $cache['location-type-'.$location->type] = $monsters;
+
+                $cache['location-type-' . $location->type] = $monsters;
             }
         }
 
         Cache::put('special-location-monsters', $cache);
     }
+
 
     /**
      * Builds celestial cache.

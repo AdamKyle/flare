@@ -2,5 +2,4 @@ import ItemAffixDefinition from '../../../../../api-definitions/items/equippable
 
 export default interface AttachedAffixDetailsProps {
   affix: ItemAffixDefinition;
-  on_close: () => void;
 }

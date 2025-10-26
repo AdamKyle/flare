@@ -1,9 +1,10 @@
 import React from 'react';
 
 import { EquippableItemWithBase } from '../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
-import StatInfoToolTip from '../../../reusable-components/item/stat-info-tool-tip';
+import StatToolTip from '../../../reusable-components/item/tool-tips/stat-tool-tip';
 import { getCraftingLabelForType } from '../../../reusable-components/item/utils/item-view';
-import { formatNumberWithCommas } from '../../../util/format-number';
+
+import { formatNumberWithCommas } from 'game-utils/format-number';
 
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
@@ -44,7 +45,7 @@ const ShopItemBaseView = ({ item }: ShopItemBaseViewProps) => {
 
         <Dt>
           <span className="inline-flex items-center gap-2">
-            <StatInfoToolTip
+            <StatToolTip
               label={`Indicates the level the skill: ${craftingLabel} has to be at for you to be able to craft this item.`}
               value={Number(item.skill_level_req)}
               align="left"
@@ -62,10 +63,10 @@ const ShopItemBaseView = ({ item }: ShopItemBaseViewProps) => {
 
         <Dt>
           <span className="inline-flex items-center gap-2">
-            <StatInfoToolTip
+            <StatToolTip
               label="Crafting XP gain threshold (you stop gaining XP at this level)"
               value={Number(item.skill_level_trivial)}
-              align="left"
+              align="right"
               size="sm"
               custom_message
             />

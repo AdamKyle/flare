@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
-import StatInfoToolTip from '../../stat-info-tool-tip';
+import StatToolTip from '../../tool-tips/stat-tool-tip';
 import {
   formatSignedInt,
   formatSignedPercent,
@@ -76,10 +76,10 @@ const PrimaryStatBlock = ({ item }: { item: EquippableItemWithBase }) => {
       </h3>
       <Separator />
       <div className="mt-2 flex items-center gap-2">
-        <StatInfoToolTip
+        <StatToolTip
           label={getPrimaryInfoLabel(primaryLabel)}
           value={primaryValue}
-          align="left"
+          align="right"
           size="sm"
         />
         <span className="font-medium">{primaryLabel}:</span>

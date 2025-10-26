@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from 'react';
 
 import { TOP_ADVANCED_CHILD } from '../../../constants/item-comparison-constants';
-import StatInfoToolTip from '../../../stat-info-tool-tip';
+import StatToolTip from '../../../tool-tips/stat-tool-tip';
 import { NumericAdjustmentKey } from '../../../types/item-comparison-types';
 import AdjustmentGroupProps from '../../../types/partials/item-comparison/adjustment-group-props';
 import { hasAnyNonZeroAdjustment } from '../../../utils/item-comparison';
@@ -85,7 +85,7 @@ const AdjustmentGroup = ({
 
     return (
       <Dt>
-        <StatInfoToolTip
+        <StatToolTip
           label={useCustomMessage ? (customText as string) : label}
           value={numericValue}
           renderAsPercent={renderAsPercent}

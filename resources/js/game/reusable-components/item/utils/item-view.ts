@@ -1,8 +1,8 @@
-import { formatNumberWithCommas } from './item-comparison';
 import {
   armourPositions,
   InventoryItemTypes,
 } from '../../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
+import { formatNumberWithCommas } from '../../../util/format-number';
 
 /**
  * Lowercases a string while safely handling null and undefined.

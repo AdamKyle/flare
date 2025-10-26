@@ -3,17 +3,15 @@ import React from 'react';
 import DefinitionRow from '../../../../../reusable-components/viewable-sections/definition-row';
 import InfoLabel from '../../../../../reusable-components/viewable-sections/info-label';
 import Section from '../../../../../reusable-components/viewable-sections/section';
-import { formatSignedPercent } from '../../../../../util/format-number';
 import AppliedHolyStacksSectionProps from '../types/attached-holy-stacks-props';
 
-import Button from 'ui/buttons/button';
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import { formatSignedPercent } from 'game-utils/format-number';
+
 import Dl from 'ui/dl/dl';
 import Separator from 'ui/separator/separator';
 
 const AppliedHolyStacksSection = ({
   stacks,
-  on_close,
 }: AppliedHolyStacksSectionProps) => {
   if (!stacks.length) {
     return null;
@@ -84,14 +82,6 @@ const AppliedHolyStacksSection = ({
 
   return (
     <div className="p-4">
-      <div className="text-center">
-        <Button
-          on_click={on_close}
-          label="Close"
-          variant={ButtonVariant.SUCCESS}
-        />
-      </div>
-
       <div>
         <h2 className="text-lg my-2 text-gray-800 dark:text-gray-300">
           Attached Holy Stacks

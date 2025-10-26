@@ -9,18 +9,16 @@ use App\Game\Core\Traits\ResponseBuilder;
 use Illuminate\Support\Facades\Cache;
 use Psr\SimpleCache\InvalidArgumentException;
 
-/**
- * Get monsters for the character's current position and map context.
- *
- * @param  Character  $character
- * @return array
- */
 class MonsterListService
 {
     use ResponseBuilder;
 
-    /**
+    /*
+     * Build a simple list payload of monsters for the character's current context.
+     *
+     * @param Character $character
      * @throws InvalidArgumentException
+     * @return array
      */
     public function getMonstersForCharacter(Character $character): array
     {
@@ -31,10 +29,12 @@ class MonsterListService
         return $this->successResult($payload);
     }
 
-    /**
-     * Resolve and return the full monsters dataset for the character (same selection logic as list view).
+    /*
+     * Resolve the full monsters dataset for the character based on map and location rules.
      *
+     * @param Character $character
      * @throws InvalidArgumentException
+     * @return array
      */
     public function resolveMonsterDataSetForCharacter(Character $character): array
     {
@@ -90,8 +90,11 @@ class MonsterListService
         );
     }
 
-    /**
+    /*
+     * Ensure the base monster cache exists; build it if missing.
+     *
      * @throws InvalidArgumentException
+     * @return void
      */
     private function ensureMonsterCache(): void
     {
@@ -100,6 +103,14 @@ class MonsterListService
         }
     }
 
+    /*
+     * Find a location at the given coordinates that has an enemy strength effect.
+     *
+     * @param int $x
+     * @param int $y
+     * @param int $gameMapId
+     * @return Location|null
+     */
     private function findLocationWithEffect(int $x, int $y, int $gameMapId): ?Location
     {
         return Location::whereNotNull('enemy_strength_increase')
@@ -109,6 +120,14 @@ class MonsterListService
             ->first();
     }
 
+    /*
+     * Find a location at the given coordinates that has a special location type.
+     *
+     * @param int $x
+     * @param int $y
+     * @param int $gameMapId
+     * @return Location|null
+     */
     private function findLocationWithType(int $x, int $y, int $gameMapId): ?Location
     {
         return Location::whereNotNull('type')
@@ -118,11 +137,29 @@ class MonsterListService
             ->first();
     }
 
+    /*
+     * Get the base monsters list for the given map key.
+     *
+     * @param array $monstersCache
+     * @param string $monstersKey
+     * @return array
+     */
     private function baseMonsters(array $monstersCache, string $monstersKey): array
     {
         return $monstersCache[$monstersKey] ?? ['data' => []];
     }
 
+    /*
+     * Apply overrides from a location with an enemy strength effect, considering special map tiers.
+     *
+     * @param array $monstersCache
+     * @param array $current
+     * @param Location|null $locationWithEffect
+     * @param bool $isTheIcePlane
+     * @param bool $hasPurgatoryAccess
+     * @param string $monstersKey
+     * @return array
+     */
     private function applyLocationEffectOverrides(
         array $monstersCache,
         array $current,
@@ -145,6 +182,17 @@ class MonsterListService
         return $current;
     }
 
+    /*
+     * Apply map-tier overrides (regular vs easier) for special maps and Purgatory access.
+     *
+     * @param array $monstersCache
+     * @param array $current
+     * @param bool $isTheIcePlane
+     * @param bool $isDelusionalMemories
+     * @param bool $hasPurgatoryAccess
+     * @param string $monstersKey
+     * @return array
+     */
     private function applyMapTierOverrides(
         array $monstersCache,
         array $current,
@@ -168,6 +216,13 @@ class MonsterListService
         return $current;
     }
 
+    /*
+     * If standing on a special location type, override with that location-type monster list.
+     *
+     * @param array $current
+     * @param Location|null $locationWithType
+     * @return array
+     */
     private function applySpecialLocationOverride(
         array $current,
         ?Location $locationWithType
@@ -183,6 +238,12 @@ class MonsterListService
         return $current;
     }
 
+    /*
+     * Convert a full monster dataset into a compact list payload for the API.
+     *
+     * @param array $monsters
+     * @return array
+     */
     private function buildPayload(array $monsters): array
     {
         return collect($monsters['data'] ?? [])->map(function ($monster) {
@@ -194,6 +255,12 @@ class MonsterListService
         })->values()->toArray();
     }
 
+    /*
+     * Determine if the character has Purgatory access via equipped/held items.
+     *
+     * @param Character $character
+     * @return bool
+     */
     private function characterHasPurgatoryAccess(Character $character): bool
     {
         $slots = optional($character->inventory)->slots;

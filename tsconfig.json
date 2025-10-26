@@ -25,6 +25,7 @@
             "configuration/*": ["resources/js/configuration/*"],
             "event-system/*": ["resources/js/event-system/*"],
             "game-data/*": ["resources/js/game-data/*"],
+            "game-utils/*": ["resources/js/game/util/*"],
             "api-handler/*": ["resources/js/api-handler/*"],
             "ui/*": ["resources/js/ui/*"],
             "service-container/*": ["resources/js/service-container/*"],

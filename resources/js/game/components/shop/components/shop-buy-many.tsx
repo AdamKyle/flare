@@ -2,14 +2,14 @@ import { debounce } from 'lodash';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import ShopCardDetails from './shop-card-details';
-import StatInfoToolTip from '../../../reusable-components/item/stat-info-tool-tip';
 import Section from '../../../reusable-components/viewable-sections/section';
-import { formatNumberWithCommas } from '../../../util/format-number';
 import { UsePurchaseManyItems } from '../api/hooks/use-purchase-many-items';
 import ShopBuyManyProps from '../types/shop-buy-many-props';
 
 import CharacterSheetDefinition from 'game-data/api-data-definitions/character/character-sheet-definition';
 import { useGameData } from 'game-data/hooks/use-game-data';
+
+import { formatNumberWithCommas } from 'game-utils/format-number';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
@@ -22,6 +22,7 @@ import Dt from 'ui/dl/dt';
 import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import Separator from 'ui/separator/separator';
+import GeneralToolTip from 'ui/tool-tips/general-tool-tip';
 
 const ShopBuyMany = ({ item, on_close }: ShopBuyManyProps) => {
   const { gameData, updateCharacter } = useGameData();
@@ -156,12 +157,10 @@ const ShopBuyMany = ({ item, on_close }: ShopBuyManyProps) => {
       <Section title="Character" showSeparator={false} showTitleSeparator>
         <Dt>
           <span className="inline-flex items-center gap-2">
-            <StatInfoToolTip
+            <GeneralToolTip
               label="Inventory Break Down"
-              value={0}
               align="right"
               size="sm"
-              custom_message
               message={
                 <Section
                   title="Inventory Break Down"
@@ -275,12 +274,10 @@ const ShopBuyMany = ({ item, on_close }: ShopBuyManyProps) => {
         >
           <Dt>
             <span className="inline-flex items-center gap-2">
-              <StatInfoToolTip
+              <GeneralToolTip
                 label="Cost includes a 5% sales tax applied"
-                value={totalWithTax}
                 align="right"
                 size="sm"
-                custom_message
               />
               <span>Cost</span>
             </span>

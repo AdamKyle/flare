@@ -6,8 +6,8 @@ import { GoblinShopContext } from './context/goblin-shop-context';
 import GoblinShopProps from './types/goblin-shop-props';
 import { useCustomContext } from '../../../utils/hooks/use-custom-context';
 import BaseUsableItemDefinition from '../../api-definitions/items/usable-item-definitions/base-usable-item-definition';
-import { isNilOrZeroValue } from '../../reusable-components/item/utils/item-comparison';
 import { formatNumberWithCommas } from '../../util/format-number';
+import { isNilOrZeroValue } from '../../util/general-util';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';

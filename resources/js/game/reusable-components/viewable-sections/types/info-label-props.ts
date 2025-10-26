@@ -1,10 +1,10 @@
-import StatInfoToolTipProps from '../../item/types/stat-info-tool-tip-props';
+import StatToolTipProps from '../../item/tool-tips/types/stat-tool-tip-props';
 
 export default interface InfoLabelProps {
   label: string;
   tooltip?: string;
   tooltipValue?: number;
-  tooltipAlign?: StatInfoToolTipProps['align'];
+  tooltipAlign?: StatToolTipProps['align'];
   tooltipRenderAsPercent?: boolean;
-  tooltipSize?: StatInfoToolTipProps['size'];
+  tooltipSize?: StatToolTipProps['size'];
 }

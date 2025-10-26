@@ -1,6 +1,10 @@
-import React, { ReactNode } from 'react';
+import ApiErrorAlert from 'api-handler/components/api-error-alert';
+import { isNil } from 'lodash';
+import React, { ReactNode, useEffect } from 'react';
 
-import { useManageMonsterStatSectionVisibility } from './hooks/use-manage-monster-stat-section-visibility';
+import { useFetchMonsterStatsApi } from './api/hooks/use-fetch-monster-stats-api';
+
+import { useGameData } from 'game-data/hooks/use-game-data';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
@@ -9,42 +13,110 @@ import ContainerWithTitle from 'ui/container/container-with-title';
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
+import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import Separator from 'ui/separator/separator';
 
-export const MonsterStatSection = (): ReactNode => {
-  const { closeMonsterStats } = useManageMonsterStatSectionVisibility();
+interface MonsterStatSectionProps {
+  monster_id: number;
+  toggle_monster_stat_visibility: (monsterId: number) => void;
+}
+
+export const MonsterStatSection = ({
+  monster_id,
+  toggle_monster_stat_visibility,
+}: MonsterStatSectionProps): ReactNode => {
+  const { gameData } = useGameData();
+  const { loading, data, error, setRequestParams } = useFetchMonsterStatsApi();
+
+  useEffect(() => {
+    if (monster_id === 0 || !gameData?.character) {
+      return;
+    }
+
+    setRequestParams({
+      character_id: gameData.character.id,
+      monster_id,
+    });
+  }, [gameData?.character, monster_id]);
+
+  if (isNil(data) || loading) {
+    return (
+      <ContainerWithTitle
+        manageSectionVisibility={() => toggle_monster_stat_visibility(0)}
+        title={'Fetching Monster'}
+      >
+        <Card>
+          <InfiniteLoader />
+        </Card>
+      </ContainerWithTitle>
+    );
+  }
+
+  if (!isNil(error)) {
+    return (
+      <ContainerWithTitle
+        manageSectionVisibility={() => toggle_monster_stat_visibility(0)}
+        title={'something went wrong'}
+      >
+        <Card>
+          <ApiErrorAlert apiError={error.message} />
+        </Card>
+      </ContainerWithTitle>
+    );
+  }
 
   return (
     <ContainerWithTitle
-      manageSectionVisibility={closeMonsterStats}
+      manageSectionVisibility={() => toggle_monster_stat_visibility(0)}
       title={'Monster Name'}
     >
       <Card>
-        <div role="region" aria-labelledby="celestial-info" className="mb-6">
-          <h2 id="celestial-info" className="sr-only">
-            Celestial Creature Information
-          </h2>
-          <Alert variant={AlertVariant.INFO}>
-            <strong>This Creature is a celestial</strong>: You will find the
-            conjuration cost in shards to conjure this beast. You cannot
-            encounter this beast in the wild unless you trigger a spawn by
-            either moving (small chance) or unless it's Celestial Day, in which
-            case any form of movement has an 80% chance to conjure one. Players
-            who completed Quest X can use /PCT command to instantly travel to
-            it. Killing it in one hit is advised or it will move and heal for
-            full health.
-          </Alert>
-        </div>
+        <Alert variant={AlertVariant.INFO}>
+          <strong>This Creature is a celestial</strong>: You will find the
+          conjuration cost in shards to conjure this beast. You cannot encounter
+          this beast in the wild unless you trigger a spawn by either moving
+          (small chance) or unless it's Celestial Day, in which case any form of
+          movement has an 80% chance to conjure one. Players who completed Quest
+          X can use /PCT command to instantly travel to it. Killing it in one
+          hit is advised or it will move and heal for full health.
+        </Alert>
+
+        <Alert variant={AlertVariant.INFO}>
+          <strong>This creature is a raid monster</strong>: These creatures live
+          at specific locations on specific maps while a raid is taking place.
+          These creatures can be strong and hard to take down, but they drop
+          quest items to progress raid story line quests that lead towards
+          unlocking cosmetic based rewards. You can fight them while at the
+          specific location(s) and selecting them from the drop down.
+        </Alert>
+
+        <Alert variant={AlertVariant.INFO}>
+          <strong>This creature is a raid boss</strong>: This beast lives at a
+          specific location while a raid is in progress. These creatures cannot
+          be taken down alone, and require many players to work together to
+          bring the beast down! The player who lands the last hit, gets a full
+          set of gear the raid boss raid dropping. Come prepared to die child!
+        </Alert>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
           <div>
             <Dl>
               <Dt>Monster Name:</Dt>
               <Dd>Name</Dd>
+              <Dt>Lives on map:</Dt>
+              <Dd>Surface</Dd>
+              <Dt>Can only be fought at:</Dt>
+              <Dd>Special Location</Dd>
+              <Dt>Base Damage Stat:</Dt>
+              <Dd>Str</Dd>
               <Dt>Receive 1/3 Xp at level:</Dt>
               <Dd>10</Dd>
-              <Dt>Conjuration Cost (Shards):</Dt>
+              <Dt>Conjuration Cost (Gold):</Dt>
               <Dd>1,000</Dd>
+              <Dt>Conjuration Cost (Gold Dust):</Dt>
+              <Dd>1,000</Dd>
+              <Dt>To Hit Base</Dt>
+              <Dd>10</Dd>
             </Dl>
 
             <h3 className="text-danube-500 dark:text-danube-700 mt-5">
@@ -56,12 +128,29 @@ export const MonsterStatSection = (): ReactNode => {
               <Dd>100 - 200</Dd>
               <Dt>Attack Range:</Dt>
               <Dd>100 - 200</Dd>
+              <Dt>Increase Damage By:</Dt>
+              <Dd>10%</Dd>
               <Dt>Max Spell Damage:</Dt>
+              <Dd>350</Dd>
+              <Dt>Max Affix Damage:</Dt>
               <Dd>350</Dd>
               <Dt>Entrancing Chance:</Dt>
               <Dd>8%</Dd>
+              <Dt>Max Healing:</Dt>
+              <Dd>1,800,000</Dd>
               <Dt>Armour Class (Defence):</Dt>
               <Dd>150</Dd>
+            </Dl>
+
+            <h3 className="text-danube-500 dark:text-danube-700 mt-5">
+              Raid Special Attack
+            </h3>
+            <Separator />
+            <Dl>
+              <Dt>Attack Name:</Dt>
+              <Dd>Some Attack</Dd>
+              <Dt>Details:</Dt>
+              <Dd>Deals damage to players</Dd>
             </Dl>
 
             <h3 className="text-danube-500 dark:text-danube-700 mt-5">
@@ -80,6 +169,19 @@ export const MonsterStatSection = (): ReactNode => {
             </Dl>
 
             <h3 className="text-danube-500 dark:text-danube-700 mt-5">
+              Elemental Atonement
+            </h3>
+            <Separator />
+            <Dl>
+              <Dt>Fire Atonement:</Dt>
+              <Dd>24%</Dd>
+              <Dt>Water Atonement:</Dt>
+              <Dd>78%</Dd>
+              <Dt>Ice Atonement:</Dt>
+              <Dd>10%</Dd>
+            </Dl>
+
+            <h3 className="text-danube-500 dark:text-danube-700 mt-5">
               Rewards
             </h3>
             <Separator />
@@ -88,6 +190,8 @@ export const MonsterStatSection = (): ReactNode => {
               <Dd>100</Dd>
               <Dt>Gold:</Dt>
               <Dd>500</Dd>
+              <Dt>Shard Reward:</Dt>
+              <Dd>1,000</Dd>
               <Dt>Drop Chance:</Dt>
               <Dd>10%</Dd>
             </Dl>
@@ -98,6 +202,8 @@ export const MonsterStatSection = (): ReactNode => {
             <Separator />
             <Dl>
               <Dt>Str:</Dt>
+              <Dd>100</Dd>
+              <Dt>Dur:</Dt>
               <Dd>100</Dd>
               <Dt>Dex:</Dt>
               <Dd>100</Dd>

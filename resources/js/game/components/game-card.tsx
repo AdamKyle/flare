@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 
 import Actions from './actions/partials/actions/actions';
 import { useManageMarketVisibility } from './actions/partials/floating-cards/map-section/hooks/use-manage-market-visibility';
@@ -24,9 +24,11 @@ import { useManageShopSectionVisibility } from './shop/hooks/use-manage-shop-sec
 import ShopScreen from './shop/shop-screen';
 
 export const GameCard = (): ReactNode => {
+  const [monsterIdToView, setMonsterIdToView] = useState<number>(0);
+
   const { closeCharacterSheet } = useManageCharacterSheetVisibility();
 
-  const { showMonsterStatsSection, showMonsterStats } =
+  const { showMonsterStatsSection, showMonsterStats, closeMonsterStats } =
     useManageMonsterStatSectionVisibility();
 
   const { showCharacterInventory, closeInventory } =
@@ -51,6 +53,18 @@ export const GameCard = (): ReactNode => {
 
   const { closeGoblinShop, showGoblinShop } = useManageGoblinShopVisibility();
 
+  const handleShowMonsterStats = (monsterId: number) => {
+    setMonsterIdToView(monsterId);
+
+    if (monsterId === 0) {
+      closeMonsterStats();
+
+      return;
+    }
+
+    showMonsterStats();
+  };
+
   if (showPlayerKingdoms) {
     return <PlayerKingdoms close_shop={closePlayerKingdoms} />;
   }
@@ -74,7 +88,12 @@ export const GameCard = (): ReactNode => {
   }
 
   if (showMonsterStatsSection) {
-    return <MonsterStatSection />;
+    return (
+      <MonsterStatSection
+        monster_id={monsterIdToView}
+        toggle_monster_stat_visibility={handleShowMonsterStats}
+      />
+    );
   }
 
   if (showAttackType && attackType !== null) {
@@ -105,7 +124,7 @@ export const GameCard = (): ReactNode => {
 
   return (
     <div className="relative z-10">
-      <Actions showMonsterStats={showMonsterStats} />
+      <Actions showMonsterStats={handleShowMonsterStats} />
     </div>
   );
 };

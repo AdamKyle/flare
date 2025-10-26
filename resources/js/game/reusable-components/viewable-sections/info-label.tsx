@@ -1,7 +1,7 @@
 import React from 'react';
 
-import StatInfoToolTip from '../item/stat-info-tool-tip';
 import InfoLabelProps from './types/info-label-props';
+import StatToolTip from '../item/tool-tips/stat-tool-tip';
 
 const InfoLabel = ({
   label,
@@ -14,7 +14,7 @@ const InfoLabel = ({
   return (
     <span className="inline-flex items-center gap-2">
       {tooltip ? (
-        <StatInfoToolTip
+        <StatToolTip
           label={tooltip}
           value={tooltipValue}
           align={tooltipAlign}

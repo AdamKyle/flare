@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 
 import { InventoryItemTypes } from '../../../../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
 import { RESISTANCE_FIELDS } from '../../../constants/item-comparison-constants';
-import StatInfoToolTip from '../../../stat-info-tool-tip';
+import StatToolTip from '../../../tool-tips/stat-tool-tip';
 import ResistanceSectionProps from '../../../types/partials/item-comparison/comparison-column-sections/resistance-section-props';
 import { hasAnyNonZeroAdjustment } from '../../../utils/item-comparison';
 import AdjustmentChangeDisplay from '../adjustment-change-display';
@@ -34,7 +34,7 @@ const ResistanceSection = ({
       <Fragment key={label}>
         <dt className="font-medium text-gray-900 dark:text-gray-100">
           <div className="flex items-center">
-            <StatInfoToolTip
+            <StatToolTip
               label={label.toLowerCase()}
               value={value}
               renderAsPercent

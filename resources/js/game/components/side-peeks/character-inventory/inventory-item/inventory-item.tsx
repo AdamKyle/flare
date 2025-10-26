@@ -102,7 +102,11 @@ const InventoryItem = ({
     );
   };
 
-  if (itemAffixToView) {
+  const renderItemAffixView = () => {
+    if (!itemAffixToView) {
+      return null;
+    }
+
     let itemAffix = null;
 
     if (item?.item_suffix?.id === itemAffixToView) {
@@ -115,22 +119,24 @@ const InventoryItem = ({
 
     if (itemAffix) {
       return (
-        <AttachedAffixDetails
-          affix={itemAffix}
-          on_close={handleCloseItemAffixView}
-        />
+        <StackedCard on_close={handleCloseItemAffixView}>
+          <AttachedAffixDetails affix={itemAffix} />
+        </StackedCard>
       );
     }
-  }
+  };
 
-  if (shouldViewHolyStacks && item.applied_stacks) {
+  const renderAttachedHolyStacksView = () => {
+    if (!shouldViewHolyStacks || !item.applied_stacks) {
+      return null;
+    }
+
     return (
-      <AttachedHolyStacks
-        stacks={item.applied_stacks}
-        on_close={() => setShouldViewHolyStacks(false)}
-      />
+      <StackedCard on_close={() => setShouldViewHolyStacks(false)}>
+        <AttachedHolyStacks stacks={item.applied_stacks} />
+      </StackedCard>
     );
-  }
+  };
 
   const attack = Number(item.raw_damage ?? item.base_damage ?? 0);
   const ac = Number(item.raw_ac ?? item.base_ac ?? 0);
@@ -201,6 +207,10 @@ const InventoryItem = ({
         </div>
       </div>
       <AnimatePresence mode="wait">{renderEquipItem()}</AnimatePresence>
+      <AnimatePresence mode="wait">{renderItemAffixView()}</AnimatePresence>
+      <AnimatePresence mode="wait">
+        {renderAttachedHolyStacksView()}
+      </AnimatePresence>
     </>
   );
 };

@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 
 import { InventoryItemTypes } from '../../../../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
-import StatInfoToolTip from '../../../stat-info-tool-tip';
+import StatToolTip from '../../../tool-tips/stat-tool-tip';
 import ResurrectionChanceSectionProps from '../../../types/partials/item-comparison/comparison-column-sections/resurrection-chance-section-props';
 import AdjustmentChangeDisplay from '../adjustment-change-display';
 
@@ -32,7 +32,7 @@ const ResurrectionChanceSection = ({
       <dl className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1">
         <dt className="font-medium text-gray-900 dark:text-gray-100">
           <div className="flex items-center">
-            <StatInfoToolTip
+            <StatToolTip
               label="chance"
               value={value}
               renderAsPercent

@@ -8,6 +8,6 @@ export default interface MonsterTopSectionProps {
   next_action: (currentIndex: number) => void;
   prev_action: (currentIndex: number) => void;
   select_action: (index: number) => void;
-  view_monster_stats: () => void;
+  view_monster_stats: (monsterId: number) => void;
   monsters: MonsterNameListDefinition[];
 }

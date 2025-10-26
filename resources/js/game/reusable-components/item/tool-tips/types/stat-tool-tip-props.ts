@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default interface StatInfoToolTipProps {
+export default interface StatToolTipProps {
   label: string;
   value: number;
   renderAsPercent?: boolean;

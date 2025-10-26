@@ -1,3 +1,3 @@
 export default interface ActionsProps {
-  showMonsterStats: () => void;
+  showMonsterStats: (monsterId: number) => void;
 }

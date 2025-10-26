@@ -7,14 +7,9 @@ import AffixSkillModifiersSection from '../partials/affix-view/affix-skill-modif
 import AffixStatsSection from '../partials/affix-view/affix-stats-section';
 import AttachedAffixDetailsProps from '../types/attached-affix-details-props';
 
-import Button from 'ui/buttons/button';
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Separator from 'ui/separator/separator';
 
-const AttachedAffixDetails = ({
-  affix,
-  on_close,
-}: AttachedAffixDetailsProps) => {
+const AttachedAffixDetails = ({ affix }: AttachedAffixDetailsProps) => {
   const renderAffixHeader = () => {
     return (
       <div>
@@ -32,14 +27,6 @@ const AttachedAffixDetails = ({
 
   return (
     <>
-      <div className="text-center p-4">
-        <Button
-          on_click={on_close}
-          label="Close"
-          variant={ButtonVariant.SUCCESS}
-        />
-      </div>
-
       <div className="px-4 flex flex-col gap-4 pb-4">
         {renderAffixHeader()}
 

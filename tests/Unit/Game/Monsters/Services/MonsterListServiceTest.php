@@ -8,22 +8,22 @@ use App\Flare\Values\MapNameValue;
 use App\Game\Monsters\Services\BuildMonsterCacheService;
 use App\Game\Monsters\Services\MonsterListService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateItem;
 
 class MonsterListServiceTest extends TestCase
 {
-    use CreateGameMap, RefreshDatabase;
+    use CreateGameMap, CreateItem, RefreshDatabase;
 
     private ?MonsterListService $service;
 
     private ?CharacterFactory $characterFactory;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -32,7 +32,7 @@ class MonsterListServiceTest extends TestCase
         $this->characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         parent::tearDown();
 
@@ -109,13 +109,13 @@ class MonsterListServiceTest extends TestCase
 
         $this->seedSpecialLocationCache([]);
 
-        $pos = $character->map;
+        $position = $character->map;
 
         Location::factory()->create([
             'name' => 'Volcano',
-            'x' => $pos->character_position_x,
-            'y' => $pos->character_position_y,
-            'game_map_id' => $pos->game_map_id,
+            'x' => $position->character_position_x,
+            'y' => $position->character_position_y,
+            'game_map_id' => $position->game_map_id,
             'enemy_strength_increase' => 0.10,
         ]);
 
@@ -128,7 +128,7 @@ class MonsterListServiceTest extends TestCase
         ], $data);
     }
 
-    public function test_location_with_effect_on_ice_plane_without_purgatory_uses_easier()
+    public function test_location_on_ice_plane_without_purgatory_uses_easier()
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -153,13 +153,13 @@ class MonsterListServiceTest extends TestCase
 
         $this->seedSpecialLocationCache([]);
 
-        $pos = $character->map;
+        $position = $character->map;
 
         Location::factory()->create([
             'name' => 'Frost Rift',
-            'x' => $pos->character_position_x,
-            'y' => $pos->character_position_y,
-            'game_map_id' => $pos->game_map_id,
+            'x' => $position->character_position_x,
+            'y' => $position->character_position_y,
+            'game_map_id' => $position->game_map_id,
             'enemy_strength_increase' => 0.20,
         ]);
 
@@ -172,15 +172,15 @@ class MonsterListServiceTest extends TestCase
         ], $data);
     }
 
-    public function test_location_with_effect_on_ice_plane_with_purgatory_uses_regular()
+    public function test_location_on_ice_plane_with_purgatory_uses_regular()
     {
-        $character = $this->characterFactory->getCharacter();
+        $character = $this->characterFactory->inventoryManagement()->giveItem($this->createItem([
+            'effect' => ItemEffectsValue::PURGATORY
+        ]))->getCharacter();
 
         $character->map()->update([
             'game_map_id' => $this->createGameMap(['name' => MapNameValue::ICE_PLANE])->id,
         ]);
-
-        $character = $this->givePurgatoryAccess($character);
 
         $mapName = $character->map->gameMap->name;
 
@@ -197,13 +197,13 @@ class MonsterListServiceTest extends TestCase
 
         $this->seedSpecialLocationCache([]);
 
-        $pos = $character->map;
+        $position = $character->map;
 
         Location::factory()->create([
             'name' => 'Chilled Hollow',
-            'x' => $pos->character_position_x,
-            'y' => $pos->character_position_y,
-            'game_map_id' => $pos->game_map_id,
+            'x' => $position->character_position_x,
+            'y' => $position->character_position_y,
+            'game_map_id' => $position->game_map_id,
             'enemy_strength_increase' => 0.25,
         ]);
 
@@ -218,13 +218,13 @@ class MonsterListServiceTest extends TestCase
 
     public function test_ice_plane_regular_with_purgatory_without_location()
     {
-        $character = $this->characterFactory->getCharacter();
+        $character = $this->characterFactory->inventoryManagement()->giveItem($this->createItem([
+            'effect' => ItemEffectsValue::PURGATORY
+        ]))->getCharacter();
 
         $character->map()->update([
             'game_map_id' => $this->createGameMap(['name' => MapNameValue::ICE_PLANE])->id,
         ]);
-
-        $character = $this->givePurgatoryAccess($character);
 
         $mapName = $character->map->gameMap->name;
 
@@ -280,13 +280,13 @@ class MonsterListServiceTest extends TestCase
 
     public function test_delusional_memories_regular_with_purgatory()
     {
-        $character = $this->characterFactory->getCharacter();
+        $character = $this->characterFactory->inventoryManagement()->giveItem($this->createItem([
+            'effect' => ItemEffectsValue::PURGATORY
+        ]))->getCharacter();
 
         $character->map()->update([
             'game_map_id' => $this->createGameMap(['name' => MapNameValue::DELUSIONAL_MEMORIES])->id,
         ]);
-
-        $character = $this->givePurgatoryAccess($character);
 
         $mapName = $character->map->gameMap->name;
 
@@ -360,13 +360,13 @@ class MonsterListServiceTest extends TestCase
             ],
         ]);
 
-        $pos = $character->map;
+        $position = $character->map;
 
         Location::factory()->create([
             'name' => 'Any Name',
-            'x' => $pos->character_position_x,
-            'y' => $pos->character_position_y,
-            'game_map_id' => $pos->game_map_id,
+            'x' => $position->character_position_x,
+            'y' => $position->character_position_y,
+            'game_map_id' => $position->game_map_id,
             'type' => 1,
         ]);
 
@@ -387,27 +387,6 @@ class MonsterListServiceTest extends TestCase
     private function seedSpecialLocationCache(array $payload): void
     {
         Cache::put('special-location-monsters', $payload, 60);
-    }
-
-    private function givePurgatoryAccess($character)
-    {
-        $slots = new Collection([
-            ['item' => ['effect' => ItemEffectsValue::PURGATORY]],
-        ]);
-
-        $inventory = new class($slots)
-        {
-            public Collection $slots;
-
-            public function __construct(Collection $slots)
-            {
-                $this->slots = $slots;
-            }
-        };
-
-        $character->setRelation('inventory', $inventory);
-
-        return $character;
     }
 
     private function unwrap(mixed $response): array

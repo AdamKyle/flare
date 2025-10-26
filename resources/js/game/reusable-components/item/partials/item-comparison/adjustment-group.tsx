@@ -3,7 +3,7 @@ import { match } from 'ts-pattern';
 
 import AdjustmentChangeDisplay from './adjustment-change-display';
 import { TOP_ADVANCED_CHILD } from '../../constants/item-comparison-constants';
-import StatInfoToolTip from '../../stat-info-tool-tip';
+import StatToolTip from '../../tool-tips/stat-tool-tip';
 import { NumericAdjustmentKey } from '../../types/item-comparison-types';
 import AdjustmentGroupProps from '../../types/partials/item-comparison/adjustment-group-props';
 import { hasAnyNonZeroAdjustment } from '../../utils/item-comparison';
@@ -75,7 +75,7 @@ const AdjustmentGroup = ({
     return (
       <Dt>
         <div className={`flex items-center${indentClass}`}>
-          <StatInfoToolTip
+          <StatToolTip
             label={useCustom ? (opts!.customMessage as string) : displayLabel}
             value={numericValue}
             renderAsPercent={!!forcePercent}

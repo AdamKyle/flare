@@ -7,7 +7,6 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Flare\Models\Map;
 use App\Flare\Models\Monster;
-use App\Flare\Values\CelestialType;
 use App\Flare\Values\LocationType;
 use App\Game\Battle\Services\BattleDrop;
 use Exception;
@@ -58,10 +57,6 @@ class DropCheckService
             ->setLootingChance($this->lootingChance);
 
         $this->handleDropChance($character);
-
-        if ($monster->celestial_type === CelestialType::KING_CELESTIAL) {
-            $this->handleMythicDrop($character, true);
-        }
 
         if (! is_null($this->locationWithEffect)) {
             if (! is_null($this->locationWithEffect->type)) {

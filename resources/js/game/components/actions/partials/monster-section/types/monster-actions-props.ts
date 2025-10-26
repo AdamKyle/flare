@@ -1,4 +1,4 @@
 export default interface MonsterActionsProps {
   is_showing_side_section: boolean;
-  show_monster_section: () => void;
+  show_monster_section: (monsterId: number) => void;
 }

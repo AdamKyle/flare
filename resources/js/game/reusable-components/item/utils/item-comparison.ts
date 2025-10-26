@@ -1,28 +1,11 @@
-import isNil from 'lodash/isNil';
 import some from 'lodash/some';
 
 import { ItemAdjustments } from '../../../api-definitions/items/item-comparison-details';
 import { InventoryItemTypes } from '../../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
 import type { FieldDef } from '../types/item-comparison-types';
 
-/**
- * True when a numeric value is null/undefined or exactly 0.
- *
- * @param value - Number to test (may be null/undefined)
- * @returns Whether the value is nil or exactly zero
- *
- * @example
- * isNilOrZeroValue(null)  // true
- * isNilOrZeroValue(0)     // true
- * isNilOrZeroValue(1)     // false
- */
-export const isNilOrZeroValue = (value: number | null | undefined): boolean => {
-  if (isNil(value)) {
-    return true;
-  }
-
-  return value === 0;
-};
+import { formatNumberWithCommas } from 'game-utils/format-number';
+import { isNilOrZeroValue } from 'game-utils/general-util';
 
 /**
  * Return the sign prefix for formatting a number.
@@ -42,24 +25,6 @@ export const getSignedPrefix = (value: number): string => {
   }
 
   return '-';
-};
-
-/**
- * Format integers with thousands separators (e.g., 1000 → "1,000").
- *
- * @param value - Integer value
- * @returns A formatted string with commas
- *
- * @example
- * formatNumberWithCommas(999)   // "999"
- * formatNumberWithCommas(1234)  // "1,234"
- */
-export const formatNumberWithCommas = (value: number): string => {
-  if (value < 1000) {
-    return value.toString();
-  }
-
-  return value.toLocaleString('en-US');
 };
 
 /**

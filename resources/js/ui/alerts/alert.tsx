@@ -9,21 +9,19 @@ export const Alert = (props: AlertProps) => {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
+    console.log('Rendering Alert Over And Over Again?');
     if (props.force_close) {
       setVisible(false);
+
+      if (props.on_close) {
+        props.on_close();
+      }
+
+      return;
     }
 
-    if (props.force_close && props.on_close) {
-      props.on_close();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.force_close, props.on_close]);
-
-  useEffect(() => {
-    if (!props.force_close) {
-      setVisible(true);
-    }
-  }, [props.children, props.force_close]);
+    setVisible(true);
+  }, [props.force_close, props.on_close, props.children]);
 
   const handleClose = (): void => {
     setVisible(false);

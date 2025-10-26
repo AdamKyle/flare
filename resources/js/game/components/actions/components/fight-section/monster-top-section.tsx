@@ -37,6 +37,12 @@ const MonsterTopSection = ({
     prev_action(newIndex);
   };
 
+  const handleViewMonsterStats = () => {
+    const monsterId = monsters[current_index].id;
+
+    view_monster_stats(monsterId || 0);
+  };
+
   return (
     <>
       <img
@@ -93,7 +99,7 @@ const MonsterTopSection = ({
         <LinkButton
           label="View Stats"
           variant={ButtonVariant.PRIMARY}
-          on_click={() => view_monster_stats()}
+          on_click={handleViewMonsterStats}
         />
       </div>
     </>

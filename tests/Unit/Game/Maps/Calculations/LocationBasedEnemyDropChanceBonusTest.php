@@ -11,52 +11,52 @@ class LocationBasedEnemyDropChanceBonusTest extends TestCase
     {
         $result = LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent(0.0);
 
-        $this->assertEquals(5.00, $result);
+        $this->assertEquals(0.02, $result);
     }
 
     public function test_negative_values_clamp_to_minimum(): void
     {
         $result = LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent(-2.0);
 
-        $this->assertEquals(5.00, $result);
+        $this->assertEquals(0.02, $result);
     }
 
     public function test_mapping_at_point_one_zero(): void
     {
         $result = LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent(0.10);
 
-        $this->assertEquals(5.91, $result);
+        $this->assertEquals(0.03, $result);
     }
 
     public function test_mapping_at_point_one_five(): void
     {
         $result = LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent(0.15);
 
-        $this->assertEquals(6.30, $result);
+        $this->assertEquals(0.04, $result);
     }
 
     public function test_mapping_at_point_three_zero(): void
     {
         $result = LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent(0.30);
 
-        $this->assertEquals(7.31, $result);
+        $this->assertEquals(0.05, $result);
     }
 
     public function test_mapping_at_point_four_five(): void
     {
         $result = LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent(0.45);
 
-        $this->assertEquals(8.10, $result);
+        $this->assertEquals(0.06, $result);
     }
 
     public function test_mapping_at_one_point_zero(): void
     {
         $result = LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent(1.0);
 
-        $this->assertEquals(10.00, $result);
+        $this->assertEquals(0.09, $result);
     }
 
-    public function test_monotonic_increase_across_rounded_samples(): void
+    public function test_monotonic_non_decreasing_across_rounded_samples(): void
     {
         $samples = [0.0, 0.10, 0.15, 0.30, 0.45, 1.0, 2.0];
 
@@ -66,28 +66,33 @@ class LocationBasedEnemyDropChanceBonusTest extends TestCase
             $current = LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent($value);
 
             if ($previous !== null) {
-                $this->assertGreaterThan($previous, $current);
+                $this->assertGreaterThanOrEqual($previous, $current);
             }
 
             $previous = $current;
         }
+
+        $first = LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent($samples[0]);
+        $last = LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent(end($samples));
+
+        $this->assertGreaterThan($first, $last);
     }
 
-    public function test_large_values_approach_but_do_not_reach_maximum(): void
+    public function test_large_values_approach_but_do_not_exceed_maximum(): void
     {
         $ten = LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent(10.0);
         $hundred = LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent(100.0);
         $thousand = LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent(1000.0);
 
-        $this->assertEquals(14.09, $ten);
-        $this->assertEquals(14.90, $hundred);
-        $this->assertEquals(14.99, $thousand);
+        $this->assertEquals(0.14, $ten);
+        $this->assertEquals(0.15, $hundred);
+        $this->assertEquals(0.15, $thousand);
 
-        $this->assertLessThan(15.00, $ten);
-        $this->assertLessThan(15.00, $hundred);
-        $this->assertLessThan(15.00, $thousand);
+        $this->assertLessThanOrEqual(0.15, $ten);
+        $this->assertLessThanOrEqual(0.15, $hundred);
+        $this->assertLessThanOrEqual(0.15, $thousand);
 
-        $this->assertGreaterThan($ten, $hundred);
-        $this->assertGreaterThan($hundred, $thousand);
+        $this->assertGreaterThanOrEqual($ten, $hundred);
+        $this->assertGreaterThanOrEqual($hundred, $thousand);
     }
 }

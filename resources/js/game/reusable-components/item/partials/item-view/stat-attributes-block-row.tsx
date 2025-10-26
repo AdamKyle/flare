@@ -1,6 +1,6 @@
 import React from 'react';
 
-import StatInfoToolTip from '../../stat-info-tool-tip';
+import StatToolTip from '../../tool-tips/stat-tool-tip';
 import { formatSignedPercent, isPositiveNumber } from '../../utils/item-view';
 
 import Dd from 'ui/dl/dd';
@@ -20,7 +20,7 @@ const StatsAttributesBlockRow = ({
   return (
     <>
       <Dt>
-        <StatInfoToolTip
+        <StatToolTip
           label={label}
           value={value}
           renderAsPercent
