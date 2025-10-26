@@ -39,6 +39,7 @@ export const MonsterStatSection = ({
       character_id: gameData.character.id,
       monster_id,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameData?.character, monster_id]);
 
   if (isNil(data) || loading) {

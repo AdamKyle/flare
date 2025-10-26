@@ -40,9 +40,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Set whether this monster should be flagged as special.
-     *
-     * @param bool $isSpecial
-     * @return MonsterTransformer
      */
     public function setIsMonsterSpecial(bool $isSpecial): MonsterTransformer
     {
@@ -53,9 +50,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Provide the total enemy stat increase percent (location + map).
-     *
-     * @param float $percent
-     * @return MonsterTransformer
      */
     public function withEnemyIncrease(float $percent): MonsterTransformer
     {
@@ -66,9 +60,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Provide the drop chance increase percent (map-only).
-     *
-     * @param float $percent
-     * @return MonsterTransformer
      */
     public function withDropChanceIncrease(float $percent): MonsterTransformer
     {
@@ -79,9 +70,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Build the transformed monster payload applying enemy and drop chance increases.
-     *
-     * @param Monster $monster
-     * @return array
      */
     public function transform(Monster $monster): array
     {
@@ -153,10 +141,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Apply a percent multiplier to an integer-like stat and round to int.
-     *
-     * @param int|float|null $value
-     * @param float $percent
-     * @return int
      */
     private function applyPercentToIntegerStat(int|float|null $value, float $percent): int
     {
@@ -167,10 +151,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Apply a percent multiplier to a "min-max" range string.
-     *
-     * @param string $range
-     * @param float $percent
-     * @return string
      */
     private function applyPercentToRange(string $range, float $percent): string
     {
@@ -182,15 +162,11 @@ class MonsterTransformer extends TransformerAbstract
         $min = (int) round($min * (1 + $percent));
         $max = (int) round($max * (1 + $percent));
 
-        return $min . '-' . $max;
+        return $min.'-'.$max;
     }
 
     /**
      * Increase a numeric (non-probability) stat by a percent.
-     *
-     * @param float|int|null $value
-     * @param float $percent
-     * @return float|int
      */
     private function increaseNumeric(float|int|null $value, float $percent): float|int
     {
@@ -201,11 +177,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Increase a ratio/probability by a percent and clamp to a maximum cap.
-     *
-     * @param float|int|null $value
-     * @param float $percent
-     * @param float $cap
-     * @return float
      */
     private function increaseRatio(float|int|null $value, float $percent, float $cap): float
     {
@@ -219,9 +190,6 @@ class MonsterTransformer extends TransformerAbstract
     /**
      * Compute final drop chance using base drop_check plus map-only increase, clamped to 1.0.
      * The base drop_check is capped at 0.99 before applying the increase.
-     *
-     * @param Monster $monster
-     * @return float
      */
     private function computeFinalDropChance(Monster $monster): float
     {

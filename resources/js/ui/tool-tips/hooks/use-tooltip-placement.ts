@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useState } from 'react';
+import { useLayoutEffect, useCallback, useState } from 'react';
 
 import UseTooltipPlacementDefinition from 'ui/tool-tips/hooks/definitions/use-tooltip-placement-definition';
 import UseTooltipPlacementParams from 'ui/tool-tips/hooks/definitions/use-tooltip-placement-params';
@@ -10,14 +10,12 @@ const useTooltipPlacement = (
   const { containerRef, buttonRef, popoverRef, align, open, extraDeps } =
     params;
 
-  const preferRight = align !== 'left';
-
   const [horizontal, setHorizontal] = useState<'left' | 'right'>(
-    preferRight ? 'right' : 'left'
+    align !== 'left' ? 'right' : 'left'
   );
   const [vertical, setVertical] = useState<'above' | 'below'>('below');
 
-  const place = (): void => {
+  const place = useCallback((): void => {
     const triggerEl = buttonRef.current;
     const tooltipEl = popoverRef.current;
 
@@ -40,6 +38,8 @@ const useTooltipPlacement = (
     const spaceBelow = parentRect.bottom - triggerRect.bottom;
     const spaceAbove = triggerRect.top - parentRect.top;
 
+    const preferRight = align !== 'left';
+
     if (preferRight && spaceRight >= tooltipWidth + 4) {
       setHorizontal('right');
     } else if (!preferRight && spaceLeft >= tooltipWidth + 4) {
@@ -57,11 +57,7 @@ const useTooltipPlacement = (
     } else {
       setVertical(spaceBelow >= spaceAbove ? 'below' : 'above');
     }
-  };
-
-  const deps = useMemo(() => {
-    return [open, align, ...(extraDeps || [])];
-  }, [open, align, extraDeps]);
+  }, [align, buttonRef, popoverRef, containerRef]);
 
   useLayoutEffect(() => {
     if (!open) {
@@ -92,7 +88,8 @@ const useTooltipPlacement = (
       parent?.removeEventListener('scroll', onScroll);
       window.removeEventListener('scroll', onScroll, true);
     };
-  }, deps);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, align, containerRef, place, ...(extraDeps || [])]);
 
   return {
     horizontal,

@@ -22,15 +22,8 @@ const GoblinShop = ({ on_close }: GoblinShopProps) => {
     null
   );
 
-  const {
-    data,
-    loading,
-    error,
-    handleScroll,
-    gold_bars,
-    inventory_count,
-    inventoryIsFull,
-  } = useCustomContext(GoblinShopContext, 'GoblinShop');
+  const { data, loading, error, handleScroll, gold_bars, inventoryIsFull } =
+    useCustomContext(GoblinShopContext, 'GoblinShop');
 
   const handleViewItem = (item_id: number) => {
     const foundItem = data.find((item) => item.item_id === item_id);

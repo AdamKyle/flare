@@ -12,15 +12,9 @@ use Psr\SimpleCache\InvalidArgumentException;
 
 class MonstersController extends Controller
 {
-    /**
-     * @param MonsterListService $monsterListService
-     * @param MonsterStatsService $monsterStatsService
-     */
     public function __construct(private readonly MonsterListService $monsterListService, private readonly MonsterStatsService $monsterStatsService) {}
 
     /**
-     * @param Character $character
-     * @return JsonResponse
      * @throws InvalidArgumentException
      */
     public function listMonsters(Character $character): JsonResponse
@@ -34,9 +28,6 @@ class MonstersController extends Controller
     }
 
     /**
-     * @param Monster $monster
-     * @param Character $character
-     * @return JsonResponse
      * @throws InvalidArgumentException
      */
     public function getMonsterStats(Monster $monster, Character $character): JsonResponse

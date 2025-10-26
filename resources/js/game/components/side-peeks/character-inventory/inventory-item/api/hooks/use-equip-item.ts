@@ -69,6 +69,7 @@ export const useEquipItem = ({
     }
 
     equipSelectedItem().catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [equipSelectedItem, requestParams]);
 
   return {

@@ -23,7 +23,7 @@ class MonsterListServiceTest extends TestCase
 
     private ?CharacterFactory $characterFactory;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -32,7 +32,7 @@ class MonsterListServiceTest extends TestCase
         $this->characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -175,7 +175,7 @@ class MonsterListServiceTest extends TestCase
     public function test_location_on_ice_plane_with_purgatory_uses_regular()
     {
         $character = $this->characterFactory->inventoryManagement()->giveItem($this->createItem([
-            'effect' => ItemEffectsValue::PURGATORY
+            'effect' => ItemEffectsValue::PURGATORY,
         ]))->getCharacter();
 
         $character->map()->update([
@@ -219,7 +219,7 @@ class MonsterListServiceTest extends TestCase
     public function test_ice_plane_regular_with_purgatory_without_location()
     {
         $character = $this->characterFactory->inventoryManagement()->giveItem($this->createItem([
-            'effect' => ItemEffectsValue::PURGATORY
+            'effect' => ItemEffectsValue::PURGATORY,
         ]))->getCharacter();
 
         $character->map()->update([
@@ -281,7 +281,7 @@ class MonsterListServiceTest extends TestCase
     public function test_delusional_memories_regular_with_purgatory()
     {
         $character = $this->characterFactory->inventoryManagement()->giveItem($this->createItem([
-            'effect' => ItemEffectsValue::PURGATORY
+            'effect' => ItemEffectsValue::PURGATORY,
         ]))->getCharacter();
 
         $character->map()->update([

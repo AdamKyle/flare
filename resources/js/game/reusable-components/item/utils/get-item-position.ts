@@ -1,5 +1,4 @@
 import { getType } from './get-type';
-import { isTwoHandedType } from './item-comparison';
 import { BaseItemDetails } from '../../../api-definitions/items/base-item-details';
 import { EquippableItemWithBase } from '../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import { armourPositions } from '../../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
@@ -10,7 +9,6 @@ export const getItemPositions = (
   item: BaseItemDetails | EquippableItemWithBase
 ) => {
   const itemType = getType(item, armourPositions);
-  const isTwoHanded = isTwoHandedType(item.type);
 
   if (itemType === ItemBaseTypes.Weapon) {
     return [ItemPositions.LEFT_HAND, ItemPositions.RIGHT_HAND];

@@ -21,6 +21,7 @@ export const Alert = (props: AlertProps) => {
     }
 
     setVisible(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.force_close, props.on_close, props.children]);
 
   const handleClose = (): void => {

@@ -14,7 +14,6 @@ const GoblinShopContext = createContext<
 const GoblinShopProvider = ({
   character,
   children,
-  update_character,
 }: GoblinShopProviderProps) => {
   const { data, loading, error, onEndReached } =
     UsePaginatedApiHandler<BaseUsableItemDefinition>({

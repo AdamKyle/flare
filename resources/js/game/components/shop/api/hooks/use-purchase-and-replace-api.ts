@@ -73,6 +73,8 @@ export const usePurchaseAndReplaceApi = (
     }
 
     purchaseAndReplaceItem().catch(() => {});
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [purchaseAndReplaceItem, requestParams]);
 
   return {

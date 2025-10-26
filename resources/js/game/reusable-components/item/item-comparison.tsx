@@ -31,10 +31,6 @@ const ItemComparison = ({
     setShowEquipActions(true);
   };
 
-  const handleCloseEquipSection = () => {
-    setShowEquipActions(false);
-  };
-
   const handleBuyAndReplace = (
     requestParams: UsePurchaseAndReplaceApiRequestDefinition
   ) => {
