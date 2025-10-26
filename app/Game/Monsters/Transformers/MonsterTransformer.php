@@ -100,7 +100,6 @@ class MonsterTransformer extends TransformerAbstract
             'int' => $this->applyPercentToIntegerStat($monster->int, $enemyIncrease),
             'agi' => $this->applyPercentToIntegerStat($monster->agi, $enemyIncrease),
             'focus' => $this->applyPercentToIntegerStat($monster->focus, $enemyIncrease),
-            'to_hit_base' => $this->applyPercentToIntegerStat($monster->dex, $enemyIncrease),
             'ac' => $this->applyPercentToIntegerStat($monster->ac, $enemyIncrease),
 
             'health_range' => $this->applyPercentToRange($monster->health_range, $enemyIncrease),
@@ -112,7 +111,6 @@ class MonsterTransformer extends TransformerAbstract
 
             'criticality' => $this->increaseNumeric($monster->criticality, $enemyIncrease),
 
-            'base_stat' => $this->applyPercentToIntegerStat($monster->{$monster->damage_stat}, $enemyIncrease),
             'max_level' => $monster->max_level,
             'has_damage_spells' => $monster->can_cast,
             'spell_damage' => $this->increaseNumeric($monster->max_spell_damage, $enemyIncrease),

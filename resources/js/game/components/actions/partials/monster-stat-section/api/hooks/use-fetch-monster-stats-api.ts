@@ -5,8 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { MonsterApiUrls } from '../enums/monster-api-urls';
 import SetMonsterPartsDefinition from './definitions/set-monster-params-definition';
 import UseFetchMonsterStatsApiDefinition from './definitions/use-fetch-monster-stats-api-definition';
-
-import MonsterDefinition from 'game-data/api-data-definitions/monsters/monster-definition';
+import MonsterDefinition from '../../../../../../api-definitions/monsters/monster-definition';
 
 export const useFetchMonsterStatsApi =
   (): UseFetchMonsterStatsApiDefinition => {

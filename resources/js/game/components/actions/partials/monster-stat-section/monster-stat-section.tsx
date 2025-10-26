@@ -3,6 +3,8 @@ import { isNil } from 'lodash';
 import React, { ReactNode, useEffect } from 'react';
 
 import { useFetchMonsterStatsApi } from './api/hooks/use-fetch-monster-stats-api';
+import MonsterCoreSection from './partials/monster-core-section';
+import MonsterStatSectionProps from './types/monster-stat-section-props';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 
@@ -15,11 +17,6 @@ import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import Separator from 'ui/separator/separator';
-
-interface MonsterStatSectionProps {
-  monster_id: number;
-  toggle_monster_stat_visibility: (monsterId: number) => void;
-}
 
 export const MonsterStatSection = ({
   monster_id,
@@ -65,59 +62,70 @@ export const MonsterStatSection = ({
     );
   }
 
+  const renderCelestialAlert = () => {
+    if (!data.is_celestial_entity) {
+      return null;
+    }
+
+    return (
+      <Alert variant={AlertVariant.INFO}>
+        <strong>This Creature is a celestial</strong>: You will find the
+        conjuration cost in shards to conjure this beast. You cannot encounter
+        this beast in the wild unless you trigger a spawn by either moving
+        (small chance) or unless it's Celestial Day, in which case any form of
+        movement has an 80% chance to conjure one. Players who completed Quest X
+        can use /PCT command to instantly travel to it. Killing it in one hit is
+        advised or it will move and heal for full health.
+      </Alert>
+    );
+  };
+
+  const renderRaidMonsterAlert = () => {
+    if (!data.is_raid_monster) {
+      return null;
+    }
+
+    return (
+      <Alert variant={AlertVariant.INFO}>
+        <strong>This creature is a raid monster</strong>: These creatures live
+        at specific locations on specific maps while a raid is taking place.
+        These creatures can be strong and hard to take down, but they drop quest
+        items to progress raid story line quests that lead towards unlocking
+        cosmetic based rewards. You can fight them while at the specific
+        location(s) and selecting them from the drop down.
+      </Alert>
+    );
+  };
+
+  const renderRaidBossAlert = () => {
+    if (!data.is_raid_boss) {
+      return null;
+    }
+
+    return (
+      <Alert variant={AlertVariant.INFO}>
+        <strong>This creature is a raid boss</strong>: This beast lives at a
+        specific location while a raid is in progress. These creatures cannot be
+        taken down alone, and require many players to work together to bring the
+        beast down! The player who lands the last hit, gets a full set of gear
+        the raid boss raid dropping. Come prepared to die child!
+      </Alert>
+    );
+  };
+
   return (
     <ContainerWithTitle
       manageSectionVisibility={() => toggle_monster_stat_visibility(0)}
-      title={'Monster Name'}
+      title={data.name}
     >
       <Card>
-        <Alert variant={AlertVariant.INFO}>
-          <strong>This Creature is a celestial</strong>: You will find the
-          conjuration cost in shards to conjure this beast. You cannot encounter
-          this beast in the wild unless you trigger a spawn by either moving
-          (small chance) or unless it's Celestial Day, in which case any form of
-          movement has an 80% chance to conjure one. Players who completed Quest
-          X can use /PCT command to instantly travel to it. Killing it in one
-          hit is advised or it will move and heal for full health.
-        </Alert>
-
-        <Alert variant={AlertVariant.INFO}>
-          <strong>This creature is a raid monster</strong>: These creatures live
-          at specific locations on specific maps while a raid is taking place.
-          These creatures can be strong and hard to take down, but they drop
-          quest items to progress raid story line quests that lead towards
-          unlocking cosmetic based rewards. You can fight them while at the
-          specific location(s) and selecting them from the drop down.
-        </Alert>
-
-        <Alert variant={AlertVariant.INFO}>
-          <strong>This creature is a raid boss</strong>: This beast lives at a
-          specific location while a raid is in progress. These creatures cannot
-          be taken down alone, and require many players to work together to
-          bring the beast down! The player who lands the last hit, gets a full
-          set of gear the raid boss raid dropping. Come prepared to die child!
-        </Alert>
+        {renderCelestialAlert()}
+        {renderRaidMonsterAlert()}
+        {renderRaidBossAlert()}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
           <div>
-            <Dl>
-              <Dt>Monster Name:</Dt>
-              <Dd>Name</Dd>
-              <Dt>Lives on map:</Dt>
-              <Dd>Surface</Dd>
-              <Dt>Can only be fought at:</Dt>
-              <Dd>Special Location</Dd>
-              <Dt>Base Damage Stat:</Dt>
-              <Dd>Str</Dd>
-              <Dt>Receive 1/3 Xp at level:</Dt>
-              <Dd>10</Dd>
-              <Dt>Conjuration Cost (Gold):</Dt>
-              <Dd>1,000</Dd>
-              <Dt>Conjuration Cost (Gold Dust):</Dt>
-              <Dd>1,000</Dd>
-              <Dt>To Hit Base</Dt>
-              <Dd>10</Dd>
-            </Dl>
+            <MonsterCoreSection monster={data} />
 
             <h3 className="text-danube-500 dark:text-danube-700 mt-5">
               Basic Stats

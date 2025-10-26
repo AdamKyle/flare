@@ -12,7 +12,6 @@ export default interface MonsterDefinition {
   agi: number;
   focus: number;
 
-  to_hit_base: number;
   ac: number;
 
   health_range: string;
@@ -23,7 +22,6 @@ export default interface MonsterDefinition {
   casting_accuracy: number;
   criticality: number;
 
-  base_stat: number;
   max_level: number;
 
   spell_damage: number;
