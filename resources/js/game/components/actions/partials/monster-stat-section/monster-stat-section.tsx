@@ -3,7 +3,16 @@ import { isNil } from 'lodash';
 import React, { ReactNode, useEffect } from 'react';
 
 import { useFetchMonsterStatsApi } from './api/hooks/use-fetch-monster-stats-api';
+import MonsterAmbushCounterSection from './partials/monster-ambush-counter-section';
+import MonsterBasicStatsSection from './partials/monster-basic-stats-section';
 import MonsterCoreSection from './partials/monster-core-section';
+import MonsterCoreStatsSection from './partials/monster-core-stats-section';
+import MonsterDevouringSection from './partials/monster-devouring-section';
+import MonsterElementalAtonementSection from './partials/monster-element-atonement-section';
+import MonsterRaidSpecialAttackSection from './partials/monster-raid-special-attack-section';
+import MonsterResistanceSection from './partials/monster-resistance-section';
+import MonsterRewardsSection from './partials/monster-reward-section';
+import MonsterSkillSection from './partials/monster-skill-section';
 import MonsterStatSectionProps from './types/monster-stat-section-props';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
@@ -12,11 +21,7 @@ import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Card from 'ui/cards/card';
 import ContainerWithTitle from 'ui/container/container-with-title';
-import Dd from 'ui/dl/dd';
-import Dl from 'ui/dl/dl';
-import Dt from 'ui/dl/dt';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
-import Separator from 'ui/separator/separator';
 
 export const MonsterStatSection = ({
   monster_id,
@@ -127,142 +132,25 @@ export const MonsterStatSection = ({
           <div>
             <MonsterCoreSection monster={data} />
 
-            <h3 className="text-danube-500 dark:text-danube-700 mt-5">
-              Basic Stats
-            </h3>
-            <Separator />
-            <Dl>
-              <Dt>Health Range:</Dt>
-              <Dd>100 - 200</Dd>
-              <Dt>Attack Range:</Dt>
-              <Dd>100 - 200</Dd>
-              <Dt>Increase Damage By:</Dt>
-              <Dd>10%</Dd>
-              <Dt>Max Spell Damage:</Dt>
-              <Dd>350</Dd>
-              <Dt>Max Affix Damage:</Dt>
-              <Dd>350</Dd>
-              <Dt>Entrancing Chance:</Dt>
-              <Dd>8%</Dd>
-              <Dt>Max Healing:</Dt>
-              <Dd>1,800,000</Dd>
-              <Dt>Armour Class (Defence):</Dt>
-              <Dd>150</Dd>
-            </Dl>
+            <MonsterRewardsSection monster={data} />
 
-            <h3 className="text-danube-500 dark:text-danube-700 mt-5">
-              Raid Special Attack
-            </h3>
-            <Separator />
-            <Dl>
-              <Dt>Attack Name:</Dt>
-              <Dd>Some Attack</Dd>
-              <Dt>Details:</Dt>
-              <Dd>Deals damage to players</Dd>
-            </Dl>
+            <MonsterBasicStatsSection monster={data} />
 
-            <h3 className="text-danube-500 dark:text-danube-700 mt-5">
-              Ambush and Counter
-            </h3>
-            <Separator />
-            <Dl>
-              <Dt>Ambush Chance:</Dt>
-              <Dd>8%</Dd>
-              <Dt>Ambush Resistance:</Dt>
-              <Dd>2%</Dd>
-              <Dt>Counter Chance:</Dt>
-              <Dd>10%</Dd>
-              <Dt>Counter Resistance:</Dt>
-              <Dd>10%</Dd>
-            </Dl>
+            <MonsterRaidSpecialAttackSection monster={data} />
 
-            <h3 className="text-danube-500 dark:text-danube-700 mt-5">
-              Elemental Atonement
-            </h3>
-            <Separator />
-            <Dl>
-              <Dt>Fire Atonement:</Dt>
-              <Dd>24%</Dd>
-              <Dt>Water Atonement:</Dt>
-              <Dd>78%</Dd>
-              <Dt>Ice Atonement:</Dt>
-              <Dd>10%</Dd>
-            </Dl>
+            <MonsterAmbushCounterSection monster={data} />
 
-            <h3 className="text-danube-500 dark:text-danube-700 mt-5">
-              Rewards
-            </h3>
-            <Separator />
-            <Dl>
-              <Dt>XP:</Dt>
-              <Dd>100</Dd>
-              <Dt>Gold:</Dt>
-              <Dd>500</Dd>
-              <Dt>Shard Reward:</Dt>
-              <Dd>1,000</Dd>
-              <Dt>Drop Chance:</Dt>
-              <Dd>10%</Dd>
-            </Dl>
+            <MonsterElementalAtonementSection monster={data} />
           </div>
 
           <div>
-            <h3 className="text-danube-500 dark:text-danube-700">Core Stats</h3>
-            <Separator />
-            <Dl>
-              <Dt>Str:</Dt>
-              <Dd>100</Dd>
-              <Dt>Dur:</Dt>
-              <Dd>100</Dd>
-              <Dt>Dex:</Dt>
-              <Dd>100</Dd>
-              <Dt>Int:</Dt>
-              <Dd>100</Dd>
-              <Dt>Chr:</Dt>
-              <Dd>100</Dd>
-              <Dt>Agi:</Dt>
-              <Dd>100</Dd>
-              <Dt>Focus:</Dt>
-              <Dd>100</Dd>
-            </Dl>
+            <MonsterCoreStatsSection monster={data} />
 
-            <h3 className="text-danube-500 dark:text-danube-700 mt-5">
-              Skills
-            </h3>
-            <Separator />
-            <Dl>
-              <Dt>Accuracy:</Dt>
-              <Dd>1.5%</Dd>
-              <Dt>Casting Accuracy:</Dt>
-              <Dd>2.8%</Dd>
-              <Dt>Dodge:</Dt>
-              <Dd>10%</Dd>
-              <Dt>Criticality:</Dt>
-              <Dd>10%</Dd>
-            </Dl>
+            <MonsterSkillSection monster={data} />
 
-            <h3 className="text-danube-500 dark:text-danube-700 mt-5">
-              Resistances
-            </h3>
-            <Separator />
-            <Dl>
-              <Dt>Affix:</Dt>
-              <Dd>1.5%</Dd>
-              <Dt>Spells:</Dt>
-              <Dd>2.8%</Dd>
-              <Dt>Life Stealing:</Dt>
-              <Dd>10%</Dd>
-            </Dl>
+            <MonsterResistanceSection monster={data} />
 
-            <h3 className="text-danube-500 dark:text-danube-700 mt-5">
-              Devouring Light / Darkness
-            </h3>
-            <Separator />
-            <Dl>
-              <Dt>Devouring Light:</Dt>
-              <Dd>1.5%</Dd>
-              <Dt>Devouring Darkness:</Dt>
-              <Dd>2.8%</Dd>
-            </Dl>
+            <MonsterDevouringSection monster={data} />
           </div>
         </div>
       </Card>

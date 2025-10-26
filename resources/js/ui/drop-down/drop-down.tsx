@@ -33,7 +33,6 @@ const Dropdown = ({
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string | number>('');
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
-
   const [searchTerm, setSearchTerm] = useState('');
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -67,11 +66,10 @@ const Dropdown = ({
   useEffect(() => {
     if (isOpen && focusedIndex !== null && listRef.current) {
       const element = listRef.current.children[focusedIndex] as HTMLElement;
-
       element?.scrollIntoView({ block: 'nearest' });
     }
 
-    if (pre_selected_item && selectedValue !== pre_selected_item.value) {
+    if (pre_selected_item) {
       setSelectedValue(pre_selected_item.value);
     }
 
@@ -207,7 +205,7 @@ const Dropdown = ({
     on_select(item);
     setIsOpen(false);
     setFocusedIndex(null);
-    setSearchTerm(''); // NEW: reset on select
+    setSearchTerm('');
   };
 
   const renderIcon = () => {
@@ -248,11 +246,14 @@ const Dropdown = ({
     ));
 
   const renderSelectionText = () => {
-    if (selectedValue) {
-      const found = items.find((it) => it.value === selectedValue);
+    const current =
+      selectedValue !== ''
+        ? items.find((it) => it.value === selectedValue)
+        : pre_selected_item;
 
+    if (current) {
       return (
-        <div className="text-gray-900 dark:text-white">{found?.label}</div>
+        <div className="text-gray-900 dark:text-white">{current.label}</div>
       );
     }
 
@@ -284,7 +285,6 @@ const Dropdown = ({
           'w-full text-black dark:text-white',
           !use_pagination && 'max-h-60 overflow-auto',
           !use_pagination &&
-            // neutral gray scrollbar to match borders
             'scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 scrollbar-thumb-rounded-md'
         )}
       >
@@ -293,7 +293,6 @@ const Dropdown = ({
     );
 
     const wrapperClasses = clsx(
-      // doubled gap from trigger: mt-1 -> mt-2
       'absolute w-full mt-2 border border-gray-500 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md',
       is_in_modal ? 'z-[9999]' : 'z-50'
     );
@@ -316,7 +315,6 @@ const Dropdown = ({
             additional_css={clsx(
               'max-h-60',
               additional_scroll_css,
-              // same scrollbar styling here for consistency
               'scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 scrollbar-thumb-rounded-md'
             )}
           >

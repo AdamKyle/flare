@@ -1,6 +1,6 @@
 import React from 'react';
 
-import MonsterCoreSectionProps from '../types/partials/monster-core-section-props';
+import MonsterSectionProps from '../types/partials/monster-section-props';
 import { getLocationTypeName } from '../util/get-location-type-name';
 
 import { formatNumberWithCommas } from 'game-utils/format-number';
@@ -10,7 +10,7 @@ import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
 import GeneralToolTip from 'ui/tool-tips/general-tool-tip';
 
-const MonsterCoreSection = (props: MonsterCoreSectionProps) => {
+const MonsterCoreSection = (props: MonsterSectionProps) => {
   const { monster } = props;
 
   const renderLabel = (
@@ -105,7 +105,7 @@ const MonsterCoreSection = (props: MonsterCoreSectionProps) => {
           'Much like characters, this is the stat the monster uses when they attack, a portion of this stat is added to their over all attack.'
         )}
       </Dt>
-      <Dd>{monster.damage_stat}</Dd>
+      <Dd>{monster.damage_stat.toString()}</Dd>
 
       <Dt>
         {renderLabel(

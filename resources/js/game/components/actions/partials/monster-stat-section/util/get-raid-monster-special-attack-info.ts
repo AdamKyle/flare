@@ -13,7 +13,7 @@ export type SpecialAttackTypeInfo = {
  * @param attackType
  */
 export const getRaidMonsterSpecialAttackInfo = (
-  attackType: RaidSpecialAttackTypes
+  attackType: RaidSpecialAttackTypes | null
 ): SpecialAttackTypeInfo => {
   return match(attackType)
     .with(RaidSpecialAttackTypes.PHYSICAL_ATTACK, () => {
