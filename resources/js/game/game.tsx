@@ -6,6 +6,7 @@ import { ServiceContainer } from 'service-container-provider/service-container';
 import { EchoHandlerProvider } from '../websocket-handler/components/echo-handler-provider';
 import BaseSidePeek from './components/side-peeks/base/base-side-peek';
 import GameSection from './game-section';
+import { AppScreenProvider } from '../config/screen-manager/screen-manager-kit';
 
 import GameDataProvider from 'game-data/components/game-data-provider';
 
@@ -17,7 +18,9 @@ export const Game = () => {
           <EchoHandlerProvider>
             <GameDataProvider>
               <BaseSidePeek />
-              <GameSection />
+              <AppScreenProvider>
+                <GameSection />
+              </AppScreenProvider>
             </GameDataProvider>
           </EchoHandlerProvider>
         </ApiHandlerProvider>
