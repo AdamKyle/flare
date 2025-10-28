@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 
 import Actions from './actions/partials/actions/actions';
 import { useManageMarketVisibility } from './actions/partials/floating-cards/map-section/hooks/use-manage-market-visibility';
@@ -8,8 +8,6 @@ import { MonsterStatSection } from './actions/partials/monster-stat-section/mons
 import { useAttackDetailsVisibility } from './character-sheet/hooks/use-attack-details-visibility';
 import { useStatDetailsVisibility } from './character-sheet/hooks/use-stat-details-visibility';
 import CharacterStatTypeBreakDown from './character-sheet/partials/character-stat-types/character-stat-type-breakdown';
-import GoblinShopScreen from './goblin-shop/goblin-shop-screen';
-import { useManageGoblinShopVisibility } from './goblin-shop/hooks/use-manage-goblin-shop-visibility';
 import { useCharacterInventoryVisibility } from './hooks/use-character-inventory-visibility';
 import FullMap from './map-section/full-map';
 import { useToggleFullMapVisibility } from './map-section/hooks/use-toggle-full-map-visibility';
@@ -17,8 +15,6 @@ import Market from './market/market';
 import CharacterAttackTypeBreakdown from './partials/character-attack-type-breakdown';
 import CharacterInventory from './partials/character-inventory';
 import PlayerKingdoms from './player-kingdoms/player-kingdoms';
-import { useManageShopSectionVisibility } from './shop/hooks/use-manage-shop-section-visibility';
-import ShopScreen from './shop/shop-screen';
 
 export const GameCard = (): ReactNode => {
   const [monsterIdToView, setMonsterIdToView] = useState<number>(0);
@@ -42,18 +38,6 @@ export const GameCard = (): ReactNode => {
   const { showPlayerKingdoms, closePlayerKingdoms } =
     useManagePlayerKingdomManagementVisibility();
 
-  const { closeShopSection, showShopSection } =
-    useManageShopSectionVisibility();
-
-  const { closeGoblinShop, showGoblinShop } = useManageGoblinShopVisibility();
-
-  useEffect(() => {
-    return () => {
-      // fires when GameCard unmounts (note: in React StrictMode dev, this runs twice)
-      console.log('[GameCard] unmounted');
-    };
-  }, []);
-
   const handleShowMonsterStats = (monsterId: number) => {
     setMonsterIdToView(monsterId);
 
@@ -73,14 +57,6 @@ export const GameCard = (): ReactNode => {
 
     if (showMarket) {
       return <Market close_shop={closeMarket} />;
-    }
-
-    if (showShopSection) {
-      return <ShopScreen close_shop={closeShopSection} />;
-    }
-
-    if (showGoblinShop) {
-      return <GoblinShopScreen on_close={closeGoblinShop} />;
     }
 
     if (showMonsterStatsSection) {

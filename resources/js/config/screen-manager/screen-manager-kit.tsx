@@ -2,7 +2,7 @@ import React from 'react';
 
 import { AppScreenPropsMap } from './screen-manager-props';
 import { appScreenRegistry } from './screen-manager-registry';
-import createScreenManager from '../../screen-manager/core/create-screen-manager';
+import createScreenManager from '../../screen-manager/create-screen-manager';
 
 const ScreenKit = createScreenManager<AppScreenPropsMap>();
 

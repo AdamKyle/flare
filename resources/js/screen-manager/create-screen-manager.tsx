@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, {
   Attributes,
@@ -9,15 +10,13 @@ import React, {
   useState,
 } from 'react';
 
-import {
-  ScreenMap,
-  ScreenName,
-  ScreenPropsOf,
-  StackEntry,
-  ScreenRegistry,
-  ScreenNavigation,
-} from './types';
-import UseBindScreenParams from '../hooks/definitions/use-bind-screen-params';
+import UseBindScreenParams from './hooks/definitions/use-bind-screen-params';
+import { ScreenNavigation } from './types/navigation-type';
+import { ScreenRegistry } from './types/registery-type';
+import { ScreenMap } from './types/screen-map-type';
+import { ScreenName } from './types/screen-name-type';
+import { ScreenPropsOf } from './types/screen-props-of-type';
+import { StackEntry } from './types/stack-entry-type';
 
 const slideVariants = {
   hidden: { x: '100%', opacity: 0 },
@@ -105,9 +104,7 @@ const createScreenManager = <TMap extends ScreenMap>() => {
             return prev;
           }
 
-          const next = prev.slice(0, Math.max(0, prev.length - count));
-
-          return next;
+          return prev.slice(0, Math.max(0, prev.length - count));
         });
       };
 
@@ -116,9 +113,7 @@ const createScreenManager = <TMap extends ScreenMap>() => {
           return null;
         }
 
-        const top = stack[stack.length - 1];
-
-        return top;
+        return stack[stack.length - 1];
       };
 
       const getHidden = () => {
@@ -126,9 +121,7 @@ const createScreenManager = <TMap extends ScreenMap>() => {
           return [];
         }
 
-        const hidden = stack.slice(0, stack.length - 1);
-
-        return hidden;
+        return stack.slice(0, stack.length - 1);
       };
 
       const resolve = <K extends ScreenName<TMap>>(name: K) => {
@@ -198,26 +191,18 @@ const createScreenManager = <TMap extends ScreenMap>() => {
     const navigation = useScreenNavigation();
 
     const top = useMemo(() => {
-      const t = navigation._getTop();
-
-      return t;
+      return navigation._getTop();
     }, [navigation]);
-
-    const wrapperClasses = () => {
-      if (!top) {
-        return 'w-full pointer-events-none';
-      }
-
-      return 'w-full relative z-20';
-    };
 
     const renderResolved = <K extends ScreenName<TMap>>(
       name: K,
       props: ScreenPropsOf<TMap, K>
     ) => {
-      const C = navigation._resolve(name) as React.ComponentType<unknown>;
+      const component = navigation._resolve(
+        name
+      ) as React.ComponentType<unknown>;
 
-      return React.createElement(C, props as Attributes);
+      return React.createElement(component, props as Attributes);
     };
 
     const renderHiddenScreens = () => {
@@ -260,7 +245,13 @@ const createScreenManager = <TMap extends ScreenMap>() => {
     };
 
     return (
-      <div className={wrapperClasses()} style={{ willChange: 'transform' }}>
+      <div
+        className={clsx({
+          'w-full pointer-events-none': !top,
+          'w-full relative z-20': top,
+        })}
+        style={{ willChange: 'transform' }}
+      >
         {renderHiddenScreens()}
         <AnimatePresence>{renderTopScreen()}</AnimatePresence>
       </div>

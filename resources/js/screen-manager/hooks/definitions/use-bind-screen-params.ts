@@ -1,9 +1,8 @@
-import {
-  BindMode,
-  ScreenMap,
-  ScreenName,
-  ScreenPropsOf,
-} from '../../core/types';
+import { ScreenMap } from '../../types/screen-map-type';
+import { ScreenName } from '../../types/screen-name-type';
+import { ScreenPropsOf } from '../../types/screen-props-of-type';
+
+export type BindMode = 'push' | 'replace' | 'reset';
 
 export default interface UseBindScreenParams<
   TMap extends ScreenMap,
@@ -15,5 +14,3 @@ export default interface UseBindScreenParams<
   mode?: BindMode;
   dedupeKey?: string;
 }
-
-export type { ScreenMap, ScreenName, ScreenPropsOf };
