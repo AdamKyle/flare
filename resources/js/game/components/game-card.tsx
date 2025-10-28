@@ -1,3 +1,5 @@
+import { setScreenIntent } from 'configuration/screen-manager/screen-intent';
+import { Screens } from 'configuration/screen-manager/screen-manager-constants';
 import React, { ReactNode, useState } from 'react';
 
 import Actions from './actions/partials/actions/actions';
@@ -41,6 +43,11 @@ export const GameCard = (): ReactNode => {
 
       return;
     }
+
+    setScreenIntent(Screens.MONSTER_DETAILS, {
+      monster_id: monsterId,
+      toggle_monster_stat_visibility: handleShowMonsterStats,
+    });
 
     showMonsterStats();
   };

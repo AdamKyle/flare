@@ -1,6 +1,7 @@
 import BindCharacterInventory from './bind-character-inventory';
 import BindCharacterSheet from './bind-character-sheet';
 import BindGoblinShop from './bind-goblin-shop';
+import BindMonsterStatSection from './bind-monster-stat-section';
 import BindShop from './bind-shop';
 
 export const gameScreenBindings = [
@@ -8,4 +9,5 @@ export const gameScreenBindings = [
   BindShop,
   BindGoblinShop,
   BindCharacterInventory,
+  BindMonsterStatSection,
 ] as const;
