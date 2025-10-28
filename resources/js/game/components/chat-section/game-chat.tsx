@@ -8,101 +8,12 @@ import ExplorationMessages from './components/exploration-messages/exploration-m
 import ServerMessages from './components/server-messages/server-messages';
 import { useChatStream } from './websockets/hooks/use-chat-stream';
 import AnnouncementMessageDefinition from '../../api-definitions/chat/annoucement-message-definition';
-import ChatType, {
-  ChatMessageType,
-} from '../../api-definitions/chat/chat-message-definition';
+import ChatType from '../../api-definitions/chat/chat-message-definition';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 import { useGameData } from 'game-data/hooks/use-game-data';
 
 import PillTabs from 'ui/tabs/pill-tabs';
-
-type SystemRow = {
-  type: Exclude<ChatMessageType, 'chat'>;
-  message: string | null | undefined;
-};
-
-type ChatRow = {
-  type: 'chat';
-  color?: string | null;
-  map_name?: string | null;
-  character_name?: string | null;
-  message?: string | null;
-  x?: number | string | null;
-  y?: number | string | null;
-  hide_location?: boolean | null;
-};
-
-type _StreamRow = ChatRow | SystemRow;
-
-const makeSystemChat = (message: string, type: ChatMessageType): ChatType => {
-  return {
-    color: '',
-    map_name: '',
-    character_name: '',
-    message,
-    x: 0,
-    y: 0,
-    type,
-    hide_location: true,
-  };
-};
-
-const isObject = (value: unknown): value is Record<string, unknown> => {
-  return typeof value === 'object' && value !== null;
-};
-
-const isChatRow = (row: unknown): row is ChatRow => {
-  if (!isObject(row)) {
-    return false;
-  }
-
-  if (!('type' in row) || (row as { type?: unknown }).type !== 'chat') {
-    return false;
-  }
-
-  return true;
-};
-
-const isSystemRow = (row: unknown): row is SystemRow => {
-  if (!isObject(row)) {
-    return false;
-  }
-
-  if (!('type' in row)) {
-    return false;
-  }
-
-  const typeValue = (row as { type?: unknown }).type;
-  return (
-    typeValue === 'creator-message' ||
-    typeValue === 'global-message' ||
-    typeValue === 'error-message' ||
-    typeValue === 'private-message-sent'
-  );
-};
-
-const coerceStreamToChatType = (row: unknown): ChatType => {
-  if (isChatRow(row)) {
-    return {
-      color: (row.color ?? '') as string,
-      map_name: (row.map_name ?? '') as string,
-      character_name: (row.character_name ?? '') as string,
-      message: (row.message ?? '') as string,
-      x: Number(row.x ?? 0),
-      y: Number(row.y ?? 0),
-      type: 'chat',
-      hide_location: Boolean(row.hide_location),
-    };
-  }
-
-  if (isSystemRow(row)) {
-    const sys = row as SystemRow;
-    return makeSystemChat(String(sys.message ?? ''), sys.type);
-  }
-
-  return makeSystemChat(String(row ?? ''), 'error-message');
-};
 
 const GameChat = () => {
   const { gameData } = useGameData();
@@ -160,10 +71,10 @@ const GameChat = () => {
 
   const push_silenced_message = useCallback(() => {
     setLocalChats((previous) => {
-      const next = makeSystemChat(
-        "You child, have been chatting up a storm. Slow down. I'll let you know whe you can talk again ...",
-        'error-message'
-      );
+      const next = {
+        message: "You child, have been chatting up a storm. Slow down. I'll let you know whe you can talk again ...",
+        type: 'error-message'
+      } as ChatType;
 
       const updated = [next, ...previous];
 
@@ -177,10 +88,11 @@ const GameChat = () => {
 
   const push_private_message_sent = useCallback((messageData: string[]) => {
     setLocalChats((previous) => {
-      const next = makeSystemChat(
-        `Sent to ${messageData[1]}: ${messageData[2]}`,
-        'private-message-sent'
-      );
+
+      const next = {
+        message: `Sent to ${messageData[1]}: ${messageData[2]}`,
+        type: 'private-message-sent',
+      } as ChatType;
 
       const updated = [next, ...previous];
 
@@ -194,7 +106,11 @@ const GameChat = () => {
 
   const push_error_message = useCallback((message: string) => {
     setLocalChats((previous) => {
-      const next = makeSystemChat(message, 'error-message');
+
+      const next = {
+        message,
+        type: "error-message"
+      } as ChatType;
 
       const updated = [next, ...previous];
 
@@ -213,14 +129,9 @@ const GameChat = () => {
     [setRequestParams]
   );
 
-  const streamedChatAsChatType = useMemo(() => {
-    // Now strongly typed: chatMessages is ChatType[] from the hook definition
-    return chatMessages.map((row) => coerceStreamToChatType(row));
-  }, [chatMessages]);
-
   const combinedChat = useMemo(() => {
-    return [...localChats, ...streamedChatAsChatType];
-  }, [localChats, streamedChatAsChatType]);
+    return [...localChats, ...chatMessages];
+  }, [localChats, chatMessages]);
 
   const renderBody = () => {
     if (!character) {
