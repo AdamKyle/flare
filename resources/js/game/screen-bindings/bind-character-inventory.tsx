@@ -6,31 +6,32 @@ import {
 import { ScreenPropsOf } from 'configuration/screen-manager/screen-manager-props';
 import { useRef } from 'react';
 
-import { useManageGoblinShopVisibility } from '../components/goblin-shop/hooks/use-manage-goblin-shop-visibility';
+import { useManageCharacterInventoryVisibility } from '../components/character-sheet/hooks/use-manage-character-inventory-visibility';
 
-const BindGoblinShop = () => {
+const BindCharacterInventory = () => {
   const { pop } = useScreenNavigation();
-  const { closeGoblinShop, showGoblinShop } = useManageGoblinShopVisibility();
+  const { closeInventory, showInventory } =
+    useManageCharacterInventoryVisibility();
 
   const activeRef = useRef(false);
 
   useBindScreen({
-    when: showGoblinShop,
-    to: Screens.GOBLIN_SHOP,
-    props: (): ScreenPropsOf<typeof Screens.GOBLIN_SHOP> => ({
-      on_close: () => {
+    when: showInventory,
+    to: Screens.CHARACTER_INVENTORY,
+    props: (): ScreenPropsOf<typeof Screens.CHARACTER_INVENTORY> => ({
+      close_inventory: () => {
         if (activeRef.current) {
           pop();
         }
-        closeGoblinShop();
+        closeInventory();
         activeRef.current = false;
       },
     }),
     mode: 'push',
-    dedupeKey: 'goblin-shop',
+    dedupeKey: 'character-inventory',
   });
 
   return null;
 };
 
-export default BindGoblinShop;
+export default BindCharacterInventory;

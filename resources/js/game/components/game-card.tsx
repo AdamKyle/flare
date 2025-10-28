@@ -8,12 +8,10 @@ import { MonsterStatSection } from './actions/partials/monster-stat-section/mons
 import { useAttackDetailsVisibility } from './character-sheet/hooks/use-attack-details-visibility';
 import { useStatDetailsVisibility } from './character-sheet/hooks/use-stat-details-visibility';
 import CharacterStatTypeBreakDown from './character-sheet/partials/character-stat-types/character-stat-type-breakdown';
-import { useCharacterInventoryVisibility } from './hooks/use-character-inventory-visibility';
 import FullMap from './map-section/full-map';
 import { useToggleFullMapVisibility } from './map-section/hooks/use-toggle-full-map-visibility';
 import Market from './market/market';
 import CharacterAttackTypeBreakdown from './partials/character-attack-type-breakdown';
-import CharacterInventory from './partials/character-inventory';
 import PlayerKingdoms from './player-kingdoms/player-kingdoms';
 
 export const GameCard = (): ReactNode => {
@@ -21,9 +19,6 @@ export const GameCard = (): ReactNode => {
 
   const { showMonsterStatsSection, showMonsterStats, closeMonsterStats } =
     useManageMonsterStatSectionVisibility();
-
-  const { showCharacterInventory, closeInventory } =
-    useCharacterInventoryVisibility();
 
   const { showAttackType, attackType, closeAttackDetails } =
     useAttackDetailsVisibility();
@@ -84,10 +79,6 @@ export const GameCard = (): ReactNode => {
           close_stat_type={closeStatDetails}
         />
       );
-    }
-
-    if (showCharacterInventory) {
-      return <CharacterInventory close_inventory={closeInventory} />;
     }
 
     if (showFullMap) {

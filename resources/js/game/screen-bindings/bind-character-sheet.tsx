@@ -1,11 +1,11 @@
-import { useRef } from 'react';
-
-import { Screens } from '../../config/screen-manager/screen-manager-constants';
+import { Screens } from 'configuration/screen-manager/screen-manager-constants';
 import {
   useBindScreen,
   useScreenNavigation,
-} from '../../config/screen-manager/screen-manager-kit';
-import { ScreenPropsOf } from '../../config/screen-manager/screen-manager-props';
+} from 'configuration/screen-manager/screen-manager-kit';
+import { ScreenPropsOf } from 'configuration/screen-manager/screen-manager-props';
+import { useRef } from 'react';
+
 import { useCharacterSheetVisibility } from '../components/hooks/use-character-sheet-visibility';
 import { useManageCharacterSheetVisibility } from '../components/hooks/use-manage-character-sheet-visibility';
 

@@ -1,4 +1,6 @@
 import clsx from 'clsx';
+import { useScreenNavigation } from 'configuration/screen-manager/screen-manager-kit';
+import { ScreenHost } from 'configuration/screen-manager/screen-manager-kit';
 import { motion } from 'framer-motion';
 import React from 'react';
 
@@ -9,8 +11,6 @@ import ScreenBindingHost from '../screen-manager/screen-binding-host';
 import GameLoader from './components/game-loader/game-loader';
 import { useGameLoaderVisibility } from './components/hooks/use-game-loader-visibility';
 import { gameScreenBindings } from './screen-bindings';
-import { useScreenNavigation } from '../config/screen-manager/screen-manager-kit';
-import { ScreenHost } from '../config/screen-manager/screen-manager-kit';
 
 const GameSection = () => {
   const { showGameLoader } = useGameLoaderVisibility();

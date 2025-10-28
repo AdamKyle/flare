@@ -1,11 +1,11 @@
-import { useRef } from 'react';
-
-import { Screens } from '../../config/screen-manager/screen-manager-constants';
+import { Screens } from 'configuration/screen-manager/screen-manager-constants';
 import {
   useBindScreen,
   useScreenNavigation,
-} from '../../config/screen-manager/screen-manager-kit';
-import { ScreenPropsOf } from '../../config/screen-manager/screen-manager-props';
+} from 'configuration/screen-manager/screen-manager-kit';
+import { ScreenPropsOf } from 'configuration/screen-manager/screen-manager-props';
+import { useRef } from 'react';
+
 import { useManageShopSectionVisibility } from '../components/shop/hooks/use-manage-shop-section-visibility';
 
 const BindShop = () => {
@@ -28,7 +28,7 @@ const BindShop = () => {
       },
     }),
     mode: 'push',
-    dedupeKey: 'character-sheet',
+    dedupeKey: 'shop',
   });
 
   return null;
