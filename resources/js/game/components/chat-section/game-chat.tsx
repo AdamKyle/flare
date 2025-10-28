@@ -1,3 +1,4 @@
+import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useFetchChatHistory } from './api/hooks/use-fetch-chat-history';
@@ -13,6 +14,7 @@ import ChatType from '../../api-definitions/chat/chat-message-definition';
 import { GameDataError } from 'game-data/components/game-data-error';
 import { useGameData } from 'game-data/hooks/use-game-data';
 
+import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import PillTabs from 'ui/tabs/pill-tabs';
 
 const GameChat = () => {
@@ -20,7 +22,7 @@ const GameChat = () => {
 
   const characterId = gameData?.character?.id ?? 0;
 
-  const { data } = useFetchChatHistory({ character_id: characterId });
+  const { data, loading, error } = useFetchChatHistory();
 
   const character = gameData?.character ?? null;
   const isAdmin = Boolean(character?.is_admin);
@@ -46,9 +48,7 @@ const GameChat = () => {
     AnnouncementMessageDefinition[]
   >(data?.announcements || []);
 
-  const { setRequestParams } = useSendChatMessage({
-    character_id: characterId,
-  });
+  const { setRequestParams } = useSendChatMessage();
 
   useEffect(() => {
     const initial: AnnouncementMessageDefinition[] = data?.announcements || [];
@@ -72,8 +72,9 @@ const GameChat = () => {
   const push_silenced_message = useCallback(() => {
     setLocalChats((previous) => {
       const next = {
-        message: "You child, have been chatting up a storm. Slow down. I'll let you know whe you can talk again ...",
-        type: 'error-message'
+        message:
+          "You child, have been chatting up a storm. Slow down. I'll let you know whe you can talk again ...",
+        type: 'error-message',
       } as ChatType;
 
       const updated = [next, ...previous];
@@ -88,7 +89,6 @@ const GameChat = () => {
 
   const push_private_message_sent = useCallback((messageData: string[]) => {
     setLocalChats((previous) => {
-
       const next = {
         message: `Sent to ${messageData[1]}: ${messageData[2]}`,
         type: 'private-message-sent',
@@ -106,10 +106,9 @@ const GameChat = () => {
 
   const push_error_message = useCallback((message: string) => {
     setLocalChats((previous) => {
-
       const next = {
         message,
-        type: "error-message"
+        type: 'error-message',
       } as ChatType;
 
       const updated = [next, ...previous];
@@ -196,6 +195,14 @@ const GameChat = () => {
 
     return <PillTabs tabs={tabs} additional_tab_css="w-full md:w-2/3" />;
   };
+
+  if (loading) {
+    return <InfiniteLoader />;
+  }
+
+  if (error) {
+    return <ApiErrorAlert apiError={error.message} />;
+  }
 
   return <div className="px-4">{renderBody()}</div>;
 };

@@ -3,13 +3,10 @@ import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 
 import { UseFetchChatHistoryDefinition } from './definitions/use-fetch-chat-history-definition';
-import { UseFetchChatHistoryParams } from './definitions/use-fetch-chat-history-params';
 import { ChatApiUrls } from '../enums/chat-api-urls';
 import { ChatHistoryDataDefinition } from './definitions/chat-history-data-definition';
 
-export const useFetchChatHistory = (
-  params: UseFetchChatHistoryParams
-): UseFetchChatHistoryDefinition => {
+export const useFetchChatHistory = (): UseFetchChatHistoryDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
 
   const [data, setData] = useState<ChatHistoryDataDefinition | null>(null);
@@ -17,9 +14,7 @@ export const useFetchChatHistory = (
     useState<UseFetchChatHistoryDefinition['error']>(null);
   const [loading, setLoading] = useState(true);
 
-  const url = getUrl(ChatApiUrls.FETCH_HISTORY, {
-    character: params.character_id,
-  });
+  const url = getUrl(ChatApiUrls.FETCH_HISTORY);
 
   const fetchHistory = useCallback(async () => {
     try {

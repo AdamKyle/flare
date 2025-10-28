@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import EventPayload from './definitions/event-payload-definition';
+import RegularChatEventDefinition from './definitions/regular-chat-event-definition';
+import { RegularMessagePayloadDefinition } from './definitions/regular-message-payload-definition';
 import UseChatStreamParams from './definitions/use-chat-stream-params';
 import { ChannelType } from '../../../../../websocket-handler/enums/channel-type';
 import { useWebsocket } from '../../../../../websocket-handler/hooks/use-websocket';
@@ -13,37 +16,9 @@ import { ChatWebsocketEventNames } from '../enums/chat-websocket-event-names';
 import { UseChatStreamDefinition } from './definitions/use-chat-stream-definition';
 import ServerMessagesDefinition from '../../../../api-definitions/chat/server-messages-definition';
 
-type RegularMessagePayload = {
-  message: string;
-  color?: string | null;
-  map_name?: string | null;
-  x_position?: number | null;
-  y_position?: number | null;
-  hide_location?: boolean | null;
-  is_chat_bold?: boolean | null;
-  is_chat_italic?: boolean | null;
-  character_name?: string | null;
-};
-
-type RegularChatEvent = {
-  type: ChatMessageType;
-  message: RegularMessagePayload;
-};
-
-// The incoming socket event types we care about for the PUBLIC channel:
-type ChatSentEvent =
-  | { type: 'creator-message'; message: string | { message: string } }
-  | { type: 'global-message'; message: string }
-  | { type: 'npc-message'; message: string }
-  | { type: 'error-message'; message: string }
-  | { type: 'private-message-sent'; message: string }
-  | RegularChatEvent;
-
-type ServerEvent = ServerMessagesDefinition;
-type ExplorationEvent = ExplorationMessageDefinition;
-type AnnouncementEvent = AnnouncementMessageDefinition;
-
-const isRegularPayload = (value: unknown): value is RegularMessagePayload => {
+const isRegularPayload = (
+  value: unknown
+): value is RegularMessagePayloadDefinition => {
   if (typeof value !== 'object' || value === null) {
     return false;
   }
@@ -51,18 +26,25 @@ const isRegularPayload = (value: unknown): value is RegularMessagePayload => {
 };
 
 const toChatTypeFromRegularPayload = (
-  payload: RegularMessagePayload,
+  payload: RegularMessagePayloadDefinition,
   chatType: ChatMessageType
 ): ChatType => {
+  console.log('toChatTypeFromRegularPayload', payload);
+
   return {
-    color: payload.color ?? '',
-    map_name: payload.map_name ?? '',
-    character_name: payload.character_name ?? '',
+    color: payload.color,
+    map_name: payload.map_name,
+    character_name: payload.name,
     message: payload.message,
-    x: Number(payload.x_position ?? 0),
-    y: Number(payload.y_position ?? 0),
+    x: Number(payload.x_position),
+    y: Number(payload.y_position),
     type: chatType,
-    hide_location: Boolean(payload.hide_location),
+    hide_location: payload.hide_location,
+    user_id: payload.user_id,
+    custom_class: payload.custom_class,
+    is_chat_bold: payload.is_chat_bold,
+    is_chat_italic: payload.is_chat_italic,
+    name_tag: payload.nameTag,
   };
 };
 
@@ -77,6 +59,11 @@ const toCreatorChat = (message: string | { message: string }): ChatType => {
     y: 0,
     type: 'creator-message',
     hide_location: true,
+    is_chat_bold: false,
+    is_chat_italic: false,
+    user_id: 0,
+    custom_class: '',
+    name_tag: '',
   };
 };
 
@@ -93,31 +80,48 @@ const toSystemChat = (
     y: 0,
     type,
     hide_location: true,
+    is_chat_bold: false,
+    is_chat_italic: false,
+    user_id: 0,
+    custom_class: '',
+    name_tag: '',
   };
 };
 
 export const useChatStream = (
   params?: UseChatStreamParams
 ): UseChatStreamDefinition => {
-  const [server, setServer] = useState<ServerEvent[]>([]);
-  const [exploration, setExploration] = useState<ExplorationEvent[]>([]);
-  const [announcements, setAnnouncements] = useState<AnnouncementEvent[]>([]);
+  const [server, setServer] = useState<ServerMessagesDefinition[]>([]);
+  const [exploration, setExploration] = useState<
+    ExplorationMessageDefinition[]
+  >([]);
+  const [announcements, setAnnouncements] = useState<
+    AnnouncementMessageDefinition[]
+  >([]);
   const [chatMessages, setChatMessages] = useState<ChatType[]>([]);
   const [ready, setReady] = useState(false);
 
-  const onServerEvent = useCallback((event: ServerEvent) => {
+  const onServerEvent = useCallback((event: ServerMessagesDefinition) => {
     setServer((previous) => [event, ...previous].slice(0, 500));
   }, []);
 
-  const onExplorationEvent = useCallback((event: ExplorationEvent) => {
-    setExploration((previous) => [event, ...previous].slice(0, 500));
-  }, []);
+  const onExplorationEvent = useCallback(
+    (event: ExplorationMessageDefinition) => {
+      setExploration((previous) => [event, ...previous].slice(0, 500));
+    },
+    []
+  );
 
-  const onAnnouncementEvent = useCallback((event: AnnouncementEvent) => {
-    setAnnouncements((previous) => [event, ...previous].slice(0, 500));
-  }, []);
+  const onAnnouncementEvent = useCallback(
+    (event: AnnouncementMessageDefinition) => {
+      setAnnouncements((previous) => [event, ...previous].slice(0, 500));
+    },
+    []
+  );
 
-  const onChatSent = useCallback((event: ChatSentEvent) => {
+  const onChatSent = useCallback((event: EventPayload) => {
+    console.log('onChatSent', event);
+
     let next: ChatType;
 
     if (event.type === 'creator-message') {
@@ -127,15 +131,20 @@ export const useChatStream = (
       event.type === 'error-message' ||
       event.type === 'private-message-sent'
     ) {
-      next = toSystemChat(event.message as string, event.type);
+      next = toSystemChat(event.message.message as string, event.type);
     } else if (event.type === 'npc-message') {
       // Map NPC messages to a display-safe system type present in ChatMessageType
-      next = toSystemChat(event.message, 'global-message');
+      next = toSystemChat(event.message.message, 'global-message');
     } else {
       // Regular chat payload
-      const regular = event as RegularChatEvent;
+      const regular = event as RegularChatEventDefinition;
       if (isRegularPayload(regular.message)) {
-        next = toChatTypeFromRegularPayload(regular.message, regular.type);
+        const message = {
+          ...regular.message,
+          name: event.name,
+          nameTag: event.nameTag,
+        };
+        next = toChatTypeFromRegularPayload(message, regular.type);
       } else {
         next = toSystemChat(
           String((regular as unknown as { message: string }).message),
@@ -147,10 +156,9 @@ export const useChatStream = (
     setChatMessages((previous) => [next, ...previous].slice(0, 1000));
   }, []);
 
-  // Only pass numeric params to satisfy UseWebsocketParams.params: Record<string, number>
   const userId = params?.characterData?.id ?? 0;
 
-  useWebsocket<ServerEvent>({
+  useWebsocket<ServerMessagesDefinition>({
     url: ChatWebSocketChannels.SERVER,
     params: { userId },
     type: ChannelType.PRIVATE,
@@ -158,7 +166,7 @@ export const useChatStream = (
     onEvent: onServerEvent,
   });
 
-  useWebsocket<ExplorationEvent>({
+  useWebsocket<ExplorationMessageDefinition>({
     url: ChatWebSocketChannels.EXPLORATION,
     params: { userId },
     type: ChannelType.PRIVATE,
@@ -166,7 +174,7 @@ export const useChatStream = (
     onEvent: onExplorationEvent,
   });
 
-  useWebsocket<AnnouncementEvent>({
+  useWebsocket<AnnouncementMessageDefinition>({
     url: ChatWebSocketChannels.ANNOUNCEMENTS,
     params: {},
     type: ChannelType.PRIVATE,
@@ -174,7 +182,7 @@ export const useChatStream = (
     onEvent: onAnnouncementEvent,
   });
 
-  useWebsocket<ChatSentEvent>({
+  useWebsocket<EventPayload>({
     url: ChatWebSocketChannels.CHAT,
     params: {},
     type: ChannelType.PUBLIC,

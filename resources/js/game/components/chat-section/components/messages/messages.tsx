@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React, { useCallback, useRef, useState } from 'react';
 
 import MessagesProps from './definitions/message-props';
@@ -52,6 +53,16 @@ const Messages = ({
     text,
   ]);
 
+  const handleInputKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        handleSend();
+      }
+    },
+    [handleSend]
+  );
+
   return (
     <div className="w-full lg:w-3/4 mx-auto my-4">
       <Card>
@@ -72,29 +83,43 @@ const Messages = ({
             }
             value={text}
             onChange={(e) => setText(e.target.value)}
+            onKeyDown={handleInputKeyDown}
             className="flex-grow border border-gray-300 rounded-md p-2"
             disabled={!!is_silenced}
+            enterKeyHint="send"
           />
         </div>
         <div
           ref={listRef}
-          className="bg-gray-700 dark:bg-gray-800 p-2 w-full h-96 overflow-y-auto rounded-md text-gray-400"
+          className="bg-gray-700 dark:bg-gray-800 p-2 w-full h-96 overflow-y-auto rounded-md"
         >
-          <ul className="space-y-4">
+          <ul className="space-y-2">
             {chat.map((row, idx) => {
-              const name = row.character_name || '';
+              console.log('message row', row);
+
+              const name = ` ${row.character_name || ''} ${row.name_tag}`;
               const coords = row.hide_location
                 ? '***/***'
                 : `${row.x}/${row.y}`;
               const tag = row.map_name ? `[${row.map_name} (${coords})]` : '';
 
+              const customClass = row.custom_class || '';
+              const hasCustomClass = customClass.length > 0;
+
               return (
                 <li key={idx}>
-                  <span className="underline font-bold">
-                    {tag} {name}
+                  <span className={clsx('underline font-bold', customClass)}>
+                    {tag} {name} {': '}
                   </span>
-                  {': '}
-                  <span style={{ color: row.color || undefined }}>
+
+                  <span
+                    style={{
+                      color: hasCustomClass
+                        ? undefined
+                        : row.color || undefined,
+                    }}
+                    className={hasCustomClass ? customClass : undefined}
+                  >
                     {row.message}
                   </span>
                 </li>
