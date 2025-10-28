@@ -8,6 +8,7 @@ const PillTabs = <PTuple extends readonly object[]>({
   tabs,
   ariaLabel = 'Tabs',
   initialIndex = 0,
+  additional_tab_css,
 }: PillTabsProps<PTuple>) => {
   const [activeIndex, setActiveIndex] = useState<number>(initialIndex);
 
@@ -51,6 +52,7 @@ const PillTabs = <PTuple extends readonly object[]>({
           onSelect={handleSelectTab}
           tabIds={tabIds}
           panelIds={panelIds}
+          additional_tab_css={additional_tab_css}
         />
         <TabsPanels
           tabs={tabs}

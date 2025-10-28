@@ -52,7 +52,7 @@ const TabsPanels = <PTuple extends readonly object[]>({
     }
 
     return (
-      <div className="w-full max-w-md">
+      <div className="w-full">
         <div
           id={panelIds[activeIndex]}
           role="tabpanel"

@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import React from 'react';
 
 import MobileNav from './components/actions/components/mobile-nav-bar/mobile-nav';
-import Chat from './components/chat-section/chat';
+import GameChat from './components/chat-section/game-chat';
 import { GameCard } from './components/game-card';
 import ScreenBindingHost from '../screen-manager/screen-binding-host';
 import GameLoader from './components/game-loader/game-loader';
@@ -45,7 +45,7 @@ const GameSection = () => {
           </div>
         </div>
 
-        <Chat />
+        <GameChat />
         <MobileNav />
       </div>
     );

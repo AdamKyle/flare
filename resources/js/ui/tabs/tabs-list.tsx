@@ -10,6 +10,7 @@ const TabsList = <PTuple extends readonly object[]>({
   onSelect,
   tabIds,
   panelIds,
+  additional_tab_css,
 }: TabsListProps<PTuple>) => {
   const handleTabListKeyDown = (
     event: React.KeyboardEvent<HTMLDivElement>
@@ -61,7 +62,10 @@ const TabsList = <PTuple extends readonly object[]>({
         aria-label={ariaLabel}
         aria-orientation="horizontal"
         onKeyDown={handleTabListKeyDown}
-        className="relative flex w-full max-w-md rounded-md border border-gray-300 bg-gray-100 p-1 dark:border-gray-600 dark:bg-gray-700"
+        className={clsx(
+          'relative flex rounded-md border border-gray-300 bg-gray-100 p-1 dark:border-gray-600 dark:bg-gray-700',
+          additional_tab_css
+        )}
       >
         <div
           aria-hidden="true"

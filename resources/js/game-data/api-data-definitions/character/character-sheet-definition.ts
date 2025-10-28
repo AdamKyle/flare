@@ -52,4 +52,10 @@ export default interface CharacterSheetDefinition {
   resistance_info: ResistanceInfoDefinition;
   elemental_atonements: ElementalAtonementDefinition;
   reincarnation_info: ReincarnationInfoDefinition;
+
+  is_admin?: boolean;
+  is_silenced?: boolean | null;
+  can_talk_again_at?: string | null;
+  view_port?: number;
+  is_automation_running?: boolean;
 }

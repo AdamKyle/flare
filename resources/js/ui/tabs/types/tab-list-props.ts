@@ -7,4 +7,5 @@ export default interface TabsListProps<PTuple extends readonly object[]> {
   onSelect: (index: number) => void;
   tabIds: string[];
   panelIds: string[];
+  additional_tab_css?: string;
 }
