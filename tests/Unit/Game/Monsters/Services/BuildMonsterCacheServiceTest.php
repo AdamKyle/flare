@@ -18,7 +18,7 @@ class BuildMonsterCacheServiceTest extends TestCase
 
     private ?BuildMonsterCacheService $service;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -27,7 +27,7 @@ class BuildMonsterCacheServiceTest extends TestCase
         Cache::flush();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->service = null;
 

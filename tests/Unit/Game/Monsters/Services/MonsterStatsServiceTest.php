@@ -21,7 +21,7 @@ class MonsterStatsServiceTest extends TestCase
 
     private ?CharacterFactory $characterFactory = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -31,7 +31,7 @@ class MonsterStatsServiceTest extends TestCase
         Cache::flush();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->service = null;
         $this->characterFactory = null;

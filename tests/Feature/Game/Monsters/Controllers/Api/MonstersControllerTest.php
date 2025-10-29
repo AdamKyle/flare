@@ -21,14 +21,14 @@ class MonstersControllerTest extends TestCase
 
     private ?CharacterFactory $characterFactory = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->characterFactory = null;
 
