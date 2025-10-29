@@ -29,8 +29,6 @@ const toChatTypeFromRegularPayload = (
   payload: RegularMessagePayloadDefinition,
   chatType: ChatMessageType
 ): ChatType => {
-  console.log('toChatTypeFromRegularPayload', payload);
-
   return {
     color: payload.color,
     map_name: payload.map_name,

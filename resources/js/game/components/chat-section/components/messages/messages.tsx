@@ -19,6 +19,7 @@ const Messages = ({
 }: MessagesProps) => {
   const [text, setText] = useState('');
   const listRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const canSend = /\S/.test(text);
 
@@ -63,6 +64,41 @@ const Messages = ({
     [handleSend]
   );
 
+  const handleStartPrivateMessage = useCallback((character: string) => {
+    const trimmed = character.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    const value = `/m ${trimmed}: `;
+    setText(value);
+
+    requestAnimationFrame(() => {
+      const element = inputRef.current;
+
+      if (!element) {
+        return;
+      }
+
+      element.focus();
+      element.setSelectionRange(value.length, value.length);
+    });
+  }, []);
+
+  const handleOnKeyDown = useCallback(
+    (character: string) => (event: React.KeyboardEvent<HTMLSpanElement>) => {
+      const key = event.key;
+
+      if (key !== 'Enter') {
+        return;
+      }
+
+      event.preventDefault();
+      handleStartPrivateMessage(character);
+    },
+    [handleStartPrivateMessage]
+  );
+
   return (
     <div className="w-full lg:w-3/4 mx-auto my-4">
       <Card>
@@ -75,6 +111,7 @@ const Messages = ({
             disabled={!!is_silenced}
           />
           <input
+            ref={inputRef}
             type="text"
             placeholder={
               is_silenced && can_talk_again_at
@@ -82,7 +119,7 @@ const Messages = ({
                 : 'Type your message'
             }
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={(event) => setText(event.target.value)}
             onKeyDown={handleInputKeyDown}
             className="flex-grow border border-gray-300 rounded-md p-2"
             disabled={!!is_silenced}
@@ -97,6 +134,8 @@ const Messages = ({
             {chat.map((row, idx) => {
               console.log('message row', row);
 
+              const displayName: string =
+                row.character_name.trim() || (row.name_tag ?? '').trim();
               const name = ` ${row.character_name || ''} ${row.name_tag}`;
               const coords = row.hide_location
                 ? '***/***'
@@ -108,7 +147,16 @@ const Messages = ({
 
               return (
                 <li key={idx}>
-                  <span className={clsx('underline font-bold', customClass)}>
+                  <span
+                    className={clsx(
+                      'underline font-bold cursor-pointer',
+                      customClass
+                    )}
+                    onClick={() => handleStartPrivateMessage(displayName)}
+                    onKeyDown={handleOnKeyDown(displayName)}
+                    role="button"
+                    tabIndex={0}
+                  >
                     {tag} {name} {': '}
                   </span>
 
@@ -118,7 +166,7 @@ const Messages = ({
                         ? undefined
                         : row.color || undefined,
                     }}
-                    className={hasCustomClass ? customClass : undefined}
+                    className={clsx(hasCustomClass && customClass, 'pl-2')}
                   >
                     {row.message}
                   </span>

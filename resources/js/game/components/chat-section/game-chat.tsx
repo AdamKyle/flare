@@ -20,8 +20,6 @@ import PillTabs from 'ui/tabs/pill-tabs';
 const GameChat = () => {
   const { gameData } = useGameData();
 
-  const characterId = gameData?.character?.id ?? 0;
-
   const { data, loading, error } = useFetchChatHistory();
 
   const character = gameData?.character ?? null;
@@ -36,7 +34,6 @@ const GameChat = () => {
     exploration,
     announcements: streamAnnouncements,
     chatMessages,
-    ready,
   } = useChatStream({
     characterData: character,
     view_port: viewPort,
@@ -50,24 +47,52 @@ const GameChat = () => {
 
   const { setRequestParams } = useSendChatMessage();
 
-  useEffect(() => {
+  const handleSettingAnnouncementData = () => {
     const initial: AnnouncementMessageDefinition[] = data?.announcements || [];
+
     if (initial.length === 0) {
       return;
     }
-    setAnnouncements(initial);
-  }, [data?.announcements]);
 
-  useEffect(() => {
-    if (!ready) {
+    setAnnouncements(initial);
+  };
+
+  const handleSettingChatHistory = () => {
+    if (!data) {
       return;
     }
-    return;
-  }, [ready]);
 
-  const setTabToUpdated = useCallback((_key: string) => {
-    return;
-  }, []);
+    const chatHistory = data.chat_messages.map((chatMessage) => {
+      return {
+        color: chatMessage.color,
+        map_name: chatMessage.map,
+        character_name: chatMessage.name,
+        message: chatMessage.message,
+        x: chatMessage.x_position,
+        y: chatMessage.y_position,
+        type: 'chat',
+        hide_location: chatMessage.hide_location,
+        user_id: chatMessage.user_id,
+        custom_class: chatMessage.custom_class,
+        is_chat_bold: chatMessage.is_chat_bold,
+        is_chat_italic: chatMessage.is_chat_italic,
+        name_tag: chatMessage.name_tag,
+      };
+    });
+
+    setLocalChats(chatHistory as ChatType[]);
+  };
+
+  useEffect(() => {
+    if (!data) {
+      return;
+    }
+
+    handleSettingAnnouncementData();
+    handleSettingChatHistory();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
   const push_silenced_message = useCallback(() => {
     setLocalChats((previous) => {
@@ -132,6 +157,8 @@ const GameChat = () => {
     return [...localChats, ...chatMessages];
   }, [localChats, chatMessages]);
 
+  console.log('combinedChat', combinedChat);
+
   const renderBody = () => {
     if (!character) {
       return <GameDataError />;
@@ -143,7 +170,7 @@ const GameChat = () => {
           is_silenced={isSilenced}
           can_talk_again_at={canTalkAgainAt}
           chat={combinedChat}
-          set_tab_to_updated={setTabToUpdated}
+          set_tab_to_updated={() => {}}
           push_silenced_message={push_silenced_message}
           push_private_message_sent={push_private_message_sent}
           push_error_message={push_error_message}
@@ -160,7 +187,7 @@ const GameChat = () => {
           is_silenced: isSilenced,
           can_talk_again_at: canTalkAgainAt,
           chat: combinedChat,
-          set_tab_to_updated: setTabToUpdated,
+          set_tab_to_updated: () => {},
           push_silenced_message,
           push_private_message_sent,
           push_error_message,
