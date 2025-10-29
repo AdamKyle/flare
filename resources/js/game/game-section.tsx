@@ -26,10 +26,11 @@ const GameSection = () => {
         <ScreenBindingHost bindings={gameScreenBindings} />
 
         <div className="grid">
-          <div className="row-start-1 col-start-1 z-10">
+          <div className="row-start-1 col-start-1 z-10 relative">
             <motion.div
               className={clsx({
                 'pointer-events-none': stackDepth > 0,
+                'absolute inset-0': stackDepth > 0,
               })}
               initial={false}
               animate={{ opacity: stackDepth > 0 ? 0 : 1 }}
@@ -45,7 +46,9 @@ const GameSection = () => {
           </div>
         </div>
 
-        <GameChat />
+        <div className={clsx({ 'mt-4': stackDepth > 0 })}>
+          <GameChat />
+        </div>
         <MobileNav />
       </div>
     );

@@ -5,8 +5,20 @@ import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 
 const ApiErrorAlert = ({ apiError, on_close }: ApiErrorAlertProps) => {
+  const isClosable = (): boolean => {
+    if (!on_close) {
+      return false;
+    }
+
+    return true;
+  };
+
   return (
-    <Alert variant={AlertVariant.DANGER} closable on_close={on_close}>
+    <Alert
+      variant={AlertVariant.DANGER}
+      closable={isClosable()}
+      on_close={on_close}
+    >
       {apiError}
     </Alert>
   );

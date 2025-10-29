@@ -12,13 +12,13 @@ import noEarlyReturnHook from './eslint-rules/no-early-return-before-hook.js';
 export default [
   {
     files: [
-      "resources/js/**/*.{ts,tsx}",
-      "resources/js/dts/**/*.d.ts"
+      'resources/js/**/*.{ts,tsx}',
+      'resources/js/dts/**/*.d.ts',
     ],
     ignores: [
-      "node_modules/",
-      "dist/",
-      "**/*.d.ts",
+      'node_modules/',
+      'dist/',
+      '**/*.d.ts',
     ],
     languageOptions: {
       parser: tsParser,
@@ -29,7 +29,7 @@ export default [
       '@stylistic': stylistic,
       'react-hooks': reactHooks,
       'jsx-a11y': jsxA11y,
-      'prettier': prettierPlugin,
+      prettier: prettierPlugin,
       'unused-imports': unusedImports,
       'local-hooks': {
         rules: {
@@ -49,6 +49,7 @@ export default [
             ['service-container', './resources/js/service-container'],
             ['websockets', './resources/js/websocket-handler'],
             ['game-utils', './resources/js/game/util'],
+            ['screen-manager', './resources/js/screen-manager'],
           ],
           extensions: ['.ts', '.tsx', '.js', '.jsx'],
         },
@@ -77,30 +78,31 @@ export default [
         },
       ],
 
-      "import/order": [
-        "warn",
+      'import/order': [
+        'warn',
         {
           groups: [
-            ["builtin", "external"],
-            ["internal", "parent", "sibling", "index"],
+            ['builtin', 'external'],
+            ['internal', 'parent', 'sibling', 'index'],
           ],
           pathGroups: [
-            { pattern: "react", group: "builtin", position: "before" },
-            { pattern: "framer-motion", group: "builtin", position: "after" },
-            { pattern: "tsyringe", group: "builtin", position: "after" },
-            { pattern: "ts-pattern", group: "builtin", position: "after" },
-            { pattern: "configuration/**", group: "internal", position: "before" },
-            { pattern: 'websockets/**', group: "internal", position: "after" },
-            { pattern: "api-handler/**", group: "internal", position: "after" },
-            { pattern: "event-system/**", group: "internal", position: "after" },
-            { pattern: "game-data/**", group: "internal", position: "after" },
-            { pattern: "game-utils/**", group: "internal", position: "after" },
-            { pattern: "ui/**", group: "internal", position: "after" },
-            { pattern: "service-container/**", group: "internal", position: "after" },
-            { pattern: "service-container-provider/**", group: "internal", position: "after" },
+            { pattern: 'react', group: 'builtin', position: 'before' },
+            { pattern: 'framer-motion', group: 'builtin', position: 'after' },
+            { pattern: 'tsyringe', group: 'builtin', position: 'after' },
+            { pattern: 'ts-pattern', group: 'builtin', position: 'after' },
+            { pattern: 'configuration/**', group: 'internal', position: 'before' },
+            { pattern: 'screen-manager/**', group: 'internal', position: 'before' },
+            { pattern: 'websockets/**', group: 'internal', position: 'after' },
+            { pattern: 'api-handler/**', group: 'internal', position: 'after' },
+            { pattern: 'event-system/**', group: 'internal', position: 'after' },
+            { pattern: 'game-data/**', group: 'internal', position: 'after' },
+            { pattern: 'game-utils/**', group: 'internal', position: 'after' },
+            { pattern: 'ui/**', group: 'internal', position: 'after' },
+            { pattern: 'service-container/**', group: 'internal', position: 'after' },
+            { pattern: 'service-container-provider/**', group: 'internal', position: 'after' },
           ],
-          "newlines-between": "always",
-          alphabetize: { order: "asc", caseInsensitive: true },
+          'newlines-between': 'always',
+          alphabetize: { order: 'asc', caseInsensitive: true },
         },
       ],
       'max-len': [
@@ -111,8 +113,8 @@ export default [
           ignoreUrls: true,
           ignoreStrings: true,
           ignoreTemplateLiterals: true,
-          ignoreComments: true
-        }
+          ignoreComments: true,
+        },
       ],
       '@stylistic/max-len': [
         'warn',
@@ -122,18 +124,18 @@ export default [
           ignoreUrls: true,
           ignoreStrings: true,
           ignoreTemplateLiterals: true,
-          ignoreComments: true
-        }
+          ignoreComments: true,
+        },
       ],
-      "no-undef": [
-        "off",
+      'no-undef': [
+        'off',
         {
-          "globals": [
-            "window",
-            "document",
-            "HTMLElement",
-          ]
-        }
+          globals: [
+            'window',
+            'document',
+            'HTMLElement',
+          ],
+        },
       ],
     },
   },

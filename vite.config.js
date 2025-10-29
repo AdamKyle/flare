@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import react from '@vitejs/plugin-react';
-import tailwindcss from '@tailwindcss/vite'
+import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 
 const isDevelopment = process.env.NODE_ENV === 'local';
@@ -19,8 +19,8 @@ export default defineConfig({
     ],
     optimizeDeps: {
         esbuildOptions: {
-            tsconfig: 'tsconfig.json'
-        }
+            tsconfig: 'tsconfig.json',
+        },
     },
     resolve: {
         alias: {
@@ -32,8 +32,9 @@ export default defineConfig({
             components: path.resolve(__dirname, 'resources/js/components'),
             ui: path.resolve(__dirname, 'resources/js/ui'),
             'service-container': path.resolve(__dirname, 'resources/js/service-container'),
-            'service-container-provider': path.resolve(__dirname, 'resources/js/service-container-provider')
-        }
+            'service-container-provider': path.resolve(__dirname, 'resources/js/service-container-provider'),
+            'screen-manager': path.resolve(__dirname, 'resources/js/screen-manager'),
+        },
     },
     build: {
         minify: !isDevelopment,

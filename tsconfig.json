@@ -30,7 +30,8 @@
             "ui/*": ["resources/js/ui/*"],
             "service-container/*": ["resources/js/service-container/*"],
             "service-container-provider/*": ["resources/js/service-container-provider/*"],
-            "websockets": ["resources/js/websocket-handler/*"]
+            "websockets": ["resources/js/websocket-handler/*"],
+            "screen-manager/*": ["resources/js/screen-manager/*"]
         }
     },
     "skipLibCheck": true,

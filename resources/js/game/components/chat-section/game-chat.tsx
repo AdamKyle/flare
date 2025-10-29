@@ -157,8 +157,6 @@ const GameChat = () => {
     return [...localChats, ...chatMessages];
   }, [localChats, chatMessages]);
 
-  console.log('combinedChat', combinedChat);
-
   const renderBody = () => {
     if (!character) {
       return <GameDataError />;
@@ -224,11 +222,23 @@ const GameChat = () => {
   };
 
   if (loading) {
-    return <InfiniteLoader />;
+    return (
+      <div className="px-4">
+        <div className="w-full md:w-2/3 mx-auto">
+          <InfiniteLoader />
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <ApiErrorAlert apiError={error.message} />;
+    return (
+      <div className="px-4">
+        <div className="w-full md:w-2/3 mx-auto">
+          <ApiErrorAlert apiError={error.message} />
+        </div>
+      </div>
+    );
   }
 
   return <div className="px-4">{renderBody()}</div>;
