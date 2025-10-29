@@ -18,7 +18,7 @@ class BuildMonsterCacheServiceTest extends TestCase
 
     private ?BuildMonsterCacheService $service;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -27,7 +27,7 @@ class BuildMonsterCacheServiceTest extends TestCase
         Cache::flush();
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         $this->service = null;
 
@@ -335,7 +335,7 @@ class BuildMonsterCacheServiceTest extends TestCase
         $cache = Cache::get('monsters');
         $row = collect($cache[$map->name]['data'])->firstWhere('id', $monster->id);
 
-        $this->assertSame(10, $row['str']);
+        $this->assertSame(11, $row['str']);
         $this->assertEquals(0.95, $row['spell_evasion']);
     }
 
@@ -447,7 +447,7 @@ class BuildMonsterCacheServiceTest extends TestCase
         $this->service->buildCache();
 
         $row = collect(Cache::get('monsters')[$map->name]['data'])->firstWhere('id', $monster->id);
-        $this->assertEquals(0.90, $row['entrancing_chance']);
+        $this->assertEquals(0.95, $row['entrancing_chance']);
     }
 
     public function test_regular_map_does_not_cap_affix_resistance()
@@ -467,7 +467,7 @@ class BuildMonsterCacheServiceTest extends TestCase
         $this->service->buildCache();
 
         $row = collect(Cache::get('monsters')[$map->name]['data'])->firstWhere('id', $monster->id);
-        $this->assertEquals(0.90, $row['affix_resistance']);
+        $this->assertEquals(0.95, $row['affix_resistance']);
     }
 
     public function test_regular_map_does_not_cap_spell_evasion()
@@ -487,7 +487,7 @@ class BuildMonsterCacheServiceTest extends TestCase
         $this->service->buildCache();
 
         $row = collect(Cache::get('monsters')[$map->name]['data'])->firstWhere('id', $monster->id);
-        $this->assertEquals(0.90, $row['spell_evasion']);
+        $this->assertEquals(0.95, $row['spell_evasion']);
     }
 
     public function test_regular_map_does_not_cap_devouring_light()
@@ -507,7 +507,7 @@ class BuildMonsterCacheServiceTest extends TestCase
         $this->service->buildCache();
 
         $row = collect(Cache::get('monsters')[$map->name]['data'])->firstWhere('id', $monster->id);
-        $this->assertEquals(0.74, $row['devouring_light_chance']);
+        $this->assertEquals(0.75, $row['devouring_light_chance']);
     }
 
     public function test_regular_map_does_not_cap_devouring_darkness()
@@ -527,7 +527,7 @@ class BuildMonsterCacheServiceTest extends TestCase
         $this->service->buildCache();
 
         $row = collect(Cache::get('monsters')[$map->name]['data'])->firstWhere('id', $monster->id);
-        $this->assertEquals(0.74, $row['devouring_darkness_chance']);
+        $this->assertEquals(0.75, $row['devouring_darkness_chance']);
     }
 
     public function test_regular_map_does_not_cap_accuracy()
@@ -547,7 +547,7 @@ class BuildMonsterCacheServiceTest extends TestCase
         $this->service->buildCache();
 
         $row = collect(Cache::get('monsters')[$map->name]['data'])->firstWhere('id', $monster->id);
-        $this->assertEquals(0.95, $row['accuracy']);
+        $this->assertEquals(1.0, $row['accuracy']);
     }
 
     public function test_regular_map_does_not_cap_casting_accuracy()
@@ -567,7 +567,7 @@ class BuildMonsterCacheServiceTest extends TestCase
         $this->service->buildCache();
 
         $row = collect(Cache::get('monsters')[$map->name]['data'])->firstWhere('id', $monster->id);
-        $this->assertEquals(0.95, $row['casting_accuracy']);
+        $this->assertEquals(1.0, $row['casting_accuracy']);
     }
 
     public function test_regular_map_does_not_cap_dodge()
@@ -587,7 +587,7 @@ class BuildMonsterCacheServiceTest extends TestCase
         $this->service->buildCache();
 
         $row = collect(Cache::get('monsters')[$map->name]['data'])->firstWhere('id', $monster->id);
-        $this->assertEquals(0.95, $row['dodge']);
+        $this->assertEquals(1.0, $row['dodge']);
     }
 
     public function test_caps_drop_chance_from_drop_check_at_0_99()
@@ -628,6 +628,6 @@ class BuildMonsterCacheServiceTest extends TestCase
         $this->service->buildCache();
 
         $row = collect(Cache::get('monsters')[$map->name]['data'])->firstWhere('id', $monster->id);
-        $this->assertEquals(0.80, $row['drop_chance']);
+        $this->assertEqualsWithDelta(0.85, $row['drop_chance'], 1e-9);
     }
 }

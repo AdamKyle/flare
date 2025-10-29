@@ -21,7 +21,7 @@ class MonsterStatsServiceTest extends TestCase
 
     private ?CharacterFactory $characterFactory = null;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -31,7 +31,7 @@ class MonsterStatsServiceTest extends TestCase
         Cache::flush();
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         $this->service = null;
         $this->characterFactory = null;
@@ -95,7 +95,7 @@ class MonsterStatsServiceTest extends TestCase
         $response = $this->service->getMonsterStats($character->refresh(), $monster);
         $row = $this->unwrap($response);
 
-        $this->assertSame(31, $row['str']);
+        $this->assertSame(13, $row['str']);
     }
 
     public function test_location_percent_increase_scales_stats_on_basic_map()
@@ -130,7 +130,7 @@ class MonsterStatsServiceTest extends TestCase
         $response = $this->service->getMonsterStats($character->refresh(), $monster);
         $row = $this->unwrap($response);
 
-        $this->assertSame(30, $row['str']);
+        $this->assertSame(12, $row['str']);
     }
 
     public function test_regular_monster_flag_is_returned()

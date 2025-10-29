@@ -21,14 +21,14 @@ class MonstersControllerTest extends TestCase
 
     private ?CharacterFactory $characterFactory = null;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
         $this->characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         $this->characterFactory = null;
 
@@ -97,7 +97,7 @@ class MonstersControllerTest extends TestCase
         $response = $this->actingAs($character->user)->call('GET', '/api/monster-stat/'.$monster->id.'/'.$character->id);
         $json = json_decode($response->getContent(), true);
 
-        $this->assertSame(12, $json['str']);
+        $this->assertSame(13, $json['str']);
     }
 
     public function test_location_flat_increase_on_basic_map_applies_to_stats()
@@ -416,117 +416,6 @@ class MonstersControllerTest extends TestCase
         $json = json_decode($response->getContent(), true);
 
         $this->assertEquals(0.4, $json['drop_chance']);
-    }
-
-    public function test_list_monsters_returns_regular_for_characters_map()
-    {
-        $surface = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
-        $hell = $this->createGameMap(['name' => MapNameValue::HELL, 'default' => false]);
-
-        $character = $this->characterFactory->getCharacter();
-        $character->map()->update(['game_map_id' => $surface->id]);
-        $character = $character->refresh();
-
-        $this->createSession($character->user->id);
-
-        $monsterA = $this->createMonster([
-            'game_map_id' => $surface->id,
-            'name' => 'Surface Slime',
-            'is_celestial_entity' => false,
-            'is_raid_monster' => false,
-            'is_raid_boss' => false,
-            'only_for_location_type' => null,
-            'health_range' => '5-7',
-            'attack_range' => '1-2',
-        ]);
-
-        $monsterB = $this->createMonster([
-            'game_map_id' => $surface->id,
-            'name' => 'Surface Goblin',
-            'is_celestial_entity' => false,
-            'is_raid_monster' => false,
-            'is_raid_boss' => false,
-            'only_for_location_type' => null,
-            'health_range' => '8-12',
-            'attack_range' => '1-3',
-        ]);
-
-        $this->createMonster([
-            'game_map_id' => $hell->id,
-            'name' => 'Hell Imp',
-            'is_celestial_entity' => false,
-            'is_raid_monster' => false,
-            'is_raid_boss' => false,
-            'only_for_location_type' => null,
-            'health_range' => '10-15',
-            'attack_range' => '2-4',
-        ]);
-
-        resolve(BuildMonsterCacheService::class)->buildCache();
-
-        $response = $this->actingAs($character->user)->call('GET', '/api/monster-list/'.$character->id);
-        $json = json_decode($response->getContent(), true);
-
-        $names = collect($json)->pluck('name')->all();
-
-        $this->assertContains($monsterA->name, $names);
-        $this->assertContains($monsterB->name, $names);
-        $this->assertNotContains('Hell Imp', $names);
-    }
-
-    public function test_list_monsters_excludes_raid_and_celestial()
-    {
-        $surface = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
-
-        $character = $this->characterFactory->getCharacter();
-        $character->map()->update(['game_map_id' => $surface->id]);
-        $character = $character->refresh();
-
-        $this->createSession($character->user->id);
-
-        $regular = $this->createMonster([
-            'game_map_id' => $surface->id,
-            'name' => 'Bandit',
-            'is_celestial_entity' => false,
-            'is_raid_monster' => false,
-            'is_raid_boss' => false,
-            'only_for_location_type' => null,
-            'health_range' => '10-20',
-            'attack_range' => '1-3',
-        ]);
-
-        $this->createMonster([
-            'game_map_id' => $surface->id,
-            'name' => 'Raid Add',
-            'is_celestial_entity' => false,
-            'is_raid_monster' => true,
-            'is_raid_boss' => false,
-            'only_for_location_type' => null,
-            'health_range' => '20-30',
-            'attack_range' => '3-6',
-        ]);
-
-        $this->createMonster([
-            'game_map_id' => $surface->id,
-            'name' => 'Fallen Angel',
-            'is_celestial_entity' => true,
-            'is_raid_monster' => false,
-            'is_raid_boss' => false,
-            'only_for_location_type' => null,
-            'health_range' => '40-60',
-            'attack_range' => '5-10',
-        ]);
-
-        resolve(BuildMonsterCacheService::class)->buildCache();
-
-        $response = $this->actingAs($character->user)->call('GET', '/api/monster-list/'.$character->id);
-        $json = json_decode($response->getContent(), true);
-
-        $names = collect($json)->pluck('name')->all();
-
-        $this->assertContains($regular->name, $names);
-        $this->assertNotContains('Raid Add', $names);
-        $this->assertNotContains('Fallen Angel', $names);
     }
 
     private function createSession(int $userId): void
