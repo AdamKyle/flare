@@ -6,6 +6,6 @@ import ServerMessagesDefinition from '../../../../../api-definitions/chat/server
 export interface ChatHistoryDataDefinition {
   serverMessages: ServerMessagesDefinition[];
   explorationMessages: ExplorationMessageDefinition[];
-  chat: ChatMessageType[];
+  chat_messages: ChatMessageType[];
   announcements: AnnouncementMessageDefinition[];
 }
