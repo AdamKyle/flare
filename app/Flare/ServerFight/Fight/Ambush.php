@@ -16,7 +16,7 @@ class Ambush extends BattleBase
         parent::__construct($characterCacheData);
     }
 
-    public function handleAmbush(Character $character, ServerMonster $monster, bool $isCharacterVoided = false): Ambush
+    public function handleAmbush(Character $character, ServerMonster $monster, bool $isCharacterVoided = false, bool $isEnemyVoided = false): Ambush
     {
 
         $this->healthObject = [
@@ -25,9 +25,9 @@ class Ambush extends BattleBase
         ];
 
         if ($character->map->gameMap->mapType()->isPurgatory()) {
-            $this->monsterAmbushesPlayer($character, $monster, $isCharacterVoided);
+            $this->monsterAmbushesPlayer($character, $monster, $isCharacterVoided, $isEnemyVoided);
         } else {
-            $this->playerAmbushesMonster($character, $monster, $isCharacterVoided);
+            $this->playerAmbushesMonster($character, $monster, $isCharacterVoided, $isEnemyVoided);
         }
 
         return $this;
@@ -38,7 +38,7 @@ class Ambush extends BattleBase
         return $this->healthObject;
     }
 
-    public function playerAmbushesMonster(Character $character, ServerMonster $serverMonster, bool $isPlayerVoided)
+    public function playerAmbushesMonster(Character $character, ServerMonster $serverMonster, bool $isPlayerVoided, bool $isEnemyVoided)
     {
         $characterAmbushResistance = $this->characterCacheData->getCachedCharacterData($character, 'ambush_resistance_chance');
         $characterAmbushChance = $this->characterCacheData->getCachedCharacterData($character, 'ambush_chance');
@@ -56,6 +56,10 @@ class Ambush extends BattleBase
 
             $this->healthObject['current_monster_health'] -= $damage;
 
+            if ($isPlayerVoided) {
+                $this->addMessage('The enemy has voided you, your ambush will be weaker, your strength escapes you', 'enemy-action');
+            }
+
             $this->addMessage('You strike the enemy in an ambush doing: '.number_format($damage).' damage!', 'player-action');
         } elseif ($this->canMonsterAmbushPlayer($serverMonster->getMonsterStat('ambush_chance'), $characterAmbushResistance)) {
 
@@ -67,7 +71,14 @@ class Ambush extends BattleBase
 
             $this->addMessage('The enemies plotting and scheming comes to fruition!', 'enemy-action');
 
-            $damage = $serverMonster->buildAttack() * 2;
+            $baseDamage = $serverMonster->buildAttack();
+            $damage = $baseDamage * 2;
+
+            if ($isEnemyVoided) {
+                $this->addMessage('The enemies strength is sapped from its core as your voidance washes over it!', 'player-action');
+
+                $damage = $baseDamage;
+            }
 
             $this->healthObject['current_character_health'] -= $damage;
 
@@ -75,7 +86,7 @@ class Ambush extends BattleBase
         }
     }
 
-    public function monsterAmbushesPlayer(Character $character, ServerMonster $serverMonster, bool $isPlayerVoided)
+    public function monsterAmbushesPlayer(Character $character, ServerMonster $serverMonster, bool $isPlayerVoided, bool $isEnemyVoided)
     {
         $characterAmbushResistance = $this->characterCacheData->getCachedCharacterData($character, 'ambush_resistance_chance');
         $characterAmbushChance = $this->characterCacheData->getCachedCharacterData($character, 'ambush_chance');
@@ -90,8 +101,14 @@ class Ambush extends BattleBase
 
             $this->addMessage('The enemies plotting and scheming comes to fruition!', 'enemy-action');
 
-            $damageStat = $serverMonster->getMonsterStat('damage_stat');
-            $damage = $serverMonster->getMonsterStat($damageStat) * 2;
+            $baseDamage = $serverMonster->buildAttack();
+            $damage = $baseDamage * 2;
+
+            if ($isEnemyVoided) {
+                $this->addMessage('The enemies strength is sapped from its core as your voidance washes over it!', 'player-action');
+
+                $damage = $baseDamage;
+            }
 
             $this->healthObject['current_character_health'] -= $damage;
 
@@ -104,6 +121,10 @@ class Ambush extends BattleBase
             $damage = $baseStat * 2;
 
             $this->healthObject['current_monster_health'] -= $damage;
+
+            if ($isPlayerVoided) {
+                $this->addMessage('The enemy has voided you, your ambush will be weaker, your strength escapes you', 'enemy-action');
+            }
 
             $this->addMessage('You strike the enemy in an ambush doing: '.number_format($damage).' damage!', 'player-action');
         }

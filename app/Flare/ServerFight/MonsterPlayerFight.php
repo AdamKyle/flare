@@ -201,7 +201,7 @@ class MonsterPlayerFight
         $isPlayerVoided = $this->voidance->isPlayerVoided();
         $isEnemyVoided = $this->voidance->isEnemyVoided();
 
-        $ambush = $this->ambush->handleAmbush($this->character, $monster, $isPlayerVoided);
+        $ambush = $this->ambush->handleAmbush($this->character, $monster, $isPlayerVoided, $isEnemyVoided);
 
         $health = $ambush->getHealthObject();
 
@@ -212,22 +212,10 @@ class MonsterPlayerFight
 
         $this->mergeMessages($this->ambush->getMessages());
 
-        $elementalAtonement = $monster->getElementData();
-        $highestElement = $monster->getHighestElementName($elementalAtonement, $monster->getHighestElementDamage($elementalAtonement));
-
-        $monster = $monster->getMonster();
-
-        if (! empty($elementalAtonement)) {
-            $monster['elemental_atonement'] = $elementalAtonement;
-            $monster['highest_element'] = $highestElement;
-        }
-
         return [
             'health' => $health,
-            'player_voided' => $isPlayerVoided,
-            'enemy_voided' => $isEnemyVoided,
-            'monster' => $monster,
-            'opening_messages' => $this->getBattleMessages(),
+            'attack_messages' => $this->getBattleMessages(),
+            'monster_id' => $monster->getId(),
         ];
     }
 
@@ -359,7 +347,7 @@ class MonsterPlayerFight
 
         $mapName = $map->gameMap->name;
 
-        $monsters = Cache::get('monsters')[$mapName];
+        $monsters = Cache::get('monsters')[$mapName]['data'];
 
         $gameMap = GameMap::where('name', $mapName)->first();
 

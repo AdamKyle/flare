@@ -44,7 +44,7 @@ class MonsterFightService
         $data = $data->fightSetUp();
 
         if ($data['health']['current_monster_health'] <= 0) {
-            $this->battleEventHandler->processMonsterDeath($character->id, $data['monster']['id']);
+            $this->battleEventHandler->processMonsterDeath($character->id, $data['monster_id']);
 
             event(new AttackTimeOutEvent($character));
 
@@ -54,7 +54,7 @@ class MonsterFightService
         }
 
         if ($data['health']['current_character_health'] <= 0) {
-            $monster = Monster::find($data['monster']['id']);
+            $monster = Monster::find($data['monster_id']);
 
             $this->battleEventHandler->processDeadCharacter($character, $monster);
         }
@@ -103,7 +103,7 @@ class MonsterFightService
 
         $cache['health']['current_character_health'] = $characterHealth;
         $cache['health']['current_monster_health'] = $monsterHealth;
-        $cache['messages'] = $this->monsterPlayerFight->getBattleMessages();
+        $cache['attack_messages'] = $this->monsterPlayerFight->getBattleMessages();
 
         if ($monsterHealth >= 0) {
             Cache::put('monster-fight-'.$character->id, $cache, 900);

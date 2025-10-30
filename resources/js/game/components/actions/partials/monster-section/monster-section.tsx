@@ -1,11 +1,16 @@
+import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import { isNil } from 'lodash';
 import React, { ReactNode, useEffect, useState } from 'react';
 
+import { useAttackMonster } from './api/hooks/use-attack-monster';
+import { AttackType } from './enums/attack-type';
+import { BattleType } from './enums/battle-type';
 import MonsterImageProgression from './enums/monster-images';
 import MonsterExplorationConfiguration from './monster-exploration-configuration';
 import MonsterSectionProps from './types/monster-section-props';
 import { getImageTierByIndex } from './util/monster-image-tier';
 import AttackButtonsContainer from '../../components/fight-section/attack-buttons-container';
+import AttackMessages from '../../components/fight-section/attack-messages';
 import { HealthBarType } from '../../components/fight-section/enums/health-bar-type';
 import HealthBar from '../../components/fight-section/health-bar';
 import HealthBarContainer from '../../components/fight-section/health-bar-container';
@@ -19,12 +24,13 @@ import Button from 'ui/buttons/button';
 import { ButtonGradientVarient } from 'ui/buttons/enums/button-gradient-variant';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import GradientButton from 'ui/buttons/gradient-button';
+import InfiniteLoaderRoseDanube from 'ui/infinite-scroll/infinite-loader-rose-danube';
 
 const MonsterSection = ({
   show_monster_stats,
-  has_initiate_monster_fight,
 }: MonsterSectionProps): ReactNode => {
   const { gameData } = useGameData();
+  const { loading, setRequestData, data, error } = useAttackMonster();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [monsterName, setMonsterName] = useState<string | null>(null);
@@ -43,13 +49,19 @@ const MonsterSection = ({
   }, [monsters]);
 
   const handelMonsterSelection = () => {
-    if (!monsters || !monsters[currentIndex]) {
+    if (!monsters || !monsters[currentIndex] || !gameData.character) {
       return;
     }
 
     const selectedMonster = monsters[currentIndex] as MonsterDefinition;
     setMonsterToFight(selectedMonster.id);
-    has_initiate_monster_fight(true);
+
+    setRequestData({
+      character_id: gameData.character.id,
+      monster_id: selectedMonster.id,
+      attack_type: AttackType.ATTACK,
+      battle_type: BattleType.INITIATE,
+    });
   };
 
   const handleNextIndex = (index: number) => {
@@ -61,7 +73,6 @@ const MonsterSection = ({
     setCurrentIndex(index);
     setMonsterToFight(null);
     setMonsterName(selectedMonster.name);
-    has_initiate_monster_fight(false);
   };
 
   const handlePreviousAction = (index: number) => {
@@ -73,7 +84,6 @@ const MonsterSection = ({
     setCurrentIndex(index);
     setMonsterToFight(null);
     setMonsterName(selectedMonster.name);
-    has_initiate_monster_fight(false);
   };
 
   if (!monsters) {
@@ -103,6 +113,14 @@ const MonsterSection = ({
       return <MonsterExplorationConfiguration />;
     }
 
+    if (loading) {
+      return <InfiniteLoaderRoseDanube />;
+    }
+
+    if (error) {
+      return <ApiErrorAlert apiError={error.message} />;
+    }
+
     if (isNil(monsterToFight)) {
       return (
         <div className="text-center my-4">
@@ -122,58 +140,77 @@ const MonsterSection = ({
       );
     }
 
+    const renderAttackButtons = () => {
+      if (
+        !data ||
+        data.health.current_character_health <= 0 ||
+        data.health.current_monster_health <= 0
+      ) {
+        return null;
+      }
+
+      return (
+        <>
+          <AttackButtonsContainer>
+            <Button
+              label="Attack"
+              variant={ButtonVariant.PRIMARY}
+              additional_css="w-full lg:w-1/3"
+              on_click={() => {}}
+            />
+            <Button
+              label="Cast"
+              variant={ButtonVariant.PRIMARY}
+              additional_css="w-full lg:w-1/3"
+              on_click={() => {}}
+            />
+          </AttackButtonsContainer>
+          <AttackButtonsContainer>
+            <GradientButton
+              label="Atk & Cast"
+              gradient={ButtonGradientVarient.DANGER_TO_PRIMARY}
+              additional_css="w-full lg:w-1/3"
+              on_click={() => {}}
+            />
+            <GradientButton
+              label="Cast & Atk"
+              gradient={ButtonGradientVarient.PRIMARY_TO_DANGER}
+              additional_css="w-full lg:w-1/3"
+              on_click={() => {}}
+            />
+          </AttackButtonsContainer>
+          <AttackButtonsContainer>
+            <Button
+              label="Defend"
+              variant={ButtonVariant.PRIMARY}
+              additional_css="w-full lg:w-1/3"
+              on_click={() => {}}
+            />
+          </AttackButtonsContainer>
+        </>
+      );
+    };
+
     return (
       <>
         <HealthBarContainer>
           <HealthBar
-            current_health={100}
-            max_health={100}
-            name="Sewer Rat"
+            current_health={data?.health.current_monster_health || 0}
+            max_health={data?.health.max_monster_health || 0}
+            name={monsterName || 'Unknown'}
             health_bar_type={HealthBarType.ENEMY}
           />
           <HealthBar
-            current_health={100}
-            max_health={100}
-            name="Credence"
+            current_health={data?.health.current_character_health || 0}
+            max_health={data?.health.max_character_health || 0}
+            name={gameData?.character?.name || 'Unknown'}
             health_bar_type={HealthBarType.PLAYER}
           />
         </HealthBarContainer>
-        <AttackButtonsContainer>
-          <Button
-            label="Attack"
-            variant={ButtonVariant.PRIMARY}
-            additional_css="w-full lg:w-1/3"
-            on_click={() => {}}
-          />
-          <Button
-            label="Cast"
-            variant={ButtonVariant.PRIMARY}
-            additional_css="w-full lg:w-1/3"
-            on_click={() => {}}
-          />
-        </AttackButtonsContainer>
-        <AttackButtonsContainer>
-          <GradientButton
-            label="Atk & Cast"
-            gradient={ButtonGradientVarient.DANGER_TO_PRIMARY}
-            additional_css="w-full lg:w-1/3"
-            on_click={() => {}}
-          />
-          <GradientButton
-            label="Cast & Atk"
-            gradient={ButtonGradientVarient.PRIMARY_TO_DANGER}
-            additional_css="w-full lg:w-1/3"
-            on_click={() => {}}
-          />
-        </AttackButtonsContainer>
-        <AttackButtonsContainer>
-          <Button
-            label="Defend"
-            variant={ButtonVariant.PRIMARY}
-            additional_css="w-full lg:w-1/3"
-            on_click={() => {}}
-          />
-        </AttackButtonsContainer>
+        {renderAttackButtons()}
+        <div className="mt-4 rounded-lg bg-gray-100 dark:bg-gray-700 p-4 text-sm border border-solid border-gray-200 dark:border-gray-800 ">
+          <AttackMessages messages={data?.attack_messages || []} />
+        </div>
       </>
     );
   };

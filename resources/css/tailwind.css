@@ -298,3 +298,22 @@
     color: theme('colors.gray.400') !important;
   }
 }
+
+@layer utilities {
+  @keyframes colorfade {
+    0%   { background-color: var(--loader-from); }
+    50%  { background-color: var(--loader-to); }
+    100% { background-color: var(--loader-from); }
+  }
+  .loader-colors {
+    --loader-from: var(--color-rose-500);
+    --loader-to: var(--color-danube-500);
+  }
+  .dark .loader-colors {
+    --loader-from: var(--color-rose-300);
+    --loader-to: var(--color-danube-300);
+  }
+  .loader-anim {
+    animation: progress 1s infinite linear, colorfade 3s ease-in-out infinite alternate;
+  }
+}

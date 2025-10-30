@@ -1,5 +1,5 @@
 export enum AttackMessageType {
-  PLAYER_ATTACK = 'player-attack',
-  ENEMY_ATTACK = 'enemy-attack',
+  PLAYER_ATTACK = 'player-action',
+  ENEMY_ATTACK = 'enemy-action',
   REGULAR = 'regular',
 }
