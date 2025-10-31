@@ -5,4 +5,5 @@ export default interface PillTabsProps<PTuple extends readonly object[]> {
   ariaLabel?: string;
   initialIndex?: number;
   additional_tab_css?: string;
+  onActiveIndexChange?: (index: number) => void;
 }

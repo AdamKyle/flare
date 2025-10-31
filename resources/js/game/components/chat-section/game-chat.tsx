@@ -1,5 +1,5 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect } from 'react';
 
 import { useFetchChatHistory } from './api/hooks/use-fetch-chat-history';
 import { useSendChatMessage } from './api/hooks/use-send-chat-message';
@@ -7,6 +7,9 @@ import Chat from './chat';
 import AnnouncementMessages from './components/announcements/announcement-messages';
 import ExplorationMessages from './components/exploration-messages/exploration-messages';
 import ServerMessages from './components/server-messages/server-messages';
+import useChatActions from './hooks/use-chat-actions';
+import useUnreadBadges from './hooks/use-unread-badges';
+import buildTabs from './utils/build-tabs';
 import { useChatStream } from './websockets/hooks/use-chat-stream';
 import AnnouncementMessageDefinition from '../../api-definitions/chat/annoucement-message-definition';
 import ChatType from '../../api-definitions/chat/chat-message-definition';
@@ -40,29 +43,37 @@ const GameChat = () => {
     is_automation_running: isAutomationRunning,
   });
 
-  const [localChats, setLocalChats] = useState<ChatType[]>([]);
-  const [announcements, setAnnouncements] = useState<
-    AnnouncementMessageDefinition[]
-  >(data?.announcements || []);
-
   const { setRequestParams } = useSendChatMessage();
 
-  const handleSettingAnnouncementData = () => {
+  const {
+    combinedChat,
+    setInitialAnnouncements,
+    setInitialChatHistory,
+    pushSilencedMessage,
+    pushPrivateMessageSent,
+    pushErrorMessage,
+    onSend,
+  } = useChatActions({
+    chatMessages,
+    setRequestParams,
+  });
+
+  useEffect(() => {
     const initial: AnnouncementMessageDefinition[] = data?.announcements || [];
 
     if (initial.length === 0) {
       return;
     }
 
-    setAnnouncements(initial);
-  };
+    setInitialAnnouncements(initial);
+  }, [data, setInitialAnnouncements]);
 
-  const handleSettingChatHistory = () => {
+  useEffect(() => {
     if (!data) {
       return;
     }
 
-    const chatHistory = data.chat_messages.map((chatMessage) => {
+    const chatHistory: ChatType[] = data.chat_messages.map((chatMessage) => {
       return {
         color: chatMessage.color,
         map_name: chatMessage.map,
@@ -80,82 +91,25 @@ const GameChat = () => {
       };
     });
 
-    setLocalChats(chatHistory as ChatType[]);
-  };
+    setInitialChatHistory(chatHistory);
+  }, [data, setInitialChatHistory]);
 
-  useEffect(() => {
-    if (!data) {
-      return;
-    }
+  const announcementsCount =
+    (streamAnnouncements?.length || 0) +
+    (combinedChat.announcements?.length || 0);
 
-    handleSettingAnnouncementData();
-    handleSettingChatHistory();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
-
-  const push_silenced_message = useCallback(() => {
-    setLocalChats((previous) => {
-      const next = {
-        message:
-          "You child, have been chatting up a storm. Slow down. I'll let you know whe you can talk again ...",
-        type: 'error-message',
-      } as ChatType;
-
-      const updated = [next, ...previous];
-
-      if (updated.length > 1000) {
-        return updated.slice(0, 500);
-      }
-
-      return updated;
-    });
-  }, []);
-
-  const push_private_message_sent = useCallback((messageData: string[]) => {
-    setLocalChats((previous) => {
-      const next = {
-        message: `Sent to ${messageData[1]}: ${messageData[2]}`,
-        type: 'private-message-sent',
-      } as ChatType;
-
-      const updated = [next, ...previous];
-
-      if (updated.length > 1000) {
-        return updated.slice(0, 500);
-      }
-
-      return updated;
-    });
-  }, []);
-
-  const push_error_message = useCallback((message: string) => {
-    setLocalChats((previous) => {
-      const next = {
-        message,
-        type: 'error-message',
-      } as ChatType;
-
-      const updated = [next, ...previous];
-
-      if (updated.length > 1000) {
-        return updated.slice(0, 500);
-      }
-
-      return updated;
-    });
-  }, []);
-
-  const on_send = useCallback(
-    (text: string) => {
-      setRequestParams({ message: text });
-    },
-    [setRequestParams]
-  );
-
-  const combinedChat = useMemo(() => {
-    return [...localChats, ...chatMessages];
-  }, [localChats, chatMessages]);
+  const {
+    unreadServer,
+    unreadAnnouncements,
+    activeTabIndex,
+    handleActiveIndexChange,
+  } = useUnreadBadges({
+    serverCount: server.length,
+    announcementsCount,
+    serverIndex: 1,
+    announcementsIndex: 3,
+    initialActiveIndex: 0,
+  });
 
   const renderBody = () => {
     if (!character) {
@@ -167,58 +121,61 @@ const GameChat = () => {
         <Chat
           is_silenced={isSilenced}
           can_talk_again_at={canTalkAgainAt}
-          chat={combinedChat}
+          chat={combinedChat.chat}
           set_tab_to_updated={() => {}}
-          push_silenced_message={push_silenced_message}
-          push_private_message_sent={push_private_message_sent}
-          push_error_message={push_error_message}
-          on_send={on_send}
+          push_silenced_message={pushSilencedMessage}
+          push_private_message_sent={pushPrivateMessageSent}
+          push_error_message={pushErrorMessage}
+          on_send={onSend}
         />
       );
     }
 
-    const tabs = [
-      {
-        label: 'Chat',
-        component: Chat,
-        props: {
-          is_silenced: isSilenced,
-          can_talk_again_at: canTalkAgainAt,
-          chat: combinedChat,
-          set_tab_to_updated: () => {},
-          push_silenced_message,
-          push_private_message_sent,
-          push_error_message,
-          on_send,
-        },
+    const tabs = buildTabs({
+      chatComponent: Chat,
+      serverComponent: ServerMessages,
+      explorationComponent: ExplorationMessages,
+      announcementsComponent: AnnouncementMessages,
+      bellIconClass: 'far fa-bell',
+      bellIconStyles:
+        'text-[color:var(--color-mango-tango-600)] dark:text-[color:var(--color-mango-tango-300)]',
+      chatProps: {
+        is_silenced: isSilenced,
+        can_talk_again_at: canTalkAgainAt,
+        chat: combinedChat.chat,
+        set_tab_to_updated: () => {},
+        push_silenced_message: pushSilencedMessage,
+        push_private_message_sent: pushPrivateMessageSent,
+        push_error_message: pushErrorMessage,
+        on_send: onSend,
       },
-      {
-        label: 'Server Messages',
-        component: ServerMessages,
-        props: {
-          server_messages: server,
-          character_id: character.id,
-          view_port: viewPort,
-          is_automation_running: isAutomationRunning,
-        },
+      serverProps: {
+        server_messages: server,
+        character_id: character!.id,
+        view_port: viewPort,
+        is_automation_running: isAutomationRunning,
       },
-      {
-        label: 'Exploration',
-        component: ExplorationMessages,
-        props: {
-          exploration_messages: exploration,
-        },
+      explorationProps: {
+        exploration_messages: exploration,
       },
-      {
-        label: 'Announcements',
-        component: AnnouncementMessages,
-        props: {
-          announcements: [...streamAnnouncements, ...announcements],
-        },
+      announcementsProps: {
+        announcements: [
+          ...streamAnnouncements,
+          ...(combinedChat.announcements || []),
+        ],
       },
-    ] as const;
+      unreadServer,
+      unreadAnnouncements,
+    });
 
-    return <PillTabs tabs={tabs} additional_tab_css="w-full md:w-2/3" />;
+    return (
+      <PillTabs
+        tabs={tabs}
+        additional_tab_css="w-full md:w-2/3"
+        onActiveIndexChange={handleActiveIndexChange}
+        initialIndex={activeTabIndex}
+      />
+    );
   };
 
   if (loading) {
