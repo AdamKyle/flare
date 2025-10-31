@@ -59,4 +59,6 @@ export default interface CharacterSheetDefinition {
   can_talk_again_at?: string | null;
   view_port?: number;
   is_automation_running?: boolean;
+
+  map_name: string;
 }

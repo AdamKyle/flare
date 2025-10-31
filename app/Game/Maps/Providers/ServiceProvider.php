@@ -25,6 +25,7 @@ use App\Game\Maps\Services\WalkingService;
 use App\Game\Maps\Transformers\LocationsTransformer;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Monsters\Services\BuildMonsterCacheService;
+use App\Game\Monsters\Services\MonsterListService;
 use App\Game\Monsters\Transformers\MonsterTransformer;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
@@ -104,6 +105,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterSheetBaseInfoTransformer::class),
                 $app->make(BuildCharacterAttackTypes::class),
                 $app->make(MonsterTransformer::class),
+                $app->make(MonsterListService::class),
                 $app->make(LocationService::class),
                 $app->make(MapTileValue::class)
             );

@@ -3,7 +3,8 @@ import { AnimatePresence } from 'framer-motion';
 import React, { useMemo, useState } from 'react';
 
 import UseFetchTraversableMapsResponse from './api/hooks/deffinitions/use-fetch-traversable-maps-response';
-import { useOpenTraverseModal } from './api/hooks/use-fetch-traversable-maps';
+import { useOpenTraverseModalApi } from './api/hooks/use-fetch-traversable-maps-api';
+import useTraverseMapsApi from './api/hooks/use-traverse-maps-api';
 import TraversePropsDefinition from './definitions/traverse-props-definition';
 import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import BaseQuestItemDefinition from '../../../../api-definitions/items/quest-item-definitions/base-quest-item-definition';
@@ -21,7 +22,10 @@ import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import Separator from 'ui/separator/separator';
 
 export const Traverse = ({ character_data }: TraversePropsDefinition) => {
-  const { data, loading, error } = useOpenTraverseModal();
+  const { data, loading, error } = useOpenTraverseModalApi();
+  const { setRequestParams, loading: isTraversing } = useTraverseMapsApi({
+    character_id: character_data.id,
+  });
 
   const [selectedMap, setSelectedMap] = useState<DropdownItem | null>(null);
   const [mapDetails, setMapDetails] =
@@ -108,6 +112,16 @@ export const Traverse = ({ character_data }: TraversePropsDefinition) => {
     setQuestItemToView(null);
   };
 
+  const handleTraverse = () => {
+    if (!selectedMap) {
+      return;
+    }
+
+    setRequestParams({
+      map_id: Number(selectedMap.value),
+    });
+  };
+
   const isTraverseDisabled = () => {
     if (!mapDetails) {
       return true;
@@ -169,6 +183,22 @@ export const Traverse = ({ character_data }: TraversePropsDefinition) => {
     );
   };
 
+  const renderTraverseButtonOrLoading = () => {
+    if (isTraversing) {
+      return <InfiniteLoader />;
+    }
+
+    return (
+      <Button
+        on_click={handleTraverse}
+        label={'Traverse'}
+        variant={ButtonVariant.PRIMARY}
+        additional_css={'my-4'}
+        disabled={isTraverseDisabled()}
+      />
+    );
+  };
+
   return (
     <div className="p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
       <div className="grid gap-2">
@@ -181,13 +211,7 @@ export const Traverse = ({ character_data }: TraversePropsDefinition) => {
           on_clear={handleClearSelection}
           pre_selected_item={currentSelectedMap}
         />
-        <Button
-          on_click={() => {}}
-          label={'Traverse'}
-          variant={ButtonVariant.PRIMARY}
-          additional_css={'my-4'}
-          disabled={isTraverseDisabled()}
-        />
+        {renderTraverseButtonOrLoading()}
         <Separator />
         {renderSelectedMapDetails()}
       </div>

@@ -9,6 +9,7 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Game\Maps\Events\UpdateMonsterList;
 use App\Game\Maps\Events\UpdateRaidMonsters;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Monsters\Services\MonsterListService;
 use Illuminate\Support\Facades\Cache;
 
 trait UpdateRaidMonstersForLocation
@@ -23,7 +24,9 @@ trait UpdateRaidMonstersForLocation
             return;
         }
 
-        $monsters = Cache::get('monsters')[$character->map->gameMap->name];
+        $monsterListService = resolve(MonsterListService::class);
+
+        $monsters = $monsterListService->getMonstersForCharacterAsList($character);
 
         $hasAccessToPurgatory = $character->inventory->slots->where('item.effect', ItemEffectsValue::PURGATORY)->count() > 0;
 
@@ -45,7 +48,6 @@ trait UpdateRaidMonstersForLocation
 
         if (! is_null($location)) {
             if (! is_null($location->enemy_strength_increase)) {
-                $locationMonsters = Cache::get('monsters')[$location->name];
 
                 if (! $hasAccessToPurgatory && ! is_null($character->map->gameMap->only_during_event_type)) {
                     event(new ServerMessageEvent(
@@ -57,7 +59,6 @@ trait UpdateRaidMonstersForLocation
                         location in the list on the help docs and open it to see the quest items.'
                     ));
                 } else {
-                    $monsters = $locationMonsters;
 
                     event(new ServerMessageEvent(
                         $character->user,

@@ -15,6 +15,7 @@ const useBaseMapDetailsApi = (
   const [error, setError] =
     useState<BaseMapDetailsApiDefinition['error']>(null);
   const [loading, setLoading] = useState(true);
+  const [refresh, setRefresh] = useState(false);
 
   let url = '';
 
@@ -60,12 +61,13 @@ const useBaseMapDetailsApi = (
 
   useEffect(() => {
     fetchCharacterMapDetails().catch(() => {});
-  }, [fetchCharacterMapDetails]);
+  }, [fetchCharacterMapDetails, refresh]);
 
   return {
     data,
     error,
     loading,
+    setRefresh,
   };
 };
 

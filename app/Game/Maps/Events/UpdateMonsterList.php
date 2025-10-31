@@ -24,7 +24,8 @@ class UpdateMonsterList implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      *
-     * @param  Map  $map
+     * @param array $monsters
+     * @param User $user
      */
     public function __construct(array $monsters, User $user)
     {

@@ -14,6 +14,7 @@ use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilderWithDeductions;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use App\Game\Core\Events\UpdateCharacterMapName;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateMap;
@@ -23,6 +24,7 @@ use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\MovementMessageTypes;
+use App\Game\Monsters\Services\MonsterListService;
 use App\Game\Monsters\Transformers\MonsterTransformer;
 use Facades\App\Flare\Cache\CoordinatesCache;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -46,6 +48,8 @@ class TraverseService
 
     private CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer;
 
+    private MonsterListService $monsterListService;
+
     /**
      * TraverseService constructor.
      */
@@ -54,6 +58,7 @@ class TraverseService
         CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer,
         BuildCharacterAttackTypes $buildCharacterAttackTypes,
         MonsterTransformer $monsterTransformer,
+        MonsterListService $monsterListService,
         LocationService $locationService,
         MapTileValue $mapTileValue
     ) {
@@ -63,6 +68,7 @@ class TraverseService
         $this->monsterTransformer = $monsterTransformer;
         $this->locationService = $locationService;
         $this->mapTileValue = $mapTileValue;
+        $this->monsterListService = $monsterListService;
     }
 
     /**
@@ -354,7 +360,7 @@ class TraverseService
 
         $this->updateActionsForMap($gameMap, $oldGameMap, $character);
 
-        $monsters = $this->getMonstersForMap($character->map, $mapId);
+        $monsters = $this->monsterListService->getMonstersForCharacterAsList($character);
 
         $characterBaseStats = new Item($character, $this->characterSheetBaseInfoTransformer);
 
@@ -363,6 +369,8 @@ class TraverseService
         event(new UpdateBaseCharacterInformation($user, $characterBaseStats));
 
         event(new UpdateTopBarEvent($character));
+
+        event(new UpdateCharacterMapName($user, $character->map->gameMap->name));
 
         event(new UpdateMonsterList($monsters, $user));
     }

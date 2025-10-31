@@ -15,6 +15,8 @@ const MonsterNamePicker = ({
     return null;
   }
 
+  console.log('MonsterNamePicker', monsters);
+
   const dropdownItems: DropdownItem[] = monsters.map((monster, index) => ({
     value: index,
     label: monster.name,

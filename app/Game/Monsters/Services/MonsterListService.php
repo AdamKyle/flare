@@ -29,6 +29,12 @@ class MonsterListService
         return $this->successResult($payload);
     }
 
+    public function getMonstersForCharacterAsList(Character $character): array {
+        $monsters = $this->resolveMonsterDataSetForCharacter($character);
+
+        return $this->buildPayload($monsters);
+    }
+
     /*
      * Resolve the full monsters dataset for the character based on map and location rules.
      *

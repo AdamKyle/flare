@@ -29,7 +29,7 @@ import InfiniteLoaderRoseDanube from 'ui/infinite-scroll/infinite-loader-rose-da
 const MonsterSection = ({
   show_monster_stats,
 }: MonsterSectionProps): ReactNode => {
-  const { gameData } = useGameData();
+  const { gameData, listenForMonsterUpdates } = useGameData();
   const { loading, setRequestData, data, error } = useAttackMonster();
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -47,6 +47,8 @@ const MonsterSection = ({
 
     setMonsterName(monsters[0].name);
   }, [monsters]);
+
+  listenForMonsterUpdates();
 
   const handelMonsterSelection = () => {
     if (!monsters || !monsters[currentIndex] || !gameData.character) {

@@ -10,6 +10,7 @@ import { useManagePlayerKingdomManagementVisibility } from './hooks/use-manage-p
 import { useManageSetSailButtonState } from './hooks/use-manage-set-sail-button-state';
 import { useManageViewLocationState } from './hooks/use-manage-view-location-state';
 import { MapMovementTypes } from './map-movement-types/map-movement-types';
+import { useListenForMapNameChange } from './websockets/hooks/use-listen-for-map-name-change';
 import { CharacterPosition } from '../../../../map-section/api/hooks/definitions/base-map-api-definition';
 import { useEmitCharacterPosition } from '../../../../map-section/hooks/use-emit-character-position';
 import { useOpenLocationInfoSidePeek } from '../../../../map-section/hooks/use-open-location-info-side-peek';
@@ -40,13 +41,17 @@ const MapCard = () => {
   const { moveCharacterDirectionally } = useDirectionallyMoveCharacter();
   const { canMove, showTimerBar, lengthOfTime } = useFetchMovementTimeoutData();
   const { isSetSailEnabled } = useManageSetSailButtonState();
-  const { gameData } = useGameData();
+  const { gameData, updateCharacter } = useGameData();
   const { openTeleport } = UseOpenTeleportSidePeek();
   const { errorMessage, resetErrorMessage } = useManageMapMovementErrorState();
   const { characterPosition } = useEmitCharacterPosition();
   const { isViewLocationEnabled, locationData } = useManageViewLocationState();
   const { openLocationDetails } = useOpenLocationInfoSidePeek({
     characterData: gameData?.character,
+  });
+  useListenForMapNameChange({
+    character_data: gameData?.character || null,
+    updateCharacterData: updateCharacter,
   });
   const { openPlayerKingdoms } = useManagePlayerKingdomManagementVisibility();
   const { openTraverse } = UseOpenTraverseSidePeek();
@@ -140,7 +145,10 @@ const MapCard = () => {
   }
 
   return (
-    <FloatingCard title={'Map: Surface'} close_action={closeMapCard}>
+    <FloatingCard
+      title={`Map: ${characterData.map_name}`}
+      close_action={closeMapCard}
+    >
       <div className="text-center">
         <Map additional_css={'h-[350px] border-2 border-slate-600'} zoom={2} />
       </div>

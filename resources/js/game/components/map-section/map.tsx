@@ -20,6 +20,7 @@ import { useMovementTimer } from './websockets/hooks/use-movement-timer';
 import { useFetchMovementTimeoutData } from '../actions/partials/floating-cards/map-section/hooks/use-fetch-movement-timeout-data';
 import { useManageSetSailButtonState } from '../actions/partials/floating-cards/map-section/hooks/use-manage-set-sail-button-state';
 import { useManageViewLocationState } from '../actions/partials/floating-cards/map-section/hooks/use-manage-view-location-state';
+import { useEmitMapRefresh } from '../side-peeks/map-actions/traverse/hooks/use-emit-map-refresh';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 import { useGameData } from 'game-data/hooks/use-game-data';
@@ -34,6 +35,7 @@ const Map = ({ additional_css, zoom = 1 }: MapProps) => {
 
   const { manageSetSailButtonState } = useManageSetSailButtonState();
   const { canViewLocationData } = useManageViewLocationState();
+  const { shouldRefreshMap, emitShouldRefreshMap } = useEmitMapRefresh();
 
   const { emitCharacterPosition, characterPosition: emittedCharacterPosition } =
     useEmitCharacterPosition();
@@ -64,7 +66,7 @@ const Map = ({ additional_css, zoom = 1 }: MapProps) => {
     });
   };
 
-  const { loading, error, data } = useBaseMapDetailsApi({
+  const { loading, error, data, setRefresh } = useBaseMapDetailsApi({
     url: MapApiUrls.BASE_MAP_DETAILS,
     callback: mapDetailsHandler,
     characterData,
@@ -83,6 +85,14 @@ const Map = ({ additional_css, zoom = 1 }: MapProps) => {
   });
 
   useEffect(() => {
+    if (shouldRefreshMap) {
+      setRefresh((prev) => !prev);
+
+      emitShouldRefreshMap(false);
+
+      return;
+    }
+
     emitCharacterPosition(characterMapPosition);
 
     const foundLocation = data?.locations.find((location) => {
@@ -113,7 +123,7 @@ const Map = ({ additional_css, zoom = 1 }: MapProps) => {
       location_name: foundLocation.name,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [characterMapPosition]);
+  }, [characterMapPosition, shouldRefreshMap]);
 
   useEffect(
     () => {
