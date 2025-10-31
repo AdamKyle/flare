@@ -5,6 +5,7 @@ import UsableItemsProps from '../../character-inventory/usable-items/types/usabl
 import CharacterKingdomDetailsProps from '../../map-actions/kingdom-details/types/character-kingdom-details-props';
 import LocationDetailsProps from '../../map-actions/location-details/types/location-details-props';
 import TeleportProps from '../../map-actions/teleport/types/teleport-props';
+import TraversePropsDefinition from '../../map-actions/traverse/definitions/traverse-props-definition';
 
 import SidePeekProps from 'ui/side-peek/types/side-peek-props';
 
@@ -16,5 +17,6 @@ export type SidePeekComponentPropsMap = {
   [SidePeekComponentRegistrationEnum.MAP_ACTIONS_TELEPORT]: TeleportProps;
   [SidePeekComponentRegistrationEnum.LOCATION_DETAILS]: LocationDetailsProps;
   [SidePeekComponentRegistrationEnum.CHARACTER_KINGDOM_DETAILS]: CharacterKingdomDetailsProps;
+  [SidePeekComponentRegistrationEnum.MAP_ACTIONS_TRAVERSE]: TraversePropsDefinition;
   // Future components go here
 };

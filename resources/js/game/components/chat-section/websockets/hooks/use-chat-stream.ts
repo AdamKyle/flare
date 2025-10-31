@@ -118,8 +118,6 @@ export const useChatStream = (
   );
 
   const onChatSent = useCallback((event: EventPayload) => {
-    console.log('onChatSent', event);
-
     let next: ChatType;
 
     if (event.type === 'creator-message') {

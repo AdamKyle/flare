@@ -13,7 +13,8 @@ import { MapMovementTypes } from './map-movement-types/map-movement-types';
 import { CharacterPosition } from '../../../../map-section/api/hooks/definitions/base-map-api-definition';
 import { useEmitCharacterPosition } from '../../../../map-section/hooks/use-emit-character-position';
 import { useOpenLocationInfoSidePeek } from '../../../../map-section/hooks/use-open-location-info-side-peek';
-import { UseOpenTeleportSidePeek } from '../../../../map-section/hooks/use-open-teleport-sidepeek';
+import { UseOpenTeleportSidePeek } from '../../../../map-section/hooks/use-open-teleport-side-peek';
+import { UseOpenTraverseSidePeek } from '../../../../map-section/hooks/use-open-traverse-side-peek';
 import Map from '../../../../map-section/map';
 import FloatingCard from '../../../components/icon-section/floating-card';
 
@@ -48,6 +49,7 @@ const MapCard = () => {
     characterData: gameData?.character,
   });
   const { openPlayerKingdoms } = useManagePlayerKingdomManagementVisibility();
+  const { openTraverse } = UseOpenTraverseSidePeek();
 
   useEffect(() => {
     if (isNil(gameData)) {
@@ -87,6 +89,14 @@ const MapCard = () => {
       characterPosition.x,
       characterPosition.y
     );
+  };
+
+  const handleOpenTraverseSidePeek = () => {
+    if (!gameData?.character) {
+      return;
+    }
+
+    openTraverse(gameData.character);
   };
 
   const renderTimerBar = () => {
@@ -193,7 +203,7 @@ const MapCard = () => {
           disabled={isSetSailDisabled()}
         />
         <Button
-          on_click={() => {}}
+          on_click={handleOpenTraverseSidePeek}
           label={'Traverse'}
           variant={ButtonVariant.PRIMARY}
           disabled={!canMove}

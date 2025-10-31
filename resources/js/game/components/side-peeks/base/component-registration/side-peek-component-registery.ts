@@ -12,6 +12,8 @@ import LocationDetails from '../../map-actions/location-details/location-details
 import LocationDetailsProps from '../../map-actions/location-details/types/location-details-props';
 import Teleport from '../../map-actions/teleport/teleport';
 import TeleportProps from '../../map-actions/teleport/types/teleport-props';
+import TraversePropsDefinition from '../../map-actions/traverse/definitions/traverse-props-definition';
+import Traverse from '../../map-actions/traverse/traverse';
 
 import SidePeekProps from 'ui/side-peek/types/side-peek-props';
 
@@ -43,6 +45,10 @@ export const SidePeekComponentRegistry = {
   [SidePeekComponentRegistrationEnum.CHARACTER_KINGDOM_DETAILS]: {
     component: CharacterKingdomDetails,
     props: {} as CharacterKingdomDetailsProps,
+  },
+  [SidePeekComponentRegistrationEnum.MAP_ACTIONS_TRAVERSE]: {
+    component: Traverse,
+    props: {} as TraversePropsDefinition,
   },
   // Add more components here
 };

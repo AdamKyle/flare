@@ -9,7 +9,6 @@ export const Alert = (props: AlertProps) => {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    console.log('Rendering Alert Over And Over Again?');
     if (props.force_close) {
       setVisible(false);
 

@@ -22,8 +22,6 @@ export const useSendChatMessage = (): UseSendChatMessageDefinition => {
   const send = useCallback(async () => {
     setError(null);
 
-    console.log('requestParams', requestParams);
-
     try {
       const result = await apiHandler.post<
         SendChatMessageResponse,
@@ -32,8 +30,6 @@ export const useSendChatMessage = (): UseSendChatMessageDefinition => {
       >(url, {
         message: requestParams.message,
       });
-
-      console.log('result', result);
     } catch (err) {
       if (err instanceof AxiosError) {
         setError(err.response?.data || null);
@@ -45,7 +41,7 @@ export const useSendChatMessage = (): UseSendChatMessageDefinition => {
     if (requestParams.message === '') {
       return;
     }
-    console.log('useEffect - requestParams', requestParams);
+
     send().catch(() => {});
   }, [send, requestParams]);
 

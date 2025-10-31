@@ -132,8 +132,6 @@ const Messages = ({
         >
           <ul className="space-y-2">
             {chat.map((row, idx) => {
-              console.log('message row', row);
-
               const displayName: string =
                 row.character_name.trim() || (row.name_tag ?? '').trim();
               const name = ` ${row.character_name || ''} ${row.name_tag}`;

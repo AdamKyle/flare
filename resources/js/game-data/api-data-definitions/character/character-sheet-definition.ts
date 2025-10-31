@@ -7,6 +7,7 @@ import ResistanceInfoDefinition from 'game-data/api-data-definitions/character/r
 export default interface CharacterSheetDefinition {
   id: number;
   user_id: number;
+  game_map_id: number;
   name: string;
   class: string;
   class_id: number;

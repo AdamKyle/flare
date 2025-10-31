@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use App\Flare\Items\DataBuilders\QuestItem\QuestItemBuilder;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MapNameValue;
 use Database\Factories\GameMapFactory;
@@ -79,19 +80,22 @@ class GameMap extends Model
 
     public function getMapRequiredItemAttribute()
     {
+
+        $questItemDataBuilder = resolve(QuestItemBuilder::class);
+
         switch ($this->name) {
             case 'Labyrinth':
-                return Item::where('effect', ItemEffectsValue::LABYRINTH)->first();
+                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectsValue::LABYRINTH)->first());
             case 'Dungeons':
-                return Item::where('effect', ItemEffectsValue::DUNGEON)->first();
+                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectsValue::DUNGEON)->first());
             case 'Shadow Plane':
-                return Item::where('effect', ItemEffectsValue::SHADOW_PLANE)->first();
+                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectsValue::SHADOW_PLANE)->first());
             case 'Hell':
-                return Item::where('effect', ItemEffectsValue::HELL)->first();
+                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectsValue::HELL)->first());
             case 'Purgatory':
-                return Item::where('effect', ItemEffectsValue::PURGATORY)->first();
+                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectsValue::PURGATORY)->first());
             case 'Twisted Memories':
-                return Item::where('effect', ItemEffectsValue::TWISTED_TREE_BRANCH)->first();
+                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectsValue::TWISTED_TREE_BRANCH)->first());
             case 'Surface':
             default:
                 return null;

@@ -36,6 +36,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         return [
             'id' => $character->id,
             'user_id' => $character->user_id,
+            'game_map_id' => $character->map->game_map_id,
             'name' => $character->name,
             'class' => $gameClass->name,
             'class_id' => $gameClass->id,

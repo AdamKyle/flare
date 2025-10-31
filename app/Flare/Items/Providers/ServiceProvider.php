@@ -4,6 +4,7 @@ namespace App\Flare\Items\Providers;
 
 use App\Flare\Items\Comparison\Comparator;
 use App\Flare\Items\Comparison\ItemComparison;
+use App\Flare\Items\DataBuilders\QuestItem\QuestItemBuilder;
 use App\Flare\Items\Enricher\EquippableEnricher;
 use App\Flare\Items\Enricher\ItemEnricherFactory;
 use App\Flare\Items\Enricher\Manifest\Concerns\ManifestSchema;
@@ -66,6 +67,13 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(BaseEquippableItemTransformer::class),
                 $app->make(PlainDataSerializer::class),
                 $app->make(Manager::class),
+            );
+        });
+
+        $this->app->bind(QuestItemBuilder::class, function ($app) {
+            return new QuestItemBuilder(
+                $app->make(Manager::class),
+                $app->make(QuestItemTransformer::class),
             );
         });
 
