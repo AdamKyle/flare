@@ -14,8 +14,6 @@ use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilderWithDeductions;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
-use App\Game\Core\Events\UpdateCharacterMapName;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateMap;
 use App\Game\Maps\Events\UpdateMonsterList;
@@ -367,10 +365,6 @@ class TraverseService
         $characterBaseStats = $this->manager->createData($characterBaseStats)->toArray();
 
         event(new UpdateBaseCharacterInformation($user, $characterBaseStats));
-
-        event(new UpdateTopBarEvent($character));
-
-        event(new UpdateCharacterMapName($user, $character->map->gameMap->name));
 
         event(new UpdateMonsterList($monsters, $user));
     }

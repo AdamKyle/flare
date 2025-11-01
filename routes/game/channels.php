@@ -74,7 +74,3 @@ Broadcast::channel('update-factions-{userId}', function ($user, $userId) {
 Broadcast::channel('update-character-attacks-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;
 });
-
-Broadcast::channel('update-character-map-name-{userId}', function ($user, $userId) {
-    return $user->id === (int) $userId;
-});

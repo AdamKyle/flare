@@ -15,7 +15,8 @@ class MonstersController extends Controller
     public function __construct(private readonly MonsterListService $monsterListService, private readonly MonsterStatsService $monsterStatsService) {}
 
     /**
-     * @throws InvalidArgumentException
+     * @param Character $character
+     * @return JsonResponse
      */
     public function listMonsters(Character $character): JsonResponse
     {
@@ -28,6 +29,9 @@ class MonstersController extends Controller
     }
 
     /**
+     * @param Monster $monster
+     * @param Character $character
+     * @return JsonResponse
      * @throws InvalidArgumentException
      */
     public function getMonsterStats(Monster $monster, Character $character): JsonResponse

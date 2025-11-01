@@ -29,10 +29,29 @@ class MonsterListService
         return $this->successResult($payload);
     }
 
+    /**
+     * Get a straight list of monsters as an array
+     *
+     * @param Character $character
+     * @return array
+     */
     public function getMonstersForCharacterAsList(Character $character): array {
         $monsters = $this->resolveMonsterDataSetForCharacter($character);
 
         return $this->buildPayload($monsters);
+    }
+
+    /**
+     * Get the monster the character should fight.
+     *
+     * @param Character $character
+     * @param int $monsterId
+     * @return array
+     */
+    public function getMonsterForFight(Character $character, int $monsterId): array {
+        $monsters = $this->resolveMonsterDataSetForCharacter($character)['data'];
+
+        return collect($monsters)->where('id', $monsterId)->first();
     }
 
     /*
@@ -236,8 +255,15 @@ class MonsterListService
         if (! is_null($locationWithType)) {
             $monstersForLocation = Cache::get('special-location-monsters');
 
+            $monstersForLocationType = [];
+
             if (isset($monstersForLocation['location-type-'.$locationWithType->type])) {
-                $current = $monstersForLocation['location-type-'.$locationWithType->type];
+
+                $monstersForLocationType = $monstersForLocation['location-type-'.$locationWithType->type];
+            }
+
+            if (count($monstersForLocationType['data']) > 0) {
+                $current = $monstersForLocationType;
             }
         }
 

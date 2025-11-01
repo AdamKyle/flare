@@ -1,3 +1,4 @@
+import { useActivityTimeout } from 'api-handler/hooks/use-activity-timeout';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
@@ -10,6 +11,7 @@ export const useFetchTeleportCoordinatesApi = (
   params: UseFetchTeleportCoordinatesApiParams
 ): UseFetchTeleportCoordinatesApiDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
+  const { handleInactivity } = useActivityTimeout();
 
   const [data, setData] = useState<TeleportCoordinatesApiDefinition | null>(
     null
@@ -36,6 +38,11 @@ export const useFetchTeleportCoordinatesApi = (
         setData(result);
       } catch (err) {
         if (err instanceof AxiosError) {
+          handleInactivity({
+            setError,
+            response: err,
+          });
+
           setError(err.response?.data || null);
         }
       } finally {

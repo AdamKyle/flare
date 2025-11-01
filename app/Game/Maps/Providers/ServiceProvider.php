@@ -54,6 +54,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(ConjureService::class),
                 $app->make(MovementService::class),
                 $app->make(TraverseService::class),
+                $app->make(Manager::class),
+                $app->make(CharacterSheetBaseInfoTransformer::class)
             );
         });
 

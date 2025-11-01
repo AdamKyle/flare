@@ -17,7 +17,7 @@ class UpdateBaseCharacterInformation implements ShouldBroadcastNow
     /**
      * @param  array  $character
      */
-    public $baseStats;
+    public $character;
 
     /**
      * @var User
@@ -27,9 +27,9 @@ class UpdateBaseCharacterInformation implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      */
-    public function __construct(User $user, array $baseStats)
+    public function __construct(User $user, array $characterData)
     {
-        $this->baseStats = $baseStats;
+        $this->character = $characterData['data'];
         $this->user = $user;
     }
 

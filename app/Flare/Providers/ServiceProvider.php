@@ -82,6 +82,7 @@ use App\Game\Kingdoms\Transformers\KingdomBuildingTransformer;
 use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Transformers\OtherKingdomTransformer;
 use App\Game\Kingdoms\Transformers\UnitTransformer;
+use App\Game\Monsters\Services\MonsterListService;
 use App\Game\Monsters\Transformers\MonsterTransformer;
 use App\Game\Quests\Services\BuildQuestCacheService;
 use App\Game\Quests\Transformers\QuestTransformer;
@@ -405,6 +406,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(MonsterPlayerFight::class, function ($app) {
             return new MonsterPlayerFight(
                 $app->make(BuildMonster::class),
+                $app->make(MonsterListService::class),
                 $app->make(CharacterCacheData::class),
                 $app->make(Voidance::class),
                 $app->make(Ambush::class),

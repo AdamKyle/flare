@@ -1,3 +1,4 @@
+import { useActivityTimeout } from 'api-handler/hooks/use-activity-timeout';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
 import { AxiosError, AxiosRequestConfig } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
@@ -14,6 +15,7 @@ export const useEquipItem = ({
   on_success,
 }: UseEquipItemParamsDefinition): UseEquipItemApiDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
+  const { handleInactivity } = useActivityTimeout();
 
   const [error, setError] = useState<UseEquipItemApiDefinition['error']>(null);
   const [loading, setLoading] = useState(false);
@@ -53,6 +55,11 @@ export const useEquipItem = ({
         setLoading(false);
       } catch (err) {
         if (err instanceof AxiosError) {
+          handleInactivity({
+            setError,
+            response: err,
+          });
+
           setError(err.response?.data || null);
         }
       } finally {

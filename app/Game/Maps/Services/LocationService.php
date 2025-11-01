@@ -153,9 +153,6 @@ class LocationService
 
         // Update monsters for a possible raid at a possible location
         $this->updateMonstersForRaid($character, $this->location);
-
-        // Update monsters for a specific location type
-        $this->updateMonsterForLocationType($character, $this->location);
     }
 
     /**

@@ -1,3 +1,4 @@
+import { useActivityTimeout } from 'api-handler/hooks/use-activity-timeout';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { isNil } from 'lodash';
@@ -15,6 +16,7 @@ export const useGetInventoryItemComparisonDetails = ({
   slot_id,
 }: UseGetInventoryItemComparisonDetailsParams): UseGetInventoryItemComparisonDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
+  const { handleInactivity } = useActivityTimeout();
 
   const [data, setData] = useState<ItemComparisonRow[] | [] | null>(null);
   const [error, setError] =
@@ -49,16 +51,10 @@ export const useGetInventoryItemComparisonDetails = ({
       setData(result.details);
     } catch (err) {
       if (err instanceof AxiosError) {
-        if (err.response?.status === 401) {
-          setError({
-            message:
-              'You have been logged out due to inactivity. One moment while we redirect you.',
-          });
-
-          window.location.reload();
-
-          return;
-        }
+        handleInactivity({
+          setError: setError,
+          response: err,
+        });
 
         setError(err.response?.data || null);
       }

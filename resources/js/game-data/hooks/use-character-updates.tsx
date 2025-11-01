@@ -2,11 +2,11 @@ import React, { useCallback, useState } from 'react';
 
 import UseMonsterUpdateDefinition from './definitions/use-monster-update-definition';
 
-import MonsterUpdatesWire from 'game-data/components/monster-updates-wire';
-import UseMonsterUpdatesParams from 'game-data/hooks/definitions/use-monster-update-params-definition';
+import { CharacterUpdatesWire } from 'game-data/components/character-updates-wire';
+import UseCharacterUpdateParamsDefinition from 'game-data/hooks/definitions/use-character-update-params-definition';
 
-const useMonsterUpdates = (
-  params: UseMonsterUpdatesParams
+const UseCharacterUpdates = (
+  params: UseCharacterUpdateParamsDefinition
 ): UseMonsterUpdateDefinition => {
   const { userId, onEvent } = params;
 
@@ -24,10 +24,10 @@ const useMonsterUpdates = (
       return null;
     }
 
-    return <MonsterUpdatesWire userId={userId} onEvent={onEvent} />;
+    return <CharacterUpdatesWire userId={userId} onEvent={onEvent} />;
   };
 
   return { listening, start, renderWire };
 };
 
-export default useMonsterUpdates;
+export default UseCharacterUpdates;

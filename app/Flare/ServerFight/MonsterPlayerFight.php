@@ -15,6 +15,7 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Monsters\Services\BuildMonsterCacheService;
+use App\Game\Monsters\Services\MonsterListService;
 use Illuminate\Support\Facades\Cache;
 
 class MonsterPlayerFight
@@ -31,30 +32,15 @@ class MonsterPlayerFight
 
     private bool $tookTooLong;
 
-    private Character $character;
-
-    private BuildMonster $buildMonster;
-
-    private CharacterCacheData $characterCacheData;
-
-    private Voidance $voidance;
-
-    private Ambush $ambush;
-
-    private Attack $attack;
-
     public function __construct(
-        BuildMonster $buildMonster,
-        CharacterCacheData $characterCacheData,
-        Voidance $voidance,
-        Ambush $ambush,
-        Attack $attack
+        private readonly BuildMonster $buildMonster,
+        private readonly MonsterListService $monsterListService,
+        private readonly CharacterCacheData $characterCacheData,
+        private readonly Voidance $voidance,
+        private readonly Ambush $ambush,
+        private readonly Attack $attack
     ) {
-        $this->buildMonster = $buildMonster;
-        $this->characterCacheData = $characterCacheData;
-        $this->voidance = $voidance;
-        $this->ambush = $ambush;
-        $this->attack = $attack;
+
         $this->battleMessages = [];
         $this->tookTooLong = false;
     }
@@ -80,8 +66,9 @@ class MonsterPlayerFight
      */
     public function setUpFight(Character $character, array $params): MonsterPlayerFight|array
     {
+
         $this->character = $character;
-        $this->monster = $this->fetchMonster($character->map, $params['selected_monster_id']);
+        $this->monster = $this->monsterListService->getMonsterForFight($character, $params['selected_monster_id']);
         $this->attackType = $params['attack_type'];
 
         if (empty($this->monster)) {
@@ -145,14 +132,6 @@ class MonsterPlayerFight
     }
 
     /**
-     * Get the enemy name.
-     */
-    public function getEnemyName(): string
-    {
-        return $this->monster['name'];
-    }
-
-    /**
      * get the monster.
      */
     public function getMonster(): array
@@ -174,11 +153,6 @@ class MonsterPlayerFight
     public function getMonsterHealth(): int
     {
         return $this->attack->getMonsterHealth();
-    }
-
-    public function getRank(): int
-    {
-        return $this->rank;
     }
 
     /**
@@ -306,34 +280,6 @@ class MonsterPlayerFight
         $this->tookTooLong = $this->attack->tookTooLong();
 
         return false;
-    }
-
-    /**
-     * Fetch the monster.
-     */
-    protected function fetchMonster(Map $map, int $monsterId): array
-    {
-
-        $regularMonster = $this->fetchRegularMonster($map, $monsterId);
-
-        if (! is_null($regularMonster)) {
-            return $regularMonster;
-        }
-
-        $celestial = $this->fetchCelestial($map, $monsterId);
-
-        if (! is_null($celestial)) {
-            return $celestial;
-        }
-
-        $locationBasedMonster = $this->fetchLocationTypeSpecialMonster($map, $monsterId);
-
-        if (! is_null($locationBasedMonster)) {
-
-            return $locationBasedMonster;
-        }
-
-        return [];
     }
 
     /**

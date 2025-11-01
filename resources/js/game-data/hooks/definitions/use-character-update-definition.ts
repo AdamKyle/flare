@@ -1,8 +1,7 @@
 import { ReactNode } from 'react';
 
-export default interface UseMonsterUpdatesDefinition {
+export default interface UseCharterUpdateStreamResponse {
   listening: boolean;
   start: () => void;
-  stop: () => void | null;
   renderWire: () => ReactNode;
 }

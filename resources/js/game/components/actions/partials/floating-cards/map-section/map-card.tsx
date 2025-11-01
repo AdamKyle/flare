@@ -10,7 +10,6 @@ import { useManagePlayerKingdomManagementVisibility } from './hooks/use-manage-p
 import { useManageSetSailButtonState } from './hooks/use-manage-set-sail-button-state';
 import { useManageViewLocationState } from './hooks/use-manage-view-location-state';
 import { MapMovementTypes } from './map-movement-types/map-movement-types';
-import { useListenForMapNameChange } from './websockets/hooks/use-listen-for-map-name-change';
 import { CharacterPosition } from '../../../../map-section/api/hooks/definitions/base-map-api-definition';
 import { useEmitCharacterPosition } from '../../../../map-section/hooks/use-emit-character-position';
 import { useOpenLocationInfoSidePeek } from '../../../../map-section/hooks/use-open-location-info-side-peek';
@@ -48,10 +47,6 @@ const MapCard = () => {
   const { isViewLocationEnabled, locationData } = useManageViewLocationState();
   const { openLocationDetails } = useOpenLocationInfoSidePeek({
     characterData: gameData?.character,
-  });
-  useListenForMapNameChange({
-    character_data: gameData?.character || null,
-    updateCharacterData: updateCharacter,
   });
   const { openPlayerKingdoms } = useManagePlayerKingdomManagementVisibility();
   const { openTraverse } = UseOpenTraverseSidePeek();

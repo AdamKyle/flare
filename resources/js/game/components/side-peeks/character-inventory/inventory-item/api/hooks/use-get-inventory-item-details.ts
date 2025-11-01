@@ -1,3 +1,4 @@
+import { useActivityTimeout } from 'api-handler/hooks/use-activity-timeout';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
@@ -13,6 +14,7 @@ export const useGetInventoryItemDetails = ({
   url,
 }: UseGetInventoryItemDetailsApiDefinition): UseGetInventoryItemDetailsResponse => {
   const { apiHandler, getUrl } = useApiHandler();
+  const { handleInactivity } = useActivityTimeout();
 
   const [data, setData] = useState<
     EquippableItemWithBase | BaseQuestItemDefinition | null
@@ -37,6 +39,11 @@ export const useGetInventoryItemDetails = ({
       setData(result);
     } catch (err) {
       if (err instanceof AxiosError) {
+        handleInactivity({
+          setError: setError,
+          response: err,
+        });
+
         setError(err.response?.data || null);
       }
     } finally {

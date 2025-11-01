@@ -5,7 +5,9 @@ import GameDataProviderProps from './types/game-data-provider-props';
 import CharacterSheetDefinition from '../api-data-definitions/character/character-sheet-definition';
 import GameDataDefinition from '../deffinitions/game-data-definition';
 
+import UseCharterUpdateStreamResponse from 'game-data/hooks/definitions/use-character-update-stream-response';
 import UseMonsterUpdateStreamResponse from 'game-data/hooks/definitions/use-monster-update-stream-response';
+import useCharacterUpdates from 'game-data/hooks/use-character-updates';
 import useMonsterUpdates from 'game-data/hooks/use-monster-updates';
 
 const GameDataProvider = (props: GameDataProviderProps) => {
@@ -46,11 +48,24 @@ const GameDataProvider = (props: GameDataProviderProps) => {
         return prev;
       }
 
-      console.log('handle on monster list update', monsterList);
-
       return {
         ...prev,
         monsters: monsterList.monsters,
+      };
+    });
+  };
+
+  const handleOnCharacterUpdate = (
+    character: UseCharterUpdateStreamResponse
+  ) => {
+    setGameData((prev): GameDataDefinition | null => {
+      if (!prev || !prev.monsters) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        character: character.character,
       };
     });
   };
@@ -74,6 +89,19 @@ const GameDataProvider = (props: GameDataProviderProps) => {
     onEvent: handleOnMonsterListUpdate,
   });
 
+  const {
+    listening: characterUpdatesListening,
+    start: startCharacterUpdates,
+    renderWire: renderCharacterUpdateWire,
+  } = useCharacterUpdates({
+    userId: userIdForWire,
+    onEvent: handleOnCharacterUpdate,
+  });
+
+  if (!characterUpdatesListening) {
+    startCharacterUpdates();
+  }
+
   const listenForMonsterUpdates = () => {
     if (!monsterListening) {
       startMonsterUpdates();
@@ -91,6 +119,7 @@ const GameDataProvider = (props: GameDataProviderProps) => {
       }}
     >
       {renderMonsterUpdatesWire()}
+      {renderCharacterUpdateWire()}
       {props.children}
     </GameDataContext.Provider>
   );

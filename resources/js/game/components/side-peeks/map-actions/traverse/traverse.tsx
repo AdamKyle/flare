@@ -142,11 +142,15 @@ export const Traverse = ({ character_data }: TraversePropsDefinition) => {
     }
 
     return (
-      <GenericItem
-        key={map.map_required_item.item_id}
-        item={map.map_required_item}
-        on_click={handleViewQuestItem}
-      />
+      <>
+        <h3>Required Quest Item To Enter</h3>
+        <Separator />
+        <GenericItem
+          key={map.map_required_item.item_id}
+          item={map.map_required_item}
+          on_click={handleViewQuestItem}
+        />
+      </>
     );
   };
 
@@ -202,9 +206,9 @@ export const Traverse = ({ character_data }: TraversePropsDefinition) => {
   return (
     <div className="p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
       <div className="grid gap-2">
-        <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
           Traversable Maps
-        </label>
+        </h3>
         <Dropdown
           items={mapsToSelect}
           on_select={handleSelectMap}

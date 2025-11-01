@@ -1,3 +1,4 @@
+import { useActivityTimeout } from 'api-handler/hooks/use-activity-timeout';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
 import { AxiosError, AxiosRequestConfig } from 'axios';
 import { isNil } from 'lodash';
@@ -8,10 +9,11 @@ import BaseMapDetailsApiDefinition from '../../../../../map-section/api/hooks/de
 import { TeleportApiUrls } from '../enums/teleport-api-urls';
 import TeleportCharacterRequestDefinition from './definitions/teleport-character-request-definition';
 import { UseTeleportPlayerApiDefinition } from './definitions/use-teleport-player-api-definition';
+import UseTeleportPlayerApiResponseDefinition from './definitions/use-teleport-player-api-response-definition';
 import { useManageMapMovementErrorState } from '../../../../../actions/partials/floating-cards/map-section/hooks/use-manage-map-movement-error-state';
-import { CharacterPosition } from '../../../../../map-section/api/hooks/definitions/base-map-api-definition';
 import { useEmitCharacterPosition } from '../../../../../map-section/hooks/use-emit-character-position';
 import { useCloseSidePeekEmitter } from '../../../../base/hooks/use-close-side-peek-emitter';
+import { useEmitMapRefresh } from '../../../traverse/hooks/use-emit-map-refresh';
 
 export const useTeleportPlayerApi = (
   params: UseTeleportPlayerApiParams
@@ -20,6 +22,8 @@ export const useTeleportPlayerApi = (
   const { emitCharacterPosition } = useEmitCharacterPosition();
   const { showMessage } = useManageMapMovementErrorState();
   const { closeSidePeek } = useCloseSidePeekEmitter();
+  const { emitShouldRefreshMap } = useEmitMapRefresh();
+  const { handleInactivity } = useActivityTimeout();
 
   const [error, setError] =
     useState<BaseMapDetailsApiDefinition['error']>(null);
@@ -41,10 +45,12 @@ export const useTeleportPlayerApi = (
         return;
       }
 
+      setError(null);
+
       try {
         const result = await apiHandler.post<
-          CharacterPosition,
-          AxiosRequestConfig<CharacterPosition>,
+          UseTeleportPlayerApiResponseDefinition,
+          AxiosRequestConfig<UseTeleportPlayerApiResponseDefinition>,
           TeleportCharacterRequestDefinition
         >(url, {
           x: requestParams.x,
@@ -54,13 +60,22 @@ export const useTeleportPlayerApi = (
         });
 
         emitCharacterPosition({
-          x: result.x_position,
-          y: result.y_position,
+          x: result.character_position_data.x_position,
+          y: result.character_position_data.y_position,
         });
+
+        if (result.has_traversed) {
+          emitShouldRefreshMap(true);
+        }
 
         closeSidePeek();
       } catch (error) {
         if (error instanceof AxiosError) {
+          handleInactivity({
+            setError,
+            response: error,
+          });
+
           setError(error.response?.data);
         }
       }

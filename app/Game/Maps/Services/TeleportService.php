@@ -5,16 +5,22 @@ namespace App\Game\Maps\Services;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Battle\Services\ConjureService;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Values\MapTileValue;
 use Exception;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
 
 class TeleportService extends BaseMovementService
 {
     use ResponseBuilder;
+
+    private bool $characterTraversed = false;
 
     public function __construct(
         MapTileValue $mapTileValue,
@@ -22,6 +28,8 @@ class TeleportService extends BaseMovementService
         ConjureService $conjureService,
         MovementService $movementService,
         TraverseService $traverseService,
+        private readonly Manager $manager,
+        private readonly CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer,
     ) {
         parent::__construct(
             $mapTileValue,
@@ -70,8 +78,20 @@ class TeleportService extends BaseMovementService
         $character = $this->teleportCharacter($character, $location, $usingPCTCommand);
 
         return $this->successResult(
-            $this->movementService->accessLocationService()->getCharacterPositionData($character->map)
+            [
+                'character_position_data' => $this->movementService->accessLocationService()->getCharacterPositionData($character->map),
+                'has_traversed' => $this->characterTraversed,
+            ]
         );
+    }
+
+    /**
+     * Get weather the character has traversed or not.
+     *
+     * @return bool
+     */
+    public function getHasCharacterTraversed(): bool {
+        return $this->characterTraversed;
     }
 
     /**
@@ -108,18 +128,22 @@ class TeleportService extends BaseMovementService
             event(new MoveTimeOutEvent($character, $timeout, true));
         }
 
-        event(new UpdateTopBarEvent($character));
+        $characterData = new Item($character, $this->characterSheetBaseInfoTransformer);
+        $characterData = $this->manager->createData($characterData)->toArray();
+
+        event(new UpdateBaseCharacterInformation($character->user, $characterData));
 
         if (! is_null($location)) {
 
             if ($this->traversePlayer($location, $character)) {
+
+                $this->characterTraversed = true;
+
                 return $character;
             }
 
             $this->movementService->giveLocationReward($character, $location);
         }
-
-        $this->updateMonstersList($character, $location);
 
         return $character;
     }
