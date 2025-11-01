@@ -31,11 +31,9 @@ class MonsterListService
 
     /**
      * Get a straight list of monsters as an array
-     *
-     * @param Character $character
-     * @return array
      */
-    public function getMonstersForCharacterAsList(Character $character): array {
+    public function getMonstersForCharacterAsList(Character $character): array
+    {
         $monsters = $this->resolveMonsterDataSetForCharacter($character);
 
         return $this->buildPayload($monsters);
@@ -43,12 +41,9 @@ class MonsterListService
 
     /**
      * Get the monster the character should fight.
-     *
-     * @param Character $character
-     * @param int $monsterId
-     * @return array
      */
-    public function getMonsterForFight(Character $character, int $monsterId): array {
+    public function getMonsterForFight(Character $character, int $monsterId): array
+    {
         $monsters = $this->resolveMonsterDataSetForCharacter($character)['data'];
 
         return collect($monsters)->where('id', $monsterId)->first();

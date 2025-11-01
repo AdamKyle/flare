@@ -8,7 +8,6 @@ use App\Flare\Models\Location;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Values\MapTileValue;
@@ -87,10 +86,9 @@ class TeleportService extends BaseMovementService
 
     /**
      * Get weather the character has traversed or not.
-     *
-     * @return bool
      */
-    public function getHasCharacterTraversed(): bool {
+    public function getHasCharacterTraversed(): bool
+    {
         return $this->characterTraversed;
     }
 

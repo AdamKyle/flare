@@ -80,7 +80,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'healing_amount' => $characterStatBuilder->buildHealing(),
             'voided_healing_amount' => $characterStatBuilder->buildHealing(true),
             'gold_bars' => $this->fetchGoldBarsAmount($character),
-            'map_name' => $character->map->gameMap->name
+            'map_name' => $character->map->gameMap->name,
         ];
     }
 

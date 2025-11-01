@@ -1,13 +1,12 @@
 import React, { useCallback, useState } from 'react';
 
-import UseMonsterUpdateDefinition from './definitions/use-monster-update-definition';
-
 import { CharacterUpdatesWire } from 'game-data/components/character-updates-wire';
+import UseCharacterUpdateDefinition from 'game-data/hooks/definitions/use-character-update-definition';
 import UseCharacterUpdateParamsDefinition from 'game-data/hooks/definitions/use-character-update-params-definition';
 
 const UseCharacterUpdates = (
   params: UseCharacterUpdateParamsDefinition
-): UseMonsterUpdateDefinition => {
+): UseCharacterUpdateDefinition => {
   const { userId, onEvent } = params;
 
   const [listening, setListening] = useState<boolean>(false);

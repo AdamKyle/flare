@@ -2,7 +2,6 @@
 
 namespace App\Game\Maps\Events;
 
-use App\Flare\Models\Map;
 use App\Flare\Models\User;
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
@@ -23,9 +22,6 @@ class UpdateMonsterList implements ShouldBroadcastNow
 
     /**
      * Create a new event instance.
-     *
-     * @param array $monsters
-     * @param User $user
      */
     public function __construct(array $monsters, User $user)
     {
