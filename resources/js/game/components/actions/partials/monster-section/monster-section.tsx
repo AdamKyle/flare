@@ -30,7 +30,8 @@ const MonsterSection = ({
   show_monster_stats,
 }: MonsterSectionProps): ReactNode => {
   const { gameData, listenForMonsterUpdates } = useGameData();
-  const { loading, setRequestData, data, error } = useAttackMonster();
+  const { loading, setRequestData, data, error, disableAttackButtons } =
+    useAttackMonster();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [monsterName, setMonsterName] = useState<string | null>(null);
@@ -86,6 +87,21 @@ const MonsterSection = ({
     setCurrentIndex(index);
     setMonsterToFight(null);
     setMonsterName(selectedMonster.name);
+  };
+
+  const handleAttackMonster = (attackType: AttackType) => {
+    if (!monsters || !monsters[currentIndex] || !gameData.character) {
+      return;
+    }
+
+    const selectedMonster = monsters[currentIndex] as MonsterDefinition;
+
+    setRequestData({
+      character_id: gameData.character.id,
+      monster_id: selectedMonster.id,
+      attack_type: attackType,
+      battle_type: BattleType.ATTACK,
+    });
   };
 
   if (!monsters) {
@@ -158,13 +174,15 @@ const MonsterSection = ({
               label="Attack"
               variant={ButtonVariant.PRIMARY}
               additional_css="w-full lg:w-1/3"
-              on_click={() => {}}
+              on_click={() => handleAttackMonster(AttackType.ATTACK)}
+              disabled={disableAttackButtons}
             />
             <Button
               label="Cast"
               variant={ButtonVariant.PRIMARY}
               additional_css="w-full lg:w-1/3"
-              on_click={() => {}}
+              on_click={() => handleAttackMonster(AttackType.CAST)}
+              disabled={disableAttackButtons}
             />
           </AttackButtonsContainer>
           <AttackButtonsContainer>
@@ -172,13 +190,15 @@ const MonsterSection = ({
               label="Atk & Cast"
               gradient={ButtonGradientVarient.DANGER_TO_PRIMARY}
               additional_css="w-full lg:w-1/3"
-              on_click={() => {}}
+              on_click={() => handleAttackMonster(AttackType.ATTACK_AND_CAST)}
+              disabled={disableAttackButtons}
             />
             <GradientButton
               label="Cast & Atk"
               gradient={ButtonGradientVarient.PRIMARY_TO_DANGER}
               additional_css="w-full lg:w-1/3"
-              on_click={() => {}}
+              on_click={() => handleAttackMonster(AttackType.CAST_AND_ATTACK)}
+              disabled={disableAttackButtons}
             />
           </AttackButtonsContainer>
           <AttackButtonsContainer>
@@ -186,7 +206,8 @@ const MonsterSection = ({
               label="Defend"
               variant={ButtonVariant.PRIMARY}
               additional_css="w-full lg:w-1/3"
-              on_click={() => {}}
+              on_click={() => handleAttackMonster(AttackType.DEFEND)}
+              disabled={disableAttackButtons}
             />
           </AttackButtonsContainer>
         </>

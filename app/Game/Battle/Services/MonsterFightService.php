@@ -17,18 +17,12 @@ class MonsterFightService
 {
     use ResponseBuilder;
 
-    private MonsterPlayerFight $monsterPlayerFight;
-
-    private BattleEventHandler $battleEventHandler;
-
-    private WeeklyBattleService $weeklyBattleService;
-
-    public function __construct(MonsterPlayerFight $monsterPlayerFight, BattleEventHandler $battleEventHandler, WeeklyBattleService $weeklyBattleService)
-    {
-        $this->monsterPlayerFight = $monsterPlayerFight;
-        $this->battleEventHandler = $battleEventHandler;
-        $this->weeklyBattleService = $weeklyBattleService;
-    }
+    public function __construct(
+        private readonly MonsterPlayerFight $monsterPlayerFight,
+        private readonly BattleEventHandler $battleEventHandler,
+        private readonly WeeklyBattleService $weeklyBattleService,
+    )
+    { }
 
     public function setupMonster(Character $character, array $params): array
     {
@@ -72,11 +66,11 @@ class MonsterFightService
             return $this->errorResult('The monster seems to have fled. Click attack again to start a new battle. You have 15 minutes from clicking attack to attack the creature.');
         }
 
-        if (! isset($cache['monster']) || ! is_array($cache['monster']) || ! isset($cache['monster']['id'])) {
+        if (! isset($cache['monster_id'])) {
             return $this->errorResult('The monster seems to have fled. Click attack again to start a new battle. You have 15 minutes from clicking attack to attack the creature.');
         }
 
-        $monsterId = (int) $cache['monster']['id'];
+        $monsterId = $cache['monster_id'];
 
         if (! $this->isAtMonstersLocation($character, $monsterId)) {
             return $this->errorResult('You are too far away from the monster. Move back to it\'s location');

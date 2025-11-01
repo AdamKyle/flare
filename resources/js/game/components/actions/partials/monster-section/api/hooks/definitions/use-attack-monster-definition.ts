@@ -7,6 +7,7 @@ import { StateSetter } from '../../../../../../../../types/state-setter-type';
 export default interface UseAttackMonsterDefinition {
   data: UseAttackMonsterInitiationResponse | null;
   loading: boolean;
+  disableAttackButtons: boolean;
   error: AxiosErrorDefinition | null;
   setRequestData: StateSetter<UseAttackMonsterRequestParams>;
 }

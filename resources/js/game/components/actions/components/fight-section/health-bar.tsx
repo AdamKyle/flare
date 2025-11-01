@@ -5,9 +5,17 @@ import { fetchHealthBarColorForType } from './helpers/fetch-health-bar-color-for
 import { healthBarPercentage } from './helpers/fetch-health-bar-percentage';
 import HealthBarProps from './types/health-bar-props';
 
-import { formatNumberWithCommas } from 'game-utils/format-number';
+import { shortenNumber } from 'game-utils/format-number';
 
 const HealthBar = (props: HealthBarProps): ReactNode => {
+  const formatCurrentHealth = (currentHealth: number) => {
+    if (currentHealth <= 0) {
+      return 0;
+    }
+
+    return shortenNumber(currentHealth);
+  };
+
   return (
     <div className="space-y-2 mb-4">
       <div className="flex justify-between text-sm font-medium text-gray-800 dark:text-gray-200">
@@ -16,8 +24,8 @@ const HealthBar = (props: HealthBarProps): ReactNode => {
         </span>
         <span>{props.name}</span>
         <span aria-labelledby={props.name + '-health-bar'} aria-live="polite">
-          {formatNumberWithCommas(props.current_health)}/
-          {formatNumberWithCommas(props.max_health)}
+          {formatCurrentHealth(props.current_health)}/
+          {shortenNumber(props.max_health)}
         </span>
       </div>
       <div className="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2">

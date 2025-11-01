@@ -92,14 +92,6 @@ class MonsterPlayerFight
     }
 
     /**
-     * Did the fight take too long?
-     */
-    public function getTookTooLong(): bool
-    {
-        return $this->tookTooLong;
-    }
-
-    /**
      * Delete the cache data for the character
      */
     public function deleteCharacterCache(Character $character): void
@@ -113,8 +105,6 @@ class MonsterPlayerFight
     public function getBattleMessages(): array
     {
         $messages = $this->battleMessages;
-
-        // $this->removeDuplicateMessages($messages);
 
         return $messages;
     }
@@ -190,6 +180,9 @@ class MonsterPlayerFight
             'health' => $health,
             'attack_messages' => $this->getBattleMessages(),
             'monster_id' => $monster->getId(),
+            'monster' => $monster->getMonster(),
+            'player_voided' => $isPlayerVoided,
+            'enemy_voided' => $isEnemyVoided,
         ];
     }
 
