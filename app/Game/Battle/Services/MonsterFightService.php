@@ -21,8 +21,7 @@ class MonsterFightService
         private readonly MonsterPlayerFight $monsterPlayerFight,
         private readonly BattleEventHandler $battleEventHandler,
         private readonly WeeklyBattleService $weeklyBattleService,
-    )
-    { }
+    ) {}
 
     public function setupMonster(Character $character, array $params): array
     {
