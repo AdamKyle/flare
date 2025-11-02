@@ -5,21 +5,21 @@
 
   <div class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"></div>
 
-  <dl>
-    <dt>Can Stack? (Allows you to use multiple at once)</dt>
-    <dd>{{ $item->can_stack ? 'Yes' : 'No' }}</dd>
-    <dt>Lasts for (Minutes)</dt>
-    <dd>{{ $item->lasts_for }}</dd>
-  </dl>
+  <x-core.dl.dl>
+    <x-core.dl.dt>Can Stack? (Allows you to use multiple at once)</x-core.dl.dt>
+    <x-core.dl.dd>{{ $item->can_stack ? 'Yes' : 'No' }}</x-core.dl.dd>
+    <x-core.dl.dt>Lasts for (Minutes)</x-core.dl.dt>
+    <x-core.dl.dd>{{ $item->lasts_for }}</x-core.dl.dd>
+  </x-core.dl.dl>
 
   <div class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"></div>
 
-  <dl>
-    <dt>Xp bonus per kill</dt>
-    <dd>{{ $item->xp_bonus * 100 }}%</dd>
-    <dt>Gain additional level on level up?</dt>
-    <dd>{{ $item->gains_additional_level ? 'Yes' : 'No' }}</dd>
-  </dl>
+  <x-core.dl.dl>
+    <x-core.dl.dt>Xp bonus per kill</x-core.dl.dt>
+    <x-core.dl.dd>{{ $item->xp_bonus * 100 }}%</x-core.dl.dd>
+    <x-core.dl.dt>Gain additional level on level up?</x-core.dl.dt>
+    <x-core.dl.dd>{{ $item->gains_additional_level ? 'Yes' : 'No' }}</x-core.dl.dd>
+  </x-core.dl.dl>
 
   <div class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"></div>
 
@@ -29,10 +29,10 @@
       <div
         class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
       ></div>
-      <dl>
-        <dt>All Stat increase %</dt>
-        <dd>{{ $item->increase_stat_by * 100, 2 }}%</dd>
-      </dl>
+      <x-core.dl.dl>
+        <x-core.dl.dt>All Stat increase %</x-core.dl.dt>
+        <x-core.dl.dd>{{ $item->increase_stat_by * 100, 2 }}%</x-core.dl.dd>
+      </x-core.dl.dl>
     </div>
     <div
       class="my-3 block border-b-2 border-b-gray-300 md:hidden dark:border-b-gray-600"
@@ -42,14 +42,14 @@
       <div
         class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
       ></div>
-      <dl>
-        <dt>Base Damage Mod</dt>
-        <dd>{{ $item->base_damage_mod * 100 }} %</dd>
-        <dt>Base Ac Mod</dt>
-        <dd>{{ $item->base_ac_mod * 100 }} %</dd>
-        <dt>Base Healing Mod</dt>
-        <dd>{{ $item->base_healing_mod * 100 }} %</dd>
-      </dl>
+      <x-core.dl.dl>
+        <x-core.dl.dt>Base Damage Mod</x-core.dl.dt>
+        <x-core.dl.dd>{{ $item->base_damage_mod * 100 }} %</x-core.dl.dd>
+        <x-core.dl.dt>Base Ac Mod</x-core.dl.dt>
+        <x-core.dl.dd>{{ $item->base_ac_mod * 100 }} %</x-core.dl.dd>
+        <x-core.dl.dt>Base Healing Mod</x-core.dl.dt>
+        <x-core.dl.dd>{{ $item->base_healing_mod * 100 }} %</x-core.dl.dd>
+      </x-core.dl.dl>
     </div>
     <div
       class="my-3 block border-b-2 border-b-gray-300 md:hidden dark:border-b-gray-600"
@@ -64,16 +64,16 @@
         $skillTrainingBonus = $item->increase_skill_training_bonus_by * 100;
       @endphp
 
-      <dl>
-        <dt>Effects Skills:</dt>
-        <dd>
+      <x-core.dl.dl>
+        <x-core.dl.dt>Effects Skills:</x-core.dl.dt>
+        <x-core.dl.dd>
           {{ ! is_null($item->affects_skill_type) ? implode(',', $skills) : 'N/A' }}
-        </dd>
-        <dt>Skill Bonus</dt>
-        <dd>{{ $skillBonus > 100 ? 100 : $skillBonus }}%</dd>
-        <dt>Skill XP Bonus</dt>
-        <dd>{{ $skillTrainingBonus > 100 ? 100 : $skillTrainingBonus }}%</dd>
-      </dl>
+        </x-core.dl.dd>
+        <x-core.dl.dt>Skill Bonus</x-core.dl.dt>
+        <x-core.dl.dd>{{ $skillBonus > 100 ? 100 : $skillBonus }}%</x-core.dl.dd>
+        <x-core.dl.dt>Skill XP Bonus</x-core.dl.dt>
+        <x-core.dl.dd>{{ $skillTrainingBonus > 100 ? 100 : $skillTrainingBonus }}%</x-core.dl.dd>
+      </x-core.dl.dl>
     </div>
   </div>
 </x-core.cards.card-with-title>
@@ -86,20 +86,20 @@
         <div
           class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
         ></div>
-        <dl>
-          <dt>Skill Required</dt>
-          <dd>
+        <x-core.dl.dl>
+          <x-core.dl.dt>Skill Required</x-core.dl.dt>
+          <x-core.dl.dd>
             @if ($item->crafting_type !== 'trinketry' || $item->crafting_type !== 'alchemy')
               {{ ucfirst($item->crafting_type) }}
             @else
               {{ ucfirst($item->crafting_type) }} Crafting
             @endif
-          </dd>
-          <dt>Skill Level Required</dt>
-          <dd>{{ $item->skill_level_required }}</dd>
-          <dt>Becomes Trivial at (no XP)</dt>
-          <dd>{{ $item->skill_level_trivial }}</dd>
-        </dl>
+          </x-core.dl.dd>
+          <x-core.dl.dt>Skill Level Required</x-core.dl.dt>
+          <x-core.dl.dd>{{ $item->skill_level_required }}</x-core.dl.dd>
+          <x-core.dl.dt>Becomes Trivial at (no XP)</x-core.dl.dt>
+          <x-core.dl.dd>{{ $item->skill_level_trivial }}</x-core.dl.dd>
+        </x-core.dl.dl>
       </div>
       <div
         class="my-3 block border-b-2 border-b-gray-300 md:hidden dark:border-b-gray-600"
@@ -109,27 +109,27 @@
         <div
           class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
         ></div>
-        <dl>
+        <x-core.dl.dl>
           @if (! is_null($item->gold_cost) || $item->gold_cost > 0)
-            <dt>Gold Cost</dt>
-            <dd>{{ number_format($item->gold_cost) }}</dd>
+            <x-core.dl.dt>Gold Cost</x-core.dl.dt>
+            <x-core.dl.dd>{{ number_format($item->gold_cost) }}</x-core.dl.dd>
           @endif
 
           @if (! is_null($item->gold_dust_cost) || $item->gold_dust_cost > 0)
-            <dt>Gold Dust Cost</dt>
-            <dd>{{ number_format($item->gold_dust_cost) }}</dd>
+            <x-core.dl.dt>Gold Dust Cost</x-core.dl.dt>
+            <x-core.dl.dd>{{ number_format($item->gold_dust_cost) }}</x-core.dl.dd>
           @endif
 
           @if (! is_null($item->shards_cost) || $item->shards_cost > 0)
-            <dt>Shard Cost</dt>
-            <dd>{{ number_format($item->shards_cost) }}</dd>
+            <x-core.dl.dt>Shard Cost</x-core.dl.dt>
+            <x-core.dl.dd>{{ number_format($item->shards_cost) }}</x-core.dl.dd>
           @endif
 
           @if (! is_null($item->copper_coin_cost) || $item->copper_coin_cost > 0)
-            <dt>Gold Cost</dt>
-            <dd>{{ number_format($item->copper_coin_cost) }}</dd>
+            <x-core.dl.dt>Gold Cost</x-core.dl.dt>
+            <x-core.dl.dd>{{ number_format($item->copper_coin_cost) }}</x-core.dl.dd>
           @endif
-        </dl>
+        </x-core.dl.dl>
       </div>
     </div>
   </x-core.cards.card>

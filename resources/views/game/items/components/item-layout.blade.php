@@ -14,32 +14,35 @@
   }
 @endphp
 
-<h2 class="mt-2 font-light">
-  <x-item-display-color :item="$item" />
-</h2>
+<div class="my-8 flex items-center justify-between">
+  <h2 class="font-light text-2xl leading-tight flex items-center h-10 relative top-1">
+    <x-item-display-color :item="$item" />
+  </h2>
 
-<div class="relative">
-  <div class="float-right mt-[-30px]">
-    @auth
-      @if (auth()->user()->hasRole('Admin'))
-        <x-core.buttons.link-buttons.success-button
-          href="{{$backUrl}}"
-          css="tw-ml-2"
-        >
-          Back
-        </x-core.buttons.link-buttons.success-button>
-        <x-core.buttons.link-buttons.primary-button
-          href="{{route('items.edit', ['item' => $item->id])}}"
-          css="tw-ml-2"
-        >
-          Edit Item
-        </x-core.buttons.link-buttons.primary-button>
-      @endif
-    @endauth
+  <div class="relative mb-0">
+    <div class="mt-0 flex items-center">
+      @auth
+        @if (auth()->user()->hasRole('Admin'))
+          <x-core.buttons.link-buttons.success-button
+            href="{{ $backUrl }}"
+            css="tw-ml-2"
+          >
+            Back
+          </x-core.buttons.link-buttons.success-button>
+          <x-core.buttons.link-buttons.primary-button
+            href="{{ route('items.edit', ['item' => $item->id]) }}"
+            css="tw-ml-2"
+          >
+            Edit Item
+          </x-core.buttons.link-buttons.primary-button>
+        @endif
+      @endauth
+    </div>
   </div>
 </div>
 
-<div class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"></div>
+
+<x-core.separator.separator />
 
 @if ($item->type === 'alchemy' && $item->damages_kingdoms)
   @include('game.items.components.item-kingdom-details')

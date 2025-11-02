@@ -56,7 +56,7 @@
     </dl>
   </x-core.cards.card-with-title>
 
-  <x-core.cards.card css="mb-4">
+  <x-core.cards.card-with-title title="Crafting Details" buttons="false">
     <div class="grid gap-3 md:grid-cols-2">
       <div>
         <strong>Crafting Information</strong>
@@ -109,5 +109,5 @@
         </dl>
       </div>
     </div>
-  </x-core.cards.card>
+  </x-core.cards.card-with-title>
 </div>

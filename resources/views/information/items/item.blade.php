@@ -2,13 +2,14 @@
 
 @section('content')
   <div class="m-auto mt-20 mb-10 w-full lg:w-3/5">
-    <x-core.page.title-slot
+    <x-core.page.title
+      title="Back"
       route="{{url()->previous()}}"
-      link="Back"
-      color="primary"
+      color="success"
+      link="back"
     >
       <x-item-display-color :item="$item" />
-    </x-core.page.title-slot>
+    </x-core.page.title>
 
     @include(
       'game.items.item',

@@ -17,9 +17,9 @@
       </x-core.alerts.info-alert>
 
       @if (! is_null($monster))
-        <dl class="mb-4">
-          <dt>Drops from:</dt>
-          <dd>
+        <x-core.dl.dl class="mb-4">
+          <x-core.dl.dt>Drops from:</x-core.dl.dt>
+          <x-core.dl.dd>
             @guest
               <a
                 href="{{
@@ -45,19 +45,19 @@
                 {{ $monster->name }}
               </a>
             @endif
-          </dd>
-          <dt>Drop chance:</dt>
-          <dd>{{ $monster->quest_item_drop_chance * 100 }}%</dd>
-        </dl>
+          </x-core.dl.dd>
+          <x-core.dl.dt>Drop chance:</x-core.dl.dt>
+          <x-core.dl.dd>{{ $monster->quest_item_drop_chance * 100 }}%</x-core.dl.dd>
+        </x-core.dl.dl>
       @endif
 
       @if (! is_null($location))
         <div
           class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
         ></div>
-        <dl class="mb-4">
-          <dt>Found By Visiting:</dt>
-          <dd>
+        <x-core.dl.dl class="mb-4">
+          <x-core.dl.dt>Found By Visiting:</x-core.dl.dt>
+          <x-core.dl.dd>
             @auth
               @if (auth()->user()->hasRole('Admin'))
                 <a
@@ -97,10 +97,10 @@
                 {{ $location->name }}
               </a>
             @endauth
-          </dd>
-          <dt>X/Y:</dt>
-          <dd>{{ $location->x }} / {{ $location->y }}</dd>
-        </dl>
+          </x-core.dl.dd>
+          <x-core.dl.dt>X/Y:</x-core.dl.dt>
+          <x-core.dl.dd>{{ $location->x }} / {{ $location->y }}</x-core.dl.dd>
+        </x-core.dl.dl>
       @endif
 
       @if (! is_null($quest))
@@ -108,9 +108,9 @@
           class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
         ></div>
         <p class="mb-4">This quest item is used in the following quest:</p>
-        <dl>
-          <dt>Quest Name:</dt>
-          <dd>
+        <x-core.dl.dl>
+          <x-core.dl.dt>Quest Name:</x-core.dl.dt>
+          <x-core.dl.dd>
             @guest
               <a
                 href="{{
@@ -150,8 +150,8 @@
                 </a>
               @endif
             @endguest
-          </dd>
-        </dl>
+          </x-core.dl.dd>
+        </x-core.dl.dl>
       @endif
 
       @if (! is_null($item->dropLocation))
@@ -164,18 +164,18 @@
           also eed to do relevant quests to access this location.
         </p>
 
-        <dl>
-          <dt>
+        <x-core.dl.dl>
+          <x-core.dl.dt>
             Drops only from
             <sup>*</sup>
             :
-          </dt>
-          <dd>{{ $item->dropLocation->name }}</dd>
-          <dt>At (X/Y):</dt>
-          <dd>{{ $item->dropLocation->x }}/{{ $item->dropLocation->y }}</dd>
-          <dt>Located on plane:</dt>
-          <dd>{{ $item->dropLocation->name }}</dd>
-        </dl>
+          </x-core.dl.dt>
+          <x-core.dl.dd>{{ $item->dropLocation->name }}</x-core.dl.dd>
+          <x-core.dl.dt>At (X/Y):</x-core.dl.dt>
+          <x-core.dl.dd>{{ $item->dropLocation->x }}/{{ $item->dropLocation->y }}</x-core.dl.dd>
+          <x-core.dl.dt>Located on plane:</x-core.dl.dt>
+          <x-core.dl.dd>{{ $item->dropLocation->name }}</x-core.dl.dd>
+        </x-core.dl.dl>
       @endif
 
       @if (! is_null($item->xp_bonus))
@@ -208,12 +208,12 @@
             no longer get the XP bonus.
           </p>
         </x-core.alerts.info-alert>
-        <dl>
-          <dt>XP Bonus:</dt>
-          <dd>{{ $item->xp_bonus * 100 }}%</dd>
-          <dt>Ignores Caps:</dt>
-          <dd>{{ $item->ignores_caps ? 'Yes' : 'No' }}</dd>
-        </dl>
+        <x-core.dl.dl>
+          <x-core.dl.dt>XP Bonus:</x-core.dl.dt>
+          <x-core.dl.dd>{{ $item->xp_bonus * 100 }}%</x-core.dl.dd>
+          <x-core.dl.dt>Ignores Caps:</x-core.dl.dt>
+          <x-core.dl.dd>{{ $item->ignores_caps ? 'Yes' : 'No' }}</x-core.dl.dd>
+        </x-core.dl.dl>
       @endif
     </x-core.cards.card-with-title>
   </div>

@@ -2,6 +2,10 @@
 
 @import './theme/theme-styles.css';
 
+@import './item-colors.css';
+
+@import './chat-colors.css';
+
 @import '../../node_modules/rpg-awesome/css/rpg-awesome.min.css';
 
 /**
@@ -21,35 +25,6 @@
    No extra rules needed; this block is here only if you prefer explicit guarding. */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .mobile-bottom-nav { /* no-op guard; keep for clarity */ }
-}
-
-/** Chat Colors - TODO: Clean this up**/
-.ocean-depths {
-  color: #2ddaa5;
-}
-
-.memories-grass {
-  color: #c9ddb9;
-}
-
-.depths-despair {
-  color: #88cdad;
-}
-
-.lipstick {
-  color: #ff4979
-}
-
-.fifties-cheeks {
-  color: #d195ac
-}
-
-.sky-clouds {
-  color: #d3e1f3;
-}
-
-.golden-sheen {
-  color: #f9e067;
 }
 
 

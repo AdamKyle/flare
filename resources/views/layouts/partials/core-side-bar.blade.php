@@ -37,6 +37,35 @@
             Export Locations
           </x-sidebar.menu-items.nested-menu-option>
         </x-sidebar.menu-items.nested-container>
+        <x-sidebar.menu-items.nested-container
+          name="Items"
+          key="Items"
+          activePages="['import','export','items']"
+          selected="Items"
+          icon="ra ra-wooden-sign"
+        >
+          <x-sidebar.menu-items.nested-menu-option
+            href="{{route('items.list')}}"
+            pageKey="items"
+            icon="ra ra-wooden-sign"
+          >
+            Items
+          </x-sidebar.menu-items.nested-menu-option>
+          <x-sidebar.menu-items.nested-menu-option
+            href="#"
+            pageKey="import"
+            icon="fas fa-file-import"
+          >
+            Import Locations
+          </x-sidebar.menu-items.nested-menu-option>
+          <x-sidebar.menu-items.nested-menu-option
+            href="#"
+            pageKey="export"
+            icon="fas fa-file-download"
+          >
+            Export Locations
+          </x-sidebar.menu-items.nested-menu-option>
+        </x-sidebar.menu-items.nested-container>
       </x-sidebar.menu-items.group-options-container>
 
       <!-- MENU GROUP -->
