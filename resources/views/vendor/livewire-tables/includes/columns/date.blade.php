@@ -1,3 +1,3 @@
 <div class="livewire-tables-dateColumn">
-    {{ $value }}
+  {{ $value }}
 </div>

@@ -1,28 +1,14 @@
 @props([
-    'href'       => '#',
-    'attributes' => '',
-    'css'        => '',
+  'href' => '#',
+  'attributes' => '',
+  'css' => '',
 ])
 
 <a
   href="{{ $href }}"
   {{ $attributes }}
   role="button"
-  class="
-      w-full sm:w-auto inline-block
-      bg-danube-600 hover:bg-danube-700
-      dark:bg-danube-700 dark:hover:bg-danube-600
-      text-white
-      font-semibold
-      py-2 px-4
-      rounded-md
-      drop-shadow-sm hover:drop-shadow-md
-      transition-colors transition-shadow
-      focus:outline-none focus:ring-2 focus:ring-danube-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800
-      disabled:opacity-75 disabled:cursor-not-allowed
-      mr-2
-      {{ $css }}
-    "
+  class="bg-danube-600 hover:bg-danube-700 dark:bg-danube-700 dark:hover:bg-danube-600 focus:ring-danube-500 {{ $css }} mr-2 inline-block w-full rounded-md px-4 py-2 font-semibold text-white drop-shadow-sm transition-colors transition-shadow hover:drop-shadow-md focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-75 sm:w-auto dark:focus:ring-offset-gray-800"
 >
-    {{ $slot }}
+  {{ $slot }}
 </a>

@@ -1,34 +1,34 @@
 <table>
-    <thead>
-        <tr>
-            <th>id</th>
-            <th>name</th>
-            <th>real_name</th>
-            <th>type</th>
-            <th>game_map_id</th>
-            <th>moves_around_map</th>
-            <th>must_be_at_same_location</th>
-            <th>text_command_to_message</th>
-            <th>x_position</th>
-            <th>y_position</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach ($npcs as $npc)
-            <tr>
-                <td>{{ $npc->id }}</td>
-                <td>{{ $npc->name }}</td>
-                <td>{{ $npc->real_name }}</td>
-                <td>{{ $npc->type }}</td>
-                <td>
-                    {{ ! is_null($npc->game_map_id) ? $npc->gameMap->name : '' }}
-                </td>
-                <td>{{ $npc->moves_around_map }}</td>
-                <td>{{ $npc->must_be_at_same_location }}</td>
-                <td>{{ $npc->text_command_to_message }}</td>
-                <td>{{ $npc->x_position }}</td>
-                <td>{{ $npc->y_position }}</td>
-            </tr>
-        @endforeach
-    </tbody>
+  <thead>
+    <tr>
+      <th>id</th>
+      <th>name</th>
+      <th>real_name</th>
+      <th>type</th>
+      <th>game_map_id</th>
+      <th>moves_around_map</th>
+      <th>must_be_at_same_location</th>
+      <th>text_command_to_message</th>
+      <th>x_position</th>
+      <th>y_position</th>
+    </tr>
+  </thead>
+  <tbody>
+    @foreach ($npcs as $npc)
+      <tr>
+        <td>{{ $npc->id }}</td>
+        <td>{{ $npc->name }}</td>
+        <td>{{ $npc->real_name }}</td>
+        <td>{{ $npc->type }}</td>
+        <td>
+          {{ ! is_null($npc->game_map_id) ? $npc->gameMap->name : '' }}
+        </td>
+        <td>{{ $npc->moves_around_map }}</td>
+        <td>{{ $npc->must_be_at_same_location }}</td>
+        <td>{{ $npc->text_command_to_message }}</td>
+        <td>{{ $npc->x_position }}</td>
+        <td>{{ $npc->y_position }}</td>
+      </tr>
+    @endforeach
+  </tbody>
 </table>

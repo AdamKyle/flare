@@ -1,24 +1,12 @@
 @props([
-    'attributes' => '',
-    'css'        => '',
+  'attributes' => '',
+  'css' => '',
 ])
 
 <button
   type="button"
   {{ $attributes }}
-  class="
-      w-full sm:w-auto
-      bg-rose-600 hover:bg-rose-700
-      dark:bg-rose-700 dark:hover:bg-rose-600
-      text-white
-      font-semibold
-      py-2 px-4
-      rounded-md
-      drop-shadow-sm hover:drop-shadow-md
-      transition-colors transition-shadow
-      focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800
-      {{ $css }}
-    "
+  class="{{ $css }} w-full rounded-md bg-rose-600 px-4 py-2 font-semibold text-white drop-shadow-sm transition-colors transition-shadow hover:bg-rose-700 hover:drop-shadow-md focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 focus:outline-none dark:bg-rose-700 dark:hover:bg-rose-600 dark:focus:ring-offset-gray-800"
 >
-    {{ $slot }}
+  {{ $slot }}
 </button>

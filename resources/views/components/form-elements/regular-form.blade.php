@@ -1,8 +1,8 @@
 @props([
-    'attributes' => '',
-    'css' => '',
+  'attributes' => '',
+  'css' => '',
 ])
 
 <form {{ $attributes }}>
-    {{ $slot }}
+  {{ $slot }}
 </form>

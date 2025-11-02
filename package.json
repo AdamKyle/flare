@@ -4,6 +4,7 @@
     "scripts": {
         "dev": "vite",
         "cleanup": "prettier --write \"resources/js/**/*.{ts,tsx}\" && eslint --fix \"resources/js/**/*.{ts,tsx}\"",
+        "cleanup:blade": "prettier --write \"resources/views/**/*.blade.php\"",
         "build": "NODE_ENV=production vite build",
         "build:dev": "NODE_ENV=development vite build",
         "prepare": "husky",
@@ -44,6 +45,8 @@
         "lodash": "^4.17.21",
         "popper.js": "^1.14.3",
         "prettier": "^3.5.3",
+        "prettier-plugin-blade": "^2.1.21",
+        "prettier-plugin-tailwindcss": "^0.7.1",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
         "tailwindcss": "^4.1.8",

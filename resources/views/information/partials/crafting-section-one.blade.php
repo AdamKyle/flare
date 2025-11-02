@@ -1,7 +1,6 @@
 <p class="mt-5">
-    When you see these in item tables, you can click on their names. They are
-    still links that will open in a new tab and show you the details of that
-    item.
+  When you see these in item tables, you can click on their names. They are
+  still links that will open in a new tab and show you the details of that item.
 </p>
 
 <div class="normal-item">I am a regular item</div>

@@ -1,43 +1,47 @@
 @props([
-    'user' => null
+  'user' => null,
 ])
 
-<div class="relative" x-data="{ dropdownOpen: false }" @click.outside="dropdownOpen = false">
-
+<div
+  class="relative"
+  x-data="{ dropdownOpen: false }"
+  @click.outside="dropdownOpen = false"
+>
   @if ($user->hasRole('Admin'))
     <x-header.profile-drop-down-trigger image="https://placehold.co/600x400">
       Administrator
     </x-header.profile-drop-down-trigger>
   @else
     <x-header.profile-drop-down-trigger image="https://placehold.co/600x400">
-      {{$user->character->name}}
+      {{ $user->character->name }}
     </x-header.profile-drop-down-trigger>
   @endif
-
 
   <div
     x-cloak
     x-show="dropdownOpen"
-    class="shadow-theme-lg absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white dark:bg-gray-700 p-3 dark:border-gray-800"
+    class="shadow-theme-lg absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-700"
   >
-
     @if ($user->hasRole('Admin'))
       <x-header.profile-drop-down-trigger image="https://placehold.co/600x400">
         Administrator
       </x-header.profile-drop-down-trigger>
     @else
       <x-header.profile-drop-down-name>
-        {{$user->character->name}}
+        {{ $user->character->name }}
       </x-header.profile-drop-down-name>
     @endif
 
-
     <x-header.profile-drop-down-options-container>
-      @if (!$user->hasRole('Admin'))
-        <x-header.profile-drop-down-option href="#" icon="fas fa-cog">
+      @if (! $user->hasRole('Admin'))
+        <x-header.profile-drop-down-option
+          href="{{route('user.settings', ['user' => auth()->user()])}}"
+          icon="fas fa-cog"
+        >
           Settings
         </x-header.profile-drop-down-option>
       @endif
+
       <x-header.profile-drop-down-option href="#" icon="fas fa-question-circle">
         Help Docs
       </x-header.profile-drop-down-option>
@@ -51,7 +55,9 @@
       onclick="event.preventDefault();
         document.getElementById('logout-form-profile').submit();"
     >
-      <i class="fas fa-sign-out-alt group-hover:fill-gray-700 dark:fill-gray-400"></i>
+      <i
+        class="fas fa-sign-out-alt group-hover:fill-gray-700 dark:fill-gray-400"
+      ></i>
       Sign out
     </button>
 

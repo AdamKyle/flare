@@ -1,8 +1,8 @@
 @props([
-    'href',
-    'itemKey',
-    'pageKey',
-    'icon' => 'fas fa-file',
+  'href',
+  'itemKey',
+  'pageKey',
+  'icon' => 'fas fa-file',
 ])
 
 <li role="none">

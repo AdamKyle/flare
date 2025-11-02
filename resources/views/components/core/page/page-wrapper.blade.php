@@ -1,3 +1,3 @@
 <div class="flex h-screen overflow-hidden">
-    {{ $slot }}
+  {{ $slot }}
 </div>

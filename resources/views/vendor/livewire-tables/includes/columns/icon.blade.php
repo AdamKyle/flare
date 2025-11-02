@@ -1,7 +1,4 @@
 <div class="livewire-tables-columns-icon">
-    @svg(
-        $icon,
-        $classes,
-        $attributes,
-    )
+  @svg(
+  $icon, $classes, $attributes  )
 </div>

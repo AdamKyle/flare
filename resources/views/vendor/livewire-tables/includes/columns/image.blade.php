@@ -1,1 +1,4 @@
-<img src="{{ $path }}" {!! count($attributes) ? $column->arrayToAttributes($attributes) : '' !!} />
+<img
+  src="{{ $path }}"
+  {!! count($attributes) ? $column->arrayToAttributes($attributes) : '' !!}
+/>

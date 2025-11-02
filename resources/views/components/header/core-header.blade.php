@@ -7,7 +7,9 @@
   x-data="{ menuToggle: false }"
   class="sticky top-0 z-99999 flex w-full border-gray-200 bg-white lg:border-b dark:border-gray-800 dark:bg-gray-900"
 >
-  <div class="flex grow flex-col items-center justify-between lg:flex-row lg:px-6">
+  <div
+    class="flex grow flex-col items-center justify-between lg:flex-row lg:px-6"
+  >
     <div
       class="flex w-full items-center justify-between gap-2 border-b border-gray-200 px-3 py-3 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4 dark:border-gray-800"
     >
@@ -55,16 +57,16 @@
 
       <div>
         <a
-          href="{{route('releases.list')}}"
+          href="{{ route('releases.list') }}"
           aria-label="Version 2.0.0 release notes"
-          class="text-danube-500 dark:text-danube-300 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-danube px-4"
+          class="text-danube-500 dark:text-danube-300 focus:ring-danube px-4 hover:underline focus:ring-2 focus:ring-offset-2 focus:outline-none"
         >
           Vs. 2.0.0
         </a>
       </div>
 
       @if ($isLoggedIn)
-        <x-header.profile-drop-down :user="$user"/>
+        <x-header.profile-drop-down :user="$user" />
       @else
         <div>
           <x-core.buttons.link-buttons.login-button href="{{ route('login') }}">

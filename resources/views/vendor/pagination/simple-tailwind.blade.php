@@ -1,41 +1,41 @@
 @if ($paginator->hasPages())
-    <nav
-        role="navigation"
-        aria-label="Pagination Navigation"
-        class="flex justify-between"
-    >
-        {{-- Previous Page Link --}}
-        @if ($paginator->onFirstPage())
-            <span
-                class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default leading-5 rounded-md"
-            >
-                {!! __('pagination.previous') !!}
-            </span>
-        @else
-            <a
-                href="{{ $paginator->previousPageUrl() }}"
-                rel="prev"
-                class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"
-            >
-                {!! __('pagination.previous') !!}
-            </a>
-        @endif
+  <nav
+    role="navigation"
+    aria-label="Pagination Navigation"
+    class="flex justify-between"
+  >
+    {{-- Previous Page Link --}}
+    @if ($paginator->onFirstPage())
+      <span
+        class="relative inline-flex cursor-default items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm leading-5 font-medium text-gray-500"
+      >
+        {!! __('pagination.previous') !!}
+      </span>
+    @else
+      <a
+        href="{{ $paginator->previousPageUrl() }}"
+        rel="prev"
+        class="focus:shadow-outline-blue relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm leading-5 font-medium text-gray-700 transition duration-150 ease-in-out hover:text-gray-500 focus:border-blue-300 focus:outline-none active:bg-gray-100 active:text-gray-700"
+      >
+        {!! __('pagination.previous') !!}
+      </a>
+    @endif
 
-        {{-- Next Page Link --}}
-        @if ($paginator->hasMorePages())
-            <a
-                href="{{ $paginator->nextPageUrl() }}"
-                rel="next"
-                class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"
-            >
-                {!! __('pagination.next') !!}
-            </a>
-        @else
-            <span
-                class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default leading-5 rounded-md"
-            >
-                {!! __('pagination.next') !!}
-            </span>
-        @endif
-    </nav>
+    {{-- Next Page Link --}}
+    @if ($paginator->hasMorePages())
+      <a
+        href="{{ $paginator->nextPageUrl() }}"
+        rel="next"
+        class="focus:shadow-outline-blue relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm leading-5 font-medium text-gray-700 transition duration-150 ease-in-out hover:text-gray-500 focus:border-blue-300 focus:outline-none active:bg-gray-100 active:text-gray-700"
+      >
+        {!! __('pagination.next') !!}
+      </a>
+    @else
+      <span
+        class="relative inline-flex cursor-default items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm leading-5 font-medium text-gray-500"
+      >
+        {!! __('pagination.next') !!}
+      </span>
+    @endif
+  </nav>
 @endif

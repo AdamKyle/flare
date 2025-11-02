@@ -2,6 +2,6 @@
   Welcome to Purgatories Dungeons!
 </h2>
 <p class="mb-4">
-  This location will let you explore here, for 3x the copper coin drop
-  and a 1/1000 chance for a Mythic Item to drop.
+  This location will let you explore here, for 3x the copper coin drop and a
+  1/1000 chance for a Mythic Item to drop.
 </p>

@@ -1,18 +1,20 @@
 @props([
-    'href' => '#',
-    'title' => 'Admin Options',
+  'href' => '#',
+  'title' => 'Admin Options',
 ])
 
 <div
   role="banner"
   aria-label="{{ $title }} sidebar header"
-  class="sidebar-header flex items-center gap-3 px-6 py-8 bg-white dark:bg-gray-800 py-4"
+  class="sidebar-header flex items-center gap-3 bg-white px-6 py-4 py-8 dark:bg-gray-800"
 >
   <a
     href="{{ $href }}"
-    class="group flex items-center focus:outline-none focus:ring-2 focus:ring-danube-500 rounded"
+    class="group focus:ring-danube-500 flex items-center rounded focus:ring-2 focus:outline-none"
   >
-    <h1 class="text-xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">
+    <h1
+      class="text-xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100"
+    >
       {{ $title }}
     </h1>
   </a>

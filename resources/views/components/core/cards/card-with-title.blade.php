@@ -1,21 +1,29 @@
 @props([
-    'title' => 'Example',
-    'route' => null,
-    'css' => '',
-    'buttons' => 'false',
-    'backUrl' => '#',
-    'editUrl' => '#',
-    'secondaryUrl' => '#',
-    'secondaryLabel' => '',
+  'title' => 'Example',
+  'route' => null,
+  'css' => '',
+  'buttons' => 'false',
+  'backUrl' => '#',
+  'editUrl' => '#',
+  'secondaryUrl' => '#',
+  'secondaryLabel' => '',
 ])
 
-<div class="w-full md:w-2/3 mx-auto px-6 sm:px-8 lg:px-12 mt-12 mb-8">
-  <div class="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl shadow-xl overflow-hidden {{ $css }}">
-    <div class="flex items-center justify-between p-8 border-b border-gray-200 dark:border-gray-700">
+<div class="mx-auto mt-12 mb-8 w-full px-6 sm:px-8 md:w-2/3 lg:px-12">
+  <div
+    class="{{ $css }} overflow-hidden rounded-2xl bg-white text-gray-800 shadow-xl dark:bg-gray-800 dark:text-gray-200"
+  >
+    <div
+      class="flex items-center justify-between border-b border-gray-200 p-8 dark:border-gray-700"
+    >
       @if ($buttons != 'false')
         @if (! is_null($route))
           <h2 class="text-3xl font-medium">
-            <a href="{{ $route }}" {{ $attributes }} class="text-gray-900 dark:text-gray-100 hover:underline focus:outline-none">
+            <a
+              href="{{ $route }}"
+              {{ $attributes }}
+              class="text-gray-900 hover:underline focus:outline-none dark:text-gray-100"
+            >
               {!! $title !!}
             </a>
           </h2>
@@ -33,7 +41,9 @@
           @endif
 
           @if (auth()->user()?->hasRole('Admin') && $secondaryUrl !== '#')
-            <x-core.buttons.link-buttons.orange-button href="{{ $secondaryUrl }}">
+            <x-core.buttons.link-buttons.orange-button
+              href="{{ $secondaryUrl }}"
+            >
               {{ $secondaryLabel }}
             </x-core.buttons.link-buttons.orange-button>
           @endif
@@ -45,7 +55,11 @@
       @else
         @if (! is_null($route))
           <h2 class="text-3xl font-medium">
-            <a href="{{ $route }}" {{ $attributes }} class="text-gray-900 dark:text-gray-100 hover:underline focus:outline-none">
+            <a
+              href="{{ $route }}"
+              {{ $attributes }}
+              class="text-gray-900 hover:underline focus:outline-none dark:text-gray-100"
+            >
               {{ $title }}
             </a>
           </h2>

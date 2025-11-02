@@ -1,9 +1,9 @@
-<div class="flex flex-wrap -mx-2 mb-2">
-    <div class="w-full lg:w-1/2 px-2 mb-4">
-        {{ $columnOne }}
-    </div>
+<div class="-mx-2 mb-2 flex flex-wrap">
+  <div class="mb-4 w-full px-2 lg:w-1/2">
+    {{ $columnOne }}
+  </div>
 
-    <div class="w-full lg:w-1/2 px-2 mb-4">
-        {{ $columnTwo }}
-    </div>
+  <div class="mb-4 w-full px-2 lg:w-1/2">
+    {{ $columnTwo }}
+  </div>
 </div>
