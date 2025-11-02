@@ -9,7 +9,7 @@
 @php
   $value = old($name, optional($model)->{$modelKey});
 
-  if (is_null($value) && !is_null($defaultValue)) {
+  if (is_null($value) && ! is_null($defaultValue)) {
       $value = $defaultValue;
   }
 
@@ -31,7 +31,7 @@
     value="{{ $value }}"
     class="focus:ring-danube-500 focus:border-danube-500 block w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:ring-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
     aria-describedby="{{ $errorId }}"
-    {{ $attributes  }}
+    {{ $attributes }}
     @error($name)
         aria-invalid="true"
     @enderror

@@ -1,9 +1,9 @@
 <div class="row justify-content-center">
   <div class="col-md-12">
     <p class="mb-4">
-      Here you may set up your auto disenchanting. This is useful for high
-      level characters who can get to the Shadow Plane and receive large
-      amounts of drops.
+      Here you may set up your auto disenchanting. This is useful for high level
+      characters who can get to the Shadow Plane and receive large amounts of
+      drops.
     </p>
     <p class="mb-4">
       Auto disenchant will work across planes - but
@@ -12,9 +12,7 @@
       <strong>never, ever</strong>
       , disenchant quest drops as they cannot be disenchanted or destroyed.
     </p>
-    <div
-      class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-    ></div>
+    <div class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"></div>
     <form
       action="{{ route('user.settings.auto-disenchant', ['user' => $user->id]) }}"
       method="POST"
@@ -37,8 +35,8 @@
           </label>
         </div>
         <x-core.alerts.info-alert title="ATTN!">
-          By selecting this you are saying you want to auto disenchant items
-          as they drop instead of collecting them.
+          By selecting this you are saying you want to auto disenchant items as
+          they drop instead of collecting them.
           <strong>
             New players are advised to not enable this as the low level drops
             can be useful to you
@@ -109,17 +107,16 @@
           <p class="mb-4">
             Choosing
             <strong>
-              Keep items With Value of 1 Billion Gold (useful for Shadow
-              Plane)
+              Keep items With Value of 1 Billion Gold (useful for Shadow Plane)
             </strong>
-            will only keep items who's item cost with combined affixes is or
-            is above 1 Billion Gold.
+            will only keep items who's item cost with combined affixes is or is
+            above 1 Billion Gold.
           </p>
           <p class="mb-4">
             If you are slightly under geared and head to Shadow Plane, select
-            the last option to get the gear you want. Remember, any item and
-            any affix can drop in combination in the Shadow Plane as long as
-            the creature is 10 levels higher than you.
+            the last option to get the gear you want. Remember, any item and any
+            affix can drop in combination in the Shadow Plane as long as the
+            creature is 10 levels higher than you.
           </p>
         </x-core.alerts.info-alert>
       </div>

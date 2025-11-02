@@ -1,3 +1,10 @@
+<x-core.buttons.link-buttons.primary-button
+  href="{{ route('passive.skill.edit', ['passiveSkill' => $skill->id]) }}"
+  css="ml-2"
+>
+  Edit Passive
+</x-core.buttons.link-buttons.primary-button>
+
 <x-core.cards.card>
   <p class="my-5">{!! nl2br(e($skill->description)) !!}</p>
   <dl>
@@ -35,12 +42,8 @@
     .
   </p>
 </x-core.cards.card>
+
 <h2 class="my-5 font-light">Child Skills</h2>
 <p class="my-5">These skills will unlock at specific levels of this skill.</p>
 
-@livewire(
-  'admin.passive-skills.passive-skill-table',
-  [
-    'skillId' => $skill->id,
-  ]
-)
+@livewire('admin.passive-skills.passive-skill-table', ['skillId' => $skill->id])
