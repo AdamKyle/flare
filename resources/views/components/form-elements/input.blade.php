@@ -3,11 +3,16 @@
     "label",
     "model" => null,
     "modelKey" => null,
+    "defaultValue" => null,
 ])
 
 @php
   $value = old($name, optional($model)->{$modelKey});
-  dump($value);
+
+  if (is_null($value) && !is_null($defaultValue)) {
+      $value = $defaultValue;
+  }
+
   $errorId = $name . "-error";
 @endphp
 

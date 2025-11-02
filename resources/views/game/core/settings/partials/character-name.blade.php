@@ -11,7 +11,7 @@
 
   <div class="mb-5">
     <h3>Change your name</h3>
-    <x-form-elements.input name="name"  label="Character Name" required autofocus />
+    <x-form-elements.input name="name"  label="Character Name" default-value="{{$name}}" required autofocus />
 
     @error('name')
       <div class="invalid-feedback mt-2" role="alert">
