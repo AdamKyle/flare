@@ -117,7 +117,7 @@ class GuideQuestRequirementsService
             $gameMap = GameMap::find($quest->required_game_map_id);
 
             $canHandIn = $character->inventory->slots->filter(function ($slot) use ($gameMap) {
-                return $slot->item->type === 'quest' && $slot->item->id === $gameMap->map_required_item->id;
+                return $slot->item->type === 'quest' && $slot->item->id === $gameMap->map_required_item['item_id'];
             })->isNotEmpty();
 
             if ($canHandIn) {
