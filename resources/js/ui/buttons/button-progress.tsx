@@ -22,8 +22,8 @@ const ProgressButton = (props: ProgressButtonProps): ReactNode => {
       aria-valuemax={100}
       style={{ position: 'relative' }}
     >
-      <span className="z-10 relative">{props.label}</span>
-      <div className="absolute bottom-0 left-0 w-full h-full bg-white/20 rounded-lg">
+      <span className="relative z-10">{props.label}</span>
+      <div className="absolute bottom-0 left-0 h-full w-full rounded-lg bg-white/20">
         <div
           className={clsx(
             progressBaseStyles(),

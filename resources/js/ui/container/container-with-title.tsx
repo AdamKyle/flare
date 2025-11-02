@@ -7,8 +7,8 @@ import Separator from 'ui/separator/separator';
 
 const ContainerWithTitle = (props: ContainerProps): ReactNode => {
   return (
-    <div className="w-full lg:w-3/4 mt-4 mx-auto sm:px-2">
-      <div className="flex items-center justify-between mb-4 px-2 lg:px-0">
+    <div className="mx-auto mt-4 w-full sm:px-2 lg:w-3/4">
+      <div className="mb-4 flex items-center justify-between px-2 lg:px-0">
         <h3 className="flex items-center text-xl text-gray-800 dark:text-gray-300">
           {props.title}
         </h3>

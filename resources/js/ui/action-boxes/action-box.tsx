@@ -51,7 +51,7 @@ const ActionBox = ({
       actions={renderActions()}
       additional_css={additional_css}
     >
-      <div className={'grid grid-cols-2 gap-2 items-stretch'}>{children}</div>
+      <div className={'grid grid-cols-2 items-stretch gap-2'}>{children}</div>
     </ActionBoxBase>
   );
 };

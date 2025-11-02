@@ -8,9 +8,9 @@ const ExplorationMessages = ({
   exploration_messages,
 }: ExplorationMessageProps) => {
   return (
-    <div className="w-full lg:w-3/4 mx-auto my-4">
+    <div className="mx-auto my-4 w-full lg:w-3/4">
       <Card>
-        <div className="bg-gray-700 dark:bg-gray-800 p-2 w-full h-96 overflow-y-auto rounded-md text-gray-400">
+        <div className="h-96 w-full overflow-y-auto rounded-md bg-gray-700 p-2 text-gray-400 dark:bg-gray-800">
           <ul className="space-y-2">
             {exploration_messages.map((row) => (
               <li

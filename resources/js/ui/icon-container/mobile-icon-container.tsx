@@ -10,10 +10,10 @@ export const MobileIconContainer = ({
 }: MobileIconContainerProps): ReactNode => {
   return (
     <>
-      <div className="hidden 3xl:block">
+      <div className="3xl:block hidden">
         <VerticalSideIcons icon_buttons={icon_buttons} />
       </div>
-      <div className="hidden md:block 3xl:hidden">
+      <div className="3xl:hidden hidden md:block">
         <HorizontalIcons icon_buttons={icon_buttons} />
       </div>
     </>

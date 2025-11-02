@@ -29,7 +29,7 @@ const IconButton = (props: IconButtonProps): ReactNode => {
           </span>
         )}
         {props.label && (
-          <span className="text-sm text-left">{props.label}</span>
+          <span className="text-left text-sm">{props.label}</span>
         )}
       </div>
     </button>

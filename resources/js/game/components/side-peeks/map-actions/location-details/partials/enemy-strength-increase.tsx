@@ -22,8 +22,7 @@ const EnemyStrengthIncrease = ({
           onClick={() =>
             handle_on_info_click(LocationInfoTypes.ENEMY_STRENGTH_INCREASE)
           }
-          className="p-1 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500
-                       text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          className="rounded p-1 text-gray-500 hover:text-gray-700 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:text-gray-400 dark:hover:text-gray-200"
           aria-label={`More info about ${label}`}
         >
           <i className="fas fa-info-circle" aria-hidden="true" />

@@ -17,7 +17,7 @@ const HealthBar = (props: HealthBarProps): ReactNode => {
   };
 
   return (
-    <div className="space-y-2 mb-4">
+    <div className="mb-4 space-y-2">
       <div className="flex justify-between text-sm font-medium text-gray-800 dark:text-gray-200">
         <span id={props.name + '-health-bar'} className="sr-only">
           {props.name}
@@ -28,11 +28,11 @@ const HealthBar = (props: HealthBarProps): ReactNode => {
           {shortenNumber(props.max_health)}
         </span>
       </div>
-      <div className="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2">
+      <div className="h-2 w-full rounded-full bg-gray-300 dark:bg-gray-700">
         <div
           className={clsx(
             fetchHealthBarColorForType(props.health_bar_type),
-            'rounded-full h-full'
+            'h-full rounded-full'
           )}
           style={{
             width:

@@ -181,7 +181,7 @@ const GameChat = () => {
   if (loading) {
     return (
       <div className="px-4">
-        <div className="w-full md:w-2/3 mx-auto">
+        <div className="mx-auto w-full md:w-2/3">
           <InfiniteLoader />
         </div>
       </div>
@@ -191,7 +191,7 @@ const GameChat = () => {
   if (error) {
     return (
       <div className="px-4">
-        <div className="w-full md:w-2/3 mx-auto">
+        <div className="mx-auto w-full md:w-2/3">
           <ApiErrorAlert apiError={error.message} />
         </div>
       </div>

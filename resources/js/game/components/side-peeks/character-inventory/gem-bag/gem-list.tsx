@@ -15,7 +15,7 @@ const GemList = ({
   const renderGemSlots = () => {
     if (isEmpty(gems)) {
       return (
-        <div className="text-center py-4">
+        <div className="py-4 text-center">
           You don't have any gems. These can be crafted and then socketed into
           your gear to provide elemental immunity to certain monsters as well as
           deal elemental attacks
@@ -29,7 +29,7 @@ const GemList = ({
   };
 
   return (
-    <div className="w-full h-full text-gray-800 dark:text-gray-200">
+    <div className="h-full w-full text-gray-800 dark:text-gray-200">
       <InfiniteScroll handle_scroll={on_scroll_to_end} additional_css={'my-2'}>
         {renderGemSlots()}
       </InfiniteScroll>

@@ -6,7 +6,7 @@ import { formatNumberWithCommas } from '../../../../util/format-number';
 
 const XpBar = (props: XpBarProps): ReactNode => {
   return (
-    <div className="space-y-2 mb-6">
+    <div className="mb-6 space-y-2">
       <div className="flex justify-between text-sm font-medium text-gray-800 dark:text-gray-200">
         <span id="xp-label" className="sr-only">
           Xp
@@ -17,9 +17,9 @@ const XpBar = (props: XpBarProps): ReactNode => {
           {formatNumberWithCommas(props.max_xp)}
         </span>
       </div>
-      <div className="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2">
+      <div className="h-2 w-full rounded-full bg-gray-300 dark:bg-gray-700">
         <div
-          className={'bg-orange-600 dark:bg-orange-500 rounded-full h-full'}
+          className={'h-full rounded-full bg-orange-600 dark:bg-orange-500'}
           style={{
             width: xpbarPercentage(props.current_xp, props.max_xp) + '%',
           }}

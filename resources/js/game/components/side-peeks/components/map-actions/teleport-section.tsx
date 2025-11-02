@@ -19,7 +19,7 @@ const TeleportSection = ({
   }
 
   return (
-    <div className="mt-4 rounded-lg bg-gray-100 dark:bg-gray-700 p-4 space-y-2 text-sm border border-solid border-gray-200 dark:border-gray-800 ">
+    <div className="mt-4 space-y-2 rounded-lg border border-solid border-gray-200 bg-gray-100 p-4 text-sm dark:border-gray-800 dark:bg-gray-700">
       <div className="flex justify-between">
         <span className="font-medium text-gray-800 dark:text-gray-200">
           Your Gold:

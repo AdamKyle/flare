@@ -182,7 +182,7 @@ const InventoryItem = ({
 
   return (
     <>
-      <div className="px-4 flex flex-col gap-4">
+      <div className="flex flex-col gap-4 px-4">
         <ItemMetaSection
           name={item.name}
           description={item.description}

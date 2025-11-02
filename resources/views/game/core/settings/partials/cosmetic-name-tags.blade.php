@@ -3,7 +3,7 @@
   seen by all when you talk in public chat. Name tags are a way to show off your
   accomplishments and stand out a bit.
 </p>
-<div class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"></div>
+<x-core.separator.separator />
 <form
   action="{{ route('user.settings.cosmetic-name-tag', ['user' => $user->id]) }}"
   method="POST"
@@ -12,23 +12,9 @@
 
   <div class="grid grid-cols-2 gap-4">
     <div class="mb-5">
-      <label class="label mb-2 block" for="name_tag">Name tag</label>
-      <select
-        class="form-control"
-        name="name_tag"
-        id="name_tag"
-        value="{{ ! is_null($user) ? $user->chat_text_color : null }}"
-      >
-        <option value="">Please select</option>
-        @foreach ($nameTags as $value => $label)
-          <option
-            value="{{ $value }}"
-            {{ $user->name_tag === $value ? 'selected' : '' }}
-          >
-            {{ $label }}
-          </option>
-        @endforeach
-      </select>
+
+      <x-form-elements.select name="name_tag" label="Name Tag" :model="$user" model-key="name_tag" :options="$nameTags" />
+
     </div>
     <x-core.alerts.info-alert title="ATTN!">
       By Selecting a name tag, you are stating you want to append a name tag to

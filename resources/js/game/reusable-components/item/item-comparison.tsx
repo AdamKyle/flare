@@ -132,7 +132,7 @@ const ItemComparison = ({
             </div>
 
             {index < comparisonRows.length - 1 && (
-              <div className="block md:hidden my-6 px-2">
+              <div className="my-6 block px-2 md:hidden">
                 <Separator />
               </div>
             )}

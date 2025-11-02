@@ -60,11 +60,11 @@ export const CharacterStatTypeDetails = ({
         and added to your raw stat value when you reincarnate.
       </p>
       <Separator />
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid gap-4 md:grid-cols-2">
         <div>
           <h4>Gear affecting this stat</h4>
           <Separator />
-          <ol className="space-y-4 text-gray-500 list-decimal list-inside dark:text-gray-400">
+          <ol className="list-inside list-decimal space-y-4 text-gray-500 dark:text-gray-400">
             <EquippedItems
               items_equipped={data.items_equipped}
               stat_type={stat_type}

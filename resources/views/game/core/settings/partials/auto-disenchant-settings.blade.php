@@ -12,7 +12,7 @@
       <strong>never, ever</strong>
       , disenchant quest drops as they cannot be disenchanted or destroyed.
     </p>
-    <div class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"></div>
+    <x-core.separator.separator />
     <form
       action="{{ route('user.settings.auto-disenchant', ['user' => $user->id]) }}"
       method="POST"
@@ -21,18 +21,7 @@
 
       <div class="grid gap-4 md:grid-cols-2">
         <div>
-          <label class="custom-checkbox mb-5" for="auto_disenchant">
-            <input type="hidden" name="auto_disenchant" value="0" />
-            <input
-              type="checkbox"
-              id="auto_disenchant"
-              name="auto_disenchant"
-              value="1"
-              {{ $user->auto_disenchant ? 'checked' : '' }}
-            />
-            <span></span>
-            <span>Auto Disenchant?</span>
-          </label>
+          <x-form-elements.check-box name="auto_disenchant" label="Auto Disenchant?" :model="$user" model-key="auto_disenchant" />
         </div>
         <x-core.alerts.info-alert title="ATTN!">
           By selecting this you are saying you want to auto disenchant items as
@@ -44,59 +33,22 @@
           .
         </x-core.alerts.info-alert>
       </div>
-      <div
-        class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-      ></div>
+      <x-core.separator.separator />
       <div class="grid gap-4 md:grid-cols-2">
         <div>
-          <label class="custom-checkbox mb-5" for="auto_sell_item">
-            <input type="hidden" name="auto_sell_item" value="0" />
-            <input
-              type="checkbox"
-              id="auto_sell_item"
-              name="auto_sell_item"
-              value="1"
-              {{ $user->auto_sell_item ? 'checked' : '' }}
-            />
-            <span></span>
-            <span>Auto Sell?</span>
-          </label>
+          <x-form-elements.check-box name="auto_sell_item" label="Auto Sell?" :model="$user" model-key="auto_sell_item" />
         </div>
         <x-core.alerts.info-alert title="ATTN!">
           By selecting this you are saying you want to auto sell items you
           cannot disenchant because you are Gold Dust capped.
         </x-core.alerts.info-alert>
       </div>
-      <div
-        class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-      ></div>
+      <x-core.separator.separator />
       <div class="mb-4 grid gap-4 md:grid-cols-2">
         <div>
-          <div class="mb-5">
-            <label class="label mb-2 block" for="auto_disenchant_amount">
-              Auto Disenchant Amount
-            </label>
-            <select
-              class="form-control"
-              name="auto_disenchant_amount"
-              id="auto_disenchant_amount"
-              value="{{ $user->auto_disenchant_amount }}"
-            >
-              <option value="">Please select</option>
-              <option
-                value="all"
-                {{ $user->auto_disenchant_amount === 'all' ? 'selected' : '' }}
-              >
-                All
-              </option>
-              <option
-                value="1-billion"
-                {{ $user->auto_disenchant_amount === '1-billion' ? 'selected' : '' }}
-              >
-                Keep items with value of 1 Billion
-              </option>
-            </select>
-          </div>
+
+          <x-form-elements.select name="auto_disenchant_amount" label="Auto Disenchant Amount" :model="$user" model-key="auto_disenchant_amount" :options="['all','1-billion']" />
+
         </div>
         <x-core.alerts.info-alert title="ATTN!">
           <p class="mb-4">

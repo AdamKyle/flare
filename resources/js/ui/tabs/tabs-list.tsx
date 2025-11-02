@@ -55,7 +55,7 @@ const TabsList = <PTuple extends readonly object[]>({
     if (!tabItem.activity_icon) {
       return (
         <span
-          className="block h-[1em] invisible max-sm:w-[1rem] sm:w-[1.25rem]"
+          className="invisible block h-[1em] max-sm:w-[1rem] sm:w-[1.25rem]"
           aria-hidden="true"
         />
       );
@@ -64,7 +64,7 @@ const TabsList = <PTuple extends readonly object[]>({
     return (
       <i
         className={clsx(
-          'leading-none text-center max-sm:w-[1rem] sm:w-[1.25rem]',
+          'text-center leading-none max-sm:w-[1rem] sm:w-[1.25rem]',
           tabItem.icon_styles,
           tabItem.activity_icon
         )}
@@ -76,7 +76,7 @@ const TabsList = <PTuple extends readonly object[]>({
   const renderIconRightSpacer = () => {
     return (
       <span
-        className="block h-[1em] invisible max-sm:w-[1rem] sm:w-[1.25rem]"
+        className="invisible block h-[1em] max-sm:w-[1rem] sm:w-[1.25rem]"
         aria-hidden="true"
       />
     );
@@ -96,10 +96,10 @@ const TabsList = <PTuple extends readonly object[]>({
     const tabItem = tabItemAt(tabIndex);
 
     return (
-      <span className="inline-grid items-center justify-center min-w-0 max-sm:grid-cols-[1rem_1fr_1rem] sm:grid-cols-[1.25rem_1fr_1.25rem] max-sm:gap-1 sm:gap-1.5">
+      <span className="inline-grid min-w-0 items-center justify-center max-sm:grid-cols-[1rem_1fr_1rem] max-sm:gap-1 sm:grid-cols-[1.25rem_1fr_1.25rem] sm:gap-1.5">
         {renderIconLeft(tabIndex)}
         <span
-          className="min-w-0 text-center leading-tight max-sm:whitespace-normal max-sm:break-normal sm:whitespace-nowrap max-sm:text-xs sm:text-sm"
+          className="min-w-0 text-center leading-tight max-sm:text-xs max-sm:break-normal max-sm:whitespace-normal sm:text-sm sm:whitespace-nowrap"
           style={{ overflowWrap: 'normal', wordBreak: 'normal' }}
         >
           {tabItem.label}
@@ -135,7 +135,7 @@ const TabsList = <PTuple extends readonly object[]>({
       >
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute left-1 top-1 bottom-1 rounded-md border border-danube-500 bg-gray-300 shadow-sm transition-transform duration-300 ease-out dark:border-danube-300 dark:bg-gray-500"
+          className="border-danube-500 dark:border-danube-300 pointer-events-none absolute top-1 bottom-1 left-1 rounded-md border bg-gray-300 shadow-sm transition-transform duration-300 ease-out dark:bg-gray-500"
           style={{ width: indicatorWidth, transform: indicatorTransform }}
         />
         {tabs.map((_, tabIndex) => {

@@ -219,7 +219,7 @@ const Dropdown = ({
       <i className="fas fa-chevron-down text-gray-500 dark:text-gray-300" />
     ) : (
       <i
-        className="fas fa-times text-gray-500 dark:text-gray-300 cursor-pointer"
+        className="fas fa-times cursor-pointer text-gray-500 dark:text-gray-300"
         onClick={handleClearSelection}
       />
     );
@@ -235,7 +235,7 @@ const Dropdown = ({
         tabIndex={-1}
         onClick={() => handleSelectItem(item)}
         className={clsx(
-          'mx-1 my-1 px-4 py-4 cursor-pointer rounded-lg transition-colors duration-100',
+          'mx-1 my-1 cursor-pointer rounded-lg px-4 py-4 transition-colors duration-100',
           focusedIndex === index
             ? 'bg-gray-300 dark:bg-gray-700'
             : 'hover:bg-gray-300 dark:hover:bg-gray-800'
@@ -307,7 +307,7 @@ const Dropdown = ({
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search..."
               aria-label="Search"
-              className="w-full rounded-sm bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border-0"
+              className="w-full rounded-sm border-0 bg-transparent px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
           <InfiniteScroll
@@ -333,7 +333,7 @@ const Dropdown = ({
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search..."
             aria-label="Search"
-            className="w-full rounded-md my-2 bg-transparent border-1 border-gray-500 dark:border-gray-600 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="my-2 w-full rounded-md border-1 border-gray-500 bg-transparent px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600"
           />
         </div>
         {listMarkup}
@@ -358,14 +358,14 @@ const Dropdown = ({
         aria-controls={disabled ? undefined : 'dropdown-listbox'}
         onClick={disabled ? undefined : handleTriggerClick}
         className={clsx(
-          'w-full p-2 pr-10 pl-3 rounded-md border flex items-center relative',
+          'relative flex w-full items-center rounded-md border p-2 pr-10 pl-3',
           disabled
-            ? 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-80'
-            : 'bg-white dark:bg-gray-800 border-gray-500 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500'
+            ? 'cursor-not-allowed border-gray-300 bg-gray-100 text-gray-400 opacity-80 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500'
+            : 'border-gray-500 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800'
         )}
       >
         <span className="flex-1 truncate">{renderSelectionText()}</span>
-        <span className="absolute right-3 top-1/2 -translate-y-1/2">
+        <span className="absolute top-1/2 right-3 -translate-y-1/2">
           {renderIcon()}
         </span>
       </div>

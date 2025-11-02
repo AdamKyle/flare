@@ -129,7 +129,7 @@ export const MonsterStatSection = ({
         {renderRaidMonsterAlert()}
         {renderRaidBossAlert()}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
           <div>
             <MonsterCoreSection monster={data} />
 

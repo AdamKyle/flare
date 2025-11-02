@@ -9,7 +9,7 @@ const EnemyStrengthIncreaseInfo = ({
   handel_close_info_section,
 }: LocationInfoSectionProps) => {
   return (
-    <div className={'prose dark:prose-dark dark:text-white py-2 px-4'}>
+    <div className={'prose dark:prose-dark px-4 py-2 dark:text-white'}>
       <h2>Enemy Strength Increase</h2>
       <p>
         When it comes to a location increasing the strength of an enemy this

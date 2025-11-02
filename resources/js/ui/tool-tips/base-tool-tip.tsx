@@ -114,13 +114,13 @@ const BaseToolTip = (props: BaseToolTipProps) => {
         aria-live="polite"
         className={clsx(
           'absolute z-50 rounded-md border bg-white p-3 shadow-lg',
-          'min-w-[16rem] max-w-[min(28rem,calc(100vw-3rem))] whitespace-normal break-words',
+          'max-w-[min(28rem,calc(100vw-3rem))] min-w-[16rem] break-words whitespace-normal',
           'max-h-[min(70vh,28rem)] overflow-auto',
           'border-gray-200 text-gray-800',
           'dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100',
           horizontal === 'right' ? 'left-full ml-1' : 'right-full mr-1',
           vertical === 'below'
-            ? 'top-0 translate-y-[-6px] origin-top'
+            ? 'top-0 origin-top translate-y-[-6px]'
             : 'bottom-full mb-1 origin-bottom'
         )}
       >

@@ -162,9 +162,7 @@
       @if ($itemAffix->skill_name || $itemAffix->skill_training_bonus > 0 || $itemAffix->skill_bonus > 0)
         <div>
           <h3 class="text-sky-600 dark:text-sky-500">Skill Modifiers</h3>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl>
             <dt>Skill Name:</dt>
             <dd>

@@ -114,7 +114,7 @@ const GoblinShop = ({ on_close }: GoblinShopProps) => {
   return (
     <ContainerWithTitle manageSectionVisibility={on_close} title="Goblin Shop">
       <Card>
-        <p className="my-4 italic text-gray-800 dark:text-gray-300">
+        <p className="my-4 text-gray-800 italic dark:text-gray-300">
           Hello my child. Do you have any gold bars? I love me some shiny gold
           bars. I have things for you in exchange for those gold bars! Take a
           look see.

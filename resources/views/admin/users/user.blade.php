@@ -21,13 +21,9 @@
             <dd>{{ $character->level }}</dd>
           </dl>
 
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <h3 class="text-sky-600 dark:text-sky-500">Currencies</h3>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl>
             <dt>Gold</dt>
             <dd>{{ $character->gold }}</dd>

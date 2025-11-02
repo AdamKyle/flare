@@ -24,7 +24,7 @@ const HorizontalIcons = ({
   };
 
   return (
-    <div className="relative left-0 top-4 flex flex-row items-center space-x-4 mb-16">
+    <div className="relative top-4 left-0 mb-16 flex flex-row items-center space-x-4">
       {renderButtons()}
     </div>
   );

@@ -20,7 +20,7 @@ const CoreImpactSection = ({
 
   return (
     <Fragment>
-      <h4 className="mt-2 mb-1 text-xs font-semibold uppercase tracking-wide text-mango-tango-500 dark:text-mango-tango-300">
+      <h4 className="text-mango-tango-500 dark:text-mango-tango-300 mt-2 mb-1 text-xs font-semibold tracking-wide uppercase">
         Core Impact
       </h4>
       <Separator />

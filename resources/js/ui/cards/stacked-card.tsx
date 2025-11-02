@@ -25,7 +25,7 @@ const slideVariants = {
 
 const StackedCard = ({ children, on_close }: StackedCardProps) => {
   return (
-    <div className="fixed inset-0 z-50 flex items-stretch justify-start pointer-events-none">
+    <div className="pointer-events-none fixed inset-0 z-50 flex items-stretch justify-start">
       <motion.div
         variants={slideVariants}
         initial="hidden"
@@ -35,16 +35,16 @@ const StackedCard = ({ children, on_close }: StackedCardProps) => {
         style={{ willChange: 'transform' }}
       >
         <div
-          className="absolute top-4 left-4 right-0 bottom-0 rounded-sm bg-white/25 dark:bg-gray-900/30 border-1 border-gray-300/40 dark:border-gray-700/40"
+          className="absolute top-4 right-0 bottom-0 left-4 rounded-sm border-1 border-gray-300/40 bg-white/25 dark:border-gray-700/40 dark:bg-gray-900/30"
           aria-hidden
         />
 
         <div
-          className="absolute top-2 left-2 right-0 bottom-0 rounded-sm bg-white/40 dark:bg-gray-900/45 border-1 border-gray-300/50 dark:border-gray-700/50"
+          className="absolute top-2 right-0 bottom-0 left-2 rounded-sm border-1 border-gray-300/50 bg-white/40 dark:border-gray-700/50 dark:bg-gray-900/45"
           aria-hidden
         />
 
-        <div className="relative h-full bg-white rounded-sm dark:bg-gray-800 dark:text-gray-400 border-1 border-gray-300 dark:border-gray-700 overflow-y-auto">
+        <div className="relative h-full overflow-y-auto rounded-sm border-1 border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
           <div
             className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/15 to-transparent dark:from-white/10"
             aria-hidden
@@ -54,11 +54,11 @@ const StackedCard = ({ children, on_close }: StackedCardProps) => {
             onClick={on_close}
             aria-label="Close item details"
             title="Close"
-            className="absolute right-3 top-3 h-9 w-9 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 dark:focus:ring-gray-500 flex items-center justify-center text-gray-800 dark:text-gray-100"
+            className="absolute top-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-800 hover:bg-gray-200 focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:outline-none dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600 dark:focus:ring-gray-500"
           >
             <i className="fas fa-times" aria-hidden="true" />
           </button>
-          <div className="px-6 pb-6 pt-12">{children}</div>
+          <div className="px-6 pt-12 pb-6">{children}</div>
         </div>
       </motion.div>
     </div>

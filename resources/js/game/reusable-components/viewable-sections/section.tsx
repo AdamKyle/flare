@@ -40,7 +40,7 @@ const Section = ({
   return (
     <>
       <div className={className}>
-        <h4 className="mt-3 mb-2 text-xs font-semibold uppercase tracking-wide text-mango-tango-500 dark:text-mango-tango-300">
+        <h4 className="text-mango-tango-500 dark:text-mango-tango-300 mt-3 mb-2 text-xs font-semibold tracking-wide uppercase">
           {title}
         </h4>
         {renderLead()}

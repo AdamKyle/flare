@@ -31,7 +31,7 @@ const Input = ({
         type="button"
         onClick={handleClear}
         aria-label="Clear input"
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:hover:text-white focus:outline-none"
+        className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none dark:hover:text-white"
         disabled={disabled}
       >
         <i className="fas fa-times"></i>
@@ -48,7 +48,7 @@ const Input = ({
         type="text"
         onChange={handleTextChange}
         aria-label="Input field"
-        className="w-full p-2 pr-10 rounded-sm border border-gray-500 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full rounded-sm border border-gray-500 bg-white p-2 pr-10 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
         placeholder={placeHolder}
         value={value}
         disabled={disabled}

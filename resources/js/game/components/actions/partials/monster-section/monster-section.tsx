@@ -141,7 +141,7 @@ const MonsterSection = ({
 
     if (isNil(monsterToFight)) {
       return (
-        <div className="text-center my-4">
+        <div className="my-4 text-center">
           <Button
             on_click={handelMonsterSelection}
             label="Initiate Fight"
@@ -231,7 +231,7 @@ const MonsterSection = ({
           />
         </HealthBarContainer>
         {renderAttackButtons()}
-        <div className="mt-4 rounded-lg bg-gray-100 dark:bg-gray-700 p-4 text-sm border border-solid border-gray-200 dark:border-gray-800 ">
+        <div className="mt-4 rounded-lg border border-solid border-gray-200 bg-gray-100 p-4 text-sm dark:border-gray-800 dark:bg-gray-700">
           <AttackMessages messages={data?.attack_messages || []} />
         </div>
       </>

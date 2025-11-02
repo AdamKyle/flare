@@ -15,7 +15,7 @@ const UsableItemsList = ({
   const renderUsableItemSlots = () => {
     if (isEmpty(items)) {
       return (
-        <div className="text-center py-4">
+        <div className="py-4 text-center">
           You don't have any usable items. You can craft these through Alchemy.
           Players can craft items that buff their stats and attack, deal damage
           to their opponents kingdoms or apply buffs to their items in the form
@@ -30,7 +30,7 @@ const UsableItemsList = ({
   };
 
   return (
-    <div className="w-full h-full text-gray-800 dark:text-gray-200">
+    <div className="h-full w-full text-gray-800 dark:text-gray-200">
       <InfiniteScroll handle_scroll={on_scroll_to_end} additional_css={'my-2'}>
         {renderUsableItemSlots()}
       </InfiniteScroll>

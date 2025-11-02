@@ -26,7 +26,7 @@ const GameSection = () => {
         <ScreenBindingHost bindings={gameScreenBindings} />
 
         <div className="grid">
-          <div className="row-start-1 col-start-1 z-10 relative">
+          <div className="relative z-10 col-start-1 row-start-1">
             <motion.div
               className={clsx({
                 'pointer-events-none': stackDepth > 0,
@@ -41,7 +41,7 @@ const GameSection = () => {
             </motion.div>
           </div>
 
-          <div className="row-start-1 col-start-1">
+          <div className="col-start-1 row-start-1">
             <ScreenHost />
           </div>
         </div>

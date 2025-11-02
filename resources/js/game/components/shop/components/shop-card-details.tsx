@@ -20,15 +20,15 @@ const ShopCardDetails = ({ item }: ShopCardDetailsProps) => {
     <>
       <div className="w-full">
         <div className="mb-4">
-          <h2 className="text-xl text-gray-700 dark:text-gray-300 font-semibold break-words">
+          <h2 className="text-xl font-semibold break-words text-gray-700 dark:text-gray-300">
             {item.name}
           </h2>
-          <p className="my-4 text-gray-700 dark:text-gray-300 break-words">
+          <p className="my-4 break-words text-gray-700 dark:text-gray-300">
             {item.description}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <ShopItemBaseView item={item} />
           <PrimaryStatBlock item={item} />
           {renderStatsOrResistances()}

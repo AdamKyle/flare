@@ -12,7 +12,7 @@ const PlayerKingdoms = ({ close_shop }: PlayerKingdomsProps) => {
       title={`Your kingdoms`}
     >
       <Card>
-        <p className={'my-4 italic text-gray-800 dark:text-gray-300'}>
+        <p className={'my-4 text-gray-800 italic dark:text-gray-300'}>
           Show character kingdoms
         </p>
       </Card>

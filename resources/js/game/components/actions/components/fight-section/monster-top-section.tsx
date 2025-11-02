@@ -48,22 +48,11 @@ const MonsterTopSection = ({
       <img
         src={img_src}
         alt=""
-        className="
-                    mx-auto mt-4 rounded-md drop-shadow-md
-                    sm:w-64 md:w-72 lg:w-80
-                    transition-all duration-300 ease-in-out transform hover:scale-105
-                    dark:drop-shadow-lg dark:border dark:border-gray-700 dark:bg-gray-800
-                    focus:outline-none focus:ring-2 focus:ring-danube-500 focus:ring-offset-2 focus:ring-offset-white
-                "
+        className="focus:ring-danube-500 mx-auto mt-4 transform rounded-md drop-shadow-md transition-all duration-300 ease-in-out hover:scale-105 focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:outline-none sm:w-64 md:w-72 lg:w-80 dark:border dark:border-gray-700 dark:bg-gray-800 dark:drop-shadow-lg"
       />
-      <div
-        className="
-                    mx-auto mt-4 flex items-center justify-center
-                    w-full gap-x-3 text-lg leading-none
-                "
-      >
+      <div className="mx-auto mt-4 flex w-full items-center justify-center gap-x-3 text-lg leading-none">
         <button
-          className="text-xl transition-all duration-300 ease-in-out transform hover:scale-105 hover:text-gray-700 dark:hover:text-gray-500"
+          className="transform text-xl transition-all duration-300 ease-in-out hover:scale-105 hover:text-gray-700 dark:hover:text-gray-500"
           aria-label="Previous"
           onClick={handleMovePrevious}
           type="button"
@@ -71,7 +60,7 @@ const MonsterTopSection = ({
           <i className="fas fa-chevron-circle-left" aria-hidden="true"></i>
         </button>
 
-        <div className="w-2/3 sm:w-full min-w-[16ch] max-w-[28ch]">
+        <div className="w-2/3 max-w-[28ch] min-w-[16ch] sm:w-full">
           <MonsterNamePicker
             display_name={monster_name || ''}
             monsters={monsters}
@@ -81,7 +70,7 @@ const MonsterTopSection = ({
         </div>
 
         <button
-          className="text-xl transition-all duration-300 ease-in-out transform hover:scale-105 hover:text-gray-700 dark:hover:text-gray-500"
+          className="transform text-xl transition-all duration-300 ease-in-out hover:scale-105 hover:text-gray-700 dark:hover:text-gray-500"
           aria-label="Next"
           onClick={handleMoveNext}
           type="button"
@@ -90,12 +79,7 @@ const MonsterTopSection = ({
         </button>
       </div>
 
-      <div
-        className="
-                    mx-auto mt-4 flex items-center justify-center
-                    w-full lg:w-1/3 gap-x-3 text-lg leading-none
-                "
-      >
+      <div className="mx-auto mt-4 flex w-full items-center justify-center gap-x-3 text-lg leading-none lg:w-1/3">
         <LinkButton
           label="View Stats"
           variant={ButtonVariant.PRIMARY}

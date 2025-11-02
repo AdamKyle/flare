@@ -179,7 +179,7 @@ const CharacterSheetDetails = (
         </div>
       </div>
       <Separator />
-      <div className="w-full lg:w-3/4 xl:w-1/2 mx-auto my-6">
+      <div className="mx-auto my-6 w-full lg:w-3/4 xl:w-1/2">
         <XpBar current_xp={characterData.xp} max_xp={characterData.xp_next} />
       </div>
       <Separator />

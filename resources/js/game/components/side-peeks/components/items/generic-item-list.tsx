@@ -118,10 +118,7 @@ const GenericItemList = ({
     }
 
     return (
-      <div
-        className="sticky top-0 z-10 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-b
-      border-gray-200 dark:border-gray-700 px-2 py-2 rounded"
-      >
+      <div className="sticky top-0 z-10 rounded border-b border-gray-200 bg-white/90 px-2 py-2 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800/90">
         <div className="flex items-center justify-between">
           <label
             htmlFor="select-all-visible"
@@ -131,10 +128,7 @@ const GenericItemList = ({
               id="select-all-visible"
               ref={selectAllRef}
               type="checkbox"
-              className="h-5 w-5 rounded-md border-2 border-gray-700 dark:border-gray-300 accent-danube-600
-              dark:accent-danube-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danube-500
-              dark:accent-danube-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white
-              dark:focus-visible:ring-offset-gray-900"
+              className="accent-danube-600 dark:accent-danube-500 focus-visible:ring-danube-500 dark:accent-danube-400 h-5 w-5 rounded-md border-2 border-gray-700 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white focus-visible:outline-none dark:border-gray-300 dark:focus-visible:ring-offset-gray-900"
               checked={hasAllSelected}
               onChange={(e) => handleSelectAllChange(e.target.checked)}
               disabled={is_selection_disabled}
@@ -149,7 +143,7 @@ const GenericItemList = ({
   const renderBackPackItems = () => {
     if (isEmpty(items) && is_quest_items) {
       return (
-        <div className="text-center py-4">
+        <div className="py-4 text-center">
           You have no quest items. Quest items are obtained by visiting
           locations and completing quests. Some items are used in subsequent
           quests while others have special effects that can unlock additional
@@ -160,7 +154,7 @@ const GenericItemList = ({
 
     if (isEmpty(items) && !is_quest_items) {
       return (
-        <div className="text-center py-4">
+        <div className="py-4 text-center">
           You have nothing in your inventory that you can equip. Either use the
           shop, craft or fight monsters to get some items. You can also checkout
           the market board for items as well that other players might be
@@ -184,7 +178,7 @@ const GenericItemList = ({
   };
 
   return (
-    <div className="w-full h-full text-gray-800 dark:text-gray-200">
+    <div className="h-full w-full text-gray-800 dark:text-gray-200">
       <InfiniteScroll handle_scroll={on_scroll_to_end} additional_css={'my-2'}>
         {renderSelectAllHeader()}
         <h2 id="inventory-heading" className="sr-only">

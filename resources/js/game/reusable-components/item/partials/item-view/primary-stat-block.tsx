@@ -49,7 +49,7 @@ const PrimaryStatBlock = ({ item }: { item: EquippableItemWithBase }) => {
 
     return (
       <div className="mt-4">
-        <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-mango-tango-500 dark:text-mango-tango-300">
+        <h3 className="text-mango-tango-500 dark:text-mango-tango-300 mb-1 text-xs font-semibold tracking-wide uppercase">
           Resurrection Chance
         </h3>
         <Separator />
@@ -71,7 +71,7 @@ const PrimaryStatBlock = ({ item }: { item: EquippableItemWithBase }) => {
 
   return (
     <div>
-      <h3 className="mb-1 text-sm font-semibold uppercase tracking-wide text-mango-tango-500 dark:text-mango-tango-300">
+      <h3 className="text-mango-tango-500 dark:text-mango-tango-300 mb-1 text-sm font-semibold tracking-wide uppercase">
         Damage / AC / Healing
       </h3>
       <Separator />

@@ -63,7 +63,7 @@ const BaseSidePeek = () => {
     }
 
     return (
-      <div className="border-t p-4 flex justify-between">
+      <div className="flex justify-between border-t p-4">
         {renderFooterSecondaryAction()}
         {renderFooterPrimaryAction()}
       </div>
@@ -81,7 +81,7 @@ const BaseSidePeek = () => {
       on_close={closeSidePeek}
       allow_clicking_outside={componentProps.allow_clicking_outside}
     >
-      <div className="flex flex-col h-full min-h-0 pb-4">
+      <div className="flex h-full min-h-0 flex-col pb-4">
         <div className="flex-1 overflow-auto">
           {ComponentToRender && <ComponentToRender {...componentProps} />}
         </div>

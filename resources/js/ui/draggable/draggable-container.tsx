@@ -40,7 +40,7 @@ const DraggableContainerWrapper = ({
       tabIndex={0}
       onKeyDown={onKeyDown}
       className={clsx(
-        'relative overflow-hidden select-none border border-gray-300 rounded',
+        'relative overflow-hidden rounded border border-gray-300 select-none',
         'focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-offset-2',
         additional_css
       )}

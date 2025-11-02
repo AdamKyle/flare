@@ -87,7 +87,7 @@ const GenericItem = ({
     }
 
     return (
-      <div className="self-start mt-6">
+      <div className="mt-6 self-start">
         <input
           id={checkboxId}
           type="checkbox"
@@ -95,7 +95,7 @@ const GenericItem = ({
           onChange={(event) =>
             on_item_selected?.(item.slot_id, event.target.checked)
           }
-          className="h-6 w-6 shrink-0 rounded-md border-2 border-gray-700 dark:border-gray-300 accent-danube-600 dark:accent-danube-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danube-500 dark:focus-visible:ring-danube-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900"
+          className="accent-danube-600 dark:accent-danube-500 focus-visible:ring-danube-500 dark:focus-visible:ring-danube-400 h-6 w-6 shrink-0 rounded-md border-2 border-gray-700 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white focus-visible:outline-none dark:border-gray-300 dark:focus-visible:ring-offset-gray-900"
           aria-describedby={detailsId}
           disabled={is_selection_disabled}
         />

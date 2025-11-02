@@ -33,7 +33,7 @@ const GameLoader = (): ReactNode => {
 
   if (loading) {
     return (
-      <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-transparent z-50">
+      <div className="fixed top-0 right-0 bottom-0 left-0 z-50 flex items-center justify-center bg-transparent">
         <ContainerWrapper>
           <ProgressBar
             progress={progress}
@@ -47,7 +47,7 @@ const GameLoader = (): ReactNode => {
 
   if (error) {
     return (
-      <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-transparent z-50">
+      <div className="fixed top-0 right-0 bottom-0 left-0 z-50 flex items-center justify-center bg-transparent">
         <ContainerWrapper>
           <Alert variant={AlertVariant.DANGER}>
             <p>{error.message}</p>

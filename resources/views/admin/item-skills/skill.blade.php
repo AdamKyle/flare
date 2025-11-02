@@ -29,9 +29,7 @@
       <div class="grid gap-2 md:grid-cols-2">
         <div>
           <h3 class="text-sky-600 dark:text-sky-500">Stat Modifiers</h3>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl>
             <dt>Str Modifier:</dt>
             <dd>{{ $itemSkill->str_mod * 100 }}%</dd>
@@ -56,9 +54,7 @@
           <h3 class="text-sky-600 dark:text-sky-500">
             Damage/AC/Healing Modifiers
           </h3>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl>
             <dt>Base Attack Modifier:</dt>
             <dd>{{ $itemSkill->base_damage_mod * 100 }}%</dd>
@@ -67,13 +63,9 @@
             <dt>Base Healing Modifier:</dt>
             <dd>{{ $itemSkill->base_healing_mod * 100 }}%</dd>
           </dl>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <h3 class="text-sky-600 dark:text-sky-500">Level Info</h3>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl>
             <dt>Max Level:</dt>
             <dd>{{ $itemSkill->max_level }}</dd>
@@ -120,13 +112,9 @@
       </div>
       @if ($itemSkill->children()->count() > 0)
         <div class="my-4">
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <h3 class="text-sky-600 dark:text-sky-500">Child Skills</h3>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
 
           @livewire(
             'admin.item-skills.item-skills-table',

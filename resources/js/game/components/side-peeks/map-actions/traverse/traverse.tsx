@@ -204,7 +204,7 @@ export const Traverse = ({ character_data }: TraversePropsDefinition) => {
   };
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+    <div className="bg-white p-4 text-gray-900 dark:bg-gray-800 dark:text-gray-100">
       <div className="grid gap-2">
         <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
           Traversable Maps

@@ -38,7 +38,7 @@ const SidePeek = (props: SidePeekProps) => {
     <>
       {props.is_open && (
         <div
-          className="fixed inset-0 z-40 bg-black opacity-50 dark:bg-black/70 z-[99999]"
+          className="fixed inset-0 z-40 z-[99999] bg-black opacity-50 dark:bg-black/70"
           onClick={handleClickingOutside}
           aria-hidden="true"
         />
@@ -51,18 +51,18 @@ const SidePeek = (props: SidePeekProps) => {
         aria-labelledby="sidepeek-title"
         onKeyDown={handleKeyDown}
         className={clsx(
-          'fixed top-0 right-0 h-full w-full md:w-1/2 lg:w-1/4 z-50',
-          'bg-white dark:bg-gray-800 shadow-lg',
+          'fixed top-0 right-0 z-50 h-full w-full md:w-1/2 lg:w-1/4',
+          'bg-white shadow-lg dark:bg-gray-800',
           'transition-transform duration-300 ease-in-out',
           props.is_open ? 'translate-x-0' : 'translate-x-full',
-          'flex flex-col position-static z-[99999]'
+          'position-static z-[99999] flex flex-col'
         )}
       >
-        <div className="flex justify-between items-center p-4 border-b dark:border-gray-700">
+        <div className="flex items-center justify-between border-b p-4 dark:border-gray-700">
           <div className="flex items-center gap-2">
             <button
               onClick={props.on_close}
-              className="text-gray-700 dark:text-white px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+              className="rounded px-2 py-1 text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
               aria-label="Close panel"
             >
               <i className="fas fa-angle-double-right" aria-hidden="true"></i>
@@ -76,7 +76,7 @@ const SidePeek = (props: SidePeekProps) => {
           </div>
         </div>
 
-        <div className="flex-1 min-h-0">{props.children}</div>
+        <div className="min-h-0 flex-1">{props.children}</div>
       </div>
     </>
   );

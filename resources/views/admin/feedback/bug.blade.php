@@ -25,9 +25,7 @@
 
         <div class="prose dark:prose-dark dark:text-white">
           <h2>Description</h2>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
 
           {!! $renderedHtml !!}
         </div>

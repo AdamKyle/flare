@@ -136,13 +136,13 @@ const GoblinShopItemView = ({ item, on_close }: GoblinShopItemViewProps) => {
             >
               {item.name}
             </h2>
-            <p className="mt-2 text-gray-700 dark:text-gray-300 break-words">
+            <p className="mt-2 break-words text-gray-700 dark:text-gray-300">
               {item.description}
             </p>
           </div>
           <Separator />
 
-          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <GoblinShopCostView item={item} />
             {factories.map((renderSection) => renderSection(false))}
           </div>

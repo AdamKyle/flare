@@ -198,7 +198,7 @@ const createScreenManager = <TMap extends ScreenMap>() => {
         return (
           <div
             key={entry.key}
-            className="absolute inset-0 opacity-0 pointer-events-none z-0"
+            className="pointer-events-none absolute inset-0 z-0 opacity-0"
             aria-hidden
           >
             {renderResolved(entry.name as never, entry.props as never)}
@@ -229,8 +229,8 @@ const createScreenManager = <TMap extends ScreenMap>() => {
     return (
       <div
         className={clsx({
-          'w-full pointer-events-none': !top,
-          'w-full relative z-20': top,
+          'pointer-events-none w-full': !top,
+          'relative z-20 w-full': top,
         })}
         style={{ willChange: 'transform' }}
       >

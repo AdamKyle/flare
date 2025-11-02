@@ -311,7 +311,7 @@ const Shop = ({ close_shop }: ShopProps) => {
   return (
     <ContainerWithTitle manageSectionVisibility={close_shop} title="Shop">
       <Card>
-        <p className="my-4 italic text-gray-800 dark:text-gray-300">
+        <p className="my-4 text-gray-800 italic dark:text-gray-300">
           Welcome to my humble shop. What can I get you? If you are looking to
           replace something, click Compare, you might find the item is better
           and you can simply replace it, for a fee of course.
@@ -323,7 +323,7 @@ const Shop = ({ close_shop }: ShopProps) => {
         {renderPurchaseSuccess()}
         {renderPurchaseAndReplaceSuccess()}
         {renderPurchaseLoading()}
-        <div className="flex flex-col md:flex-row md:items-center gap-4 pt-2 px-4">
+        <div className="flex flex-col gap-4 px-4 pt-2 md:flex-row md:items-center">
           <div className="flex-1">
             <Input
               value={localSearch}

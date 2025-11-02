@@ -76,7 +76,7 @@ const QuestItemDetails = ({ item }: QuestItemDetailsProps) => {
   const lastIndex = sections.length - 1;
 
   return (
-    <div className="max-w-none flex flex-col gap-2">
+    <div className="flex max-w-none flex-col gap-2">
       {sections.map((section, index) =>
         React.cloneElement<SectionCommonProps>(section, {
           showSeparator: index !== lastIndex,

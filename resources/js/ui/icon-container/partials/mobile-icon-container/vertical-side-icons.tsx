@@ -24,7 +24,7 @@ const VerticalSideIcons = ({
   };
 
   return (
-    <div className="absolute left-0 top-4 flex flex-col items-start space-y-4">
+    <div className="absolute top-4 left-0 flex flex-col items-start space-y-4">
       {renderButtons()}
     </div>
   );

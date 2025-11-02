@@ -21,8 +21,8 @@ const GemDetails = ({ gem }: GemDetailsProps) => {
 
   return (
     <>
-      <div className="px-4 flex flex-col gap-2">
-        <h2 className={clsx('text-lg my-2', itemColor)}>{gem.name}</h2>
+      <div className="flex flex-col gap-2 px-4">
+        <h2 className={clsx('my-2 text-lg', itemColor)}>{gem.name}</h2>
         <Separator />
 
         <Section title="Basic Info" showSeparator>

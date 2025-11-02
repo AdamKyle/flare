@@ -22,9 +22,7 @@
             <dt>Class:</dt>
             <dd>{{ $character->class->name }}</dd>
           </dl>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl>
             <dt>Gold:</dt>
             <dd>{{ number_format($character->gold) }}</dd>
@@ -35,9 +33,7 @@
             <dt>Gold Dust:</dt>
             <dd>{{ number_format($character->gold_dust) }}</dd>
           </dl>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <div class="grid gap-2 lg:grid-cols-2">
             <div>
               <h3 class="my-2">Reincarnation Information</h3>

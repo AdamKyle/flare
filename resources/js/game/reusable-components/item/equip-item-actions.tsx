@@ -110,7 +110,7 @@ const EquipItemActions = ({
         onClick={handleCloseBuyAndReplace}
         aria-label="Close"
         title="Close"
-        className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500"
+        className="rounded p-1 hover:bg-gray-100 focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 focus:outline-none dark:hover:bg-gray-800"
       >
         <i className="fas fa-times" aria-hidden="true"></i>
       </button>
@@ -125,7 +125,7 @@ const EquipItemActions = ({
     return (
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h4 className="text-gray-800 dark:text-gray-300 font-bold">
+          <h4 className="font-bold text-gray-800 dark:text-gray-300">
             Equip Item Options
           </h4>
         </div>
@@ -153,7 +153,7 @@ const EquipItemActions = ({
     }
 
     return (
-      <div className="grid grid-cols-2 gap-2 items-stretch">
+      <div className="grid grid-cols-2 items-stretch gap-2">
         <IconButton
           disabled={is_processing}
           on_click={() => handleConfirmation(positions[0] as ItemPositions)}

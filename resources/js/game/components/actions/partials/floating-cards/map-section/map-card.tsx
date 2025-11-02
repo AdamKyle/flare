@@ -153,7 +153,7 @@ const MapCard = () => {
         Map Position (X/Y): {characterMapPosition.x_position}/
         {characterMapPosition.y_position})
       </div>
-      <div className="my-2 p-2 flex flex-col gap-2 md:flex-row justify-center">
+      <div className="my-2 flex flex-col justify-center gap-2 p-2 md:flex-row">
         <Button
           on_click={() =>
             moveCharacterDirectionally(-16, MapMovementTypes.NORTH)
@@ -186,7 +186,7 @@ const MapCard = () => {
         />
       </div>
 
-      <div className="my-2 p-2 flex flex-col gap-2 md:flex-row justify-center">
+      <div className="my-2 flex flex-col justify-center gap-2 p-2 md:flex-row">
         <Button
           on_click={() =>
             openTeleport(
@@ -217,7 +217,7 @@ const MapCard = () => {
           variant={ButtonVariant.PRIMARY}
         />
       </div>
-      <div className="my-2 p-2 w-full">
+      <div className="my-2 w-full p-2">
         <Button
           on_click={handleViewLocationDetails}
           label={'View Location'}
@@ -226,7 +226,7 @@ const MapCard = () => {
           disabled={!isViewLocationEnabled}
         />
       </div>
-      <div className="my-2 p-2 flex flex-col gap-2 md:flex-row justify-center">
+      <div className="my-2 flex flex-col justify-center gap-2 p-2 md:flex-row">
         <Button
           on_click={openPlayerKingdoms}
           label={'My Kingdoms'}

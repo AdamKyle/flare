@@ -20,7 +20,7 @@ const SkillModifiersSection = ({
       <DefinitionRow
         left={<InfoLabel label="Skill" />}
         right={
-          <span className="text-gray-800 dark:text-gray-200 whitespace-nowrap">
+          <span className="whitespace-nowrap text-gray-800 dark:text-gray-200">
             +{formatPercent(item.increase_skill_bonus_by!)}
           </span>
         }
@@ -29,7 +29,7 @@ const SkillModifiersSection = ({
       <DefinitionRow
         left={<InfoLabel label="Training" />}
         right={
-          <span className="text-gray-800 dark:text-gray-200 whitespace-nowrap">
+          <span className="whitespace-nowrap text-gray-800 dark:text-gray-200">
             +{formatPercent(item.increase_skill_training_bonus_by!)}
           </span>
         }
@@ -38,15 +38,7 @@ const SkillModifiersSection = ({
       <DefinitionRow
         left={<InfoLabel label="Affected Skills" />}
         right={
-          <span
-            className="
-              text-gray-800 dark:text-gray-200
-              inline-block
-              max-w-2/3
-              whitespace-normal break-words text-sm leading-relaxed text-left align-top
-              mr-[-10px]
-            "
-          >
+          <span className="mr-[-10px] inline-block max-w-2/3 text-left align-top text-sm leading-relaxed break-words whitespace-normal text-gray-800 dark:text-gray-200">
             {item.skills.join(', ')}
           </span>
         }

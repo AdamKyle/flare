@@ -48,7 +48,7 @@ const EquipItem = ({
 
   if (loading) {
     return (
-      <div className=" p-4">
+      <div className="p-4">
         <InfiniteLoader />
       </div>
     );

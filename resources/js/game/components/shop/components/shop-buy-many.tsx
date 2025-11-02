@@ -340,7 +340,7 @@ const ShopBuyMany = ({ item, on_close }: ShopBuyManyProps) => {
       <Card>
         <ShopCardDetails item={item} />
         <Separator />
-        <div className="pt-2 px-4 w-full md:w-1/2 mx-auto">
+        <div className="mx-auto w-full px-4 pt-2 md:w-1/2">
           {renderCharacterSummary()}
           <Separator />
           <div>

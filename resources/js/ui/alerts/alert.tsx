@@ -53,7 +53,7 @@ export const Alert = (props: AlertProps) => {
         className={clsx(
           baseStyle(),
           variantStyle(props.variant),
-          'flex justify-between items-start'
+          'flex items-start justify-between'
         )}
       >
         <div className="flex-1">{props.children}</div>

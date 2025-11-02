@@ -10,7 +10,7 @@ import Separator from 'ui/separator/separator';
 const QuestItem = ({ quest_item }: QuestItemProps) => {
   return (
     <>
-      <div className="px-4 flex flex-col gap-2">
+      <div className="flex flex-col gap-2 px-4">
         <ItemMetaSection
           name={quest_item.name}
           description={quest_item.description}

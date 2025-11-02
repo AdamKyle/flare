@@ -164,7 +164,7 @@ const Teleport = ({ character_data, x, y }: TeleportProps) => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-4 bg-white dark:bg-gray-800">
+      <div className="flex items-center justify-center bg-white p-4 dark:bg-gray-800">
         <InfiniteLoader />
       </div>
     );
@@ -172,7 +172,7 @@ const Teleport = ({ character_data, x, y }: TeleportProps) => {
 
   if (error || isNil(data)) {
     return (
-      <div className="flex items-center justify-center p-4 bg-white dark:bg-gray-800">
+      <div className="flex items-center justify-center bg-white p-4 dark:bg-gray-800">
         <GameDataError />
       </div>
     );
@@ -251,7 +251,7 @@ const Teleport = ({ character_data, x, y }: TeleportProps) => {
   };
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+    <div className="bg-white p-4 text-gray-900 dark:bg-gray-800 dark:text-gray-100">
       <div className="grid gap-2">
         <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
           Locations
@@ -263,7 +263,7 @@ const Teleport = ({ character_data, x, y }: TeleportProps) => {
           location_type_selected={selectedLocationType}
         />
       </div>
-      <div className="grid gap-2 my-2">
+      <div className="my-2 grid gap-2">
         <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
           Ports
         </label>

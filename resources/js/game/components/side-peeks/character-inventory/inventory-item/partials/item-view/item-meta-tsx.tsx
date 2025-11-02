@@ -31,7 +31,7 @@ const ItemMetaSection = ({
   return (
     <>
       <div>
-        <h2 className={clsx(titleClassName, 'text-lg my-2')}>{name}</h2>
+        <h2 className={clsx(titleClassName, 'my-2 text-lg')}>{name}</h2>
 
         <Separator />
 

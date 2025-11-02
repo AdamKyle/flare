@@ -77,11 +77,11 @@ const GemBag = ({ character_id }: GemBagProps) => {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <div className="pt-2 px-4">
+    <div className="flex h-full flex-col overflow-hidden">
+      <div className="px-4 pt-2">
         <Input on_change={onSearch} place_holder={'Search gems'} clearable />
       </div>
-      <div className="flex-1 min-h-0">
+      <div className="min-h-0 flex-1">
         <GemList
           gems={data}
           on_scroll_to_end={handleGemBagScroll}

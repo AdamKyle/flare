@@ -7,7 +7,7 @@ const Separator = (props: SeperatorProps): ReactNode => {
   return (
     <div
       className={clsx(
-        'border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3',
+        'my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600',
         props.additional_css
       )}
     ></div>

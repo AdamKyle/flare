@@ -6,7 +6,7 @@ const AttackButtonsContainer = (
   props: AttackButtonsContainerProps
 ): ReactNode => {
   return (
-    <div className="mx-auto mt-4 flex flex-col sm:flex-row items-center justify-center w-full gap-y-4 gap-x-3 text-lg leading-none">
+    <div className="mx-auto mt-4 flex w-full flex-col items-center justify-center gap-x-3 gap-y-4 text-lg leading-none sm:flex-row">
       {props.children}
     </div>
   );

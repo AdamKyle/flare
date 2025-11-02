@@ -201,7 +201,7 @@ const LocationDetails = ({
             the quest item will drop for you!
           </p>
           <Separator />
-          <div className="px-4 flex flex-col gap-2">
+          <div className="flex flex-col gap-2 px-4">
             <ItemMetaSection
               name={questItem.name}
               description={questItem.description}

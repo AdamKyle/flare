@@ -69,7 +69,7 @@ const Coordinates = ({
   }, [x, y]);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <div className="grid gap-2">
         <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
           X Coordinate

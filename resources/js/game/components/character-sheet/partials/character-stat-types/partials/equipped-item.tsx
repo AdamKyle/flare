@@ -17,7 +17,7 @@ const EquippedItem = ({
       <span className="text-green-700 dark:text-green-500">
         (+{(equipped_item.item_base_stat * 100).toFixed(2)}%)
       </span>
-      <ul className="ps-5 mt-2 space-y-1 list-disc list-inside">
+      <ul className="mt-2 list-inside list-disc space-y-1 ps-5">
         <AttachedAffixes
           attached_affixes={equipped_item.attached_affixes}
           stat_type={stat_type}

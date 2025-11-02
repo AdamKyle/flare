@@ -14,7 +14,7 @@ type StatsBlockProps = {
 const StatsAttributesBlock = ({ item }: StatsBlockProps) => {
   return (
     <div>
-      <h3 className="mb-1 text-sm font-semibold uppercase tracking-wide text-mango-tango-500 dark:text-mango-tango-300">
+      <h3 className="text-mango-tango-500 dark:text-mango-tango-300 mb-1 text-sm font-semibold tracking-wide uppercase">
         Stats
       </h3>
       <Separator />

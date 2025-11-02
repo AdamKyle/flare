@@ -41,7 +41,7 @@ const ShopCard = ({
       <div className="flex items-start justify-between">
         <h3
           id={`item-${item.item_id}-name`}
-          className="flex-1 text-lg font-semibold text-danube-600 dark:text-danube-300 break-words"
+          className="text-danube-600 dark:text-danube-300 flex-1 text-lg font-semibold break-words"
         >
           {item.name}
         </h3>

@@ -9,7 +9,7 @@ const Market = ({ close_shop }: MarketProps) => {
   return (
     <ContainerWithTitle manageSectionVisibility={close_shop} title={`Market`}>
       <Card>
-        <p className={'my-4 italic text-gray-800 dark:text-gray-300'}>
+        <p className={'my-4 text-gray-800 italic dark:text-gray-300'}>
           Show market jazz here.
         </p>
       </Card>

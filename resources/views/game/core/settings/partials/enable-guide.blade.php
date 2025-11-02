@@ -10,7 +10,7 @@
     After enabling this, you cannot disable the guide. See below for why.
   </strong>
 </p>
-<div class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"></div>
+<x-core.separator.separator />
 <form
   action="{{ route('user.settings.enable-guide', ['user' => $user->id]) }}"
   method="POST"
@@ -19,19 +19,7 @@
 
   <div class="grid grid-cols-2 gap-4">
     <div>
-      <label class="custom-checkbox mb-5" for="guide_enabled">
-        <input type="hidden" name="guide_enabled" value="0" />
-        <input
-          type="checkbox"
-          id="guide_enabled"
-          name="guide_enabled"
-          value="1"
-          {{ $user->guide_enabled ? 'checked' : '' }}
-          {{ $user->guide_enabled || $user->character->level > 10 ? 'disabled' : '' }}
-        />
-        <span></span>
-        <span>Enable Guide</span>
-      </label>
+      <x-form-elements.check-box name="guide_enabled" label="Enable Guide" :model="$user" model-key="guide_enabled" />
     </div>
     <x-core.alerts.info-alert title="ATTN!">
       <p class="mb-2">

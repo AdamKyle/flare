@@ -93,7 +93,7 @@ const LocationDroppableItems = ({
 
   return (
     <>
-      <div className="flex flex-col h-full overflow-hidden">
+      <div className="flex h-full flex-col overflow-hidden">
         <div className="flex justify-center p-4">
           <Button
             on_click={() => go_back()}
@@ -102,10 +102,10 @@ const LocationDroppableItems = ({
           />
         </div>
         <hr className="w-full border-t border-gray-300 dark:border-gray-600" />
-        <div className="pt-2 px-4">
+        <div className="px-4 pt-2">
           <Input on_change={onSearch} place_holder={'Search items'} clearable />
         </div>
-        <div className="flex-1 min-h-0">
+        <div className="min-h-0 flex-1">
           <GenericItemList
             items={data}
             is_quest_items={true}

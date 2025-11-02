@@ -20,7 +20,7 @@ const ShopItemBaseView = ({ item }: ShopItemBaseViewProps) => {
 
   return (
     <div>
-      <h3 className="mb-1 text-sm font-semibold uppercase tracking-wide text-mango-tango-500 dark:text-mango-tango-300">
+      <h3 className="text-mango-tango-500 dark:text-mango-tango-300 mb-1 text-sm font-semibold tracking-wide uppercase">
         Cost
       </h3>
       <Separator />
@@ -33,7 +33,7 @@ const ShopItemBaseView = ({ item }: ShopItemBaseViewProps) => {
         </Dd>
       </Dl>
       <Separator />
-      <h3 className="mb-1 text-sm font-semibold uppercase tracking-wide text-mango-tango-500 dark:text-mango-tango-300">
+      <h3 className="text-mango-tango-500 dark:text-mango-tango-300 mb-1 text-sm font-semibold tracking-wide uppercase">
         Crafting Details
       </h3>
       <Separator />

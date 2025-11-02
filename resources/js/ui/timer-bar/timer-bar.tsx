@@ -47,11 +47,11 @@ const TimerBar = ({ length, title, additional_css }: TimerBarProps) => {
 
   return (
     <div className={clsx('w-full', additional_css)}>
-      <div className="flex justify-between items-center mb-1">
+      <div className="mb-1 flex items-center justify-between">
         <span className="text-sm font-medium text-gray-900 dark:text-gray-300">
           {title}
         </span>
-        <span className="text-sm font-mono text-gray-800 dark:text-gray-300">
+        <span className="font-mono text-sm text-gray-800 dark:text-gray-300">
           {formattedRemaining}
         </span>
       </div>
@@ -61,7 +61,7 @@ const TimerBar = ({ length, title, additional_css }: TimerBarProps) => {
         aria-valuemax={length}
         aria-valuenow={remaining}
         aria-label={title}
-        className="relative h-4 bg-gray-200 rounded overflow-hidden dark:bg-gray-700"
+        className="relative h-4 overflow-hidden rounded bg-gray-200 dark:bg-gray-700"
       >
         <div className={barClasses} style={{ width: `${percent}%` }} />
       </div>

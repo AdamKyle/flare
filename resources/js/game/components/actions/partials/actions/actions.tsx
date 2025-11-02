@@ -46,17 +46,17 @@ const Actions = (props: ActionsProps): ReactNode => {
   };
 
   return (
-    <div className="w-full lg:w-3/4 mx-auto my-4 position-relative">
+    <div className="position-relative mx-auto my-4 w-full lg:w-3/4">
       <Card>
         <div
-          className={clsx('grid grid-cols-1 gap-4 p-4 items-start', {
+          className={clsx('grid grid-cols-1 items-start gap-4 p-4', {
             'lg:[grid-template-columns:6rem_minmax(0,1fr)]':
               isNotShowingSideSection(),
             'lg:[grid-template-columns:6rem_minmax(0,1fr)_clamp(26rem,38vw,40rem)]':
               isShowingSideSection(),
           })}
         >
-          <aside className="flex justify-between lg:flex-col lg:space-y-2 pb-2 lg:pb-0 mx-auto">
+          <aside className="mx-auto flex justify-between pb-2 lg:flex-col lg:space-y-2 lg:pb-0">
             <NavigationActionsComponent />
           </aside>
 

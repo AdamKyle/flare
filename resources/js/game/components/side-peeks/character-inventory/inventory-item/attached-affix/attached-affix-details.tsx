@@ -13,7 +13,7 @@ const AttachedAffixDetails = ({ affix }: AttachedAffixDetailsProps) => {
   const renderAffixHeader = () => {
     return (
       <div>
-        <h2 className="text-lg my-2 text-gray-800 dark:text-gray-300">
+        <h2 className="my-2 text-lg text-gray-800 dark:text-gray-300">
           {affix.name}
         </h2>
         <Separator />
@@ -27,7 +27,7 @@ const AttachedAffixDetails = ({ affix }: AttachedAffixDetailsProps) => {
 
   return (
     <>
-      <div className="px-4 flex flex-col gap-4 pb-4">
+      <div className="flex flex-col gap-4 px-4 pb-4">
         {renderAffixHeader()}
 
         <div className="space-y-4">

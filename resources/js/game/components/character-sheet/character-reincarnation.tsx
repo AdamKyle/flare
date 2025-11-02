@@ -24,7 +24,7 @@ const CharacterReincarnation = ({
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
       <div>
         <Dl>
           <Dt>Times Reincarnated:</Dt>

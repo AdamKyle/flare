@@ -83,7 +83,7 @@ const AppliedHolyStacksSection = ({
   return (
     <div className="p-4">
       <div>
-        <h2 className="text-lg my-2 text-gray-800 dark:text-gray-300">
+        <h2 className="my-2 text-lg text-gray-800 dark:text-gray-300">
           Attached Holy Stacks
         </h2>
         <Separator />
@@ -96,11 +96,11 @@ const AppliedHolyStacksSection = ({
       </div>
 
       <Section title="Applied Holy Stacks">
-        <div className="space-y-4 mt-2">
+        <div className="mt-2 space-y-4">
           {stacks.map((stack) => (
             <div
               key={stack.id}
-              className="border border-gray-200 dark:border-gray-700 rounded-md p-4"
+              className="rounded-md border border-gray-200 p-4 dark:border-gray-700"
             >
               <Dl>
                 {renderStatIncreaseRow(Number(stack.stat_increase_bonus))}

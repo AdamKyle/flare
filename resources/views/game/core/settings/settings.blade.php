@@ -7,9 +7,7 @@
       backUrl="{{route('game')}}"
     >
       <h2 class="text-lg font-bold">Account Settings</h2>
-      <div
-        class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-      ></div>
+      <x-core.separator.separator />
       @include(
         'game.core.settings.partials.character-name',
         [
@@ -25,101 +23,77 @@
       )
       <div class="mt-4 w-2/3 w-full space-y-2">
         @if ($user->character->level <= 10)
-          <h2 class="text-lg font-bold">General Game Settings</h2>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
-          <div
-            class="my-4 rounded-md border-1 border-gray-500 p-4 dark:border-gray-400"
-          >
+          <h2 class="text-lg font-bold">Guide Settings</h2>
+          <x-core.separator.separator />
+          <x-core.cards.card-border>
             @include(
               'game.core.settings.partials.enable-guide',
               [
                 'user' => $user,
               ]
             )
-          </div>
+          </x-core.cards.card-border>
         @endif
 
         @if ($cosmeticText)
           <h2 class="text-lg font-bold">Cosmetic Text</h2>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
-          <div
-            class="my-4 rounded-md border-1 border-gray-500 p-4 dark:border-gray-400"
-          >
+          <x-core.separator.separator />
+            <x-core.cards.card-border>
             @include(
               'game.core.settings.partials.cosmetic-text',
               [
                 'uses' => $user,
               ]
             )
-          </div>
+            </x-core.cards.card-border>
         @endif
 
         @if ($cosmeticNameTag)
           <h2 class="text-lg font-bold">Cosmetic Name tags</h2>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
-          <div
-            class="my-4 rounded-md border-1 border-gray-500 p-4 dark:border-gray-400"
-          >
+          <x-core.separator.separator />
+            <x-core.cards.card-border>
             @include(
               'game.core.settings.partials.cosmetic-name-tags',
               [
                 'uses' => $user,
               ]
             )
-          </div>
+            </x-core.cards.card-border>
         @endif
 
         @if ($cosmeticRaceChanger)
           <h2 class="text-lg font-bold">Cosmetic Race Changer</h2>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
-          <div
-            class="my-4 rounded-md border-1 border-gray-500 p-4 dark:border-gray-400"
-          >
+          <x-core.separator.separator />
+          <x-core.cards.card-border>
             @include(
               'game.core.settings.partials.cosmetic-race-changer',
               [
                 'uses' => $user,
               ]
             )
-          </div>
+          </x-core.cards.card-border>
         @endif
 
         <h2 class="text-lg font-bold">Auto Disenchant</h2>
-        <div
-          class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-        ></div>
-        <div
-          class="my-4 rounded-md border-1 border-gray-500 p-4 dark:border-gray-400"
-        >
+        <x-core.separator.separator />
+        <x-core.cards.card-border>
           @include(
             'game.core.settings.partials.auto-disenchant-settings',
             [
               'user' => $user,
             ]
           )
-        </div>
+        </x-core.cards.card-border>
         <h2 class="text-lg font-bold">Chat Settings</h2>
-        <div
-          class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-        ></div>
-        <div
-          class="my-4 rounded-md border-1 border-gray-500 p-4 dark:border-gray-400"
-        >
+        <x-core.separator.separator />
+        <x-core.cards.card-border>
           @include(
             'game.core.settings.partials.chat-settings',
             [
               'user' => $user,
             ]
           )
-        </div>
+        </x-core.cards.card-border>
       </div>
     </x-core.cards.card-with-title>
   </x-core.layout.info-container>

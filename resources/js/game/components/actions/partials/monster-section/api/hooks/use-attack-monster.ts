@@ -51,9 +51,6 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
     );
 
   const handleInitiateFightRequest = useCallback(async () => {
-    console.log('Initiate Fight Request');
-    console.log(urlToUse);
-
     try {
       const result = await apiHandler.get<
         UseAttackMonsterInitiationResponse,
@@ -112,8 +109,6 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
       }
 
       if (requestData.battle_type === BattleType.INITIATE) {
-        console.log('initiating');
-
         setLoading(true);
 
         handleInitiateFightRequest().finally(() => setLoading(false));

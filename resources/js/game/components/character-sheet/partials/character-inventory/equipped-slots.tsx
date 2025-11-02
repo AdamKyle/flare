@@ -33,7 +33,7 @@ const EquippedSlots = ({ character_id }: EquippedSlotsProps) => {
   }
 
   return (
-    <div className="flex flex-col sm:flex-row items-center lg:p-4 gap-4 w-full lg:w-3/4 md:justify-center">
+    <div className="flex w-full flex-col items-center gap-4 sm:flex-row md:justify-center lg:w-3/4 lg:p-4">
       <div className="flex flex-col items-center space-y-4">
         <div>
           <EquippedSlot
@@ -97,7 +97,7 @@ const EquippedSlots = ({ character_id }: EquippedSlotsProps) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-4 sm:grid-cols-2">
         <EquippedSlot
           equipped_item={undefined}
           positionName={'Weapon (Left Hand)'}

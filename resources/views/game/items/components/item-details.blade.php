@@ -9,9 +9,7 @@
       <div class="grid gap-3 md:grid-cols-3">
         <div>
           <strong>Stats</strong>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl>
             <dt>Str Modifier</dt>
             <dd>{{ $item->str_mod * 100 }}%</dd>
@@ -34,9 +32,7 @@
         ></div>
         <div>
           <strong>Modifiers</strong>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl>
             <dt>Base Damage</dt>
             <dd>{{ $item->base_damage > 0 ? $item->base_damage : 0 }}</dd>
@@ -51,13 +47,9 @@
             <dt>Base Healing Mod</dt>
             <dd>{{ $item->base_healing_mod * 100 }} %</dd>
           </dl>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <strong>Skill Modifiers</strong>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
 
           @if ($item->type === 'alchemy')
             <dl>
@@ -88,9 +80,7 @@
         ></div>
         <div>
           <strong>Evasion and Reductions</strong>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl>
             <dt>Spell Evasion</dt>
             <dd>{{ $item->spell_evasion * 100 }} %</dd>
@@ -99,22 +89,16 @@
             <dt>Affix Dmg. Reduction</dt>
             <dd>{{ $item->affix_damage_reduction * 100 }} %</dd>
           </dl>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <strong>Timeout reductions</strong>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl>
             <dt>Fight Timeout Reduction</dt>
             <dd>{{ $item->fight_time_out_mod_bonus * 100 }} %</dd>
             <dt>Move Timeout Reduction</dt>
             <dd>{{ $item->move_time_out_mod_bonus * 100 }} %</dd>
           </dl>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <div class="mt-4">
             <div class="mb-4">
               @if (! is_null($item->itemPrefix))
@@ -145,9 +129,7 @@
       <div class="grid gap-3 md:grid-cols-3">
         <div>
           <strong>Devouring Chance</strong>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl>
             <dt>Devouring Light</dt>
             <dd>{{ $item->devouring_light * 100 }} %</dd>
@@ -160,9 +142,7 @@
         ></div>
         <div>
           <strong>Resurrection</strong>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl>
             <dt>Chance</dt>
             <dd>{{ $item->resurrection_chance * 100 }} %</dd>
@@ -173,9 +153,7 @@
         ></div>
         <div>
           <strong>Holy Info</strong>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <p class="mb-4">
             Indicates how many can be applied to the item, via the
             <a href="/information/holy-items" target="_blank">
@@ -195,9 +173,7 @@
       <div class="grid gap-3 md:grid-cols-2">
         <div>
           <strong>Ambush Info</strong>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl>
             <dt>Chance</dt>
             <dd>{{ $item->ambush_chance * 100 }} %</dd>
@@ -210,9 +186,7 @@
         ></div>
         <div>
           <strong>Counter</strong>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl>
             <dt>Chance</dt>
             <dd>{{ $item->counter_chance * 100 }} %</dd>

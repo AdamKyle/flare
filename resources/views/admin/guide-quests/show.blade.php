@@ -21,9 +21,7 @@
       <div class="grid gap-4 md:grid-cols-2">
         <div>
           <h3 class="text-sky-600 dark:text-sky-500">Requirements</h3>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl class="mb-5">
             @if (! is_null($guideQuest->required_level))
               <dt>Required Player Level</dt>
@@ -253,9 +251,7 @@
             @endif
           </dl>
           <h3 class="text-sky-600 dark:text-sky-500">XP Reward</h3>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl class="my-4">
             <dt>XP Reward</dt>
             <dd>
@@ -263,9 +259,7 @@
             </dd>
           </dl>
           <h3 class="text-sky-600 dark:text-sky-500">Currency Rewards</h3>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl>
             <dt>Gold Reward</dt>
             <dd>

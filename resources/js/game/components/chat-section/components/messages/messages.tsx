@@ -100,9 +100,9 @@ const Messages = ({
   );
 
   return (
-    <div className="w-full lg:w-3/4 mx-auto my-4">
+    <div className="mx-auto my-4 w-full lg:w-3/4">
       <Card>
-        <div className="flex items-center mb-2">
+        <div className="mb-2 flex items-center">
           <Button
             label="Send"
             on_click={handleSend}
@@ -121,14 +121,14 @@ const Messages = ({
             value={text}
             onChange={(event) => setText(event.target.value)}
             onKeyDown={handleInputKeyDown}
-            className="flex-grow border border-gray-300 rounded-md p-2"
+            className="flex-grow rounded-md border border-gray-300 p-2"
             disabled={!!is_silenced}
             enterKeyHint="send"
           />
         </div>
         <div
           ref={listRef}
-          className="bg-gray-700 dark:bg-gray-800 p-2 w-full h-96 overflow-y-auto rounded-md"
+          className="h-96 w-full overflow-y-auto rounded-md bg-gray-700 p-2 dark:bg-gray-800"
         >
           <ul className="space-y-2">
             {chat.map((row, idx) => {
@@ -147,7 +147,7 @@ const Messages = ({
                 <li key={idx}>
                   <span
                     className={clsx(
-                      'underline font-bold cursor-pointer',
+                      'cursor-pointer font-bold underline',
                       customClass
                     )}
                     onClick={() => handleStartPrivateMessage(displayName)}

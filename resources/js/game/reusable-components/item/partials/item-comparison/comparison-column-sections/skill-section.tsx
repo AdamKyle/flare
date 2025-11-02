@@ -15,7 +15,7 @@ const SkillsSection = ({ adjustments }: SkillsSectionProps) => {
 
   return (
     <Fragment>
-      <h4 className="mt-3 mb-1 text-xs font-semibold uppercase tracking-wide text-mango-tango-500 dark:text-mango-tango-300">
+      <h4 className="text-mango-tango-500 dark:text-mango-tango-300 mt-3 mb-1 text-xs font-semibold tracking-wide uppercase">
         Skills
       </h4>
       <Separator />

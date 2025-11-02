@@ -2,7 +2,7 @@
   Below you can change the color and style of your cosmetic text. This text will
   then be displayed any time you send a public message.
 </p>
-<div class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"></div>
+<x-core.separator.separator />
 <form
   action="{{ route('user.settings.cosmetic-text', ['user' => $user->id]) }}"
   method="POST"
@@ -11,92 +11,25 @@
 
   <div class="grid grid-cols-2 gap-4">
     <div class="mb-5">
-      <label class="label mb-2 block" for="chat_text_color">
-        Chat Color text
-      </label>
-      <select
-        class="form-control"
-        name="chat_text_color"
-        id="chat_text_color"
-        value="{{ ! is_null($user) ? $user->chat_text_color : null }}"
-      >
-        <option value="">Please select</option>
-        <option
-          value="ocean-depths"
-          {{ $user->chat_text_color === 'ocean-depths' ? 'selected' : '' }}
-          class="ocean-depths"
-        >
-          Ocean Depths
-        </option>
-        <option
-          value="memeories-grass"
-          {{ $user->chat_text_color === 'memories-grass' ? 'selected' : '' }}
-          class="memories-grass"
-        >
-          Memories Grass
-        </option>
-        <option
-          value="depths-despair"
-          {{ $user->chat_text_color === 'depths-despair' ? 'selected' : '' }}
-          class="depths-despair"
-        >
-          Depths Despair
-        </option>
-        <option
-          value="lipstick"
-          {{ $user->chat_text_color === 'lipstick' ? 'selected' : '' }}
-          class="lipstick"
-        >
-          Lip Stick
-        </option>
-        <option
-          value="fifties-cheeks"
-          {{ $user->chat_text_color === 'fifties-cheeks' ? 'selected' : '' }}
-          class="fifties-cheeks"
-        >
-          Fifties Cheeks
-        </option>
-        <option
-          value="sky-clouds"
-          {{ $user->chat_text_color === 'sky-clouds' ? 'selected' : '' }}
-          class="sky-clouds"
-        >
-          Sky Clouds
-        </option>
-        <option
-          value="golden-sheen"
-          {{ $user->chat_text_color === 'golden-sheen' ? 'selected' : '' }}
-          class="golden-sheen"
-        >
-          Golden Sheen
-        </option>
-      </select>
 
-      <label class="custom-checkbox mt-4 mb-5" for="chat_is_bold">
-        <input type="hidden" name="chat_is_bold" value="0" />
-        <input
-          type="checkbox"
-          id="chat_is_bold"
-          name="chat_is_bold"
-          value="1"
-          {{ $user->chat_is_bold ? 'checked' : '' }}
-        />
-        <span></span>
-        <span>Bold Text?</span>
-      </label>
+      <x-form-elements.coloured-select   name="chat_text_color"
+                                         label="Chat Color text"
+                                         :model="$user"
+                                         modelKey="chat_text_color"
+                                         :options="[
+                                          'ocean-depths' => 'ocean-depths',
+                                          'memories-grass' => 'memories-grass',
+                                          'depths-despair' => 'depths-despair',
+                                          'lipstick' => 'lipstick',
+                                          'fifties-cheeks' => 'fifties-cheeks',
+                                          'sky-clouds' => 'sky-clouds',
+                                          'golden-sheen' => 'golden-sheen',
+                                        ]" />
 
-      <label class="custom-checkbox mb-5" for="chat_is_italic">
-        <input type="hidden" name="chat_is_italic" value="0" />
-        <input
-          type="checkbox"
-          id="chat_is_italic"
-          name="chat_is_italic"
-          value="1"
-          {{ $user->chat_is_italic ? 'checked' : '' }}
-        />
-        <span></span>
-        <span>Italicize Text?</span>
-      </label>
+      <x-form-elements.check-box name="chat_is_bold" label="Bold text?" :model="$user" model-key="chat_is_bold" />
+
+      <x-form-elements.check-box name="chat_is_italic" label="Italic text?" :model="$user" model-key="chat_is_italic" />
+
     </div>
     <x-core.alerts.info-alert title="ATTN!">
       By selecting these options you are stating you want to (optionally) change

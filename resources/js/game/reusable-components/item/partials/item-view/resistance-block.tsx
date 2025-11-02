@@ -61,7 +61,7 @@ const ResistanceBlock = ({ item }: { item: EquippableItemWithBase }) => {
 
   return (
     <div>
-      <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-mango-tango-500 dark:text-mango-tango-300">
+      <h4 className="text-mango-tango-500 dark:text-mango-tango-300 mb-1 text-xs font-semibold tracking-wide uppercase">
         Resistances
       </h4>
       <Separator />

@@ -13,9 +13,7 @@
       <div class="grid gap-2 md:grid-cols-2">
         <div>
           <h3 class="text-sky-600 dark:text-sky-500">Stat Modifiers</h3>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl>
             <dt>Str Modifier:</dt>
             <dd>{{ $itemAffix->str_mod * 100 }}%</dd>
@@ -40,9 +38,7 @@
           <h3 class="text-sky-600 dark:text-sky-500">
             Damage/AC/Healing Modifiers
           </h3>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl>
             <dt>Base Attack Modifier:</dt>
             <dd>{{ $itemAffix->base_damage_mod * 100 }}%</dd>
@@ -51,13 +47,9 @@
             <dt>Base Healing Modifier:</dt>
             <dd>{{ $itemAffix->base_healing_mod * 100 }}%</dd>
           </dl>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <h3 class="text-sky-600 dark:text-sky-500">Class Modifier</h3>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl>
             <dt>Class Bonus Mod:</dt>
             <dd>{{ $itemAffix->class_bonus * 100 }}%</dd>
@@ -70,9 +62,7 @@
       <div class="grid gap-2 md:grid-cols-2">
         <div>
           <h3 class="text-sky-600 dark:text-sky-500">Skill Modifiers</h3>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl>
             <dt>Skill Name:</dt>
             <dd>
@@ -93,9 +83,7 @@
         ></div>
         <div>
           <h3 class="text-sky-600 dark:text-sky-500">Other Skill Modifiers</h3>
-          <div
-            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-          ></div>
+          <x-core.separator.separator />
           <dl>
             <dt>Damage Modifier:</dt>
             <dd>{{ $itemAffix->base_damage_mod_bonus * 100 }}%</dd>

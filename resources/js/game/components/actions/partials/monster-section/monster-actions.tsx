@@ -11,7 +11,7 @@ const MonsterActions = ({
   return (
     <div className="flex flex-col items-center space-y-4">
       <div
-        className={clsx('w-full lg:w-1/2 mx-auto', {
+        className={clsx('mx-auto w-full lg:w-1/2', {
           'lg:w-full': is_showing_side_section,
         })}
       >

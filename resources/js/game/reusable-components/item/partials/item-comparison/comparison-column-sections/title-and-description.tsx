@@ -13,7 +13,7 @@ const TitleAndDescription = ({ item }: TitleAndDescriptionProps) => {
         {item.name}
       </h3>
 
-      <p className="mb-4 text-base leading-relaxed text-gray-700 dark:text-gray-300 break-words">
+      <p className="mb-4 text-base leading-relaxed break-words text-gray-700 dark:text-gray-300">
         {item.description}
       </p>
     </>

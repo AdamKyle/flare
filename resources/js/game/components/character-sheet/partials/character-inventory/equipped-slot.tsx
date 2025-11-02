@@ -14,8 +14,8 @@ const EquippedSlot = (props: EquippedSlotProps): ReactNode => {
   return (
     <button
       className={
-        'w-16 h-16 text-white flex items-center justify-center border border-gray-600 rounded focus:outline-none ' +
-        'focus:ring-2 focus:ring-offset-2 focus:ring-gray-600 ' +
+        'flex h-16 w-16 items-center justify-center rounded border border-gray-600 text-white focus:outline-none ' +
+        'focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 ' +
         'hover:bg-gray-200 dark:hover:bg-gray-700 dark:focus:ring-gray-500'
       }
       onClick={() => {}}

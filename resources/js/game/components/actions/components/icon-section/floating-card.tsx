@@ -4,21 +4,21 @@ import FloatingCardProps from './types/floating-card-props';
 
 const FloatingCard = (props: FloatingCardProps): ReactNode => {
   return (
-    <div className="shadow-lg rounded-md border border-gray-500 dark:border-gray-700 w-full max-w-[40rem] lg:w-[clamp(26rem,38vw,40rem)] z-20 text-black dark:text-gray-300">
-      <div className="bg-gray-400 dark:bg-gray-800 border-b-2 border-b-gray-500 dark:border-b-gray-600 px-4 py-3 flex items-center justify-between">
-        <h3 className="text-lg font-semibold mb-0">{props.title}</h3>
+    <div className="z-20 w-full max-w-[40rem] rounded-md border border-gray-500 text-black shadow-lg lg:w-[clamp(26rem,38vw,40rem)] dark:border-gray-700 dark:text-gray-300">
+      <div className="flex items-center justify-between border-b-2 border-b-gray-500 bg-gray-400 px-4 py-3 dark:border-b-gray-600 dark:bg-gray-800">
+        <h3 className="mb-0 text-lg font-semibold">{props.title}</h3>
         <button
-          className="p-0 bg-transparent border-none cursor-pointer transition-all duration-300 ease-in-out transform hover:scale-105"
+          className="transform cursor-pointer border-none bg-transparent p-0 transition-all duration-300 ease-in-out hover:scale-105"
           onClick={props.close_action}
           aria-label="Close"
         >
           <i
-            className="fas fa-times-circle text-rose-600 dark:text-rose-500 rounded-full text-lg p-1"
+            className="fas fa-times-circle rounded-full p-1 text-lg text-rose-600 dark:text-rose-500"
             aria-hidden="true"
           ></i>
         </button>
       </div>
-      <div className="p-4 bg-gray-200 dark:bg-gray-700">{props.children}</div>
+      <div className="bg-gray-200 p-4 dark:bg-gray-700">{props.children}</div>
     </div>
   );
 };
