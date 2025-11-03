@@ -1,9 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-  <div class="container-fluid">
-    <div class="justify-content-center container">
+  <div class="w-full  mx-auto md:w-2/3 px-4">
       @include('admin.monsters.partials.monster', ['monster' => $monster, 'quest' => $quest])
-    </div>
   </div>
 @endsection

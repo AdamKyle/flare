@@ -66,6 +66,35 @@
             Export Locations
           </x-sidebar.menu-items.nested-menu-option>
         </x-sidebar.menu-items.nested-container>
+        <x-sidebar.menu-items.nested-container
+          name="Monsters"
+          key="Monsters"
+          activePages="['import','export','items']"
+          selected="Monsters"
+          icon="ra ra-wooden-sign"
+        >
+          <x-sidebar.menu-items.nested-menu-option
+            href="{{route('monsters.list')}}"
+            pageKey="monsters"
+            icon="ra ra-wooden-sign"
+          >
+            Monsters
+          </x-sidebar.menu-items.nested-menu-option>
+          <x-sidebar.menu-items.nested-menu-option
+            href="#"
+            pageKey="import"
+            icon="fas fa-file-import"
+          >
+            Import Locations
+          </x-sidebar.menu-items.nested-menu-option>
+          <x-sidebar.menu-items.nested-menu-option
+            href="#"
+            pageKey="export"
+            icon="fas fa-file-download"
+          >
+            Export Locations
+          </x-sidebar.menu-items.nested-menu-option>
+        </x-sidebar.menu-items.nested-container>
       </x-sidebar.menu-items.group-options-container>
 
       <!-- MENU GROUP -->

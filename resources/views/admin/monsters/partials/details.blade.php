@@ -1,28 +1,28 @@
-<x-core.cards.card>
+<x-core.cards.card-with-title title="Monster Stats" buttons="false">
   <div class="grid gap-4 md:grid-cols-2">
     <div>
       <strong>Stats</strong>
       <div
         class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
       ></div>
-      <dl>
-        <dt>str</dt>
-        <dd>{{ number_format($monster->str) }}</dd>
-        <dt>dex</dt>
-        <dd>{{ number_format($monster->dex) }}</dd>
-        <dt>dur</dt>
-        <dd>{{ number_format($monster->dur) }}</dd>
-        <dt>chr</dt>
-        <dd>{{ number_format($monster->chr) }}</dd>
-        <dt>int</dt>
-        <dd>{{ number_format($monster->int) }}</dd>
-        <dt>agi</dt>
-        <dd>{{ number_format($monster->int) }}</dd>
-        <dt>focus</dt>
-        <dd>{{ number_format($monster->int) }}</dd>
-        <dt>Damage Stat</dt>
-        <dd>{{ $monster->damage_stat }}</dd>
-      </dl>
+      <x-core.dl.dl>
+        <x-core.dl.dt>str</x-core.dl.dt>
+        <x-core.dl.dd>{{ number_format($monster->str) }}</x-core.dl.dd>
+        <x-core.dl.dt>dex</x-core.dl.dt>
+        <x-core.dl.dd>{{ number_format($monster->dex) }}</x-core.dl.dd>
+        <x-core.dl.dt>dur</x-core.dl.dt>
+        <x-core.dl.dd>{{ number_format($monster->dur) }}</x-core.dl.dd>
+        <x-core.dl.dt>chr</x-core.dl.dt>
+        <x-core.dl.dd>{{ number_format($monster->chr) }}</x-core.dl.dd>
+        <x-core.dl.dt>int</x-core.dl.dt>
+        <x-core.dl.dd>{{ number_format($monster->int) }}</x-core.dl.dd>
+        <x-core.dl.dt>agi</x-core.dl.dt>
+        <x-core.dl.dd>{{ number_format($monster->int) }}</x-core.dl.dd>
+        <x-core.dl.dt>focus</x-core.dl.dt>
+        <x-core.dl.dd>{{ number_format($monster->int) }}</x-core.dl.dd>
+        <x-core.dl.dt>Damage Stat</x-core.dl.dt>
+        <x-core.dl.dd>{{ $monster->damage_stat }}</x-core.dl.dd>
+      </x-core.dl.dl>
       <div
         class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
       ></div>
@@ -30,16 +30,16 @@
       <div
         class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
       ></div>
-      <dl>
-        <dt>Accuracy</dt>
-        <dd>{{ $monster->accuracy * 100 }}%</dd>
-        <dt>Casting Accuracy</dt>
-        <dd>{{ $monster->casting_accuracy * 100 }}%</dd>
-        <dt>Criticality</dt>
-        <dd>{{ $monster->criticality * 100 }}%</dd>
-        <dt>Dodge</dt>
-        <dd>{{ $monster->dodge * 100 }}%</dd>
-      </dl>
+      <x-core.dl.dl>
+        <x-core.dl.dt>Accuracy</x-core.dl.dt>
+        <x-core.dl.dd>{{ $monster->accuracy * 100 }}%</x-core.dl.dd>
+        <x-core.dl.dt>Casting Accuracy</x-core.dl.dt>
+        <x-core.dl.dd>{{ $monster->casting_accuracy * 100 }}%</x-core.dl.dd>
+        <x-core.dl.dt>Criticality</x-core.dl.dt>
+        <x-core.dl.dd>{{ $monster->criticality * 100 }}%</x-core.dl.dd>
+        <x-core.dl.dt>Dodge</x-core.dl.dt>
+        <x-core.dl.dd>{{ $monster->dodge * 100 }}%</x-core.dl.dd>
+      </x-core.dl.dl>
     </div>
     <div
       class="my-3 block border-b-2 border-b-gray-300 md:hidden dark:border-b-gray-600"
@@ -49,22 +49,22 @@
       <div
         class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
       ></div>
-      <dl>
-        <dt>Health Range</dt>
-        <dd>
+      <x-core.dl.dl>
+        <x-core.dl.dt>Health Range</x-core.dl.dt>
+        <x-core.dl.dd>
           {{ number_format(explode('-', $monster->health_range)[0]) }}
           -
           {{ number_format(explode('-', $monster->health_range)[1]) }}
-        </dd>
-        <dt>Attack Range</dt>
-        <dd>
+        </x-core.dl.dd>
+        <x-core.dl.dt>Attack Range</x-core.dl.dt>
+        <x-core.dl.dd>
           {{ number_format(explode('-', $monster->attack_range)[0]) }}
           -
           {{ number_format(explode('-', $monster->attack_range)[1]) }}
-        </dd>
-        <dt>AC</dt>
-        <dd>{{ number_format($monster->ac) }}</dd>
-      </dl>
+        </x-core.dl.dd>
+        <x-core.dl.dt>AC</x-core.dl.dt>
+        <x-core.dl.dd>{{ number_format($monster->ac) }}</x-core.dl.dd>
+      </x-core.dl.dl>
       <div
         class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
       ></div>
@@ -72,19 +72,19 @@
       <div
         class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
       ></div>
-      <dl>
-        <dt>Drop Chance</dt>
-        <dd>{{ $monster->drop_check * 100 }}%</dd>
-        <dt>XP</dt>
-        <dd>{{ $monster->xp }}</dd>
-        <dt>
+      <x-core.dl.dl>
+        <x-core.dl.dt>Drop Chance</x-core.dl.dt>
+        <x-core.dl.dd>{{ $monster->drop_check * 100 }}%</x-core.dl.dd>
+        <x-core.dl.dt>XP</x-core.dl.dt>
+        <x-core.dl.dd>{{ $monster->xp }}</x-core.dl.dd>
+        <x-core.dl.dt>
           Max Level
           <sup>*</sup>
-        </dt>
-        <dd>{{ $monster->max_level }}</dd>
-        <dt>Gold Reward</dt>
-        <dd>{{ number_format($monster->gold) }}</dd>
-      </dl>
+        </x-core.dl.dt>
+        <x-core.dl.dd>{{ $monster->max_level }}</x-core.dl.dd>
+        <x-core.dl.dt>Gold Reward</x-core.dl.dt>
+        <x-core.dl.dd>{{ number_format($monster->gold) }}</x-core.dl.dd>
+      </x-core.dl.dl>
       <p class="mt-4">
         <sup>*</sup>
         Indicates that if you are over this level, you only get 1/3
@@ -102,16 +102,16 @@
       <div
         class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
       ></div>
-      <dl>
-        <dt>Affix Resistance (chance):</dt>
-        <dd>{{ $monster->affix_resistance * 100 }}%</dd>
-        <dt>Spell Evasion (chance):</dt>
-        <dd>{{ $monster->spell_evasion * 100 }}%</dd>
-        <dt>Life Stealing Resistance:</dt>
-        <dd>
+      <x-core.dl.dl>
+        <x-core.dl.dt>Affix Resistance (chance):</x-core.dl.dt>
+        <x-core.dl.dd>{{ $monster->affix_resistance * 100 }}%</x-core.dl.dd>
+        <x-core.dl.dt>Spell Evasion (chance):</x-core.dl.dt>
+        <x-core.dl.dd>{{ $monster->spell_evasion * 100 }}%</x-core.dl.dd>
+        <x-core.dl.dt>Life Stealing Resistance:</x-core.dl.dt>
+        <x-core.dl.dd>
           {{ is_null($monster->life_stealing_resistance) ? 0 : $monster->life_stealing_resistance * 100 }}%
-        </dd>
-      </dl>
+        </x-core.dl.dd>
+      </x-core.dl.dl>
     </div>
     <div>
       <div
@@ -122,41 +122,41 @@
         class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
       ></div>
       <div>
-        <dl>
-          <dt>Devouring Light Chance:</dt>
-          <dd>{{ $monster->devouring_light_chance * 100 }}%</dd>
-          <dt>Devouring Darkness Chance:</dt>
-          <dd>{{ $monster->devouring_darkness_chance * 100 }}%</dd>
-        </dl>
+        <x-core.dl.dl>
+          <x-core.dl.dt>Devouring Light Chance:</x-core.dl.dt>
+          <x-core.dl.dd>{{ $monster->devouring_light_chance * 100 }}%</x-core.dl.dd>
+          <x-core.dl.dt>Devouring Darkness Chance:</x-core.dl.dt>
+          <x-core.dl.dd>{{ $monster->devouring_darkness_chance * 100 }}%</x-core.dl.dd>
+        </x-core.dl.dl>
       </div>
     </div>
   </div>
-</x-core.cards.card>
+</x-core.cards.card-with-title>
 
 <x-core.cards.card-with-title title="Cast and Affixes">
-  <dl class="mt-3">
-    <dt>Max Cast For</dt>
-    <dd>{{ number_format($monster->max_spell_damage) }}</dd>
-    <dt>Max Affix Damage</dt>
-    <dd>{{ number_format($monster->max_affix_damage) }}</dd>
-    <dt>Healing Percentage</dt>
-    <dd>{{ $monster->healing_percentage * 100 }}%</dd>
-    <dt>Entrancing Chance</dt>
-    <dd>{{ $monster->entrancing_chance * 100 }}%</dd>
-  </dl>
+  <x-core.dl.dl class="mt-3">
+    <x-core.dl.dt>Max Cast For</x-core.dl.dt>
+    <x-core.dl.dd>{{ number_format($monster->max_spell_damage) }}</x-core.dl.dd>
+    <x-core.dl.dt>Max Affix Damage</x-core.dl.dt>
+    <x-core.dl.dd>{{ number_format($monster->max_affix_damage) }}</x-core.dl.dd>
+    <x-core.dl.dt>Healing Percentage</x-core.dl.dt>
+    <x-core.dl.dd>{{ $monster->healing_percentage * 100 }}%</x-core.dl.dd>
+    <x-core.dl.dt>Entrancing Chance</x-core.dl.dt>
+    <x-core.dl.dd>{{ $monster->entrancing_chance * 100 }}%</x-core.dl.dd>
+  </x-core.dl.dl>
 </x-core.cards.card-with-title>
 <hr />
 <x-core.cards.card-with-title title="Ambush & Counter">
-  <dl class="mt-3">
-    <dt>Ambush Chance</dt>
-    <dd>{{ $monster->ambush_chance * 100 }}%</dd>
-    <dt>Ambush Resistance Chance</dt>
-    <dd>{{ $monster->ambush_resistance * 100 }}%</dd>
-    <dt>Counter Chance</dt>
-    <dd>{{ $monster->counter_chance * 100 }}%</dd>
-    <dt>Counter Resistance Chance</dt>
-    <dd>{{ $monster->counter_resistance * 100 }}%</dd>
-  </dl>
+  <x-core.dl.dl class="mt-3">
+    <x-core.dl.dt>Ambush Chance</x-core.dl.dt>
+    <x-core.dl.dd>{{ $monster->ambush_chance * 100 }}%</x-core.dl.dd>
+    <x-core.dl.dt>Ambush Resistance Chance</x-core.dl.dt>
+    <x-core.dl.dd>{{ $monster->ambush_resistance * 100 }}%</x-core.dl.dd>
+    <x-core.dl.dt>Counter Chance</x-core.dl.dt>
+    <x-core.dl.dd>{{ $monster->counter_chance * 100 }}%</x-core.dl.dd>
+    <x-core.dl.dt>Counter Resistance Chance</x-core.dl.dt>
+    <x-core.dl.dd>{{ $monster->counter_resistance * 100 }}%</x-core.dl.dd>
+  </x-core.dl.dl>
 </x-core.cards.card-with-title>
 
 @if (! is_null($monster->fire_atonement) && ! is_null($monster->ice_atonement) && ! is_null($monster->water_atonement))
@@ -175,33 +175,33 @@
       the amount of damage.
     </p>
     <p>Your armour class can block the damage, if it is high enough.</p>
-    <dl class="mt-3">
-      <dt>Fire Atunement</dt>
-      <dd>{{ $monster->fire_atonement * 100 }}%</dd>
-      <dt>Ice Atunement</dt>
-      <dd>{{ $monster->ice_atonement * 100 }}%</dd>
-      <dt>Water Atunement</dt>
-      <dd>{{ $monster->water_atonement * 100 }}%</dd>
-    </dl>
+    <x-core.dl.dl class="mt-3">
+      <x-core.dl.dt>Fire Atunement</x-core.dl.dt>
+      <x-core.dl.dd>{{ $monster->fire_atonement * 100 }}%</x-core.dl.dd>
+      <x-core.dl.dt>Ice Atunement</x-core.dl.dt>
+      <x-core.dl.dd>{{ $monster->ice_atonement * 100 }}%</x-core.dl.dd>
+      <x-core.dl.dt>Water Atunement</x-core.dl.dt>
+      <x-core.dl.dd>{{ $monster->water_atonement * 100 }}%</x-core.dl.dd>
+    </x-core.dl.dl>
   </x-core.cards.card-with-title>
 @endif
 
 @if ($monster->is_celestial_entity)
   <hr />
   <x-core.cards.card-with-title title="Celestial Conjuration Cost/Reward">
-    <dl class="mt-3">
+    <x-core.dl.dl class="mt-3">
       @if ($monster->gold_cost > 0)
-        <dt>Gold Cost:</dt>
-        <dd>{{ number_format($monster->gold_cost) }}</dd>
+        <x-core.dl.dt>Gold Cost:</x-core.dl.dt>
+        <x-core.dl.dd>{{ number_format($monster->gold_cost) }}</x-core.dl.dd>
       @endif
 
       @if ($monster->gold_dust_cost > 0)
-        <dt>Gold Dust Cost:</dt>
-        <dd>{{ number_format($monster->gold_dust_cost) }}</dd>
+        <x-core.dl.dt>Gold Dust Cost:</x-core.dl.dt>
+        <x-core.dl.dd>{{ number_format($monster->gold_dust_cost) }}</x-core.dl.dd>
       @endif
 
-      <dt>Shard Reward:</dt>
-      <dd>{{ number_format($monster->shards) }}</dd>
-    </dl>
+      <x-core.dl.dt>Shard Reward:</x-core.dl.dt>
+      <x-core.dl.dd>{{ number_format($monster->shards) }}</x-core.dl.dd>
+    </x-core.dl.dl>
   </x-core.cards.card-with-title>
 @endif
