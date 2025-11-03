@@ -1,5 +1,3 @@
-<!-- resources/views/components/form-wizard/container.blade.php -->
-
 @props([
   'totalSteps' => 1,
   'name',
@@ -8,7 +6,40 @@
   'modelId' => '0',
 ])
 <form
-  x-data="{ currentStep: 1, totalSteps: {{ $totalSteps }} }"
+  x-data="{
+    currentStep: 1,
+    totalSteps: {{ $totalSteps }},
+    viewportHeight: 0,
+    ro: null,
+
+    slides() {
+      return this.$refs.track ? Array.from(this.$refs.track.children) : [];
+    },
+
+    measure() {
+      this.$nextTick(() => {
+        const current = this.slides()[this.currentStep - 1];
+        if (!current) return;
+        // measure AFTER layout settles so transforms/media/fonts won't trick us
+        requestAnimationFrame(() => {
+          this.viewportHeight = current.getBoundingClientRect().height;
+        });
+      });
+    }
+  }"
+  x-init="
+    measure();
+    $watch('currentStep', () => {
+      if (ro) ro.disconnect();
+      measure();
+      const current = slides()[currentStep - 1];
+      if (current && 'ResizeObserver' in window) {
+        ro = new ResizeObserver(() => measure());
+        ro.observe(current);
+      }
+    });
+  "
+  @resize.window="measure()"
   x-cloak
   class="my-4 flex items-center justify-center px-4"
   action="{{ $formAction }}"
@@ -30,14 +61,20 @@
         Home
       </a>
     </header>
-    <div class="overflow-hidden">
+
+    <div
+      class="overflow-hidden transition-[height] duration-300 ease-in-out"
+      :style="`height: ${viewportHeight}px`"
+    >
       <div
-        class="flex transition-transform duration-500 ease-in-out"
+        x-ref="track"
+        class="flex items-start transition-transform duration-500 ease-in-out"
         :style="`width: ${ totalSteps * 100 }%; transform: translateX(-${ (currentStep - 1) * (100 / totalSteps) }%);`"
       >
         {!! $slot !!}
       </div>
     </div>
+
     <div
       class="flex items-center justify-between border-t border-gray-200 px-6 py-4 dark:border-gray-700"
     >
@@ -67,6 +104,7 @@
         </button>
       </template>
     </div>
+
     <div class="flex justify-center space-x-2 px-6 pb-6">
       <template x-for="i in totalSteps" :key="i">
         <button
