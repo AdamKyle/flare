@@ -56,13 +56,13 @@
             class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:focus:ring-blue-400"
           />
           @error('email')
-            <p
-              id="email-error"
-              class="mt-2 text-sm text-red-600 dark:text-red-400"
-              role="alert"
-            >
-              {{ $message }}
-            </p>
+          <p
+            id="email-error"
+            class="mt-2 text-sm text-red-600 dark:text-red-400"
+            role="alert"
+          >
+            {{ $message }}
+          </p>
           @enderror
         </div>
 
@@ -84,13 +84,13 @@
             class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:focus:ring-blue-400"
           />
           @error('password')
-            <p
-              id="password-error"
-              class="mt-2 text-sm text-red-600 dark:text-red-400"
-              role="alert"
-            >
-              {{ $message }}
-            </p>
+          <p
+            id="password-error"
+            class="mt-2 text-sm text-red-600 dark:text-red-400"
+            role="alert"
+          >
+            {{ $message }}
+          </p>
           @enderror
         </div>
 
@@ -111,7 +111,7 @@
             Login
           </x-core.buttons.primary-button>
 
-          <div class="flex flex-col space-y-2 text-center sm:text-right">
+          <div class="flex flex-col space-y-2 text-center sm:text-right sm:flex-none sm:w-64 sm:pl-6 shrink-0">
             <a
               href="/information/account-deletion"
               target="_blank"
