@@ -11,7 +11,6 @@ use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
 class ItemsTable extends DataTableComponent
 {
-    public $isShop = false;
 
     public $type = null;
 
@@ -38,14 +37,6 @@ class ItemsTable extends DataTableComponent
             $query = Item::where('type', $this->type)->where('drop_location_id', $this->locationId);
         }
 
-        if ($this->isShop) {
-            $query = $query->where('cost', '<=', 2000000000)
-                ->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
-                ->whereNull('item_suffix_id')
-                ->whereNull('item_prefix_id')
-                ->whereNull('specialty_type');
-        }
-
         return $query;
     }
 
@@ -56,21 +47,6 @@ class ItemsTable extends DataTableComponent
                 ->options($this->buildOptions())
                 ->filter(function (Builder $builder, string $value) {
                     $builder = $builder->where('type', $value);
-
-                    if (in_array($value, ['quest', 'alchemy', 'trinket'])) {
-
-                        if ($value === 'alchemy') {
-                            if (! is_null(auth()->user())) {
-                                if (auth()->user()->hasRole('Admin')) {
-                                    $builder->where('gold_bars_cost', '>', 0);
-                                }
-                            } else {
-                                return $builder->whereNotNull('skill_level_required');
-                            }
-                        }
-
-                        return $builder;
-                    }
 
                     $builder = $builder->whereNull('item_suffix_id')
                         ->whereNull('item_prefix_id');
@@ -84,10 +60,6 @@ class ItemsTable extends DataTableComponent
                             $builder = $builder->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
                                 ->where('cost', '<=', 2000000000);
                         }
-                    }
-
-                    if ($this->isShop) {
-                        $builder->whereNull('specialty_type');
                     }
 
                     return $builder;
