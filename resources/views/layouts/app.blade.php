@@ -85,7 +85,6 @@
       </x-core.page.content-area>
     </x-core.page.page-wrapper>
     @livewireScriptConfig
-    <script src="{{ asset('vendor/theme/script.js') }}"></script>
     @if (! is_null(auth()->user()))
       @if (! auth()->user()->hasRole('Admin'))
         @vite('resources/js/app.ts')
@@ -98,6 +97,8 @@
           }, 30000);
         </script>
       @else
+        @vite('resources/js/admin-apps.ts')
+
         <script>
           const lightbox = GLightbox();
         </script>

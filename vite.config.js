@@ -11,6 +11,7 @@ export default defineConfig({
         laravel([
             'resources/css/styles.css',
             'resources/js/app.ts',
+            'resources/js/admin-apps.ts',
             'resources/js/vendor/livewire-data-tables.js',
             'resources/js/vendor/livewire.js',
         ]),
