@@ -121,6 +121,7 @@
         />
         <x-core.separator.separator />
         <h2 class="mb-4 text-lg text-center">Item Cost Info</h2>
+        <x-core.separator.separator />
         <x-form-elements.input
           :model="$item"
           label="Base Attack:"

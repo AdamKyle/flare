@@ -26,6 +26,14 @@ class WeaponTypes
 
     const RING = 'ring';
 
+    const SWORD = 'sword';
+
+    const CENSOR = 'censor';
+
+    const CLAW = 'claw';
+
+    const WAND = 'wand';
+
     /**
      * @var string[]
      */
@@ -39,6 +47,10 @@ class WeaponTypes
         self::MACE => self::MACE,
         self::SCRATCH_AWL => self::SCRATCH_AWL,
         self::RING => self::RING,
+        self::CLAW => self::CLAW,
+        self::CENSOR => self::CENSOR,
+        self::WAND => self::WAND,
+        self::SWORD => self::SWORD,
     ];
 
     /**

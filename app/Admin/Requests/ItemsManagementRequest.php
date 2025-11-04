@@ -9,24 +9,15 @@ use Illuminate\Foundation\Http\FormRequest;
  */
 class ItemsManagementRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
     public function authorize()
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
     public function rules()
     {
         return [
+            'id' => 'nullable|integer|min:1',
             'name' => 'required',
             'type' => 'required',
             'description' => 'required',
@@ -45,11 +36,6 @@ class ItemsManagementRequest extends FormRequest
             'skill_level_trivial' => 'nullable',
             'skill_name' => 'nullable',
             'skill_bonus' => 'nullable',
-            'base_damage_mod_bonus' => 'nullable',
-            'base_healing_mod_bonus' => 'nullable',
-            'base_ac_mod_bonus' => 'nullable',
-            'fight_time_out_mod_bonus' => 'nullable',
-            'move_time_out_mod_bonus' => 'nullable',
             'skill_training_bonus' => 'nullable',
             'market_sellable' => 'nullable',
             'usable' => 'nullable',
@@ -93,11 +79,6 @@ class ItemsManagementRequest extends FormRequest
         ];
     }
 
-    /**
-     * Messages for the validation.
-     *
-     * @return array
-     */
     public function messages()
     {
         return [
@@ -105,5 +86,14 @@ class ItemsManagementRequest extends FormRequest
             'type.required' => 'Missing Type',
             'description.required' => 'Missing Description',
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $id = $this->input('id');
+
+        if ($id === 0 || $id === '0') {
+            $this->merge(['id' => null]);
+        }
     }
 }

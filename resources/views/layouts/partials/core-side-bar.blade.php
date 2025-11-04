@@ -7,7 +7,7 @@
     class="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear"
   >
     <nav x-data="{ selected: $persist('Dashboard') }">
-      <x-sidebar.menu-items.group-options-container headerTitle="Game Aspects">
+      <x-sidebar.menu-items.group-options-container headerTitle="Game Data Management">
         <x-sidebar.menu-items.nested-container
           name="Locations"
           key="Locations"
@@ -42,12 +42,12 @@
           key="Items"
           activePages="['import','export','items']"
           selected="Items"
-          icon="ra ra-wooden-sign"
+          icon="ra ra-crossed-swords"
         >
           <x-sidebar.menu-items.nested-menu-option
             href="{{route('items.list')}}"
             pageKey="items"
-            icon="ra ra-wooden-sign"
+            icon="ra ra-crossed-swords"
           >
             Items
           </x-sidebar.menu-items.nested-menu-option>
@@ -71,12 +71,12 @@
           key="Monsters"
           activePages="['import','export','items']"
           selected="Monsters"
-          icon="ra ra-wooden-sign"
+          icon="ra ra-dragon"
         >
           <x-sidebar.menu-items.nested-menu-option
             href="{{route('monsters.list')}}"
             pageKey="monsters"
-            icon="ra ra-wooden-sign"
+            icon="ra ra-dragon"
           >
             Monsters
           </x-sidebar.menu-items.nested-menu-option>
@@ -95,6 +95,40 @@
             Export Locations
           </x-sidebar.menu-items.nested-menu-option>
         </x-sidebar.menu-items.nested-container>
+      </x-sidebar.menu-items.group-options-container>
+
+      <x-sidebar.menu-items.group-options-container headerTitle="Guide Quests">
+
+        <x-sidebar.menu-items.nested-container
+          name="Guide Quests"
+          key="guide-quests"
+          activePages="['import','export','guide-quests']"
+          selected="Guide Quests"
+          icon="ra ra-wooden-sign"
+        >
+          <x-sidebar.menu-items.nested-menu-option
+            href="{{route('admin.guide-quests')}}"
+            pageKey="guide-quests"
+            icon="ra ra-wooden-sign"
+          >
+            Manage Guide Quests
+          </x-sidebar.menu-items.nested-menu-option>
+          <x-sidebar.menu-items.nested-menu-option
+            href="#"
+            pageKey="import"
+            icon="fas fa-file-import"
+          >
+            Import Locations
+          </x-sidebar.menu-items.nested-menu-option>
+          <x-sidebar.menu-items.nested-menu-option
+            href="#"
+            pageKey="export"
+            icon="fas fa-file-download"
+          >
+            Export Locations
+          </x-sidebar.menu-items.nested-menu-option>
+        </x-sidebar.menu-items.nested-container>
+
       </x-sidebar.menu-items.group-options-container>
 
       <!-- MENU GROUP -->

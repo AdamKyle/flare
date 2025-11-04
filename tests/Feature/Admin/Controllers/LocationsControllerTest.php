@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Admin;
+namespace Feature\Admin\Controllers;
 
 use App\Flare\Models\Location;
 use App\Flare\Models\Quest;

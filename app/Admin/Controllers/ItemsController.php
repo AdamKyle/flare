@@ -61,7 +61,7 @@ class ItemsController extends Controller
             $message = 'Updated '.$item->name;
         }
 
-        return response()->redirectToRoute('game.items.item', ['item' => $item->id])->with('success', $message);
+        return response()->redirectToRoute('items.item', ['item' => $item->id])->with('success', $message);
     }
 
     public function exportItems()

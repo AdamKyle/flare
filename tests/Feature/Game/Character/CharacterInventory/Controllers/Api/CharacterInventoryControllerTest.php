@@ -274,7 +274,7 @@ class CharacterInventoryControllerTest extends TestCase
     {
         $character = $this->character->inventoryManagement()
             ->giveItemMultipleTimes($this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => WeaponTypes::SWORD,
                 'name' => 'To Replace',
             ]))
             ->getCharacterFactory()
@@ -282,7 +282,7 @@ class CharacterInventoryControllerTest extends TestCase
             ->createInventorySets()
             ->createInventorySets()
             ->putItemInSet($this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => WeaponTypes::SWORD,
                 'name' => 'Equipped',
             ]), 0, 'left-hand', true)
             ->getCharacter();
