@@ -14,11 +14,11 @@ use Tests\Traits\CreateUser;
 
 class ItemsControllerTest extends TestCase
 {
-    use RefreshDatabase, CreateRole, CreateUser, CreateItem;
+    use CreateItem, CreateRole, CreateUser, RefreshDatabase;
 
     private ?CharacterFactory $characterFactory = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -29,7 +29,7 @@ class ItemsControllerTest extends TestCase
         $this->characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 

@@ -20,13 +20,13 @@ use Tests\Traits\CreateItem;
 
 class ItemsServiceTest extends TestCase
 {
-    use RefreshDatabase, CreateItem;
+    use CreateItem, RefreshDatabase;
 
     private ?ItemsService $service = null;
 
     private ?CharacterFactory $characterFactory = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -34,7 +34,7 @@ class ItemsServiceTest extends TestCase
         $this->characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 

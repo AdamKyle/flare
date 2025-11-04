@@ -11,7 +11,6 @@ use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
 class ItemsTable extends DataTableComponent
 {
-
     public $type = null;
 
     public $locationId = null;

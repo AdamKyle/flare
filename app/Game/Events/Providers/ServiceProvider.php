@@ -21,6 +21,7 @@ use App\Game\Events\Services\KingdomEventService;
 use App\Game\Events\Services\MoveCharacterAfterEventService;
 use App\Game\Events\Services\RaidEventEnderService;
 use App\Game\Events\Services\RegularEventGoalResetService;
+use App\Game\Events\Services\ScheduleEventFinalizerService;
 use App\Game\Events\Services\WeeklyCelestialEventEnderService;
 use App\Game\Events\Services\WeeklyCurrencyEventEnderService;
 use App\Game\Events\Services\WeeklyFactionLoyaltyEnderService;
@@ -31,7 +32,6 @@ use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\TraverseService;
 use App\Game\Maps\Services\UpdateRaidMonsters;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
-use Tests\Unit\Game\Events\Services\ScheduleEventFinalizerService;
 
 class ServiceProvider extends ApplicationServiceProvider
 {

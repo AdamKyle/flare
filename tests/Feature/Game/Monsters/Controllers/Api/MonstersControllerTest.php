@@ -56,8 +56,11 @@ class MonstersControllerTest extends TestCase
 
         $response = $this->actingAs($character->user)->call('GET', '/api/monster-stat/'.$monster->id.'/'.$character->id);
 
+        $this->assertEquals(200, $response->getStatusCode());
+
         $json = json_decode($response->getContent(), true);
 
+        $this->assertArrayNotHasKey('status', $json);
         $this->assertSame(10, $json['str']);
     }
 
@@ -95,8 +98,12 @@ class MonstersControllerTest extends TestCase
         resolve(BuildMonsterCacheService::class)->buildCache();
 
         $response = $this->actingAs($character->user)->call('GET', '/api/monster-stat/'.$monster->id.'/'.$character->id);
+
+        $this->assertEquals(200, $response->getStatusCode());
+
         $json = json_decode($response->getContent(), true);
 
+        $this->assertArrayNotHasKey('status', $json);
         $this->assertSame(13, $json['str']);
     }
 
@@ -130,8 +137,12 @@ class MonstersControllerTest extends TestCase
         resolve(BuildMonsterCacheService::class)->buildCache();
 
         $response = $this->actingAs($character->user)->call('GET', '/api/monster-stat/'.$monster->id.'/'.$character->id);
+
+        $this->assertEquals(200, $response->getStatusCode());
+
         $json = json_decode($response->getContent(), true);
 
+        $this->assertArrayNotHasKey('status', $json);
         $this->assertSame(12, $json['str']);
     }
 
@@ -158,8 +169,12 @@ class MonstersControllerTest extends TestCase
         resolve(BuildMonsterCacheService::class)->buildCache();
 
         $response = $this->actingAs($character->user)->call('GET', '/api/monster-stat/'.$monster->id.'/'.$character->id);
+
+        $this->assertEquals(200, $response->getStatusCode());
+
         $json = json_decode($response->getContent(), true);
 
+        $this->assertArrayNotHasKey('status', $json);
         $this->assertFalse($json['is_raid_monster']);
     }
 
@@ -186,8 +201,12 @@ class MonstersControllerTest extends TestCase
         resolve(BuildMonsterCacheService::class)->buildCache();
 
         $response = $this->actingAs($character->user)->call('GET', '/api/monster-stat/'.$raid->id.'/'.$character->id);
+
+        $this->assertNotEquals(200, $response->getStatusCode());
+
         $json = json_decode($response->getContent(), true);
 
+        $this->assertArrayNotHasKey('status', $json);
         $this->assertArrayHasKey('message', $json);
     }
 
@@ -241,8 +260,11 @@ class MonstersControllerTest extends TestCase
         $response = $this->actingAs($character->user)
             ->call('GET', '/api/monster-stat/'.$regular->id.'/'.$character->id);
 
+        $this->assertEquals(200, $response->getStatusCode());
+
         $json = json_decode($response->getContent(), true);
 
+        $this->assertArrayNotHasKey('status', $json);
         $this->assertSame('Ice Regular', $json['name']);
     }
 
@@ -266,8 +288,12 @@ class MonstersControllerTest extends TestCase
         resolve(BuildMonsterCacheService::class)->buildCache();
 
         $response = $this->actingAs($character->user)->call('GET', '/api/monster-stat/'.$monster->id.'/'.$character->id);
+
+        $this->assertEquals(200, $response->getStatusCode());
+
         $json = json_decode($response->getContent(), true);
 
+        $this->assertArrayNotHasKey('status', $json);
         $this->assertEquals(0.42, $json['drop_chance']);
     }
 
@@ -305,8 +331,12 @@ class MonstersControllerTest extends TestCase
         resolve(BuildMonsterCacheService::class)->buildCache();
 
         $response = $this->actingAs($character->user)->call('GET', '/api/monster-stat/'.$monster->id.'/'.$character->id);
+
+        $this->assertEquals(200, $response->getStatusCode());
+
         $json = json_decode($response->getContent(), true);
 
+        $this->assertArrayNotHasKey('status', $json);
         $this->assertEquals(0.80, $json['drop_chance']);
     }
 
@@ -340,8 +370,12 @@ class MonstersControllerTest extends TestCase
         resolve(BuildMonsterCacheService::class)->buildCache();
 
         $response = $this->actingAs($character->user)->call('GET', '/api/monster-stat/'.$monster->id.'/'.$character->id);
+
+        $this->assertEquals(200, $response->getStatusCode());
+
         $json = json_decode($response->getContent(), true);
 
+        $this->assertArrayNotHasKey('status', $json);
         $this->assertEquals(0.33, $json['drop_chance']);
     }
 
@@ -365,8 +399,12 @@ class MonstersControllerTest extends TestCase
         resolve(BuildMonsterCacheService::class)->buildCache();
 
         $response = $this->actingAs($character->user)->call('GET', '/api/monster-stat/'.$monster->id.'/'.$character->id);
+
+        $this->assertEquals(200, $response->getStatusCode());
+
         $json = json_decode($response->getContent(), true);
 
+        $this->assertArrayNotHasKey('status', $json);
         $this->assertEquals(0.99, $json['drop_chance']);
     }
 
@@ -413,9 +451,40 @@ class MonstersControllerTest extends TestCase
         $response = $this->actingAs($character->user)
             ->call('GET', '/api/monster-stat/'.$monster->id.'/'.$character->id);
 
+        $this->assertEquals(200, $response->getStatusCode());
+
         $json = json_decode($response->getContent(), true);
 
+        $this->assertArrayNotHasKey('status', $json);
         $this->assertEquals(0.4, $json['drop_chance']);
+    }
+
+    public function test_list_monsters_returns_json_without_status_key()
+    {
+        $surface = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
+
+        $character = $this->characterFactory->getCharacter();
+        $character->map()->update(['game_map_id' => $surface->id]);
+        $character = $character->refresh();
+
+        $this->createSession($character->user->id);
+
+        $this->createMonster([
+            'game_map_id' => $surface->id,
+            'health_range' => '10-20',
+            'attack_range' => '1-3',
+        ]);
+
+        resolve(BuildMonsterCacheService::class)->buildCache();
+
+        $response = $this->actingAs($character->user)->call('GET', '/api/monster-list/'.$character->id);
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $json = json_decode($response->getContent(), true);
+
+        $this->assertIsArray($json);
+        $this->assertArrayNotHasKey('status', $json);
     }
 
     private function createSession(int $userId): void

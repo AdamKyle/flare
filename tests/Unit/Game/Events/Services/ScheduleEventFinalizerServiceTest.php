@@ -3,6 +3,8 @@
 namespace Tests\Unit\Game\Events\Services;
 
 use App\Flare\Events\UpdateScheduledEvents;
+use App\Game\Events\Providers\ServiceProvider;
+use App\Game\Events\Registry\EventEnderRegistry;
 use App\Game\Events\Services\ScheduleEventFinalizerService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event as EventFacade;
@@ -31,6 +33,18 @@ class ScheduleEventFinalizerServiceTest extends TestCase
         $this->service = null;
 
         parent::tearDown();
+    }
+
+    public function test_register_binds_services(): void
+    {
+        $provider = new ServiceProvider($this->app);
+        $provider->register();
+
+        $this->assertTrue($this->app->bound(EventEnderRegistry::class));
+        $this->assertInstanceOf(EventEnderRegistry::class, $this->app->make(EventEnderRegistry::class));
+
+        $this->assertTrue($this->app->bound(ScheduleEventFinalizerService::class));
+        $this->assertInstanceOf(ScheduleEventFinalizerService::class, $this->app->make(ScheduleEventFinalizerService::class));
     }
 
     public function test_mark_not_running_and_broadcast_updates_flag_and_dispatches_update(): void

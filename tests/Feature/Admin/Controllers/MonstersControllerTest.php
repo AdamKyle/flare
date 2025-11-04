@@ -14,11 +14,11 @@ use Tests\Traits\CreateUser;
 
 class MonstersControllerTest extends TestCase
 {
-    use RefreshDatabase, CreateRole, CreateUser, CreateGameMap, CreateMonster, CreateItem;
+    use CreateGameMap, CreateItem, CreateMonster, CreateRole, CreateUser, RefreshDatabase;
 
     private ?GameMap $map = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -34,7 +34,7 @@ class MonstersControllerTest extends TestCase
         ]);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 

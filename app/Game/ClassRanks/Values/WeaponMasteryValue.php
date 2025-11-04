@@ -26,6 +26,14 @@ class WeaponMasteryValue
 
     const SCRATCH_AWL = 9;
 
+    const CLAWN = 10;
+
+    const CENSOR = 11;
+
+    const WAND = 12;
+
+    const SWORD = 13;
+
     const XP_PER_LEVEL = 1000000;
 
     const XP_PER_KILL = 10000;
@@ -43,6 +51,10 @@ class WeaponMasteryValue
         self::FAN => 7,
         self::MACE => 8,
         self::SCRATCH_AWL => 9,
+        self::CLAWN => 10,
+        self::CENSOR => 11,
+        self::WAND => 12,
+        self::SWORD => 13,
     ];
 
     protected static $attributes = [
@@ -111,6 +123,14 @@ class WeaponMasteryValue
                 return self::MACE;
             case 'scratch-awl':
                 return self::SCRATCH_AWL;
+            case 'claw':
+                return self::CLAWN;
+            case 'censor':
+                return self::CENSOR;
+            case 'wand':
+                return self::WAND;
+            case 'sword':
+                return self::SWORD;
             case 'spell-damage':
                 return self::DAMAGE_SPELL;
             case 'spell-healing':
@@ -139,6 +159,14 @@ class WeaponMasteryValue
                 return 'mace';
             case self::SCRATCH_AWL:
                 return 'scratch-awl';
+            case self::CLAWN:
+                return 'claw';
+            case self::CENSOR:
+                return 'censor';
+            case self::WAND:
+                return 'wand';
+            case self::SWORD:
+                return 'sword';
             case self::DAMAGE_SPELL:
                 return 'spell-damage';
             case self::HEALING_SPELL:
@@ -153,7 +181,7 @@ class WeaponMasteryValue
      */
     public static function isValidType(string $type): bool
     {
-        $types = ['weapon', 'hammer', 'bow', 'gun', 'fan', 'mace', 'scratch-awl', 'stave', 'spell-damage', 'spell-healing'];
+        $types = ['weapon', 'hammer', 'bow', 'gun', 'fan', 'mace', 'scratch-awl', 'stave', 'sword', 'claw', 'censor', 'wand', 'spell-damage', 'spell-healing'];
 
         return in_array(strtolower($type), $types);
     }
@@ -201,6 +229,26 @@ class WeaponMasteryValue
     public function isScratchAwl(): bool
     {
         return $this->value === self::SCRATCH_AWL;
+    }
+
+    public function isClaw(): bool
+    {
+        return $this->value === self::CLAWN;
+    }
+
+    public function isCensor(): bool
+    {
+        return $this->value === self::CENSOR;
+    }
+
+    public function isWand(): bool
+    {
+        return $this->value === self::WAND;
+    }
+
+    public function isSword(): bool
+    {
+        return $this->value === self::SWORD;
     }
 
     public function isDamageSpell(): bool
