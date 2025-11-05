@@ -1,17 +1,21 @@
 import React from 'react';
 
 import Card from 'ui/cards/card';
-import ContainerWrapper from 'ui/container/container-wrapper';
-import MarkDownEditor from 'ui/mark-down-editor/mark-down-editor';
+import WideContainerWrapper from 'ui/container/wide-container-wrapper';
+import Separator from 'ui/separator/separator';
+import ManageGuideQuestSectionContent from "./manage-guide-quest-section-content";
 
 const ManageGuideQuest = () => {
   return (
-    <ContainerWrapper>
+    <WideContainerWrapper>
       <Card>
-        <h3>Edit/Create Guide Quests</h3>
-        <MarkDownEditor />
+        <h2 className={'text-xl text-gray-800 dark:text-gray-400'}>
+          Edit/Create Guide Quests
+        </h2>
+        <Separator />
+        <ManageGuideQuestSectionContent />
       </Card>
-    </ContainerWrapper>
+    </WideContainerWrapper>
   );
 };
 

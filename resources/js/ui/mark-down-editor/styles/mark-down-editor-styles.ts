@@ -18,5 +18,5 @@ export const toolbar_container_classes =
 export const toolbar_button_classes =
   'px-2 py-1 text-sm rounded-md border border-gray-300 dark:border-gray-700 bg-danube-100 hover:bg-danube-200 active:bg-danube-300 dark:bg-danube-900/50 dark:hover:bg-danube-800 dark:active:bg-danube-700 text-gray-800 dark:text-gray-100';
 
-export const toolbar_split_classes =
-  'mx-2 h-5 w-px bg-gray-300 dark:bg-gray-700';
+export const preview_container_classes =
+  'w-full max-w-none min-h-[12rem] max-h-[28rem] overflow-y-auto px-4 py-3 prose prose-sm sm:prose-base dark:prose-invert bg-white/70 dark:bg-gray-900/40 text-gray-900 dark:text-gray-100';

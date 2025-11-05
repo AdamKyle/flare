@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { debounce } from 'lodash';
+import ReactMarkdown from 'react-markdown';
 import 'prismjs/themes/prism.css';
 
 import { CodeNode, CodeHighlightNode } from '@lexical/code';
-import { HorizontalRuleNode } from '@lexical/extension';
 import { LinkNode } from '@lexical/link';
 import { ListItemNode, ListNode } from '@lexical/list';
 import {
@@ -16,15 +16,16 @@ import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
+import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
-import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
-import { TableNode, TableCellNode, TableRowNode } from '@lexical/table';
+import { AnimatePresence, motion } from 'framer-motion';
 import type { EditorState, LexicalEditor } from 'lexical';
+import remarkGfm from 'remark-gfm';
 
 import CodeHighlighterPlugin from 'ui/mark-down-editor/code-highlighter-component';
 import {
@@ -33,6 +34,8 @@ import {
   editor_outer_classes,
   placeholder_classes,
   alpha_ol_class,
+  toolbar_button_classes,
+  preview_container_classes,
 } from 'ui/mark-down-editor/styles/mark-down-editor-styles';
 import { mark_down_editor_theme } from 'ui/mark-down-editor/styles/mark-down-editor-theme';
 import ToolbarPlugin from 'ui/mark-down-editor/tool-bar';
@@ -48,39 +51,40 @@ function MarkDownEditor(props: MarkDownEditorProps) {
   } = props;
 
   const [alpha_ol_mode, set_alpha_ol_mode] = useState(false);
+  const [is_preview, set_is_preview] = useState(false);
+  const [markdown_value, set_markdown_value] = useState(initial_markdown ?? '');
 
-  const initial_config: InitialConfigType = {
-    namespace: 'mark-down-editor',
-    theme: mark_down_editor_theme,
-    nodes: [
-      HeadingNode,
-      QuoteNode,
-      ListNode,
-      ListItemNode,
-      CodeNode,
-      CodeHighlightNode,
-      LinkNode,
-      HorizontalRuleNode,
-      TableNode,
-      TableCellNode,
-      TableRowNode,
-    ],
-    onError: (error) => {
-      throw error;
-    },
-    editorState: initial_markdown
-      ? (editor: LexicalEditor) => {
-          editor.update(() => {
-            $convertFromMarkdownString(initial_markdown, TRANSFORMERS);
-          });
-        }
-      : undefined,
-  };
+  const initial_config: InitialConfigType = useMemo(
+    () => ({
+      namespace: 'mark-down-editor',
+      theme: mark_down_editor_theme,
+      nodes: [
+        HeadingNode,
+        QuoteNode,
+        ListNode,
+        ListItemNode,
+        LinkNode,
+        CodeNode,
+        CodeHighlightNode,
+        HorizontalRuleNode,
+      ],
+      editorState: initial_markdown
+        ? (editor: LexicalEditor) => {
+            editor.update(() => {
+              $convertFromMarkdownString(initial_markdown, TRANSFORMERS);
+            });
+          }
+        : undefined,
+      onError: (error: Error, _editor: LexicalEditor) => {
+        throw error;
+      },
+    }),
+    [initial_markdown]
+  );
 
   const debounced_emit_change = useMemo(
     () => debounce((value: string) => on_value_change?.(value), 300),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [on_value_change]
   );
 
   useEffect(() => {
@@ -90,21 +94,72 @@ function MarkDownEditor(props: MarkDownEditorProps) {
   }, [debounced_emit_change]);
 
   const handle_change = (editor_state: EditorState) => {
-    if (!on_value_change) {
-      return;
-    }
-
-    const extract_markdown_from_state = (editor_state: EditorState): string => {
+    const extract_markdown_from_state = (state: EditorState): string => {
       let markdown = '';
-
-      editor_state.read(() => {
+      state.read(() => {
         markdown = $convertToMarkdownString(TRANSFORMERS);
       });
-
       return markdown;
     };
 
-    debounced_emit_change(extract_markdown_from_state(editor_state));
+    const md = extract_markdown_from_state(editor_state);
+    set_markdown_value(md);
+
+    if (on_value_change) {
+      debounced_emit_change(md);
+    }
+  };
+
+  const renderPreview = () => {
+    return (
+      <motion.div
+        key="preview"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        <div className={preview_container_classes}>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {markdown_value || ''}
+          </ReactMarkdown>
+        </div>
+      </motion.div>
+    );
+  };
+
+  const renderEditor = () => {
+    return (
+      <motion.div
+        key="editor"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        <RichTextPlugin
+          contentEditable={
+            <ContentEditable id={id} className={content_editable_classes} />
+          }
+          placeholder={<div className={placeholder_classes}>{placeholder}</div>}
+          ErrorBoundary={LexicalErrorBoundary}
+        />
+        <HistoryPlugin />
+        <ListPlugin />
+        <LinkPlugin />
+        <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+        <CodeHighlighterPlugin />
+        <OnChangePlugin onChange={handle_change} />
+      </motion.div>
+    );
+  };
+
+  const renderContent = () => {
+    if (is_preview) {
+      return renderPreview();
+    }
+
+    return renderEditor();
   };
 
   return (
@@ -112,27 +167,27 @@ function MarkDownEditor(props: MarkDownEditorProps) {
       <LexicalComposer initialConfig={initial_config}>
         <div className={editor_outer_classes}>
           <ToolbarPlugin
-            on_toggle_alpha_ol={() => set_alpha_ol_mode((v) => !v)}
+            on_toggle_alpha_ol={() => set_alpha_ol_mode((value) => !value)}
           />
+
+          <div className="flex items-center justify-end px-2 py-2">
+            <button
+              type="button"
+              className={toolbar_button_classes}
+              onClick={() => set_is_preview((value) => !value)}
+            >
+              {is_preview ? 'Edit' : 'Preview'}
+            </button>
+          </div>
+
           <div
-            className={`relative ${editor_container_classes} ${alpha_ol_mode ? alpha_ol_class : ''}`}
+            className={`relative ${editor_container_classes} ${
+              alpha_ol_mode ? alpha_ol_class : ''
+            }`}
           >
-            <RichTextPlugin
-              contentEditable={
-                <ContentEditable id={id} className={content_editable_classes} />
-              }
-              placeholder={
-                <div className={placeholder_classes}>{placeholder}</div>
-              }
-              ErrorBoundary={LexicalErrorBoundary}
-            />
-            <HistoryPlugin />
-            <ListPlugin />
-            <LinkPlugin />
-            <TablePlugin />
-            <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
-            <CodeHighlighterPlugin />
-            <OnChangePlugin onChange={handle_change} />
+            <AnimatePresence mode="wait" initial={false}>
+              {renderContent()}
+            </AnimatePresence>
           </div>
         </div>
       </LexicalComposer>
