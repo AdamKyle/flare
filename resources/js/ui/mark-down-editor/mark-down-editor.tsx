@@ -1,9 +1,3 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { debounce } from 'lodash';
-import ReactMarkdown from 'react-markdown';
-import 'prismjs/themes/prism.css';
-
-import { CodeNode, CodeHighlightNode } from '@lexical/code';
 import { LinkNode } from '@lexical/link';
 import { ListItemNode, ListNode } from '@lexical/list';
 import {
@@ -11,8 +5,8 @@ import {
   $convertToMarkdownString,
   TRANSFORMERS,
 } from '@lexical/markdown';
-import type { InitialConfigType } from '@lexical/react/LexicalComposer';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
+import type { InitialConfigType } from '@lexical/react/LexicalComposer';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
@@ -25,16 +19,16 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { EditorState, LexicalEditor } from 'lexical';
-import remarkGfm from 'remark-gfm';
+import { debounce } from 'lodash';
+import React, { useEffect, useMemo, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 
-import CodeHighlighterPlugin from 'ui/mark-down-editor/code-highlighter-component';
+import MarkdownPastePlugin from 'ui/mark-down-editor/plugins/mark-down-paste-plugin';
 import {
   content_editable_classes,
   editor_container_classes,
   editor_outer_classes,
   placeholder_classes,
-  alpha_ol_class,
-  toolbar_button_classes,
   preview_container_classes,
 } from 'ui/mark-down-editor/styles/mark-down-editor-styles';
 import { mark_down_editor_theme } from 'ui/mark-down-editor/styles/mark-down-editor-theme';
@@ -50,9 +44,26 @@ function MarkDownEditor(props: MarkDownEditorProps) {
     initial_markdown,
   } = props;
 
-  const [alpha_ol_mode, set_alpha_ol_mode] = useState(false);
   const [is_preview, set_is_preview] = useState(false);
   const [markdown_value, set_markdown_value] = useState(initial_markdown ?? '');
+
+  const transformerList = useMemo(() => {
+    return TRANSFORMERS.filter((tr: unknown) => {
+      const t = tr as { dependencies?: unknown[]; type?: unknown };
+      const deps = Array.isArray(t.dependencies) ? t.dependencies : [];
+      const typeName = String(t.type ?? '').toLowerCase();
+      if (deps.some((d) => String(d).toLowerCase().includes('code'))) {
+        return false;
+      }
+      if (typeName.includes('code')) {
+        return false;
+      }
+      if (typeName.includes('strikethrough')) {
+        return false;
+      }
+      return true;
+    });
+  }, []);
 
   const initial_config: InitialConfigType = useMemo(
     () => ({
@@ -64,22 +75,24 @@ function MarkDownEditor(props: MarkDownEditorProps) {
         ListNode,
         ListItemNode,
         LinkNode,
-        CodeNode,
-        CodeHighlightNode,
         HorizontalRuleNode,
       ],
       editorState: initial_markdown
         ? (editor: LexicalEditor) => {
+            const sanitized = (initial_markdown ?? '')
+              .replace(/(^|\n)```[\s\S]*?```/g, '$1')
+              .replace(/`([^`]+)`/g, '$1')
+              .replace(/~~([^~]+)~~/g, '$1');
             editor.update(() => {
-              $convertFromMarkdownString(initial_markdown, TRANSFORMERS);
+              $convertFromMarkdownString(sanitized, transformerList);
             });
           }
         : undefined,
-      onError: (error: Error, _editor: LexicalEditor) => {
+      onError: (error: Error) => {
         throw error;
       },
     }),
-    [initial_markdown]
+    [initial_markdown, transformerList]
   );
 
   const debounced_emit_change = useMemo(
@@ -94,17 +107,15 @@ function MarkDownEditor(props: MarkDownEditorProps) {
   }, [debounced_emit_change]);
 
   const handle_change = (editor_state: EditorState) => {
-    const extract_markdown_from_state = (state: EditorState): string => {
+    const md = (() => {
       let markdown = '';
-      state.read(() => {
-        markdown = $convertToMarkdownString(TRANSFORMERS);
+      editor_state.read(() => {
+        markdown = $convertToMarkdownString(transformerList);
       });
       return markdown;
-    };
+    })();
 
-    const md = extract_markdown_from_state(editor_state);
     set_markdown_value(md);
-
     if (on_value_change) {
       debounced_emit_change(md);
     }
@@ -120,9 +131,7 @@ function MarkDownEditor(props: MarkDownEditorProps) {
         transition={{ duration: 0.2 }}
       >
         <div className={preview_container_classes}>
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {markdown_value || ''}
-          </ReactMarkdown>
+          <ReactMarkdown>{markdown_value || ''}</ReactMarkdown>
         </div>
       </motion.div>
     );
@@ -147,9 +156,9 @@ function MarkDownEditor(props: MarkDownEditorProps) {
         <HistoryPlugin />
         <ListPlugin />
         <LinkPlugin />
-        <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
-        <CodeHighlighterPlugin />
+        <MarkdownShortcutPlugin transformers={transformerList} />
         <OnChangePlugin onChange={handle_change} />
+        <MarkdownPastePlugin />
       </motion.div>
     );
   };
@@ -158,7 +167,6 @@ function MarkDownEditor(props: MarkDownEditorProps) {
     if (is_preview) {
       return renderPreview();
     }
-
     return renderEditor();
   };
 
@@ -166,25 +174,17 @@ function MarkDownEditor(props: MarkDownEditorProps) {
     <div className={class_name}>
       <LexicalComposer initialConfig={initial_config}>
         <div className={editor_outer_classes}>
-          <ToolbarPlugin
-            on_toggle_alpha_ol={() => set_alpha_ol_mode((value) => !value)}
-          />
-
+          <ToolbarPlugin />
           <div className="flex items-center justify-end px-2 py-2">
             <button
               type="button"
-              className={toolbar_button_classes}
+              className="bg-danube-100 hover:bg-danube-200 active:bg-danube-300 dark:bg-danube-900/50 dark:hover:bg-danube-800 dark:active:bg-danube-700 rounded-md border border-gray-300 px-2 py-1 text-sm text-gray-800 dark:border-gray-700 dark:text-gray-100"
               onClick={() => set_is_preview((value) => !value)}
             >
               {is_preview ? 'Edit' : 'Preview'}
             </button>
           </div>
-
-          <div
-            className={`relative ${editor_container_classes} ${
-              alpha_ol_mode ? alpha_ol_class : ''
-            }`}
-          >
+          <div className={`relative ${editor_container_classes}`}>
             <AnimatePresence mode="wait" initial={false}>
               {renderContent()}
             </AnimatePresence>
