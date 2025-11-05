@@ -1,6 +1,7 @@
 {
   "entry": [
-    "resources/js/app.ts"
+    "resources/js/app.ts",
+    "resources/js/admin-apps.ts"
   ],
   "extensions": [
     ".ts",
@@ -10,6 +11,7 @@
   ],
   "ignoreUnused": [
     "@headlessui/react",
+    "@lexical/extension",
     "@tailwindcss/vite",
     "@types/node",
     "@types/react-resizable",

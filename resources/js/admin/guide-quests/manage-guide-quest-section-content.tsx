@@ -1,19 +1,16 @@
-import Input from "ui/input/input";
-import ImageUploader from "ui/file-upload/image-uploader";
-import MarkDownEditor from "ui/mark-down-editor/mark-down-editor";
-import Button from "ui/buttons/button";
-import {ButtonVariant} from "ui/buttons/enums/button-variant-enum";
 import React from 'react';
+
+import Button from 'ui/buttons/button';
+import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import ImageUploader from 'ui/file-upload/image-uploader';
+import Input from 'ui/input/input';
+import MarkDownEditor from 'ui/mark-down-editor/mark-down-editor';
 
 const ManageGuideQuestSectionContent = () => {
   return (
     <div className="rounded-md border-1 border-gray-500 p-2 pb-4">
       <div className="my-2">
-        <Input
-          on_change={() => {}}
-          value={''}
-          place_holder={'Section Title'}
-        />
+        <Input on_change={() => {}} value={''} place_holder={'Section Title'} />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <ImageUploader />
@@ -33,7 +30,7 @@ const ManageGuideQuestSectionContent = () => {
         />
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default ManageGuideQuestSectionContent;

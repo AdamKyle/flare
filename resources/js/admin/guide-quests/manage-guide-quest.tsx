@@ -1,9 +1,10 @@
 import React from 'react';
 
+import ManageGuideQuestSectionContent from './manage-guide-quest-section-content';
+
 import Card from 'ui/cards/card';
 import WideContainerWrapper from 'ui/container/wide-container-wrapper';
 import Separator from 'ui/separator/separator';
-import ManageGuideQuestSectionContent from "./manage-guide-quest-section-content";
 
 const ManageGuideQuest = () => {
   return (
