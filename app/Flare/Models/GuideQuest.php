@@ -82,6 +82,9 @@ class GuideQuest extends Model
      * @var array
      */
     protected $casts = [
+        'intro_text' => 'array',
+        'desktop_instructions' => 'array',
+        'mobile_instructions' => 'array',
         'required_level' => 'integer',
         'required_skill' => 'integer',
         'required_skill_level' => 'integer',

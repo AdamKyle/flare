@@ -83,7 +83,8 @@
         "tailwindcss-classnames": "^3.0.2",
         "tippy.js": "^6.3.7",
         "ts-pattern": "^5.5.0",
-        "tsyringe": "^4.8.0"
+        "tsyringe": "^4.8.0",
+        "uuid": "^13.0.0"
     },
     "type": "module"
 }

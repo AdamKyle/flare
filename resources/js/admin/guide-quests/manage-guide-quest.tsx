@@ -1,37 +1,17 @@
+import { ApiHandlerProvider } from 'api-handler/components/api-handler-provider';
 import React from 'react';
+import { ServiceContainer } from 'service-container-provider/service-container';
 
-import ManageGuideQuestSectionContent from './components/manage-guide-quest-section-content';
+import ManageGuideQuestsForm from './form-components/manage-guide-quests-form';
+import ManageGuideQuestProps from './types/manage-guide-quest-props';
 
-import WideContainerWrapper from 'ui/container/wide-container-wrapper';
-import FormWizard from 'ui/form-wizard/form-wizard';
-import Step from 'ui/form-wizard/step';
-import Input from 'ui/input/input';
-
-const ManageGuideQuest = () => {
+const ManageGuideQuest = ({ guide_quest_id }: ManageGuideQuestProps) => {
   return (
-    <WideContainerWrapper>
-      <FormWizard
-        total_steps={2}
-        name="Create / Edit Guide Quest"
-        is_loading={false}
-        on_request_next={(current_index: number) => {
-          return true;
-        }}
-      >
-        <Step step_title="Basic Info" key="basic">
-          <Input
-            on_change={() => {}}
-            key={'guide-quest-name'}
-            value={''}
-            place_holder={'Whats the name?'}
-          />
-        </Step>
-
-        <Step step_title="Introduction" key="intro">
-          <ManageGuideQuestSectionContent />
-        </Step>
-      </FormWizard>
-    </WideContainerWrapper>
+    <ServiceContainer>
+      <ApiHandlerProvider>
+        <ManageGuideQuestsForm guide_quest_id={guide_quest_id} />
+      </ApiHandlerProvider>
+    </ServiceContainer>
   );
 };
 

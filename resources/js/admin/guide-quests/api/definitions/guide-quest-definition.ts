@@ -1,0 +1,64 @@
+export interface GuideQuestContentBlockDefinition {
+  id: string;
+  content: string;
+  image_url: string | File | null;
+}
+
+export default interface GuideQuestDefinition {
+  id: number;
+  name: string;
+  intro_text: GuideQuestContentBlockDefinition[] | null;
+  desktop_instructions: GuideQuestContentBlockDefinition[] | null;
+  mobile_instructions: GuideQuestContentBlockDefinition[] | null;
+  required_level: number | null;
+  required_skill: number | null;
+  required_skill_level: number | null;
+  required_faction_id: number | null;
+  required_faction_level: number | null;
+  required_game_map_id: number | null;
+  required_quest_id: number | null;
+  required_quest_item_id: number | null;
+  created_at: string | null;
+  updated_at: string | null;
+  gold_dust_reward: number | null;
+  shards_reward: number | null;
+  required_kingdoms: number | null;
+  required_kingdom_level: number | null;
+  required_kingdom_units: number | null;
+  required_passive_skill: number | null;
+  required_passive_level: number | null;
+  faction_points_per_kill: number | null;
+  required_shards: number | null;
+  xp_reward: number | null;
+  gold_reward: number | null;
+  required_gold_dust: number | null;
+  required_gold: number | null;
+  required_stats: number | null;
+  required_str: number | null;
+  required_dex: number | null;
+  required_int: number | null;
+  required_dur: number | null;
+  required_chr: number | null;
+  required_agi: number | null;
+  required_focus: number | null;
+  required_secondary_skill: number | null;
+  required_secondary_skill_level: number | null;
+  secondary_quest_item_id: number | null;
+  required_skill_type: number | null;
+  required_skill_type_level: number | null;
+  required_class_specials_equipped: number | null;
+  required_class_rank_level: number | null;
+  required_kingdom_building_id: string | null;
+  required_kingdom_building_level: number | null;
+  required_gold_bars: number | null;
+  parent_id: number | null;
+  unlock_at_level: number | null;
+  only_during_event: number | null;
+  be_on_game_map: number | null;
+  required_event_goal_participation: number | null;
+  required_holy_stacks: number | null;
+  required_attached_gems: number | null;
+  required_copper_coins: number | null;
+  required_specialty_type: string | null;
+  required_fame_level: number | null;
+}

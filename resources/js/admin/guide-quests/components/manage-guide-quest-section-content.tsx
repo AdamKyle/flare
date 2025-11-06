@@ -1,19 +1,22 @@
-import React, { useCallback, useState } from 'react';
+import { debounce } from 'lodash';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+
+import UseFetchGuideQuestsDefinition from './types/manage-guide-quest-section-content-props';
+import { GuideQuestContentBlockDefinition } from '../api/definitions/guide-quest-definition';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import ImageUploader from 'ui/file-upload/image-uploader';
-import Input from 'ui/input/input';
 import MarkDownEditor from 'ui/mark-down-editor/mark-down-editor';
 
-const ManageGuideQuestSectionContent = () => {
-  const [sectionTitle, setSectionTitle] = useState<string>('');
-  const [contentBlock, setContentBlock] = useState<string>('');
+const ManageGuideQuestSectionContent = ({
+  step,
+  on_update_content,
+}: UseFetchGuideQuestsDefinition) => {
+  const [contentBlock, setContentBlock] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
-
-  const handleChangeTitle = useCallback((value: string) => {
-    setSectionTitle(value);
-  }, []);
+  const [blockId] = useState(() => uuidv4());
 
   const handleFileChange = useCallback((file: File | null) => {
     setImageFile(file);
@@ -23,41 +26,37 @@ const ManageGuideQuestSectionContent = () => {
     setContentBlock(markdown);
   }, []);
 
-  const handleAddAnotherSection = useCallback(() => {
-    const payload = {
-      content_block: contentBlock,
-      image: imageFile,
+  const emitDebounced = useMemo(
+    () =>
+      debounce(
+        (payload: { intro_text: GuideQuestContentBlockDefinition[] }) => {
+          on_update_content(step, payload);
+        },
+        300
+      ),
+    [on_update_content, step]
+  );
+
+  useEffect(() => {
+    const block: GuideQuestContentBlockDefinition = {
+      id: blockId,
+      content: contentBlock ?? '',
+      image_url: imageFile ?? null,
     };
 
-    const formData = new FormData();
+    emitDebounced({ intro_text: [block] });
 
-    formData.append('content_block', contentBlock ?? '');
+    return () => {
+      emitDebounced.cancel();
+    };
+  }, [contentBlock, imageFile, blockId, emitDebounced]);
 
-    if (imageFile) {
-      formData.append('image', imageFile);
-    }
-
-    // Useful console output to verify contents:
-    // 1) Plain object (easy to read)
-    // 2) FormData entries (what will be sent to the backend)
-    // Note: Logging FormData directly won't show entries reliably across browsers.
-    // Keeping console usage only here, as requested.
-
-    console.log('section payload (object):', payload);
-
-    console.log('section payload (FormData):', Array.from(formData.entries()));
-  }, [contentBlock, imageFile]);
+  const handleAddAnotherSection = useCallback(() => {
+    return;
+  }, []);
 
   return (
     <div className="container rounded-md border-1 border-gray-500 p-2 pb-4">
-      <div className="my-2">
-        <Input
-          on_change={handleChangeTitle}
-          value={sectionTitle}
-          place_holder="Section Title"
-        />
-      </div>
-
       <div className="grid grid-cols-2 gap-4">
         <ImageUploader onFileChange={handleFileChange} />
         <MarkDownEditor on_value_change={handleMarkdownChange} />

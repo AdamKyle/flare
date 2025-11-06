@@ -18,6 +18,7 @@ use App\Admin\Services\SuggestionAndBugsService;
 use App\Admin\Services\SurveyService;
 use App\Admin\Services\UpdateCharacterStatsService;
 use App\Admin\Services\UserService;
+use App\Admin\Transformers\GuideQuestTransformer;
 use App\Flare\Cache\CoordinatesCache;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
@@ -78,6 +79,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(SiteStatisticsService::class, function () {
             return new SiteStatisticsService;
+        });
+
+        $this->app->bind(GuideQuestTransformer::class, function() {
+            return new GuideQuestTransformer;
         });
 
         $this->commands([CreateAdminAccount::class, GiveKingdomsToNpcs::class]);
