@@ -2,20 +2,35 @@ import React from 'react';
 
 import ManageGuideQuestSectionContent from './components/manage-guide-quest-section-content';
 
-import Card from 'ui/cards/card';
 import WideContainerWrapper from 'ui/container/wide-container-wrapper';
-import Separator from 'ui/separator/separator';
+import FormWizard from 'ui/form-wizard/form-wizard';
+import Step from 'ui/form-wizard/step';
+import Input from 'ui/input/input';
 
 const ManageGuideQuest = () => {
   return (
     <WideContainerWrapper>
-      <Card>
-        <h2 className={'text-xl text-gray-800 dark:text-gray-400'}>
-          Edit/Create Guide Quests
-        </h2>
-        <Separator />
-        <ManageGuideQuestSectionContent />
-      </Card>
+      <FormWizard
+        total_steps={2}
+        name="Create / Edit Guide Quest"
+        is_loading={false}
+        on_request_next={(current_index: number) => {
+          return true;
+        }}
+      >
+        <Step step_title="Basic Info" key="basic">
+          <Input
+            on_change={() => {}}
+            key={'guide-quest-name'}
+            value={''}
+            place_holder={'Whats the name?'}
+          />
+        </Step>
+
+        <Step step_title="Introduction" key="intro">
+          <ManageGuideQuestSectionContent />
+        </Step>
+      </FormWizard>
     </WideContainerWrapper>
   );
 };

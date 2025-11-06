@@ -30,7 +30,9 @@ const ManageGuideQuestSectionContent = () => {
     };
 
     const formData = new FormData();
+
     formData.append('content_block', contentBlock ?? '');
+
     if (imageFile) {
       formData.append('image', imageFile);
     }
