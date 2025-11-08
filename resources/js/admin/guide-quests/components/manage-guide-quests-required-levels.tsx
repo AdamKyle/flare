@@ -70,9 +70,9 @@ const ManageGuideQuestsRequiredLevels = ({
   };
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-      <div className="flex flex-col">
-        <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+    <div className="space-y-4">
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
           Required Level
         </label>
         <Input
@@ -80,8 +80,8 @@ const ManageGuideQuestsRequiredLevels = ({
         />
       </div>
 
-      <div className="flex flex-col">
-        <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
           Required Skill
         </label>
         <Dropdown
@@ -90,8 +90,8 @@ const ManageGuideQuestsRequiredLevels = ({
         />
       </div>
 
-      <div className="flex flex-col">
-        <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
           Required Skill Level
         </label>
         <Input
@@ -101,8 +101,8 @@ const ManageGuideQuestsRequiredLevels = ({
         />
       </div>
 
-      <div className="flex flex-col">
-        <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
           Secondary Required Skill
         </label>
         <Dropdown
@@ -113,8 +113,8 @@ const ManageGuideQuestsRequiredLevels = ({
         />
       </div>
 
-      <div className="flex flex-col">
-        <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
           Secondary Required Skill Level
         </label>
         <Input
@@ -124,8 +124,8 @@ const ManageGuideQuestsRequiredLevels = ({
         />
       </div>
 
-      <div className="flex flex-col">
-        <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
           Required Skill Type
         </label>
         <Dropdown
@@ -136,8 +136,8 @@ const ManageGuideQuestsRequiredLevels = ({
         />
       </div>
 
-      <div className="flex flex-col md:col-span-2">
-        <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
           Required Skill Type Level
         </label>
         <Input
