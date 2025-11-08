@@ -2,10 +2,11 @@ import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import { isEmpty, debounce } from 'lodash';
 import React, { useMemo, useState } from 'react';
 
-import ManageGuideQuestSectionContent from '../components/manage-guide-quest-section-content';
+import ManageGuideQuestsTextContent from './manage-guide-quest-text-content';
 import ManageGuideQuestsFormProps from './types/manage-guide-quests-form-props';
 import GuideQuestDefinition from '../api/definitions/guide-quest-definition';
 import { useFetchGuideQuest } from '../api/hooks/use-fetch-guide-quest';
+import ManageGuideQuestsRequiredLevels from '../components/manage-guide-quests-required-levels';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
@@ -59,7 +60,7 @@ const ManageGuideQuestsForm = ({
     debounced_store_name(value);
   };
 
-  const handleIntroTextFormData = (
+  const handleSetFormDataFromComponent = (
     step: number,
     data: Partial<GuideQuestDefinition>
   ) => {
@@ -76,7 +77,7 @@ const ManageGuideQuestsForm = ({
     });
   };
 
-  if (loading && guide_quest_id !== 0) {
+  if (loading) {
     return (
       <WideContainerWrapper>
         <Card>
@@ -86,7 +87,7 @@ const ManageGuideQuestsForm = ({
     );
   }
 
-  if (!data && guide_quest_id !== 0) {
+  if (!data) {
     return (
       <WideContainerWrapper>
         <Card>
@@ -112,7 +113,7 @@ const ManageGuideQuestsForm = ({
   return (
     <WideContainerWrapper>
       <FormWizard
-        total_steps={2}
+        total_steps={3}
         name="Create / Edit Guide Quest"
         is_loading={false}
         on_request_next={handleNextStep}
@@ -126,14 +127,27 @@ const ManageGuideQuestsForm = ({
         </Step>
 
         <Step step_title="Introduction" key="intro">
-          <ManageGuideQuestSectionContent
+          <ManageGuideQuestsTextContent
             step={1}
-            on_update_content={handleIntroTextFormData}
+            on_update_content={handleSetFormDataFromComponent}
+            field_key={'intro_text'}
           />
         </Step>
 
         <Step step_title={'Desktop Instructions'} key={'desktop-instructions'}>
-          A new form
+          <ManageGuideQuestsTextContent
+            step={2}
+            on_update_content={handleSetFormDataFromComponent}
+            field_key={'desktop_instructions'}
+          />
+        </Step>
+        <Step step_title={'Required levels'} key={'required-levels'}>
+          <ManageGuideQuestsRequiredLevels
+            data_for_component={data}
+            on_update={(formData) =>
+              handleSetFormDataFromComponent(3, formData)
+            }
+          />
         </Step>
       </FormWizard>
     </WideContainerWrapper>

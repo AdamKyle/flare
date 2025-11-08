@@ -1,9 +1,9 @@
 import { AxiosErrorDefinition } from 'api-handler/definitions/axios-error-definition';
 
-import GuideQuestDefinition from '../../definitions/guide-quest-definition';
+import GuideQuestResponseDefinition from '../../definitions/guide-quest-response-defintion';
 
 export default interface UseFetchGuideQuestsDefinition {
-  data: GuideQuestDefinition | null;
+  data: GuideQuestResponseDefinition | null;
   error: AxiosErrorDefinition | null;
   loading: boolean;
 }

@@ -1,3 +1,3 @@
 export enum GuideQuestApiUrls {
-  FETCH_GUIDE_QUEST = 'admin/guide-quests/{guideQuest}',
+  FETCH_GUIDE_QUEST = '/admin/manage-guide-quest',
 }
