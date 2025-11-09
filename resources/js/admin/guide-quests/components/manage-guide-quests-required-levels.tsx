@@ -1,73 +1,17 @@
-import { debounce } from 'lodash';
-import React, { useEffect, useMemo, useState } from 'react';
-
-import ManageGuideQuesRequired from './types/manage-guide-quests-required-levels-props';
-import GuideQuestDefinition from '../api/definitions/guide-quest-definition';
+import React from 'react';
 
 import Dropdown from 'ui/drop-down/drop-down';
-import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import Input from 'ui/input/input';
+import ManageGuideQuestStepProps from "./types/manage-guide-quest-step-props";
+import {useManageFormSectionData} from "../hooks/use-manage-form-section-data";
 
 const ManageGuideQuestsRequiredLevels = ({
   data_for_component,
   on_update,
-}: ManageGuideQuesRequired) => {
-  const [requiredQuestLevels, setRequiredQuestLevels] =
-    useState<Partial<GuideQuestDefinition> | null>(null);
-
-  const convertObjectToKeyValue = (object: {
-    [key: string | number]: string;
-  }) => {
-    return Object.entries(object)
-      .map(([id, label]) => ({ value: Number(id), label }))
-      .sort((a, b) => a.value - b.value);
-  };
-
-  const requiredSkillsOptions = useMemo<DropdownItem[]>(() => {
-    const gameSkills = data_for_component.game_skills;
-
-    return convertObjectToKeyValue(gameSkills);
-  }, [data_for_component.game_skills]);
-
-  const requiredSkillTypeOptions = useMemo<DropdownItem[]>(() => {
-    return data_for_component.skill_types.map((skillType: string) => {
-      return {
-        label: skillType,
-        value: skillType,
-      };
-    });
-  }, [data_for_component.skill_types]);
-
-  const emitUp = useMemo(
-    () =>
-      debounce((payload: Partial<GuideQuestDefinition>) => {
-        on_update(payload);
-      }, 300),
-    [on_update]
-  );
-
-  useEffect(() => {
-    if (!requiredQuestLevels) {
-      return;
-    }
-
-    emitUp(requiredQuestLevels);
-
-    return () => {
-      emitUp.cancel();
-    };
-  }, [requiredQuestLevels, emitUp]);
-
-  const handleUpdateFormData = (key: string, value: DropdownItem | string) => {
-    setRequiredQuestLevels((prev) => {
-      const keyValue = typeof value === 'object' ? value.value : value;
-
-      return {
-        ...prev,
-        [key]: keyValue,
-      };
-    });
-  };
+}: ManageGuideQuestStepProps) => {
+  const {convertObjectToKeyValue, handleUpdateFormData, convertArrayToDropDown} = useManageFormSectionData({
+    on_update,
+  })
 
   return (
     <div className="space-y-4">
@@ -85,7 +29,7 @@ const ManageGuideQuestsRequiredLevels = ({
           Required Skill
         </label>
         <Dropdown
-          items={requiredSkillsOptions}
+          items={convertObjectToKeyValue(data_for_component.game_skills)}
           on_select={(value) => handleUpdateFormData('required_skill', value)}
         />
       </div>
@@ -106,7 +50,7 @@ const ManageGuideQuestsRequiredLevels = ({
           Secondary Required Skill
         </label>
         <Dropdown
-          items={requiredSkillsOptions}
+          items={convertObjectToKeyValue(data_for_component.game_skills)}
           on_select={(value) =>
             handleUpdateFormData('required_secondary_skill', value)
           }
@@ -129,7 +73,7 @@ const ManageGuideQuestsRequiredLevels = ({
           Required Skill Type
         </label>
         <Dropdown
-          items={requiredSkillTypeOptions}
+          items={convertArrayToDropDown(data_for_component.skill_types)}
           on_select={(value) =>
             handleUpdateFormData('required_skill_type', value)
           }

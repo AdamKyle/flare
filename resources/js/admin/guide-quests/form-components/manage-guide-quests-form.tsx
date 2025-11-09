@@ -16,6 +16,9 @@ import FormWizard from 'ui/form-wizard/form-wizard';
 import Step from 'ui/form-wizard/step';
 import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
+import ManageGuideQuestRequiredFaction from "../components/manage-guide-quest-required-faction";
+import ManageGuideQuestsRequiredStats from "../components/manage-guide-quests-required-stats";
+import ManageGuideQuestsRequiredKingdomAttributes from "../components/manage-guide-quests-required-kingdom-attributes";
 
 const ManageGuideQuestsForm = ({
   guide_quest_id,
@@ -113,7 +116,7 @@ const ManageGuideQuestsForm = ({
   return (
     <WideContainerWrapper>
       <FormWizard
-        total_steps={3}
+        total_steps={5}
         name="Create / Edit Guide Quest"
         is_loading={false}
         on_request_next={handleNextStep}
@@ -147,6 +150,30 @@ const ManageGuideQuestsForm = ({
             on_update={(formData) =>
               handleSetFormDataFromComponent(3, formData)
             }
+          />
+        </Step>
+        <Step step_title={'Faction Requirements'} key={'required-faction-levels'}>
+          <ManageGuideQuestRequiredFaction
+            data_for_component={data}
+            on_update={(formData) => {
+              handleSetFormDataFromComponent(4, formData);
+            }}
+          />
+        </Step>
+        <Step step_title={'Required Stats'} key={'required-stats'}>
+          <ManageGuideQuestsRequiredStats
+            data_for_component={data}
+            on_update={(formData) => {
+              handleSetFormDataFromComponent(5, formData);
+            }}
+          />
+        </Step>
+        <Step step_title={'Required Kingdom Attributes'} key={'required-kingdom-attributes'}>
+          <ManageGuideQuestsRequiredKingdomAttributes
+            data_for_component={data}
+            on_update={(formData) => {
+              handleSetFormDataFromComponent(6, formData);
+            }}
           />
         </Step>
       </FormWizard>
