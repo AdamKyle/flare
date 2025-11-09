@@ -16,6 +16,7 @@ import ManageGuideQuestsRequiredLevels from '../components/manage-guide-quests-r
 import ManageGuideQuestsRequiredQuestAndPlaneAttributes from '../components/manage-guide-quests-required-quest-and-plane-attributes';
 import ManageGuideQuestsRequiredStats from '../components/manage-guide-quests-required-stats';
 import ManageGuideQuestsRewardsAndBonuses from '../components/manage-guide-quests-rewards-and-bonuses';
+import { makeRequestObject } from '../utils/guide-quest-form-data-util';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
@@ -44,11 +45,17 @@ const ManageGuideQuestsForm = ({
       return true;
     }
 
-    if (isFormDataEmpty) {
-      return false;
-    }
+    const requestObject = makeRequestObject(
+      guide_quest_id,
+      data_for_submission ?? {}
+    );
 
-    return true;
+    console.log('handle next step - ready to submit form:', {
+      current_index,
+      requestObject,
+    });
+
+    return !isFormDataEmpty;
   };
 
   const handleSetFormDataFromComponent = (
