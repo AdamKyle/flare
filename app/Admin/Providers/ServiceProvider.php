@@ -81,7 +81,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new SiteStatisticsService;
         });
 
-        $this->app->bind(GuideQuestTransformer::class, function() {
+        $this->app->bind(GuideQuestTransformer::class, function () {
             return new GuideQuestTransformer;
         });
 

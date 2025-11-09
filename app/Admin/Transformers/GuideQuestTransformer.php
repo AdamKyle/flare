@@ -9,9 +9,6 @@ class GuideQuestTransformer extends BaseTransformer
 {
     /**
      * Transform a guide quest into a response array.
-     *
-     * @param GuideQuest $guideQuest
-     * @return array
      */
     public function transform(GuideQuest $guideQuest): array
     {

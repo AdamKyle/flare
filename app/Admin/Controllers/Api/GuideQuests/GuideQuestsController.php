@@ -19,26 +19,17 @@ use Illuminate\Http\JsonResponse;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 
-class GuideQuestsController {
+class GuideQuestsController
+{
+    public function __construct(private readonly PlainDataSerializer $plainDataSerializer, private readonly Manager $manager, private readonly GuideQuestTransformer $guideQuestTransformer) {}
 
-    /**
-     * @param PlainDataSerializer $plainDataSerializer
-     * @param Manager $manager
-     * @param GuideQuestTransformer $guideQuestTransformer
-     */
-    public function __construct(private readonly PlainDataSerializer $plainDataSerializer, private readonly Manager $manager, private readonly GuideQuestTransformer $guideQuestTransformer) {
-    }
-
-    /**
-     * @param GuideQuestRequest $request
-     * @return JsonResponse
-     */
-    public function guideQuest(GuideQuestRequest $request): JsonResponse {
+    public function guideQuest(GuideQuestRequest $request): JsonResponse
+    {
 
         $guideQuest = GuideQuest::find($request->guide_quest_id);
         $guideQuestData = null;
 
-        if (!is_null($guideQuest)) {
+        if (! is_null($guideQuest)) {
             $guideQuestData = new Item($guideQuest, $this->guideQuestTransformer);
             $guideQuestData = $this->manager->setSerializer($this->plainDataSerializer)->createData($guideQuestData)->toArray();
         }
