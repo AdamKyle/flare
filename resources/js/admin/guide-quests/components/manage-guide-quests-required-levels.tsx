@@ -1,17 +1,22 @@
 import React from 'react';
 
+import ManageGuideQuestStepProps from './types/manage-guide-quest-step-props';
+import { useManageFormSectionData } from '../hooks/use-manage-form-section-data';
+
 import Dropdown from 'ui/drop-down/drop-down';
 import Input from 'ui/input/input';
-import ManageGuideQuestStepProps from "./types/manage-guide-quest-step-props";
-import {useManageFormSectionData} from "../hooks/use-manage-form-section-data";
 
 const ManageGuideQuestsRequiredLevels = ({
   data_for_component,
   on_update,
 }: ManageGuideQuestStepProps) => {
-  const {convertObjectToKeyValue, handleUpdateFormData, convertArrayToDropDown} = useManageFormSectionData({
+  const {
+    convertObjectToKeyValue,
+    handleUpdateFormData,
+    convertArrayToDropDown,
+  } = useManageFormSectionData({
     on_update,
-  })
+  });
 
   return (
     <div className="space-y-4">

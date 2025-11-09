@@ -32,8 +32,6 @@ export const useFetchGuideQuest = ({
         },
       });
 
-      console.log(result);
-
       setData(result);
     } catch (err) {
       if (err instanceof AxiosError) {

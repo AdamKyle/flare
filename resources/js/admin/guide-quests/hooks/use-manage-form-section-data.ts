@@ -1,50 +1,68 @@
-import { useEffect, useMemo, useState } from 'react';
-import { debounce } from 'lodash';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import UseManagementFormSectionParams from './definitions/use-manage-form-section-params';
-import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
-import GuideQuestDefinition from '../api/definitions/guide-quest-definition';
 import UseManageFormSectionDefinition from './definitions/use-manage-form-section-definition';
+import UseManagementFormSectionParams from './definitions/use-manage-form-section-params';
+import GuideQuestDefinition from '../api/definitions/guide-quest-definition';
 
-export const useManageFormSectionData = ({ on_update }: UseManagementFormSectionParams): UseManageFormSectionDefinition => {
-  const [requiredQuestLevels, setRequiredQuestLevels] = useState<Partial<GuideQuestDefinition> | null>(null);
+import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
-  const emitUp = useMemo(
-    () =>
-      debounce((payload: Partial<GuideQuestDefinition>) => {
-        on_update(payload);
-      }, 300),
-    [on_update]
+export const useManageFormSectionData = ({
+  on_update,
+}: UseManagementFormSectionParams): UseManageFormSectionDefinition => {
+  const debounceTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(
+    new Map()
   );
 
+  const [stepFormData, setSetpFormData] =
+    useState<Partial<GuideQuestDefinition> | null>(null);
+
   useEffect(() => {
-    if (!requiredQuestLevels) {
+    if (!stepFormData) {
       return;
     }
 
-    emitUp(requiredQuestLevels);
+    on_update(stepFormData);
+  }, [stepFormData, on_update]);
 
+  useEffect(() => {
     return () => {
-      emitUp.cancel();
+      debounceTimersRef.current.forEach((timeoutId) => clearTimeout(timeoutId));
+      debounceTimersRef.current.clear();
     };
-  }, [requiredQuestLevels, emitUp]);
+  }, []);
 
-  const convertObjectToKeyValue = (object: { [key: string | number]: string }) => {
-    return Object.entries(object)
-      .map(([id, label]) => ({ value: Number(id), label }))
-      .sort((a, b) => a.value - b.value);
+  const convertObjectToKeyValue = (object: {
+    [key: string | number]: string;
+  }) => {
+    return Object.entries(object).map(([valueAsString, label]) => ({
+      value: valueAsString,
+      label,
+    }));
   };
 
-  const handleUpdateFormData = (key: string, value: DropdownItem | string) => {
-    setRequiredQuestLevels((prev) => {
-      const keyValue = typeof value === 'object' ? value.value : value;
+  const handleUpdateFormData = useCallback(
+    (key: string, value: DropdownItem | string) => {
+      if (typeof value === 'object') {
+        setSetpFormData((previous) => ({ ...previous, [key]: value.value }));
+        return;
+      }
 
-      return {
-        ...prev,
-        [key]: keyValue,
-      };
-    });
-  };
+      const timers = debounceTimersRef.current;
+      const existing = timers.get(key);
+
+      if (existing) {
+        clearTimeout(existing);
+      }
+
+      const timeoutId = setTimeout(() => {
+        setSetpFormData((previous) => ({ ...previous, [key]: value }));
+        timers.delete(key);
+      }, 300);
+
+      timers.set(key, timeoutId);
+    },
+    []
+  );
 
   const convertArrayToDropDown = (data: string[]): DropdownItem[] => {
     return data.map((skillType: string) => {
@@ -53,7 +71,7 @@ export const useManageFormSectionData = ({ on_update }: UseManagementFormSection
         value: skillType,
       };
     });
-  }
+  };
 
   return {
     convertObjectToKeyValue,

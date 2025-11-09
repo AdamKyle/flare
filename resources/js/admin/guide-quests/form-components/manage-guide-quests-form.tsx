@@ -1,12 +1,21 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
-import { isEmpty, debounce } from 'lodash';
-import React, { useMemo, useState } from 'react';
+import { isEmpty } from 'lodash';
+import React, { useState } from 'react';
 
 import ManageGuideQuestsTextContent from './manage-guide-quest-text-content';
 import ManageGuideQuestsFormProps from './types/manage-guide-quests-form-props';
 import GuideQuestDefinition from '../api/definitions/guide-quest-definition';
 import { useFetchGuideQuest } from '../api/hooks/use-fetch-guide-quest';
+import ManageGuideQuestRequiredFaction from '../components/manage-guide-quest-required-faction';
+import ManageGuideQuestsBasicQuestAttributes from '../components/manage-guide-quests-basic-quest-attributes';
+import ManageGuideQuestsRequiredClassRanksAttributes from '../components/manage-guide-quests-required-class-ranks-attributes';
+import ManageGuideQuestsRequiredCurrencies from '../components/manage-guide-quests-required-currencies';
+import ManageGuideQuestsRequiredItemAttributes from '../components/manage-guide-quests-required-item-attributes';
+import ManageGuideQuestsRequiredKingdomAttributes from '../components/manage-guide-quests-required-kingdom-attributes';
 import ManageGuideQuestsRequiredLevels from '../components/manage-guide-quests-required-levels';
+import ManageGuideQuestsRequiredQuestAndPlaneAttributes from '../components/manage-guide-quests-required-quest-and-plane-attributes';
+import ManageGuideQuestsRequiredStats from '../components/manage-guide-quests-required-stats';
+import ManageGuideQuestsRewardsAndBonuses from '../components/manage-guide-quests-rewards-and-bonuses';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
@@ -14,11 +23,7 @@ import Card from 'ui/cards/card';
 import WideContainerWrapper from 'ui/container/wide-container-wrapper';
 import FormWizard from 'ui/form-wizard/form-wizard';
 import Step from 'ui/form-wizard/step';
-import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
-import ManageGuideQuestRequiredFaction from "../components/manage-guide-quest-required-faction";
-import ManageGuideQuestsRequiredStats from "../components/manage-guide-quests-required-stats";
-import ManageGuideQuestsRequiredKingdomAttributes from "../components/manage-guide-quests-required-kingdom-attributes";
 
 const ManageGuideQuestsForm = ({
   guide_quest_id,
@@ -28,39 +33,22 @@ const ManageGuideQuestsForm = ({
   const [formData, setFormData] = useState<
     Array<Partial<GuideQuestDefinition> | null>
   >([]);
-  const [name_value, set_name_value] = useState('');
-
-  const debounced_store_name = useMemo(
-    () =>
-      debounce((value: string) => {
-        setFormData((prev) => {
-          const next = prev.slice();
-          if (next.length === 0) {
-            next.length = 1;
-          }
-          const existing = next[0] ?? {};
-          next[0] = { ...existing, name: value };
-          return next;
-        });
-      }, 300),
-    []
-  );
 
   const handleNextStep = (current_index: number): boolean => {
     const data_for_submission = formData[current_index];
 
-    if (!data_for_submission || isEmpty(data_for_submission)) {
+    const isFormDataEmpty =
+      !data_for_submission || isEmpty(data_for_submission);
+
+    if (current_index >= 4 && isFormDataEmpty) {
+      return true;
+    }
+
+    if (isFormDataEmpty) {
       return false;
     }
 
-    console.log(current_index, data_for_submission);
-
     return true;
-  };
-
-  const handleNameChange = (value: string) => {
-    set_name_value(value);
-    debounced_store_name(value);
   };
 
   const handleSetFormDataFromComponent = (
@@ -116,16 +104,17 @@ const ManageGuideQuestsForm = ({
   return (
     <WideContainerWrapper>
       <FormWizard
-        total_steps={5}
+        total_steps={13}
         name="Create / Edit Guide Quest"
         is_loading={false}
         on_request_next={handleNextStep}
       >
         <Step step_title="Basic Info" key="basic">
-          <Input
-            on_change={handleNameChange}
-            value={name_value}
-            place_holder="Whats the name?"
+          <ManageGuideQuestsBasicQuestAttributes
+            data_for_component={data}
+            on_update={(formData) =>
+              handleSetFormDataFromComponent(0, formData)
+            }
           />
         </Step>
 
@@ -144,19 +133,29 @@ const ManageGuideQuestsForm = ({
             field_key={'desktop_instructions'}
           />
         </Step>
+        <Step step_title={'Mobile Instructions'} key={'mobile-instructions'}>
+          <ManageGuideQuestsTextContent
+            step={3}
+            on_update_content={handleSetFormDataFromComponent}
+            field_key={'mobile_instructions'}
+          />
+        </Step>
         <Step step_title={'Required levels'} key={'required-levels'}>
           <ManageGuideQuestsRequiredLevels
             data_for_component={data}
             on_update={(formData) =>
-              handleSetFormDataFromComponent(3, formData)
+              handleSetFormDataFromComponent(4, formData)
             }
           />
         </Step>
-        <Step step_title={'Faction Requirements'} key={'required-faction-levels'}>
+        <Step
+          step_title={'Faction Requirements'}
+          key={'required-faction-levels'}
+        >
           <ManageGuideQuestRequiredFaction
             data_for_component={data}
             on_update={(formData) => {
-              handleSetFormDataFromComponent(4, formData);
+              handleSetFormDataFromComponent(5, formData);
             }}
           />
         </Step>
@@ -164,15 +163,72 @@ const ManageGuideQuestsForm = ({
           <ManageGuideQuestsRequiredStats
             data_for_component={data}
             on_update={(formData) => {
-              handleSetFormDataFromComponent(5, formData);
+              handleSetFormDataFromComponent(6, formData);
             }}
           />
         </Step>
-        <Step step_title={'Required Kingdom Attributes'} key={'required-kingdom-attributes'}>
+        <Step
+          step_title={'Required Kingdom Attributes'}
+          key={'required-kingdom-attributes'}
+        >
           <ManageGuideQuestsRequiredKingdomAttributes
             data_for_component={data}
             on_update={(formData) => {
-              handleSetFormDataFromComponent(6, formData);
+              handleSetFormDataFromComponent(7, formData);
+            }}
+          />
+        </Step>
+
+        <Step
+          step_title={'Required Item Attributes'}
+          key={'required-item-attributes'}
+        >
+          <ManageGuideQuestsRequiredItemAttributes
+            data_for_component={data}
+            on_update={(formData) => {
+              handleSetFormDataFromComponent(8, formData);
+            }}
+          />
+        </Step>
+
+        <Step
+          step_title={'Quest and Plane Requirements'}
+          key={'required-quest-attributes'}
+        >
+          <ManageGuideQuestsRequiredQuestAndPlaneAttributes
+            data_for_component={data}
+            on_update={(formData) => {
+              handleSetFormDataFromComponent(9, formData);
+            }}
+          />
+        </Step>
+
+        <Step
+          step_title={'Class Rank Requirements'}
+          key={'required-class-rank-attributes'}
+        >
+          <ManageGuideQuestsRequiredClassRanksAttributes
+            data_for_component={data}
+            on_update={(formData) => {
+              handleSetFormDataFromComponent(10, formData);
+            }}
+          />
+        </Step>
+
+        <Step step_title={'Required Currencies'} key={'required-currencies'}>
+          <ManageGuideQuestsRequiredCurrencies
+            data_for_component={data}
+            on_update={(formData) => {
+              handleSetFormDataFromComponent(11, formData);
+            }}
+          />
+        </Step>
+
+        <Step step_title={'Rewards and Bonuses'} key={'rewards-and-bonuses'}>
+          <ManageGuideQuestsRewardsAndBonuses
+            data_for_component={data}
+            on_update={(formData) => {
+              handleSetFormDataFromComponent(12, formData);
             }}
           />
         </Step>

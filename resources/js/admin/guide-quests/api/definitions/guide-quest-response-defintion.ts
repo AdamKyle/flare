@@ -10,7 +10,7 @@ export default interface GuideQuestResponseDefinition {
   skill_types: string[];
   kingdom_buildings: { [key: number]: string };
   events: string[];
-  guide_quests: { [key: number]: string };
+  guide_quests: { [key: number]: string } | null;
   game_maps: { [key: number]: string };
-  item_specialty_types: string[];
+  item_specialty_types: { [key: string]: string };
 }

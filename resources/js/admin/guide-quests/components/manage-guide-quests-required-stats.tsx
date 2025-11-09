@@ -1,16 +1,14 @@
 import React from 'react';
 
-import Dropdown from 'ui/drop-down/drop-down';
+import ManageGuideQuestStepProps from './types/manage-guide-quest-step-props';
+import { useManageFormSectionData } from '../hooks/use-manage-form-section-data';
+
 import Input from 'ui/input/input';
-import ManageGuideQuestStepProps from "./types/manage-guide-quest-step-props";
-import {useManageFormSectionData} from "../hooks/use-manage-form-section-data";
 
 const ManageGuideQuestsRequiredStats = ({
   on_update,
 }: ManageGuideQuestStepProps) => {
-  const {
-    handleUpdateFormData,
-  } = useManageFormSectionData({
+  const { handleUpdateFormData } = useManageFormSectionData({
     on_update,
   });
 
