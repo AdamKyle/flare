@@ -1,7 +1,8 @@
 import { useMarkdownPaste } from 'ui/mark-down-editor/hooks/use-mark-down-paste';
 
 const MarkdownPastePlugin = (): null => {
-  useMarkdownPaste({});
+  useMarkdownPaste();
+
   return null;
 };
 

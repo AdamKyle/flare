@@ -1,5 +1,5 @@
 import { debounce } from 'lodash';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import ManageGuideQuestsTextContentProps from './types/manage-guide-quest-test-content-props';
@@ -15,61 +15,93 @@ const ManageGuideQuestsTextContent = ({
   field_key,
   on_update_content,
 }: ManageGuideQuestsTextContentProps) => {
-  const [blocks, set_blocks] = useState<GuideQuestContentBlockDefinition[]>([
-    { id: uuidv4(), content: '', image_url: null },
-  ]);
+  const [contentBlocks, setContentBlocks] = useState<
+    GuideQuestContentBlockDefinition[]
+  >([{ id: uuidv4(), content: '', image_url: null }]);
 
-  const debounced_emit = useMemo(
-    () =>
-      debounce((current_blocks: GuideQuestContentBlockDefinition[]) => {
-        const payload = { [field_key]: current_blocks } as unknown as Partial<
-          Record<typeof field_key, GuideQuestContentBlockDefinition[]>
-        >;
+  const latestRefs = useRef({
+    on_update_content,
+    step,
+    field_key,
+  });
 
-        on_update_content(step, payload);
-      }, 300),
-    [on_update_content, step, field_key]
+  useEffect(() => {
+    latestRefs.current.on_update_content = on_update_content;
+    latestRefs.current.step = step;
+    latestRefs.current.field_key = field_key;
+  }, [on_update_content, step, field_key]);
+
+  const debouncedEmitRef = useRef(
+    debounce((currentBlocks: GuideQuestContentBlockDefinition[]) => {
+      const {
+        on_update_content: onUpdate,
+        step: currentStep,
+        field_key: fieldKey,
+      } = latestRefs.current;
+
+      const payload = {
+        [fieldKey]: currentBlocks,
+      } as unknown as Partial<
+        Record<typeof field_key, GuideQuestContentBlockDefinition[]>
+      >;
+
+      onUpdate(currentStep, payload);
+    }, 300)
   );
 
   useEffect(() => {
-    debounced_emit(blocks);
-
     return () => {
-      debounced_emit.cancel();
+      debouncedEmitRef.current.cancel();
     };
-  }, [blocks, debounced_emit]);
-
-  const handle_markdown_change = useCallback((id: string, markdown: string) => {
-    set_blocks((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, content: markdown ?? '' } : b))
-    );
   }, []);
 
-  const handle_file_change = useCallback((id: string, file: File | null) => {
-    set_blocks((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, image_url: file ?? null } : b))
-    );
+  const handleMarkdownChange = useCallback((id: string, markdown: string) => {
+    setContentBlocks((previousBlocks) => {
+      const nextBlocks = previousBlocks.map((block) =>
+        block.id === id ? { ...block, content: markdown ?? '' } : block
+      );
+      debouncedEmitRef.current(nextBlocks);
+      return nextBlocks;
+    });
   }, []);
 
-  const handle_add_blank = useCallback(() => {
-    set_blocks((prev) => [
-      ...prev,
-      { id: uuidv4(), content: '', image_url: null },
-    ]);
+  const handleFileChange = useCallback((id: string, file: File | null) => {
+    setContentBlocks((previousBlocks) => {
+      const nextBlocks = previousBlocks.map((block) =>
+        block.id === id ? { ...block, image_url: file ?? null } : block
+      );
+      debouncedEmitRef.current(nextBlocks);
+      return nextBlocks;
+    });
   }, []);
 
-  const handle_remove = useCallback((id: string) => {
-    set_blocks((prev) => prev.filter((b) => b.id !== id));
+  const handleAddSection = useCallback(() => {
+    setContentBlocks((previousBlocks) => {
+      const nextBlocks = [
+        ...previousBlocks,
+        { id: uuidv4(), content: '', image_url: null },
+      ];
+      debouncedEmitRef.current(nextBlocks);
+      return nextBlocks;
+    });
   }, []);
 
-  const render_remove_button = (can_remove: boolean, id: string) => {
-    if (!can_remove) {
+  const handleRemoveSection = useCallback((id: string) => {
+    setContentBlocks((previousBlocks) => {
+      const nextBlocks = previousBlocks.filter((block) => block.id !== id);
+      debouncedEmitRef.current(nextBlocks);
+      return nextBlocks;
+    });
+  }, []);
+
+  const renderRemoveButton = (canRemove: boolean, id: string) => {
+    if (!canRemove) {
       return null;
     }
 
     return (
       <Button
-        on_click={() => handle_remove(id)}
+        on_click={() => handleRemoveSection(id)}
         label="Remove Section"
         variant={ButtonVariant.DANGER}
         additional_css="ml-2"
@@ -77,9 +109,9 @@ const ManageGuideQuestsTextContent = ({
     );
   };
 
-  const render_row = (
+  const renderRow = (
     block: GuideQuestContentBlockDefinition,
-    can_remove: boolean
+    canRemove: boolean
   ) => {
     return (
       <div
@@ -88,40 +120,42 @@ const ManageGuideQuestsTextContent = ({
       >
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <ImageUploader
-            onFileChange={(file) => handle_file_change(block.id, file)}
+            onFileChange={(file) => handleFileChange(block.id, file)}
           />
           <MarkDownEditor
-            on_value_change={(md) => handle_markdown_change(block.id, md)}
+            on_value_change={(markdown) =>
+              handleMarkdownChange(block.id, markdown)
+            }
           />
         </div>
 
         <div className="mt-4 w-full text-right">
           <Button
-            on_click={handle_add_blank}
+            on_click={handleAddSection}
             label="Add Another Section"
             variant={ButtonVariant.PRIMARY}
           />
-          {render_remove_button(can_remove, block.id)}
+          {renderRemoveButton(canRemove, block.id)}
         </div>
       </div>
     );
   };
 
-  const render_rows = () => {
-    if (!blocks.length) {
+  const renderRows = () => {
+    if (!contentBlocks.length) {
       return null;
     }
 
-    const can_remove = blocks.length > 1;
+    const canRemove = contentBlocks.length > 1;
 
     return (
       <div className="space-y-4">
-        {blocks.map((block) => render_row(block, can_remove))}
+        {contentBlocks.map((block) => renderRow(block, canRemove))}
       </div>
     );
   };
 
-  return <div className="w-full">{render_rows()}</div>;
+  return <div className="w-full">{renderRows()}</div>;
 };
 
 export default ManageGuideQuestsTextContent;

@@ -3,7 +3,6 @@ import { ListItemNode, ListNode } from '@lexical/list';
 import {
   $convertFromMarkdownString,
   $convertToMarkdownString,
-  TRANSFORMERS,
 } from '@lexical/markdown';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import type { InitialConfigType } from '@lexical/react/LexicalComposer';
@@ -19,10 +18,10 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { EditorState, LexicalEditor } from 'lexical';
-import { debounce } from 'lodash';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 
+import { useMarkdownPaste } from 'ui/mark-down-editor/hooks/use-mark-down-paste';
 import MarkdownPastePlugin from 'ui/mark-down-editor/plugins/mark-down-paste-plugin';
 import {
   content_editable_classes,
@@ -35,35 +34,17 @@ import { mark_down_editor_theme } from 'ui/mark-down-editor/styles/mark-down-edi
 import ToolbarPlugin from 'ui/mark-down-editor/tool-bar';
 import MarkDownEditorProps from 'ui/mark-down-editor/types/mark-down-editor-props';
 
-function MarkDownEditor(props: MarkDownEditorProps) {
-  const {
-    id,
-    placeholder = 'Start typing…',
-    on_value_change,
-    class_name,
-    initial_markdown,
-  } = props;
+function MarkDownEditor({
+  id,
+  placeholder = 'Start typing…',
+  on_value_change,
+  class_name,
+  initial_markdown,
+}: MarkDownEditorProps) {
+  const { transformers } = useMarkdownPaste();
 
   const [is_preview, set_is_preview] = useState(false);
   const [markdown_value, set_markdown_value] = useState(initial_markdown ?? '');
-
-  const transformerList = useMemo(() => {
-    return TRANSFORMERS.filter((tr: unknown) => {
-      const t = tr as { dependencies?: unknown[]; type?: unknown };
-      const deps = Array.isArray(t.dependencies) ? t.dependencies : [];
-      const typeName = String(t.type ?? '').toLowerCase();
-      if (deps.some((d) => String(d).toLowerCase().includes('code'))) {
-        return false;
-      }
-      if (typeName.includes('code')) {
-        return false;
-      }
-      if (typeName.includes('strikethrough')) {
-        return false;
-      }
-      return true;
-    });
-  }, []);
 
   const initial_config: InitialConfigType = useMemo(
     () => ({
@@ -84,7 +65,7 @@ function MarkDownEditor(props: MarkDownEditorProps) {
               .replace(/`([^`]+)`/g, '$1')
               .replace(/~~([^~]+)~~/g, '$1');
             editor.update(() => {
-              $convertFromMarkdownString(sanitized, transformerList);
+              $convertFromMarkdownString(sanitized, transformers);
             });
           }
         : undefined,
@@ -92,33 +73,18 @@ function MarkDownEditor(props: MarkDownEditorProps) {
         throw error;
       },
     }),
-    [initial_markdown, transformerList]
+    [initial_markdown, transformers]
   );
-
-  const debounced_emit_change = useMemo(
-    () => debounce((value: string) => on_value_change?.(value), 300),
-    [on_value_change]
-  );
-
-  useEffect(() => {
-    return () => {
-      debounced_emit_change.cancel();
-    };
-  }, [debounced_emit_change]);
 
   const handle_change = (editor_state: EditorState) => {
-    const md = (() => {
-      let markdown = '';
-      editor_state.read(() => {
-        markdown = $convertToMarkdownString(transformerList);
-      });
-      return markdown;
-    })();
+    let markdown = '';
 
-    set_markdown_value(md);
-    if (on_value_change) {
-      debounced_emit_change(md);
-    }
+    editor_state.read(() => {
+      markdown = $convertToMarkdownString(transformers);
+    });
+
+    set_markdown_value(markdown);
+    on_value_change?.(markdown);
   };
 
   const renderPreview = () => {
@@ -156,7 +122,7 @@ function MarkDownEditor(props: MarkDownEditorProps) {
         <HistoryPlugin />
         <ListPlugin />
         <LinkPlugin />
-        <MarkdownShortcutPlugin transformers={transformerList} />
+        <MarkdownShortcutPlugin transformers={transformers} />
         <OnChangePlugin onChange={handle_change} />
         <MarkdownPastePlugin />
       </motion.div>

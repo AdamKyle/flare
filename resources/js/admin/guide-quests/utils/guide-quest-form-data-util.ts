@@ -88,6 +88,7 @@ export function hasImagesInSlice(
 
   for (const k of keys) {
     const blocks = slice[k];
+
     if (
       Array.isArray(blocks) &&
       blocks.some((b) => (b as GuideQuestContentBlockDefinition)?.image_url)
