@@ -33,4 +33,5 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     route::post('/admin/save-survey/{survey}', ['uses' => 'Api\SurveyController@saveSurvey']);
 
     route::get('/admin/manage-guide-quest', ['uses' => 'Api\GuideQuests\GuideQuestsController@guideQuest']);
+    route::post('/admin/store-guide-quest', ['uses' => 'Api\GuideQuests\GuideQuestsController@storeFormResponse']);
 });

@@ -6,4 +6,5 @@ export default interface UseFetchGuideQuestsDefinition {
   data: GuideQuestResponseDefinition | null;
   error: AxiosErrorDefinition | null;
   loading: boolean;
+  updateGuideQuest: (data: GuideQuestResponseDefinition) => void;
 }

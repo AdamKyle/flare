@@ -10,8 +10,27 @@ const ManageGuideQuestRequiredFaction = ({
   data_for_component,
   on_update,
 }: ManageGuideQuestStepProps) => {
-  const { convertObjectToKeyValue, handleUpdateFormData } =
-    useManageFormSectionData({ on_update });
+  const { convertObjectToKeyValue, handleUpdateFormData, getPreSelected } =
+    useManageFormSectionData({
+      on_update,
+      initial_values: data_for_component.guide_quest,
+    });
+
+  const guideQuest = data_for_component.guide_quest ?? null;
+
+  const getDefaultString = (candidate?: number | string | null): string => {
+    if (!candidate) {
+      return '';
+    }
+
+    return String(candidate);
+  };
+
+  const factionItems = convertObjectToKeyValue(data_for_component.faction_maps);
+  const preSelectedFaction = getPreSelected(
+    factionItems,
+    guideQuest?.required_faction_id
+  );
 
   return (
     <div className="space-y-4">
@@ -20,7 +39,8 @@ const ManageGuideQuestRequiredFaction = ({
           Required Faction
         </label>
         <Dropdown
-          items={convertObjectToKeyValue(data_for_component.faction_maps)}
+          items={factionItems}
+          pre_selected_item={preSelectedFaction}
           on_select={(value) =>
             handleUpdateFormData('required_faction_id', value)
           }
@@ -32,6 +52,7 @@ const ManageGuideQuestRequiredFaction = ({
           Required Faction Level
         </label>
         <Input
+          default_value={getDefaultString(guideQuest?.required_faction_level)}
           on_change={(value) =>
             handleUpdateFormData('required_faction_level', value)
           }
@@ -43,6 +64,7 @@ const ManageGuideQuestRequiredFaction = ({
           Required Fame Level
         </label>
         <Input
+          default_value={getDefaultString(guideQuest?.required_fame_level)}
           on_change={(value) =>
             handleUpdateFormData('required_fame_level', value)
           }

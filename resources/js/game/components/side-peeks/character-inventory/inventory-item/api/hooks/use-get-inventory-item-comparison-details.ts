@@ -61,6 +61,7 @@ export const useGetInventoryItemComparisonDetails = ({
     } finally {
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiHandler, url, slot_id, item_to_equip_type]);
 
   useEffect(() => {

@@ -1,9 +1,17 @@
 import { debounce } from 'lodash';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import ManageGuideQuestsTextContentProps from './types/manage-guide-quest-test-content-props';
-import { GuideQuestContentBlockDefinition } from '../api/definitions/guide-quest-definition';
+import GuideQuestDefinition, {
+  GuideQuestContentBlockDefinition,
+} from '../api/definitions/guide-quest-definition';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
@@ -14,22 +22,44 @@ const ManageGuideQuestsTextContent = ({
   step,
   field_key,
   on_update_content,
+  initial_content,
 }: ManageGuideQuestsTextContentProps) => {
-  const [contentBlocks, setContentBlocks] = useState<
-    GuideQuestContentBlockDefinition[]
-  >([{ id: uuidv4(), content: '', image_url: null }]);
+  const sectionBlocks = useMemo<
+    GuideQuestContentBlockDefinition[] | null
+  >(() => {
+    if (!initial_content) {
+      return null;
+    }
+
+    const value = initial_content[field_key as keyof GuideQuestDefinition];
+
+    if (!Array.isArray(value)) {
+      return null;
+    }
+
+    return value as GuideQuestContentBlockDefinition[];
+  }, [initial_content, field_key]);
+
+  const seedBlocks = useMemo<GuideQuestContentBlockDefinition[]>(() => {
+    if (!sectionBlocks || sectionBlocks.length === 0) {
+      return [{ id: uuidv4(), content: '', image_url: null }];
+    }
+
+    return sectionBlocks.map((contentBlock) => ({
+      id: contentBlock.id || uuidv4(),
+      content: contentBlock.content || '',
+      image_url: contentBlock.image_url ?? null,
+    }));
+  }, [sectionBlocks]);
+
+  const [contentBlocks, setContentBlocks] =
+    useState<GuideQuestContentBlockDefinition[]>(seedBlocks);
 
   const latestRefs = useRef({
     on_update_content,
     step,
     field_key,
   });
-
-  useEffect(() => {
-    latestRefs.current.on_update_content = on_update_content;
-    latestRefs.current.step = step;
-    latestRefs.current.field_key = field_key;
-  }, [on_update_content, step, field_key]);
 
   const debouncedEmitRef = useRef(
     debounce((currentBlocks: GuideQuestContentBlockDefinition[]) => {
@@ -49,48 +79,87 @@ const ManageGuideQuestsTextContent = ({
     }, 300)
   );
 
+  const lastSeedSignatureRef = useRef<string>('');
+
+  const seedSignature = useMemo(() => {
+    return JSON.stringify(
+      seedBlocks.map((block) => ({
+        id: block.id,
+        content: block.content,
+        image_url:
+          typeof block.image_url === 'string'
+            ? block.image_url
+            : block.image_url
+              ? 'FILE'
+              : null,
+      }))
+    );
+  }, [seedBlocks]);
+
   useEffect(() => {
+    latestRefs.current.on_update_content = on_update_content;
+    latestRefs.current.step = step;
+    latestRefs.current.field_key = field_key;
+
+    const debounced = debouncedEmitRef.current;
+
+    if (lastSeedSignatureRef.current !== seedSignature) {
+      setContentBlocks(seedBlocks);
+      lastSeedSignatureRef.current = seedSignature;
+    }
+
+    if (contentBlocks.length > 0) {
+      debounced(contentBlocks);
+    }
+
     return () => {
-      debouncedEmitRef.current.cancel();
+      debounced.cancel();
     };
-  }, []);
+  }, [
+    on_update_content,
+    step,
+    field_key,
+    seedSignature,
+    seedBlocks,
+    contentBlocks,
+  ]);
 
   const handleMarkdownChange = useCallback((id: string, markdown: string) => {
     setContentBlocks((previousBlocks) => {
-      const nextBlocks = previousBlocks.map((block) =>
+      return previousBlocks.map((block) =>
         block.id === id ? { ...block, content: markdown ?? '' } : block
       );
-      debouncedEmitRef.current(nextBlocks);
-      return nextBlocks;
     });
   }, []);
 
   const handleFileChange = useCallback((id: string, file: File | null) => {
     setContentBlocks((previousBlocks) => {
-      const nextBlocks = previousBlocks.map((block) =>
+      return previousBlocks.map((block) =>
         block.id === id ? { ...block, image_url: file ?? null } : block
       );
-      debouncedEmitRef.current(nextBlocks);
-      return nextBlocks;
+    });
+  }, []);
+
+  const handleClearImage = useCallback((id: string) => {
+    setContentBlocks((previousBlocks) => {
+      return previousBlocks.map((block) =>
+        block.id === id ? { ...block, image_url: null } : block
+      );
     });
   }, []);
 
   const handleAddSection = useCallback(() => {
     setContentBlocks((previousBlocks) => {
-      const nextBlocks = [
+      return [
         ...previousBlocks,
         { id: uuidv4(), content: '', image_url: null },
       ];
-      debouncedEmitRef.current(nextBlocks);
-      return nextBlocks;
     });
   }, []);
 
   const handleRemoveSection = useCallback((id: string) => {
     setContentBlocks((previousBlocks) => {
-      const nextBlocks = previousBlocks.filter((block) => block.id !== id);
-      debouncedEmitRef.current(nextBlocks);
-      return nextBlocks;
+      return previousBlocks.filter((block) => block.id !== id);
     });
   }, []);
 
@@ -113,6 +182,11 @@ const ManageGuideQuestsTextContent = ({
     block: GuideQuestContentBlockDefinition,
     canRemove: boolean
   ) => {
+    const initialImageUrl =
+      typeof block.image_url === 'string' && block.image_url.length > 0
+        ? block.image_url
+        : null;
+
     return (
       <div
         key={block.id}
@@ -120,9 +194,13 @@ const ManageGuideQuestsTextContent = ({
       >
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <ImageUploader
+            initialImageUrl={initialImageUrl}
             onFileChange={(file) => handleFileChange(block.id, file)}
+            onDelete={() => handleClearImage(block.id)}
           />
           <MarkDownEditor
+            id={block.id}
+            initial_markdown={block.content || ''}
             on_value_change={(markdown) =>
               handleMarkdownChange(block.id, markdown)
             }

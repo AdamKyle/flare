@@ -6,11 +6,23 @@ import { useManageFormSectionData } from '../hooks/use-manage-form-section-data'
 import Input from 'ui/input/input';
 
 const ManageGuideQuestsRequiredCurrencies = ({
+  data_for_component,
   on_update,
 }: ManageGuideQuestStepProps) => {
   const { handleUpdateFormData } = useManageFormSectionData({
     on_update,
+    initial_values: data_for_component.guide_quest,
   });
+
+  const guideQuest = data_for_component.guide_quest ?? null;
+
+  const getDefaultString = (candidate?: number | string | null): string => {
+    if (!candidate) {
+      return '';
+    }
+
+    return String(candidate);
+  };
 
   return (
     <div className="space-y-4">
@@ -19,6 +31,7 @@ const ManageGuideQuestsRequiredCurrencies = ({
           Required Gold
         </label>
         <Input
+          default_value={getDefaultString(guideQuest?.required_gold)}
           on_change={(value) => handleUpdateFormData('required_gold', value)}
         />
       </div>
@@ -28,6 +41,7 @@ const ManageGuideQuestsRequiredCurrencies = ({
           Required Gold Dust
         </label>
         <Input
+          default_value={getDefaultString(guideQuest?.required_gold_dust)}
           on_change={(value) =>
             handleUpdateFormData('required_gold_dust', value)
           }
@@ -39,6 +53,7 @@ const ManageGuideQuestsRequiredCurrencies = ({
           Required Shards
         </label>
         <Input
+          default_value={getDefaultString(guideQuest?.required_shards)}
           on_change={(value) => handleUpdateFormData('required_shards', value)}
         />
       </div>
@@ -48,6 +63,7 @@ const ManageGuideQuestsRequiredCurrencies = ({
           Required Copper Coins
         </label>
         <Input
+          default_value={getDefaultString(guideQuest?.required_copper_coins)}
           on_change={(value) =>
             handleUpdateFormData('required_copper_coins', value)
           }
@@ -59,6 +75,7 @@ const ManageGuideQuestsRequiredCurrencies = ({
           Required Gold Bars
         </label>
         <Input
+          default_value={getDefaultString(guideQuest?.required_gold_bars)}
           on_change={(value) =>
             handleUpdateFormData('required_gold_bars', value)
           }

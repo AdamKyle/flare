@@ -40,7 +40,7 @@ const MapCard = () => {
   const { moveCharacterDirectionally } = useDirectionallyMoveCharacter();
   const { canMove, showTimerBar, lengthOfTime } = useFetchMovementTimeoutData();
   const { isSetSailEnabled } = useManageSetSailButtonState();
-  const { gameData, updateCharacter } = useGameData();
+  const { gameData } = useGameData();
   const { openTeleport } = UseOpenTeleportSidePeek();
   const { errorMessage, resetErrorMessage } = useManageMapMovementErrorState();
   const { characterPosition } = useEmitCharacterPosition();

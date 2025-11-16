@@ -8,6 +8,7 @@ use App\Admin\Middleware\IsAdminMiddleware;
 use App\Admin\Services\AssignSkillService;
 use App\Admin\Services\FeedbackService;
 use App\Admin\Services\GuideQuestService;
+use App\Admin\Services\ImageHandlerService;
 use App\Admin\Services\InfoPageService;
 use App\Admin\Services\ItemAffixService;
 use App\Admin\Services\ItemsService;
@@ -21,6 +22,7 @@ use App\Admin\Services\UserService;
 use App\Admin\Transformers\GuideQuestTransformer;
 use App\Flare\Cache\CoordinatesCache;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
+use Nette\Utils\Image;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -57,8 +59,14 @@ class ServiceProvider extends ApplicationServiceProvider
             return new InfoPageService;
         });
 
-        $this->app->bind(GuideQuestService::class, function () {
-            return new GuideQuestService;
+        $this->app->bind(ImageHandlerService::class, function () {
+            return new ImageHandlerService;
+        });
+
+        $this->app->bind(GuideQuestService::class, function ($app) {
+            return new GuideQuestService(
+                $app->make(ImageHandlerService::class),
+            );
         });
 
         $this->app->bind(LocationService::class, function ($app) {
@@ -86,6 +94,7 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->commands([CreateAdminAccount::class, GiveKingdomsToNpcs::class]);
+
     }
 
     /**

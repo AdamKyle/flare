@@ -45,15 +45,27 @@ export const useFetchGuideQuest = ({
     } finally {
       setLoading(false);
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [url]);
 
   useEffect(() => {
     fetchGuideQuest().catch(() => {});
   }, [fetchGuideQuest]);
 
+  const updateGuideQuest = (data: GuideQuestResponseDefinition) => {
+    setData((previous) => {
+      if (!previous) {
+        return previous;
+      }
+
+      return { ...previous, guide_quest: data.guide_quest };
+    });
+  };
+
   return {
     data,
     error,
     loading,
+    updateGuideQuest,
   };
 };

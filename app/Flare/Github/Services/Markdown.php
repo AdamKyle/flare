@@ -9,17 +9,20 @@ class Markdown
     /**
      * Clean up the string that contains markdown.
      */
-    public function cleanMarkdown(string $markdown): string
+    public function cleanMarkdown(?string $markdown): string
     {
+
+        if (is_null($markdown)) {
+            return '';
+        }
+
         $markdown = trim($markdown);
 
         $markdown = str_replace('\\', '', $markdown);
 
         $markdown = preg_replace("/\r\n|\r|\n/", "\n", $markdown);
 
-        $markdown = html_entity_decode($markdown, ENT_QUOTES, 'UTF-8');
-
-        return $markdown;
+        return html_entity_decode($markdown, ENT_QUOTES, 'UTF-8');
     }
 
     /**

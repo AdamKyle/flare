@@ -10,10 +10,30 @@ const ManageGuideQuestsRequiredItemAttributes = ({
   data_for_component,
   on_update,
 }: ManageGuideQuestStepProps) => {
-  const { handleUpdateFormData, convertObjectToKeyValue } =
+  const { handleUpdateFormData, convertObjectToKeyValue, getPreSelected } =
     useManageFormSectionData({
       on_update,
+      initial_values: data_for_component.guide_quest,
     });
+
+  const guideQuest = data_for_component.guide_quest ?? null;
+
+  const getDefaultString = (candidate?: number | string | null): string => {
+    if (!candidate) {
+      return '';
+    }
+
+    return String(candidate);
+  };
+
+  const specialtyItems = convertObjectToKeyValue(
+    data_for_component.item_specialty_types
+  );
+
+  const preSelectedSpecialty = getPreSelected(
+    specialtyItems,
+    guideQuest?.required_specialty_type
+  );
 
   return (
     <div className="space-y-4">
@@ -22,9 +42,8 @@ const ManageGuideQuestsRequiredItemAttributes = ({
           Required Kingdom Passive
         </label>
         <Dropdown
-          items={convertObjectToKeyValue(
-            data_for_component.item_specialty_types
-          )}
+          items={specialtyItems}
+          pre_selected_item={preSelectedSpecialty}
           on_select={(value) =>
             handleUpdateFormData('required_specialty_type', value)
           }
@@ -36,6 +55,7 @@ const ManageGuideQuestsRequiredItemAttributes = ({
           Required Holy Stacks Level
         </label>
         <Input
+          default_value={getDefaultString(guideQuest?.required_holy_stacks)}
           on_change={(value) =>
             handleUpdateFormData('required_holy_stacks', value)
           }
@@ -47,6 +67,7 @@ const ManageGuideQuestsRequiredItemAttributes = ({
           Required Gems Attached
         </label>
         <Input
+          default_value={getDefaultString(guideQuest?.required_attached_gems)}
           on_change={(value) =>
             handleUpdateFormData('required_attached_gems', value)
           }

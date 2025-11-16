@@ -1,3 +1,4 @@
+import { useActivityTimeout } from 'api-handler/hooks/use-activity-timeout';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
 import { AxiosError, AxiosRequestConfig } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
@@ -14,6 +15,7 @@ const UseTraverseMapsApi = ({
   character_id,
 }: UseTraverseMapsApiParamsDefinition): UseTraverseMapsApiDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
+  const { handleInactivity } = useActivityTimeout();
   const { emitShouldRefreshMap } = useEmitMapRefresh();
   const { closeSidePeek } = useCloseSidePeekEmitter();
 
@@ -51,11 +53,17 @@ const UseTraverseMapsApi = ({
       closeSidePeek();
     } catch (error) {
       if (error instanceof AxiosError) {
+        handleInactivity({
+          setError,
+          response: error,
+        });
+
         setError(error.response?.data);
       }
     } finally {
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiHandler, url, requestParams]);
 
   useEffect(() => {

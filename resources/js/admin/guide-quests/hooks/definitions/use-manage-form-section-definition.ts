@@ -6,4 +6,8 @@ export default interface UseManageFormSectionDefinition {
   }) => DropdownItem[];
   handleUpdateFormData: (key: string, value: DropdownItem | string) => void;
   convertArrayToDropDown: (data: string[]) => DropdownItem[];
+  getPreSelected: (
+    items: DropdownItem[],
+    candidate: string | number | null
+  ) => DropdownItem | undefined;
 }

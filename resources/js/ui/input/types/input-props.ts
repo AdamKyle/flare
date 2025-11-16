@@ -3,5 +3,6 @@ export default interface InputProps {
   clearable?: boolean;
   place_holder?: string;
   value?: string;
+  default_value?: string | null;
   disabled?: boolean;
 }

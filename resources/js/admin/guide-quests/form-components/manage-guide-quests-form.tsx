@@ -1,11 +1,12 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
-import { isEmpty } from 'lodash';
-import React, { useState } from 'react';
+import { isEmpty, isNil } from 'lodash';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import ManageGuideQuestsTextContent from './manage-guide-quest-text-content';
 import ManageGuideQuestsFormProps from './types/manage-guide-quests-form-props';
 import GuideQuestDefinition from '../api/definitions/guide-quest-definition';
 import { useFetchGuideQuest } from '../api/hooks/use-fetch-guide-quest';
+import { useStoreGuideQuestContent } from '../api/hooks/use-store-guide-quest-content';
 import ManageGuideQuestRequiredFaction from '../components/manage-guide-quest-required-faction';
 import ManageGuideQuestsBasicQuestAttributes from '../components/manage-guide-quests-basic-quest-attributes';
 import ManageGuideQuestsRequiredClassRanksAttributes from '../components/manage-guide-quests-required-class-ranks-attributes';
@@ -29,13 +30,32 @@ import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 const ManageGuideQuestsForm = ({
   guide_quest_id,
 }: ManageGuideQuestsFormProps) => {
-  const { data, loading, error } = useFetchGuideQuest({ id: guide_quest_id });
+  const { data, loading, error, updateGuideQuest } = useFetchGuideQuest({
+    id: guide_quest_id,
+  });
+
+  const {
+    loading: currentlyStoring,
+    error: storageError,
+    setRequestParams,
+    canMoveForward,
+  } = useStoreGuideQuestContent({ update_guide_quest: updateGuideQuest });
 
   const [formData, setFormData] = useState<
     Array<Partial<GuideQuestDefinition> | null>
   >([]);
 
-  const handleNextStep = (current_index: number): boolean => {
+  const storingRef = useRef(currentlyStoring);
+  const canMoveForwardRef = useRef(canMoveForward);
+  const storageErrorRef = useRef(storageError);
+
+  useEffect(() => {
+    storingRef.current = currentlyStoring;
+    canMoveForwardRef.current = canMoveForward;
+    storageErrorRef.current = storageError;
+  }, [currentlyStoring, canMoveForward, storageError]);
+
+  const handleNextStep = async (current_index: number): Promise<boolean> => {
     const data_for_submission = formData[current_index];
 
     const isFormDataEmpty =
@@ -45,35 +65,105 @@ const ManageGuideQuestsForm = ({
       return true;
     }
 
-    const requestObject = makeRequestObject(
-      guide_quest_id,
-      data_for_submission ?? {}
-    );
+    let questId = guide_quest_id;
 
-    console.log('handle next step - ready to submit form:', {
-      current_index,
-      requestObject,
-    });
+    if (!isNil(data) && !isNil(data?.guide_quest)) {
+      questId = data.guide_quest.id;
+    }
 
-    return !isFormDataEmpty;
+    const requestObject = makeRequestObject(questId, data_for_submission ?? {});
+
+    setRequestParams(requestObject);
+
+    return !isFormDataEmpty && !!canMoveForwardRef.current && isNil(error);
   };
 
-  const handleSetFormDataFromComponent = (
-    step: number,
-    data: Partial<GuideQuestDefinition>
-  ) => {
-    setFormData((prev) => {
-      const next = prev.slice();
+  const handleSetFormDataFromComponent = useCallback(
+    (step: number, data: Partial<GuideQuestDefinition>) => {
+      setFormData((prev) => {
+        const next = prev.slice();
 
-      if (next.length <= step) {
-        next.length = step + 1;
-      }
+        if (next.length <= step) {
+          next.length = step + 1;
+        }
 
-      next[step] = data;
+        next[step] = data;
 
-      return next;
-    });
-  };
+        return next;
+      });
+    },
+    []
+  );
+
+  const handleUpdateStep0 = useCallback(
+    (updated: Partial<GuideQuestDefinition>) => {
+      handleSetFormDataFromComponent(0, updated);
+    },
+    [handleSetFormDataFromComponent]
+  );
+
+  const handleUpdateStep4 = useCallback(
+    (updated: Partial<GuideQuestDefinition>) => {
+      handleSetFormDataFromComponent(4, updated);
+    },
+    [handleSetFormDataFromComponent]
+  );
+
+  const handleUpdateStep5 = useCallback(
+    (updated: Partial<GuideQuestDefinition>) => {
+      handleSetFormDataFromComponent(5, updated);
+    },
+    [handleSetFormDataFromComponent]
+  );
+
+  const handleUpdateStep6 = useCallback(
+    (updated: Partial<GuideQuestDefinition>) => {
+      handleSetFormDataFromComponent(6, updated);
+    },
+    [handleSetFormDataFromComponent]
+  );
+
+  const handleUpdateStep7 = useCallback(
+    (updated: Partial<GuideQuestDefinition>) => {
+      handleSetFormDataFromComponent(7, updated);
+    },
+    [handleSetFormDataFromComponent]
+  );
+
+  const handleUpdateStep8 = useCallback(
+    (updated: Partial<GuideQuestDefinition>) => {
+      handleSetFormDataFromComponent(8, updated);
+    },
+    [handleSetFormDataFromComponent]
+  );
+
+  const handleUpdateStep9 = useCallback(
+    (updated: Partial<GuideQuestDefinition>) => {
+      handleSetFormDataFromComponent(9, updated);
+    },
+    [handleSetFormDataFromComponent]
+  );
+
+  const handleUpdateStep10 = useCallback(
+    (updated: Partial<GuideQuestDefinition>) => {
+      handleSetFormDataFromComponent(10, updated);
+    },
+    [handleSetFormDataFromComponent]
+  );
+
+  const handleUpdateStep11 = useCallback(
+    (updated: Partial<GuideQuestDefinition>) => {
+      handleSetFormDataFromComponent(11, updated);
+    },
+    [handleSetFormDataFromComponent]
+  );
+
+  const handleUpdateStep12 = useCallback(
+    (updated: Partial<GuideQuestDefinition>) => {
+      handleSetFormDataFromComponent(12, updated);
+    },
+    [handleSetFormDataFromComponent]
+  );
 
   if (loading) {
     return (
@@ -113,15 +203,14 @@ const ManageGuideQuestsForm = ({
       <FormWizard
         total_steps={13}
         name="Create / Edit Guide Quest"
-        is_loading={false}
+        is_loading={currentlyStoring}
         on_request_next={handleNextStep}
+        form_error={storageError}
       >
         <Step step_title="Basic Info" key="basic">
           <ManageGuideQuestsBasicQuestAttributes
             data_for_component={data}
-            on_update={(formData) =>
-              handleSetFormDataFromComponent(0, formData)
-            }
+            on_update={handleUpdateStep0}
           />
         </Step>
 
@@ -130,6 +219,7 @@ const ManageGuideQuestsForm = ({
             step={1}
             on_update_content={handleSetFormDataFromComponent}
             field_key={'intro_text'}
+            initial_content={data.guide_quest}
           />
         </Step>
 
@@ -138,6 +228,7 @@ const ManageGuideQuestsForm = ({
             step={2}
             on_update_content={handleSetFormDataFromComponent}
             field_key={'desktop_instructions'}
+            initial_content={data.guide_quest}
           />
         </Step>
         <Step step_title={'Mobile Instructions'} key={'mobile-instructions'}>
@@ -145,14 +236,13 @@ const ManageGuideQuestsForm = ({
             step={3}
             on_update_content={handleSetFormDataFromComponent}
             field_key={'mobile_instructions'}
+            initial_content={data.guide_quest}
           />
         </Step>
         <Step step_title={'Required levels'} key={'required-levels'}>
           <ManageGuideQuestsRequiredLevels
             data_for_component={data}
-            on_update={(formData) =>
-              handleSetFormDataFromComponent(4, formData)
-            }
+            on_update={handleUpdateStep4}
           />
         </Step>
         <Step
@@ -161,17 +251,13 @@ const ManageGuideQuestsForm = ({
         >
           <ManageGuideQuestRequiredFaction
             data_for_component={data}
-            on_update={(formData) => {
-              handleSetFormDataFromComponent(5, formData);
-            }}
+            on_update={handleUpdateStep5}
           />
         </Step>
         <Step step_title={'Required Stats'} key={'required-stats'}>
           <ManageGuideQuestsRequiredStats
             data_for_component={data}
-            on_update={(formData) => {
-              handleSetFormDataFromComponent(6, formData);
-            }}
+            on_update={handleUpdateStep6}
           />
         </Step>
         <Step
@@ -180,9 +266,7 @@ const ManageGuideQuestsForm = ({
         >
           <ManageGuideQuestsRequiredKingdomAttributes
             data_for_component={data}
-            on_update={(formData) => {
-              handleSetFormDataFromComponent(7, formData);
-            }}
+            on_update={handleUpdateStep7}
           />
         </Step>
 
@@ -192,9 +276,7 @@ const ManageGuideQuestsForm = ({
         >
           <ManageGuideQuestsRequiredItemAttributes
             data_for_component={data}
-            on_update={(formData) => {
-              handleSetFormDataFromComponent(8, formData);
-            }}
+            on_update={handleUpdateStep8}
           />
         </Step>
 
@@ -204,9 +286,7 @@ const ManageGuideQuestsForm = ({
         >
           <ManageGuideQuestsRequiredQuestAndPlaneAttributes
             data_for_component={data}
-            on_update={(formData) => {
-              handleSetFormDataFromComponent(9, formData);
-            }}
+            on_update={handleUpdateStep9}
           />
         </Step>
 
@@ -216,27 +296,21 @@ const ManageGuideQuestsForm = ({
         >
           <ManageGuideQuestsRequiredClassRanksAttributes
             data_for_component={data}
-            on_update={(formData) => {
-              handleSetFormDataFromComponent(10, formData);
-            }}
+            on_update={handleUpdateStep10}
           />
         </Step>
 
         <Step step_title={'Required Currencies'} key={'required-currencies'}>
           <ManageGuideQuestsRequiredCurrencies
             data_for_component={data}
-            on_update={(formData) => {
-              handleSetFormDataFromComponent(11, formData);
-            }}
+            on_update={handleUpdateStep11}
           />
         </Step>
 
         <Step step_title={'Rewards and Bonuses'} key={'rewards-and-bonuses'}>
           <ManageGuideQuestsRewardsAndBonuses
             data_for_component={data}
-            on_update={(formData) => {
-              handleSetFormDataFromComponent(12, formData);
-            }}
+            on_update={handleUpdateStep12}
           />
         </Step>
       </FormWizard>

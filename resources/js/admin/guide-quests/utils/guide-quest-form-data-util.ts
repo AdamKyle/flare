@@ -1,7 +1,7 @@
 import GuideQuestDefinition, {
   GuideQuestContentBlockDefinition,
 } from '../api/definitions/guide-quest-definition';
-import FormRequestDefinition from '../definitions/form-request-definition';
+import UseStoreGuideQuestRequestDefinition from '../api/hooks/definitions/use-store-guide-quest-request-definition';
 import StepSliceDefinition from '../definitions/step-slice-definition';
 
 /**
@@ -109,13 +109,13 @@ export function hasImagesInSlice(
 export function makeRequestObject(
   guideQuestId: number,
   slice: Partial<GuideQuestDefinition>
-): FormRequestDefinition {
+): UseStoreGuideQuestRequestDefinition {
   const form_data = buildFormDataFromSlice(slice);
   const has_images = hasImagesInSlice(slice);
 
   return {
     guide_quest_id: guideQuestId,
-    form_data,
-    has_images,
+    content: form_data,
+    has_image: has_images,
   };
 }

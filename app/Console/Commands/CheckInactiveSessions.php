@@ -28,14 +28,14 @@ class CheckInactiveSessions extends Command
     public function handle()
     {
 
-        $threshold = Carbon::now()->subMinutes(30); // example threshold, adjust as needed
+        $threshold = Carbon::now()->subMinutes(30);
 
         UserLoginDuration::whereNull('logged_out_at')
-            ->where('last_heart_beat', '<', $threshold) // Correct column name
+            ->where('last_heart_beat', '<', $threshold)
             ->get()
             ->each(function ($login) {
                 $loggedInAt = Carbon::parse($login->logged_in_at);
-                $lastHeartbeat = Carbon::parse($login->last_heart_beat); // Correct column name
+                $lastHeartbeat = Carbon::parse($login->last_heart_beat);
 
                 $login->logged_out_at = Carbon::now();
                 $login->duration_in_seconds = $lastHeartbeat->diffInSeconds($loggedInAt);

@@ -10,10 +10,35 @@ const ManageGuideQuestsRequiredKingdomAttributes = ({
   data_for_component,
   on_update,
 }: ManageGuideQuestStepProps) => {
-  const { handleUpdateFormData, convertObjectToKeyValue } =
+  const { handleUpdateFormData, convertObjectToKeyValue, getPreSelected } =
     useManageFormSectionData({
       on_update,
+      initial_values: data_for_component.guide_quest,
     });
+
+  const guideQuest = data_for_component.guide_quest ?? null;
+
+  const getDefaultString = (candidate?: number | string | null): string => {
+    if (!candidate) {
+      return '';
+    }
+
+    return String(candidate);
+  };
+
+  const kingdomBuildingItems = convertObjectToKeyValue(
+    data_for_component.kingdom_buildings
+  );
+  const preSelectedKingdomBuilding = getPreSelected(
+    kingdomBuildingItems,
+    guideQuest?.required_kingdom_building_id
+  );
+
+  const passiveItems = convertObjectToKeyValue(data_for_component.passives);
+  const preSelectedPassive = getPreSelected(
+    passiveItems,
+    guideQuest?.required_passive_skill
+  );
 
   return (
     <div className="space-y-4">
@@ -22,6 +47,7 @@ const ManageGuideQuestsRequiredKingdomAttributes = ({
           Total Kingdoms Owned
         </label>
         <Input
+          default_value={getDefaultString(guideQuest?.required_kingdoms)}
           on_change={(value) =>
             handleUpdateFormData('required_kingdoms', value)
           }
@@ -36,6 +62,7 @@ const ManageGuideQuestsRequiredKingdomAttributes = ({
           This is the total level for all kingdoms you own.
         </p>
         <Input
+          default_value={getDefaultString(guideQuest?.required_kingdom_level)}
           on_change={(value) =>
             handleUpdateFormData('required_kingdom_level', value)
           }
@@ -47,7 +74,8 @@ const ManageGuideQuestsRequiredKingdomAttributes = ({
           Required Kingdom Building
         </label>
         <Dropdown
-          items={convertObjectToKeyValue(data_for_component.kingdom_buildings)}
+          items={kingdomBuildingItems}
+          pre_selected_item={preSelectedKingdomBuilding}
           on_select={(value) =>
             handleUpdateFormData('required_kingdom_building_id', value)
           }
@@ -59,6 +87,9 @@ const ManageGuideQuestsRequiredKingdomAttributes = ({
           Required Kingdom Building Level
         </label>
         <Input
+          default_value={getDefaultString(
+            guideQuest?.required_kingdom_building_level
+          )}
           on_change={(value) =>
             handleUpdateFormData('required_kingdom_building_level', value)
           }
@@ -73,6 +104,7 @@ const ManageGuideQuestsRequiredKingdomAttributes = ({
           This is the total units across all kingdoms
         </p>
         <Input
+          default_value={getDefaultString(guideQuest?.required_kingdom_units)}
           on_change={(value) =>
             handleUpdateFormData('required_kingdom_units', value)
           }
@@ -84,7 +116,8 @@ const ManageGuideQuestsRequiredKingdomAttributes = ({
           Required Kingdom Passive
         </label>
         <Dropdown
-          items={convertObjectToKeyValue(data_for_component.passives)}
+          items={passiveItems}
+          pre_selected_item={preSelectedPassive}
           on_select={(value) =>
             handleUpdateFormData('required_passive_skill', value)
           }
@@ -96,6 +129,7 @@ const ManageGuideQuestsRequiredKingdomAttributes = ({
           Required Kingdom Passive Level
         </label>
         <Input
+          default_value={getDefaultString(guideQuest?.required_passive_level)}
           on_change={(value) =>
             handleUpdateFormData('required_passive_level', value)
           }

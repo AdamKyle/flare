@@ -2,22 +2,67 @@
 
 namespace App\Admin\Services;
 
+use App\Flare\Models\GuideQuest;
+use Illuminate\Database\Eloquent\Model;
+
 class GuideQuestService
 {
-    public function cleanRequest(array $params): array
+    /**
+     * @param ImageHandlerService $imageHandlerService
+     */
+    public function __construct(private readonly ImageHandlerService $imageHandlerService)
     {
-        if (! is_null($params['required_skill_level']) && is_null($params['required_skill'])) {
-            $params['required_skill_level'] = null;
+    }
+
+    /**
+     * Upsert a GuideQuest from the payload and return the refreshed model.
+     *
+     * @param array $payload
+     * @param GuideQuest $guideQuest
+     * @return GuideQuest
+     */
+    public function upsert(array $payload, GuideQuest $guideQuest): GuideQuest
+    {
+        $guideQuestId = $payload['guide_quest_id'];
+        $hasImage = $payload['has_image'] === '1';
+        $incomingContent = $payload['content'];
+
+        $model = $this->resolveModel($guideQuestId, $guideQuest);
+
+        $existingContent = collect($incomingContent)
+            ->mapWithKeys(function ($_, $key) use ($model) {
+                return [$key => $model->getAttribute($key)];
+            })
+            ->toArray();
+
+        $finalContent = $this->imageHandlerService->process(
+            $model,
+            $incomingContent,
+            $existingContent,
+            $hasImage,
+            'guide-quest-images',
+            'guide-quests'
+        );
+
+        $model->fill($finalContent);
+        $model->save();
+
+        return $model->fresh();
+    }
+
+    /**
+     * @param string $id
+     * @param Model $model
+     * @return GuideQuest
+     */
+    private function resolveModel(string $id, Model $model): Model
+    {
+        $foundInstance = $model::find($id);
+
+        if (is_null($foundInstance)) {
+            return $model;
         }
 
-        if (! is_null($params['required_passive_level']) && is_null($params['required_passive_skill'])) {
-            $params['required_passive_level'] = null;
-        }
-
-        if (! is_null($params['required_faction_level']) && is_null($params['required_faction_id'])) {
-            $params['required_faction_id'] = null;
-        }
-
-        return $params;
+        return $foundInstance;
     }
 }

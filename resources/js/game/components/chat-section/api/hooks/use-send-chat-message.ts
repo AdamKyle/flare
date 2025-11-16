@@ -23,7 +23,7 @@ export const useSendChatMessage = (): UseSendChatMessageDefinition => {
     setError(null);
 
     try {
-      const result = await apiHandler.post<
+      await apiHandler.post<
         SendChatMessageResponse,
         AxiosRequestConfig<AxiosResponse<SendChatMessageResponse>>,
         SendChatMessageRequest

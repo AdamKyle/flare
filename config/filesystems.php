@@ -76,6 +76,13 @@ return [
             'visibility' => 'public',
         ],
 
+        'guide-quest-images' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/guide-quest-images'),
+            'url' => env('APP_URL').'/storage/guide-quest-images',
+            'visibility' => 'public',
+        ],
+
         'generated-monsters-and-bugs' => [
             'driver' => 'local',
             'root' => storage_path('app/public/generated-monsters-and-bugs'),

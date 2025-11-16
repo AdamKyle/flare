@@ -72,6 +72,7 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
         setError(err.response?.data || null);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiHandler, urlToUse]);
 
   const handleAttackMonster = useCallback(async () => {
@@ -99,6 +100,7 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
         setError(err.response?.data || null);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiHandler, urlToUse]);
 
   const fetchBattleResults = useCallback(

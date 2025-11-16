@@ -49,6 +49,7 @@ export const useGetInventoryItemDetails = ({
     } finally {
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiHandler, apiUrl, slot_id]);
 
   useEffect(() => {

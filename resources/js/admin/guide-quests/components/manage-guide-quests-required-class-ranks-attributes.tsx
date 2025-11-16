@@ -6,11 +6,23 @@ import { useManageFormSectionData } from '../hooks/use-manage-form-section-data'
 import Input from 'ui/input/input';
 
 const ManageGuideQuestsRequiredClassRanksAttributes = ({
+  data_for_component,
   on_update,
 }: ManageGuideQuestStepProps) => {
   const { handleUpdateFormData } = useManageFormSectionData({
     on_update,
+    initial_values: data_for_component.guide_quest,
   });
+
+  const guideQuest = data_for_component.guide_quest ?? null;
+
+  const getDefaultString = (candidate?: number | string | null): string => {
+    if (!candidate) {
+      return '';
+    }
+
+    return String(candidate);
+  };
 
   return (
     <div className="space-y-4">
@@ -19,6 +31,9 @@ const ManageGuideQuestsRequiredClassRanksAttributes = ({
           Required Total Class Specialities Equipped
         </label>
         <Input
+          default_value={getDefaultString(
+            guideQuest?.required_class_specials_equipped
+          )}
           on_change={(value) =>
             handleUpdateFormData('required_class_specials_equipped', value)
           }
@@ -30,6 +45,9 @@ const ManageGuideQuestsRequiredClassRanksAttributes = ({
           Required Class Rank level
         </label>
         <Input
+          default_value={getDefaultString(
+            guideQuest?.required_class_rank_level
+          )}
           on_change={(value) =>
             handleUpdateFormData('required_class_rank_level', value)
           }

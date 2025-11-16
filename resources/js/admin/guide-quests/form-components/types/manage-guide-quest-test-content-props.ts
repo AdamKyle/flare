@@ -7,4 +7,5 @@ export default interface ManageGuideQuestsTextContentProps {
     step: number,
     data: Partial<GuideQuestDefinition>
   ) => void;
+  initial_content: Partial<GuideQuestDefinition>;
 }

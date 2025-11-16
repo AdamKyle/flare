@@ -1,3 +1,4 @@
+import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import { motion } from 'framer-motion';
 import React, { ReactElement, useMemo, useRef, useState } from 'react';
 
@@ -12,6 +13,7 @@ const FormWizard = ({
   render_loading_icon,
   on_request_next,
   children,
+  form_error,
 }: FormWizardProps) => {
   const [current_index, set_current_index] = useState(0);
   const step_refs = useRef<Array<HTMLDivElement | null>>([]);
@@ -106,19 +108,30 @@ const FormWizard = ({
     );
   };
 
+  const renderFormError = () => {
+    if (!form_error) {
+      return null;
+    }
+
+    return <ApiErrorAlert apiError={form_error.message} />;
+  };
+
   const renderFooter = () => {
     return (
-      <FormWizardNav
-        current_index={current_index}
-        total_steps={computed_total_steps}
-        can_go_previous={current_index > 0}
-        is_last_step={current_index === computed_total_steps - 1}
-        is_loading={!!is_loading}
-        on_previous_click={handlePreviousClick}
-        on_next_click={handleNextClick}
-        on_dot_click={handleDotClick}
-        render_loading_icon={render_loading_icon}
-      />
+      <>
+        {renderFormError()}
+        <FormWizardNav
+          current_index={current_index}
+          total_steps={computed_total_steps}
+          can_go_previous={current_index > 0}
+          is_last_step={current_index === computed_total_steps - 1}
+          is_loading={!!is_loading}
+          on_previous_click={handlePreviousClick}
+          on_next_click={handleNextClick}
+          on_dot_click={handleDotClick}
+          render_loading_icon={render_loading_icon}
+        />
+      </>
     );
   };
 

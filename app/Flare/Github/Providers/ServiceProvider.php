@@ -37,5 +37,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         // Release Notes Blade Component
         Blade::component('release-note', ReleaseNote::class);
+
+        // new @convertMarkdownToHtml directive
+        Blade::directive('convertMarkdownToHtml', function (string $expression): string {
+            return "<?php echo app('".Markdown::class."')->convertToHtml(app('".Markdown::class."')->cleanMarkdown({$expression})); ?>";
+        });
     }
 }

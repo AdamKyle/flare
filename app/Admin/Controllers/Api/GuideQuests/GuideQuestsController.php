@@ -3,6 +3,8 @@
 namespace App\Admin\Controllers\Api\GuideQuests;
 
 use App\Admin\Requests\GuideQuestRequest;
+use App\Admin\Requests\GuideQuestStoreRequest;
+use App\Admin\Services\GuideQuestService;
 use App\Admin\Transformers\GuideQuestTransformer;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
@@ -21,7 +23,12 @@ use League\Fractal\Resource\Item;
 
 class GuideQuestsController
 {
-    public function __construct(private readonly PlainDataSerializer $plainDataSerializer, private readonly Manager $manager, private readonly GuideQuestTransformer $guideQuestTransformer) {}
+    public function __construct(
+        private readonly PlainDataSerializer $plainDataSerializer,
+        private readonly Manager $manager,
+        private readonly GuideQuestTransformer $guideQuestTransformer,
+        private readonly GuideQuestService $guideQuestService,
+    ) {}
 
     public function guideQuest(GuideQuestRequest $request): JsonResponse
     {
@@ -50,6 +57,20 @@ class GuideQuestsController
             'guide_quests' => GuideQuest::pluck('name', 'id')->toArray(),
             'game_maps' => GameMap::pluck('name', 'id')->toArray(),
             'item_specialty_types' => ItemSpecialtyType::getValuesForSelect(),
+        ]);
+    }
+
+    public function storeFormResponse(GuideQuestStoreRequest $guideQuestStoreRequest): JsonResponse {
+
+        $request = $guideQuestStoreRequest->all();
+
+        $guideQuest = $this->guideQuestService->upsert($request, new GuideQuest());
+
+        $guideQuestData = new Item($guideQuest, $this->guideQuestTransformer);
+        $guideQuestData = $this->manager->setSerializer($this->plainDataSerializer)->createData($guideQuestData)->toArray();
+
+        return response()->json([
+            'guide_quest' => $guideQuestData,
         ]);
     }
 }
