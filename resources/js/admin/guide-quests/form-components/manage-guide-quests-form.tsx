@@ -56,12 +56,17 @@ const ManageGuideQuestsForm = ({
   }, [currentlyStoring, canMoveForward, storageError]);
 
   const handleNextStep = async (current_index: number): Promise<boolean> => {
-    const data_for_submission = formData[current_index];
+    const lastStepIndex = 12;
 
+    const data_for_submission = formData[current_index];
     const isFormDataEmpty =
       !data_for_submission || isEmpty(data_for_submission);
 
-    if (current_index >= 4 && isFormDataEmpty) {
+    if (
+      current_index >= 4 &&
+      current_index < lastStepIndex &&
+      isFormDataEmpty
+    ) {
       return true;
     }
 
@@ -72,10 +77,16 @@ const ManageGuideQuestsForm = ({
     }
 
     const requestObject = makeRequestObject(questId, data_for_submission ?? {});
-
     setRequestParams(requestObject);
 
-    return !isFormDataEmpty && !!canMoveForwardRef.current && isNil(error);
+    const canProceed =
+      !isFormDataEmpty && !!canMoveForwardRef.current && isNil(error);
+
+    if (canProceed && current_index === lastStepIndex) {
+      window.location.assign(`/admin/guide-quests/show/${questId}`);
+    }
+
+    return canProceed;
   };
 
   const handleSetFormDataFromComponent = useCallback(
