@@ -7,19 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class GuideQuestService
 {
-    /**
-     * @param ImageHandlerService $imageHandlerService
-     */
-    public function __construct(private readonly ImageHandlerService $imageHandlerService)
-    {
-    }
+    public function __construct(private readonly ImageHandlerService $imageHandlerService) {}
 
     /**
      * Upsert a GuideQuest from the payload and return the refreshed model.
-     *
-     * @param array $payload
-     * @param GuideQuest $guideQuest
-     * @return GuideQuest
      */
     public function upsert(array $payload, GuideQuest $guideQuest): GuideQuest
     {
@@ -51,8 +42,6 @@ class GuideQuestService
     }
 
     /**
-     * @param string $id
-     * @param Model $model
      * @return GuideQuest
      */
     private function resolveModel(string $id, Model $model): Model

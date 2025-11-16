@@ -60,7 +60,8 @@ class GuideQuestsController
         ]);
     }
 
-    public function storeFormResponse(GuideQuestStoreRequest $guideQuestStoreRequest): JsonResponse {
+    public function storeFormResponse(GuideQuestStoreRequest $guideQuestStoreRequest): JsonResponse
+    {
 
         $request = $guideQuestStoreRequest->all();
 

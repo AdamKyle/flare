@@ -22,7 +22,6 @@ use App\Admin\Services\UserService;
 use App\Admin\Transformers\GuideQuestTransformer;
 use App\Flare\Cache\CoordinatesCache;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
-use Nette\Utils\Image;
 
 class ServiceProvider extends ApplicationServiceProvider
 {

@@ -16,14 +16,6 @@ class ImageHandlerService
      * Process the full content payload: for each content key that is an array of blocks,
      * delete images for removed blocks, upload/replace/remove images for kept/added blocks,
      * and return the normalized content array preserving incoming order.
-     *
-     * @param Model $model
-     * @param array $incomingContent
-     * @param array $existingContent
-     * @param bool $hasImage
-     * @param string $disk
-     * @param string $basePrefix
-     * @return array
      */
     public function process(Model $model, array $incomingContent, array $existingContent, bool $hasImage, string $disk, string $basePrefix): array
     {
@@ -53,15 +45,6 @@ class ImageHandlerService
 
     /**
      * Process one content entry (a block array) for a given key.
-     *
-     * @param Model $model
-     * @param string $contentKey
-     * @param array $incomingBlocks
-     * @param array $existingBlocks
-     * @param bool $hasImage
-     * @param string $disk
-     * @param string $basePrefix
-     * @return array
      */
     private function processContentEntry(Model $model, string $contentKey, array $incomingBlocks, array $existingBlocks, bool $hasImage, string $disk, string $basePrefix): array
     {
@@ -98,11 +81,6 @@ class ImageHandlerService
 
     /**
      * Delete images for any blocks that existed previously but are missing in the incoming payload.
-     *
-     * @param Collection $existingById
-     * @param Collection $incomingById
-     * @param string $disk
-     * @return void
      */
     private function deleteRemovedBlockImages(Collection $existingById, Collection $incomingById, string $disk): void
     {
@@ -125,16 +103,6 @@ class ImageHandlerService
 
     /**
      * Resolve a single block's image state.
-     *
-     * @param Model $model
-     * @param string $contentKey
-     * @param string $blockId
-     * @param array $incomingBlock
-     * @param array $existingBlock
-     * @param bool $hasImage
-     * @param string $disk
-     * @param string $basePrefix
-     * @return array
      */
     private function processSingleBlock(Model $model, string $contentKey, string $blockId, array $incomingBlock, array $existingBlock, bool $hasImage, string $disk, string $basePrefix): array
     {
@@ -206,13 +174,6 @@ class ImageHandlerService
 
     /**
      * Apply "no-image" mode behavior.
-     *
-     * @param array $block
-     * @param bool $hasKey
-     * @param mixed $incomingValue
-     * @param string|null $existingPath
-     * @param string $disk
-     * @return array
      */
     private function resolveNoImageMode(array $block, bool $hasKey, mixed $incomingValue, ?string $existingPath, string $disk): array
     {
@@ -246,9 +207,6 @@ class ImageHandlerService
 
     /**
      * Determine whether a value is a block array (array of arrays each having an 'id' key).
-     *
-     * @param mixed $value
-     * @return bool
      */
     private function isBlockArray(mixed $value): bool
     {
@@ -268,9 +226,6 @@ class ImageHandlerService
 
     /**
      * Extract an existing original image path from a block if present and a string; otherwise null.
-     *
-     * @param array $block
-     * @return string|null
      */
     private function getExistingOriginalPath(array $block): ?string
     {
@@ -281,10 +236,6 @@ class ImageHandlerService
 
     /**
      * Delete a file at the given path on the given disk when it exists.
-     *
-     * @param string $disk
-     * @param string|null $path
-     * @return void
      */
     private function deletePathIfExists(string $disk, ?string $path): void
     {
@@ -299,14 +250,6 @@ class ImageHandlerService
 
     /**
      * Upload a file and return the stored relative path.
-     *
-     * @param Model $model
-     * @param string $contentKey
-     * @param string $blockId
-     * @param UploadedFile $file
-     * @param string $disk
-     * @param string $basePrefix
-     * @return string
      */
     private function uploadFile(Model $model, string $contentKey, string $blockId, UploadedFile $file, string $disk, string $basePrefix): string
     {
@@ -317,24 +260,19 @@ class ImageHandlerService
         $blockIdSlug = $this->sanitizeFilename($blockId);
 
         $prefix = $this->normalizeBasePrefix($basePrefix);
-        $dir = $prefix . '/' . $nameSlug . '/' . $contentKeySlug . '/' . $blockIdSlug . '/images';
+        $dir = $prefix.'/'.$nameSlug.'/'.$contentKeySlug.'/'.$blockIdSlug.'/images';
 
         $hash = md5_file($file->getRealPath()) ?: Str::random(40);
         $ext = $file->getClientOriginalExtension();
-        $filename = $ext !== '' ? $hash . '.' . $ext : $hash;
+        $filename = $ext !== '' ? $hash.'.'.$ext : $hash;
 
         Storage::disk($disk)->putFileAs($dir, $file, $filename);
 
-        return $dir . '/' . $filename;
+        return $dir.'/'.$filename;
     }
 
     /**
      * Compare an existing stored file with an uploaded file using md5 hashes; return true if identical.
-     *
-     * @param string $disk
-     * @param string|null $existingPath
-     * @param UploadedFile $file
-     * @return bool
      */
     private function filesAreIdentical(string $disk, ?string $existingPath, UploadedFile $file): bool
     {
@@ -364,9 +302,6 @@ class ImageHandlerService
 
     /**
      * Sanitize a filename by replacing spaces and removing disallowed characters.
-     *
-     * @param string $name
-     * @return string
      */
     private function sanitizeFilename(string $name): string
     {
@@ -377,10 +312,6 @@ class ImageHandlerService
 
     /**
      * Convert a stored relative path into a full URL for the given disk.
-     *
-     * @param string $disk
-     * @param string|null $path
-     * @return string|null
      */
     private function pathToUrl(string $disk, ?string $path): ?string
     {
@@ -397,9 +328,6 @@ class ImageHandlerService
 
     /**
      * Determine if the provided string is an absolute URL.
-     *
-     * @param string $value
-     * @return bool
      */
     private function isAbsoluteUrl(string $value): bool
     {
@@ -408,9 +336,6 @@ class ImageHandlerService
 
     /**
      * Normalize a base prefix to a relative storage path segment.
-     *
-     * @param string $basePrefix
-     * @return string
      */
     private function normalizeBasePrefix(string $basePrefix): string
     {
