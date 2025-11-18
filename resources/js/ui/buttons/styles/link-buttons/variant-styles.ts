@@ -19,5 +19,10 @@ export const variantStyles = (variant: ButtonVariant): string => {
       () =>
         'text-danube-600 dark:text-danube-300 hover:text-danube-500 dark:hover:text-danube-200 focus:ring-danube-400 dark:focus:ring-danube-200'
     )
+    .with(
+      ButtonVariant.SERVER_MESSAGE_LINK,
+      () =>
+        'text-danube-300 dark:text-danube-200 hover:text-danube-200 dark:hover:text-danube-300 focus:ring-danube-400 dark:focus:ring-danube-200'
+    )
     .otherwise(() => '');
 };

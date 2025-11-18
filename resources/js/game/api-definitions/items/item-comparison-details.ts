@@ -48,3 +48,8 @@ export interface ItemComparisonRow {
   comparison: ComparisonPayload;
   item_to_equip: BaseItemDetails;
 }
+
+export interface ItemComparison {
+  details: ItemComparisonRow[];
+  item_to_equip: EquippableItemWithBase;
+}

@@ -182,7 +182,7 @@ class MovementService
                 broadcast(new GlobalMessageEvent($message));
             }
 
-            event(new GameServerMessageEvent($character->user, 'You found: '.$questItem->affix_name, $slot->id, true));
+            event(new GameServerMessageEvent($character->user, 'You found: '.$questItem->affix_name, $slot->id));
 
             event(new UpdateCharacterStatus($character));
         }

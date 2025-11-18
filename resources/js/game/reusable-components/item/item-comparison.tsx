@@ -6,7 +6,6 @@ import EquipItemActions from './equip-item-actions';
 import ItemComparisonColumn from './partials/item-comparison/item-comparison-column';
 import ItemComparisonProps from './types/item-comparison-props';
 import { hasAnyNonZeroAdjustment } from './utils/item-comparison';
-import type { ItemComparisonRow } from '../../api-definitions/items/item-comparison-details';
 import UsePurchaseAndReplaceApiRequestDefinition from '../../components/shop/api/hooks/definitions/use-purchase-and-replace-api-request-definition';
 
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
@@ -37,9 +36,7 @@ const ItemComparison = ({
     set_request_params(requestParams);
   };
 
-  const comparisonRows = (
-    (comparisonDetails ?? []) as ItemComparisonRow[]
-  ).slice(0, 2);
+  const comparisonRows = (comparisonDetails.details ?? []).slice(0, 2);
 
   if (comparisonRows.length === 0) {
     return null;

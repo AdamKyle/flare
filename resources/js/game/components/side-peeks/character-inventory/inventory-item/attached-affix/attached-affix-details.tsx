@@ -4,6 +4,7 @@ import AffixCoreAttributesSection from '../partials/affix-view/affix-core-attrib
 import AffixDamageSection from '../partials/affix-view/affix-damage-section';
 import AffixMiscModifiersSection from '../partials/affix-view/affix-misc-modifiers-section';
 import AffixSkillModifiersSection from '../partials/affix-view/affix-skill-modifier-section';
+import AffixStatsReductionSection from '../partials/affix-view/affix-stat-reduction-section';
 import AffixStatsSection from '../partials/affix-view/affix-stats-section';
 import AttachedAffixDetailsProps from '../types/attached-affix-details-props';
 
@@ -32,6 +33,7 @@ const AttachedAffixDetails = ({ affix }: AttachedAffixDetailsProps) => {
 
         <div className="space-y-4">
           <AffixStatsSection affix={affix} />
+          <AffixStatsReductionSection affix={affix} />
           <AffixCoreAttributesSection affix={affix} />
           <AffixDamageSection affix={affix} />
           <AffixSkillModifiersSection affix={affix} />

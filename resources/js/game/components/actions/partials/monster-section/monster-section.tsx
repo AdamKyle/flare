@@ -231,9 +231,7 @@ const MonsterSection = ({
           />
         </HealthBarContainer>
         {renderAttackButtons()}
-        <div className="mt-4 rounded-lg border border-solid border-gray-200 bg-gray-100 p-4 text-sm dark:border-gray-800 dark:bg-gray-700">
-          <AttackMessages messages={data?.attack_messages || []} />
-        </div>
+        <AttackMessages messages={data?.attack_messages || []} />
       </>
     );
   };

@@ -29,8 +29,6 @@ const GameChat = () => {
   const isAdmin = Boolean(character?.is_admin);
   const isSilenced = character?.is_silenced ?? null;
   const canTalkAgainAt = character?.can_talk_again_at ?? null;
-  const viewPort = character?.view_port ?? 0;
-  const isAutomationRunning = Boolean(character?.is_automation_running);
 
   const {
     server,
@@ -38,9 +36,7 @@ const GameChat = () => {
     announcements: streamAnnouncements,
     chatMessages,
   } = useChatStream({
-    characterData: character,
-    view_port: viewPort,
-    is_automation_running: isAutomationRunning,
+    character_data: character,
   });
 
   const { setRequestParams } = useSendChatMessage();
@@ -152,8 +148,6 @@ const GameChat = () => {
       serverProps: {
         server_messages: server,
         character_id: character!.id,
-        view_port: viewPort,
-        is_automation_running: isAutomationRunning,
       },
       explorationProps: {
         exploration_messages: exploration,

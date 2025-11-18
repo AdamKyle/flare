@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import UseCompareItemApiDefinition from './definitions/use-compare-item-api-definition';
 import UseCompareItemApiRequestParameters from './definitions/use-compare-item-api-request-params';
 import { UseCompareItemApiResponseDefinition } from './definitions/use-compare-item-api-response-definition';
-import { ItemComparisonRow } from '../../../../api-definitions/items/item-comparison-details';
+import { ItemComparison } from '../../../../api-definitions/items/item-comparison-details';
 
 export const useCompareItemApi = (
   params: UseCompareItemApiRequestParameters
@@ -13,7 +13,7 @@ export const useCompareItemApi = (
   const { apiHandler, getUrl } = useApiHandler();
 
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<ItemComparisonRow[] | [] | null>(null);
+  const [data, setData] = useState<ItemComparison | null>(null);
   const [error, setError] =
     useState<UseCompareItemApiDefinition['error']>(null);
 
@@ -40,7 +40,7 @@ export const useCompareItemApi = (
           },
         });
 
-        setData(result.details);
+        setData(result);
       } catch (err) {
         if (err instanceof AxiosError) {
           setError(err.response?.data || null);

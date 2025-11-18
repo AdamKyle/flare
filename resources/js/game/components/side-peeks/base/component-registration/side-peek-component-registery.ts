@@ -14,6 +14,8 @@ import Teleport from '../../map-actions/teleport/teleport';
 import TeleportProps from '../../map-actions/teleport/types/teleport-props';
 import TraversePropsDefinition from '../../map-actions/traverse/definitions/traverse-props-definition';
 import Traverse from '../../map-actions/traverse/traverse';
+import ServerChatItem from '../../server-chat-item/server-chat-item';
+import ServerChatItemProps from '../../server-chat-item/types/server-chat-item-props';
 
 import SidePeekProps from 'ui/side-peek/types/side-peek-props';
 
@@ -49,6 +51,10 @@ export const SidePeekComponentRegistry = {
   [SidePeekComponentRegistrationEnum.MAP_ACTIONS_TRAVERSE]: {
     component: Traverse,
     props: {} as TraversePropsDefinition,
+  },
+  [SidePeekComponentRegistrationEnum.SERVER_CHAT_ITEM]: {
+    component: ServerChatItem,
+    props: {} as ServerChatItemProps,
   },
   // Add more components here
 };

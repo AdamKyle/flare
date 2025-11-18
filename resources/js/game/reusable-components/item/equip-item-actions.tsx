@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { capitalize } from 'lodash';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { ItemBaseTypes } from './enums/item-base-type';
 import { ItemPositions } from './enums/item-positions';
@@ -31,7 +31,13 @@ const EquipItemActions = ({
   const [equippedPosition, setEquippedPosition] =
     useState<ItemPositions | null>(null);
 
-  const itemToEquip = comparison_details[0].item_to_equip;
+  const itemToEquip = useMemo(() => {
+    if (comparison_details.details.length <= 0) {
+      return comparison_details.item_to_equip;
+    }
+
+    return comparison_details.details[0].item_to_equip;
+  }, [comparison_details]);
 
   const baseType = getType(itemToEquip, armourPositions);
 
@@ -59,19 +65,35 @@ const EquipItemActions = ({
   const handleConfirmation = (position: ItemPositions) => {
     setEquippedPosition(position);
 
-    const foundComparison = comparison_details.find((detail) => {
+    const foundComparison = comparison_details.details.find((detail) => {
       return detail.position === position;
     });
 
-    if (!foundComparison) {
+    console.log('handleConfirmation', {
+      foundComparison,
+      itemToEquip,
+      is_equipping,
+    });
+
+    if (!foundComparison && !itemToEquip) {
       return;
     }
 
+    let slotId = itemToEquip.slot_id;
+
+    if (foundComparison) {
+      slotId = foundComparison.equipped_item.slot_id;
+    }
+
+    if (!slotId) {
+      slotId = 0;
+    }
+
+    console.log('Here?');
+
     on_confirm_action({
       position,
-      slot_id: is_equipping
-        ? itemToEquip.slot_id || 0
-        : foundComparison.equipped_item.slot_id,
+      slot_id: slotId,
       equip_type: itemToEquip.type,
       item_id_to_buy: itemToEquip.item_id,
     });

@@ -1,6 +1,6 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import { isNil } from 'lodash';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import EquipComparison from './equip-comparison';
 import { TOP_ADVANCED_CHILD_FIELDS } from '../../../../../../reusable-components/item/constants/item-comparison-constants';
@@ -46,6 +46,18 @@ const EquipItem = ({
     on_success: on_equip,
   });
 
+  const itemToEquip = useMemo(() => {
+    if (!data) {
+      return;
+    }
+
+    if (data.details.length <= 0) {
+      return data?.item_to_equip;
+    }
+
+    return data.details[0].item_to_equip;
+  }, [data]);
+
   if (loading) {
     return (
       <div className="p-4">
@@ -62,9 +74,7 @@ const EquipItem = ({
     return <GameDataError />;
   }
 
-  const itemToEquip = data[0].item_to_equip;
-
-  const showAdvancedChildUnderTop = data.some((row) =>
+  const showAdvancedChildUnderTop = data.details.some((row) =>
     hasAnyNonZeroAdjustment(
       row.comparison.adjustments,
       TOP_ADVANCED_CHILD_FIELDS
@@ -84,7 +94,7 @@ const EquipItem = ({
   const resolveTabLabels = () => {
     const hasData = Array.isArray(data) && data.length > 0;
 
-    if (!hasData) {
+    if (!hasData || !itemToEquip) {
       return null;
     }
 
@@ -113,9 +123,8 @@ const EquipItem = ({
     if (!labels) {
       return (
         <>
-          <Separator />
           <EquipComparison
-            comparison_data={data[0]}
+            comparison_data={data.details[0]}
             show_advanced_child_under_top={showAdvancedChildUnderTop}
           />
         </>
@@ -127,7 +136,7 @@ const EquipItem = ({
         label: label,
         component: EquipComparison,
         props: {
-          comparison_data: data[index],
+          comparison_data: data.details[index],
           show_advanced_child_under_top: showAdvancedChildUnderTop,
         },
       };
@@ -148,15 +157,25 @@ const EquipItem = ({
     return <ApiErrorAlert apiError={equipmentError.message} />;
   };
 
+  const renderItemMetaData = () => {
+    if (!itemToEquip) {
+      return null;
+    }
+
+    return (
+      <ItemMetaSection
+        name={itemToEquip.name}
+        description={itemToEquip.description}
+        type={itemToEquip.type}
+        titleClassName={planeTextItemColors(itemToEquip)}
+      />
+    );
+  };
+
   return (
     <>
       <div className="px-4">
-        <ItemMetaSection
-          name={itemToEquip.name}
-          description={itemToEquip.description}
-          type={itemToEquip.type}
-          titleClassName={planeTextItemColors(itemToEquip)}
-        />
+        {renderItemMetaData()}
         <Separator />
       </div>
       {renderEquipError()}

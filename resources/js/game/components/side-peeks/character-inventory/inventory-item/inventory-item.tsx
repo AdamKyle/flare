@@ -8,6 +8,7 @@ import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-
 import { useGetInventoryItemDetails } from './api/hooks/use-get-inventory-item-details';
 import AttachedAffixDetails from './attached-affix/attached-affix-details';
 import AttachedHolyStacks from './attached-holy-stacks/attached-holy-stacks';
+import InventoryItemActionButton from './inventory-item-action-button';
 import EquipItem from './partials/equip/equip-item';
 import AffixesSection from './partials/item-view/affixes-section';
 import AmbushCounterSection from './partials/item-view/ambush-and-counter-section';
@@ -189,14 +190,25 @@ const InventoryItem = ({
           type={item.type}
           titleClassName={planeTextItemColors(item)}
         />
-
         <Separator />
-        <div className="text-center">
-          <Button
-            on_click={handleViewEquip}
-            label="Equip Item"
-            variant={ButtonVariant.SUCCESS}
-          />
+        <div className="flex flex-col items-stretch gap-3 text-center sm:flex-row sm:items-center sm:justify-center sm:gap-6">
+          <div className="flex justify-center sm:justify-end">
+            <Button
+              on_click={handleViewEquip}
+              label="Equip Item"
+              variant={ButtonVariant.SUCCESS}
+            />
+          </div>
+
+          <div className="flex items-center justify-center gap-2">
+            <span className="inline-block h-px w-10 bg-gray-300" />
+            <span className="text-sm font-medium text-gray-500">Or</span>
+            <span className="inline-block h-px w-10 bg-gray-300" />
+          </div>
+
+          <div className="flex justify-center sm:justify-start">
+            <InventoryItemActionButton />
+          </div>
         </div>
         <Separator />
 

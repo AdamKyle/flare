@@ -1,5 +1,5 @@
 export default interface ServerMessagesDefinition {
-  id: string;
+  id: string | null;
   message: string;
   event_id: number;
 }

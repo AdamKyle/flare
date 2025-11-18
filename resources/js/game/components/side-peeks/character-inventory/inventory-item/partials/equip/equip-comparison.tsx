@@ -20,7 +20,8 @@ const EquipComparison = ({
   if (!comparison_data) {
     return (
       <div className="space-y-3 text-center">
-        There is nothing equipped for this position.
+        There is nothing equipped for this position. Anything os better then
+        nothing.
       </div>
     );
   }

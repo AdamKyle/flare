@@ -19,6 +19,10 @@ export const fetchEquippedArmour = (
   equippedItems: BaseInventoryItemDefinition[] | [],
   inventoryType: PartialInventoryItemTypes
 ): BaseInventoryItemDefinition | undefined => {
+  if (!equippedItems) {
+    return;
+  }
+
   return equippedItems.find(
     (equippedItem: BaseInventoryItemDefinition) =>
       equippedItem.type === inventoryType

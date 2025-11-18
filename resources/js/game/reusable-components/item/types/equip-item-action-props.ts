@@ -1,8 +1,8 @@
-import { ItemComparisonRow } from '../../../api-definitions/items/item-comparison-details';
+import { ItemComparison } from '../../../api-definitions/items/item-comparison-details';
 import UsePurchaseAndReplaceApiRequestDefinition from '../../../components/shop/api/hooks/definitions/use-purchase-and-replace-api-request-definition';
 
 export default interface EquipItemActionProps {
-  comparison_details: ItemComparisonRow[] | [];
+  comparison_details: ItemComparison;
   on_confirm_action: (
     requestParams: UsePurchaseAndReplaceApiRequestDefinition
   ) => void;

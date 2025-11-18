@@ -6,6 +6,7 @@ import CharacterKingdomDetailsProps from '../../map-actions/kingdom-details/type
 import LocationDetailsProps from '../../map-actions/location-details/types/location-details-props';
 import TeleportProps from '../../map-actions/teleport/types/teleport-props';
 import TraversePropsDefinition from '../../map-actions/traverse/definitions/traverse-props-definition';
+import ServerChatItemProps from '../../server-chat-item/types/server-chat-item-props';
 
 import SidePeekProps from 'ui/side-peek/types/side-peek-props';
 
@@ -18,5 +19,6 @@ export type SidePeekComponentPropsMap = {
   [SidePeekComponentRegistrationEnum.LOCATION_DETAILS]: LocationDetailsProps;
   [SidePeekComponentRegistrationEnum.CHARACTER_KINGDOM_DETAILS]: CharacterKingdomDetailsProps;
   [SidePeekComponentRegistrationEnum.MAP_ACTIONS_TRAVERSE]: TraversePropsDefinition;
+  [SidePeekComponentRegistrationEnum.SERVER_CHAT_ITEM]: ServerChatItemProps;
   // Future components go here
 };

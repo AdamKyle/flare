@@ -18,4 +18,9 @@ export enum SidePeekComponentRegistrationEnum {
    */
   LOCATION_DETAILS = 'LOCATION_DETAILS',
   CHARACTER_KINGDOM_DETAILS = 'CHARACTER_KINGDOM_DETAILS',
+
+  /**
+   * Server Chat Items
+   */
+  SERVER_CHAT_ITEM = 'SERVER_CHAT_ITEM',
 }

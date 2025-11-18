@@ -4,7 +4,7 @@ import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { isNil } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 
-import { ItemComparisonRow } from '../../../../../../api-definitions/items/item-comparison-details';
+import { ItemComparison } from '../../../../../../api-definitions/items/item-comparison-details';
 import { CharacterInventoryApiUrls } from '../../../api/enums/character-inventory-api-urls';
 import UseGetInventoryItemComparisonDefinition from '../definitions/use-get-inventory-item-comparison-definition';
 import UseGetInventoryItemComparisonDetailsParams from '../definitions/use-get-inventory-item-comparison-details-params-definition';
@@ -18,7 +18,7 @@ export const useGetInventoryItemComparisonDetails = ({
   const { apiHandler, getUrl } = useApiHandler();
   const { handleInactivity } = useActivityTimeout();
 
-  const [data, setData] = useState<ItemComparisonRow[] | [] | null>(null);
+  const [data, setData] = useState<ItemComparison | null>(null);
   const [error, setError] =
     useState<UseGetInventoryItemComparisonDefinition['error']>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -48,7 +48,10 @@ export const useGetInventoryItemComparisonDetails = ({
         },
       });
 
-      setData(result.details);
+      setData({
+        item_to_equip: result.itemToEquip,
+        details: result.details,
+      });
     } catch (err) {
       if (err instanceof AxiosError) {
         handleInactivity({
