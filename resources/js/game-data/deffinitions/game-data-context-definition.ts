@@ -9,5 +9,6 @@ export default interface GameDataContextDefinition {
   setGameData: React.Dispatch<React.SetStateAction<GameDataDefinition | null>>;
   updateCharacter: (character: Partial<CharacterSheetDefinition>) => void;
   listenForMonsterUpdates: () => void;
+  markAnnouncementsSeen: () => void;
   characterId: number;
 }

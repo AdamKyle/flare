@@ -3,25 +3,15 @@ import { useEffect, useState } from 'react';
 import UseUnreadBadgesDefinition from './definitions/use-unread-badges-definition';
 import UseUnreadBadgesParamsDefinition from './definitions/use-unread-badges-params-definition';
 
-const useUnreadBadges = (
-  params: UseUnreadBadgesParamsDefinition
-): UseUnreadBadgesDefinition => {
-  const {
-    serverCount,
-    announcementsCount,
-    serverIndex,
-    announcementsIndex,
-    initialActiveIndex = 0,
-  } = params;
-
+const useUnreadBadges = ({
+  serverCount,
+  serverIndex,
+  initialActiveIndex = 0,
+}: UseUnreadBadgesParamsDefinition): UseUnreadBadgesDefinition => {
   const [activeTabIndex, setActiveTabIndex] =
     useState<number>(initialActiveIndex);
   const [unreadServer, setUnreadServer] = useState<boolean>(false);
-  const [unreadAnnouncements, setUnreadAnnouncements] =
-    useState<boolean>(false);
   const [lastSeenServerCount, setLastSeenServerCount] = useState<number>(0);
-  const [lastSeenAnnouncementsCount, setLastSeenAnnouncementsCount] =
-    useState<number>(0);
 
   useEffect(() => {
     if (activeTabIndex === serverIndex) {
@@ -33,25 +23,7 @@ const useUnreadBadges = (
         setUnreadServer(true);
       }
     }
-
-    if (activeTabIndex === announcementsIndex) {
-      setLastSeenAnnouncementsCount(announcementsCount);
-
-      setUnreadAnnouncements(false);
-    } else {
-      if (announcementsCount > lastSeenAnnouncementsCount) {
-        setUnreadAnnouncements(true);
-      }
-    }
-  }, [
-    activeTabIndex,
-    serverIndex,
-    announcementsIndex,
-    serverCount,
-    announcementsCount,
-    lastSeenServerCount,
-    lastSeenAnnouncementsCount,
-  ]);
+  }, [activeTabIndex, serverIndex, serverCount, lastSeenServerCount]);
 
   const handleActiveIndexChange = (index: number): void => {
     setActiveTabIndex(index);
@@ -61,17 +33,10 @@ const useUnreadBadges = (
 
       setUnreadServer(false);
     }
-
-    if (index === announcementsIndex) {
-      setLastSeenAnnouncementsCount(announcementsCount);
-
-      setUnreadAnnouncements(false);
-    }
   };
 
   return {
     unreadServer,
-    unreadAnnouncements,
     activeTabIndex,
     handleActiveIndexChange,
   };

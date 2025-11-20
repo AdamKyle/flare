@@ -4,11 +4,10 @@ import { CharacterUpdatesWire } from 'game-data/components/character-updates-wir
 import UseCharacterUpdateDefinition from 'game-data/hooks/definitions/use-character-update-definition';
 import UseCharacterUpdateParamsDefinition from 'game-data/hooks/definitions/use-character-update-params-definition';
 
-const UseCharacterUpdates = (
-  params: UseCharacterUpdateParamsDefinition
-): UseCharacterUpdateDefinition => {
-  const { userId, onEvent } = params;
-
+const UseCharacterUpdates = ({
+  userId,
+  onEvent,
+}: UseCharacterUpdateParamsDefinition): UseCharacterUpdateDefinition => {
   const [listening, setListening] = useState<boolean>(false);
 
   const start = useCallback(() => {

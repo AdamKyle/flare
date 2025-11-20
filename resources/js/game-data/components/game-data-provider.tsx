@@ -2,11 +2,13 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { GameDataContext } from '../game-data-context';
 import GameDataProviderProps from './types/game-data-provider-props';
+import AnnouncementMessageDefinition from '../../game/api-definitions/chat/annoucement-message-definition';
 import CharacterSheetDefinition from '../api-data-definitions/character/character-sheet-definition';
 import GameDataDefinition from '../deffinitions/game-data-definition';
 
 import UseCharterUpdateStreamResponse from 'game-data/hooks/definitions/use-character-update-stream-response';
 import UseMonsterUpdateStreamResponse from 'game-data/hooks/definitions/use-monster-update-stream-response';
+import { useAnnouncementUpdates } from 'game-data/hooks/use-announcement-updates';
 import useCharacterUpdates from 'game-data/hooks/use-character-updates';
 import useMonsterUpdates from 'game-data/hooks/use-monster-updates';
 
@@ -59,13 +61,42 @@ const GameDataProvider = (props: GameDataProviderProps) => {
     character: UseCharterUpdateStreamResponse
   ) => {
     setGameData((prev): GameDataDefinition | null => {
-      if (!prev || !prev.monsters) {
+      if (!prev || !prev.character) {
         return prev;
       }
 
       return {
         ...prev,
         character: character.character,
+      };
+    });
+  };
+
+  const handleUpdateAnnouncements = (data: AnnouncementMessageDefinition) => {
+    setGameData((prev): GameDataDefinition | null => {
+      if (!prev) {
+        return prev;
+      }
+
+      const previousAnnouncements = prev.announcements ?? [];
+
+      return {
+        ...prev,
+        announcements: [...previousAnnouncements, data],
+        hasNewAnnouncements: true,
+      };
+    });
+  };
+
+  const markAnnouncementsSeen = (): void => {
+    setGameData((prev): GameDataDefinition | null => {
+      if (!prev) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        hasNewAnnouncements: false,
       };
     });
   };
@@ -98,6 +129,18 @@ const GameDataProvider = (props: GameDataProviderProps) => {
     onEvent: handleOnCharacterUpdate,
   });
 
+  const {
+    listening: announcementUpdateListening,
+    start: startAnnouncementListening,
+    renderWire: renderAnnouncementUpdateWire,
+  } = useAnnouncementUpdates({
+    onEvent: handleUpdateAnnouncements,
+  });
+
+  if (!announcementUpdateListening) {
+    startAnnouncementListening();
+  }
+
   if (!characterUpdatesListening) {
     startCharacterUpdates();
   }
@@ -116,10 +159,12 @@ const GameDataProvider = (props: GameDataProviderProps) => {
         characterId,
         updateCharacter,
         listenForMonsterUpdates,
+        markAnnouncementsSeen,
       }}
     >
       {renderMonsterUpdatesWire()}
       {renderCharacterUpdateWire()}
+      {renderAnnouncementUpdateWire()}
       {props.children}
     </GameDataContext.Provider>
   );

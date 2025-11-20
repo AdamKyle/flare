@@ -22,25 +22,21 @@ const TabsList = <PTuple extends readonly object[]>({
   ): void => {
     if (event.key === 'ArrowRight') {
       event.preventDefault();
-
       onSelect((activeIndex + 1) % tabs.length);
     }
 
     if (event.key === 'ArrowLeft') {
       event.preventDefault();
-
       onSelect((activeIndex - 1 + tabs.length) % tabs.length);
     }
 
     if (event.key === 'Home') {
       event.preventDefault();
-
       onSelect(0);
     }
 
     if (event.key === 'End') {
       event.preventDefault();
-
       onSelect(tabs.length - 1);
     }
   };
@@ -118,8 +114,7 @@ const TabsList = <PTuple extends readonly object[]>({
     }
 
     const totalTabs = tabs.length;
-    const stepPercent = 100 / totalTabs;
-    const indicatorWidth = `calc(${stepPercent}%)`;
+    const indicatorWidth = `calc((100% - 0.5rem) / ${totalTabs})`;
     const indicatorTransform = `translateX(${activeIndex * 100}%)`;
 
     return (

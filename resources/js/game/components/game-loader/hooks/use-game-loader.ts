@@ -4,6 +4,7 @@ import UseGameLoaderDefinition from './definitions/use-game-loader-definition';
 import { BatchApiCallKey } from './enums/batch-api-call-key';
 import { useBatchApiCalls } from './use-batch-api-calls';
 import { GameLoaderApiUrls } from '../api/enums/game-loader-api-urls';
+import { UseAnnouncementsApi } from '../api/hooks/use-announcements-api';
 import { useCharacterSheetApi } from '../api/hooks/use-character-sheet-api';
 import { useMonsterApi } from '../api/hooks/use-monster-api';
 
@@ -26,6 +27,10 @@ export const useGameLoader = (): UseGameLoaderDefinition => {
     },
   });
 
+  const { fetchAnnouncements } = UseAnnouncementsApi({
+    url: GameLoaderApiUrls.ANNOUNCEMENTS,
+  });
+
   const { loading, progress, error, data, executeBatchApiCalls } =
     useBatchApiCalls([
       {
@@ -36,7 +41,12 @@ export const useGameLoader = (): UseGameLoaderDefinition => {
       {
         api_call: fetchMonstersData,
         key: BatchApiCallKey.MONSTERS,
-        progress_step: 50,
+        progress_step: 25,
+      },
+      {
+        api_call: fetchAnnouncements,
+        key: BatchApiCallKey.ANNOUNCEMENTS,
+        progress_step: 25,
       },
     ]);
 

@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 
+import Notifications from './notifications';
 import MonsterNamePicker from './partials/monster-name-picker';
 import MonsterTopSectionProps from './types/monster-top-section-props';
 
@@ -85,6 +86,9 @@ const MonsterTopSection = ({
           variant={ButtonVariant.PRIMARY}
           on_click={handleViewMonsterStats}
         />
+      </div>
+      <div className={'mt-2'}>
+        <Notifications />
       </div>
     </>
   );

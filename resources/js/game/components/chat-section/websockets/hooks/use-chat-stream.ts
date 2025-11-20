@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { UseChatStreamDefinition } from './definitions/use-chat-stream-definition';
 import UseChatStreamParams from './definitions/use-chat-stream-params';
-import { useAnnouncementMessages } from './use-announcement-messages';
 import { useChatMessages } from './use-chat-messages';
 import { useExplorationMessages } from './use-exploration-messages';
 import { useServerMessages } from './use-server-messages';
@@ -14,7 +13,6 @@ export const useChatStream = ({
 
   const { serverMessages } = useServerMessages({ user_id: userId });
   const { explorationMessages } = useExplorationMessages({ user_id: userId });
-  const { announcementMessages } = useAnnouncementMessages();
   const { chatMessages } = useChatMessages();
 
   const [ready, setReady] = useState(false);
@@ -27,16 +25,9 @@ export const useChatStream = ({
     () => ({
       server: serverMessages,
       exploration: explorationMessages,
-      announcements: announcementMessages,
       chatMessages,
       ready,
     }),
-    [
-      serverMessages,
-      explorationMessages,
-      announcementMessages,
-      chatMessages,
-      ready,
-    ]
+    [serverMessages, explorationMessages, chatMessages, ready]
   );
 };

@@ -2,5 +2,5 @@ import UseCharterUpdateStreamResponse from 'game-data/hooks/definitions/use-char
 
 export default interface CharacterUpdateWireProps {
   userId: number;
-  onEvent: (character: UseCharterUpdateStreamResponse) => void;
+  onEvent: (data: UseCharterUpdateStreamResponse) => void;
 }

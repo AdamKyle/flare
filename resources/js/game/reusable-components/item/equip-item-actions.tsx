@@ -69,12 +69,6 @@ const EquipItemActions = ({
       return detail.position === position;
     });
 
-    console.log('handleConfirmation', {
-      foundComparison,
-      itemToEquip,
-      is_equipping,
-    });
-
     if (!foundComparison && !itemToEquip) {
       return;
     }
@@ -88,8 +82,6 @@ const EquipItemActions = ({
     if (!slotId) {
       slotId = 0;
     }
-
-    console.log('Here?');
 
     on_confirm_action({
       position,

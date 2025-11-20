@@ -3,6 +3,7 @@
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/server-message', ['uses' => 'Api\ServerMessageController@generateServerMessage']);
     Route::get('/last-chats', ['uses' => 'Api\FetchMessagesController@fetchChatMessages']);
+    Route::get('/announcements', ['uses' => 'Api\AnnouncementsController@fetchAnnouncements']);
 
     Route::group(['middleware' => 'throttle:chat'], function () {
         Route::post('/public-message', ['uses' => 'Api\PostMessagesController@postPublicMessage']);

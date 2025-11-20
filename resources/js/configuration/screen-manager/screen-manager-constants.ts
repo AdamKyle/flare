@@ -4,4 +4,5 @@ export const Screens = {
   GOBLIN_SHOP: 'goblin-shop',
   CHARACTER_INVENTORY: 'character-investment',
   MONSTER_DETAILS: 'monster-details',
+  ANNOUNCEMENTS: 'announcements',
 } as const;

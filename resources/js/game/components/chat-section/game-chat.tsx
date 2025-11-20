@@ -4,7 +4,6 @@ import React, { useEffect } from 'react';
 import { useFetchChatHistory } from './api/hooks/use-fetch-chat-history';
 import { useSendChatMessage } from './api/hooks/use-send-chat-message';
 import Chat from './chat';
-import AnnouncementMessages from './components/announcements/announcement-messages';
 import ExplorationMessages from './components/exploration-messages/exploration-messages';
 import ServerMessages from './components/server-messages/server-messages';
 import useChatActions from './hooks/use-chat-actions';
@@ -30,12 +29,7 @@ const GameChat = () => {
   const isSilenced = character?.is_silenced ?? null;
   const canTalkAgainAt = character?.can_talk_again_at ?? null;
 
-  const {
-    server,
-    exploration,
-    announcements: streamAnnouncements,
-    chatMessages,
-  } = useChatStream({
+  const { server, exploration, chatMessages } = useChatStream({
     character_data: character,
   });
 
@@ -90,22 +84,12 @@ const GameChat = () => {
     setInitialChatHistory(chatHistory);
   }, [data, setInitialChatHistory]);
 
-  const announcementsCount =
-    (streamAnnouncements?.length || 0) +
-    (combinedChat.announcements?.length || 0);
-
-  const {
-    unreadServer,
-    unreadAnnouncements,
-    activeTabIndex,
-    handleActiveIndexChange,
-  } = useUnreadBadges({
-    serverCount: server.length,
-    announcementsCount,
-    serverIndex: 1,
-    announcementsIndex: 3,
-    initialActiveIndex: 0,
-  });
+  const { unreadServer, activeTabIndex, handleActiveIndexChange } =
+    useUnreadBadges({
+      serverCount: server.length,
+      serverIndex: 1,
+      initialActiveIndex: 0,
+    });
 
   const renderBody = () => {
     if (!character) {
@@ -131,10 +115,8 @@ const GameChat = () => {
       chatComponent: Chat,
       serverComponent: ServerMessages,
       explorationComponent: ExplorationMessages,
-      announcementsComponent: AnnouncementMessages,
       bellIconClass: 'far fa-bell',
-      bellIconStyles:
-        'text-[color:var(--color-mango-tango-600)] dark:text-[color:var(--color-mango-tango-300)]',
+      bellIconStyles: 'text-mango-tango-600 dark:text-mango-tango-300',
       chatProps: {
         is_silenced: isSilenced,
         can_talk_again_at: canTalkAgainAt,
@@ -152,20 +134,13 @@ const GameChat = () => {
       explorationProps: {
         exploration_messages: exploration,
       },
-      announcementsProps: {
-        announcements: [
-          ...streamAnnouncements,
-          ...(combinedChat.announcements || []),
-        ],
-      },
       unreadServer,
-      unreadAnnouncements,
     });
 
     return (
       <PillTabs
         tabs={tabs}
-        additional_tab_css="w-full md:w-2/3"
+        additional_tab_css="w-full lg:w-2/3"
         onActiveIndexChange={handleActiveIndexChange}
         initialIndex={activeTabIndex}
       />
