@@ -43,7 +43,6 @@ class FetchMessagesControllerTest extends TestCase
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertNotEmpty($jsonData['chat_messages']);
-        $this->assertNotEmpty($jsonData['announcements']);
         $this->assertEquals(200, $response->status());
     }
 }

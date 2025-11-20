@@ -19,5 +19,10 @@ export const variantStyles = (variant: ButtonVariant): string => {
       () =>
         'bg-danube-600 hover:bg-danube-500 focus:ring-danube-400 dark:focus:ring-danube-600'
     )
+    .with(
+      ButtonVariant.DONATIONS,
+      () =>
+        'bg-mango-tango-600 hover:bg-mango-tango-500 focus:ring-mango-tango-400 dark:focus:ring-mango-tango-600'
+    )
     .otherwise(() => '');
 };

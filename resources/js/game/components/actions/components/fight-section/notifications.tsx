@@ -29,19 +29,22 @@ const Notifications = () => {
     openAnnouncements();
   };
 
-  const renderHeader = () => {
-    const renderIcon = () => {
-      if (!gameData?.hasNewAnnouncements) {
-        return null;
-      }
+  const renderIcon = () => {
+    if (!gameData?.hasNewAnnouncements) {
+      return null;
+    }
 
-      return (
-        <i
-          className="far fa-bell text-mango-tango-600 mr-2"
-          aria-hidden="true"
-        />
-      );
-    };
+    return (
+      <i className="far fa-bell text-mango-tango-600 mr-2" aria-hidden="true" />
+    );
+  };
+
+  const renderHeader = () => {
+    let title = 'Things are happening!';
+
+    if (!gameData?.hasNewAnnouncements) {
+      title = 'A place of action';
+    }
 
     return (
       <button
@@ -53,7 +56,7 @@ const Notifications = () => {
       >
         <span className="inline-flex items-center">
           {renderIcon()}
-          <span>Things are happening!</span>
+          <span>{title}</span>
         </span>
         <i className={chevronClassName} aria-hidden="true" />
       </button>
@@ -95,6 +98,16 @@ const Notifications = () => {
             variant={ButtonVariant.SUCCESS}
             on_click={() => {}}
             additional_css="w-full sm:flex-1"
+          />
+        </div>
+        <div className="mt-2 w-full text-center">
+          <IconButton
+            on_click={() => {}}
+            variant={ButtonVariant.DONATIONS}
+            label={'Donations'}
+            additional_css={'w-full md:w-2/3'}
+            icon={<i className="fas fa-hand-holding-usd"></i>}
+            center_content
           />
         </div>
       </div>
