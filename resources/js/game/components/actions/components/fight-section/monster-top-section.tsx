@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 
-import Notifications from './notifications';
+import Notifications from '../../../notifications/notifications';
 import MonsterNamePicker from './partials/monster-name-picker';
 import MonsterTopSectionProps from './types/monster-top-section-props';
 

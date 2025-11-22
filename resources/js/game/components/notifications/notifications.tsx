@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import React, { useId, useState } from 'react';
 
-import { UseManageAnnouncementsVisibility } from '../../../announcements/hooks/use-manage-announcements-visibility';
+import { UseManageAnnouncementsVisibility } from '../announcements/hooks/use-manage-announcements-visibility';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 
