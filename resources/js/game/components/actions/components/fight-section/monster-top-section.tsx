@@ -1,8 +1,8 @@
 import React, { ReactNode } from 'react';
 
-import Notifications from '../../../notifications/notifications';
 import MonsterNamePicker from './partials/monster-name-picker';
 import MonsterTopSectionProps from './types/monster-top-section-props';
+import Notifications from '../../../notifications/notifications';
 
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import LinkButton from 'ui/buttons/link-button';

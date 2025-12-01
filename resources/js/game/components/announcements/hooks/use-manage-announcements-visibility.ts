@@ -8,7 +8,7 @@ export const UseManageAnnouncementsVisibility =
   (): UseManageAnnouncementsVisibilityDefinition => {
     const eventSystem = useEventSystem();
 
-    const [showAnnouncements, setShowAnnouncements] = useState<boolean>(false);
+    const [showAnnouncements, setShowAnnouncements] = useState(false);
 
     const manageInventoryEmitter = eventSystem.fetchOrCreateEventEmitter<{
       [key: string]: boolean;

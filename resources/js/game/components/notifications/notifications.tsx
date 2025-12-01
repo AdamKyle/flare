@@ -2,6 +2,8 @@ import clsx from 'clsx';
 import React, { useId, useState } from 'react';
 
 import { UseManageAnnouncementsVisibility } from '../announcements/hooks/use-manage-announcements-visibility';
+import { useManageDonationsVisibility } from '../donations/hooks/use-manage-donations-visibility';
+import { useManageGuideQuestsVisibility } from '../guide-quests/hooks/use-manage-guide-quests-visibility';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 
@@ -11,6 +13,8 @@ import IconButton from 'ui/buttons/icon-button';
 const Notifications = () => {
   const { gameData, markAnnouncementsSeen } = useGameData();
   const { openAnnouncements } = UseManageAnnouncementsVisibility();
+  const { openDonationScreen } = useManageDonationsVisibility();
+  const { openGuideQuestsScreen } = useManageGuideQuestsVisibility();
   const [isExpanded, setIsExpanded] = useState(false);
   const contentId = useId();
 
@@ -96,13 +100,13 @@ const Notifications = () => {
           <IconButton
             label="Guide Quest"
             variant={ButtonVariant.SUCCESS}
-            on_click={() => {}}
+            on_click={openGuideQuestsScreen}
             additional_css="w-full sm:flex-1"
           />
         </div>
         <div className="mt-2 w-full text-center">
           <IconButton
-            on_click={() => {}}
+            on_click={openDonationScreen}
             variant={ButtonVariant.DONATIONS}
             label={'Donations'}
             additional_css={'w-full md:w-2/3'}
