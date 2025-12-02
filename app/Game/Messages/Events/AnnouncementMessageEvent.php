@@ -2,6 +2,10 @@
 
 namespace App\Game\Messages\Events;
 
+use App\Flare\Models\Announcement;
+use App\Game\Events\Values\EventType;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -13,27 +17,34 @@ class AnnouncementMessageEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public string $message;
-
-    public int $id;
+    public Announcement $announcement;
 
     /**
-     * Create a new event instance.
-     *
-     * - specialColor should be a css class that
-     * represents the color you want applied to the message.
+     * @param Announcement $announcement
+     * @throws Exception
      */
-    public function __construct(string $message, int $id)
+    public function __construct(Announcement $announcement)
     {
-        $this->message = $message;
-        $this->id = $id;
+        $this->announcement = $this->appendAdditionalDetails($announcement);
     }
 
     /**
-     * Get the channels the event should broadcast on.
+     * @return Channel|array|Channel[]|string[]
      */
     public function broadcastOn(): Channel|array
     {
         return new PresenceChannel('announcement-message');
+    }
+
+    /**
+     * @param Announcement $announcement
+     * @return Announcement
+     * @throws Exception
+     */
+    protected function appendAdditionalDetails(Announcement $announcement): Announcement {
+        $announcement->expires_at_formatted = (new Carbon($announcement->expires_at))->format('l, j \of F \a\t h:ia \G\M\TP');
+        $announcement->event_name = (new EventType($announcement->event->type))->getNameForEvent();
+
+        return $announcement;
     }
 }

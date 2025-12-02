@@ -5,8 +5,6 @@ import { useCallback } from 'react';
 
 import AnnouncementMessageDefinition from '../../../../api-definitions/chat/annoucement-message-definition';
 
-import MonsterDefinition from 'game-data/api-data-definitions/monsters/monster-definition';
-
 export const UseAnnouncementsApi = (params: ApiParametersDefinitions) => {
   const { apiHandler, getUrl } = useApiHandler();
   const url = getUrl(params.url);
@@ -15,7 +13,7 @@ export const UseAnnouncementsApi = (params: ApiParametersDefinitions) => {
     try {
       return await apiHandler.get<
         AnnouncementMessageDefinition[],
-        AxiosResponse<MonsterDefinition[]>
+        AxiosResponse<AnnouncementMessageDefinition[]>
       >(url);
     } catch (error) {
       if (error instanceof AxiosError) {

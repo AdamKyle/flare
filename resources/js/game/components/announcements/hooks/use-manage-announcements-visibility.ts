@@ -10,7 +10,7 @@ export const UseManageAnnouncementsVisibility =
 
     const [showAnnouncements, setShowAnnouncements] = useState(false);
 
-    const manageInventoryEmitter = eventSystem.fetchOrCreateEventEmitter<{
+    const manageAnnouncementVisibility = eventSystem.fetchOrCreateEventEmitter<{
       [key: string]: boolean;
     }>(AnnouncementEvents.OPEN_ANNOUNCEMENTS);
 
@@ -19,25 +19,31 @@ export const UseManageAnnouncementsVisibility =
         setShowAnnouncements(visible);
       };
 
-      manageInventoryEmitter.on(
+      manageAnnouncementVisibility.on(
         AnnouncementEvents.OPEN_ANNOUNCEMENTS,
         updateVisibility
       );
 
       return () => {
-        manageInventoryEmitter.off(
+        manageAnnouncementVisibility.off(
           AnnouncementEvents.OPEN_ANNOUNCEMENTS,
           updateVisibility
         );
       };
-    }, [manageInventoryEmitter]);
+    }, [manageAnnouncementVisibility]);
 
     const openAnnouncements = () => {
-      manageInventoryEmitter.emit(AnnouncementEvents.OPEN_ANNOUNCEMENTS, true);
+      manageAnnouncementVisibility.emit(
+        AnnouncementEvents.OPEN_ANNOUNCEMENTS,
+        true
+      );
     };
 
     const closeAnnouncements = () => {
-      manageInventoryEmitter.emit(AnnouncementEvents.OPEN_ANNOUNCEMENTS, false);
+      manageAnnouncementVisibility.emit(
+        AnnouncementEvents.OPEN_ANNOUNCEMENTS,
+        false
+      );
     };
 
     return {

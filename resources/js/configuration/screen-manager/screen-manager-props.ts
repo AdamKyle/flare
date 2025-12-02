@@ -1,5 +1,6 @@
 import { Screens } from './screen-manager-constants';
 import MonsterStatSectionProps from '../../game/components/actions/partials/monster-stat-section/types/monster-stat-section-props';
+import AnnouncementDetailsProps from '../../game/components/announcements/types/announcement-details-props';
 import AnnouncementsProps from '../../game/components/announcements/types/announcements-props';
 import CharacterSheetProps from '../../game/components/character-sheet/types/character-sheet-props';
 import DonationsProps from '../../game/components/donations/types/donations-props';
@@ -17,6 +18,7 @@ export interface AppScreenPropsMap {
   [Screens.ANNOUNCEMENTS]: AnnouncementsProps;
   [Screens.DONATIONS]: DonationsProps;
   [Screens.GUIDE_QUESTS]: GuideQuestProps;
+  [Screens.ANNOUNCEMENT_DETAILS]: AnnouncementDetailsProps;
 }
 
 export type AppScreenName = keyof AppScreenPropsMap;

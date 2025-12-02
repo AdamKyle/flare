@@ -184,6 +184,21 @@
   --color-wisp-pink-900: #831852;
   --color-wisp-pink-950: #50072f;
 
+  /*- Glacier -*/
+  --color-glacier-50: #f1f7fa;
+  --color-glacier-100: #dcebf1;
+  --color-glacier-200: #bed8e3;
+  --color-glacier-300: #90bbd0;
+  --color-glacier-400: #73a6bf;
+  --color-glacier-500: #407b9a;
+  --color-glacier-600: #386582;
+  --color-glacier-700: #33546b;
+  --color-glacier-800: #30485a;
+  --color-glacier-900: #2c3e4d;
+  --color-glacier-950: #192733;
+
+
+
   /*— Spacing (Aspect-Ratio keys) —*/
   --spacing-1\/1:    100%;
   --spacing-3\/4:    75%;
