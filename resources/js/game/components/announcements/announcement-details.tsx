@@ -1,96 +1,24 @@
-import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 
 import AnnouncementDetailsProps from './types/announcement-details-props';
 
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
-import LinkButton from 'ui/buttons/link-button';
+import AnimatedCard from 'ui/cards/animated/card-flip/animated-card';
+import CardBack from 'ui/cards/animated/card-flip/card-back';
+import CardFront from 'ui/cards/animated/card-flip/card-front';
 import Card from 'ui/cards/card';
 import ContainerWithTitle from 'ui/container/container-with-title';
 
 const AnnouncementDetails = ({ on_close }: AnnouncementDetailsProps) => {
-  const [flippedCardIndex, setFlippedCardIndex] = useState<number | null>(null);
+  const [flippedCardKey, setFlippedCardKey] = useState<string | null>(null);
 
-  const infoCardTitles = ['Bonus Rewards', 'Faction Tasks', 'NPC Refresh'];
-
-  const handleCardClick = (cardIndex: number) => {
-    if (flippedCardIndex === cardIndex) {
-      setFlippedCardIndex(null);
+  const handleToggleCard = (cardKey: string) => {
+    if (flippedCardKey === cardKey) {
+      setFlippedCardKey(null);
 
       return;
     }
 
-    setFlippedCardIndex(cardIndex);
-  };
-
-  const renderInfoCards = () => {
-    return infoCardTitles.map((cardTitle, cardIndex) => {
-      const isFlipped = flippedCardIndex === cardIndex;
-
-      return (
-        <div
-          key={cardTitle}
-          className="relative mx-auto h-44 w-full max-w-xs md:h-56"
-          style={{ perspective: '1200px' }}
-        >
-          <button
-            type="button"
-            onClick={() => handleCardClick(cardIndex)}
-            className="group relative block h-full w-full bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900"
-            aria-pressed={isFlipped}
-            aria-label={`Toggle details for ${cardTitle}`}
-          >
-            <motion.div
-              className="relative z-10 h-full w-full"
-              style={{ transformStyle: 'preserve-3d' }}
-              animate={{ rotateY: isFlipped ? 180 : 0 }}
-              transition={{ duration: 0.45 }}
-            >
-              <div
-                className="absolute inset-0 flex h-full flex-col items-center justify-center rounded-t-xl border-x border-t border-gray-200/80 bg-gray-50 px-4 text-center text-gray-900 shadow-sm transition-shadow group-hover:shadow-md dark:border-gray-600/70 dark:bg-gray-800 dark:text-gray-50"
-                style={{
-                  backfaceVisibility: 'hidden',
-                  WebkitBackfaceVisibility: 'hidden',
-                  transform: 'rotateY(0deg)',
-                }}
-              >
-                <h4 className="mb-2 text-sm font-semibold">{cardTitle}</h4>
-                <p className="text-xs leading-relaxed text-gray-700 dark:text-gray-200">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                  non risus. Integer posuere erat a ante venenatis dapibus.
-                </p>
-              </div>
-
-              <div
-                className="absolute inset-0 flex h-full flex-col items-center justify-between rounded-t-xl border-x border-t border-gray-900/60 bg-gray-900 px-4 py-4 text-center text-gray-50 shadow-sm transition-shadow group-hover:shadow-md dark:border-gray-700/80 dark:bg-gray-700"
-                style={{
-                  backfaceVisibility: 'hidden',
-                  WebkitBackfaceVisibility: 'hidden',
-                  transform: 'rotateY(180deg)',
-                }}
-              >
-                <div className="px-1">
-                  <h4 className="mb-2 text-sm font-semibold">{cardTitle}</h4>
-                  <p className="text-xs leading-relaxed">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                    non risus. Suspendisse lectus tortor, dignissim sit amet,
-                    adipiscing nec, ultricies sed, dolor.
-                  </p>
-                </div>
-
-                <div className="mt-3 flex justify-center pb-1">
-                  <LinkButton
-                    label="view"
-                    variant={ButtonVariant.PRIMARY}
-                    on_click={() => console.log('view', cardTitle)}
-                  />
-                </div>
-              </div>
-            </motion.div>
-          </button>
-        </div>
-      );
-    });
+    setFlippedCardKey(cardKey);
   };
 
   return (
@@ -108,14 +36,173 @@ const AnnouncementDetails = ({ on_close }: AnnouncementDetailsProps) => {
               <span className="font-semibold">Ends At:</span> Today&apos;s date
             </p>
             <p className="mx-auto max-w-2xl text-sm leading-relaxed text-gray-700 dark:text-gray-200">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer
-              nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi.
-              Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum.
+              Weekly Faction Loyalty is a limited-time event where you pledge to
+              a plane and help its NPCs with Faction tasks to raise Fame. Higher
+              Fame strengthens your kingdoms&apos; item defence, unlocks story
+              quests, and increases your chances of earning powerful unique
+              items.
+            </p>
+            <p className="mx-auto mt-4 max-w-2xl border-t border-gray-200 pt-2 text-xs text-gray-600 dark:border-gray-700 dark:text-gray-300">
+              Click a card to flip it and learn more about each part of the
+              event.
             </p>
           </div>
 
           <div className="mx-auto w-full max-w-5xl md:max-w-3xl">
-            <div className="grid gap-4 md:grid-cols-3">{renderInfoCards()}</div>
+            <div className="grid gap-4 md:grid-cols-3">
+              <AnimatedCard
+                aria_label="Toggle details for Bonus Rewards"
+                is_flipped={flippedCardKey === 'bonus_rewards'}
+                on_click_card={() => handleToggleCard('bonus_rewards')}
+              >
+                <CardFront>
+                  <h4 className="mb-2 flex items-center justify-center text-sm font-semibold">
+                    <i className="ra ra-gem mr-2 text-lg" />
+                    Bonus Rewards
+                  </h4>
+                  <p className="text-xs leading-relaxed text-gray-700 dark:text-gray-200">
+                    Turn a single day of Faction work into accelerated progress.
+                    With Fame requirements temporarily halved, you can push key
+                    NPCs to important thresholds faster and reach the XP, gold,
+                    item, and kingdom-defence rewards tied to those levels
+                    sooner.
+                  </p>
+                </CardFront>
+
+                <CardBack
+                  link_title="view"
+                  on_click_link={() => console.log('view', 'Bonus Rewards')}
+                >
+                  <h4 className="mb-2 flex items-center justify-center text-sm font-semibold">
+                    <i className="ra ra-gem mr-2 text-lg" />
+                    Bonus Rewards
+                  </h4>
+                  <p className="text-xs leading-relaxed">
+                    Plan a focused session around your pledged plane while Fame
+                    requirements are reduced. Chain key NPC task lines to finish
+                    slow Fame grinds and position your kingdoms for stronger
+                    item defence and earlier access to unique-item rewards.
+                  </p>
+                </CardBack>
+              </AnimatedCard>
+
+              <AnimatedCard
+                aria_label="Toggle details for Faction Tasks"
+                is_flipped={flippedCardKey === 'faction_tasks'}
+                on_click_card={() => handleToggleCard('faction_tasks')}
+              >
+                <CardFront>
+                  <h4 className="mb-2 flex items-center justify-center text-sm font-semibold">
+                    <i className="ra ra-scroll-unfurled mr-2 text-lg" />
+                    Faction Tasks
+                  </h4>
+                  <p className="text-xs leading-relaxed text-gray-700 dark:text-gray-200">
+                    Faction bounty and crafting tasks are how you gain Fame with
+                    NPCs on a plane. Completing their requests during the event
+                    is easier, letting you climb ranks faster and keep your
+                    kingdoms moving toward full protection.
+                  </p>
+                </CardFront>
+
+                <CardBack
+                  link_title="view"
+                  on_click_link={() => console.log('view', 'Faction Tasks')}
+                >
+                  <h4 className="mb-2 flex items-center justify-center text-sm font-semibold">
+                    <i className="ra ra-scroll-unfurled mr-2 text-lg" />
+                    Faction Tasks
+                  </h4>
+                  <p className="text-xs leading-relaxed">
+                    During Weekly Faction Loyalty, all Fame requirements for
+                    both bounty and crafting tasks are cut in half. This makes
+                    it far less tedious to clear multiple NPCs in one session
+                    and level the characters tied to important story quests.
+                  </p>
+                </CardBack>
+              </AnimatedCard>
+
+              <AnimatedCard
+                aria_label="Toggle details for Pledge And Help NPCs"
+                is_flipped={flippedCardKey === 'pledge_help_npcs'}
+                on_click_card={() => handleToggleCard('pledge_help_npcs')}
+              >
+                <CardFront>
+                  <h4 className="mb-2 flex items-center justify-center text-sm font-semibold">
+                    <i className="ra ra-users mr-2 text-lg" />
+                    Pledge And Help NPCs
+                  </h4>
+                  <p className="text-xs leading-relaxed text-gray-700 dark:text-gray-200">
+                    Use the Faction Fame system to pledge loyalty to a plane,
+                    then help its NPCs with tasks to raise Fame, harden kingdom
+                    item defence, and earn{' '}
+                    <a
+                      href="#"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-semibold underline"
+                    >
+                      unique items
+                    </a>{' '}
+                    more quickly.
+                  </p>
+                </CardFront>
+
+                <CardBack
+                  link_title="view"
+                  on_click_link={() =>
+                    console.log('view', 'Pledge And Help NPCs')
+                  }
+                >
+                  <h4 className="mb-2 flex items-center justify-center text-sm font-semibold">
+                    <i className="ra ra-users mr-2 text-lg" />
+                    Pledge And Help NPCs
+                  </h4>
+                  <p className="text-xs leading-relaxed">
+                    Helping NPCs during this event cuts the Fame grind roughly
+                    in half, letting you unlock Fame-gated quests with specific
+                    NPCs and advance your chosen plane&apos;s story and kingdom
+                    protection sooner.
+                  </p>
+                </CardBack>
+              </AnimatedCard>
+            </div>
+
+            <div className="mt-6">
+              <dl className="mx-auto max-w-2xl space-y-4 text-left text-sm text-gray-700 dark:text-gray-200">
+                <div>
+                  <dt className="font-semibold">How do I access the event?</dt>
+                  <dd className="mt-1">
+                    You need at least one plane&apos;s Faction at level 5 on
+                    your character sheet. From there, pledge to that plane in
+                    the Faction section, then use the new Faction tab on the
+                    Game screen to assist NPCs with their bounty and crafting
+                    tasks during the event window.
+                  </dd>
+                </div>
+
+                <div>
+                  <dt className="font-semibold">
+                    Can I use automation on bounty tasks?
+                  </dt>
+                  <dd className="mt-1">
+                    No. Bounty tasks must be completed manually, so you will
+                    need to click through the tasks yourself even while the Fame
+                    requirements are reduced.
+                  </dd>
+                </div>
+
+                <div>
+                  <dt className="font-semibold">What rewards do I get?</dt>
+                  <dd className="mt-1">
+                    You earn XP, gold, items, and kingdom item defence that
+                    protects your kingdoms from players dropping items on them
+                    to do damage. When combined with Faction systems, this also
+                    helps you reach the Fame levels needed for powerful unique
+                    items and story-driven quests tied to specific NPCs.
+                  </dd>
+                </div>
+              </dl>
+            </div>
           </div>
         </div>
       </Card>
