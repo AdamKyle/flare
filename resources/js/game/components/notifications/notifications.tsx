@@ -39,7 +39,10 @@ const Notifications = () => {
     }
 
     return (
-      <i className="far fa-bell text-mango-tango-600 mr-2" aria-hidden="true" />
+      <i
+        className="far fa-bell text-mango-tango-600 dark:text-mango-tango-500 mr-2"
+        aria-hidden="true"
+      />
     );
   };
 
@@ -53,7 +56,7 @@ const Notifications = () => {
     return (
       <button
         type="button"
-        className="border-danube-500 text-danube-900 dark:text-danube-100 flex w-full items-center justify-between border-b-1 px-3 py-1.5 text-left font-semibold"
+        className="border-danube-300 bg-regent-st-blue-50 text-regent-st-blue-900 dark:border-danube-700 dark:bg-regent-st-blue-900 dark:text-regent-st-blue-50 flex w-full items-center justify-between border-b-1 px-3 py-1.5 text-left font-semibold"
         aria-expanded={isExpanded}
         aria-controls={contentId}
         onClick={handleToggle}
@@ -79,7 +82,10 @@ const Notifications = () => {
       }
 
       return (
-        <i className="far fa-bell text-mango-tango-600" aria-hidden="true" />
+        <i
+          className="far fa-bell text-mango-tango-300 dark:text-mango-tango-400"
+          aria-hidden="true"
+        />
       );
     };
 
@@ -108,9 +114,9 @@ const Notifications = () => {
           <IconButton
             on_click={openDonationScreen}
             variant={ButtonVariant.DONATIONS}
-            label={'Donations'}
-            additional_css={'w-full md:w-2/3'}
-            icon={<i className="fas fa-hand-holding-usd"></i>}
+            label="Donations"
+            additional_css="w-full md:w-2/3"
+            icon={<i className="fas fa-hand-holding-usd" />}
             center_content
           />
         </div>
@@ -121,7 +127,8 @@ const Notifications = () => {
   return (
     <div
       className={clsx(
-        'border-danube-400 bg-danube-200 dark:border-danube-500 mx-auto rounded-md border-1 transition-all duration-300 ease-in-out',
+        'border-danube-300 bg-danube-100 dark:border-danube-700 dark:bg-danube-900 mx-auto ' +
+          'rounded-md border-1 transition-all duration-300 ease-in-out',
         isExpanded ? 'w-full max-w-md' : 'w-full max-w-xs'
       )}
     >

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 
+import { useFlipCard } from './hooks/use-flip-card';
 import AnnouncementDetailsProps from './types/announcement-details-props';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
@@ -14,22 +15,12 @@ const AnnouncementDetails = ({
   on_close,
   announcement_id,
 }: AnnouncementDetailsProps) => {
-  const [flippedCardKey, setFlippedCardKey] = useState<string | null>(null);
+  const { flippedCardKey, handleToggleCard } = useFlipCard();
 
   const { gameData } = useGameData();
 
   const basePath: string = import.meta.env.VITE_BASE_IMAGE_URL;
   const weeklyFactionPoints: string = `${basePath}/event-images/weekly-faction-points.png`;
-
-  const handleToggleCard = (cardKey: string) => {
-    if (flippedCardKey === cardKey) {
-      setFlippedCardKey(null);
-
-      return;
-    }
-
-    setFlippedCardKey(cardKey);
-  };
 
   if (!gameData || !gameData.announcements) {
     return null;
@@ -42,6 +33,8 @@ const AnnouncementDetails = ({
   if (!announcement) {
     return null;
   }
+
+  console.log(announcement);
 
   return (
     <ContainerWithTitle

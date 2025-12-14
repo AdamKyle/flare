@@ -20,7 +20,6 @@ class AnnouncementMessageEvent implements ShouldBroadcastNow
     public Announcement $announcement;
 
     /**
-     * @param Announcement $announcement
      * @throws Exception
      */
     public function __construct(Announcement $announcement)
@@ -37,11 +36,10 @@ class AnnouncementMessageEvent implements ShouldBroadcastNow
     }
 
     /**
-     * @param Announcement $announcement
-     * @return Announcement
      * @throws Exception
      */
-    protected function appendAdditionalDetails(Announcement $announcement): Announcement {
+    protected function appendAdditionalDetails(Announcement $announcement): Announcement
+    {
         $announcement->expires_at_formatted = (new Carbon($announcement->expires_at))->format('l, j \of F \a\t h:ia \G\M\TP');
         $announcement->event_name = (new EventType($announcement->event->type))->getNameForEvent();
 

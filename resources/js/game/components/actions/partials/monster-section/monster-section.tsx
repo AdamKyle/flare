@@ -158,6 +158,42 @@ const MonsterSection = ({
       );
     }
 
+    const renderAttackAgainButton = () => {
+      if (
+        !data ||
+        data.health.current_monster_health > 0 ||
+        data.health.current_character_health <= 0
+      ) {
+        return (
+          <div className={'w-full text-center'}>
+            <Button
+              label="Reset fight"
+              variant={ButtonVariant.DANGER}
+              additional_css="w-full lg:w-1/3 mt-2"
+              on_click={() => {}}
+            />
+          </div>
+        );
+      }
+
+      return (
+        <div className="flex w-full flex-col items-center gap-2 text-center lg:flex-row lg:justify-center">
+          <Button
+            label="Attack Again!"
+            variant={ButtonVariant.PRIMARY}
+            additional_css="w-full lg:w-1/3"
+            on_click={() => {}}
+          />
+          <Button
+            label="Clear"
+            variant={ButtonVariant.DANGER}
+            additional_css="w-full lg:w-1/3"
+            on_click={() => {}}
+          />
+        </div>
+      );
+    };
+
     const renderAttackButtons = () => {
       if (
         !data ||
@@ -231,6 +267,7 @@ const MonsterSection = ({
           />
         </HealthBarContainer>
         {renderAttackButtons()}
+        {renderAttackAgainButton()}
         <AttackMessages messages={data?.attack_messages || []} />
       </>
     );
