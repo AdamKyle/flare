@@ -157,7 +157,6 @@ export default class FetchGameData {
     }
 
     setMapData(result: AxiosResponse) {
-        console.log("setMapData", result.data);
         this.component.setState({
             map_data: MapStateManager.buildCoreState(
                 result.data,

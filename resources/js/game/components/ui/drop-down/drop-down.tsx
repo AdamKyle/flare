@@ -103,7 +103,7 @@ export default class DropDown extends React.Component<DropDownProps, any> {
         return (
             <div className="my-2 md:my-4 lg:text-left grid">
                 <Menu as="div" className="relative inline-block text-left">
-                    <div className="my-2 md:my-4">
+                    <div className="">
                         <Menu.Button
                             className={clsx(
                                 "inline-flex justify-center w-full px-4 py-2 text-sm font-medium rounded-small focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-200 dark:focus-visible:ring-white focus-visible:ring-opacity-75 hover:bg-blue-700 hover:drop-shadow-md dark:text-white hover:text-gray-300 bg-blue-600 dark:bg-blue-700 text-white dark:hover:bg-blue-600 dark:hover:text-white font-semibold py-2 px-4 rounded-sm drop-shadow-sm disabled:bg-blue-400 dark:disabled:bg-blue-400",

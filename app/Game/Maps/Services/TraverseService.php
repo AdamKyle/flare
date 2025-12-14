@@ -435,7 +435,7 @@ class TraverseService
      */
     protected function updateActionTypeCache(Character $character, float $deduction): void
     {
-        CharacterAttackTypesCacheBuilderWithDeductions::dispatch($character, $deduction);
+        CharacterAttackTypesCacheBuilderWithDeductions::dispatch($character, $deduction)->delay(now()->addSeconds(2));
     }
 
     /**

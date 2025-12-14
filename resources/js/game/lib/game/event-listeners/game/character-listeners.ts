@@ -15,6 +15,7 @@ export default class CharacterListeners implements GameListener {
     private characterInventoryCount?: Channel;
     private characterAttacks?: Channel;
     private characterStatus?: Channel;
+    private characterBaseStatus?: Channel;
     private characterRevive?: Channel;
     private characterAttackData?: Channel;
     private globalTimeOut?: Channel;
@@ -49,6 +50,9 @@ export default class CharacterListeners implements GameListener {
             this.characterStatus = echo.private(
                 "update-character-status-" + this.userId,
             );
+            this.characterBaseStatus = echo.private(
+                "update-character-base-stats-" + this.userId,
+            );
             this.characterRevive = echo.private(
                 "character-revive-" + this.userId,
             );
@@ -67,6 +71,7 @@ export default class CharacterListeners implements GameListener {
         this.listenToInventoryCountUpdate();
         this.listenToAttackDataUpdates();
         this.listenForCharacterStatusUpdates();
+        this.listenForCharacterBaseStatusUpdates();
         this.listenForCharacterRevive();
         this.listenForCharacterAttackDataUpdates();
         this.listenForGlobalUpdatesThatAffectTheCharacter();
@@ -207,6 +212,33 @@ export default class CharacterListeners implements GameListener {
                     character: {
                         ...this.component.state.character,
                         ...event.characterStatuses,
+                    },
+                });
+            },
+        );
+    }
+
+    /**
+     * Listen for character base status updates.
+     *
+     * @protected
+     */
+    protected listenForCharacterBaseStatusUpdates() {
+        if (!this.characterBaseStatus) {
+            return;
+        }
+
+        this.characterBaseStatus.listen(
+            "Game.Core.Events.UpdateBaseCharacterInformation",
+            (event: any) => {
+                if (!this.component) {
+                    return;
+                }
+
+                this.component.setState({
+                    character: {
+                        ...this.component.state.character,
+                        ...event.baseStats,
                     },
                 });
             },

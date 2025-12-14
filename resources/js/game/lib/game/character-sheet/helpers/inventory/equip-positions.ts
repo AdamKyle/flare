@@ -13,6 +13,7 @@ export abstract class EquipPositions {
             case "sword":
             case "wand":
             case "censer":
+            case "claw":
             case "scratch-awl":
                 return ["left-hand", "right-hand"];
             case "ring":
