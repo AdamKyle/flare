@@ -143,6 +143,9 @@ class MovementService
             'can_access_hell_forged_shop' => $character->map->gameMap->mapType()->isHell(),
             'can_access_purgatory_chains_shop' => $character->map->gameMap->mapType()->isPurgatory(),
             'can_access_twisted_earth_shop' => $character->map->gameMap->mapType()->isTwistedMemories(),
+            'can_access_hell_forged' => $character->map->gameMap->mapType()->isHell(),
+            'can_access_purgatory_chains' =>  $character->map->gameMap->mapType()->isPurgatory(),
+            'can_access_twisted_earth' => $character->map->gameMap->mapType()->isTwistedMemories(),
         ]);
     }
 
