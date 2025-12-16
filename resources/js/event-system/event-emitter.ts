@@ -1,9 +1,9 @@
 import EventEmitterDefinition from './deffintions/event-emitter-deffinition';
 import EventMapDefinition from './deffintions/event-map-definition';
 
-export default class EventEmitter<T extends EventMapDefinition>
-  implements EventEmitterDefinition<T>
-{
+export default class EventEmitter<
+  T extends EventMapDefinition,
+> implements EventEmitterDefinition<T> {
   private listeners: {
     [K in keyof T]?: Array<
       T[K] extends [infer FirstArg, infer SecondArg]

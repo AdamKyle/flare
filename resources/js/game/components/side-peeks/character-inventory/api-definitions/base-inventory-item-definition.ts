@@ -5,8 +5,7 @@ import { InventoryItemTypes } from '../../../character-sheet/partials/character-
 import LocationDetailsApi from '../../map-actions/api-definitions/location-details-api';
 
 export default interface BaseInventoryItemDefinition
-  extends BaseItemDetails,
-    BaseUsableItemDetails {
+  extends BaseItemDetails, BaseUsableItemDetails {
   id: number;
   item_id: number;
   slot_id: number;
