@@ -27,6 +27,16 @@ class GuideQuestService
         $this->guideQuestRequirementsService = $guideQuestRequirementsService;
     }
 
+    /**
+     * @param Character $character
+     * @return GuideQuest[]
+     */
+    public function getCurrentQuestsForCharacter(Character $character): array
+    {
+        return $this->fetchNextGuideQuest($character);
+    }
+
+
     public function fetchQuestForCharacter(Character $character): array
     {
 

@@ -106,6 +106,14 @@ return [
             'block_for' => null,
         ],
 
+        'exploration_faction_points_reward' => [
+            'driver' => 'redis',
+            'connection' => 'exploration_faction_points_reward',
+            'queue' => 'exploration_faction_points_reward',
+            'retry_after' => 1200,
+            'block_for' => null,
+        ],
+
         'exploration_battle_skill_xp_reward' => [
             'driver' => 'redis',
             'connection' => 'exploration_battle_skill_xp_reward',

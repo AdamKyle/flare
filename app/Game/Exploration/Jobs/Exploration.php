@@ -2,6 +2,8 @@
 
 namespace App\Game\Exploration\Jobs;
 
+use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
+use App\Game\BattleRewardProcessing\Jobs\ExplorationFactionPointHandler;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -54,6 +56,7 @@ class Exploration implements ShouldQueue
         BattleEventHandler $battleEventHandler,
         CharacterCacheData $characterCacheData,
         CharacterRewardService $characterRewardService,
+        FactionHandler $factionHandler,
         SkillService $skillService
     ): void {
 
@@ -157,7 +160,7 @@ class Exploration implements ShouldQueue
         return false;
     }
 
-    private function canSurviveFight(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool
+    private function canSurviveFight(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, FactionHandler $factionHandler, array $params): bool
     {
 
         if (Cache::has('can-character-survive-' . $this->character->id)) {
@@ -169,6 +172,7 @@ class Exploration implements ShouldQueue
         $monster = Monster::find($params['selected_monster_id']);
         $totalXpToReward = 0;
         $totalSkillXpToReward = 0;
+        $totalFactionPoints = 0;
         $characterRewardService = $this->characterRewardService->setCharacter($this->character);
         $characterSkillService = $this->skillService->setSkillInTraining($this->character);
 
@@ -180,8 +184,10 @@ class Exploration implements ShouldQueue
 
             $totalXpToReward += $characterRewardService->fetchXpForMonster($monster);
             $totalSkillXpToReward += $characterSkillService->getXpForSkillIntraining($this->character, $monster->xp);
+            $totalFactionPoints += $factionHandler->getFactionPointsPerKill($this->character);
         }
 
+        ExplorationFactionPointHandler::dispatch($this->character->id, $totalFactionPoints)->onConnection('exploration_faction_points_reward')->onQueue('exploration_faction_points_reward')->delay(now()->addSeconds(2));
         ExplorationXpHandler::dispatch($this->character->id, 10, $totalXpToReward)->onConnection('exploration_battle_xp_reward')->onQueue('exploration_battle_xp_reward')->delay(now()->addSeconds(2));
         ExplorationSkillXpHandler::dispatch($this->character->id, $totalSkillXpToReward)->onConnection('exploration_battle_skill_xp_reward')->onQueue('exploration_battle_skill_xp_reward')->delay(now()->addSeconds(2));
         WinterEventChristmasGiftHandler::dispatch($this->character->id)->onConnection('event_battle_reward')->onQueue('event_battle_reward')->delay(now()->addSeconds(2));

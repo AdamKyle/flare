@@ -41,7 +41,7 @@ class BattleRewardService
         return $this;
     }
 
-    public function handleBaseRewards($includeXp = true, $includeEventRewards = true)
+    public function handleBaseRewards($includeXp = true, $includeEventRewards = true, $includeFactionReward = true)
     {
 
         if ($includeXp) {
@@ -52,7 +52,10 @@ class BattleRewardService
             WinterEventChristmasGiftHandler::dispatch($this->characterId)->onConnection('event_battle_reward')->onQueue('event_battle_reward')->delay(now()->addSeconds(2));
         }
 
-        BattleFactionHandler::dispatch($this->characterId, $this->monsterId)->onConnection('battle_reward_factions')->onQueue('battle_reward_factions')->delay(now()->addSeconds(2));
+        if ($includeFactionReward) {
+            BattleFactionHandler::dispatch($this->characterId, $this->monsterId)->onConnection('battle_reward_factions')->onQueue('battle_reward_factions')->delay(now()->addSeconds(2));
+        }
+
         BattleSecondaryRewardHandler::dispatch($this->characterId)->onConnection('battle_secondary_reward')->onQueue('battle_secondary_reward')->delay(now()->addSeconds(2));
         BattleCurrenciesHandler::dispatch($this->characterId, $this->monsterId)->onConnection('battle_reward_currencies')->onQueue('battle_reward_currencies')->delay(now()->addSeconds(2));
         BattleGlobalEventHandler::dispatch($this->characterId)->onConnection('battle_reward_global_event')->onQueue('battle_reward_global_event')->delay(now()->addSeconds(2));

@@ -51,11 +51,12 @@ class BattleEventHandler
      * @param integer $monsterId
      * @param boolean $includeXp
      * @param boolean $includeEventReward
+     * @param bool $includeFactionReward
      * @return void
      */
-    public function processMonsterDeath(int $characterId, int $monsterId, bool $includeXp = true, $includeEventReward = true): void
+    public function processMonsterDeath(int $characterId, int $monsterId, bool $includeXp = true, bool $includeEventReward = true, bool $includeFactionReward = true): void
     {
-        $this->battleRewardService->setUp($characterId, $monsterId)->handleBaseRewards($includeXp, $includeEventReward);
+        $this->battleRewardService->setUp($characterId, $monsterId)->handleBaseRewards($includeXp, $includeEventReward, $includeFactionReward);
     }
 
     /**

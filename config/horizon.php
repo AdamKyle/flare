@@ -234,6 +234,16 @@ return [
             'nice' => 0,
         ],
 
+        'supervisor-exploration-faction-points-reward' => [
+            'connection' => 'exploration_faction_points_reward',
+            'queue' => ['exploration_faction_points_reward'],
+            'balance' => 'auto',
+            'maxProcesses' => 25,
+            'memory' => 256,
+            'tries' => 5,
+            'nice' => 0,
+        ],
+
         'supervisor-exploration-battle-skill-xp-reward' => [
             'connection' => 'exploration_battle_skill_xp_reward',
             'queue' => ['exploration_battle_skill_xp_reward'],
@@ -349,7 +359,15 @@ return [
                 'timeout' => 900,
                 'nice' => 0,
             ],
-
+            'supervisor-exploration-faction-points-reward' => [
+                'connection' => 'exploration_faction_points_reward',
+                'queue' => ['exploration_faction_points_reward'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
             'supervisor-event-battle-reward' => [
                 'connection' => 'event_battle_reward',
                 'queue' => ['event_battle_reward'],
@@ -359,7 +377,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
             'supervisor-battle-reward-xp' => [
                 'connection' => 'battle_reward_xp',
                 'queue' => ['battle_reward_xp'],
@@ -369,7 +386,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
             'supervisor-exploration-battle-xp-reward' => [
                 'connection' => 'exploration_battle_xp_reward',
                 'queue' => ['exploration_battle_xp_reward'],
@@ -379,7 +395,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
             'supervisor-exploration-battle-skill-xp-reward' => [
                 'connection' => 'exploration_battle_skill_xp_reward',
                 'queue' => ['exploration_battle_skill_xp_reward'],
@@ -389,7 +404,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
             'supervisor-battle-reward-currencies' => [
                 'connection' => 'battle_reward_currencies',
                 'queue' => ['battle_reward_currencies'],
@@ -399,7 +413,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
             'supervisor-battle-secondary-reward' => [
                 'connection' => 'battle_secondary_reward',
                 'queue' => ['battle_secondary_reward'],
@@ -409,7 +422,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
             'supervisor-battle-reward-factions' => [
                 'connection' => 'battle_reward_factions',
                 'queue' => ['battle_reward_factions'],
@@ -419,7 +431,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
             'supervisor-battle-reward-global-event' => [
                 'connection' => 'battle_reward_global_event',
                 'queue' => ['battle_reward_global_event'],
@@ -429,7 +440,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
             'supervisor-battle-reward-location-handlers' => [
                 'connection' => 'battle_reward_location_handlers',
                 'queue' => ['battle_reward_location_handlers'],
@@ -439,7 +449,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
             'supervisor-battle-reward-weekly-fights' => [
                 'connection' => 'battle_reward_weekly_fights',
                 'queue' => ['battle_reward_weekly_fights'],
@@ -449,7 +458,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
             'supervisor-battle-reward-item-handler' => [
                 'connection' => 'battle_reward_item_handler',
                 'queue' => ['battle_reward_item_handler'],
@@ -459,7 +467,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
         ],
 
         'local' => [
@@ -484,7 +491,15 @@ return [
                 'timeout' => 900,
                 'nice' => 0,
             ],
-
+            'supervisor-exploration-faction-points-reward' => [
+                'connection' => 'exploration_faction_points_reward',
+                'queue' => ['exploration_faction_points_reward'],
+                'balance' => 'auto',
+                'maxProcesses' => 25,
+                'memory' => 256,
+                'tries' => 5,
+                'nice' => 0,
+            ],
             'supervisor-event-battle-reward' => [
                 'connection' => 'event_battle_reward',
                 'queue' => ['event_battle_reward'],
@@ -494,7 +509,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
             'supervisor-battle-reward-xp' => [
                 'connection' => 'battle_reward_xp',
                 'queue' => ['battle_reward_xp'],
@@ -504,7 +518,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
             'supervisor-exploration-battle-xp-reward' => [
                 'connection' => 'exploration_battle_xp_reward',
                 'queue' => ['exploration_battle_xp_reward'],
@@ -514,7 +527,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
             'supervisor-exploration-battle-skill-xp-reward' => [
                 'connection' => 'exploration_battle_skill_xp_reward',
                 'queue' => ['exploration_battle_skill_xp_reward'],
@@ -524,7 +536,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
             'supervisor-battle-reward-currencies' => [
                 'connection' => 'battle_reward_currencies',
                 'queue' => ['battle_reward_currencies'],
@@ -534,7 +545,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
             'supervisor-battle-secondary-reward' => [
                 'connection' => 'battle_secondary_reward',
                 'queue' => ['battle_secondary_reward'],
@@ -544,7 +554,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
             'supervisor-battle-reward-factions' => [
                 'connection' => 'battle_reward_factions',
                 'queue' => ['battle_reward_factions'],
@@ -554,7 +563,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
             'supervisor-battle-reward-global-event' => [
                 'connection' => 'battle_reward_global_event',
                 'queue' => ['battle_reward_global_event'],
@@ -564,7 +572,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
             'supervisor-battle-reward-location-handlers' => [
                 'connection' => 'battle_reward_location_handlers',
                 'queue' => ['battle_reward_location_handlers'],
@@ -574,7 +581,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
             'supervisor-battle-reward-weekly-fights' => [
                 'connection' => 'battle_reward_weekly_fights',
                 'queue' => ['battle_reward_weekly_fights'],
@@ -584,7 +590,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
             'supervisor-battle-reward-item-handler' => [
                 'connection' => 'battle_reward_item_handler',
                 'queue' => ['battle_reward_item_handler'],
@@ -594,8 +599,6 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
-
         ],
     ],
-
 ];

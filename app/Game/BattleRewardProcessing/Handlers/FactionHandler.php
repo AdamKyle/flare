@@ -20,15 +20,148 @@ use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class FactionHandler
 {
 
     public function __construct(
-        private RandomAffixGenerator $randomAffixGenerator,
-        private GuideQuestService $guideQuestService,
-        private BattleMessageHandler $battleMessageHandler
+        private readonly RandomAffixGenerator $randomAffixGenerator,
+        private readonly GuideQuestService $guideQuestService,
+        private readonly BattleMessageHandler $battleMessageHandler
     ) {}
+
+    /**
+     * @param Character $character
+     * @param int $totalFactionPointsToReward
+     * @return void
+     * @throws Throwable
+     */
+    public function awardFactionPointsFromBatch(Character $character, int $totalFactionPointsToReward): void
+    {
+        if ($totalFactionPointsToReward <= 0) {
+            return;
+        }
+
+        $map = GameMap::find($character->map->game_map_id);
+
+        if ($map->mapType()->isPurgatory()) {
+            return;
+        }
+
+        DB::transaction(function () use ($character, $map, $totalFactionPointsToReward): void {
+            $faction = Faction::where('character_id', $character->id)
+                ->where('game_map_id', $map->id)
+                ->lockForUpdate()
+                ->first();
+
+            if (is_null($faction) || $faction->maxed) {
+                return;
+            }
+
+            $remainingPoints = $totalFactionPointsToReward;
+
+            while ($remainingPoints > 0) {
+                $faction = $faction->refresh();
+
+                if ($faction->maxed) {
+                    return;
+                }
+
+                $pointsNeeded = $faction->points_needed - $faction->current_points;
+
+                if ($pointsNeeded <= 0) {
+                    if (! FactionLevel::isMaxLevel($faction->current_level)) {
+                        $this->handleFactionLevelUp($character, $faction, $map->name);
+
+                        continue;
+                    }
+
+                    $this->handleFactionMaxedOut($character, $faction, $map->name);
+
+                    return;
+                }
+
+                $pointsToApply = min($remainingPoints, $pointsNeeded);
+
+                $newPoints = $faction->current_points + $pointsToApply;
+
+                if ($newPoints > $faction->points_needed) {
+                    $newPoints = $faction->points_needed;
+                }
+
+                $faction->update([
+                    'current_points' => $newPoints,
+                ]);
+
+                $remainingPoints -= $pointsToApply;
+
+                $faction = $faction->refresh();
+
+                if ($faction->current_points !== $faction->points_needed) {
+                    continue;
+                }
+
+                if (! FactionLevel::isMaxLevel($faction->current_level)) {
+                    $this->handleFactionLevelUp($character, $faction, $map->name);
+
+                    continue;
+                }
+
+                $this->handleFactionMaxedOut($character, $faction, $map->name);
+
+                return;
+            }
+        });
+    }
+
+    /**
+     * @param Character $character
+     * @return int
+     */
+    public function getFactionPointsPerKill(Character $character): int
+    {
+        $map = GameMap::find($character->map->game_map_id);
+        $faction = Faction::where('character_id', $character->id)->where('game_map_id', $map->id)->first();
+
+        if (is_null($faction) || $faction->maxed) {
+            return 0;
+        }
+
+        $pointsPerKill = FactionLevel::gatPointsPerLevel($faction->current_level);
+
+        if ($this->playerHasQuestItem($character)) {
+            $pointsPerKill += 50;
+        }
+
+        if (! $character->user->guide_enabled) {
+            return $pointsPerKill;
+        }
+
+        $quests = $this->guideQuestService->getCurrentQuestsForCharacter($character);
+
+        foreach ($quests as $quest) {
+            if (is_null($quest->faction_points_per_kill) || is_null($quest->required_faction_level)) {
+                continue;
+            }
+
+            if ($faction->game_map_id !== $quest->required_faction_id) {
+                continue;
+            }
+
+            if ($quest->required_faction_level === $faction->current_level) {
+                continue;
+            }
+
+            $pointsPerKill += (int) $quest->faction_points_per_kill;
+
+            break;
+        }
+
+        return $pointsPerKill;
+    }
+
 
     /**
      * Handle faction points.

@@ -53,6 +53,7 @@ use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Services\CanUserEnterSiteService;
+use App\Flare\Services\CharacterCurrencyRewardService;
 use App\Flare\Services\CharacterDeletion;
 use App\Flare\Services\CharacterRewardService;
 use App\Flare\Services\CharacterXPService;
@@ -193,13 +194,20 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CoordinatesCache;
         });
 
-        $this->app->bind(CharacterXPService::class, function () {
-            return new CharacterXPService;
+        $this->app->bind(CharacterXPService::class, function ($app) {
+            return new CharacterXPService(
+                $app->make(CharacterService::class),
+                $app->make(SkillService::class),
+                $app->make(Manager::class),
+                $app->make(CharacterSheetBaseInfoTransformer::class),
+                $app->make(BattleMessageHandler::class),
+            );
         });
 
         $this->app->bind(CharacterRewardService::class, function ($app) {
             return new CharacterRewardService(
                 $app->make(CharacterXPService::class),
+                $app->make(CharacterCurrencyRewardService::class),
                 $app->make(CharacterService::class),
                 $app->make(SkillService::class),
                 $app->make(Manager::class),
@@ -448,6 +456,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(SiteAccessStatisticService::class, function () {
             return new SiteAccessStatisticService();
+        });
+
+        $this->app->singleton(CharacterCurrencyRewardService::class, function ($app) {
+            return new CharacterCurrencyRewardService($app->make(BattleMessageHandler::class));
         });
     }
 
