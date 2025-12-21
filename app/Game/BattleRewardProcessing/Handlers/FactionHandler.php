@@ -87,10 +87,6 @@ class FactionHandler
 
                 $newPoints = $faction->current_points + $pointsToApply;
 
-                if ($newPoints > $faction->points_needed) {
-                    $newPoints = $faction->points_needed;
-                }
-
                 $faction->update([
                     'current_points' => $newPoints,
                 ]);
@@ -222,7 +218,7 @@ class FactionHandler
         if ($character->user->guide_enabled) {
             $guideQuest = $guideQuestService->fetchQuestForCharacter($character);
 
-            if (is_null($guideQuest)) {
+            if (empty($guideQuest['quests'])) {
                 $faction->save();
 
                 return;
