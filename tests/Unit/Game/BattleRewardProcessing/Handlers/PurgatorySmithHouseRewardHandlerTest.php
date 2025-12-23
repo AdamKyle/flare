@@ -39,8 +39,6 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
 
     public function tearDown(): void
     {
-        \Mockery::close();
-
         $this->handler = null;
         Cache::forget('monsters');
 
@@ -52,9 +50,12 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
 
+        $character->map()->update([
+            'character_position_x' => 12,
+            'character_position_y' => 12,
+        ]);
+
         $character->update([
-            'x_position' => 12,
-            'y_position' => 12,
             'gold_dust' => 10,
             'shards' => 20,
             'copper_coins' => 30,
@@ -79,9 +80,12 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
 
+        $character->map()->update([
+            'character_position_x' => 12,
+            'character_position_y' => 12,
+        ]);
+
         $character->update([
-            'x_position' => 12,
-            'y_position' => 12,
             'gold_dust' => 10,
             'shards' => 20,
             'copper_coins' => 30,
@@ -91,7 +95,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
             'x' => 12,
             'y' => 12,
-            'type' => 999999,
+            'type' => LocationType::ALCHEMY_CHURCH,
             'name' => 'invalid_type_location',
         ]);
 
@@ -204,9 +208,12 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
 
+        $character->map()->update([
+            'character_position_x' => 12,
+            'character_position_y' => 12,
+        ]);
+
         $character->update([
-            'x_position' => 12,
-            'y_position' => 12,
             'gold_dust' => 0,
             'shards' => 0,
             'copper_coins' => 0,
@@ -257,9 +264,12 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
 
+        $character->map()->update([
+            'character_position_x' => 12,
+            'character_position_y' => 12,
+        ]);
+
         $character->update([
-            'x_position' => 12,
-            'y_position' => 12,
             'gold_dust' => 0,
             'shards' => 0,
             'copper_coins' => 0,
@@ -329,9 +339,9 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
             ]);
         }
 
-        $character->update([
-            'x_position' => 12,
-            'y_position' => 12,
+        $character->map()->update([
+            'character_position_x' => 12,
+            'character_position_y' => 12,
         ]);
 
         $location = $this->createSmithHouseLocation($character);
@@ -405,9 +415,9 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
             ]);
         }
 
-        $character->update([
-            'x_position' => 12,
-            'y_position' => 12,
+        $character->map()->update([
+            'character_position_x' => 12,
+            'character_position_y' => 12,
         ]);
 
         $location = $this->createSmithHouseLocation($character);
@@ -465,9 +475,9 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
 
-        $character->update([
-            'x_position' => 12,
-            'y_position' => 12,
+        $character->map()->update([
+            'character_position_x' => 12,
+            'character_position_y' => 12,
         ]);
 
         $character = $this->fillInventoryUntilFull($character);
@@ -518,9 +528,9 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
 
-        $character->update([
-            'x_position' => 12,
-            'y_position' => 12,
+        $character->map()->update([
+            'character_position_x' => 12,
+            'character_position_y' => 12,
         ]);
 
         $location = $this->createSmithHouseLocation($character);
@@ -578,9 +588,9 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
 
-        $character->update([
-            'x_position' => 12,
-            'y_position' => 12,
+        $character->map()->update([
+            'character_position_x' => 12,
+            'character_position_y' => 12,
         ]);
 
         $location = $this->createSmithHouseLocation($character);
@@ -622,38 +632,6 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $this->assertTrue($items->contains(function ($item) {
             return ! $item->is_mythic;
         }));
-    }
-
-    private function createSmithHouseLocation($character): Location
-    {
-        return $this->createLocation([
-            'game_map_id' => $character->map->game_map_id,
-            'x' => $character->x_position,
-            'y' => $character->y_position,
-            'type' => LocationType::PURGATORY_SMITH_HOUSE,
-            'name' => 'smith_house_' . uniqid('', true),
-        ]);
-    }
-
-    private function fillInventoryUntilFull($character)
-    {
-        $iterations = 0;
-
-        while (! $character->isInventoryFull() && $iterations < 250) {
-            $item = $this->createItem([
-                'type' => 'weapon',
-            ]);
-
-            $character->inventory->slots()->create([
-                'inventory_id' => $character->inventory->id,
-                'item_id' => $item->id,
-            ]);
-
-            $character = $character->refresh();
-            $iterations++;
-        }
-
-        return $character->refresh();
     }
 
     public function testHandleClampsLootingChanceWhenOverCap(): void
@@ -745,9 +723,9 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
 
-        $character->update([
-            'x_position' => 12,
-            'y_position' => 12,
+        $character->map()->update([
+            'character_position_x' => 12,
+            'character_position_y' => 12,
         ]);
 
         $location = $this->createSmithHouseLocation($character);
@@ -796,9 +774,9 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
 
-        $character->update([
-            'x_position' => 12,
-            'y_position' => 12,
+        $character->map()->update([
+            'character_position_x' => 12,
+            'character_position_y' => 12,
         ]);
 
         $location = $this->createSmithHouseLocation($character);
@@ -828,5 +806,285 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $afterSlots = $result->inventory->slots()->count();
 
         $this->assertEquals($beforeSlots, $afterSlots);
+    }
+
+    public function testHandleAggregatesCurrenciesForKillCount(): void
+    {
+        RandomNumberGenerator::shouldReceive('generateRandomNumber')->twice()->andReturn(10);
+
+        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $character = $characterFactory->getCharacter();
+
+        $character->update([
+            'gold_dust' => 0,
+            'shards' => 0,
+            'copper_coins' => 0,
+        ]);
+
+        $character->map()->update([
+            'character_position_x' => 12,
+            'character_position_y' => 12,
+        ]);
+
+        $this->createSmithHouseLocation($character->refresh());
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+        ]);
+
+        $this->createExploringAutomation([
+            'character_id' => $character->id,
+        ]);
+
+        $result = $this->handler->handleFightingAtPurgatorySmithHouse($character->refresh(), $monster, 10)->refresh();
+
+        $this->assertEquals(100, $result->gold_dust);
+        $this->assertEquals(100, $result->shards);
+        $this->assertEquals(0, $result->copper_coins);
+    }
+
+    public function testHandleRewardsLegendaryPerKillCountWhenHalfwayOrMore(): void
+    {
+        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')->andReturnTrue();
+
+        RandomNumberGenerator::shouldReceive('generateRandomNumber')->andReturn(1);
+        RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->andReturn(0);
+
+        $this->createItemAffix([
+            'type' => 'prefix',
+        ]);
+
+        $this->createItemAffix([
+            'type' => 'suffix',
+        ]);
+
+        $this->createItem([
+            'specialty_type' => ItemSpecialtyType::PURGATORY_CHAINS,
+            'item_prefix_id' => null,
+            'item_suffix_id' => null,
+            'type' => 'weapon',
+        ]);
+
+        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $character = $characterFactory->getCharacter();
+
+        $character->map()->update([
+            'character_position_x' => 12,
+            'character_position_y' => 12,
+        ]);
+
+        $character->map()->update([
+            'character_position_x' => 12,
+            'character_position_y' => 12,
+        ]);
+
+        $character = $character->refresh();
+        $location = $this->createSmithHouseLocation($character);
+
+        $monsters = [
+            $this->createMonster(['game_map_id' => $character->map->game_map_id]),
+            $this->createMonster(['game_map_id' => $character->map->game_map_id]),
+            $this->createMonster(['game_map_id' => $character->map->game_map_id]),
+            $this->createMonster(['game_map_id' => $character->map->game_map_id]),
+        ];
+
+        $targetMonster = $monsters[2];
+
+        Cache::put('monsters', [
+            $location->name => [
+                ['id' => $monsters[0]->id],
+                ['id' => $monsters[1]->id],
+                ['id' => $monsters[2]->id],
+                ['id' => $monsters[3]->id],
+            ],
+        ]);
+
+        $beforeSlots = $character->inventory->slots()->count();
+
+        $result = $this->handler->handleFightingAtPurgatorySmithHouse($character->refresh(), $targetMonster, 10)->refresh();
+
+        $afterSlots = $result->inventory->slots()->count();
+
+        $this->assertEquals($beforeSlots + 10, $afterSlots);
+
+        $newItems = $result->inventory->slots()->latest('id')->take(10)->get()->pluck('item');
+
+        $this->assertFalse($newItems->contains(function ($item) {
+            return (bool) $item->is_mythic;
+        }));
+
+        $this->assertFalse(FlareEvent::where('type', EventType::PURGATORY_SMITH_HOUSE)->exists());
+    }
+
+    public function testHandleFinalMonsterCapsMythicToOnePerBatch(): void
+    {
+        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')->andReturnTrue();
+
+        RandomNumberGenerator::shouldReceive('generateRandomNumber')->andReturn(1);
+        RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->andReturn(0);
+
+        $this->createItemAffix([
+            'type' => 'prefix',
+        ]);
+
+        $this->createItemAffix([
+            'type' => 'suffix',
+        ]);
+
+        $this->createItem([
+            'specialty_type' => ItemSpecialtyType::PURGATORY_CHAINS,
+            'item_prefix_id' => null,
+            'item_suffix_id' => null,
+            'type' => 'weapon',
+        ]);
+
+        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $character = $characterFactory->getCharacter();
+
+        $character->map()->update([
+            'character_position_x' => 12,
+            'character_position_y' => 12,
+        ]);
+
+        $character->map()->update([
+            'character_position_x' => 12,
+            'character_position_y' => 12,
+        ]);
+
+        $character = $character->refresh();
+        $location = $this->createSmithHouseLocation($character);
+
+        $monsters = [
+            $this->createMonster(['game_map_id' => $character->map->game_map_id]),
+            $this->createMonster(['game_map_id' => $character->map->game_map_id]),
+            $this->createMonster(['game_map_id' => $character->map->game_map_id]),
+            $this->createMonster(['game_map_id' => $character->map->game_map_id]),
+        ];
+
+        $targetMonster = $monsters[3];
+
+        Cache::put('monsters', [
+            $location->name => [
+                ['id' => $monsters[0]->id],
+                ['id' => $monsters[1]->id],
+                ['id' => $monsters[2]->id],
+                ['id' => $monsters[3]->id],
+            ],
+        ]);
+
+        $beforeSlots = $character->inventory->slots()->count();
+
+        $result = $this->handler->handleFightingAtPurgatorySmithHouse($character->refresh(), $targetMonster, 15)->refresh();
+
+        $afterSlots = $result->inventory->slots()->count();
+
+        $this->assertEquals($beforeSlots + 16, $afterSlots);
+
+        $newItems = $result->inventory->slots()->latest('id')->take(16)->get()->pluck('item');
+
+        $this->assertEquals(1, $newItems->filter(function ($item) {
+            return (bool) $item->is_mythic;
+        })->count());
+
+        $this->assertFalse(FlareEvent::where('type', EventType::PURGATORY_SMITH_HOUSE)->exists());
+    }
+
+    public function testHandleDoesNotRewardItemWhenInventoryIsFullAfterDropCheckPasses(): void
+    {
+        RandomNumberGenerator::shouldReceive('generateRandomNumber')->andReturn(1);
+        RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->andReturn(0);
+
+        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $character = $characterFactory->getCharacter();
+
+        $character->map()->update([
+            'character_position_x' => 12,
+            'character_position_y' => 12,
+        ]);
+
+        $character = $character->refresh();
+
+        $character->inventory_max = $character->totalInventoryCount() + 1;
+        $character->save();
+
+        $character = $character->refresh();
+
+        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
+            ->once()
+            ->andReturnUsing(function () use ($character) {
+                $fillerItem = $this->createItem([
+                    'type' => 'weapon',
+                ]);
+
+                $character->inventory->slots()->create([
+                    'inventory_id' => $character->inventory->id,
+                    'item_id' => $fillerItem->id,
+                ]);
+
+                return true;
+            });
+
+        $location = $this->createSmithHouseLocation($character);
+
+        $monsters = [
+            $this->createMonster(['game_map_id' => $character->map->game_map_id]),
+            $this->createMonster(['game_map_id' => $character->map->game_map_id]),
+            $this->createMonster(['game_map_id' => $character->map->game_map_id]),
+            $this->createMonster(['game_map_id' => $character->map->game_map_id]),
+        ];
+
+        $targetMonster = $monsters[2];
+
+        Cache::put('monsters', [
+            $location->name => [
+                ['id' => $monsters[0]->id],
+                ['id' => $monsters[1]->id],
+                ['id' => $monsters[2]->id],
+                ['id' => $monsters[3]->id],
+            ],
+        ]);
+
+        $beforeSlots = $character->inventory->slots()->count();
+
+        $result = $this->handler->handleFightingAtPurgatorySmithHouse($character->refresh(), $targetMonster)->refresh();
+
+        $afterSlots = $result->inventory->slots()->count();
+
+        $this->assertEquals($beforeSlots + 1, $afterSlots);
+        $this->assertFalse(FlareEvent::where('type', EventType::PURGATORY_SMITH_HOUSE)->exists());
+    }
+
+    private function createSmithHouseLocation($character): Location
+    {
+        $map = $character->map->refresh();
+
+        return $this->createLocation([
+            'game_map_id' => $character->map->game_map_id,
+            'x' => $map->character_position_x,
+            'y' => $map->character_position_y,
+            'type' => LocationType::PURGATORY_SMITH_HOUSE,
+            'name' => 'smith_house_' . uniqid('', true),
+        ]);
+    }
+
+    private function fillInventoryUntilFull($character)
+    {
+        $iterations = 0;
+
+        while (! $character->isInventoryFull() && $iterations < 250) {
+            $item = $this->createItem([
+                'type' => 'weapon',
+            ]);
+
+            $character->inventory->slots()->create([
+                'inventory_id' => $character->inventory->id,
+                'item_id' => $item->id,
+            ]);
+
+            $character = $character->refresh();
+            $iterations++;
+        }
+
+        return $character->refresh();
     }
 }

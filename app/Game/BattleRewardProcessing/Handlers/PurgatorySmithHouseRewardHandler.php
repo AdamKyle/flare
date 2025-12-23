@@ -24,12 +24,10 @@ use Illuminate\Support\Facades\Cache;
 
 class PurgatorySmithHouseRewardHandler
 {
-
     public function __construct(private RandomAffixGenerator $randomAffixGenerator, private BattleMessageHandler $battleMessageHandler) {}
 
-    public function handleFightingAtPurgatorySmithHouse(Character $character, Monster $monster): Character
+    public function handleFightingAtPurgatorySmithHouse(Character $character, Monster $monster, int $killCount = 1): Character
     {
-
         $location = Location::where('x', $character->map->character_position_x)
             ->where('y', $character->map->character_position_y)
             ->where('game_map_id', $character->map->game_map_id)
@@ -45,29 +43,32 @@ class PurgatorySmithHouseRewardHandler
 
         $event = Event::where('type', EventType::PURGATORY_SMITH_HOUSE)->first();
 
-        $character = $this->currencyReward($character, $event);
+        $character = $this->currencyReward($character, $event, $killCount);
 
         if ($character->currentAutomations->isNotEmpty()) {
             return $character;
         }
 
-        if ($this->isMonsterAtLeastHalfWayOrMore($location, $monster)) {
-            $character = $this->handleItemReward($character, false, $event);
+        $shouldAttemptLegendary = $this->isMonsterAtLeastHalfWayOrMore($location, $monster);
+        $shouldAttemptMythic = $this->isMonsterTheFinalMonster($location, $monster);
+
+        if ($shouldAttemptLegendary) {
+            $this->attemptLegendaryRewardsForKillCount($character, $event, $killCount);
         }
 
-        if ($this->isMonsterTheFinalMonster($location, $monster)) {
-            $character = $this->handleItemReward($character, true, $event);
+        if ($shouldAttemptMythic) {
+            $this->attemptMythicRewardsForKillCountCappedToOne($character, $event, $killCount);
         }
 
-        return $character;
+        if ($shouldAttemptLegendary || $shouldAttemptMythic) {
+            $this->createPossibleEvent($killCount);
+        }
+
+        return $character->refresh();
     }
 
-    /**
-     * is the monster at least halfway down the list?
-     */
     protected function isMonsterAtLeastHalfWayOrMore(Location $location, Monster $monster): bool
     {
-
         $monsters = Cache::get('monsters')[$location->name];
 
         $monsterCount = count($monsters);
@@ -78,9 +79,6 @@ class PurgatorySmithHouseRewardHandler
         return $position !== false && $position >= $halfWay;
     }
 
-    /**
-     * is the monster the final monster?
-     */
     protected function isMonsterTheFinalMonster(Location $location, Monster $monster): bool
     {
         $monsters = Cache::get('monsters')[$location->name];
@@ -88,12 +86,7 @@ class PurgatorySmithHouseRewardHandler
         return $monsters[count($monsters) - 1]['id'] === $monster->id;
     }
 
-    /**
-     * Reward the character with currencies.
-     *
-     * - Only gives copper coins if the character has
-     */
-    public function currencyReward(Character $character, ?Event $event = null): Character
+    public function currencyReward(Character $character, ?Event $event = null, int $killCount = 1): Character
     {
         $maximumAmount = 1_000;
 
@@ -101,14 +94,14 @@ class PurgatorySmithHouseRewardHandler
             $maximumAmount = 5_000;
         }
 
-        $goldDustToGain = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
-        $shardsToGain = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
+        $goldDustToGain = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount) * $killCount;
+        $shardsToGain = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount) * $killCount;
 
         $hasItemForCopperCoins = $character->inventory->slots->where('item.effect', ItemEffectsValue::GET_COPPER_COINS)->count() > 0;
         $copperCoinsToGain = 0;
 
         if ($hasItemForCopperCoins) {
-            $copperCoinsToGain = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
+            $copperCoinsToGain = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount) * $killCount;
         }
 
         $goldDust = $character->gold_dust + $goldDustToGain;
@@ -145,12 +138,38 @@ class PurgatorySmithHouseRewardHandler
         return $character;
     }
 
+    private function attemptLegendaryRewardsForKillCount(Character $character, ?Event $event, int $killCount): void
+    {
+        $this->attemptItemRewardsForKillCount($character, false, $event, $killCount, false);
+    }
+
+    private function attemptMythicRewardsForKillCountCappedToOne(Character $character, ?Event $event, int $killCount): void
+    {
+        $this->attemptItemRewardsForKillCount($character, true, $event, $killCount, true);
+    }
+
     /**
-     * Handle item Reward for player.
-     *
      * @throws Exception
      */
-    protected function handleItemReward(Character $character, bool $isMythic, ?Event $event = null): Character
+    private function attemptItemRewardsForKillCount(Character $character, bool $isMythic, ?Event $event, int $killCount, bool $capToOneReward): void
+    {
+        for ($iterationIndex = 0; $iterationIndex < $killCount; $iterationIndex++) {
+            if ($character->isInventoryFull()) {
+                break;
+            }
+
+            $wasRewarded = $this->attemptItemReward($character, $isMythic, $event);
+
+            if ($capToOneReward && $wasRewarded) {
+                break;
+            }
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function attemptItemReward(Character $character, bool $isMythic, ?Event $event): bool
     {
         $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->first()->skill_bonus;
         $maxRoll = $isMythic ? 1_000 : 5_00;
@@ -161,28 +180,24 @@ class PurgatorySmithHouseRewardHandler
 
         if (! is_null($event)) {
             $lootingChance = .30;
-            $maxRoll = $maxRoll / 2;
+            $maxRoll = (int) ($maxRoll / 2);
         }
 
-        if (DropCheckCalculator::fetchDifficultItemChance($lootingChance, $maxRoll)) {
-            if (! $character->isInventoryFull()) {
-                $this->rewardForCharacter($character, $isMythic);
-            }
+        if (! DropCheckCalculator::fetchDifficultItemChance($lootingChance, $maxRoll)) {
+            return false;
         }
 
-        $this->createPossibleEvent();
+        if ($character->isInventoryFull()) {
+            return false;
+        }
 
-        return $character->refresh();
+        return $this->rewardForCharacter($character, $isMythic);
     }
 
     /**
-     * Reward player with item.
-     *
-     * @return void
-     *
      * @throws Exception
      */
-    protected function rewardForCharacter(Character $character, bool $isMythic = false)
+    protected function rewardForCharacter(Character $character, bool $isMythic = false): bool
     {
         $item = Item::where('specialty_type', ItemSpecialtyType::PURGATORY_CHAINS)
             ->whereNull('item_prefix_id')
@@ -193,26 +208,7 @@ class PurgatorySmithHouseRewardHandler
             ->first();
 
         if (is_null($item)) {
-            return;
-        }
-
-        if (! $isMythic) {
-            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)
-                ->setPaidAmount(RandomAffixDetails::LEGENDARY);
-
-            $newItem = $item->duplicate();
-
-            $newItem->update([
-                'item_prefix_id' => $randomAffixGenerator->generateAffix('prefix')->id,
-                'item_suffix_id' => $randomAffixGenerator->generateAffix('suffix')->id,
-            ]);
-
-            $slot = $character->inventory->slots()->create([
-                'inventory_id' => $character->inventory->id,
-                'item_id' => $newItem->id,
-            ]);
-
-            event(new ServerMessageEvent($character->user, 'You found something LEGENDARY in the basement child: ' . $item->affix_name, $slot->id));
+            return false;
         }
 
         if ($isMythic) {
@@ -234,22 +230,41 @@ class PurgatorySmithHouseRewardHandler
             ]);
 
             event(new ServerMessageEvent($character->user, 'You found something MYTHICAL in the basement child: ' . $item->affix_name, $slot->id));
+
+            return true;
         }
+
+        $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)
+            ->setPaidAmount(RandomAffixDetails::LEGENDARY);
+
+        $newItem = $item->duplicate();
+
+        $newItem->update([
+            'item_prefix_id' => $randomAffixGenerator->generateAffix('prefix')->id,
+            'item_suffix_id' => $randomAffixGenerator->generateAffix('suffix')->id,
+        ]);
+
+        $slot = $character->inventory->slots()->create([
+            'inventory_id' => $character->inventory->id,
+            'item_id' => $newItem->id,
+        ]);
+
+        event(new ServerMessageEvent($character->user, 'You found something LEGENDARY in the basement child: ' . $item->affix_name, $slot->id));
+
+        return true;
     }
 
-    /**
-     * 1 out of 1 million chance to create an event.
-     *
-     * @return void
-     */
-    protected function createPossibleEvent()
+    protected function createPossibleEvent(int $killCount = 1): void
     {
-
         if (Event::where('type', EventType::PURGATORY_SMITH_HOUSE)->exists()) {
             return;
         }
 
-        if (RandomNumberGenerator::generateTrueRandomNumber(100) >= 90) {
+        $chancePercent = 10 + $killCount;
+
+        $threshold = 100 - $chancePercent;
+
+        if (RandomNumberGenerator::generateTrueRandomNumber(100) >= $threshold) {
             Event::create([
                 'type' => EventType::PURGATORY_SMITH_HOUSE,
                 'started_at' => now(),
@@ -260,8 +275,8 @@ class PurgatorySmithHouseRewardHandler
 
             event(new GlobalMessageEvent(
                 'The floor boards creak and the cries of the children trapped in their own misery wale across the lands. ' .
-                    '"Children of Tlessa, hear me as I lay bare my treasures for you to find in the depths of my own memories." echoes a familiar voice. ' .
-                    'You recognise it. The Creator ...'
+                '"Children of Tlessa, hear me as I lay bare my treasures for you to find in the depths of my own memories." echoes a familiar voice. ' .
+                'You recognise it. The Creator ...'
             ));
         }
     }
