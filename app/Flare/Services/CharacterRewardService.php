@@ -130,9 +130,9 @@ class CharacterRewardService
      *
      * @throws Exception
      */
-    public function giveCurrencies(Monster $monster): CharacterRewardService
+    public function giveCurrencies(Monster $monster, $totalKills = 1): CharacterRewardService
     {
-        $this->characterCurrencyRewardService->setCharacter($this->character)->giveCurrencies($monster);
+        $this->characterCurrencyRewardService->setCharacter($this->character)->giveCurrencies($monster, $totalKills);
 
         return $this;
     }

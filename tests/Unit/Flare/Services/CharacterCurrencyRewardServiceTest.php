@@ -498,4 +498,111 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         $this->assertGreaterThan(-1000, $character->copper_coins);
         $this->assertLessThan(MaxCurrenciesValue::COPPER, $character->copper_coins);
     }
+
+    public function test_give_currencies_awards_gold_for_kill_count()
+    {
+        $character = $this->character->getCharacter();
+        $character->update([
+            'gold' => 0,
+        ]);
+
+        $monster = $this->createMonster([
+            'gold' => 10,
+            'game_map_id' => $character->map->game_map_id,
+        ]);
+
+        $this->characterCurrencyRewardService
+            ->setCharacter($character->refresh())
+            ->giveCurrencies($monster, 5);
+
+        $character = $this->characterCurrencyRewardService->getCharacter();
+
+        $this->assertEquals(50, $character->gold);
+    }
+
+    public function test_give_currencies_awards_gold_for_kill_count_and_caps_at_max()
+    {
+        $character = $this->character->getCharacter();
+        $character->update([
+            'gold' => MaxCurrenciesValue::MAX_GOLD - 5,
+        ]);
+
+        $monster = $this->createMonster([
+            'gold' => 10,
+            'game_map_id' => $character->map->game_map_id,
+        ]);
+
+        $this->characterCurrencyRewardService
+            ->setCharacter($character->refresh())
+            ->giveCurrencies($monster, 2);
+
+        $character = $this->characterCurrencyRewardService->getCharacter();
+
+        $this->assertEquals(MaxCurrenciesValue::MAX_GOLD, $character->gold);
+    }
+
+    public function test_currency_event_reward_scales_shards_and_gold_dust_with_kill_count()
+    {
+        $this->createScheduledEvent([
+            'event_type' => EventType::WEEKLY_CURRENCY_DROPS,
+            'currently_running' => true,
+        ]);
+
+        $character = $this->character->getCharacter();
+        $character->update([
+            'shards' => 0,
+            'gold_dust' => 0,
+            'copper_coins' => 0,
+        ]);
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'is_celestial_entity' => false,
+        ]);
+
+        $this->characterCurrencyRewardService
+            ->setCharacter($character->refresh())
+            ->currencyEventReward($monster, 5);
+
+        $character = $this->characterCurrencyRewardService->getCharacter();
+
+        $this->assertGreaterThanOrEqual(5, $character->shards);
+        $this->assertLessThanOrEqual(2500, $character->shards);
+
+        $this->assertGreaterThanOrEqual(5, $character->gold_dust);
+        $this->assertLessThanOrEqual(2500, $character->gold_dust);
+
+        $this->assertEquals(0, $character->copper_coins);
+    }
+
+    public function test_currency_event_reward_caps_shards_and_gold_dust_with_kill_count()
+    {
+        $this->createScheduledEvent([
+            'event_type' => EventType::WEEKLY_CURRENCY_DROPS,
+            'currently_running' => true,
+        ]);
+
+        $character = $this->character->getCharacter();
+        $character->update([
+            'shards' => MaxCurrenciesValue::MAX_SHARDS - 1,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST - 1,
+            'copper_coins' => 0,
+        ]);
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'is_celestial_entity' => false,
+        ]);
+
+        $this->characterCurrencyRewardService
+            ->setCharacter($character->refresh())
+            ->currencyEventReward($monster, 10);
+
+        $character = $this->characterCurrencyRewardService->getCharacter();
+
+        $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
+        $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
+        $this->assertEquals(0, $character->copper_coins);
+    }
+
 }

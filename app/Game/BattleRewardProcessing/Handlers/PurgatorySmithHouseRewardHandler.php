@@ -30,8 +30,8 @@ class PurgatorySmithHouseRewardHandler
     public function handleFightingAtPurgatorySmithHouse(Character $character, Monster $monster): Character
     {
 
-        $location = Location::where('x', $character->x_position)
-            ->where('y', $character->y_position)
+        $location = Location::where('x', $character->map->character_position_x)
+            ->where('y', $character->map->character_position_y)
             ->where('game_map_id', $character->map->game_map_id)
             ->first();
 
@@ -249,7 +249,7 @@ class PurgatorySmithHouseRewardHandler
             return;
         }
 
-        if (RandomNumberGenerator::generateTrueRandomNumber(1000) >= 999) {
+        if (RandomNumberGenerator::generateTrueRandomNumber(100) >= 90) {
             Event::create([
                 'type' => EventType::PURGATORY_SMITH_HOUSE,
                 'started_at' => now(),

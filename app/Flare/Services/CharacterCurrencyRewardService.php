@@ -48,17 +48,19 @@ class CharacterCurrencyRewardService
      * Give currencies.
      *
      * @param Monster $monster
+     * @param int $killCount
      * @return CharacterCurrencyRewardService
      */
-    public function giveCurrencies(Monster $monster): CharacterCurrencyRewardService
+    public function giveCurrencies(Monster $monster, int $killCount = 1): CharacterCurrencyRewardService
     {
-        $this->distributeGold($monster);
 
-        $this->distributeCopperCoins($monster);
+        $this->distributeGold($monster, $killCount);
 
-        $this->currencyEventReward($monster);
+        $this->distributeCopperCoins($monster, $killCount);
 
-        if (!$this->character->is_auto_battling && $this->character->isLoggedIn()) {
+        $this->currencyEventReward($monster, $killCount);
+
+        if ($this->character->isLoggedIn()) {
             event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
         }
 
@@ -69,10 +71,12 @@ class CharacterCurrencyRewardService
      * Handles Currency Event Rewards when the event is running.
      *
      * @param Monster $monster
+     * @param int $killCount
      * @return CharacterCurrencyRewardService
      */
-    public function currencyEventReward(Monster $monster): CharacterCurrencyRewardService
+    public function currencyEventReward(Monster $monster, int $killCount = 1): CharacterCurrencyRewardService
     {
+
         $event = ScheduledEvent::where('event_type', EventType::WEEKLY_CURRENCY_DROPS)->where('currently_running', true)->first();
 
         if (! is_null($event) && ! $monster->is_celestial_entity) {
@@ -81,15 +85,15 @@ class CharacterCurrencyRewardService
                 return $slot->item->effect === ItemEffectsValue::GET_COPPER_COINS;
             })->isNotEmpty();
 
-            $shards = rand(1, 500);
+            $shards = rand(1, 500) * $killCount;
 
-            $goldDust = rand(1, 500);
+            $goldDust = rand(1, 500) * $killCount;
 
             $characterShards = $this->character->shards + $shards;
             $characterGoldDust = $this->character->gold_dust + $goldDust;
 
             if ($canHaveCopperCoins) {
-                $copperCoins = rand(1, 150);
+                $copperCoins = rand(1, 150) * $killCount;
 
                 $characterCopperCoins = $this->character->copper_coins + $copperCoins;
             } else {
@@ -145,11 +149,14 @@ class CharacterCurrencyRewardService
      * Gives gold to the player.
      *
      * @param Monster $monster
+     * @param int $killCount
      * @return void
      */
-    private function distributeGold(Monster $monster): void
+    private function distributeGold(Monster $monster, int $killCount): void
     {
-        $newGold = $this->character->gold + $monster->gold;
+        $goldToReward = $monster->gold * $killCount;
+
+        $newGold = $this->character->gold + $goldToReward;
 
         if ($newGold >= MaxCurrenciesValue::MAX_GOLD) {
             $newGold = MaxCurrenciesValue::MAX_GOLD;
@@ -161,16 +168,17 @@ class CharacterCurrencyRewardService
 
         $character = $this->character->refresh();
 
-        $this->battleMessageHandler->handleCurrencyGainMessage($character->user, CurrenciesMessageTypes::GOLD, $monster->gold, $newGold);
+        $this->battleMessageHandler->handleCurrencyGainMessage($character->user, CurrenciesMessageTypes::GOLD, $goldToReward, $newGold);
     }
 
     /**
      * Give copper coins only to those that have the quest item and are on purgatory.
      *
      * @param Monster $monster
+     * @param int $killCount
      * @return void
      */
-    private function distributeCopperCoins(Monster $monster): void
+    private function distributeCopperCoins(Monster $monster, int $killCount): void
     {
         $copperCoinsItem = ItemModel::where('effect', ItemEffectsValue::GET_COPPER_COINS)->first();
         $mercenarySlotBonusItem = ItemModel::where('effect', ItemEffectsValue::MERCENARY_SLOT_BONUS)->first();
@@ -187,7 +195,7 @@ class CharacterCurrencyRewardService
             $mercenaryQuestSlot = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $mercenarySlotBonusItem->id)->first();
 
             if (! is_null($copperCoinSlot)) {
-                $coins = rand(5, 20);
+                $coins = rand(5, 20) * $killCount;
                 $purgatoryDungeons = $this->purgatoryDungeons($this->character->map);
 
                 if (! is_null($purgatoryDungeons)) {

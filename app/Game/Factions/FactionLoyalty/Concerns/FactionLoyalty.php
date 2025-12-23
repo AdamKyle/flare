@@ -41,23 +41,18 @@ trait FactionLoyalty
     /**
      * Updates a matching helping task.
      */
-    public function updateMatchingHelpTask(FactionLoyaltyNpc $helpingNpc, string $key, int $id): FactionLoyaltyNpc
+    public function updateMatchingHelpTask(FactionLoyaltyNpc $helpingNpc, string $key, int $id, int $killCount = 1): FactionLoyaltyNpc
     {
 
         $existingFame = $helpingNpc->current_fame;
         $tasks = $helpingNpc->factionLoyaltyNpcTasks->fame_tasks;
 
+        $event = Event::where('type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->first();
+        $increment = $killCount * (is_null($event) ? 1 : 2);
+
         foreach ($tasks as $index => $task) {
             if (isset($task[$key]) && $task[$key] === $id) {
-                $amount = min($task['current_amount'] + 1, $task['required_amount']);
-
-                $event = Event::where('type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->first();
-
-                if (! is_null($event)) {
-                    $amount = min($task['current_amount'] + 2, $task['required_amount']);
-                }
-
-               $tasks[$index]['current_amount'] = $amount;
+                $tasks[$index]['current_amount'] = min($task['current_amount'] + $increment, $task['required_amount']);
             }
         }
 
@@ -67,11 +62,9 @@ trait FactionLoyalty
 
         $helpingNpc = $helpingNpc->refresh();
 
-        if ($existingFame < $helpingNpc->current_fame) {
-            $this->updatedMatchingTaskAmount = true;
-        }
+        $this->updatedMatchingTaskAmount = $existingFame < $helpingNpc->current_fame;
 
-        return $helpingNpc->refresh();
+        return $helpingNpc;
     }
 
     /**
