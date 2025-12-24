@@ -17,6 +17,7 @@ use App\Game\BattleRewardProcessing\Jobs\BattleSecondaryRewardHandler;
 use App\Game\BattleRewardProcessing\Jobs\BattleWeeklyFightHandler;
 use App\Game\BattleRewardProcessing\Jobs\BattleXpHandler;
 use App\Game\BattleRewardProcessing\Jobs\Events\WinterEventChristmasGiftHandler;
+use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
@@ -49,6 +50,7 @@ class BattleRewardService
         private readonly FactionLoyaltyService $factionLoyaltyService,
         private readonly GoldRush $goldRush,
         private readonly BattleLocationRewardService $battleLocationRewardService,
+        private readonly DropCheckService $dropCheckService,
     ) {}
 
     /**
@@ -84,6 +86,7 @@ class BattleRewardService
         $this->handleFactionLoyaltyBounty();
         $this->handleCurrencyRewards();
         $this->handleSpecificLocationRewards();
+        $this->handleItemDrops();
     }
 
     /**
@@ -186,8 +189,8 @@ class BattleRewardService
     private function handleCurrencyRewards(): void {
         $totalKills = 1;
 
-        if (isset($this->context['total_kills'])) {
-            $totalKills = $this->context['total_kills'];
+        if (isset($this->context['total_creatures'])) {
+            $totalKills = $this->context['total_creatures'];
         }
 
         $this->characterRewardService->setCharacter($this->character)->giveCurrencies($this->monster, $totalKills);
@@ -202,11 +205,31 @@ class BattleRewardService
     private function handleSpecificLocationRewards(): void {
         $totalKills = 1;
 
-        if (isset($this->context['total_kills'])) {
-            $totalKills = $this->context['total_kills'];
+        if (isset($this->context['total_creatures'])) {
+            $totalKills = $this->context['total_creatures'];
         }
 
         $this->battleLocationRewardService->setContext($this->character, $this->monster)->handleLocationSpecificRewards($totalKills);
+    }
+
+    private function handleItemDrops(): void {
+        $totalKills = 1;
+
+        if (isset($this->context['total_creatures'])) {
+            $totalKills = $this->context['total_creatures'];
+        }
+
+        if ($totalKills > 1) {
+            for ($i = 0; $i < $totalKills; $i++) {
+                $this->dropCheckService->process($this->character, $this->monster);
+
+                $this->character = $this->character->refresh();
+            }
+
+            return;
+        }
+
+        $this->dropCheckService->process($this->character, $this->monster);
     }
 
     public function handleBaseRewards($includeXp = true, $includeEventRewards = true, $includeFactionReward = true)
