@@ -48,6 +48,7 @@ class BattleRewardService
         private readonly FactionLoyaltyBountyHandler $factionLoyaltyBountyHandler,
         private readonly FactionLoyaltyService $factionLoyaltyService,
         private readonly GoldRush $goldRush,
+        private readonly BattleLocationRewardService $battleLocationRewardService,
     ) {}
 
     /**
@@ -82,6 +83,7 @@ class BattleRewardService
         $this->handleFactionPoints();
         $this->handleFactionLoyaltyBounty();
         $this->handleCurrencyRewards();
+        $this->handleSpecificLocationRewards();
     }
 
     /**
@@ -175,6 +177,12 @@ class BattleRewardService
         event(new FactionLoyaltyUpdate($this->character->user, $this->factionLoyaltyService->getLoyaltyInfoForPlane($this->character)));
     }
 
+    /**
+     * Handle currency rewards
+     *
+     * @return void
+     * @throws Exception
+     */
     private function handleCurrencyRewards(): void {
         $totalKills = 1;
 
@@ -184,7 +192,21 @@ class BattleRewardService
 
         $this->characterRewardService->setCharacter($this->character)->giveCurrencies($this->monster, $totalKills);
 
-        $this->character = $this->character->refresh();
+        $character = $this->character->refresh();
+
+        $this->goldRush->processPotentialGoldRush($character);
+
+        $this->character = $character->refresh();
+    }
+
+    private function handleSpecificLocationRewards(): void {
+        $totalKills = 1;
+
+        if (isset($this->context['total_kills'])) {
+            $totalKills = $this->context['total_kills'];
+        }
+
+        $this->battleLocationRewardService->setContext($this->character, $this->monster)->handleLocationSpecificRewards($totalKills);
     }
 
     public function handleBaseRewards($includeXp = true, $includeEventRewards = true, $includeFactionReward = true)
