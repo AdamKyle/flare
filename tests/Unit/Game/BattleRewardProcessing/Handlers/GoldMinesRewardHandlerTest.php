@@ -459,7 +459,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(1);
         RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->andReturn(0);
 
-        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')->once()->andReturnTrue();
+        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')->never();
 
         $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();

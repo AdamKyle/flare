@@ -22,13 +22,12 @@ use Illuminate\Support\Facades\Cache;
 
 class GoldMinesRewardHandler
 {
-
     public function __construct(private RandomAffixGenerator $randomAffixGenerator, private BattleMessageHandler $battleMessageHandler) {}
 
-    public function handleFightingAtGoldMines(Character $character, Monster $monster): Character
+    public function handleFightingAtGoldMines(Character $character, Monster $monster, int $killCount = 1): Character
     {
-        $location = Location::where('x', $character->x_position)
-            ->where('y', $character->y_position)
+        $location = Location::where('x', $character->map->character_position_x)
+            ->where('y', $character->map->character_position_y)
             ->where('game_map_id', $character->map->game_map_id)
             ->first();
 
@@ -42,17 +41,17 @@ class GoldMinesRewardHandler
 
         $event = Event::where('type', EventType::GOLD_MINES)->first();
 
-        $character = $this->currencyReward($character, $event);
+        $character = $this->currencyReward($character, $event, $killCount);
 
         if ($character->currentAutomations->isNotEmpty()) {
             return $character;
         }
 
         if ($this->isMonsterAtLeastHalfWayOrMore($location, $monster)) {
-            $character = $this->handleItemReward($character, $event);
+            $character = $this->handleItemReward($character, $event, $killCount);
         }
 
-        return $character;
+        return $character->refresh();
     }
 
     /**
@@ -60,7 +59,6 @@ class GoldMinesRewardHandler
      */
     protected function isMonsterAtLeastHalfWayOrMore(Location $location, Monster $monster): bool
     {
-
         $monsters = Cache::get('monsters')[$location->name];
 
         $monsterCount = count($monsters);
@@ -76,7 +74,7 @@ class GoldMinesRewardHandler
      *
      * - Only gives copper coins if the character has
      */
-    public function currencyReward(Character $character, ?Event $event = null): Character
+    public function currencyReward(Character $character, ?Event $event = null, int $killCount = 1): Character
     {
         $maximumAmount = 500;
         $maximumGold = 1000;
@@ -86,9 +84,9 @@ class GoldMinesRewardHandler
             $maximumGold = 5000;
         }
 
-        $goldDustToReward = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
-        $shardsToReward = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount);
-        $goldToReward = RandomNumberGenerator::generateRandomNumber(1, $maximumGold);
+        $goldDustToReward = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount) * $killCount;
+        $shardsToReward = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount) * $killCount;
+        $goldToReward = RandomNumberGenerator::generateRandomNumber(1, $maximumGold) * $killCount;
 
         $gold = $character->gold + $goldToReward;
         $goldDust = $character->gold_dust + $goldDustToReward;
@@ -126,7 +124,7 @@ class GoldMinesRewardHandler
      *
      * @throws Exception
      */
-    protected function handleItemReward(Character $character, ?Event $event = null): Character
+    protected function handleItemReward(Character $character, ?Event $event = null, int $killCount = 1): Character
     {
         $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->first()->skill_bonus;
         $maxRoll = 1_000;
@@ -137,16 +135,23 @@ class GoldMinesRewardHandler
 
         if (! is_null($event)) {
             $lootingChance = .30;
-            $maxRoll = $maxRoll / 2;
+            $maxRoll = (int) ($maxRoll / 2);
         }
 
-        if (DropCheckCalculator::fetchDifficultItemChance($lootingChance, $maxRoll)) {
-            if (! $character->isInventoryFull()) {
-                $this->rewardForCharacter($character);
+        for ($iterationIndex = 0; $iterationIndex < $killCount; $iterationIndex++) {
+            if ($character->isInventoryFull()) {
+                break;
             }
+
+            if (! DropCheckCalculator::fetchDifficultItemChance($lootingChance, $maxRoll)) {
+                continue;
+            }
+
+            $this->rewardForCharacter($character);
+            $character = $character->refresh();
         }
 
-        $this->createPossibleEvent();
+        $this->createPossibleEvent($killCount);
 
         return $character->refresh();
     }
@@ -158,7 +163,7 @@ class GoldMinesRewardHandler
      *
      * @throws Exception
      */
-    protected function rewardForCharacter(Character $character, bool $isMythic = false)
+    protected function rewardForCharacter(Character $character, bool $isMythic = false): void
     {
         $item = Item::whereNull('specialty_type')
             ->whereNull('item_prefix_id')
@@ -196,14 +201,16 @@ class GoldMinesRewardHandler
      *
      * @return void
      */
-    protected function createPossibleEvent()
+    protected function createPossibleEvent(int $killCount = 1): void
     {
-
         if (Event::where('type', EventType::GOLD_MINES)->exists()) {
             return;
         }
 
-        if (RandomNumberGenerator::generateTrueRandomNumber(1000) >= 999) {
+        $chancePercent = 10 + $killCount;
+        $threshold = 100 - $chancePercent;
+
+        if (RandomNumberGenerator::generateTrueRandomNumber(100) >= $threshold) {
             Event::create([
                 'type' => EventType::GOLD_MINES,
                 'started_at' => now(),
