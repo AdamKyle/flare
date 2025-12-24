@@ -19,6 +19,7 @@ use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\ClassRanks\Services\ClassRankService;
+use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\GuideQuests\Services\GuideQuestService;
@@ -97,7 +98,11 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(FactionLoyaltyBountyHandler::class),
                 $app->make(FactionLoyaltyService::class),
                 $app->make(GoldRush::class),
-                $app->make(BattleLocationRewardService::class)
+                $app->make(BattleLocationRewardService::class),
+                $app->make(DropCheckService::class),
+                $app->make(WeeklyBattleService::class),
+                $app->make(SecondaryRewardService::class),
+                $app->make(BattleRewardService::class),
             );
         });
 

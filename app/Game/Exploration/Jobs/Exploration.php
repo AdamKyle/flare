@@ -56,7 +56,6 @@ class Exploration implements ShouldQueue
         BattleEventHandler $battleEventHandler,
         CharacterCacheData $characterCacheData,
         CharacterRewardService $characterRewardService,
-        FactionHandler $factionHandler,
         SkillService $skillService
     ): void {
 

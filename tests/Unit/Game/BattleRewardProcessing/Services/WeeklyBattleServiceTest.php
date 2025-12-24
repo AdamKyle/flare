@@ -167,6 +167,28 @@ class WeeklyBattleServiceTest extends TestCase
         $this->assertTrue($weeklyBattleFight->monster_was_killed);
     }
 
+    public function testCallLocationSpecialityHandler()
+    {
+
+        $character = $this->characterFactory->getCharacter();
+
+        $monster = $this->createMonster([
+            'only_for_location_type' => LocationType::TWSITED_MAIDENS_DUNGEONS,
+        ]);
+
+        $weeklyFight = $this->createWeeklyMonsterFight([
+            'character_id' => $character->id,
+            'monster_id' => $monster->id,
+            'character_deaths' => 10,
+        ]);
+
+        $this->weeklyBattleService->handleMonsterDeath($character, $monster);
+
+        $weeklyBattleFight = $weeklyFight->refresh();
+
+        $this->assertTrue($weeklyBattleFight->monster_was_killed);
+    }
+
     public function testCreateRecordMonsterWasKilled()
     {
 

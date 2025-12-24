@@ -3,8 +3,13 @@
 namespace App\Game\BattleRewardProcessing\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\Event;
+use App\Flare\Models\GameMap;
+use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\Monster;
 use App\Flare\Services\CharacterRewardService;
+use App\Flare\Values\MapNameValue;
+use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
@@ -19,6 +24,7 @@ use App\Game\BattleRewardProcessing\Jobs\BattleXpHandler;
 use App\Game\BattleRewardProcessing\Jobs\Events\WinterEventChristmasGiftHandler;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
+use App\Game\Events\Values\EventType;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use Exception;
@@ -42,6 +48,19 @@ class BattleRewardService
      */
     private array $context;
 
+    /**
+     * @param BattleMessageHandler $battleMessageHandler
+     * @param CharacterRewardService $characterRewardService
+     * @param FactionHandler $factionHandler
+     * @param FactionLoyaltyBountyHandler $factionLoyaltyBountyHandler
+     * @param FactionLoyaltyService $factionLoyaltyService
+     * @param GoldRush $goldRush
+     * @param BattleLocationRewardService $battleLocationRewardService
+     * @param DropCheckService $dropCheckService
+     * @param WeeklyBattleService $weeklyBattleService
+     * @param SecondaryRewardService $secondaryRewardService
+     * @param BattleGlobalEventParticipationHandler $battleGlobalEventParticipationHandler
+     */
     public function __construct(
         private readonly BattleMessageHandler $battleMessageHandler,
         private readonly CharacterRewardService $characterRewardService,
@@ -51,6 +70,9 @@ class BattleRewardService
         private readonly GoldRush $goldRush,
         private readonly BattleLocationRewardService $battleLocationRewardService,
         private readonly DropCheckService $dropCheckService,
+        private readonly WeeklyBattleService $weeklyBattleService,
+        private readonly SecondaryRewardService $secondaryRewardService,
+        private readonly BattleGlobalEventParticipationHandler $battleGlobalEventParticipationHandler,
     ) {}
 
     /**
@@ -69,6 +91,12 @@ class BattleRewardService
         return $this;
     }
 
+    /**
+     * Set the context for the service.
+     *
+     * @param array $context
+     * @return $this
+     */
     public function setContext(array $context): BattleRewardService {
         $this->context = $context;
 
@@ -76,17 +104,24 @@ class BattleRewardService
     }
 
     /**
+     * @param bool $includeWinterEvent
      * @return void
-     * @throws Exception
      * @throws Throwable
      */
-    public function processRewards(): void {
+    public function processRewards(bool $includeWinterEvent = false): void {
         $this->handleAwardingXP();
         $this->handleFactionPoints();
         $this->handleFactionLoyaltyBounty();
         $this->handleCurrencyRewards();
         $this->handleSpecificLocationRewards();
         $this->handleItemDrops();
+        $this->handleWeeklyFightRewards();
+        $this->handleSecondaryRewards();
+        $this->handleGlobalEventParticipation();
+
+        if ($includeWinterEvent) {
+            WinterEventChristmasGiftHandler::dispatch($this->character->id)->onConnection('event_battle_reward')->onQueue('event_battle_reward')->delay(now()->addSeconds(2));
+        }
     }
 
     /**
@@ -202,6 +237,11 @@ class BattleRewardService
         $this->character = $character->refresh();
     }
 
+    /**
+     * Handle specific location rewards
+     *
+     * @return void
+     */
     private function handleSpecificLocationRewards(): void {
         $totalKills = 1;
 
@@ -212,6 +252,12 @@ class BattleRewardService
         $this->battleLocationRewardService->setContext($this->character, $this->monster)->handleLocationSpecificRewards($totalKills);
     }
 
+    /**
+     * Process enemy drops.
+     *
+     * @return void
+     * @throws Exception
+     */
     private function handleItemDrops(): void {
         $totalKills = 1;
 
@@ -230,6 +276,92 @@ class BattleRewardService
         }
 
         $this->dropCheckService->process($this->character, $this->monster);
+    }
+
+    /**
+     * Handle weekly fight rewards, only when not exploring.
+     *
+     * @return void
+     * @throws Exception
+     */
+    private function handleWeeklyFightRewards(): void {
+        if ($this->character->is_auto_battling) {
+            return;
+        }
+
+        $this->character = $this->weeklyBattleService->handleMonsterDeath($this->character, $this->monster);
+    }
+
+    /**
+     * Handle secondary rewards.
+     *
+     * - Class Ranks
+     * - Item Skills
+     *
+     * @return void
+     */
+    private function handleSecondaryRewards(): void {
+        $totalKills = 1;
+
+        if (isset($this->context['total_creatures'])) {
+            $totalKills = $this->context['total_creatures'];
+        }
+
+        if ($totalKills > 1) {
+            for ($i = 0; $i < $totalKills; $i++) {
+                $this->secondaryRewardService->handleSecondaryRewards($this->character);
+
+                $this->character = $this->character->refresh();
+            }
+
+            return;
+        }
+
+        $this->secondaryRewardService->handleSecondaryRewards($this->character);
+
+        $this->character = $this->character->refresh();
+    }
+
+    private function handleGlobalEventParticipation(): void {
+        $event = Event::whereIn('type', [
+            EventType::WINTER_EVENT,
+            EventType::DELUSIONAL_MEMORIES_EVENT,
+        ])->first();
+
+        if (is_null($event)) {
+            return;
+        }
+
+        $globalEventGoal = GlobalEventGoal::where('event_type', $event->type)->first();
+
+        $gameMapArrays = GameMap::whereIn('name', [
+            MapNameValue::ICE_PLANE,
+            MapNameValue::DELUSIONAL_MEMORIES,
+        ])->pluck('id')->toArray();
+
+        if (is_null($globalEventGoal) || ! in_array($this->character->map->game_map_id, $gameMapArrays)) {
+            return;
+        }
+
+        $totalKills = 1;
+
+        if (isset($this->context['total_creatures'])) {
+            $totalKills = $this->context['total_creatures'];
+        }
+
+        if ($totalKills > 1) {
+            for ($i = 0; $i < $totalKills; $i++) {
+                $this->battleGlobalEventParticipationHandler->handleGlobalEventParticipation($this->character, $globalEventGoal);
+
+                $this->character = $this->character->refresh();
+            }
+
+            return;
+        }
+
+        $this->battleGlobalEventParticipationHandler->handleGlobalEventParticipation($this->character, $globalEventGoal);
+
+        $this->character = $this->character->refresh();
     }
 
     public function handleBaseRewards($includeXp = true, $includeEventRewards = true, $includeFactionReward = true)
