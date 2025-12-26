@@ -92,7 +92,7 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(BattleRewardService::class, function ($app) {
             return new BattleRewardService(
-                $app->make(BattleMessageHandler::class),
+               $app->make(BattleMessageHandler::class),
                 $app->make(CharacterRewardService::class),
                 $app->make(FactionHandler::class),
                 $app->make(FactionLoyaltyBountyHandler::class),
@@ -102,7 +102,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(DropCheckService::class),
                 $app->make(WeeklyBattleService::class),
                 $app->make(SecondaryRewardService::class),
-                $app->make(BattleRewardService::class),
+                $app->make(BattleGlobalEventParticipationHandler::class)
             );
         });
 

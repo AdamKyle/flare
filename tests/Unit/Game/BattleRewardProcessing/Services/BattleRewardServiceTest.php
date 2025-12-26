@@ -7,12 +7,11 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\MapNameValue;
 use App\Flare\Values\RandomAffixDetails;
-use App\Game\BattleRewardProcessing\Jobs\BattleItemHandler;
+use App\Game\BattleRewardProcessing\Jobs\Events\WinterEventChristmasGiftHandler;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Events\Values\EventType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -21,11 +20,13 @@ use Tests\TestCase;
 use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGlobalEventGoal;
+use Tests\Traits\CreateItem;
+use Tests\Traits\CreateItemAffix;
 use Tests\Traits\CreateMonster;
 
 class BattleRewardServiceTest extends TestCase
 {
-    use CreateEvent, CreateGameMap, CreateGlobalEventGoal, CreateMonster, RefreshDatabase;
+    use CreateEvent, CreateGameMap, CreateGlobalEventGoal, CreateMonster, RefreshDatabase, CreateItem, CreateItemAffix;
 
     private ?BattleRewardService $battleRewardService;
 
@@ -34,6 +35,16 @@ class BattleRewardServiceTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        $this->createItemAffix(['type' => 'suffix']);
+        $this->createItemAffix(['type' => 'prefix']);
+        $this->createItem([
+            'type' => 'weapon',
+            'specialty_type' => null,
+            'skill_level_required' => 1,
+            'item_prefix_id' => null,
+            'item_suffix_id' => null,
+        ]);
 
         $this->battleRewardService = resolve(BattleRewardService::class);
 
@@ -55,7 +66,7 @@ class BattleRewardServiceTest extends TestCase
         $this->characterFactory = null;
     }
 
-    public function testShouldNotUpdateCharacterCurrenciesWhenNotLoggedIn()
+    public function testShouldNotUpdateCharacterCurrenciesWhenNotLoggedIn(): void
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -64,19 +75,21 @@ class BattleRewardServiceTest extends TestCase
         ]);
 
         Event::fake();
-
         Queue::fake();
 
-        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
+        $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
 
         Event::assertNotDispatched(UpdateCharacterCurrenciesEvent::class);
     }
 
-    public function testShouldReceiveLessXpWhenTrainingASkill()
+    public function testShouldReceiveLessXpWhenTrainingASkill(): void
     {
         $character = $this->characterFactory->getCharacter();
+        $initialXp = $character->xp;
 
-        $character->skills()->where('game_skill_id', GameSkill::where('name', 'Accuracy')->first()->id)->update([
+        $accuracySkill = GameSkill::where('name', 'Accuracy')->first();
+
+        $character->skills()->where('game_skill_id', $accuracySkill->id)->update([
             'currently_training' => true,
             'xp_towards' => 0.10,
         ]);
@@ -100,19 +113,19 @@ class BattleRewardServiceTest extends TestCase
         ]]);
 
         Event::fake();
-
         Queue::fake();
 
-        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
+        $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
 
         $character = $character->refresh();
 
-        $this->assertLessThan($monster->xp, $character->xp);
+        $this->assertLessThan($monster->xp, $character->xp - $initialXp);
     }
 
-    public function testShouldReceiveFullXpWhenTrainingASkillThatIsMaxLevel()
+    public function testShouldReceiveFullXpWhenTrainingASkillThatIsMaxLevel(): void
     {
         $character = $this->characterFactory->getCharacter();
+        $initialXp = $character->xp;
 
         $accuracySkill = GameSkill::where('name', 'Accuracy')->first();
 
@@ -142,23 +155,16 @@ class BattleRewardServiceTest extends TestCase
         ]]);
 
         Event::fake();
+        Queue::fake();
 
-        Queue::fake([
-            BattleItemHandler::class,
-        ]);
-
-        app('queue')->addConnector('sync', function () {
-            return new SyncConnector;
-        });
-
-        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
+        $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
 
         $character = $character->refresh();
 
-        $this->assertEquals($monster->xp, $character->xp);
+        $this->assertEquals($monster->xp, $character->xp - $initialXp);
     }
 
-    public function testShouldUpdateCharacterCurrenciesWhenLoggedIn()
+    public function testShouldUpdateCharacterCurrenciesWhenLoggedIn(): void
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -178,36 +184,14 @@ class BattleRewardServiceTest extends TestCase
         ]]);
 
         Event::fake();
+        Queue::fake();
 
-        Queue::fake([
-            BattleItemHandler::class,
-        ]);
-
-        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
+        $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
 
         Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
     }
 
-    public function testBattleItemRewardHandlerIsDispatched()
-    {
-        $character = $this->characterFactory->getCharacter();
-
-        $monster = $this->createMonster([
-            'game_map_id' => $character->map->game_map_id,
-        ]);
-
-        Event::fake();
-
-        Queue::fake([
-            BattleItemHandler::class,
-        ]);
-
-        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
-
-        Queue::assertPushed(BattleItemHandler::class);
-    }
-
-    public function testShouldGetFactionPoints()
+    public function testShouldGetFactionPoints(): void
     {
         $character = $this->characterFactory->assignFactionSystem()->getCharacter();
 
@@ -216,12 +200,9 @@ class BattleRewardServiceTest extends TestCase
         ]);
 
         Event::fake();
+        Queue::fake();
 
-        Queue::fake([
-            BattleItemHandler::class,
-        ]);
-
-        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
+        $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
 
         $character = $character->refresh();
 
@@ -232,7 +213,7 @@ class BattleRewardServiceTest extends TestCase
         $this->assertGreaterThan(0, $faction->current_points);
     }
 
-    public function testShouldNotUpdateGlobalEventParticipationWhenNoEventIsRunning()
+    public function testShouldNotUpdateGlobalEventParticipationWhenNoEventIsRunning(): void
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -241,19 +222,16 @@ class BattleRewardServiceTest extends TestCase
         ]);
 
         Event::fake();
+        Queue::fake();
 
-        Queue::fake([
-            BattleItemHandler::class,
-        ]);
-
-        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
+        $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
 
         $character = $character->refresh();
 
         $this->assertNull($character->globalEventParticipation);
     }
 
-    public function testShouldNotUpdateGlobalEventParticipationWhenNoGlobalEventIsRunning()
+    public function testShouldNotUpdateGlobalEventParticipationWhenNoGlobalEventIsRunning(): void
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -266,19 +244,16 @@ class BattleRewardServiceTest extends TestCase
         ]);
 
         Event::fake();
+        Queue::fake();
 
-        Queue::fake([
-            BattleItemHandler::class,
-        ]);
-
-        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
+        $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
 
         $character = $character->refresh();
 
         $this->assertNull($character->globalEventParticipation);
     }
 
-    public function testShouldUpdateGlobalEventParticipation()
+    public function testShouldUpdateGlobalEventParticipation(): void
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -306,21 +281,17 @@ class BattleRewardServiceTest extends TestCase
         ]);
 
         Event::fake();
+        Queue::fake();
 
-        Queue::fake([
-            BattleItemHandler::class,
-        ]);
-
-        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
+        $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
 
         $character = $character->refresh();
 
         $this->assertNotNull($character->globalEventParticipation);
     }
 
-    public function testShouldUpdateGlobalEventParticipationWhenParticipationExists()
+    public function testShouldUpdateGlobalEventParticipationWhenParticipationExists(): void
     {
-
         $character = $this->characterFactory->getCharacter();
 
         $character->map()->update([
@@ -360,12 +331,9 @@ class BattleRewardServiceTest extends TestCase
         ]);
 
         Event::fake();
+        Queue::fake();
 
-        Queue::fake([
-            BattleItemHandler::class,
-        ]);
-
-        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
+        $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
 
         $character = $character->refresh();
 
@@ -373,7 +341,7 @@ class BattleRewardServiceTest extends TestCase
         $this->assertEquals(2, $character->globalEventKills->kills);
     }
 
-    public function testNoFactionRewardsGivenWhenCharacterIsInPurgatory()
+    public function testNoFactionRewardsGivenWhenCharacterIsInPurgatory(): void
     {
         $character = $this->characterFactory->assignFactionSystem()->getCharacter();
 
@@ -383,22 +351,36 @@ class BattleRewardServiceTest extends TestCase
             ])->id,
         ]);
 
+        $character = $character->refresh();
+
         $monster = $this->createMonster([
             'game_map_id' => $character->map->game_map_id,
         ]);
 
         Event::fake();
+        Queue::fake();
 
-        Queue::fake([
-            BattleItemHandler::class,
-        ]);
-
-        $this->battleRewardService->setUp($character->id, $monster->id)->handleBaseRewards();
+        $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
 
         $character = $character->refresh();
 
         foreach ($character->factions as $faction) {
             $this->assertEquals(0, $faction->current_points);
         }
+    }
+
+    public function testWinterEventChristmasGiftHandlerIsDispatchedWhenIncluded(): void
+    {
+        $character = $this->characterFactory->getCharacter();
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+        ]);
+
+        Queue::fake();
+
+        $this->battleRewardService->setUp($character->id, $monster->id)->processRewards(true);
+
+        Queue::assertPushed(WinterEventChristmasGiftHandler::class);
     }
 }
