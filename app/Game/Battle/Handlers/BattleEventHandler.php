@@ -8,6 +8,7 @@ use App\Flare\Models\Monster;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Events\CharacterRevive;
 use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\BattleRewardProcessing\Jobs\BattleRewardHandler;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\Character\Concerns\FetchEquipped;
@@ -49,14 +50,12 @@ class BattleEventHandler
      *
      * @param integer $characterId
      * @param integer $monsterId
-     * @param boolean $includeXp
-     * @param boolean $includeEventReward
-     * @param bool $includeFactionReward
+     * @param array $context
      * @return void
      */
-    public function processMonsterDeath(int $characterId, int $monsterId, bool $includeXp = true, bool $includeEventReward = true, bool $includeFactionReward = true): void
+    public function processMonsterDeath(int $characterId, int $monsterId, array $context = []): void
     {
-        $this->battleRewardService->setUp($characterId, $monsterId)->handleBaseRewards($includeXp, $includeEventReward, $includeFactionReward);
+        BattleRewardHandler::dispatch($characterId, $monsterId, $context)->onQueue('battle_reward_processing')->onConnection('battle_reward_processing')->delay(now()->addSecond());
     }
 
     /**

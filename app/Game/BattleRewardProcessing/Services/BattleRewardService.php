@@ -13,14 +13,6 @@ use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandl
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
-use App\Game\BattleRewardProcessing\Jobs\BattleCurrenciesHandler;
-use App\Game\BattleRewardProcessing\Jobs\BattleFactionHandler;
-use App\Game\BattleRewardProcessing\Jobs\BattleGlobalEventHandler;
-use App\Game\BattleRewardProcessing\Jobs\BattleItemHandler;
-use App\Game\BattleRewardProcessing\Jobs\BattleLocationHandler;
-use App\Game\BattleRewardProcessing\Jobs\BattleSecondaryRewardHandler;
-use App\Game\BattleRewardProcessing\Jobs\BattleWeeklyFightHandler;
-use App\Game\BattleRewardProcessing\Jobs\BattleXpHandler;
 use App\Game\BattleRewardProcessing\Jobs\Events\WinterEventChristmasGiftHandler;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
@@ -34,14 +26,14 @@ class BattleRewardService
 {
 
     /**
-     * @var Character $characterId
+     * @var ?Character $characterId
      */
-    private Character $character;
+    private ?Character $character;
 
     /**
-     * @var Monster $monsterId
+     * @var ?Monster $monsterId
      */
-    private Monster $monster;
+    private ?Monster $monster;
 
     /**
      * @var array $context
@@ -109,6 +101,11 @@ class BattleRewardService
      * @throws Throwable
      */
     public function processRewards(bool $includeWinterEvent = false): void {
+
+        if (is_null($this->character) || is_null($this->monster)) {
+            return;
+        }
+
         $this->handleAwardingXP();
         $this->handleFactionPoints();
         $this->handleFactionLoyaltyBounty();

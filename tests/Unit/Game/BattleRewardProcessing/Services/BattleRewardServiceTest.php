@@ -383,4 +383,35 @@ class BattleRewardServiceTest extends TestCase
 
         Queue::assertPushed(WinterEventChristmasGiftHandler::class);
     }
+
+    public function testProcessRewardsReturnsEarlyWhenCharacterCannotBeFound(): void
+    {
+        $character = $this->characterFactory->getCharacter();
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+        ]);
+
+        Event::fake();
+        Queue::fake();
+
+        $this->battleRewardService->setUp(999999999, $monster->id)->processRewards(true);
+
+        Queue::assertNotPushed(WinterEventChristmasGiftHandler::class);
+        Event::assertNotDispatched(UpdateCharacterCurrenciesEvent::class);
+    }
+
+    public function testProcessRewardsReturnsEarlyWhenMonsterCannotBeFound(): void
+    {
+        $character = $this->characterFactory->getCharacter();
+
+        Event::fake();
+        Queue::fake();
+
+        $this->battleRewardService->setUp($character->id, 999999999)->processRewards(true);
+
+        Queue::assertNotPushed(WinterEventChristmasGiftHandler::class);
+        Event::assertNotDispatched(UpdateCharacterCurrenciesEvent::class);
+    }
+
 }

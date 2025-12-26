@@ -139,15 +139,14 @@ class Exploration implements ShouldQueue
             $characterSkillService = $this->skillService->setSkillInTraining($this->character);
 
             for ($i = 1; $i <= $enemies; $i++) {
-                $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], false, false);
-
                 $totalXpToReward += $characterRewardService->fetchXpForMonster($monster);
                 $totalSkillXpToReward += $characterSkillService->getXpForSkillIntraining($this->character, $monster->xp);
             }
 
-            ExplorationXpHandler::dispatch($this->character->id, $enemies, $totalXpToReward)->onConnection('exploration_battle_xp_reward')->onQueue('exploration_battle_xp_reward')->delay(now()->addSeconds(2));
-            ExplorationSkillXpHandler::dispatch($this->character->id, $totalSkillXpToReward)->onConnection('exploration_battle_skill_xp_reward')->onQueue('exploration_battle_skill_xp_reward')->delay(now()->addSeconds(2));
-            WinterEventChristmasGiftHandler::dispatch($this->character->id)->onConnection('event_battle_reward')->onQueue('event_battle_reward')->delay(now()->addSeconds(2));
+            $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], [
+                'total_creatures' => $enemies,
+                'total_xp' => $totalXpToReward,
+            ]);
 
             $this->sendOutEventLogUpdate('The last of the enemies fall. Covered in blood, exhausted, you look around for any signs of more of their friends. The area is silent. "Another day, another battle.
             We managed to survive." The Guide states as he walks from the shadows. The pair of you set off in search of the next adventure ...
@@ -171,7 +170,6 @@ class Exploration implements ShouldQueue
         $monster = Monster::find($params['selected_monster_id']);
         $totalXpToReward = 0;
         $totalSkillXpToReward = 0;
-        $totalFactionPoints = 0;
         $characterRewardService = $this->characterRewardService->setCharacter($this->character);
         $characterSkillService = $this->skillService->setSkillInTraining($this->character);
 
@@ -183,13 +181,12 @@ class Exploration implements ShouldQueue
 
             $totalXpToReward += $characterRewardService->fetchXpForMonster($monster);
             $totalSkillXpToReward += $characterSkillService->getXpForSkillIntraining($this->character, $monster->xp);
-            $totalFactionPoints += $factionHandler->getFactionPointsPerKill($this->character);
         }
 
-        ExplorationFactionPointHandler::dispatch($this->character->id, $totalFactionPoints)->onConnection('exploration_faction_points_reward')->onQueue('exploration_faction_points_reward')->delay(now()->addSeconds(2));
-        ExplorationXpHandler::dispatch($this->character->id, 10, $totalXpToReward)->onConnection('exploration_battle_xp_reward')->onQueue('exploration_battle_xp_reward')->delay(now()->addSeconds(2));
-        ExplorationSkillXpHandler::dispatch($this->character->id, $totalSkillXpToReward)->onConnection('exploration_battle_skill_xp_reward')->onQueue('exploration_battle_skill_xp_reward')->delay(now()->addSeconds(2));
-        WinterEventChristmasGiftHandler::dispatch($this->character->id)->onConnection('event_battle_reward')->onQueue('event_battle_reward')->delay(now()->addSeconds(2));
+        $battleEventHandler->processMonsterDeath($this->character->id, $monster->id, [
+            'total_creatures' => 10,
+            'total_xp' => $totalXpToReward,
+        ]);
 
         Cache::put('can-character-survive-' . $this->character->id, true);
 
@@ -215,8 +212,6 @@ class Exploration implements ShouldQueue
         }
 
         $response->resetBattleMessages();
-
-        $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], false, false);
 
         return true;
     }
