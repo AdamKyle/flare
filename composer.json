@@ -36,6 +36,7 @@
         "barryvdh/laravel-ide-helper": "^2.13.0",
         "beyondcode/laravel-dump-server": "1.9.0",
         "fakerphp/faker": "^1.21.0",
+        "itsgoingd/clockwork": "^5.3",
         "laravel/browser-kit-testing": "^7.0",
         "laravel/pint": "^1.17",
         "mockery/mockery": "^1.6.6",
