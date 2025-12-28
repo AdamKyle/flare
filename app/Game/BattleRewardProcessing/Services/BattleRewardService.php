@@ -19,6 +19,7 @@ use App\Game\Core\Services\GoldRush;
 use App\Game\Events\Values\EventType;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
+use App\Game\Skills\Services\SkillService;
 use Exception;
 use Throwable;
 
@@ -52,6 +53,7 @@ class BattleRewardService
      * @param WeeklyBattleService $weeklyBattleService
      * @param SecondaryRewardService $secondaryRewardService
      * @param BattleGlobalEventParticipationHandler $battleGlobalEventParticipationHandler
+     * @param SkillService $skillService
      */
     public function __construct(
         private readonly BattleMessageHandler $battleMessageHandler,
@@ -65,6 +67,7 @@ class BattleRewardService
         private readonly WeeklyBattleService $weeklyBattleService,
         private readonly SecondaryRewardService $secondaryRewardService,
         private readonly BattleGlobalEventParticipationHandler $battleGlobalEventParticipationHandler,
+        private readonly SkillService $skillService,
     ) {}
 
     /**
@@ -107,6 +110,7 @@ class BattleRewardService
         }
 
         $this->handleAwardingXP();
+        $this->handleAwardSkillPoints();
         $this->handleFactionPoints();
         $this->handleFactionLoyaltyBounty();
         $this->handleCurrencyRewards();
@@ -130,8 +134,7 @@ class BattleRewardService
     private function handleAwardingXP(): void {
         if (!isset($this->context['total_xp']) && !isset($this->context['total_creatures'])) {
             $this->characterRewardService->setCharacter($this->character)
-                ->distributeCharacterXP($this->monster)
-                ->distributeSkillXP($this->monster);
+                ->distributeCharacterXP($this->monster);
 
             $this->character = $this->character->refresh();
 
@@ -146,6 +149,30 @@ class BattleRewardService
         $this->battleMessageHandler->handleMessageForExplorationXp($user, $totalCreatures, $totalXP);
 
         $this->characterRewardService->setCharacter($this->character)->distributeSpecifiedXp($totalXP);
+
+        $this->character = $this->character->refresh();
+    }
+
+    /**
+     * Handle awarding skill experience.
+     *
+     * @return void
+     * @throws Exception
+     */
+    private function handleAwardSkillPoints(): void {
+
+        if (!isset($this->context['total_skill_xp'])) {
+            $this->characterRewardService->setCharacter($this->character)
+                ->distributeSkillXP($this->monster);
+
+            $this->character = $this->character->refresh();
+
+            return;
+        }
+
+        $totalSkillPoints = $this->context['total_skill_xp'];
+
+        $this->skillService->setSkillInTraining($this->character)->giveXpToTrainingSkill($this->character, $totalSkillPoints);
 
         $this->character = $this->character->refresh();
     }
@@ -319,6 +346,12 @@ class BattleRewardService
         $this->character = $this->character->refresh();
     }
 
+    /**
+     * Handle event participation.
+     *
+     * @return void
+     * @throws Exception
+     */
     private function handleGlobalEventParticipation(): void {
         $event = Event::whereIn('type', [
             EventType::WINTER_EVENT,
@@ -359,28 +392,5 @@ class BattleRewardService
         $this->battleGlobalEventParticipationHandler->handleGlobalEventParticipation($this->character, $globalEventGoal);
 
         $this->character = $this->character->refresh();
-    }
-
-    public function handleBaseRewards($includeXp = true, $includeEventRewards = true, $includeFactionReward = true)
-    {
-
-        if ($includeXp) {
-            BattleXpHandler::dispatch($this->characterId, $this->monsterId)->onConnection('battle_reward_xp')->onQueue('battle_reward_xp')->delay(now()->addSeconds(2));
-        }
-
-        if ($includeEventRewards) {
-            WinterEventChristmasGiftHandler::dispatch($this->characterId)->onConnection('event_battle_reward')->onQueue('event_battle_reward')->delay(now()->addSeconds(2));
-        }
-
-        if ($includeFactionReward) {
-            BattleFactionHandler::dispatch($this->characterId, $this->monsterId)->onConnection('battle_reward_factions')->onQueue('battle_reward_factions')->delay(now()->addSeconds(2));
-        }
-
-        BattleSecondaryRewardHandler::dispatch($this->characterId)->onConnection('battle_secondary_reward')->onQueue('battle_secondary_reward')->delay(now()->addSeconds(2));
-        BattleCurrenciesHandler::dispatch($this->characterId, $this->monsterId)->onConnection('battle_reward_currencies')->onQueue('battle_reward_currencies')->delay(now()->addSeconds(2));
-        BattleGlobalEventHandler::dispatch($this->characterId)->onConnection('battle_reward_global_event')->onQueue('battle_reward_global_event')->delay(now()->addSeconds(2));
-        BattleLocationHandler::dispatch($this->characterId, $this->monsterId)->onConnection('battle_reward_location_handlers')->onQueue('battle_reward_location_handlers')->delay(now()->addSeconds(2));
-        BattleWeeklyFightHandler::dispatch($this->characterId, $this->monsterId)->onConnection('battle_reward_weekly_fights')->onQueue('battle_reward_weekly_fights')->delay(now()->addSeconds(2));
-        BattleItemHandler::dispatch($this->characterId, $this->monsterId)->onConnection('battle_reward_item_handler')->onQueue('battle_reward_item_handler')->delay(now()->addSeconds(2));
     }
 }
