@@ -122,7 +122,7 @@ class Exploration implements ShouldQueue
     private function encounter(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, FactionHandler $factionHandler, array $params, int $timeDelay): bool
     {
 
-        $canSurviveFights = $this->canSurviveFight($response, $automation, $battleEventHandler, $factionHandler, $params);
+        $canSurviveFights = $this->canSurviveFight($response, $automation, $battleEventHandler, $params);
 
         if ($canSurviveFights) {
 
@@ -167,16 +167,14 @@ class Exploration implements ShouldQueue
      * Fight and process rewards and return true or false.
      *
      * - Uses a cached version to make this faster.
-     * - Processes rewards in a batched manner.
      *
      * @param MonsterPlayerFight $response
      * @param CharacterAutomation $automation
      * @param BattleEventHandler $battleEventHandler
-     * @param FactionHandler $factionHandler
      * @param array $params
      * @return bool
      */
-    private function canSurviveFight(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, FactionHandler $factionHandler, array $params): bool
+    private function canSurviveFight(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool
     {
 
         if (Cache::has('can-character-survive-' . $this->character->id)) {
@@ -185,30 +183,12 @@ class Exploration implements ShouldQueue
 
         $this->sendOutEventLogUpdate('"Child, I can see a small group of these creature. If we slaughter them we might learn something." The guide insists. "Theres ten of them. Quick, kill them. We will continue the hunt!"');
 
-        $monster = Monster::find($params['selected_monster_id']);
-        $totalXpToReward = 0;
-        $totalSkillXpToReward = 0;
-        $totalFactionPoints = 0;
-        $characterRewardService = $this->characterRewardService->setCharacter($this->character);
-        $characterSkillService = $this->skillService->setSkillInTraining($this->character);
-
 
         for ($i = 1; $i <= 10; $i++) {
             if (!$this->fightAutomationMonster($response, $automation, $battleEventHandler, $params)) {
                 return false;
             }
-
-            $totalXpToReward += $characterRewardService->fetchXpForMonster($monster);
-            $totalSkillXpToReward += $characterSkillService->getXpForSkillIntraining($this->character, $monster->xp);
-            $totalFactionPoints += $factionHandler->getFactionPointsPerKill($this->character);
         }
-
-        $battleEventHandler->processMonsterDeath($this->character->id, $monster->id, [
-            'total_creatures' => 10,
-            'total_xp' => $totalXpToReward,
-            'total_faction_points' => $totalFactionPoints,
-            'total_skill_xp' => $totalSkillXpToReward
-        ]);
 
         Cache::put('can-character-survive-' . $this->character->id, true);
 

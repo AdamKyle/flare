@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use Exception;
 use Facades\App\Game\Skills\Handlers\UpdateItemSkill;
 
 class SecondaryRewardService
@@ -26,17 +27,24 @@ class SecondaryRewardService
      * - Give XP to equipped class specials
      * - Handle character skill progression
      *
+     * @param Character $character
+     * @param int $killCount
      * @return void
+     * @throws Exception
      */
-    public function handleSecondaryRewards(Character $character)
+    public function handleSecondaryRewards(Character $character, int $killCount = 1): void
     {
-        $this->classRankService->giveXpToClassRank($character);
+        if ($killCount <= 0) {
+            return;
+        }
 
-        $this->classRankService->giveXpToMasteries($character);
+        $this->classRankService->giveXpToClassRank($character, $killCount);
 
-        $this->classRankService->giveXpToEquippedClassSpecialties($character);
+        $this->classRankService->giveXpToMasteries($character, $killCount);
 
-        $this->handleItemSkillUpdate($character);
+        $this->classRankService->giveXpToEquippedClassSpecialties($character, $killCount);
+
+        $this->handleItemSkillUpdate($character, $killCount);
 
         if ($character->isLoggedIn()) {
             event(new UpdateTopBarEvent($character->refresh()));
@@ -47,10 +55,12 @@ class SecondaryRewardService
      * Handle item skill updates for artifacts that are equipped with skill trees.
      *
      * @param Character $character
+     * @param int $killCount
      * @return void
      */
-    private function handleItemSkillUpdate(Character $character): void
+    private function handleItemSkillUpdate(Character $character, int $killCount = 1): void
     {
+
         $equippedItems = $this->fetchEquipped($character);
 
         if (is_null($equippedItems)) {
@@ -65,6 +75,6 @@ class SecondaryRewardService
             return;
         }
 
-        UpdateItemSkill::updateItemSkill($character, $equippedItem->item);
+        UpdateItemSkill::updateItemSkill($character, $equippedItem->item, $killCount);
     }
 }

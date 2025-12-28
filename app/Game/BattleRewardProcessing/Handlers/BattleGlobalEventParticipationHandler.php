@@ -13,45 +13,77 @@ use Exception;
 
 class BattleGlobalEventParticipationHandler extends BaseGlobalEventGoalParticipationHandler
 {
+    /**
+     * @param RandomAffixGenerator $randomAffixGenerator
+     * @param EventGoalsService $eventGoalService
+     */
     public function __construct(RandomAffixGenerator $randomAffixGenerator, EventGoalsService $eventGoalService)
     {
-
         parent::__construct($randomAffixGenerator, $eventGoalService);
     }
 
     /**
      * Handle updating the global; event participation
      *
+     * @param Character $character
+     * @param GlobalEventGoal $globalEventGoal
+     * @param int $killCount
      * @return void
      *
      * @throws Exception
      */
-    public function handleGlobalEventParticipation(Character $character, GlobalEventGoal $globalEventGoal)
+    public function handleGlobalEventParticipation(Character $character, GlobalEventGoal $globalEventGoal, int $killCount = 1): void
     {
+
         if ($globalEventGoal->total_kills >= $globalEventGoal->max_kills) {
             return;
         }
 
-        $this->handleUpdatingParticipation($character, $globalEventGoal, 'kills');
+        $remainingKills = (int) $globalEventGoal->max_kills - (int) $globalEventGoal->total_kills;
+
+        if ($remainingKills <= 0) {
+            return;
+        }
+
+        $appliedKillCount = $killCount > $remainingKills ? $remainingKills : $killCount;
+
+        $this->handleUpdatingParticipation($character, $globalEventGoal, 'kills', $appliedKillCount);
 
         $character = $character->refresh();
 
         $globalEventGoal = $globalEventGoal->refresh();
 
-        if ($globalEventGoal->total_kills >= $globalEventGoal->next_reward_at) {
-            $newAmount = $globalEventGoal->next_reward_at + $globalEventGoal->reward_every;
+        $maxKills = (int) $globalEventGoal->max_kills;
+        $rewardEvery = (int) $globalEventGoal->reward_every;
 
-            $this->rewardCharactersParticipating($globalEventGoal->refresh());
+        if ($rewardEvery > 0) {
+            while ($globalEventGoal->total_kills >= $globalEventGoal->next_reward_at) {
+                $currentNextRewardAt = (int) $globalEventGoal->next_reward_at;
 
-            $globalEventGoal->update([
-                'next_reward_at' => $newAmount >= $globalEventGoal->max_kills ? $globalEventGoal->max_kills : $newAmount,
-            ]);
+                $this->rewardCharactersParticipating($globalEventGoal->refresh());
+
+                if ($currentNextRewardAt >= $maxKills) {
+                    break;
+                }
+
+                $newAmount = $currentNextRewardAt + $rewardEvery;
+
+                $globalEventGoal->update([
+                    'next_reward_at' => $newAmount >= $maxKills ? $maxKills : $newAmount,
+                ]);
+
+                $globalEventGoal = $globalEventGoal->refresh();
+
+                if ((int) $globalEventGoal->next_reward_at >= $maxKills) {
+                    break;
+                }
+            }
         }
 
         event(new UpdateEventGoalProgress($this->eventGoalsService->getEventGoalData($character)));
 
-        $amount = $character->globalEventKills->kills;
+        $currentKills = $character->globalEventKills->kills;
 
-        event(new UpdateEventGoalCurrentProgressForCharacter($character->user->id, $amount));
+        event(new UpdateEventGoalCurrentProgressForCharacter($character->user->id, $currentKills));
     }
 }

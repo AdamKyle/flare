@@ -323,6 +323,7 @@ class BattleRewardService
      * - Item Skills
      *
      * @return void
+     * @throws Exception
      */
     private function handleSecondaryRewards(): void {
         $totalKills = 1;
@@ -331,17 +332,7 @@ class BattleRewardService
             $totalKills = $this->context['total_creatures'];
         }
 
-        if ($totalKills > 1) {
-            for ($i = 0; $i < $totalKills; $i++) {
-                $this->secondaryRewardService->handleSecondaryRewards($this->character);
-
-                $this->character = $this->character->refresh();
-            }
-
-            return;
-        }
-
-        $this->secondaryRewardService->handleSecondaryRewards($this->character);
+        $this->secondaryRewardService->handleSecondaryRewards($this->character, $totalKills);
 
         $this->character = $this->character->refresh();
     }
@@ -379,18 +370,8 @@ class BattleRewardService
             $totalKills = $this->context['total_creatures'];
         }
 
-        if ($totalKills > 1) {
-            for ($i = 0; $i < $totalKills; $i++) {
-                $this->battleGlobalEventParticipationHandler->handleGlobalEventParticipation($this->character, $globalEventGoal);
+       $this->battleGlobalEventParticipationHandler->handleGlobalEventParticipation($this->character, $globalEventGoal, $totalKills);
 
-                $this->character = $this->character->refresh();
-            }
-
-            return;
-        }
-
-        $this->battleGlobalEventParticipationHandler->handleGlobalEventParticipation($this->character, $globalEventGoal);
-
-        $this->character = $this->character->refresh();
+       $this->character = $this->character->refresh();
     }
 }

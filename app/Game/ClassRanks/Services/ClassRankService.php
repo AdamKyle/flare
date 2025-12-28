@@ -229,29 +229,81 @@ class ClassRankService
      *
      * @throws Exception
      */
-    public function giveXpToClassRank(Character $character): void
+    public function giveXpToClassRank(Character $character, int $killCount = 1): void
     {
-        $classRank = $character->classRanks()->where('game_class_id', $character->game_class_id)->first();
-
-        if ($classRank->level >= ClassRankValue::MAX_LEVEL) {
+        if ($killCount <= 0) {
             return;
         }
 
+        if ($killCount === 1) {
+            $classRank = $character->classRanks()->where('game_class_id', $character->game_class_id)->first();
+
+            if ($classRank->level >= ClassRankValue::MAX_LEVEL) {
+                return;
+            }
+
+            $classRank->update([
+                'current_xp' => $classRank->current_xp + ClassRankValue::XP_PER_KILL,
+            ]);
+
+            $classRank = $classRank->refresh();
+
+            $this->battleMessageHandler->handleClassRankMessage($character->user, ClassRanksMessageTypes::XP_FOR_CLASS_RANKS, $character->class->name, ClassRankValue::XP_PER_KILL, $classRank->current_xp);
+
+            if ($classRank->current_xp >= $classRank->required_xp) {
+                $classRank->update([
+                    'level' => $classRank->level + 1,
+                    'current_xp' => 0,
+                ]);
+
+                event(new ServerMessageEvent($character->user, 'You gained a new class rank in: ' . $character->class->name));
+            }
+
+            return;
+        }
+
+        $classRank = $character->classRanks()->where('game_class_id', $character->game_class_id)->first();
+
+        if (is_null($classRank) || $classRank->level >= ClassRankValue::MAX_LEVEL) {
+            return;
+        }
+
+        $startingLevel = (int) $classRank->level;
+
+        [$newLevel, $newCurrentXp, $levelsGained] = $this->applyKillCountToProgression(
+            (int) $classRank->level,
+            (int) $classRank->current_xp,
+            (int) $classRank->required_xp,
+            (int) ClassRankValue::XP_PER_KILL,
+            $killCount,
+            (int) ClassRankValue::MAX_LEVEL
+        );
+
         $classRank->update([
-            'current_xp' => $classRank->current_xp + ClassRankValue::XP_PER_KILL,
+            'level' => $newLevel,
+            'current_xp' => $newCurrentXp,
         ]);
 
         $classRank = $classRank->refresh();
 
-        $this->battleMessageHandler->handleClassRankMessage($character->user, ClassRanksMessageTypes::XP_FOR_CLASS_RANKS, $character->class->name, ClassRankValue::XP_PER_KILL, $classRank->current_xp);
+        $this->battleMessageHandler->handleClassRankMessage(
+            $character->user,
+            ClassRanksMessageTypes::XP_FOR_CLASS_RANKS,
+            $character->class->name,
+            (int) ClassRankValue::XP_PER_KILL * $killCount,
+            $classRank->current_xp
+        );
 
-        if ($classRank->current_xp >= $classRank->required_xp) {
-            $classRank->update([
-                'level' => $classRank->level + 1,
-                'current_xp' => 0,
-            ]);
+        if ($levelsGained > 0) {
+            for ($gainedLevelIndex = 0; $gainedLevelIndex < $levelsGained; $gainedLevelIndex++) {
+                $newMessageLevel = $startingLevel + $gainedLevelIndex + 1;
 
-            event(new ServerMessageEvent($character->user, 'You gained a new class rank in: ' . $character->class->name));
+                if ($newMessageLevel > ClassRankValue::MAX_LEVEL) {
+                    break;
+                }
+
+                event(new ServerMessageEvent($character->user, 'You gained a new class rank in: ' . $character->class->name));
+            }
         }
     }
 
@@ -260,33 +312,100 @@ class ClassRankService
      *
      * @throws Exception
      */
-    public function giveXpToEquippedClassSpecialties(Character $character): void
+    public function giveXpToEquippedClassSpecialties(Character $character, int $killCount = 1): void
     {
+        if ($killCount <= 0) {
+            return;
+        }
+
+        if ($killCount === 1) {
+            $equippedSpecials = $character->classSpecialsEquipped()->where('equipped', true)->get();
+
+            foreach ($equippedSpecials as $special) {
+                if ($special->level >= ClassSpecialValue::MAX_LEVEL) {
+                    continue;
+                }
+
+                $special->update([
+                    'current_xp' => $special->current_xp + ClassSpecialValue::XP_PER_KILL,
+                ]);
+
+                $special = $special->refresh();
+
+                $this->battleMessageHandler->handleClassRankMessage($character->user, ClassRanksMessageTypes::XP_FOR_EQUIPPED_CLASS_SPECIALS, $character->class->name, ClassSpecialValue::XP_PER_KILL, $special->current_xp, null, $special->gameClassSpecial->name);
+
+                if ($special->current_xp >= $special->required_xp) {
+                    $special->update([
+                        'level' => $special->level + 1,
+                        'current_xp' => 0,
+                    ]);
+
+                    event(new ServerMessageEvent($character->user, 'Your class special:  ' . $special->gameClassSpecial->name . ' has gained a new level is now level: ' . $special->level));
+
+                    $this->updateCharacterAttackTypes->updateCache($character->refresh());
+                }
+            }
+
+            return;
+        }
+
         $equippedSpecials = $character->classSpecialsEquipped()->where('equipped', true)->get();
+
+        $didLevel = false;
 
         foreach ($equippedSpecials as $special) {
             if ($special->level >= ClassSpecialValue::MAX_LEVEL) {
                 continue;
             }
 
+            $startingLevel = (int) $special->level;
+
+            [$newLevel, $newCurrentXp, $levelsGained] = $this->applyKillCountToProgression(
+                (int) $special->level,
+                (int) $special->current_xp,
+                (int) $special->required_xp,
+                (int) ClassSpecialValue::XP_PER_KILL,
+                $killCount,
+                (int) ClassSpecialValue::MAX_LEVEL
+            );
+
             $special->update([
-                'current_xp' => $special->current_xp + ClassSpecialValue::XP_PER_KILL,
+                'level' => $newLevel,
+                'current_xp' => $newCurrentXp,
             ]);
 
             $special = $special->refresh();
 
-            $this->battleMessageHandler->handleClassRankMessage($character->user, ClassRanksMessageTypes::XP_FOR_EQUIPPED_CLASS_SPECIALS, $character->class->name, ClassSpecialValue::XP_PER_KILL, $special->current_xp, null, $special->gameClassSpecial->name);
+            $this->battleMessageHandler->handleClassRankMessage(
+                $character->user,
+                ClassRanksMessageTypes::XP_FOR_EQUIPPED_CLASS_SPECIALS,
+                $character->class->name,
+                (int) ClassSpecialValue::XP_PER_KILL * $killCount,
+                $special->current_xp,
+                null,
+                $special->gameClassSpecial->name
+            );
 
-            if ($special->current_xp >= $special->required_xp) {
-                $special->update([
-                    'level' => $special->level + 1,
-                    'current_xp' => 0,
-                ]);
+            if ($levelsGained > 0) {
+                $didLevel = true;
 
-                event(new ServerMessageEvent($character->user, 'Your class special:  ' . $special->gameClassSpecial->name . ' has gained a new level is now level: ' . $special->level));
+                for ($gainedLevelIndex = 0; $gainedLevelIndex < $levelsGained; $gainedLevelIndex++) {
+                    $newMessageLevel = $startingLevel + $gainedLevelIndex + 1;
 
-                $this->updateCharacterAttackTypes->updateCache($character->refresh());
+                    if ($newMessageLevel > ClassSpecialValue::MAX_LEVEL) {
+                        break;
+                    }
+
+                    event(new ServerMessageEvent(
+                        $character->user,
+                        'Your class special:  ' . $special->gameClassSpecial->name . ' has gained a new level is now level: ' . $newMessageLevel
+                    ));
+                }
             }
+        }
+
+        if ($didLevel) {
+            $this->updateCharacterAttackTypes->updateCache($character->refresh());
         }
     }
 
@@ -296,15 +415,75 @@ class ClassRankService
      * @throws Exception
      */
     public function
-    giveXpToMasteries(Character $character): void
+    giveXpToMasteries(Character $character, int $killCount = 1): void
     {
+        if ($killCount <= 0) {
+            return;
+        }
+
+        if ($killCount === 1) {
+            $classRank = $character->classRanks()->where('game_class_id', $character->game_class_id)->first();
+
+            $inventory = $this->fetchEquipped($character);
+
+            if (is_null($inventory)) {
+                return;
+            }
+
+            foreach (ItemType::allWeaponTypes() as $type) {
+
+                $inventorySlot = $inventory->where('item.type', $type)->first();
+
+                if (! is_null($inventorySlot)) {
+                    $weaponMastery = $classRank->weaponMasteries()->where('weapon_type', $type)->first();
+
+                    if ($weaponMastery->level >= WeaponMasteryValue::MAX_LEVEL) {
+                        continue;
+                    }
+
+                    $weaponMastery->update([
+                        'current_xp' => $weaponMastery->current_xp + WeaponMasteryValue::XP_PER_KILL,
+                    ]);
+
+                    $weaponMastery = $weaponMastery->refresh();
+
+                    $weaponMasteryName = ItemType::getProperNameForType($type);
+
+                    $this->battleMessageHandler->handleClassRankMessage($character->user, ClassRanksMessageTypes::XP_FOR_CLASS_MASTERIES, $character->class->name, WeaponMasteryValue::XP_PER_KILL, $weaponMastery->current_xp, $weaponMasteryName);
+
+                    if ($weaponMastery->current_xp >= $weaponMastery->required_xp) {
+                        $weaponMastery->update([
+                            'level' => $weaponMastery->level + 1,
+                            'current_xp' => 0,
+                        ]);
+
+                        $weaponMastery = $weaponMastery->refresh();
+
+                        $this->updateCharacterAttackTypes->updateCache($character->refresh());
+
+                        event(new ServerMessageEvent(
+                            $character->user,
+                            'Your class: ' .
+                            $classRank->gameClass->name . ' has gained a new level in (Weapon Masteries): ' .
+                            $weaponMasteryName .
+                            ' and is now level: ' . $weaponMastery->level
+                        ));
+                    }
+                }
+            }
+
+            return;
+        }
+
         $classRank = $character->classRanks()->where('game_class_id', $character->game_class_id)->first();
 
         $inventory = $this->fetchEquipped($character);
 
-        if (is_null($inventory)) {
+        if (is_null($inventory) || is_null($classRank)) {
             return;
         }
+
+        $didLevel = false;
 
         foreach (ItemType::allWeaponTypes() as $type) {
 
@@ -313,39 +492,63 @@ class ClassRankService
             if (! is_null($inventorySlot)) {
                 $weaponMastery = $classRank->weaponMasteries()->where('weapon_type', $type)->first();
 
-                if ($weaponMastery->level >= WeaponMasteryValue::MAX_LEVEL) {
+                if (is_null($weaponMastery) || $weaponMastery->level >= WeaponMasteryValue::MAX_LEVEL) {
                     continue;
                 }
 
+                $startingLevel = (int) $weaponMastery->level;
+
+                [$newLevel, $newCurrentXp, $levelsGained] = $this->applyKillCountToProgression(
+                    (int) $weaponMastery->level,
+                    (int) $weaponMastery->current_xp,
+                    (int) $weaponMastery->required_xp,
+                    (int) WeaponMasteryValue::XP_PER_KILL,
+                    $killCount,
+                    (int) WeaponMasteryValue::MAX_LEVEL
+                );
+
                 $weaponMastery->update([
-                    'current_xp' => $weaponMastery->current_xp + WeaponMasteryValue::XP_PER_KILL,
+                    'level' => $newLevel,
+                    'current_xp' => $newCurrentXp,
                 ]);
 
                 $weaponMastery = $weaponMastery->refresh();
 
                 $weaponMasteryName = ItemType::getProperNameForType($type);
 
-                $this->battleMessageHandler->handleClassRankMessage($character->user, ClassRanksMessageTypes::XP_FOR_CLASS_MASTERIES, $character->class->name, WeaponMasteryValue::XP_PER_KILL, $weaponMastery->current_xp, $weaponMasteryName);
+                $this->battleMessageHandler->handleClassRankMessage(
+                    $character->user,
+                    ClassRanksMessageTypes::XP_FOR_CLASS_MASTERIES,
+                    $character->class->name,
+                    (int) WeaponMasteryValue::XP_PER_KILL * $killCount,
+                    $weaponMastery->current_xp,
+                    $weaponMasteryName
+                );
 
-                if ($weaponMastery->current_xp >= $weaponMastery->required_xp) {
-                    $weaponMastery->update([
-                        'level' => $weaponMastery->level + 1,
-                        'current_xp' => 0,
-                    ]);
+                if ($levelsGained > 0) {
+                    $didLevel = true;
 
-                    $weaponMastery = $weaponMastery->refresh();
+                    for ($gainedLevelIndex = 0; $gainedLevelIndex < $levelsGained; $gainedLevelIndex++) {
+                        $newMessageLevel = $startingLevel + $gainedLevelIndex + 1;
 
-                    $this->updateCharacterAttackTypes->updateCache($character->refresh());
+                        if ($newMessageLevel > WeaponMasteryValue::MAX_LEVEL) {
+                            break;
+                        }
 
-                    event(new ServerMessageEvent(
-                        $character->user,
-                        'Your class: ' .
+                        event(new ServerMessageEvent(
+                            $character->user,
+                            'Your class: ' .
                             $classRank->gameClass->name . ' has gained a new level in (Weapon Masteries): ' .
                             $weaponMasteryName .
-                            ' and is now level: ' . $weaponMastery->level
-                    ));
+                            ' and is now level: ' . $newMessageLevel
+                        ));
+                    }
                 }
             }
+        }
+
+        if ($didLevel) {
+            $this->updateCharacterAttackTypes->updateCache($character->refresh());
         }
     }
 
@@ -367,5 +570,79 @@ class ClassRankService
         }
 
         return false;
+    }
+
+    private function applyKillCountToProgression(
+        int $currentLevel,
+        int $currentXp,
+        int $requiredXp,
+        int $xpPerKill,
+        int $killCount,
+        int $maxLevel
+    ): array {
+        if ($killCount <= 0) {
+            return [$currentLevel, $currentXp, 0];
+        }
+
+        if ($currentLevel >= $maxLevel) {
+            return [$currentLevel, 0, 0];
+        }
+
+        if ($requiredXp <= 0 || $xpPerKill <= 0) {
+            return [$currentLevel, $currentXp, 0];
+        }
+
+        $startingLevel = $currentLevel;
+
+        $killsToFirstLevel = $this->killsToReachThreshold($currentXp, $requiredXp, $xpPerKill);
+
+        if ($killCount < $killsToFirstLevel) {
+            return [$currentLevel, $currentXp + ($xpPerKill * $killCount), 0];
+        }
+
+        $currentLevel++;
+
+        if ($currentLevel >= $maxLevel) {
+            return [$maxLevel, 0, $maxLevel - $startingLevel];
+        }
+
+        $remainingKills = $killCount - $killsToFirstLevel;
+
+        $killsPerLevel = $this->killsToReachThreshold(0, $requiredXp, $xpPerKill);
+
+        $levelsAvailable = $maxLevel - $currentLevel;
+
+        $additionalLevels = intdiv($remainingKills, $killsPerLevel);
+
+        if ($additionalLevels > $levelsAvailable) {
+            $additionalLevels = $levelsAvailable;
+        }
+
+        $currentLevel += $additionalLevels;
+
+        $remainingKills -= $additionalLevels * $killsPerLevel;
+
+        if ($currentLevel >= $maxLevel) {
+            return [$maxLevel, 0, $maxLevel - $startingLevel];
+        }
+
+        $newCurrentXp = $xpPerKill * $remainingKills;
+
+        return [$currentLevel, $newCurrentXp, $currentLevel - $startingLevel];
+    }
+
+    private function killsToReachThreshold(int $currentXp, int $requiredXp, int $xpPerKill): int
+    {
+        if ($xpPerKill >= $requiredXp) {
+            return 1;
+        }
+
+        if ($currentXp >= $requiredXp) {
+            return 1;
+        }
+
+        $remaining = $requiredXp - $currentXp;
+
+        return (int) ceil($remaining / $xpPerKill);
     }
 }
