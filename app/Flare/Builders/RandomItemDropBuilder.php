@@ -7,6 +7,10 @@ use App\Flare\Models\ItemAffix;
 
 class RandomItemDropBuilder
 {
+    private array $cachedAffixesByType = [];
+
+    private array $cachedAffixesMaxLevelByType = [];
+
     /**
      * Generates the random item for a player.
      */
@@ -33,7 +37,7 @@ class RandomItemDropBuilder
      *
      * The item cannot be a quest item, artifact item or alchemy item.
      */
-    protected function getItem(int $level): Item
+    private function getItem(int $level): Item
     {
         $query = Item::inRandomOrder()->doesntHave('itemSuffix')
             ->doesntHave('itemPrefix')
@@ -47,17 +51,23 @@ class RandomItemDropBuilder
     /**
      * Fetches one or two Affixes.
      */
-    protected function getAffixes(int $level): array
+    private function getAffixes(int $level): array
     {
         $affixes = [];
 
-        $affixes[] = ItemAffix::inRandomOrder()->where('type', 'prefix')->where('skill_Level_required', '<=', rand(1, $level))->first();
+        $prefixAffix = $this->getRandomAffix('prefix', $level, rand(1, $level));
+
+        if (is_null($prefixAffix)) {
+            return [];
+        }
+
+        $affixes[] = $prefixAffix;
 
         if (rand(1, 100) > 50) {
-            $affix = ItemAffix::inRandomOrder()->where('type', 'suffix')->where('skill_Level_required', '<=', rand(1, $level))->first();
+            $suffixAffix = $this->getRandomAffix('suffix', $level, rand(1, $level));
 
-            if (! is_null($affix)) {
-                $affixes[] = $affix;
+            if (! is_null($suffixAffix)) {
+                $affixes[] = $suffixAffix;
             }
         }
 
@@ -67,7 +77,7 @@ class RandomItemDropBuilder
     /**
      * Returns a possible item that may already exist with the affixes.
      */
-    protected function itemExists(Item $item, array $affixes): ?Item
+    private function itemExists(Item $item, array $affixes): ?Item
     {
         $query = Item::where('id', $item->id);
 
@@ -82,7 +92,7 @@ class RandomItemDropBuilder
     /**
      * Creates a new entry in the database for a new item.
      */
-    protected function createItem(Item $item, array $affixes): Item
+    private function createItem(Item $item, array $affixes): Item
     {
         $item = $item->duplicate();
 
@@ -95,5 +105,81 @@ class RandomItemDropBuilder
         $item->update($updates);
 
         return $item;
+    }
+
+    /**
+     * Fetch a random affix without using ORDER BY RAND().
+     */
+    private function getRandomAffix(string $type, int $level, int $maxRequiredLevel): ?ItemAffix
+    {
+        $this->ensureAffixesCached($type, $level);
+
+        if (! array_key_exists($type, $this->cachedAffixesByType)) {
+            return null;
+        }
+
+        $affixes = $this->cachedAffixesByType[$type];
+
+        if (count($affixes) === 0) {
+            return null;
+        }
+
+        $lastEligibleIndex = $this->findLastAffixIndexForMaxRequired($affixes, $maxRequiredLevel);
+
+        if ($lastEligibleIndex < 0) {
+            return null;
+        }
+
+        $randomIndex = rand(0, $lastEligibleIndex);
+
+        return $affixes[$randomIndex];
+    }
+
+    /**
+     * Cache affixes by type and max level for the current process.
+     */
+    private function ensureAffixesCached(string $type, int $level): void
+    {
+        $cachedMaxLevel = $this->cachedAffixesMaxLevelByType[$type] ?? 0;
+
+        if ($cachedMaxLevel >= $level) {
+            return;
+        }
+
+        $this->cachedAffixesByType[$type] = ItemAffix::query()
+            ->select(['id', 'type', 'skill_Level_required'])
+            ->where('type', $type)
+            ->where('skill_Level_required', '<=', $level)
+            ->orderBy('skill_Level_required')
+            ->orderBy('id')
+            ->get()
+            ->all();
+
+        $this->cachedAffixesMaxLevelByType[$type] = $level;
+    }
+
+    /**
+     * Find last index where skill_Level_required is <= the provided max.
+     */
+    private function findLastAffixIndexForMaxRequired(array $affixes, int $maxRequiredLevel): int
+    {
+        $lowIndex = 0;
+        $highIndex = count($affixes) - 1;
+        $resultIndex = -1;
+
+        while ($lowIndex <= $highIndex) {
+            $midIndex = (int) floor(($lowIndex + $highIndex) / 2);
+
+            $requiredLevel = (int) ($affixes[$midIndex]->skill_Level_required ?? 0);
+
+            if ($requiredLevel <= $maxRequiredLevel) {
+                $resultIndex = $midIndex;
+                $lowIndex = $midIndex + 1;
+            } else {
+                $highIndex = $midIndex - 1;
+            }
+        }
+
+        return $resultIndex;
     }
 }
