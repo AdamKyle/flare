@@ -19,7 +19,11 @@ class DropCheckService
 
     private Monster $monster;
 
-    private ?Location $locationWithEffect;
+    private ?Location $locationWithEffect = null;
+
+    private ?string $cachedLocationWithEffectKey = null;
+
+    private ?Location $cachedLocationWithEffect = null;
 
     private BuildMythicItem $buildMythicItem;
 
@@ -40,11 +44,13 @@ class DropCheckService
      */
     public function process(Character $character, Monster $monster): void
     {
+        $this->gameMapBonus = 0.0;
+
         $this->lootingChance = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
         $this->monster = $monster;
 
-        $gameMap = $character->map->gameMap;
         $characterMap = $character->map;
+        $gameMap = $characterMap->gameMap;
 
         if (! is_null($gameMap->drop_chance_bonus)) {
             $this->gameMapBonus = $gameMap->drop_chance_bonus;
@@ -63,14 +69,18 @@ class DropCheckService
             $this->handleMythicDrop($character, true);
         }
 
-        if (! is_null($this->locationWithEffect)) {
-            if (! is_null($this->locationWithEffect->type)) {
-                $locationType = new LocationType($this->locationWithEffect->type);
+        if (is_null($this->locationWithEffect)) {
+            return;
+        }
 
-                if ($locationType->isPurgatoryDungeons() && $character->currentAutomations->isEmpty()) {
-                    $this->handleMythicDrop($character);
-                }
-            }
+        if (is_null($this->locationWithEffect->type)) {
+            return;
+        }
+
+        $locationType = new LocationType($this->locationWithEffect->type);
+
+        if ($locationType->isPurgatoryDungeons() && $character->currentAutomations->isEmpty()) {
+            $this->handleMythicDrop($character);
         }
     }
 
@@ -81,7 +91,7 @@ class DropCheckService
      *
      * @throws Exception
      */
-    public function handleMythicDrop(Character $character, bool $useLootingChance = false)
+    private function handleMythicDrop(Character $character, bool $useLootingChance = false): void
     {
         $canGetDrop = $this->canHaveMythic($useLootingChance);
 
@@ -99,7 +109,7 @@ class DropCheckService
      *
      * @throws Exception
      */
-    public function handleDropChance(Character $character)
+    private function handleDropChance(Character $character): void
     {
         $canGetDrop = $this->canHaveDrop($character);
 
@@ -115,19 +125,38 @@ class DropCheckService
     /**
      * Are we at a location with an effect (special location)?
      */
-    public function findLocationWithEffect(Map $map): void
+    private function findLocationWithEffect(Map $map): void
     {
+        $cacheKey = $this->makeLocationWithEffectCacheKey($map);
+
+        if ($this->cachedLocationWithEffectKey === $cacheKey) {
+            $this->locationWithEffect = $this->cachedLocationWithEffect;
+
+            return;
+        }
+
         $this->locationWithEffect = Location::whereNotNull('enemy_strength_type')
             ->where('x', $map->character_position_x)
             ->where('y', $map->character_position_y)
             ->where('game_map_id', $map->game_map_id)
             ->first();
+
+        $this->cachedLocationWithEffectKey = $cacheKey;
+        $this->cachedLocationWithEffect = $this->locationWithEffect;
+    }
+
+    /**
+     * Build a cache key for determining if we need to re-query the location effect.
+     */
+    private function makeLocationWithEffectCacheKey(Map $map): string
+    {
+        return $map->game_map_id . ':' . $map->character_position_x . ':' . $map->character_position_y;
     }
 
     /**
      * Can we get the mythic item?
      */
-    protected function canHaveMythic(bool $useLooting = false): bool
+    private function canHaveMythic(bool $useLooting = false): bool
     {
         $chance = $this->lootingChance;
 
@@ -148,7 +177,7 @@ class DropCheckService
      *
      * @throws Exception
      */
-    protected function canHaveDrop(Character $character): bool
+    private function canHaveDrop(Character $character): bool
     {
         if (! is_null($this->locationWithEffect)) {
 
