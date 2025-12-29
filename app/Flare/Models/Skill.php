@@ -4,6 +4,8 @@ namespace App\Flare\Models;
 
 use App\Flare\Models\Traits\CalculateSkillBonus;
 use App\Flare\Models\Traits\CalculateTimeReduction;
+use App\Flare\Services\SkillBonusContextService;
+use App\Flare\Services\SkillBonusSources;
 use App\Game\Skills\Values\SkillTypeValue;
 use Database\Factories\SkillFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -116,11 +118,13 @@ class Skill extends Model
 
     public function getReducesTimeAttribute()
     {
-        if (is_null($this->baseSkill->fight_time_out_mod_bonus_per_level)) {
+        $value = $this->baseSkill->fight_time_out_mod_bonus_per_level;
+
+        if (is_null($value)) {
             return false;
         }
 
-        if (floatval($this->baseSkill->fight_time_out_mod_bonus_per_level) === 0.0) {
+        if ($value <= 0) {
             return false;
         }
 
@@ -145,11 +149,13 @@ class Skill extends Model
     public function getReducesMovementTimeAttribute()
     {
 
-        if (is_null($this->baseSkill->move_time_out_mod_bonus_per_level)) {
+        $value = $this->baseSkill->move_time_out_mod_bonus_per_level;
+
+        if (is_null($value)) {
             return false;
         }
 
-        if (floatval($this->baseSkill->move_time_out_mod_bonus_per_level) === 0.0) {
+        if ($value <= 0) {
             return false;
         }
 
@@ -310,7 +316,7 @@ class Skill extends Model
         return $bonus;
     }
 
-    protected function getCharacterSkillBonus(Character $character, string $name): float
+    private function getCharacterSkillBonus(Character $character, string $name): float
     {
         $raceSkillBonusValue = $character->race->{Str::snake($name . '_mod')};
         $classSkillBonusValue = $character->class->{Str::snake($name . '_mod')};
@@ -318,12 +324,10 @@ class Skill extends Model
         return $raceSkillBonusValue + $classSkillBonusValue;
     }
 
-    /**
-     * Handle class specific bonuses towards specific skills.
-     */
-    protected function getClassSpecificTrainingBonus(Character $character): float
+    private function getClassSpecificTrainingBonus(Character $character): float
     {
-        $class = GameClass::find($character->game_class_id);
+        $skillBonusSources = $this->getSkillBonusSources();
+        $class = $skillBonusSources->getGameClass($character);
 
         if ($class->type()->isBlacksmith() && ($this->baseSkill->name === 'Weapon Crafting' || $this->baseSkill->name === 'Armour Crafting' || $this->baseSkill->name === 'Ring Crafting')) {
             return 0.15;
@@ -336,32 +340,30 @@ class Skill extends Model
         return 0.0;
     }
 
-    protected function getItemBonuses(GameSkill $skill, string $skillAttribute = 'skill_bonus', bool $equippedOnly = false): float
+    private function getItemBonuses(GameSkill $skill, string $skillAttribute = 'skill_bonus', bool $equippedOnly = false): float
     {
-        $bonuses = [];
+        $skillBonusSources = $this->getSkillBonusSources();
+        $bonus = 0.0;
 
-        foreach ($this->fetchSlotsWithEquipment() as $slot) {
-            $bonuses[] = $this->calculateBonus($slot->item, $skill, $skillAttribute);
+        foreach ($skillBonusSources->getEquippedSlotsWithItems() as $slot) {
+            $bonus += $this->calculateBonus($slot->item, $skill, $skillAttribute);
         }
 
         if (! $equippedOnly) {
-            foreach ($this->character->inventory->slots as $slot) {
-                if ($slot->item->type === 'quest' && $slot->item->skill_name === $this->baseSkill->name) {
-                    $bonuses[] = $this->calculateBonus($slot->item, $this->baseSkill, $skillAttribute);
-                }
+            foreach ($skillBonusSources->getQuestSlotsWithItems() as $slot) {
+                $bonus += $this->calculateBonus($slot->item, $this->baseSkill, $skillAttribute);
             }
         }
 
-        return empty($bonuses) ? 0.0 : array_sum($bonuses);
+        return $bonus;
     }
 
-    protected function getItemBonusBreakDown(GameSkill $skill, string $skillAttribute = 'skill_bonus'): array
+    private function getItemBonusBreakDown(GameSkill $skill, string $skillAttribute = 'skill_bonus'): array
     {
+        $skillBonusSources = $this->getSkillBonusSources();
         $itemsThatEffectBonus = [];
 
-        $equippedSlots = $this->fetchSlotsWithEquipment();
-
-        foreach ($equippedSlots as $slot) {
+        foreach ($skillBonusSources->getEquippedSlotsWithItems() as $slot) {
 
             $bonus =  $this->calculateBonus($slot->item, $skill, $skillAttribute);
 
@@ -380,9 +382,7 @@ class Skill extends Model
             }
         }
 
-        $slots = $this->character->inventory->slots;
-
-        foreach ($slots as $slot) {
+        foreach ($skillBonusSources->getQuestSlotsWithItems() as $slot) {
             if ($slot->item->type === 'quest' && $slot->item->skill_name === $this->baseSkill->name) {
 
                 $bonus =  $this->calculateBonus($slot->item, $skill, $skillAttribute);
@@ -406,39 +406,41 @@ class Skill extends Model
         return $itemsThatEffectBonus;
     }
 
-    protected function getCharacterBoonsBonus(string $skillBonusAttribute)
+    private function getCharacterBoonsBonus(string $skillBonusAttribute)
     {
+        $skillBonusSources = $this->getSkillBonusSources();
         $newBonus = 0.0;
 
-        $boons = CharacterBoon::where('character_id', $this->character->id)->get();
+        foreach ($skillBonusSources->getBoonsWithItemUsed() as $boon) {
+            $itemUsed = $boon->itemUsed;
 
-        if ($boons->isNotEmpty()) {
-            $newBonus += $boons->sum('itemUsed.' . $skillBonusAttribute);
+            if (is_null($itemUsed)) {
+                continue;
+            }
+
+            $value = $itemUsed->{$skillBonusAttribute};
+
+            if (is_null($value)) {
+                continue;
+            }
+
+            $newBonus += $value;
         }
 
         return $newBonus;
     }
 
-    private function fetchSlotsWithEquipment(): Collection
-    {
-        $inventory = Inventory::where('character_id', $this->character_id)->first();
-
-        $slots = InventorySlot::where('inventory_id', $inventory->id)->where('equipped', true)->get();
-
-        if ($slots->isEmpty()) {
-
-            $equippedSet = InventorySet::where('character_id', $this->character_id)->where('is_equipped', true)->first();
-
-            if (! is_null($equippedSet)) {
-                $slots = $equippedSet->slots;
-            }
-        }
-
-        return $slots;
-    }
-
-    protected static function newFactory()
+    protected static function newFactory(): SkillFactory
     {
         return SkillFactory::new();
+    }
+
+    private function getSkillBonusSources(): SkillBonusContextService
+    {
+        $skillBonusSources = resolve(SkillBonusContextService::class);
+
+        $skillBonusSources->setSkillInstance($this);
+
+        return $skillBonusSources;
     }
 }

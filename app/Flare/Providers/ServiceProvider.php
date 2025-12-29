@@ -61,6 +61,7 @@ use App\Flare\Services\CreateSurveySnapshot;
 use App\Flare\Services\DailyGoldDustService;
 use App\Flare\Services\EventSchedulerService;
 use App\Flare\Services\SiteAccessStatisticService;
+use App\Flare\Services\SkillBonusContextService;
 use App\Flare\Transformers\BasicKingdomTransformer;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
@@ -460,6 +461,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->singleton(CharacterCurrencyRewardService::class, function ($app) {
             return new CharacterCurrencyRewardService($app->make(BattleMessageHandler::class));
+        });
+
+        $this->app->bind(SkillBonusContextService::class, function () {
+            return new SkillBonusContextService();
         });
     }
 
