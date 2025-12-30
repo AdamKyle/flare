@@ -42,11 +42,11 @@ class DropCheckService
      *
      * @throws Exception
      */
-    public function process(Character $character, Monster $monster): void
+    public function process(Character $character, Monster $monster, ?float $lootingChance = null): void
     {
         $this->gameMapBonus = 0.0;
 
-        $this->lootingChance = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
+        $this->lootingChance = $lootingChance ?? $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
         $this->monster = $monster;
 
         $characterMap = $character->map;

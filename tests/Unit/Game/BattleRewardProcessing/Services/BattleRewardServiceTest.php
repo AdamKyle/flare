@@ -414,4 +414,136 @@ class BattleRewardServiceTest extends TestCase
         Event::assertNotDispatched(UpdateCharacterCurrenciesEvent::class);
     }
 
+    public function testProcessRewardsUsesContextToProcessBatchRewards(): void
+    {
+        $character = $this->characterFactory->assignFactionSystem()->getCharacter();
+
+        $accuracySkill = GameSkill::where('name', 'Accuracy')->first();
+
+        $character->skills()->where('game_skill_id', $accuracySkill->id)->update([
+            'currently_training' => true,
+            'xp_towards' => 0.10,
+        ]);
+
+        $character = $character->refresh();
+
+        $initialXp = $character->xp;
+        $initialTrainingSkillXp = $character->skills()->where('game_skill_id', $accuracySkill->id)->first()->xp;
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'xp' => 1,
+        ]);
+
+        $this->battleRewardService
+            ->setUp($character->id, $monster->id)
+            ->setContext([
+                'total_creatures' => 2,
+                'total_xp' => 10,
+                'total_skill_xp' => 10,
+                'total_faction_points' => 5,
+            ])
+            ->processRewards();
+
+        $character = $character->refresh();
+
+        $this->assertEquals($initialXp + 10, $character->xp);
+
+        $trainingSkill = $character->skills()->where('game_skill_id', $accuracySkill->id)->first();
+        $this->assertEquals($initialTrainingSkillXp + 10, $trainingSkill->xp);
+
+        $faction = $character->factions()->where('game_map_id', $character->map->game_map_id)->first();
+        $this->assertEquals(5, $faction->current_points);
+    }
+
+    public function testNoFactionRewardsGivenWhenCharacterIsAutoBattling(): void
+    {
+        $character = $this->characterFactory
+            ->assignFactionSystem()
+            ->getCharacter();
+
+        $character->currentAutomations()->create([
+            'character_id' => $character->id,
+            'monster_id' => $this->createMonster()->id,
+            'type' => 0,
+            'started_at' => now(),
+            'completed_at' => now()->addDay(),
+            'move_down_monster_list_every' => null,
+            'previous_level' => 10,
+            'current_level' => 20,
+            'attack_type' => 'attack',
+        ]);
+
+        $character = $character->refresh();
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'xp' => 1,
+        ]);
+
+        $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
+
+        $character = $character->refresh();
+
+        $faction = $character->factions()->where('game_map_id', $character->map->game_map_id)->first();
+        $this->assertEquals(0, $faction->current_points);
+    }
+
+    public function testShouldUpdateGlobalEventParticipationUsesContextKillCount(): void
+    {
+
+        $character = $this->characterFactory->getCharacter();
+
+        $character->map()->update([
+            'game_map_id' => $this->createGameMap([
+                'name' => MapNameValue::ICE_PLANE,
+            ])->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'xp' => 1,
+        ]);
+
+        $this->createEvent([
+            'type' => EventType::WINTER_EVENT,
+        ]);
+
+        $eventGoal = $this->createGlobalEventGoal([
+            'max_kills' => 100,
+            'event_type' => EventType::WINTER_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        $this->createGlobalEventParticipation([
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id' => $character->id,
+            'current_kills' => 1,
+            'current_crafts' => null,
+        ]);
+
+        $this->createGlobalEventKill([
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id' => $character->id,
+            'kills' => 1,
+        ]);
+
+        $this->battleRewardService
+            ->setUp($character->id, $monster->id)
+            ->setContext([
+                'total_creatures' => 2,
+                'total_xp' => 1,
+            ])
+            ->processRewards();
+
+        $character = $character->refresh();
+
+        $this->assertEquals(3, $character->globalEventParticipation->current_kills);
+        $this->assertEquals(3, $character->globalEventKills->kills);
+    }
+
+
 }

@@ -290,9 +290,11 @@ class BattleRewardService
             $totalKills = $this->context['total_creatures'];
         }
 
+        $lootingChance = $this->character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
+
         if ($totalKills > 1) {
             for ($i = 0; $i < $totalKills; $i++) {
-                $this->dropCheckService->process($this->character, $this->monster);
+                $this->dropCheckService->process($this->character, $this->monster, $lootingChance);
 
                 $this->character = $this->character->refresh();
             }
@@ -300,7 +302,7 @@ class BattleRewardService
             return;
         }
 
-        $this->dropCheckService->process($this->character, $this->monster);
+        $this->dropCheckService->process($this->character, $this->monster, $lootingChance);
     }
 
     /**

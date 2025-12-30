@@ -14,14 +14,15 @@ trait FetchEquipped
     /**
      * Fetches the equipped items from player.
      *
-     * Can return null.
+     * @param Character $character
+     * @return Collection|null
      */
     public function fetchEquipped(Character $character): ?Collection
     {
-        $inventory = Inventory::where('character_id', $character->id)->first();
+        $inventory = $this->getCharacterInventory($character);
 
-        // Somehow the character has no inventory, instead - lets mark them for deletion.
-        // These could be characters who deleted their accounts and the deletion failed.
+        // In rare cases a character was not deleted properly. As a result we want to make sure to mark them as deleted
+        // if this happens.
         if (is_null($inventory)) {
             if (! $character->user->will_be_deleted) {
                 $character->user()->update([
@@ -32,18 +33,137 @@ trait FetchEquipped
             return null;
         }
 
-        $slots = InventorySlot::where('inventory_id', $inventory->id)->where('equipped', true)->with('item', 'item.itemSuffix', 'item.itemPrefix', 'item.appliedHolyStacks')->get();
+        $slots = $this->fetchEquippedInventorySlots($inventory);
 
         if ($slots->isNotEmpty()) {
             return $slots;
         }
 
-        $inventorySet = InventorySet::where('character_id', $character->id)->where('is_equipped', true)->first();
+        $inventorySet = $this->fetchEquippedInventorySet($character);
 
         if (! is_null($inventorySet)) {
-            return SetSlot::where('inventory_set_id', $inventorySet->id)->with('item', 'item.itemSuffix', 'item.itemPrefix', 'item.appliedHolyStacks')->get();
+            return $this->fetchEquippedSetSlots($inventorySet);
         }
 
         return null;
+    }
+
+    /**
+     * Fetch the inventory for the character, preferring loaded relations.
+     *
+     * @param Character $character
+     * @return Inventory|null
+     */
+    private function getCharacterInventory(Character $character): ?Inventory
+    {
+        if ($character->relationLoaded('inventory')) {
+            return $character->inventory;
+        }
+
+        return Inventory::where('character_id', $character->id)->first();
+    }
+
+    /**
+     * Fetch equipped inventory slots, preferring loaded relations when item relations are also loaded.
+     *
+     * @param Inventory $inventory
+     * @return Collection
+     */
+    private function fetchEquippedInventorySlots(Inventory $inventory): Collection
+    {
+        if ($inventory->relationLoaded('slots')) {
+            $slots = $inventory->slots->where('equipped', true);
+
+            if ($slots->isNotEmpty() && $this->inventorySlotHasLoadedItemRelations($slots->first())) {
+                return $slots;
+            }
+        }
+
+        return InventorySlot::where('inventory_id', $inventory->id)
+            ->where('equipped', true)
+            ->with('item', 'item.itemSuffix', 'item.itemPrefix', 'item.appliedHolyStacks')
+            ->get();
+    }
+
+    /**
+     * Fetch the equipped inventory set for the character, preferring loaded relations.
+     *
+     * @param Character $character
+     * @return InventorySet|null
+     */
+    private function fetchEquippedInventorySet(Character $character): ?InventorySet
+    {
+        if ($character->relationLoaded('inventorySets')) {
+            $inventorySet = $character->inventorySets->firstWhere('is_equipped', true);
+
+            if (! is_null($inventorySet)) {
+                return $inventorySet;
+            }
+        }
+
+        return InventorySet::where('character_id', $character->id)
+            ->where('is_equipped', true)
+            ->first();
+    }
+
+    /**
+     * Fetch equipped set slots, preferring loaded relations when item relations are also loaded.
+     *
+     * @param InventorySet $inventorySet
+     * @return Collection
+     */
+    private function fetchEquippedSetSlots(InventorySet $inventorySet): Collection
+    {
+        if ($inventorySet->relationLoaded('slots')) {
+            $slots = $inventorySet->slots;
+
+            if ($slots->isEmpty()) {
+                return $slots;
+            }
+
+            if ($this->setSlotHasLoadedItemRelations($slots->first())) {
+                return $slots;
+            }
+        }
+
+        return SetSlot::where('inventory_set_id', $inventorySet->id)
+            ->with('item', 'item.itemSuffix', 'item.itemPrefix', 'item.appliedHolyStacks')
+            ->get();
+    }
+
+    /**
+     * Determine if an inventory slot has all required item relations loaded.
+     *
+     * @param InventorySlot $slot
+     * @return bool
+     */
+    private function inventorySlotHasLoadedItemRelations(InventorySlot $slot): bool
+    {
+        return match (true) {
+            ! $slot->relationLoaded('item') => false,
+            is_null($slot->item) => true,
+            ! $slot->item->relationLoaded('itemSuffix') => false,
+            ! $slot->item->relationLoaded('itemPrefix') => false,
+            ! $slot->item->relationLoaded('appliedHolyStacks') => false,
+            default => true,
+        };
+    }
+
+    /**
+     * Determine if a set slot has all required item relations loaded.
+     *
+     * @param SetSlot $slot
+     * @return bool
+     */
+    private function setSlotHasLoadedItemRelations(SetSlot $slot): bool
+    {
+        return match (true) {
+            ! $slot->relationLoaded('item') => false,
+            is_null($slot->item) => true,
+            ! $slot->item->relationLoaded('itemSuffix') => false,
+            ! $slot->item->relationLoaded('itemPrefix') => false,
+            ! $slot->item->relationLoaded('appliedHolyStacks') => false,
+            default => true,
+        };
     }
 }
