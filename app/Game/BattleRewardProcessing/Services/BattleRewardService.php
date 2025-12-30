@@ -21,6 +21,7 @@ use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Skills\Services\SkillService;
 use Exception;
+use Illuminate\Support\Facades\Cache;
 use Throwable;
 
 class BattleRewardService
@@ -344,21 +345,41 @@ class BattleRewardService
      * @throws Exception
      */
     private function handleGlobalEventParticipation(): void {
-        $event = Event::whereIn('type', [
-            EventType::WINTER_EVENT,
-            EventType::DELUSIONAL_MEMORIES_EVENT,
-        ])->first();
+        $cacheTtl = now()->addSeconds(15);
+
+        $event = Cache::remember(
+            'battle_reward_service:active_event',
+            $cacheTtl,
+            static function (): ?Event {
+                return Event::whereIn('type', [
+                    EventType::WINTER_EVENT,
+                    EventType::DELUSIONAL_MEMORIES_EVENT,
+                ])->first();
+            }
+        );
 
         if (is_null($event)) {
             return;
         }
 
-        $globalEventGoal = GlobalEventGoal::where('event_type', $event->type)->first();
+        $globalEventGoal = Cache::remember(
+            'battle_reward_service:global_event_goal:' . $event->type,
+            $cacheTtl,
+            static function () use ($event): ?GlobalEventGoal {
+                return GlobalEventGoal::where('event_type', $event->type)->first();
+            }
+        );
 
-        $gameMapArrays = GameMap::whereIn('name', [
-            MapNameValue::ICE_PLANE,
-            MapNameValue::DELUSIONAL_MEMORIES,
-        ])->pluck('id')->toArray();
+        $gameMapArrays = Cache::remember(
+            'battle_reward_service:global_event_map_ids',
+            $cacheTtl,
+            static function (): array {
+                return GameMap::whereIn('name', [
+                    MapNameValue::ICE_PLANE,
+                    MapNameValue::DELUSIONAL_MEMORIES,
+                ])->pluck('id')->toArray();
+            }
+        );
 
         if (is_null($globalEventGoal) || ! in_array($this->character->map->game_map_id, $gameMapArrays)) {
             return;
@@ -370,8 +391,8 @@ class BattleRewardService
             $totalKills = $this->context['total_creatures'];
         }
 
-       $this->battleGlobalEventParticipationHandler->handleGlobalEventParticipation($this->character, $globalEventGoal, $totalKills);
+        $this->battleGlobalEventParticipationHandler->handleGlobalEventParticipation($this->character, $globalEventGoal, $totalKills);
 
-       $this->character = $this->character->refresh();
+        $this->character = $this->character->refresh();
     }
 }
