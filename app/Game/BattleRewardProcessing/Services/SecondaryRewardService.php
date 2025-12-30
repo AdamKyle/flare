@@ -29,14 +29,12 @@ class SecondaryRewardService
      *
      * @param Character $character
      * @param int $killCount
+     * @param bool $dispatchTopBarEvent
      * @return void
      * @throws Exception
      */
-    public function handleSecondaryRewards(Character $character, int $killCount = 1): void
+    public function handleSecondaryRewards(Character $character, int $killCount = 1, bool $dispatchTopBarEvent = true): void
     {
-        if ($killCount <= 0) {
-            return;
-        }
 
         $this->classRankService->giveXpToClassRank($character, $killCount);
 
@@ -46,8 +44,8 @@ class SecondaryRewardService
 
         $this->handleItemSkillUpdate($character, $killCount);
 
-        if ($character->isLoggedIn()) {
-            event(new UpdateTopBarEvent($character->refresh()));
+        if ($dispatchTopBarEvent && $character->isLoggedIn()) {
+            event(new UpdateTopBarEvent($character));
         }
     }
 
