@@ -8,7 +8,6 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Quest;
-use App\Flare\Models\User;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Traits\CanHaveQuestItem;
@@ -21,7 +20,6 @@ use Exception;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
-use Illuminate\Support\Facades\Cache;
 
 class BattleDrop
 {
@@ -144,7 +142,7 @@ class BattleDrop
      * @return void
      * @throws Exception
      */
-    public function handleSpecialLocationQuestItem(Character $character)
+    public function handleSpecialLocationQuestItem(Character $character): void
     {
         $automation = $character->currentAutomations()->where('type', AutomationType::EXPLORING)->first();
 
@@ -160,25 +158,56 @@ class BattleDrop
             ->where('type', 'quest')->get();
 
         if ($items->isNotEmpty()) {
+            $canHave = DropCheckCalculator::fetchDifficultItemChance($lootingChance, 100);
 
-            $items = collect($items)->filter(function ($item) use ($character) {
-                $doesntHave = $character->inventory->slots->where('item_id', '=', $item->id)->isEmpty();
+            if (! $canHave) {
+                return;
+            }
 
-                $questThatNeedsThisItem = Quest::where('item_id', $item->id)->orWhere('secondary_required_item', $item->id)->first();
+            $character->loadMissing('inventory.slots');
 
-                if (! is_null($questThatNeedsThisItem)) {
-                    $completedQuest = $character->questsCompleted()->where('quest_id', $questThatNeedsThisItem->id)->first();
+            $candidateItemIds = $items->pluck('id')->all();
+            $ownedItemIds = $character->inventory->slots->pluck('item_id')->all();
+            $ownedItemIdSet = array_fill_keys($ownedItemIds, true);
 
-                    return is_null($completedQuest) && $doesntHave;
+            $quests = Quest::query()
+                ->where(function ($query) use ($candidateItemIds) {
+                    $query->whereIn('item_id', $candidateItemIds)
+                        ->orWhereIn('secondary_required_item', $candidateItemIds);
+                })
+                ->get();
+
+            $questByItemId = [];
+
+            foreach ($quests as $quest) {
+                if (! is_null($quest->item_id) && in_array($quest->item_id, $candidateItemIds, true) && ! array_key_exists($quest->item_id, $questByItemId)) {
+                    $questByItemId[$quest->item_id] = $quest->id;
+                }
+
+                if (! is_null($quest->secondary_required_item) && in_array($quest->secondary_required_item, $candidateItemIds, true) && ! array_key_exists($quest->secondary_required_item, $questByItemId)) {
+                    $questByItemId[$quest->secondary_required_item] = $quest->id;
+                }
+            }
+
+            $completedQuestIds = $character->questsCompleted()->pluck('quest_id')->all();
+            $completedQuestIdSet = array_fill_keys($completedQuestIds, true);
+
+            $eligibleItems = $items->filter(function (Item $item) use ($ownedItemIdSet, $questByItemId, $completedQuestIdSet): bool {
+                $doesntHave = ! array_key_exists($item->id, $ownedItemIdSet);
+
+                $questId = $questByItemId[$item->id] ?? null;
+
+                if (! is_null($questId)) {
+                    $isCompleted = array_key_exists($questId, $completedQuestIdSet);
+
+                    return ! $isCompleted && $doesntHave;
                 }
 
                 return $doesntHave;
             });
 
-            $canHave = DropCheckCalculator::fetchDifficultItemChance($lootingChance, 100);
-
-            if ($items->isNotEmpty() && $canHave) {
-                $this->attemptToPickUpItem($character, $items->random());
+            if ($eligibleItems->isNotEmpty()) {
+                $this->attemptToPickUpItem($character, $eligibleItems->random());
             }
         }
     }
@@ -201,8 +230,9 @@ class BattleDrop
     protected function getMaxLevelBasedOnPlane(Character $character): int
     {
         $characterLevel = $character->level;
+        $mapType = $character->map->gameMap->mapType();
 
-        if ($character->map->gameMap->mapType()->isSurface()) {
+        if ($mapType->isSurface()) {
             if ($characterLevel >= 50) {
                 return 50;
             }
@@ -210,7 +240,7 @@ class BattleDrop
             return $characterLevel;
         }
 
-        if ($character->map->gameMap->mapType()->isLabyrinth()) {
+        if ($mapType->isLabyrinth()) {
             if ($characterLevel >= 150) {
                 return 150;
             }
@@ -218,7 +248,7 @@ class BattleDrop
             return $characterLevel;
         }
 
-        if ($character->map->gameMap->mapType()->isDungeons()) {
+        if ($mapType->isDungeons()) {
             if ($characterLevel >= 240) {
                 return 240;
             }
@@ -226,7 +256,7 @@ class BattleDrop
             return $characterLevel;
         }
 
-        if ($character->map->gameMap->mapType()->isHell()) {
+        if ($mapType->isHell()) {
             if ($characterLevel >= 300) {
                 return 300;
             }
@@ -238,30 +268,14 @@ class BattleDrop
     }
 
     /**
-     * Gets drop from the cache. Can return null.
-     */
-    protected function getDrop(string $cacheName): ?Item
-    {
-        if (Cache::has($cacheName)) {
-            $items = Cache::get($cacheName);
-
-            if (count($items) < 75) {
-                return null;
-            }
-
-            return Item::find($items[rand(0, (count($items) - 1))]);
-        }
-
-        return null;
-    }
-
-    /**
      * Attempts to pick up the item and give it to the player.
      *
+     * @param Character $character
+     * @param Item $item
      * @return void
      * @throws Exception
      */
-    protected function attemptToPickUpItem(Character $character, Item $item)
+    protected function attemptToPickUpItem(Character $character, Item $item): void
     {
         $user = $character->user;
 
@@ -330,12 +344,15 @@ class BattleDrop
     /**
      * If the player can have the item, give it to them.
      *
+     * @param Character $character
+     * @param Item $item
+     * @param bool $isMythic
      * @return void
      */
     private function giveItemToPlayer(Character $character, Item $item, bool $isMythic = false)
     {
         if ($this->canHaveItem($character, $item)) {
-            $character->inventory->slots()->create([
+            $slot = $character->inventory->slots()->create([
                 'item_id' => $item->id,
                 'inventory_id' => $character->inventory->id,
             ]);
@@ -343,14 +360,10 @@ class BattleDrop
             if ($item->type === 'quest') {
                 $message = $character->name . ' has found: ' . $item->affix_name;
 
-                $slot = $character->refresh()->inventory->slots()->where('item_id', $item->id)->first();
-
                 event(new ServerMessageEvent($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
 
                 broadcast(new GlobalMessageEvent($message));
             } else {
-                $slot = $character->refresh()->inventory->slots()->where('item_id', $item->id)->first();
-
                 event(new ServerMessageEvent($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
 
                 if ($isMythic) {
