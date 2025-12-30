@@ -46,7 +46,7 @@ class TestExploration extends Command
 
         $this->line('Starting explorations for 1 hour, using default attack type, killing the first surface monster ...');
 
-        $bar = $this->output->createProgressBar($characters > count());
+        $bar = $this->output->createProgressBar($characters->count());
 
         $bar->start();
 

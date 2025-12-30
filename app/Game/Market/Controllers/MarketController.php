@@ -106,6 +106,10 @@ class MarketController extends Controller
 
         $totalPrice = ($listing->listed_price * 1.05);
 
+        if ($totalPrice > MaxCurrenciesValue::MAX_GOLD) {
+            $totalPrice = MaxCurrenciesValue::MAX_GOLD;
+        }
+
         if (! ($character->gold >= $totalPrice)) {
             $listing->update(['is_locked' => false]);
 
@@ -140,6 +144,10 @@ class MarketController extends Controller
         }
 
         $totalPrice = ($listing->listed_price * 1.05);
+
+        if ($totalPrice > MaxCurrenciesValue::MAX_GOLD) {
+            $totalPrice = MaxCurrenciesValue::MAX_GOLD;
+        }
 
         if (! ($character->gold >= $totalPrice)) {
             return response()->redirectToRoute('game.market')->with('error', 'Not enough gold. We add a 5% tax to the total price.');
@@ -226,7 +234,7 @@ class MarketController extends Controller
             return redirect()->back()->with('error', 'You are not allowed to do that.');
         }
 
-        if (! ($character->inventory_max > $character->inventory->slots->count())) {
+        if ($character->isInventoryFull()) {
             return redirect()->back()->with('error', 'You don\'t have the inventory space to delist the item.');
         }
 

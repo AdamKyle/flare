@@ -47,7 +47,7 @@ class EndScheduledEvent extends Command
      *
      * @var string
      */
-    protected $signature = 'end:scheduled-event';
+    protected $signature = 'end:scheduled-event {eventId?}';
 
     /**
      * The console command description.
@@ -103,7 +103,13 @@ class EndScheduledEvent extends Command
         CreateSurveySnapshot $createSurveySnapshot
     ): void {
 
-        $scheduledEvents = ScheduledEvent::where('end_date', '<=', now())->where('currently_running', true)->get();
+        $eventId = $this->argument('eventId');
+
+        if (is_null($eventId)) {
+            $scheduledEvents = ScheduledEvent::where('end_date', '<=', now())->where('currently_running', true)->get();
+        } else {
+            $scheduledEvents = ScheduledEvent::where('id', '=', $eventId)->where('currently_running', true)->get();
+        }
 
         foreach ($scheduledEvents as $event) {
 
