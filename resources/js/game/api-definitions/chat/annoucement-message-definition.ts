@@ -1,6 +1,8 @@
+import { EventType } from '../../components/announcements/enums/EventType';
+
 export interface EventTypeDefinition {
   id: number;
-  type: number;
+  type: EventType;
   started_at: string;
   ends_at: string;
   created_at: string;
