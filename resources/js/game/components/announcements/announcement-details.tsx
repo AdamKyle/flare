@@ -1,6 +1,7 @@
 import React from 'react';
 import { match } from 'ts-pattern';
 
+import PurgatorySmithsHouseEvent from './announcement-types/purgatory-smiths-house-event';
 import WeeklyCelestialEvent from './announcement-types/weekly-celestial-event';
 import WeeklyFactionPointsEvent from './announcement-types/weekly-faction-points-event';
 import { EventType } from './enums/EventType';
@@ -9,7 +10,6 @@ import AnnouncementDetailsProps from './types/announcement-details-props';
 import { useGameData } from 'game-data/hooks/use-game-data';
 
 import ContainerWithTitle from 'ui/container/container-with-title';
-import PurgatorySmithsHouseEvent from "./announcement-types/purgatory-smiths-house-event";
 
 const AnnouncementDetails = ({
   on_close,
