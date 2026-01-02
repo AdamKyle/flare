@@ -34,6 +34,8 @@ const CharacterCardDetails = ({
 
   const characterInventorProgress = Math.min(rawProgress, 100);
 
+  console.log(characterData);
+
   return (
     <>
       <XpBar current_xp={characterData.xp} max_xp={characterData.xp_next} />

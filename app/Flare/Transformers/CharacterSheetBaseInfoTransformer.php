@@ -2,6 +2,7 @@
 
 namespace App\Flare\Transformers;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use App\Flare\Values\ClassAttackValue;
@@ -77,11 +78,11 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'resurrection_chance' => $characterStatBuilder->buildResurrectionChance(),
             'spell_evasion' => $characterStatBuilder,
             'elemental_atonements' => $characterStatBuilder->buildElementalAtonement(),
-            'weapon_attack' => $characterStatBuilder->buildDamage('weapon'),
-            'voided_weapon_attack' => $characterStatBuilder->buildDamage('weapon', true),
-            'ring_damage' => $characterStatBuilder->buildDamage('ring'),
-            'spell_damage' => $characterStatBuilder->buildDamage('spell-damage'),
-            'voided_spell_damage' => $characterStatBuilder->buildDamage('spell-damage', true),
+            'weapon_attack' => $characterStatBuilder->buildDamage(ItemType::validWeapons()),
+            'voided_weapon_attack' => $characterStatBuilder->buildDamage(ItemType::validWeapons(), true),
+            'ring_damage' => $characterStatBuilder->buildDamage(ItemType::RING->value),
+            'spell_damage' => $characterStatBuilder->buildDamage(ItemType::SPELL_DAMAGE->value),
+            'voided_spell_damage' => $characterStatBuilder->buildDamage(ItemType::SPELL_DAMAGE->value, true),
             'healing_amount' => $characterStatBuilder->buildHealing(),
             'voided_healing_amount' => $characterStatBuilder->buildHealing(true),
             'gold_bars' => $this->fetchGoldBarsAmount($character),
