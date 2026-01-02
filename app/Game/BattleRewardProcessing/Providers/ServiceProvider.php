@@ -13,13 +13,16 @@ use App\Game\BattleRewardProcessing\Handlers\GoldMinesRewardHandler;
 use App\Game\BattleRewardProcessing\Handlers\LocationSpecialtyHandler;
 use App\Game\BattleRewardProcessing\Handlers\PurgatorySmithHouseRewardHandler;
 use App\Game\BattleRewardProcessing\Handlers\TheOldChurchRewardHandler;
+use App\Game\BattleRewardProcessing\Services\BattleLocationRewardService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\ClassRanks\Services\ClassRankService;
+use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\GuideQuests\Services\GuideQuestService;
+use App\Game\Skills\Services\SkillService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -89,15 +92,18 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(BattleRewardService::class, function ($app) {
             return new BattleRewardService(
-                $app->make(FactionHandler::class),
+               $app->make(BattleMessageHandler::class),
                 $app->make(CharacterRewardService::class),
-                $app->make(GoldRush::class),
-                $app->make(BattleGlobalEventParticipationHandler::class),
-                $app->make(PurgatorySmithHouseRewardHandler::class),
-                $app->make(GoldMinesRewardHandler::class),
+                $app->make(FactionHandler::class),
                 $app->make(FactionLoyaltyBountyHandler::class),
-                $app->make(TheOldChurchRewardHandler::class),
-                $app->make(WeeklyBattleService::class)
+                $app->make(FactionLoyaltyService::class),
+                $app->make(GoldRush::class),
+                $app->make(BattleLocationRewardService::class),
+                $app->make(DropCheckService::class),
+                $app->make(WeeklyBattleService::class),
+                $app->make(SecondaryRewardService::class),
+                $app->make(BattleGlobalEventParticipationHandler::class),
+                $app->make(SkillService::class),
             );
         });
 

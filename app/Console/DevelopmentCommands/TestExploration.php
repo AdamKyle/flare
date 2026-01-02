@@ -10,6 +10,7 @@ use App\Flare\Models\Monster;
 use App\Flare\Models\User;
 use App\Game\Character\CharacterCreation\Services\CharacterBuilderService;
 use App\Game\Exploration\Services\ExplorationAutomationService;
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Hash;
@@ -45,11 +46,14 @@ class TestExploration extends Command
 
         $this->line('Starting explorations for 1 hour, using default attack type, killing the first surface monster ...');
 
-        $bar = $this->output->createProgressBar($characters > count());
+        $bar = $this->output->createProgressBar($characters->count());
 
         $bar->start();
 
         foreach ($characters as $character) {
+
+            $explorationAutomationService->stopExploration($character);
+
             $explorationAutomationService->beginAutomation($character, [
                 'selected_monster_id' => Monster::where('name', 'Sewer Rat')->first()->id,
                 'auto_attack_length' => 1,
@@ -68,8 +72,8 @@ class TestExploration extends Command
     /**
      * Get the collection of characters.
      *
-     * - Will create a specfic amount to match the number of characters we want to use for exploration.
-     * - Will ignore a specfic character from the list to return.
+     * - Will create a specific amount to match the number of characters we want to use for exploration.
+     * - Will ignore a specific character from the list to return.
      */
     protected function getTheCharacters(CharacterBuilderService $characterBuilder, int $numberOfCharacters, ?string $characterToIgnore): Collection
     {
@@ -98,6 +102,7 @@ class TestExploration extends Command
      * Create the characters needed.
      *
      * @return void
+     * @throws Exception
      */
     protected function createTheCharacters(CharacterBuilderService $characterBuilder, int $charactersToCreate)
     {
@@ -129,9 +134,12 @@ class TestExploration extends Command
     /**
      * Create the character.
      *
-     * @param  Collection  $races
-     * @param  string  $password
-     *
+     * @param CharacterBuilderService $characterBuilder
+     * @param User $user
+     * @param GameMap $map
+     * @param GameClass $class
+     * @param GameRace $race
+     * @return Character
      * @throws Exception
      */
     protected function createCharacter(CharacterBuilderService $characterBuilder, User $user, GameMap $map, GameClass $class, GameRace $race): Character

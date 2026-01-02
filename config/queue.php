@@ -29,18 +29,15 @@ return [
     */
 
     'connections' => [
-
         'sync' => [
             'driver' => 'sync',
         ],
-
         'database' => [
             'driver' => 'database',
             'table' => 'jobs',
             'queue' => 'default',
             'retry_after' => 90,
         ],
-
         'beanstalkd' => [
             'driver' => 'beanstalkd',
             'host' => 'localhost',
@@ -48,7 +45,6 @@ return [
             'retry_after' => 90,
             'block_for' => 0,
         ],
-
         'sqs' => [
             'driver' => 'sqs',
             'key' => env('AWS_ACCESS_KEY_ID'),
@@ -57,7 +53,6 @@ return [
             'queue' => env('SQS_QUEUE', 'your-queue-name'),
             'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
         ],
-
         'redis' => [
             'driver' => 'redis',
             'connection' => 'default',
@@ -65,7 +60,6 @@ return [
             'retry_after' => 90,
             'block_for' => null,
         ],
-
         'kingdom_jobs' => [
             'driver' => 'redis',
             'connection' => 'kingdom_jobs',
@@ -73,7 +67,6 @@ return [
             'retry_after' => 90,
             'block_for' => null,
         ],
-
         'weekly_spawn' => [
             'driver' => 'redis',
             'connection' => 'weekly_spawn',
@@ -81,7 +74,6 @@ return [
             'retry_after' => 90,
             'block_for' => null,
         ],
-
         'event_battle_reward' => [
             'driver' => 'redis',
             'connection' => 'event_battle_reward',
@@ -89,87 +81,13 @@ return [
             'retry_after' => 1200,
             'block_for' => null,
         ],
-
-        'battle_reward_xp' => [
+        'battle_reward_processing' => [
             'driver' => 'redis',
-            'connection' => 'battle_reward_xp',
-            'queue' => 'battle_reward_xp',
+            'connection' => 'battle_reward_processing',
+            'queue' => 'battle_reward_processing',
             'retry_after' => 1200,
             'block_for' => null,
         ],
-
-        'exploration_battle_xp_reward' => [
-            'driver' => 'redis',
-            'connection' => 'exploration_battle_xp_reward',
-            'queue' => 'exploration_battle_xp_reward',
-            'retry_after' => 1200,
-            'block_for' => null,
-        ],
-
-        'exploration_battle_skill_xp_reward' => [
-            'driver' => 'redis',
-            'connection' => 'exploration_battle_skill_xp_reward',
-            'queue' => 'exploration_battle_skill_xp_reward',
-            'retry_after' => 1200,
-            'block_for' => null,
-        ],
-
-        'battle_reward_currencies' => [
-            'driver' => 'redis',
-            'connection' => 'battle_reward_currencies',
-            'queue' => 'battle_reward_currencies',
-            'retry_after' => 1200,
-            'block_for' => null,
-        ],
-
-        'battle_secondary_reward' => [
-            'driver' => 'redis',
-            'connection' => 'battle_secondary_reward',
-            'queue' => 'battle_secondary_reward',
-            'retry_after' => 1200,
-            'block_for' => null,
-        ],
-
-        'battle_reward_factions' => [
-            'driver' => 'redis',
-            'connection' => 'battle_reward_factions',
-            'queue' => 'battle_reward_factions',
-            'retry_after' => 1200,
-            'block_for' => null,
-        ],
-
-        'battle_reward_global_event' => [
-            'driver' => 'redis',
-            'connection' => 'battle_reward_global_event',
-            'queue' => 'battle_reward_global_event',
-            'retry_after' => 1200,
-            'block_for' => null,
-        ],
-
-        'battle_reward_location_handlers' => [
-            'driver' => 'redis',
-            'connection' => 'battle_reward_location_handlers',
-            'queue' => 'battle_reward_location_handlers',
-            'retry_after' => 1200,
-            'block_for' => null,
-        ],
-
-        'battle_reward_weekly_fights' => [
-            'driver' => 'redis',
-            'connection' => 'battle_reward_weekly_fights',
-            'queue' => 'battle_reward_weekly_fights',
-            'retry_after' => 1200,
-            'block_for' => null,
-        ],
-
-        'battle_reward_item_handler' => [
-            'driver' => 'redis',
-            'connection' => 'battle_reward_item_handler',
-            'queue' => 'battle_reward_item_handler',
-            'retry_after' => 1200,
-            'block_for' => null,
-        ],
-
         'long_running' => [
             'driver' => 'redis',
             'connection' => 'long_running',

@@ -24,7 +24,7 @@ class CharacterAttackBuilderTest extends TestCase
 
     private ?CharacterAttackBuilder $characterAttackBuilder;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -33,7 +33,7 @@ class CharacterAttackBuilderTest extends TestCase
         $this->characterAttackBuilder = resolve(CharacterAttackBuilder::class);
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         parent::tearDown();
 
@@ -41,16 +41,15 @@ class CharacterAttackBuilderTest extends TestCase
         $this->characterAttackBuilder = null;
     }
 
-    public function test_build_weapon_damage()
+    public function testBuildWeaponDamage()
     {
         $character = $this->setUpCharacterForTests();
-
         $attack = $this->characterAttackBuilder->setCharacter($character)->buildAttack();
 
         $this->assertGreaterThan(0, $attack['weapon_damage']);
     }
 
-    public function test_build_cast_damage()
+    public function testBuildCastDamage()
     {
         $character = $this->setUpCharacterForTests();
 
@@ -59,7 +58,7 @@ class CharacterAttackBuilderTest extends TestCase
         $this->assertGreaterThan(0, $attack['spell_damage']);
     }
 
-    public function test_build_cast_and_attack_damage()
+    public function testBuildCastAndAttackDamage()
     {
         $character = $this->setUpCharacterForTests();
 
@@ -70,7 +69,7 @@ class CharacterAttackBuilderTest extends TestCase
         $this->assertEquals(0, $attack['heal_for']);
     }
 
-    public function test_build_attack_and_cast_damage()
+    public function testBuildAttackAndCastDamage()
     {
         $character = $this->setUpCharacterForTests();
 
@@ -81,7 +80,7 @@ class CharacterAttackBuilderTest extends TestCase
         $this->assertEquals(0, $attack['heal_for']);
     }
 
-    public function test_build_defend()
+    public function testBuildDefend()
     {
         $character = $this->setUpCharacterForTests();
 
@@ -90,7 +89,7 @@ class CharacterAttackBuilderTest extends TestCase
         $this->assertGreaterThan(0, $attack['defence']);
     }
 
-    public function test_should_have_class_specialty_damage_when_building_attack()
+    public function testShouldHaveClassSpecialtyDamageWhenBuildingAttack()
     {
         $character = $this->setUpCharacterForTests();
 
@@ -118,7 +117,7 @@ class CharacterAttackBuilderTest extends TestCase
         $this->assertNotEmpty($attack['special_damage']);
     }
 
-    public function test_should_not_have_class_specialty_damage_when_building_attack()
+    public function testShouldNotHaveClassSpecialtyDamageWhenBuildingAttack()
     {
         $character = $this->setUpCharacterForTests();
 

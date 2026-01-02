@@ -253,7 +253,11 @@ class Character extends Model
 
     public function getIsAutoBattlingAttribute()
     {
-        return ! is_null(CharacterAutomation::where('character_id', $this->id)->first());
+        if ($this->relationLoaded('currentAutomations')) {
+            return $this->currentAutomations->isNotEmpty();
+        }
+
+        return $this->currentAutomations()->exists();
     }
 
     /**
@@ -294,15 +298,29 @@ class Character extends Model
      */
     public function getInventoryCount(): int
     {
-        $inventory = Inventory::where('character_id', $this->id)->first();
+        $inventoryId = Inventory::where('character_id', $this->id)->value('id');
 
-        return InventorySlot::select('inventory_slots.*')
-            ->where('inventory_slots.inventory_id', $inventory->id)
+        if (is_null($inventoryId)) {
+            return 0;
+        }
+
+        $slotCount = InventorySlot::where('inventory_slots.inventory_id', $inventoryId)
             ->where('inventory_slots.equipped', false)
             ->join('items', function ($join) {
                 $join->on('items.id', '=', 'inventory_slots.item_id')
                     ->where('items.type', '!=', 'quest');
-            })->count() + $this->gemBag->gemSlots->sum('amount');
+            })
+            ->count();
+
+        $gemBag = $this->gemBag;
+
+        $gemAmount = 0;
+
+        if (! is_null($gemBag)) {
+            $gemAmount = GemBagSlot::where('gem_bag_id', $gemBag->id)->sum('amount');
+        }
+
+        return $slotCount + $gemAmount;
     }
 
     /**
@@ -310,16 +328,14 @@ class Character extends Model
      */
     public function isInventoryFull(): bool
     {
-        $gemCount = $this->gemBag->gemSlots->sum('amount');
 
-        return ($this->getInventoryCount() + $gemCount) >= $this->inventory_max;
+        return $this->getInventoryCount() >= $this->inventory_max;
     }
 
     public function totalInventoryCount(): int
     {
-        $gemCount = $this->gemBag->gemSlots->sum('amount');
 
-        return $this->getInventoryCount() + $gemCount;
+        return $this->getInventoryCount();
     }
 
     protected static function newFactory()

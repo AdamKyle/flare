@@ -30,13 +30,8 @@ class FactionLoyaltyBountyHandler
     /**
      * Handle the faction loyalty bounty.
      */
-    public function handleBounty(Character $character, Monster $monster): Character
+    public function handleBounty(Character $character, Monster $monster, int $killCount = 1): Character
     {
-
-        if ($character->currentAutomations->isNotEmpty()) {
-            return $character;
-        }
-
         $faction = $character->factions->where('game_map_id', $monster->game_map_id)->first();
 
         if (is_null($faction)) {
@@ -63,10 +58,9 @@ class FactionLoyaltyBountyHandler
             return $character;
         }
 
-        $helpingNpc = $this->updateMatchingHelpTask($helpingNpc, 'monster_id', $monster->id);
+        $helpingNpc = $this->updateMatchingHelpTask($helpingNpc, 'monster_id', $monster->id, $killCount);
 
         if ($this->wasCurrentFameForTaskUpdated()) {
-
             $matchingTask = $this->getMatchingTask($helpingNpc, 'monster_id', $monster->id);
 
             ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name.
@@ -74,8 +68,10 @@ class FactionLoyaltyBountyHandler
                 ($matchingTask['required_amount'] - $matchingTask['current_amount']).' to go child!"');
         }
 
-        if ($this->canLevelUpFame($helpingNpc) && $helpingNpc->current_level !== $helpingNpc->max_level) {
+        while ($this->canLevelUpFame($helpingNpc) && $helpingNpc->current_level !== $helpingNpc->max_level) {
             $this->handleFameLevelUp($character, $helpingNpc);
+
+            $helpingNpc = $helpingNpc->refresh();
         }
 
         return $character->refresh();

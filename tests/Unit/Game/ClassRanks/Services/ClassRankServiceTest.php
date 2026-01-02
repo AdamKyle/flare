@@ -16,7 +16,7 @@ use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameClassSpecial;
 use Tests\Traits\CreateGameSkill;
 
-class ClassRanksServiceTest extends TestCase
+class ClassRankServiceTest extends TestCase
 {
     use CreateCharacterClassRank, CreateCharacterClassSpecialitiesEquipped, CreateClass, CreateGameClassSpecial, CreateGameSkill, RefreshDatabase;
 

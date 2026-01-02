@@ -8,6 +8,7 @@ use App\Flare\Models\Monster;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Events\CharacterRevive;
 use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\BattleRewardProcessing\Jobs\BattleRewardHandler;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\Character\Concerns\FetchEquipped;
@@ -47,11 +48,14 @@ class BattleEventHandler
      *
      * - Handles rewarding the player
      *
-     * @param  bool  $includeEventReward
+     * @param integer $characterId
+     * @param integer $monsterId
+     * @param array $context
+     * @return void
      */
-    public function processMonsterDeath(int $characterId, int $monsterId, bool $includeXp = true, $includeEventReward = true): void
+    public function processMonsterDeath(int $characterId, int $monsterId, array $context = []): void
     {
-        $this->battleRewardService->setUp($characterId, $monsterId)->handleBaseRewards($includeXp, $includeEventReward);
+        BattleRewardHandler::dispatch($characterId, $monsterId, $context)->onQueue('battle_reward_processing')->onConnection('battle_reward_processing')->delay(now()->addSecond());
     }
 
     /**
@@ -72,12 +76,12 @@ class BattleEventHandler
             ]);
         }
 
-        $monsterFightCache = Cache::get('monster-fight-'.$character->id);
+        $monsterFightCache = Cache::get('monster-fight-' . $character->id);
 
         if (! is_null($monsterFightCache)) {
             $monsterFightCache['health']['current_character_health'] = $characterHealth;
 
-            Cache::put('monster-fight-'.$character->id, $monsterFightCache, 900);
+            Cache::put('monster-fight-' . $character->id, $monsterFightCache, 900);
         }
 
         event(new CharacterRevive($character->user, $characterHealth));

@@ -51,6 +51,7 @@ use App\Flare\ServerFight\Monster\MonsterSpecialAttack;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Services\CanUserEnterSiteService;
+use App\Flare\Services\CharacterCurrencyRewardService;
 use App\Flare\Services\CharacterDeletion;
 use App\Flare\Services\CharacterRewardService;
 use App\Flare\Services\CharacterXPService;
@@ -58,6 +59,7 @@ use App\Flare\Services\CreateSurveySnapshot;
 use App\Flare\Services\DailyGoldDustService;
 use App\Flare\Services\EventSchedulerService;
 use App\Flare\Services\SiteAccessStatisticService;
+use App\Flare\Services\SkillBonusContextService;
 use App\Flare\Transformers\BasicKingdomTransformer;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
@@ -193,13 +195,20 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CoordinatesCache;
         });
 
-        $this->app->bind(CharacterXPService::class, function () {
-            return new CharacterXPService;
+        $this->app->bind(CharacterXPService::class, function ($app) {
+            return new CharacterXPService(
+                $app->make(CharacterService::class),
+                $app->make(SkillService::class),
+                $app->make(Manager::class),
+                $app->make(CharacterSheetBaseInfoTransformer::class),
+                $app->make(BattleMessageHandler::class),
+            );
         });
 
         $this->app->bind(CharacterRewardService::class, function ($app) {
             return new CharacterRewardService(
                 $app->make(CharacterXPService::class),
+                $app->make(CharacterCurrencyRewardService::class),
                 $app->make(CharacterService::class),
                 $app->make(SkillService::class),
                 $app->make(Manager::class),
@@ -446,6 +455,14 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(PlainDataSerializer::class, function () {
             return new PlainDataSerializer;
+        });
+
+        $this->app->singleton(CharacterCurrencyRewardService::class, function ($app) {
+            return new CharacterCurrencyRewardService($app->make(BattleMessageHandler::class));
+        });
+
+        $this->app->bind(SkillBonusContextService::class, function () {
+            return new SkillBonusContextService();
         });
     }
 
