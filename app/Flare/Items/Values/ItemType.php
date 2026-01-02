@@ -27,8 +27,6 @@ enum ItemType: string
      *
      * - Ignores spells
      * - Ignore rings
-     *
-     * @return array
      */
     public static function validWeapons(): array
     {
@@ -52,8 +50,6 @@ enum ItemType: string
      * Gets all weapon types including spells.
      *
      * - ignores rings
-     *
-     * @return array
      */
     public static function allWeaponTypes(): array
     {
@@ -67,8 +63,6 @@ enum ItemType: string
 
     /**
      * Get all types as a string array
-     *
-     * @return array
      */
     public static function allTypes(): array
     {
@@ -77,9 +71,6 @@ enum ItemType: string
 
     /**
      * Returns the proper name of a weapon type.
-     *
-     * @param string $type
-     * @return string
      */
     public static function getProperNameForType(string $type): string
     {
@@ -88,8 +79,6 @@ enum ItemType: string
 
     /**
      * Get valid weapons as options.
-     *
-     * @return array
      */
     public static function getValidWeaponsAsOptions(): array
     {

@@ -13,12 +13,6 @@ use Psr\SimpleCache\InvalidArgumentException;
 
 class CharacterCacheData
 {
-    /**
-     * @param Manager $manager
-     * @param PlainDataSerializer $plainDataSerializer
-     * @param CharacterAttackDataTransformer $characterAttackDataTransformer
-     * @param CharacterStatBuilder $characterStatBuilder
-     */
     public function __construct(
         private readonly Manager $manager,
         private readonly PlainDataSerializer $plainDataSerializer,
@@ -28,10 +22,6 @@ class CharacterCacheData
 
     /**
      * Set the characters AC.
-     *
-     * @param Character $character
-     * @param int $defence
-     * @return void
      */
     public function setCharacterDefendAc(Character $character, int $defence): void
     {
@@ -40,9 +30,6 @@ class CharacterCacheData
 
     /**
      * Get the characters Defence AC
-     *
-     * @param Character $character
-     * @return mixed
      */
     public function getCharacterDefenceAc(Character $character): mixed
     {
@@ -63,10 +50,6 @@ class CharacterCacheData
      * - defend
      * - voided_defend
      * - elemental_atonement
-     *
-     * @param Character $character
-     * @param string $attackType
-     * @return array
      */
     public function getDataFromAttackCache(Character $character, string $attackType): array
     {
@@ -78,9 +61,6 @@ class CharacterCacheData
     /**
      * Gets a cached version of the character data.
      *
-     * @param Character $character
-     * @param string $key
-     * @return mixed
      * @throws InvalidArgumentException
      */
     public function getCachedCharacterData(Character $character, string $key): mixed
@@ -103,8 +83,8 @@ class CharacterCacheData
     /**
      * Deletes the cached version of the character sheet
      *
-     * @param Character $character
      * @return void
+     *
      * @throws InvalidArgumentException
      */
     public function deleteCharacterSheet(Character $character)
@@ -119,8 +99,6 @@ class CharacterCacheData
     /**
      * Gets the character sheet data.
      *
-     * @param Character $character
-     * @return array
      * @throws InvalidArgumentException
      */
     public function getCharacterSheetCache(Character $character): array
@@ -135,9 +113,8 @@ class CharacterCacheData
     /**
      * Updates the character sheet cached data,
      *
-     * @param Character $character
-     * @param array $data
      * @return bool|void
+     *
      * @throws InvalidArgumentException
      */
     public function updateCharacterSheetCache(Character $character, array $data)
@@ -154,9 +131,6 @@ class CharacterCacheData
     /**
      * Creates the character sheet cache.
      *
-     * @param Character $character
-     * @param bool $ignoreReductions
-     * @return array
      * @throws InvalidArgumentException
      */
     public function characterSheetCache(Character $character, bool $ignoreReductions = false): array

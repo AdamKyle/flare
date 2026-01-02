@@ -15,22 +15,13 @@ class CharacterAttackBuilder
 {
     use FetchEquipped;
 
-    /**
-     * @var Character $character
-     */
     private Character $character;
 
-    /**
-     * @param CharacterStatBuilder $characterStatBuilder
-     */
-    public function __construct(private CharacterStatBuilder $characterStatBuilder)
-    {}
+    public function __construct(private CharacterStatBuilder $characterStatBuilder) {}
 
     /**
      * Set the character.
      *
-     * @param Character $character
-     * @param bool $ignoreReductions
      * @return $this
      */
     public function setCharacter(Character $character, bool $ignoreReductions = false): CharacterAttackBuilder
@@ -45,8 +36,6 @@ class CharacterAttackBuilder
     /**
      * Build the characters attack.
      *
-     * @param bool $voided
-     * @return array
      * @throws Exception
      */
     public function buildAttack(bool $voided = false): array
@@ -61,8 +50,8 @@ class CharacterAttackBuilder
     /**
      * Build the characters cast attack
      *
-     * @param bool $voided
      * @return array
+     *
      * @throws Exception
      */
     public function buildCastAttack(bool $voided = false)
@@ -78,8 +67,6 @@ class CharacterAttackBuilder
     /**
      * Build the characters Cast and Attack.
      *
-     * @param bool $voided
-     * @return array
      * @throws Exception
      */
     public function buildCastAndAttack(bool $voided = false): array
@@ -90,8 +77,6 @@ class CharacterAttackBuilder
     /**
      * Build the characters Attack and Cast.
      *
-     * @param bool $voided
-     * @return array
      * @throws Exception
      */
     public function buildAttackAndCast(bool $voided = false): array
@@ -102,8 +87,6 @@ class CharacterAttackBuilder
     /**
      * Build the characters defend.
      *
-     * @param bool $voided
-     * @return array
      * @throws Exception
      */
     public function buildDefend(bool $voided = false): array
@@ -118,9 +101,6 @@ class CharacterAttackBuilder
     /**
      * The base attack object when building the different attack types.
      *
-     * @param string $attackType
-     * @param bool $voided
-     * @return array
      * @throws Exception
      */
     private function baseAttack(string $attackType, bool $voided = false): array
@@ -157,8 +137,6 @@ class CharacterAttackBuilder
      * Builds the special damage information.
      *
      * - Based off the class special equipped which does damage.
-     *
-     * @return array
      */
     private function fetchClassSpecialDamageInfo(): array
     {
@@ -180,11 +158,6 @@ class CharacterAttackBuilder
     /**
      * Deals with the positional aspects of Attack and Cast and Cast and Attack.
      *
-     * @param string $attackType
-     * @param string $spellPosition
-     * @param string $weaponPosition
-     * @param bool $voided
-     * @return array
      * @throws Exception
      */
     private function castAndAttackPositionalDamage(string $attackType, string $spellPosition, string $weaponPosition, bool $voided = false): array
