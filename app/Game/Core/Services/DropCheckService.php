@@ -2,12 +2,11 @@
 
 namespace App\Game\Core\Services;
 
-use App\Flare\Builders\BuildMythicItem;
+use App\Flare\Items\Builders\BuildMythicItem;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Flare\Models\Map;
 use App\Flare\Models\Monster;
-use App\Flare\Values\CelestialType;
 use App\Flare\Values\LocationType;
 use App\Game\Battle\Services\BattleDrop;
 use Exception;
@@ -65,9 +64,7 @@ class DropCheckService
 
         $this->handleDropChance($character);
 
-        if ($monster->celestial_type === CelestialType::KING_CELESTIAL) {
-            $this->handleMythicDrop($character, true);
-        }
+        $this->handleMythicDrop($character, true);
 
         if (is_null($this->locationWithEffect)) {
             return;
@@ -133,7 +130,7 @@ class DropCheckService
             return;
         }
 
-        $this->locationWithEffect = Location::whereNotNull('enemy_strength_type')
+        $this->locationWithEffect = Location::whereNotNull('enemy_strength_increase')
             ->where('x', $map->character_position_x)
             ->where('y', $map->character_position_y)
             ->where('game_map_id', $map->game_map_id)

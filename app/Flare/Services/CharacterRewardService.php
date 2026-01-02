@@ -136,7 +136,7 @@ class CharacterRewardService
      */
     private function purgatoryDungeons(Map $map): ?Location
     {
-        return Location::whereNotNull('enemy_strength_type')
+        return Location::whereNotNull('enemy_strength_increase')
             ->where('x', $map->character_position_x)
             ->where('y', $map->character_position_y)
             ->where('game_map_id', $map->game_map_id)

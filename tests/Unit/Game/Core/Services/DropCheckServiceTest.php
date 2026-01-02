@@ -4,7 +4,6 @@ namespace Tests\Unit\Game\Core\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
-use App\Flare\Values\CelestialType;
 use App\Flare\Values\LocationType;
 use App\Game\Core\Services\DropCheckService;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
@@ -51,6 +50,11 @@ class DropCheckServiceTest extends TestCase
             })
             ->andReturnFalse();
 
+        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
+            ->once()
+            ->withAnyArgs()
+            ->andReturnFalse();
+
         $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
         $character = $this->setLootingToBonus($characterFactory->getCharacter(), 0.10);
 
@@ -81,6 +85,11 @@ class DropCheckServiceTest extends TestCase
             })
             ->andReturnFalse();
 
+        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
+            ->once()
+            ->withAnyArgs()
+            ->andReturnFalse();
+
         $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
         $character = $this->setLootingToBonus($characterFactory->getCharacter(), 0.10);
 
@@ -106,11 +115,19 @@ class DropCheckServiceTest extends TestCase
 
     public function test_process_uses_difficult_item_chance_when_at_special_location_and_clamps_looting_chance_at_point_four_five(): void
     {
+        DropCheckCalculator::shouldReceive('fetchDropCheckChance')
+            ->never();
+
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
             ->once()
             ->withArgs(function ($chance, $maxRoll) {
                 return abs($chance - 0.45) < 0.00001 && $maxRoll === 100;
             })
+            ->andReturnFalse();
+
+        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
+            ->once()
+            ->withAnyArgs()
             ->andReturnFalse();
 
         $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
@@ -150,7 +167,6 @@ class DropCheckServiceTest extends TestCase
 
         $monster = $this->createMonster([
             'game_map_id' => $character->map->game_map_id,
-            'celestial_type' => CelestialType::KING_CELESTIAL,
             'quest_item_id' => null,
         ]);
 
@@ -181,7 +197,6 @@ class DropCheckServiceTest extends TestCase
 
         $monster = $this->createMonster([
             'game_map_id' => $character->map->game_map_id,
-            'celestial_type' => CelestialType::KING_CELESTIAL,
             'quest_item_id' => null,
         ]);
 
@@ -207,9 +222,9 @@ class DropCheckServiceTest extends TestCase
             ->andReturnFalse();
 
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
-            ->once()
-            ->withNoArgs()
-            ->andReturnTrue();
+            ->twice()
+            ->withAnyArgs()
+            ->andReturn(false, true);
 
         $this->createItemAffix(['type' => 'prefix']);
         $this->createItemAffix(['type' => 'suffix']);
@@ -257,6 +272,11 @@ class DropCheckServiceTest extends TestCase
             })
             ->andReturnFalse();
 
+        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
+            ->once()
+            ->withAnyArgs()
+            ->andReturnFalse();
+
         $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
         $character = $this->setLootingToBonus($characterFactory->getCharacter(), 0.30);
 
@@ -284,15 +304,22 @@ class DropCheckServiceTest extends TestCase
 
     public function test_process_uses_cached_location_with_effect_when_key_does_not_change(): void
     {
+        DropCheckCalculator::shouldReceive('fetchDropCheckChance')
+            ->never();
+
+        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
+            ->twice()
+            ->withArgs(function ($chance, $maxRoll = null) {
+                return is_null($maxRoll) && abs($chance - 0.10) < 0.00001;
+            })
+            ->andReturnFalse();
+
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
             ->twice()
             ->withArgs(function ($chance, $maxRoll) {
                 return abs($chance - 0.10) < 0.00001 && $maxRoll === 100;
             })
             ->andReturnFalse();
-
-        DropCheckCalculator::shouldReceive('fetchDropCheckChance')
-            ->never();
 
         $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
         $character = $this->setLootingToBonus($characterFactory->getCharacter(), 0.10);
@@ -378,7 +405,7 @@ class DropCheckServiceTest extends TestCase
             'x' => $map->character_position_x,
             'y' => $map->character_position_y,
             'type' => $type,
-            'enemy_strength_type' => 1,
+            'enemy_strength_increase' => 1.0000,
             'name' => 'special_location_'.uniqid('', true),
         ]);
     }

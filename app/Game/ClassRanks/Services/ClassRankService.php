@@ -2,6 +2,7 @@
 
 namespace App\Game\ClassRanks\Services;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterClassRank;
 use App\Flare\Models\CharacterClassSpecialtiesEquipped;
@@ -9,7 +10,6 @@ use App\Flare\Models\GameClassSpecial;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\ClassRanks\Values\ClassRankValue;
 use App\Game\ClassRanks\Values\ClassSpecialValue;
@@ -362,9 +362,9 @@ class ClassRankService
                 (int) $special->level,
                 (int) $special->current_xp,
                 (int) $special->required_xp,
-                (int) ClassSpecialValue::XP_PER_KILL,
+                ClassSpecialValue::XP_PER_KILL,
                 $killCount,
-                (int) ClassSpecialValue::MAX_LEVEL
+                ClassSpecialValue::MAX_LEVEL
             );
 
             $special->update([
@@ -378,7 +378,7 @@ class ClassRankService
                 $character->user,
                 ClassRanksMessageTypes::XP_FOR_EQUIPPED_CLASS_SPECIALS,
                 $character->class->name,
-                (int) ClassSpecialValue::XP_PER_KILL * $killCount,
+                ClassSpecialValue::XP_PER_KILL * $killCount,
                 $special->current_xp,
                 null,
                 $special->gameClassSpecial->name
@@ -499,9 +499,9 @@ class ClassRankService
                     (int) $weaponMastery->level,
                     (int) $weaponMastery->current_xp,
                     (int) $weaponMastery->required_xp,
-                    (int) WeaponMasteryValue::XP_PER_KILL,
+                    WeaponMasteryValue::XP_PER_KILL,
                     $killCount,
-                    (int) WeaponMasteryValue::MAX_LEVEL
+                    WeaponMasteryValue::MAX_LEVEL
                 );
 
                 $weaponMastery->update([
@@ -517,7 +517,7 @@ class ClassRankService
                     $character->user,
                     ClassRanksMessageTypes::XP_FOR_CLASS_MASTERIES,
                     $character->class->name,
-                    (int) WeaponMasteryValue::XP_PER_KILL * $killCount,
+                    WeaponMasteryValue::XP_PER_KILL * $killCount,
                     $weaponMastery->current_xp,
                     $weaponMasteryName
                 );

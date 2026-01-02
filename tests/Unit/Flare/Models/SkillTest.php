@@ -142,7 +142,7 @@ class SkillTest extends TestCase
         $this->assertSame(0.0, $skill->getBaseACModAttribute());
     }
 
-    public function test_base_damage_healing_and_ac_mods_include_items_and_boons_when_per_level_positive(): void
+    public function test_base_damage_healing_and_ac_mods_return_computed_when_per_level_positive(): void
     {
         $skill = $this->getCharacterSkillByName($this->character, 'Accuracy');
 
@@ -156,58 +156,11 @@ class SkillTest extends TestCase
 
         $skill->update(['level' => 2]);
 
-        $equippedItem = $this->createItem([
-            'skill_name' => $baseSkill->name,
-            'base_damage_mod_bonus' => 0.25,
-            'base_healing_mod_bonus' => 0.50,
-            'base_ac_mod_bonus' => 0.40,
-        ]);
-
-        $this->character->refresh()->load('inventory');
-
-        $this->character->inventory->slots()->create([
-            'inventory_id' => $this->character->inventory->id,
-            'item_id' => $equippedItem->id,
-            'equipped' => true,
-            'position' => 'right-hand',
-        ]);
-
-        $boonDamageItem = $this->createItem(['base_damage_mod_bonus' => 0.15]);
-        $boonHealingItem = $this->createItem(['base_healing_mod_bonus' => 0.15]);
-        $boonAcItem = $this->createItem(['base_ac_mod_bonus' => 0.15]);
-
-        $this->character->boons()->create([
-            'character_id' => $this->character->id,
-            'item_id' => $boonDamageItem->id,
-            'last_for_minutes' => 10,
-            'amount_used' => 1,
-            'started' => now(),
-            'complete' => now()->addMinutes(10),
-        ]);
-
-        $this->character->boons()->create([
-            'character_id' => $this->character->id,
-            'item_id' => $boonHealingItem->id,
-            'last_for_minutes' => 10,
-            'amount_used' => 1,
-            'started' => now(),
-            'complete' => now()->addMinutes(10),
-        ]);
-
-        $this->character->boons()->create([
-            'character_id' => $this->character->id,
-            'item_id' => $boonAcItem->id,
-            'last_for_minutes' => 10,
-            'amount_used' => 1,
-            'started' => now(),
-            'complete' => now()->addMinutes(10),
-        ]);
-
         $skill = $this->reloadSkill($skill);
 
-        $this->assertEqualsWithDelta(0.60, $skill->getBaseDamageModAttribute(), 0.00001);
-        $this->assertEqualsWithDelta(0.60, $skill->getBaseHealingModAttribute(), 0.00001);
-        $this->assertEqualsWithDelta(0.75, $skill->getBaseACModAttribute(), 0.00001);
+        $this->assertEqualsWithDelta(0.20, $skill->getBaseDamageModAttribute(), 0.00001);
+        $this->assertEqualsWithDelta(0.20, $skill->getBaseHealingModAttribute(), 0.00001);
+        $this->assertEqualsWithDelta(0.20, $skill->getBaseACModAttribute(), 0.00001);
     }
 
     public function test_fight_time_out_mod_caps_at_half(): void

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Flare\Builders;
+namespace App\Flare\Items\Builders;
 
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
@@ -43,7 +43,7 @@ class RandomItemDropBuilder
             ->doesntHave('itemPrefix')
             ->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
             ->whereNull('specialty_type')
-            ->where('skill_level_required', '<=', rand(1, $level));
+            ->where('skill_level_required', '<=', $this->rollLevel($level));
 
         return $query->first();
     }
@@ -55,7 +55,7 @@ class RandomItemDropBuilder
     {
         $affixes = [];
 
-        $prefixAffix = $this->getRandomAffix('prefix', $level, rand(1, $level));
+        $prefixAffix = $this->getRandomAffix('prefix', $level, $this->rollLevel($level));
 
         if (is_null($prefixAffix)) {
             return [];
@@ -63,8 +63,8 @@ class RandomItemDropBuilder
 
         $affixes[] = $prefixAffix;
 
-        if (rand(1, 100) > 50) {
-            $suffixAffix = $this->getRandomAffix('suffix', $level, rand(1, $level));
+        if ($this->rollPercent() > 50) {
+            $suffixAffix = $this->getRandomAffix('suffix', $level, $this->rollLevel($level));
 
             if (! is_null($suffixAffix)) {
                 $affixes[] = $suffixAffix;
@@ -181,5 +181,15 @@ class RandomItemDropBuilder
         }
 
         return $resultIndex;
+    }
+
+    protected function rollLevel(int $level): int
+    {
+        return rand(1, $level);
+    }
+
+    protected function rollPercent(): int
+    {
+        return rand(1, 100);
     }
 }

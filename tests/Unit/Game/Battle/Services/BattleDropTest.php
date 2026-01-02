@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Game\Battle\Services;
 
-use App\Flare\Builders\RandomItemDropBuilder;
+use App\Flare\Items\Builders\RandomItemDropBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
