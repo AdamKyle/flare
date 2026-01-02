@@ -16,7 +16,8 @@ class UpdateTopBarListener
     private CharacterTopBarTransformer $characterTopBarTransformer;
 
     /**
-     * @param  CharacterSheetBaseInfoTransformer  $characterSheetBaseInfoTransformer
+     * @param Manager $manager
+     * @param CharacterTopBarTransformer $characterTopBarTransformer
      */
     public function __construct(Manager $manager, CharacterTopBarTransformer $characterTopBarTransformer)
     {
