@@ -102,6 +102,7 @@ class TestExploration extends Command
      * Create the characters needed.
      *
      * @return void
+     *
      * @throws Exception
      */
     protected function createTheCharacters(CharacterBuilderService $characterBuilder, int $charactersToCreate)
@@ -134,12 +135,6 @@ class TestExploration extends Command
     /**
      * Create the character.
      *
-     * @param CharacterBuilderService $characterBuilder
-     * @param User $user
-     * @param GameMap $map
-     * @param GameClass $class
-     * @param GameRace $race
-     * @return Character
      * @throws Exception
      */
     protected function createCharacter(CharacterBuilderService $characterBuilder, User $user, GameMap $map, GameClass $class, GameRace $race): Character

@@ -14,7 +14,7 @@ class BattleRewardHandlerTest extends TestCase
     use MockeryPHPUnitIntegration;
     use RefreshDatabase;
 
-    public function testHandleCallsBattleRewardServiceWithIdsContextAndIncludesWinterEvent(): void
+    public function test_handle_calls_battle_reward_service_with_ids_context_and_includes_winter_event(): void
     {
         $characterId = 123;
         $monsterId = 456;
@@ -34,7 +34,7 @@ class BattleRewardHandlerTest extends TestCase
         $job->handle($battleRewardService);
     }
 
-    public function testHandleUsesEmptyContextWhenNotProvided(): void
+    public function test_handle_uses_empty_context_when_not_provided(): void
     {
         $characterId = 123;
         $monsterId = 456;

@@ -25,7 +25,7 @@ class CharacterCurrencyRewardServiceTest extends TestCase
 
     private ?CharacterCurrencyRewardService $characterCurrencyRewardService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -33,7 +33,7 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         $this->characterCurrencyRewardService = resolve(CharacterCurrencyRewardService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -604,5 +604,4 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
         $this->assertEquals(0, $character->copper_coins);
     }
-
 }

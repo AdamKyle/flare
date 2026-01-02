@@ -809,7 +809,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $this->assertEquals(0, $character->shards);
     }
 
-    public function testDoesNotHandleBountyWhenCharacterHasNoFactionForMonsterMap()
+    public function test_does_not_handle_bounty_when_character_has_no_faction_for_monster_map()
     {
         $purgatoryMap = $this->createGameMap([
             'name' => MapNameValue::PURGATORY,
@@ -852,7 +852,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         Event::assertNotDispatched(UpdateTopBarEvent::class);
     }
 
-    public function testGivesThousandXpWhenNpcCurrentLevelIsZero()
+    public function test_gives_thousand_xp_when_npc_current_level_is_zero()
     {
         $monster = $this->createMonster();
 
@@ -943,7 +943,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $this->assertEquals(1000, $character->refresh()->xp);
     }
 
-    public function testWeeklyEventRunningKillCountFifteenMarksBountyComplete()
+    public function test_weekly_event_running_kill_count_fifteen_marks_bounty_complete()
     {
         $monster = $this->createMonster();
 
@@ -1002,7 +1002,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $this->assertEquals(25, $task['required_amount']);
     }
 
-    public function testNoWeeklyEventKillCountTwentyFiveMarksBountyComplete()
+    public function test_no_weekly_event_kill_count_twenty_five_marks_bounty_complete()
     {
         $monster = $this->createMonster();
 
@@ -1057,7 +1057,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $this->assertEquals(25, $task['required_amount']);
     }
 
-    public function testNoWeeklyEventKillCountFiveHasLeftOver()
+    public function test_no_weekly_event_kill_count_five_has_left_over()
     {
         $monster = $this->createMonster();
 
@@ -1112,7 +1112,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $this->assertEquals(20, $task['required_amount'] - $task['current_amount']);
     }
 
-    public function testWeeklyEventRunningKillCountFiveHasLeftOverAndTotalIsTen()
+    public function test_weekly_event_running_kill_count_five_has_left_over_and_total_is_ten()
     {
         $monster = $this->createMonster();
 

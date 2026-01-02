@@ -117,17 +117,16 @@ class ClassRankService
 
             $classRank->weapon_masteries = $sortedWeaponMasteries;
 
-
             $primaryClass = $classRank->gameClass->primaryClassRequired;
             $secondaryClass = $classRank->gameClass->secondaryClassRequired;
 
-            $classRank->primary_class_name = !is_null($primaryClass) ? $primaryClass->name : null;
-            $classRank->secondary_class_name = !is_null($secondaryClass) ? $secondaryClass->name : null;
+            $classRank->primary_class_name = ! is_null($primaryClass) ? $primaryClass->name : null;
+            $classRank->secondary_class_name = ! is_null($secondaryClass) ? $secondaryClass->name : null;
             $classRank->primary_class_required_level = $classRank->gameClass->primary_required_class_level;
             $classRank->secondary_class_required_level = $classRank->gameClass->secondary_required_class_level;
 
             return $classRank;
-        })->sortByDesc(fn($item) => $item->is_active)
+        })->sortByDesc(fn ($item) => $item->is_active)
             ->values();
 
         $result = [];
@@ -142,7 +141,6 @@ class ClassRankService
             'class_ranks' => $result,
         ]);
     }
-
 
     /**
      * Equip a class specialty
@@ -194,7 +192,7 @@ class ClassRankService
         event(new UpdateTopBarEvent($character));
 
         return $this->successResult(array_merge([
-            'message' => 'Equipped class special: ' . $gameClassSpecial->name,
+            'message' => 'Equipped class special: '.$gameClassSpecial->name,
         ], $this->getSpecials($character)));
     }
 
@@ -220,7 +218,7 @@ class ClassRankService
         $this->updateCharacterAttackTypes->updateCache($character);
 
         return $this->successResult(array_merge([
-            'message' => 'Unequipped class special: ' . $classSpecialEquipped->gameClassSpecial->name,
+            'message' => 'Unequipped class special: '.$classSpecialEquipped->gameClassSpecial->name,
         ], $this->getSpecials($character)));
     }
 
@@ -256,7 +254,7 @@ class ClassRankService
                     'current_xp' => 0,
                 ]);
 
-                event(new ServerMessageEvent($character->user, 'You gained a new class rank in: ' . $character->class->name));
+                event(new ServerMessageEvent($character->user, 'You gained a new class rank in: '.$character->class->name));
             }
 
             return;
@@ -302,7 +300,7 @@ class ClassRankService
                     break;
                 }
 
-                event(new ServerMessageEvent($character->user, 'You gained a new class rank in: ' . $character->class->name));
+                event(new ServerMessageEvent($character->user, 'You gained a new class rank in: '.$character->class->name));
             }
         }
     }
@@ -340,7 +338,7 @@ class ClassRankService
                         'current_xp' => 0,
                     ]);
 
-                    event(new ServerMessageEvent($character->user, 'Your class special:  ' . $special->gameClassSpecial->name . ' has gained a new level is now level: ' . $special->level));
+                    event(new ServerMessageEvent($character->user, 'Your class special:  '.$special->gameClassSpecial->name.' has gained a new level is now level: '.$special->level));
 
                     $this->updateCharacterAttackTypes->updateCache($character->refresh());
                 }
@@ -398,7 +396,7 @@ class ClassRankService
 
                     event(new ServerMessageEvent(
                         $character->user,
-                        'Your class special:  ' . $special->gameClassSpecial->name . ' has gained a new level is now level: ' . $newMessageLevel
+                        'Your class special:  '.$special->gameClassSpecial->name.' has gained a new level is now level: '.$newMessageLevel
                     ));
                 }
             }
@@ -414,8 +412,7 @@ class ClassRankService
      *
      * @throws Exception
      */
-    public function
-    giveXpToMasteries(Character $character, int $killCount = 1): void
+    public function giveXpToMasteries(Character $character, int $killCount = 1): void
     {
         if ($killCount <= 0) {
             return;
@@ -463,10 +460,10 @@ class ClassRankService
 
                         event(new ServerMessageEvent(
                             $character->user,
-                            'Your class: ' .
-                            $classRank->gameClass->name . ' has gained a new level in (Weapon Masteries): ' .
-                            $weaponMasteryName .
-                            ' and is now level: ' . $weaponMastery->level
+                            'Your class: '.
+                            $classRank->gameClass->name.' has gained a new level in (Weapon Masteries): '.
+                            $weaponMasteryName.
+                            ' and is now level: '.$weaponMastery->level
                         ));
                     }
                 }
@@ -537,10 +534,10 @@ class ClassRankService
 
                         event(new ServerMessageEvent(
                             $character->user,
-                            'Your class: ' .
-                            $classRank->gameClass->name . ' has gained a new level in (Weapon Masteries): ' .
-                            $weaponMasteryName .
-                            ' and is now level: ' . $newMessageLevel
+                            'Your class: '.
+                            $classRank->gameClass->name.' has gained a new level in (Weapon Masteries): '.
+                            $weaponMasteryName.
+                            ' and is now level: '.$newMessageLevel
                         ));
                     }
                 }

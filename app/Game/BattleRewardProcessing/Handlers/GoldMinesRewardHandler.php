@@ -159,7 +159,6 @@ class GoldMinesRewardHandler
     /**
      * Reward player with item.
      *
-     * @return void
      *
      * @throws Exception
      */
@@ -198,8 +197,6 @@ class GoldMinesRewardHandler
 
     /**
      * 1 out of 1 million chance to create an event.
-     *
-     * @return void
      */
     protected function createPossibleEvent(int $killCount = 1): void
     {

@@ -13,9 +13,6 @@ trait FetchEquipped
 {
     /**
      * Fetches the equipped items from player.
-     *
-     * @param Character $character
-     * @return Collection|null
      */
     public function fetchEquipped(Character $character): ?Collection
     {
@@ -50,9 +47,6 @@ trait FetchEquipped
 
     /**
      * Fetch the inventory for the character, preferring loaded relations.
-     *
-     * @param Character $character
-     * @return Inventory|null
      */
     private function getCharacterInventory(Character $character): ?Inventory
     {
@@ -65,9 +59,6 @@ trait FetchEquipped
 
     /**
      * Fetch equipped inventory slots, preferring loaded relations when item relations are also loaded.
-     *
-     * @param Inventory $inventory
-     * @return Collection
      */
     private function fetchEquippedInventorySlots(Inventory $inventory): Collection
     {
@@ -87,9 +78,6 @@ trait FetchEquipped
 
     /**
      * Fetch the equipped inventory set for the character, preferring loaded relations.
-     *
-     * @param Character $character
-     * @return InventorySet|null
      */
     private function fetchEquippedInventorySet(Character $character): ?InventorySet
     {
@@ -108,9 +96,6 @@ trait FetchEquipped
 
     /**
      * Fetch equipped set slots, preferring loaded relations when item relations are also loaded.
-     *
-     * @param InventorySet $inventorySet
-     * @return Collection
      */
     private function fetchEquippedSetSlots(InventorySet $inventorySet): Collection
     {
@@ -133,9 +118,6 @@ trait FetchEquipped
 
     /**
      * Determine if an inventory slot has all required item relations loaded.
-     *
-     * @param InventorySlot $slot
-     * @return bool
      */
     private function inventorySlotHasLoadedItemRelations(InventorySlot $slot): bool
     {
@@ -151,9 +133,6 @@ trait FetchEquipped
 
     /**
      * Determine if a set slot has all required item relations loaded.
-     *
-     * @param SetSlot $slot
-     * @return bool
      */
     private function setSlotHasLoadedItemRelations(SetSlot $slot): bool
     {

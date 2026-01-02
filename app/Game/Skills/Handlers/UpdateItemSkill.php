@@ -102,7 +102,7 @@ class UpdateItemSkill
 
                 ServerMessageHandler::sendBasicMessage(
                     $character->user,
-                    'Your equipped artifacts: ' . $skillProgressionToUpdate->item->affix_name . '\'s Skill: ' . $skillProgressionToUpdate->itemSkill->name . ' has gained a new level and is now level: ' . $newMessageLevel . '.'
+                    'Your equipped artifacts: '.$skillProgressionToUpdate->item->affix_name.'\'s Skill: '.$skillProgressionToUpdate->itemSkill->name.' has gained a new level and is now level: '.$newMessageLevel.'.'
                 );
             }
         }

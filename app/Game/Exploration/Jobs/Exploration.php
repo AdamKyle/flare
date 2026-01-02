@@ -2,14 +2,6 @@
 
 namespace App\Game\Exploration\Jobs;
 
-use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
-use App\Game\BattleRewardProcessing\Jobs\ExplorationFactionPointHandler;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Cache;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Monster;
@@ -18,14 +10,18 @@ use App\Flare\Services\CharacterRewardService;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
-use App\Game\BattleRewardProcessing\Jobs\Events\WinterEventChristmasGiftHandler;
-use App\Game\BattleRewardProcessing\Jobs\ExplorationSkillXpHandler;
-use App\Game\BattleRewardProcessing\Jobs\ExplorationXpHandler;
+use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
 use App\Game\Exploration\Events\ExplorationTimeOut;
 use App\Game\Skills\Services\SkillService;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 
 class Exploration implements ShouldQueue
 {
@@ -69,7 +65,7 @@ class Exploration implements ShouldQueue
         if ($this->shouldBail($automation)) {
             $this->endAutomation($automation, $characterCacheData);
 
-            Cache::delete('can-character-survive-' . $this->character->id);
+            Cache::delete('can-character-survive-'.$this->character->id);
 
             return;
         }
@@ -130,7 +126,7 @@ class Exploration implements ShouldQueue
 
             $enemies = rand(10, 25);
 
-            $this->sendOutEventLogUpdate('"Chirst, child there are: ' . $enemies . ' of them ..."
+            $this->sendOutEventLogUpdate('"Chirst, child there are: '.$enemies.' of them ..."
             The Guide hisses at you from the shadows. You ignore his words and prepare for battle. One right after the other ...', true);
 
             $monster = Monster::find($params['selected_monster_id']);
@@ -155,7 +151,7 @@ class Exploration implements ShouldQueue
 
             $this->sendOutEventLogUpdate('The last of the enemies fall. Covered in blood, exhausted, you look around for any signs of more of their friends. The area is silent. "Another day, another battle.
             We managed to survive." The Guide states as he walks from the shadows. The pair of you set off in search of the next adventure ...
-            (Exploration will begin again in ' . $timeDelay . ' minutes)', true);
+            (Exploration will begin again in '.$timeDelay.' minutes)', true);
 
             return true;
         }
@@ -167,42 +163,29 @@ class Exploration implements ShouldQueue
      * Fight and process rewards and return true or false.
      *
      * - Uses a cached version to make this faster.
-     *
-     * @param MonsterPlayerFight $response
-     * @param CharacterAutomation $automation
-     * @param BattleEventHandler $battleEventHandler
-     * @param array $params
-     * @return bool
      */
     private function canSurviveFight(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool
     {
 
-        if (Cache::has('can-character-survive-' . $this->character->id)) {
+        if (Cache::has('can-character-survive-'.$this->character->id)) {
             return true;
         }
 
         $this->sendOutEventLogUpdate('"Child, I can see a small group of these creature. If we slaughter them we might learn something." The guide insists. "Theres ten of them. Quick, kill them. We will continue the hunt!"');
 
-
         for ($i = 1; $i <= 10; $i++) {
-            if (!$this->fightAutomationMonster($response, $automation, $battleEventHandler, $params)) {
+            if (! $this->fightAutomationMonster($response, $automation, $battleEventHandler, $params)) {
                 return false;
             }
         }
 
-        Cache::put('can-character-survive-' . $this->character->id, true);
+        Cache::put('can-character-survive-'.$this->character->id, true);
 
         return true;
     }
 
     /**
      * Fight monster through automation.
-     *
-     * @param MonsterPlayerFight $response
-     * @param CharacterAutomation $automation
-     * @param BattleEventHandler $battleEventHandler
-     * @param array $params
-     * @return bool
      */
     private function fightAutomationMonster(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool
     {
@@ -229,9 +212,6 @@ class Exploration implements ShouldQueue
 
     /**
      * Should we bail?
-     *
-     * @param CharacterAutomation|null $automation
-     * @return bool
      */
     private function shouldBail(?CharacterAutomation $automation = null): bool
     {
@@ -249,9 +229,6 @@ class Exploration implements ShouldQueue
 
     /**
      * Update automation.
-     *
-     * @param CharacterAutomation $automation
-     * @return CharacterAutomation
      */
     private function updateAutomation(CharacterAutomation $automation): CharacterAutomation
     {
@@ -283,10 +260,6 @@ class Exploration implements ShouldQueue
 
     /**
      * End automation.
-     *
-     * @param CharacterAutomation|null $automation
-     * @param CharacterCacheData $characterCacheData
-     * @return void
      */
     private function endAutomation(?CharacterAutomation $automation, CharacterCacheData $characterCacheData): void
     {
@@ -314,9 +287,6 @@ class Exploration implements ShouldQueue
 
     /**
      * Reward the player for automation completion.
-     *
-     * @param Character $character
-     * @return void
      */
     private function rewardPlayer(Character $character): void
     {

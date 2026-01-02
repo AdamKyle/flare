@@ -20,7 +20,7 @@ class SkillBonusContextServiceTest extends TestCase
 
     private Skill $skill;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -34,12 +34,12 @@ class SkillBonusContextServiceTest extends TestCase
             ->firstOrFail();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
 
-    public function testGetEquippedSlotsWithItemsUsesLoadedRelationsAndCachesByCharacterId(): void
+    public function test_get_equipped_slots_with_items_uses_loaded_relations_and_caches_by_character_id(): void
     {
         $equippedItem = $this->createItem();
 
@@ -68,7 +68,7 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertEquals($equippedItem->id, $slotsFirstCall->first()->item->id);
     }
 
-    public function testGetEquippedSlotsWithItemsFallsBackToInventorySlotQueryWhenLoadedRelationsMissingPieces(): void
+    public function test_get_equipped_slots_with_items_falls_back_to_inventory_slot_query_when_loaded_relations_missing_pieces(): void
     {
         $equippedItem = $this->createItem();
 
@@ -95,7 +95,7 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertEquals($equippedItem->id, $slots->first()->item->id);
     }
 
-    public function testGetEquippedSlotsWithItemsUsesEquippedInventorySetWhenInventoryHasNoEquippedSlots(): void
+    public function test_get_equipped_slots_with_items_uses_equipped_inventory_set_when_inventory_has_no_equipped_slots(): void
     {
         $setEquippedItem = $this->createItem();
 
@@ -119,7 +119,7 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertEquals($setEquippedItem->id, $slots->first()->item->id);
     }
 
-    public function testGetEquippedSlotsWithItemsReturnsEmptyWhenNoInventoryRecordExists(): void
+    public function test_get_equipped_slots_with_items_returns_empty_when_no_inventory_record_exists(): void
     {
         $this->character->inventory()->delete();
 
@@ -139,7 +139,7 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertSame($slotsFirstCall, $slotsSecondCall);
     }
 
-    public function testGetQuestSlotsWithItemsUsesLoadedRelationsAndCachesByInventoryIdAndSkillName(): void
+    public function test_get_quest_slots_with_items_uses_loaded_relations_and_caches_by_inventory_id_and_skill_name(): void
     {
         $skill = Skill::query()
             ->whereKey($this->skill->id)
@@ -189,7 +189,7 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertEquals($questItem->id, $slotsFirstCall->first()->item->id);
     }
 
-    public function testGetQuestSlotsWithItemsFallsBackToQueryWhenItemsAreNotLoaded(): void
+    public function test_get_quest_slots_with_items_falls_back_to_query_when_items_are_not_loaded(): void
     {
         $skill = Skill::query()
             ->whereKey($this->skill->id)
@@ -224,7 +224,7 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertEquals($questItem->id, $slots->first()->item->id);
     }
 
-    public function testGetQuestSlotsWithItemsReturnsEmptyWhenNoInventoryRecordExists(): void
+    public function test_get_quest_slots_with_items_returns_empty_when_no_inventory_record_exists(): void
     {
         $this->character->inventory()->delete();
 
@@ -242,7 +242,7 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertTrue($slots->isEmpty());
     }
 
-    public function testGetBoonsWithItemUsedReturnsEmptyWhenCharacterRelationIsNull(): void
+    public function test_get_boons_with_item_used_returns_empty_when_character_relation_is_null(): void
     {
         $skill = Skill::query()
             ->whereKey($this->skill->id)
@@ -260,7 +260,7 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertTrue($boons->isEmpty());
     }
 
-    public function testGetBoonsWithItemUsedUsesLoadedRelationsAndCaches(): void
+    public function test_get_boons_with_item_used_uses_loaded_relations_and_caches(): void
     {
         $itemOne = $this->createItem();
         $itemTwo = $this->createItem();
@@ -303,7 +303,7 @@ class SkillBonusContextServiceTest extends TestCase
         }));
     }
 
-    public function testGetBoonsWithItemUsedFallsBackToQueryWhenBoonsLoadedButItemUsedNotLoaded(): void
+    public function test_get_boons_with_item_used_falls_back_to_query_when_boons_loaded_but_item_used_not_loaded(): void
     {
         $item = $this->createItem();
 
@@ -332,7 +332,7 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertEquals($item->id, $boons->first()->itemUsed->id);
     }
 
-    public function testGetBoonsWithItemUsedFallsBackToQueryWhenBoonsNotLoaded(): void
+    public function test_get_boons_with_item_used_falls_back_to_query_when_boons_not_loaded(): void
     {
         $item = $this->createItem();
 
@@ -361,7 +361,7 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertEquals($item->id, $boons->first()->itemUsed->id);
     }
 
-    public function testGetGameClassUsesLoadedRelationAndCaches(): void
+    public function test_get_game_class_uses_loaded_relation_and_caches(): void
     {
         $character = $this->character->load('class');
 
@@ -375,7 +375,7 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertEquals($character->game_class_id, $classFirstCall->id);
     }
 
-    public function testGetGameClassFallsBackToQueryWhenRelationNotLoaded(): void
+    public function test_get_game_class_falls_back_to_query_when_relation_not_loaded(): void
     {
         $character = $this->character->refresh();
 
@@ -387,7 +387,7 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertEquals($character->game_class_id, $class->id);
     }
 
-    public function testGetEquippedSlotsWithItemsFallsBackWhenSkillCharacterIsLoadedButNull(): void
+    public function test_get_equipped_slots_with_items_falls_back_when_skill_character_is_loaded_but_null(): void
     {
         $equippedItem = $this->createItem();
 
@@ -416,7 +416,7 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertEquals($equippedItem->id, $slots->first()->item->id);
     }
 
-    public function testGetEquippedSlotsWithItemsFallsBackWhenCharacterInventoryIsNotLoaded(): void
+    public function test_get_equipped_slots_with_items_falls_back_when_character_inventory_is_not_loaded(): void
     {
         $equippedItem = $this->createItem();
 
@@ -443,7 +443,7 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertEquals($equippedItem->id, $slots->first()->item->id);
     }
 
-    public function testGetEquippedSlotsWithItemsFallsBackWhenCharacterInventoryIsLoadedButNull(): void
+    public function test_get_equipped_slots_with_items_falls_back_when_character_inventory_is_loaded_but_null(): void
     {
         $equippedItem = $this->createItem();
 
@@ -472,7 +472,7 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertEquals($equippedItem->id, $slots->first()->item->id);
     }
 
-    public function testGetEquippedSlotsWithItemsFallsBackWhenInventorySlotsAreNotLoaded(): void
+    public function test_get_equipped_slots_with_items_falls_back_when_inventory_slots_are_not_loaded(): void
     {
         $equippedItem = $this->createItem();
 
@@ -499,7 +499,7 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertEquals($equippedItem->id, $slots->first()->item->id);
     }
 
-    public function testGetEquippedSlotsWithItemsFallsBackWhenEquippedSlotsAreEmptyInLoadedRelations(): void
+    public function test_get_equipped_slots_with_items_falls_back_when_equipped_slots_are_empty_in_loaded_relations(): void
     {
         $nonEquippedItem = $this->createItem();
 
@@ -535,7 +535,7 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertEquals($equippedItem->id, $slots->first()->item->id);
     }
 
-    public function testGetEquippedSlotsWithItemsFallsBackWhenEquippedSlotItemsAreNotLoaded(): void
+    public function test_get_equipped_slots_with_items_falls_back_when_equipped_slot_items_are_not_loaded(): void
     {
         $equippedItem = $this->createItem();
 
@@ -562,7 +562,7 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertEquals($equippedItem->id, $slots->first()->item->id);
     }
 
-    public function testGetQuestSlotsWithItemsFallsBackWhenSkillCharacterIsLoadedButNull(): void
+    public function test_get_quest_slots_with_items_falls_back_when_skill_character_is_loaded_but_null(): void
     {
         $skillForName = Skill::query()
             ->whereKey($this->skill->id)
@@ -599,7 +599,7 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertEquals($questItem->id, $slots->first()->item->id);
     }
 
-    public function testGetQuestSlotsWithItemsFallsBackWhenCharacterInventoryIsNotLoaded(): void
+    public function test_get_quest_slots_with_items_falls_back_when_character_inventory_is_not_loaded(): void
     {
         $skillForName = Skill::query()
             ->whereKey($this->skill->id)
@@ -634,7 +634,7 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertEquals($questItem->id, $slots->first()->item->id);
     }
 
-    public function testGetQuestSlotsWithItemsFallsBackWhenCharacterInventoryIsLoadedButNull(): void
+    public function test_get_quest_slots_with_items_falls_back_when_character_inventory_is_loaded_but_null(): void
     {
         $skillForName = Skill::query()
             ->whereKey($this->skill->id)
@@ -671,7 +671,7 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertEquals($questItem->id, $slots->first()->item->id);
     }
 
-    public function testGetQuestSlotsWithItemsFallsBackWhenInventorySlotsAreNotLoaded(): void
+    public function test_get_quest_slots_with_items_falls_back_when_inventory_slots_are_not_loaded(): void
     {
         $skillForName = Skill::query()
             ->whereKey($this->skill->id)

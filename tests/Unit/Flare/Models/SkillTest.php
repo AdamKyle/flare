@@ -21,7 +21,7 @@ class SkillTest extends TestCase
 
     private Character $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -30,19 +30,19 @@ class SkillTest extends TestCase
         $this->character = $this->characterFactory->getCharacter()->refresh();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
 
-    public function testNewFactoryCanCreateSkillInstance(): void
+    public function test_new_factory_can_create_skill_instance(): void
     {
         $skill = Skill::factory()->make();
 
         $this->assertInstanceOf(Skill::class, $skill);
     }
 
-    public function testAccessorsAndTypeUseBaseSkillFields(): void
+    public function test_accessors_and_type_use_base_skill_fields(): void
     {
         $skill = $this->getCharacterSkillByName($this->character, 'Accuracy');
 
@@ -78,7 +78,7 @@ class SkillTest extends TestCase
         $this->assertSame($this->character->game_class_id, $skill->getClassIdAttribute());
     }
 
-    public function testReducesTimeAndMovementTimeBranches(): void
+    public function test_reduces_time_and_movement_time_branches(): void
     {
         $skill = $this->getCharacterSkillByName($this->character, 'Accuracy');
 
@@ -123,7 +123,7 @@ class SkillTest extends TestCase
         $this->assertTrue($skill->getReducesMovementTimeAttribute());
     }
 
-    public function testBaseDamageHealingAndAcModsReturnZeroWhenPerLevelInvalid(): void
+    public function test_base_damage_healing_and_ac_mods_return_zero_when_per_level_invalid(): void
     {
         $skill = $this->getCharacterSkillByName($this->character, 'Accuracy');
 
@@ -142,7 +142,7 @@ class SkillTest extends TestCase
         $this->assertSame(0.0, $skill->getBaseACModAttribute());
     }
 
-    public function testBaseDamageHealingAndAcModsIncludeItemsAndBoonsWhenPerLevelPositive(): void
+    public function test_base_damage_healing_and_ac_mods_include_items_and_boons_when_per_level_positive(): void
     {
         $skill = $this->getCharacterSkillByName($this->character, 'Accuracy');
 
@@ -210,7 +210,7 @@ class SkillTest extends TestCase
         $this->assertEqualsWithDelta(0.75, $skill->getBaseACModAttribute(), 0.00001);
     }
 
-    public function testFightTimeOutModCapsAtHalf(): void
+    public function test_fight_time_out_mod_caps_at_half(): void
     {
         $skill = $this->getCharacterSkillByName($this->character, 'Accuracy');
 
@@ -245,7 +245,7 @@ class SkillTest extends TestCase
         $this->assertSame(0.50, $skill->getFightTimeOutModAttribute());
     }
 
-    public function testMoveTimeOutModCapsAtOneAndReturnsComputedWhenBelowCap(): void
+    public function test_move_time_out_mod_caps_at_one_and_returns_computed_when_below_cap(): void
     {
         $skill = $this->getCharacterSkillByName($this->character, 'Accuracy');
 
@@ -304,7 +304,7 @@ class SkillTest extends TestCase
         $this->assertEqualsWithDelta(0.5, $skill->getMoveTimeOutModAttribute(), 0.00001);
     }
 
-    public function testSkillBonusReturnsZeroWhenPerLevelNullAndReturnsOneAtMaxLevel(): void
+    public function test_skill_bonus_returns_zero_when_per_level_null_and_returns_one_at_max_level(): void
     {
         $skill = $this->getCharacterSkillByName($this->character, 'Alchemy');
 
@@ -331,7 +331,7 @@ class SkillTest extends TestCase
         $this->assertSame(1.0, $skill->getSkillBonusAttribute());
     }
 
-    public function testSkillBonusClampsAtOneAndAppliesAccuracyRaceAndClassMods(): void
+    public function test_skill_bonus_clamps_at_one_and_applies_accuracy_race_and_class_mods(): void
     {
         $skill = $this->getCharacterSkillByName($this->character, 'Accuracy');
 
@@ -354,7 +354,7 @@ class SkillTest extends TestCase
         $this->assertSame(1.0, $skill->getSkillBonusAttribute());
     }
 
-    public function testSkillBonusAppliesClassSpecificTrainingBonusForBlacksmithWeaponCrafting(): void
+    public function test_skill_bonus_applies_class_specific_training_bonus_for_blacksmith_weapon_crafting(): void
     {
         $blacksmithFactory = (new CharacterFactory())->createBaseCharacter([], ['name' => 'Blacksmith']);
         $blacksmith = $blacksmithFactory->getCharacter()->refresh();
@@ -378,7 +378,7 @@ class SkillTest extends TestCase
         $this->assertEqualsWithDelta(0.25, $skill->getSkillBonusAttribute(), 0.00001);
     }
 
-    public function testSkillTrainingBonusSumsEquippedQuestBoonsAndClassSpecificAndSkipsNullCases(): void
+    public function test_skill_training_bonus_sums_equipped_quest_boons_and_class_specific_and_skips_null_cases(): void
     {
         $alchemistFactory = (new CharacterFactory())->createBaseCharacter([], ['name' => 'Arcane Alchemist']);
         $alchemist = $alchemistFactory->getCharacter()->refresh();
@@ -463,7 +463,7 @@ class SkillTest extends TestCase
         $this->assertEqualsWithDelta(0.5, $skill->getSkillTrainingBonusAttribute(), 0.00001);
     }
 
-    public function testItemSkillBreakdownIncludesOnlyPositiveBonusesFromEquippedAndQuestMatchingSkill(): void
+    public function test_item_skill_breakdown_includes_only_positive_bonuses_from_equipped_and_quest_matching_skill(): void
     {
         $skill = $this->getCharacterSkillByName($this->character, 'Alchemy');
 
@@ -559,7 +559,7 @@ class SkillTest extends TestCase
         $this->assertIsArray($trainingBreakdown);
     }
 
-    public function testFightTimeOutModReturnsComputedWhenBelowCap(): void
+    public function test_fight_time_out_mod_returns_computed_when_below_cap(): void
     {
         $skill = $this->getCharacterSkillByName($this->character, 'Accuracy');
 
@@ -596,7 +596,7 @@ class SkillTest extends TestCase
         $this->assertEqualsWithDelta($baseline + 0.1, $withItem, 0.00001);
     }
 
-    public function testSkillBonusAppliesLootingRaceAndClassMods(): void
+    public function test_skill_bonus_applies_looting_race_and_class_mods(): void
     {
         $skill = $this->getCharacterSkillByName($this->character, 'Looting');
 
@@ -619,7 +619,7 @@ class SkillTest extends TestCase
         $this->assertEqualsWithDelta(0.35, $skill->getSkillBonusAttribute(), 0.00001);
     }
 
-    public function testSkillBonusAppliesDodgeRaceAndClassMods(): void
+    public function test_skill_bonus_applies_dodge_race_and_class_mods(): void
     {
         $skill = $this->getCharacterSkillByName($this->character, 'Dodge');
 

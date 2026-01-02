@@ -5,12 +5,10 @@ namespace App\Flare\Models;
 use App\Flare\Models\Traits\CalculateSkillBonus;
 use App\Flare\Models\Traits\CalculateTimeReduction;
 use App\Flare\Services\SkillBonusContextService;
-use App\Flare\Services\SkillBonusSources;
 use App\Game\Skills\Values\SkillTypeValue;
 use Database\Factories\SkillFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class Skill extends Model
@@ -318,8 +316,8 @@ class Skill extends Model
 
     private function getCharacterSkillBonus(Character $character, string $name): float
     {
-        $raceSkillBonusValue = $character->race->{Str::snake($name . '_mod')};
-        $classSkillBonusValue = $character->class->{Str::snake($name . '_mod')};
+        $raceSkillBonusValue = $character->race->{Str::snake($name.'_mod')};
+        $classSkillBonusValue = $character->class->{Str::snake($name.'_mod')};
 
         return $raceSkillBonusValue + $classSkillBonusValue;
     }
@@ -365,7 +363,7 @@ class Skill extends Model
 
         foreach ($skillBonusSources->getEquippedSlotsWithItems() as $slot) {
 
-            $bonus =  $this->calculateBonus($slot->item, $skill, $skillAttribute);
+            $bonus = $this->calculateBonus($slot->item, $skill, $skillAttribute);
 
             if ($bonus > 0) {
                 $itemsThatEffectBonus[] = [
@@ -385,7 +383,7 @@ class Skill extends Model
         foreach ($skillBonusSources->getQuestSlotsWithItems() as $slot) {
             if ($slot->item->type === 'quest' && $slot->item->skill_name === $this->baseSkill->name) {
 
-                $bonus =  $this->calculateBonus($slot->item, $skill, $skillAttribute);
+                $bonus = $this->calculateBonus($slot->item, $skill, $skillAttribute);
 
                 if ($bonus > 0) {
                     $itemsThatEffectBonus[] = [

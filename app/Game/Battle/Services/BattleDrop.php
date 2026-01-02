@@ -33,11 +33,6 @@ class BattleDrop
 
     private float $lootingChance;
 
-    /**
-     * @param RandomItemDropBuilder $randomItemDropBuilder
-     * @param DisenchantService $disenchantService
-     * @param ShopService $shopService
-     */
     public function __construct(
         private readonly RandomItemDropBuilder $randomItemDropBuilder,
         private readonly DisenchantService $disenchantService,
@@ -138,8 +133,6 @@ class BattleDrop
     }
 
     /**
-     * @param Character $character
-     * @return void
      * @throws Exception
      */
     public function handleSpecialLocationQuestItem(Character $character): void
@@ -212,21 +205,11 @@ class BattleDrop
         }
     }
 
-    /**
-     * @param Character $character
-     * @param string $gameMapName
-     * @param Location|null $locationWithEffect
-     * @return Item|null
-     */
     protected function getDropFromCache(Character $character, string $gameMapName, ?Location $locationWithEffect = null): ?Item
     {
         return $this->randomItemDropBuilder->generateItem($this->getMaxLevelBasedOnPlane($character));
     }
 
-    /**
-     * @param Character $character
-     * @return int
-     */
     protected function getMaxLevelBasedOnPlane(Character $character): int
     {
         $characterLevel = $character->level;
@@ -270,9 +253,6 @@ class BattleDrop
     /**
      * Attempts to pick up the item and give it to the player.
      *
-     * @param Character $character
-     * @param Item $item
-     * @return void
      * @throws Exception
      */
     protected function attemptToPickUpItem(Character $character, Item $item): void
@@ -293,8 +273,6 @@ class BattleDrop
     /**
      * Auto disenchants the item using the characters disenchanting skill.
      *
-     * @param Character $character
-     * @param Item $item
      * @throws Exception
      */
     private function autoDisenchantItem(Character $character, Item $item): void
@@ -322,12 +300,10 @@ class BattleDrop
     /**
      * Handle either auto selling the item or auto disenchanting the item.
      *
-     * @param Character $character
-     * @param Item $item
-     * @return void
      * @throws Exception
      */
-    private function handleDisenchantOrAutoSell(Character $character, Item $item): void {
+    private function handleDisenchantOrAutoSell(Character $character, Item $item): void
+    {
         $maxCurrenciesValue = new MaxCurrenciesValue($character->gold_dust, MaxCurrenciesValue::GOLD_DUST);
 
         if ($character->user->auto_sell_item) {
@@ -344,9 +320,6 @@ class BattleDrop
     /**
      * If the player can have the item, give it to them.
      *
-     * @param Character $character
-     * @param Item $item
-     * @param bool $isMythic
      * @return void
      */
     private function giveItemToPlayer(Character $character, Item $item, bool $isMythic = false)
@@ -358,16 +331,16 @@ class BattleDrop
             ]);
 
             if ($item->type === 'quest') {
-                $message = $character->name . ' has found: ' . $item->affix_name;
+                $message = $character->name.' has found: '.$item->affix_name;
 
-                event(new ServerMessageEvent($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
+                event(new ServerMessageEvent($character->user, 'You found: '.$item->affix_name.' on the enemies corpse.', $slot->id));
 
                 broadcast(new GlobalMessageEvent($message));
             } else {
-                event(new ServerMessageEvent($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
+                event(new ServerMessageEvent($character->user, 'You found: '.$item->affix_name.' on the enemies corpse.', $slot->id));
 
                 if ($isMythic) {
-                    event(new GlobalMessageEvent($character->name . ' Has found a mythical item on the enemies corpse! Such a rare drop!'));
+                    event(new GlobalMessageEvent($character->name.' Has found a mythical item on the enemies corpse! Such a rare drop!'));
                 }
             }
         }

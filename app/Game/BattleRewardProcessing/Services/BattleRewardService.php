@@ -26,36 +26,12 @@ use Throwable;
 
 class BattleRewardService
 {
-
-    /**
-     * @var ?Character $characterId
-     */
     private ?Character $character;
 
-    /**
-     * @var ?Monster $monsterId
-     */
     private ?Monster $monster;
 
-    /**
-     * @var array $context
-     */
     private array $context;
 
-    /**
-     * @param BattleMessageHandler $battleMessageHandler
-     * @param CharacterRewardService $characterRewardService
-     * @param FactionHandler $factionHandler
-     * @param FactionLoyaltyBountyHandler $factionLoyaltyBountyHandler
-     * @param FactionLoyaltyService $factionLoyaltyService
-     * @param GoldRush $goldRush
-     * @param BattleLocationRewardService $battleLocationRewardService
-     * @param DropCheckService $dropCheckService
-     * @param WeeklyBattleService $weeklyBattleService
-     * @param SecondaryRewardService $secondaryRewardService
-     * @param BattleGlobalEventParticipationHandler $battleGlobalEventParticipationHandler
-     * @param SkillService $skillService
-     */
     public function __construct(
         private readonly BattleMessageHandler $battleMessageHandler,
         private readonly CharacterRewardService $characterRewardService,
@@ -73,10 +49,6 @@ class BattleRewardService
 
     /**
      * Set up the battle reward service
-     *
-     * @param integer $characterId
-     * @param integer $monsterId
-     * @return BattleRewardService
      */
     public function setUp(int $characterId, int $monsterId): BattleRewardService
     {
@@ -90,21 +62,20 @@ class BattleRewardService
     /**
      * Set the context for the service.
      *
-     * @param array $context
      * @return $this
      */
-    public function setContext(array $context): BattleRewardService {
+    public function setContext(array $context): BattleRewardService
+    {
         $this->context = $context;
 
         return $this;
     }
 
     /**
-     * @param bool $includeWinterEvent
-     * @return void
      * @throws Throwable
      */
-    public function processRewards(bool $includeWinterEvent = false): void {
+    public function processRewards(bool $includeWinterEvent = false): void
+    {
 
         if (is_null($this->character) || is_null($this->monster)) {
             return;
@@ -129,11 +100,11 @@ class BattleRewardService
     /**
      * Handle awarding XP and Skill XP
      *
-     * @return void
      * @throws Exception
      */
-    private function handleAwardingXP(): void {
-        if (!isset($this->context['total_xp']) && !isset($this->context['total_creatures'])) {
+    private function handleAwardingXP(): void
+    {
+        if (! isset($this->context['total_xp']) && ! isset($this->context['total_creatures'])) {
             $this->characterRewardService->setCharacter($this->character)
                 ->distributeCharacterXP($this->monster);
 
@@ -157,12 +128,12 @@ class BattleRewardService
     /**
      * Handle awarding skill experience.
      *
-     * @return void
      * @throws Exception
      */
-    private function handleAwardSkillPoints(): void {
+    private function handleAwardSkillPoints(): void
+    {
 
-        if (!isset($this->context['total_skill_xp'])) {
+        if (! isset($this->context['total_skill_xp'])) {
             $this->characterRewardService->setCharacter($this->character)
                 ->distributeSkillXP($this->monster);
 
@@ -181,10 +152,10 @@ class BattleRewardService
     /**
      * Handle awarding faction points.
      *
-     * @return void
      * @throws Throwable
      */
-    private function handleFactionPoints(): void {
+    private function handleFactionPoints(): void
+    {
 
         $gameMap = $this->character->map->gameMap;
 
@@ -196,7 +167,7 @@ class BattleRewardService
             return;
         }
 
-        if (!isset($this->context['total_faction_points'])) {
+        if (! isset($this->context['total_faction_points'])) {
             $this->factionHandler->handleFaction($this->character, $this->monster);
 
             $this->character = $this->character->refresh();
@@ -213,17 +184,16 @@ class BattleRewardService
 
     /**
      * Handles Faction Bounties.
-     *
-     * @return void
      */
-    private function handleFactionLoyaltyBounty(): void {
+    private function handleFactionLoyaltyBounty(): void
+    {
         $gameMap = $this->character->map->gameMap;
 
         if ($gameMap->mapType()->isPurgatory()) {
             return;
         }
 
-        if (!isset($this->context['total_creatures'])) {
+        if (! isset($this->context['total_creatures'])) {
             $this->factionLoyaltyBountyHandler->handleBounty($this->character, $this->monster);
 
             $this->character = $this->character->refresh();
@@ -243,10 +213,10 @@ class BattleRewardService
     /**
      * Handle currency rewards
      *
-     * @return void
      * @throws Exception
      */
-    private function handleCurrencyRewards(): void {
+    private function handleCurrencyRewards(): void
+    {
         $totalKills = 1;
 
         if (isset($this->context['total_creatures'])) {
@@ -264,10 +234,9 @@ class BattleRewardService
 
     /**
      * Handle specific location rewards
-     *
-     * @return void
      */
-    private function handleSpecificLocationRewards(): void {
+    private function handleSpecificLocationRewards(): void
+    {
         $totalKills = 1;
 
         if (isset($this->context['total_creatures'])) {
@@ -280,10 +249,10 @@ class BattleRewardService
     /**
      * Process enemy drops.
      *
-     * @return void
      * @throws Exception
      */
-    private function handleItemDrops(): void {
+    private function handleItemDrops(): void
+    {
         $totalKills = 1;
 
         if (isset($this->context['total_creatures'])) {
@@ -308,10 +277,10 @@ class BattleRewardService
     /**
      * Handle weekly fight rewards, only when not exploring.
      *
-     * @return void
      * @throws Exception
      */
-    private function handleWeeklyFightRewards(): void {
+    private function handleWeeklyFightRewards(): void
+    {
         if ($this->character->is_auto_battling) {
             return;
         }
@@ -325,10 +294,10 @@ class BattleRewardService
      * - Class Ranks
      * - Item Skills
      *
-     * @return void
      * @throws Exception
      */
-    private function handleSecondaryRewards(): void {
+    private function handleSecondaryRewards(): void
+    {
         $totalKills = 1;
 
         if (isset($this->context['total_creatures'])) {
@@ -343,10 +312,10 @@ class BattleRewardService
     /**
      * Handle event participation.
      *
-     * @return void
      * @throws Exception
      */
-    private function handleGlobalEventParticipation(): void {
+    private function handleGlobalEventParticipation(): void
+    {
         $cacheTtl = now()->addSeconds(15);
 
         $event = Cache::remember(
@@ -365,7 +334,7 @@ class BattleRewardService
         }
 
         $globalEventGoal = Cache::remember(
-            'battle_reward_service:global_event_goal:' . $event->type,
+            'battle_reward_service:global_event_goal:'.$event->type,
             $cacheTtl,
             static function () use ($event): ?GlobalEventGoal {
                 return GlobalEventGoal::where('event_type', $event->type)->first();

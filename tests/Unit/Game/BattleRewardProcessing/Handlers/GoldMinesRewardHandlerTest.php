@@ -28,7 +28,7 @@ class GoldMinesRewardHandlerTest extends TestCase
 
     private ?GoldMinesRewardHandler $handler;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -36,7 +36,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         Cache::forget('monsters');
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->handler = null;
         Cache::forget('monsters');
@@ -44,7 +44,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         parent::tearDown();
     }
 
-    public function testReturnsCharacterWhenLocationDoesNotExist(): void
+    public function test_returns_character_when_location_does_not_exist(): void
     {
         $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
@@ -72,7 +72,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertEquals(30, $result->shards);
     }
 
-    public function testReturnsCharacterWhenLocationTypeIsNull(): void
+    public function test_returns_character_when_location_type_is_null(): void
     {
         $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
@@ -107,7 +107,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertEquals(30, $result->shards);
     }
 
-    public function testCurrencyRewardCapsWithoutEvent(): void
+    public function test_currency_reward_caps_without_event(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(1000);
 
@@ -127,7 +127,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $result->shards);
     }
 
-    public function testCurrencyRewardCapsWithEvent(): void
+    public function test_currency_reward_caps_with_event(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(5000);
 
@@ -151,7 +151,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $result->shards);
     }
 
-    public function testHandleRewardsCurrencyButReturnsEarlyWhenAutomationsAreRunning(): void
+    public function test_handle_rewards_currency_but_returns_early_when_automations_are_running(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(10);
 
@@ -199,7 +199,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertFalse(FlareEvent::where('type', EventType::GOLD_MINES)->exists());
     }
 
-    public function testHandleDoesNotRewardItemsWhenMonsterNotInCacheList(): void
+    public function test_handle_does_not_reward_items_when_monster_not_in_cache_list(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(10);
 
@@ -245,7 +245,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertFalse(FlareEvent::where('type', EventType::GOLD_MINES)->exists());
     }
 
-    public function testHandleDoesNotRewardItemsWhenMonsterIsBeforeHalfway(): void
+    public function test_handle_does_not_reward_items_when_monster_is_before_halfway(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(10);
 
@@ -296,7 +296,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertFalse(FlareEvent::where('type', EventType::GOLD_MINES)->exists());
     }
 
-    public function testHandleClampsLootingChanceWhenOverCap(): void
+    public function test_handle_clamps_looting_chance_when_over_cap(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(1);
         RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->andReturn(0);
@@ -318,7 +318,7 @@ class GoldMinesRewardHandlerTest extends TestCase
                 $query->where('name', 'Looting');
             })->first();
 
-        if (!is_null($lootingSkill)) {
+        if (! is_null($lootingSkill)) {
             $lootingSkill->update([
                 'skill_bonus' => 1,
             ]);
@@ -356,7 +356,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertFalse(FlareEvent::where('type', EventType::GOLD_MINES)->exists());
     }
 
-    public function testHandleUsesEventOverridesLootingChanceAndHalvesMaxRoll(): void
+    public function test_handle_uses_event_overrides_looting_chance_and_halves_max_roll(): void
     {
         $this->createEvent([
             'type' => EventType::GOLD_MINES,
@@ -409,7 +409,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertEquals($beforeSlots, $afterSlots);
     }
 
-    public function testHandleDoesNotRewardItemWhenDropCheckFailsButCanCreateEvent(): void
+    public function test_handle_does_not_reward_item_when_drop_check_fails_but_can_create_event(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(1);
         RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->andReturn(0);
@@ -454,7 +454,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertFalse(FlareEvent::where('type', EventType::GOLD_MINES)->exists());
     }
 
-    public function testHandleDoesNotRewardItemWhenInventoryIsFull(): void
+    public function test_handle_does_not_reward_item_when_inventory_is_full(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(1);
         RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->andReturn(0);
@@ -500,7 +500,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertEquals($beforeSlots, $afterSlots);
     }
 
-    public function testHandleDoesNotAddSlotWhenRewardItemQueryReturnsNull(): void
+    public function test_handle_does_not_add_slot_when_reward_item_query_returns_null(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(1);
         RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->andReturn(0);
@@ -552,7 +552,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertFalse(FlareEvent::where('type', EventType::GOLD_MINES)->exists());
     }
 
-    public function testHandleRewardsItemWhenDropCheckPassesAndInventoryNotFull(): void
+    public function test_handle_rewards_item_when_drop_check_passes_and_inventory_not_full(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(1);
         RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->andReturn(0);
@@ -617,7 +617,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertFalse(FlareEvent::where('type', EventType::GOLD_MINES)->exists());
     }
 
-    public function testHandleCreatesEventWhenRandomAtThreshold(): void
+    public function test_handle_creates_event_when_random_at_threshold(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(1);
         RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->andReturn(999);
@@ -659,7 +659,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertTrue(FlareEvent::where('type', EventType::GOLD_MINES)->exists());
     }
 
-    public function testHandleDoesNotAttemptToCreateEventWhenEventAlreadyExists(): void
+    public function test_handle_does_not_attempt_to_create_event_when_event_already_exists(): void
     {
         $this->createEvent([
             'type' => EventType::GOLD_MINES,
@@ -703,7 +703,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertEquals(1, FlareEvent::where('type', EventType::GOLD_MINES)->count());
     }
 
-    public function testReturnsCharacterWhenLocationIsNotGoldMines(): void
+    public function test_returns_character_when_location_is_not_gold_mines(): void
     {
         $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
@@ -738,7 +738,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertEquals(30, $result->shards);
     }
 
-    public function testReturnsCharacterWhenLocationIsNotGoldMinesWhenAlchemyChurch(): void
+    public function test_returns_character_when_location_is_not_gold_mines_when_alchemy_church(): void
     {
         $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
@@ -773,7 +773,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertEquals(30, $result->shards);
     }
 
-    public function testHandleClampsLootingChanceWhenOverCapByLevel(): void
+    public function test_handle_clamps_looting_chance_when_over_cap_by_level(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(1);
         RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->andReturn(0);
@@ -798,7 +798,7 @@ class GoldMinesRewardHandlerTest extends TestCase
                 $query->where('name', 'Looting');
             })->first();
 
-        if (!is_null($lootingSkill)) {
+        if (! is_null($lootingSkill)) {
             $lootingSkill->level = 999;
             $lootingSkill->save();
         }
@@ -844,7 +844,7 @@ class GoldMinesRewardHandlerTest extends TestCase
             'x' => $map->character_position_x,
             'y' => $map->character_position_y,
             'type' => LocationType::GOLD_MINES,
-            'name' => 'gold_mines_' . uniqid('', true),
+            'name' => 'gold_mines_'.uniqid('', true),
         ]);
     }
 
@@ -852,7 +852,7 @@ class GoldMinesRewardHandlerTest extends TestCase
     {
         $iterations = 0;
 
-        while (!$character->isInventoryFull() && $iterations < 250) {
+        while (! $character->isInventoryFull() && $iterations < 250) {
             $item = $this->createItem([
                 'type' => 'weapon',
             ]);

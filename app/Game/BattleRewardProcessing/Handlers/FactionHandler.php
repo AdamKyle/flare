@@ -32,9 +32,6 @@ class FactionHandler
     ) {}
 
     /**
-     * @param Character $character
-     * @param int $totalFactionPointsToReward
-     * @return void
      * @throws Throwable
      */
     public function awardFactionPointsFromBatch(Character $character, int $totalFactionPointsToReward): void
@@ -111,10 +108,6 @@ class FactionHandler
         });
     }
 
-    /**
-     * @param Character $character
-     * @return int
-     */
     public function getFactionPointsPerKill(Character $character): int
     {
         $map = GameMap::find($character->map->game_map_id);
@@ -156,7 +149,6 @@ class FactionHandler
 
         return $pointsPerKill;
     }
-
 
     /**
      * Handle faction points.

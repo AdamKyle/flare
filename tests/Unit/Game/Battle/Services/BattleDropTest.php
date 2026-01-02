@@ -45,7 +45,7 @@ class BattleDropTest extends TestCase
     use CreateQuest;
     use RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -53,7 +53,7 @@ class BattleDropTest extends TestCase
         config(['broadcasting.default' => 'log']);
     }
 
-    public function testHandleDropReturnsNullWhenCannotGetDrop(): void
+    public function test_handle_drop_returns_null_when_cannot_get_drop(): void
     {
         $gameMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'path' => 'path', 'default' => true]);
 
@@ -73,7 +73,7 @@ class BattleDropTest extends TestCase
         $this->assertNull($battleDrop->handleDrop($character, false));
     }
 
-    public function testHandleDropReturnsNullWhenDropIsNull(): void
+    public function test_handle_drop_returns_null_when_drop_is_null(): void
     {
         $gameMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'path' => 'path', 'default' => true]);
 
@@ -98,7 +98,7 @@ class BattleDropTest extends TestCase
         $this->assertNull($battleDrop->handleDrop($character, true));
     }
 
-    public function testHandleDropReturnsDropWhenNoAffix(): void
+    public function test_handle_drop_returns_drop_when_no_affix(): void
     {
         $gameMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'path' => 'path', 'default' => true]);
 
@@ -130,7 +130,7 @@ class BattleDropTest extends TestCase
         $this->assertSame(0, $character->refresh()->inventory->slots()->count());
     }
 
-    public function testHandleDropReturnsDropWhenReturnItemTrueEvenWithAffix(): void
+    public function test_handle_drop_returns_drop_when_return_item_true_even_with_affix(): void
     {
         $gameMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'path' => 'path', 'default' => true]);
 
@@ -167,7 +167,7 @@ class BattleDropTest extends TestCase
         $this->assertSame(0, $character->refresh()->inventory->slots()->count());
     }
 
-    public function testHandleDropAddsItemToInventoryWhenDropHasAffixAndReturnItemFalse(): void
+    public function test_handle_drop_adds_item_to_inventory_when_drop_has_affix_and_return_item_false(): void
     {
         Event::fake([ServerMessageEvent::class, GlobalMessageEvent::class]);
 
@@ -206,7 +206,7 @@ class BattleDropTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testHandleDropSendsInventoryFullMessageWhenInventoryIsFull(): void
+    public function test_handle_drop_sends_inventory_full_message_when_inventory_is_full(): void
     {
         $gameMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'path' => 'path', 'default' => true]);
 
@@ -260,7 +260,7 @@ class BattleDropTest extends TestCase
         $this->assertSame(1, $character->refresh()->inventory->slots()->count());
     }
 
-    public function testHandleDropAutoDisenchantAllCallsDisenchantWhenAutoSellDisabled(): void
+    public function test_handle_drop_auto_disenchant_all_calls_disenchant_when_auto_sell_disabled(): void
     {
         $gameMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'path' => 'path', 'default' => true]);
 
@@ -309,7 +309,7 @@ class BattleDropTest extends TestCase
         $this->assertSame(0, $character->refresh()->inventory->slots()->count());
     }
 
-    public function testHandleDropAutoDisenchantAllCallsDisenchantWhenAutoSellEnabledButNotCapped(): void
+    public function test_handle_drop_auto_disenchant_all_calls_disenchant_when_auto_sell_enabled_but_not_capped(): void
     {
         $gameMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'path' => 'path', 'default' => true]);
 
@@ -356,7 +356,7 @@ class BattleDropTest extends TestCase
         $this->assertSame(0, $character->refresh()->inventory->slots()->count());
     }
 
-    public function testHandleDropAutoDisenchantAllAutoSellsWhenGoldDustCappedAndAutoSellEnabled(): void
+    public function test_handle_drop_auto_disenchant_all_auto_sells_when_gold_dust_capped_and_auto_sell_enabled(): void
     {
         $gameMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'path' => 'path', 'default' => true]);
 
@@ -408,7 +408,7 @@ class BattleDropTest extends TestCase
         $this->assertSame(0, $character->refresh()->inventory->slots()->count());
     }
 
-    public function testHandleDropAutoDisenchantOneBillionGivesItemWhenOverThreshold(): void
+    public function test_handle_drop_auto_disenchant_one_billion_gives_item_when_over_threshold(): void
     {
         Event::fake([ServerMessageEvent::class, GlobalMessageEvent::class]);
 
@@ -458,7 +458,7 @@ class BattleDropTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testHandleDropAutoDisenchantOneBillionAutoSellsWhenUnderThresholdAndGoldDustCapped(): void
+    public function test_handle_drop_auto_disenchant_one_billion_auto_sells_when_under_threshold_and_gold_dust_capped(): void
     {
         $gameMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'path' => 'path', 'default' => true]);
 
@@ -510,7 +510,7 @@ class BattleDropTest extends TestCase
         $this->assertSame(0, $character->refresh()->inventory->slots()->count());
     }
 
-    public function testHandleDropAutoDisenchantDoesNothingWhenAmountIsUnknown(): void
+    public function test_handle_drop_auto_disenchant_does_nothing_when_amount_is_unknown(): void
     {
         $gameMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'path' => 'path', 'default' => true]);
 
@@ -556,7 +556,7 @@ class BattleDropTest extends TestCase
         $this->assertSame(0, $character->refresh()->inventory->slots()->count());
     }
 
-    public function testGiveMythicItemCreatesInventorySlotAndDispatchesGlobalMessage(): void
+    public function test_give_mythic_item_creates_inventory_slot_and_dispatches_global_message(): void
     {
         Event::fake([ServerMessageEvent::class, GlobalMessageEvent::class]);
 
@@ -585,7 +585,7 @@ class BattleDropTest extends TestCase
         Event::assertDispatched(GlobalMessageEvent::class);
     }
 
-    public function testHandleMonsterQuestDropReturnsNullWhenNoQuestItem(): void
+    public function test_handle_monster_quest_drop_returns_null_when_no_quest_item(): void
     {
         $gameMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'path' => 'path', 'default' => true]);
 
@@ -605,7 +605,7 @@ class BattleDropTest extends TestCase
         $this->assertNull($battleDrop->handleMonsterQuestDrop($character, false));
     }
 
-    public function testHandleMonsterQuestDropReturnsNullWhenDropCheckFails(): void
+    public function test_handle_monster_quest_drop_returns_null_when_drop_check_fails(): void
     {
         $gameMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'path' => 'path', 'default' => true]);
 
@@ -635,7 +635,7 @@ class BattleDropTest extends TestCase
         $this->assertSame(0, $character->refresh()->inventory->slots()->count());
     }
 
-    public function testHandleMonsterQuestDropReturnsQuestItemWhenReturnItemTrueAndDropCheckPasses(): void
+    public function test_handle_monster_quest_drop_returns_quest_item_when_return_item_true_and_drop_check_passes(): void
     {
         $gameMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'path' => 'path', 'default' => true]);
 
@@ -668,7 +668,7 @@ class BattleDropTest extends TestCase
         $this->assertSame(0, $character->refresh()->inventory->slots()->count());
     }
 
-    public function testHandleMonsterQuestDropGivesQuestItemWhenDropCheckPassesAndReturnItemFalse(): void
+    public function test_handle_monster_quest_drop_gives_quest_item_when_drop_check_passes_and_return_item_false(): void
     {
         Event::fake([ServerMessageEvent::class, GlobalMessageEvent::class]);
 
@@ -702,7 +702,7 @@ class BattleDropTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testHandleMonsterQuestDropDoesNotGiveQuestItemIfAlreadyInInventory(): void
+    public function test_handle_monster_quest_drop_does_not_give_quest_item_if_already_in_inventory(): void
     {
         Event::fake([ServerMessageEvent::class, GlobalMessageEvent::class]);
 
@@ -741,7 +741,7 @@ class BattleDropTest extends TestCase
         Event::assertNotDispatched(GlobalMessageEvent::class);
     }
 
-    public function testHandleSpecialLocationQuestItemReturnsWhenExploringAutomationExists(): void
+    public function test_handle_special_location_quest_item_returns_when_exploring_automation_exists(): void
     {
         $gameMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'path' => 'path', 'default' => true]);
 
@@ -764,7 +764,7 @@ class BattleDropTest extends TestCase
         $this->assertSame(0, $character->refresh()->inventory->slots()->count());
     }
 
-    public function testHandleSpecialLocationQuestItemDoesNothingWhenNoItems(): void
+    public function test_handle_special_location_quest_item_does_nothing_when_no_items(): void
     {
         $gameMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'path' => 'path', 'default' => true]);
 
@@ -785,7 +785,7 @@ class BattleDropTest extends TestCase
         $this->assertSame(0, $character->refresh()->inventory->slots()->count());
     }
 
-    public function testHandleSpecialLocationQuestItemDoesNothingWhenDropCheckFails(): void
+    public function test_handle_special_location_quest_item_does_nothing_when_drop_check_fails(): void
     {
         $gameMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'path' => 'path', 'default' => true]);
 
@@ -822,7 +822,7 @@ class BattleDropTest extends TestCase
         $this->assertSame(0, $character->refresh()->inventory->slots()->count());
     }
 
-    public function testHandleDropCoversGetMaxLevelBasedOnPlaneBranches(): void
+    public function test_handle_drop_covers_get_max_level_based_on_plane_branches(): void
     {
         $cases = [
             [MapNameValue::SURFACE, 49, 49],
@@ -872,7 +872,7 @@ class BattleDropTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testHandleSpecialLocationQuestItemGivesEligibleQuestItemAndClampsLootingChance(): void
+    public function test_handle_special_location_quest_item_gives_eligible_quest_item_and_clamps_looting_chance(): void
     {
         Event::fake([ServerMessageEvent::class, GlobalMessageEvent::class]);
 
@@ -956,7 +956,7 @@ class BattleDropTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testHandleSpecialLocationQuestItemCoversReturnDoesntHaveWhenNoQuestExistsForItem(): void
+    public function test_handle_special_location_quest_item_covers_return_doesnt_have_when_no_quest_exists_for_item(): void
     {
         $gameMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'path' => 'path', 'default' => true]);
 
@@ -995,7 +995,6 @@ class BattleDropTest extends TestCase
             $character->refresh()->inventory->slots()->where('item_id', $questItemWithNoQuest->id)->exists()
         );
     }
-
 
     private function buildBattleDrop(Monster $monster, ?RandomItemDropBuilder $randomItemDropBuilder = null): BattleDrop
     {

@@ -2,9 +2,7 @@
 
 namespace App\Game\BattleRewardProcessing\Jobs;
 
-use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
-use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -32,8 +30,6 @@ class BattleRewardHandler implements ShouldQueue
     /**
      * Process rewards from the fight.
      *
-     * @param BattleRewardService $battleRewardService
-     * @return void
      * @throws Throwable
      */
     public function handle(BattleRewardService $battleRewardService): void

@@ -13,10 +13,6 @@ use Exception;
 
 class BattleGlobalEventParticipationHandler extends BaseGlobalEventGoalParticipationHandler
 {
-    /**
-     * @param RandomAffixGenerator $randomAffixGenerator
-     * @param EventGoalsService $eventGoalService
-     */
     public function __construct(RandomAffixGenerator $randomAffixGenerator, EventGoalsService $eventGoalService)
     {
         parent::__construct($randomAffixGenerator, $eventGoalService);
@@ -25,10 +21,6 @@ class BattleGlobalEventParticipationHandler extends BaseGlobalEventGoalParticipa
     /**
      * Handle updating the global; event participation
      *
-     * @param Character $character
-     * @param GlobalEventGoal $globalEventGoal
-     * @param int $killCount
-     * @return void
      *
      * @throws Exception
      */

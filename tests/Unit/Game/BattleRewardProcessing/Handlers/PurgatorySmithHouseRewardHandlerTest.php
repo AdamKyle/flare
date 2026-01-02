@@ -29,7 +29,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
 
     private ?PurgatorySmithHouseRewardHandler $handler;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -37,7 +37,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         Cache::forget('monsters');
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->handler = null;
         Cache::forget('monsters');
@@ -45,7 +45,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         parent::tearDown();
     }
 
-    public function testReturnsCharacterWhenLocationDoesNotExist(): void
+    public function test_returns_character_when_location_does_not_exist(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
@@ -75,7 +75,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $this->assertEquals(30, $result->copper_coins);
     }
 
-    public function testReturnsCharacterWhenLocationTypeIsInvalid(): void
+    public function test_returns_character_when_location_type_is_invalid(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
@@ -112,7 +112,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $this->assertEquals(30, $result->copper_coins);
     }
 
-    public function testReturnsCharacterWhenLocationIsNotSmithHouse(): void
+    public function test_returns_character_when_location_is_not_smith_house(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
@@ -152,7 +152,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $this->assertEquals(30, $result->copper_coins);
     }
 
-    public function testCurrencyRewardCapsWithoutEventAndWithoutCopperCoinsItem(): void
+    public function test_currency_reward_caps_without_event_and_without_copper_coins_item(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->andReturn(1000);
 
@@ -172,7 +172,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $this->assertEquals(123, $result->copper_coins);
     }
 
-    public function testCurrencyRewardCapsWithEventAndWithCopperCoinsItem(): void
+    public function test_currency_reward_caps_with_event_and_with_copper_coins_item(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->andReturn(5000);
 
@@ -201,7 +201,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $this->assertEquals(MaxCurrenciesValue::MAX_COPPER, $result->copper_coins);
     }
 
-    public function testHandleRewardsCurrencyButReturnsEarlyWhenAutomationsAreRunning(): void
+    public function test_handle_rewards_currency_but_returns_early_when_automations_are_running(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->andReturn(10);
 
@@ -249,7 +249,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $this->assertEquals($beforeSlots, $afterSlots);
     }
 
-    public function testHandleDoesNotRewardItemsWhenMonsterNotInCacheList(): void
+    public function test_handle_does_not_reward_items_when_monster_not_in_cache_list(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->andReturn(10);
 
@@ -303,7 +303,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $this->assertFalse(FlareEvent::where('type', EventType::PURGATORY_SMITH_HOUSE)->exists());
     }
 
-    public function testHandleRewardsLegendaryAtHalfwayOrMoreAndDoesNotCreateEventWhenRandomBelowThreshold(): void
+    public function test_handle_rewards_legendary_at_halfway_or_more_and_does_not_create_event_when_random_below_threshold(): void
     {
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')->andReturnTrue();
 
@@ -381,7 +381,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $this->assertFalse(FlareEvent::where('type', EventType::PURGATORY_SMITH_HOUSE)->exists());
     }
 
-    public function testHandleDoesNotRewardItemWhenDropCheckFails(): void
+    public function test_handle_does_not_reward_item_when_drop_check_fails(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->andReturn(1000);
         RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->andReturn(0);
@@ -450,7 +450,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $this->assertEquals($beforeSlots, $afterSlots);
     }
 
-    public function testHandleDoesNotRewardItemWhenInventoryIsFull(): void
+    public function test_handle_does_not_reward_item_when_inventory_is_full(): void
     {
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')->andReturnTrue();
 
@@ -512,7 +512,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $this->assertEquals($beforeSlots, $afterSlots);
     }
 
-    public function testHandleDoesNotAddSlotWhenNoEligiblePurgatoryChainsItemExists(): void
+    public function test_handle_does_not_add_slot_when_no_eligible_purgatory_chains_item_exists(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->andReturn(1);
         RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->andReturn(0);
@@ -563,7 +563,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $this->assertEquals($beforeSlots, $afterSlots);
     }
 
-    public function testHandleFinalMonsterRewardsLegendaryAndMythicAndCreatesEvent(): void
+    public function test_handle_final_monster_rewards_legendary_and_mythic_and_creates_event(): void
     {
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')->andReturnTrue();
 
@@ -634,7 +634,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         }));
     }
 
-    public function testHandleClampsLootingChanceWhenOverCap(): void
+    public function test_handle_clamps_looting_chance_when_over_cap(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->andReturn(1);
         RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->andReturn(0);
@@ -705,7 +705,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $this->assertEquals($beforeSlots + 2, $afterSlots);
     }
 
-    public function testHandleUsesEventOverridesLootingChanceAndHalvesMaxRoll(): void
+    public function test_handle_uses_event_overrides_looting_chance_and_halves_max_roll(): void
     {
         $this->createEvent([
             'type' => EventType::PURGATORY_SMITH_HOUSE,
@@ -757,7 +757,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $this->assertEquals($beforeSlots, $afterSlots);
     }
 
-    public function testHandleDoesNotAddSlotWhenRewardItemQueryReturnsNull(): void
+    public function test_handle_does_not_add_slot_when_reward_item_query_returns_null(): void
     {
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')->once()->andReturnTrue();
 
@@ -808,7 +808,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $this->assertEquals($beforeSlots, $afterSlots);
     }
 
-    public function testHandleAggregatesCurrenciesForKillCount(): void
+    public function test_handle_aggregates_currencies_for_kill_count(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->twice()->andReturn(10);
 
@@ -843,7 +843,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $this->assertEquals(0, $result->copper_coins);
     }
 
-    public function testHandleRewardsLegendaryPerKillCountWhenHalfwayOrMore(): void
+    public function test_handle_rewards_legendary_per_kill_count_when_halfway_or_more(): void
     {
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')->andReturnTrue();
 
@@ -916,7 +916,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $this->assertFalse(FlareEvent::where('type', EventType::PURGATORY_SMITH_HOUSE)->exists());
     }
 
-    public function testHandleFinalMonsterCapsMythicToOnePerBatch(): void
+    public function test_handle_final_monster_caps_mythic_to_one_per_batch(): void
     {
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')->andReturnTrue();
 
@@ -989,7 +989,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         $this->assertFalse(FlareEvent::where('type', EventType::PURGATORY_SMITH_HOUSE)->exists());
     }
 
-    public function testHandleDoesNotRewardItemWhenInventoryIsFullAfterDropCheckPasses(): void
+    public function test_handle_does_not_reward_item_when_inventory_is_full_after_drop_check_passes(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->andReturn(1);
         RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->andReturn(0);
@@ -1063,7 +1063,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
             'x' => $map->character_position_x,
             'y' => $map->character_position_y,
             'type' => LocationType::PURGATORY_SMITH_HOUSE,
-            'name' => 'smith_house_' . uniqid('', true),
+            'name' => 'smith_house_'.uniqid('', true),
         ]);
     }
 

@@ -23,19 +23,12 @@ class CharacterCurrencyRewardService
 {
     private Character $character;
 
-    /**
-     * @param BattleMessageHandler $battleMessageHandler
-     */
     public function __construct(
         private readonly BattleMessageHandler $battleMessageHandler,
-    ) {
-    }
+    ) {}
 
     /**
      * Set the character.
-     *
-     * @param Character $character
-     * @return CharacterCurrencyRewardService
      */
     public function setCharacter(Character $character): CharacterCurrencyRewardService
     {
@@ -46,10 +39,6 @@ class CharacterCurrencyRewardService
 
     /**
      * Give currencies.
-     *
-     * @param Monster $monster
-     * @param int $killCount
-     * @return CharacterCurrencyRewardService
      */
     public function giveCurrencies(Monster $monster, int $killCount = 1): CharacterCurrencyRewardService
     {
@@ -69,10 +58,6 @@ class CharacterCurrencyRewardService
 
     /**
      * Handles Currency Event Rewards when the event is running.
-     *
-     * @param Monster $monster
-     * @param int $killCount
-     * @return CharacterCurrencyRewardService
      */
     public function currencyEventReward(Monster $monster, int $killCount = 1): CharacterCurrencyRewardService
     {
@@ -137,8 +122,6 @@ class CharacterCurrencyRewardService
 
     /**
      * Gets the character.
-     *
-     * @return Character
      */
     public function getCharacter(): Character
     {
@@ -147,10 +130,6 @@ class CharacterCurrencyRewardService
 
     /**
      * Gives gold to the player.
-     *
-     * @param Monster $monster
-     * @param int $killCount
-     * @return void
      */
     private function distributeGold(Monster $monster, int $killCount): void
     {
@@ -173,10 +152,6 @@ class CharacterCurrencyRewardService
 
     /**
      * Give copper coins only to those that have the quest item and are on purgatory.
-     *
-     * @param Monster $monster
-     * @param int $killCount
-     * @return void
      */
     private function distributeCopperCoins(Monster $monster, int $killCount): void
     {
@@ -225,9 +200,6 @@ class CharacterCurrencyRewardService
 
     /**
      * Are we at a location with an effect (special location)?
-     *
-     * @param Map $map
-     * @return Location|null
      */
     private function purgatoryDungeons(Map $map): ?Location
     {

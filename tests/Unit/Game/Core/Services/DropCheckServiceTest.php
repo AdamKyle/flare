@@ -24,21 +24,21 @@ class DropCheckServiceTest extends TestCase
 
     private ?DropCheckService $service;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->service = resolve(DropCheckService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->service = null;
 
         parent::tearDown();
     }
 
-    public function testProcessUsesDropCheckChanceWhenNotAtSpecialLocationAndNoGameMapBonus(): void
+    public function test_process_uses_drop_check_chance_when_not_at_special_location_and_no_game_map_bonus(): void
     {
         DropCheckCalculator::shouldReceive('fetchDropCheckChance')
             ->once()
@@ -46,7 +46,7 @@ class DropCheckServiceTest extends TestCase
                 return $level === 1
                     && abs($lootingChance - 0.10) < 0.00001
                     && abs($gameMapBonus - 0.0) < 0.00001
-                    && !is_null($passedMonster)
+                    && ! is_null($passedMonster)
                     && $passedMonster->id > 0;
             })
             ->andReturnFalse();
@@ -68,7 +68,7 @@ class DropCheckServiceTest extends TestCase
         $this->assertEquals($beforeSlots, $afterSlots);
     }
 
-    public function testProcessSetsGameMapBonusWhenPresent(): void
+    public function test_process_sets_game_map_bonus_when_present(): void
     {
         DropCheckCalculator::shouldReceive('fetchDropCheckChance')
             ->once()
@@ -76,7 +76,7 @@ class DropCheckServiceTest extends TestCase
                 return $level === 1
                     && abs($lootingChance - 0.10) < 0.00001
                     && abs($gameMapBonus - 0.25) < 0.00001
-                    && !is_null($passedMonster)
+                    && ! is_null($passedMonster)
                     && $passedMonster->id > 0;
             })
             ->andReturnFalse();
@@ -104,7 +104,7 @@ class DropCheckServiceTest extends TestCase
         $this->assertEquals($beforeSlots, $afterSlots);
     }
 
-    public function testProcessUsesDifficultItemChanceWhenAtSpecialLocationAndClampsLootingChanceAtPointFourFive(): void
+    public function test_process_uses_difficult_item_chance_when_at_special_location_and_clamps_looting_chance_at_point_four_five(): void
     {
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
             ->once()
@@ -132,7 +132,7 @@ class DropCheckServiceTest extends TestCase
         $this->assertEquals($beforeSlots, $afterSlots);
     }
 
-    public function testProcessHandlesKingCelestialMythicDropAndClampsLootingChanceAtPointOneFive(): void
+    public function test_process_handles_king_celestial_mythic_drop_and_clamps_looting_chance_at_point_one_five(): void
     {
         DropCheckCalculator::shouldReceive('fetchDropCheckChance')
             ->once()
@@ -163,7 +163,7 @@ class DropCheckServiceTest extends TestCase
         $this->assertEquals($beforeSlots, $afterSlots);
     }
 
-    public function testProcessHandlesKingCelestialMythicDropWithoutClampingWhenUnderCap(): void
+    public function test_process_handles_king_celestial_mythic_drop_without_clamping_when_under_cap(): void
     {
         DropCheckCalculator::shouldReceive('fetchDropCheckChance')
             ->once()
@@ -194,7 +194,7 @@ class DropCheckServiceTest extends TestCase
         $this->assertEquals($beforeSlots, $afterSlots);
     }
 
-    public function testProcessAwardsMythicItemInPurgatoryDungeonsWhenNoAutomations(): void
+    public function test_process_awards_mythic_item_in_purgatory_dungeons_when_no_automations(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->withAnyArgs()->zeroOrMoreTimes()->andReturn(1);
         RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->withAnyArgs()->zeroOrMoreTimes()->andReturn(1);
@@ -248,7 +248,7 @@ class DropCheckServiceTest extends TestCase
         $this->assertNotNull($newItem->item_suffix_id);
     }
 
-    public function testProcessDoesNotAwardMythicItemInPurgatoryDungeonsWhenAutomationsRunning(): void
+    public function test_process_does_not_award_mythic_item_in_purgatory_dungeons_when_automations_running(): void
     {
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
             ->once()
@@ -282,7 +282,7 @@ class DropCheckServiceTest extends TestCase
         $this->assertEquals($beforeSlots, $afterSlots);
     }
 
-    public function testProcessUsesCachedLocationWithEffectWhenKeyDoesNotChange(): void
+    public function test_process_uses_cached_location_with_effect_when_key_does_not_change(): void
     {
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
             ->twice()
@@ -319,7 +319,6 @@ class DropCheckServiceTest extends TestCase
         $this->assertEquals($beforeSlots, $afterSlots);
     }
 
-
     private function setLootingToBonus(Character $character, float $targetBonus): Character
     {
         $lootingSkill = $character->skills()->whereHas('baseSkill', function ($query) {
@@ -332,14 +331,14 @@ class DropCheckServiceTest extends TestCase
 
         $baseSkill = $lootingSkill->baseSkill;
 
-        if (!is_null($baseSkill)) {
+        if (! is_null($baseSkill)) {
             $baseSkill->skill_bonus_per_level = 0.01;
             $baseSkill->max_level = 100;
             $baseSkill->save();
         }
 
         $perLevel = 0.01;
-        $maxLevel = !is_null($baseSkill) ? (int) $baseSkill->max_level : 100;
+        $maxLevel = ! is_null($baseSkill) ? (int) $baseSkill->max_level : 100;
 
         if ($targetBonus >= 1.0) {
             $targetLevel = $maxLevel;
@@ -364,7 +363,7 @@ class DropCheckServiceTest extends TestCase
         $computed = $character->skills->where('name', 'Looting')->first()?->skill_bonus ?? 0.0;
 
         if (abs($computed - $targetBonus) > 0.00001 && $targetBonus < 1.0) {
-            throw new \Exception('Looting bonus did not match target. Got: ' . $computed . ' Target: ' . $targetBonus);
+            throw new \Exception('Looting bonus did not match target. Got: '.$computed.' Target: '.$targetBonus);
         }
 
         return $character;
@@ -380,7 +379,7 @@ class DropCheckServiceTest extends TestCase
             'y' => $map->character_position_y,
             'type' => $type,
             'enemy_strength_type' => 1,
-            'name' => 'special_location_' . uniqid('', true),
+            'name' => 'special_location_'.uniqid('', true),
         ]);
     }
 }

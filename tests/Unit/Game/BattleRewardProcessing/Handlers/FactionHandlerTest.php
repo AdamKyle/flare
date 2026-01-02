@@ -30,7 +30,7 @@ use Tests\Traits\CreateUser;
 
 class FactionHandlerTest extends TestCase
 {
-    use CreateGameMap, CreateItem, CreateItemAffix, CreateLocation, CreateMonster, CreateNpc, CreateQuest, CreateGuideQuest, CreateSkill, CreateUser, RefreshDatabase;
+    use CreateGameMap, CreateGuideQuest, CreateItem, CreateItemAffix, CreateLocation, CreateMonster, CreateNpc, CreateQuest, CreateSkill, CreateUser, RefreshDatabase;
 
     private ?CharacterFactory $character = null;
 
@@ -38,7 +38,7 @@ class FactionHandlerTest extends TestCase
 
     private ?FactionHandler $factionHandler = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -52,7 +52,7 @@ class FactionHandlerTest extends TestCase
         $this->factionHandler = resolve(FactionHandler::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -61,9 +61,6 @@ class FactionHandlerTest extends TestCase
         $this->factionHandler = null;
     }
 
-    /**
-     * @return int
-     */
     private function getMaxFactionLevel(): int
     {
         foreach (range(0, 500) as $candidate) {
@@ -77,17 +74,12 @@ class FactionHandlerTest extends TestCase
         return 0;
     }
 
-    /**
-     * @param array $options
-     * @return void
-     */
     private function createExploringAutomation(array $options): void
     {
         $this->assertNotNull($this->character);
 
         $this->character->assignAutomation($options);
     }
-
 
     public function test_award_faction_points_from_batch_returns_when_amount_is_zero(): void
     {
@@ -870,6 +862,7 @@ class FactionHandlerTest extends TestCase
         $this->assertSame(10, $factionAfter->current_points);
         $this->assertSame(1, $factionAfter->current_level);
     }
+
     public function test_get_faction_points_per_kill_skips_quests_with_null_bonus_or_null_required_level_and_applies_next_valid_bonus(): void
     {
         $character = $this->character->getCharacter();
@@ -1324,6 +1317,4 @@ class FactionHandlerTest extends TestCase
         $this->assertSame($maxLevel, $factionAfter->current_level);
         $this->assertSame(100, $factionAfter->current_points);
     }
-
-
 }

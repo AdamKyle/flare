@@ -86,7 +86,7 @@ class SkillBonusContextService
         }
 
         $skillName = $this->skill->baseSkill->name;
-        $questSlotsKey = $inventoryId . '|' . $skillName;
+        $questSlotsKey = $inventoryId.'|'.$skillName;
 
         if (array_key_exists($questSlotsKey, $this->questSlotsByInventoryIdAndSkillName)) {
             return $this->questSlotsByInventoryIdAndSkillName[$questSlotsKey];
