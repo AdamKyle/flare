@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Flare\Transformers;
+namespace App\Game\Character\CharacterSheet\Transformers;
 
 use App\Flare\Models\Character;
+use App\Flare\Transformers\BaseTransformer;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 
 class CharacterStatDetailsTransformer extends BaseTransformer

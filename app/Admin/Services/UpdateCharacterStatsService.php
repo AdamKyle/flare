@@ -5,7 +5,7 @@ namespace App\Admin\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameRace;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
 use Facades\App\Flare\Values\UserOnlineValue;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -26,7 +26,7 @@ class UpdateCharacterStatsService
             foreach ($characters as $character) {
                 $character = $this->updateCharacterStatsForRace($character, $oldRace, $newRace);
 
-                event(new UpdateTopBarEvent($character));
+                event(new UpdateCharacterBaseDetailsEvent($character));
             }
         });
 
@@ -107,7 +107,7 @@ class UpdateCharacterStatsService
             $character->save();
 
             if (UserOnlineValue::isOnline($character->user)) {
-                event(new UpdateTopBarEvent($character->refresh()));
+                event(new UpdateCharacterBaseDetailsEvent($character->refresh()));
 
                 ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::NEW_DAMAGE_STAT, $newClass->damage_stat);
             }

@@ -18,5 +18,13 @@ export const CharacterUpdatesWire = ({
     onEvent,
   });
 
+  useWebsocket<UseCharterUpdateStreamResponse>({
+    url: CoreWebSocketChannels.UPDATE_CORE_CHARACTER_DETAILS,
+    params: { userId },
+    type: ChannelType.PRIVATE,
+    channelName: CoreWebSocketEventNames.UPDATE_CORE_CHARACTER_DETAILS,
+    onEvent,
+  });
+
   return null;
 };

@@ -3,7 +3,7 @@
 namespace Tests\Unit\Game\BattleRewardProcessing\Services;
 
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Skills\Handlers\UpdateItemSkill;
 use Facades\App\Game\Skills\Handlers\UpdateItemSkill as UpdateItemSkillFacade;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -50,7 +50,7 @@ class SecondaryRewardServiceTest extends TestCase
 
         $this->secondaryRewardService->handleSecondaryRewards($character);
 
-        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
     }
 
     public function test_update_top_bar_is_called_when_logged_in()
@@ -72,7 +72,7 @@ class SecondaryRewardServiceTest extends TestCase
 
         $this->secondaryRewardService->handleSecondaryRewards($character);
 
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertDispatched(UpdateCharacterBaseDetailsEvent::class);
     }
 
     public function test_item_skill_do_nots_get_updated()
@@ -87,7 +87,7 @@ class SecondaryRewardServiceTest extends TestCase
 
         $this->secondaryRewardService->handleSecondaryRewards($character);
 
-        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
 
         $mock->shouldNotReceive('updateItemSkill');
     }
@@ -104,6 +104,6 @@ class SecondaryRewardServiceTest extends TestCase
 
         $this->secondaryRewardService->handleSecondaryRewards($character);
 
-        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
     }
 }

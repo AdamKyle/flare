@@ -4,7 +4,7 @@ namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Kingdoms\Values\UnitCosts;
 
@@ -48,7 +48,7 @@ class PurchasePeopleService
             'current_population' => $amountToBuy,
         ]);
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateCharacterBaseDetailsEvent($character->refresh()));
 
         $this->updateKingdom->updateKingdom($this->kingdom->refresh());
     }

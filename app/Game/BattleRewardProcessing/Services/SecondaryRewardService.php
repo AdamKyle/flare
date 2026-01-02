@@ -3,9 +3,9 @@
 namespace App\Game\BattleRewardProcessing\Services;
 
 use App\Flare\Models\Character;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\ClassRanks\Services\ClassRankService;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use Exception;
 use Facades\App\Game\Skills\Handlers\UpdateItemSkill;
 
@@ -41,7 +41,7 @@ class SecondaryRewardService
         $this->handleItemSkillUpdate($character, $killCount);
 
         if ($dispatchTopBarEvent && $character->isLoggedIn()) {
-            event(new UpdateTopBarEvent($character));
+            event(new UpdateCharacterBaseDetailsEvent($character));
         }
     }
 

@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Game\PassiveSkills\Services;
 
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\PassiveSkills\Jobs\TrainPassiveSkill;
 use App\Game\PassiveSkills\Services\PassiveSkillTrainingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -47,6 +47,6 @@ class PassiveTrainingSkillServiceTest extends TestCase
         $this->passiveSkillTrainingService->trainSkill($character->passiveSkills()->first(), $character);
 
         Queue::assertPushed(TrainPassiveSkill::class);
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertDispatched(UpdateCharacterBaseDetailsEvent::class);
     }
 }

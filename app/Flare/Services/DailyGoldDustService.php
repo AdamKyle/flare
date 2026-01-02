@@ -4,7 +4,7 @@ namespace App\Flare\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Types\LotteryMessageType;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -35,7 +35,7 @@ class DailyGoldDustService
 
         ServerMessageHandler::handleMessageWithNewValue($character->user, LotteryMessageType::DAILY_LOTTERY, number_format($amount), number_format($character->gold_dust));
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
     }
 
     /**
@@ -67,6 +67,6 @@ class DailyGoldDustService
 
         ServerMessageHandler::handleMessageWithNewValue($character->user, LotteryMessageType::LOTTO_MAX, number_format(self::LOTTO_MAX), number_format($character->gold_dust));
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
     }
 }

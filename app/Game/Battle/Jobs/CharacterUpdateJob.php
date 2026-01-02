@@ -3,9 +3,9 @@
 namespace App\Game\Battle\Jobs;
 
 use App\Flare\Models\Character;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -28,7 +28,7 @@ class CharacterUpdateJob implements ShouldQueue
      */
     public function handle(): void
     {
-        event(new UpdateTopBarEvent($this->character));
+        event(new UpdateCharacterBaseDetailsEvent($this->character));
 
         event(new UpdateCharacterCurrenciesEvent($this->character));
     }

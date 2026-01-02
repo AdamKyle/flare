@@ -7,14 +7,14 @@ use App\Flare\Models\CharacterBoon;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\CharacterInventory\Events\CharacterBoonsUpdateBroadcastEvent;
 use App\Game\Character\CharacterInventory\Jobs\CharacterBoonJob;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
+use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
@@ -83,7 +83,7 @@ class UseItemService
         $this->updateCharacterAttackTypes->updateCache($character);
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         event(new UpdateCharacterInventoryCountEvent($character));
 
@@ -125,7 +125,7 @@ class UseItemService
         $this->updateCharacterAttackTypes->updateCache($character);
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         event(new UpdateCharacterInventoryCountEvent($character));
 
@@ -217,7 +217,7 @@ class UseItemService
         $characterAttack = new ResourceItem($character, $this->characterAttackTransformer);
 
         event(new UpdateBaseCharacterInformation($character->user, $this->manager->createData($characterAttack)->toArray()));
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         if (! is_null($item)) {
             event(new ServerMessageEvent($character->user, 'You used: '.$item->name));

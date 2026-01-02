@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Events;
+namespace App\Game\Character\CharacterSheet\Events;
 
 use App\Flare\Models\User;
 use Illuminate\Broadcasting\Channel;
@@ -10,19 +10,19 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class UpdateTopBarBroadcastEvent implements ShouldBroadcastNow
+class UpdateCharacterBaseDetailsBroadcastEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * @var array
      */
-    public $characterSheet;
+    public array $characterSheet;
 
     /**
      * @var User
      */
-    private $user;
+    private User $user;
 
     /**
      * Create a new event instance.
@@ -38,10 +38,10 @@ class UpdateTopBarBroadcastEvent implements ShouldBroadcastNow
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return Channel|array
+     * @return Channel|PrivateChannel
      */
-    public function broadcastOn()
+    public function broadcastOn(): Channel|PrivateChannel
     {
-        return new PrivateChannel('update-top-bar-'.$this->user->id);
+        return new PrivateChannel('update-character-base-details-'.$this->user->id);
     }
 }

@@ -4,7 +4,7 @@ namespace App\Flare\Jobs;
 
 use App\Admin\Events\UpdateAdminChatEvent;
 use App\Flare\Models\User;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Bus\Queueable;
@@ -46,7 +46,7 @@ class UpdateSilencedUserJob implements ShouldQueue
 
         ServerMessageHandler::handleMessage($user, CharacterMessageTypes::SILENCED, $forMessage);
 
-        event(new UpdateTopBarEvent($user->character));
+        event(new UpdateCharacterBaseDetailsEvent($user->character));
 
         $adminUser = User::with('roles')->whereHas('roles', function ($q) {
             $q->where('name', 'Admin');

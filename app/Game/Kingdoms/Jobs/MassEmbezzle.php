@@ -5,7 +5,7 @@ namespace App\Game\Kingdoms\Jobs;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Kingdoms\Service\KingdomService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Bus\Queueable;
@@ -169,7 +169,7 @@ class MassEmbezzle implements ShouldQueue
 
         $character = $this->character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         event(new ServerMessageEvent($this->character->user, $message));
     }

@@ -4,7 +4,7 @@ namespace App\Game\PassiveSkills\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterPassiveSkill;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\PassiveSkills\Services\PassiveSkillTrainingService;
 use App\Http\Controllers\Controller;
@@ -66,7 +66,7 @@ class CharacterPassiveSkillController extends Controller
 
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         return response()->json([
             'message' => 'Stopped training '.$characterPassiveSkill->passiveSkill->name,

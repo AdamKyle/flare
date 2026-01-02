@@ -9,8 +9,8 @@ use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\NpcActions\LabyrinthOracle\Events\LabyrinthOracleUpdate;
 
@@ -92,7 +92,7 @@ class InventorySetService
         $character = $character->refresh();
 
         if ($fireEvents) {
-            event(new UpdateTopBarEvent($character));
+            event(new UpdateCharacterBaseDetailsEvent($character));
 
             event(new LabyrinthOracleUpdate($character));
 
@@ -193,7 +193,7 @@ class InventorySetService
             $setName = 'Set '.$index + 1;
         }
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         event(new UpdateCharacterInventoryCountEvent($character));
 
@@ -249,7 +249,7 @@ class InventorySetService
 
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         event(new UpdateCharacterInventoryCountEvent($character));
 
@@ -645,7 +645,7 @@ class InventorySetService
             $setName = $inventorySet->name;
         }
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         $inventory = $this->characterInventoryService->setCharacter($character);
 

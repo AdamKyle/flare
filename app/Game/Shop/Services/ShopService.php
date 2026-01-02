@@ -13,7 +13,7 @@ use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Shop\Events\BuyItemEvent;
@@ -71,7 +71,7 @@ class ShopService
             ]);
         }
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         return $this->successResult([
             'message' => 'Sold all your items for a total of: '.number_format($totalSoldFor).' gold.',

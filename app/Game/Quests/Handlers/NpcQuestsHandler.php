@@ -4,7 +4,7 @@ namespace App\Game\Quests\Handlers;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Quest;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Quests\Traits\QuestDetails;
 use Exception;
@@ -122,6 +122,6 @@ class NpcQuestsHandler
             'copper_coins' => ! is_null($quest->copper_coin_cost) ? $newCopperCoins : $character->copper_coins,
         ]);
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateCharacterBaseDetailsEvent($character->refresh()));
     }
 }

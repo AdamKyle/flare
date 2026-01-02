@@ -3,7 +3,7 @@
 namespace App\Game\Kingdoms\Controllers\Api;
 
 use App\Flare\Models\Character;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Kingdoms\Requests\NPCKingdomPurchaseRequest;
 use App\Game\Kingdoms\Service\KingdomSettleService;
 use App\Http\Controllers\Controller;
@@ -53,7 +53,7 @@ class NpcKingdomController extends Controller
 
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         return response()->json($this->kingdomSettleService->addKingdomToMap($character), 200);
     }

@@ -8,7 +8,7 @@ use App\Admin\Jobs\BanEmail;
 use App\Admin\Jobs\UpdateBannedUserJob;
 use App\Flare\Jobs\UpdateSilencedUserJob;
 use App\Flare\Models\User;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
 use Carbon\Carbon;
@@ -41,7 +41,7 @@ class UserService
 
         $user = $user->refresh();
 
-        event(new UpdateTopBarEvent($user->character));
+        event(new UpdateCharacterBaseDetailsEvent($user->character));
 
         $this->sendUserMail($user, $unBanAt);
 
@@ -91,7 +91,7 @@ class UserService
 
         ServerMessageHandler::handleMessage($user, CharacterMessageTypes::SILENCED, $message);
 
-        event(new UpdateTopBarEvent($user->character));
+        event(new UpdateCharacterBaseDetailsEvent($user->character));
 
         UpdateSilencedUserJob::dispatch($user)->delay($canSpeakAgainAt);
 
@@ -104,7 +104,7 @@ class UserService
             'force_name_change' => true,
         ]);
 
-        event(new UpdateTopBarEvent($user->character->refresh()));
+        event(new UpdateCharacterBaseDetailsEvent($user->character->refresh()));
 
         broadcast(new UpdateAdminChatEvent(auth()->user()));
     }

@@ -8,13 +8,13 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Models\Monster;
 use App\Flare\Models\ScheduledEvent;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Battle\Values\MaxLevel;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
+use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -61,7 +61,7 @@ class CharacterXPService
         $this->handleLevelUp();
 
         if (! $this->character->isLoggedIn()) {
-            event(new UpdateTopBarEvent($this->character->refresh()));
+            event(new UpdateCharacterBaseDetailsEvent($this->character->refresh()));
         }
 
         return $this;

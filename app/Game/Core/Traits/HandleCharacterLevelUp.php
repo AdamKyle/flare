@@ -3,8 +3,8 @@
 namespace App\Game\Core\Traits;
 
 use App\Flare\Models\Character;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
+use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Messages\Types\CharacterMessageTypes;

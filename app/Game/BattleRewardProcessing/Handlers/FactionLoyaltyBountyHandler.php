@@ -9,7 +9,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Monster;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Factions\FactionLoyalty\Concerns\FactionLoyalty;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
@@ -143,7 +143,7 @@ class FactionLoyaltyBountyHandler
 
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         $this->battleMessageHandler->handleCurrencyGainMessage($character->user, CurrenciesMessageTypes::GOLD, $goldToReward, $character->gold);
         $this->battleMessageHandler->handleCurrencyGainMessage($character->user, CurrenciesMessageTypes::GOLD_DUST, $goldDustToReward, $character->gold_dust);

@@ -5,7 +5,7 @@ namespace App\Game\Kingdoms\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\Kingdoms\Jobs\MassEmbezzle;
 use App\Game\Kingdoms\Requests\KingdomDepositRequest;
@@ -143,7 +143,7 @@ class KingdomTreasuryController extends Controller
 
         $this->updateKingdomHandler->refreshPlayersKingdoms($character);
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         return response()->json([
             'message' => 'Deposited: '.number_format($amountToDeposit).' which in turn increased your morale to: '.($newMorale * 100).'%',

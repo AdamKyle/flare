@@ -8,8 +8,8 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Values\RandomAffixDetails;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Facades\App\Game\Core\Handlers\DuplicateItemHandler;
@@ -76,7 +76,7 @@ class ReRollEnchantmentService
 
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         event(new ServerMessageEvent($character->user, 'Ooooh hoo hoo hoo! I have done it, child! I have made the modifications and I think you\'ll be happy! Oh child, I am so happy! Ooh hoo hoo hoo!'));
     }

@@ -8,7 +8,7 @@ use App\Flare\Models\FactionLoyaltyNpc;
 use App\Flare\Models\Item;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Factions\FactionLoyalty\Concerns\FactionLoyalty;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
@@ -149,7 +149,7 @@ class UpdateCraftingTasksForFactionLoyalty
             'shards' => $newShards,
         ]);
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateCharacterBaseDetailsEvent($character->refresh()));
 
         ServerMessageHandler::sendBasicMessage($character->user, 'Your fame with: '.$factionLoyaltyNpc->npc->real_name.' on Plane: '.$factionLoyaltyNpc->npc->gameMap->name);
     }

@@ -4,7 +4,7 @@ namespace App\Game\Kingdoms\Controllers\Api;
 
 use App\Flare\Models\Kingdom;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Kingdoms\Requests\PurchaseGoldBarsRequest;
 use App\Game\Kingdoms\Requests\WithdrawGoldBarsRequest;
 use App\Game\Kingdoms\Service\UpdateKingdom;
@@ -75,7 +75,7 @@ class KingdomGoldBarsController extends Controller
 
         $this->updateKingdom->updateKingdomAllKingdoms($character->refresh());
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateCharacterBaseDetailsEvent($character->refresh()));
 
         return response()->json([
             'message' => 'Purchased: '.number_format($amountToBuy).' Gold bars.',
@@ -123,7 +123,7 @@ class KingdomGoldBarsController extends Controller
 
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         $this->updateKingdom->updateKingdom($kingdom->refresh());
 

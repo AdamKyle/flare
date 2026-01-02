@@ -6,9 +6,9 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\GemBagSlot;
 use App\Flare\Models\Skill;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Gems\Builders\GemBuilder;
 use App\Game\Gems\Values\GemTierValue;
@@ -190,7 +190,7 @@ class GemService
 
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         return $character;
     }

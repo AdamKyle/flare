@@ -8,7 +8,7 @@ use App\Flare\Models\GuideQuest;
 use App\Flare\Models\QuestsCompleted;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Events\Values\EventType;
 use App\Game\GuideQuests\Events\ShowGuideQuestCompletedToast;
@@ -113,7 +113,7 @@ class GuideQuestService
             event(new ServerMessageEvent($character->user, 'Rewarded with: '.number_format($quest->shards_reward).' Shards. You now have: '.number_format($character->shards)));
         }
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         event(new ShowGuideQuestCompletedToast($character->user, false));
 

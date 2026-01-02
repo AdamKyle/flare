@@ -9,8 +9,8 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CraftingMessageTypes;
@@ -75,7 +75,7 @@ class DisenchantService
 
             $this->setUp($character)->disenchantWithSkill($foundItem);
 
-            event(new UpdateTopBarEvent($character->refresh()));
+            event(new UpdateCharacterBaseDetailsEvent($character->refresh()));
         }
 
         if ($doNotSendResponse) {
@@ -227,7 +227,7 @@ class DisenchantService
             'gold_dust' => $characterTotalGoldDust,
         ]);
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateCharacterBaseDetailsEvent($character->refresh()));
 
         return $goldDust;
     }

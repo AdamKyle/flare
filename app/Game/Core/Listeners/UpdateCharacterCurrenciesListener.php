@@ -3,8 +3,8 @@
 namespace App\Game\Core\Listeners;
 
 use App\Flare\Transformers\CharacterCurrenciesTransformer;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Flare\Transformers\CharacterTopBarTransformer;
+use App\Game\Character\CharacterSheet\Transformers\CharacterBaseDetailsTransformer;
+use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Events\UpdateCharacterCurrenciesBroadcastEvent;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use League\Fractal\Manager;
@@ -17,7 +17,7 @@ class UpdateCharacterCurrenciesListener
     private CharacterCurrenciesTransformer $characterCurrenciesTransformer;
 
     /**
-     * @param  CharacterTopBarTransformer  $characterTopBarTransformer
+     * @param  CharacterBaseDetailsTransformer  $characterTopBarTransformer
      * @param  CharacterSheetBaseInfoTransformer  $characterSheetBaseInfoTransformer
      */
     public function __construct(Manager $manager, CharacterCurrenciesTransformer $characterCurrenciesTransformer)

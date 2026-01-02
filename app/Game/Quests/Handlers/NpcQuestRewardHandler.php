@@ -10,7 +10,7 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Factions\FactionLoyalty\Services\UpdateFactionLoyaltyService;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
@@ -297,7 +297,7 @@ class NpcQuestRewardHandler
 
         broadcast(new ServerMessageEvent($character->user, 'Quest: '.$quest->name.' completed. Check quest logs under quest logs section.'));
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
     }
 
     private function giveAdditionalSetsToCharacter(Character $character): Character

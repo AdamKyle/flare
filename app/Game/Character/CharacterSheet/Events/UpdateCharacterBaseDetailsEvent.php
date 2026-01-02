@@ -1,23 +1,23 @@
 <?php
 
-namespace App\Game\Core\Events;
+namespace App\Game\Character\CharacterSheet\Events;
 
 use App\Flare\Models\Character;
 use Illuminate\Queue\SerializesModels;
 
-class UpdateTopBarEvent
+class UpdateCharacterBaseDetailsEvent
 {
     use SerializesModels;
 
     /**
-     * @var Character;
+     * @var Character $character;
      */
-    public $character;
+    public Character $character;
 
     /**
      * Create a new event instance.
      *
-     * @return void
+     * @param Character $character
      */
     public function __construct(Character $character)
     {

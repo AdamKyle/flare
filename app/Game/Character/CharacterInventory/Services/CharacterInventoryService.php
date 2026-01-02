@@ -18,8 +18,8 @@ use App\Flare\Transformers\UsableItemTransformer;
 use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
@@ -700,7 +700,7 @@ class CharacterInventoryService
 
         $this->updateCharacterAttackDataCache($character);
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateCharacterBaseDetailsEvent($character->refresh()));
 
         return $this->successResult([
             'message' => 'Unequipped item: '.$foundItem->item->affix_name,
@@ -769,7 +769,7 @@ class CharacterInventoryService
 
         $character = $this->character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         event(new UpdateCharacterInventoryCountEvent($character));
 
@@ -796,7 +796,7 @@ class CharacterInventoryService
 
         $character = $this->character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         return $this->successResult([
             'message' => 'Destroyed All Alchemy Items.',

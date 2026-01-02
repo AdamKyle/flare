@@ -4,7 +4,7 @@ namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Models\Kingdom;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 
 class KingdomService
@@ -42,6 +42,6 @@ class KingdomService
 
         $this->updateKingdomHandle->refreshPlayersKingdoms($character->refresh());
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateCharacterBaseDetailsEvent($character->refresh()));
     }
 }

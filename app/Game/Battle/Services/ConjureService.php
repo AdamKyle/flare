@@ -11,7 +11,7 @@ use App\Flare\Models\Npc;
 use App\Flare\Values\MapNameValue;
 use App\Flare\Values\NpcTypes;
 use App\Game\Battle\Values\CelestialConjureType;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Events\Values\EventType;
 use App\Game\Maps\Events\UpdateMap;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
@@ -151,7 +151,7 @@ class ConjureService
         $characterMapId = $character->map->game_map_id;
         $npc = Npc::where('type', NpcTypes::SUMMONER)->where('game_map_id', $characterMapId)->first();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         event(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build(NpcMessageTypes::PAID_CONJURING, $npc)));
     }

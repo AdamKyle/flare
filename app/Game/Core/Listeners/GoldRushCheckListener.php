@@ -3,8 +3,8 @@
 namespace App\Game\Core\Listeners;
 
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Events\GoldRushCheckEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Types\MessageType;
 use Exception;
 use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
@@ -52,7 +52,7 @@ class GoldRushCheckListener
 
             ServerMessageHandler::handleMessage($character->user, $type, number_format($goldRush));
 
-            event(new UpdateTopBarEvent($character));
+            event(new UpdateCharacterBaseDetailsEvent($character));
         }
     }
 }

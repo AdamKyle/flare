@@ -60,6 +60,8 @@ const GameDataProvider = (props: GameDataProviderProps) => {
   const handleOnCharacterUpdate = (
     character: UseCharterUpdateStreamResponse
   ) => {
+    console.log(character);
+
     setGameData((prev): GameDataDefinition | null => {
       if (!prev || !prev.character) {
         return prev;

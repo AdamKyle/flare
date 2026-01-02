@@ -15,8 +15,8 @@ use App\Game\Battle\Jobs\CelestialTimeOut;
 use App\Game\Battle\Values\CelestialConjureType;
 use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Events\UpdateCharacterCelestialTimeOut;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -228,7 +228,7 @@ class CelestialFightService
 
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         event(new ServerMessageEvent($character->user, 'You received: '.number_format($monsterShards).' shards! Shards can only be used in Alchemy.'));
     }

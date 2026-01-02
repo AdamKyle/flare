@@ -1,10 +1,13 @@
 <?php
 
-namespace App\Flare\Transformers;
+namespace App\Game\Character\CharacterSheet\Transformers;
 
 use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
+use App\Flare\Transformers\BaseTransformer;
+use App\Flare\Transformers\CharacterInventoryCountTransformer;
+use App\Flare\Transformers\CharacterReincarnationInfoTransformer;
 use App\Flare\Values\ClassAttackValue;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use Exception;
@@ -74,7 +77,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'can_access_purgatory_chains' => $character->map->gameMap->mapType()->isPurgatory(),
             'can_access_labyrinth_oracle' => $character->map->gameMap->mapType()->isLabyrinth(),
             'can_access_twisted_earth' => $character->map->gameMap->mapType()->isTwistedMemories(),
-            'is_in_timeout' => ! is_null($character->user->timeout_until),
+            'is_in_timeout' => !is_null($character->user->timeout_until),
             'resurrection_chance' => $characterStatBuilder->buildResurrectionChance(),
             'spell_evasion' => $characterStatBuilder,
             'elemental_atonements' => $characterStatBuilder->buildElementalAtonement(),

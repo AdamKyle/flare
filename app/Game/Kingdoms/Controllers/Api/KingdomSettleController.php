@@ -3,7 +3,7 @@
 namespace App\Game\Kingdoms\Controllers\Api;
 
 use App\Flare\Models\Character;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Kingdoms\Requests\KingdomsSettleRequest;
 use App\Game\Kingdoms\Service\KingdomSettleService;
 use App\Http\Controllers\Controller;
@@ -47,7 +47,7 @@ class KingdomSettleController extends Controller
             'gold' => $character->gold - $amount,
         ]);
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateCharacterBaseDetailsEvent($character->refresh()));
 
         $this->kingdomSettleService->createKingdom($character, $request->name);
 

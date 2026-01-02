@@ -4,8 +4,8 @@ namespace App\Game\Core\Listeners;
 
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Events\CharacterLevelUpEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Messages\Types\CharacterMessageTypes;
 use Exception;
@@ -46,11 +46,11 @@ class CharacterLevelUpListener
             if ($event->shouldUpdateCache) {
                 $this->buildCharacterAttackTypes->buildCache($character);
 
-                event(new UpdateTopBarEvent($character));
+                event(new UpdateCharacterBaseDetailsEvent($character));
                 event(new UpdateCharacterAttackEvent($character));
             }
         } else {
-            event(new UpdateTopBarEvent($event->character));
+            event(new UpdateCharacterBaseDetailsEvent($event->character));
         }
     }
 }

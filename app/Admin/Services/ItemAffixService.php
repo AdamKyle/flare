@@ -8,7 +8,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Models\MarketHistory;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Messages\Types\AdminMessageTypes;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Database\Eloquent\Collection;
@@ -125,7 +125,7 @@ class ItemAffixService
 
             ServerMessageHandler::handleMessage($character->user, AdminMessageTypes::DELETED_AFFIX, $forMessages);
 
-            event(new UpdateTopBarEvent($character));
+            event(new UpdateCharacterBaseDetailsEvent($character));
         }
     }
 }

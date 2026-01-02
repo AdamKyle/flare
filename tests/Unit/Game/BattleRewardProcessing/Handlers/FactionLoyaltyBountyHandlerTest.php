@@ -5,7 +5,7 @@ namespace Tests\Unit\Game\BattleRewardProcessing\Handlers;
 use App\Flare\Values\MapNameValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -54,7 +54,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $this->factionLoyaltyBountyHandler->handleBounty($character, $monster);
 
         Event::assertNotDispatched(ServerMessageEvent::class);
-        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
     }
 
     public function test_does_not_handle_bounty_when_character_is_not_pledged_to_a_faction()
@@ -77,7 +77,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $this->factionLoyaltyBountyHandler->handleBounty($character->refresh(), $monster);
 
         Event::assertNotDispatched(ServerMessageEvent::class);
-        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
     }
 
     public function test_does_not_handle_bounty_when_character_is_not_helping_an_npc()
@@ -112,7 +112,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $this->factionLoyaltyBountyHandler->handleBounty($character->refresh(), $monster);
 
         Event::assertNotDispatched(ServerMessageEvent::class);
-        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
     }
 
     public function test_does_not_update_loyalty_tasks_when_no_bounty_task_found()
@@ -153,7 +153,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $this->factionLoyaltyBountyHandler->handleBounty($character->refresh(), $monster);
 
         Event::assertNotDispatched(ServerMessageEvent::class);
-        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
     }
 
     public function test_does_not_update_loyalty_tasks_when_player_is_not_on_the_same_map()
@@ -200,7 +200,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $this->factionLoyaltyBountyHandler->handleBounty($character->refresh(), $monster);
 
         Event::assertNotDispatched(ServerMessageEvent::class);
-        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
     }
 
     public function test_does_not_handle_bounty_when_monster_is_not_apart_of_the_bounty_list()
@@ -247,7 +247,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $character = $this->factionLoyaltyBountyHandler->handleBounty($character->refresh(), $monster);
 
         Event::assertNotDispatched(ServerMessageEvent::class);
-        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
 
         $this->assertEquals(0, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->factionLoyaltyNpcTasks->fame_tasks[0]['current_amount']);
     }
@@ -296,7 +296,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $character = $this->factionLoyaltyBountyHandler->handleBounty($character->refresh(), $monster);
 
         Event::assertDispatched(ServerMessageEvent::class);
-        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
 
         $this->assertEquals(1, $character->factionLoyalties->first()
             ->factionLoyaltyNpcs
@@ -354,7 +354,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $character = $this->factionLoyaltyBountyHandler->handleBounty($character->refresh(), $monster);
 
         Event::assertDispatched(ServerMessageEvent::class);
-        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
 
         $this->assertEquals(2, $character->factionLoyalties->first()
             ->factionLoyaltyNpcs
@@ -446,7 +446,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $character = $this->factionLoyaltyBountyHandler->handleBounty($character->refresh(), $monster);
 
         Event::assertDispatched(ServerMessageEvent::class);
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertDispatched(UpdateCharacterBaseDetailsEvent::class);
 
         $this->assertEquals(2, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->current_level);
         $this->assertEquals(1000000, $character->gold);
@@ -540,7 +540,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $character = $this->factionLoyaltyBountyHandler->handleBounty($character->refresh(), $monster);
 
         Event::assertDispatched(ServerMessageEvent::class);
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertDispatched(UpdateCharacterBaseDetailsEvent::class);
 
         $this->assertEquals(2, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->current_level);
         $this->assertEquals(1000000, $character->gold);
@@ -632,7 +632,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $character = $this->factionLoyaltyBountyHandler->handleBounty($character->refresh(), $monster);
 
         Event::assertDispatched(ServerMessageEvent::class);
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertDispatched(UpdateCharacterBaseDetailsEvent::class);
 
         $this->assertEquals(2, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->current_level);
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD, $character->gold);
@@ -716,7 +716,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $character = $this->factionLoyaltyBountyHandler->handleBounty($character->refresh(), $monster);
 
         Event::assertDispatched(ServerMessageEvent::class);
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertDispatched(UpdateCharacterBaseDetailsEvent::class);
 
         $this->assertEquals(25, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->current_level);
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD, $character->gold);
@@ -801,7 +801,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $character = $this->factionLoyaltyBountyHandler->handleBounty($character->refresh(), $monster);
 
         Event::assertNotDispatched(ServerMessageEvent::class);
-        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
 
         $this->assertEquals(25, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->current_level);
         $this->assertEquals(0, $character->gold);
@@ -849,7 +849,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         $this->assertEquals($initialMapId, $character->map->game_map_id);
 
         Event::assertNotDispatched(ServerMessageEvent::class);
-        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
     }
 
     public function test_gives_thousand_xp_when_npc_current_level_is_zero()
@@ -937,7 +937,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
 
         $character = $this->factionLoyaltyBountyHandler->handleBounty($character->refresh(), $monster);
 
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertDispatched(UpdateCharacterBaseDetailsEvent::class);
         Event::assertDispatched(ServerMessageEvent::class);
 
         $this->assertEquals(1000, $character->refresh()->xp);

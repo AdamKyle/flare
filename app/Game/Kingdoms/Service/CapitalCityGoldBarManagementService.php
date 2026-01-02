@@ -6,7 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\Kingdom;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Values\BuildingCosts;
 use Facades\App\Game\Core\Handlers\HandleGoldBarsAsACurrency;
@@ -87,7 +87,7 @@ class CapitalCityGoldBarManagementService
 
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         $this->updateKingdom->updateKingdomAllKingdoms($character);
 
@@ -128,7 +128,7 @@ class CapitalCityGoldBarManagementService
 
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         $this->updateKingdom->updateKingdomAllKingdoms($character);
 

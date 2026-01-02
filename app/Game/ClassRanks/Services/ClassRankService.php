@@ -10,11 +10,11 @@ use App\Flare\Models\GameClassSpecial;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\ClassRanks\Values\ClassRankValue;
 use App\Game\ClassRanks\Values\ClassSpecialValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\ClassRanksMessageTypes;
@@ -189,7 +189,7 @@ class ClassRankService
 
         $this->updateCharacterAttackTypes->updateCache($character);
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         return $this->successResult(array_merge([
             'message' => 'Equipped class special: '.$gameClassSpecial->name,

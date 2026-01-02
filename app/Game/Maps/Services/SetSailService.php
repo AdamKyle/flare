@@ -6,7 +6,7 @@ use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Game\Battle\Services\ConjureService;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Values\MapTileValue;
@@ -108,7 +108,7 @@ class SetSailService extends BaseMovementService
 
         event(new MoveTimeOutEvent($character, $this->timeout, true));
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         return $character;
     }

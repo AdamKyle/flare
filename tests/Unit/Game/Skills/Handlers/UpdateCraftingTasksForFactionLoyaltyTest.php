@@ -3,7 +3,7 @@
 namespace Tests\Unit\Game\Skills\Handlers;
 
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Handlers\UpdateCraftingTasksForFactionLoyalty;
@@ -55,7 +55,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character->refresh(), $this->createItem());
 
         Event::assertNotDispatched(ServerMessageEvent::class);
-        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
     }
 
     public function test_does_not_handle_crafting_faction_loyalty_when_character_is_not_helping_an_npc()
@@ -90,7 +90,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character->refresh(), $item);
 
         Event::assertNotDispatched(ServerMessageEvent::class);
-        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
     }
 
     public function test_does_not_update_loyalty_tasks_when_no_crafting_task_found()
@@ -131,7 +131,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character->refresh(), $item);
 
         Event::assertNotDispatched(ServerMessageEvent::class);
-        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
     }
 
     public function test_does_not_handle_crafting_fame_when_item_is_not_apart_of_the_crafting_list()
@@ -178,7 +178,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         $character = $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character->refresh(), $item);
 
         Event::assertNotDispatched(ServerMessageEvent::class);
-        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
 
         $this->assertEquals(0, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->factionLoyaltyNpcTasks->fame_tasks[0]['current_amount']);
     }
@@ -229,7 +229,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         $character = $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character, $item);
 
         Event::assertDispatched(ServerMessageEvent::class);
-        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
 
         $this->assertEquals(1, $character->factionLoyalties->first()
             ->factionLoyaltyNpcs
@@ -289,7 +289,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         $character = $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character, $item);
 
         Event::assertDispatched(ServerMessageEvent::class);
-        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
 
         $this->assertEquals(1, $character->factionLoyalties->first()
             ->factionLoyaltyNpcs
@@ -391,7 +391,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         $character = $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character->refresh(), $item);
 
         Event::assertDispatched(ServerMessageEvent::class);
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertDispatched(UpdateCharacterBaseDetailsEvent::class);
 
         $this->assertEquals(2, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->current_level);
         $this->assertEquals(1000000, $character->gold);
@@ -496,7 +496,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         $character = $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character->refresh(), $item);
 
         Event::assertDispatched(ServerMessageEvent::class);
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertDispatched(UpdateCharacterBaseDetailsEvent::class);
 
         $this->assertEquals(2, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->current_level);
         $this->assertEquals(1000000, $character->gold);
@@ -600,7 +600,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         $character = $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character, $item);
 
         Event::assertDispatched(ServerMessageEvent::class);
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertDispatched(UpdateCharacterBaseDetailsEvent::class);
 
         $this->assertEquals(2, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->current_level);
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD, $character->gold);
@@ -685,7 +685,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         $character = $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character->refresh(), $item);
 
         Event::assertDispatched(ServerMessageEvent::class);
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertDispatched(UpdateCharacterBaseDetailsEvent::class);
 
         $this->assertEquals(25, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->current_level);
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD, $character->gold);
@@ -770,7 +770,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         $character = $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character->refresh(), $item);
 
         Event::assertNotDispatched(ServerMessageEvent::class);
-        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
 
         $this->assertEquals(25, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->current_level);
         $this->assertEquals(0, $character->gold);

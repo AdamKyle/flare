@@ -7,7 +7,7 @@ use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Values\FeatureTypes;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Traits\CharacterMaxLevel;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Reincarnate\Values\MaxReincarnationStats;
@@ -109,7 +109,7 @@ class CharacterReincarnateService
 
         $this->updateCharacterAttackTypes->updateCache($character);
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         return $this->successResult([
             'message' => 'Reincarnated character and applied 20% of your current level (base) stats toward your new (base) stats.',

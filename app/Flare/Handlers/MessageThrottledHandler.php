@@ -4,7 +4,7 @@ namespace App\Flare\Handlers;
 
 use App\Flare\Jobs\UpdateSilencedUserJob;
 use App\Flare\Models\User;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class MessageThrottledHandler
@@ -56,7 +56,7 @@ class MessageThrottledHandler
 
             ServerMessageHandler::handleMessage($user, 'silenced', $forMessage);
 
-            event(new UpdateTopBarEvent($user->character));
+            event(new UpdateCharacterBaseDetailsEvent($user->character));
 
             UpdateSilencedUserJob::dispatch($user)->delay($canSpeakAgainAt);
         }
