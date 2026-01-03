@@ -36,6 +36,8 @@ enum ItemType: string
                 self::SPELL_DAMAGE,
                 self::SPELL_HEALING,
                 self::RING,
+                self::TRINKET,
+                self::ARTIFACT,
             ], true)
         );
 

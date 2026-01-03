@@ -66,13 +66,13 @@ class StatModifierDetails
             case 'ac':
                 return $this->buildDefenceBreakDown($isVodied);
             case 'weapon_damage':
-                return $this->buildDamageBreakDown('weapon', $isVodied);
+                return $this->buildDamageBreakDown(ItemType::validWeapons(), $isVodied);
             case 'spell_damage':
-                return $this->buildDamageBreakDown('spell-damage', $isVodied);
+                return $this->buildDamageBreakDown([ItemType::SPELL_DAMAGE->value], $isVodied);
             case 'ring_damage':
-                return $this->buildDamageBreakDown('ring', $isVodied);
+                return $this->buildDamageBreakDown([ItemType::RING->value], $isVodied);
             case 'heal_for':
-                return $this->buildDamageBreakDown('spell-healing', $isVodied);
+                return $this->buildDamageBreakDown([ItemType::SPELL_HEALING->value], $isVodied);
             default:
                 return [];
         }
@@ -87,6 +87,7 @@ class StatModifierDetails
 
         $details['stat_amount'] = number_format($this->character->getInformation()->statMod('dur', $isVoided));
         $details['class_specialties'] = $this->fetchClassRankSpecialtiesForHealth();
+        $details['items_equipped'] = array_values($this->fetchItemDetails('dur'));
 
         return $details;
     }
@@ -103,11 +104,12 @@ class StatModifierDetails
         $details['boon_details'] = $this->fetchBoonDetails('base_ac');
         $details['class_specialties'] = $this->fetchClassRankSpecialtiesDetails('base_ac');
         $details['ancestral_item_skill_data'] = $this->fetchAncestralItemSkills('base_ac');
+        $details['items_equipped'] = array_values($this->fetchItemDetails('base_ac'));
 
         return array_merge($details, $this->character->getInformation()->getDefenceBuilder()->buildDefenceBreakDownDetails($isVoided));
     }
 
-    public function buildDamageBreakDown(string $type, bool $isVoided): array
+    public function buildDamageBreakDown(array $types, bool $isVoided): array
     {
         $details = [];
 
@@ -119,33 +121,31 @@ class StatModifierDetails
         $details['non_equipped_percentage_of_stat_used'] = 0;
         $details['spell_damage_stat_amount_to_use'] = 0;
         $details['percentage_of_stat_used'] = 0;
-        $details['total_damage_for_type'] = number_format($this->character->getInformation()->buildDamage($type, $isVoided));
+        $details['total_damage_for_type'] = number_format($this->character->getInformation()->buildDamage($types, $isVoided));
         $details['base_damage'] = 0;
+        $details['items_equipped'] = $this->fetchDamageOrHealingEquipmentBreakDown($types);
 
         $equipped = $this->fetchEquipped($this->character);
 
         if (is_null($equipped)) {
-            if (in_array($type, ItemType::validWeapons())) {
+            if ($this->character->classType()->isAlcoholic()) {
+                $value = $damageStatAmount * 0.25;
 
-                if ($this->character->classType()->isAlcoholic()) {
-                    $value = $damageStatAmount * 0.25;
+                $details['non_equipped_damage_amount'] = number_format(max($value, 5));
+                $details['non_equipped_percentage_of_stat_used'] = 0.25;
+            } elseif ($this->character->classType()->isFighter()) {
+                $value = $damageStatAmount * 0.05;
 
-                    $details['non_equipped_damage_amount'] = number_format(max($value, 5));
-                    $details['non_equipped_percentage_of_stat_used'] = 0.25;
-                } elseif ($this->character->classType()->isFighter()) {
-                    $value = $damageStatAmount * 0.05;
+                $details['non_equipped_damage_amount'] = number_format(max($value, 5));
+                $details['non_equipped_percentage_of_stat_used'] = 0.05;
+            } else {
+                $value = $damageStatAmount * 0.02;
 
-                    $details['non_equipped_damage_amount'] = number_format(max($value, 5));
-                    $details['non_equipped_percentage_of_stat_used'] = 0.05;
-                } else {
-                    $value = $damageStatAmount * 0.02;
-
-                    $details['non_equipped_damage_amount'] = number_format(max($value, 5));
-                    $details['non_equipped_percentage_of_stat_used'] = 0.02;
-                }
+                $details['non_equipped_damage_amount'] = number_format(max($value, 5));
+                $details['non_equipped_percentage_of_stat_used'] = 0.02;
             }
 
-            if ($type === ItemType::SPELL_DAMAGE->value && $this->character->classType()->isHeretic()) {
+            if ($this->character->classType()->isHeretic()) {
 
                 $value = $damageStatAmount * 0.15;
 
@@ -154,20 +154,36 @@ class StatModifierDetails
             }
         }
 
-        $details['class_bonus_details'] = $type === 'ring' ? null : $this->fetchClassBonusesEffecting('base_damage');
-        $details['boon_details'] = $type === 'ring' ? null : $this->fetchBoonDetails('base_damage');
-        $details['class_specialties'] = $type === 'ring' ? null : $this->fetchClassRankSpecialtiesDetails('base_damage');
-        $details['ancestral_item_skill_data'] = $type === 'ring' ? null : $this->fetchAncestralItemSkills('base_damage');
+        $details['class_bonus_details'] = $this->fetchClassBonusesEffecting('base_damage');
+        $details['boon_details'] = $this->fetchBoonDetails('base_damage');
+        $details['class_specialties'] = $this->fetchClassRankSpecialtiesDetails('base_damage');
+        $details['ancestral_item_skill_data'] = $this->fetchAncestralItemSkills('base_damage');
 
         $typeAttributes = match (true) {
-            in_array($type, ItemType::validWeapons()) => $this->character->getInformation()->getDamageBuilder()->buildWeaponDamageBreakDown($damageStatAmount, $isVoided),
-            $type === ItemType::SPELL_DAMAGE->value => $this->character->getInformation()->getDamageBuilder()->buildSpellDamageBreakDownDetails($isVoided),
-            $type === ItemType::RING->value => $this->character->getInformation()->getDamageBuilder()->buildRingDamageBreakDown(),
-            $type === ItemType::SPELL_HEALING->value => $this->character->getInformation()->getHealingBuilder()->getHealingBuilder($isVoided),
-            default => [],
+            in_array(ItemType::SPELL_DAMAGE->value, $types) => $this->character->getInformation()->getDamageBuilder()->buildSpellDamageBreakDownDetails($isVoided),
+            in_array(ItemType::RING->value, $types) => $this->character->getInformation()->getDamageBuilder()->buildRingDamageBreakDown(),
+            in_array(ItemType::SPELL_HEALING->value, $types) => $this->character->getInformation()->getHealingBuilder()->getHealingBuilder($isVoided),
+            default => $this->character->getInformation()->getDamageBuilder()->buildWeaponDamageBreakDown($damageStatAmount, $isVoided),
         };
 
         return array_merge($details, $typeAttributes);
+    }
+
+    /**
+     * @param array $types
+     * @param string $statType
+     * @return array
+     */
+    private function fetchDamageOrHealingEquipmentBreakDown(array $types): array {
+        if (in_array(ItemType::RING->value, $types)) {
+            return [];
+        }
+
+        if (in_array(ItemType::SPELL_HEALING->value, $types)) {
+            return  array_values($this->fetchItemDetails('base_healing'));
+        }
+
+        return array_values($this->fetchItemDetails('base_damage'));
     }
 
     /**
@@ -379,7 +395,7 @@ class StatModifierDetails
     /**
      * Fetch Item Details that effect the stat.
      */
-    private function fetchItemDetails(string $stat): array
+    private function fetchItemDetails(string $stat, bool $isVoided = false): array
     {
         if (is_null($this->equipped)) {
             return [];
@@ -392,8 +408,8 @@ class StatModifierDetails
 
             $details[$slot->item->affix_name]['item_base_stat'] = $slot->item->{$stat.'_mod'} ?? 0;
             $details[$slot->item->affix_name]['item_details'] = $this->getBasicDetailsOfItem($slot->item);
-            $details[$slot->item->affix_name]['total_stat_increase'] = $slot->item->holy_stack_stat_bonus;
-            $details[$slot->item->affix_name]['attached_affixes'] = $this->fetchStatDetailsFromEquipment($slot->item, $stat)['attached_affixes'];
+            $details[$slot->item->affix_name]['total_stat_increase'] = $isVoided ? 0 : $slot->item->holy_stack_stat_bonus;
+            $details[$slot->item->affix_name]['attached_affixes'] = $isVoided ? [] : $this->fetchStatDetailsFromEquipment($slot->item, $stat)['attached_affixes'];
         }
 
         return $details;

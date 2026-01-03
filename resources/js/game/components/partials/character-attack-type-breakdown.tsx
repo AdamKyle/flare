@@ -1,9 +1,11 @@
+import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import { isNil } from 'lodash';
 import React, { ReactNode } from 'react';
 import { match, P } from 'ts-pattern';
 
 import CharacterAttackTypeBreakdownProps from './types/character-attack-type-breakdown-props';
 import { AttackTypes } from '../character-sheet/enums/attack-types';
+import { useGetCharacterAttackDetails } from '../character-sheet/partials/character-attack-details/api/hooks/use-get-character-attack-details';
 import Defence from '../character-sheet/partials/character-attack-types/defence';
 import Healing from '../character-sheet/partials/character-attack-types/healing';
 import Health from '../character-sheet/partials/character-attack-types/health';
@@ -18,17 +20,77 @@ import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Card from 'ui/cards/card';
 import ContainerWithTitle from 'ui/container/container-with-title';
+import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const CharacterAttackTypeBreakdown = ({
   attack_type,
   close_attack_details,
 }: CharacterAttackTypeBreakdownProps): ReactNode => {
   const { gameData } = useGameData();
+  const { data, loading, error } = useGetCharacterAttackDetails({
+    character_id: gameData?.character?.id || 0,
+    attack_type,
+  });
 
   const characterData = gameData?.character;
 
-  if (!characterData) {
-    return <GameDataError />;
+  const renderManageSectionVisibility = (): (() => void) => {
+    return match({
+      attack_type,
+    })
+      .with(
+        {
+          attack_type: P.union(
+            AttackTypes.WEAPON,
+            AttackTypes.SPELL_DAMAGE,
+            AttackTypes.HEALING,
+            AttackTypes.RING_DAMAGE,
+            AttackTypes.HEALTH,
+            AttackTypes.DEFENCE
+          ),
+        },
+        () => close_attack_details
+      )
+      .otherwise(() => () => {});
+  };
+
+  if (loading) {
+    return (
+      <ContainerWithTitle
+        manageSectionVisibility={renderManageSectionVisibility()}
+        title={'One Moment while we fetch the details'}
+      >
+        <Card>
+          <InfiniteLoader />
+        </Card>
+      </ContainerWithTitle>
+    );
+  }
+
+  if (!characterData || !data) {
+    return (
+      <ContainerWithTitle
+        manageSectionVisibility={renderManageSectionVisibility()}
+        title={'Woah! What happened here?'}
+      >
+        <Card>
+          <GameDataError />
+        </Card>
+      </ContainerWithTitle>
+    );
+  }
+
+  if (error) {
+    return (
+      <ContainerWithTitle
+        manageSectionVisibility={renderManageSectionVisibility()}
+        title={'Woah! Something blew up'}
+      >
+        <Card>
+          <ApiErrorAlert apiError={error.message} />;
+        </Card>
+      </ContainerWithTitle>
+    );
   }
 
   const renderTitle = (): string => {
@@ -60,26 +122,6 @@ const CharacterAttackTypeBreakdown = ({
         () => `${characterData.name} Defence Breakdown`
       )
       .otherwise(() => `${characterData.name}`);
-  };
-
-  const renderManageSectionVisibility = (): (() => void) => {
-    return match({
-      attack_type,
-    })
-      .with(
-        {
-          attack_type: P.union(
-            AttackTypes.WEAPON,
-            AttackTypes.SPELL_DAMAGE,
-            AttackTypes.HEALING,
-            AttackTypes.RING_DAMAGE,
-            AttackTypes.HEALTH,
-            AttackTypes.DEFENCE
-          ),
-        },
-        () => close_attack_details
-      )
-      .otherwise(() => () => {});
   };
 
   const renderAttackDetailsType = (attack_type: AttackTypes): ReactNode => {

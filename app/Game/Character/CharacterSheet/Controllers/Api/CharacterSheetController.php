@@ -70,9 +70,7 @@ class CharacterSheetController extends Controller
             'voided' => $this->statModifierDetails->setCharacter($character)->buildSpecificBreakDown($request->type, true),
         ];
 
-        return response()->json([
-            'break_down' => $breakDownDetails,
-        ]);
+        return response()->json($breakDownDetails);
     }
 
     public function basicLocationInformation(Character $character)

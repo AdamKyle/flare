@@ -19,7 +19,16 @@ const CharacterStatTypeBreakDown = ({
   const characterData = gameData?.character;
 
   if (!characterData) {
-    return <GameDataError />;
+    return (
+      <ContainerWithTitle
+        manageSectionVisibility={close_stat_type}
+        title={'Woah we got an error!'}
+      >
+        <Card>
+          <GameDataError />
+        </Card>
+      </ContainerWithTitle>
+    );
   }
 
   return (

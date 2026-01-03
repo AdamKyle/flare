@@ -117,8 +117,6 @@ class DamageBuilder extends BaseAttribute
             $details['skills_effecting_damage'] = $this->fetchBaseAttributeFromSkillsDetails('base_damage');
         }
 
-        $details['attached_affixes'] = $this->getAttributeBonusFromAllItemAffixesDetails('base_damage', $voided);
-
         $details['masteries'] = [];
 
         if (is_null($this->inventory)) {
@@ -130,6 +128,11 @@ class DamageBuilder extends BaseAttribute
         });
 
         foreach ($slots as $slot) {
+
+            if (is_null($slot->item->type) || is_null($slot->position)) {
+                dd($slot->item);
+            }
+
             $details['masteries'][] = $this->classRanksWeaponMasteriesBuilder->fetchClassMasteryBreakDownForPosition($slot->item->type, $slot->position);
         }
 
