@@ -1,4 +1,4 @@
-import { AttackTypes } from '../../character-sheet/enums/attack-types';
+import { AttackTypes } from '../../../enums/attack-types';
 
 export default interface CharacterAttackTypeBreakdownProps {
   close_attack_details: () => void;

@@ -7,7 +7,6 @@ import { CharacterAttackDetailsUrls } from '../enums/character-attack-details-ur
 import UseGetCharacterAttackDefinitionParams from './definitions/use-get-character-attack-definition-params';
 import UseGetCharacterStatBreakdownDefinition from './definitions/use-get-character-attack-details-definition';
 import UseGetCharacterAttackDetailsRequestParamsDefinition from './definitions/use-get-character-attack-details-request-params-definition';
-import UseGetCharacterAttackDetailsResponseDefinition from './definitions/use-get-character-attack-details-response-definition';
 import { getAttackTypeName } from '../../../../enums/attack-types';
 import CharacterAttackBreakDownDefinition from '../definitions/character-attack-break-down-definition';
 
@@ -38,11 +37,11 @@ export const useGetCharacterAttackDetails = ({
 
       try {
         const result = await apiHandler.get<
-          UseGetCharacterAttackDetailsResponseDefinition,
-          AxiosRequestConfig<UseGetCharacterAttackDetailsResponseDefinition>
+          CharacterAttackBreakDownDefinition,
+          AxiosRequestConfig<CharacterAttackBreakDownDefinition>
         >(url, { params: { type: getAttackTypeName(attack_type) } });
 
-        setData(result.data);
+        setData(result);
       } catch (error) {
         if (error instanceof AxiosError) {
           setError(error.response?.data);

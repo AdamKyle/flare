@@ -4,14 +4,14 @@ import React, { ReactNode } from 'react';
 import { match, P } from 'ts-pattern';
 
 import CharacterAttackTypeBreakdownProps from './types/character-attack-type-breakdown-props';
-import { AttackTypes } from '../character-sheet/enums/attack-types';
-import { useGetCharacterAttackDetails } from '../character-sheet/partials/character-attack-details/api/hooks/use-get-character-attack-details';
-import Defence from '../character-sheet/partials/character-attack-types/defence';
-import Healing from '../character-sheet/partials/character-attack-types/healing';
-import Health from '../character-sheet/partials/character-attack-types/health';
-import RingDamage from '../character-sheet/partials/character-attack-types/ring-damage';
-import SpellDamage from '../character-sheet/partials/character-attack-types/spell-damage';
-import WeaponDamage from '../character-sheet/partials/character-attack-types/weapon-damage';
+import { AttackTypes } from '../../enums/attack-types';
+import { useGetCharacterAttackDetails } from './api/hooks/use-get-character-attack-details';
+import Defence from './attack-type-sections/defence';
+import Healing from './attack-type-sections/healing';
+import Health from './attack-type-sections/health';
+import RingDamage from './attack-type-sections/ring-damage';
+import SpellDamage from './attack-type-sections/spell-damage';
+import WeaponDamage from './attack-type-sections/weapon-damage';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 import { useGameData } from 'game-data/hooks/use-game-data';
@@ -66,6 +66,8 @@ const CharacterAttackTypeBreakdown = ({
       </ContainerWithTitle>
     );
   }
+
+  console.log(data, characterData);
 
   if (!characterData || !data) {
     return (
@@ -126,7 +128,7 @@ const CharacterAttackTypeBreakdown = ({
 
   const renderAttackDetailsType = (attack_type: AttackTypes): ReactNode => {
     return match(attack_type)
-      .with(AttackTypes.WEAPON, () => <WeaponDamage />)
+      .with(AttackTypes.WEAPON, () => <WeaponDamage break_down={data} />)
       .with(AttackTypes.SPELL_DAMAGE, () => <SpellDamage />)
       .with(AttackTypes.HEALING, () => <Healing />)
       .with(AttackTypes.RING_DAMAGE, () => <RingDamage />)

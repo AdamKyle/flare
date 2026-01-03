@@ -6,11 +6,11 @@ import { MonsterStatSection } from '../../game/components/actions/partials/monst
 import AnnouncementDetails from '../../game/components/announcements/announcement-details';
 import Announcements from '../../game/components/announcements/announcements';
 import CharacterSheet from '../../game/components/character-sheet/character-sheet';
+import CharacterAttackTypeBreakdown from '../../game/components/character-sheet/partials/character-attack-details/character-attack-type-breakdown';
 import CharacterStatTypeBreakDown from '../../game/components/character-sheet/partials/character-stat-types/character-stat-type-breakdown';
 import Donations from '../../game/components/donations/dontations';
 import GoblinShopScreen from '../../game/components/goblin-shop/goblin-shop-screen';
 import GuideQuest from '../../game/components/guide-quests/guide-quest';
-import CharacterAttackTypeBreakdown from '../../game/components/partials/character-attack-type-breakdown';
 import CharacterInventory from '../../game/components/partials/character-inventory';
 import ShopScreen from '../../game/components/shop/shop-screen';
 

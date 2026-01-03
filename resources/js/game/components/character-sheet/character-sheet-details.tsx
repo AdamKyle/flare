@@ -1,17 +1,10 @@
 import { capitalize } from 'lodash';
 import React, { ReactNode } from 'react';
-import { match } from 'ts-pattern';
 
 import { AttackTypes } from './enums/attack-types';
 import { StatTypes } from './enums/stat-types';
 import { useManageAttackDetailsBreakdown } from './hooks/use-manage-attack-details-breakdown';
 import { useManageStatDetailsBreakdown } from './hooks/use-manage-stat-details-breakdown';
-import Defence from './partials/character-attack-types/defence';
-import Healing from './partials/character-attack-types/healing';
-import Health from './partials/character-attack-types/health';
-import RingDamage from './partials/character-attack-types/ring-damage';
-import SpellDamage from './partials/character-attack-types/spell-damage';
-import WeaponDamage from './partials/character-attack-types/weapon-damage';
 import CharacterSheetDetailsProps from './types/character-sheet-details-props';
 import {
   formatNumberWithCommas,
@@ -19,8 +12,6 @@ import {
 } from '../../util/format-number';
 import XpBar from '../actions/components/character-details/xp-bar';
 
-import { Alert } from 'ui/alerts/alert';
-import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';
 import ProgressButton from 'ui/buttons/button-progress';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
@@ -42,28 +33,6 @@ const CharacterSheetDetails = (
     (characterData.inventory_count.data.inventory_count /
       characterData.inventory_count.data.inventory_max) *
     100;
-
-  const renderAttackDetailsType = (attackType: AttackTypes): ReactNode => {
-    return match(attackType)
-      .with(AttackTypes.WEAPON, () => <WeaponDamage />)
-      .with(AttackTypes.SPELL_DAMAGE, () => <SpellDamage />)
-      .with(AttackTypes.HEALING, () => <Healing />)
-      .with(AttackTypes.RING_DAMAGE, () => <RingDamage />)
-      .with(AttackTypes.HEALTH, () => <Health />)
-      .with(AttackTypes.DEFENCE, () => <Defence />)
-      .otherwise(() => (
-        <Alert variant={AlertVariant.DANGER}>
-          <p>
-            Invalid component returned. This is a bug. Please head to discord:
-            Top Right Profile icon, CLick discord and report this in #bugs.
-          </p>
-        </Alert>
-      ));
-  };
-
-  if (props.showAttackType && props.attackType !== null) {
-    return renderAttackDetailsType(props.attackType);
-  }
 
   return (
     <>

@@ -85,7 +85,7 @@ class StatModifierDetails
     {
         $details = [];
 
-        $details['stat_amount'] = number_format($this->character->getInformation()->statMod('dur', $isVoided));
+        $details['stat_amount'] = $this->character->getInformation()->statMod('dur', $isVoided);
         $details['class_specialties'] = $this->fetchClassRankSpecialtiesForHealth();
         $details['items_equipped'] = array_values($this->fetchItemDetails('dur'));
 
@@ -116,12 +116,12 @@ class StatModifierDetails
         $damageStatAmount = $this->character->getInformation()->statMod($this->character->damage_stat, $isVoided);
 
         $details['damage_stat_name'] = $this->character->damage_stat;
-        $details['damage_stat_amount'] = number_format($this->character->getInformation()->statMod($this->character->damage_stat, $isVoided));
+        $details['damage_stat_amount'] = $this->character->getInformation()->statMod($this->character->damage_stat, $isVoided);
         $details['non_equipped_damage_amount'] = 0;
         $details['non_equipped_percentage_of_stat_used'] = 0;
         $details['spell_damage_stat_amount_to_use'] = 0;
         $details['percentage_of_stat_used'] = 0;
-        $details['total_damage_for_type'] = number_format($this->character->getInformation()->buildDamage($types, $isVoided));
+        $details['total_damage_for_type'] = $this->character->getInformation()->buildDamage($types, $isVoided);
         $details['base_damage'] = 0;
         $details['items_equipped'] = $this->fetchDamageOrHealingEquipmentBreakDown($types);
 
@@ -131,17 +131,17 @@ class StatModifierDetails
             if ($this->character->classType()->isAlcoholic()) {
                 $value = $damageStatAmount * 0.25;
 
-                $details['non_equipped_damage_amount'] = number_format(max($value, 5));
+                $details['non_equipped_damage_amount'] = max($value, 5);
                 $details['non_equipped_percentage_of_stat_used'] = 0.25;
             } elseif ($this->character->classType()->isFighter()) {
                 $value = $damageStatAmount * 0.05;
 
-                $details['non_equipped_damage_amount'] = number_format(max($value, 5));
+                $details['non_equipped_damage_amount'] = max($value, 5);
                 $details['non_equipped_percentage_of_stat_used'] = 0.05;
             } else {
                 $value = $damageStatAmount * 0.02;
 
-                $details['non_equipped_damage_amount'] = number_format(max($value, 5));
+                $details['non_equipped_damage_amount'] = max($value, 5);
                 $details['non_equipped_percentage_of_stat_used'] = 0.02;
             }
 
@@ -149,7 +149,7 @@ class StatModifierDetails
 
                 $value = $damageStatAmount * 0.15;
 
-                $details['spell_damage_stat_amount_to_use'] = number_format(max($value, 5));
+                $details['spell_damage_stat_amount_to_use'] = max($value, 5);
                 $details['percentage_of_stat_used'] = 0.15;
             }
         }
