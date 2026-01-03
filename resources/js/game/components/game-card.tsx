@@ -7,13 +7,9 @@ import { useManageMarketVisibility } from './actions/partials/floating-cards/map
 import { useManagePlayerKingdomManagementVisibility } from './actions/partials/floating-cards/map-section/hooks/use-manage-player-kingdom-management-visibility';
 import { useManageMonsterStatSectionVisibility } from './actions/partials/monster-stat-section/hooks/use-manage-monster-stat-section-visibility';
 import { MonsterStatSection } from './actions/partials/monster-stat-section/monster-stat-section';
-import { useAttackDetailsVisibility } from './character-sheet/hooks/use-attack-details-visibility';
-import { useStatDetailsVisibility } from './character-sheet/hooks/use-stat-details-visibility';
-import CharacterStatTypeBreakDown from './character-sheet/partials/character-stat-types/character-stat-type-breakdown';
 import FullMap from './map-section/full-map';
 import { useToggleFullMapVisibility } from './map-section/hooks/use-toggle-full-map-visibility';
 import Market from './market/market';
-import CharacterAttackTypeBreakdown from './partials/character-attack-type-breakdown';
 import PlayerKingdoms from './player-kingdoms/player-kingdoms';
 
 export const GameCard = (): ReactNode => {
@@ -21,12 +17,6 @@ export const GameCard = (): ReactNode => {
 
   const { showMonsterStatsSection, showMonsterStats, closeMonsterStats } =
     useManageMonsterStatSectionVisibility();
-
-  const { showAttackType, attackType, closeAttackDetails } =
-    useAttackDetailsVisibility();
-
-  const { showStatDetails, statType, closeStatDetails } =
-    useStatDetailsVisibility();
 
   const { showFullMap, closeMap } = useToggleFullMapVisibility();
 
@@ -66,24 +56,6 @@ export const GameCard = (): ReactNode => {
         <MonsterStatSection
           monster_id={monsterIdToView}
           toggle_monster_stat_visibility={handleShowMonsterStats}
-        />
-      );
-    }
-
-    if (showAttackType && attackType !== null) {
-      return (
-        <CharacterAttackTypeBreakdown
-          close_attack_details={closeAttackDetails}
-          attack_type={attackType}
-        />
-      );
-    }
-
-    if (showStatDetails && statType !== null) {
-      return (
-        <CharacterStatTypeBreakDown
-          stat_type={statType}
-          close_stat_type={closeStatDetails}
         />
       );
     }

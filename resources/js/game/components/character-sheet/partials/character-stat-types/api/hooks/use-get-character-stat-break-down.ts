@@ -1,5 +1,6 @@
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
 import { AxiosError, AxiosRequestConfig } from 'axios';
+import { isNil } from 'lodash';
 import { useState, useEffect, useCallback } from 'react';
 
 import FetchCharacterStatInfoApiParams from './definitions/fetch-character-stat-info-api-params';
@@ -23,6 +24,10 @@ export const useGetCharacterStatBreakDown = (
 
   const fetchCharacterStatInfo = useCallback(
     async ({ statType }: FetchCharacterStatInfoApiParams) => {
+      if (isNil(statType)) {
+        return;
+      }
+
       const requestParams = characterStatParamBuilder(statType);
 
       try {

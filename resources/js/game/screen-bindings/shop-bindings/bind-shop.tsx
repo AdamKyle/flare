@@ -6,27 +6,26 @@ import {
 import { ScreenPropsOf } from 'configuration/screen-manager/screen-manager-props';
 import { useRef } from 'react';
 
-import { UseManageAnnouncementDetailsVisibility } from '../components/announcements/hooks/use-manage-announcement-details-visibility';
+import { useManageShopSectionVisibility } from '../../components/shop/hooks/use-manage-shop-section-visibility';
 
-const BindAnnouncementDetailsSection = () => {
+const BindShop = () => {
   const { pop } = useScreenNavigation();
-  const { announcementId, closeAnnouncementDetails } =
-    UseManageAnnouncementDetailsVisibility();
+  const { closeShopSection, showShopSection } =
+    useManageShopSectionVisibility();
 
   const activeRef = useRef(false);
 
   useBindScreen({
-    when: announcementId !== null,
-    to: Screens.ANNOUNCEMENT_DETAILS,
-    props: (): ScreenPropsOf<typeof Screens.ANNOUNCEMENT_DETAILS> => ({
-      on_close: () => {
+    when: showShopSection,
+    to: Screens.SHOP,
+    props: (): ScreenPropsOf<typeof Screens.SHOP> => ({
+      close_shop: () => {
         if (activeRef.current) {
           pop();
         }
-        closeAnnouncementDetails();
+        closeShopSection();
         activeRef.current = false;
       },
-      announcement_id: announcementId,
     }),
     mode: 'push',
     dedupeKey: 'shop',
@@ -35,4 +34,4 @@ const BindAnnouncementDetailsSection = () => {
   return null;
 };
 
-export default BindAnnouncementDetailsSection;
+export default BindShop;

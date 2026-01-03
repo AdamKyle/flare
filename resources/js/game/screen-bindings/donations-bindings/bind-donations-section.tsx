@@ -6,24 +6,23 @@ import {
 import { ScreenPropsOf } from 'configuration/screen-manager/screen-manager-props';
 import { useRef } from 'react';
 
-import { useManageGuideQuestsVisibility } from '../components/guide-quests/hooks/use-manage-guide-quests-visibility';
+import { useManageDonationsVisibility } from '../../components/donations/hooks/use-manage-donations-visibility';
 
-const BindGuideQuestsSection = () => {
+const BindDonationsSection = () => {
   const { pop } = useScreenNavigation();
-  const { closeGuideQuestsScreen, showGuideQuests } =
-    useManageGuideQuestsVisibility();
+  const { closeDonationScreen, showDonations } = useManageDonationsVisibility();
 
   const activeRef = useRef(false);
 
   useBindScreen({
-    when: showGuideQuests,
+    when: showDonations,
     to: Screens.DONATIONS,
     props: (): ScreenPropsOf<typeof Screens.DONATIONS> => ({
       on_close: () => {
         if (activeRef.current) {
           pop();
         }
-        closeGuideQuestsScreen();
+        closeDonationScreen();
         activeRef.current = false;
       },
     }),
@@ -34,4 +33,4 @@ const BindGuideQuestsSection = () => {
   return null;
 };
 
-export default BindGuideQuestsSection;
+export default BindDonationsSection;

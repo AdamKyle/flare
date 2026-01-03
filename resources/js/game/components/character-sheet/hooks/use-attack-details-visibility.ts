@@ -28,13 +28,13 @@ export const useAttackDetailsVisibility =
       };
 
       manageAttackDetailsEmitter.on(
-        CharacterSheet.OPEN_INVENTORY_SECTION,
+        CharacterSheet.OPEN_ATTACK_DETAILS,
         updateVisibility
       );
 
       return () => {
         manageAttackDetailsEmitter.off(
-          CharacterSheet.OPEN_INVENTORY_SECTION,
+          CharacterSheet.OPEN_ATTACK_DETAILS,
           updateVisibility
         );
       };
@@ -42,7 +42,7 @@ export const useAttackDetailsVisibility =
 
     const closeAttackDetails = () => {
       setAttackType(null);
-      manageAttackDetailsEmitter.emit(CharacterSheet.OPEN_INVENTORY_SECTION, [
+      manageAttackDetailsEmitter.emit(CharacterSheet.OPEN_ATTACK_DETAILS, [
         false,
       ]);
     };

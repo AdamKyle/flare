@@ -6,8 +6,8 @@ import {
 import { ScreenPropsOf } from 'configuration/screen-manager/screen-manager-props';
 import { useRef } from 'react';
 
-import { useCharacterSheetVisibility } from '../components/hooks/use-character-sheet-visibility';
-import { useManageCharacterSheetVisibility } from '../components/hooks/use-manage-character-sheet-visibility';
+import { useCharacterSheetVisibility } from '../../components/hooks/use-character-sheet-visibility';
+import { useManageCharacterSheetVisibility } from '../../components/hooks/use-manage-character-sheet-visibility';
 
 const BindCharacterSheet = () => {
   const { pop } = useScreenNavigation();

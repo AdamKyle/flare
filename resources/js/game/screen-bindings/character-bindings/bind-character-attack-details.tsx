@@ -6,26 +6,27 @@ import {
 import { ScreenPropsOf } from 'configuration/screen-manager/screen-manager-props';
 import { useRef } from 'react';
 
-import { useManageCharacterInventoryVisibility } from '../components/character-sheet/hooks/use-manage-character-inventory-visibility';
+import { useAttackDetailsVisibility } from '../../components/character-sheet/hooks/use-attack-details-visibility';
 
 const BindCharacterInventory = () => {
   const { pop } = useScreenNavigation();
-  const { closeInventory, showInventory } =
-    useManageCharacterInventoryVisibility();
+  const { showAttackType, closeAttackDetails, attackType } =
+    useAttackDetailsVisibility();
 
   const activeRef = useRef(false);
 
   useBindScreen({
-    when: showInventory,
-    to: Screens.CHARACTER_INVENTORY,
-    props: (): ScreenPropsOf<typeof Screens.CHARACTER_INVENTORY> => ({
-      close_inventory: () => {
+    when: showAttackType,
+    to: Screens.CHARACTER_ATTACK_DETAILS,
+    props: (): ScreenPropsOf<typeof Screens.CHARACTER_ATTACK_DETAILS> => ({
+      close_attack_details: () => {
         if (activeRef.current) {
           pop();
         }
-        closeInventory();
+        closeAttackDetails();
         activeRef.current = false;
       },
+      attack_type: attackType,
     }),
     mode: 'push',
     dedupeKey: 'character-inventory',

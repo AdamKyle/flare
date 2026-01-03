@@ -1,6 +1,6 @@
 import { StatTypes } from '../../../enums/stat-types';
 
 export default interface CharacterStatTypeDetailsProps {
-  stat_type: StatTypes;
+  stat_type: StatTypes | null;
   character_id: number;
 }

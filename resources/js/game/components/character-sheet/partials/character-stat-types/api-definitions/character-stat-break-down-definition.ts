@@ -12,7 +12,7 @@ export interface ClassSpecialities {
 }
 
 export interface MapReduction {
-  name: string;
+  map_name: string;
   reduction_amount: number;
 }
 

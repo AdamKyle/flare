@@ -13,7 +13,7 @@ export const useManageAttackDetailsBreakdown =
     );
 
     const openAttackDetails = (attackType: AttackTypes) => {
-      manageAttackDetailsEmitter.emit(CharacterSheet.OPEN_INVENTORY_SECTION, [
+      manageAttackDetailsEmitter.emit(CharacterSheet.OPEN_ATTACK_DETAILS, [
         true,
         attackType,
       ]);

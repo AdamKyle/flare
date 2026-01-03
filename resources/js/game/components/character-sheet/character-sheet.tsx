@@ -6,12 +6,10 @@ import CharacterInventoryManagement from './character-inventory-management';
 import CharacterReincarnation from './character-reincarnation';
 import CharacterSheetDetails from './character-sheet-details';
 import { AttackTypes } from './enums/attack-types';
-import { getStatName, StatTypes } from './enums/stat-types';
 import { useAttackDetailsVisibility } from './hooks/use-attack-details-visibility';
 import { useManageCharacterInventoryVisibility } from './hooks/use-manage-character-inventory-visibility';
 import { useManageClassRanksVisibility } from './hooks/use-manage-class-ranks-visibility';
 import { useManageReincarnationVisibility } from './hooks/use-manage-reincarnation-visibility';
-import { useStatDetailsVisibility } from './hooks/use-stat-details-visibility';
 import CharacterSheetProps from './types/character-sheet-props';
 
 import { GameDataError } from 'game-data/components/game-data-error';
@@ -29,8 +27,6 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
     useManageCharacterInventoryVisibility();
   const { showAttackType, attackType, closeAttackDetails } =
     useAttackDetailsVisibility();
-  const { showStatDetails, statType, closeStatDetails } =
-    useStatDetailsVisibility();
 
   const { gameData } = useGameData();
 
@@ -68,8 +64,6 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
           characterData={characterData}
           showAttackType={showAttackType}
           attackType={attackType}
-          showStatType={showStatDetails}
-          statType={statType}
         />
       ));
   };
@@ -79,10 +73,8 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
       showReincarnation,
       showClassRanks,
       showInventory,
-      showStatDetails,
       showAttackType,
       attackType,
-      statType,
     })
       .with(
         { showReincarnation: true },
@@ -114,10 +106,6 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
         { showAttackType, attackType: AttackTypes.DEFENCE },
         () => `${characterData.name}: Defence Breakdown`
       )
-      .with(
-        { showStatDetails: true },
-        () => `${characterData.name}: ${getStatName(statType)} break down`
-      )
       .otherwise(() => `${characterData.name}`);
   };
 
@@ -127,9 +115,7 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
       showClassRanks,
       showInventory,
       showAttackType,
-      showStatDetails,
       attackType,
-      statType,
     })
       .with({ showReincarnation: true }, () => closeReincarnation)
       .with({ showClassRanks: true }, () => closeClassRanks)
@@ -148,22 +134,6 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
         },
         () => closeAttackDetails
       )
-      .with(
-        {
-          showStatDetails: true,
-          statType: P.union(
-            StatTypes.STR,
-            StatTypes.DEX,
-            StatTypes.INT,
-            StatTypes.DUR,
-            StatTypes.CHR,
-            StatTypes.AGI,
-            StatTypes.FOCUS
-          ),
-        },
-        () => closeStatDetails
-      )
-
       .otherwise(() => props.manageCharacterSheetVisibility);
   };
 

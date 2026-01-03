@@ -6,31 +6,32 @@ import {
 import { ScreenPropsOf } from 'configuration/screen-manager/screen-manager-props';
 import { useRef } from 'react';
 
-import { useManageGoblinShopVisibility } from '../components/goblin-shop/hooks/use-manage-goblin-shop-visibility';
+import { useManageGuideQuestsVisibility } from '../../components/guide-quests/hooks/use-manage-guide-quests-visibility';
 
-const BindGoblinShop = () => {
+const BindGuideQuestsSection = () => {
   const { pop } = useScreenNavigation();
-  const { closeGoblinShop, showGoblinShop } = useManageGoblinShopVisibility();
+  const { closeGuideQuestsScreen, showGuideQuests } =
+    useManageGuideQuestsVisibility();
 
   const activeRef = useRef(false);
 
   useBindScreen({
-    when: showGoblinShop,
-    to: Screens.GOBLIN_SHOP,
-    props: (): ScreenPropsOf<typeof Screens.GOBLIN_SHOP> => ({
+    when: showGuideQuests,
+    to: Screens.DONATIONS,
+    props: (): ScreenPropsOf<typeof Screens.DONATIONS> => ({
       on_close: () => {
         if (activeRef.current) {
           pop();
         }
-        closeGoblinShop();
+        closeGuideQuestsScreen();
         activeRef.current = false;
       },
     }),
     mode: 'push',
-    dedupeKey: 'goblin-shop',
+    dedupeKey: 'shop',
   });
 
   return null;
 };
 
-export default BindGoblinShop;
+export default BindGuideQuestsSection;

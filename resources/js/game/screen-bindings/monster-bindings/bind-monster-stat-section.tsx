@@ -7,7 +7,7 @@ import {
 import { ScreenPropsOf } from 'configuration/screen-manager/screen-manager-props';
 import { useRef } from 'react';
 
-import { useManageMonsterStatSectionVisibility } from '../components/actions/partials/monster-stat-section/hooks/use-manage-monster-stat-section-visibility';
+import { useManageMonsterStatSectionVisibility } from '../../components/actions/partials/monster-stat-section/hooks/use-manage-monster-stat-section-visibility';
 
 const BindMonsterStatSection = () => {
   const { pop } = useScreenNavigation();

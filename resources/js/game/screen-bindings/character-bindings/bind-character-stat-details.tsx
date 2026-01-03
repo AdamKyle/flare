@@ -6,32 +6,33 @@ import {
 import { ScreenPropsOf } from 'configuration/screen-manager/screen-manager-props';
 import { useRef } from 'react';
 
-import { UseManageAnnouncementsVisibility } from '../components/announcements/hooks/use-manage-announcements-visibility';
+import { useStatDetailsVisibility } from '../../components/character-sheet/hooks/use-stat-details-visibility';
 
-const BindAnnouncementsSection = () => {
+const BindCharacterInventory = () => {
   const { pop } = useScreenNavigation();
-  const { closeAnnouncements, showAnnouncements } =
-    UseManageAnnouncementsVisibility();
+  const { closeStatDetails, showStatDetails, statType } =
+    useStatDetailsVisibility();
 
   const activeRef = useRef(false);
 
   useBindScreen({
-    when: showAnnouncements,
-    to: Screens.ANNOUNCEMENTS,
-    props: (): ScreenPropsOf<typeof Screens.ANNOUNCEMENTS> => ({
-      on_close: () => {
+    when: showStatDetails,
+    to: Screens.CHARACTER_STAT_DETAILS,
+    props: (): ScreenPropsOf<typeof Screens.CHARACTER_STAT_DETAILS> => ({
+      close_stat_type: () => {
         if (activeRef.current) {
           pop();
         }
-        closeAnnouncements();
+        closeStatDetails();
         activeRef.current = false;
       },
+      stat_type: statType,
     }),
     mode: 'push',
-    dedupeKey: 'shop',
+    dedupeKey: 'character-inventory',
   });
 
   return null;
 };
 
-export default BindAnnouncementsSection;
+export default BindCharacterInventory;

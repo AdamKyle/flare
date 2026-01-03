@@ -12,7 +12,6 @@ import Health from './partials/character-attack-types/health';
 import RingDamage from './partials/character-attack-types/ring-damage';
 import SpellDamage from './partials/character-attack-types/spell-damage';
 import WeaponDamage from './partials/character-attack-types/weapon-damage';
-import { CharacterStatTypeDetails } from './partials/character-stat-types/character-stat-type-details';
 import CharacterSheetDetailsProps from './types/character-sheet-details-props';
 import {
   formatNumberWithCommas,
@@ -64,15 +63,6 @@ const CharacterSheetDetails = (
 
   if (props.showAttackType && props.attackType !== null) {
     return renderAttackDetailsType(props.attackType);
-  }
-
-  if (props.showStatType && props.statType !== null) {
-    return (
-      <CharacterStatTypeDetails
-        stat_type={props.statType}
-        character_id={characterData.id}
-      />
-    );
   }
 
   return (

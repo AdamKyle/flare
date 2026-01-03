@@ -6,25 +6,27 @@ import {
 import { ScreenPropsOf } from 'configuration/screen-manager/screen-manager-props';
 import { useRef } from 'react';
 
-import { useManageDonationsVisibility } from '../components/donations/hooks/use-manage-donations-visibility';
+import { UseManageAnnouncementDetailsVisibility } from '../../components/announcements/hooks/use-manage-announcement-details-visibility';
 
-const BindDonationsSection = () => {
+const BindAnnouncementDetailsSection = () => {
   const { pop } = useScreenNavigation();
-  const { closeDonationScreen, showDonations } = useManageDonationsVisibility();
+  const { announcementId, closeAnnouncementDetails } =
+    UseManageAnnouncementDetailsVisibility();
 
   const activeRef = useRef(false);
 
   useBindScreen({
-    when: showDonations,
-    to: Screens.DONATIONS,
-    props: (): ScreenPropsOf<typeof Screens.DONATIONS> => ({
+    when: announcementId !== null,
+    to: Screens.ANNOUNCEMENT_DETAILS,
+    props: (): ScreenPropsOf<typeof Screens.ANNOUNCEMENT_DETAILS> => ({
       on_close: () => {
         if (activeRef.current) {
           pop();
         }
-        closeDonationScreen();
+        closeAnnouncementDetails();
         activeRef.current = false;
       },
+      announcement_id: announcementId,
     }),
     mode: 'push',
     dedupeKey: 'shop',
@@ -33,4 +35,4 @@ const BindDonationsSection = () => {
   return null;
 };
 
-export default BindDonationsSection;
+export default BindAnnouncementDetailsSection;

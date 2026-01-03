@@ -1,3 +1,4 @@
+import { isNil } from 'lodash';
 import React, { ReactNode } from 'react';
 import { match, P } from 'ts-pattern';
 
@@ -98,6 +99,10 @@ const CharacterAttackTypeBreakdown = ({
         </Alert>
       ));
   };
+
+  if (isNil(attack_type)) {
+    return null;
+  }
 
   return (
     <ContainerWithTitle
