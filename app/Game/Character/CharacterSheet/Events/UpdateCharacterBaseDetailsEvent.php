@@ -9,15 +9,10 @@ class UpdateCharacterBaseDetailsEvent
 {
     use SerializesModels;
 
-    /**
-     * @var Character $character;
-     */
     public Character $character;
 
     /**
      * Create a new event instance.
-     *
-     * @param Character $character
      */
     public function __construct(Character $character)
     {

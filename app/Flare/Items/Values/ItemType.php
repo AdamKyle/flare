@@ -65,16 +65,15 @@ enum ItemType: string
      * Gets all the weapon mastery types
      *
      * - does not include: Rings, Trinket or Artifacts
-     *
-     * @return array
      */
-    public static function weaponMasteryTypes(): array {
+    public static function weaponMasteryTypes(): array
+    {
         return array_map(
             fn (self $type) => $type->value,
             array_filter(self::cases(), fn (self $type) => ! in_array($type, [
                 self::RING,
                 self::TRINKET,
-                self::ARTIFACT
+                self::ARTIFACT,
             ], true))
         );
     }

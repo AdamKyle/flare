@@ -56,7 +56,7 @@ class CharacterBaseDetailsTransformer extends BaseTransformer
             'can_access_purgatory_chains' => $character->map->gameMap->mapType()->isPurgatory(),
             'can_access_labyrinth_oracle' => $character->map->gameMap->mapType()->isLabyrinth(),
             'can_access_twisted_earth' => $character->map->gameMap->mapType()->isTwistedMemories(),
-            'is_in_timeout' => !is_null($character->user->timeout_until),
+            'is_in_timeout' => ! is_null($character->user->timeout_until),
             'weapon_attack' => $characterStatBuilder->buildDamage(ItemType::validWeapons()),
             'voided_weapon_attack' => $characterStatBuilder->buildDamage(ItemType::validWeapons(), true),
             'ring_damage' => $characterStatBuilder->buildDamage(ItemType::RING->value),
@@ -72,7 +72,6 @@ class CharacterBaseDetailsTransformer extends BaseTransformer
     /**
      * Includes the inventory count.
      *
-     * @param Character $character
      * @return Item
      */
     public function includeInventoryCount(Character $character)
@@ -82,9 +81,6 @@ class CharacterBaseDetailsTransformer extends BaseTransformer
 
     /**
      * Fetches the gold bar amount.
-     *
-     * @param Character $character
-     * @return int
      */
     private function fetchGoldBarsAmount(Character $character): int
     {

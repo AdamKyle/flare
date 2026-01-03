@@ -77,7 +77,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'can_access_purgatory_chains' => $character->map->gameMap->mapType()->isPurgatory(),
             'can_access_labyrinth_oracle' => $character->map->gameMap->mapType()->isLabyrinth(),
             'can_access_twisted_earth' => $character->map->gameMap->mapType()->isTwistedMemories(),
-            'is_in_timeout' => !is_null($character->user->timeout_until),
+            'is_in_timeout' => ! is_null($character->user->timeout_until),
             'resurrection_chance' => $characterStatBuilder->buildResurrectionChance(),
             'spell_evasion' => $characterStatBuilder,
             'elemental_atonements' => $characterStatBuilder->buildElementalAtonement(),

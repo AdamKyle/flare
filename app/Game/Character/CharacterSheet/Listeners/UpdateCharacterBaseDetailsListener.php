@@ -14,10 +14,6 @@ class UpdateCharacterBaseDetailsListener
 
     private CharacterBaseDetailsTransformer $characterTopBarTransformer;
 
-    /**
-     * @param Manager $manager
-     * @param CharacterBaseDetailsTransformer $characterTopBarTransformer
-     */
     public function __construct(Manager $manager, CharacterBaseDetailsTransformer $characterTopBarTransformer)
     {
         $this->manager = $manager;

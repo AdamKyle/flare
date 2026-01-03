@@ -14,14 +14,8 @@ class UpdateCharacterBaseDetailsBroadcastEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * @var array
-     */
     public array $character;
 
-    /**
-     * @var User
-     */
     private User $user;
 
     /**
@@ -37,8 +31,6 @@ class UpdateCharacterBaseDetailsBroadcastEvent implements ShouldBroadcastNow
 
     /**
      * Get the channels the event should broadcast on.
-     *
-     * @return Channel|PrivateChannel
      */
     public function broadcastOn(): Channel|PrivateChannel
     {
