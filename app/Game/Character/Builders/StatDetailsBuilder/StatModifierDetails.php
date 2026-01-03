@@ -170,17 +170,16 @@ class StatModifierDetails
     }
 
     /**
-     * @param array $types
-     * @param string $statType
-     * @return array
+     * @param  string  $statType
      */
-    private function fetchDamageOrHealingEquipmentBreakDown(array $types): array {
+    private function fetchDamageOrHealingEquipmentBreakDown(array $types): array
+    {
         if (in_array(ItemType::RING->value, $types)) {
             return [];
         }
 
         if (in_array(ItemType::SPELL_HEALING->value, $types)) {
-            return  array_values($this->fetchItemDetails('base_healing'));
+            return array_values($this->fetchItemDetails('base_healing'));
         }
 
         return array_values($this->fetchItemDetails('base_damage'));
