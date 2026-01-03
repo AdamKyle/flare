@@ -427,7 +427,7 @@ class ClassRankService
                 return;
             }
 
-            foreach (ItemType::allWeaponTypes() as $type) {
+            foreach (ItemType::weaponMasteryTypes() as $type) {
 
                 $inventorySlot = $inventory->where('item.type', $type)->first();
 

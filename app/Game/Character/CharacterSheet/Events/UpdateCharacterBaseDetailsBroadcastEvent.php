@@ -17,7 +17,7 @@ class UpdateCharacterBaseDetailsBroadcastEvent implements ShouldBroadcastNow
     /**
      * @var array
      */
-    public array $characterSheet;
+    public array $character;
 
     /**
      * @var User
@@ -31,7 +31,7 @@ class UpdateCharacterBaseDetailsBroadcastEvent implements ShouldBroadcastNow
      */
     public function __construct(array $characterSheet, User $user)
     {
-        $this->characterSheet = $characterSheet;
+        $this->character = $characterSheet['data'];
         $this->user = $user;
     }
 
