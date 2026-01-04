@@ -7,6 +7,7 @@ import ClassSkillsSection from './sections/class-skills-section';
 import ClassSpecialtiesSection from './sections/class-specialties-section';
 import AttackTypesBreakDownProps from './types/attack-types-break-down-props';
 import { getAttackTypeFormattedName } from '../../../enums/attack-types';
+import { StatTypes } from '../../../enums/stat-types';
 import EquippedItems from '../../character-stat-types/partials/equipped-items';
 
 import { formatNumberWithCommas } from 'game-utils/format-number';
@@ -15,8 +16,6 @@ import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
 import Separator from 'ui/separator/separator';
-
-import { StatTypes } from '../../../enums/stat-types';
 
 const SpellDamage = ({
   break_down,
