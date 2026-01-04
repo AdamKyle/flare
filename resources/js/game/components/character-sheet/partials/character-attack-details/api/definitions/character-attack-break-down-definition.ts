@@ -15,7 +15,7 @@ export interface ClassBonusDetails {
   amount: number;
 }
 
-export interface SkillEffectingDamage {
+export interface EffectingSkills {
   name: string;
   increase_amount: number;
 }
@@ -35,12 +35,14 @@ export interface CharacterAttackTypeBreakDownDefinition {
   percentage_of_stat_used: number;
   total_damage_for_type: string;
   base_damage: number;
+  base_healing: number;
   items_equipped: BaseEquippedItemDetails[] | [];
   class_bonus_details: ClassBonusDetails | null;
   boon_details: CharacterBoonDefinition | null;
   class_specialties: ClassSpecialities[] | null;
   ancestral_item_skill_data: AncestralItemSkillData[] | [];
-  skills_effecting_damage: SkillEffectingDamage[] | null;
+  skills_effecting_damage: EffectingSkills[] | null;
+  skill_affecting_healing: EffectingSkills[] | null;
   masteries: MasteryBreakdown[] | [];
   stat_amount: number;
 }

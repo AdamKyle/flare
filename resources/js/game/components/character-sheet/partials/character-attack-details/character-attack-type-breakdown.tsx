@@ -130,7 +130,9 @@ const CharacterAttackTypeBreakdown = ({
         <WeaponDamage break_down={data} type={AttackTypes.WEAPON} />
       ))
       .with(AttackTypes.SPELL_DAMAGE, () => <SpellDamage />)
-      .with(AttackTypes.HEALING, () => <Healing />)
+      .with(AttackTypes.HEALING, () => (
+        <Healing break_down={data} type={AttackTypes.HEALING} />
+      ))
       .with(AttackTypes.RING_DAMAGE, () => <RingDamage />)
       .with(AttackTypes.HEALTH, () => (
         <Health break_down={data} type={AttackTypes.HEALTH} />

@@ -3,6 +3,7 @@ import React, { ReactNode } from 'react';
 import AncestralItemSkillSection from './sections/ancestral-item-skill-section';
 import ClassBonusAttributesSection from './sections/class-bonus-attributes-section';
 import ClassMasteriesSection from './sections/class-masteries-section';
+import ClassSkillsSection from './sections/class-skills-section';
 import ClassSpecialtiesSection from './sections/class-specialties-section';
 import AttackTypesBreakDownProps from './types/attack-types-break-down-props';
 import { getAttackTypeFormattedName } from '../../../enums/attack-types';
@@ -80,6 +81,9 @@ const WeaponDamage = ({
               ancestral_item_skill_data={
                 break_down.regular.ancestral_item_skill_data
               }
+            />
+            <ClassSkillsSection
+              class_skills={break_down.regular.skills_effecting_damage}
             />
             <ClassBonusAttributesSection
               class_bonus_details={break_down.regular.class_bonus_details}

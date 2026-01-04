@@ -9,6 +9,7 @@ export enum StatTypes {
   CHR,
   FOCUS,
   BASE_DAMAGE,
+  BASE_HEALING,
 }
 
 export const getStatName = (statType: StatTypes | null): string => {
