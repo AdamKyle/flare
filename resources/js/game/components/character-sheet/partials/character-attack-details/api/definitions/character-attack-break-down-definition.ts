@@ -42,6 +42,7 @@ export interface CharacterAttackTypeBreakDownDefinition {
   ancestral_item_skill_data: AncestralItemSkillData[] | [];
   skills_effecting_damage: SkillEffectingDamage[] | null;
   masteries: MasteryBreakdown[] | [];
+  stat_amount: number;
 }
 
 export default interface CharacterAttackBreakDownDefinition {

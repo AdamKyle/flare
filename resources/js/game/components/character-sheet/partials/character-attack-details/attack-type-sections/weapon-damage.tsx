@@ -1,5 +1,9 @@
 import React, { ReactNode } from 'react';
 
+import AncestralItemSkillSection from './sections/ancestral-item-skill-section';
+import ClassBonusAttributesSection from './sections/class-bonus-attributes-section';
+import ClassMasteriesSection from './sections/class-masteries-section';
+import ClassSpecialtiesSection from './sections/class-specialties-section';
 import AttackTypesBreakDownProps from './types/attack-types-break-down-props';
 import { getAttackTypeFormattedName } from '../../../enums/attack-types';
 import { StatTypes } from '../../../enums/stat-types';
@@ -16,96 +20,6 @@ const WeaponDamage = ({
   break_down,
   type,
 }: AttackTypesBreakDownProps): ReactNode => {
-  const renderAncestralSkillItemData = () => {
-    const ancestralSkillItemData = break_down.regular.ancestral_item_skill_data;
-
-    if (ancestralSkillItemData.length <= 0) {
-      return null;
-    }
-
-    const listElements = ancestralSkillItemData.map((ancestralSkillInfo) => {
-      return (
-        <li>
-          <strong>{ancestralSkillInfo.name}</strong>{' '}
-          <span className="text-green-700 dark:text-green-500">
-            +{(ancestralSkillInfo.increase_amount * 100).toFixed(2)}%
-          </span>
-        </li>
-      );
-    });
-
-    return (
-      <div className={'my-2'}>
-        <h4
-          className={'text-marigold-700 dark:text-marigold-500 my-2 font-bold'}
-        >
-          Ancestral Item Skill Effects
-        </h4>
-        <ol className="ml-2 list-inside list-decimal space-y-4 text-gray-500 dark:text-gray-400">
-          {listElements}
-        </ol>
-      </div>
-    );
-  };
-
-  const renderClassMasteries = () => {
-    const classMasteries = break_down.regular.masteries;
-
-    if (!classMasteries || classMasteries.length <= 0) {
-      return null;
-    }
-
-    const listElements = classMasteries.map((classMastery) => {
-      return (
-        <li>
-          <strong>{classMastery.name}</strong>{' '}
-          <span className="text-green-700 dark:text-green-500">
-            +{(classMastery.amount * 100).toFixed(2)}%
-          </span>
-        </li>
-      );
-    });
-
-    return (
-      <div className={'my-2'}>
-        <h4
-          className={'text-marigold-700 dark:text-marigold-500 my-2 font-bold'}
-        >
-          Class Masteries
-        </h4>
-        <ol className="ml-2 list-inside list-decimal space-y-4 text-gray-500 dark:text-gray-400">
-          {listElements}
-        </ol>
-      </div>
-    );
-  };
-
-  const renderClassBonusAttribute = () => {
-    const classBonusDetails = break_down.regular.class_bonus_details;
-
-    if (!classBonusDetails) {
-      return null;
-    }
-
-    return (
-      <div className={'mb-2'}>
-        <h4
-          className={'text-marigold-700 dark:text-marigold-500 my-2 font-bold'}
-        >
-          Class Bonus Attributes
-        </h4>
-        <ol className="ml-2 list-inside list-decimal space-y-4 text-gray-500 dark:text-gray-400">
-          <li>
-            <strong>{classBonusDetails.name}</strong>{' '}
-            <span className="text-green-700 dark:text-green-500">
-              +{(classBonusDetails.amount * 100).toFixed(2)}%
-            </span>
-          </li>
-        </ol>
-      </div>
-    );
-  };
-
   return (
     <div>
       <div className={'mx-auto w-full md:w-2/3'}>
@@ -162,9 +76,20 @@ const WeaponDamage = ({
               <h4>Other Enhancements/Afflictions</h4>
             </div>
             <Separator />
-            {renderAncestralSkillItemData()}
-            {renderClassBonusAttribute()}
-            {renderClassMasteries()}
+            <AncestralItemSkillSection
+              ancestral_item_skill_data={
+                break_down.regular.ancestral_item_skill_data
+              }
+            />
+            <ClassBonusAttributesSection
+              class_bonus_details={break_down.regular.class_bonus_details}
+            />
+            <ClassMasteriesSection
+              class_masteries={break_down.regular.masteries}
+            />
+            <ClassSpecialtiesSection
+              class_specialties={break_down.regular.class_specialties}
+            />
           </div>
         </div>
       </div>
