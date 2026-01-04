@@ -5,4 +5,5 @@ export default interface BaseEquippedItemDetails {
   item_base_stat: number;
   item_details: BaseItemDetails;
   attached_affixes: ItemAffixDefinition[] | [];
+  total_stat_increase: number;
 }

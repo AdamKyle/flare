@@ -67,8 +67,6 @@ const CharacterAttackTypeBreakdown = ({
     );
   }
 
-  console.log(data, characterData);
-
   if (!characterData || !data) {
     return (
       <ContainerWithTitle
@@ -128,7 +126,9 @@ const CharacterAttackTypeBreakdown = ({
 
   const renderAttackDetailsType = (attack_type: AttackTypes): ReactNode => {
     return match(attack_type)
-      .with(AttackTypes.WEAPON, () => <WeaponDamage break_down={data} />)
+      .with(AttackTypes.WEAPON, () => (
+        <WeaponDamage break_down={data} type={AttackTypes.WEAPON} />
+      ))
       .with(AttackTypes.SPELL_DAMAGE, () => <SpellDamage />)
       .with(AttackTypes.HEALING, () => <Healing />)
       .with(AttackTypes.RING_DAMAGE, () => <RingDamage />)

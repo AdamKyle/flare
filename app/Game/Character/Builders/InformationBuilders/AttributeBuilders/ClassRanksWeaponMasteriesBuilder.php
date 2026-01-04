@@ -44,13 +44,6 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute
 
         $mastery = $classRank->weaponMasteries->where('weapon_type', $slot->item->type)->where('character_class_rank_id', $classRank->id)->first();
 
-        if (is_null($mastery)) {
-            dump('Mastery is null, why?');
-            dump($slot->item->type);
-            dump('For class rank');
-            dump($classRank);
-        }
-
         return [
             'position' => $position,
             'name' => $type,

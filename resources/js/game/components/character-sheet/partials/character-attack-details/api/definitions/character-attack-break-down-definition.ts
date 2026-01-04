@@ -1,4 +1,4 @@
-import { BaseItemDetails } from '../../../../../../api-definitions/items/base-item-details';
+import BaseEquippedItemDetails from '../../../../../../api-definitions/items/base-equipped-item-details';
 import {
   AncestralItemSkillData,
   CharacterBoonDefinition,
@@ -8,13 +8,6 @@ import {
 export interface AttackAttachedAffix {
   affix_name: string;
   base_damage_mod: number;
-}
-
-export interface CharacterAttackEquippedItemDetails {
-  item_base_stat: number | string;
-  item_details: BaseItemDetails;
-  total_stat_increase: number;
-  attached_affixes: AttackAttachedAffix[] | [];
 }
 
 export interface ClassBonusDetails {
@@ -35,14 +28,14 @@ export interface MasteryBreakdown {
 
 export interface CharacterAttackTypeBreakDownDefinition {
   damage_stat_name: string;
-  damage_stat_amount: string;
+  damage_stat_amount: number;
   non_equipped_damage_amount: number;
   non_equipped_percentage_of_stat_used: number;
   spell_damage_stat_amount_to_use: number;
   percentage_of_stat_used: number;
   total_damage_for_type: string;
-  base_damage: string;
-  items_equipped: CharacterAttackEquippedItemDetails[] | [];
+  base_damage: number;
+  items_equipped: BaseEquippedItemDetails[] | [];
   class_bonus_details: ClassBonusDetails | null;
   boon_details: CharacterBoonDefinition | null;
   class_specialties: ClassSpecialities[] | null;

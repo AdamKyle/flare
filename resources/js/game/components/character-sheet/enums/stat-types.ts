@@ -8,6 +8,7 @@ export enum StatTypes {
   AGI,
   CHR,
   FOCUS,
+  BASE_DAMAGE,
 }
 
 export const getStatName = (statType: StatTypes | null): string => {
