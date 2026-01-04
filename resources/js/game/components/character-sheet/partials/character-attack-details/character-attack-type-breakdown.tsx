@@ -129,15 +129,21 @@ const CharacterAttackTypeBreakdown = ({
       .with(AttackTypes.WEAPON, () => (
         <WeaponDamage break_down={data} type={AttackTypes.WEAPON} />
       ))
-      .with(AttackTypes.SPELL_DAMAGE, () => <SpellDamage />)
+      .with(AttackTypes.SPELL_DAMAGE, () => (
+        <SpellDamage break_down={data} type={AttackTypes.SPELL_DAMAGE} />
+      ))
       .with(AttackTypes.HEALING, () => (
         <Healing break_down={data} type={AttackTypes.HEALING} />
       ))
-      .with(AttackTypes.RING_DAMAGE, () => <RingDamage />)
+      .with(AttackTypes.RING_DAMAGE, () => (
+        <RingDamage break_down={data} type={AttackTypes.RING_DAMAGE} />
+      ))
       .with(AttackTypes.HEALTH, () => (
         <Health break_down={data} type={AttackTypes.HEALTH} />
       ))
-      .with(AttackTypes.DEFENCE, () => <Defence />)
+      .with(AttackTypes.DEFENCE, () => (
+        <Defence break_down={data} type={AttackTypes.DEFENCE} />
+      ))
       .otherwise(() => (
         <Alert variant={AlertVariant.DANGER}>
           <p>

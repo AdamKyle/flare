@@ -183,9 +183,8 @@ class DamageBuilder extends BaseAttribute
     {
         $details = [];
 
-        $details['attached_affixes'] = $this->getAttributeBonusFromAllItemAffixesDetails('base_damage', $voided, ItemType::SPELL_DAMAGE->value);
         $details['skills_effecting_damage'] = null;
-        $details['base_damage'] = number_format($this->getDamageFromItems(ItemType::SPELL_DAMAGE->value, 'both'));
+        $details['base_damage'] = $this->getDamageFromItems(ItemType::SPELL_DAMAGE->value, 'both');
 
         if ($this->shouldIncludeSkillDamage($this->character->class, 'spell')) {
             $details['skills_effecting_damage'] = $this->fetchBaseAttributeFromSkillsDetails('base_damage');

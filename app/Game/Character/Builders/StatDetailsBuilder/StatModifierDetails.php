@@ -117,41 +117,35 @@ class StatModifierDetails
 
         $details['damage_stat_name'] = $this->character->damage_stat;
         $details['damage_stat_amount'] = $this->character->getInformation()->statMod($this->character->damage_stat, $isVoided);
-        $details['non_equipped_damage_amount'] = 0;
-        $details['non_equipped_percentage_of_stat_used'] = 0;
         $details['spell_damage_stat_amount_to_use'] = 0;
         $details['percentage_of_stat_used'] = 0;
         $details['total_damage_for_type'] = $this->character->getInformation()->buildDamage($types, $isVoided);
         $details['base_damage'] = 0;
         $details['items_equipped'] = $this->fetchDamageOrHealingEquipmentBreakDown($types);
 
-        $equipped = $this->fetchEquipped($this->character);
+        if ($this->character->classType()->isAlcoholic()) {
+            $value = $damageStatAmount * 0.25;
 
-        if (is_null($equipped)) {
-            if ($this->character->classType()->isAlcoholic()) {
-                $value = $damageStatAmount * 0.25;
+            $details['non_equipped_damage_amount'] = max($value, 5);
+            $details['non_equipped_percentage_of_stat_used'] = 0.25;
+        } elseif ($this->character->classType()->isFighter()) {
+            $value = $damageStatAmount * 0.05;
 
-                $details['non_equipped_damage_amount'] = max($value, 5);
-                $details['non_equipped_percentage_of_stat_used'] = 0.25;
-            } elseif ($this->character->classType()->isFighter()) {
-                $value = $damageStatAmount * 0.05;
+            $details['non_equipped_damage_amount'] = max($value, 5);
+            $details['non_equipped_percentage_of_stat_used'] = 0.05;
+        } elseif ($this->character->classType()->isHeretic()) {
 
-                $details['non_equipped_damage_amount'] = max($value, 5);
-                $details['non_equipped_percentage_of_stat_used'] = 0.05;
-            } else {
-                $value = $damageStatAmount * 0.02;
+            $value = $damageStatAmount * 0.15;
 
-                $details['non_equipped_damage_amount'] = max($value, 5);
-                $details['non_equipped_percentage_of_stat_used'] = 0.02;
-            }
+            $details['non_equipped_damage_amount'] = max($value, 5);
+            $details['spell_damage_stat_amount_to_use'] = max($value, 5);
+            $details['percentage_of_stat_used'] = 0.15;
+            $details['non_equipped_percentage_of_stat_used'] = 0.15;
+        } else {
+            $value = $damageStatAmount * 0.02;
 
-            if ($this->character->classType()->isHeretic()) {
-
-                $value = $damageStatAmount * 0.15;
-
-                $details['spell_damage_stat_amount_to_use'] = max($value, 5);
-                $details['percentage_of_stat_used'] = 0.15;
-            }
+            $details['non_equipped_damage_amount'] = max($value, 5);
+            $details['non_equipped_percentage_of_stat_used'] = 0.02;
         }
 
         $details['class_bonus_details'] = $this->fetchClassBonusesEffecting('base_damage');

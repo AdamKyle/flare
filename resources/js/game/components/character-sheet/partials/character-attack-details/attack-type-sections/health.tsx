@@ -28,12 +28,12 @@ const Health = ({ break_down, type }: AttackTypesBreakDownProps): ReactNode => {
         </Dl>
         <p className="my-4">
           Below is a break down of your{' '}
-          <strong>{getAttackTypeFormattedName(type)}</strong>. When it comes to
-          survivability theres two forms: Be a glass cannon and pray you kill
-          the creature in one turn, or buff up and survive the onslaught to
-          greet you. Everything below is a complete break down of what goes into
-          your health. Your durability stat above, is the modded version of your
-          durability, the more durability, the more health.
+          <strong>{getAttackTypeFormattedName(type)}</strong>. Above is your
+          modded durability. Add on all the equipment, the enchantments, the
+          holy oils, the boons, class rank abilities and so on and you'll
+          understand what goes into your health over all. You will need health
+          if you plan to survive, alas it would be best to slaughter the fiend
+          in one hit.
         </p>
         <Separator />
       </div>

@@ -45,9 +45,8 @@ class DefenceBuilder extends BaseAttribute
         $details = [];
 
         $details['base_ac'] = $this->character->ac;
-        $details['ac_from_items'] = number_format($this->getACFromItems($this->getItemsWithBaseAC()));
+        $details['ac_from_items'] = $this->getACFromItems($this->getItemsWithBaseAC());
         $details['skill_effecting_ac'] = $this->fetchBaseAttributeFromSkillsDetails('base_ac');
-        $details['attached_affixes'] = $this->getAttributeBonusFromAllItemAffixesDetails('base_ac', $voided);
 
         return $details;
     }

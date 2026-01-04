@@ -33,7 +33,7 @@ export interface CharacterAttackTypeBreakDownDefinition {
   non_equipped_percentage_of_stat_used: number;
   spell_damage_stat_amount_to_use: number;
   percentage_of_stat_used: number;
-  total_damage_for_type: string;
+  total_damage_for_type: number;
   base_damage: number;
   base_healing: number;
   items_equipped: BaseEquippedItemDetails[] | [];
@@ -43,8 +43,11 @@ export interface CharacterAttackTypeBreakDownDefinition {
   ancestral_item_skill_data: AncestralItemSkillData[] | [];
   skills_effecting_damage: EffectingSkills[] | null;
   skill_affecting_healing: EffectingSkills[] | null;
+  skills_effecting_ac: EffectingSkills[] | null;
   masteries: MasteryBreakdown[] | [];
   stat_amount: number;
+  base_ac: number;
+  ac_from_items: number;
 }
 
 export default interface CharacterAttackBreakDownDefinition {

@@ -48,13 +48,13 @@ const WeaponDamage = ({
         </Dl>
         <p className="my-4">
           Below is a break down of your{' '}
-          <strong>{getAttackTypeFormattedName(type)}</strong>. This is your
-          total damage and everything you have equipped, enchanted and so on.
-          When it comes to fighting you ability to kill the creature in one hit
-          is more paramount that your ability to survive. Why delay the rewards
-          when you can increase this value, min max it and break the threshold.
-          There is no cap on damage and everything plays apart of it, how high
-          can you make it go?
+          <strong>{getAttackTypeFormattedName(type)}</strong>. We use 5% of your
+          damage stat and apply that to all your damage which is a sum of all
+          the weapons you have equipped. Upon that we add all the bonuses, such
+          as enchantments, holy oils, anything that increases your damage is
+          also added. The more damage you do, the more likely you are to survive
+          the on coming onslaught! besides we like to kill things in one hit,
+          not many paper cuts!
         </p>
         <Separator />
       </div>
