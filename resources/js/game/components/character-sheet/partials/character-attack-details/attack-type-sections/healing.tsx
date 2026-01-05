@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
 
 import AncestralItemSkillSection from './sections/ancestral-item-skill-section';
 import ClassBonusAttributesSection from './sections/class-bonus-attributes-section';
@@ -17,10 +17,7 @@ import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
 import Separator from 'ui/separator/separator';
 
-const Healing = ({
-  break_down,
-  type,
-}: AttackTypesBreakDownProps): ReactNode => {
+const Healing = ({ break_down, type }: AttackTypesBreakDownProps) => {
   return (
     <div>
       <div className={'mx-auto w-full md:w-2/3'}>

@@ -207,6 +207,21 @@ class BaseAttribute
             ->sum('item.base_damage');
     }
 
+    protected function getAttributeFromItems(string $type, string $attribute, string $position): mixed
+    {
+        if (is_null($this->inventory)) {
+            return 0;
+        }
+
+        if ($position === 'both') {
+            return $this->inventory->whereIn('item.type', $type)->sum('item.'.$attribute);
+        }
+
+        return $this->inventory->where('item.type', $type)
+            ->where('position', $position)
+            ->sum('item.'.$attribute);
+    }
+
     /**
      * Get healing from items.
      */

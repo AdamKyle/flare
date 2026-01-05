@@ -204,6 +204,9 @@ class DamageBuilder extends BaseAttribute
     {
         $details['attached_affixes'] = $this->getAttributeBonusFromAllItemAffixesDetails('base_damage', false, ItemType::RING->value);
         $details['base_damage'] = $this->getDamageFromItems('ring', 'both');
+        $details['spell_evasion'] = $this->getAttributeFromItems('ring', 'spell_evasion', 'both');
+        $details['affix_damage_reduction'] = $this->getAttributeFromItems('ring', 'affix_damage_reduction', 'both');
+        $details['healing_reduction'] = $this->getAttributeFromItems('ring', 'healing_reduction', 'both');
         $details['skills_effecting_damage'] = null;
         $details['masteries'] = [];
 

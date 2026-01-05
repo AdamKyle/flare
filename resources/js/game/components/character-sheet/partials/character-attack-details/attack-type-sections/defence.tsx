@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
 
 import AncestralItemSkillSection from './sections/ancestral-item-skill-section';
 import ClassBonusAttributesSection from './sections/class-bonus-attributes-section';
@@ -17,10 +17,7 @@ import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
 import Separator from 'ui/separator/separator';
 
-const Defence = ({
-  break_down,
-  type,
-}: AttackTypesBreakDownProps): ReactNode => {
+const Defence = ({ break_down, type }: AttackTypesBreakDownProps) => {
   return (
     <div>
       <div className={'mx-auto w-full md:w-2/3'}>
@@ -55,7 +52,7 @@ const Defence = ({
             <ol className="list-inside list-decimal space-y-4 text-gray-500 dark:text-gray-400">
               <EquippedItems
                 items_equipped={break_down.regular.items_equipped}
-                stat_type={StatTypes.BASE_DAMAGE}
+                stat_type={StatTypes.BASE_AC}
               />
             </ol>
           </div>

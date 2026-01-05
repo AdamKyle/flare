@@ -3,6 +3,7 @@ import {
   AncestralItemSkillData,
   CharacterBoonDefinition,
   ClassSpecialities,
+  MapReduction,
 } from '../../../character-stat-types/api-definitions/character-stat-break-down-definition';
 
 export interface AttackAttachedAffix {
@@ -45,9 +46,13 @@ export interface CharacterAttackTypeBreakDownDefinition {
   skill_affecting_healing: EffectingSkills[] | null;
   skills_effecting_ac: EffectingSkills[] | null;
   masteries: MasteryBreakdown[] | [];
+  map_reduction: MapReduction | null;
   stat_amount: number;
   base_ac: number;
   ac_from_items: number;
+  spell_evasion: number;
+  affix_damage_reduction: number;
+  healing_reduction: number;
 }
 
 export default interface CharacterAttackBreakDownDefinition {

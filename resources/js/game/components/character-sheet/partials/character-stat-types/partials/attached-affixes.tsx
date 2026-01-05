@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 
 import AttachedAffixesProps from './types/attached-affixes-props';
 import ItemAffixDefinition from '../../../../../api-definitions/items/equippable-item-definitions/item-affix-definition';
-import { getStatAbbreviation } from '../../../enums/stat-types';
+import { getStatAbbreviation, getStatName } from '../../../enums/stat-types';
 
 const AttachedAffixes = ({
   attached_affixes,
@@ -21,7 +21,7 @@ const AttachedAffixes = ({
         <span className="text-green-700 dark:text-green-500">
           (+
           {(modifierValue * 100).toFixed(2)}
-          %);
+          %) towards {getStatName(stat_type)}
         </span>
       </li>
     );

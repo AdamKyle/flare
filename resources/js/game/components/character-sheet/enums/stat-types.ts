@@ -10,6 +10,7 @@ export enum StatTypes {
   FOCUS,
   BASE_DAMAGE,
   BASE_HEALING,
+  BASE_AC,
 }
 
 export const getStatName = (statType: StatTypes | null): string => {
@@ -21,6 +22,9 @@ export const getStatName = (statType: StatTypes | null): string => {
     .with(StatTypes.AGI, () => 'Agility')
     .with(StatTypes.CHR, () => 'Charisma')
     .with(StatTypes.FOCUS, () => 'Focus')
+    .with(StatTypes.BASE_DAMAGE, () => 'Base Damage Mod')
+    .with(StatTypes.BASE_HEALING, () => 'Base Healing Mod')
+    .with(StatTypes.BASE_AC, () => 'Base Ac Mod')
     .otherwise(() => 'Unknown stat type');
 };
 
@@ -33,5 +37,8 @@ export const getStatAbbreviation = (statType: StatTypes): string => {
     .with(StatTypes.AGI, () => 'agi')
     .with(StatTypes.CHR, () => 'chr')
     .with(StatTypes.FOCUS, () => 'focus')
+    .with(StatTypes.BASE_DAMAGE, () => 'base_damage')
+    .with(StatTypes.BASE_AC, () => 'base_ac')
+    .with(StatTypes.BASE_HEALING, () => 'base_healing')
     .otherwise(() => 'Unknown');
 };

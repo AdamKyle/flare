@@ -88,6 +88,7 @@ class StatModifierDetails
         $details['stat_amount'] = $this->character->getInformation()->statMod('dur', $isVoided);
         $details['class_specialties'] = $this->fetchClassRankSpecialtiesForHealth();
         $details['items_equipped'] = array_values($this->fetchItemDetails('dur'));
+        $details['map_reduction'] = $this->getMapCharacterReductionsDetails();
 
         return $details;
     }
@@ -105,6 +106,7 @@ class StatModifierDetails
         $details['class_specialties'] = $this->fetchClassRankSpecialtiesDetails('base_ac');
         $details['ancestral_item_skill_data'] = $this->fetchAncestralItemSkills('base_ac');
         $details['items_equipped'] = array_values($this->fetchItemDetails('base_ac'));
+        $details['map_reduction'] = $this->getMapCharacterReductionsDetails();
 
         return array_merge($details, $this->character->getInformation()->getDefenceBuilder()->buildDefenceBreakDownDetails($isVoided));
     }
@@ -122,6 +124,7 @@ class StatModifierDetails
         $details['total_damage_for_type'] = $this->character->getInformation()->buildDamage($types, $isVoided);
         $details['base_damage'] = 0;
         $details['items_equipped'] = $this->fetchDamageOrHealingEquipmentBreakDown($types);
+        $details['map_reduction'] = $this->getMapCharacterReductionsDetails();
 
         if ($this->character->classType()->isAlcoholic()) {
             $value = $damageStatAmount * 0.25;
@@ -163,9 +166,6 @@ class StatModifierDetails
         return array_merge($details, $typeAttributes);
     }
 
-    /**
-     * @param  string  $statType
-     */
     private function fetchDamageOrHealingEquipmentBreakDown(array $types): array
     {
         if (in_array(ItemType::RING->value, $types)) {
@@ -426,7 +426,7 @@ class StatModifierDetails
 
             if ($statAmount > 0) {
                 $details['attached_affixes'][] = [
-                    'affix_name' => $itemPrefix->name,
+                    'name' => $itemPrefix->name,
                     $stat.'_mod' => $itemPrefix->{$stat.'_mod'},
                 ];
             }
@@ -437,7 +437,7 @@ class StatModifierDetails
 
             if ($statAmount > 0) {
                 $details['attached_affixes'][] = [
-                    'affix_name' => $itemSuffix->name,
+                    'name' => $itemSuffix->name,
                     $stat.'_mod' => $itemSuffix->{$stat.'_mod'},
                 ];
             }
