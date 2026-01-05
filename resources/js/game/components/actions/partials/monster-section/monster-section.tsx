@@ -30,8 +30,14 @@ const MonsterSection = ({
   show_monster_stats,
 }: MonsterSectionProps): ReactNode => {
   const { gameData, listenForMonsterUpdates } = useGameData();
-  const { loading, setRequestData, data, error, disableAttackButtons } =
-    useAttackMonster();
+  const {
+    loading,
+    setRequestData,
+    data,
+    error,
+    disableAttackButtons,
+    setReinitializeFight,
+  } = useAttackMonster();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [monsterName, setMonsterName] = useState<string | null>(null);
@@ -51,7 +57,7 @@ const MonsterSection = ({
 
   listenForMonsterUpdates();
 
-  const handelMonsterSelection = () => {
+  const handelMonsterSelection = (shouldFightAgain?: boolean) => {
     if (!monsters || !monsters[currentIndex] || !gameData.character) {
       return;
     }
@@ -65,6 +71,10 @@ const MonsterSection = ({
       attack_type: AttackType.ATTACK,
       battle_type: BattleType.INITIATE,
     });
+
+    if (shouldFightAgain) {
+      setReinitializeFight((prev) => !prev);
+    }
   };
 
   const handleNextIndex = (index: number) => {
@@ -126,6 +136,10 @@ const MonsterSection = ({
     return MonsterImageProgression[tierIndex];
   };
 
+  const handleClearBattleResults = () => {
+    setMonsterToFight(null);
+  };
+
   const renderMonsterFightSection = () => {
     if (showExplorationConfiguration) {
       return <MonsterExplorationConfiguration />;
@@ -182,13 +196,13 @@ const MonsterSection = ({
             label="Attack Again!"
             variant={ButtonVariant.PRIMARY}
             additional_css="w-full lg:w-1/3"
-            on_click={() => {}}
+            on_click={() => handelMonsterSelection(true)}
           />
           <Button
             label="Clear"
             variant={ButtonVariant.DANGER}
             additional_css="w-full lg:w-1/3"
-            on_click={() => {}}
+            on_click={handleClearBattleResults}
           />
         </div>
       );

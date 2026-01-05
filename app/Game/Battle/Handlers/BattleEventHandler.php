@@ -50,7 +50,7 @@ class BattleEventHandler
      */
     public function processMonsterDeath(int $characterId, int $monsterId, array $context = []): void
     {
-        BattleRewardHandler::dispatch($characterId, $monsterId, $context)->onQueue('battle_reward_processing')->onConnection('battle_reward_processing')->delay(now()->addSecond());
+        BattleRewardHandler::dispatch($characterId, $monsterId, $context)->onQueue('battle_reward_processing')->onConnection('battle_reward_processing');
     }
 
     /**

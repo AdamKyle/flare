@@ -10,4 +10,5 @@ export default interface UseAttackMonsterDefinition {
   disableAttackButtons: boolean;
   error: AxiosErrorDefinition | null;
   setRequestData: StateSetter<UseAttackMonsterRequestParams>;
+  setReinitializeFight: StateSetter<boolean>;
 }

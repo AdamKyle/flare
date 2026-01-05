@@ -22,6 +22,7 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
   const [error, setError] = useState<UseAttackMonsterDefinition['error']>(null);
   const [loading, setLoading] = useState(false);
   const [disableAttackButtons, setDisableAttackButtons] = useState(false);
+  const [reinitializeFight, setReinitializeFight] = useState(false);
   const [requestData, setRequestData] = useState<UseAttackMonsterRequestParams>(
     {
       monster_id: 0,
@@ -73,10 +74,10 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiHandler, urlToUse]);
+  }, [apiHandler, urlToUse, reinitializeFight]);
 
   const handleAttackMonster = useCallback(async () => {
-    if (!requestData.attack_type) {
+    if (!requestData.attack_type || requestData.monster_id === 0) {
       return;
     }
 
@@ -127,7 +128,7 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [apiHandler, urlToUse]
+    [apiHandler, urlToUse, reinitializeFight]
   );
 
   useEffect(() => {
@@ -138,6 +139,7 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
     loading,
     disableAttackButtons,
     setRequestData,
+    setReinitializeFight,
     error,
     data,
   };
