@@ -54,8 +54,6 @@ class CharacterCreator
 
         $state->setCharacter($character);
 
-        dump('Calling Next from CharacterCreator');
-
         return $next($state);
     }
 }

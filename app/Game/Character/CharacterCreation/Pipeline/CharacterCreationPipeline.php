@@ -29,11 +29,7 @@ class CharacterCreationPipeline
             ->via('process')
             ->thenReturn();
 
-        dump('Yay we have a character builder state!');
-
         BuildCharacterCacheData::dispatch($characterBuilderState->getCharacter()->id);
-
-        dump('We dispatched the job.');
 
         return $characterBuilderState;
     }

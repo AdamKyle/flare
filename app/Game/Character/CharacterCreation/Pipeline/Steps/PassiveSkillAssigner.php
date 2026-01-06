@@ -67,8 +67,6 @@ class PassiveSkillAssigner
         $this->flushUpdates();
         $this->flushInserts($character);
 
-        dump('Calling Next from PassiveSkillAssigner');
-
         return $next($state);
     }
 

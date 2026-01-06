@@ -24,8 +24,6 @@ class MapPlacement
             'game_map_id' => $map->id,
         ]);
 
-        dump('Calling Next from MapPlacement');
-
         return $next($state);
     }
 }

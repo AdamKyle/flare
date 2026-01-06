@@ -39,8 +39,6 @@ class SkillAssigner
             Skill::query()->insert($rows);
         }
 
-        dump('Calling Next from SkillAssigner');
-
         return $next($state);
     }
 
