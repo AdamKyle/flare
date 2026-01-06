@@ -2,6 +2,7 @@
 
 namespace App\Game\Character\CharacterCreation\Pipeline;
 
+use App\Game\Character\CharacterCreation\Jobs\BuildCharacterCacheData;
 use App\Game\Character\CharacterCreation\Pipeline\Steps\BuildCache;
 use App\Game\Character\CharacterCreation\Pipeline\Steps\CharacterCreator;
 use App\Game\Character\CharacterCreation\Pipeline\Steps\ClassRankAssigner;
@@ -22,11 +23,15 @@ class CharacterCreationPipeline
      */
     public function run(CharacterBuildState $state): CharacterBuildState
     {
-        return $this->pipeline
+        $characterBuilderState = $this->pipeline
             ->send($state)
             ->through($this->steps())
             ->via('process')
             ->thenReturn();
+
+        BuildCharacterCacheData::dispatch($characterBuilderState);
+
+        return $characterBuilderState;
     }
 
     /**
