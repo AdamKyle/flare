@@ -18,9 +18,9 @@ class BuildCharacterCacheData implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @param CharacterBuildState $state
+     * @param int $characterId
      */
-    public function __construct(private readonly CharacterBuildState $state)
+    public function __construct(private readonly int $characterId)
     {}
 
     /**
@@ -28,6 +28,9 @@ class BuildCharacterCacheData implements ShouldQueue
      */
     public function handle(BuildCache $buildCache): void
     {
-        $buildCache->process($this->state);
+
+        $character = Character::find($this->characterId);
+
+        $buildCache->process($character);
     }
 }

@@ -46,6 +46,8 @@ class ClassRankAssigner
             }
         });
 
+        dump('Calling Next from ClassRankAssigner');
+
         return $next($state);
     }
 

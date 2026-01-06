@@ -54,6 +54,8 @@ class StarterWeaponAndInventory
             InventorySet::query()->insert($rows);
         }
 
+        dump('Calling Next from StarterWeaponAndInventory');
+
         return $next($state);
     }
 

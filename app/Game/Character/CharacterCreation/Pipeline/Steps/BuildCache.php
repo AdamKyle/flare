@@ -2,9 +2,8 @@
 
 namespace App\Game\Character\CharacterCreation\Pipeline\Steps;
 
+use App\Flare\Models\Character;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
-use App\Game\Character\CharacterCreation\State\CharacterBuildState;
-use Closure;
 use Exception;
 
 class BuildCache
@@ -18,16 +17,12 @@ class BuildCache
      *
      * Build character attack type cache
      *
-     * @param CharacterBuildState $state
+     * @param Character $character
      * @return void
      * @throws Exception
      */
-    public function process(CharacterBuildState $state): void
+    public function process(Character $character): void
     {
-        $character = $state->getCharacter();
-
-        if ($character !== null) {
-            $this->buildCharacterAttackTypes->buildCache($character);
-        }
+        $this->buildCharacterAttackTypes->buildCache($character);
     }
 }

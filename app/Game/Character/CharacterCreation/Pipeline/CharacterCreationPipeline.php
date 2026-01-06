@@ -29,7 +29,11 @@ class CharacterCreationPipeline
             ->via('process')
             ->thenReturn();
 
-        BuildCharacterCacheData::dispatch($characterBuilderState);
+        dump('Yay we have a character builder state!');
+
+        BuildCharacterCacheData::dispatch($characterBuilderState->getCharacter()->id);
+
+        dump('We dispatched the job.');
 
         return $characterBuilderState;
     }
@@ -47,7 +51,6 @@ class CharacterCreationPipeline
             SkillAssigner::class,
             PassiveSkillAssigner::class,
             ClassRankAssigner::class,
-            BuildCache::class,
         ];
     }
 }

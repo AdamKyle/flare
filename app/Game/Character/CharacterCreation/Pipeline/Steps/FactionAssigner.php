@@ -34,6 +34,8 @@ class FactionAssigner
             $character->factions()->getRelated()->newQuery()->insert($rows);
         }
 
+        dump('Calling Next from FactionAssigner');
+
         return $next($state);
     }
 
