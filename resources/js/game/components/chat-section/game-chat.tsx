@@ -149,25 +149,21 @@ const GameChat = () => {
 
   if (loading) {
     return (
-      <div className="px-4">
-        <div className="mx-auto w-full md:w-2/3">
-          <InfiniteLoader />
-        </div>
+      <div className="mx-auto w-full md:w-2/3">
+        <InfiniteLoader />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="px-4">
-        <div className="mx-auto w-full md:w-2/3">
-          <ApiErrorAlert apiError={error.message} />
-        </div>
+      <div className="mx-auto w-full md:w-2/3">
+        <ApiErrorAlert apiError={error.message} />
       </div>
     );
   }
 
-  return <div className="px-4">{renderBody()}</div>;
+  return renderBody();
 };
 
 export default GameChat;

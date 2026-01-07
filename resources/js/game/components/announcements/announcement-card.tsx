@@ -25,6 +25,8 @@ const AnnouncementCard = ({
     }
   };
 
+  console.log(announcement);
+
   return (
     <div
       role="button"

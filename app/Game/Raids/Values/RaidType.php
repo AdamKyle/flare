@@ -51,6 +51,11 @@ class RaidType
         $this->value = $value;
     }
 
+    public function getNameForRaid(): string
+    {
+        return self::$selectionOptions[$this->value];
+    }
+
     public function isPirateLordRaid(): bool
     {
         return $this->value === self::PIRATE_LORD;
