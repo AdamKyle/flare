@@ -8,6 +8,7 @@ use App\Game\Character\Builders\AttackBuilders\AttackDetails\CharacterAttackBuil
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use Exception;
 use Illuminate\Support\Facades\Cache;
+use Psr\SimpleCache\InvalidArgumentException;
 
 class BuildCharacterAttackTypes
 {
@@ -18,7 +19,7 @@ class BuildCharacterAttackTypes
     /**
      * Build character attack data cache
      *
-     * @throws Exception
+     * @throws Exception|InvalidArgumentException
      */
     public function buildCache(Character $character, bool $ignoreReductions = false): array
     {

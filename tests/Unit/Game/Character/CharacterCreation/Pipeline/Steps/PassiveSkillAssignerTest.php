@@ -63,8 +63,8 @@ class PassiveSkillAssignerTest extends TestCase
 
         $step = app(PassiveSkillAssigner::class);
 
-        $result = $step->process($state, function (CharacterBuildState $s) {
-            return $s;
+        $result = $step->process($state, function (CharacterBuildState $characterState) {
+            return $characterState;
         });
 
         $this->assertInstanceOf(CharacterBuildState::class, $result);
@@ -82,8 +82,8 @@ class PassiveSkillAssignerTest extends TestCase
         $this->assertNotNull($parentRow);
         $this->assertNotNull($childRow);
 
-        $this->assertFalse((bool) $parentRow->is_locked);
-        $this->assertTrue((bool) $childRow->is_locked);
+        $this->assertFalse($parentRow->is_locked);
+        $this->assertTrue($childRow->is_locked);
 
         $this->assertNull($parentRow->parent_skill_id);
         $this->assertSame($parentRow->id, $childRow->parent_skill_id);

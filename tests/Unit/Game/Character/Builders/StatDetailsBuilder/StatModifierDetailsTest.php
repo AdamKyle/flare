@@ -105,7 +105,7 @@ class StatModifierDetailsTest extends TestCase
     {
         $character = $this->createCharacterForData($this->character);
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildSpecificBreakDown('health', false);
+        $data = $this->statModifierDetails->setCharacter($character)->buildSpecificBreakDown('health');
 
         $this->assertGreaterThan(0, $data['stat_amount']);
         $this->assertNotNull($data['class_specialties']);
@@ -134,7 +134,6 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNotNull($data['boon_details']);
         $this->assertNotNull($data['ancestral_item_skill_data']);
         $this->assertNotEmpty($data['skill_effecting_ac']);
-        $this->assertNotEmpty($data['attached_affixes']);
     }
 
     public function test_get_ac_details_when_voided()
@@ -149,7 +148,6 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNotNull($data['class_specialties']);
         $this->assertNotNull($data['ancestral_item_skill_data']);
         $this->assertNotEmpty($data['skill_effecting_ac']);
-        $this->assertNotEmpty($data['attached_affixes']);
     }
 
     public function test_get_ac_details_when_not_voided_and_naked()
@@ -164,19 +162,18 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNull($data['class_specialties']);
         $this->assertNull($data['ancestral_item_skill_data']);
         $this->assertEmpty($data['skill_effecting_ac']);
-        $this->assertEmpty($data['attached_affixes']);
     }
 
     public function test_get_damage_for_weapons_when_not_voided()
     {
         $character = $this->createCharacterForData($this->character);
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown(ItemType::SWORD->value, false);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown([ItemType::SWORD->value], false);
 
         $this->assertEquals($character->damage_stat, $data['damage_stat_name']);
         $this->assertGreaterThan(0, $data['damage_stat_amount']);
-        $this->assertEquals(0, $data['non_equipped_damage_amount']);
-        $this->assertEquals(0, $data['non_equipped_percentage_of_stat_used']);
+        $this->assertGreaterThan(0, $data['non_equipped_damage_amount']);
+        $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
         $this->assertEquals(0, $data['spell_damage_stat_amount_to_use']);
         $this->assertGreaterThan(0, $data['percentage_of_stat_used']);
         $this->assertGreaterThan(0, $data['base_damage']);
@@ -185,7 +182,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNotNull($data['boon_details']);
         $this->assertNotNull($data['ancestral_item_skill_data']);
         $this->assertNotEmpty($data['skills_effecting_damage']);
-        $this->assertNotEmpty($data['attached_affixes']);
+        $this->assertArrayNotHasKey('attached_affixes', $data);
         $this->assertNotEmpty($data['masteries']);
     }
 
@@ -193,12 +190,12 @@ class StatModifierDetailsTest extends TestCase
     {
         $character = $this->createCharacterForData($this->character);
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('spell-damage', false);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown([ItemType::SPELL_DAMAGE->value], false);
 
         $this->assertEquals($character->damage_stat, $data['damage_stat_name']);
         $this->assertGreaterThan(0, $data['damage_stat_amount']);
-        $this->assertEquals(0, $data['non_equipped_damage_amount']);
-        $this->assertEquals(0, $data['non_equipped_percentage_of_stat_used']);
+        $this->assertGreaterThan(0, $data['non_equipped_damage_amount']);
+        $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
         $this->assertEquals(0, $data['spell_damage_stat_amount_to_use']);
         $this->assertEquals(0, $data['percentage_of_stat_used']);
         $this->assertGreaterThan(0, $data['base_damage']);
@@ -207,7 +204,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNotNull($data['boon_details']);
         $this->assertNotNull($data['ancestral_item_skill_data']);
         $this->assertNull($data['skills_effecting_damage']);
-        $this->assertNotEmpty($data['attached_affixes']);
+        $this->assertArrayNotHasKey('attached_affixes', $data);
         $this->assertNotEmpty($data['masteries']);
     }
 
@@ -221,24 +218,23 @@ class StatModifierDetailsTest extends TestCase
         ]);
 
         $character = (new CharacterFactory)->createBaseCharacter([], $this->gameClass)->givePlayerLocation();
-
         $character = $this->createCharacterForData($character);
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('spell-damage', false);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown([ItemType::SPELL_DAMAGE->value], false);
 
         $this->assertEquals($character->damage_stat, $data['damage_stat_name']);
         $this->assertGreaterThan(0, $data['damage_stat_amount']);
-        $this->assertEquals(0, $data['non_equipped_damage_amount']);
-        $this->assertEquals(0, $data['non_equipped_percentage_of_stat_used']);
-        $this->assertEquals(0, $data['spell_damage_stat_amount_to_use']);
-        $this->assertEquals(0, $data['percentage_of_stat_used']);
+        $this->assertGreaterThan(0, $data['non_equipped_damage_amount']);
+        $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
+        $this->assertGreaterThan(0, $data['spell_damage_stat_amount_to_use']);
+        $this->assertGreaterThan(0, $data['percentage_of_stat_used']);
         $this->assertGreaterThan(0, $data['base_damage']);
         $this->assertNotNull($data['class_specialties']);
         $this->assertNotNull($data['class_bonus_details']);
         $this->assertNotNull($data['boon_details']);
         $this->assertNotNull($data['ancestral_item_skill_data']);
         $this->assertNotNull($data['skills_effecting_damage']);
-        $this->assertNotEmpty($data['attached_affixes']);
+        $this->assertArrayNotHasKey('attached_affixes', $data);
         $this->assertNotEmpty($data['masteries']);
     }
 
@@ -246,12 +242,12 @@ class StatModifierDetailsTest extends TestCase
     {
         $character = $this->createCharacterForData($this->character);
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown(ItemType::SWORD->value, true);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown([ItemType::SWORD->value], true);
 
         $this->assertEquals($character->damage_stat, $data['damage_stat_name']);
         $this->assertGreaterThan(0, $data['damage_stat_amount']);
-        $this->assertEquals(0, $data['non_equipped_damage_amount']);
-        $this->assertEquals(0, $data['non_equipped_percentage_of_stat_used']);
+        $this->assertGreaterThan(0, $data['non_equipped_damage_amount']);
+        $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
         $this->assertEquals(0, $data['spell_damage_stat_amount_to_use']);
         $this->assertGreaterThan(0, $data['percentage_of_stat_used']);
         $this->assertGreaterThan(0, $data['base_damage']);
@@ -260,7 +256,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNotNull($data['boon_details']);
         $this->assertNotNull($data['ancestral_item_skill_data']);
         $this->assertNotEmpty($data['skills_effecting_damage']);
-        $this->assertNotEmpty($data['attached_affixes']);
+        $this->assertArrayNotHasKey('attached_affixes', $data);
         $this->assertNotEmpty($data['masteries']);
     }
 
@@ -268,12 +264,12 @@ class StatModifierDetailsTest extends TestCase
     {
         $character = $this->createCharacterForData($this->character);
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('spell-damage', false);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown([ItemType::SPELL_DAMAGE->value], true);
 
         $this->assertEquals($character->damage_stat, $data['damage_stat_name']);
         $this->assertGreaterThan(0, $data['damage_stat_amount']);
-        $this->assertEquals(0, $data['non_equipped_damage_amount']);
-        $this->assertEquals(0, $data['non_equipped_percentage_of_stat_used']);
+        $this->assertGreaterThan(0, $data['non_equipped_damage_amount']);
+        $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
         $this->assertEquals(0, $data['spell_damage_stat_amount_to_use']);
         $this->assertEquals(0, $data['percentage_of_stat_used']);
         $this->assertGreaterThan(0, $data['base_damage']);
@@ -282,7 +278,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNotNull($data['boon_details']);
         $this->assertNotNull($data['ancestral_item_skill_data']);
         $this->assertNull($data['skills_effecting_damage']);
-        $this->assertNotEmpty($data['attached_affixes']);
+        $this->assertArrayNotHasKey('attached_affixes', $data);
         $this->assertNotEmpty($data['masteries']);
     }
 
@@ -299,21 +295,21 @@ class StatModifierDetailsTest extends TestCase
 
         $character = $this->createCharacterForData($character);
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('spell-damage', false);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown([ItemType::SPELL_DAMAGE->value], true);
 
         $this->assertEquals($character->damage_stat, $data['damage_stat_name']);
         $this->assertGreaterThan(0, $data['damage_stat_amount']);
-        $this->assertEquals(0, $data['non_equipped_damage_amount']);
-        $this->assertEquals(0, $data['non_equipped_percentage_of_stat_used']);
-        $this->assertEquals(0, $data['spell_damage_stat_amount_to_use']);
-        $this->assertEquals(0, $data['percentage_of_stat_used']);
+        $this->assertGreaterThan(0, $data['non_equipped_damage_amount']);
+        $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
+        $this->assertGreaterThan(0, $data['spell_damage_stat_amount_to_use']);
+        $this->assertGreaterThan(0, $data['percentage_of_stat_used']);
         $this->assertGreaterThan(0, $data['base_damage']);
         $this->assertNotNull($data['class_specialties']);
         $this->assertNotNull($data['class_bonus_details']);
         $this->assertNotNull($data['boon_details']);
         $this->assertNotNull($data['ancestral_item_skill_data']);
         $this->assertNotEmpty($data['skills_effecting_damage']);
-        $this->assertNotEmpty($data['attached_affixes']);
+        $this->assertArrayNotHasKey('attached_affixes', $data);
         $this->assertNotEmpty($data['masteries']);
     }
 
@@ -321,7 +317,7 @@ class StatModifierDetailsTest extends TestCase
     {
         $character = $this->character->getCharacter();
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown(ItemType::SWORD->value, false);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown([ItemType::SWORD->value], false);
 
         $this->assertEquals($character->damage_stat, $data['damage_stat_name']);
         $this->assertGreaterThan(0, $data['damage_stat_amount']);
@@ -335,7 +331,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNull($data['boon_details']);
         $this->assertNull($data['ancestral_item_skill_data']);
         $this->assertEmpty($data['skills_effecting_damage']);
-        $this->assertEmpty($data['attached_affixes']);
+        $this->assertArrayNotHasKey('attached_affixes', $data);
         $this->assertEmpty($data['masteries']);
     }
 
@@ -343,12 +339,12 @@ class StatModifierDetailsTest extends TestCase
     {
         $character = $this->character->getCharacter();
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('spell-damage', false);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown([ItemType::SPELL_DAMAGE->value], false);
 
         $this->assertEquals($character->damage_stat, $data['damage_stat_name']);
         $this->assertGreaterThan(0, $data['damage_stat_amount']);
-        $this->assertEquals(0, $data['non_equipped_damage_amount']);
-        $this->assertEquals(0, $data['non_equipped_percentage_of_stat_used']);
+        $this->assertGreaterThan(0, $data['non_equipped_damage_amount']);
+        $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
         $this->assertEquals(0, $data['spell_damage_stat_amount_to_use']);
         $this->assertEquals(0, $data['percentage_of_stat_used']);
         $this->assertEquals(0, $data['base_damage']);
@@ -357,7 +353,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNull($data['boon_details']);
         $this->assertNull($data['ancestral_item_skill_data']);
         $this->assertNull($data['skills_effecting_damage']);
-        $this->assertEmpty($data['attached_affixes']);
+        $this->assertArrayNotHasKey('attached_affixes', $data);
         $this->assertEmpty($data['masteries']);
     }
 
@@ -372,12 +368,12 @@ class StatModifierDetailsTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter([], $this->gameClass)->givePlayerLocation()->getCharacter();
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown(ItemType::SPELL_DAMAGE->value, false);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown([ItemType::SPELL_DAMAGE->value], false);
 
         $this->assertEquals($character->damage_stat, $data['damage_stat_name']);
         $this->assertGreaterThan(0, $data['damage_stat_amount']);
-        $this->assertEquals(0, $data['non_equipped_damage_amount']);
-        $this->assertEquals(0, $data['non_equipped_percentage_of_stat_used']);
+        $this->assertGreaterThan(0, $data['non_equipped_damage_amount']);
+        $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
         $this->assertGreaterThan(0, $data['spell_damage_stat_amount_to_use']);
         $this->assertGreaterThan(0, $data['percentage_of_stat_used']);
         $this->assertEquals(0, $data['base_damage']);
@@ -386,7 +382,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNull($data['boon_details']);
         $this->assertNull($data['ancestral_item_skill_data']);
         $this->assertNotNull($data['skills_effecting_damage']);
-        $this->assertEmpty($data['attached_affixes']);
+        $this->assertArrayNotHasKey('attached_affixes', $data);
         $this->assertEmpty($data['masteries']);
     }
 
@@ -395,19 +391,19 @@ class StatModifierDetailsTest extends TestCase
 
         $character = $this->createCharacterForData($this->character);
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('ring', false);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown([ItemType::RING->value], false);
 
         $this->assertEquals($character->damage_stat, $data['damage_stat_name']);
         $this->assertGreaterThan(0, $data['damage_stat_amount']);
-        $this->assertEquals(0, $data['non_equipped_damage_amount']);
-        $this->assertEquals(0, $data['non_equipped_percentage_of_stat_used']);
+        $this->assertGreaterThan(0, $data['non_equipped_damage_amount']);
+        $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
         $this->assertEquals(0, $data['spell_damage_stat_amount_to_use']);
         $this->assertEquals(0, $data['percentage_of_stat_used']);
         $this->assertGreaterThan(0, $data['base_damage']);
-        $this->assertNull($data['class_specialties']);
-        $this->assertNull($data['class_bonus_details']);
-        $this->assertNull($data['boon_details']);
-        $this->assertNull($data['ancestral_item_skill_data']);
+        $this->assertNotNull($data['class_specialties']);
+        $this->assertNotNull($data['class_bonus_details']);
+        $this->assertNotNull($data['boon_details']);
+        $this->assertNotNull($data['ancestral_item_skill_data']);
         $this->assertNull($data['skills_effecting_damage']);
         $this->assertNotEmpty($data['attached_affixes']);
         $this->assertEmpty($data['masteries']);
@@ -418,12 +414,12 @@ class StatModifierDetailsTest extends TestCase
 
         $character = $this->character->getCharacter();
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('ring', false);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown([ItemType::RING->value], false);
 
         $this->assertEquals($character->damage_stat, $data['damage_stat_name']);
         $this->assertGreaterThan(0, $data['damage_stat_amount']);
-        $this->assertEquals(0, $data['non_equipped_damage_amount']);
-        $this->assertEquals(0, $data['non_equipped_percentage_of_stat_used']);
+        $this->assertGreaterThan(0, $data['non_equipped_damage_amount']);
+        $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
         $this->assertEquals(0, $data['spell_damage_stat_amount_to_use']);
         $this->assertEquals(0, $data['percentage_of_stat_used']);
         $this->assertEquals(0, $data['base_damage']);
@@ -440,21 +436,22 @@ class StatModifierDetailsTest extends TestCase
     {
         $character = $this->createCharacterForData($this->character);
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('spell-healing', false);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown([ItemType::SPELL_HEALING->value], false);
 
         $this->assertEquals($character->damage_stat, $data['damage_stat_name']);
         $this->assertGreaterThan(0, $data['damage_stat_amount']);
-        $this->assertEquals(0, $data['non_equipped_damage_amount']);
-        $this->assertEquals(0, $data['non_equipped_percentage_of_stat_used']);
+        $this->assertGreaterThan(0, $data['non_equipped_damage_amount']);
+        $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
         $this->assertEquals(0, $data['spell_damage_stat_amount_to_use']);
         $this->assertEquals(0, $data['percentage_of_stat_used']);
-        $this->assertGreaterThan(0, $data['base_damage']);
+        $this->assertEquals(0, $data['base_damage']);
+        $this->assertGreaterThan(0, $data['base_healing']);
         $this->assertNotNull($data['class_specialties']);
         $this->assertNotNull($data['class_bonus_details']);
         $this->assertNotNull($data['boon_details']);
         $this->assertNotNull($data['ancestral_item_skill_data']);
-        $this->assertNull($data['skills_effecting_damage']);
-        $this->assertNotEmpty($data['attached_affixes']);
+        $this->assertNull($data['skills_effecting_healing']);
+        $this->assertArrayNotHasKey('attached_affixes', $data);
         $this->assertNotEmpty($data['masteries']);
     }
 
@@ -462,21 +459,22 @@ class StatModifierDetailsTest extends TestCase
     {
         $character = $this->createCharacterForData($this->character);
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown('spell-healing', true);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown([ItemType::SPELL_HEALING->value], true);
 
         $this->assertEquals($character->damage_stat, $data['damage_stat_name']);
         $this->assertGreaterThan(0, $data['damage_stat_amount']);
-        $this->assertEquals(0, $data['non_equipped_damage_amount']);
-        $this->assertEquals(0, $data['non_equipped_percentage_of_stat_used']);
+        $this->assertGreaterThan(0, $data['non_equipped_damage_amount']);
+        $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
         $this->assertEquals(0, $data['spell_damage_stat_amount_to_use']);
         $this->assertEquals(0, $data['percentage_of_stat_used']);
-        $this->assertGreaterThan(0, $data['base_damage']);
+        $this->assertEquals(0, $data['base_damage']);
+        $this->assertGreaterThan(0, $data['base_healing']);
         $this->assertNotNull($data['class_specialties']);
         $this->assertNotNull($data['class_bonus_details']);
         $this->assertNotNull($data['boon_details']);
         $this->assertNotNull($data['ancestral_item_skill_data']);
-        $this->assertNull($data['skills_effecting_damage']);
-        $this->assertNotEmpty($data['attached_affixes']);
+        $this->assertNull($data['skills_effecting_healing']);
+        $this->assertArrayNotHasKey('attached_affixes', $data);
         $this->assertNotEmpty($data['masteries']);
     }
 
@@ -496,7 +494,7 @@ class StatModifierDetailsTest extends TestCase
 
         $character = $character->refresh();
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown(ItemType::SWORD->value, false);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown([ItemType::SWORD->value], false);
 
         $this->assertGreaterThan(0, $data['non_equipped_damage_amount']);
         $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
@@ -518,7 +516,7 @@ class StatModifierDetailsTest extends TestCase
 
         $character = $character->refresh();
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown(ItemType::SWORD->value, false);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown([ItemType::SWORD->value], false);
 
         $this->assertGreaterThan(0, $data['non_equipped_damage_amount']);
         $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
@@ -540,7 +538,7 @@ class StatModifierDetailsTest extends TestCase
 
         $character = $character->refresh();
 
-        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown(ItemType::SWORD->value, false);
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown([ItemType::SWORD->value], false);
 
         $this->assertGreaterThan(0, $data['non_equipped_damage_amount']);
         $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);

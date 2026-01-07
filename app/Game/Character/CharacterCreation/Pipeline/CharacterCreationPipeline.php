@@ -3,7 +3,6 @@
 namespace App\Game\Character\CharacterCreation\Pipeline;
 
 use App\Game\Character\CharacterCreation\Jobs\BuildCharacterCacheData;
-use App\Game\Character\CharacterCreation\Pipeline\Steps\BuildCache;
 use App\Game\Character\CharacterCreation\Pipeline\Steps\CharacterCreator;
 use App\Game\Character\CharacterCreation\Pipeline\Steps\ClassRankAssigner;
 use App\Game\Character\CharacterCreation\Pipeline\Steps\FactionAssigner;
@@ -29,7 +28,13 @@ class CharacterCreationPipeline
             ->via('process')
             ->thenReturn();
 
-        BuildCharacterCacheData::dispatch($characterBuilderState->getCharacter()->id);
+        $character = $characterBuilderState->getCharacter();
+
+        if (is_null($character)) {
+            return $characterBuilderState;
+        }
+
+        BuildCharacterCacheData::dispatch($character->id);
 
         return $characterBuilderState;
     }

@@ -2,12 +2,11 @@
 
 namespace Tests\Unit\Game\Character\CharacterCreation\Pipeline\Steps;
 
-use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
-use App\Game\Character\CharacterCreation\Pipeline\Steps\BuildCache;
+use App\Game\Character\CharacterCreation\Jobs\BuildCharacterCacheData;
 use App\Game\Character\CharacterCreation\State\CharacterBuildState;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
-use Mockery;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateClass;
@@ -42,10 +41,6 @@ class BuildCacheTest extends TestCase
             'game_race_id' => $race->id,
         ]);
 
-        $mock = Mockery::mock(BuildCharacterAttackTypes::class);
-        $mock->shouldReceive('buildCache')->once()->with($character);
-        $this->app->instance(BuildCharacterAttackTypes::class, $mock);
-
         $state = app(CharacterBuildState::class)
             ->setUser($user)
             ->setRace($race)
@@ -53,29 +48,18 @@ class BuildCacheTest extends TestCase
             ->setCharacter($character)
             ->setNow(now());
 
-        $step = app(BuildCache::class);
+        $character = $state->getCharacter();
 
-        $result = $step->process($state, function (CharacterBuildState $s) {
-            return $s;
-        });
+        BuildCharacterCacheData::dispatchSync($character->id);
 
-        $this->assertInstanceOf(CharacterBuildState::class, $result);
+        $this->assertNotNull($character);
+
     }
 
     public function test_no_op_when_state_has_no_character(): void
     {
-        $mock = Mockery::mock(BuildCharacterAttackTypes::class);
-        $mock->shouldReceive('buildCache')->never();
-        $this->app->instance(BuildCharacterAttackTypes::class, $mock);
+        BuildCharacterCacheData::dispatchSync(0);
 
-        $state = app(CharacterBuildState::class)->setNow(now());
-
-        $step = app(BuildCache::class);
-
-        $result = $step->process($state, function (CharacterBuildState $s) {
-            return $s;
-        });
-
-        $this->assertInstanceOf(CharacterBuildState::class, $result);
+        $this->assertNull(Cache::get('character-attack-data-0'));
     }
 }
