@@ -37,6 +37,7 @@ class ItemEnricherFactory
     public function buildItemData(Item $item, InventorySlot|SetSlot|null $slot = null): array
     {
         if (! is_null($slot) && $this->isEquippable($slot->item)) {
+            dump('Should be in here to build item data.');
             $enriched = $this->equippableEnricher->enrich($slot->item);
             $slot->setRelation('item', $enriched);
 

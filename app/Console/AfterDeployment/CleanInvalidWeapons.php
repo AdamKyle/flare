@@ -2,7 +2,11 @@
 
 namespace App\Console\AfterDeployment;
 
+use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
+use App\Flare\Models\MarketBoard;
+use App\Flare\Models\MarketHistory;
+use App\Flare\Models\SetSlot;
 use Illuminate\Console\Command;
 
 class CleanInvalidWeapons extends Command
@@ -38,6 +42,15 @@ class CleanInvalidWeapons extends Command
      */
     public function handle(): void
     {
-        Item::where('type', self::INVALID_TYPE)->delete();
+        $items = Item::where('type', self::INVALID_TYPE)->get();
+
+        foreach ($items as $item) {
+            InventorySlot::where('item_id', $item->id)->delete();
+            SetSlot::where('item_id', $item->id)->delete();
+            MarketHistory::where('item_id', $item->id)->delete();
+            MarketBoard::where('item_id', $item->id)->delete();
+
+            $item->delete();
+        }
     }
 }

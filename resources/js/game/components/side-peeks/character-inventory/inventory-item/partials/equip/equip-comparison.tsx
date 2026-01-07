@@ -11,6 +11,7 @@ const EquipComparison = ({
   comparison_data,
   show_advanced_child_under_top,
 }: EquipComparisonProps) => {
+  console.log('Am I here when called?');
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const handleToggleAdvanced = () => {
@@ -19,7 +20,7 @@ const EquipComparison = ({
 
   if (!comparison_data) {
     return (
-      <div className="space-y-3 text-center">
+      <div className="my-3 text-center">
         There is nothing equipped for this position. Anything os better then
         nothing.
       </div>
@@ -30,7 +31,7 @@ const EquipComparison = ({
     show_advanced_child_under_top && showAdvanced;
 
   return (
-    <div className="space-y-3">
+    <div className="my-3">
       <Separator />
       <div className="flex items-center justify-end">
         <IconButton
@@ -55,7 +56,7 @@ const EquipComparison = ({
         row={comparison_data}
         showAdvanced={showAdvanced}
         showAdvancedChildUnderTop={ShowAdvancedChildrenUnderTop}
-        showHeaderSection={false}
+        showHeaderSection={true}
       />
     </div>
   );

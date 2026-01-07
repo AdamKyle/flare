@@ -81,7 +81,7 @@ class StarterWeaponAndInventory
             throw new \RuntimeException('No starter item exists for character creation.');
         }
 
-        return (int) $id;
+        return $id;
     }
 
     /**

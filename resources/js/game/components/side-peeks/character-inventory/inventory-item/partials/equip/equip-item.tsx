@@ -185,7 +185,6 @@ const EquipItem = ({
         is_processing={equipmentIsLoading}
         is_equipping
       />
-      <Separator />
       {renderTabsOrComparison()}
     </>
   );
