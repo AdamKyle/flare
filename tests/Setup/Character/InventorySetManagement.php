@@ -15,25 +15,12 @@ class InventorySetManagement
 {
     use CreateInventorySets;
 
-    /**
-     * @var BuildCharacterAttackTypes $buildCharacterAttackData
-     */
     private BuildCharacterAttackTypes $buildCharacterAttackData;
 
-    /**
-     * @var array $inventorySetIds
-     */
     private array $inventorySetIds = [];
 
-    /**
-     * @var int $inventoryId
-     */
     private int $inventoryId;
 
-    /**
-     * @param Character $character
-     * @param CharacterFactory|null $characterFactory
-     */
     public function __construct(private Character $character, private readonly ?CharacterFactory $characterFactory = null)
     {
         $this->buildCharacterAttackData = resolve(BuildCharacterAttackTypes::class);
@@ -127,10 +114,6 @@ class InventorySetManagement
         throw new Exception('Index does not exist for inventory sets on this character.');
     }
 
-    /**
-     * @param int $amount
-     * @return void
-     */
     private function appendLatestInventorySetIds(int $amount): void
     {
         $latestIds = $this->character->inventorySets()

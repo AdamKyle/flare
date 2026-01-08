@@ -11,21 +11,10 @@ use Psr\SimpleCache\InvalidArgumentException;
 
 class InventoryManagement
 {
-
-    /**
-     * @var BuildCharacterAttackTypes $buildAttackData
-     */
     private BuildCharacterAttackTypes $buildAttackData;
 
-    /**
-     * @var array $slotIds
-     */
     public array $slotIds = [];
 
-    /**
-     * @param Character $character
-     * @param CharacterFactory|null $characterFactory
-     */
     public function __construct(private Character $character, private readonly ?CharacterFactory $characterFactory = null)
     {
         $this->buildAttackData = resolve(BuildCharacterAttackTypes::class);
@@ -148,10 +137,8 @@ class InventoryManagement
         return null;
     }
 
-    /**
-     * @return array
-     */
-    public function getSlotIds(): array {
+    public function getSlotIds(): array
+    {
         return $this->slotIds;
     }
 

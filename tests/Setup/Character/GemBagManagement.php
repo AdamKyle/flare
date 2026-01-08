@@ -9,17 +9,10 @@ class GemBagManagement
 {
     use CreateGem;
 
-    /**
-     * @param Character $character
-     * @param CharacterFactory|null $characterFactory
-     */
-    public function __construct(private Character $character, private readonly ?CharacterFactory $characterFactory = null)
-    {}
+    public function __construct(private Character $character, private readonly ?CharacterFactory $characterFactory = null) {}
 
     /**
      * Get the character factory.
-     *
-     * @return CharacterFactory
      */
     public function getCharacterFactory(): CharacterFactory
     {
@@ -28,8 +21,6 @@ class GemBagManagement
 
     /**
      * Get the character back.
-     *
-     * @return Character
      */
     public function getCharacter(): Character
     {
@@ -38,10 +29,6 @@ class GemBagManagement
 
     /**
      * Give the player a set of gems
-     *
-     * @param int $amount
-     * @param int $amountOfGems
-     * @return GemBagManagement
      */
     public function assignGemsToBag(int $amount = 1, int $amountOfGems = 1): GemBagManagement
     {
@@ -69,8 +56,6 @@ class GemBagManagement
     /**
      * Assign a specific gem to the character.
      *
-     * @param int $gemId
-     * @param int $amount
      * @return $this
      */
     public function assignGemToBag(int $gemId, int $amount = 1): GemBagManagement

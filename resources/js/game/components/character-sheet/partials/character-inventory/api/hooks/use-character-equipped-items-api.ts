@@ -4,8 +4,9 @@ import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 
 import CharacterInventoryItemDetails from './definitions/character-equipped-items-api-definitions';
-import UseCharacterEquippedApiDefinition from './types/use-character-equipped-api-definition';
-import BaseInventoryItemDefinition from '../../../../../side-peeks/character-inventory/api-definitions/base-inventory-item-definition';
+import UseCharacterEquippedApiDefinition, {
+  CharacterEquippedDefinition,
+} from './types/use-character-equipped-api-definition';
 
 const useCharacterEquippedItemsApi = (
   params: ApiParametersDefinitions
@@ -13,7 +14,7 @@ const useCharacterEquippedItemsApi = (
   const { apiHandler, getUrl } = useApiHandler();
   const url = getUrl(params.url, params.urlParams);
 
-  const [data, setData] = useState<BaseInventoryItemDefinition[]>([]);
+  const [data, setData] = useState<CharacterEquippedDefinition | null>(null);
   const [error, setError] =
     useState<UseCharacterEquippedApiDefinition['error']>(null);
   const [loading, setLoading] = useState(true);
@@ -25,7 +26,13 @@ const useCharacterEquippedItemsApi = (
         AxiosRequestConfig<AxiosResponse<CharacterInventoryItemDetails>>
       >(url);
 
-      setData(result.equipped.data);
+      setData({
+        equipped_items: result.equipped.data,
+        weapon_damage: result.weapon_damage,
+        spell_damage: result.spell_damage,
+        healing_amount: result.healing_amount,
+        defence_amount: result.defence_amount,
+      });
     } catch (error) {
       if (error instanceof AxiosError) {
         setError(error.response?.data || null);

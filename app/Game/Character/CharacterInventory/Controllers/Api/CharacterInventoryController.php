@@ -3,6 +3,7 @@
 namespace App\Game\Character\CharacterInventory\Controllers\Api;
 
 use App\Flare\Items\Enricher\ItemEnricherFactory;
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
@@ -71,6 +72,10 @@ class CharacterInventoryController extends Controller
     {
         return response()->json([
             'equipped' => $this->characterInventoryService->setCharacter($character)->fetchEquipped(),
+            'weapon_damage' => $character->getInformation()->buildDamage(ItemType::validWeapons()),
+            'spell_damage' => $character->getInformation()->buildDamage(ItemType::SPELL_DAMAGE->value),
+            'healing_amount' => $character->getInformation()->buildDamage(ItemType::SPELL_HEALING->value),
+            'defence_amount' => $character->getInformation()->buildDefence(),
         ]);
     }
 

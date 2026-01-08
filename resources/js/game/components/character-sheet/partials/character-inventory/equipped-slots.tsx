@@ -1,43 +1,21 @@
 import React from 'react';
 
-import { CharacterEquippedApiUrls } from './api/enums/character-equipped-api-urls';
-import useCharacterEquippedItemsApi from './api/hooks/use-character-equipped-items-api';
 import { Position } from './enums/equipment-positions';
 import { InventoryItemTypes } from './enums/inventory-item-types';
 import EquippedSlot from './equipped-slot';
 import EquippedSlotsProps from './types/equipped-slots-props';
 import { fetchEquippedArmour } from './utils/fetch-equipped-armour';
 
-import { GameDataError } from 'game-data/components/game-data-error';
-
-import InfiniteLoader from 'ui/loading-bar/infinite-loader';
-
-const EquippedSlots = ({ character_id }: EquippedSlotsProps) => {
-  const { data, loading, error } = useCharacterEquippedItemsApi({
-    url: CharacterEquippedApiUrls.CHARACTER_EQUIPPED,
-    urlParams: {
-      character: character_id,
-    },
-  });
-
-  if (error) {
-    return <GameDataError />;
-  }
-
-  if (loading) {
-    return (
-      <div className="h-[384px]">
-        <InfiniteLoader />
-      </div>
-    );
-  }
-
+const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
   return (
     <div className="flex w-full flex-col items-center gap-4 sm:flex-row md:justify-center lg:w-3/4 lg:p-4">
       <div className="flex flex-col items-center space-y-4">
         <div>
           <EquippedSlot
-            equipped_item={fetchEquippedArmour(data, InventoryItemTypes.HELMET)}
+            equipped_item={fetchEquippedArmour(
+              equipped_items,
+              InventoryItemTypes.HELMET
+            )}
             positionName={'Helmet'}
             position={Position.HELMET}
           />
@@ -46,20 +24,23 @@ const EquippedSlots = ({ character_id }: EquippedSlotsProps) => {
         <div className="grid grid-cols-3 gap-4">
           <EquippedSlot
             equipped_item={fetchEquippedArmour(
-              data,
+              equipped_items,
               InventoryItemTypes.SLEEVES
             )}
             positionName={'Sleeves (Left)'}
             position={Position.SLEEVES_LEFT}
           />
           <EquippedSlot
-            equipped_item={fetchEquippedArmour(data, InventoryItemTypes.BODY)}
+            equipped_item={fetchEquippedArmour(
+              equipped_items,
+              InventoryItemTypes.BODY
+            )}
             positionName={'Body'}
             position={Position.BODY}
           />
           <EquippedSlot
             equipped_item={fetchEquippedArmour(
-              data,
+              equipped_items,
               InventoryItemTypes.SLEEVES
             )}
             positionName={'Sleeves (Right)'}
@@ -69,20 +50,26 @@ const EquippedSlots = ({ character_id }: EquippedSlotsProps) => {
 
         <div className="grid grid-cols-3 gap-4">
           <EquippedSlot
-            equipped_item={fetchEquippedArmour(data, InventoryItemTypes.GLOVES)}
+            equipped_item={fetchEquippedArmour(
+              equipped_items,
+              InventoryItemTypes.GLOVES
+            )}
             positionName={'Gloves (Left)'}
             position={Position.GLOVES_LEFT}
           />
           <EquippedSlot
             equipped_item={fetchEquippedArmour(
-              data,
+              equipped_items,
               InventoryItemTypes.LEGGINGS
             )}
             positionName={'Leggings'}
             position={Position.LEGGINGS}
           />
           <EquippedSlot
-            equipped_item={fetchEquippedArmour(data, InventoryItemTypes.GLOVES)}
+            equipped_item={fetchEquippedArmour(
+              equipped_items,
+              InventoryItemTypes.GLOVES
+            )}
             positionName={'Gloves (Right)'}
             position={Position.GLOVES_RIGHT}
           />
@@ -90,7 +77,10 @@ const EquippedSlots = ({ character_id }: EquippedSlotsProps) => {
 
         <div>
           <EquippedSlot
-            equipped_item={fetchEquippedArmour(data, InventoryItemTypes.FEET)}
+            equipped_item={fetchEquippedArmour(
+              equipped_items,
+              InventoryItemTypes.FEET
+            )}
             positionName={'Feet'}
             position={Position.FEET}
           />
