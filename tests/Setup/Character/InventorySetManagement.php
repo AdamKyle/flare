@@ -3,32 +3,41 @@
 namespace Tests\Setup\Character;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use Exception;
 use Illuminate\Support\Str;
+use Psr\SimpleCache\InvalidArgumentException;
 use Tests\Traits\CreateInventorySets;
 
 class InventorySetManagement
 {
     use CreateInventorySets;
 
-    private Character $character;
-
-    private ?CharacterFactory $characterFactory;
-
-    private $buildCharacterAttackData;
-
-    private $inventorySetIds = [];
+    /**
+     * @var BuildCharacterAttackTypes $buildCharacterAttackData
+     */
+    private BuildCharacterAttackTypes $buildCharacterAttackData;
 
     /**
-     * Constructor
+     * @var array $inventorySetIds
      */
-    public function __construct(Character $character, ?CharacterFactory $characterFactory = null)
+    private array $inventorySetIds = [];
+
+    /**
+     * @var int $inventoryId
+     */
+    private int $inventoryId;
+
+    /**
+     * @param Character $character
+     * @param CharacterFactory|null $characterFactory
+     */
+    public function __construct(private Character $character, private readonly ?CharacterFactory $characterFactory = null)
     {
-        $this->character = $character;
-        $this->characterFactory = $characterFactory;
         $this->buildCharacterAttackData = resolve(BuildCharacterAttackTypes::class);
+        $this->inventoryId = $character->inventory->id;
     }
 
     /**
@@ -46,12 +55,22 @@ class InventorySetManagement
      */
     public function createInventorySets(int $amount = 1, bool $useName = false): InventorySetManagement
     {
+        $inventorySets = collect();
+
         for ($i = 1; $i <= $amount; $i++) {
-            $this->inventorySetIds[] = $this->createInventorySet([
+            $inventorySets->push([
                 'character_id' => $this->character->id,
                 'name' => ($useName ? Str::random(12) : null),
-            ])->id;
+            ]);
         }
+
+        $inventorySetModel = $this->character->inventorySets()->getModel();
+
+        $inventorySets->chunk(100)->each(function ($chunk) use ($inventorySetModel) {
+            $inventorySetModel->newQuery()->insert($chunk->all());
+        });
+
+        $this->appendLatestInventorySetIds($amount);
 
         return $this;
     }
@@ -59,7 +78,7 @@ class InventorySetManagement
     /**
      * Puts an item in the characters inventory set.
      *
-     * @throws Exception
+     * @throws Exception|InvalidArgumentException
      */
     public function putItemInSet(Item $item, int $setIndex, ?string $position = null, bool $equipped = false): InventorySetManagement
     {
@@ -73,9 +92,12 @@ class InventorySetManagement
         ]);
 
         if ($equipped) {
-            $this->character->inventorySets()->find($setId)->update(['is_equipped' => true]);
+            $this->character->inventorySets()->where('id', $setId)->update(['is_equipped' => true]);
 
-            $this->character->inventory->slots()->where('equipped', true)->update(['equipped' => false]);
+            InventorySlot::query()
+                ->where('inventory_id', $this->inventoryId)
+                ->where('equipped', true)
+                ->update(['equipped' => false]);
 
             $this->buildCharacterAttackData->buildCache($this->character->refresh());
         }
@@ -103,5 +125,24 @@ class InventorySetManagement
         }
 
         throw new Exception('Index does not exist for inventory sets on this character.');
+    }
+
+    /**
+     * @param int $amount
+     * @return void
+     */
+    private function appendLatestInventorySetIds(int $amount): void
+    {
+        $latestIds = $this->character->inventorySets()
+            ->orderByDesc('id')
+            ->limit($amount)
+            ->pluck('id')
+            ->reverse()
+            ->values()
+            ->all();
+
+        foreach ($latestIds as $latestId) {
+            $this->inventorySetIds[] = $latestId;
+        }
     }
 }

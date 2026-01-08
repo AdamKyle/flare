@@ -3,6 +3,7 @@
 namespace Tests\Unit\Game\Kingdoms\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\Item;
 use App\Flare\Models\KingdomLog;
 use App\Game\Kingdoms\Service\AttackWithItemsService;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -27,6 +28,8 @@ class AttackWithItemServiceTest extends TestCase
 
     private ?AttackWithItemsService $attackWithItemService;
 
+    private ?Item $alchemyItemToDamageKingdoms;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -34,6 +37,12 @@ class AttackWithItemServiceTest extends TestCase
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $this->defendingKingdomCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $this->attackWithItemService = resolve(AttackWithItemsService::class);
+
+        $this->item = $this->createItem([
+            'usable' => true,
+            'damages_kingdoms' => true,
+            'kingdom_damage' => 0.10,
+        ]);
     }
 
     protected function tearDown(): void
@@ -58,10 +67,7 @@ class AttackWithItemServiceTest extends TestCase
     public function test_you_cannot_attack_your_own_kingdoms()
     {
 
-        $slotIds = $this->character->inventoryManagement()->giveItemMultipleTimes($this->createItem([
-            'damages_kingdoms' => true,
-            'kingdom_damage' => 0.25,
-        ]), 3)->getSlotIds();
+        $slotIds = $this->character->inventoryManagement()->giveItemMultipleTimes($this->item, 10)->getSlotIds();
 
         $charactersOwnKingdom = $this->createKingdomForCharacter($this->character);
 
@@ -74,10 +80,7 @@ class AttackWithItemServiceTest extends TestCase
     public function test_cannot_attack_protected_kingdom()
     {
 
-        $slotIds = $this->character->inventoryManagement()->giveItemMultipleTimes($this->createItem([
-            'damages_kingdoms' => true,
-            'kingdom_damage' => 0.25,
-        ]), 3)->getSlotIds();
+        $slotIds = $this->character->inventoryManagement()->giveItemMultipleTimes($this->item, 10)->getSlotIds();
 
         $defendersKingdom = $this->createKingdomForCharacter($this->defendingKingdomCharacter);
 
@@ -96,10 +99,7 @@ class AttackWithItemServiceTest extends TestCase
     public function test_cannot_attack_kingdom_not_on_the_same_plane()
     {
 
-        $slotIds = $this->character->inventoryManagement()->giveItemMultipleTimes($this->createItem([
-            'damages_kingdoms' => true,
-            'kingdom_damage' => 0.25,
-        ]), 3)->getSlotIds();
+        $slotIds = $this->character->inventoryManagement()->giveItemMultipleTimes($this->item, 10)->getSlotIds();
 
         $defendersKingdom = $this->createKingdomForCharacter($this->defendingKingdomCharacter);
 
@@ -123,8 +123,9 @@ class AttackWithItemServiceTest extends TestCase
         Event::fake();
 
         $slotIds = $this->character->inventoryManagement()->giveItemMultipleTimes($this->createItem([
+            'usable' => true,
             'damages_kingdoms' => true,
-            'kingdom_damage' => 0,
+            'kingdom_damage' => 0.01,
         ]), 1)->getSlotIds();
 
         $this->defendingKingdomCharacter->assignFactionSystem();
@@ -155,10 +156,7 @@ class AttackWithItemServiceTest extends TestCase
 
         Event::fake();
 
-        $slotIds = $this->character->inventoryManagement()->giveItemMultipleTimes($this->createItem([
-            'damages_kingdoms' => true,
-            'kingdom_damage' => 1.25,
-        ]), 12)->getSlotIds();
+        $slotIds = $this->character->inventoryManagement()->giveItemMultipleTimes($this->item, 10)->getSlotIds();
 
         $this->defendingKingdomCharacter->assignFactionSystem();
 

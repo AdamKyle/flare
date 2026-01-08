@@ -6,32 +6,36 @@ use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
+use Exception;
+use Psr\SimpleCache\InvalidArgumentException;
 
 class InventoryManagement
 {
-    private $character;
-
-    private $characterFactory;
-
-    private $buildAttackData;
-
-    private $slotIds = [];
 
     /**
-     * Constructor
+     * @var BuildCharacterAttackTypes $buildAttackData
      */
-    public function __construct(Character $character, ?CharacterFactory $characterFactory = null)
-    {
-        $this->character = $character;
-        $this->characterFactory = $characterFactory;
+    private BuildCharacterAttackTypes $buildAttackData;
 
+    /**
+     * @var array $slotIds
+     */
+    public array $slotIds = [];
+
+    /**
+     * @param Character $character
+     * @param CharacterFactory|null $characterFactory
+     */
+    public function __construct(private Character $character, private readonly ?CharacterFactory $characterFactory = null)
+    {
         $this->buildAttackData = resolve(BuildCharacterAttackTypes::class);
     }
 
     /**
      * Equip the left hand with an item that isn't already equipped.
      *
-     * @throws \Exception
+     * @throws Exception
+     * @throws InvalidArgumentException
      */
     public function equipLeftHand(string $itemName): InventoryManagement
     {
@@ -50,57 +54,11 @@ class InventoryManagement
     }
 
     /**
-     * Equip the right hand.
-     *
-     * @throws \Exception
-     */
-    public function equipRightHand(string $itemName): InventoryManagement
-    {
-        $slot = $this->fetchSlot($itemName);
-
-        $slot->update([
-            'equipped' => true,
-            'position' => 'right-hand',
-        ]);
-
-        $this->character = $this->character->refresh();
-
-        $this->buildAttackData->buildCache($this->character);
-
-        return $this;
-    }
-
-    /**
-     * Equip the Spell slot
-     *
-     * Accepted: spell-one, spell-two
-     *
-     * @param  string  $position  | spell-one, spell-two
-     *
-     * @throws \Exception
-     */
-    public function equipSpellSlot(string $itemName, string $position = 'spell-one'): InventoryManagement
-    {
-        $slot = $this->fetchSlot($itemName);
-
-        $slot->update([
-            'equipped' => true,
-            'position' => $position,
-        ]);
-
-        $this->character = $this->character->refresh();
-
-        $this->buildAttackData->buildCache($this->character);
-
-        return $this;
-    }
-
-    /**
      * Equip an artifact.
      *
      * @param  string  $position  | artifact-one, artifact-two
      *
-     * @throws \Exception
+     * @throws Exception|InvalidArgumentException
      */
     public function equipArtifact(string $itemName, string $position = 'artifact-one'): InventoryManagement
     {
@@ -121,7 +79,7 @@ class InventoryManagement
     /**
      * Equip an item.
      *
-     * @throws \Exception
+     * @throws Exception|InvalidArgumentException
      */
     public function equipItem(string $position, string $itemName): InventoryManagement
     {
@@ -153,8 +111,6 @@ class InventoryManagement
             'position' => $position,
         ])->id;
 
-        $this->character = $this->character->refresh();
-
         return $this;
     }
 
@@ -173,8 +129,6 @@ class InventoryManagement
                 'position' => $position,
             ])->id;
         }
-
-        $this->character = $this->character->refresh();
 
         return $this;
     }
@@ -195,30 +149,10 @@ class InventoryManagement
     }
 
     /**
-     * Return slots ids
+     * @return array
      */
-    public function getSlotIds(): array
-    {
+    public function getSlotIds(): array {
         return $this->slotIds;
-    }
-
-    /**
-     * Unequip all items.
-     */
-    public function unequipAll(): InventoryManagement
-    {
-        $this->character->inventory->slots->each(function ($slot) {
-            $slot->update([
-                'position' => null,
-                'equipped' => false,
-            ]);
-        });
-
-        $this->character = $this->character->refresh();
-
-        $this->buildAttackData->buildCache($this->character);
-
-        return $this;
     }
 
     /**
@@ -237,16 +171,20 @@ class InventoryManagement
         return $this->character->refresh();
     }
 
-    protected function fetchSlot(string $itemName): InventorySlot
+    private function fetchSlot(string $itemName): InventorySlot
     {
-        $foundMatching = $this->character->inventory->slots->filter(function ($slot) use ($itemName) {
-            return $slot->item->name === $itemName;
-        })->first();
+        $slot = InventorySlot::query()
+            ->where('inventory_id', $this->character->inventory->id)
+            ->where('equipped', false)
+            ->whereHas('item', function ($query) use ($itemName) {
+                $query->where('name', $itemName);
+            })
+            ->first();
 
-        if (is_null($foundMatching)) {
-            throw new \Exception('Item is not in inventory or is already equipped');
+        if (is_null($slot)) {
+            throw new Exception('Item is not in inventory or is already equipped');
         }
 
-        return $foundMatching;
+        return $slot;
     }
 }
