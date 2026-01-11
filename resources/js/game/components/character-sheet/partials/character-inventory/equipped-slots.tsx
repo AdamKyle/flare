@@ -4,7 +4,7 @@ import { Position } from './enums/equipment-positions';
 import { InventoryItemTypes } from './enums/inventory-item-types';
 import EquippedSlot from './equipped-slot';
 import EquippedSlotsProps from './types/equipped-slots-props';
-import { fetchEquippedArmour } from './utils/fetch-equipped-armour';
+import { fetchEquippedItemForSlot } from './utils/fetch-equipped-armour';
 
 const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
   return (
@@ -12,7 +12,7 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
       <div className="flex flex-col items-center space-y-4">
         <div>
           <EquippedSlot
-            equipped_item={fetchEquippedArmour(
+            equipped_item={fetchEquippedItemForSlot(
               equipped_items,
               InventoryItemTypes.HELMET
             )}
@@ -23,7 +23,7 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
 
         <div className="grid grid-cols-3 gap-4">
           <EquippedSlot
-            equipped_item={fetchEquippedArmour(
+            equipped_item={fetchEquippedItemForSlot(
               equipped_items,
               InventoryItemTypes.SLEEVES
             )}
@@ -31,7 +31,7 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
             position={Position.SLEEVES_LEFT}
           />
           <EquippedSlot
-            equipped_item={fetchEquippedArmour(
+            equipped_item={fetchEquippedItemForSlot(
               equipped_items,
               InventoryItemTypes.BODY
             )}
@@ -39,7 +39,7 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
             position={Position.BODY}
           />
           <EquippedSlot
-            equipped_item={fetchEquippedArmour(
+            equipped_item={fetchEquippedItemForSlot(
               equipped_items,
               InventoryItemTypes.SLEEVES
             )}
@@ -50,7 +50,7 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
 
         <div className="grid grid-cols-3 gap-4">
           <EquippedSlot
-            equipped_item={fetchEquippedArmour(
+            equipped_item={fetchEquippedItemForSlot(
               equipped_items,
               InventoryItemTypes.GLOVES
             )}
@@ -58,7 +58,7 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
             position={Position.GLOVES_LEFT}
           />
           <EquippedSlot
-            equipped_item={fetchEquippedArmour(
+            equipped_item={fetchEquippedItemForSlot(
               equipped_items,
               InventoryItemTypes.LEGGINGS
             )}
@@ -66,7 +66,7 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
             position={Position.LEGGINGS}
           />
           <EquippedSlot
-            equipped_item={fetchEquippedArmour(
+            equipped_item={fetchEquippedItemForSlot(
               equipped_items,
               InventoryItemTypes.GLOVES
             )}
@@ -77,7 +77,7 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
 
         <div>
           <EquippedSlot
-            equipped_item={fetchEquippedArmour(
+            equipped_item={fetchEquippedItemForSlot(
               equipped_items,
               InventoryItemTypes.FEET
             )}
@@ -91,32 +91,32 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
         <EquippedSlot
           equipped_item={undefined}
           positionName={'Weapon (Left Hand)'}
-          position={Position.WEAPON_LEFT}
+          position={Position.LEFT_HAND}
         />
         <EquippedSlot
           equipped_item={undefined}
           positionName={'Weapon (Right Hand)'}
-          position={Position.WEAPON_RIGHT}
+          position={Position.RING_HAND}
         />
         <EquippedSlot
           equipped_item={undefined}
           positionName={'Ring (Ring One)'}
-          position={Position.RING_LEFT}
+          position={Position.RING_TWO}
         />
         <EquippedSlot
           equipped_item={undefined}
           positionName={'Ring (Ring One)'}
-          position={Position.RING_RIGHT}
+          position={Position.RING_ONE}
         />
         <EquippedSlot
           equipped_item={undefined}
           positionName={'Spell (Spell One)'}
-          position={Position.SPELL_LEFT}
+          position={Position.SPELL_TWO}
         />
         <EquippedSlot
           equipped_item={undefined}
           positionName={'Spell (Spell Two)'}
-          position={Position.SPELL_RIGHT}
+          position={Position.SPELL_ONE}
         />
         <EquippedSlot
           equipped_item={undefined}

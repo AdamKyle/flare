@@ -10,12 +10,12 @@ type PartialInventoryItemTypes =
   | InventoryItemTypes.SLEEVES;
 
 /**
- * Fetch equipped armour.
+ * Fetch equipped item for a given slot based on type.
  *
  * @param equippedItems
  * @param inventoryType
  */
-export const fetchEquippedArmour = (
+export const fetchEquippedItemForSlot = (
   equippedItems: BaseInventoryItemDefinition[] | [],
   inventoryType: PartialInventoryItemTypes
 ): BaseInventoryItemDefinition | undefined => {
