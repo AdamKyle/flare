@@ -8,6 +8,7 @@ export interface CharacterEquippedDefinition {
   spell_damage: number;
   healing_amount: number;
   defence_amount: number;
+  set_name: string | null;
 }
 
 export default interface UseCharacterEquippedApiDefinition {

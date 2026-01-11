@@ -44,7 +44,7 @@ class CharacterInventoryService
 
     private bool $isInventorySetIsEquipped = false;
 
-    private string $inventorySetEquippedName = '';
+    private ?string $inventorySetEquippedName;
 
     public function __construct(
         private readonly ItemEnricherFactory $itemEnricherFactory,
@@ -108,6 +108,10 @@ class CharacterInventoryService
             'set_is_equipped' => $this->isInventorySetIsEquipped,
             'set_name_equipped' => $this->inventorySetEquippedName,
         ];
+    }
+
+    public function getSetName(): ?string {
+        return $this->inventorySetEquippedName;
     }
 
     public function getInventoryForType(string $type): Collection|array

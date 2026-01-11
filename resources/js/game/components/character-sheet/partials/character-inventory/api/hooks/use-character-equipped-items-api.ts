@@ -32,6 +32,7 @@ const useCharacterEquippedItemsApi = (
         spell_damage: result.spell_damage,
         healing_amount: result.healing_amount,
         defence_amount: result.defence_amount,
+        set_name: result.set_name,
       });
     } catch (error) {
       if (error instanceof AxiosError) {

@@ -8,4 +8,5 @@ export default interface CharacterInventoryItemDetails {
   spell_damage: number;
   healing_amount: number;
   defence_amount: number;
+  set_name: string | null;
 }

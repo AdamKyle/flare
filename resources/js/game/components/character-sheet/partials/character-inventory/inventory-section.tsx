@@ -72,7 +72,7 @@ const InventorySection = ({
 
       <div className={'mx-auto w-full md:w-3/5'}>
         <Separator />
-        <h4 className={'text-marigold-700 dark:text-marigold-500'}>
+        <h4 className={'text-mango-tango-700 dark:text-mango-tango-500'}>
           Basic Run Down
         </h4>
 
@@ -80,6 +80,10 @@ const InventorySection = ({
           Below is some basic details about your gear currently equipped.
         </p>
         <Separator />
+        <p className={'mt-2 mb-4 text-sm italic'}>
+          <strong>Currently Equipped</strong>:{' '}
+          <span className={'text-mango-tango-700 dark:text-mango-tango-500'}>{data.set_name ?? 'Inventory Items'}</span>
+        </p>
         <Dl>
           <Dt>Weapon Damage</Dt>
           <Dd>{shortenNumber(data.weapon_damage)}</Dd>
