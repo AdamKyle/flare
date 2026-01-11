@@ -82,7 +82,9 @@ const InventorySection = ({
         <Separator />
         <p className={'mt-2 mb-4 text-sm italic'}>
           <strong>Currently Equipped</strong>:{' '}
-          <span className={'text-mango-tango-700 dark:text-mango-tango-500'}>{data.set_name ?? 'Inventory Items'}</span>
+          <span className={'text-mango-tango-700 dark:text-mango-tango-500'}>
+            {data.set_name ?? 'Inventory Items'}
+          </span>
         </p>
         <Dl>
           <Dt>Weapon Damage</Dt>

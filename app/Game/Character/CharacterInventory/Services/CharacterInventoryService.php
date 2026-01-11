@@ -110,7 +110,8 @@ class CharacterInventoryService
         ];
     }
 
-    public function getSetName(): ?string {
+    public function getSetName(): ?string
+    {
         return $this->inventorySetEquippedName;
     }
 
