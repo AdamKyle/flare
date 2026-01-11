@@ -56,4 +56,4 @@ export const handBasedItems = [
   InventoryItemTypes.MACE,
   InventoryItemTypes.DAGGER,
   InventoryItemTypes.TRINKET,
-]
+];
