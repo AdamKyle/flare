@@ -38,3 +38,22 @@ export const armourPositions = [
   InventoryItemTypes.LEGGINGS,
   InventoryItemTypes.SLEEVES,
 ];
+
+export const handBasedItems = [
+  InventoryItemTypes.SWORD,
+  InventoryItemTypes.SHIELD,
+  InventoryItemTypes.GUN,
+  InventoryItemTypes.FAN,
+  InventoryItemTypes.RING,
+  InventoryItemTypes.SPELL_DAMAGE,
+  InventoryItemTypes.SPELL_HEALING,
+  InventoryItemTypes.HAMMER,
+  InventoryItemTypes.WAND,
+  InventoryItemTypes.CENSOR,
+  InventoryItemTypes.CLAW,
+  InventoryItemTypes.SCRATCH_AWL,
+  InventoryItemTypes.STAVE,
+  InventoryItemTypes.MACE,
+  InventoryItemTypes.DAGGER,
+  InventoryItemTypes.TRINKET,
+]
