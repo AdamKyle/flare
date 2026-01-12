@@ -6,7 +6,7 @@ import {
   defaultPositionImageAlt,
   Position,
 } from '../enums/equipment-positions';
-import { armourPositions } from '../enums/inventory-item-types';
+import { armourPositions, handBasedItems } from '../enums/inventory-item-types';
 import FetchEquippedImageDefinition from './definitions/fetch-equipped-image-definition';
 import { cosmicItemRecord } from './image-records/cosmic-item-record';
 import { holyItemRecord } from './image-records/holy-item-record';
@@ -38,7 +38,15 @@ export const fetchEquippedImage = (
     };
   }
 
-  if (armourPositions.includes(item.type)) {
+  if (handBasedItems.includes(item.type)) {
+    if (position === Position.RING_ONE) {
+      path = fetchItemImage(item, position) || defaultPositionImage[position];
+
+      console.log('hand based items', item, position, path);
+    }
+    path = fetchItemImage(item, position) || defaultPositionImage[position];
+    itemName = item.name;
+  } else if (armourPositions.includes(item.type)) {
     path = fetchItemImage(item, position) || defaultPositionImage[position];
     itemName = item.name;
   }

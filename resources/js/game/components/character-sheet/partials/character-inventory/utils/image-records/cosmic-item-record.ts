@@ -34,7 +34,7 @@ export const cosmicItemRecord: Partial<
   [InventoryItemTypes.CENSOR]: `${EquipmentImagePaths.COSMIC_ITEMS}/censor-cosmic.gif`,
   [InventoryItemTypes.SPELL_HEALING]: `${EquipmentImagePaths.COSMIC_ITEMS}/spell-healing-cosmic.gif`,
   [InventoryItemTypes.SPELL_DAMAGE]: `${EquipmentImagePaths.COSMIC_ITEMS}/spell-damage-cosmic.gif`,
-  [InventoryItemTypes.RING]: `${EquipmentImagePaths.COSMIC_ITEMS}/spell-damage-cosmic.gif`,
+  [InventoryItemTypes.RING]: `${EquipmentImagePaths.COSMIC_ITEMS}/ring-cosmic.gif`,
   [InventoryItemTypes.GUN]: `${EquipmentImagePaths.COSMIC_ITEMS}/gun-cosmic.gif`,
   [InventoryItemTypes.FAN]: `${EquipmentImagePaths.COSMIC_ITEMS}/fan-cosmic.gif`,
   [InventoryItemTypes.CLAW]: `${EquipmentImagePaths.COSMIC_ITEMS}/claw-cosmic.gif`,

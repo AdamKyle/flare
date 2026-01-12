@@ -34,7 +34,7 @@ export const normalItemRecord: Partial<
   [InventoryItemTypes.CENSOR]: `${EquipmentImagePaths.NORMAL_ITEMS}/censor-normal.png`,
   [InventoryItemTypes.SPELL_HEALING]: `${EquipmentImagePaths.NORMAL_ITEMS}/spell-healing-normal.png`,
   [InventoryItemTypes.SPELL_DAMAGE]: `${EquipmentImagePaths.NORMAL_ITEMS}/spell-damage-normal.png`,
-  [InventoryItemTypes.RING]: `${EquipmentImagePaths.NORMAL_ITEMS}/spell-damage-normal.png`,
+  [InventoryItemTypes.RING]: `${EquipmentImagePaths.NORMAL_ITEMS}/ring-normal.png`,
   [InventoryItemTypes.GUN]: `${EquipmentImagePaths.NORMAL_ITEMS}/gun-normal.png`,
   [InventoryItemTypes.FAN]: `${EquipmentImagePaths.NORMAL_ITEMS}/fan-normal.png`,
   [InventoryItemTypes.CLAW]: `${EquipmentImagePaths.NORMAL_ITEMS}/claw-normal.png`,

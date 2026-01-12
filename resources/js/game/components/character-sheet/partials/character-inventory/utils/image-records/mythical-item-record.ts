@@ -34,7 +34,7 @@ export const mythicalItemRecord: Partial<
   [InventoryItemTypes.CENSOR]: `${EquipmentImagePaths.MYTHICAL_ITEMS}/censor-mythical.gif`,
   [InventoryItemTypes.SPELL_HEALING]: `${EquipmentImagePaths.MYTHICAL_ITEMS}/spell-healing-mythical.gif`,
   [InventoryItemTypes.SPELL_DAMAGE]: `${EquipmentImagePaths.MYTHICAL_ITEMS}/spell-damage-mythical.gif`,
-  [InventoryItemTypes.RING]: `${EquipmentImagePaths.MYTHICAL_ITEMS}/spell-damage-mythical.gif`,
+  [InventoryItemTypes.RING]: `${EquipmentImagePaths.MYTHICAL_ITEMS}/ring-mythical.gif`,
   [InventoryItemTypes.GUN]: `${EquipmentImagePaths.MYTHICAL_ITEMS}/gun-mythical.gif`,
   [InventoryItemTypes.FAN]: `${EquipmentImagePaths.MYTHICAL_ITEMS}/fan-mythical.gif`,
   [InventoryItemTypes.CLAW]: `${EquipmentImagePaths.MYTHICAL_ITEMS}/claw-mythical.gif`,

@@ -34,7 +34,7 @@ export const holyItemRecord: Partial<
   [InventoryItemTypes.CENSOR]: `${EquipmentImagePaths.HOLY_ITEMS}/censor-holy.png`,
   [InventoryItemTypes.SPELL_HEALING]: `${EquipmentImagePaths.HOLY_ITEMS}/spell-healing-holy.png`,
   [InventoryItemTypes.SPELL_DAMAGE]: `${EquipmentImagePaths.HOLY_ITEMS}/spell-damage-holy.png`,
-  [InventoryItemTypes.RING]: `${EquipmentImagePaths.HOLY_ITEMS}/spell-damage-holy.png`,
+  [InventoryItemTypes.RING]: `${EquipmentImagePaths.HOLY_ITEMS}/ring-holy.png`,
   [InventoryItemTypes.GUN]: `${EquipmentImagePaths.HOLY_ITEMS}/gun-holy.png`,
   [InventoryItemTypes.FAN]: `${EquipmentImagePaths.HOLY_ITEMS}/fan-holy.png`,
   [InventoryItemTypes.CLAW]: `${EquipmentImagePaths.HOLY_ITEMS}/claw-holy.png`,

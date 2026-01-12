@@ -34,7 +34,7 @@ export const uniqueItemRecord: Partial<
   [InventoryItemTypes.CENSOR]: `${EquipmentImagePaths.UNIQUE_ITEMS}/censor-unique.gif`,
   [InventoryItemTypes.SPELL_HEALING]: `${EquipmentImagePaths.UNIQUE_ITEMS}/spell-healing-unique.gif`,
   [InventoryItemTypes.SPELL_DAMAGE]: `${EquipmentImagePaths.UNIQUE_ITEMS}/spell-damage-unique.gif`,
-  [InventoryItemTypes.RING]: `${EquipmentImagePaths.UNIQUE_ITEMS}/spell-damage-unique.gif`,
+  [InventoryItemTypes.RING]: `${EquipmentImagePaths.UNIQUE_ITEMS}/ring-unique.gif`,
   [InventoryItemTypes.GUN]: `${EquipmentImagePaths.UNIQUE_ITEMS}/gun-unique.gif`,
   [InventoryItemTypes.FAN]: `${EquipmentImagePaths.UNIQUE_ITEMS}/fan-unique.gif`,
   [InventoryItemTypes.CLAW]: `${EquipmentImagePaths.UNIQUE_ITEMS}/claw-unique.gif`,

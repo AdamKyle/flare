@@ -1,7 +1,13 @@
 import React from 'react';
 
-import { Position } from './enums/equipment-positions';
-import { InventoryItemTypes } from './enums/inventory-item-types';
+import {
+  InventoryPositionDefinition,
+  Position,
+} from './enums/equipment-positions';
+import {
+  handBasedItems,
+  InventoryItemTypes,
+} from './enums/inventory-item-types';
 import EquippedSlot from './equipped-slot';
 import EquippedSlotsProps from './types/equipped-slots-props';
 import { fetchEquippedItemForSlot } from './utils/fetch-equipped-armour';
@@ -14,7 +20,8 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
           <EquippedSlot
             equipped_item={fetchEquippedItemForSlot(
               equipped_items,
-              InventoryItemTypes.HELMET
+              InventoryItemTypes.HELMET,
+              InventoryPositionDefinition.HELMET
             )}
             positionName={'Helmet'}
             position={Position.HELMET}
@@ -25,7 +32,8 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
           <EquippedSlot
             equipped_item={fetchEquippedItemForSlot(
               equipped_items,
-              InventoryItemTypes.SLEEVES
+              InventoryItemTypes.SLEEVES,
+              InventoryPositionDefinition.SLEEVES
             )}
             positionName={'Sleeves (Left)'}
             position={Position.SLEEVES_LEFT}
@@ -33,7 +41,8 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
           <EquippedSlot
             equipped_item={fetchEquippedItemForSlot(
               equipped_items,
-              InventoryItemTypes.BODY
+              InventoryItemTypes.BODY,
+              InventoryPositionDefinition.BODY
             )}
             positionName={'Body'}
             position={Position.BODY}
@@ -41,7 +50,8 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
           <EquippedSlot
             equipped_item={fetchEquippedItemForSlot(
               equipped_items,
-              InventoryItemTypes.SLEEVES
+              InventoryItemTypes.SLEEVES,
+              InventoryPositionDefinition.SLEEVES
             )}
             positionName={'Sleeves (Right)'}
             position={Position.SLEEVES_RIGHT}
@@ -52,7 +62,8 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
           <EquippedSlot
             equipped_item={fetchEquippedItemForSlot(
               equipped_items,
-              InventoryItemTypes.GLOVES
+              InventoryItemTypes.GLOVES,
+              InventoryPositionDefinition.GLOVES
             )}
             positionName={'Gloves (Left)'}
             position={Position.GLOVES_LEFT}
@@ -60,7 +71,8 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
           <EquippedSlot
             equipped_item={fetchEquippedItemForSlot(
               equipped_items,
-              InventoryItemTypes.LEGGINGS
+              InventoryItemTypes.LEGGINGS,
+              InventoryPositionDefinition.LEGGINGS
             )}
             positionName={'Leggings'}
             position={Position.LEGGINGS}
@@ -68,7 +80,8 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
           <EquippedSlot
             equipped_item={fetchEquippedItemForSlot(
               equipped_items,
-              InventoryItemTypes.GLOVES
+              InventoryItemTypes.GLOVES,
+              InventoryPositionDefinition.GLOVES
             )}
             positionName={'Gloves (Right)'}
             position={Position.GLOVES_RIGHT}
@@ -79,7 +92,8 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
           <EquippedSlot
             equipped_item={fetchEquippedItemForSlot(
               equipped_items,
-              InventoryItemTypes.FEET
+              InventoryItemTypes.FEET,
+              InventoryPositionDefinition.FEET
             )}
             positionName={'Feet'}
             position={Position.FEET}
@@ -89,37 +103,65 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
 
       <div className="grid grid-cols-3 gap-4 sm:grid-cols-2">
         <EquippedSlot
-          equipped_item={undefined}
+          equipped_item={fetchEquippedItemForSlot(
+            equipped_items,
+            handBasedItems,
+            InventoryPositionDefinition.LEFT_HAND
+          )}
           positionName={'Weapon (Left Hand)'}
           position={Position.LEFT_HAND}
         />
         <EquippedSlot
-          equipped_item={undefined}
+          equipped_item={fetchEquippedItemForSlot(
+            equipped_items,
+            handBasedItems,
+            InventoryPositionDefinition.RIGHT_HAND
+          )}
           positionName={'Weapon (Right Hand)'}
           position={Position.RING_HAND}
         />
         <EquippedSlot
-          equipped_item={undefined}
+          equipped_item={fetchEquippedItemForSlot(
+            equipped_items,
+            handBasedItems,
+            InventoryPositionDefinition.RING_TWO
+          )}
           positionName={'Ring (Ring One)'}
           position={Position.RING_TWO}
         />
         <EquippedSlot
-          equipped_item={undefined}
+          equipped_item={fetchEquippedItemForSlot(
+            equipped_items,
+            handBasedItems,
+            InventoryPositionDefinition.RING_ONE
+          )}
           positionName={'Ring (Ring One)'}
           position={Position.RING_ONE}
         />
         <EquippedSlot
-          equipped_item={undefined}
+          equipped_item={fetchEquippedItemForSlot(
+            equipped_items,
+            handBasedItems,
+            InventoryPositionDefinition.SPELL_TWO
+          )}
           positionName={'Spell (Spell One)'}
           position={Position.SPELL_TWO}
         />
         <EquippedSlot
-          equipped_item={undefined}
+          equipped_item={fetchEquippedItemForSlot(
+            equipped_items,
+            handBasedItems,
+            InventoryPositionDefinition.SPELL_TWO
+          )}
           positionName={'Spell (Spell Two)'}
           position={Position.SPELL_ONE}
         />
         <EquippedSlot
-          equipped_item={undefined}
+          equipped_item={fetchEquippedItemForSlot(
+            equipped_items,
+            handBasedItems,
+            InventoryPositionDefinition.TRINKET
+          )}
           positionName={'Trinket'}
           position={Position.TRINKET}
         />

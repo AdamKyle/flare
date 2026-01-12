@@ -87,6 +87,7 @@ class EquippableItemTransformer extends TransformerAbstract
             'healing_reduction' => $slot->item->healing_reduction,
             'affix_damage_reduction' => $slot->item->affix_damage_reduction,
             'resurrection_chance' => $slot->item->resurrection_chance,
+            'position' => $slot->position,
         ];
     }
 }
