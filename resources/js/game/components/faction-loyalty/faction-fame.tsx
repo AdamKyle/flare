@@ -311,7 +311,7 @@ export default class FactionFame extends React.Component<
                                             on_click={() =>
                                                 this.manageAssistingNpc(true)
                                             }
-                                            additional_css={"mt-[34px] ml-4"}
+                                            additional_css={"mt-[18px] ml-4"}
                                         />
                                     ) : (
                                         <PrimaryOutlineButton
@@ -319,7 +319,7 @@ export default class FactionFame extends React.Component<
                                             on_click={() =>
                                                 this.manageAssistingNpc(false)
                                             }
-                                            additional_css={"mt-[34px] ml-4"}
+                                            additional_css={"mt-[18px] ml-4"}
                                         />
                                     )}
                                 </div>
