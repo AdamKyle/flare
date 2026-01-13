@@ -13,6 +13,7 @@ use App\Game\Battle\Services\BattleDrop;
 use App\Game\Battle\Services\CelestialFightService;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Battle\Services\FactionLoyaltyFightService;
+use App\Game\Battle\Services\MonsterFightService;
 use App\Game\Battle\Services\RaidBattleService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
@@ -81,7 +82,7 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(FactionLoyaltyFightService::class, function ($app) {
             return new FactionLoyaltyFightService(
-                $app->make(MonsterPlayerFight::class),
+                $app->make(MonsterFightService::class),
                 $app->make(BattleEventHandler::class),
                 $app->make(FactionLoyaltyService::class)
             );
