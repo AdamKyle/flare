@@ -11,7 +11,6 @@ const EquipComparison = ({
   comparison_data,
   show_advanced_child_under_top,
 }: EquipComparisonProps) => {
-  console.log('Am I here when called?');
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const handleToggleAdvanced = () => {

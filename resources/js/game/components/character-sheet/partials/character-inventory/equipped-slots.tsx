@@ -10,7 +10,7 @@ import {
 } from './enums/inventory-item-types';
 import EquippedSlot from './equipped-slot';
 import EquippedSlotsProps from './types/equipped-slots-props';
-import { fetchEquippedItemForSlot } from './utils/fetch-equipped-armour';
+import { fetchEquippedItemForSlot } from './utils/fetch-equipped-item-for-slot';
 
 const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
   return (
@@ -142,10 +142,10 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
           equipped_item={fetchEquippedItemForSlot(
             equipped_items,
             handBasedItems,
-            InventoryPositionDefinition.SPELL_TWO
+            InventoryPositionDefinition.SPELL_ONE
           )}
           positionName={'Spell (Spell One)'}
-          position={Position.SPELL_TWO}
+          position={Position.SPELL_ONE}
         />
         <EquippedSlot
           equipped_item={fetchEquippedItemForSlot(

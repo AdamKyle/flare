@@ -7,6 +7,7 @@ const holyItems: string = `${basePath}/pixel-art/holy-items`;
 const uniqueItems: string = `${basePath}/pixel-art/unique-items`;
 const mythicalItems: string = `${basePath}/pixel-art/mythical-items`;
 const cosmicItems: string = `${basePath}/pixel-art/cosmic-items`;
+const trinkets: string = `${basePath}/pixel-art/trinket-items`;
 
 export const EquipmentImagePaths = {
   NORMAL_ITEMS: normalItems,
@@ -16,6 +17,7 @@ export const EquipmentImagePaths = {
   UNIQUE_ITEMS: uniqueItems,
   MYTHICAL_ITEMS: mythicalItems,
   COSMIC_ITEMS: cosmicItems,
+  TRINKETS: trinkets,
 };
 
 export enum Position {
@@ -51,7 +53,7 @@ export enum InventoryPositionDefinition {
   RING_TWO = 'ring-two',
   SPELL_ONE = 'spell-one',
   SPELL_TWO = 'spell-two',
-  TRINKET = 'trinket',
+  TRINKET = 'trinket-one',
   ARTIFACT = 'artifact',
 }
 

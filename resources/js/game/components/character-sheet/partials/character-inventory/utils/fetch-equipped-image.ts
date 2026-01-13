@@ -6,13 +6,18 @@ import {
   defaultPositionImageAlt,
   Position,
 } from '../enums/equipment-positions';
-import { armourPositions, handBasedItems } from '../enums/inventory-item-types';
+import {
+  armourPositions,
+  handBasedItems,
+  InventoryItemTypes,
+} from '../enums/inventory-item-types';
 import FetchEquippedImageDefinition from './definitions/fetch-equipped-image-definition';
 import { cosmicItemRecord } from './image-records/cosmic-item-record';
 import { holyItemRecord } from './image-records/holy-item-record';
 import { mythicalItemRecord } from './image-records/mythical-item-record';
 import { normalItemRecord } from './image-records/normal-item-record';
 import { oneEnchantItemRecord } from './image-records/one-enchant-item-record';
+import { trinketItemRecord } from './image-records/trinket-item-record';
 import { twoEnchantItemRecord } from './image-records/two-enchant-item-record';
 import { uniqueItemRecord } from './image-records/unique-item-record';
 
@@ -39,11 +44,6 @@ export const fetchEquippedImage = (
   }
 
   if (handBasedItems.includes(item.type)) {
-    if (position === Position.RING_ONE) {
-      path = fetchItemImage(item, position) || defaultPositionImage[position];
-
-      console.log('hand based items', item, position, path);
-    }
     path = fetchItemImage(item, position) || defaultPositionImage[position];
     itemName = item.name;
   } else if (armourPositions.includes(item.type)) {
@@ -104,6 +104,13 @@ const fetchItemImage = (
     })
     .with({ affix_count: 1 }, () => {
       const imagePath = oneEnchantItemRecord[item.type];
+      return isPartialPositionRecord(imagePath)
+        ? imagePath[position] || null
+        : imagePath || null;
+    })
+    .with({ type: InventoryItemTypes.TRINKET }, () => {
+      const imagePath = trinketItemRecord[item.type];
+
       return isPartialPositionRecord(imagePath)
         ? imagePath[position] || null
         : imagePath || null;
