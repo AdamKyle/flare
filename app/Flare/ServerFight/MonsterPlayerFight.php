@@ -79,7 +79,7 @@ class MonsterPlayerFight
     }
 
     /**
-     * Setup  the raid fight
+     * Set up  the raid fight
      */
     public function setUpRaidFight(Character $character, array $raidMonster, string $attackType): MonsterPlayerFight
     {
@@ -205,7 +205,9 @@ class MonsterPlayerFight
             $data = Cache::get('monster-fight-'.$this->character->id);
 
             $this->monster = $data['monster'];
+
         } else {
+
             $data = $this->fightSetUp();
 
             $this->monster = $data['monster'];
