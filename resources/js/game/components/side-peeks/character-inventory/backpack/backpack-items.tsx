@@ -254,7 +254,7 @@ const BackpackItems = ({
         <InventoryItem
           slot_id={slotId}
           character_id={character.id}
-          on_equip={onEquipSuccess}
+          on_action={onEquipSuccess}
         />
       </StackedCard>
     );

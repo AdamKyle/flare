@@ -8,7 +8,7 @@ const ServerChatItem = ({ slot_id, character_id }: ServerChatItemProps) => {
     <InventoryItem
       slot_id={slot_id}
       character_id={character_id}
-      on_equip={() => {}}
+      on_action={() => {}}
     />
   );
 };

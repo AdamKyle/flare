@@ -20,6 +20,8 @@ import ItemMetaSection from './partials/item-view/item-meta-tsx';
 import StatsSection from './partials/item-view/stats-section';
 import InventoryItemProps from './types/inventory-item-props';
 import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
+import { ItemActions } from '../../../../reusable-components/item/enums/item-actions';
+import ItemAction from '../../../../reusable-components/item/item-action';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
@@ -32,11 +34,13 @@ import Separator from 'ui/separator/separator';
 const InventoryItem = ({
   slot_id,
   character_id,
-  on_equip,
+  on_action,
 }: InventoryItemProps) => {
   const [itemAffixToView, setItemAffixToView] = useState<number | null>(null);
   const [shouldViewHolyStacks, setShouldViewHolyStacks] = useState(false);
   const [viewingEquip, setViewingEquip] = useState(false);
+  const [selectedItemAction, setSelectedItemAction] =
+    useState<ItemActions | null>(null);
 
   const { error, loading, data } = useGetInventoryItemDetails({
     character_id,
@@ -86,6 +90,15 @@ const InventoryItem = ({
     setViewingEquip(false);
   };
 
+  const handleActionSelected = (action: ItemActions) => {
+    console.log('handleActionSelected', action);
+    setSelectedItemAction(action);
+  };
+
+  const handleClosingActionConfirmation = () => {
+    setSelectedItemAction(null);
+  };
+
   const renderEquipItem = () => {
     if (!viewingEquip) {
       return null;
@@ -97,7 +110,7 @@ const InventoryItem = ({
           character_id={character_id}
           slot_id={item.slot_id}
           item_to_equip_type={item.type}
-          on_equip={on_equip}
+          on_equip={on_action}
         />
       </StackedCard>
     );
@@ -136,6 +149,43 @@ const InventoryItem = ({
       <StackedCard on_close={() => setShouldViewHolyStacks(false)}>
         <AttachedHolyStacks stacks={item.applied_stacks} />
       </StackedCard>
+    );
+  };
+
+  const renderActionSection = () => {
+    console.log('renderActionSection', selectedItemAction);
+
+    if (!isNil(selectedItemAction)) {
+      return (
+        <ItemAction
+          item={item}
+          action_type={selectedItemAction}
+          on_action={() => {}}
+          on_cancel={handleClosingActionConfirmation}
+        />
+      );
+    }
+
+    return (
+      <div className="flex flex-col items-stretch gap-3 text-center sm:flex-row sm:items-center sm:justify-center sm:gap-6">
+        <div className="flex justify-center sm:justify-end">
+          <Button
+            on_click={handleViewEquip}
+            label="Equip Item"
+            variant={ButtonVariant.SUCCESS}
+          />
+        </div>
+
+        <div className="flex items-center justify-center gap-2">
+          <span className="inline-block h-px w-10 bg-gray-300" />
+          <span className="text-sm font-medium text-gray-500">Or</span>
+          <span className="inline-block h-px w-10 bg-gray-300" />
+        </div>
+
+        <div className="flex justify-center sm:justify-start">
+          <InventoryItemActionButton on_select_action={handleActionSelected} />
+        </div>
+      </div>
     );
   };
 
@@ -191,25 +241,7 @@ const InventoryItem = ({
           titleClassName={planeTextItemColors(item)}
         />
         <Separator />
-        <div className="flex flex-col items-stretch gap-3 text-center sm:flex-row sm:items-center sm:justify-center sm:gap-6">
-          <div className="flex justify-center sm:justify-end">
-            <Button
-              on_click={handleViewEquip}
-              label="Equip Item"
-              variant={ButtonVariant.SUCCESS}
-            />
-          </div>
-
-          <div className="flex items-center justify-center gap-2">
-            <span className="inline-block h-px w-10 bg-gray-300" />
-            <span className="text-sm font-medium text-gray-500">Or</span>
-            <span className="inline-block h-px w-10 bg-gray-300" />
-          </div>
-
-          <div className="flex justify-center sm:justify-start">
-            <InventoryItemActionButton />
-          </div>
-        </div>
+        {renderActionSection()}
         <Separator />
 
         <div className="space-y-4">

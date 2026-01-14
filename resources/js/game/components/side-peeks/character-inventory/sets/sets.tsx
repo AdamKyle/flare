@@ -85,7 +85,7 @@ const Sets = ({ character_id }: SetsProps): ReactNode => {
         <InventoryItem
           slot_id={slotId}
           character_id={character_id}
-          on_equip={() => {}}
+          on_action={() => {}}
         />
       </StackedCard>
     );
