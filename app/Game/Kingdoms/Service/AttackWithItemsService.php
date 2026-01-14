@@ -59,7 +59,7 @@ class AttackWithItemsService
         $this->setOldUnits($kingdom);
 
         $damage = $this->gatherDamage($character->inventory, $slots);
-        dump('Total Damage', $damage);
+
         $reduction = $kingdom->fetchKingdomDefenceBonus();
 
         $damage -= ($damage * $reduction);
@@ -74,8 +74,6 @@ class AttackWithItemsService
         $kingdom = $this->damageUnits($kingdom, ($damage / 2));
 
         $newMorale = $this->calculateNewMorale($kingdom->refresh(), $currentMorale);
-        dump('current Morale', $currentMorale);
-        dump('New Morale', $newMorale);
 
         $kingdom->update(['current_morale' => $newMorale]);
 

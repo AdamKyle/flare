@@ -44,7 +44,7 @@ class CharacterInventoryService
 
     private bool $isInventorySetIsEquipped = false;
 
-    private ?string $inventorySetEquippedName;
+    private ?string $inventorySetEquippedName = null;
 
     public function __construct(
         private readonly ItemEnricherFactory $itemEnricherFactory,
