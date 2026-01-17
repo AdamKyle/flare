@@ -21,6 +21,8 @@ use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackType
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Shop\Services\ShopService;
+use App\Game\Skills\Services\DisenchantService;
 use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Exception;
@@ -55,6 +57,8 @@ class CharacterInventoryService
         private readonly MassDisenchantService $massDisenchantService,
         private readonly UpdateCharacterSkillsService $updateCharacterSkillsService,
         private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler,
+        private readonly ShopService $shopService,
+        private readonly DisenchantService $disenchantService,
         private readonly Pagination $pagination,
         private readonly Manager $manager,
     ) {}
@@ -588,18 +592,18 @@ class CharacterInventoryService
     /**
      * Delete an item from the inventory.
      */
-    public function deleteItem(int $slotId): array
+    public function deleteItem(int $itemId): array
     {
-        $slot = $this->character->inventory->slots->filter(function ($slot) use ($slotId) {
-            return $slot->id === $slotId;
-        })->first();
+        $slot = $this->character->inventory->slots()
+            ->whereHas('item', static function ($query) {
+                $query->whereNotIn('type', ['alchemy', 'quest', 'artifact', 'trinket']);
+            })
+            ->where('equipped', false)
+            ->where('item_id', $itemId)
+            ->first();
 
         if (is_null($slot)) {
-            return $this->errorResult('You don\'t own that item.');
-        }
-
-        if ($slot->equipped) {
-            return $this->errorResult('Cannot destroy equipped item.');
+            return $this->errorResult('No matching item to destroy.');
         }
 
         $name = $slot->item->affix_name;
@@ -623,10 +627,7 @@ class CharacterInventoryService
         event(new UpdateCharacterInventoryCountEvent($this->character));
 
         return $this->successResult([
-            'message' => 'Destroyed '.$name.'.',
-            'inventory' => [
-                'inventory' => $this->getInventoryForType('inventory'),
-            ],
+            'message' => 'Destroyed item: '.$name.'.',
         ]);
     }
 
@@ -811,12 +812,54 @@ class CharacterInventoryService
         ]);
     }
 
+    public function sellItem(int $itemId): array
+    {
+
+        $slot = $this->character->inventory->slots()
+            ->whereHas('item', static function ($query) {
+                $query->whereNotIn('type', ['alchemy', 'quest', 'artifact', 'trinket']);
+            })
+            ->where('equipped', false)
+            ->where('item_id', $itemId)
+            ->first();
+
+        if (is_null($slot)) {
+            return $this->errorResult('No item found to be sell.');
+        }
+
+        $itemName = $slot->item->affix_name;
+
+        $totalSoldFor = $this->shopService->sellItem($slot, $this->character);
+
+        return $this->successResult([
+            'message' => 'Sold '.$itemName.' for a total of '.number_format($totalSoldFor, 0).' gold.',
+        ]);
+    }
+
+    public function disenchantItem(int $itemId): array
+    {
+
+        $slot = $this->character->inventory->slots()
+            ->whereHas('item', static function ($query) {
+                $query->whereNotIn('type', ['alchemy', 'quest', 'artifact', 'trinket']);
+            })
+            ->where('equipped', false)
+            ->where('item_id', $itemId)
+            ->first();
+
+        if (is_null($slot)) {
+            return $this->errorResult('No item found to disenchant.');
+        }
+
+        return $this->disenchantService->setUp($this->character)->disenchantItem($slot);
+    }
+
     /**
      * Updates the character stats.
      *
      * @throws Exception
      */
-    protected function updateCharacterAttackDataCache(Character $character): void
+    private function updateCharacterAttackDataCache(Character $character): void
     {
         $this->updateCharacterAttackTypesHandler->updateCache($character);
     }
@@ -826,7 +869,7 @@ class CharacterInventoryService
      *
      * @throws Exception
      */
-    protected function fetchType(string $type): string
+    private function fetchType(string $type): string
     {
         if (in_array($type, ArmourTypes::armourTypes())) {
             $type = 'armour';

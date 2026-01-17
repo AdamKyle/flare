@@ -10,6 +10,7 @@ use App\Flare\Models\Item;
 use App\Flare\Pagination\Requests\PaginationRequest;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Requests\EquipItemValidation;
+use App\Game\Character\CharacterInventory\Requests\InventoryActionRequest;
 use App\Game\Character\CharacterInventory\Requests\MoveItemRequest;
 use App\Game\Character\CharacterInventory\Requests\RemoveItemRequest;
 use App\Game\Character\CharacterInventory\Requests\RenameSetRequest;
@@ -27,25 +28,12 @@ use Illuminate\Http\Request;
 
 class CharacterInventoryController extends Controller
 {
-    private CharacterInventoryService $characterInventoryService;
-
-    private InventorySetService $inventorySetService;
-
-    private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
-
-    private UseItemService $useItemService;
-
     public function __construct(
-        CharacterInventoryService $characterInventoryService,
-        InventorySetService $inventorySetService,
-        UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
-        UseItemService $useItemService,
-    ) {
-        $this->characterInventoryService = $characterInventoryService;
-        $this->inventorySetService = $inventorySetService;
-        $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
-        $this->useItemService = $useItemService;
-    }
+        private readonly CharacterInventoryService $characterInventoryService,
+        private readonly InventorySetService $inventorySetService,
+        private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
+        private readonly UseItemService $useItemService,
+    ) {}
 
     public function inventory(PaginationRequest $request, Character $character): JsonResponse
     {
@@ -114,7 +102,7 @@ class CharacterInventoryController extends Controller
 
     public function destroy(Request $request, Character $character): JsonResponse
     {
-        $result = $this->characterInventoryService->setCharacter($character)->deleteItem($request->slot_id);
+        $result = $this->characterInventoryService->setCharacter($character)->deleteItem($request->item_id);
 
         $status = $result['status'];
         unset($result['status']);
@@ -304,6 +292,30 @@ class CharacterInventoryController extends Controller
 
         return response()->json($result, $status);
     }
+
+    public function sellItem(InventoryActionRequest $request, Character $character): JsonResponse
+    {
+        $result = $this->characterInventoryService->setCharacter($character)->sellItem($request->item_id);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
+    }
+
+    public function disenchantItem(InventoryActionRequest $request, Character $character): JsonResponse
+    {
+        $result = $this->characterInventoryService->setCharacter($character)->disenchantItem($request->item_id);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
+    }
+
+    public function moveItemToSet() {}
+
+    public function listItem() {}
 
     /**
      * Updates the character stats.

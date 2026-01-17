@@ -28,8 +28,6 @@ class EquipItemService
 
     private InventorySetService $inventorySetService;
 
-    private CharacterInventoryService $characterInventoryService;
-
     private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler;
 
     private Character $character;
@@ -39,12 +37,11 @@ class EquipItemService
     /**
      * EquipItemService constructor.
      */
-    public function __construct(Manager $manager, CharacterAttackTransformer $characterTransformer, InventorySetService $inventorySetService, CharacterInventoryService $characterInventoryService, UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler)
+    public function __construct(Manager $manager, CharacterAttackTransformer $characterTransformer, InventorySetService $inventorySetService, UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler)
     {
         $this->manager = $manager;
         $this->characterTransformer = $characterTransformer;
         $this->inventorySetService = $inventorySetService;
-        $this->characterInventoryService = $characterInventoryService;
         $this->updateCharacterAttackTypesHandler = $updateCharacterAttackTypesHandler;
     }
 

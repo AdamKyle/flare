@@ -5,7 +5,7 @@ namespace App\Game\Character\Builders\AttackBuilders\Handler;
 use App\Flare\Models\Character;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
-use Exception;
+use Psr\SimpleCache\InvalidArgumentException;
 
 class UpdateCharacterAttackTypesHandler
 {
@@ -17,7 +17,7 @@ class UpdateCharacterAttackTypesHandler
     }
 
     /**
-     * @throws Exception
+     * @throws InvalidArgumentException
      */
     public function updateCache(Character $character, bool $ignoreReductions = false): void
     {

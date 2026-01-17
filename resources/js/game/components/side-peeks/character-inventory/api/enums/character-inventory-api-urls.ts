@@ -13,4 +13,8 @@ export enum CharacterInventoryApiUrls {
 
   CHARACTER_INVENTORY_COMPARISON = '/character/{character}/inventory/comparison',
   CHARACTER_EQUIP_ITEM = '/character/{character}/inventory/equip-item',
+
+  CHARACTER_INVENTORY_SELL_ITEM = '/character/{character}/inventory/sell-item',
+  CHARACTER_INVENTORY_DESTROY_ITEM = '/character/{character}/inventory/destroy',
+  CHARACTER_INVENTORY_DISENCHANT_ITEM = '/character/{character}/inventory/disenchant-item',
 }

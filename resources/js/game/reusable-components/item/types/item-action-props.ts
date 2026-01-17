@@ -4,6 +4,7 @@ import { ItemActions } from '../enums/item-actions';
 export default interface ItemActionProps {
   item: EquippableItemWithBase;
   action_type: ItemActions;
-  on_action: (successMessage: string) => void;
+  on_confirmation: (action: ItemActions) => void;
   on_cancel: () => void;
+  processing: boolean;
 }

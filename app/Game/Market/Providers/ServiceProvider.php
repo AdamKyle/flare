@@ -3,6 +3,7 @@
 namespace App\Game\Market\Providers;
 
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
+use App\Game\Market\Builders\MarketHistoryDailyPriceSeriesQueryBuilder;
 use App\Game\Market\Middleware\CanCharacterAccessMarket;
 use App\Game\Market\Services\MarketBoard;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -20,8 +21,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new MarketBoard($app->make(EquipItemService::class));
         });
 
-        $this->app->bind(MarketSaleHistory::class, function ($app) {
-            return new MarketSaleHistory;
+        $this->app->bind(MarketHistoryDailyPriceSeriesQueryBuilder::class, function () {
+            return new MarketHistoryDailyPriceSeriesQueryBuilder;
         });
     }
 

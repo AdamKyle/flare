@@ -11,7 +11,6 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
-use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -29,7 +28,6 @@ class ShopService
     use ResponseBuilder;
 
     public function __construct(private readonly EquipItemService $equipItemService,
-        private readonly CharacterInventoryService $characterInventoryService,
         private readonly Pagination $pagination,
         private readonly ShopTransformer $shopTransformer,
         private readonly Manager $manager
@@ -59,15 +57,10 @@ class ShopService
 
         $character = $character->refresh();
 
-        $inventory = $this->characterInventoryService->setCharacter($character);
-
         if ($totalSoldFor === 0) {
 
             return $this->successResult([
                 'message' => 'Could not sell any items ...',
-                'inventory' => [
-                    'inventory' => $inventory->getInventoryForType('inventory'),
-                ],
             ]);
         }
 
@@ -75,9 +68,6 @@ class ShopService
 
         return $this->successResult([
             'message' => 'Sold all your items for a total of: '.number_format($totalSoldFor).' gold.',
-            'inventory' => [
-                'inventory' => $inventory->getInventoryForType('inventory'),
-            ],
         ]);
     }
 

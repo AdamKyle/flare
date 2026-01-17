@@ -20,17 +20,13 @@ class InventorySetService
 
     private SetHandsValidation $setHandsValidation;
 
-    private CharacterInventoryService $characterInventoryService;
-
     private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler;
 
     public function __construct(
         SetHandsValidation $setHandsValidation,
-        CharacterInventoryService $characterInventoryService,
         UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler
     ) {
         $this->setHandsValidation = $setHandsValidation;
-        $this->characterInventoryService = $characterInventoryService;
         $this->updateCharacterAttackTypesHandler = $updateCharacterAttackTypesHandler;
     }
 
@@ -98,8 +94,6 @@ class InventorySetService
 
             event(new UpdateCharacterInventoryCountEvent($character));
 
-            $characterInventoryService = $this->characterInventoryService->setCharacter($character);
-
             if (is_null($inventorySet->name)) {
                 $index = $character->inventorySets->search(function ($set) use ($setId) {
                     return $set->id === $setId;
@@ -107,26 +101,15 @@ class InventorySetService
 
                 return $this->successResult([
                     'message' => $itemName.' Has been moved to: Set '.$index + 1,
-                    'moved_to_set_name' => $inventorySet->name,
-                    'inventory' => [
-                        'inventory' => $characterInventoryService->getInventoryForType('inventory'),
-                        'sets' => $characterInventoryService->getInventoryForType('sets')['sets'],
-                    ],
                 ]);
             }
 
             return $this->successResult([
                 'message' => $itemName.' Has been moved to: '.$inventorySet->name,
-                'moved_to_set_name' => $inventorySet->name,
-                'inventory' => [
-                    'inventory' => $characterInventoryService->getInventoryForType('inventory'),
-                    'sets' => $characterInventoryService->getInventoryForType('sets')['sets'],
-                ],
             ]);
         }
 
         if ($isLast) {
-            $characterInventoryService = $this->characterInventoryService->setCharacter($character);
 
             if (is_null($inventorySet->name)) {
                 $index = $character->inventorySets->search(function ($set) use ($setId) {
@@ -141,11 +124,7 @@ class InventorySetService
             event(new UpdateCharacterInventoryCountEvent($character));
 
             return $this->successResult([
-                'moved_to_set_name' => $setName,
-                'inventory' => [
-                    'inventory' => $characterInventoryService->getInventoryForType('inventory'),
-                    'sets' => $characterInventoryService->getInventoryForType('sets')['sets'],
-                ],
+                'message' => $itemName.' Has been moved to: '.$setName,
             ]);
         }
 
@@ -197,16 +176,8 @@ class InventorySetService
 
         event(new UpdateCharacterInventoryCountEvent($character));
 
-        $characterInventoryService = $this->characterInventoryService->setCharacter($character);
-
-        $sets = $characterInventoryService->getInventoryForType('sets');
-
         return $this->successResult([
             'message' => 'Removed '.$item->affix_name.' from '.$setName.' and placed back into your inventory.',
-            'inventory' => [
-                'inventory' => $characterInventoryService->getInventoryForType('inventory'),
-                'sets' => $sets['sets'],
-            ],
         ]);
     }
 
@@ -253,14 +224,8 @@ class InventorySetService
 
         event(new UpdateCharacterInventoryCountEvent($character));
 
-        $inventory = $this->characterInventoryService->setCharacter($character);
-
         return $this->successResult([
             'message' => 'Removed '.$itemsRemoved.' of '.$originalInventorySetCount.' items from '.$setName.'. If all items were not moved over, it is because your inventory became full.',
-            'inventory' => [
-                'inventory' => $inventory->getInventoryForType('inventory'),
-                'sets' => $inventory->getInventoryForType('sets')['sets'],
-            ],
         ]);
     }
 
@@ -431,21 +396,8 @@ class InventorySetService
             $inventoryName = $inventorySet->name;
         }
 
-        $character = $character->refresh();
-
-        $inventory = $this->characterInventoryService->setCharacter($character);
-
         return $this->successResult([
             'message' => 'Unequipped '.$inventoryName.'.',
-            'inventory' => [
-                'inventory' => $inventory->getInventoryForType('inventory'),
-                'equipped' => $inventory->getInventoryForType('equipped'),
-                'sets' => $inventory->getInventoryForType('sets')['sets'],
-                'savable_sets' => $inventory->getUsableSets(),
-                'set_is_equipped' => false,
-                'set_name_equipped' => $inventory->getEquippedInventorySetName(),
-                'usable_sets' => $inventory->getUsableSets(),
-            ],
         ]);
     }
 
@@ -474,8 +426,6 @@ class InventorySetService
 
         $this->updateCharacterAttackDataCache($character);
 
-        $characterInventoryService = $this->characterInventoryService->setCharacter($character);
-
         $inventoryName = 'Set '.$setIndex + 1;
         $set = $inventorySet->refresh();
 
@@ -485,14 +435,6 @@ class InventorySetService
 
         return $this->successResult([
             'message' => $inventoryName.' is now equipped',
-            'inventory' => [
-                'equipped' => $characterInventoryService->getInventoryForType('equipped'),
-                'sets' => $characterInventoryService->getInventoryForType('sets')['sets'],
-                'usable_sets' => $characterInventoryService->getUsableSets(),
-                'savable_sets' => $characterInventoryService->getUsableSets(),
-                'set_is_equipped' => true,
-                'set_name_equipped' => $characterInventoryService->getEquippedInventorySetName(),
-            ],
         ]);
     }
 
@@ -594,15 +536,8 @@ class InventorySetService
             'name' => $setName,
         ]);
 
-        $inventory = $this->characterInventoryService->setCharacter($character->refresh());
-
         return $this->successResult([
             'message' => 'Renamed set to: '.$setName,
-            'inventory' => [
-                'sets' => $inventory->getInventoryForType('sets')['sets'],
-                'usable_sets' => $inventory->getInventoryForType('usable_sets'),
-                'savable_sets' => $inventory->getInventoryForType('savable_sets'),
-            ],
         ]);
     }
 
@@ -647,16 +582,8 @@ class InventorySetService
 
         event(new UpdateCharacterBaseDetailsEvent($character));
 
-        $inventory = $this->characterInventoryService->setCharacter($character);
-
         return $this->successResult([
             'message' => $setName.' is now equipped (equipment has been moved to the set).',
-            'inventory' => [
-                'sets' => $inventory->getInventoryForType('sets')['sets'],
-                'usable_sets' => $inventory->getInventoryForType('usable_sets'),
-                'savable_sets' => $inventory->getInventoryForType('savable_sets'),
-                'set_is_equipped' => true,
-            ],
         ]);
     }
 

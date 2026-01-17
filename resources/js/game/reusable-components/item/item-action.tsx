@@ -13,13 +13,18 @@ const ItemAction = ({
   action_type,
   item,
   on_cancel,
-  on_action,
+  on_confirmation,
+  processing,
 }: ItemActionProps) => {
-  const handleConfirmation = () => {
-    console.log('handleConfirmation');
+  const handleConfirmation = (action: ItemActions) => {
+    on_confirmation(action);
   };
 
   const renderLoadingIcon = () => {
+    if (!processing) {
+      return null;
+    }
+
     return <i className="fas fa-spinner fa-spin" aria-hidden="true"></i>;
   };
 
@@ -107,7 +112,7 @@ const ItemAction = ({
         return (
           <div className="grid grid-cols-2 items-stretch gap-2">
             <IconButton
-              disabled={false}
+              disabled={processing}
               on_click={on_cancel}
               label={'Cancel'}
               variant={ButtonVariant.DANGER}
@@ -115,8 +120,8 @@ const ItemAction = ({
             />
 
             <IconButton
-              disabled={false}
-              on_click={() => handleConfirmation()}
+              disabled={processing}
+              on_click={() => handleConfirmation(ItemActions.SELL)}
               label={'Sell Item'}
               variant={ButtonVariant.SUCCESS}
               additional_css={`w-full justify-center`}
@@ -129,7 +134,7 @@ const ItemAction = ({
         return (
           <div className="grid grid-cols-2 items-stretch gap-2">
             <IconButton
-              disabled={false}
+              disabled={processing}
               on_click={on_cancel}
               label={'Cancel'}
               variant={ButtonVariant.DANGER}
@@ -137,8 +142,8 @@ const ItemAction = ({
             />
 
             <IconButton
-              disabled={false}
-              on_click={() => handleConfirmation()}
+              disabled={processing}
+              on_click={() => handleConfirmation(ItemActions.DESTROY)}
               label={'Destroy Item'}
               variant={ButtonVariant.SUCCESS}
               additional_css={`w-full justify-center`}
@@ -151,7 +156,7 @@ const ItemAction = ({
         return (
           <div className="grid grid-cols-2 items-stretch gap-2">
             <IconButton
-              disabled={false}
+              disabled={processing}
               on_click={on_cancel}
               label={'Cancel'}
               variant={ButtonVariant.DANGER}
@@ -159,8 +164,8 @@ const ItemAction = ({
             />
 
             <IconButton
-              disabled={false}
-              on_click={() => handleConfirmation()}
+              disabled={processing}
+              on_click={() => handleConfirmation(ItemActions.DISENCHANT)}
               label={'Disenchant Item'}
               variant={ButtonVariant.SUCCESS}
               additional_css={`w-full justify-center`}
@@ -173,7 +178,7 @@ const ItemAction = ({
         return (
           <div className="grid grid-cols-2 items-stretch gap-2">
             <IconButton
-              disabled={false}
+              disabled={processing}
               on_click={on_cancel}
               label={'Cancel'}
               variant={ButtonVariant.DANGER}
@@ -181,8 +186,8 @@ const ItemAction = ({
             />
 
             <IconButton
-              disabled={false}
-              on_click={() => handleConfirmation()}
+              disabled={processing}
+              on_click={() => handleConfirmation(ItemActions.LIST)}
               label={'List Item'}
               variant={ButtonVariant.SUCCESS}
               additional_css={`w-full justify-center`}
@@ -195,7 +200,7 @@ const ItemAction = ({
         return (
           <div className="grid grid-cols-2 items-stretch gap-2">
             <IconButton
-              disabled={false}
+              disabled={processing}
               on_click={on_cancel}
               label={'Cancel'}
               variant={ButtonVariant.DANGER}
@@ -203,8 +208,8 @@ const ItemAction = ({
             />
 
             <IconButton
-              disabled={false}
-              on_click={() => handleConfirmation()}
+              disabled={processing}
+              on_click={() => handleConfirmation(ItemActions.MOVE_TO_SET)}
               label={'Move item to set'}
               variant={ButtonVariant.SUCCESS}
               additional_css={`w-full justify-center`}

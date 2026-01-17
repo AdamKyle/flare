@@ -3,12 +3,9 @@
 namespace App\Game\Skills\Services;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
-use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -28,16 +25,7 @@ class DisenchantService
 
     private Skill $disenchantingSkill;
 
-    private SkillCheckService $skillCheckService;
-
-    private CharacterInventoryService $characterInventoryService;
-
-    public function __construct(SkillCheckService $skillCheckService, CharacterInventoryService $characterInventoryService)
-    {
-        $this->skillCheckService = $skillCheckService;
-
-        $this->characterInventoryService = $characterInventoryService;
-    }
+    public function __construct(private readonly SkillCheckService $skillCheckService) {}
 
     /**
      * Set up the service.
@@ -53,38 +41,25 @@ class DisenchantService
         return $this;
     }
 
-    public function disenchantItem(Character $character, Item $item, bool $doNotSendResponse = false): array
+    /**
+     * Disenchant the item.
+     */
+    public function disenchantItem(InventorySlot $slot, bool $doNotSendResponse = false): array
     {
+        $itemName = $slot->item->affix_name;
 
-        $inventory = Inventory::where('character_id', $character->id)->first();
+        $this->disenchantWithSkill($slot);
 
-        $foundItem = InventorySlot::where('equipped', false)->where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
+        $character = $this->character->refresh();
 
-        if (is_null($foundItem)) {
-            return $this->errorResult($item->affix_name.' Cannot be disenchanted. Not found in inventory.');
-        }
-
-        if (is_null($foundItem->item->item_suffix_id) && is_null($foundItem->item->item_prefix_id)) {
-            return $this->errorResult($item->affix_name.' Cannot be disenchanted. Has no enchantments attached.');
-        }
-
-        if (! is_null($foundItem)) {
-            if ($foundItem->item->type === 'quest') {
-                return $this->errorResult('Quest items cannot be disenchanted.');
-            }
-
-            $this->setUp($character)->disenchantWithSkill($foundItem);
-
-            event(new UpdateCharacterBaseDetailsEvent($character->refresh()));
-        }
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         if ($doNotSendResponse) {
             return $this->successResult();
         }
 
         return $this->successResult([
-            'message' => 'Disenchanted item '.$item->affix_name.' Check server message tab for Gold Dust output.',
-            'inventory' => $this->characterInventoryService->setCharacter($character)->getInventoryForType('inventory'),
+            'message' => 'Disenchanted item '.$itemName.' Check server message tab for Gold Dust output.',
         ]);
     }
 

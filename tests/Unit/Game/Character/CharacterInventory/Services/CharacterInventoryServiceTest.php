@@ -38,7 +38,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->characterInventoryService = null;
     }
 
-    public function tesGetInventoryForApi()
+    public function test_get_inventory_for_api()
     {
         $character = $this->character->inventorySetManagement()
             ->createInventorySets()

@@ -6,6 +6,7 @@ import React, { Fragment, ReactNode, useState } from 'react';
 import { planeTextItemColors } from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
 import { useGetInventoryItemDetails } from './api/hooks/use-get-inventory-item-details';
+import { useProcessItemAction } from './api/hooks/use-process-item-action';
 import AttachedAffixDetails from './attached-affix/attached-affix-details';
 import AttachedHolyStacks from './attached-holy-stacks/attached-holy-stacks';
 import InventoryItemActionButton from './inventory-item-action-button';
@@ -47,6 +48,13 @@ const InventoryItem = ({
     slot_id,
     url: CharacterInventoryApiUrls.CHARACTER_INVENTORY_ITEM,
   });
+
+  const {
+    loading: processItemActionLoading,
+    error: processItemActionError,
+    setRequestData,
+    resetError,
+  } = useProcessItemAction();
 
   if (loading) {
     return (
@@ -91,12 +99,20 @@ const InventoryItem = ({
   };
 
   const handleActionSelected = (action: ItemActions) => {
-    console.log('handleActionSelected', action);
     setSelectedItemAction(action);
   };
 
   const handleClosingActionConfirmation = () => {
     setSelectedItemAction(null);
+  };
+
+  const handleItemActionConfirmation = (itemAction: ItemActions) => {
+    setRequestData({
+      character_id: character_id,
+      item_id: data.item_id ?? 0,
+      action_type: itemAction,
+      on_success: on_action,
+    });
   };
 
   const renderEquipItem = () => {
@@ -153,15 +169,24 @@ const InventoryItem = ({
   };
 
   const renderActionSection = () => {
-    console.log('renderActionSection', selectedItemAction);
+    if (processItemActionError) {
+      return (
+        <ApiErrorAlert
+          apiError={processItemActionError.message}
+          closable
+          on_close={resetError}
+        />
+      );
+    }
 
     if (!isNil(selectedItemAction)) {
       return (
         <ItemAction
           item={item}
           action_type={selectedItemAction}
-          on_action={() => {}}
+          on_confirmation={handleItemActionConfirmation}
           on_cancel={handleClosingActionConfirmation}
+          processing={processItemActionLoading}
         />
       );
     }

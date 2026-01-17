@@ -10,6 +10,7 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Traits\UpdateMarketBoard;
 use App\Game\Market\Requests\ChangeItemTypeRequest;
+use App\Game\Market\Requests\HistoryRequest;
 use App\Game\Market\Requests\ListPriceRequest;
 use App\Http\Controllers\Controller;
 use Facades\App\Flare\Calculators\SellItemCalculator;
@@ -92,4 +93,6 @@ class MarketController extends Controller
             ],
         ]);
     }
+
+    public function fetchMarketHistoryForItem(HistoryRequest $request) {}
 }
