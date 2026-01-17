@@ -9,11 +9,15 @@ use App\Flare\Transformers\MarketItemsTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Traits\UpdateMarketBoard;
+use App\Game\Market\Builders\MarketHistoryDailyPriceSeriesQueryBuilder;
+use App\Game\Market\Enums\MarketHistorySecondaryFilter;
 use App\Game\Market\Requests\ChangeItemTypeRequest;
 use App\Game\Market\Requests\HistoryRequest;
 use App\Game\Market\Requests\ListPriceRequest;
 use App\Http\Controllers\Controller;
+use Carbon\CarbonImmutable;
 use Facades\App\Flare\Calculators\SellItemCalculator;
+use Illuminate\Http\JsonResponse;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 
@@ -21,17 +25,12 @@ class MarketController extends Controller
 {
     use IsItemUnique, UpdateMarketBoard;
 
-    private $manager;
-
-    private $transformer;
-
-    private $characterInventoryService;
-
-    public function __construct(Manager $manager, MarketItemsTransformer $transformer, CharacterInventoryService $characterInventoryService)
-    {
-        $this->manager = $manager;
-        $this->transformer = $transformer;
-        $this->characterInventoryService = $characterInventoryService;
+    public function __construct(
+        private readonly Manager $manager,
+        private readonly MarketItemsTransformer $transformer,
+        private readonly CharacterInventoryService $characterInventoryService,
+        private readonly MarketHistoryDailyPriceSeriesQueryBuilder $marketHistoryDailyPriceSeriesQueryBuilder,
+    ) {
     }
 
     public function marketItems(ChangeItemTypeRequest $request)
@@ -94,5 +93,16 @@ class MarketController extends Controller
         ]);
     }
 
-    public function fetchMarketHistoryForItem(HistoryRequest $request) {}
+    public function fetchMarketHistoryForItem(HistoryRequest $request): JsonResponse {
+
+        $builder = $this->marketHistoryDailyPriceSeriesQueryBuilder->setup($request->type, CarbonImmutable::now(), 90)->clearFilters();
+
+        if ($request->has('filter_type')) {
+            $type = MarketHistorySecondaryFilter::tryFrom($request->filter_type);
+
+            $builder = $builder->addFilter($type);
+        }
+
+        return response()->json($builder->fetchDataSet());
+    }
 }

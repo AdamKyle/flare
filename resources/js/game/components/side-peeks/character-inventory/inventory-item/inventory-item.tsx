@@ -1,12 +1,12 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
-import { AnimatePresence } from 'framer-motion';
-import { isNil } from 'lodash';
-import React, { Fragment, ReactNode, useState } from 'react';
+import {AnimatePresence} from 'framer-motion';
+import {isNil} from 'lodash';
+import React, {Fragment, ReactNode, useState} from 'react';
 
-import { planeTextItemColors } from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
-import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
-import { useGetInventoryItemDetails } from './api/hooks/use-get-inventory-item-details';
-import { useProcessItemAction } from './api/hooks/use-process-item-action';
+import {planeTextItemColors} from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
+import {CharacterInventoryApiUrls} from '../api/enums/character-inventory-api-urls';
+import {useGetInventoryItemDetails} from './api/hooks/use-get-inventory-item-details';
+import {useProcessItemAction} from './api/hooks/use-process-item-action';
 import AttachedAffixDetails from './attached-affix/attached-affix-details';
 import AttachedHolyStacks from './attached-holy-stacks/attached-holy-stacks';
 import InventoryItemActionButton from './inventory-item-action-button';
@@ -20,17 +20,20 @@ import HolyStacksSection from './partials/item-view/holy-stacks-section';
 import ItemMetaSection from './partials/item-view/item-meta-tsx';
 import StatsSection from './partials/item-view/stats-section';
 import InventoryItemProps from './types/inventory-item-props';
-import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
-import { ItemActions } from '../../../../reusable-components/item/enums/item-actions';
+import {
+  EquippableItemWithBase
+} from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
+import {ItemActions} from '../../../../reusable-components/item/enums/item-actions';
 import ItemAction from '../../../../reusable-components/item/item-action';
 
-import { GameDataError } from 'game-data/components/game-data-error';
+import {GameDataError} from 'game-data/components/game-data-error';
 
 import Button from 'ui/buttons/button';
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import {ButtonVariant} from 'ui/buttons/enums/button-variant-enum';
 import StackedCard from 'ui/cards/stacked-card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import Separator from 'ui/separator/separator';
+import ListItemOnMarket from "../../../../reusable-components/item/list-item-on-market";
 
 const InventoryItem = ({
   slot_id,
@@ -40,6 +43,7 @@ const InventoryItem = ({
   const [itemAffixToView, setItemAffixToView] = useState<number | null>(null);
   const [shouldViewHolyStacks, setShouldViewHolyStacks] = useState(false);
   const [viewingEquip, setViewingEquip] = useState(false);
+  const [listItem, setListItem] = useState<boolean>(false);
   const [selectedItemAction, setSelectedItemAction] =
     useState<ItemActions | null>(null);
 
@@ -99,6 +103,13 @@ const InventoryItem = ({
   };
 
   const handleActionSelected = (action: ItemActions) => {
+
+    if (action === ItemActions.LIST) {
+      setListItem(true);
+
+      return;
+    }
+
     setSelectedItemAction(action);
   };
 
@@ -177,6 +188,10 @@ const InventoryItem = ({
           on_close={resetError}
         />
       );
+    }
+
+    if (listItem) {
+      return <ListItemOnMarket type={data.type} />;
     }
 
     if (!isNil(selectedItemAction)) {

@@ -2,12 +2,14 @@
 
 namespace App\Game\Market\Builders;
 
+use App\Flare\Models\Item;
+use App\Flare\Models\ItemAffix;
 use App\Flare\Models\MarketHistory;
 use App\Game\Market\Enums\MarketHistorySecondaryFilter;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
+use LogicException;
 
 class MarketHistoryDailyPriceSeriesQueryBuilder
 {
@@ -15,174 +17,150 @@ class MarketHistoryDailyPriceSeriesQueryBuilder
 
     private ?CarbonImmutable $endDate = null;
 
-    private ?int $days = null;
-
     private ?string $itemType = null;
 
-    private ?int $itemId = null;
+    private ?MarketHistorySecondaryFilter $filter = null;
 
     /**
-     * @var array<int, MarketHistorySecondaryFilter>
+     * Configure the builder for a single item type, constrained to [$now - $days, $now].
      */
-    private array $filters = [];
-
-    public function setup(?CarbonImmutable $now = null, int $days = 7): self
+    public function setup(string $type, ?CarbonImmutable $now = null, int $days = 7): self
     {
+        $this->itemType = $type;
+
         $resolvedNow = $now ?? CarbonImmutable::now();
 
-        $resolvedDays = max(1, $days);
+        $resolvedDays = max(0, $days);
 
-        $this->days = $resolvedDays;
-        $this->startDate = $resolvedNow->subDays($resolvedDays - 1)->startOfDay();
+        $this->startDate = $resolvedNow->subDays($resolvedDays)->startOfDay();
         $this->endDate = $resolvedNow->endOfDay();
 
         return $this;
     }
 
-    public function forType(?string $itemType): self
+    /**
+     * Build the base query (type + timeframe + optional filter), ordered chronologically.
+     *
+     * @throws LogicException
+     */
+    public function baseQuery(): Builder
     {
-        $this->itemType = $itemType;
+        if ($this->startDate === null || $this->endDate === null) {
+            throw new LogicException('Call setup() before building the query.');
+        }
 
-        return $this;
+        $marketHistoryTable = (new MarketHistory())->getTable();
+        $itemsTable = (new Item())->getTable();
+        $affixesTable = (new ItemAffix())->getTable();
+
+        $query = MarketHistory::query()
+            ->from($marketHistoryTable)
+            ->join($itemsTable, $itemsTable . '.id', '=', $marketHistoryTable . '.item_id')
+            ->leftJoin($affixesTable . ' as item_prefix', 'item_prefix.id', '=', $itemsTable . '.item_prefix_id')
+            ->leftJoin($affixesTable . ' as item_suffix', 'item_suffix.id', '=', $itemsTable . '.item_suffix_id')
+            ->where($itemsTable . '.type', $this->itemType)
+            ->whereBetween($marketHistoryTable . '.created_at', [$this->startDate, $this->endDate])
+            ->orderBy($marketHistoryTable . '.created_at');
+
+        $this->applyFilters($query, $itemsTable);
+
+        return $query->select([
+            $marketHistoryTable . '.sold_for as cost',
+            $marketHistoryTable . '.created_at as sold_when',
+            $itemsTable . '.name as item_name',
+            'item_prefix.name as prefix_name',
+            'item_suffix.name as suffix_name',
+        ]);
     }
 
-    public function forItemId(?int $itemId): self
+    public function clearFilters(): self
     {
-        $this->itemId = $itemId;
+        $this->filter = null;
 
         return $this;
     }
 
     public function addFilter(MarketHistorySecondaryFilter $filter): self
     {
-        if (! in_array($filter, $this->filters, true)) {
-            $this->filters[] = $filter;
-        }
-
-        return $this;
-    }
-
-    public function clearFilters(): self
-    {
-        $this->filters = [];
+        $this->filter = $filter;
 
         return $this;
     }
 
     /**
-     * @return array<int, array{date: string, cost: float|null}>
+     * Fetch the dataset in the shape:
+     * [
+     *   ['cost' => int, 'affix_name' => string, 'sold_when' => string],
+     *   ...
+     * ]
      */
-    public function toRecharts(): array
+    public function fetchDataSet(): Collection
     {
-        $rows = $this->dailyAverageRows();
-        $costByDate = $rows->mapWithKeys(static function (object $row): array {
-            return [$row->date => (float) $row->cost];
-        });
+        return $this->baseQuery()
+            ->get()
+            ->map(function (MarketHistory $marketHistory): array {
+                $itemName = (string) $marketHistory->getAttribute('item_name');
+                $prefixName = $marketHistory->getAttribute('prefix_name');
+                $suffixName = $marketHistory->getAttribute('suffix_name');
 
-        $series = [];
+                return [
+                    'cost' => (int) $marketHistory->getAttribute('cost'),
+                    'affix_name' => $this->formatAffixName(
+                        $itemName,
+                        is_string($prefixName) ? $prefixName : null,
+                        is_string($suffixName) ? $suffixName : null,
+                    ),
+                    'sold_when' => (string) $marketHistory->getAttribute('sold_when'),
+                ];
+            })
+            ->values();
+    }
 
-        for ($dayIndex = 0; $dayIndex < $this->days; $dayIndex++) {
-            $date = $this->startDate->addDays($dayIndex)->toDateString();
-
-            $series[] = [
-                'date' => $date,
-                'cost' => $costByDate[$date] ?? null,
-            ];
+    private function applyFilters(Builder $query, string $itemsTable): void
+    {
+        if ($this->filter === null) {
+            return;
         }
 
-        return $series;
+        match ($this->filter) {
+            MarketHistorySecondaryFilter::SingleEnchant => $query->where(function (Builder $nestedQuery) use ($itemsTable): void {
+                $nestedQuery
+                    ->where(function (Builder $innerQuery) use ($itemsTable): void {
+                        $innerQuery
+                            ->whereNotNull($itemsTable . '.item_prefix_id')
+                            ->whereNull($itemsTable . '.item_suffix_id');
+                    })
+                    ->orWhere(function (Builder $innerQuery) use ($itemsTable): void {
+                        $innerQuery
+                            ->whereNull($itemsTable . '.item_prefix_id')
+                            ->whereNotNull($itemsTable . '.item_suffix_id');
+                    });
+            }),
+            MarketHistorySecondaryFilter::DoubleEnchant => $query
+                ->whereNotNull($itemsTable . '.item_prefix_id')
+                ->whereNotNull($itemsTable . '.item_suffix_id'),
+            MarketHistorySecondaryFilter::Unique => $query->where(function (Builder $nestedQuery): void {
+                $nestedQuery
+                    ->where('item_prefix.randomly_generated', true)
+                    ->orWhere('item_suffix.randomly_generated', true);
+            }),
+            MarketHistorySecondaryFilter::Mythic => $query->where($itemsTable . '.is_mythic', true),
+            MarketHistorySecondaryFilter::Cosmic => $query->where($itemsTable . '.is_cosmic', true),
+        };
     }
 
-    /**
-     * @return Collection<int, object>
-     */
-    private function dailyAverageRows(): Collection
+    private function formatAffixName(string $itemName, ?string $prefixName, ?string $suffixName): string
     {
-        $query = $this->applyFilters($this->baseQuery());
+        $result = '';
 
-        return $query
-            ->selectRaw('DATE(mh.created_at) as date')
-            ->selectRaw('AVG(mh.sold_for) as cost')
-            ->groupBy(DB::raw('DATE(mh.created_at)'))
-            ->orderBy('date')
-            ->get();
-    }
-
-    private function baseQuery(): Builder
-    {
-        if (is_null($this->startDate) || is_null($this->endDate)) {
-            $this->setup();
+        if ($prefixName !== null && $prefixName !== '') {
+            $result = '*' . $prefixName . '* ' . $itemName;
         }
 
-        $query = MarketHistory::query()
-            ->from('market_history as mh')
-            ->join('items as i', 'i.id', '=', 'mh.item_id')
-            ->leftJoin('item_affixes as p', 'p.id', '=', 'i.item_prefix_id')
-            ->leftJoin('item_affixes as s', 's.id', '=', 'i.item_suffix_id')
-            ->whereBetween('mh.created_at', [$this->startDate, $this->endDate]);
-
-        if (! is_null($this->itemId)) {
-            $query->where('i.id', $this->itemId);
+        if ($suffixName !== null && $suffixName !== '') {
+            $result .= $result !== '' ? ' *' . $suffixName . '*' : $itemName . ' *' . $suffixName . '*';
         }
 
-        if (! is_null($this->itemType)) {
-            $query->where('i.type', $this->itemType);
-        }
-
-        return $query;
-    }
-
-    private function applyFilters(Builder $query): Builder
-    {
-        foreach ($this->filters as $filter) {
-            $query = match ($filter) {
-                MarketHistorySecondaryFilter::SingleEnchant => $this->applySingleEnchantFilter($query),
-                MarketHistorySecondaryFilter::DoubleEnchant => $this->applyDoubleEnchantFilter($query),
-                MarketHistorySecondaryFilter::Unique => $this->applyUniqueFilter($query),
-                MarketHistorySecondaryFilter::Mythic => $this->applyMythicFilter($query),
-                MarketHistorySecondaryFilter::Cosmic => $this->applyCosmicFilter($query),
-            };
-        }
-
-        return $query;
-    }
-
-    private function applySingleEnchantFilter(Builder $query): Builder
-    {
-        return $query->where(static function (Builder $innerQuery): void {
-            $innerQuery
-                ->where(static function (Builder $left): void {
-                    $left->whereNotNull('i.item_prefix_id')->whereNull('i.item_suffix_id');
-                })
-                ->orWhere(static function (Builder $right): void {
-                    $right->whereNull('i.item_prefix_id')->whereNotNull('i.item_suffix_id');
-                });
-        });
-    }
-
-    private function applyDoubleEnchantFilter(Builder $query): Builder
-    {
-        return $query
-            ->whereNotNull('i.item_prefix_id')
-            ->whereNotNull('i.item_suffix_id');
-    }
-
-    private function applyUniqueFilter(Builder $query): Builder
-    {
-        return $query->where(static function (Builder $innerQuery): void {
-            $innerQuery
-                ->where('p.randomly_generated', true)
-                ->orWhere('s.randomly_generated', true);
-        });
-    }
-
-    private function applyMythicFilter(Builder $query): Builder
-    {
-        return $query->where('i.is_mythic', true);
-    }
-
-    private function applyCosmicFilter(Builder $query): Builder
-    {
-        return $query->where('i.is_cosmic', true);
+        return $result === '' ? $itemName : $result;
     }
 }
