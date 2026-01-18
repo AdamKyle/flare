@@ -30,8 +30,7 @@ class MarketController extends Controller
         private readonly MarketItemsTransformer $transformer,
         private readonly CharacterInventoryService $characterInventoryService,
         private readonly MarketHistoryDailyPriceSeriesQueryBuilder $marketHistoryDailyPriceSeriesQueryBuilder,
-    ) {
-    }
+    ) {}
 
     public function marketItems(ChangeItemTypeRequest $request)
     {
@@ -93,12 +92,13 @@ class MarketController extends Controller
         ]);
     }
 
-    public function fetchMarketHistoryForItem(HistoryRequest $request): JsonResponse {
+    public function fetchMarketHistoryForItem(HistoryRequest $request): JsonResponse
+    {
 
         $builder = $this->marketHistoryDailyPriceSeriesQueryBuilder->setup($request->type, CarbonImmutable::now(), 90)->clearFilters();
 
-        if ($request->has('filter_type')) {
-            $type = MarketHistorySecondaryFilter::tryFrom($request->filter_type);
+        if ($request->has('filter')) {
+            $type = MarketHistorySecondaryFilter::tryFrom($request->filter);
 
             $builder = $builder->addFilter($type);
         }

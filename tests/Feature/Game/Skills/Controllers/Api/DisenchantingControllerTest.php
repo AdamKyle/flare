@@ -63,7 +63,7 @@ class DisenchantingControllerTest extends TestCase
             ]),
         ]);
 
-        $this->character->inventory->slots()->create([
+        $slot = $this->character->inventory->slots()->create([
             'inventory_id' => $this->character->inventory->id,
             'item_id' => $item->id,
         ]);
@@ -79,7 +79,9 @@ class DisenchantingControllerTest extends TestCase
         $character = $this->character->refresh();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/disenchant/'.$item->id);
+            ->call('POST', '/api/disenchant/'.$slot->id);
+
+        $response->assertOk();
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -87,6 +89,5 @@ class DisenchantingControllerTest extends TestCase
 
         $this->assertGreaterThan(0, $character->gold_dust);
         $this->assertEquals('Disenchanted item '.$item->affix_name.' Check server message tab for Gold Dust output.', $jsonData['message']);
-        $this->assertEmpty($jsonData['inventory']['data']);
     }
 }

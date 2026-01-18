@@ -274,18 +274,19 @@ class CharacterInventoryServiceTest extends TestCase
         $result = $this->characterInventoryService->setCharacter($character)->deleteItem(56788);
 
         $this->assertEquals(422, $result['status']);
-        $this->assertEquals('You don\'t own that item.', $result['message']);
+        $this->assertEquals('No matching item to destroy.', $result['message']);
     }
 
     public function test_cannot_delete_item_that_is_equipped()
     {
-
         $character = $this->character->inventoryManagement()->giveItem($this->createItem(), true, 'left_hand')->getCharacter();
 
-        $result = $this->characterInventoryService->setCharacter($character)->deleteItem($character->inventory->slots()->where('equipped', true)->first()->id);
+        $equippedSlot = $character->inventory->slots()->where('equipped', true)->first();
+
+        $result = $this->characterInventoryService->setCharacter($character)->deleteItem($equippedSlot->item_id);
 
         $this->assertEquals(422, $result['status']);
-        $this->assertEquals('Cannot destroy equipped item.', $result['message']);
+        $this->assertEquals('No matching item to destroy.', $result['message']);
     }
 
     public function test_can_delete_item_from_inventory()
@@ -294,10 +295,10 @@ class CharacterInventoryServiceTest extends TestCase
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
-        $result = $this->characterInventoryService->setCharacter($character)->deleteItem($character->inventory->slots->first()->id);
+        $result = $this->characterInventoryService->setCharacter($character)->deleteItem($item->id);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('Destroyed '.$item->affix_name.'.', $result['message']);
+        $this->assertEquals('Destroyed item: '.$item->affix_name.'.', $result['message']);
     }
 
     public function test_can_delete_artifact_with_item_skill_progression_from_inventory()
@@ -322,10 +323,10 @@ class CharacterInventoryServiceTest extends TestCase
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
-        $result = $this->characterInventoryService->setCharacter($character)->deleteItem($character->inventory->slots->first()->id);
+        $result = $this->characterInventoryService->setCharacter($character)->deleteItem($item->id);
 
-        $this->assertEquals(200, $result['status']);
-        $this->assertEquals('Destroyed '.$item->affix_name.'.', $result['message']);
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('No matching item to destroy.', $result['message']);
     }
 
     public function test_delete_all_items_in_inventory_with_out_destroying_usable_or_quest_items_all_artifacts()

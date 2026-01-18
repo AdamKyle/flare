@@ -55,19 +55,19 @@ class MarketHistoryDailyPriceSeriesQueryBuilder
 
         $query = MarketHistory::query()
             ->from($marketHistoryTable)
-            ->join($itemsTable, $itemsTable . '.id', '=', $marketHistoryTable . '.item_id')
-            ->leftJoin($affixesTable . ' as item_prefix', 'item_prefix.id', '=', $itemsTable . '.item_prefix_id')
-            ->leftJoin($affixesTable . ' as item_suffix', 'item_suffix.id', '=', $itemsTable . '.item_suffix_id')
-            ->where($itemsTable . '.type', $this->itemType)
-            ->whereBetween($marketHistoryTable . '.created_at', [$this->startDate, $this->endDate])
-            ->orderBy($marketHistoryTable . '.created_at');
+            ->join($itemsTable, $itemsTable.'.id', '=', $marketHistoryTable.'.item_id')
+            ->leftJoin($affixesTable.' as item_prefix', 'item_prefix.id', '=', $itemsTable.'.item_prefix_id')
+            ->leftJoin($affixesTable.' as item_suffix', 'item_suffix.id', '=', $itemsTable.'.item_suffix_id')
+            ->where($itemsTable.'.type', $this->itemType)
+            ->whereBetween($marketHistoryTable.'.created_at', [$this->startDate, $this->endDate])
+            ->orderBy($marketHistoryTable.'.created_at');
 
         $this->applyFilters($query, $itemsTable);
 
         return $query->select([
-            $marketHistoryTable . '.sold_for as cost',
-            $marketHistoryTable . '.created_at as sold_when',
-            $itemsTable . '.name as item_name',
+            $marketHistoryTable.'.sold_for as cost',
+            $marketHistoryTable.'.created_at as sold_when',
+            $itemsTable.'.name as item_name',
             'item_prefix.name as prefix_name',
             'item_suffix.name as suffix_name',
         ]);
@@ -127,25 +127,25 @@ class MarketHistoryDailyPriceSeriesQueryBuilder
                 $nestedQuery
                     ->where(function (Builder $innerQuery) use ($itemsTable): void {
                         $innerQuery
-                            ->whereNotNull($itemsTable . '.item_prefix_id')
-                            ->whereNull($itemsTable . '.item_suffix_id');
+                            ->whereNotNull($itemsTable.'.item_prefix_id')
+                            ->whereNull($itemsTable.'.item_suffix_id');
                     })
                     ->orWhere(function (Builder $innerQuery) use ($itemsTable): void {
                         $innerQuery
-                            ->whereNull($itemsTable . '.item_prefix_id')
-                            ->whereNotNull($itemsTable . '.item_suffix_id');
+                            ->whereNull($itemsTable.'.item_prefix_id')
+                            ->whereNotNull($itemsTable.'.item_suffix_id');
                     });
             }),
             MarketHistorySecondaryFilter::DoubleEnchant => $query
-                ->whereNotNull($itemsTable . '.item_prefix_id')
-                ->whereNotNull($itemsTable . '.item_suffix_id'),
+                ->whereNotNull($itemsTable.'.item_prefix_id')
+                ->whereNotNull($itemsTable.'.item_suffix_id'),
             MarketHistorySecondaryFilter::Unique => $query->where(function (Builder $nestedQuery): void {
                 $nestedQuery
                     ->where('item_prefix.randomly_generated', true)
                     ->orWhere('item_suffix.randomly_generated', true);
             }),
-            MarketHistorySecondaryFilter::Mythic => $query->where($itemsTable . '.is_mythic', true),
-            MarketHistorySecondaryFilter::Cosmic => $query->where($itemsTable . '.is_cosmic', true),
+            MarketHistorySecondaryFilter::Mythic => $query->where($itemsTable.'.is_mythic', true),
+            MarketHistorySecondaryFilter::Cosmic => $query->where($itemsTable.'.is_cosmic', true),
         };
     }
 
@@ -154,11 +154,11 @@ class MarketHistoryDailyPriceSeriesQueryBuilder
         $result = '';
 
         if ($prefixName !== null && $prefixName !== '') {
-            $result = '*' . $prefixName . '* ' . $itemName;
+            $result = '*'.$prefixName.'* '.$itemName;
         }
 
         if ($suffixName !== null && $suffixName !== '') {
-            $result .= $result !== '' ? ' *' . $suffixName . '*' : $itemName . ' *' . $suffixName . '*';
+            $result .= $result !== '' ? ' *'.$suffixName.'*' : $itemName.' *'.$suffixName.'*';
         }
 
         return $result === '' ? $itemName : $result;

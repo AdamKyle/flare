@@ -173,12 +173,10 @@ class DisenchantServiceTest extends TestCase
         $skillCheckServiceMock->shouldReceive('getDCCheck')->once()->andReturn(1);
         $skillCheckServiceMock->shouldReceive('characterRoll')->once()->andReturn(100);
 
-        $characterInventoryService = $this->app->make(CharacterInventoryService::class);
-
         // Create a mock for DisenchantService and allow mocking of protected methods
         $disenchantingService = Mockery::mock(
             DisenchantService::class,
-            [$skillCheckServiceMock, $characterInventoryService]
+            [$skillCheckServiceMock]
         )
             ->makePartial()
             ->shouldAllowMockingProtectedMethods()
@@ -215,12 +213,10 @@ class DisenchantServiceTest extends TestCase
         $skillCheckServiceMock->shouldReceive('getDCCheck')->once()->andReturn(1);
         $skillCheckServiceMock->shouldReceive('characterRoll')->once()->andReturn(100);
 
-        $characterInventoryService = $this->app->make(CharacterInventoryService::class);
-
         // Create a mock for DisenchantService and allow mocking of protected methods
         $disenchantingService = Mockery::mock(
             DisenchantService::class,
-            [$skillCheckServiceMock, $characterInventoryService]
+            [$skillCheckServiceMock]
         )
             ->makePartial()
             ->shouldAllowMockingProtectedMethods()
@@ -295,7 +291,7 @@ class DisenchantServiceTest extends TestCase
 
         $disenchantingService = \Mockery::mock(DisenchantService::class)->makePartial();
 
-        $disenchantingService->__construct(resolve(SkillCheckService::class), resolve(CharacterInventoryService::class));
+        $disenchantingService->__construct(resolve(SkillCheckService::class));
 
         $disenchantingService->shouldAllowMockingProtectedMethods()
             ->shouldReceive('fetchDCRoll')
@@ -440,28 +436,46 @@ class DisenchantServiceTest extends TestCase
     {
         $character = $this->character->getCharacter();
 
-        $disenchantingService = $this->app->make(DisenchantService::class);
-
         $item = $this->createItem();
 
-        $result = $disenchantingService->disenchantItem($character, $item);
+        $characterInventoryService = $this->app->make(CharacterInventoryService::class);
 
-        $this->assertEquals($item->affix_name.' Cannot be disenchanted. Not found in inventory.', $result['message']);
+        $result = $characterInventoryService->setCharacter($character)->disenchantItem($item->id);
+
+        $this->assertEquals('No item found to disenchant.', $result['message']);
         $this->assertEquals(422, $result['status']);
     }
 
     public function test_cannot_disentchant_item_that_is_not_enchanted()
     {
+        Event::fake();
+
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('getDCCheck')->once()->andReturn(1);
+                $mock->shouldReceive('characterRoll')->once()->andReturn(100);
+            })
+        );
+
         $item = $this->createItem();
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
+        $slot = $character->inventory->slots->first();
+
         $disenchantingService = $this->app->make(DisenchantService::class);
 
-        $result = $disenchantingService->disenchantItem($character, $item);
+        $result = $disenchantingService->setUp($character)->disenchantItem($slot);
 
-        $this->assertEquals($item->affix_name.' Cannot be disenchanted. Has no enchantments attached.', $result['message']);
-        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Disenchanted item '.$item->affix_name.' Check server message tab for Gold Dust output.', $result['message']);
+        $this->assertEquals(200, $result['status']);
+
+        $character = $character->refresh();
+
+        $this->assertEmpty($character->inventory->slots);
+
+        Event::assertDispatched(UpdateCharacterEnchantingList::class);
     }
 
     public function test_cannot_disentchant_item_is_a_quest_item()
@@ -478,11 +492,11 @@ class DisenchantServiceTest extends TestCase
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
-        $disenchantingService = $this->app->make(DisenchantService::class);
+        $characterInventoryService = $this->app->make(CharacterInventoryService::class);
 
-        $result = $disenchantingService->disenchantItem($character, $item);
+        $result = $characterInventoryService->setCharacter($character)->disenchantItem($item->id);
 
-        $this->assertEquals('Quest items cannot be disenchanted.', $result['message']);
+        $this->assertEquals('No item found to disenchant.', $result['message']);
         $this->assertEquals(422, $result['status']);
     }
 
@@ -490,9 +504,12 @@ class DisenchantServiceTest extends TestCase
     {
         $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->getCharacter();
 
+        $slot = $character->inventory->slots->first();
+
         $disenchantingService = $this->app->make(DisenchantService::class);
 
-        $result = $disenchantingService->disenchantItem($character, $this->itemToDisenchant, true);
+        $result = $disenchantingService->setUp($character)->disenchantItem($slot, true);
+
         $this->assertEquals(200, $result['status']);
     }
 
@@ -500,12 +517,13 @@ class DisenchantServiceTest extends TestCase
     {
         $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->getCharacter();
 
+        $slot = $character->inventory->slots->first();
+
         $disenchantingService = $this->app->make(DisenchantService::class);
 
-        $result = $disenchantingService->disenchantItem($character, $this->itemToDisenchant);
+        $result = $disenchantingService->setUp($character)->disenchantItem($slot);
 
         $this->assertEquals('Disenchanted item '.$this->itemToDisenchant->affix_name.' Check server message tab for Gold Dust output.', $result['message']);
-        $this->assertEmpty($result['inventory']['data']);
         $this->assertEquals(200, $result['status']);
     }
 }

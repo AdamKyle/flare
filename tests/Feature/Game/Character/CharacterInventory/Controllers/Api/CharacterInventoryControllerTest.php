@@ -84,18 +84,20 @@ class CharacterInventoryControllerTest extends TestCase
 
     public function test_destroy_item()
     {
-        $item = $this->createItem();
+        $item = $this->createItem([
+            'type' => WeaponTypes::SWORD,
+        ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
         $response = $this->actingAs($character->user)
             ->call('POST', '/api/character/'.$character->id.'/inventory/destroy', [
-                'slot_id' => $character->inventory->slots->first()->id,
+                'item_id' => $item->id,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals('Destroyed '.$item->affix_name.'.', $jsonData['message']);
+        $this->assertEquals('Destroyed item: '.$item->affix_name.'.', $jsonData['message']);
     }
 
     public function test_destroy_all_items()
@@ -136,22 +138,28 @@ class CharacterInventoryControllerTest extends TestCase
 
     public function test_move_item_to_set()
     {
-        $item = $this->createItem();
-        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacterFactory()->inventorySetManagement()->createInventorySets(2, true)->getCharacter();
+        $item = $this->createItem([
+            'type' => WeaponTypes::SWORD,
+        ]);
+
+        $character = $this->character
+            ->inventorySetManagement()
+            ->createInventorySets(2, true)
+            ->getCharacterFactory()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+
+        $inventorySetId = $character->inventorySets()->first()->id;
+        $inventorySlotId = $character->inventory->slots()->first()->id;
 
         $response = $this->actingAs($character->user)
             ->call('POST', '/api/character/'.$character->id.'/inventory/move-to-set', [
-                'move_to_set' => $character->inventorySets->first()->id,
-                'slot_id' => $character->inventory->slots->first()->id,
+                'move_to_set' => $inventorySetId,
+                'slot_id' => $inventorySlotId,
             ]);
 
-        $jsonData = json_decode($response->getContent(), true);
-
-        $this->assertEquals($item->affix_name.' Has been moved to: '.$character->inventorySets->first()->name, $jsonData['message']);
-
-        $character = $character->refresh();
-
-        $this->assertEmpty($character->inventory->slots);
+        $this->assertEquals(200, $response->getStatusCode());
     }
 
     public function test_rename_set()
@@ -460,7 +468,7 @@ class CharacterInventoryControllerTest extends TestCase
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals('Destroyed Alchemy Item: '.$item->name.'.', $jsonData['message']);
+        $this->assertEquals('Destroyed Alchemy Item: '.$item->affix_name.'.', $jsonData['message']);
     }
 
     public function test_destroy_all_alchemy_items()

@@ -18,21 +18,21 @@ class MarketHistoryDailyPriceSeriesQueryBuilderTest extends TestCase
 
     private ?MarketHistoryDailyPriceSeriesQueryBuilder $builder = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->builder = resolve(MarketHistoryDailyPriceSeriesQueryBuilder::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->builder = null;
     }
 
-    public function test_fetchDataSet_throws_when_setup_not_called(): void
+    public function test_fetch_data_set_throws_when_setup_not_called(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Call setup() before building the query.');
@@ -40,7 +40,7 @@ class MarketHistoryDailyPriceSeriesQueryBuilderTest extends TestCase
         $this->builder->fetchDataSet();
     }
 
-    public function test_fetchDataSet_returns_empty_array_when_base_query_has_no_results(): void
+    public function test_fetch_data_set_returns_empty_array_when_base_query_has_no_results(): void
     {
         $now = CarbonImmutable::now();
 
@@ -52,7 +52,7 @@ class MarketHistoryDailyPriceSeriesQueryBuilderTest extends TestCase
         $this->assertSame([], $data);
     }
 
-    public function test_fetchDataSet_returns_base_item_name_when_item_has_no_enchants(): void
+    public function test_fetch_data_set_returns_base_item_name_when_item_has_no_enchants(): void
     {
         $now = CarbonImmutable::now();
 
@@ -79,7 +79,7 @@ class MarketHistoryDailyPriceSeriesQueryBuilderTest extends TestCase
         $this->assertSame('Plain Sword', $data[0]['affix_name']);
     }
 
-    public function test_fetchDataSet_returns_each_sale_cost_in_order_and_includes_affix_name(): void
+    public function test_fetch_data_set_returns_each_sale_cost_in_order_and_includes_affix_name(): void
     {
         $now = CarbonImmutable::now();
 
@@ -503,7 +503,7 @@ class MarketHistoryDailyPriceSeriesQueryBuilderTest extends TestCase
         $this->assertSame([], $noneData);
     }
 
-    public function test_clearFilters_restores_unfiltered_results(): void
+    public function test_clear_filters_restores_unfiltered_results(): void
     {
         $now = CarbonImmutable::now();
 

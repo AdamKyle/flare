@@ -13,7 +13,22 @@ class DisenchantingController extends Controller
 
     public function disenchant(Item $item): JsonResponse
     {
-        $result = $this->disenchantService->disenchantItem(auth()->user()->character, $item);
+
+        $character = auth()->user()->character;
+
+        $slot = $character->inventory->slots()
+            ->whereHas('item', static function ($query) {
+                $query->whereNotIn('type', ['alchemy', 'quest', 'artifact', 'trinket']);
+            })
+            ->where('equipped', false)
+            ->where('item_id', $item->id)
+            ->first();
+
+        if (is_null($slot)) {
+            response()->json(['message' => 'Item does not exist.'], 422);
+        }
+
+        $result = $this->disenchantService->setUp($character)->disenchantItem($slot);
 
         $status = $result['status'];
         unset($result['status']);
