@@ -79,7 +79,7 @@ class DisenchantingControllerTest extends TestCase
         $character = $this->character->refresh();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/disenchant/'.$slot->id);
+            ->call('POST', '/api/disenchant/'.$slot->item->id);
 
         $response->assertOk();
 

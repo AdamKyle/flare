@@ -12,12 +12,13 @@ import MarketHistoryChartTooltip from './partials/item-market-listing/market-his
 import ListItemOnMarketProps from './types/list-item-on-market-props';
 import { MarketHistoryForTypeFilters } from '../../components/market/api/enums/market-history-for-type-filters';
 import { useGetMarketHistoryForType } from '../../components/market/api/hooks/use-get-market-history-for-type';
+import { UseListItemOnMarket } from '../../components/market/api/hooks/use-list-item-on-market';
 
 import { formatNumberWithCommas } from 'game-utils/format-number';
 
-import Button from 'ui/buttons/button';
 import DropdownButton from 'ui/buttons/drop-down-button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import IconButton from 'ui/buttons/icon-button';
 import LinkButton from 'ui/buttons/link-button';
 import LineChart from 'ui/charts/line-chart/line-chart';
 import Input from 'ui/input/input';
@@ -25,9 +26,21 @@ import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const MAX_LISTING_PRICE = 2000000000000;
 
-const ListItemOnMarket = ({ type, on_close }: ListItemOnMarketProps) => {
+const ListItemOnMarket = ({
+  type,
+  on_close,
+  on_action,
+  slot_id,
+  character_id,
+}: ListItemOnMarketProps) => {
   const { setRequestParams, error, data, loading } =
     useGetMarketHistoryForType();
+
+  const {
+    error: listItemError,
+    loading: listItemLoading,
+    setRequestParams: setListItemRequestParams,
+  } = UseListItemOnMarket();
 
   const [selectedFilter, setSelectedFilter] =
     useState<MarketHistoryForTypeFilters | null>(null);
@@ -141,7 +154,12 @@ const ListItemOnMarket = ({ type, on_close }: ListItemOnMarketProps) => {
   };
 
   const handleClickPrimaryButton = () => {
-    console.log(listingPrice);
+    setListItemRequestParams({
+      character_id: character_id,
+      slot_id: slot_id,
+      list_for: parseInt(listingPrice) || 0,
+      on_success: on_action,
+    });
   };
 
   const handleClickDangerButton = () => {
@@ -287,6 +305,26 @@ const ListItemOnMarket = ({ type, on_close }: ListItemOnMarketProps) => {
     );
   };
 
+  const renderListLoadingIcon = () => {
+    if (!listItemLoading) {
+      return null;
+    }
+
+    return <i className="fas fa-spinner fa-spin" aria-hidden="true"></i>;
+  };
+
+  const renderListingApiError = () => {
+    if (!listItemError) {
+      return null;
+    }
+
+    return (
+      <div className={'my-4'}>
+        <ApiErrorAlert apiError={listItemError.message} />
+      </div>
+    );
+  };
+
   if (loading) {
     return <InfiniteLoader />;
   }
@@ -339,6 +377,8 @@ const ListItemOnMarket = ({ type, on_close }: ListItemOnMarketProps) => {
 
       {renderChart()}
 
+      {renderListingApiError()}
+
       <div className="mt-1 flex w-full items-start gap-2">
         <div className="w-full">
           <Input
@@ -351,12 +391,13 @@ const ListItemOnMarket = ({ type, on_close }: ListItemOnMarketProps) => {
           {renderListingError()}
         </div>
 
-        <Button
+        <IconButton
+          disabled={isListDisabled || listItemLoading}
           on_click={handleClickPrimaryButton}
           label="List"
           variant={ButtonVariant.PRIMARY}
           additional_css="whitespace-nowrap"
-          disabled={isListDisabled}
+          icon={renderListLoadingIcon()}
         />
       </div>
     </div>

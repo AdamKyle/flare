@@ -6,7 +6,6 @@ use App\Flare\Models\Character;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Traits\IsItemUnique;
 use App\Flare\Transformers\MarketItemsTransformer;
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Traits\UpdateMarketBoard;
 use App\Game\Market\Builders\MarketHistoryDailyPriceSeriesQueryBuilder;
@@ -45,7 +44,7 @@ class MarketController extends Controller
         return response()->json([
             'items' => $items,
             'gold' => auth()->user()->character->gold,
-        ], 200);
+        ]);
     }
 
     public function sellItem(ListPriceRequest $request, Character $character)
@@ -65,10 +64,6 @@ class MarketController extends Controller
 
         $listPrice = $request->list_for;
 
-        if ($listPrice > MaxCurrenciesValue::MAX_GOLD) {
-            $listPrice = MaxCurrenciesValue::MAX_GOLD;
-        }
-
         MarketBoard::create([
             'character_id' => auth()->user()->character->id,
             'item_id' => $slot->item->id,
@@ -81,14 +76,8 @@ class MarketController extends Controller
 
         $this->sendUpdate($this->transformer, $this->manager);
 
-        $inventory = $this->characterInventoryService->setCharacter($character->refresh());
-
         return response()->json([
             'message' => 'Listed: '.$itemName.' For: '.number_format($listPrice).' Gold.',
-            'inventory' => [
-                'inventory' => $inventory->getInventoryForType('inventory'),
-                'usable_items' => $inventory->getInventoryForType('usable_items'),
-            ],
         ]);
     }
 

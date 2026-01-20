@@ -193,7 +193,13 @@ const InventoryItem = ({
 
     if (listItem) {
       return (
-        <ListItemOnMarket type={data.type} on_close={handleCloseListSection} />
+        <ListItemOnMarket
+          type={data.type}
+          on_close={handleCloseListSection}
+          character_id={character_id}
+          slot_id={data?.slot_id || 0}
+          on_action={on_action}
+        />
       );
     }
 

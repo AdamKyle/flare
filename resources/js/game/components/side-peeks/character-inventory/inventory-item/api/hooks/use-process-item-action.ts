@@ -74,8 +74,6 @@ export const useProcessItemAction = (): UseProcessItemActionDefinition => {
         item_id: requestData.item_id,
       });
 
-      console.log(result);
-
       requestData.on_success(result.message);
     } catch (err) {
       if (err instanceof AxiosError) {
