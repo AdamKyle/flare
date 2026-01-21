@@ -21,4 +21,5 @@ export default interface BaseQuestItemDefinition extends BaseItemDetails {
   required_quests: QuestInfoDefinition[];
   reward_quests: QuestInfoDefinition[];
   required_locations: LocationInfoDefinition[];
+  min_list_price: number;
 }

@@ -32,6 +32,7 @@ const ListItemOnMarket = ({
   on_action,
   slot_id,
   character_id,
+  min_list_price
 }: ListItemOnMarketProps) => {
   const { setRequestParams, error, data, loading } =
     useGetMarketHistoryForType();
@@ -45,7 +46,7 @@ const ListItemOnMarket = ({
   const [selectedFilter, setSelectedFilter] =
     useState<MarketHistoryForTypeFilters | null>(null);
 
-  const [listingPrice, setListingPrice] = useState<string>('');
+  const [listingPrice, setListingPrice] = useState(min_list_price);
   const [inputError, setInputError] = useState<string | null>(null);
 
   const dropdownLabel = selectedFilter ? FILTER_LABELS[selectedFilter] : 'All';
@@ -127,29 +128,20 @@ const ListItemOnMarket = ({
   };
 
   const handleChangeInput = (nextValue: string) => {
-    const sanitizedValue = nextValue.replace(/[^\d]/g, '');
 
-    if (sanitizedValue === '') {
-      setListingPrice('');
-      setInputError(null);
-      return;
-    }
-
-    const parsedValue = Number(sanitizedValue);
+    const parsedValue = parseInt(nextValue) || 0;
 
     if (!Number.isFinite(parsedValue)) {
-      setListingPrice('');
+      setListingPrice(0);
       setInputError('Please enter a valid number.');
       return;
     }
 
     if (parsedValue > MAX_LISTING_PRICE) {
-      setListingPrice(sanitizedValue);
       setInputError('Max price is 2,000,000,000,000 gold.');
       return;
     }
 
-    setListingPrice(sanitizedValue);
     setInputError(null);
   };
 
@@ -157,7 +149,7 @@ const ListItemOnMarket = ({
     setListItemRequestParams({
       character_id: character_id,
       slot_id: slot_id,
-      list_for: parseInt(listingPrice) || 0,
+      list_for: listingPrice,
       on_success: on_action,
     });
   };
@@ -386,7 +378,7 @@ const ListItemOnMarket = ({
             clearable
             place_holder="Enter a price..."
             disabled={false}
-            value={listingPrice}
+            value={listingPrice.toString()}
           />
           {renderListingError()}
         </div>

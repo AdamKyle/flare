@@ -76,6 +76,8 @@ export default interface EquippableItemDefinition {
   spell_evasion: number;
   healing_reduction: number;
   resurrection_chance: number;
+
+  min_list_price: number;
 }
 
 export type EquippableItemWithBase = EquippableItemDefinition & BaseItemDetails;

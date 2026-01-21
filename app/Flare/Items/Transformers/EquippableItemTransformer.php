@@ -2,6 +2,7 @@
 
 namespace App\Flare\Items\Transformers;
 
+use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
 use App\Flare\Traits\IsItemUnique;
@@ -88,6 +89,7 @@ class EquippableItemTransformer extends TransformerAbstract
             'affix_damage_reduction' => $slot->item->affix_damage_reduction,
             'resurrection_chance' => $slot->item->resurrection_chance,
             'position' => $slot->position,
+            'min_list_price' => SellItemCalculator::fetchMinPrice($slot->item),
         ];
     }
 }

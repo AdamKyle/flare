@@ -199,6 +199,7 @@ const InventoryItem = ({
           character_id={character_id}
           slot_id={data?.slot_id || 0}
           on_action={on_action}
+          min_list_price={data.min_list_price}
         />
       );
     }
