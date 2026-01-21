@@ -32,6 +32,7 @@ import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import StackedCard from 'ui/cards/stacked-card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import Separator from 'ui/separator/separator';
+import MoveToSet from "./partials/move-to-set/move-to-set";
 
 const InventoryItem = ({
   slot_id,
@@ -41,7 +42,8 @@ const InventoryItem = ({
   const [itemAffixToView, setItemAffixToView] = useState<number | null>(null);
   const [shouldViewHolyStacks, setShouldViewHolyStacks] = useState(false);
   const [viewingEquip, setViewingEquip] = useState(false);
-  const [listItem, setListItem] = useState<boolean>(false);
+  const [listItem, setListItem] = useState(false);
+  const [moveItem, setMoveItem] = useState(false);
   const [selectedItemAction, setSelectedItemAction] =
     useState<ItemActions | null>(null);
 
@@ -107,6 +109,12 @@ const InventoryItem = ({
       return;
     }
 
+    if (action === ItemActions.MOVE_TO_SET) {
+      setMoveItem(true);
+
+      return;
+    }
+
     setSelectedItemAction(action);
   };
 
@@ -116,6 +124,10 @@ const InventoryItem = ({
 
   const handleCloseListSection = () => {
     setListItem(false);
+  };
+
+  const handleCloseMoveToSet = () => {
+    setMoveItem(false);
   };
 
   const handleItemActionConfirmation = (itemAction: ItemActions) => {
@@ -143,6 +155,18 @@ const InventoryItem = ({
       </StackedCard>
     );
   };
+
+  const renderMoveToSet = () => {
+    if (!moveItem) {
+      return null;
+    }
+
+    return (
+      <StackedCard on_close={handleCloseMoveToSet} >
+        <MoveToSet />
+      </StackedCard>
+    )
+  }
 
   const renderItemAffixView = () => {
     if (!itemAffixToView) {
@@ -302,6 +326,7 @@ const InventoryItem = ({
       </div>
       <AnimatePresence mode="wait">{renderEquipItem()}</AnimatePresence>
       <AnimatePresence mode="wait">{renderItemAffixView()}</AnimatePresence>
+      <AnimatePresence mode="wait">{renderMoveToSet()}</AnimatePresence>
       <AnimatePresence mode="wait">
         {renderAttachedHolyStacksView()}
       </AnimatePresence>

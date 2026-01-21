@@ -16,7 +16,7 @@ import { UseListItemOnMarket } from '../../components/market/api/hooks/use-list-
 
 import { formatNumberWithCommas } from 'game-utils/format-number';
 
-import DropdownButton from 'ui/buttons/drop-down-button';
+import DropDownButton from 'ui/buttons/drop-down-button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import IconButton from 'ui/buttons/icon-button';
 import LinkButton from 'ui/buttons/link-button';
@@ -32,7 +32,7 @@ const ListItemOnMarket = ({
   on_action,
   slot_id,
   character_id,
-  min_list_price
+  min_list_price,
 }: ListItemOnMarketProps) => {
   const { setRequestParams, error, data, loading } =
     useGetMarketHistoryForType();
@@ -128,7 +128,6 @@ const ListItemOnMarket = ({
   };
 
   const handleChangeInput = (nextValue: string) => {
-
     const parsedValue = parseInt(nextValue) || 0;
 
     if (!Number.isFinite(parsedValue)) {
@@ -163,36 +162,15 @@ const ListItemOnMarket = ({
     handleClearFilters();
   };
 
-  const renderFilterOptionButtons = () => {
-    if (FILTER_OPTIONS.length === 0) {
-      return null;
-    }
-
-    return FILTER_OPTIONS.map((filter) => {
-      return (
-        <button
-          key={filter}
-          type="button"
-          role="menuitem"
-          className="rounded-sm px-2 py-1 text-left hover:bg-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:hover:bg-gray-500"
-          onClick={() => {
-            handleApplyFilter(filter);
-          }}
-        >
-          {FILTER_LABELS[filter]}
-        </button>
-      );
-    });
-  };
-
-  const renderFilterOptions = () => {
-    const renderedFilterOptionButtons = renderFilterOptionButtons();
-
-    if (!renderedFilterOptionButtons) {
-      return null;
-    }
-
-    return <>{renderedFilterOptionButtons}</>;
+  const filterDropDownData = {
+    dropdown_label: dropdownLabel,
+    items: FILTER_OPTIONS.map((filter) => {
+      return {
+        label: FILTER_LABELS[filter],
+        value: filter,
+        aria_label: FILTER_LABELS[filter],
+      };
+    }),
   };
 
   const renderChart = () => {
@@ -362,9 +340,11 @@ const ListItemOnMarket = ({
           additional_css="whitespace-nowrap"
         />
 
-        <DropdownButton label={dropdownLabel} variant={ButtonVariant.PRIMARY}>
-          {renderFilterOptions()}
-        </DropdownButton>
+        <DropDownButton
+          data={filterDropDownData}
+          on_select={handleApplyFilter}
+          disabled={FILTER_OPTIONS.length === 0}
+        />
       </div>
 
       {renderChart()}

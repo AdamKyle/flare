@@ -1,128 +1,63 @@
-import clsx from 'clsx';
-import React, { useId, useRef, useState } from 'react';
+import React, { ReactNode } from 'react';
 
-import { baseStyles } from './styles/button/base-styles';
-import { variantStyles } from './styles/button/variant-styles';
+import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import DropDownProps from "ui/buttons/types/drop-down-props";
+import DropDownButtonBase from "ui/buttons/drop-down-button-base";
 
-import DropdownButtonProps from 'ui/buttons/types/drop-down-button-props';
 
-const DropdownButton = ({
-  label,
-  variant,
-  children,
-  on_click,
+const DropDownButton = <T,>({
+  data,
+  on_select,
   disabled,
-  additional_css,
-  aria_label,
-}: DropdownButtonProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isAlignedRight, setIsAlignedRight] = useState(false);
-  const idBase = useId();
-  const buttonRef = useRef<HTMLButtonElement | null>(null);
+}: DropDownProps<T>) => {
+  const itemClassName =
+    'inline-flex w-full items-center justify-start rounded-md px-3 py-2 text-left transition-colors ' +
+    'bg-gray-300 dark:bg-gray-500 hover:bg-gray-400 hover:text-gray-600 ' +
+    'dark:bg-gray-400 dark:hover:bg-gray-400 hover:text-gray-800 text-gray-600 dark:text-gray-800 ' +
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-gray-600 my-1';
 
-  const buttonId = `${idBase}-button`;
-  const menuId = `${idBase}-menu`;
-
-  const handleToggle = (): void => {
-    if (disabled) {
-      return;
-    }
-
-    if (!isOpen && buttonRef.current && typeof window !== 'undefined') {
-      const buttonRect = buttonRef.current.getBoundingClientRect();
-      const estimatedMenuWidth = 176;
-
-      const willOverflowRight =
-        buttonRect.left + estimatedMenuWidth > window.innerWidth;
-
-      setIsAlignedRight(willOverflowRight);
-    }
-
-    setIsOpen((previousIsOpen) => !previousIsOpen);
-
-    if (on_click) {
-      on_click();
-    }
+  const handleSelect = (value: T) => {
+    on_select(value);
   };
 
-  const handleMenuClick = (): void => {
-    if (!isOpen) {
-      return;
-    }
-
-    setIsOpen(false);
+  const renderIcon = (icon: ReactNode) => {
+    return <span className="me-2 inline-flex items-center">{icon}</span>;
   };
 
-  const renderButton = () => {
-    const iconClassName = clsx(
-      'ms-1.5 -me-0.5 h-4 w-4',
-      'fas',
-      isOpen ? 'fa-chevron-up' : 'fa-chevron-down'
-    );
+  const renderItems = () => {
+    return data.items.map((dataItem) => {
+      const resolvedItemClassName = dataItem.class_name
+        ? `${itemClassName} ${dataItem.class_name}`
+        : itemClassName;
 
-    return (
-      <button
-        ref={buttonRef}
-        id={buttonId}
-        onClick={handleToggle}
-        className={clsx(
-          'box-border inline-flex items-center justify-center border border-transparent',
-          baseStyles(),
-          variantStyles(variant),
-          additional_css
-        )}
-        aria-label={aria_label || label}
-        aria-haspopup="menu"
-        aria-expanded={isOpen}
-        aria-controls={menuId}
-        disabled={disabled}
-        role="button"
-        type="button"
-      >
-        <span>{label}</span>
-        <i className={iconClassName} aria-hidden="true" />
-      </button>
-    );
-  };
-
-  const renderMenu = () => {
-    if (!isOpen) {
-      return null;
-    }
-
-    const childrenArray = React.Children.toArray(children);
-
-    return (
-      <div
-        id={menuId}
-        className={clsx(
-          'absolute top-full z-10 mt-3 w-44 rounded-md border-1',
-          'border-gray-100 bg-gray-200 dark:border-gray-500 dark:bg-gray-600',
-          isAlignedRight ? 'right-0' : 'left-0'
-        )}
-        role="menu"
-        aria-labelledby={buttonId}
-        onClick={handleMenuClick}
-      >
-        <div className="text-body flex flex-col bg-gray-200 p-2 text-sm font-medium dark:bg-gray-600">
-          {childrenArray.map((child, index) => {
-            return (
-              <React.Fragment key={`dropdown-menu-item-${index}`}>
-                {child}
-              </React.Fragment>
-            );
-          })}
-        </div>
-      </div>
-    );
+      return (
+        <button
+          key={dataItem.aria_label}
+          type="button"
+          onClick={() => {
+            handleSelect(dataItem.value);
+          }}
+          className={resolvedItemClassName}
+          role="menuitem"
+          aria-label={dataItem.aria_label}
+          disabled={disabled}
+        >
+          {dataItem.icon ? renderIcon(dataItem.icon) : null}
+          {dataItem.label}
+        </button>
+      );
+    });
   };
 
   return (
-    <div className="relative inline-flex flex-col">
-      {renderButton()}
-      {renderMenu()}
-    </div>
+    <DropDownButtonBase
+      label={data.dropdown_label}
+      variant={ButtonVariant.PRIMARY}
+      disabled={disabled}
+    >
+      {renderItems()}
+    </DropDownButtonBase>
   );
 };
 
-export default DropdownButton;
+export default DropDownButton;
