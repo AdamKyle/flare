@@ -1,13 +1,17 @@
 import React from 'react';
 
-import Section from '../../../../../../reusable-components/viewable-sections/section';
+import MoveToSetProps from './types/move-to-set-props';
+import SetChoices from '../../../sets/set-choices';
 
-const MoveToSet = () => {
+import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
+import Separator from 'ui/separator/separator';
+
+const MoveToSet = ({ character_id }: MoveToSetProps) => {
   return (
-    <Section title="Move to set">
+    <>
       <div className="prose dark:prose-invert">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-          Rules
+          Move To Set - Rules
         </h2>
 
         <p className="mt-2 text-sm leading-6 text-gray-700 dark:text-gray-300">
@@ -23,8 +27,7 @@ const MoveToSet = () => {
                 Hands:
               </span>{' '}
               1 or 2 weapons for hands, or 1 or 2 shields or 1 duel wielded
-              weapon (bow, hammer or stave). Guns, Fans, Scratch Awls and Maces
-              follow the same rules
+              weapon (bow, hammer or stave).
             </span>
           </li>
 
@@ -34,7 +37,7 @@ const MoveToSet = () => {
               <span className="font-semibold text-gray-900 dark:text-gray-100">
                 Armour:
               </span>{' '}
-              1 of each type, body, head, leggings ...
+              1 of each type, body, head, leggings, sleeves, gloves and feet
             </span>
           </li>
 
@@ -74,7 +77,8 @@ const MoveToSet = () => {
               <span className="font-semibold text-gray-900 dark:text-gray-100">
                 Uniques (green items):
               </span>{' '}
-              1 unique, regardless of type.
+              Max of 1 item regardless of type. Ie, if you have a unique helmet,
+              you cannot have a unique ring as well.<sup>*</sup>
             </span>
           </li>
 
@@ -84,7 +88,8 @@ const MoveToSet = () => {
               <span className="font-semibold text-gray-900 dark:text-gray-100">
                 Mythics (orange items):
               </span>{' '}
-              1 Mythic, if there is no Unique, regardless of type.
+              Max of 1 item regardless of type. Ie, if you have a mythic helmet,
+              you cannot have a mythic ring as well.<sup>*</sup>
             </span>
           </li>
 
@@ -94,7 +99,8 @@ const MoveToSet = () => {
               <span className="font-semibold text-gray-900 dark:text-gray-100">
                 Comsic (light purple items):
               </span>{' '}
-              1 Cosmic, if there is no Unique OR Mythic, regardless of type.
+              Max of 1 item regardless of type. Ie, if you have a cosmic helmet,
+              you cannot have a cosmic ring as well.<sup>*</sup>
             </span>
           </li>
 
@@ -110,11 +116,27 @@ const MoveToSet = () => {
         </ul>
 
         <p className="mt-3 text-sm leading-6 text-gray-700 dark:text-gray-300">
+          <sup>*</sup>
+          <strong>Note:</strong> A Set may only have one unique OR one mythic OR
+          one cosmic. You may not have one of each type.
+        </p>
+
+        <p className="mt-3 text-sm leading-6 text-gray-700 dark:text-gray-300">
           The above rules only apply to characters who want to equip the set,
           You may also use a set as a stash tab with unlimited items.
         </p>
       </div>
-    </Section>
+      <Separator />
+      <div>
+        <SetChoices
+          character_id={character_id}
+          on_set_change={(selectedSet: DropdownItem) => {
+            console.log(selectedSet);
+          }}
+          on_set_selection_clear={() => {}}
+        />
+      </div>
+    </>
   );
 };
 

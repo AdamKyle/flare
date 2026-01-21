@@ -102,6 +102,7 @@ const Sets = ({ character_id }: SetsProps): ReactNode => {
           character_id={character_id}
           on_set_change={handleSetChange}
           on_set_selection_clear={handleClearSetSelection}
+          set_equipped_set_name
         />
       </div>
       <div className="min-h-0 flex-1">

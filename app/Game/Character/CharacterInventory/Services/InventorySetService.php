@@ -13,6 +13,8 @@ use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\NpcActions\LabyrinthOracle\Events\LabyrinthOracleUpdate;
+use Exception;
+use Psr\SimpleCache\InvalidArgumentException;
 
 class InventorySetService
 {
@@ -441,7 +443,7 @@ class InventorySetService
     /**
      * Updates the character stats.
      *
-     * @throws Exception
+     * @throws Exception|InvalidArgumentException
      */
     protected function updateCharacterAttackDataCache(Character $character): void
     {

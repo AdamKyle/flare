@@ -16,6 +16,7 @@ const SetChoices = ({
   character_id,
   on_set_change,
   on_set_selection_clear,
+  set_equipped_set_name,
 }: SetChoicesProps) => {
   const { data, error, loading, onEndReached } =
     UsePaginatedApiHandler<SetOptionDefinition>({
@@ -35,6 +36,10 @@ const SetChoices = ({
   }, [data]);
 
   const preSelectedSetOption = useMemo((): DropdownItem | undefined => {
+    if (!set_equipped_set_name) {
+      return undefined;
+    }
+
     const equippedSet = data.find((set: SetOptionDefinition) => set.equipped);
 
     if (!equippedSet) {

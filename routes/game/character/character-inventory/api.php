@@ -47,5 +47,4 @@ Route::group(['middleware' => ['is.character.dead']], function () {
     Route::post('/character/{character}/inventory/sell-item', ['uses' => 'Api\CharacterInventoryController@sellItem']);
     Route::post('/character/{character}/inventory/disenchant-item', ['uses' => 'Api\CharacterInventoryController@disenchantItem']);
     Route::post('/character/{character}/inventory/move-to-set', ['uses' => 'Api\CharacterInventoryController@moveItemToSet']);
-    Route::post('/character/{character}/inventory/list-item', ['uses' => 'Api\CharacterInventoryController@listItem']);
 });

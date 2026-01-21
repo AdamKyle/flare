@@ -75,6 +75,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(QuestItemTransformer::class),
                 $app->make(UsableItemTransformer::class),
                 $app->make(InventoryTransformer::class),
+                $app->make(InventorySetService::class),
                 $app->make(MassDisenchantService::class),
                 $app->make(UpdateCharacterSkillsService::class),
                 $app->make(UpdateCharacterAttackTypesHandler::class),

@@ -69,7 +69,7 @@ const Dropdown = ({
       element?.scrollIntoView({ block: 'nearest' });
     }
 
-    if (pre_selected_item) {
+    if (pre_selected_item && selectedValue === '') {
       setSelectedValue(pre_selected_item.value);
     }
 
@@ -307,7 +307,7 @@ const Dropdown = ({
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search..."
               aria-label="Search"
-              className="w-full rounded-sm border-0 bg-transparent px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full rounded-sm border border-solid border-gray-500 bg-transparent px-3 py-2 text-sm text-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-300 dark:text-gray-300"
             />
           </div>
           <InfiniteScroll

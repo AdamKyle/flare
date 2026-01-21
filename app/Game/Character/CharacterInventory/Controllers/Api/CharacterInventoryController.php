@@ -8,7 +8,6 @@ use App\Flare\Models\Character;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
 use App\Flare\Pagination\Requests\PaginationRequest;
-use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Requests\EquipItemValidation;
 use App\Game\Character\CharacterInventory\Requests\InventoryActionRequest;
 use App\Game\Character\CharacterInventory\Requests\MoveItemRequest;
@@ -19,7 +18,6 @@ use App\Game\Character\CharacterInventory\Requests\UseManyItemsValidation;
 use App\Game\Character\CharacterInventory\Requests\ViewInventoryItemRequest;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
-use App\Game\Character\CharacterInventory\Services\InventorySetService;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Http\Controllers\Controller;
 use Exception;
@@ -30,8 +28,6 @@ class CharacterInventoryController extends Controller
 {
     public function __construct(
         private readonly CharacterInventoryService $characterInventoryService,
-        private readonly InventorySetService $inventorySetService,
-        private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
         private readonly UseItemService $useItemService,
     ) {}
 
@@ -314,16 +310,4 @@ class CharacterInventoryController extends Controller
     }
 
     public function moveItemToSet() {}
-
-    public function listItem() {}
-
-    /**
-     * Updates the character stats.
-     *
-     * @throws Exception
-     */
-    protected function updateCharacterAttackDataCache(Character $character): void
-    {
-        $this->updateCharacterAttackTypes->updateCache($character);
-    }
 }

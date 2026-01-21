@@ -54,6 +54,7 @@ class CharacterInventoryService
         private readonly QuestItemTransformer $questItemTransformer,
         private readonly UsableItemTransformer $usableItemTransformer,
         private readonly InventoryTransformer $inventoryTransformer,
+        private readonly InventorySetService $inventorySetService,
         private readonly MassDisenchantService $massDisenchantService,
         private readonly UpdateCharacterSkillsService $updateCharacterSkillsService,
         private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler,
@@ -213,6 +214,7 @@ class CharacterInventoryService
                     'equippable' => $inventorySet->can_be_equipped,
                     'set_id' => $inventorySet->id,
                     'equipped' => $inventorySet->is_equipped,
+                    'is_equippable' => $this->inventorySetService->isSetEquippable($inventorySet),
                 ];
             } else {
                 $sets[] = [
@@ -220,6 +222,7 @@ class CharacterInventoryService
                     'equippable' => $inventorySet->can_be_equipped,
                     'set_id' => $inventorySet->id,
                     'equipped' => $inventorySet->is_equipped,
+                    'is_equippable' => $this->inventorySetService->isSetEquippable($inventorySet),
                 ];
             }
         }
@@ -358,18 +361,19 @@ class CharacterInventoryService
      */
     public function getUsableSets(): array
     {
-        $ids = InventorySet::where('is_equipped', false)->where('character_id', $this->character->id)->pluck('id')->toArray();
+        $selectableSets = InventorySet::where('is_equipped', false)->where('character_id', $this->character->id)->toArray();
         $setIds = InventorySet::where('character_id', $this->character->id)->pluck('id')->toArray();
 
         $indexes = [];
 
-        foreach ($ids as $id) {
-            $inventorySet = InventorySet::find($id);
+        foreach ($selectableSets as $selectableSet) {
+
+            $setIndex = array_search($selectableSet->id, $setIds) + 1;
 
             $indexes[] = [
-                'index' => array_search($id, $setIds) + 1,
-                'id' => $id,
-                'name' => is_null($inventorySet->name) ? 'Set '.array_search($id, $setIds) + 1 : $inventorySet->name,
+                'index' => $setIndex,
+                'id' => $selectableSet->id,
+                'name' => is_null($selectableSet->name) ? 'Set '.$setIndex : $selectableSet->name,
                 'equipped' => false,
             ];
         }
