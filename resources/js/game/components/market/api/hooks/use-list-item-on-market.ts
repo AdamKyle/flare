@@ -59,6 +59,7 @@ export const UseListItemOnMarket = (): UseListItemOnMarketDefinition => {
     } finally {
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestParams]);
 
   useEffect(() => {

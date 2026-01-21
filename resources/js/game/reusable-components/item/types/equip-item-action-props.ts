@@ -8,5 +8,4 @@ export default interface EquipItemActionProps {
   ) => void;
   on_close_equip_action?: () => void;
   is_processing: boolean;
-  is_equipping?: boolean;
 }

@@ -183,7 +183,6 @@ const EquipItem = ({
         comparison_details={data}
         on_confirm_action={handleEquipItem}
         is_processing={equipmentIsLoading}
-        is_equipping
       />
       {renderTabsOrComparison()}
     </>

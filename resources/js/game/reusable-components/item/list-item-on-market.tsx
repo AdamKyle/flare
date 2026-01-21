@@ -117,6 +117,7 @@ const ListItemOnMarket = ({
 
   useEffect(() => {
     handleLoadMarketHistoryForFilter(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type]);
 
   const handleApplyFilter = (filter: MarketHistoryForTypeFilters) => {
@@ -158,7 +159,6 @@ const ListItemOnMarket = ({
   };
 
   const handleClickClearFilterButton = () => {
-    console.log('clear filter button clicked');
     handleClearFilters();
   };
 

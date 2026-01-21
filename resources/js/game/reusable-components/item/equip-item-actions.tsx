@@ -26,7 +26,6 @@ const EquipItemActions = ({
   on_confirm_action,
   on_close_equip_action,
   is_processing,
-  is_equipping,
 }: EquipItemActionProps) => {
   const [equippedPosition, setEquippedPosition] =
     useState<ItemPositions | null>(null);

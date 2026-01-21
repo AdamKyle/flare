@@ -87,6 +87,7 @@ export const useProcessItemAction = (): UseProcessItemActionDefinition => {
     } finally {
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestData]);
 
   useEffect(() => {

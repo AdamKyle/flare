@@ -61,6 +61,7 @@ export const useGetMarketHistoryForType =
       } finally {
         setLoading(false);
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [url, apiHandler, requestParams]);
 
     useEffect(() => {
