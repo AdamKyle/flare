@@ -47,6 +47,7 @@ const SetChoices = ({
     }
 
     return { label: equippedSet.name, value: equippedSet.set_id };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   const handleSetSelection = (selectedSet: DropdownItem) => {
