@@ -361,7 +361,7 @@ class CharacterInventoryService
      */
     public function getUsableSets(): array
     {
-        $selectableSets = InventorySet::where('is_equipped', false)->where('character_id', $this->character->id)->toArray();
+        $selectableSets = InventorySet::where('is_equipped', false)->where('character_id', $this->character->id)->get();
         $setIds = InventorySet::where('character_id', $this->character->id)->pluck('id')->toArray();
 
         $indexes = [];

@@ -18,6 +18,7 @@ use App\Game\Character\CharacterInventory\Requests\UseManyItemsValidation;
 use App\Game\Character\CharacterInventory\Requests\ViewInventoryItemRequest;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
+use App\Game\Character\CharacterInventory\Services\InventorySetService;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Http\Controllers\Controller;
 use Exception;
@@ -28,6 +29,7 @@ class CharacterInventoryController extends Controller
 {
     public function __construct(
         private readonly CharacterInventoryService $characterInventoryService,
+        private readonly InventorySetService $inventorySetService,
         private readonly UseItemService $useItemService,
     ) {}
 
