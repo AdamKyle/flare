@@ -1,9 +1,8 @@
 import React, { ReactNode } from 'react';
 
+import DropDownButtonBase from 'ui/buttons/drop-down-button-base';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
-import DropDownProps from "ui/buttons/types/drop-down-props";
-import DropDownButtonBase from "ui/buttons/drop-down-button-base";
-
+import DropDownProps from 'ui/buttons/types/drop-down-props';
 
 const DropDownButton = <T,>({
   data,

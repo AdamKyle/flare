@@ -19,6 +19,7 @@ import HealingSection from './partials/item-view/healing-section';
 import HolyStacksSection from './partials/item-view/holy-stacks-section';
 import ItemMetaSection from './partials/item-view/item-meta-tsx';
 import StatsSection from './partials/item-view/stats-section';
+import MoveToSet from './partials/move-to-set/move-to-set';
 import InventoryItemProps from './types/inventory-item-props';
 import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import { ItemActions } from '../../../../reusable-components/item/enums/item-actions';
@@ -32,7 +33,6 @@ import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import StackedCard from 'ui/cards/stacked-card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import Separator from 'ui/separator/separator';
-import MoveToSet from "./partials/move-to-set/move-to-set";
 
 const InventoryItem = ({
   slot_id,
@@ -162,11 +162,11 @@ const InventoryItem = ({
     }
 
     return (
-      <StackedCard on_close={handleCloseMoveToSet} >
+      <StackedCard on_close={handleCloseMoveToSet}>
         <MoveToSet />
       </StackedCard>
-    )
-  }
+    );
+  };
 
   const renderItemAffixView = () => {
     if (!itemAffixToView) {
