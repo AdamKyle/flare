@@ -52,6 +52,27 @@ class InventorySetService
         $slot->delete();
     }
 
+    public function fetchSetEquippablityDetails(Character $character, InventorySet $inventorySet): array
+    {
+        if ($inventorySet->character_id !== $character->id) {
+            return $this->errorResult('Not allowed to access a set you do not own.');
+        }
+
+        $data = $inventorySet->slots()
+            ->join('items as items', 'items.id', '=', 'set_slots.item_id')
+            ->whereNotNull('set_slots.item_id')
+            ->groupBy('items.type')
+            ->selectRaw('items.type as type, COUNT(*) as count')
+            ->get()
+            ->map(static fn (object $row): array => [
+                'type' => $row->type,
+                'count' => (int) $row->count,
+            ])
+            ->all();
+
+        return $this->successResult($data);
+    }
+
     /**
      * Put an item into the characters inventory set.
      */

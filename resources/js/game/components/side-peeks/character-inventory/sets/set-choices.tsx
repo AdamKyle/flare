@@ -17,6 +17,7 @@ const SetChoices = ({
   on_set_change,
   on_set_selection_clear,
   set_equipped_set_name,
+  dont_show_equipped_set,
 }: SetChoicesProps) => {
   const { data, error, loading, onEndReached } =
     UsePaginatedApiHandler<SetOptionDefinition>({
@@ -29,6 +30,15 @@ const SetChoices = ({
   });
 
   const setOptions = useMemo((): DropdownItem[] => {
+    if (dont_show_equipped_set) {
+      return data
+        .filter((set) => !set.equipped)
+        .map((set: SetOptionDefinition) => ({
+          label: set.name,
+          value: set.set_id,
+        }));
+    }
+
     return data.map((set: SetOptionDefinition) => ({
       label: set.name,
       value: set.set_id,
@@ -36,10 +46,6 @@ const SetChoices = ({
   }, [data]);
 
   const preSelectedSetOption = useMemo((): DropdownItem | undefined => {
-    if (!set_equipped_set_name) {
-      return undefined;
-    }
-
     const equippedSet = data.find((set: SetOptionDefinition) => set.equipped);
 
     if (!equippedSet) {
@@ -47,8 +53,15 @@ const SetChoices = ({
     }
 
     return { label: equippedSet.name, value: equippedSet.set_id };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
+
+  const setPreSelectedOption = () => {
+    if (!set_equipped_set_name) {
+      return undefined;
+    }
+
+    return preSelectedSetOption ?? setOptions[0];
+  };
 
   const handleSetSelection = (selectedSet: DropdownItem) => {
     on_set_change(selectedSet);
@@ -73,7 +86,7 @@ const SetChoices = ({
       on_clear={handleClearSection}
       handle_scroll={handleSetSelectionScroll}
       selection_placeholder="Select a set"
-      pre_selected_item={preSelectedSetOption ?? setOptions[0]}
+      pre_selected_item={setPreSelectedOption()}
       use_pagination
       all_click_outside
     />

@@ -1,17 +1,157 @@
-import React from 'react';
+import ApiErrorAlert from 'api-handler/components/api-error-alert';
+import React, { useState } from 'react';
 
 import MoveToSetProps from './types/move-to-set-props';
+import { isSetEquippable } from './utils/is-set-equippable';
 import SetChoices from '../../../sets/set-choices';
+import UseGetSetEquippabilityResponse from '../../api/definitions/use-get-set-equippability-response-definition';
+import { UseGetSetEquippabilityDetails } from '../../api/hooks/use-get-set-equippability-details';
 
+import { Alert } from 'ui/alerts/alert';
+import { AlertVariant } from 'ui/alerts/enums/alert-variant';
+import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import IconButton from 'ui/buttons/icon-button';
+import Dd from 'ui/dl/dd';
+import Dl from 'ui/dl/dl';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import Separator from 'ui/separator/separator';
+import InfiniteLoader from 'ui/loading-bar/infinite-loader';
+import Dt from 'ui/dl/dt';
 
 const MoveToSet = ({ character_id }: MoveToSetProps) => {
+  const { data, loading, error, setRequestParams } =
+    UseGetSetEquippabilityDetails();
+
+  const [showSetDetails, setShowSetDetails] = useState(true);
+
+  const handleSelection = (selected: DropdownItem) => {
+    setShowSetDetails(true);
+
+    setRequestParams({
+      character_id,
+      inventory_set_id: parseInt(selected.value as string) || 0,
+    });
+  };
+
+  const handleClearSelection = () => {
+    setShowSetDetails(false);
+  };
+
+  const handleMoveToSet = () => {
+    console.log('Move this to the selected set');
+  };
+
+  const renderSetItems = (setItems: UseGetSetEquippabilityResponse[]) => {
+    if (!setItems.length) {
+      return null;
+    }
+
+    return (
+      <Dl>
+        {setItems.map((setItem) => {
+          return (
+            <React.Fragment key={setItem.type}>
+              <Dt>{setItem.type}</Dt>
+              <Dd>{setItem.count}</Dd>
+            </React.Fragment>
+          );
+        })}
+      </Dl>
+    );
+  };
+
+  const renderEquippabilityWarning = (equippable: boolean) => {
+    if (equippable) {
+      return null;
+    }
+
+    return (
+      <div className="mt-4">
+        <Alert variant={AlertVariant.WARNING}>
+          You can add items to this set, but it&#39;s not equippable. It will be
+          treated as a bottomless stash tab.
+        </Alert>
+      </div>
+    );
+  };
+
+  const renderSetData = () => {
+    if (!showSetDetails) {
+      return null;
+    }
+
+    if (loading) {
+      return <InfiniteLoader />;
+    }
+
+    if (error) {
+      return <ApiErrorAlert apiError={error.message} />;
+    }
+
+    if (!data) {
+      return null;
+    }
+
+    const equippable = isSetEquippable(data);
+
+    const totalItemCount = data.reduce((total, setItem) => {
+      return total + setItem.count;
+    }, 0);
+
+    return (
+      <div className="mt-4">
+        <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+          Set Details
+        </h3>
+
+        <div className="mt-3">
+          <Dl>
+            <Dt>Equippable</Dt>
+            <Dd>{equippable ? 'Yes' : 'No'}</Dd>
+
+            <Dt>Total Items</Dt>
+            <Dd>{totalItemCount}</Dd>
+          </Dl>
+        </div>
+
+        <div className="mt-4">{renderSetItems(data)}</div>
+
+        {renderEquippabilityWarning(equippable)}
+
+        <div className="mt-2">
+          <IconButton
+            on_click={handleMoveToSet}
+            label={'Move to this set'}
+            variant={ButtonVariant.SUCCESS}
+            additional_css={'w-full justify-center'}
+            center_content={true}
+            icon={<i className="fas fa-spinner fa-spin" aria-hidden="true"></i>}
+          />
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
+      <div>
+        <h2 className="my-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
+          Move To Set
+        </h2>
+        <div className={'my-4'}>
+          <SetChoices
+            character_id={character_id}
+            on_set_change={handleSelection}
+            on_set_selection_clear={handleClearSelection}
+            dont_show_equipped_set
+          />
+        </div>
+        {renderSetData()}
+      </div>
+      <Separator />
       <div className="prose dark:prose-invert">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-          Move To Set - Rules
+          Set Rules
         </h2>
 
         <p className="mt-2 text-sm leading-6 text-gray-700 dark:text-gray-300">
@@ -125,16 +265,6 @@ const MoveToSet = ({ character_id }: MoveToSetProps) => {
           The above rules only apply to characters who want to equip the set,
           You may also use a set as a stash tab with unlimited items.
         </p>
-      </div>
-      <Separator />
-      <div>
-        <SetChoices
-          character_id={character_id}
-          on_set_change={(selectedSet: DropdownItem) => {
-            console.log(selectedSet);
-          }}
-          on_set_selection_clear={() => {}}
-        />
       </div>
     </>
   );

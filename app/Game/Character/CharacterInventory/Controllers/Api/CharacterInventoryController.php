@@ -311,5 +311,15 @@ class CharacterInventoryController extends Controller
         return response()->json($result, $status);
     }
 
+    public function inventorySetEquippabilityDetails(Character $character, InventorySet $inventorySet): JsonResponse
+    {
+        $result = $this->inventorySetService->fetchSetEquippablityDetails($character, $inventorySet);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
+    }
+
     public function moveItemToSet() {}
 }

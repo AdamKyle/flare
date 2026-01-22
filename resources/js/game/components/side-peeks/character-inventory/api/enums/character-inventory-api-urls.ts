@@ -5,6 +5,7 @@ export enum CharacterInventoryApiUrls {
   CHARACTER_USABLE_ITEMS = '/character/{character}/usable-items',
   CHARACTER_SET_CHOICES = '/character/{character}/inventory/sets',
   CHARACTER_SET_ITEMS = '/character/{character}/inventory/set-items',
+  CHARACTER_SET_EQUIPPABLITY_DETAILS = '/character/{character}/inventory-set-equippability-details/{inventorySet}',
   CHARACTER_INVENTORY_ITEM = '/character/{character}/inventory/item',
 
   CHARACTER_SELL_SELECTED = '/character/{character}/inventory/sell-selected',
