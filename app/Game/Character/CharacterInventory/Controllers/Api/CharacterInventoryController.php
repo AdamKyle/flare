@@ -321,5 +321,13 @@ class CharacterInventoryController extends Controller
         return response()->json($result, $status);
     }
 
-    public function moveItemToSet() {}
+    public function moveItemToSet(MoveItemRequest $request, Character $character)
+    {
+        $result = $this->inventorySetService->moveItemToSet($character, $request->slot_id, $request->set_id, false, true);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
+    }
 }

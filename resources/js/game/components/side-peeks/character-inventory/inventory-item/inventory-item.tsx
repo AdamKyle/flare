@@ -163,7 +163,11 @@ const InventoryItem = ({
 
     return (
       <StackedCard on_close={handleCloseMoveToSet}>
-        <MoveToSet character_id={character_id} />
+        <MoveToSet
+          character_id={character_id}
+          item_slot_id={item.slot_id}
+          on_action={on_action}
+        />
       </StackedCard>
     );
   };

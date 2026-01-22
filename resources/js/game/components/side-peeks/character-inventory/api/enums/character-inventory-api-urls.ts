@@ -18,4 +18,6 @@ export enum CharacterInventoryApiUrls {
   CHARACTER_INVENTORY_SELL_ITEM = '/character/{character}/inventory/sell-item',
   CHARACTER_INVENTORY_DESTROY_ITEM = '/character/{character}/inventory/destroy',
   CHARACTER_INVENTORY_DISENCHANT_ITEM = '/character/{character}/inventory/disenchant-item',
+
+  CHARACTER_MOVE_ITEM_TO_SET = '/character/{character}/inventory/move-to-set',
 }

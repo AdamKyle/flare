@@ -6,6 +6,7 @@ import { isSetEquippable } from './utils/is-set-equippable';
 import SetChoices from '../../../sets/set-choices';
 import UseGetSetEquippabilityResponse from '../../api/definitions/use-get-set-equippability-response-definition';
 import { UseGetSetEquippabilityDetails } from '../../api/hooks/use-get-set-equippability-details';
+import { useMoveItemToSet } from '../../api/hooks/use-move-item-to-set';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
@@ -13,32 +14,57 @@ import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import IconButton from 'ui/buttons/icon-button';
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
-import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
-import Separator from 'ui/separator/separator';
-import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import Dt from 'ui/dl/dt';
+import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
+import InfiniteLoader from 'ui/loading-bar/infinite-loader';
+import Separator from 'ui/separator/separator';
 
-const MoveToSet = ({ character_id }: MoveToSetProps) => {
+const MoveToSet = ({
+  character_id,
+  item_slot_id,
+  on_action,
+}: MoveToSetProps) => {
   const { data, loading, error, setRequestParams } =
     UseGetSetEquippabilityDetails();
 
-  const [showSetDetails, setShowSetDetails] = useState(true);
+  const {
+    loading: isMovingToSet,
+    error: movingToSetError,
+    setRequestParams: setMovingToSetRequestParams,
+  } = useMoveItemToSet();
+
+  const [inventorySetId, setInventorySetId] = useState<number | null>(null);
 
   const handleSelection = (selected: DropdownItem) => {
-    setShowSetDetails(true);
+    const setId = parseInt(selected.value as string) || 0;
+
+    setInventorySetId(setId);
 
     setRequestParams({
       character_id,
-      inventory_set_id: parseInt(selected.value as string) || 0,
+      inventory_set_id: setId,
     });
   };
 
   const handleClearSelection = () => {
-    setShowSetDetails(false);
+    setInventorySetId(null);
   };
 
   const handleMoveToSet = () => {
-    console.log('Move this to the selected set');
+    setMovingToSetRequestParams({
+      character_id,
+      inventory_set_id: inventorySetId || 0,
+      inventory_slot_id: item_slot_id,
+      on_success: on_action,
+    });
+  };
+
+  const renderIsProcessingMoveRequest = () => {
+    if (!isMovingToSet) {
+      return null;
+    }
+
+    return <i className="fas fa-spinner fa-spin" aria-hidden="true"></i>;
   };
 
   const renderSetItems = (setItems: UseGetSetEquippabilityResponse[]) => {
@@ -76,7 +102,7 @@ const MoveToSet = ({ character_id }: MoveToSetProps) => {
   };
 
   const renderSetData = () => {
-    if (!showSetDetails) {
+    if (!inventorySetId || inventorySetId === 0) {
       return null;
     }
 
@@ -86,6 +112,10 @@ const MoveToSet = ({ character_id }: MoveToSetProps) => {
 
     if (error) {
       return <ApiErrorAlert apiError={error.message} />;
+    }
+
+    if (movingToSetError) {
+      return <ApiErrorAlert apiError={movingToSetError.message} />;
     }
 
     if (!data) {
@@ -125,7 +155,8 @@ const MoveToSet = ({ character_id }: MoveToSetProps) => {
             variant={ButtonVariant.SUCCESS}
             additional_css={'w-full justify-center'}
             center_content={true}
-            icon={<i className="fas fa-spinner fa-spin" aria-hidden="true"></i>}
+            disabled={isMovingToSet}
+            icon={renderIsProcessingMoveRequest()}
           />
         </div>
       </div>
