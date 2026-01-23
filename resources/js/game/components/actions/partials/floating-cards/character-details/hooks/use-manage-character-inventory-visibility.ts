@@ -17,12 +17,8 @@ export const useManageCharacterInventoryVisibility =
       const closeCraftingCardEvent = eventSystem.getEventEmitter<{
         [key: string]: boolean;
       }>(ActionCardEvents.OPEN_CRATING_CARD);
-      const closeCharacterCardEvent = eventSystem.getEventEmitter<{
-        [key: string]: boolean;
-      }>(ActionCardEvents.OPEN_CHARACTER_CARD);
 
       closeCraftingCardEvent.emit(ActionCardEvents.OPEN_CRATING_CARD, false);
-      closeCharacterCardEvent.emit(ActionCardEvents.OPEN_CHARACTER_CARD, false);
 
       manageCharacterInventoryEmitter.emit(
         CharacterSheet.OPEN_INVENTORY_SECTION,
