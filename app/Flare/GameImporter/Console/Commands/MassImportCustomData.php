@@ -36,6 +36,15 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
+        Artisan::call('import:game-data Npcs');
+        Artisan::call('import:game-data Items');
+        Artisan::call('import:game-data Locations');
+        Artisan::call('import:game-data Items');
+        Artisan::call('import:game-data Quests');
+
+        Artisan::call('create:quest-cache');
+        Artisan::call('generate:monster-cache');
+
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
