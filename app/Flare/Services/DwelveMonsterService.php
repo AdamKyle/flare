@@ -19,7 +19,6 @@ class DwelveMonsterService {
 
     const PERCENTAGE_STATS = [
         'spell_evasion',
-        'artifact_annulment',
         'affix_resistance',
         'healing_percentage',
         'entrancing_chance',
@@ -63,8 +62,13 @@ class DwelveMonsterService {
             $monster[$stat] += $increaseStatsBy;
         }
 
+        if (!isset($monster['attack_range'])) {
+            dump('Monster does not have damage range?');
+            dd($monster);
+        }
+
         $monster['health_range'] = $this->setNewRange($monster['health_range'], $increaseStatsBy);
-        $monster['damage_range'] = $this->setNewRange($monster['damage_range'], $increaseStatsBy);
+        $monster['attack_range'] = $this->setNewRange($monster['attack_range'], $increaseStatsBy);
 
         return $monster;
     }

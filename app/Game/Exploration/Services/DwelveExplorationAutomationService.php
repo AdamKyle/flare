@@ -50,7 +50,8 @@ class DwelveExplorationAutomationService
         event(new UpdateCharacterStatus($character));
 
         event(new ExplorationLogUpdate($character->user->id, 'The Dwelve will being in 3 minutes. You will fight a random monster every time, 
-        that monster will grow in strength until you simply cannot defeat it or you manage to survive 8 solid hours, good luck with that child. Monsters will grow by 5% per successful fight.'));
+        that monster will grow in strength until you simply cannot defeat it or you manage to survive 8 solid hours, good luck with that child. Monsters will grow by 6.25% per successful fight 
+        for a max of 1000%. Enemy percentage based stats such as spell evasion, enchanting damage and so on will no grow beyond 125%. No enemy will have elemental atonements. You will fight one monster at a time, every 3 minutes.'));
 
         event(new ExplorationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
 

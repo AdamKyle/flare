@@ -115,7 +115,7 @@ class DwelveExploration implements ShouldQueue
             $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id']);
 
             $this->updateDwelveAutomation($dwelveAutomation, [
-                'increase_enemy_strength' => $dwelveAutomation->increase_enemy_strength + 0.05
+                'increase_enemy_strength' => $dwelveAutomation->increase_enemy_strength + 0.0625
             ]);
 
             DwelveExploration::dispatch($this->character, $this->automationId, $this->dwelveAutomationId, $this->attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');

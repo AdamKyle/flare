@@ -88,14 +88,14 @@ class MonsterPlayerFight
         $this->character = $character;
         $this->monster = $this->fetchMonster($character->map, $params['selected_monster_id']);
 
-        if ($shouldIncreaseStrength) {
-            $this->monster = $this->dwelveMonsterService->createMonster($this->monster, $character);
-        }
-
         $this->attackType = $params['attack_type'];
 
         if (empty($this->monster)) {
             return $this->errorResult('No monster was found.');
+        }
+
+        if ($shouldIncreaseStrength) {
+            $this->monster = $this->dwelveMonsterService->createMonster($this->monster, $character);
         }
 
         return $this;
