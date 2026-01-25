@@ -133,6 +133,10 @@ trait ItemsShowInformation
             if ($effect->accessTwistedDungeons()) {
                 $effects = 'Allows the player to access the Dungeons of twisted maidens in Twisted Memories';
             }
+
+            if ($effect->accessDwelves()) {
+                $effects = 'Allows you to enter locations that have the Dwelve status on them to use a special form of exploration';
+            }
         }
 
         if ($item->usable && ! is_null($item->affects_skill_type)) {

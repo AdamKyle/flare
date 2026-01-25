@@ -86,6 +86,30 @@
             <li class="ml-4">There is a 1/1,000 chance to trigger an event while fighting here to reduce the chances and increase the currencies (the above "if an event is triggered") for 1 hour at this location only.</li>
         </ul>
     @endif
+
+    @if ($locationType->isCaveOfMemories())
+        <h3 class="mb-4">Time to Dwelve!</h3>
+        <x-core.alerts.warning-alert title="ATTN!">
+            Players can use either Exploration of Dwelve here. Exploration will fight regular monsters, while Dwleve will fight a random monster each turn and increase said monsters stat by a % every fight making it such that you eventually wont be able to survive.
+            Its about how long (max of 8 hours) you can survive.
+        </x-core.alerts.warning-alert>
+        <x-core.alerts.info-alert title="WAIT!">
+            The below only applies to those who use Dwelve when setting up exploration. Manual fighting and Exploration will not trigger the effects described below.
+        </x-core.alerts.info-alert>
+        <p class="my-4">In this location, a few things will happen for those who have access and use Dwelve:</p>
+        <ul class="list-disc my-4">
+            <li class="ml-4">Quest items can drop for this location but only if you survive for the required time, every fight after that will check if you can get the quest item via your own looting chance.</li>
+            <li class="ml-4">Monsters are chosen at random, each fight will increase the monsters stats by 5%, for example the first fight would have 0% increase, the next would have 5% increase, the next fight would have 10% and so on, increasing by 5% each time.</li>
+            <li class="ml-4"><strong>You are not intended to survive</strong>. It is about how many hours can you survive? The longer the better rewards you get.</li>
+            <li class="ml-4">Even if you die to a monster, you will be rewarded with: 1 Unique for lasting 2 hours or more. 1 Mythic for lasting 4 hours or more. 1 Cosmic for lasting 6 hours or more.</li>
+            <li class="ml-4">Dwelve can be canceled at any time and cannot have a time limit put on it. Its once every 5 minutes for a max of 8 hours.</li>
+        </ul>
+        <p class="mb-4">For dewlve is you survive for: {{$location->hours_to_drop}} hours, you can get a chance per kill after that, the following quest items to drop:</p>
+        @livewire('admin.items.items-table', [
+            'type' => 'quest',
+            'locationId' => $location->id,
+        ])
+    @endif
 @endif
 
 @if (!is_null($increasesEnemyStrengthBy))
@@ -105,4 +129,4 @@
         'locationId' => $location->id,
     ])
 @endif
-</p>
+

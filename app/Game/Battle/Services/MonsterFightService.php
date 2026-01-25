@@ -33,12 +33,21 @@ class MonsterFightService
      * @return array
      * @throws InvalidArgumentException
      */
-    public function setupMonster(Character $character, array $params, bool $returnData = false): array
+    public function setupMonster(Character $character, array $params, bool $returnData = false, bool $isDwelve = false): array
     {
         Cache::delete('monster-fight-' . $character->id);
         Cache::delete('character-sheet-' . $character->id);
 
-        $data = $this->monsterPlayerFight->setUpFight($character, $params);
+        if ($isDwelve) {
+            $monsterId = Monster::query()
+                ->where('game_map_id', $character->map->game_map_id)
+                ->inRandomOrder()
+                ->value('id');
+
+            $params['selected_monster_id'] = $monsterId;
+        }
+
+        $data = $this->monsterPlayerFight->setUpFight($character, $params, $isDwelve);
 
         if (is_array($data)) {
             return $data;

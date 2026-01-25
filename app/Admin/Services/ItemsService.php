@@ -86,6 +86,7 @@ class ItemsService
                 ItemEffectsValue::TWISTED_TREE_BRANCH,
                 ItemEffectsValue::TWISTED_DUNGEONS,
                 ItemEffectsValue::THE_OLD_CHURCH,
+                ItemEffectsValue::DWELVE,
             ],
             'specialtyTypes' => [
                 ItemSpecialtyType::HELL_FORGED,

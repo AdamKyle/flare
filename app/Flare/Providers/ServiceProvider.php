@@ -59,6 +59,7 @@ use App\Flare\Services\CharacterRewardService;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Services\CreateSurveySnapshot;
 use App\Flare\Services\DailyGoldDustService;
+use App\Flare\Services\DwelveMonsterService;
 use App\Flare\Services\EventSchedulerService;
 use App\Flare\Services\SiteAccessStatisticService;
 use App\Flare\Services\SkillBonusContextService;
@@ -419,10 +420,15 @@ class ServiceProvider extends ApplicationServiceProvider
             return new BookBindersFear($app->make(CharacterCacheData::class));
         });
 
+        $this->app->bind(DwelveMonsterService::class, function () {
+            return new DwelveMonsterService();
+        });
+
         $this->app->bind(MonsterPlayerFight::class, function ($app) {
             return new MonsterPlayerFight(
                 $app->make(BuildMonster::class),
                 $app->make(CharacterCacheData::class),
+                $app->make(DwelveMonsterService::class),
                 $app->make(Voidance::class),
                 $app->make(Ambush::class),
                 $app->make(Attack::class),

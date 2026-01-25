@@ -59,6 +59,8 @@ class ItemEffectsValue
 
     const TWISTED_DUNGEONS = 'twisted-dungeons';
 
+    const DWELVE = 'dwelve';
+
     /**
      * @var string[]
      */
@@ -88,6 +90,7 @@ class ItemEffectsValue
         self::WALK_ON_DELUSIONAL_MEMORIES_WATER => 'walk-on-delusional-memories-water',
         self::TWISTED_TREE_BRANCH => 'access-twisted-memories',
         self::TWISTED_DUNGEONS => 'twisted-dungeons',
+        self::DWELVE => 'dwelve',
     ];
 
     /**
@@ -298,5 +301,14 @@ class ItemEffectsValue
      */
     public function accessTwistedDungeons(): bool {
         return $this->value === self::TWISTED_DUNGEONS;
+    }
+
+    /**
+     * Allows player to access Dwelve based locations.
+     *
+     * @return bool
+     */
+    public function accessDwelves(): bool {
+        return $this->value === self::DWELVE;
     }
 }

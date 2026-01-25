@@ -15,6 +15,7 @@
             <th>type</th>
             <th>drops_items</th>
             <th>pin_css_class</th>
+            <th>hours_to_drop</th>
         </tr>
     </thead>
     <tbody>
@@ -34,6 +35,7 @@
                 <td>{{ $location->type }}</td>
                 <td>{{ !is_null($location->enemy_strength_type) ? 'Yes' : 'No' }}</td>
                 <td>{{ $location->pin_css_class }}</td>
+                <th>{{ $location->hours_to_drop }}</th>
             </tr>
         @endforeach
     </tbody>

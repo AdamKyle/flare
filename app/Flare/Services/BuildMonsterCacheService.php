@@ -164,7 +164,27 @@ class BuildMonsterCacheService
         Cache::put('celestials', $monstersCache);
     }
 
-    protected function createMonstersForEventMaps(Collection $monsters): array
+    public function createNewHealthRange(Monster $monster, int $increaseStatsBy): string
+    {
+        $monsterHealthRangeParts = explode('-', $monster->health_range);
+
+        $minHealth = intval($monsterHealthRangeParts[0]) + $increaseStatsBy;
+        $maxHealth = intval($monsterHealthRangeParts[1]) + $increaseStatsBy;
+
+        return $minHealth . '-' . $maxHealth;
+    }
+
+    public function createNewAttackRange(Monster $monster, int $increaseStatsBy): string
+    {
+        $monsterAttackParts = explode('-', $monster->attack_range);
+
+        $minAttack = intval($monsterAttackParts[0]) + $increaseStatsBy;
+        $maxAttack = intval($monsterAttackParts[1]) + $increaseStatsBy;
+
+        return $minAttack . '-' . $maxAttack;
+    }
+
+    private function createMonstersForEventMaps(Collection $monsters): array
     {
 
         $surface = GameMap::where('default', true)->first();
@@ -187,7 +207,7 @@ class BuildMonsterCacheService
     /**
      * Get monsters for special locations.
      */
-    protected function manageMonsters(array $monstersCache): array
+    private function manageMonsters(array $monstersCache): array
     {
         foreach (Location::whereNotNull('enemy_strength_type')->get() as $location) {
             $monsters = Monster::where('is_celestial_entity', false)
@@ -215,7 +235,7 @@ class BuildMonsterCacheService
     /**
      * Transform monsters for special location.
      */
-    protected function transformMonsterForLocation(DBCollection $monsters, int $increaseStatsBy, float $increasePercentageBy): IlluminateCollection
+    private function transformMonsterForLocation(DBCollection $monsters, int $increaseStatsBy, float $increasePercentageBy): IlluminateCollection
     {
         return $monsters->transform(function ($monster) use ($increaseStatsBy, $increasePercentageBy) {
             $monster->str += $increaseStatsBy;
@@ -241,25 +261,5 @@ class BuildMonsterCacheService
 
             return $monster;
         });
-    }
-
-    protected function createNewHealthRange(Monster $monster, int $increaseStatsBy): string
-    {
-        $monsterHealthRangeParts = explode('-', $monster->health_range);
-
-        $minHealth = intval($monsterHealthRangeParts[0]) + $increaseStatsBy;
-        $maxHealth = intval($monsterHealthRangeParts[1]) + $increaseStatsBy;
-
-        return $minHealth . '-' . $maxHealth;
-    }
-
-    protected function createNewAttackRange(Monster $monster, int $increaseStatsBy): string
-    {
-        $monsterAttackParts = explode('-', $monster->attack_range);
-
-        $minAttack = intval($monsterAttackParts[0]) + $increaseStatsBy;
-        $maxAttack = intval($monsterAttackParts[1]) + $increaseStatsBy;
-
-        return $minAttack . '-' . $maxAttack;
     }
 }

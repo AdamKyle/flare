@@ -12,6 +12,7 @@ use App\Flare\ServerFight\Fight\Voidance;
 use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\Services\BuildMonsterCacheService;
+use App\Flare\Services\DwelveMonsterService;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -37,6 +38,8 @@ class MonsterPlayerFight
 
     private CharacterCacheData $characterCacheData;
 
+    private DwelveMonsterService $dwelveMonsterService;
+
     private Voidance $voidance;
 
     private Ambush $ambush;
@@ -46,12 +49,14 @@ class MonsterPlayerFight
     public function __construct(
         BuildMonster $buildMonster,
         CharacterCacheData $characterCacheData,
+        DwelveMonsterService $dwelveMonsterService,
         Voidance $voidance,
         Ambush $ambush,
         Attack $attack
     ) {
         $this->buildMonster = $buildMonster;
         $this->characterCacheData = $characterCacheData;
+        $this->dwelveMonsterService = $dwelveMonsterService;
         $this->voidance = $voidance;
         $this->ambush = $ambush;
         $this->attack = $attack;
@@ -78,10 +83,15 @@ class MonsterPlayerFight
      *
      * @return array|$this
      */
-    public function setUpFight(Character $character, array $params): MonsterPlayerFight|array
+    public function setUpFight(Character $character, array $params, bool $shouldIncreaseStrength = false): MonsterPlayerFight|array
     {
         $this->character = $character;
         $this->monster = $this->fetchMonster($character->map, $params['selected_monster_id']);
+
+        if ($shouldIncreaseStrength) {
+            $this->monster = $this->dwelveMonsterService->createMonster($this->monster, $character);
+        }
+
         $this->attackType = $params['attack_type'];
 
         if (empty($this->monster)) {
@@ -327,7 +337,6 @@ class MonsterPlayerFight
      */
     protected function fetchMonster(Map $map, int $monsterId): array
     {
-
         $regularMonster = $this->fetchRegularMonster($map, $monsterId);
 
         if (! is_null($regularMonster)) {

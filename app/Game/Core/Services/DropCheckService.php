@@ -105,6 +105,7 @@ class DropCheckService
     /**
      * Handles the drops themselves based on chance.
      *
+     * @param Character $character
      * @return void
      *
      * @throws Exception
@@ -116,6 +117,8 @@ class DropCheckService
         $this->battleDrop->handleDrop($character, $canGetDrop);
 
         $this->battleDrop->handleMonsterQuestDrop($character);
+
+        $this->battleDrop->handleDwelveLocationQuestItems($character);
 
         if (! is_null($this->locationWithEffect)) {
             $this->battleDrop->handleSpecialLocationQuestItem($character);

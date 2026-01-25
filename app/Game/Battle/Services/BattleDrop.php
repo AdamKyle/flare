@@ -9,6 +9,7 @@ use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Quest;
 use App\Flare\Values\AutomationType;
+use App\Flare\Values\LocationType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -135,6 +136,90 @@ class BattleDrop
         }
 
         return null;
+    }
+
+    /**
+     * Handle when a character is in a dwelve exploration for quest items
+     *
+     * @param Character $character
+     * @return void
+     * @throws Exception
+     */
+    public function handleDwelveLocationQuestItems(Character $character): void {
+        $automation = $character->currentAutomations()->where('type', AutomationType::DWELVE)->first();
+
+        if (is_null($automation)) {
+            return;
+        }
+
+        $location = Location::where('type', LocationType::CAVE_OF_MEMORIES)
+                            ->where('x', $character->map->character_position_x)
+                            ->where('y', $character->map->character_position_y)
+                            ->where('game_map_id', $character->map->game_map_id)
+                            ->first();
+
+        if (is_null($location)) {
+            return;
+        }
+
+        $items = Item::where('drop_location_id', $this->locationWithEffect->id)
+            ->whereNull('item_suffix_id')
+            ->whereNull('item_prefix_id')
+            ->where('type', 'quest')->get();
+
+        if ($items->isNotEmpty()) {
+            $canHave = DropCheckCalculator::fetchDifficultItemChance($this->lootingChance, 100);
+
+            if (! $canHave) {
+                return;
+            }
+
+            $character->loadMissing('inventory.slots');
+
+            $candidateItemIds = $items->pluck('id')->all();
+            $ownedItemIds = $character->inventory->slots->pluck('item_id')->all();
+            $ownedItemIdSet = array_fill_keys($ownedItemIds, true);
+
+            $quests = Quest::query()
+                ->where(function ($query) use ($candidateItemIds) {
+                    $query->whereIn('item_id', $candidateItemIds)
+                        ->orWhereIn('secondary_required_item', $candidateItemIds);
+                })
+                ->get();
+
+            $questByItemId = [];
+
+            foreach ($quests as $quest) {
+                if (! is_null($quest->item_id) && in_array($quest->item_id, $candidateItemIds, true) && ! array_key_exists($quest->item_id, $questByItemId)) {
+                    $questByItemId[$quest->item_id] = $quest->id;
+                }
+
+                if (! is_null($quest->secondary_required_item) && in_array($quest->secondary_required_item, $candidateItemIds, true) && ! array_key_exists($quest->secondary_required_item, $questByItemId)) {
+                    $questByItemId[$quest->secondary_required_item] = $quest->id;
+                }
+            }
+
+            $completedQuestIds = $character->questsCompleted()->pluck('quest_id')->all();
+            $completedQuestIdSet = array_fill_keys($completedQuestIds, true);
+
+            $eligibleItems = $items->filter(function (Item $item) use ($ownedItemIdSet, $questByItemId, $completedQuestIdSet): bool {
+                $doesntHave = ! array_key_exists($item->id, $ownedItemIdSet);
+
+                $questId = $questByItemId[$item->id] ?? null;
+
+                if (! is_null($questId)) {
+                    $isCompleted = array_key_exists($questId, $completedQuestIdSet);
+
+                    return ! $isCompleted && $doesntHave;
+                }
+
+                return $doesntHave;
+            });
+
+            if ($eligibleItems->isNotEmpty()) {
+                $this->attemptToPickUpItem($character, $eligibleItems->random());
+            }
+        }
     }
 
     /**

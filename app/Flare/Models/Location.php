@@ -33,6 +33,7 @@ class Location extends Model
         'has_raid_boss',
         'is_corrupted',
         'pin_css_class',
+        'hours_to_drop',
     ];
 
     /**
@@ -51,6 +52,7 @@ class Location extends Model
         'quest_reward_item_id' => 'integer',
         'required_quest_item_id' => 'integer',
         'enemy_strength_type' => 'integer',
+        'hours_to_drop' => 'integer',
         'raid_id' => 'integer',
         'has_raid_boss' => 'boolean',
         'is_corrupted' => 'boolean',

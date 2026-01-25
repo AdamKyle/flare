@@ -43,6 +43,7 @@
                                     modelKey="enemy_strength_type" name="enemy_strength_type" :options="$locationEffects" />
                                 <x-core.forms.key-value-select :model="$location" label="Quest Item Required To Enter:"
                                     modelKey="required_quest_item_id" name="required_quest_item_id" :options="$questItems" />
+                                <x-core.forms.input :model="$location" label="Hours till quest item drop (Optional):" modelKey="hours_to_drop" name="hours_to_drop" />
 
                                 <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                                 <h3 class="mb-3">Quest Item Rewards (Optional)</h3>

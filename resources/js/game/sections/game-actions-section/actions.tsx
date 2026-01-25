@@ -276,16 +276,19 @@ export default class Actions extends React.Component<
                                 </div>
                             )}
 
-                        {!this.state.show_celestial_fight && (
-                            <div className="w-full">
-                                <SuccessOutlineButton
-                                    button_label={"Exploration"}
-                                    on_click={this.manageExploration.bind(this)}
-                                    additional_css={"w-full"}
-                                    disabled={this.props.character.is_dead}
-                                />
-                            </div>
-                        )}
+                        {!this.state.show_celestial_fight &&
+                            !this.state.show_exploration && (
+                                <div className="w-full">
+                                    <SuccessOutlineButton
+                                        button_label={"Exploration"}
+                                        on_click={this.manageExploration.bind(
+                                            this,
+                                        )}
+                                        additional_css={"w-full"}
+                                        disabled={this.props.character.is_dead}
+                                    />
+                                </div>
+                            )}
 
                         {this.props.can_access_hell_forged_shop && (
                             <div className="w-full">
