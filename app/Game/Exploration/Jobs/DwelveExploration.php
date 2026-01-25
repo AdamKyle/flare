@@ -4,8 +4,11 @@ namespace App\Game\Exploration\Jobs;
 
 use App\Flare\Models\DwelveExploration as DwelveExplorationModel;
 use App\Flare\Values\AutomationType;
+use App\Flare\Values\RandomAffixDetails;
 use App\Game\Battle\Services\MonsterFightService;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
+use App\Game\Messages\Events\ServerMessageEvent;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -131,7 +134,7 @@ class DwelveExploration implements ShouldQueue
 
             $character = $this->character->refresh();
 
-            $this->rewardPlayer($character);
+            $this->rewardPlayer($character, $dwelveAutomation->refresh());
 
             event(new UpdateCharacterStatus($character));
 
@@ -263,7 +266,7 @@ class DwelveExploration implements ShouldQueue
 
             $this->sendOutEventLogUpdate('You died during the dwelve. Exploration has ended, but not all is lost, you awaken from your wounds there might be treasures waiting, treasures you collected. (See server messages for treasures)');
 
-            $this->rewardPlayer($this->character);
+            $this->rewardPlayer($this->character, $dwelveExploration->refrsh());
 
             event(new ExplorationTimeOut($this->character->user, 0));
 
@@ -347,7 +350,7 @@ class DwelveExploration implements ShouldQueue
 
             $this->sendOutEventLogUpdate('Your adventure is over child. Now is the time to rest, relax, heal and sort through your haul to weed out the worthless.', true);
 
-            $this->rewardPlayer($character);
+            $this->rewardPlayer($character, $dwelveExploration->refresh());
         }
     }
 
@@ -398,16 +401,95 @@ class DwelveExploration implements ShouldQueue
         }
     }
 
+    private function sendServerMessage(string $message, int $itemId): void {
+
+        if ($this->character->isLoggedIn()) {
+            event(new ServerMessageEvent($this->character->user, $message, $itemId));
+        }
+    }
+
     /**
      * Reward the player for automation completion.
      *
      * @param Character $character
+     * @param DwelveExplorationModel $dwelveExploration
      * @return void
+     * @throws Exception
      */
-    private function rewardPlayer(Character $character): void
+    private function rewardPlayer(Character $character, DwelveExplorationModel $dwelveExploration): void
     {
 
-        $gold = $character->gold + 10_000;
+        $start = $dwelveExploration->started_at;
+        $end = $dwelveExploration->completed_at;
+
+        $timeElapsedInHours = $end->diffInHours($start);
+
+        $cosmicItem = null;
+        $mythicItem = null;
+        $uniqueItem = null;
+
+        if ($timeElapsedInHours > 6) {
+            $cosmicItem = $this->characterRewardService->getSpecialGearDrop(RandomAffixDetails::COSMIC);
+        }
+
+        if ($timeElapsedInHours > 4 && $timeElapsedInHours < 6) {
+            $mythicItem = $this->characterRewardService->getSpecialGearDrop(RandomAffixDetails::MYTHIC);
+        }
+
+        if ($timeElapsedInHours > 2 && $timeElapsedInHours < 2) {
+            $uniqueItem = $this->characterRewardService->getSpecialGearDrop(RandomAffixDetails::LEGENDARY);
+        }
+
+        $gold = 1_000;
+
+
+        if (!is_null($cosmicItem)) {
+            $slot = $character->inventory->slots()->create([
+                'item_id' => $cosmicItem->id
+            ]);
+
+            $gold = $character->gold + 1_000_000_000_000;
+
+            $this->sendOutEventLogUpdate('Gained one trillion gold for completing the dwelve.', false, true);
+
+            $this->sendOutEventLogUpdate('Gained a cosmic item child! (Check Server Messages).', false, true);
+
+            $this->sendServerMessage('You were rewarded with a cosmic item: ' . $cosmicItem->affix_name . ' for surviving for more then 6 hours in a dwelve!', $slot->id);
+        }
+
+        if (!is_null($mythicItem)) {
+            $slot = $character->inventory->slots()->create([
+                'item_id' => $mythicItem->id
+            ]);
+
+            $gold = $character->gold + 1_000_000_000;
+
+            $this->sendOutEventLogUpdate('Gained one billion gold for completing the dwelve.', false, true);
+
+            $this->sendOutEventLogUpdate('Gained a mythic item child! (Check Server Messages).', false, true);
+
+            $this->sendServerMessage('You were rewarded with a mythic item: ' . $mythicItem->affix_name . ' for surviving for more then 4 hours in a dwelve!', $slot->id);
+        }
+
+        if (!is_null($uniqueItem)) {
+            $slot = $character->inventory->slots()->create([
+                'item_id' => $uniqueItem->id
+            ]);
+
+            $gold = $character->gold + 1_000_000;
+
+            $this->sendOutEventLogUpdate('Gained one million gold for completing the dwelve.', false, true);
+
+            $this->sendOutEventLogUpdate('Gained a unique item child! (Check Server Messages).', false, true);
+
+            $this->sendServerMessage('You were rewarded with a unique item: ' . $uniqueItem->affix_name . ' for surviving for more then 2 hours in a dwelve!', $slot->id);
+        }
+
+        if ($gold === 1_000) {
+            $gold = $character->gold + $gold;
+
+            $this->sendOutEventLogUpdate('Gained one thousand gold for completing the dwelve.', false, true);
+        }
 
         if ($gold >= MaxCurrenciesValue::MAX_GOLD) {
             $gold = MaxCurrenciesValue::MAX_GOLD;
@@ -417,6 +499,5 @@ class DwelveExploration implements ShouldQueue
 
         event(new UpdateCharacterCurrenciesEvent($character->refresh()));
 
-        $this->sendOutEventLogUpdate('Gained 10k Gold for completing the exploration.', false, true);
     }
 }

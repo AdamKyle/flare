@@ -356,167 +356,191 @@ export default class ExplorationSection extends React.Component<any, any> {
         });
     }
 
+    renderAudotmationIsRunning() {
+        if (this.props.character.is_dwelve_running) {
+            return (
+                <Fragment>
+                    <div className="mb-4 lg:ml-[120px] text-center lg:text-left">
+                        Dwelve is running. You can cancel it below.{" "}
+                        <a href="/information/automation" target="_blank">
+                            See Dwelve Help{" "}
+                            <i className="fas fa-external-link-alt"></i>
+                        </a>{" "}
+                        for more details.
+                    </div>
+
+                    {this.state.loading ? <LoadingProgressBar /> : null}
+
+                    <div className="text-center">
+                        <DangerButton
+                            button_label={"Stop Dwelve"}
+                            on_click={this.stopDwelveExploration.bind(this)}
+                            disabled={this.state.loading}
+                            additional_css={"mr-2 mb-4"}
+                        />
+                        <PrimaryButton
+                            button_label={"Close Dwelve"}
+                            on_click={this.closeExploration.bind(this)}
+                            disabled={this.state.loading}
+                        />
+                    </div>
+                </Fragment>
+            );
+        }
+
+        if (this.props.character.is_automation_running) {
+            return (
+                <Fragment>
+                    <div className="mb-4 lg:ml-[120px] text-center lg:text-left">
+                        Automation is running. You can cancel it below.{" "}
+                        <a href="/information/automation" target="_blank">
+                            See Exploration Help{" "}
+                            <i className="fas fa-external-link-alt"></i>
+                        </a>{" "}
+                        for more details.
+                    </div>
+
+                    {this.state.loading ? <LoadingProgressBar /> : null}
+
+                    <div className="text-center">
+                        <DangerButton
+                            button_label={"Stop Exploration"}
+                            on_click={this.stopExploration.bind(this)}
+                            disabled={this.state.loading}
+                            additional_css={"mr-2 mb-4"}
+                        />
+                        <PrimaryButton
+                            button_label={"Close Exploration"}
+                            on_click={this.closeExploration.bind(this)}
+                            disabled={this.state.loading}
+                        />
+                    </div>
+                </Fragment>
+            );
+        }
+    }
+
     renderExplorationSection() {
         return (
             <Fragment>
-                {this.props.character.is_automation_running ? (
-                    <Fragment>
-                        <div className="mb-4 lg:ml-[120px] text-center lg:text-left">
-                            Automation is running. You can cancel it below.{" "}
-                            <a href="/information/automation" target="_blank">
-                                See Exploration Help{" "}
+                <div className="mt-2 grid lg:grid-cols-3 gap-2 lg:ml-[120px]">
+                    <div className="cols-start-1 col-span-2">
+                        <div className="mb-3">
+                            <Select
+                                onChange={this.setMonsterToFight.bind(this)}
+                                options={this.monsterOptions()}
+                                menuPosition={"absolute"}
+                                menuPlacement={"bottom"}
+                                styles={{
+                                    menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                        color: "#000000",
+                                    }),
+                                }}
+                                menuPortalTarget={document.body}
+                                value={this.defaultSelectedMonster()}
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <Select
+                                onChange={this.setLengthOfTime.bind(this)}
+                                options={this.timeOptions()}
+                                menuPosition={"absolute"}
+                                menuPlacement={"bottom"}
+                                styles={{
+                                    menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                        color: "#000000",
+                                    }),
+                                }}
+                                menuPortalTarget={document.body}
+                                value={this.defaultSelectedTime()}
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <Select
+                                onChange={this.setMoveDownList.bind(this)}
+                                options={this.moveDownTheListEvery()}
+                                menuPosition={"absolute"}
+                                menuPlacement={"bottom"}
+                                styles={{
+                                    menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                        color: "#000000",
+                                    }),
+                                }}
+                                menuPortalTarget={document.body}
+                                value={this.defaultMoveDownList()}
+                            />
+                        </div>
+                        <div>
+                            <Select
+                                onChange={this.setAttackType.bind(this)}
+                                options={this.attackTypes()}
+                                menuPosition={"absolute"}
+                                menuPlacement={"bottom"}
+                                styles={{
+                                    menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                        color: "#000000",
+                                    }),
+                                }}
+                                menuPortalTarget={document.body}
+                                value={this.defaultAttackType()}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div className={"lg:text-center mt-3 mb-3"}>
+                    <PrimaryButton
+                        button_label={"Explore"}
+                        on_click={this.startExploration.bind(this)}
+                        disabled={
+                            this.state.monster_selected === null ||
+                            this.state.time_selected === null ||
+                            this.state.attack_type === null ||
+                            this.state.loading ||
+                            this.props.character.is_dead ||
+                            !this.props.character.can_attack
+                        }
+                        additional_css={"mr-2 mb-4"}
+                    />
+                    <DangerButton
+                        button_label={"Close"}
+                        on_click={this.closeExploration.bind(this)}
+                        disabled={this.state.loading}
+                    />
+
+                    {this.state.loading ? (
+                        <div className="w-1/2 ml-auto mr-auto">
+                            <LoadingProgressBar />
+                        </div>
+                    ) : null}
+
+                    {this.state.error_message !== null ? (
+                        <div className="w-1/2 ml-auto mr-auto mt-4">
+                            <DangerAlert>
+                                {this.state.error_message}
+                            </DangerAlert>
+                        </div>
+                    ) : null}
+
+                    <div className="relative top-[24px] italic">
+                        <p>
+                            For more help please the{" "}
+                            <a href="/information/exploration" target="_blank">
+                                Exploration{" "}
                                 <i className="fas fa-external-link-alt"></i>
                             </a>{" "}
-                            for more details.
-                        </div>
-
-                        {this.state.loading ? <LoadingProgressBar /> : null}
-
-                        <div className="text-center">
-                            <DangerButton
-                                button_label={"Stop Exploration"}
-                                on_click={this.stopExploration.bind(this)}
-                                disabled={this.state.loading}
-                                additional_css={"mr-2 mb-4"}
-                            />
-                            <PrimaryButton
-                                button_label={"Close Exploration"}
-                                on_click={this.closeExploration.bind(this)}
-                                disabled={this.state.loading}
-                            />
-                        </div>
-                    </Fragment>
-                ) : (
-                    <Fragment>
-                        <div className="mt-2 grid lg:grid-cols-3 gap-2 lg:ml-[120px]">
-                            <div className="cols-start-1 col-span-2">
-                                <div className="mb-3">
-                                    <Select
-                                        onChange={this.setMonsterToFight.bind(
-                                            this,
-                                        )}
-                                        options={this.monsterOptions()}
-                                        menuPosition={"absolute"}
-                                        menuPlacement={"bottom"}
-                                        styles={{
-                                            menuPortal: (base) => ({
-                                                ...base,
-                                                zIndex: 9999,
-                                                color: "#000000",
-                                            }),
-                                        }}
-                                        menuPortalTarget={document.body}
-                                        value={this.defaultSelectedMonster()}
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <Select
-                                        onChange={this.setLengthOfTime.bind(
-                                            this,
-                                        )}
-                                        options={this.timeOptions()}
-                                        menuPosition={"absolute"}
-                                        menuPlacement={"bottom"}
-                                        styles={{
-                                            menuPortal: (base) => ({
-                                                ...base,
-                                                zIndex: 9999,
-                                                color: "#000000",
-                                            }),
-                                        }}
-                                        menuPortalTarget={document.body}
-                                        value={this.defaultSelectedTime()}
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <Select
-                                        onChange={this.setMoveDownList.bind(
-                                            this,
-                                        )}
-                                        options={this.moveDownTheListEvery()}
-                                        menuPosition={"absolute"}
-                                        menuPlacement={"bottom"}
-                                        styles={{
-                                            menuPortal: (base) => ({
-                                                ...base,
-                                                zIndex: 9999,
-                                                color: "#000000",
-                                            }),
-                                        }}
-                                        menuPortalTarget={document.body}
-                                        value={this.defaultMoveDownList()}
-                                    />
-                                </div>
-                                <div>
-                                    <Select
-                                        onChange={this.setAttackType.bind(this)}
-                                        options={this.attackTypes()}
-                                        menuPosition={"absolute"}
-                                        menuPlacement={"bottom"}
-                                        styles={{
-                                            menuPortal: (base) => ({
-                                                ...base,
-                                                zIndex: 9999,
-                                                color: "#000000",
-                                            }),
-                                        }}
-                                        menuPortalTarget={document.body}
-                                        value={this.defaultAttackType()}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className={"lg:text-center mt-3 mb-3"}>
-                            <PrimaryButton
-                                button_label={"Explore"}
-                                on_click={this.startExploration.bind(this)}
-                                disabled={
-                                    this.state.monster_selected === null ||
-                                    this.state.time_selected === null ||
-                                    this.state.attack_type === null ||
-                                    this.state.loading ||
-                                    this.props.character.is_dead ||
-                                    !this.props.character.can_attack
-                                }
-                                additional_css={"mr-2 mb-4"}
-                            />
-                            <DangerButton
-                                button_label={"Close"}
-                                on_click={this.closeExploration.bind(this)}
-                                disabled={this.state.loading}
-                            />
-
-                            {this.state.loading ? (
-                                <div className="w-1/2 ml-auto mr-auto">
-                                    <LoadingProgressBar />
-                                </div>
-                            ) : null}
-
-                            {this.state.error_message !== null ? (
-                                <div className="w-1/2 ml-auto mr-auto mt-4">
-                                    <DangerAlert>
-                                        {this.state.error_message}
-                                    </DangerAlert>
-                                </div>
-                            ) : null}
-
-                            <div className="relative top-[24px] italic">
-                                <p>
-                                    For more help please the{" "}
-                                    <a
-                                        href="/information/exploration"
-                                        target="_blank"
-                                    >
-                                        Exploration{" "}
-                                        <i className="fas fa-external-link-alt"></i>
-                                    </a>{" "}
-                                    help docs.
-                                </p>
-                            </div>
-                        </div>
-                    </Fragment>
-                )}
+                            help docs.
+                        </p>
+                    </div>
+                </div>
             </Fragment>
         );
     }
@@ -632,6 +656,13 @@ export default class ExplorationSection extends React.Component<any, any> {
 
     render() {
         console.log(this.props.character, this.state);
+
+        if (
+            this.props.character.is_automation_running ||
+            this.props.character.is_dwelve_running
+        ) {
+            this.renderAudotmationIsRunning();
+        }
 
         if (!this.props.character.is_at_dwelve_location) {
             return this.renderExplorationSection();

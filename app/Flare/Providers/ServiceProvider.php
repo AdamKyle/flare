@@ -4,7 +4,9 @@ namespace App\Flare\Providers;
 
 use App\Admin\Services\SiteStatisticsService;
 use App\Flare\Builders\AffixAttributeBuilder;
+use App\Flare\Builders\BuildCosmicItem;
 use App\Flare\Builders\BuildMythicItem;
+use App\Flare\Builders\BuildUniqueItem;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Cache\CoordinatesCache;
@@ -210,11 +212,10 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CharacterRewardService(
                 $app->make(CharacterXPService::class),
                 $app->make(CharacterCurrencyRewardService::class),
-                $app->make(CharacterService::class),
                 $app->make(SkillService::class),
-                $app->make(Manager::class),
-                $app->make(CharacterSheetBaseInfoTransformer::class),
-                $app->make(BattleMessageHandler::class)
+                $app->make(BuildUniqueItem::class),
+                $app->make(BuildMythicItem::class),
+                $app->make(BuildCosmicItem::class)
             );
         });
 
@@ -422,6 +423,14 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(DwelveMonsterService::class, function () {
             return new DwelveMonsterService();
+        });
+
+        $this->app->bind(BuildCosmicItem::class, function ($app) {
+            return new BuildCosmicItem($app->make(RandomAffixGenerator::class));
+        });
+
+        $this->app->bind(BuildUniqueItem::class, function ($app) {
+            return new BuildUniqueItem($app->make(RandomAffixGenerator::class));
         });
 
         $this->app->bind(MonsterPlayerFight::class, function ($app) {
