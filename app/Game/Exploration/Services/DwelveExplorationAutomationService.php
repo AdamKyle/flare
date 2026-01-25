@@ -27,7 +27,13 @@ class DwelveExplorationAutomationService
     public function beginAutomation(Character $character, array $params)
     {
 
-        $monsterId = Monster::where('game_map_id', $character->map->game_map_id)->inRandomOrder()->first()->id;
+        $monsterId = Monster::where('is_celestial_entity', false)
+            ->where('is_raid_monster', false)
+            ->where('is_raid_boss', false)
+            ->where('game_map_id', $character->map->game_map_id)
+            ->inRandomOrder()
+            ->first()
+            ->id;
 
         $automation = CharacterAutomation::create([
             'character_id' => $character->id,

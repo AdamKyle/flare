@@ -15,12 +15,14 @@ class DwelveMonsterService {
         'chr',
         'int',
         'ac',
+        'spell_damage',
+        'max_affix_damage',
     ];
 
     const PERCENTAGE_STATS = [
         'spell_evasion',
         'affix_resistance',
-        'healing_percentage',
+        'max_healing',
         'entrancing_chance',
         'devouring_light_chance',
         'devouring_darkness_chance',
@@ -28,6 +30,12 @@ class DwelveMonsterService {
         'casting_accuracy',
         'dodge',
         'criticality',
+        'ambush_chance',
+        'counter_chance',
+        'counter_resistance_chance',
+        'ambush_resistance_chance',
+        'increases_damage_by',
+        'life_stealing_resistance'
     ];
 
     public function createMonster(array $monster, Character $character): array {
@@ -52,6 +60,12 @@ class DwelveMonsterService {
         $monsterDamageStat = $monster[$monster['damage_stat']] * $increaseAmount;
 
         $monster = $this->increaseMonsterStats($monster, $monsterDamageStat);
+
+        $monster["elemental_atonement"] =[
+            "fire" => 0,
+            "ice" => 0,
+            "water" => 0,
+        ];
 
         return $this->increasePercentageAttributes($monster, $increaseAmount);
     }

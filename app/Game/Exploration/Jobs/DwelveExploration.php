@@ -118,6 +118,8 @@ class DwelveExploration implements ShouldQueue
                 'increase_enemy_strength' => $dwelveAutomation->increase_enemy_strength + 0.0625
             ]);
 
+            $this->updateMonsterForNextFight($dwelveAutomation);
+
             DwelveExploration::dispatch($this->character, $this->automationId, $this->dwelveAutomationId, $this->attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
 
             return;
@@ -152,6 +154,20 @@ class DwelveExploration implements ShouldQueue
         $this->sendOutEventLogUpdate('Something went wrong with dwelve. Could not process fight. Dwelve Canceled.');
 
         event(new ExplorationTimeOut($this->character->user, 0));
+    }
+
+    private function updateMonsterForNextFight(DwelveExplorationModel $dwelveExploration): void {
+        $monsterId = Monster::where('is_celestial_entity', false)
+            ->where('is_raid_monster', false)
+            ->where('is_raid_boss', false)
+            ->where('game_map_id', $dwelveExploration->character->map->game_map_id)
+            ->inRandomOrder()
+            ->first()
+            ->id;
+
+        $this->updateDwelveAutomation($dwelveExploration, [
+            'monster_id' => $monsterId
+        ]);
     }
 
     private function updateDwelveAutomation(DwelveExplorationModel $dwelveExploration, array $data): void {
