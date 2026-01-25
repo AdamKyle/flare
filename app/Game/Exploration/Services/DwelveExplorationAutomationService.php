@@ -5,6 +5,7 @@ namespace App\Game\Exploration\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\DwelveExploration;
+use App\Flare\Models\Monster;
 use App\Flare\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\Cache;
 class DwelveExplorationAutomationService
 {
 
-    private int $timeDelay = 0;
+    private int $timeDelay = 5;
 
     public function __construct(
         private readonly CharacterCacheData $characterCacheData
@@ -26,9 +27,11 @@ class DwelveExplorationAutomationService
     public function beginAutomation(Character $character, array $params)
     {
 
+        $monsterId = Monster::where('game_map_id', $character->map->game_map_id)->inRandomOrder()->first()->id;
+
         $automation = CharacterAutomation::create([
             'character_id' => $character->id,
-            'monster_id' => $params['selected_monster_id'],
+            'monster_id' => $monsterId,
             'type' => AutomationType::DWELVE,
             'started_at' => now(),
             'completed_at' => now()->addHours(8),
@@ -37,7 +40,7 @@ class DwelveExplorationAutomationService
 
         $dwelveExploration = DwelveExploration::create([
             'character_id' => $character->id,
-            'monster_id' => $params['selected_monster_id'],
+            'monster_id' => $monsterId,
             'started_at' => now(),
             'attack_type' => $params['attack_type'],
         ]);
@@ -46,7 +49,7 @@ class DwelveExplorationAutomationService
 
         event(new UpdateCharacterStatus($character));
 
-        event(new ExplorationLogUpdate($character->user->id, 'The Dwelve will being in 5 minutes. You will fight a random monster every time, 
+        event(new ExplorationLogUpdate($character->user->id, 'The Dwelve will being in 3 minutes. You will fight a random monster every time, 
         that monster will grow in strength until you simply cannot defeat it or you manage to survive 8 solid hours, good luck with that child. Monsters will grow by 5% per successful fight.'));
 
         event(new ExplorationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
@@ -66,7 +69,7 @@ class DwelveExplorationAutomationService
 
         $characterAutomation->delete();
 
-        DwelveExploration::where('character_id', $character->id)->whereIsNull('completed_at')->first()->update([
+        DwelveExploration::where('character_id', $character->id)->whereNull('completed_at')->first()->update([
             'completed_at' => now(),
         ]);
 
@@ -84,12 +87,11 @@ class DwelveExplorationAutomationService
 
     public function setTimeDelay(): void
     {
-        $this->timeDelay = 5;
+        $this->timeDelay = 3;
     }
 
     protected function startAutomation(Character $character, int $automationId, int $dwelveAutomationId, string $attackType)
     {
-
         DwelveExplorationProcessing::dispatch($character, $automationId, $dwelveAutomationId, $attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
     }
 }

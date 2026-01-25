@@ -118,7 +118,7 @@ class DwelveExploration implements ShouldQueue
                 'increase_enemy_strength' => $dwelveAutomation->increase_enemy_strength + 0.05
             ]);
 
-            DwelveExploration::dispatch($this->character, $this->automationId, $this->attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
+            DwelveExploration::dispatch($this->character, $this->automationId, $this->dwelveAutomationId, $this->attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
 
             return;
         }

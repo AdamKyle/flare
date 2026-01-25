@@ -252,7 +252,6 @@ export default class ExplorationSection extends React.Component<any, any> {
                 new Ajax()
                     .setRoute("dwelve/" + this.props.character.id + "/start")
                     .setParameters({
-                        selected_monster_id: this.state.monster_selected.id,
                         attack_type: this.state.attack_type,
                     })
                     .doAjaxCall(
@@ -661,7 +660,7 @@ export default class ExplorationSection extends React.Component<any, any> {
             this.props.character.is_automation_running ||
             this.props.character.is_dwelve_running
         ) {
-            this.renderAudotmationIsRunning();
+            return this.renderAudotmationIsRunning();
         }
 
         if (!this.props.character.is_at_dwelve_location) {

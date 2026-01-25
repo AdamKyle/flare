@@ -48,7 +48,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
             'can_engage_celestials' => $character->can_engage_celestials,
             'can_engage_celestials_again_at' => now()->diffInSeconds($character->can_engage_celestials_again_at),
             'is_dead' => $character->is_dead,
-            'is_automation_running' => $character->currentAutomations()->where('character_id', $character->id)->where('type', AutomationType::EXPLORING)->get()->isNotEmpty(),
+            'is_automation_running' => $character->currentAutomations()->where('character_id', $character->id)->get()->isNotEmpty(),
             'is_dwelve_running' => $character->currentAutomations()->where('character_id', $character->id)->where('type', AutomationType::DWELVE)->get()->isNotEmpty(),
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
             'is_silenced' => $character->is_silenced,
@@ -92,13 +92,17 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
     private function isAtDwelveLocation(Character $character): bool {
         $characterMap = $character->map;
 
-        $questItemForDwelveId = Item::where('effect', ItemEffectsValue::DWELVE)->first()->id;
+        $questItemForDwelve = Item::where('effect', ItemEffectsValue::DWELVE)->first();
+
+        if (is_null($questItemForDwelve)) {
+            return false;
+        }
 
         $location = Location::where('game_map_id', $characterMap->game_map_id)->where('x', $characterMap->character_position_x)->where('y', $characterMap->character_position_y)
             ->where('type', LocationType::CAVE_OF_MEMORIES)->first();
 
-        $characterHasItem = $character->inventory->slots->filter(function($slot) use ($questItemForDwelveId) {
-            return $slot->item_id === $questItemForDwelveId;
+        $characterHasItem = $character->inventory->slots->filter(function($slot) use ($questItemForDwelve) {
+            return $slot->item_id === $questItemForDwelve->id;
         })->isNotEmpty();
 
         return !is_null($location) && $characterHasItem;

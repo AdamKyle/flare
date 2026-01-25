@@ -16,10 +16,11 @@ return new class extends Migration
             $table->unsignedBigInteger('character_id');
             $table->unsignedBigInteger('monster_id');
             $table->dateTime('started_at');
-            $table->dateTime('completed_at');
+            $table->dateTime('completed_at')->nullable();
             $table->string('attack_type');
             $table->decimal('increase_enemy_strength', 8, 4)->default(0);
             $table->json('battle_messages')->nullable();
+            $table->timestamps();
         });
     }
 

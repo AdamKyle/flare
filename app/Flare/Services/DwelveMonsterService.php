@@ -33,7 +33,7 @@ class DwelveMonsterService {
 
     public function createMonster(array $monster, Character $character): array {
 
-        $dwelveExploration = DwelveExploration::where('character_id', $character->id)->whereIsNull('completed_at')->first();
+        $dwelveExploration = DwelveExploration::where('character_id', $character->id)->whereNull('completed_at')->first();
 
         if (is_null($dwelveExploration)) {
             return $monster;
@@ -44,6 +44,12 @@ class DwelveMonsterService {
         }
 
         $increaseAmount = $dwelveExploration->increase_enemy_strength;
+
+        if (!isset($monster['damage_stat'])) {
+            dump('Monster stat damage stat is not set, what is monster:');
+            dd($monster);
+        }
+
         $monsterDamageStat = $monster[$monster['damage_stat']] * $increaseAmount;
 
         $monster = $this->increaseMonsterStats($monster, $monsterDamageStat);

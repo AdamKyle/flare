@@ -156,13 +156,18 @@ class BattleDrop
                             ->where('x', $character->map->character_position_x)
                             ->where('y', $character->map->character_position_y)
                             ->where('game_map_id', $character->map->game_map_id)
+                            ->whereNotNull('hours_to_drop')
                             ->first();
 
         if (is_null($location)) {
             return;
         }
 
-        $items = Item::where('drop_location_id', $this->locationWithEffect->id)
+        if (now()->diffInHours($automation->started_at) < $location->hours_to_drop) {
+            return;
+        }
+
+        $items = Item::where('drop_location_id', $location->id)
             ->whereNull('item_suffix_id')
             ->whereNull('item_prefix_id')
             ->where('type', 'quest')->get();

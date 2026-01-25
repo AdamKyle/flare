@@ -30,7 +30,7 @@ class ExplorationController extends Controller
             ], 422);
         }
 
-        if ($character->currentAutomations()->where('type', AutomationType::EXPLORING)->count() > 0) {
+        if ($character->currentAutomations()->where('type', AutomationType::DWELVE)->orWhere('type', AutomationType::EXPLORING)->count() > 0) {
             return response()->json([
                 'message' => 'Nope. You already have one in progress.',
             ], 422);

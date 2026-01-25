@@ -155,14 +155,6 @@ class MonsterPlayerFight
     }
 
     /**
-     * Get the enemy name.
-     */
-    public function getEnemyName(): string
-    {
-        return $this->monster['name'];
-    }
-
-    /**
      * get the monster.
      */
     public function getMonster(): array
@@ -184,11 +176,6 @@ class MonsterPlayerFight
     public function getMonsterHealth(): int
     {
         return $this->attack->getMonsterHealth();
-    }
-
-    public function getRank(): int
-    {
-        return $this->rank;
     }
 
     /**
@@ -282,6 +269,11 @@ class MonsterPlayerFight
         $isPlayerVoided = $data['player_voided'];
         $isEnemyVoided = $data['enemy_voided'];
 
+        $this->attack = $this->attack->setHealth($health)
+            ->setIsCharacterVoided($isPlayerVoided)
+            ->setIsEnemyVoided($isEnemyVoided)
+            ->onlyAttackOnce($onlyOnce);
+
         if ($health['current_character_health'] <= 0) {
             $this->battleMessages[] = [
                 'message' => 'The enemies ambush has slaughtered you!',
@@ -300,19 +292,16 @@ class MonsterPlayerFight
             return true;
         }
 
-        return $this->doAttack($monster, $health, $isPlayerVoided, $isEnemyVoided, $onlyOnce);
+        return $this->doAttack($monster);
     }
 
     /**
      * Do the actual attack
      */
-    protected function doAttack(ServerMonster $monster, array $health, bool $isPlayerVoided, bool $isEnemyVoided, bool $onlyOnce): bool
+    protected function doAttack(ServerMonster $monster): bool
     {
 
-        $this->attack->setHealth($health)
-            ->setIsCharacterVoided($isPlayerVoided)
-            ->setIsEnemyVoided($isEnemyVoided)
-            ->onlyAttackOnce($onlyOnce)
+        $this->attack
             ->attack($this->character, $monster, $this->attackType, 'character');
 
         $this->mergeMessages($this->attack->getMessages());

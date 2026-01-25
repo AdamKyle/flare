@@ -7,6 +7,7 @@ use App\Flare\Models\Location;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\LocationType;
+use App\Game\Exploration\Requests\DwelveExplorationRequest;
 use App\Game\Exploration\Requests\ExplorationRequest;
 use App\Game\Exploration\Services\DwelveExplorationAutomationService;
 use App\Game\Exploration\Services\ExplorationAutomationService;
@@ -18,7 +19,7 @@ class DwelveExplorationController extends Controller
 
     public function __construct(private readonly DwelveExplorationAutomationService $dwelveExplorationAutomationService) {}
 
-    public function begin(ExplorationRequest $request, Character $character): JsonResponse
+    public function begin(DwelveExplorationRequest $request, Character $character): JsonResponse
     {
 
         if (! AttackTypeValue::attackTypeExists($request->attack_type)) {
@@ -27,7 +28,7 @@ class DwelveExplorationController extends Controller
             ], 422);
         }
 
-        if ($character->currentAutomations()->where('type', AutomationType::DWELVE)->count() > 0) {
+        if ($character->currentAutomations()->where('type', AutomationType::DWELVE)->orWhere('type', AutomationType::EXPLORING)->count() > 0) {
             return response()->json([
                 'message' => 'Nope. You already have one in progress.',
             ], 422);
@@ -36,7 +37,7 @@ class DwelveExplorationController extends Controller
         $location = Location::where('x', $character->map->character_position_x)
             ->where('y', $character->map->character_position_y)
             ->where('game_map_id', $character->map->game_map_id)
-            ->whereIn('type',  LocationType::CAVE_OF_MEMORIES)
+            ->where('type', LocationType::CAVE_OF_MEMORIES)
             ->first();
 
         if ( is_null($location)) {
