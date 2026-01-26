@@ -145,7 +145,7 @@ class BattleDrop
      * @return void
      * @throws Exception
      */
-    public function handleDwelveLocationQuestItems(Character $character): void {
+    public function handleDelveLocationQuestItems(Character $character): void {
         $automation = $character->currentAutomations()->where('type', AutomationType::DWELVE)->first();
 
         if (is_null($automation)) {

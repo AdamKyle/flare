@@ -4,7 +4,7 @@ namespace App\Game\Exploration\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
-use App\Flare\Models\DwelveExploration;
+use App\Flare\Models\DelveExploration;
 use App\Flare\Models\Monster;
 use App\Flare\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
@@ -12,10 +12,10 @@ use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
 use App\Game\Exploration\Events\ExplorationStatus;
 use App\Game\Exploration\Events\ExplorationTimeOut;
-use App\Game\Exploration\Jobs\DwelveExploration as DwelveExplorationProcessing;
+use App\Game\Exploration\Jobs\DelveExploration as DelveExplorationProcessing;
 use Illuminate\Support\Facades\Cache;
 
-class DwelveExplorationAutomationService
+class DelveExplorationAutomationService
 {
 
     private int $timeDelay = 5;
@@ -44,7 +44,7 @@ class DwelveExplorationAutomationService
             'attack_type' => $params['attack_type'],
         ]);
 
-        $dwelveExploration = DwelveExploration::create([
+        $dwelveExploration = DelveExploration::create([
             'character_id' => $character->id,
             'monster_id' => $monsterId,
             'started_at' => now(),
@@ -55,7 +55,7 @@ class DwelveExplorationAutomationService
 
         event(new UpdateCharacterStatus($character));
 
-        event(new ExplorationLogUpdate($character->user->id, 'The Dwelve will being in 3 minutes. You will fight a random monster every time, 
+        event(new ExplorationLogUpdate($character->user->id, 'The Delve will being in 3 minutes. You will fight a random monster every time, 
         that monster will grow in strength until you simply cannot defeat it or you manage to survive 8 solid hours, good luck with that child. Monsters will grow by 6.25% per successful fight 
         for a max of 1000%. Enemy percentage based stats such as spell evasion, enchanting damage and so on will no grow beyond 125%. No enemy will have elemental atonements. You will fight one monster at a time, every 3 minutes.'));
 
@@ -76,7 +76,7 @@ class DwelveExplorationAutomationService
 
         $characterAutomation->delete();
 
-        DwelveExploration::where('character_id', $character->id)->whereNull('completed_at')->first()->update([
+        DelveExploration::where('character_id', $character->id)->whereNull('completed_at')->first()->update([
             'completed_at' => now(),
         ]);
 
@@ -89,7 +89,7 @@ class DwelveExplorationAutomationService
         event(new ExplorationTimeOut($character->user, 0));
         event(new ExplorationStatus($character->user, false));
         event(new UpdateCharacterStatus($character));
-        event(new ExplorationLogUpdate($character->user->id, 'Dwelve has been stopped at player request.'));
+        event(new ExplorationLogUpdate($character->user->id, 'Delve has been stopped at player request.'));
     }
 
     public function setTimeDelay(): void
@@ -99,6 +99,6 @@ class DwelveExplorationAutomationService
 
     protected function startAutomation(Character $character, int $automationId, int $dwelveAutomationId, string $attackType)
     {
-        DwelveExplorationProcessing::dispatch($character, $automationId, $dwelveAutomationId, $attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
+        DelveExplorationProcessing::dispatch($character, $automationId, $dwelveAutomationId, $attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
     }
 }

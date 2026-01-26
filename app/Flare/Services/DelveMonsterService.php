@@ -3,9 +3,9 @@
 namespace App\Flare\Services;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\DwelveExploration;
+use App\Flare\Models\DelveExploration;
 
-class DwelveMonsterService {
+class DelveMonsterService {
 
     const MONSTER_STATS = [
         'str',
@@ -40,7 +40,7 @@ class DwelveMonsterService {
 
     public function createMonster(array $monster, Character $character): array {
 
-        $dwelveExploration = DwelveExploration::where('character_id', $character->id)->whereNull('completed_at')->first();
+        $dwelveExploration = DelveExploration::where('character_id', $character->id)->whereNull('completed_at')->first();
 
         if (is_null($dwelveExploration)) {
             return $monster;

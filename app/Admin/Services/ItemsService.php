@@ -87,6 +87,7 @@ class ItemsService
                 ItemEffectsValue::TWISTED_DUNGEONS,
                 ItemEffectsValue::THE_OLD_CHURCH,
                 ItemEffectsValue::DWELVE,
+                ItemEffectsValue::DWELVE_PACK_CHOICE,
             ],
             'specialtyTypes' => [
                 ItemSpecialtyType::HELL_FORGED,

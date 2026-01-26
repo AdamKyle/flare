@@ -12,7 +12,7 @@ use App\Flare\ServerFight\Fight\Voidance;
 use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\Services\BuildMonsterCacheService;
-use App\Flare\Services\DwelveMonsterService;
+use App\Flare\Services\DelveMonsterService;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -38,7 +38,7 @@ class MonsterPlayerFight
 
     private CharacterCacheData $characterCacheData;
 
-    private DwelveMonsterService $dwelveMonsterService;
+    private DelveMonsterService $dwelveMonsterService;
 
     private Voidance $voidance;
 
@@ -49,7 +49,7 @@ class MonsterPlayerFight
     public function __construct(
         BuildMonster $buildMonster,
         CharacterCacheData $characterCacheData,
-        DwelveMonsterService $dwelveMonsterService,
+        DelveMonsterService $dwelveMonsterService,
         Voidance $voidance,
         Ambush $ambush,
         Attack $attack

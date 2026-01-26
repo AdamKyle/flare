@@ -2,17 +2,17 @@
 
 namespace Database\Factories;
 
-use App\Flare\Models\DwelveExploration;
+use App\Flare\Models\DelveExploration;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class DwelveExplorationFactory extends Factory
+class DelveExplorationFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = DwelveExploration::class;
+    protected $model = DelveExploration::class;
 
     /**
      * Define the model's default state.

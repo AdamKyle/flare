@@ -134,8 +134,12 @@ trait ItemsShowInformation
                 $effects = 'Allows the player to access the Dungeons of twisted maidens in Twisted Memories';
             }
 
-            if ($effect->accessDwelves()) {
-                $effects = 'Allows you to enter locations that have the Dwelve status on them to use a special form of exploration';
+            if ($effect->accessDelves()) {
+                $effects = 'Allows you to enter locations that have the Delve status on them to use a special form of exploration';
+            }
+
+            if ($effect->canChooseDelvePack()) {
+                $effects = 'Allows you to select how many monsters you want to fight in Delve.';
             }
         }
 

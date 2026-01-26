@@ -61,6 +61,8 @@ class ItemEffectsValue
 
     const DWELVE = 'dwelve';
 
+    const DWELVE_PACK_CHOICE = 'dwelve-pack-choice';
+
     /**
      * @var string[]
      */
@@ -91,6 +93,7 @@ class ItemEffectsValue
         self::TWISTED_TREE_BRANCH => 'access-twisted-memories',
         self::TWISTED_DUNGEONS => 'twisted-dungeons',
         self::DWELVE => 'dwelve',
+        self::DWELVE_PACK_CHOICE => 'dwelve-pack-choice',
     ];
 
     /**
@@ -304,11 +307,20 @@ class ItemEffectsValue
     }
 
     /**
-     * Allows player to access Dwelve based locations.
+     * Allows player to access Delve based locations.
      *
      * @return bool
      */
-    public function accessDwelves(): bool {
+    public function accessDelves(): bool {
         return $this->value === self::DWELVE;
+    }
+
+    /**
+     * Allows player to access Delve based locations.
+     *
+     * @return bool
+     */
+    public function canChooseDelvePack(): bool {
+        return $this->value === self::DWELVE_PACK_CHOICE    ;
     }
 }

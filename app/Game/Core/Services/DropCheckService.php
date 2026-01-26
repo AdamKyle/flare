@@ -118,7 +118,7 @@ class DropCheckService
 
         $this->battleDrop->handleMonsterQuestDrop($character);
 
-        $this->battleDrop->handleDwelveLocationQuestItems($character);
+        $this->battleDrop->handleDelveLocationQuestItems($character);
 
         if (! is_null($this->locationWithEffect)) {
             $this->battleDrop->handleSpecialLocationQuestItem($character);

@@ -41,7 +41,7 @@ class AutomationType
         return $this->value === self::EXPLORING;
     }
 
-    public function isDwelve(): bool {
+    public function isDelve(): bool {
         return $this->value === self::DWELVE;
     }
 }

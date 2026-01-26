@@ -2,11 +2,11 @@
 
 namespace App\Flare\Models;
 
-use Database\Factories\DwelveExplorationFactory;
+use Database\Factories\DelveExplorationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class DwelveExploration extends Model
+class DelveExploration extends Model
 {
     use HasFactory;
 
@@ -49,6 +49,6 @@ class DwelveExploration extends Model
 
     protected static function newFactory()
     {
-        return DwelveExplorationFactory::new();
+        return DelveExplorationFactory::new();
     }
 }

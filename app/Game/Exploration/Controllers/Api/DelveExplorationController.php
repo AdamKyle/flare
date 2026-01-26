@@ -7,19 +7,19 @@ use App\Flare\Models\Location;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\LocationType;
-use App\Game\Exploration\Requests\DwelveExplorationRequest;
+use App\Game\Exploration\Requests\DelveExplorationRequest;
 use App\Game\Exploration\Requests\ExplorationRequest;
-use App\Game\Exploration\Services\DwelveExplorationAutomationService;
+use App\Game\Exploration\Services\DelveExplorationAutomationService;
 use App\Game\Exploration\Services\ExplorationAutomationService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
-class DwelveExplorationController extends Controller
+class DelveExplorationController extends Controller
 {
 
-    public function __construct(private readonly DwelveExplorationAutomationService $dwelveExplorationAutomationService) {}
+    public function __construct(private readonly DelveExplorationAutomationService $dwelveExplorationAutomationService) {}
 
-    public function begin(DwelveExplorationRequest $request, Character $character): JsonResponse
+    public function begin(DelveExplorationRequest $request, Character $character): JsonResponse
     {
 
         if (! AttackTypeValue::attackTypeExists($request->attack_type)) {
@@ -49,7 +49,7 @@ class DwelveExplorationController extends Controller
         $this->dwelveExplorationAutomationService->beginAutomation($character, $request->all());
 
         return response()->json([
-            'message' => 'Dwelve has started child. Let us see how long you last shall we? (Max dwelve time is 8 hours.)',
+            'message' => 'Delve has started child. Let us see how long you last shall we? (Max dwelve time is 8 hours.)',
         ]);
     }
 

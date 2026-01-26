@@ -60,7 +60,7 @@ export default class FactionNpcSection extends React.Component<
                             target="_blank"
                             className="text-blue-500 underline"
                         >
-                            Medium Unique Item{" "}
+                            Unique Item{" "}
                             <i className="fas fa-external-link-alt"></i>
                         </a>
                     </dd>

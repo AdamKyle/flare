@@ -242,7 +242,7 @@ export default class ExplorationSection extends React.Component<any, any> {
         );
     }
 
-    startDwelveExploration() {
+    startDelveExploration() {
         this.setState(
             {
                 loading: true,
@@ -301,7 +301,7 @@ export default class ExplorationSection extends React.Component<any, any> {
         );
     }
 
-    stopDwelveExploration() {
+    stopDelveExploration() {
         this.setState(
             {
                 loading: true,
@@ -331,13 +331,13 @@ export default class ExplorationSection extends React.Component<any, any> {
         });
     }
 
-    closeDwelve() {
+    closeDelve() {
         this.setState({
             show_dwelve_setup: false,
         });
     }
 
-    openDwelveSetUp() {
+    openDelveSetUp() {
         this.setState({
             show_dwelve_setup: true,
         });
@@ -360,9 +360,9 @@ export default class ExplorationSection extends React.Component<any, any> {
             return (
                 <Fragment>
                     <div className="mb-4 lg:ml-[120px] text-center lg:text-left">
-                        Dwelve is running. You can cancel it below.{" "}
+                        Delve is running. You can cancel it below.{" "}
                         <a href="/information/automation" target="_blank">
-                            See Dwelve Help{" "}
+                            See Delve Help{" "}
                             <i className="fas fa-external-link-alt"></i>
                         </a>{" "}
                         for more details.
@@ -372,13 +372,13 @@ export default class ExplorationSection extends React.Component<any, any> {
 
                     <div className="text-center">
                         <DangerButton
-                            button_label={"Stop Dwelve"}
-                            on_click={this.stopDwelveExploration.bind(this)}
+                            button_label={"Stop Delve"}
+                            on_click={this.stopDelveExploration.bind(this)}
                             disabled={this.state.loading}
                             additional_css={"mr-2 mb-4"}
                         />
                         <PrimaryButton
-                            button_label={"Close Dwelve"}
+                            button_label={"Close Delve"}
                             on_click={this.closeExploration.bind(this)}
                             disabled={this.state.loading}
                         />
@@ -554,9 +554,9 @@ export default class ExplorationSection extends React.Component<any, any> {
                 additional_css={"w-full"}
                 close_alert={this.hideExplorationHelp.bind(this)}
             >
-                <h2>Dwelve & Exploration</h2>
+                <h2>Delve & Exploration</h2>
                 <p className={"my-2"}>
-                    <strong>Dwelve</strong> is an exploration mechanic where
+                    <strong>Delve</strong> is an exploration mechanic where
                     specific locations pit you against a random monster each
                     turn. When you kill the creature, the next turn selects a
                     new monster and increases its stats by a percentage. This
@@ -568,24 +568,24 @@ export default class ExplorationSection extends React.Component<any, any> {
                     The longer you last, the better the rewards will be. You can
                     read more about{" "}
                     <a href="/information/exploration" target="_blank">
-                        Dwelve <i className="fas fa-external-link-alt"></i>
+                        Delve <i className="fas fa-external-link-alt"></i>
                     </a>{" "}
                     in the help docs.
                 </p>
                 <p>
                     <strong>Exploration</strong> is a mechanic that lets you
-                    select a monster, an attack, and, unlike Dwelve, a time
-                    limit you want to explore for. Monsters in Exploration also
-                    do not get stronger as you fight them, and there is no
-                    reward for how long you fight. It is all about training,
-                    leveling, and, in the early stages, getting decent enough
-                    gear to start making money for Crafting and Enchanting.
+                    select a monster, an attack, and, unlike Delve, a time limit
+                    you want to explore for. Monsters in Exploration also do not
+                    get stronger as you fight them, and there is no reward for
+                    how long you fight. It is all about training, leveling, and,
+                    in the early stages, getting decent enough gear to start
+                    making money for Crafting and Enchanting.
                 </p>
             </InfoAlert>
         );
     }
 
-    renderSetUpDwelveExploration() {
+    renderSetUpDelveExploration() {
         return (
             <Fragment>
                 <div className="mt-2 grid lg:grid-cols-1 gap-2 lg:ml-[120px]">
@@ -608,8 +608,8 @@ export default class ExplorationSection extends React.Component<any, any> {
 
                 <div className={"lg:text-center mt-3 mb-3"}>
                     <PrimaryButton
-                        button_label={"Dwelve"}
-                        on_click={this.startDwelveExploration.bind(this)}
+                        button_label={"Delve"}
+                        on_click={this.startDelveExploration.bind(this)}
                         disabled={
                             this.state.attack_type === null ||
                             this.state.loading ||
@@ -620,7 +620,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                     />
                     <DangerButton
                         button_label={"Close"}
-                        on_click={this.closeDwelve.bind(this)}
+                        on_click={this.closeDelve.bind(this)}
                         disabled={this.state.loading}
                     />
 
@@ -642,7 +642,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                         <p>
                             For more help please see the{" "}
                             <a href="/information/exploration" target="_blank">
-                                Dwelve{" "}
+                                Delve{" "}
                                 <i className="fas fa-external-link-alt"></i>
                             </a>{" "}
                             help docs.
@@ -668,7 +668,7 @@ export default class ExplorationSection extends React.Component<any, any> {
         }
 
         if (this.state.show_dwelve_setup) {
-            return this.renderSetUpDwelveExploration();
+            return this.renderSetUpDelveExploration();
         }
 
         if (this.state.show_exploration_setup) {
@@ -695,8 +695,8 @@ export default class ExplorationSection extends React.Component<any, any> {
                 </div>
                 <div>
                     <SuccessButton
-                        button_label={"Dwelve"}
-                        on_click={this.openDwelveSetUp.bind(this)}
+                        button_label={"Delve"}
+                        on_click={this.openDelveSetUp.bind(this)}
                         disabled={
                             this.props.character.is_dead ||
                             !this.props.character.can_attack

@@ -4,7 +4,7 @@ namespace App\Game\Exploration\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class DwelveExplorationRequest extends FormRequest
+class DelveExplorationRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

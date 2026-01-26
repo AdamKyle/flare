@@ -2,7 +2,7 @@
 
 namespace App\Game\Exploration\Jobs;
 
-use App\Flare\Models\DwelveExploration as DwelveExplorationModel;
+use App\Flare\Models\DelveExploration as DelveExplorationModel;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Battle\Services\MonsterFightService;
@@ -29,7 +29,7 @@ use App\Game\Exploration\Events\ExplorationTimeOut;
 use App\Game\Skills\Services\SkillService;
 use Psr\SimpleCache\InvalidArgumentException;
 
-class DwelveExploration implements ShouldQueue
+class DelveExploration implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -85,7 +85,7 @@ class DwelveExploration implements ShouldQueue
 
         $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
 
-        $dwelveAutomation = DwelveExplorationModel::where('character_id', $this->character->id)->where('id', $this->dwelveAutomationId)->first();
+        $dwelveAutomation = DelveExplorationModel::where('character_id', $this->character->id)->where('id', $this->dwelveAutomationId)->first();
 
         if ($this->shouldBail($automation, $dwelveAutomation)) {
             $this->endAutomation($automation, $dwelveAutomation, $characterCacheData);
@@ -114,13 +114,13 @@ class DwelveExploration implements ShouldQueue
 
             $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id']);
 
-            $this->updateDwelveAutomation($dwelveAutomation, [
+            $this->updateDelveAutomation($dwelveAutomation, [
                 'increase_enemy_strength' => $dwelveAutomation->increase_enemy_strength + 0.0625
             ]);
 
             $this->updateMonsterForNextFight($dwelveAutomation);
 
-            DwelveExploration::dispatch($this->character, $this->automationId, $this->dwelveAutomationId, $this->attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
+            DelveExploration::dispatch($this->character, $this->automationId, $this->dwelveAutomationId, $this->attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
 
             return;
         }
@@ -151,12 +151,12 @@ class DwelveExploration implements ShouldQueue
             'completed_at' => now(),
         ]);
 
-        $this->sendOutEventLogUpdate('Something went wrong with dwelve. Could not process fight. Dwelve Canceled.');
+        $this->sendOutEventLogUpdate('Something went wrong with dwelve. Could not process fight. Delve Canceled.');
 
         event(new ExplorationTimeOut($this->character->user, 0));
     }
 
-    private function updateMonsterForNextFight(DwelveExplorationModel $dwelveExploration): void {
+    private function updateMonsterForNextFight(DelveExplorationModel $dwelveExploration): void {
         $monsterId = Monster::where('is_celestial_entity', false)
             ->where('is_raid_monster', false)
             ->where('is_raid_boss', false)
@@ -165,25 +165,25 @@ class DwelveExploration implements ShouldQueue
             ->first()
             ->id;
 
-        $this->updateDwelveAutomation($dwelveExploration, [
+        $this->updateDelveAutomation($dwelveExploration, [
             'monster_id' => $monsterId
         ]);
     }
 
-    private function updateDwelveAutomation(DwelveExplorationModel $dwelveExploration, array $data): void {
+    private function updateDelveAutomation(DelveExplorationModel $dwelveExploration, array $data): void {
         $dwelveExploration->update($data);
     }
 
     /**
      * Handle an encounter.
      *
-     * @param DwelveExplorationModel $dwelveExploration
+     * @param DelveExplorationModel $dwelveExploration
      * @param array $params
      * @param int $timeDelay
      * @return bool
      * @throws InvalidArgumentException
      */
-    private function encounter(DwelveExplorationModel $dwelveExploration, array $params, int $timeDelay): bool
+    private function encounter(DelveExplorationModel $dwelveExploration, array $params, int $timeDelay): bool
     {
 
         $canSurviveFights = $this->canSurviveFight($dwelveExploration, $params);
@@ -203,12 +203,12 @@ class DwelveExploration implements ShouldQueue
      *
      * - Uses a cached version to make this faster.
      *
-     * @param DwelveExplorationModel $dwelveExploration
+     * @param DelveExplorationModel $dwelveExploration
      * @param array $params
      * @return bool
      * @throws InvalidArgumentException
      */
-    private function canSurviveFight(DwelveExplorationModel $dwelveExploration, array $params): bool
+    private function canSurviveFight(DelveExplorationModel $dwelveExploration, array $params): bool
     {
 
         $this->sendOutEventLogUpdate('Before you in the darkness, lies a beast unknown to man. Kill it child. Slaughter it!');
@@ -220,12 +220,12 @@ class DwelveExploration implements ShouldQueue
     /**
      * Fight monster through automation.
      *
-     * @param DwelveExplorationModel $dwelveExploration
+     * @param DelveExplorationModel $dwelveExploration
      * @param array $params
      * @return bool
      * @throws InvalidArgumentException
      */
-    private function fightAutomationMonster(DwelveExplorationModel $dwelveExploration, array $params): bool
+    private function fightAutomationMonster(DelveExplorationModel $dwelveExploration, array $params): bool
     {
 
         $data = $this->monsterFightService->setupMonster($this->character, $params, true, true);
@@ -267,11 +267,11 @@ class DwelveExploration implements ShouldQueue
     /**
      * Handle when a character dies in automation.
      *
-     * @param DwelveExplorationModel $dwelveExploration
+     * @param DelveExplorationModel $dwelveExploration
      * @param array $data
      * @return bool
      */
-    private function handleWhenCharacterDies(DwelveExplorationModel $dwelveExploration, array $data): bool {
+    private function handleWhenCharacterDies(DelveExplorationModel $dwelveExploration, array $data): bool {
         if ($data['health']['current_character_health'] <= 0) {
 
             $dwelveExploration->update([
@@ -282,7 +282,7 @@ class DwelveExploration implements ShouldQueue
 
             $this->sendOutEventLogUpdate('You died during the dwelve. Exploration has ended, but not all is lost, you awaken from your wounds there might be treasures waiting, treasures you collected. (See server messages for treasures)');
 
-            $this->rewardPlayer($this->character, $dwelveExploration->refrsh());
+            $this->rewardPlayer($this->character, $dwelveExploration->refresh());
 
             event(new ExplorationTimeOut($this->character->user, 0));
 
@@ -305,10 +305,10 @@ class DwelveExploration implements ShouldQueue
      * Should we bail?
      *
      * @param CharacterAutomation|null $automation
-     * @param DwelveExplorationModel|null $dwelveExploration
+     * @param DelveExplorationModel|null $dwelveExploration
      * @return bool
      */
-    private function shouldBail(?CharacterAutomation $automation = null, ?DwelveExplorationModel $dwelveExploration = null): bool
+    private function shouldBail(?CharacterAutomation $automation = null, ?DelveExplorationModel $dwelveExploration = null): bool
     {
 
         if (is_null($automation)) {
@@ -334,11 +334,11 @@ class DwelveExploration implements ShouldQueue
      * End automation.
      *
      * @param CharacterAutomation|null $automation
-     * @param DwelveExplorationModel|null $dwelveExploration
+     * @param DelveExplorationModel|null $dwelveExploration
      * @param CharacterCacheData $characterCacheData
      * @return void
      */
-    private function endAutomation(?CharacterAutomation $automation, ?DwelveExplorationModel $dwelveExploration, CharacterCacheData $characterCacheData): void
+    private function endAutomation(?CharacterAutomation $automation, ?DelveExplorationModel $dwelveExploration, CharacterCacheData $characterCacheData): void
     {
         $characterCacheData->deleteCharacterSheet($this->character);
 
@@ -373,17 +373,17 @@ class DwelveExploration implements ShouldQueue
     /**
      * Fight the monster.
      *
-     * @param DwelveExplorationModel $dwelveExploration
+     * @param DelveExplorationModel $dwelveExploration
      * @return array
      * @throws InvalidArgumentException
      */
-    private function fightMonster(DwelveExplorationModel $dwelveExploration): array {
+    private function fightMonster(DelveExplorationModel $dwelveExploration): array {
         $data = $this->monsterFightService->fightMonster($this->character, $this->attackType, false, true);
 
         $battleMessages = $dwelveExploration->battle_messages;
         $battleMessages[] = $data;
 
-        $this->updateDwelveAutomation($dwelveExploration, [
+        $this->updateDelveAutomation($dwelveExploration, [
             'battle_messages' => $battleMessages
         ]);
 
@@ -396,7 +396,7 @@ class DwelveExploration implements ShouldQueue
         if ($this->shouldAttackAgain($data) && $this->attempts < self::MAX_ATTEMPTS) {
             $this->attempts++;
 
-            return $this->fightMonster();
+            return $this->fightMonster($dwelveExploration);
         }
 
         return $data;
@@ -428,11 +428,11 @@ class DwelveExploration implements ShouldQueue
      * Reward the player for automation completion.
      *
      * @param Character $character
-     * @param DwelveExplorationModel $dwelveExploration
+     * @param DelveExplorationModel $dwelveExploration
      * @return void
      * @throws Exception
      */
-    private function rewardPlayer(Character $character, DwelveExplorationModel $dwelveExploration): void
+    private function rewardPlayer(Character $character, DelveExplorationModel $dwelveExploration): void
     {
 
         $start = $dwelveExploration->started_at;

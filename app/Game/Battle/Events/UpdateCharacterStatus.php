@@ -56,7 +56,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
             'is_alchemy_locked' => $this->isAlchemyLocked($character),
             'show_craft_for_event' => $this->shouldShowCraftingEventButton($character),
             'show_enchanting_for_event' => $this->shouldShowEnchantingEventButton($character),
-            'is_at_dwelve_location' => $this->isAtDwelveLocation($character),
+            'is_at_dwelve_location' => $this->isAtDelveLocation($character),
         ];
 
         $this->user = $character->user;
@@ -89,20 +89,20 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
         return $alchemySkill->is_locked;
     }
 
-    private function isAtDwelveLocation(Character $character): bool {
+    private function isAtDelveLocation(Character $character): bool {
         $characterMap = $character->map;
 
-        $questItemForDwelve = Item::where('effect', ItemEffectsValue::DWELVE)->first();
+        $questItemForDelve = Item::where('effect', ItemEffectsValue::DWELVE)->first();
 
-        if (is_null($questItemForDwelve)) {
+        if (is_null($questItemForDelve)) {
             return false;
         }
 
         $location = Location::where('game_map_id', $characterMap->game_map_id)->where('x', $characterMap->character_position_x)->where('y', $characterMap->character_position_y)
             ->where('type', LocationType::CAVE_OF_MEMORIES)->first();
 
-        $characterHasItem = $character->inventory->slots->filter(function($slot) use ($questItemForDwelve) {
-            return $slot->item_id === $questItemForDwelve->id;
+        $characterHasItem = $character->inventory->slots->filter(function($slot) use ($questItemForDelve) {
+            return $slot->item_id === $questItemForDelve->id;
         })->isNotEmpty();
 
         return !is_null($location) && $characterHasItem;
