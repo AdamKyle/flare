@@ -61,7 +61,7 @@ class DelveExplorationAutomationService
 
         event(new ExplorationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
 
-        $this->startAutomation($character, $automation->id, $delveExploration->id, $params['attack_type']);
+        $this->startAutomation($character, $automation->id, $delveExploration->id, $params);
     }
 
     public function stopExploration(Character $character)
@@ -97,8 +97,8 @@ class DelveExplorationAutomationService
         $this->timeDelay = 3;
     }
 
-    protected function startAutomation(Character $character, int $automationId, int $delveAutomationId, string $attackType)
+    protected function startAutomation(Character $character, int $automationId, int $delveAutomationId, array $params)
     {
-        DelveExplorationProcessing::dispatch($character, $automationId, $delveAutomationId, $attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
+        DelveExplorationProcessing::dispatch($character, $automationId, $delveAutomationId, $params, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
     }
 }

@@ -307,6 +307,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                     .setRoute("delve/" + this.props.character.id + "/start")
                     .setParameters({
                         attack_type: this.state.attack_type,
+                        pack_size: this.state.delve_pack_size,
                     })
                     .doAjaxCall(
                         "post",
@@ -642,7 +643,6 @@ export default class ExplorationSection extends React.Component<any, any> {
     renderPackSizeAlert(packSize: number) {
         const xpBoost = match(packSize)
             .with(1, () => "100%")
-            .with(2, () => "125%")
             .with(5, () => "175%")
             .with(10, () => "250%")
             .with(20, () => "325%")

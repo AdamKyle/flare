@@ -95,7 +95,18 @@ class MonsterPlayerFight
         }
 
         if ($shouldIncreaseStrength) {
+
+            $cachedMonster = Cache::get('delve-monster-' . $character->id . $this->monster['id'] . 'fight');
+
+            if (!is_null($cachedMonster)) {
+                return $cachedMonster;
+            }
+
             $this->monster = $this->delveMonsterService->createMonster($this->monster, $character);
+
+            if ($params['pack_size'] > 1 && $shouldIncreaseStrength) {
+                Cache::put('delve-monster-' . $character->id . $this->monster['id'] . 'fight', $this->monster, 900);
+            }
         }
 
         return $this;

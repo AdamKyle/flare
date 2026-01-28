@@ -55,14 +55,20 @@ class DelveExploration implements ShouldQueue
 
     private int $timeDelay;
 
+    private int $packSize;
+
     private int $attempts = 0;
 
-    public function __construct(Character $character, int $automationId, int $delveExplorationId, string $attackType, int $timeDelay)
+    private array $battleData = [];
+
+
+    public function __construct(Character $character, int $automationId, int $delveExplorationId, array $params, int $timeDelay)
     {
         $this->character = $character;
         $this->automationId = $automationId;
         $this->delveAutomationId = $delveExplorationId;
-        $this->attackType = $attackType;
+        $this->attackType = $params['attack_type'];
+        $this->packSize = $params['pack_size'] ?? 1;
         $this->timeDelay = $timeDelay;
     }
 
@@ -98,6 +104,7 @@ class DelveExploration implements ShouldQueue
         $params = [
             'selected_monster_id' => $delveAutomation->monster_id,
             'attack_type' => $this->attackType,
+            'pack_size' => $this->packSize,
         ];
 
         if ($this->encounter($delveAutomation, $params, $this->timeDelay)) {
@@ -112,13 +119,15 @@ class DelveExploration implements ShouldQueue
                 return;
             }
 
-            $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id']);
+            $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], $this->battleData);
 
             $this->updateDelveAutomation($delveAutomation, [
-                'increase_enemy_strength' => $delveAutomation->increase_enemy_strength + 0.0625
+                'increase_enemy_strength' => $delveAutomation->increase_enemy_strength + 0.0325
             ]);
 
             $this->updateMonsterForNextFight($delveAutomation);
+
+            $this->deletePackCache();
 
             DelveExploration::dispatch($this->character, $this->automationId, $this->delveAutomationId, $this->attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
 
@@ -138,6 +147,8 @@ class DelveExploration implements ShouldQueue
 
             $this->rewardPlayer($character, $delveAutomation->refresh());
 
+            $this->deletePackCache();
+
             event(new UpdateCharacterStatus($character));
 
             event(new ExplorationTimeOut($character->user, 0));
@@ -154,6 +165,12 @@ class DelveExploration implements ShouldQueue
         $this->sendOutEventLogUpdate('Something went wrong with delve. Could not process fight. Delve Canceled.');
 
         event(new ExplorationTimeOut($this->character->user, 0));
+    }
+
+    private function deletePackCache(): void {
+        $monsterId = $this->monsterFightService->getMonster()->id;
+
+        Cache::delete('delve-monster-' . $this->character->id . $monsterId . 'fight');
     }
 
     private function updateMonsterForNextFight(DelveExplorationModel $delveExploration): void {
@@ -213,8 +230,56 @@ class DelveExploration implements ShouldQueue
 
         $this->sendOutEventLogUpdate('Before you in the darkness, lies a beast unknown to man. Kill it child. Slaughter it!');
 
+        $packSize = $params['pack_size'];
+
+        if ($packSize > 1) {
+
+            return $this->fightMultipleEnemies($delveExploration, $params);
+        }
+
         return $this->fightAutomationMonster($delveExploration, $params);
 
+    }
+
+    private function fightMultipleEnemies(DelveExplorationModel $delveExploration, array $params): bool {
+        $totalXpToReward = 0;
+        $totalSkillXpToReward = 0;
+        $totalFactionPoints = 0;
+        $characterRewardService = $this->characterRewardService->setCharacter($this->character);
+        $characterSkillService = $this->skillService->setSkillInTraining($this->character);
+
+        $packSize = $params['pack_size'];
+
+        for ($i = 1; $i <= $packSize; $i++) {
+            $survived = $this->fightAutomationMonster($delveExploration, $params);
+
+            if (!$survived) {
+                return false;
+            }
+
+            $totalXpToReward += $characterRewardService->fetchXpForMonster($this->monster);
+            $totalSkillXpToReward += $characterSkillService->getXpForSkillIntraining($this->character, $this->monster->xp);
+            $totalFactionPoints += $this->factionHandler->getFactionPointsPerKill($this->character);
+        }
+
+        $this->battleData = [
+            'total_creatures' => $params['pack_size'],
+            'total_xp' => $this->getPackSizeXp($totalXpToReward, $packSize),
+            'total_faction_points' => $totalFactionPoints,
+            'total_skill_xp' => $this->getPackSizeXp($totalSkillXpToReward, $packSize),
+        ];
+
+        return true;
+    }
+
+    private function getPackSizeXp(int $packSize, int $xp): int {
+        return match($packSize) {
+            5 => $xp + (1.75 * $xp),
+            10 => $xp + (2.50 * $xp),
+            20 => $xp + (3.25 * $xp),
+            25 => $xp + (500 * $xp),
+            default => $xp
+        };
     }
 
     /**
@@ -270,6 +335,7 @@ class DelveExploration implements ShouldQueue
      * @param DelveExplorationModel $delveExploration
      * @param array $data
      * @return bool
+     * @throws Exception
      */
     private function handleWhenCharacterDies(DelveExplorationModel $delveExploration, array $data): bool {
         if ($data['health']['current_character_health'] <= 0) {
@@ -283,6 +349,8 @@ class DelveExploration implements ShouldQueue
             $this->sendOutEventLogUpdate('You died during the delve. Exploration has ended, but not all is lost, you awaken from your wounds there might be treasures waiting, treasures you collected. (See server messages for treasures)');
 
             $this->rewardPlayer($this->character, $delveExploration->refresh());
+
+            $this->deletePackCache();
 
             event(new ExplorationTimeOut($this->character->user, 0));
 
@@ -337,6 +405,7 @@ class DelveExploration implements ShouldQueue
      * @param DelveExplorationModel|null $delveExploration
      * @param CharacterCacheData $characterCacheData
      * @return void
+     * @throws Exception
      */
     private function endAutomation(?CharacterAutomation $automation, ?DelveExplorationModel $delveExploration, CharacterCacheData $characterCacheData): void
     {

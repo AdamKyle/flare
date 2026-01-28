@@ -52,11 +52,6 @@ class DelveMonsterService {
 
         $increaseAmount = $delveExploration->increase_enemy_strength;
 
-        if (!isset($monster['damage_stat'])) {
-            dump('Monster stat damage stat is not set, what is monster:');
-            dd($monster);
-        }
-
         $monsterDamageStat = $monster[$monster['damage_stat']] * $increaseAmount;
 
         $monster = $this->increaseMonsterStats($monster, $monsterDamageStat);
