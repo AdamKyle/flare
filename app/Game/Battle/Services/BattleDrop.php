@@ -139,14 +139,14 @@ class BattleDrop
     }
 
     /**
-     * Handle when a character is in a dwelve exploration for quest items
+     * Handle when a character is in a delve exploration for quest items
      *
      * @param Character $character
      * @return void
      * @throws Exception
      */
     public function handleDelveLocationQuestItems(Character $character): void {
-        $automation = $character->currentAutomations()->where('type', AutomationType::DWELVE)->first();
+        $automation = $character->currentAutomations()->where('type', AutomationType::DELVE)->first();
 
         if (is_null($automation)) {
             return;

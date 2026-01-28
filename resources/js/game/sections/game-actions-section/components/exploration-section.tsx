@@ -2,7 +2,6 @@ import React, { Fragment } from "react";
 import DangerButton from "../../../components/ui/buttons/danger-button";
 import Select from "react-select";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
-import { replace, startCase } from "lodash";
 import Ajax from "../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
@@ -10,6 +9,8 @@ import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-aler
 import SuccessButton from "../../../components/ui/buttons/success-button";
 import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
 import WarningAlert from "../../../components/ui/alerts/simple-alerts/warning-alert";
+import { match } from "ts-pattern";
+import { startCase } from "lodash";
 
 export default class ExplorationSection extends React.Component<any, any> {
     constructor(props: any) {
@@ -19,10 +20,11 @@ export default class ExplorationSection extends React.Component<any, any> {
             monster_selected: null,
             time_selected: null,
             attack_type: null,
+            delve_pack_size: null,
             move_down_monster_list: null,
             error_message: null,
             hide_exploration_help: false,
-            show_dwelve_setup: false,
+            show_delve_setup: false,
             show_exploration_setup: false,
         };
     }
@@ -82,6 +84,13 @@ export default class ExplorationSection extends React.Component<any, any> {
         });
     }
 
+    setDelvePackSize(data: any) {
+        this.setState({
+            delve_pack_size:
+                data.value !== "" ? parseInt(data.value) || null : null,
+        });
+    }
+
     setMoveDownList(data: any) {
         this.setState({
             move_down_monster_list: data.value !== "" ? data.value : null,
@@ -138,6 +147,35 @@ export default class ExplorationSection extends React.Component<any, any> {
         ];
     }
 
+    packSize() {
+        return [
+            {
+                label: "1 Enemy",
+                value: 1,
+            },
+            {
+                label: "2 Enemies",
+                value: "2",
+            },
+            {
+                label: "5 Enemies",
+                value: "5",
+            },
+            {
+                label: "10 Enemies",
+                value: "10",
+            },
+            {
+                label: "20 Enemies",
+                value: "defend",
+            },
+            {
+                label: "25 Enemies",
+                value: "defend",
+            },
+        ];
+    }
+
     moveDownTheListEvery() {
         return [
             {
@@ -178,6 +216,22 @@ export default class ExplorationSection extends React.Component<any, any> {
             return {
                 label: startCase(this.state.attack_type),
                 value: this.state.attack_type,
+            };
+        }
+
+        return {
+            label: "Please select attack type",
+            value: "",
+        };
+    }
+
+    defaultDelvePackSize() {
+        if (this.state.delve_pack_size !== null) {
+            const label = this.state.delve_pack_size > 1 ? "Enemies" : "Enemy";
+
+            return {
+                label: this.state.delve_pack_size + " " + label,
+                value: this.state.delve_pack_size,
             };
         }
 
@@ -250,7 +304,7 @@ export default class ExplorationSection extends React.Component<any, any> {
             },
             () => {
                 new Ajax()
-                    .setRoute("dwelve/" + this.props.character.id + "/start")
+                    .setRoute("delve/" + this.props.character.id + "/start")
                     .setParameters({
                         attack_type: this.state.attack_type,
                     })
@@ -309,7 +363,7 @@ export default class ExplorationSection extends React.Component<any, any> {
             },
             () => {
                 new Ajax()
-                    .setRoute("dwelve/" + this.props.character.id + "/stop")
+                    .setRoute("delve/" + this.props.character.id + "/stop")
                     .doAjaxCall(
                         "post",
                         (result: AxiosResponse) => {
@@ -333,13 +387,13 @@ export default class ExplorationSection extends React.Component<any, any> {
 
     closeDelve() {
         this.setState({
-            show_dwelve_setup: false,
+            show_delve_setup: false,
         });
     }
 
     openDelveSetUp() {
         this.setState({
-            show_dwelve_setup: true,
+            show_delve_setup: true,
         });
     }
 
@@ -356,7 +410,7 @@ export default class ExplorationSection extends React.Component<any, any> {
     }
 
     renderAudotmationIsRunning() {
-        if (this.props.character.is_dwelve_running) {
+        if (this.props.character.is_delve_running) {
             return (
                 <Fragment>
                     <div className="mb-4 lg:ml-[120px] text-center lg:text-left">
@@ -585,6 +639,64 @@ export default class ExplorationSection extends React.Component<any, any> {
         );
     }
 
+    renderPackSizeAlert(packSize: number) {
+        const xpBoost = match(packSize)
+            .with(1, () => "100%")
+            .with(2, () => "125%")
+            .with(5, () => "175%")
+            .with(10, () => "250%")
+            .with(20, () => "325%")
+            .with(25, () => "500%")
+            .otherwise(() => "0%");
+
+        const timeIncrease = match(packSize)
+            .with(1, () => "3 minutes")
+            .with(2, () => "3 minutes")
+            .with(5, () => "3 minutes")
+            .with(10, () => "5 minutes")
+            .with(20, () => "5 minutes")
+            .with(25, () => "8 minutes")
+            .otherwise(() => "0%");
+
+        return (
+            <WarningAlert>
+                Selecting this pack size will give you a bonus of{" "}
+                <strong>{xpBoost}</strong> which is applied BEFORE all your
+                boons or quest items ate effect XP. This can increase the amount
+                of xp you gain significantly. This does come with time delay
+                between fights which will become:{" "}
+                <strong>{timeIncrease}</strong>
+            </WarningAlert>
+        );
+    }
+
+    renderPackSizeOption() {
+        if (!this.props.character.can_set_delve_pack) {
+            return null;
+        }
+
+        return (
+            <div className="mt-2 grid lg:grid-cols-1 gap-2 lg:ml-[120px]">
+                <Select
+                    onChange={this.setDelvePackSize.bind(this)}
+                    options={this.packSize()}
+                    menuPosition={"absolute"}
+                    menuPlacement={"bottom"}
+                    styles={{
+                        menuPortal: (base) => ({
+                            ...base,
+                            zIndex: 9999,
+                            color: "#000000",
+                        }),
+                    }}
+                    menuPortalTarget={document.body}
+                    value={this.defaultDelvePackSize()}
+                />
+                {this.renderPackSizeAlert(this.state.delve_pack_size)}
+            </div>
+        );
+    }
+
     renderSetUpDelveExploration() {
         return (
             <Fragment>
@@ -605,6 +717,8 @@ export default class ExplorationSection extends React.Component<any, any> {
                         value={this.defaultAttackType()}
                     />
                 </div>
+
+                {this.renderPackSizeOption()}
 
                 <div className={"lg:text-center mt-3 mb-3"}>
                     <PrimaryButton
@@ -658,16 +772,16 @@ export default class ExplorationSection extends React.Component<any, any> {
 
         if (
             this.props.character.is_automation_running ||
-            this.props.character.is_dwelve_running
+            this.props.character.is_delve_running
         ) {
             return this.renderAudotmationIsRunning();
         }
 
-        if (!this.props.character.is_at_dwelve_location) {
+        if (!this.props.character.is_at_delve_location) {
             return this.renderExplorationSection();
         }
 
-        if (this.state.show_dwelve_setup) {
+        if (this.state.show_delve_setup) {
             return this.renderSetUpDelveExploration();
         }
 

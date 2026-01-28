@@ -2403,7 +2403,7 @@
   resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-18.3.7.tgz#b89ddf2cd83b4feafcc4e2ea41afdfb95a0d194f"
   integrity sha512-MEe3UeoENYVFXzoXEWsvcpg6ZvlrFNlOQ7EOsvhI3CfAXwzPfO8Qwuxd40nepsYKqyyVQnTdEfv68q91yLcKrQ==
 
-"@types/react-resizable@^3.1.3":
+"@types/react-resizable@^3.0.8":
   version "3.0.8"
   resolved "https://registry.yarnpkg.com/@types/react-resizable/-/react-resizable-3.0.8.tgz#b27001b4d262c82cc076272df4b8ef91d9487918"
   integrity sha512-Pcvt2eGA7KNXldt1hkhVhAgZ8hK41m0mp89mFgQi7LAAEZiaLgm4fHJ5zbJZ/4m2LVaAyYrrRRv1LHDcrGQanA==
@@ -6442,6 +6442,11 @@ ts-loader@9.5.1:
     micromatch "^4.0.0"
     semver "^7.3.4"
     source-map "^0.7.4"
+
+ts-pattern@^5.9.0:
+  version "5.9.0"
+  resolved "https://registry.yarnpkg.com/ts-pattern/-/ts-pattern-5.9.0.tgz#f0fb5205ce0b0c59af72beba62fee7612a61cea4"
+  integrity sha512-6s5V71mX8qBUmlgbrfL33xDUwO0fq48rxAu2LBE11WBeGdpCPOsXksQbZJHvHwhrd3QjUusd3mAOM5Gg0mFBLg==
 
 ts-toolbelt@^9.6.0:
   version "9.6.0"

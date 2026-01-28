@@ -38,7 +38,7 @@ class MonsterPlayerFight
 
     private CharacterCacheData $characterCacheData;
 
-    private DelveMonsterService $dwelveMonsterService;
+    private DelveMonsterService $delveMonsterService;
 
     private Voidance $voidance;
 
@@ -49,14 +49,14 @@ class MonsterPlayerFight
     public function __construct(
         BuildMonster $buildMonster,
         CharacterCacheData $characterCacheData,
-        DelveMonsterService $dwelveMonsterService,
+        DelveMonsterService $delveMonsterService,
         Voidance $voidance,
         Ambush $ambush,
         Attack $attack
     ) {
         $this->buildMonster = $buildMonster;
         $this->characterCacheData = $characterCacheData;
-        $this->dwelveMonsterService = $dwelveMonsterService;
+        $this->delveMonsterService = $delveMonsterService;
         $this->voidance = $voidance;
         $this->ambush = $ambush;
         $this->attack = $attack;
@@ -95,7 +95,7 @@ class MonsterPlayerFight
         }
 
         if ($shouldIncreaseStrength) {
-            $this->monster = $this->dwelveMonsterService->createMonster($this->monster, $character);
+            $this->monster = $this->delveMonsterService->createMonster($this->monster, $character);
         }
 
         return $this;

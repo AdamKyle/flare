@@ -49,7 +49,7 @@ class DelveExploration implements ShouldQueue
 
     private int $automationId;
 
-    private int $dwelveAutomationId;
+    private int $delveAutomationId;
 
     private string $attackType;
 
@@ -57,11 +57,11 @@ class DelveExploration implements ShouldQueue
 
     private int $attempts = 0;
 
-    public function __construct(Character $character, int $automationId, int $dwelveExplorationId, string $attackType, int $timeDelay)
+    public function __construct(Character $character, int $automationId, int $delveExplorationId, string $attackType, int $timeDelay)
     {
         $this->character = $character;
         $this->automationId = $automationId;
-        $this->dwelveAutomationId = $dwelveExplorationId;
+        $this->delveAutomationId = $delveExplorationId;
         $this->attackType = $attackType;
         $this->timeDelay = $timeDelay;
     }
@@ -85,10 +85,10 @@ class DelveExploration implements ShouldQueue
 
         $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
 
-        $dwelveAutomation = DelveExplorationModel::where('character_id', $this->character->id)->where('id', $this->dwelveAutomationId)->first();
+        $delveAutomation = DelveExplorationModel::where('character_id', $this->character->id)->where('id', $this->delveAutomationId)->first();
 
-        if ($this->shouldBail($automation, $dwelveAutomation)) {
-            $this->endAutomation($automation, $dwelveAutomation, $characterCacheData);
+        if ($this->shouldBail($automation, $delveAutomation)) {
+            $this->endAutomation($automation, $delveAutomation, $characterCacheData);
 
             Cache::delete('can-character-survive-' . $this->character->id);
 
@@ -96,31 +96,31 @@ class DelveExploration implements ShouldQueue
         }
 
         $params = [
-            'selected_monster_id' => $dwelveAutomation->monster_id,
+            'selected_monster_id' => $delveAutomation->monster_id,
             'attack_type' => $this->attackType,
         ];
 
-        if ($this->encounter($dwelveAutomation, $params, $this->timeDelay)) {
+        if ($this->encounter($delveAutomation, $params, $this->timeDelay)) {
 
             $time = now()->diffInMinutes($automation->completed_at);
 
             $delay = $time >= $this->timeDelay ? $this->timeDelay : ($time > 1 ? $time : 0);
 
             if ($delay === 0) {
-                $this->endAutomation($automation, $dwelveAutomation, $characterCacheData);
+                $this->endAutomation($automation, $delveAutomation, $characterCacheData);
 
                 return;
             }
 
             $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id']);
 
-            $this->updateDelveAutomation($dwelveAutomation, [
-                'increase_enemy_strength' => $dwelveAutomation->increase_enemy_strength + 0.0625
+            $this->updateDelveAutomation($delveAutomation, [
+                'increase_enemy_strength' => $delveAutomation->increase_enemy_strength + 0.0625
             ]);
 
-            $this->updateMonsterForNextFight($dwelveAutomation);
+            $this->updateMonsterForNextFight($delveAutomation);
 
-            DelveExploration::dispatch($this->character, $this->automationId, $this->dwelveAutomationId, $this->attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
+            DelveExploration::dispatch($this->character, $this->automationId, $this->delveAutomationId, $this->attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
 
             return;
         }
@@ -128,7 +128,7 @@ class DelveExploration implements ShouldQueue
         if ($this->attempts >= self::MAX_ATTEMPTS) {
             $automation->delete();
 
-            $dwelveAutomation->update([
+            $delveAutomation->update([
                 'completed_at' => now(),
             ]);
 
@@ -136,7 +136,7 @@ class DelveExploration implements ShouldQueue
 
             $character = $this->character->refresh();
 
-            $this->rewardPlayer($character, $dwelveAutomation->refresh());
+            $this->rewardPlayer($character, $delveAutomation->refresh());
 
             event(new UpdateCharacterStatus($character));
 
@@ -147,46 +147,46 @@ class DelveExploration implements ShouldQueue
 
         $automation->delete();
 
-        $dwelveAutomation->update([
+        $delveAutomation->update([
             'completed_at' => now(),
         ]);
 
-        $this->sendOutEventLogUpdate('Something went wrong with dwelve. Could not process fight. Delve Canceled.');
+        $this->sendOutEventLogUpdate('Something went wrong with delve. Could not process fight. Delve Canceled.');
 
         event(new ExplorationTimeOut($this->character->user, 0));
     }
 
-    private function updateMonsterForNextFight(DelveExplorationModel $dwelveExploration): void {
+    private function updateMonsterForNextFight(DelveExplorationModel $delveExploration): void {
         $monsterId = Monster::where('is_celestial_entity', false)
             ->where('is_raid_monster', false)
             ->where('is_raid_boss', false)
-            ->where('game_map_id', $dwelveExploration->character->map->game_map_id)
+            ->where('game_map_id', $delveExploration->character->map->game_map_id)
             ->inRandomOrder()
             ->first()
             ->id;
 
-        $this->updateDelveAutomation($dwelveExploration, [
+        $this->updateDelveAutomation($delveExploration, [
             'monster_id' => $monsterId
         ]);
     }
 
-    private function updateDelveAutomation(DelveExplorationModel $dwelveExploration, array $data): void {
-        $dwelveExploration->update($data);
+    private function updateDelveAutomation(DelveExplorationModel $delveExploration, array $data): void {
+        $delveExploration->update($data);
     }
 
     /**
      * Handle an encounter.
      *
-     * @param DelveExplorationModel $dwelveExploration
+     * @param DelveExplorationModel $delveExploration
      * @param array $params
      * @param int $timeDelay
      * @return bool
      * @throws InvalidArgumentException
      */
-    private function encounter(DelveExplorationModel $dwelveExploration, array $params, int $timeDelay): bool
+    private function encounter(DelveExplorationModel $delveExploration, array $params, int $timeDelay): bool
     {
 
-        $canSurviveFights = $this->canSurviveFight($dwelveExploration, $params);
+        $canSurviveFights = $this->canSurviveFight($delveExploration, $params);
 
         if ($canSurviveFights) {
 
@@ -203,36 +203,36 @@ class DelveExploration implements ShouldQueue
      *
      * - Uses a cached version to make this faster.
      *
-     * @param DelveExplorationModel $dwelveExploration
+     * @param DelveExplorationModel $delveExploration
      * @param array $params
      * @return bool
      * @throws InvalidArgumentException
      */
-    private function canSurviveFight(DelveExplorationModel $dwelveExploration, array $params): bool
+    private function canSurviveFight(DelveExplorationModel $delveExploration, array $params): bool
     {
 
         $this->sendOutEventLogUpdate('Before you in the darkness, lies a beast unknown to man. Kill it child. Slaughter it!');
 
-        return $this->fightAutomationMonster($dwelveExploration, $params);
+        return $this->fightAutomationMonster($delveExploration, $params);
 
     }
 
     /**
      * Fight monster through automation.
      *
-     * @param DelveExplorationModel $dwelveExploration
+     * @param DelveExplorationModel $delveExploration
      * @param array $params
      * @return bool
      * @throws InvalidArgumentException
      */
-    private function fightAutomationMonster(DelveExplorationModel $dwelveExploration, array $params): bool
+    private function fightAutomationMonster(DelveExplorationModel $delveExploration, array $params): bool
     {
 
         $data = $this->monsterFightService->setupMonster($this->character, $params, true, true);
 
         $monsterName = $this->monsterFightService->getMonster()->name;
 
-        $increaseAmount = $dwelveExploration->increase_enemy_strength;
+        $increaseAmount = $delveExploration->increase_enemy_strength;
 
         $this->sendOutEventLogUpdate('The Ever Burning Candle erupts forward and the light illuminates the foul beast: ' . $monsterName);
 
@@ -240,22 +240,22 @@ class DelveExploration implements ShouldQueue
             $this->sendOutEventLogUpdate("The beast is radiant with magic, you know its strength has increased by " . number_format($increaseAmount) . '%');
         }
 
-        $endedAutomationDueToCharacterDeath = $this->handleWhenCharacterDies($dwelveExploration, $data);
+        $endedAutomationDueToCharacterDeath = $this->handleWhenCharacterDies($delveExploration, $data);
 
         if ($endedAutomationDueToCharacterDeath) {
             return false;
         }
 
-        $data = $this->fightMonster($dwelveExploration);
+        $data = $this->fightMonster($delveExploration);
 
-        $battleMessages = $dwelveExploration->battle_messages;
+        $battleMessages = $delveExploration->battle_messages;
         $battleMessages[] = $data;
 
         if (empty($data)) {
             return false;
         }
 
-        $endedAutomationDueToCharacterDeath = $this->handleWhenCharacterDies($dwelveExploration, $data);
+        $endedAutomationDueToCharacterDeath = $this->handleWhenCharacterDies($delveExploration, $data);
 
         if ($endedAutomationDueToCharacterDeath) {
             return false;
@@ -267,22 +267,22 @@ class DelveExploration implements ShouldQueue
     /**
      * Handle when a character dies in automation.
      *
-     * @param DelveExplorationModel $dwelveExploration
+     * @param DelveExplorationModel $delveExploration
      * @param array $data
      * @return bool
      */
-    private function handleWhenCharacterDies(DelveExplorationModel $dwelveExploration, array $data): bool {
+    private function handleWhenCharacterDies(DelveExplorationModel $delveExploration, array $data): bool {
         if ($data['health']['current_character_health'] <= 0) {
 
-            $dwelveExploration->update([
+            $delveExploration->update([
                 'completed_at' => now(),
             ]);
 
-            CharacterAutomation::where('character_id', $dwelveExploration->character_id)->where('type', AutomationType::DWELVE)->delete();
+            CharacterAutomation::where('character_id', $delveExploration->character_id)->where('type', AutomationType::DELVE)->delete();
 
-            $this->sendOutEventLogUpdate('You died during the dwelve. Exploration has ended, but not all is lost, you awaken from your wounds there might be treasures waiting, treasures you collected. (See server messages for treasures)');
+            $this->sendOutEventLogUpdate('You died during the delve. Exploration has ended, but not all is lost, you awaken from your wounds there might be treasures waiting, treasures you collected. (See server messages for treasures)');
 
-            $this->rewardPlayer($this->character, $dwelveExploration->refresh());
+            $this->rewardPlayer($this->character, $delveExploration->refresh());
 
             event(new ExplorationTimeOut($this->character->user, 0));
 
@@ -305,17 +305,17 @@ class DelveExploration implements ShouldQueue
      * Should we bail?
      *
      * @param CharacterAutomation|null $automation
-     * @param DelveExplorationModel|null $dwelveExploration
+     * @param DelveExplorationModel|null $delveExploration
      * @return bool
      */
-    private function shouldBail(?CharacterAutomation $automation = null, ?DelveExplorationModel $dwelveExploration = null): bool
+    private function shouldBail(?CharacterAutomation $automation = null, ?DelveExplorationModel $delveExploration = null): bool
     {
 
         if (is_null($automation)) {
             return true;
         }
 
-        if (is_null($dwelveExploration)) {
+        if (is_null($delveExploration)) {
             return true;
         }
 
@@ -323,7 +323,7 @@ class DelveExploration implements ShouldQueue
             return true;
         }
 
-        if (!is_null($dwelveExploration->completed_at)) {
+        if (!is_null($delveExploration->completed_at)) {
             return true;
         }
 
@@ -334,11 +334,11 @@ class DelveExploration implements ShouldQueue
      * End automation.
      *
      * @param CharacterAutomation|null $automation
-     * @param DelveExplorationModel|null $dwelveExploration
+     * @param DelveExplorationModel|null $delveExploration
      * @param CharacterCacheData $characterCacheData
      * @return void
      */
-    private function endAutomation(?CharacterAutomation $automation, ?DelveExplorationModel $dwelveExploration, CharacterCacheData $characterCacheData): void
+    private function endAutomation(?CharacterAutomation $automation, ?DelveExplorationModel $delveExploration, CharacterCacheData $characterCacheData): void
     {
         $characterCacheData->deleteCharacterSheet($this->character);
 
@@ -352,38 +352,38 @@ class DelveExploration implements ShouldQueue
             event(new ExplorationTimeOut($character->user, 0));
         }
 
-        if (! is_null($dwelveExploration)) {
+        if (! is_null($delveExploration)) {
 
-            if (!is_null($dwelveExploration->completed_at)) {
+            if (!is_null($delveExploration->completed_at)) {
                 return;
             }
 
-            $dwelveExploration->update([
+            $delveExploration->update([
                 'completed_at' => now(),
             ]);
 
-            $this->sendOutEventLogUpdate('You climb from the depths of the dwelve exploration, covered in blood, grime, dirt. Carrying the treasures you went searching for. Maybe now you have more answers about the darkness, or maybe you have more trauma.', true);
+            $this->sendOutEventLogUpdate('You climb from the depths of the delve exploration, covered in blood, grime, dirt. Carrying the treasures you went searching for. Maybe now you have more answers about the darkness, or maybe you have more trauma.', true);
 
             $this->sendOutEventLogUpdate('Your adventure is over child. Now is the time to rest, relax, heal and sort through your haul to weed out the worthless.', true);
 
-            $this->rewardPlayer($character, $dwelveExploration->refresh());
+            $this->rewardPlayer($character, $delveExploration->refresh());
         }
     }
 
     /**
      * Fight the monster.
      *
-     * @param DelveExplorationModel $dwelveExploration
+     * @param DelveExplorationModel $delveExploration
      * @return array
      * @throws InvalidArgumentException
      */
-    private function fightMonster(DelveExplorationModel $dwelveExploration): array {
+    private function fightMonster(DelveExplorationModel $delveExploration): array {
         $data = $this->monsterFightService->fightMonster($this->character, $this->attackType, false, true);
 
-        $battleMessages = $dwelveExploration->battle_messages;
+        $battleMessages = $delveExploration->battle_messages;
         $battleMessages[] = $data;
 
-        $this->updateDelveAutomation($dwelveExploration, [
+        $this->updateDelveAutomation($delveExploration, [
             'battle_messages' => $battleMessages
         ]);
 
@@ -396,7 +396,7 @@ class DelveExploration implements ShouldQueue
         if ($this->shouldAttackAgain($data) && $this->attempts < self::MAX_ATTEMPTS) {
             $this->attempts++;
 
-            return $this->fightMonster($dwelveExploration);
+            return $this->fightMonster($delveExploration);
         }
 
         return $data;
@@ -428,15 +428,15 @@ class DelveExploration implements ShouldQueue
      * Reward the player for automation completion.
      *
      * @param Character $character
-     * @param DelveExplorationModel $dwelveExploration
+     * @param DelveExplorationModel $delveExploration
      * @return void
      * @throws Exception
      */
-    private function rewardPlayer(Character $character, DelveExplorationModel $dwelveExploration): void
+    private function rewardPlayer(Character $character, DelveExplorationModel $delveExploration): void
     {
 
-        $start = $dwelveExploration->started_at;
-        $end = $dwelveExploration->completed_at;
+        $start = $delveExploration->started_at;
+        $end = $delveExploration->completed_at;
 
         $timeElapsedInHours = $end->diffInHours($start);
 
@@ -466,11 +466,11 @@ class DelveExploration implements ShouldQueue
 
             $gold = $character->gold + 1_000_000_000_000;
 
-            $this->sendOutEventLogUpdate('Gained one trillion gold for completing the dwelve.', false, true);
+            $this->sendOutEventLogUpdate('Gained one trillion gold for completing the delve.', false, true);
 
             $this->sendOutEventLogUpdate('Gained a cosmic item child! (Check Server Messages).', false, true);
 
-            $this->sendServerMessage('You were rewarded with a cosmic item: ' . $cosmicItem->affix_name . ' for surviving for more then 6 hours in a dwelve!', $slot->id);
+            $this->sendServerMessage('You were rewarded with a cosmic item: ' . $cosmicItem->affix_name . ' for surviving for more then 6 hours in a delve!', $slot->id);
         }
 
         if (!is_null($mythicItem)) {
@@ -480,11 +480,11 @@ class DelveExploration implements ShouldQueue
 
             $gold = $character->gold + 1_000_000_000;
 
-            $this->sendOutEventLogUpdate('Gained one billion gold for completing the dwelve.', false, true);
+            $this->sendOutEventLogUpdate('Gained one billion gold for completing the delve.', false, true);
 
             $this->sendOutEventLogUpdate('Gained a mythic item child! (Check Server Messages).', false, true);
 
-            $this->sendServerMessage('You were rewarded with a mythic item: ' . $mythicItem->affix_name . ' for surviving for more then 4 hours in a dwelve!', $slot->id);
+            $this->sendServerMessage('You were rewarded with a mythic item: ' . $mythicItem->affix_name . ' for surviving for more then 4 hours in a delve!', $slot->id);
         }
 
         if (!is_null($uniqueItem)) {
@@ -494,17 +494,17 @@ class DelveExploration implements ShouldQueue
 
             $gold = $character->gold + 1_000_000;
 
-            $this->sendOutEventLogUpdate('Gained one million gold for completing the dwelve.', false, true);
+            $this->sendOutEventLogUpdate('Gained one million gold for completing the delve.', false, true);
 
             $this->sendOutEventLogUpdate('Gained a unique item child! (Check Server Messages).', false, true);
 
-            $this->sendServerMessage('You were rewarded with a unique item: ' . $uniqueItem->affix_name . ' for surviving for more then 2 hours in a dwelve!', $slot->id);
+            $this->sendServerMessage('You were rewarded with a unique item: ' . $uniqueItem->affix_name . ' for surviving for more then 2 hours in a delve!', $slot->id);
         }
 
         if ($gold === 1_000) {
             $gold = $character->gold + $gold;
 
-            $this->sendOutEventLogUpdate('Gained one thousand gold for completing the dwelve.', false, true);
+            $this->sendOutEventLogUpdate('Gained one thousand gold for completing the delve.', false, true);
         }
 
         if ($gold >= MaxCurrenciesValue::MAX_GOLD) {

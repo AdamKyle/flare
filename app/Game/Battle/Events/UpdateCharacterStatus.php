@@ -49,14 +49,15 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
             'can_engage_celestials_again_at' => now()->diffInSeconds($character->can_engage_celestials_again_at),
             'is_dead' => $character->is_dead,
             'is_automation_running' => $character->currentAutomations()->where('character_id', $character->id)->get()->isNotEmpty(),
-            'is_dwelve_running' => $character->currentAutomations()->where('character_id', $character->id)->where('type', AutomationType::DWELVE)->get()->isNotEmpty(),
+            'is_delve_running' => $character->currentAutomations()->where('character_id', $character->id)->where('type', AutomationType::DELVE)->get()->isNotEmpty(),
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
             'is_silenced' => $character->is_silenced,
             'can_move' => $character->can_move,
             'is_alchemy_locked' => $this->isAlchemyLocked($character),
             'show_craft_for_event' => $this->shouldShowCraftingEventButton($character),
             'show_enchanting_for_event' => $this->shouldShowEnchantingEventButton($character),
-            'is_at_dwelve_location' => $this->isAtDelveLocation($character),
+            'is_at_delve_location' => $this->isAtDelveLocation($character),
+            'can_set_delve_pack' => $this->canSetPactOptionsForDelve($character),
         ];
 
         $this->user = $character->user;
@@ -92,7 +93,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
     private function isAtDelveLocation(Character $character): bool {
         $characterMap = $character->map;
 
-        $questItemForDelve = Item::where('effect', ItemEffectsValue::DWELVE)->first();
+        $questItemForDelve = Item::where('effect', ItemEffectsValue::DELVE)->first();
 
         if (is_null($questItemForDelve)) {
             return false;
@@ -106,6 +107,19 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
         })->isNotEmpty();
 
         return !is_null($location) && $characterHasItem;
+    }
+
+    private function canSetPactOptionsForDelve(Character $character): bool {
+
+        $questItemForDelve = Item::where('effect', ItemEffectsValue::DELVE_PACK_CHOICE)->first();
+
+        if (is_null($questItemForDelve)) {
+            return false;
+        }
+
+        return $character->inventory->slots->filter(function($slot) use ($questItemForDelve) {
+            return $slot->item_id === $questItemForDelve->id;
+        })->isNotEmpty();
     }
 
     /**

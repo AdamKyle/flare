@@ -40,17 +40,17 @@ class DelveMonsterService {
 
     public function createMonster(array $monster, Character $character): array {
 
-        $dwelveExploration = DelveExploration::where('character_id', $character->id)->whereNull('completed_at')->first();
+        $delveExploration = DelveExploration::where('character_id', $character->id)->whereNull('completed_at')->first();
 
-        if (is_null($dwelveExploration)) {
+        if (is_null($delveExploration)) {
             return $monster;
         }
 
-        if ($dwelveExploration->increase_enemy_strength <= 0) {
+        if ($delveExploration->increase_enemy_strength <= 0) {
             return $monster;
         }
 
-        $increaseAmount = $dwelveExploration->increase_enemy_strength;
+        $increaseAmount = $delveExploration->increase_enemy_strength;
 
         if (!isset($monster['damage_stat'])) {
             dump('Monster stat damage stat is not set, what is monster:');

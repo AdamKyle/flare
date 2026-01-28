@@ -395,7 +395,7 @@
                     </x-slot:title>
 
                     <p>
-                        The deeper you dwelve, the harder they hit. Protect your self child from ambushes and counters!
+                        The deeper you delve, the harder they hit. Protect your self child from ambushes and counters!
                         help your self to counter and ambush the enemy! Crafting trinkets will help with this!
                     </p>
                 </x-core.cards.feature-card>

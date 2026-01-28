@@ -10,7 +10,7 @@ Route::middleware([
         Route::post('/exploration/{character}/start', ['as' => 'exploration.start', 'uses' => 'Api\ExplorationController@begin']);
         Route::post('/exploration/{character}/stop', ['as' => 'exploration.stop', 'uses' => 'Api\ExplorationController@stop']);
 
-        Route::post('/dwelve/{character}/start', ['as' => 'dwelve.start', 'uses' => 'Api\DelveExplorationController@begin']);
-        Route::post('/dwelve/{character}/stop', ['as' => 'dwelve.stop', 'uses' => 'Api\DelveExplorationController@stop']);
+        Route::post('/delve/{character}/start', ['as' => 'delve.start', 'uses' => 'Api\DelveExplorationController@begin']);
+        Route::post('/delve/{character}/stop', ['as' => 'delve.stop', 'uses' => 'Api\DelveExplorationController@stop']);
     });
 });

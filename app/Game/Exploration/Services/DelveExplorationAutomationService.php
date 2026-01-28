@@ -38,13 +38,13 @@ class DelveExplorationAutomationService
         $automation = CharacterAutomation::create([
             'character_id' => $character->id,
             'monster_id' => $monsterId,
-            'type' => AutomationType::DWELVE,
+            'type' => AutomationType::DELVE,
             'started_at' => now(),
             'completed_at' => now()->addHours(8),
             'attack_type' => $params['attack_type'],
         ]);
 
-        $dwelveExploration = DelveExploration::create([
+        $delveExploration = DelveExploration::create([
             'character_id' => $character->id,
             'monster_id' => $monsterId,
             'started_at' => now(),
@@ -61,12 +61,12 @@ class DelveExplorationAutomationService
 
         event(new ExplorationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
 
-        $this->startAutomation($character, $automation->id, $dwelveExploration->id, $params['attack_type']);
+        $this->startAutomation($character, $automation->id, $delveExploration->id, $params['attack_type']);
     }
 
     public function stopExploration(Character $character)
     {
-        $characterAutomation = CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::DWELVE)->first();
+        $characterAutomation = CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::DELVE)->first();
 
         if (is_null($characterAutomation)) {
             return response()->json([
@@ -97,8 +97,8 @@ class DelveExplorationAutomationService
         $this->timeDelay = 3;
     }
 
-    protected function startAutomation(Character $character, int $automationId, int $dwelveAutomationId, string $attackType)
+    protected function startAutomation(Character $character, int $automationId, int $delveAutomationId, string $attackType)
     {
-        DelveExplorationProcessing::dispatch($character, $automationId, $dwelveAutomationId, $attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
+        DelveExplorationProcessing::dispatch($character, $automationId, $delveAutomationId, $attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
     }
 }
