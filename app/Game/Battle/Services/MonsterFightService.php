@@ -30,6 +30,7 @@ class MonsterFightService
      * @param Character $character
      * @param array $params
      * @param bool $returnData
+     * @param bool $isDelve
      * @return array
      * @throws InvalidArgumentException
      */
@@ -38,14 +39,7 @@ class MonsterFightService
         Cache::delete('monster-fight-' . $character->id);
         Cache::delete('character-sheet-' . $character->id);
 
-        if ($isDelve) {
-            $monsterId = Monster::query()
-                ->where('game_map_id', $character->map->game_map_id)
-                ->inRandomOrder()
-                ->value('id');
-
-            $params['selected_monster_id'] = $monsterId;
-        }
+        $params = $this->fetchPossibleDelveMonsterId($character, $params, $isDelve);
 
         $data = $this->monsterPlayerFight->setUpFight($character, $params, $isDelve);
 
@@ -221,5 +215,31 @@ class MonsterFightService
         }
 
         return $this->weeklyBattleService->canFightMonster($character, $monster);
+    }
+
+    private function fetchPossibleDelveMonsterId(Character $character, array $params, bool $isDelve): array {
+
+        if (!$isDelve) {
+            return $params;
+        }
+
+        $selectedMonsterId = $params['selected_monster_id'];
+        $packSize          = $params['pack_size'] ?? 0;
+
+        $cachedMonsterForDelve = Cache::get('delve-monster-' . $character->id . '-' . $selectedMonsterId . '-fight');
+
+        if (!is_null($cachedMonsterForDelve) && $packSize > 1) {
+
+            $params['cached_monster'] = $cachedMonsterForDelve;
+
+            return $params;
+        }
+
+        $monsterId = Monster::query()
+            ->where('game_map_id', $character->map->game_map_id)
+            ->inRandomOrder()
+            ->value('id');
+
+        return array_merge($params, ['selected_monster_id' => $monsterId]);
     }
 }

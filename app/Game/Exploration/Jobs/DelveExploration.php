@@ -59,6 +59,8 @@ class DelveExploration implements ShouldQueue
 
     private int $attempts = 0;
 
+    private bool $showedEncounterMessage = false;
+
     private array $battleData = [];
 
 
@@ -122,14 +124,19 @@ class DelveExploration implements ShouldQueue
             $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], $this->battleData);
 
             $this->updateDelveAutomation($delveAutomation, [
-                'increase_enemy_strength' => $delveAutomation->increase_enemy_strength + 0.0325
+                'increase_enemy_strength' => $delveAutomation->increase_enemy_strength + 0.0325,
+                'monster_id' => $this->monster?->id ?? $delveAutomation->monster_id
             ]);
 
             $this->updateMonsterForNextFight($delveAutomation);
 
+            $delveAutomation = $delveAutomation->refresh();
+
             $this->deletePackCache();
 
-            DelveExploration::dispatch($this->character, $this->automationId, $this->delveAutomationId, $this->attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
+            $params['selected_monster_id'] = $this->monster?->id ?? $delveAutomation->monster_id;
+
+            DelveExploration::dispatch($this->character, $this->automationId, $this->delveAutomationId, $params, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
 
             return;
         }
@@ -168,9 +175,7 @@ class DelveExploration implements ShouldQueue
     }
 
     private function deletePackCache(): void {
-        $monsterId = $this->monsterFightService->getMonster()->id;
-
-        Cache::delete('delve-monster-' . $this->character->id . $monsterId . 'fight');
+        Cache::delete('delve-monster-' . $this->character->id . '-' . $this->monster->id . '-fight');
     }
 
     private function updateMonsterForNextFight(DelveExplorationModel $delveExploration): void {
@@ -257,6 +262,8 @@ class DelveExploration implements ShouldQueue
                 return false;
             }
 
+            $params['selected_monster_id'] = $this->monster?->id ?? $params['selected_monster_id'];
+
             $totalXpToReward += $characterRewardService->fetchXpForMonster($this->monster);
             $totalSkillXpToReward += $characterSkillService->getXpForSkillIntraining($this->character, $this->monster->xp);
             $totalFactionPoints += $this->factionHandler->getFactionPointsPerKill($this->character);
@@ -295,15 +302,9 @@ class DelveExploration implements ShouldQueue
 
         $data = $this->monsterFightService->setupMonster($this->character, $params, true, true);
 
-        $monsterName = $this->monsterFightService->getMonster()->name;
+        $this->monster = $this->monsterFightService->getMonster();
 
-        $increaseAmount = $delveExploration->increase_enemy_strength;
-
-        $this->sendOutEventLogUpdate('The Ever Burning Candle erupts forward and the light illuminates the foul beast: ' . $monsterName);
-
-        if ($increaseAmount > 0) {
-            $this->sendOutEventLogUpdate("The beast is radiant with magic, you know its strength has increased by " . number_format($increaseAmount) . '%');
-        }
+        $this->showEverBurningMessages($delveExploration->increase_enemy_strength, $this->monster->name, $params['pack_size']);
 
         $endedAutomationDueToCharacterDeath = $this->handleWhenCharacterDies($delveExploration, $data);
 
@@ -329,6 +330,27 @@ class DelveExploration implements ShouldQueue
         return true;
     }
 
+    private function showEverBurningMessages(float $increaseAmount, string $monsterName, int $packSize): void {
+
+        if ($packSize > 1 && $this->showedEncounterMessage) {
+            return;
+        }
+
+        $this->sendOutEventLogUpdate('The Ever Burning Candle erupts forward and the light illuminates the foul beast: ' . $monsterName);
+
+        if ($packSize > 1) {
+            $this->sendOutEventLogUpdate('Holy shit child, there are ' . $packSize . ' of them. Hold your ground!');
+        }
+
+        if ($increaseAmount > 0) {
+            $percent = $increaseAmount * 100;
+
+            $this->sendOutEventLogUpdate("The beast(s) is radiant with magic, you know its strength has increased by: " . $percent . '%');
+        }
+
+        $this->showedEncounterMessage = true;
+    }
+
     /**
      * Handle when a character dies in automation.
      *
@@ -338,6 +360,7 @@ class DelveExploration implements ShouldQueue
      * @throws Exception
      */
     private function handleWhenCharacterDies(DelveExplorationModel $delveExploration, array $data): bool {
+
         if ($data['health']['current_character_health'] <= 0) {
 
             $delveExploration->update([

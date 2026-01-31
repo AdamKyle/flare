@@ -86,7 +86,7 @@ class MonsterPlayerFight
     public function setUpFight(Character $character, array $params, bool $shouldIncreaseStrength = false): MonsterPlayerFight|array
     {
         $this->character = $character;
-        $this->monster = $this->fetchMonster($character->map, $params['selected_monster_id']);
+        $this->monster = $params['cached_monster'] ?? $this->fetchMonster($character->map, $params['selected_monster_id']);
 
         $this->attackType = $params['attack_type'];
 
@@ -94,18 +94,12 @@ class MonsterPlayerFight
             return $this->errorResult('No monster was found.');
         }
 
-        if ($shouldIncreaseStrength) {
-
-            $cachedMonster = Cache::get('delve-monster-' . $character->id . $this->monster['id'] . 'fight');
-
-            if (!is_null($cachedMonster)) {
-                return $cachedMonster;
-            }
+        if ($shouldIncreaseStrength && !isset($params['cached_monster'])) {
 
             $this->monster = $this->delveMonsterService->createMonster($this->monster, $character);
 
-            if ($params['pack_size'] > 1 && $shouldIncreaseStrength) {
-                Cache::put('delve-monster-' . $character->id . $this->monster['id'] . 'fight', $this->monster, 900);
+            if ($params['pack_size'] > 1) {
+                Cache::put('delve-monster-' . $character->id .'-'. $this->monster['id'] . '-fight', $this->monster, 900);
             }
         }
 

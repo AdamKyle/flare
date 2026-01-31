@@ -85,6 +85,7 @@ export default class ExplorationSection extends React.Component<any, any> {
     }
 
     setDelvePackSize(data: any) {
+        console.log(data);
         this.setState({
             delve_pack_size:
                 data.value !== "" ? parseInt(data.value) || null : null,
@@ -236,7 +237,7 @@ export default class ExplorationSection extends React.Component<any, any> {
         }
 
         return {
-            label: "Please select attack type",
+            label: "Please select a pack size",
             value: "",
         };
     }
@@ -641,6 +642,10 @@ export default class ExplorationSection extends React.Component<any, any> {
     }
 
     renderPackSizeAlert(packSize: number) {
+        if (!this.state.delve_pack_size) {
+            return null;
+        }
+
         const xpBoost = match(packSize)
             .with(1, () => "100%")
             .with(5, () => "175%")

@@ -71,11 +71,6 @@ class DelveMonsterService {
             $monster[$stat] += $increaseStatsBy;
         }
 
-        if (!isset($monster['attack_range'])) {
-            dump('Monster does not have damage range?');
-            dd($monster);
-        }
-
         $monster['health_range'] = $this->setNewRange($monster['health_range'], $increaseStatsBy);
         $monster['attack_range'] = $this->setNewRange($monster['attack_range'], $increaseStatsBy);
 
