@@ -17,6 +17,7 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Traits\ResponseBuilder;
 use Illuminate\Support\Facades\Cache;
+use function PHPUnit\Framework\isEmpty;
 
 class MonsterPlayerFight
 {
@@ -85,6 +86,7 @@ class MonsterPlayerFight
      */
     public function setUpFight(Character $character, array $params, bool $shouldIncreaseStrength = false): MonsterPlayerFight|array
     {
+
         $this->character = $character;
         $this->monster = $params['cached_monster'] ?? $this->fetchMonster($character->map, $params['selected_monster_id']);
 

@@ -28,7 +28,12 @@ class DelveExplorationController extends Controller
             ], 422);
         }
 
-        if ($character->currentAutomations()->where('type', AutomationType::DELVE)->orWhere('type', AutomationType::EXPLORING)->count() > 0) {
+        if ($character->currentAutomations()
+                ->where('type', AutomationType::DELVE)
+                ->orWhere('type', AutomationType::EXPLORING)
+                ->where('character_id', $character->id)
+                ->count() > 0
+        ) {
             return response()->json([
                 'message' => 'Nope. You already have one in progress.',
             ], 422);

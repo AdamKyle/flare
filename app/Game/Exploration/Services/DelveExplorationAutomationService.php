@@ -31,6 +31,8 @@ class DelveExplorationAutomationService
             ->where('is_raid_monster', false)
             ->where('is_raid_boss', false)
             ->where('game_map_id', $character->map->game_map_id)
+            ->whereNull('only_for_location_type')
+            ->whereNull('raid_special_attack_type')
             ->inRandomOrder()
             ->first()
             ->id;

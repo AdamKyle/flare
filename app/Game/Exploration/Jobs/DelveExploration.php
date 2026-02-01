@@ -4,6 +4,7 @@ namespace App\Game\Exploration\Jobs;
 
 use App\Flare\Models\DelveExploration as DelveExplorationModel;
 use App\Flare\Values\AutomationType;
+use App\Game\Exploration\Values\DelveOutcome;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Battle\Services\MonsterFightService;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
@@ -62,6 +63,10 @@ class DelveExploration implements ShouldQueue
     private bool $showedEncounterMessage = false;
 
     private array $battleData = [];
+
+    private array $lastFightData = [];
+
+    private bool $logCreated = false;
 
 
     public function __construct(Character $character, int $automationId, int $delveExplorationId, array $params, int $timeDelay)
@@ -125,7 +130,6 @@ class DelveExploration implements ShouldQueue
 
             $this->updateDelveAutomation($delveAutomation, [
                 'increase_enemy_strength' => $delveAutomation->increase_enemy_strength + 0.0325,
-                'monster_id' => $this->monster?->id ?? $delveAutomation->monster_id
             ]);
 
             $this->updateMonsterForNextFight($delveAutomation);
@@ -142,6 +146,8 @@ class DelveExploration implements ShouldQueue
         }
 
         if ($this->attempts >= self::MAX_ATTEMPTS) {
+            $this->createDelveLog($delveAutomation, DelveOutcome::TIMEOUT, $this->lastFightData);
+
             $automation->delete();
 
             $delveAutomation->update([
@@ -163,6 +169,8 @@ class DelveExploration implements ShouldQueue
             return;
         }
 
+        $this->createDelveLog($delveAutomation, DelveOutcome::ERROR, $this->lastFightData);
+
         $automation->delete();
 
         $delveAutomation->update([
@@ -182,7 +190,9 @@ class DelveExploration implements ShouldQueue
         $monsterId = Monster::where('is_celestial_entity', false)
             ->where('is_raid_monster', false)
             ->where('is_raid_boss', false)
-            ->where('game_map_id', $delveExploration->character->map->game_map_id)
+            ->where('game_map_id', $this->character->map->game_map_id)
+            ->whereNull('only_for_location_type')
+            ->whereNull('raid_special_attack_type')
             ->inRandomOrder()
             ->first()
             ->id;
@@ -211,6 +221,8 @@ class DelveExploration implements ShouldQueue
         $canSurviveFights = $this->canSurviveFight($delveExploration, $params);
 
         if ($canSurviveFights) {
+
+            $this->createDelveLog($delveExploration, DelveOutcome::SURVIVED, $this->lastFightData);
 
             $this->sendOutEventLogUpdate('You survived the darkness child. Alas there is more of it to go. Find your way to the depths. Find the treasure!', true);
 
@@ -281,10 +293,10 @@ class DelveExploration implements ShouldQueue
 
     private function getPackSizeXp(int $packSize, int $xp): int {
         return match($packSize) {
-            5 => $xp + (1.75 * $xp),
-            10 => $xp + (2.50 * $xp),
-            20 => $xp + (3.25 * $xp),
-            25 => $xp + (500 * $xp),
+            5 => $xp + ($xp * 1.0),
+            10 => $xp + ($xp * 1.25),
+            20 => $xp + ($xp * 1.50),
+            25 => $xp + ($xp * 1.75),
             default => $xp
         };
     }
@@ -313,9 +325,6 @@ class DelveExploration implements ShouldQueue
         }
 
         $data = $this->fightMonster($delveExploration);
-
-        $battleMessages = $delveExploration->battle_messages;
-        $battleMessages[] = $data;
 
         if (empty($data)) {
             return false;
@@ -362,6 +371,8 @@ class DelveExploration implements ShouldQueue
     private function handleWhenCharacterDies(DelveExplorationModel $delveExploration, array $data): bool {
 
         if ($data['health']['current_character_health'] <= 0) {
+
+            $this->createDelveLog($delveExploration, DelveOutcome::DIED, $data);
 
             $delveExploration->update([
                 'completed_at' => now(),
@@ -472,12 +483,7 @@ class DelveExploration implements ShouldQueue
     private function fightMonster(DelveExplorationModel $delveExploration): array {
         $data = $this->monsterFightService->fightMonster($this->character, $this->attackType, false, true);
 
-        $battleMessages = $delveExploration->battle_messages;
-        $battleMessages[] = $data;
-
-        $this->updateDelveAutomation($delveExploration, [
-            'battle_messages' => $battleMessages
-        ]);
+        $this->lastFightData = $data;
 
         if ($this->shouldAttackAgain($data) && $this->attempts >= self::MAX_ATTEMPTS) {
             $this->sendOutEventLogUpdate('Seems this beast is a little stronger then normal. You swing again and lash out your magics.', true);
@@ -492,6 +498,24 @@ class DelveExploration implements ShouldQueue
         }
 
         return $data;
+    }
+
+    private function createDelveLog(DelveExplorationModel $delveExploration, DelveOutcome $outcome, array $fightData): void
+    {
+        if ($this->logCreated) {
+            return;
+        }
+
+        $delveExploration->delveLogs()->create([
+            'character_id' => $this->character->id,
+            'increased_enemy_strength' => $delveExploration->increase_enemy_strength,
+            'delve_exploration_id' => $delveExploration->id,
+            'pack_size' => $this->packSize,
+            'outcome' => $outcome->value,
+            'fight_data' => $fightData,
+        ]);
+
+        $this->logCreated = true;
     }
 
     /**

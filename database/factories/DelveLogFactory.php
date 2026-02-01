@@ -2,17 +2,17 @@
 
 namespace Database\Factories;
 
-use App\Flare\Models\DelveExploration;
+use App\Flare\Models\DelveLog;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class DelveExplorationFactory extends Factory
+class DelveLogFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = DelveExploration::class;
+    protected $model = DelveLog::class;
 
     /**
      * Define the model's default state.
@@ -23,11 +23,10 @@ class DelveExplorationFactory extends Factory
     {
         return [
             'character_id' => 0,
-            'monster_id' => 0,
-            'started_at' => now(),
-            'completed_at' => now()->addHours(8),
-            'attack_type' => 'attack',
-            'increase_enemy_strength' => 0,
+            'delve_exploration_id' => 0,
+            'pack_size' => 1,
+            'outcome' => 'survived',
+            'fight_data' => ['message_type' => 'message'],
         ];
     }
 }

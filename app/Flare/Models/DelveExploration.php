@@ -5,6 +5,7 @@ namespace App\Flare\Models;
 use Database\Factories\DelveExplorationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DelveExploration extends Model
 {
@@ -22,7 +23,6 @@ class DelveExploration extends Model
         'completed_at',
         'attack_type',
         'increase_enemy_strength',
-        'battle_messages',
     ];
 
     /**
@@ -34,7 +34,6 @@ class DelveExploration extends Model
         'started_at' => 'datetime',
         'completed_at' => 'datetime',
         'increase_enemy_strength' => 'float',
-        'battle_messages' => 'array'
     ];
 
     public function character()
@@ -45,6 +44,11 @@ class DelveExploration extends Model
     public function monster()
     {
         return $this->belongsTo(Monster::class);
+    }
+
+    public function delveLogs(): HasMany
+    {
+        return $this->hasMany(DelveLog::class);
     }
 
     protected static function newFactory()

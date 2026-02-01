@@ -168,11 +168,11 @@ export default class ExplorationSection extends React.Component<any, any> {
             },
             {
                 label: "20 Enemies",
-                value: "defend",
+                value: "20",
             },
             {
                 label: "25 Enemies",
-                value: "defend",
+                value: "25",
             },
         ];
     }
@@ -396,6 +396,12 @@ export default class ExplorationSection extends React.Component<any, any> {
     openDelveSetUp() {
         this.setState({
             show_delve_setup: true,
+        });
+    }
+
+    openRegularExplorationSetUp() {
+        this.setState({
+            show_exploration_setup: true,
         });
     }
 
@@ -647,30 +653,18 @@ export default class ExplorationSection extends React.Component<any, any> {
         }
 
         const xpBoost = match(packSize)
-            .with(1, () => "100%")
-            .with(5, () => "175%")
-            .with(10, () => "250%")
-            .with(20, () => "325%")
-            .with(25, () => "500%")
-            .otherwise(() => "0%");
-
-        const timeIncrease = match(packSize)
-            .with(1, () => "3 minutes")
-            .with(2, () => "3 minutes")
-            .with(5, () => "3 minutes")
-            .with(10, () => "5 minutes")
-            .with(20, () => "5 minutes")
-            .with(25, () => "8 minutes")
-            .otherwise(() => "0%");
+            .with(1, () => "+0%")
+            .with(5, () => "+100%")
+            .with(10, () => "+150%")
+            .with(20, () => "+175%")
+            .with(25, () => "+200%")
+            .otherwise(() => "+0%");
 
         return (
             <WarningAlert>
                 Selecting this pack size will give you a bonus of{" "}
-                <strong>{xpBoost}</strong> which is applied BEFORE all your
-                boons or quest items ate effect XP. This can increase the amount
-                of xp you gain significantly. This does come with time delay
-                between fights which will become:{" "}
-                <strong>{timeIncrease}</strong>
+                <strong>{xpBoost}</strong> per monster fought. This bonus is
+                applied to the xp after all other bonuses are applied.
             </WarningAlert>
         );
     }
@@ -804,7 +798,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                 <div>
                     <PrimaryButton
                         button_label={"Regular Exploration"}
-                        on_click={this.startExploration.bind(this)}
+                        on_click={this.openRegularExplorationSetUp.bind(this)}
                         disabled={
                             this.props.character.is_dead ||
                             !this.props.character.can_attack

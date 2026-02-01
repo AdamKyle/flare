@@ -39,8 +39,16 @@ class MassImportCustomData extends Command
         Artisan::call('import:game-data Npcs');
         Artisan::call('import:game-data Items');
         Artisan::call('import:game-data Locations');
+        Artisan::call('import:game-data Monsters');
         Artisan::call('import:game-data Items');
         Artisan::call('import:game-data Quests');
+
+        Monster::where('is_celestial_entity', false)
+            ->where('is_raid_monster', false)
+            ->where('is_raid_boss', false)
+            ->where('game_map_id', 8)
+            ->whereNull('only_for_location_type')
+            ->update(['raid_special_attack_type' => null]);
 
         Artisan::call('create:quest-cache');
         Artisan::call('generate:monster-cache');

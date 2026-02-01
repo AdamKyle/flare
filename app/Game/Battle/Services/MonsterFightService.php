@@ -53,9 +53,9 @@ class MonsterFightService
 
             if (!$returnData) {
                 $this->battleEventHandler->processMonsterDeath($character->id, $data['monster']['id']);
-            }
 
-            event(new AttackTimeOutEvent($character));
+                event(new AttackTimeOutEvent($character));
+            }
 
             Cache::put('monster-fight-' . $character->id, $data, 900);
 
@@ -168,7 +168,7 @@ class MonsterFightService
             return $cache;
         }
 
-        Cache::delete('monster-fight-' . $character->id);
+//        Cache::delete('monster-fight-' . $character->id);
         BattleAttackHandler::dispatch($character->id, $this->monsterPlayerFight->getMonster()['id'])->onQueue('default_long')->delay(now()->addSeconds(2));
 
         return $this->successResult($cache);
@@ -235,11 +235,6 @@ class MonsterFightService
             return $params;
         }
 
-        $monsterId = Monster::query()
-            ->where('game_map_id', $character->map->game_map_id)
-            ->inRandomOrder()
-            ->value('id');
-
-        return array_merge($params, ['selected_monster_id' => $monsterId]);
+        return $params;
     }
 }
