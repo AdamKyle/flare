@@ -276,12 +276,6 @@ class DelveExploration implements ShouldQueue
 
             $params['selected_monster_id'] = $this->monster?->id ?? $params['selected_monster_id'];
 
-            if ($i === 1) {
-                dump('Monster Xp:');
-                dump($this->monster->xp);
-                dump('Total Xp to award: ' . $characterRewardService->fetchXpForMonster($this->monster));
-            }
-
             $totalXpToReward += $characterRewardService->fetchXpForMonster($this->monster);
             $totalSkillXpToReward += $characterSkillService->getXpForSkillIntraining($this->character, $this->monster->xp);
             $totalFactionPoints += $this->factionHandler->getFactionPointsPerKill($this->character);
@@ -298,16 +292,6 @@ class DelveExploration implements ShouldQueue
     }
 
     private function getPackSizeXp(int $packSize, int $xp): int {
-        dump('Lets Apply Pack size bonus?');
-        dump($xp);
-        dump('What is the XP after the pack size?');
-        dump(match($packSize) {
-            5 => $xp + ($xp * 1.0),
-            10 => $xp + ($xp * 1.25),
-            20 => $xp + ($xp * 1.50),
-            25 => $xp + ($xp * 1.75),
-            default => $xp
-        });
         return match($packSize) {
             5 => $xp + ($xp * 1.0),
             10 => $xp + ($xp * 1.25),
