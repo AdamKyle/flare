@@ -85,7 +85,6 @@ export default class ExplorationSection extends React.Component<any, any> {
     }
 
     setDelvePackSize(data: any) {
-        console.log(data);
         this.setState({
             delve_pack_size:
                 data.value !== "" ? parseInt(data.value) || null : null,
@@ -768,8 +767,6 @@ export default class ExplorationSection extends React.Component<any, any> {
     }
 
     render() {
-        console.log(this.props.character, this.state);
-
         if (
             this.props.character.is_automation_running ||
             this.props.character.is_delve_running
