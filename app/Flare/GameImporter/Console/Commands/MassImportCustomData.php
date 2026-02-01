@@ -2,13 +2,13 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
+use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Monster;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
@@ -49,6 +49,8 @@ class MassImportCustomData extends Command
             ->where('game_map_id', 8)
             ->whereNull('only_for_location_type')
             ->update(['raid_special_attack_type' => null]);
+
+        Character::first()->inventory->slots()->create(['item_id' => Item::where('name', '=', 'Twisted Tree Branch')->first()->id]);
 
         Artisan::call('create:quest-cache');
         Artisan::call('generate:monster-cache');

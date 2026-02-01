@@ -35,6 +35,8 @@ class LocationType
 
     const CAVE_OF_MEMORIES = 11;
 
+    const THE_CELLAR = 12;
+
     protected static $values = [
         0 => self::PURGATORY_SMITH_HOUSE,
         1 => self::GOLD_MINES,
@@ -48,6 +50,7 @@ class LocationType
         9 => self::BROKEN_ANVIL,
         10 => self::TWSITED_MAIDENS_DUNGEONS,
         11 => self::CAVE_OF_MEMORIES,
+        12 => self::THE_CELLAR,
     ];
 
     /**
@@ -66,6 +69,7 @@ class LocationType
         self::BROKEN_ANVIL => 'Hells Broken Anvil',
         self::TWSITED_MAIDENS_DUNGEONS => 'Twisted Maidens Dungeons',
         self::CAVE_OF_MEMORIES => 'Cave of Memories',
+        self::THE_CELLAR => 'The Cellar',
     ];
 
     /**
@@ -136,6 +140,10 @@ class LocationType
     public function isTwistedGate(): bool
     {
         return $this->value === self::TWISTED_GATE;
+    }
+
+    public function isTheCellar(): bool {
+        return $this->value === self::THE_CELLAR;
     }
 
     /**

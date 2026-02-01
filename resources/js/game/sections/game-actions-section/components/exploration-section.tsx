@@ -664,7 +664,8 @@ export default class ExplorationSection extends React.Component<any, any> {
             <WarningAlert>
                 Selecting this pack size will give you a bonus of{" "}
                 <strong>{xpBoost}</strong> per monster fought. This bonus is
-                applied to the xp after all other bonuses are applied.
+                applied to the xp after all other bonuses are applied and is per
+                fight.
             </WarningAlert>
         );
     }
