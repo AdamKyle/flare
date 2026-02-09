@@ -89,6 +89,14 @@
 
     @if ($locationType->isCaveOfMemories())
         <h3 class="mb-4">Time to Delve!</h3>
+        <dl class="mb-4">
+            <dt>Time Between Fights</dt>
+            <dd>{{$location->minutes_between_delve_fights}}</dd>
+            <dt>Enemy Increase % per Fight</dt>
+            <dd>{{$location->delve_enemy_strength_increase * 100}}%</dd>
+            <dt>Hours until quest item(s) drops</dt>
+            <dd>{{$location->hours_to_drop}}</dd>
+        </dl>
         <x-core.alerts.warning-alert title="ATTN!">
             Players can use either Exploration of Delve here. Exploration will fight regular monsters, while Dwleve will fight a random monster each turn and increase said monsters stat by a % every fight making it such that you eventually wont be able to survive.
             Its about how long (max of 8 hours) you can survive.
@@ -104,11 +112,20 @@
             <li class="ml-4">Even if you die to a monster, you will be rewarded with: 1 Unique for lasting 2 hours or more. 1 Mythic for lasting 4 hours or more. 1 Cosmic for lasting 6 hours or more.</li>
             <li class="ml-4">Delve can be canceled at any time and cannot have a time limit put on it. Its once every 5 minutes for a max of 8 hours.</li>
         </ul>
-        <p class="mb-4">For dewlve is you survive for: {{$location->hours_to_drop}} hours, you can get a chance per kill after that, the following quest items to drop:</p>
+        <p class="mb-4">These are the monsters you can encounter here while doing delve. These creatures can only be fought during delve. That means you cannot fight manually or through exploration here.</p>
+        <div>
         @livewire('admin.items.items-table', [
             'type' => 'quest',
             'locationId' => $location->id,
         ])
+        </div>
+        <p class="my-8">Below ate the items that can drop here. Above it indicates how long you must survive in delve before the quest items drop. These are tied to your looting chance with any and all other bonuses.</p>
+        <div>
+        @livewire('admin.items.items-table', [
+            'type' => 'quest',
+            'locationId' => $location->id,
+        ])
+        </div>
     @endif
 @endif
 

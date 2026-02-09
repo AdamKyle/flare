@@ -3,6 +3,7 @@
 namespace App\Game\Exploration\Jobs;
 
 use App\Flare\Models\DelveExploration as DelveExplorationModel;
+use App\Flare\Models\Location;
 use App\Flare\Values\AutomationType;
 use App\Game\Exploration\Values\DelveOutcome;
 use App\Flare\Values\RandomAffixDetails;
@@ -36,7 +37,11 @@ class DelveExploration implements ShouldQueue
 
     const MAX_ATTEMPTS = 10;
 
-    public Character $character;
+    const MAX_INCREASE_PERCENTAGE = 1000.00;
+
+    public ?Character $character = null;
+
+    public ?Location $location = null;
 
     private CharacterRewardService $characterRewardService;
 
@@ -69,9 +74,10 @@ class DelveExploration implements ShouldQueue
     private bool $logCreated = false;
 
 
-    public function __construct(Character $character, int $automationId, int $delveExplorationId, array $params, int $timeDelay)
+    public function __construct(int $characterId, int $locationId, int $automationId, int $delveExplorationId, array $params, int $timeDelay)
     {
-        $this->character = $character;
+        $this->character = Character::find($characterId);
+        $this->location = Location::find($locationId);
         $this->automationId = $automationId;
         $this->delveAutomationId = $delveExplorationId;
         $this->attackType = $params['attack_type'];
@@ -128,9 +134,18 @@ class DelveExploration implements ShouldQueue
 
             $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], $this->battleData);
 
-            $this->updateDelveAutomation($delveAutomation, [
-                'increase_enemy_strength' => $delveAutomation->increase_enemy_strength + 0.0325,
-            ]);
+
+            $newStatIncreaseValue = $delveAutomation->increase_enemy_strength + $this->location->delve_enemy_strength_increase;
+
+            if ($newStatIncreaseValue <= self::MAX_INCREASE_PERCENTAGE) {
+                $newStatIncreaseValue = self::MAX_INCREASE_PERCENTAGE;
+            }
+
+            if ($delveAutomation->increase_enemy_strength !== self::MAX_INCREASE_PERCENTAGE) {
+                $this->updateDelveAutomation($delveAutomation, [
+                    'increase_enemy_strength' => $newStatIncreaseValue
+                ]);
+            }
 
             $this->updateMonsterForNextFight($delveAutomation);
 
@@ -413,6 +428,10 @@ class DelveExploration implements ShouldQueue
     private function shouldBail(?CharacterAutomation $automation = null, ?DelveExplorationModel $delveExploration = null): bool
     {
 
+        if (is_null($this->character) || is_null($this->location)) {
+            return true;
+        }
+
         if (is_null($automation)) {
             return true;
         }
@@ -568,12 +587,11 @@ class DelveExploration implements ShouldQueue
             $mythicItem = $this->characterRewardService->getSpecialGearDrop(RandomAffixDetails::MYTHIC);
         }
 
-        if ($timeElapsedInHours > 2 && $timeElapsedInHours < 2) {
+        if ($timeElapsedInHours > 2) {
             $uniqueItem = $this->characterRewardService->getSpecialGearDrop(RandomAffixDetails::LEGENDARY);
         }
 
         $gold = 1_000;
-
 
         if (!is_null($cosmicItem)) {
             $slot = $character->inventory->slots()->create([

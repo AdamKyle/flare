@@ -5,6 +5,7 @@ namespace App\Game\Exploration\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\DelveExploration;
+use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
@@ -24,7 +25,7 @@ class DelveExplorationAutomationService
         private readonly CharacterCacheData $characterCacheData
     ) {}
 
-    public function beginAutomation(Character $character, array $params)
+    public function beginAutomation(Character $character, Location $location, array $params)
     {
 
         $monsterId = Monster::where('is_celestial_entity', false)
@@ -92,13 +93,13 @@ class DelveExplorationAutomationService
         event(new ExplorationLogUpdate($character->user->id, 'Delve has been stopped at player request.'));
     }
 
-    public function setTimeDelay(): void
+    public function setTimeDelay(Location $location): void
     {
-        $this->timeDelay = 3;
+        $this->timeDelay = $location->minutes_between_delve_fights;
     }
 
-    protected function startAutomation(Character $character, int $automationId, int $delveAutomationId, array $params)
+    protected function startAutomation(Character $character, Location $location, int $automationId, int $delveAutomationId, array $params)
     {
-        DelveExplorationProcessing::dispatch($character, $automationId, $delveAutomationId, $params, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
+        DelveExplorationProcessing::dispatch($character->id, $location->id, $automationId, $delveAutomationId, $params, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
     }
 }

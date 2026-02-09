@@ -34,6 +34,8 @@ class Location extends Model
         'is_corrupted',
         'pin_css_class',
         'hours_to_drop',
+        'minutes_between_delve_fights',
+        'delve_enemy_strength_increase',
     ];
 
     /**
@@ -56,6 +58,8 @@ class Location extends Model
         'raid_id' => 'integer',
         'has_raid_boss' => 'boolean',
         'is_corrupted' => 'boolean',
+        'minutes_between_delve_fights' => 'integer',
+        'delve_enemy_strength_increase' => 'float',
     ];
 
     public function questRewardItem()

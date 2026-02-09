@@ -49,6 +49,8 @@
                                 <h3 class="mb-3">Quest Item Rewards (Optional)</h3>
                                 <x-core.forms.key-value-select :model="$location" label="Quest Item Reward (For Visiting):"
                                     modelKey="quest_reward_item_id" name="quest_reward_item_id" :options="$questItems" />
+                                <x-core.forms.input :model="$location" label="Time Between Delve Fights (Minutes):" modelKey="minutes_between_delve_fights" name="minutes_between_delve_fights" />
+                                <x-core.forms.input :model="$location" label="Delve Enemy Increase Per Fight (%):" modelKey="delve_enemy_strength_increase" name="delve_enemy_strength_increase" />
                             </div>
                         </div>
                     </x-core.form-wizard.content>

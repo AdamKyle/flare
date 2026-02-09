@@ -51,7 +51,7 @@ class DelveExplorationController extends Controller
             ], 422);
         }
 
-        $this->delveExplorationAutomationService->beginAutomation($character, $request->all());
+        $this->delveExplorationAutomationService->beginAutomation($character, $location, $request->all());
 
         return response()->json([
             'message' => 'Delve has started child. Let us see how long you last shall we? (Max delve time is 8 hours.)',
