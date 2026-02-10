@@ -752,7 +752,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                     <div className="relative top-[24px] italic">
                         <p>
                             For more help please see the{" "}
-                            <a href="/information/exploration" target="_blank">
+                            <a href="/information/delve" target="_blank">
                                 Delve{" "}
                                 <i className="fas fa-external-link-alt"></i>
                             </a>{" "}
