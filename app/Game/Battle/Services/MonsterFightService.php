@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\ServerFight\MonsterPlayerFight;
+use App\Flare\Values\LocationType;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
@@ -199,6 +200,20 @@ class MonsterFightService
         }
 
         return true;
+    }
+
+    /**
+     * Are we at a delve location?
+     *
+     * @param Character $character
+     * @return bool
+     */
+    public function isAtDelveLocation(Character $character): bool {
+        return Location::where('x', $character->map->character_position_x)
+            ->where('y', $character->map->character_position_y)
+            ->where('game_map_id', $character->map->game_map_id)
+            ->where('type', LocationType::CAVE_OF_MEMORIES)
+            ->exists();
     }
 
     /**

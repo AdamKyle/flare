@@ -29,6 +29,14 @@ export default class ExplorationSection extends React.Component<any, any> {
         };
     }
 
+    componentDidMount() {
+        if (localStorage.getItem("hide-exploration-help") !== null) {
+            this.setState({
+                hide_exploration_help: true,
+            });
+        }
+    }
+
     setMonsterToFight(data: any) {
         const foundMonster = this.props.monsters.filter(
             (monster: any) => monster.id === parseInt(data.value),
@@ -615,7 +623,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                 additional_css={"w-full"}
                 close_alert={this.hideExplorationHelp.bind(this)}
             >
-                <h2>Delve & Exploration</h2>
+                <h2>Delve</h2>
                 <p className={"my-2"}>
                     <strong>Delve</strong> is an exploration mechanic where
                     specific locations pit you against a random monster each
@@ -628,19 +636,10 @@ export default class ExplorationSection extends React.Component<any, any> {
                 <p className={"mb-2"}>
                     The longer you last, the better the rewards will be. You can
                     read more about{" "}
-                    <a href="/information/exploration" target="_blank">
+                    <a href="/information/delve" target="_blank">
                         Delve <i className="fas fa-external-link-alt"></i>
                     </a>{" "}
                     in the help docs.
-                </p>
-                <p>
-                    <strong>Exploration</strong> is a mechanic that lets you
-                    select a monster, an attack, and, unlike Delve, a time limit
-                    you want to explore for. Monsters in Exploration also do not
-                    get stronger as you fight them, and there is no reward for
-                    how long you fight. It is all about training, leveling, and,
-                    in the early stages, getting decent enough gear to start
-                    making money for Crafting and Enchanting.
                 </p>
             </InfoAlert>
         );
@@ -789,24 +788,9 @@ export default class ExplorationSection extends React.Component<any, any> {
         return (
             <div className={"w-2/3 mx-auto"}>
                 {this.renderExplorationHelp()}
-                <WarningAlert additional_css={"w-full my-2"}>
-                    <strong>Note:</strong> You may only have type of exploration
-                    running at a time. You cannot have both.
-                </WarningAlert>
-                <div>
-                    <PrimaryButton
-                        button_label={"Regular Exploration"}
-                        on_click={this.openRegularExplorationSetUp.bind(this)}
-                        disabled={
-                            this.props.character.is_dead ||
-                            !this.props.character.can_attack
-                        }
-                        additional_css={"w-full my-2"}
-                    />
-                </div>
                 <div>
                     <SuccessButton
-                        button_label={"Delve"}
+                        button_label={"Setup Delve"}
                         on_click={this.openDelveSetUp.bind(this)}
                         disabled={
                             this.props.character.is_dead ||

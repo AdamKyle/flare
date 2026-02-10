@@ -104,6 +104,12 @@ class BattleController extends Controller
     public function setupMonster(AttackTypeRequest $attackTypeRequest, Character $character, Monster $monster): JsonResponse
     {
 
+        if ($this->monsterFightService->isAtDelveLocation($character)) {
+            return response()->json([
+                'message' => 'You may not fight here. This is a place to delve (click Exploration to set up Delve)',
+            ], 422);
+        }
+
         if (! $this->monsterFightService->isAtMonstersLocation($character, $monster->id)) {
             return response()->json([
                 'message' => 'You cannot fight a creature of this magnitude with out being at it\'s location.',
