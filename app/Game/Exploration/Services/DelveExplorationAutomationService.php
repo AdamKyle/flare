@@ -8,6 +8,7 @@ use App\Flare\Models\DelveExploration;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Values\AutomationType;
+use App\Flare\Values\LocationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
@@ -32,7 +33,7 @@ class DelveExplorationAutomationService
             ->where('is_raid_monster', false)
             ->where('is_raid_boss', false)
             ->where('game_map_id', $character->map->game_map_id)
-            ->whereNull('only_for_location_type')
+            ->whereIn('only_for_location_type', [LocationType::CAVE_OF_MEMORIES])
             ->whereNull('raid_special_attack_type')
             ->inRandomOrder()
             ->first()

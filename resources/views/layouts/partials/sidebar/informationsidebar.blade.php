@@ -219,6 +219,10 @@
                 <span class="fas fa-map-signs"></span>
                 Exploration
             </a>
+            <a href="{{ route('info.page', ['pageName' => 'delve']) }}">
+                <span class="fas fa-dungeon"></span>
+                Delve
+            </a>
             <hr />
             <h6 class="uppercase">Map Movement</h6>
             <a href="{{ route('info.page', ['pageName' => 'movement']) }}">

@@ -33,6 +33,7 @@ export default class ExplorationSection extends React.Component<any, any> {
         if (localStorage.getItem("hide-exploration-help") !== null) {
             this.setState({
                 hide_exploration_help: true,
+                show_delve_setup: true,
             });
         }
     }
@@ -395,6 +396,10 @@ export default class ExplorationSection extends React.Component<any, any> {
     }
 
     closeDelve() {
+        if (this.state.hide_exploration_help) {
+            return this.props.manage_exploration();
+        }
+
         this.setState({
             show_delve_setup: false,
         });
@@ -403,12 +408,6 @@ export default class ExplorationSection extends React.Component<any, any> {
     openDelveSetUp() {
         this.setState({
             show_delve_setup: true,
-        });
-    }
-
-    openRegularExplorationSetUp() {
-        this.setState({
-            show_exploration_setup: true,
         });
     }
 
