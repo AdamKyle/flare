@@ -150,71 +150,71 @@ class TraverseService
         $character = $character->refresh();
 
         $this->updateMap($character);
-//        $this->updateActions($mapId, $character, $oldMap);
-//        $this->updateKingdomOwnedKingdom($character);
-//
-//        $character = $character->refresh();
-//
-//        $location = $this->getLocationForCoordinates($character);
-//
-//        $this->updateMonstersList($character, $location);
-//
-//        $message = 'You have traveled to: ' . $character->map->gameMap->name;
-//
-//        ServerMessageHandler::handleMessage($character->user, MovementMessageTypes::PLANE_TRANSFER, $message);
-//
-//        $gameMap = $character->map->gameMap;
-//
-//        if ($gameMap->mapType()->isShadowPlane()) {
-//            $message = 'As you enter into the Shadow Plane, all you see for miles around are
-//            shadowy figures moving across the land. The color of the land is grey and lifeless. But you
-//            feel the presence of death as it creeps ever closer.
-//            (Characters can walk on water here.)';
-//
-//            event(new ServerMessageEvent($character->user, $message));
-//
-//            event(new GlobalMessageEvent('The gates have opened for: ' . $character->name . '. They have entered the realm of shadows!'));
-//        }
-//
-//        if ($gameMap->mapType()->isHell()) {
-//            $message = 'The stench of sulfur fills your nose. The heat of the magma oceans bathes over you. Demonic shadows and figures move about the land. Tormented souls cry out in anguish!';
-//
-//            event(new ServerMessageEvent($character->user, $message));
-//
-//            event(new GlobalMessageEvent('Hell\'s gates swing wide for: ' . $character->name . '. May the light of The Poet, be their guide through such darkness!'));
-//        }
-//
-//        if ($gameMap->mapType()->isPurgatory()) {
-//            $message = 'The silence of death fills your very being and chills you to bone. Nothing moves amongst the decay and death of this land.';
-//
-//            event(new ServerMessageEvent($character->user, $message));
-//
-//            event(new GlobalMessageEvent('Thunder claps in the sky: ' . $character->name . ' has called forth The Creator\'s gates of despair! The Creator is Furious! "Hear me, child! I shall face you in the depths of my despair and crush the soul from your bones!" the lands fall silent, the children no longer have faith and the fabric of time rips open...'));
-//        }
-//
-//        if ($gameMap->mapType()->isTheIcePlane()) {
-//            $message = 'The air becomes bitter and cold, the ice starts to form on the ground around you. Everything seems so frozen in place.';
-//
-//            event(new ServerMessageEvent($character->user, $message));
-//
-//            event(new GlobalMessageEvent('"Have you seen my son?" the call of the Ice Queen is heard across the lands of Tlessa. The Poet turns in his study: "So she has breached our reality."'));
-//        }
-//
-//        if ($gameMap->mapType()->isTwistedMemories()) {
-//            $message = 'Your mind becomes a fog as you enter into a land where even your own thoughts become twisted into a darkness never before experienced by mortals before.';
-//
-//            event(new ServerMessageEvent($character->user, $message));
-//
-//            event(new GlobalMessageEvent('"She is the reason the world is trapped in these lies." ' . $character->name . ' enters into a place where their own heart becomes a memory that is twisted into hate.'));
-//        }
-//
-//        if ($gameMap->mapType()->isDelusionalMemories()) {
-//            $message = 'The delusions of a mad man are heavy on the air here ...';
-//
-//            event(new ServerMessageEvent($character->user, $message));
-//
-//            event(new GlobalMessageEvent('"Fliniguss has gone mad."  the Red Hawk Soldier states. "Help us put him down!" ' . $character->name . ' enters into a place where the war of the ages past never ended.'));
-//        }
+        $this->updateActions($mapId, $character, $oldMap);
+        $this->updateKingdomOwnedKingdom($character);
+
+        $character = $character->refresh();
+
+        $location = $this->getLocationForCoordinates($character);
+
+        $this->updateMonstersList($character, $location);
+
+        $message = 'You have traveled to: ' . $character->map->gameMap->name;
+
+        ServerMessageHandler::handleMessage($character->user, MovementMessageTypes::PLANE_TRANSFER, $message);
+
+        $gameMap = $character->map->gameMap;
+
+        if ($gameMap->mapType()->isShadowPlane()) {
+            $message = 'As you enter into the Shadow Plane, all you see for miles around are
+            shadowy figures moving across the land. The color of the land is grey and lifeless. But you
+            feel the presence of death as it creeps ever closer.
+            (Characters can walk on water here.)';
+
+            event(new ServerMessageEvent($character->user, $message));
+
+            event(new GlobalMessageEvent('The gates have opened for: ' . $character->name . '. They have entered the realm of shadows!'));
+        }
+
+        if ($gameMap->mapType()->isHell()) {
+            $message = 'The stench of sulfur fills your nose. The heat of the magma oceans bathes over you. Demonic shadows and figures move about the land. Tormented souls cry out in anguish!';
+
+            event(new ServerMessageEvent($character->user, $message));
+
+            event(new GlobalMessageEvent('Hell\'s gates swing wide for: ' . $character->name . '. May the light of The Poet, be their guide through such darkness!'));
+        }
+
+        if ($gameMap->mapType()->isPurgatory()) {
+            $message = 'The silence of death fills your very being and chills you to bone. Nothing moves amongst the decay and death of this land.';
+
+            event(new ServerMessageEvent($character->user, $message));
+
+            event(new GlobalMessageEvent('Thunder claps in the sky: ' . $character->name . ' has called forth The Creator\'s gates of despair! The Creator is Furious! "Hear me, child! I shall face you in the depths of my despair and crush the soul from your bones!" the lands fall silent, the children no longer have faith and the fabric of time rips open...'));
+        }
+
+        if ($gameMap->mapType()->isTheIcePlane()) {
+            $message = 'The air becomes bitter and cold, the ice starts to form on the ground around you. Everything seems so frozen in place.';
+
+            event(new ServerMessageEvent($character->user, $message));
+
+            event(new GlobalMessageEvent('"Have you seen my son?" the call of the Ice Queen is heard across the lands of Tlessa. The Poet turns in his study: "So she has breached our reality."'));
+        }
+
+        if ($gameMap->mapType()->isTwistedMemories()) {
+            $message = 'Your mind becomes a fog as you enter into a land where even your own thoughts become twisted into a darkness never before experienced by mortals before.';
+
+            event(new ServerMessageEvent($character->user, $message));
+
+            event(new GlobalMessageEvent('"She is the reason the world is trapped in these lies." ' . $character->name . ' enters into a place where their own heart becomes a memory that is twisted into hate.'));
+        }
+
+        if ($gameMap->mapType()->isDelusionalMemories()) {
+            $message = 'The delusions of a mad man are heavy on the air here ...';
+
+            event(new ServerMessageEvent($character->user, $message));
+
+            event(new GlobalMessageEvent('"Fliniguss has gone mad."  the Red Hawk Soldier states. "Help us put him down!" ' . $character->name . ' enters into a place where the war of the ages past never ended.'));
+        }
 
         event(new UpdateCharacterStatus($character));
     }
@@ -306,51 +306,6 @@ class TraverseService
         if ($didReroll) {
             ServerMessageHandler::handleMessage($character->user, MovementMessageTypes::MOVE_LOCATION, 'Your character was moved as you are missing the appropriate quest item or were not allowed to enter the area.');
         }
-    }
-
-    /**
-     * Change the players' location if they cannot walk on the planes water.
-     *
-     * We do this till we find ground.
-     */
-    protected function changeLocation(Character $character, array $cache): Character
-    {
-
-        $x = $cache['x'];
-        $y = $cache['y'];
-
-        if (
-            ! $this->mapTileValue->canWalkOnWater($character->map->character_position_x, $character->map->character_position_y) ||
-            ! $this->mapTileValue->canWalkOnDeathWater($character->map->character_position_x, $character->map->character_position_y) ||
-            ! $this->mapTileValue->canWalkOnMagma($character->map->character_position_x, $character->map->character_position_y) ||
-            $this->mapTileValue->isPurgatoryWater((int) $this->mapTileValue->getTileColor($character->map->character_position_x, $character->map->character_position_y)) ||
-            $this->mapTileValue->isTwistedMemoriesWater((int) $this->mapTileValue->getTileColor($character->map->character_position_x, $character->map->character_position_y)) ||
-            $this->mapTileValue->isDelusionalMemoriesWater((int) $this->mapTileValue->getTileColor($character->map->character_position_x, $character->map->character_position_y))
-        ) {
-            // Update the players location, call the method again to validate that we are not at a invalid location.
-            // repeat until we are in a non-invalid location,
-            $character->map()->update([
-                'character_position_x' => $x[rand(0, count($x) - 1)],
-                'character_position_y' => $y[rand(0, count($y) - 1)],
-            ]);
-
-            return $this->changeLocation($character->refresh(), $cache);
-        }
-
-        $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->where('game_map_id', $character->map->game_map_id)->first();
-
-        if (! is_null($location)) {
-            if (! $location->can_players_enter) {
-                $character->map()->update([
-                    'character_position_x' => $x[rand(0, count($x) - 1)],
-                    'character_position_y' => $y[rand(0, count($y) - 1)],
-                ]);
-
-                return $this->changeLocation($character->refresh(), $cache);
-            }
-        }
-
-        return $character->refresh();
     }
 
     /**

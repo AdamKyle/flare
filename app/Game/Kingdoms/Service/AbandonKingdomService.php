@@ -129,6 +129,6 @@ class AbandonKingdomService
 
         event(new ServerMessageEvent($this->character->user, 'You have been locked out of settling or purchasing a new kingdom for: ' .
             $minutes . ' Minutes. If you abandon another kingdom, we add 15 minutes to what ever time is left.
-            If you attempt to settle or purchase a king you will be told how much time you have left.'));
+            If you attempt to settle or purchase a kingdom you will be told how much time you have left.'));
     }
 }
