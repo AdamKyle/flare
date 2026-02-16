@@ -41,6 +41,7 @@ class CharacterPassiveSkill extends Model
         'is_max_level',
         'current_bonus',
         'resource_request_time_reduction',
+        'resource_increase_amount',
         'capital_city_building_request_travel_time_reduction',
         'capital_city_unit_request_travel_time_reduction'
     ];
@@ -68,6 +69,11 @@ class CharacterPassiveSkill extends Model
     public function getCurrentBonusAttribute()
     {
         return $this->current_level * $this->passiveSkill->bonus_per_level;
+    }
+
+    public function getResourceIncreaseAmountAttribute()
+    {
+        return $this->current_level * $this->passiveSkill->resource_bonus_per_level;
     }
 
     public function getNameAttribute()

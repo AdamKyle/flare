@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Console\AfterDeployment\CreateLocationDataCache;
 use App\Console\AfterDeployment\FixFactionLoyaltyCraftingTasks;
+use App\Console\AfterDeployment\FixKingdomMaxResourcesBasedOnPassiveSkill;
 use App\Console\AfterDeployment\FixWeaponMasteryTypes;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Mail;
@@ -96,6 +97,7 @@ class AppServiceProvider extends ServiceProvider
             FixFactionLoyaltyCraftingTasks::class,
             FixWeaponMasteryTypes::class,
             CreateLocationDataCache::class,
+            FixKingdomMaxResourcesBasedOnPassiveSkill::class,
 
             // Development Commands:
             CreateCharacter::class,

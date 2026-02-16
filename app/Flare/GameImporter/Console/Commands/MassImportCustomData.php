@@ -56,6 +56,7 @@ class MassImportCustomData extends Command
         Artisan::call('create:quest-cache');
         Artisan::call('generate:monster-cache');
         Artisan::call('create:location-data-cache');
+        Artisan::call('fix:kingdom-max-resources-based-on-passive-skill');
 
         $this->importInformationSection();
 

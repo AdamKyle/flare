@@ -146,7 +146,6 @@ class LocationService
         $cachedValue = Cache::get($cacheKey);
 
         if (!is_null($cachedValue)) {
-            dump('Being called?');
             return collect($cachedValue);
         }
 

@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingQueue;
+use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\User;
@@ -12,6 +13,7 @@ use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Messages\Types\KingdomMessageTypes;
+use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Exception;
 use Facades\App\Flare\Values\UserOnlineValue;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -28,7 +30,9 @@ class UpgradeBuilding implements ShouldQueue
     /**
      * @var User
      */
-    protected $user;
+    protected User $user;
+
+    protected Character $character;
 
     protected KingdomBuilding $building;
 
@@ -53,6 +57,8 @@ class UpgradeBuilding implements ShouldQueue
     {
         $this->user = $user;
 
+        $this->character = $user->character;
+
         $this->building = $building;
 
         $this->queueId = $queueId;
@@ -71,6 +77,9 @@ class UpgradeBuilding implements ShouldQueue
     {
 
         $queue = BuildingInQueue::find($this->queueId);
+
+        $skill = $this->character->passiveSkills->where('passiveSkill.effect_type', PassiveSkillTypeValue::RESOURCE_INCREASE)->first();
+
 
         if (is_null($queue)) {
             return;
@@ -109,7 +118,7 @@ class UpgradeBuilding implements ShouldQueue
             }
             // @codeCoverageIgnoreEnd
 
-            $this->building->kingdom->{'max_' . $type} += 1000;
+            $this->building->kingdom->{'max_' . $type} += (1000 + $skill->resource_increase_amount);
         }
 
         $this->building->kingdom->save();
@@ -133,7 +142,7 @@ class UpgradeBuilding implements ShouldQueue
 
         if ($building->is_farm) {
             $building->kingdom->update([
-                'max_population' => $building->kingdom->max_population + (($building->level * 100) + 100),
+                'max_population' => $building->kingdom->max_population + (($building->level * 100) + 100) + $skill->resource_increase_amount,
             ]);
         }
 
