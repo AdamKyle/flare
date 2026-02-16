@@ -9,6 +9,7 @@ use App\Flare\Models\Raid;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Models\ScheduledEventConfiguration;
 use App\Game\Messages\Events\DeleteAnnouncementEvent;
+use App\Game\Raids\Values\RaidType;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Events\Values\EventType;
@@ -166,6 +167,91 @@ class EventSchedulerService
         ]);
 
         event(new UpdateScheduledEvents($this->fetchEvents()));
+    }
+
+    public function generateFutureRaid(ScheduledEvent $scheduledRaidEvent, Carbon $futureDate = null): void
+    {
+        $startDate = $futureDate ?? $scheduledRaidEvent->start_date->copy()->addMonths(3);
+        $endDate = $startDate->copy()->addMonth();
+
+        $raidEvents = ScheduledEvent::query()
+            ->whereNotNull('raid_id')
+            ->where('start_date', '<', $endDate)
+            ->where('end_date', '>', $startDate)
+            ->orderBy('start_date')
+            ->get();
+
+        if ($raidEvents->isEmpty()) {
+            $params = [
+                'selected_event_type' => $scheduledRaidEvent->event_type,
+                'selected_start_date' => $startDate,
+                'selected_raid' => $scheduledRaidEvent->raid_id,
+                'selected_end_date' => $endDate,
+                'event_description' => $scheduledRaidEvent->description,
+                'raids_for_event' => $scheduledRaidEvent->raids_for_event
+            ];
+
+            $this->createEvent($params);
+            return;
+        }
+
+        if ($raidEvents->count() > 1) {
+            $lastRaidEvent = $raidEvents->last();
+
+            $shiftedLastRaidStartDate = $lastRaidEvent->end_date->copy()->addHour();
+            $shiftedLastRaidEndDate = $shiftedLastRaidStartDate->copy()->addMonth();
+
+            $hasRaidInShiftedWindow = ScheduledEvent::query()
+                ->whereNotNull('raid_id')
+                ->where('start_date', '<', $shiftedLastRaidEndDate)
+                ->where('end_date', '>', $shiftedLastRaidStartDate)
+                ->exists();
+
+            if (! $hasRaidInShiftedWindow) {
+                $params = [
+                    'selected_event_type' => $scheduledRaidEvent->event_type,
+                    'selected_start_date' => $shiftedLastRaidStartDate,
+                    'selected_raid' => $scheduledRaidEvent->raid_id,
+                    'selected_end_date' => $shiftedLastRaidEndDate,
+                    'event_description' => $scheduledRaidEvent->description,
+                    'raids_for_event' => $scheduledRaidEvent->raids_for_event
+                ];
+
+                $this->createEvent($params);
+                return;
+            }
+
+            $this->generateFutureRaid($scheduledRaidEvent, $shiftedLastRaidStartDate->copy()->addMonth());
+            return;
+        }
+
+        $existingRaidEvent = $raidEvents->first();
+
+        $shiftedStartDate = $existingRaidEvent->end_date->copy()->addHour();
+        $shiftedEndDate = $shiftedStartDate->copy()->addMonth();
+
+        $hasRaidInShiftedWindow = ScheduledEvent::query()
+            ->whereNotNull('raid_id')
+            ->where('start_date', '<', $shiftedEndDate)
+            ->where('end_date', '>', $shiftedStartDate)
+            ->exists();
+
+        if (! $hasRaidInShiftedWindow) {
+            $params = [
+                'selected_event_type' => $scheduledRaidEvent->event_type,
+                'selected_start_date' => $shiftedEndDate,
+                'selected_raid' => $scheduledRaidEvent->raid_id,
+                'selected_end_date' => $shiftedStartDate,
+                'event_description' => $scheduledRaidEvent->description,
+                'raids_for_event' => $scheduledRaidEvent->raids_for_event
+            ];
+
+            $this->createEvent($params);
+
+            return;
+        }
+
+        $this->generateFutureRaid($scheduledRaidEvent, $startDate->copy()->addMonth());
     }
 
     private function createBaseScheduledEvent(array $params): array

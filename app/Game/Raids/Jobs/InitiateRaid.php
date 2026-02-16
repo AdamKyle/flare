@@ -63,6 +63,8 @@ class InitiateRaid implements ShouldQueue
 
             $buildQuestCacheService->buildRaidQuestCache(true);
 
+            $eventSchedulerService->generateFutureRaid($event);
+
             return;
         }
 
