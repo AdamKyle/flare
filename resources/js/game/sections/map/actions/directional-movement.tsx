@@ -27,6 +27,12 @@ export default class DirectionalMovement extends React.Component<
         });
     }
 
+    closeTraverse() {
+        this.setState({
+            show_traverse: false,
+        });
+    }
+
     handleMovePlayer(direction: string) {
         new MovePlayer(this)
             .setCharacterPosition(this.props.character_position)
@@ -73,7 +79,7 @@ export default class DirectionalMovement extends React.Component<
                 {this.state.show_traverse ? (
                     <TraverseModal
                         is_open={true}
-                        handle_close={this.traverse.bind(this)}
+                        handle_close={this.closeTraverse.bind(this)}
                         character_id={this.props.character_id}
                         map_id={this.props.map_id}
                         update_map_state={this.props.update_map_state}

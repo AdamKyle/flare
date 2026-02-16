@@ -232,9 +232,9 @@ export default class MapSection extends React.Component<MapProps, MapState> {
     setStateFromData(data: MapData, callback?: () => void) {
         const state = MapStateManager.buildChangeState(data, this);
 
-        this.setState(state, () => {
-            this.props.set_map_data(data);
+        this.props.set_map_data(data);
 
+        this.setState(state, () => {
             if (typeof callback === "function") {
                 return callback();
             }

@@ -27,11 +27,6 @@ export default class MapStateManager {
 
         state.port_location = getPortLocation(state);
 
-        const viewPort: number =
-            component instanceof MapSection
-                ? component.props.view_port
-                : component.state.view_port;
-
         state.map_position = {
             x: getNewXPosition(
                 data.character_map.character_position_x,

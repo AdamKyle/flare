@@ -23,6 +23,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 
 class InitiateRaid implements ShouldQueue
 {
@@ -163,6 +164,12 @@ class InitiateRaid implements ShouldQueue
             'raid_id' => $raid->id,
             'has_raid_boss' => true,
         ]);
+
+        $locationMapIds[] = $locationOfRaidBoss->game_map_id;
+
+        foreach (array_unique($locationMapIds) as $gameMapId) {
+            Cache::forget('map-locations-'.$gameMapId);
+        }
 
         event(new GlobalMessageEvent('Location: '.$locationOfRaidBoss->name.' At (X/Y): '.$locationOfRaidBoss->x.
             '/'.$locationOfRaidBoss->y.' on plane: '.$locationOfRaidBoss->map->name.' has become over run! The Raid boss: '.$raid->raidBoss->name.

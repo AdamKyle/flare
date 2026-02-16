@@ -21,6 +21,7 @@ use App\Game\Maps\Services\TeleportService;
 use App\Game\Maps\Services\TraverseService;
 use App\Game\Maps\Services\UpdateRaidMonsters;
 use App\Game\Maps\Services\WalkingService;
+use App\Game\Maps\Transformers\LocationTransformer;
 use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Maps\Values\MapTileValue;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -35,6 +36,11 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function register()
     {
+
+        $this->app->bind(LocationTransformer::class, function() {
+            return new LocationTransformer();
+        });
+
         $this->app->bind(DistanceCalculation::class, function ($app) {
             return new DistanceCalculation;
         });
@@ -119,6 +125,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CoordinatesCache::class),
                 $app->make(CharacterCacheData::class),
                 $app->make(UpdateCharacterAttackTypesHandler::class),
+                $app->make(Manager::class),
+                $app->make(LocationTransformer::class),
             );
         });
 

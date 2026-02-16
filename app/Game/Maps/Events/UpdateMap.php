@@ -22,10 +22,10 @@ class UpdateMap implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      */
-    public function __construct(User $user)
+    public function __construct(User $user, bool $includeLocationData = true)
     {
         $character = $user->character->refresh();
-        $this->mapDetails = resolve(LocationService::class)->getLocationData($character);
+        $this->mapDetails = resolve(LocationService::class)->getLocationData($character, $includeLocationData);
         $this->user = $user;
     }
 

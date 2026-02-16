@@ -24,6 +24,8 @@ export default class MapListeners implements GameListener {
 
     private pctCommandUpdate?: Channel;
 
+    private updateMapLocations?: Channel;
+
     constructor(
         @inject(CoreEventListener) private coreEventListener: CoreEventListener,
     ) {}
@@ -51,6 +53,10 @@ export default class MapListeners implements GameListener {
             );
             this.pctCommandUpdate = echo.private("update-map-" + this.userId);
 
+            this.updateMapLocations = echo.private(
+                "location-data-for-maps-" + this.userId,
+            );
+
             this.corruptedLocations = echo.join("corrupt-locations");
         } catch (e: any | unknown) {
             throw new Error(e);
@@ -64,6 +70,7 @@ export default class MapListeners implements GameListener {
         this.listenForEventGoalUpdates();
         this.listenForCorruptedLocationUpdates();
         this.listenForPctCommand();
+        this.listenForMapLocationUpdate();
     }
 
     /**
@@ -248,6 +255,33 @@ export default class MapListeners implements GameListener {
                 this.component.updateQuestPlane(
                     event.map_data.character_map.game_map.name,
                 );
+            },
+        );
+    }
+
+    private listenForMapLocationUpdate() {
+        if (!this.updateMapLocations) {
+            return;
+        }
+
+        this.updateMapLocations.listen(
+            "Game.Maps.Events.UpdateMapLocations",
+            (event: any) => {
+                if (!this.component) {
+                    return;
+                }
+
+                const mapState = this.component.state.map_data;
+
+                if (!mapState) {
+                    return;
+                }
+
+                mapState.locations = event.locationData;
+
+                this.component.setState({
+                    map_data: mapState,
+                });
             },
         );
     }

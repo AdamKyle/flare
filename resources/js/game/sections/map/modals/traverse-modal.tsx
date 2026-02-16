@@ -16,6 +16,7 @@ export default class TraverseModal extends React.Component<any, any> {
             is_traversing: false,
             error_message: null,
             traverse_is_same_map: true,
+            should_close_traversing_model: false,
             map: 0,
         };
     }
@@ -45,6 +46,12 @@ export default class TraverseModal extends React.Component<any, any> {
                 }
             },
         );
+    }
+
+    componentDidUpdate() {
+        if (this.state.should_close_traversing_model) {
+            this.props.handle_close();
+        }
     }
 
     setMap(data: any) {
@@ -131,11 +138,10 @@ export default class TraverseModal extends React.Component<any, any> {
                 (result: AxiosResponse) => {
                     this.setState({
                         is_traversing: false,
+                        should_close_traversing_model: true,
                     });
 
                     this.props.update_map_state(result.data);
-
-                    this.props.handle_close();
                 },
                 (error: AxiosError) => {
                     if (typeof error.response !== "undefined") {

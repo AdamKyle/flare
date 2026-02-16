@@ -39,6 +39,7 @@ use App\Game\Raids\Events\CorruptLocations;
 use App\Game\Survey\Events\ShowSurvey;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 
 class EndScheduledEvent extends Command
 {
@@ -520,6 +521,10 @@ class EndScheduledEvent extends Command
             'raid_id' => null,
             'has_raid_boss' => false,
         ]);
+
+        foreach (Location::whereIn('id', $raidLocations)->pluck('game_map_id')->unique()->all() as $gameMapId) {
+            Cache::forget('map-locations-'.$gameMapId);
+        }
 
         event(new CorruptLocations($locationService->fetchCorruptedLocationData($raid)->toArray()));
     }

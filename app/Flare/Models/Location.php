@@ -6,6 +6,7 @@ use App\Flare\Values\LocationType;
 use Database\Factories\LocationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Location extends Model
 {
@@ -94,5 +95,16 @@ class Location extends Model
     protected static function newFactory()
     {
         return LocationFactory::new();
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(function (Location $location): void {
+            Cache::forget('map-locations-'.$location->game_map_id);
+        });
+
+        static::deleted(function (Location $location): void {
+            Cache::forget('map-locations-'.$location->game_map_id);
+        });
     }
 }

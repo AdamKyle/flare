@@ -46,7 +46,9 @@ class WalkingService extends BaseMovementService
             return $this->errorResult('Invalid coordinates');
         }
 
-        if (! $this->mapTileValue->canWalk($character, $this->x, $this->y)) {
+        $this->mapTileValue->setUp($character, $character->map->gameMap);
+
+        if (! $this->mapTileValue->canWalk($this->x, $this->y)) {
             event(new ServerMessageEvent($character->user, 'You are missing a specific quest item for that.
             Click the map name under the map to see what item you need.'));
 

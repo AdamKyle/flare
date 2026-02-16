@@ -11,6 +11,12 @@ class MapTileValue
 {
     private $imageResource;
 
+    private ?string $loadedMapPath = null;
+
+    private array $itemEffects = [];
+
+    private GameMap $gameMap;
+
     const WATER_TILES = [
         74146170, // Surface, Labyrinth
         255255200, // Dungeons
@@ -21,14 +27,36 @@ class MapTileValue
         112219255, // Delusional Memories
     ];
 
+    public function setUp(Character $character, GameMap $gameMap): MapTileValue {
+        $this->itemEffects = $character->inventory->slots()
+            ->join('items', 'inventory_slots.item_id', '=', 'items.id')
+            ->whereNotNull('items.effect')
+            ->distinct()
+            ->pluck('items.effect')
+            ->toArray();
+
+        $this->gameMap = $gameMap;
+
+        return $this;
+    }
+
     /**
      * Get the tile color from the current map.
      */
-    public function getTileColor(GameMap $gameMap, int $xPosition, int $yPosition): string
+    public function getTileColor(int $xPosition, int $yPosition): string
     {
-        $contents = Storage::disk('maps')->get($gameMap->path);
+        $path = $this->gameMap->path;
 
-        $this->imageResource = imagecreatefromstring($contents);
+        if ($this->loadedMapPath !== $path || is_null($this->imageResource)) {
+            if (! is_null($this->imageResource)) {
+                imagedestroy($this->imageResource);
+            }
+
+            $contents = Storage::disk('maps')->get($path);
+
+            $this->imageResource = imagecreatefromstring($contents);
+            $this->loadedMapPath = $path;
+        }
 
         $rgbIndex = imagecolorat($this->imageResource, $xPosition, $yPosition);
 
@@ -42,7 +70,7 @@ class MapTileValue
      */
     public function isWaterTile(int $color): bool
     {
-        return in_array($color, [74146170]);
+        return in_array($color, self::WATER_TILES);
     }
 
     /**
@@ -50,70 +78,63 @@ class MapTileValue
      */
     public function isDeathWaterTile(int $color): bool
     {
-        return in_array($color, [255255200]);
+        return in_array($color, self::WATER_TILES);
     }
 
     public function isMagma(int $color): bool
     {
-        return in_array($color, [164027]);
+        return in_array($color, self::WATER_TILES);
     }
 
     public function isPurgatoryWater(int $color): bool
     {
-        return in_array($color, [255255255]);
+        return in_array($color, self::WATER_TILES);
     }
 
     public function isIcePlaneIce(int $color): bool
     {
-        return in_array($color, [255255255]);
+        return in_array($color, self::WATER_TILES);
     }
 
     public function isTwistedMemoriesWater(int $color): bool
     {
-        return in_array($color, [3096147]);
+        return in_array($color, self::WATER_TILES);
     }
 
     public function isDelusionalMemoriesWater(int $color): bool
     {
-        return in_array($color, [112219255]);
+        return in_array($color, self::WATER_TILES);
     }
 
-    public function canWalk(Character $character, int $x, int $y)
+    public function canWalk(int $x, int $y)
     {
+        $mapType = $this->gameMap->mapType();
 
-        if (! $this->canWalkOnWater($character, $x, $y)) {
+        if (($mapType->isSurface() || $mapType->isLabyrinth()) && !$this->canWalkOnWater($x, $y)) {
             return false;
         }
 
-        if (! $this->canWalkOnDeathWater($character, $x, $y)) {
+        if ($mapType->isDungeons() && !$this->canWalkOnDeathWater($x, $y)) {
             return false;
         }
 
-        if (! $this->canWalkOnMagma($character, $x, $y)) {
+        if ($mapType->isHell() && !$this->canWalkOnMagma($x, $y)) {
             return false;
         }
 
-        if ($character->map->gameMap->mapType()->isTheIcePlane()) {
-            if (! $this->canWalkOnIcePlaneIce($character, $x, $y)) {
-                return false;
-            }
-
-            return true;
-        }
-
-        if ($character->map->gameMap->mapType()->isDelusionalMemories()) {
-            if (! $this->canWalkOnDelusionalMemoriesWater($character, $x, $y)) {
-                return false;
-            }
-
-            return true;
-        }
-
-        if (! $this->canWalkOnPurgatoryWater($character, $x, $y)) {
+        if ($mapType->isTheIcePlane() && !$this->canWalkOnIcePlaneIce($x, $y)) {
             return false;
         }
 
-        if (! $this->canWalkOnTwistedMemoriesWater($character, $x, $y)) {
+        if ($mapType->isDelusionalMemories() && !$this->canWalkOnDelusionalMemoriesWater($x, $y)) {
+            return false;
+        }
+
+        if ($mapType->isPurgatory() && !$this->canWalkOnPurgatoryWater($x, $y)) {
+            return false;
+        }
+
+        if ($mapType->isTwistedMemories() && !$this->canWalkOnTwistedMemoriesWater($x, $y)) {
             return false;
         }
 
@@ -123,14 +144,12 @@ class MapTileValue
     /**
      * Can the character walk on death water?
      */
-    public function canWalkOnDeathWater(Character $character, int $x, int $y): bool
+    public function canWalkOnDeathWater(int $x, int $y): bool
     {
-        $color = $this->getTileColor($character->map->gameMap, $x, $y);
+        $color = $this->getTileColor($x, $y);
 
         if ($this->isDeathWaterTile((int) $color)) {
-            return $character->inventory->slots->filter(function ($slot) {
-                return $slot->item->effect === ItemEffectsValue::WALK_ON_DEATH_WATER;
-            })->isNotEmpty();
+            return in_array(ItemEffectsValue::WALK_ON_DEATH_WATER, $this->itemEffects);
         }
 
         // We are not death water
@@ -140,15 +159,13 @@ class MapTileValue
     /**
      * Can we teleport to water based locations?
      */
-    public function canWalkOnWater(Character $character, int $x, int $y): bool
+    public function canWalkOnWater(int $x, int $y): bool
     {
 
-        $color = $this->getTileColor($character->map->gameMap, $x, $y);
+        $color = $this->getTileColor($x, $y);
 
         if ($this->isWaterTile((int) $color)) {
-            return $character->inventory->slots->filter(function ($slot) {
-                return $slot->item->effect === ItemEffectsValue::WALK_ON_WATER;
-            })->isNotEmpty();
+            return in_array(ItemEffectsValue::WALK_ON_WATER, $this->itemEffects);
         }
 
         // We are not water
@@ -158,14 +175,12 @@ class MapTileValue
     /**
      * Can we walk on water?
      */
-    public function canWalkOnMagma(Character $character, int $x, int $y): bool
+    public function canWalkOnMagma(int $x, int $y): bool
     {
-        $color = $this->getTileColor($character->map->gameMap, $x, $y);
+        $color = $this->getTileColor($x, $y);
 
         if ($this->isMagma((int) $color)) {
-            return $character->inventory->slots->filter(function ($slot) {
-                return $slot->item->effect === ItemEffectsValue::WALK_ON_MAGMA;
-            })->isNotEmpty();
+            return in_array(ItemEffectsValue::WALK_ON_MAGMA, $this->itemEffects);
         }
 
         // We are not death water
@@ -177,9 +192,9 @@ class MapTileValue
      *
      * No we cannot if we are on purgatory water.
      */
-    public function canWalkOnPurgatoryWater(Character $character, int $x, int $y): bool
+    public function canWalkOnPurgatoryWater(int $x, int $y): bool
     {
-        $color = $this->getTileColor($character->map->gameMap, $x, $y);
+        $color = $this->getTileColor($x, $y);
 
         if ($this->isPurgatoryWater((int) $color)) {
             return false;
@@ -191,14 +206,12 @@ class MapTileValue
     /**
      * Can we walk on ice plane ice?
      */
-    public function canWalkOnIcePlaneIce(Character $character, int $x, int $y): bool
+    public function canWalkOnIcePlaneIce(int $x, int $y): bool
     {
-        $color = $this->getTileColor($character->map->gameMap, $x, $y);
+        $color = $this->getTileColor($x, $y);
 
         if ($this->isIcePlaneIce((int) $color)) {
-            return $character->inventory->slots->filter(function ($slot) {
-                return $slot->item->effect === ItemEffectsValue::WALK_ON_ICE;
-            })->isNotEmpty();
+            return in_array(ItemEffectsValue::WALK_ON_ICE, $this->itemEffects);
         }
 
         return true;
@@ -207,14 +220,12 @@ class MapTileValue
     /**
      * Can walk on Delusional Memories water?
      */
-    public function canWalkOnDelusionalMemoriesWater(Character $character, int $x, int $y): bool
+    public function canWalkOnDelusionalMemoriesWater(int $x, int $y): bool
     {
-        $color = $this->getTileColor($character->map->gameMap, $x, $y);
+        $color = $this->getTileColor($x, $y);
 
         if ($this->isDelusionalMemoriesWater($color)) {
-            return $character->inventory->slots->filter(function ($slot) {
-                return $slot->item->effect === ItemEffectsValue::WALK_ON_DELUSIONAL_MEMORIES_WATER;
-            })->isNotEmpty();
+            return in_array(ItemEffectsValue::WALK_ON_DELUSIONAL_MEMORIES_WATER, $this->itemEffects);
         }
 
         return true;
@@ -223,9 +234,9 @@ class MapTileValue
     /**
      * Can walk on Delusional Memories water?
      */
-    public function canWalkOnTwistedMemoriesWater(Character $character, int $x, int $y): bool
+    public function canWalkOnTwistedMemoriesWater(int $x, int $y): bool
     {
-        $color = $this->getTileColor($character->map->gameMap, $x, $y);
+        $color = $this->getTileColor($x, $y);
 
         if ($this->isTwistedMemoriesWater($color)) {
             return false;

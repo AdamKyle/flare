@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Console\AfterDeployment\CreateLocationDataCache;
 use App\Console\AfterDeployment\FixFactionLoyaltyCraftingTasks;
 use App\Console\AfterDeployment\FixWeaponMasteryTypes;
 use Illuminate\Support\Facades\Blade;
@@ -94,6 +95,7 @@ class AppServiceProvider extends ServiceProvider
             CreateQuestChainRelationships::class,
             FixFactionLoyaltyCraftingTasks::class,
             FixWeaponMasteryTypes::class,
+            CreateLocationDataCache::class,
 
             // Development Commands:
             CreateCharacter::class,

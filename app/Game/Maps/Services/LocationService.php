@@ -20,8 +20,12 @@ use App\Game\Maps\Events\UpdateLocationBasedEventGoals;
 use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
 use App\Game\Maps\Services\Common\LiveCharacterCount;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
+use App\Game\Maps\Transformers\LocationTransformer;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection as LeagueCollection;
 
 class LocationService
 {
@@ -33,10 +37,14 @@ class LocationService
 
     private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
 
+    private Manager $manager;
+
+    private LocationTransformer $locationTransformer;
+
     /**
      * @var ?Location | null
      */
-    private ?Location $location;
+    private ?Location $location = null;
 
     /**
      * @var bool | false
@@ -45,11 +53,13 @@ class LocationService
 
     private bool $isEventBasedUpdate = false;
 
-    public function __construct(CoordinatesCache $coordinatesCache, CharacterCacheData $characterCacheData, UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes)
+    public function __construct(CoordinatesCache $coordinatesCache, CharacterCacheData $characterCacheData, UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes, Manager $manager, LocationTransformer $locationTransformer)
     {
         $this->coordinatesCache = $coordinatesCache;
         $this->characterCacheData = $characterCacheData;
         $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
+        $this->manager = $manager;
+        $this->locationTransformer = $locationTransformer;
     }
 
     public function setIsEventBasedUpdate(bool $isEventBased): LocationService
@@ -62,19 +72,21 @@ class LocationService
     /**
      * Get location data
      */
-    public function getLocationData(Character $character, ?Raid $raid = null): array
+    public function getLocationData(Character $character, bool $includeLocationData = true, ?Raid $raid = null): array
     {
 
         $this->locationBasedEvents($character);
 
-        $this->kingdomManagement($character);
+       $this->kingdomManagement();
 
         $lockedLocation = $this->getLockedLocation($character);
 
-        return [
+        $map = $character->map->gameMap;
+
+        $locationData = [
             'map_url' => Storage::disk('maps')->url($character->map_url),
+            'locations' => [],
             'character_map' => $character->map,
-            'locations' => $this->fetchLocationData($character)->merge($this->fetchCorruptedLocationData($raid)),
             'can_move' => $character->can_move,
             'can_move_again_at' => $character->can_move_again_at,
             'coordinates' => $this->coordinatesCache->getFromCache(),
@@ -86,13 +98,19 @@ class LocationService
             'characters_on_map' => $this->getActiveUsersCountForMap($character),
             'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type,
             'is_event_based' => $this->isEventBasedUpdate,
-            'can_access_hell_forged_shop' => $character->map->gameMap->mapType()->isHell(),
-            'can_access_purgatory_chains_shop' =>  $character->map->gameMap->mapType()->isPurgatory(),
-            'can_access_twisted_earth_shop' => $character->map->gameMap->mapType()->isTwistedMemories(),
-            'can_access_hell_forged' => $character->map->gameMap->mapType()->isHell(),
-            'can_access_purgatory_chains' =>  $character->map->gameMap->mapType()->isPurgatory(),
-            'can_access_twisted_memories' => $character->map->gameMap->mapType()->isTwistedMemories(),
+            'can_access_hell_forged_shop' => $map->mapType()->isHell(),
+            'can_access_purgatory_chains_shop' => $map->mapType()->isPurgatory(),
+            'can_access_twisted_earth_shop' => $map->mapType()->isTwistedMemories(),
+            'can_access_hell_forged' => $map->mapType()->isHell(),
+            'can_access_purgatory_chains' =>  $map->mapType()->isPurgatory(),
+            'can_access_twisted_memories' => $map->mapType()->isTwistedMemories(),
         ];
+
+        if ($includeLocationData) {
+            $locationData['locations'] = $this->fetchLocationData($character->map->game_map_id)->merge($this->fetchCorruptedLocationData($raid));
+        }
+
+        return $locationData;
     }
 
     /**
@@ -100,7 +118,7 @@ class LocationService
      */
     public function locationBasedEvents(Character $character): void
     {
-        $this->processLocation($character);
+         $this->processLocation($character);
 
         // In case automation is running, this way the timer updates.
         event(new UpdateCharacterStatus($character));
@@ -121,11 +139,28 @@ class LocationService
     /**
      * Fetch the locations for this map the characters on.
      */
-    public function fetchLocationData(Character $character): Collection
+    public function fetchLocationData(int $gameMapId): Collection
     {
-        $locations = Location::with('questRewardItem')->where('game_map_id', $character->map->game_map_id)->get();
+        $cacheKey = 'map-locations-'.$gameMapId;
 
-        return $this->transformLocationData($locations);
+        $cachedValue = Cache::get($cacheKey);
+
+        if (!is_null($cachedValue)) {
+            dump('Being called?');
+            return collect($cachedValue);
+        }
+
+        $locations = Cache::rememberForever($cacheKey, function () use ($gameMapId) {
+            $locationsForMap = Location::with(['map', 'questRewardItem', 'requiredQuestItem'])
+                ->where('game_map_id', $gameMapId)
+                ->get();
+
+            $locationsForMapCollection = new LeagueCollection($locationsForMap, $this->locationTransformer);
+
+            return $this->manager->createData($locationsForMapCollection)->toArray();
+        });
+
+        return collect($locations);
     }
 
     /**
@@ -133,7 +168,7 @@ class LocationService
      */
     public function fetchLocationsForMap(GameMap $map): Collection
     {
-        $locations = Location::with('questRewardItem')->where('game_map_id', $map->id)->get();
+        $locations = Location::with(['map', 'questRewardItem', 'requiredQuestItem'])->where('game_map_id', $map->id)->get();
 
         return $this->transformLocationData($locations);
     }
@@ -143,7 +178,8 @@ class LocationService
      *
      * If no raid is set, return an empty collection.
      *
-     * @param  ?Raid  $raid
+     * @param  ?Raid $raid
+     * @return Collection
      */
     public function fetchCorruptedLocationData(?Raid $raid = null): Collection
     {
@@ -156,9 +192,11 @@ class LocationService
 
         array_push($corruptedLocationIds, $raid->raid_boss_location_id);
 
-        $locations = Location::whereIn('id', $corruptedLocationIds)->get();
+        $locations = Location::with(['map', 'questRewardItem', 'requiredQuestItem'])
+            ->whereIn('id', $corruptedLocationIds)
+            ->get();
 
-        return $this->transformLocationData($locations);
+        return collect($this->transformLocationData($locations)->values()->toArray());
     }
 
     /**
@@ -261,7 +299,7 @@ class LocationService
      * We determine the action the player can take. That is, can they settle?
      * Can they attack the kingdom or can they manage the kingdom?
      */
-    protected function kingdomManagement(Character $character): void
+    protected function kingdomManagement(): void
     {
         if (is_null($this->location)) {
             $this->canSettle = true;

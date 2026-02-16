@@ -66,27 +66,47 @@ trait KingdomCache
      *
      * @return mixed
      */
-    public function getEnemyKingdoms(Character $character, bool $refresh = false)
+    public function getEnemyKingdoms(Character $character, bool $refresh = false): array
     {
         $plane = $character->map->gameMap->name;
 
         if (Cache::has('enemy-kingdoms-'.$plane) && ! $refresh) {
             return Cache::get('enemy-kingdoms-'.$plane);
-        } else {
-            $kingdoms = Kingdom::select('x_position', 'y_position', 'id', 'color', 'character_id', 'name', 'current_morale', 'game_map_id')
-                ->whereNotNull('character_id')
-                ->where('game_map_id', $character->map->game_map_id)
-                ->get()
-                ->transform(function ($kingdom) {
-                    $kingdom->character_name = $kingdom->character->name;
-
-                    return $kingdom;
-                })->all();
-
-            Cache::put('enemy-kingdoms-'.$plane, $kingdoms);
         }
 
-        return Cache::get('enemy-kingdoms-'.$plane);
+        $kingdoms = Kingdom::query()
+            ->select(
+                'kingdoms.x_position',
+                'kingdoms.y_position',
+                'kingdoms.id',
+                'kingdoms.color',
+                'kingdoms.character_id',
+                'kingdoms.name',
+                'kingdoms.current_morale',
+                'kingdoms.game_map_id',
+                'characters.name as character_name'
+            )
+            ->join('characters', 'characters.id', '=', 'kingdoms.character_id')
+            ->where('kingdoms.game_map_id', $character->map->game_map_id)
+            ->get()
+            ->map(function (Kingdom $kingdom) {
+                return [
+                    'x_position' => $kingdom->x_position,
+                    'y_position' => $kingdom->y_position,
+                    'id' => $kingdom->id,
+                    'color' => $kingdom->color,
+                    'character_id' => $kingdom->character_id,
+                    'name' => $kingdom->name,
+                    'current_morale' => $kingdom->current_morale,
+                    'game_map_id' => $kingdom->game_map_id,
+                    'character_name' => $kingdom->character_name,
+                ];
+            })
+            ->all();
+
+        Cache::put('enemy-kingdoms-'.$plane, $kingdoms);
+
+        return $kingdoms;
     }
 
     /**
