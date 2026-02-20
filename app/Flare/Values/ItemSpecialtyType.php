@@ -22,6 +22,8 @@ class ItemSpecialtyType
 
     const FAITHLESS_PLATE = 'Faithless Plate';
 
+    const LABYRINTH_CLOTH = 'Labyrinth Cloth';
+
     /**
      * @var string[]
      */
@@ -33,6 +35,7 @@ class ItemSpecialtyType
         self::DELUSIONAL_SILVER => 'Delusional Silver',
         self::TWISTED_EARTH => 'Twisted Earth',
         self::FAITHLESS_PLATE => 'Faithless Plate',
+        self::LABYRINTH_CLOTH => 'Labyrinth Cloth',
     ];
 
     /**
@@ -126,5 +129,9 @@ class ItemSpecialtyType
     public function isFaithlessPlate(): bool
     {
         return $this->value === self::FAITHLESS_PLATE;
+    }
+
+    public function isLabyrinthCloth(): bool {
+        return $this->value === self::LABYRINTH_CLOTH;
     }
 }

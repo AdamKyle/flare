@@ -96,6 +96,7 @@ class ItemsService
                 ItemSpecialtyType::CORRUPTED_ICE,
                 ItemSpecialtyType::TWISTED_EARTH,
                 ItemSpecialtyType::DELUSIONAL_SILVER,
+                ItemSpecialtyType::LABYRINTH_CLOTH,
             ],
             'itemSkills' => ItemSkill::whereNull('parent_id')->get(),
             'locations' => Location::select('name', 'id')->get(),

@@ -6,7 +6,7 @@ use App\Game\Raids\Values\RaidType;
 use Exception;
 use Tests\TestCase;
 
-class RaitTypeTest extends TestCase
+class RaidTypeTest extends TestCase
 {
     public function testThrowsExceptionForInvalidType()
     {
@@ -48,6 +48,13 @@ class RaitTypeTest extends TestCase
     {
         $this->assertTrue(
             (new RaidType(RaidType::CORRUPTED_BISHOP))->isCorruptedBishop()
+        );
+    }
+
+    public function testIsEnragedLittleGirl()
+    {
+        $this->assertTrue(
+            (new RaidType(RaidType::ENRAGED_LITTLE_GIRL))->isEnragedLittleGirl()
         );
     }
 }

@@ -11,6 +11,7 @@ class RaidType
     const JESTER_OF_TIME = 'jester-of-time';
     const FROZEN_KING = 'frozen-king';
     const CORRUPTED_BISHOP = 'corrupted-bishop';
+    const ENRAGED_LITTLE_GIRL = 'enraged-little-girl';
 
     private string $value;
 
@@ -23,6 +24,7 @@ class RaidType
         self::JESTER_OF_TIME => self::JESTER_OF_TIME,
         self::FROZEN_KING => self::FROZEN_KING,
         self::CORRUPTED_BISHOP => self::CORRUPTED_BISHOP,
+        self::ENRAGED_LITTLE_GIRL => self::ENRAGED_LITTLE_GIRL,
     ];
 
     public static array $selectionOptions = [
@@ -31,6 +33,7 @@ class RaidType
         self::JESTER_OF_TIME => 'Jester of Time Raid',
         self::FROZEN_KING => 'Frozen King',
         self::CORRUPTED_BISHOP => 'Corrupted Bishop',
+        self::ENRAGED_LITTLE_GIRL => 'Enraged Little Girl Raid',
     ];
 
     /**
@@ -70,5 +73,9 @@ class RaidType
     public function isCorruptedBishop(): bool
     {
         return $this->value === self::CORRUPTED_BISHOP;
+    }
+
+    public function isEnragedLittleGirl(): bool {
+        return $this->value === self::ENRAGED_LITTLE_GIRL;
     }
 }

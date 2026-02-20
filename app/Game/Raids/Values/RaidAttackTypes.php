@@ -12,6 +12,8 @@ class RaidAttackTypes
 
     const WATER_ATTACK = 2;
 
+    const ENRAGED_HATE = 3;
+
     private int $value;
 
     /**
@@ -21,6 +23,7 @@ class RaidAttackTypes
         0 => self::FIRE_ATTACK,
         1 => self::ICE_ATTACK,
         2 => self::WATER_ATTACK,
+        3 => self::ENRAGED_HATE,
     ];
 
     /**
@@ -59,5 +62,9 @@ class RaidAttackTypes
     public function isWaterAttack(): bool
     {
         return $this->value === self::WATER_ATTACK;
+    }
+
+    public function isEnragedHate(): bool {
+        return $this->value === self::ENRAGED_HATE;
     }
 }

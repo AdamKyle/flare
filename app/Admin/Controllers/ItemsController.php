@@ -115,6 +115,7 @@ class ItemsController extends Controller
                 ItemSpecialtyType::DELUSIONAL_SILVER,
                 ItemSpecialtyType::TWISTED_EARTH,
                 ItemSpecialtyType::FAITHLESS_PLATE,
+                ItemSpecialtyType::LABYRINTH_CLOTH,
             ],
         ];
 
