@@ -9,6 +9,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -313,7 +314,7 @@ class  InventorySetService
         $armourPositions = ['body', 'leggings', 'feet', 'sleeves', 'sleeves', 'helmet', 'gloves'];
 
         foreach ($inventorySet->slots as $slot) {
-            if ($slot->item->type === 'weapon') {
+            if (in_array($slot->item->type, ItemType::validWeapons())) {
                 $data = $this->setPositionEquipData($slot, $data, 'left-hand', 'right-hand');
             }
 
@@ -346,8 +347,10 @@ class  InventorySetService
             }
         }
 
-        foreach ($data as $slotId => $data) {
-            $inventorySet->slots()->find($slotId)->update($data);
+        dump('Whats the data?', $data);
+
+        foreach ($data as $slotId => $slotData) {
+            $inventorySet->slots()->find($slotId)->update($slotData);
         }
 
         $inventorySet->update(['is_equipped' => true]);
