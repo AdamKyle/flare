@@ -4,6 +4,7 @@ namespace App\Game\Quests\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
+use App\Flare\Models\Location;
 use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\Quest;
 use App\Game\Events\Values\EventType;
@@ -27,13 +28,21 @@ class QuestsController extends Controller
 
     public function index(Character $character)
     {
+        $eventRaidQuests = [];
 
-        $eventWithRaid = Event::whereNotNull('raid_id')->first();
+        $raidEvents = Event::whereNotNull('raid_id')
+            ->with('raid')
+            ->get();
+
+        foreach ($raidEvents as $event) {
+
+            $eventRaidQuests[] = $this->buildQuestCacheService->fetchQuestsForRaid($event)[0];
+        }
 
         return response()->json([
             'completed_quests' => $character->questsCompleted()->whereNotNull('quest_id')->pluck('quest_id'),
             'quests' => $this->buildQuestCacheService->getRegularQuests(),
-            'raid_quests' => $this->buildQuestCacheService->fetchQuestsForRaid($eventWithRaid),
+            'raid_quests' => $eventRaidQuests,
             'player_plane' => $character->map->gameMap->name,
             'is_winter_event' => Event::where('type', EventType::WINTER_EVENT)->count() > 0,
             'is_delusional_memories' => Event::where('type', EventType::DELUSIONAL_MEMORIES_EVENT)->count() > 0,
