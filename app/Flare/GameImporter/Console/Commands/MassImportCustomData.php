@@ -42,8 +42,8 @@ class MassImportCustomData extends Command
         Artisan::call('import:game-data Monsters');
         Artisan::call('import:game-data Items');
         Artisan::call('import:game-data Skills');
-        Artisan::call('import:game-data Quests');
         Artisan::call('import:game-data Raids');
+        Artisan::call('import:game-data Quests');
         Artisan::call('assign:new-npcs-to-faction-loyalty');
 
         Monster::where('is_celestial_entity', false)
