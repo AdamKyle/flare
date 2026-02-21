@@ -60,6 +60,10 @@ class EventSchedulerService
     {
         $raidsForEvent = $scheduledEvent->raids_for_event;
 
+        if (is_null($raidsForEvent)) {
+            return;
+        }
+
         foreach ($raidsForEvent as $raidForEvent) {
 
             $raid = Raid::find($raidForEvent['selected_raid']);
@@ -192,6 +196,7 @@ class EventSchedulerService
             ];
 
             $this->createEvent($params);
+
             return;
         }
 
