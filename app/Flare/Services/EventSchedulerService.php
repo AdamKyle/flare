@@ -175,8 +175,7 @@ class EventSchedulerService
         $endDate = $startDate->copy()->addMonth();
 
         $raidEvents = ScheduledEvent::query()
-            ->where('event_type', $scheduledRaidEvent->event_type)
-            ->whereNotNull('raid_id')
+            ->where('raid_id', $scheduledRaidEvent->raid_id)
             ->where('start_date', '<', $endDate)
             ->where('end_date', '>', $startDate)
             ->orderBy('start_date')
