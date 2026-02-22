@@ -86,9 +86,8 @@
                     </dd>
                 </dl>
             @endif
-            @if (!is_null($item->dropLocation))
+            @if (!is_null($item->dropLocation) && !is_null($item->dropLocation->locationType()))
                 <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-
                 @if ($item->dropLocation->locationType()->isCaveOfMemories())
                     <h4>Delve is the only way to get this item.</h4>
                     <p class="my-4">

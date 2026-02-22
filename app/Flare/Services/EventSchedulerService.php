@@ -175,11 +175,18 @@ class EventSchedulerService
 
     public function generateFutureRaid(ScheduledEvent $scheduledRaidEvent, Carbon $futureDate = null): void
     {
+
+        $raid = $scheduledRaidEvent->raid;
+
+        if (in_array($raid->type, [RaidType::CORRUPTED_BISHOP, RaidType::JESTER_OF_TIME. RaidType::FROZEN_KING, RaidType::ICE_QUEEN])) {
+            return;
+        }
+
         $startDate = $futureDate ?? $scheduledRaidEvent->start_date->copy()->addMonths(3);
         $endDate = $startDate->copy()->addMonth();
 
         $raidEvents = ScheduledEvent::query()
-            ->where('raid_id', $scheduledRaidEvent->raid_id)
+            ->where('raid_id', $raid->id)
             ->where('start_date', '<', $endDate)
             ->where('end_date', '>', $startDate)
             ->orderBy('start_date')
@@ -189,7 +196,7 @@ class EventSchedulerService
             $params = [
                 'selected_event_type' => $scheduledRaidEvent->event_type,
                 'selected_start_date' => $startDate,
-                'selected_raid' => $scheduledRaidEvent->raid_id,
+                'selected_raid' => $raid->id,
                 'selected_end_date' => $endDate,
                 'event_description' => $scheduledRaidEvent->description,
                 'raids_for_event' => $scheduledRaidEvent->raids_for_event
