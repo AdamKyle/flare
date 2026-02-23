@@ -53,6 +53,8 @@
                                 <h3 class="mb-3">Required levels for completion</h3>
                                 <x-core.forms.input :model="$guideQuest" label="Required (Player) Level:"
                                     modelKey="required_level" name="required_level" />
+                                <x-core.forms.input :model="$guideQuest" label="Required (Player) Reincarnations:"
+                                                    modelKey="required_reincarnation_amount" name="required_reincarnation_amount" />
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Required Skill:"
                                     modelKey="required_skill" name="required_skill" :options="$gameSkills" />
                                 <x-core.forms.input :model="$guideQuest" label="Required (Skill) Level:"
@@ -184,6 +186,16 @@
                                 <x-core.forms.input :model="$guideQuest" label="Required Event Goal Kills:"
                                    modelKey="required_event_goal_participation"
                                    name="required_event_goal_participation" />
+
+                                <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'>
+                                </div>
+
+                                <h3 class="mb-3">Delve Requirements</h3>
+
+                                <x-core.forms.input :model="$guideQuest" label="Required Delve Survival Hour(s):"
+                                                    modelKey="required_delve_survival_time" name="required_delve_survival_time" />
+                                <x-core.forms.input :model="$guideQuest" label="Required Delve Pack Size:"
+                                                    modelKey="required_delve_pack_size" name="required_delve_pack_size" />
                             </div>
                         </div>
                     </x-core.form-wizard.content>

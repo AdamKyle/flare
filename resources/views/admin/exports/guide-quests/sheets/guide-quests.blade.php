@@ -8,6 +8,7 @@
             <th>desktop_instructions</th>
             <th>mobile_instructions</th>
             <th>required_level</th>
+            <th>required_reincarnation_amount</th>
             <th>required_skill</th>
             <th>required_skill_level</th>
             <th>required_secondary_skill</th>
@@ -55,6 +56,8 @@
             <th>required_attached_gems</th>
             <th>required_specialty_type</th>
             <th>required_fame_level</th>
+            <th>required_delve_survival_time</th>
+            <th>required_delve_pack_size</th>
         </tr>
     </thead>
     <tbody>
@@ -67,6 +70,7 @@
                 <td>{{ nl2br($guideQuest->desktop_instructions) }}
                 <td>{{ nl2br($guideQuest->mobile_instructions) }}
                 <td>{{ $guideQuest->required_level }}</td>
+                <td>{{ $guideQuest->required_reincarnation_amount }}</td>
                 <td>{{ !is_null($guideQuest->required_skill) ? $guideQuest->skill_name : '' }}</td>
                 <td>{{ $guideQuest->required_skill_level }}</td>
                 <td>{{ !is_null($guideQuest->required_secondary_skill) ? $guideQuest->secondary_skill_name : '' }}</td>
@@ -116,6 +120,8 @@
                 <td>{{ $guideQuest->required_attached_gems }}</td>
                 <td>{{ $guideQuest->required_specialty_type }}</td>
                 <td>{{ $guideQuest->required_fame_level }}</td>
+                <td>{{ $guideQuest->required_delve_survival_time }}</td>
+                <td>{{ $guideQuest->required_delve_pack_size }}</td>
             </tr>
         @endforeach
     </tbody>

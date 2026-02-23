@@ -23,6 +23,10 @@
                             <dt>Required Player Level</dt>
                             <dd>{{ $guideQuest->required_level }}</dd>
                         @endif
+                          @if (!is_null($guideQuest->required_reincarnation_amount))
+                            <dt>Required Player Reincarnation Amount</dt>
+                            <dd>{{ $guideQuest->required_reincarnation_amount }}</dd>
+                          @endif
                         @if (!is_null($guideQuest->required_event_goal_participation))
                             <dt>Participate in the Event Goal and Kill # of Creatures:</dt>
                             <dd>{{$guideQuest->required_event_goal_participation}}</dd>
@@ -165,6 +169,14 @@
                             <dt>Required Fame Level</dt>
                             <dd>{{ number_format($guideQuest->required_fame_level) }}</dd>
                         @endif
+                          @if (!is_null($guideQuest->required_delve_survival_time))
+                            <dt>Required Delve Survival Hour(s)</dt>
+                            <dd>{{ number_format($guideQuest->required_delve_survival_time) }}</dd>
+                          @endif
+                          @if (!is_null($guideQuest->required_delve_pack_size))
+                            <dt>Required Delve Pack Size</dt>
+                            <dd>{{ number_format($guideQuest->required_delve_pack_size) }}</dd>
+                          @endif
                     </dl>
                     <h3 class="text-sky-600 dark:text-sky-500">XP Reward</h3>
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>

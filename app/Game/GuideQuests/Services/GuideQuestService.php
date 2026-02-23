@@ -139,6 +139,7 @@ class GuideQuestService
         }
 
         $this->completedAttributes = $this->guideQuestRequirementsService->requiredLevelCheck($character, $quest)
+            ->requiredReincarnatedAmount($character, $quest)
             ->requiredQuest($character, $quest)
             ->requiredSkillCheck($character, $quest)
             ->requiredSkillCheck($character, $quest, false)
@@ -166,6 +167,7 @@ class GuideQuestService
             ->requiredSpecialtyType($character, $quest)
             ->requiredHolyStacks($character, $quest)
             ->requiredFameLevel($character, $quest)
+            ->requiredDelveSurvivalTime($character, $quest)
             ->getFinishedRequirements();
 
         if (! empty($this->completedAttributes)) {

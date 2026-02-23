@@ -113,6 +113,12 @@ const guideQuestLabelBuilder = (
             return "Kill # of Event Creatures";
         case "required_fame_level":
             return "Increase your fame with an NPC to";
+        case "required_reincarnation_amount":
+            return "Required Reincarnation Amount";
+        case "required_delve_survival_time":
+            return "Required Delve Survival Hour(s)";
+        case "required_delve_pack_size":
+            return "Required Delve Pack Size";
         default:
             return null;
     }
