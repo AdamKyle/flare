@@ -249,7 +249,7 @@ class EndScheduledEvent extends Command
         $this->updateMonstersForCharactersAtRaidLocations($raid, $updateRaidMonsters);
 
         if (! is_null($event)) {
-            $announcement = Announcement::where('Announcementevent_id', $event->id)->first();
+            $announcement = Announcement::where('event_id', $event->id)->first();
 
             if (! is_null($announcement)) {
                 event(new DeleteAnnouncementEvent($announcement->id));
