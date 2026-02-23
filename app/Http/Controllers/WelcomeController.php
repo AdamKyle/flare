@@ -37,7 +37,7 @@ class WelcomeController extends Controller
     {
 
         $eventType = $request->event_type;
-        $raids = ['jester-of-time-raid', 'the-smugglers-are-back-raid', 'ice-queen-raid', 'the-frozen-king-raid', 'corrupted-bishop-raid'];
+        $raids = ['jester-of-time-raid', 'the-smugglers-are-back-raid', 'ice-queen-raid', 'the-frozen-king-raid', 'corrupted-bishop-raid', 'labyrinth-monster-raid'];
         $events = ['delusional-memories', 'weekly-celestials', 'weekly-currency-drops', 'weekly-faction-loyalty', 'tlessas-feedback-event', 'the-winter-event'];
 
         if (in_array($eventType, $raids)) {
@@ -48,6 +48,7 @@ class WelcomeController extends Controller
                 'ice-queen-raid' => RaidType::ICE_QUEEN,
                 'the-frozen-king-raid' => RaidType::FROZEN_KING,
                 'corrupted-bishop-raid' => RaidType::CORRUPTED_BISHOP,
+                'labyrinth-monster-raid' => RaidType::ENRAGED_LITTLE_GIRL,
             };
 
             $event = ScheduledEvent::where('event_type', EventType::RAID_EVENT)->where('currently_running', true)->whereHas('raid', function ($query) use ($raidType) {
@@ -79,6 +80,10 @@ class WelcomeController extends Controller
                     ]);
                 case 'corrupted-bishop-raid':
                     return view('events.corrupted-bishop-raid.event-page', [
+                        'event' => $event,
+                    ]);
+                case 'labyrinth-monster-raid':
+                    return view('events.labyrinth-monster-raid.event-page', [
                         'event' => $event,
                     ]);
                 default:

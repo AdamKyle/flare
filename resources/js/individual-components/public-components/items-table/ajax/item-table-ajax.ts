@@ -108,6 +108,8 @@ export default class ItemTableAjax<T extends Record<string, unknown>> {
                 return "Purgatory Chains";
             case TableType.PIRATE_LORD_LEATHER:
                 return "Pirate Lord Leather";
+            case TableType.LABYRINTH_CLOTH:
+                return "Labyrinth Cloth";
             case TableType.CORRUPTED_ICE:
                 return "Corrupted Ice";
             case TableType.TWISTED_EARTH:

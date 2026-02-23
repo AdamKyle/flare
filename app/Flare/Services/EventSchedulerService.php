@@ -177,7 +177,7 @@ class EventSchedulerService
     {
 
         $raid = $scheduledRaidEvent->raid;
-        
+
         if (in_array($raid->raid_type, [RaidType::CORRUPTED_BISHOP, RaidType::JESTER_OF_TIME, RaidType::FROZEN_KING, RaidType::ICE_QUEEN])) {
             return;
         }

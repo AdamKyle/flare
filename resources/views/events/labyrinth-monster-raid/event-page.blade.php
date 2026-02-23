@@ -9,8 +9,8 @@
     <div class="container mx-auto lg:px-4 mb-5">
         <div class="mb-10 lg:mt-10">
             <div class="text-center">
-                <h3 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800 text-4xl md:text-7xl">Jester of Time</h3>
-                <p class="mb-5 dark:text-gray-300 text-gray-800 italic">A mad man with a corrupted sense of cruelty! Will he ever find his lover?</p>
+                <h3 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800 text-4xl md:text-7xl">The Labyrinth Monster</h3>
+                <p class="mb-5 dark:text-gray-300 text-gray-800 italic">A little girl and a witches curse, whats the real story here?</p>
             </div>
             @if (!is_null($event))
                 <p class="mb-10 text-orange-600 dark:text-orange-300 my-2 text-center">
@@ -41,10 +41,10 @@
         <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
             <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
                 <i class="ra ra-death-skull"></i>
-                The Jester plays around with your own delusions
+                The Little Girl is hunted by her parents ...
             </h2>
             <p class="mb-10 dark:text-gray-300 text-gray-800">
-                During this <a href="/information/raids">raid</a> players have a chance to participate in raid quests that flush out more of the story from <a href="/information/planes">Delusional Memories</a> event.
+                During this <a href="/information/raids">raid</a> players have a chance to participate in raid quests that flush out more of the story of The Little Girl and how The Witch placed a curse on her parents. All is not what it seems though ...
                 Players can enter corrupted locations and put their might to the test as they work together to take down the raid boss!
             </p>
 
@@ -56,7 +56,7 @@
 
         <div class="grid md:grid-cols-2 gap-6 mt-5 w-full mt-10 mx-auto lg:w-3/4 md:mt-20">
             <div class="mt-4 lg:mt-0">
-                <img src="{{ asset('promotion/jester-of-time-raid/raid-locations.png') }}"
+                <img src="{{ asset('promotion/labyrinth-monster-raid/raid-location.png') }}"
                      class="shadow rounded max-w-full h-auto align-middle border-none img-fluid glightbox w-100 mb-5 cursor-pointer" />
                 <div class="text-center text-sm">
                     Click to make larger.
@@ -81,9 +81,7 @@
             </h2>
             <p class="mb-10 dark:text-gray-300 text-gray-800">
                Participate in two branches of quests! One will tell the story of The Jester and requires your ability to kill raid monsters to get the quest items,
-                and the other quest line will lead to a cosmetic unlock. In this case Players get an additional 10 sets to put
-                items into clearing up even more space in your inventory. Defeat the Raid boss and gain Delusional Silver gear pieces.
-            </p>
+                and the other quest line will lead to a cosmetic unlock. In this case Players get 75 additional slots for their inventory, brining their max inventory to 150! This counts for Alchemy, Gems and regular inventory space.
         </div>
 
         <div class="grid md:grid-cols-2 gap-6 mt-5 w-full mt-10 mx-auto lg:w-3/4 md:mt-20">
@@ -91,15 +89,15 @@
                 <div>
                     <h2 class="mb-5 font-thin md:text-4xl lg:text-5xl dark:text-gray-300 text-gray-800">Put your skill to the test!</h2>
                     <p class="mb-4 dark:text-gray-300 text-gray-800">
-                        <a href="/information/monsters?table-filters[maps]=Delusional+Memories+Raid+Monsters#no-link">Raid Critters</a> are much stronger then you might be use to. While the <a href="/information/monsters?table-filters[maps]=Delusional+Memories+Raid+Bosses">Raid Boss</a> needs players to take it down, the raid critters will
+                        <a href="/information/monsters?table-filters[maps]=Delusional+Memories+Raid+Monsters#no-link">Raid Critters</a> are much stronger then you might be use to. While the <a href="/information/monsters?table-filters[maps]=Labyrinth+Raid+Monsters">Raid Boss</a> needs players to take it down, the raid critters will
                         put your gear to the test. Just take a look for your self.
                     </p>
                     <p class="mb-10 dark:text-gray-300 text-gray-800"><strong>Are you new?</strong> Don't fret, you can even participate in the Raid Boss fight, while the raid critters might be
-                    too strong for you, the raid boss can be participated in by all players of all skill and level. Highend players are imited in their damage output to make things fun and balanced!</p>
+                    too strong for you, the raid boss can be participated in by all players of all skill and level. High end players are limited in their damage output to make things fun and balanced!</p>
                 </div>
             </div>
             <div class="mt-4 lg:mt-0">
-                <img src="{{ asset('promotion/jester-of-time-raid/jester-of-time-raid.png') }}"
+                <img src="{{ asset('promotion/labyrinth-monster-raid/labyrinth-monster-raid.png') }}"
                      class="shadow rounded max-w-full h-auto align-middle border-none img-fluid glightbox w-100 mb-5 cursor-pointer" />
                 <div class="text-center text-sm">
                     Click to make larger.
@@ -114,11 +112,11 @@
                 <span class="fa-stack">
                     <i class="fas fa-shopping-bag"></i>
                 </span>
-                Gain 10 new Sets
+                Increase Inventory Max to 150
             </h2>
             <p class="mb-10 dark:text-gray-300 text-gray-800">
-                Complete the Raid Quests on Delusional Memories Plane and gain an additional ten <a href="/information/equipment-sets">sets</a> for additional gear sets.
-                This will give you a total of 20 Sets!
+                Complete the raid quests and earn an additional 75 inventory slots! this will allow you to carry
+                more weapons, armour, rings, spells, alchemy items and or even gems!
             </p>
         </div>
 
@@ -129,7 +127,7 @@
                 </x-slot:icon>
                 <x-slot:title>
                     <a
-                        href="/information/monsters?table-filters[maps]=Delusional+Memories">New Monsters To Fight</a>
+                        href="/information/monsters?table-filters[maps]=Labyrinth+Raid+Monsters">New Monsters To Fight</a>
                 </x-slot:title>
 
                 <p>
@@ -143,12 +141,13 @@
                 <x-slot:title>
                     <a
                         href="{{ route('info.page', [
-                            'pageName' => 'delusional-silver',
-                        ]) }}">Gain Delusional Silver</a>
+                            'pageName' => 'labyrinth-cloth',
+                        ]) }}">Gain Labyrinth Cloth</a>
                 </x-slot:title>
 
                 <p>
-                    gain the next piece of your gear progression: <a href="/information/delusional-silver">Delusional Silver</a>. This gear comes with no enchantments allowing you to make it your own!
+                    Earn a full set of Labyrinth Cloth gear set. This will come unenchanted and allow you to customize it to your builds need.
+                    You have to be the one who kills the raid boss to earn this full set.
                 </p>
             </x-core.cards.feature-card>
             <x-core.cards.feature-card>
@@ -159,11 +158,11 @@
                     <a
                         href="{{ route('info.page', [
                             'pageName' => 'raids',
-                        ]) }}">Band together to take down the Jester</a>
+                        ]) }}">Band together to take down the monster</a>
                 </x-slot:title>
 
                 <p>
-                    Band together with other players and take down the raid boss: Jester of Time
+                    Band together with other players and take down the raid boss: The Enraged Little Girl
                 </p>
             </x-core.cards.feature-card>
         </div>
@@ -193,11 +192,12 @@
             <dl class="mt-3">
                 <dt>How do I access the event?</dt>
                 <dd>
-                    Simply log in and head down to the Delusional Memories plane and search for a skull location. One of these locations will have the raid boss as the first critter in the list.
+                    Simply log in and head down to the Labyrinth plane and search for a skull location. One of these locations will have the raid boss as the first critter in the list.
                 </dd>
                 <dt>What level should I be?</dt>
                 <dd>
-                    If you want to take on raid critters I would suggest you <a href="/information/reincarnation">reincarnate</a> your character at least once and level up to max leve again as well as having a full set of <a href="/information/twisted-earth">Twisted Earth</a> gear. But if you are loking at fighting the raid boss, any level will do!
+                    It is suggested that you have level to at least level 5,000 to participate in raid quests and the raid boss fight. it is recommended you have reincarnated a few times. New players can still participate
+                    and be rewarded with the +75 Inventory Max, if they have at least level past level 1,000
                 </dd>
             </dl>
         </div>

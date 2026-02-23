@@ -1,3 +1,3 @@
 export default interface ItemsTableProps {
-    type?: string;
+    type: string | null;
 }

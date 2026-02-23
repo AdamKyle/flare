@@ -420,6 +420,10 @@
                 <span class="ra ra-dervish-swords"></span>
                 Pirate Lord Leather
             </a>
+            <a href="{{ route('info.page', ['pageName' => 'labyrinth-cloth']) }}">
+                <span class="ra ra-dervish-swords"></span>
+                Labyrinth Cloth
+            </a>
             <a href="{{ route('info.page', ['pageName' => 'corrupted-ice']) }}">
                 <span class="ra ra-kaleidoscope"></span>
                 Corrupted Ice

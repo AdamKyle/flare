@@ -19,6 +19,10 @@ export const buildItemTableOptions = (): SelectOption[] => {
             value: "purgatory-chains",
         },
         {
+            label: "Labyrinth Cloth",
+            value: "labyrinth-cloth",
+        },
+        {
             label: "Pirate Lord Leather",
             value: "pirate-lord-leather",
         },

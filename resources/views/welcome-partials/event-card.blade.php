@@ -34,7 +34,7 @@
     }
 
     if ($eventRunning->getTitleOfEvent() === 'The Jester of Time') {
-        $href = route('event.type', ['event_type' => 'jester-of-time']);
+        $href = route('event.type', ['event_type' => 'jester-of-time-raid']);
     }
 
     if ($eventRunning->getTitleOfEvent() === 'The Smugglers Are Back!') {
@@ -51,6 +51,10 @@
 
     if ($eventRunning->getTitleOfEvent() === 'Corrupted Bishop') {
         $href = route('event.type', ['event_type' => 'corrupted-bishop-raid']);
+    }
+
+        if ($eventRunning->getTitleOfEvent() === 'The Labyrinth Monster') {
+        $href = route('event.type', ['event_type' => 'labyrinth-monster-raid']);
     }
 
     if ($eventRunning->getTitleOfEvent() === 'Tlessa\'s Feedback Event') {

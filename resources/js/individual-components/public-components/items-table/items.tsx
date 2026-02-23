@@ -71,6 +71,10 @@ export default class Items extends React.Component<
     }
 
     onFilterChange() {
+        if (!this.props.type) {
+            return;
+        }
+
         this.ajax.fetchTableData(this, this.props.type, {
             filter: this.state.filter,
             search_text: this.state.search_text,
