@@ -57,3 +57,7 @@
 @if ($class->type()->isMerchant())
     @include('information.classes.partials.prefered-weapons.merchant')
 @endif
+
+@if ($class->type()->isApothecary())
+  @include('information.classes.partials.prefered-weapons.apothecary')
+@endif

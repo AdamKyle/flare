@@ -36,6 +36,7 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleHeal;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\GunslingersAssassination;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\HammerSmash;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\MerchantSupply;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\PlagueSurge;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\SensualDance;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\ThiefBackStab;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\TripleAttack;
@@ -407,6 +408,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(MerchantSupply::class, function ($app) {
             return new MerchantSupply($app->make(CharacterCacheData::class));
+        });
+
+        $this->app->bind(PlagueSurge::class, function ($app) {
+            return new PlagueSurge($app->make(CharacterCacheData::class));
         });
 
         $this->app->bind(GunslingersAssassination::class, function ($app) {

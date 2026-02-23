@@ -36,6 +36,7 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
+        Artisan::call('import:game-data Core');
         Artisan::call('import:game-data Npcs');
         Artisan::call('import:game-data Items');
         Artisan::call('import:game-data Weapons');

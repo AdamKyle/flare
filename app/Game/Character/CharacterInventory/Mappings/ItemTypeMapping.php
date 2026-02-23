@@ -2,6 +2,7 @@
 
 namespace App\Game\Character\CharacterInventory\Mappings;
 
+use App\Game\Character\CharacterInventory\Values\ArmourType;
 use App\Game\Character\CharacterInventory\Values\ItemType;
 
 final class ItemTypeMapping
@@ -31,6 +32,8 @@ final class ItemTypeMapping
             'cleric'           => ItemType::MACE->value,
             'gunslinger'       => ItemType::GUN->value,
             'book binder'      => ItemType::SCRATCH_AWL->value,
+            'apothecary'       => [ItemType::CENSER->value, ItemType::DAGGER->value],
+            'alcoholic'        => ArmourType::SHIELD->value,
             default            => null,
         };
     }

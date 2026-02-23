@@ -167,6 +167,10 @@
             @if ($class->type()->isCleric())
                 @include('information.classes.partials.cleric')
             @endif
+
+                @if ($class->type()->isApothecary())
+                    @include('information.classes.partials.apothecary')
+                @endif
         </div>
     </x-core.cards.card-with-title>
 </div>
