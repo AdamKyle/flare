@@ -343,6 +343,7 @@ export default class LocationDetails extends React.Component<
     }
 
     render() {
+        console.log(this.props.location);
         return (
             <Fragment>
                 <p className="my-3">{this.props.location.description}</p>
@@ -454,6 +455,58 @@ export default class LocationDetails extends React.Component<
                                 </a>
                             </dd>
                         </dl>
+                    </Fragment>
+                ) : null}
+
+                {this.props.location.type_name === "Cave of Memories" ? (
+                    <Fragment>
+                        <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block"></div>
+                        <h5 className="text-orange-500 dark:text-orange-400 mb-4">
+                            Delve Location!
+                        </h5>
+                        <dl>
+                            <dt>Enemies will increase by: </dt>
+                            <dd>
+                                {(
+                                    this.props.location
+                                        .delve_enemy_strength_increase * 100
+                                ).toFixed(3)}
+                                %
+                            </dd>
+                            <dt>Minutes between fights:</dt>
+                            <dd>
+                                {
+                                    this.props.location
+                                        .minutes_between_delve_fights
+                                }
+                            </dd>
+                            <dt>Hours till quest item drop:</dt>
+                            <dd>{this.props.location.hours_to_drop}</dd>
+                        </dl>
+                        <WarningAlert additional_css={"my-4"}>
+                            You cannot do regular exploration here, nor can you
+                            manually fight. You can select Exploration to set up
+                            Delve. It is recommended you have reincarnated at
+                            least 10 times to have chance. It is not about
+                            surviving the full 8 hours.
+                        </WarningAlert>
+                        <p className="mb-4">
+                            This is a{" "}
+                            <a href="/information/delve" target="_blank">
+                                Delve{" "}
+                                <i className="fas fa-external-link-alt"></i>
+                            </a>{" "}
+                            location. Here you can set up a special kind of
+                            exploration called Delve, you will choose your
+                            attack type, and if you have the{" "}
+                            <strong>Clasp of silver Dreams</strong>, you can
+                            also choose a pack size.
+                        </p>
+                        <p className="mb-4">
+                            Monsters here are chosen at random. The idea is to
+                            survive as long as you can collecting rewards along
+                            the way.
+                        </p>
                     </Fragment>
                 ) : null}
 

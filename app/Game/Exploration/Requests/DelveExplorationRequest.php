@@ -25,7 +25,7 @@ class DelveExplorationRequest extends FormRequest
     {
         return [
             'attack_type' => 'required|string',
-            'pack_size' => 'integer',
+            'pack_size' => 'nullable|integer',
         ];
     }
 

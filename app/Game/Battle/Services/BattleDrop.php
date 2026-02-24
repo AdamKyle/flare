@@ -145,7 +145,8 @@ class BattleDrop
      * @return void
      * @throws Exception
      */
-    public function handleDelveLocationQuestItems(Character $character): void {
+    public function handleDelveLocationQuestItems(Character $character): void
+    {
         $automation = $character->currentAutomations()->where('type', AutomationType::DELVE)->first();
 
         if (is_null($automation)) {
@@ -153,11 +154,11 @@ class BattleDrop
         }
 
         $location = Location::where('type', LocationType::CAVE_OF_MEMORIES)
-                            ->where('x', $character->map->character_position_x)
-                            ->where('y', $character->map->character_position_y)
-                            ->where('game_map_id', $character->map->game_map_id)
-                            ->whereNotNull('hours_to_drop')
-                            ->first();
+            ->where('x', $character->map->character_position_x)
+            ->where('y', $character->map->character_position_y)
+            ->where('game_map_id', $character->map->game_map_id)
+            ->whereNotNull('hours_to_drop')
+            ->first();
 
         if (is_null($location)) {
             return;
@@ -170,61 +171,54 @@ class BattleDrop
         $items = Item::where('drop_location_id', $location->id)
             ->whereNull('item_suffix_id')
             ->whereNull('item_prefix_id')
-            ->where('type', 'quest')->get();
+            ->where('type', 'quest')
+            ->get();
 
-        if ($items->isNotEmpty()) {
-            $canHave = DropCheckCalculator::fetchDifficultItemChance($this->lootingChance, 100);
-
-            if (! $canHave) {
-                return;
-            }
-
-            $character->loadMissing('inventory.slots');
-
-            $candidateItemIds = $items->pluck('id')->all();
-            $ownedItemIds = $character->inventory->slots->pluck('item_id')->all();
-            $ownedItemIdSet = array_fill_keys($ownedItemIds, true);
-
-            $quests = Quest::query()
-                ->where(function ($query) use ($candidateItemIds) {
-                    $query->whereIn('item_id', $candidateItemIds)
-                        ->orWhereIn('secondary_required_item', $candidateItemIds);
-                })
-                ->get();
-
-            $questByItemId = [];
-
-            foreach ($quests as $quest) {
-                if (! is_null($quest->item_id) && in_array($quest->item_id, $candidateItemIds, true) && ! array_key_exists($quest->item_id, $questByItemId)) {
-                    $questByItemId[$quest->item_id] = $quest->id;
-                }
-
-                if (! is_null($quest->secondary_required_item) && in_array($quest->secondary_required_item, $candidateItemIds, true) && ! array_key_exists($quest->secondary_required_item, $questByItemId)) {
-                    $questByItemId[$quest->secondary_required_item] = $quest->id;
-                }
-            }
-
-            $completedQuestIds = $character->questsCompleted()->pluck('quest_id')->all();
-            $completedQuestIdSet = array_fill_keys($completedQuestIds, true);
-
-            $eligibleItems = $items->filter(function (Item $item) use ($ownedItemIdSet, $questByItemId, $completedQuestIdSet): bool {
-                $doesntHave = ! array_key_exists($item->id, $ownedItemIdSet);
-
-                $questId = $questByItemId[$item->id] ?? null;
-
-                if (! is_null($questId)) {
-                    $isCompleted = array_key_exists($questId, $completedQuestIdSet);
-
-                    return ! $isCompleted && $doesntHave;
-                }
-
-                return $doesntHave;
-            });
-
-            if ($eligibleItems->isNotEmpty()) {
-                $this->attemptToPickUpItem($character, $eligibleItems->random());
-            }
+        if ($items->isEmpty()) {
+            return;
         }
+
+        if (! DropCheckCalculator::fetchDifficultItemChance($this->lootingChance, 100)) {
+            return;
+        }
+
+        $character->loadMissing('inventory.slots');
+
+        $ownedItemIds = $character->inventory->slots->pluck('item_id')->all();
+
+        $completedQuestIds = $character->questsCompleted()
+            ->whereNotNull('quest_id')
+            ->pluck('quest_id')
+            ->all();
+
+        $blockedItemIds = [];
+
+        if (! empty($completedQuestIds)) {
+            $blockedItemIds = Quest::query()
+                ->whereIn('id', $completedQuestIds)
+                ->get(['item_id', 'secondary_required_item'])
+                ->flatMap(function (Quest $quest): array {
+                    return [
+                        $quest->item_id,
+                        $quest->secondary_required_item,
+                    ];
+                })
+                ->filter()
+                ->unique()
+                ->values()
+                ->all();
+        }
+
+        $eligibleItems = $items->filter(function (Item $item) use ($ownedItemIds, $blockedItemIds): bool {
+            return ! in_array($item->id, $ownedItemIds, true)
+                && ! in_array($item->id, $blockedItemIds, true);
+        });
+
+        if ($eligibleItems->isEmpty()) {
+            return;
+        }
+
+        $this->attemptToPickUpItem($character, $eligibleItems->random());
     }
 
     /**
@@ -234,72 +228,63 @@ class BattleDrop
      */
     public function handleSpecialLocationQuestItem(Character $character): void
     {
-        $automation = $character->currentAutomations()->where('type', AutomationType::EXPLORING)->first();
-
-        if (! is_null($automation)) {
+        if ($character->currentAutomations()->where('type', AutomationType::EXPLORING)->exists()) {
             return;
         }
 
-        $lootingChance = $this->lootingChance > 0.45 ? 0.45 : $this->lootingChance;
+        $lootingChance = min($this->lootingChance, 0.45);
 
         $items = Item::where('drop_location_id', $this->locationWithEffect->id)
             ->whereNull('item_suffix_id')
             ->whereNull('item_prefix_id')
-            ->where('type', 'quest')->get();
+            ->where('type', 'quest')
+            ->get();
 
-        if ($items->isNotEmpty()) {
-            $canHave = DropCheckCalculator::fetchDifficultItemChance($lootingChance, 100);
-
-            if (! $canHave) {
-                return;
-            }
-
-            $character->loadMissing('inventory.slots');
-
-            $candidateItemIds = $items->pluck('id')->all();
-            $ownedItemIds = $character->inventory->slots->pluck('item_id')->all();
-            $ownedItemIdSet = array_fill_keys($ownedItemIds, true);
-
-            $quests = Quest::query()
-                ->where(function ($query) use ($candidateItemIds) {
-                    $query->whereIn('item_id', $candidateItemIds)
-                        ->orWhereIn('secondary_required_item', $candidateItemIds);
-                })
-                ->get();
-
-            $questByItemId = [];
-
-            foreach ($quests as $quest) {
-                if (! is_null($quest->item_id) && in_array($quest->item_id, $candidateItemIds, true) && ! array_key_exists($quest->item_id, $questByItemId)) {
-                    $questByItemId[$quest->item_id] = $quest->id;
-                }
-
-                if (! is_null($quest->secondary_required_item) && in_array($quest->secondary_required_item, $candidateItemIds, true) && ! array_key_exists($quest->secondary_required_item, $questByItemId)) {
-                    $questByItemId[$quest->secondary_required_item] = $quest->id;
-                }
-            }
-
-            $completedQuestIds = $character->questsCompleted()->pluck('quest_id')->all();
-            $completedQuestIdSet = array_fill_keys($completedQuestIds, true);
-
-            $eligibleItems = $items->filter(function (Item $item) use ($ownedItemIdSet, $questByItemId, $completedQuestIdSet): bool {
-                $doesntHave = ! array_key_exists($item->id, $ownedItemIdSet);
-
-                $questId = $questByItemId[$item->id] ?? null;
-
-                if (! is_null($questId)) {
-                    $isCompleted = array_key_exists($questId, $completedQuestIdSet);
-
-                    return ! $isCompleted && $doesntHave;
-                }
-
-                return $doesntHave;
-            });
-
-            if ($eligibleItems->isNotEmpty()) {
-                $this->attemptToPickUpItem($character, $eligibleItems->random());
-            }
+        if ($items->isEmpty()) {
+            return;
         }
+
+        if (! DropCheckCalculator::fetchDifficultItemChance($lootingChance, 100)) {
+            return;
+        }
+
+        $character->loadMissing('inventory.slots');
+
+        $ownedItemIds = $character->inventory->slots->pluck('item_id')->all();
+
+        $completedQuestIds = $character->questsCompleted()
+            ->whereNotNull('quest_id')
+            ->pluck('quest_id')
+            ->all();
+
+        $blockedItemIds = [];
+
+        if (! empty($completedQuestIds)) {
+            $blockedItemIds = Quest::query()
+                ->whereIn('id', $completedQuestIds)
+                ->get(['item_id', 'secondary_required_item'])
+                ->flatMap(function (Quest $quest): array {
+                    return [
+                        $quest->item_id,
+                        $quest->secondary_required_item,
+                    ];
+                })
+                ->filter()
+                ->unique()
+                ->values()
+                ->all();
+        }
+
+        $eligibleItems = $items->filter(function (Item $item) use ($ownedItemIds, $blockedItemIds): bool {
+            return ! in_array($item->id, $ownedItemIds, true)
+                && ! in_array($item->id, $blockedItemIds, true);
+        });
+
+        if ($eligibleItems->isEmpty()) {
+            return;
+        }
+
+        $this->attemptToPickUpItem($character, $eligibleItems->random());
     }
 
     /**

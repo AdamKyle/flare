@@ -70,6 +70,10 @@ class LocationTransformer extends TransformerAbstract
             return 'The Old Church';
         }
 
+        if ($locationType->isCaveOfMemories()) {
+            return 'Cave of Memories';
+        }
+
         return null;
     }
 

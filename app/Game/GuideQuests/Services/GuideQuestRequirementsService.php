@@ -3,11 +3,11 @@
 namespace App\Game\GuideQuests\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\DelveExploration;
 use App\Flare\Models\DelveLog;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GuideQuest;
-use App\Game\Exploration\Jobs\DelveExploration;
 use App\Game\Skills\Values\SkillTypeValue;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -70,6 +70,10 @@ class GuideQuestRequirementsService
     public function requiredDelveSurvivalTime(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
         if (!is_null($quest->required_delve_survival_time)) {
             $lastDelveExploration = DelveExploration::where('character_id', $character->id)->orderBy('started_at', 'desc')->first();
+
+            if (is_null($lastDelveExploration)) {
+                return $this;
+            }
 
             if ($lastDelveExploration->started_at->diffInHours($lastDelveExploration->completed_at) >= $quest->required_delve_survival_time) {
                 $this->finishedRequirements[] = 'required_delve_survival_time';

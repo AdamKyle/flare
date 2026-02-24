@@ -38,4 +38,10 @@ export default interface LocationDetails {
     game_map_name: string;
 
     game_map_id: number;
+
+    minutes_between_delve_fights: number;
+
+    delve_enemy_strength_increase: number;
+
+    hours_to_drop: number;
 }

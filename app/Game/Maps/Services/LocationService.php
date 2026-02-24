@@ -221,6 +221,10 @@ class LocationService
                 if ((new LocationType($location->type))->isAlchemyChurch()) {
                     $location->type_name = 'Alchemy Church';
                 }
+
+                if ((new LocationType($location->type))->isCaveOfMemories()) {
+                    $location->type_name = 'Cave of Memories';
+                }
             }
 
             if (! is_null($location->enemy_strength_type)) {

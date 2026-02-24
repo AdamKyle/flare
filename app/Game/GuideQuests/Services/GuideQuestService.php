@@ -168,6 +168,7 @@ class GuideQuestService
             ->requiredHolyStacks($character, $quest)
             ->requiredFameLevel($character, $quest)
             ->requiredDelveSurvivalTime($character, $quest)
+            ->requiredDelvePackSize($character, $quest)
             ->getFinishedRequirements();
 
         if (! empty($this->completedAttributes)) {
@@ -260,15 +261,21 @@ class GuideQuestService
     private function fetchNextRegularGuideQuest(Character $character): ?GuideQuest
     {
         $lastCompletedGuideQuest = $character->questsCompleted()
-            ->whereHas('guideQuest', function ($query) {
-                $query->whereNull('only_during_event')
-                    ->whereNull('unlock_at_level');
-            })
+            ->whereNotNull('guide_quest_id')
             ->orderByDesc('guide_quest_id')
             ->first();
 
         if (is_null($lastCompletedGuideQuest)) {
             return GuideQuest::whereNull('only_during_event')->whereNull('unlock_at_level')->first();
+        }
+
+        $nextChild = GuideQuest::whereNull('only_during_event')
+            ->whereNull('unlock_at_level')
+            ->where('parent_id', $lastCompletedGuideQuest->guide_quest_id)
+            ->first();
+
+        if (!is_null($nextChild)) {
+            return $nextChild;
         }
 
         $questId = GuideQuest::whereNull('only_during_event')
