@@ -151,8 +151,6 @@ class QuestHandlerService
 
         $oldMapDetails = $character->map;
 
-        $this->mapTileValue->setUp($character, $character->map->gameMap);
-
         if ($npc->game_map_id !== $character->map->game_map_id) {
             if (! $this->canTravelToMap->canTravel($npc->game_map_id, $character)) {
                 return $this->errorResult('You are missing the required quest item to travel to this NPC. Check NPC Access Requirements Section above.');
@@ -167,7 +165,12 @@ class QuestHandlerService
             CharacterAttackTypesCacheBuilder::dispatch($character);
         }
 
+        $character = $character->refresh();
+
+        $this->mapTileValue->setUp($character, $character->map->gameMap);
+
         if (! $this->mapTileValue->canWalk($npc->x_position, $npc->y_position)) {
+
             $character->map->update(['game_map_id' => $oldMapDetails->game_map_id]);
 
             return $this->errorResult('You can traverse to the NPC, but not move to their location as you are

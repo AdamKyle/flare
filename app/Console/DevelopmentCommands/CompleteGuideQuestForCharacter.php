@@ -55,7 +55,7 @@ class CompleteGuideQuestForCharacter extends Command
 
         if (! is_null($data)) {
 
-            $quest = $data['quest'];
+            $quest = $data['quests'][0];
 
             return $quest;
         }

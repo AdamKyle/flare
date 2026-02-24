@@ -6,6 +6,7 @@ use App\Console\AfterDeployment\CreateLocationDataCache;
 use App\Console\AfterDeployment\FixFactionLoyaltyCraftingTasks;
 use App\Console\AfterDeployment\FixKingdomMaxResourcesBasedOnPassiveSkill;
 use App\Console\AfterDeployment\FixWeaponMasteryTypes;
+use App\Console\DevelopmentCommands\GivePlayerDelveLocationQuestItems;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
@@ -113,6 +114,7 @@ class AppServiceProvider extends ServiceProvider
             CompleteGuideQuestForCharacter::class,
             MaxOutCharactersPassiveSkills::class,
             CreateEventsForDevelopment::class,
+            GivePlayerDelveLocationQuestItems::class,
         ]);
     }
 

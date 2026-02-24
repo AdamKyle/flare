@@ -180,6 +180,7 @@ class MapTileValue
         $color = $this->getTileColor($x, $y);
 
         if ($this->isMagma((int) $color)) {
+            dump($this->itemEffects);
             return in_array(ItemEffectsValue::WALK_ON_MAGMA, $this->itemEffects);
         }
 
