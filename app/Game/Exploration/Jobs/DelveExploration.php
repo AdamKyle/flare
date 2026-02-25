@@ -137,7 +137,7 @@ class DelveExploration implements ShouldQueue
 
             $newStatIncreaseValue = $delveAutomation->increase_enemy_strength + $this->location->delve_enemy_strength_increase;
 
-            if ($newStatIncreaseValue <= self::MAX_INCREASE_PERCENTAGE) {
+            if ($newStatIncreaseValue >= self::MAX_INCREASE_PERCENTAGE) {
                 $newStatIncreaseValue = self::MAX_INCREASE_PERCENTAGE;
             }
 
@@ -155,7 +155,7 @@ class DelveExploration implements ShouldQueue
 
             $params['selected_monster_id'] = $this->monster?->id ?? $delveAutomation->monster_id;
 
-            DelveExploration::dispatch($this->character, $this->automationId, $this->delveAutomationId, $params, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
+            DelveExploration::dispatch($this->character->id, $this->location->id, $this->automationId, $this->delveAutomationId, $params, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
 
             return;
         }

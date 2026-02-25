@@ -429,7 +429,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                 <Fragment>
                     <div className="mb-4 lg:ml-[120px] text-center lg:text-left">
                         Delve is running. You can cancel it below.{" "}
-                        <a href="/information/automation" target="_blank">
+                        <a href="/information/delve" target="_blank">
                             See Delve Help{" "}
                             <i className="fas fa-external-link-alt"></i>
                         </a>{" "}
