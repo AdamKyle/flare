@@ -59,7 +59,7 @@ class DelveExplorationAutomationService
 
         event(new UpdateCharacterStatus($character));
 
-        event(new ExplorationLogUpdate($character->user->id, 'The Delve will begin in '.$location->minutes_between_delve_fights.' minutes. every three minustes you will fight ' . $params['pack_size'] . 'Enemy(ies). You will fight a new pack of or creature every 3 minutes (randomly chosen beast). A pack is always made up of the same creature.'));
+        event(new ExplorationLogUpdate($character->user->id, 'The Delve will begin in '.$location->minutes_between_delve_fights.' minutes. every three minutes you will fight ' . $params['pack_size'] . ' enemy(ies). You will fight a new pack of or creature every 3 minutes (randomly chosen beast). A pack is always made up of the same creature.'));
 
         event(new ExplorationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
 

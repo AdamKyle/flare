@@ -184,15 +184,11 @@ class DelveExploration implements ShouldQueue
             return;
         }
 
-        $this->createDelveLog($delveAutomation, DelveOutcome::ERROR, $this->lastFightData);
-
         $automation->delete();
 
         $delveAutomation->update([
             'completed_at' => now(),
         ]);
-
-        $this->sendOutEventLogUpdate('Something went wrong with delve. Could not process fight. Delve Canceled.');
 
         event(new ExplorationTimeOut($this->character->user, 0));
     }
