@@ -2,9 +2,11 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
+use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Monster;
+use App\Flare\Models\UnitInQueue;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
@@ -63,6 +65,9 @@ class MassImportCustomData extends Command
         Artisan::call('create:location-data-cache');
         Artisan::call('fix:kingdom-max-resources-based-on-passive-skill');
         Artisan::call('clean-up:invalid-events');
+
+        UnitInQueue::truncate();
+        CapitalCityUnitQueue::truncate();
 
         $this->importInformationSection();
 
