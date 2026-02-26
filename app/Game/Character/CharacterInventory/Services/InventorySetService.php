@@ -347,8 +347,6 @@ class  InventorySetService
             }
         }
 
-        dump('Whats the data?', $data);
-
         foreach ($data as $slotId => $slotData) {
             $inventorySet->slots()->find($slotId)->update($slotData);
         }
