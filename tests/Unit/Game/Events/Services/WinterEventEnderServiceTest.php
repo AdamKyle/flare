@@ -131,6 +131,8 @@ class WinterEventEnderServiceTest extends TestCase
         $this->instance(
             MapTileValue::class,
             Mockery::mock(MapTileValue::class, function (MockInterface $mock) {
+                $mock->shouldReceive('setUp')->withAnyArgs()->andReturnSelf();
+                $mock->shouldReceive('canWalk')->andReturn(true);
                 $mock->shouldReceive('canWalkOnWater')->andReturn(true);
                 $mock->shouldReceive('canWalkOnDeathWater')->andReturn(true);
                 $mock->shouldReceive('canWalkOnMagma')->andReturn(true);

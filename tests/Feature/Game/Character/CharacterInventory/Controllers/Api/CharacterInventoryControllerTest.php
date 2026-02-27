@@ -154,8 +154,8 @@ class CharacterInventoryControllerTest extends TestCase
         $inventorySlotId = $character->inventory->slots()->first()->id;
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/'.$character->id.'/inventory/move-to-set', [
-                'move_to_set' => $inventorySetId,
+            ->call('POST', '/api/character/'.$character->id.'/inventory/move-item-to-set', [
+                'set_id' => $inventorySetId,
                 'slot_id' => $inventorySlotId,
             ]);
 

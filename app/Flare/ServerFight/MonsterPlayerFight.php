@@ -11,7 +11,6 @@ use App\Flare\ServerFight\Fight\Attack;
 use App\Flare\ServerFight\Fight\Voidance;
 use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\ServerFight\Monster\ServerMonster;
-use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Services\DelveMonsterService;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
@@ -309,8 +308,6 @@ class MonsterPlayerFight
     }
 
     /**
-<<<<<<< HEAD
-=======
      * Fetch the monster.
      */
     protected function fetchMonster(Map $map, int $monsterId): array
@@ -338,7 +335,6 @@ class MonsterPlayerFight
     }
 
     /**
->>>>>>> master
      * Fetches a regular monster.
      */
     protected function fetchRegularMonster(Map $map, int $monsterId): ?array

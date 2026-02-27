@@ -48,6 +48,7 @@ class LocationsControllerTest extends TestCase
     public function test_create_displays_manage_view()
     {
         $response = $this->call('GET', route('locations.create'));
+
         $this->assertEquals(200, $response->getStatusCode());
 
         $view = $response->original;

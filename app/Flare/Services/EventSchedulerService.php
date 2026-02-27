@@ -11,10 +11,8 @@ use App\Flare\Models\ScheduledEventConfiguration;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\DeleteAnnouncementEvent;
-use App\Game\Messages\Events\DeleteAnnouncementEvent;
 use App\Game\Raids\Values\RaidType;
 use Carbon\Carbon;
-use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 
 class EventSchedulerService

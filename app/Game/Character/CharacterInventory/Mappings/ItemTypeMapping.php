@@ -2,8 +2,8 @@
 
 namespace App\Game\Character\CharacterInventory\Mappings;
 
-use App\Game\Character\CharacterInventory\Values\ArmourType;
-use App\Game\Character\CharacterInventory\Values\ItemType;
+use App\Flare\Items\Values\ArmourType;
+use App\Flare\Items\Values\ItemType;
 
 final class ItemTypeMapping
 {

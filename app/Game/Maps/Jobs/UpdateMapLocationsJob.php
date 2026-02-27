@@ -42,8 +42,15 @@ class UpdateMapLocationsJob implements ShouldQueue
 
         $raid = Raid::find($this->raidId);
 
-        $locationData = $locationService->fetchLocationData($character->map->game_map_id)->merge($locationService->fetchCorruptedLocationData($raid));
+        $locationData = $locationService->fetchLocationData($character);
+        $corruptedLocationData = [];
 
-        event(new UpdateMapLocations($character->user, $locationData));
+        if (! is_null($raid)) {
+            $corruptedLocationData = $locationService->fetchCorruptedLocationData($raid);
+        }
+
+        $mergedData = collect(array_merge($locationData, $corruptedLocationData));
+
+        event(new UpdateMapLocations($character->user, $mergedData));
     }
 }
