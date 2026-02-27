@@ -2,14 +2,26 @@
 
 namespace App\Game\Exploration\Jobs;
 
+use App\Flare\Models\Character;
+use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\DelveExploration as DelveExplorationModel;
 use App\Flare\Models\Location;
+use App\Flare\Models\Monster;
+use App\Flare\Services\CharacterRewardService;
 use App\Flare\Values\AutomationType;
-use App\Game\Exploration\Values\DelveOutcome;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
+use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Exploration\Events\ExplorationLogUpdate;
+use App\Game\Exploration\Events\ExplorationTimeOut;
+use App\Game\Exploration\Values\DelveOutcome;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Skills\Services\SkillService;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -17,18 +29,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
-use App\Flare\Models\Character;
-use App\Flare\Models\CharacterAutomation;
-use App\Flare\Models\Monster;
-use App\Flare\Services\CharacterRewardService;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Battle\Handlers\BattleEventHandler;
-use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
-use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
-use App\Game\Exploration\Events\ExplorationLogUpdate;
-use App\Game\Exploration\Events\ExplorationTimeOut;
-use App\Game\Skills\Services\SkillService;
 use Psr\SimpleCache\InvalidArgumentException;
 
 class DelveExploration implements ShouldQueue
@@ -73,7 +73,6 @@ class DelveExploration implements ShouldQueue
 
     private bool $logCreated = false;
 
-
     public function __construct(int $characterId, int $locationId, int $automationId, int $delveExplorationId, array $params, int $timeDelay)
     {
         $this->character = Character::find($characterId);
@@ -109,7 +108,7 @@ class DelveExploration implements ShouldQueue
         if ($this->shouldBail($automation, $delveAutomation)) {
             $this->endAutomation($automation, $delveAutomation, $characterCacheData);
 
-            Cache::delete('can-character-survive-' . $this->character->id);
+            Cache::delete('can-character-survive-'.$this->character->id);
 
             return;
         }
@@ -134,7 +133,6 @@ class DelveExploration implements ShouldQueue
 
             $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], $this->battleData);
 
-
             $newStatIncreaseValue = $delveAutomation->increase_enemy_strength + $this->location->delve_enemy_strength_increase;
 
             if ($newStatIncreaseValue >= self::MAX_INCREASE_PERCENTAGE) {
@@ -143,7 +141,7 @@ class DelveExploration implements ShouldQueue
 
             if ($delveAutomation->increase_enemy_strength !== self::MAX_INCREASE_PERCENTAGE) {
                 $this->updateDelveAutomation($delveAutomation, [
-                    'increase_enemy_strength' => $newStatIncreaseValue
+                    'increase_enemy_strength' => $newStatIncreaseValue,
                 ]);
             }
 
@@ -193,11 +191,13 @@ class DelveExploration implements ShouldQueue
         event(new ExplorationTimeOut($this->character->user, 0));
     }
 
-    private function deletePackCache(): void {
-        Cache::delete('delve-monster-' . $this->character->id . '-' . $this->monster->id . '-fight');
+    private function deletePackCache(): void
+    {
+        Cache::delete('delve-monster-'.$this->character->id.'-'.$this->monster->id.'-fight');
     }
 
-    private function updateMonsterForNextFight(DelveExplorationModel $delveExploration): void {
+    private function updateMonsterForNextFight(DelveExplorationModel $delveExploration): void
+    {
         $monsterId = Monster::where('is_celestial_entity', false)
             ->where('is_raid_monster', false)
             ->where('is_raid_boss', false)
@@ -209,21 +209,18 @@ class DelveExploration implements ShouldQueue
             ->id;
 
         $this->updateDelveAutomation($delveExploration, [
-            'monster_id' => $monsterId
+            'monster_id' => $monsterId,
         ]);
     }
 
-    private function updateDelveAutomation(DelveExplorationModel $delveExploration, array $data): void {
+    private function updateDelveAutomation(DelveExplorationModel $delveExploration, array $data): void
+    {
         $delveExploration->update($data);
     }
 
     /**
      * Handle an encounter.
      *
-     * @param DelveExplorationModel $delveExploration
-     * @param array $params
-     * @param int $timeDelay
-     * @return bool
      * @throws InvalidArgumentException
      */
     private function encounter(DelveExplorationModel $delveExploration, array $params, int $timeDelay): bool
@@ -248,9 +245,6 @@ class DelveExploration implements ShouldQueue
      *
      * - Uses a cached version to make this faster.
      *
-     * @param DelveExplorationModel $delveExploration
-     * @param array $params
-     * @return bool
      * @throws InvalidArgumentException
      */
     private function canSurviveFight(DelveExplorationModel $delveExploration, array $params): bool
@@ -269,7 +263,8 @@ class DelveExploration implements ShouldQueue
 
     }
 
-    private function fightMultipleEnemies(DelveExplorationModel $delveExploration, array $params): bool {
+    private function fightMultipleEnemies(DelveExplorationModel $delveExploration, array $params): bool
+    {
         $totalXpToReward = 0;
         $totalSkillXpToReward = 0;
         $totalFactionPoints = 0;
@@ -281,7 +276,7 @@ class DelveExploration implements ShouldQueue
         for ($i = 1; $i <= $packSize; $i++) {
             $survived = $this->fightAutomationMonster($delveExploration, $params);
 
-            if (!$survived) {
+            if (! $survived) {
                 return false;
             }
 
@@ -302,8 +297,9 @@ class DelveExploration implements ShouldQueue
         return true;
     }
 
-    private function getPackSizeXp(int $packSize, int $xp): int {
-        return match($packSize) {
+    private function getPackSizeXp(int $packSize, int $xp): int
+    {
+        return match ($packSize) {
             5 => $xp + ($xp * 1.0),
             10 => $xp + ($xp * 1.25),
             20 => $xp + ($xp * 1.50),
@@ -315,9 +311,6 @@ class DelveExploration implements ShouldQueue
     /**
      * Fight monster through automation.
      *
-     * @param DelveExplorationModel $delveExploration
-     * @param array $params
-     * @return bool
      * @throws InvalidArgumentException
      */
     private function fightAutomationMonster(DelveExplorationModel $delveExploration, array $params): bool
@@ -350,22 +343,23 @@ class DelveExploration implements ShouldQueue
         return true;
     }
 
-    private function showEverBurningMessages(float $increaseAmount, string $monsterName, int $packSize): void {
+    private function showEverBurningMessages(float $increaseAmount, string $monsterName, int $packSize): void
+    {
 
         if ($packSize > 1 && $this->showedEncounterMessage) {
             return;
         }
 
-        $this->sendOutEventLogUpdate('The Ever Burning Candle erupts forward and the light illuminates the foul beast: ' . $monsterName);
+        $this->sendOutEventLogUpdate('The Ever Burning Candle erupts forward and the light illuminates the foul beast: '.$monsterName);
 
         if ($packSize > 1) {
-            $this->sendOutEventLogUpdate('Holy shit child, there are ' . $packSize . ' of them. Hold your ground!');
+            $this->sendOutEventLogUpdate('Holy shit child, there are '.$packSize.' of them. Hold your ground!');
         }
 
         if ($increaseAmount > 0) {
             $percent = $increaseAmount * 100;
 
-            $this->sendOutEventLogUpdate("The beast(s) is radiant with magic, you know its strength has increased by: " . $percent . '%');
+            $this->sendOutEventLogUpdate('The beast(s) is radiant with magic, you know its strength has increased by: '.$percent.'%');
         }
 
         $this->showedEncounterMessage = true;
@@ -374,12 +368,10 @@ class DelveExploration implements ShouldQueue
     /**
      * Handle when a character dies in automation.
      *
-     * @param DelveExplorationModel $delveExploration
-     * @param array $data
-     * @return bool
      * @throws Exception
      */
-    private function handleWhenCharacterDies(DelveExplorationModel $delveExploration, array $data): bool {
+    private function handleWhenCharacterDies(DelveExplorationModel $delveExploration, array $data): bool
+    {
 
         if ($data['health']['current_character_health'] <= 0) {
 
@@ -405,7 +397,8 @@ class DelveExploration implements ShouldQueue
         return false;
     }
 
-    private function shouldAttackAgain(array $data): bool {
+    private function shouldAttackAgain(array $data): bool
+    {
 
         if ($data['health']['current_monster_health'] > 0) {
             return true;
@@ -416,10 +409,6 @@ class DelveExploration implements ShouldQueue
 
     /**
      * Should we bail?
-     *
-     * @param CharacterAutomation|null $automation
-     * @param DelveExplorationModel|null $delveExploration
-     * @return bool
      */
     private function shouldBail(?CharacterAutomation $automation = null, ?DelveExplorationModel $delveExploration = null): bool
     {
@@ -440,7 +429,7 @@ class DelveExploration implements ShouldQueue
             return true;
         }
 
-        if (!is_null($delveExploration->completed_at)) {
+        if (! is_null($delveExploration->completed_at)) {
             return true;
         }
 
@@ -450,10 +439,6 @@ class DelveExploration implements ShouldQueue
     /**
      * End automation.
      *
-     * @param CharacterAutomation|null $automation
-     * @param DelveExplorationModel|null $delveExploration
-     * @param CharacterCacheData $characterCacheData
-     * @return void
      * @throws Exception
      */
     private function endAutomation(?CharacterAutomation $automation, ?DelveExplorationModel $delveExploration, CharacterCacheData $characterCacheData): void
@@ -472,7 +457,7 @@ class DelveExploration implements ShouldQueue
 
         if (! is_null($delveExploration)) {
 
-            if (!is_null($delveExploration->completed_at)) {
+            if (! is_null($delveExploration->completed_at)) {
                 return;
             }
 
@@ -491,11 +476,10 @@ class DelveExploration implements ShouldQueue
     /**
      * Fight the monster.
      *
-     * @param DelveExplorationModel $delveExploration
-     * @return array
      * @throws InvalidArgumentException
      */
-    private function fightMonster(DelveExplorationModel $delveExploration): array {
+    private function fightMonster(DelveExplorationModel $delveExploration): array
+    {
         $data = $this->monsterFightService->fightMonster($this->character, $this->attackType, false, true);
 
         $this->lastFightData = $data;
@@ -535,11 +519,6 @@ class DelveExploration implements ShouldQueue
 
     /**
      * Send out event log updates
-     *
-     * @param string $message
-     * @param bool $makeItalic
-     * @param bool $isReward
-     * @return void
      */
     private function sendOutEventLogUpdate(string $message, bool $makeItalic = false, bool $isReward = false): void
     {
@@ -548,7 +527,8 @@ class DelveExploration implements ShouldQueue
         }
     }
 
-    private function sendServerMessage(string $message, int $itemId): void {
+    private function sendServerMessage(string $message, int $itemId): void
+    {
 
         if ($this->character->isLoggedIn()) {
             event(new ServerMessageEvent($this->character->user, $message, $itemId));
@@ -558,9 +538,6 @@ class DelveExploration implements ShouldQueue
     /**
      * Reward the player for automation completion.
      *
-     * @param Character $character
-     * @param DelveExplorationModel $delveExploration
-     * @return void
      * @throws Exception
      */
     private function rewardPlayer(Character $character, DelveExplorationModel $delveExploration): void
@@ -589,9 +566,9 @@ class DelveExploration implements ShouldQueue
 
         $gold = 1_000;
 
-        if (!is_null($cosmicItem)) {
+        if (! is_null($cosmicItem)) {
             $slot = $character->inventory->slots()->create([
-                'item_id' => $cosmicItem->id
+                'item_id' => $cosmicItem->id,
             ]);
 
             $gold = $character->gold + 1_000_000_000_000;
@@ -600,12 +577,12 @@ class DelveExploration implements ShouldQueue
 
             $this->sendOutEventLogUpdate('Gained a cosmic item child! (Check Server Messages).', false, true);
 
-            $this->sendServerMessage('You were rewarded with a cosmic item: ' . $cosmicItem->affix_name . ' for surviving for more then 6 hours in a delve!', $slot->id);
+            $this->sendServerMessage('You were rewarded with a cosmic item: '.$cosmicItem->affix_name.' for surviving for more then 6 hours in a delve!', $slot->id);
         }
 
-        if (!is_null($mythicItem)) {
+        if (! is_null($mythicItem)) {
             $slot = $character->inventory->slots()->create([
-                'item_id' => $mythicItem->id
+                'item_id' => $mythicItem->id,
             ]);
 
             $gold = $character->gold + 1_000_000_000;
@@ -614,12 +591,12 @@ class DelveExploration implements ShouldQueue
 
             $this->sendOutEventLogUpdate('Gained a mythic item child! (Check Server Messages).', false, true);
 
-            $this->sendServerMessage('You were rewarded with a mythic item: ' . $mythicItem->affix_name . ' for surviving for more then 4 hours in a delve!', $slot->id);
+            $this->sendServerMessage('You were rewarded with a mythic item: '.$mythicItem->affix_name.' for surviving for more then 4 hours in a delve!', $slot->id);
         }
 
-        if (!is_null($uniqueItem)) {
+        if (! is_null($uniqueItem)) {
             $slot = $character->inventory->slots()->create([
-                'item_id' => $uniqueItem->id
+                'item_id' => $uniqueItem->id,
             ]);
 
             $gold = $character->gold + 1_000_000;
@@ -628,7 +605,7 @@ class DelveExploration implements ShouldQueue
 
             $this->sendOutEventLogUpdate('Gained a unique item child! (Check Server Messages).', false, true);
 
-            $this->sendServerMessage('You were rewarded with a unique item: ' . $uniqueItem->affix_name . ' for surviving for more then 2 hours in a delve!', $slot->id);
+            $this->sendServerMessage('You were rewarded with a unique item: '.$uniqueItem->affix_name.' for surviving for more then 2 hours in a delve!', $slot->id);
         }
 
         if ($gold === 1_000) {

@@ -89,7 +89,8 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
         return $alchemySkill->is_locked;
     }
 
-    private function isAtDelveLocation(Character $character): bool {
+    private function isAtDelveLocation(Character $character): bool
+    {
         $characterMap = $character->map;
 
         $questItemForDelve = Item::where('effect', ItemEffectsValue::DELVE)->first();
@@ -101,14 +102,15 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
         $location = Location::where('game_map_id', $characterMap->game_map_id)->where('x', $characterMap->character_position_x)->where('y', $characterMap->character_position_y)
             ->where('type', LocationType::CAVE_OF_MEMORIES)->first();
 
-        $characterHasItem = $character->inventory->slots->filter(function($slot) use ($questItemForDelve) {
+        $characterHasItem = $character->inventory->slots->filter(function ($slot) use ($questItemForDelve) {
             return $slot->item_id === $questItemForDelve->id;
         })->isNotEmpty();
 
-        return !is_null($location) && $characterHasItem;
+        return ! is_null($location) && $characterHasItem;
     }
 
-    private function canSetPactOptionsForDelve(Character $character): bool {
+    private function canSetPactOptionsForDelve(Character $character): bool
+    {
 
         $questItemForDelve = Item::where('effect', ItemEffectsValue::DELVE_PACK_CHOICE)->first();
 
@@ -116,7 +118,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
             return false;
         }
 
-        return $character->inventory->slots->filter(function($slot) use ($questItemForDelve) {
+        return $character->inventory->slots->filter(function ($slot) use ($questItemForDelve) {
             return $slot->item_id === $questItemForDelve->id;
         })->isNotEmpty();
     }

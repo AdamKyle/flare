@@ -4,7 +4,6 @@ namespace App\Game\Quests\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
-use App\Flare\Models\Location;
 use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\Quest;
 use App\Game\Events\Values\EventType;

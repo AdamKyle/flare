@@ -33,6 +33,6 @@ class UpdateMapLocations implements ShouldBroadcastNow
      */
     public function broadcastOn(): Channel|array
     {
-        return new PrivateChannel('location-data-for-maps-' . $this->user->id);
+        return new PrivateChannel('location-data-for-maps-'.$this->user->id);
     }
 }

@@ -34,6 +34,6 @@ class UpdateMap implements ShouldBroadcastNow
      */
     public function broadcastOn(): Channel|array
     {
-        return new PrivateChannel('update-plane-' . $this->user->id);
+        return new PrivateChannel('update-plane-'.$this->user->id);
     }
 }

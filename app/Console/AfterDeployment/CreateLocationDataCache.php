@@ -3,7 +3,6 @@
 namespace App\Console\AfterDeployment;
 
 use App\Flare\Models\GameMap;
-use App\Flare\Models\Location;
 use App\Game\Maps\Services\LocationService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;

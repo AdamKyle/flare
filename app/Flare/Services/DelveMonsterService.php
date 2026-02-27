@@ -5,8 +5,8 @@ namespace App\Flare\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\DelveExploration;
 
-class DelveMonsterService {
-
+class DelveMonsterService
+{
     const MONSTER_STATS = [
         'str',
         'dex',
@@ -35,10 +35,11 @@ class DelveMonsterService {
         'counter_resistance_chance',
         'ambush_resistance_chance',
         'increases_damage_by',
-        'life_stealing_resistance'
+        'life_stealing_resistance',
     ];
 
-    public function createMonster(array $monster, Character $character): array {
+    public function createMonster(array $monster, Character $character): array
+    {
 
         $delveExploration = DelveExploration::where('character_id', $character->id)->whereNull('completed_at')->first();
 
@@ -56,16 +57,17 @@ class DelveMonsterService {
 
         $monster = $this->increaseMonsterStats($monster, $monsterDamageStat);
 
-        $monster["elemental_atonement"] =[
-            "fire" => 0,
-            "ice" => 0,
-            "water" => 0,
+        $monster['elemental_atonement'] = [
+            'fire' => 0,
+            'ice' => 0,
+            'water' => 0,
         ];
 
         return $this->increasePercentageAttributes($monster, $increaseAmount);
     }
 
-    private function increaseMonsterStats(array $monster, int $increaseStatsBy): array {
+    private function increaseMonsterStats(array $monster, int $increaseStatsBy): array
+    {
 
         foreach (self::MONSTER_STATS as $stat) {
             $monster[$stat] += $increaseStatsBy;
@@ -77,7 +79,8 @@ class DelveMonsterService {
         return $monster;
     }
 
-    private function increasePercentageAttributes(array $monster, float $increaseBy): array {
+    private function increasePercentageAttributes(array $monster, float $increaseBy): array
+    {
         foreach (self::PERCENTAGE_STATS as $stat) {
             $monsterPercentStatAmount = min(($monster[$stat] + $increaseBy), 1.25);
 
@@ -87,13 +90,14 @@ class DelveMonsterService {
         return $monster;
     }
 
-    private function setNewRange(string $range, int $increaseBy): string {
+    private function setNewRange(string $range, int $increaseBy): string
+    {
 
         $rangeRaw = explode('-', $range);
 
         $min = intval($rangeRaw[0]) + $increaseBy;
         $max = intval($rangeRaw[1]) + $increaseBy;
 
-        return $min . '-' . $max;
+        return $min.'-'.$max;
     }
 }

@@ -272,7 +272,7 @@ class GuideQuestService
             ->where('parent_id', $lastCompletedGuideQuest->guide_quest_id)
             ->first();
 
-        if (!is_null($nextChild)) {
+        if (! is_null($nextChild)) {
             return $nextChild;
         }
 

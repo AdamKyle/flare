@@ -64,7 +64,7 @@ class InventorySetService
             ->groupBy('items.type')
             ->selectRaw('items.type as type, COUNT(*) as count')
             ->get()
-            ->map(static fn(object $row): array => [
+            ->map(static fn (object $row): array => [
                 'type' => $row->type,
                 'count' => (int) $row->count,
             ])
@@ -123,12 +123,12 @@ class InventorySetService
                 });
 
                 return $this->successResult([
-                    'message' => $itemName . ' Has been moved to: Set ' . $index + 1,
+                    'message' => $itemName.' Has been moved to: Set '.$index + 1,
                 ]);
             }
 
             return $this->successResult([
-                'message' => $itemName . ' Has been moved to: ' . $inventorySet->name,
+                'message' => $itemName.' Has been moved to: '.$inventorySet->name,
             ]);
         }
 
@@ -139,7 +139,7 @@ class InventorySetService
                     return $set->id === $setId;
                 });
 
-                $setName = 'Set ' . $index;
+                $setName = 'Set '.$index;
             } else {
                 $setName = $inventorySet->name;
             }
@@ -147,7 +147,7 @@ class InventorySetService
             event(new UpdateCharacterInventoryCountEvent($character));
 
             return $this->successResult([
-                'message' => $itemName . ' Has been moved to: ' . $setName,
+                'message' => $itemName.' Has been moved to: '.$setName,
             ]);
         }
 
@@ -192,7 +192,7 @@ class InventorySetService
                 return $set->id === $inventorySetId;
             });
 
-            $setName = 'Set ' . $index + 1;
+            $setName = 'Set '.$index + 1;
         }
 
         event(new UpdateCharacterBaseDetailsEvent($character));
@@ -200,7 +200,7 @@ class InventorySetService
         event(new UpdateCharacterInventoryCountEvent($character));
 
         return $this->successResult([
-            'message' => 'Removed ' . $item->affix_name . ' from ' . $setName . ' and placed back into your inventory.',
+            'message' => 'Removed '.$item->affix_name.' from '.$setName.' and placed back into your inventory.',
         ]);
     }
 
@@ -236,7 +236,7 @@ class InventorySetService
         });
 
         if (is_null($inventorySet->name)) {
-            $setName = 'Set ' . $setIndex + 1;
+            $setName = 'Set '.$setIndex + 1;
         } else {
             $setName = $inventorySet->name;
         }
@@ -248,7 +248,7 @@ class InventorySetService
         event(new UpdateCharacterInventoryCountEvent($character));
 
         return $this->successResult([
-            'message' => 'Removed ' . $itemsRemoved . ' of ' . $originalInventorySetCount . ' items from ' . $setName . '. If all items were not moved over, it is because your inventory became full.',
+            'message' => 'Removed '.$itemsRemoved.' of '.$originalInventorySetCount.' items from '.$setName.'. If all items were not moved over, it is because your inventory became full.',
         ]);
     }
 
@@ -413,14 +413,14 @@ class InventorySetService
 
         $this->updateCharacterAttackDataCache($character);
 
-        $inventoryName = 'Set ' . $inventoryIndex + 1;
+        $inventoryName = 'Set '.$inventoryIndex + 1;
 
         if (! is_null($inventorySet->name)) {
             $inventoryName = $inventorySet->name;
         }
 
         return $this->successResult([
-            'message' => 'Unequipped ' . $inventoryName . '.',
+            'message' => 'Unequipped '.$inventoryName.'.',
         ]);
     }
 
@@ -449,7 +449,7 @@ class InventorySetService
 
         $this->updateCharacterAttackDataCache($character);
 
-        $inventoryName = 'Set ' . $setIndex + 1;
+        $inventoryName = 'Set '.$setIndex + 1;
         $set = $inventorySet->refresh();
 
         if (! is_null($set->name)) {
@@ -457,7 +457,7 @@ class InventorySetService
         }
 
         return $this->successResult([
-            'message' => $inventoryName . ' is now equipped',
+            'message' => $inventoryName.' is now equipped',
         ]);
     }
 
@@ -560,7 +560,7 @@ class InventorySetService
         ]);
 
         return $this->successResult([
-            'message' => 'Renamed set to: ' . $setName,
+            'message' => 'Renamed set to: '.$setName,
         ]);
     }
 
@@ -597,7 +597,7 @@ class InventorySetService
             return $set->is_equipped;
         });
 
-        $setName = 'Set ' . $setIndex + 1;
+        $setName = 'Set '.$setIndex + 1;
 
         if (! is_null($inventorySet->name)) {
             $setName = $inventorySet->name;
@@ -606,7 +606,7 @@ class InventorySetService
         event(new UpdateCharacterBaseDetailsEvent($character));
 
         return $this->successResult([
-            'message' => $setName . ' is now equipped (equipment has been moved to the set).',
+            'message' => $setName.' is now equipped (equipment has been moved to the set).',
         ]);
     }
 

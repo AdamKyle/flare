@@ -2,20 +2,17 @@
 
 namespace App\Flare\Services;
 
-use App\Flare\Builders\BuildCosmicItem;
-use App\Flare\Builders\BuildMythicItem;
-use App\Flare\Builders\BuildUniqueItem;
-use App\Flare\Values\RandomAffixDetails;
-use Exception;
+use App\Flare\Items\Builders\BuildCosmicItem;
+use App\Flare\Items\Builders\BuildMythicItem;
+use App\Flare\Items\Builders\BuildUniqueItem;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item as ItemModel;
 use App\Flare\Models\Monster;
 use App\Game\Skills\Services\SkillService;
-
+use Exception;
 
 class CharacterRewardService
 {
-
     private ?Character $character = null;
 
     /**
@@ -109,8 +106,6 @@ class CharacterRewardService
     }
 
     /**
-     * @param int $amountPaid
-     * @return ItemModel
      * @throws Exception
      */
     public function getSpecialGearDrop(int $amountPaid): ItemModel

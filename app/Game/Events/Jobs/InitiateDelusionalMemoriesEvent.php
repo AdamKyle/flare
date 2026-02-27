@@ -142,7 +142,7 @@ class InitiateDelusionalMemoriesEvent implements ShouldQueue
         }
 
         $scheduledEvent->update([
-            'raids_for_event' => $newRaidForEventData
+            'raids_for_event' => $newRaidForEventData,
         ]);
     }
 }

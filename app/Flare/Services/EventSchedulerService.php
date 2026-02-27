@@ -8,13 +8,13 @@ use App\Flare\Models\Event;
 use App\Flare\Models\Raid;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Models\ScheduledEventConfiguration;
-use App\Game\Messages\Events\DeleteAnnouncementEvent;
-use App\Game\Raids\Values\RaidType;
-use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\DeleteAnnouncementEvent;
+use App\Game\Messages\Events\DeleteAnnouncementEvent;
+use App\Game\Raids\Values\RaidType;
 use Carbon\Carbon;
+use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 
 class EventSchedulerService
@@ -175,7 +175,7 @@ class EventSchedulerService
         event(new UpdateScheduledEvents($this->fetchEvents()));
     }
 
-    public function generateFutureRaid(ScheduledEvent $scheduledRaidEvent, Carbon $futureDate = null): void
+    public function generateFutureRaid(ScheduledEvent $scheduledRaidEvent, ?Carbon $futureDate = null): void
     {
 
         $raid = $scheduledRaidEvent->raid;
@@ -201,7 +201,7 @@ class EventSchedulerService
                 'selected_raid' => $raid->id,
                 'selected_end_date' => $endDate,
                 'event_description' => $scheduledRaidEvent->description,
-                'raids_for_event' => $scheduledRaidEvent->raids_for_event
+                'raids_for_event' => $scheduledRaidEvent->raids_for_event,
             ];
 
             $this->createEvent($params);
@@ -228,14 +228,16 @@ class EventSchedulerService
                     'selected_raid' => $scheduledRaidEvent->raid_id,
                     'selected_end_date' => $shiftedLastRaidEndDate,
                     'event_description' => $scheduledRaidEvent->description,
-                    'raids_for_event' => $scheduledRaidEvent->raids_for_event
+                    'raids_for_event' => $scheduledRaidEvent->raids_for_event,
                 ];
 
                 $this->createEvent($params);
+
                 return;
             }
 
             $this->generateFutureRaid($scheduledRaidEvent, $shiftedLastRaidStartDate->copy()->addMonth());
+
             return;
         }
 
@@ -257,7 +259,7 @@ class EventSchedulerService
                 'selected_raid' => $scheduledRaidEvent->raid_id,
                 'selected_end_date' => $shiftedStartDate,
                 'event_description' => $scheduledRaidEvent->description,
-                'raids_for_event' => $scheduledRaidEvent->raids_for_event
+                'raids_for_event' => $scheduledRaidEvent->raids_for_event,
             ];
 
             $this->createEvent($params);
@@ -298,7 +300,7 @@ class EventSchedulerService
         }
 
         if ($type->isWeeklyCurrencyDrops()) {
-            return 'For the next 24 hours you just have to kill creatures for Gold Dust,' .
+            return 'For the next 24 hours you just have to kill creatures for Gold Dust,'.
                 'Shards and Copper Coins (provided you have the quest item) will drop at a rate of 1-50 per kill! How fun!';
         }
 

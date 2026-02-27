@@ -116,7 +116,7 @@ class BuildQuestCacheService
             return $eventQuests;
         }
 
-        if (!isset($raidQuests[$eventWithRaid->raid_id])) {
+        if (! isset($raidQuests[$eventWithRaid->raid_id])) {
             return $eventQuests;
         }
 

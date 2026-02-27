@@ -51,7 +51,7 @@ class RaidTypeTest extends TestCase
         );
     }
 
-    public function testIsEnragedLittleGirl()
+    public function test_is_enraged_little_girl()
     {
         $this->assertTrue(
             (new RaidType(RaidType::ENRAGED_LITTLE_GIRL))->isEnragedLittleGirl()

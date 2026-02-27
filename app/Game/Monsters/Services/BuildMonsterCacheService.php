@@ -142,7 +142,7 @@ class BuildMonsterCacheService
 
             if (! empty($monsters)) {
 
-                $cache['location-type-' . $location->type] = $monsters;
+                $cache['location-type-'.$location->type] = $monsters;
             }
         }
 
@@ -184,7 +184,7 @@ class BuildMonsterCacheService
         $minHealth = intval($monsterHealthRangeParts[0]) + $increaseStatsBy;
         $maxHealth = intval($monsterHealthRangeParts[1]) + $increaseStatsBy;
 
-        return $minHealth . '-' . $maxHealth;
+        return $minHealth.'-'.$maxHealth;
     }
 
     public function createNewAttackRange(Monster $monster, int $increaseStatsBy): string
@@ -194,7 +194,7 @@ class BuildMonsterCacheService
         $minAttack = intval($monsterAttackParts[0]) + $increaseStatsBy;
         $maxAttack = intval($monsterAttackParts[1]) + $increaseStatsBy;
 
-        return $minAttack . '-' . $maxAttack;
+        return $minAttack.'-'.$maxAttack;
     }
 
     private function createMonstersForEventMaps(Collection $monsters): array

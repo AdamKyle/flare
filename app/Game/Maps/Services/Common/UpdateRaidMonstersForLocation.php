@@ -3,7 +3,6 @@
 namespace App\Game\Maps\Services\Common;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\Event;
 use App\Flare\Models\Location;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Values\ItemEffectsValue;

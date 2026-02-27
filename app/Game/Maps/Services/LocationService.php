@@ -74,7 +74,7 @@ class LocationService
             //            'can_settle_kingdom' => $this->canSettle,
             'character_kingdoms' => $this->getKingdoms($character),
             'npc_kingdoms' => $this->getNpcKingdoms($character),
-            'enemy_kingdoms' => [], //$this->getEnemyKingdoms($character),
+            'enemy_kingdoms' => [], // $this->getEnemyKingdoms($character),
             //            'characters_on_map' => $this->getActiveUsersCountForMap($character),
             //            'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type,
             //            'is_event_based' => $this->isEventBasedUpdate,
@@ -93,7 +93,7 @@ class LocationService
 
     public function getDroppableItems(Location $location, int $perPage = 10, int $page = 1, string $searchText = ''): array
     {
-        $items = ItemModel::where('drop_location_id', $location->id)->where('name', 'LIKE', '%' . $searchText . '%')->get();
+        $items = ItemModel::where('drop_location_id', $location->id)->where('name', 'LIKE', '%'.$searchText.'%')->get();
 
         return $this->pagination->buildPaginatedDate($items, $this->questItemTransformer, $perPage, $page);
     }
@@ -103,7 +103,7 @@ class LocationService
         return [
             'character_kingdoms' => $this->getKingdoms($character),
             'npc_kingdoms' => $this->getNpcKingdoms($character),
-            'enemy_kingdoms' => [], //$this->getEnemyKingdoms($character),
+            'enemy_kingdoms' => [], // $this->getEnemyKingdoms($character),
             'locations' => $this->fetchLocationData($character),
             'coordinates' => $this->coordinatesCache->getFromCache(),
         ];

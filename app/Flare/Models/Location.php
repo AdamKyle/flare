@@ -105,11 +105,11 @@ class Location extends Model
     protected static function booted(): void
     {
         static::saved(function (Location $location): void {
-            Cache::forget('map-locations-' . $location->game_map_id);
+            Cache::forget('map-locations-'.$location->game_map_id);
         });
 
         static::deleted(function (Location $location): void {
-            Cache::forget('map-locations-' . $location->game_map_id);
+            Cache::forget('map-locations-'.$location->game_map_id);
         });
     }
 }

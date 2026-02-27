@@ -10,6 +10,7 @@ class AutomationType
     private $value;
 
     const EXPLORING = 0;
+
     const DELVE = 1;
 
     /**
@@ -41,7 +42,8 @@ class AutomationType
         return $this->value === self::EXPLORING;
     }
 
-    public function isDelve(): bool {
+    public function isDelve(): bool
+    {
         return $this->value === self::DELVE;
     }
 }

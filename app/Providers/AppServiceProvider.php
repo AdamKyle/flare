@@ -2,16 +2,15 @@
 
 namespace App\Providers;
 
-use App\Console\AfterDeployment\CreateLocationDataCache;
-use App\Console\AfterDeployment\FixKingdomMaxResourcesBasedOnPassiveSkill;
-use App\Console\DevelopmentCommands\GivePlayerDelveLocationQuestItems;
 use App\Console\AfterDeployment\AddHolyStacksToItems;
 use App\Console\AfterDeployment\AssignNewBuildingsToExistingKingdoms;
 use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
 use App\Console\AfterDeployment\CleanInvalidWeapons;
 use App\Console\AfterDeployment\CleanMarketPlaceOfInvalidWeapons;
 use App\Console\AfterDeployment\ClearInvalidCapitalCityQueues;
+use App\Console\AfterDeployment\CreateLocationDataCache;
 use App\Console\AfterDeployment\CreateQuestChainRelationships;
+use App\Console\AfterDeployment\FixKingdomMaxResourcesBasedOnPassiveSkill;
 use App\Console\AfterDeployment\RemoveInvalidQuestItems;
 use App\Console\AfterDeployment\UpdateCharactersForClassRanks;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
@@ -20,6 +19,7 @@ use App\Console\DevelopmentCommands\CreateCharacter;
 use App\Console\DevelopmentCommands\CreateEventsForDevelopment;
 use App\Console\DevelopmentCommands\CreateTestCharacters;
 use App\Console\DevelopmentCommands\GivePlayerAncenstorItem;
+use App\Console\DevelopmentCommands\GivePlayerDelveLocationQuestItems;
 use App\Console\DevelopmentCommands\GivePlayerUniqueItem;
 use App\Console\DevelopmentCommands\LevelCharacter;
 use App\Console\DevelopmentCommands\ManageKingdomResources;
@@ -92,7 +92,7 @@ class AppServiceProvider extends ServiceProvider
 
             $headers = [
                 'Content-type' => 'text/json',
-                'Content-Disposition' => 'attachment; filename=' . $fileName . '.json',
+                'Content-Disposition' => 'attachment; filename='.$fileName.'.json',
             ];
 
             return \Response::make($content, 200, $headers);

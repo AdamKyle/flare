@@ -147,7 +147,8 @@ class LocationType
         return $this->value === self::TWISTED_GATE;
     }
 
-    public function isTheCellar(): bool {
+    public function isTheCellar(): bool
+    {
         return $this->value === self::THE_CELLAR;
     }
 

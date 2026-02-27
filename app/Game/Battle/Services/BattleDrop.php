@@ -137,8 +137,6 @@ class BattleDrop
     /**
      * Handle when a character is in a delve exploration for quest items
      *
-     * @param Character $character
-     * @return void
      * @throws Exception
      */
     public function handleDelveLocationQuestItems(Character $character): void
@@ -218,8 +216,6 @@ class BattleDrop
     }
 
     /**
-     * @param Character $character
-     * @return void
      * @throws Exception
      */
     public function handleSpecialLocationQuestItem(Character $character): void
@@ -409,16 +405,16 @@ class BattleDrop
             ]);
 
             if ($item->type === 'quest') {
-                $message = $character->name . ' has found: ' . $item->affix_name;
+                $message = $character->name.' has found: '.$item->affix_name;
 
-                event(new ServerMessageEvent($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
+                event(new ServerMessageEvent($character->user, 'You found: '.$item->affix_name.' on the enemies corpse.', $slot->id));
 
                 broadcast(new GlobalMessageEvent($message));
             } else {
-                event(new ServerMessageEvent($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
+                event(new ServerMessageEvent($character->user, 'You found: '.$item->affix_name.' on the enemies corpse.', $slot->id));
 
                 if ($isMythic) {
-                    event(new GlobalMessageEvent($character->name . ' Has found a mythical item on the enemies corpse! Such a rare drop!'));
+                    event(new GlobalMessageEvent($character->name.' Has found a mythical item on the enemies corpse! Such a rare drop!'));
                 }
             }
         }

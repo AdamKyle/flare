@@ -240,10 +240,9 @@ class CharacterClassValue
 
     /**
      * Is Apothecary class?
-     *
-     * @return bool
      */
-    public function isApothecary(): bool {
+    public function isApothecary(): bool
+    {
         return $this->value === self::APOTHECARY;
     }
 

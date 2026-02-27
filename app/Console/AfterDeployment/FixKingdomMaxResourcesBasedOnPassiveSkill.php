@@ -31,7 +31,6 @@ class FixKingdomMaxResourcesBasedOnPassiveSkill extends Command
             foreach ($kingdoms as $kingdom) {
                 $skill = $kingdom->character->passiveSkills->where('passiveSkill.effect_type', PassiveSkillTypeValue::RESOURCE_INCREASE)->first();
 
-
                 if (is_null($skill)) {
                     return;
                 }

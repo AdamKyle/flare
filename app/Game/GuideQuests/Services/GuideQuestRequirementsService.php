@@ -63,12 +63,11 @@ class GuideQuestRequirementsService
     /**
      * Has the player survived the required hours?
      *
-     * @param Character $character
-     * @param GuideQuest $quest
      * @return $this
      */
-    public function requiredDelveSurvivalTime(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
-        if (!is_null($quest->required_delve_survival_time)) {
+    public function requiredDelveSurvivalTime(Character $character, GuideQuest $quest): GuideQuestRequirementsService
+    {
+        if (! is_null($quest->required_delve_survival_time)) {
             $lastDelveExploration = DelveExploration::where('character_id', $character->id)->orderBy('started_at', 'desc')->first();
 
             if (is_null($lastDelveExploration)) {
@@ -83,8 +82,9 @@ class GuideQuestRequirementsService
         return $this;
     }
 
-    public function requiredDelvePackSize(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
-        if (!is_null($quest->required_delve_pack_size)) {
+    public function requiredDelvePackSize(Character $character, GuideQuest $quest): GuideQuestRequirementsService
+    {
+        if (! is_null($quest->required_delve_pack_size)) {
             $lastDelveExploration = DelveExploration::where('character_id', $character->id)->orderBy('started_at', 'desc')->first();
 
             if (is_null($lastDelveExploration->completed_at)) {

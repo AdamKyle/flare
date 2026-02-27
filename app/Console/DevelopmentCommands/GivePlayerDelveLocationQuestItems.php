@@ -35,7 +35,7 @@ class GivePlayerDelveLocationQuestItems extends Command
         $character = Character::where('name', $characterName)->first();
 
         if (is_null($character)) {
-            $this->error('No character found for name: ' . $characterName);
+            $this->error('No character found for name: '.$characterName);
 
             return;
         }
@@ -84,7 +84,7 @@ class GivePlayerDelveLocationQuestItems extends Command
         }
 
         foreach ($eligibleItems as $eligibleItem) {
-            $this->info('Gave: ' . $eligibleItem->name . ' to: ' . $characterName);
+            $this->info('Gave: '.$eligibleItem->name.' to: '.$characterName);
 
             $character->inventory->slots()->create([
                 'item_id' => $eligibleItem->id,

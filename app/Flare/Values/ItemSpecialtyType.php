@@ -129,7 +129,8 @@ class ItemSpecialtyType
         return $this->value === self::FAITHLESS_PLATE;
     }
 
-        public function isLabyrinthCloth(): bool {
+    public function isLabyrinthCloth(): bool
+    {
         return $this->value === self::LABYRINTH_CLOTH;
     }
 
@@ -147,6 +148,6 @@ class ItemSpecialtyType
             self::DELUSIONAL_SILVER => 280_000_000_000,
             self::FAITHLESS_PLATE => 300_000_000_000,
             default => null,
-
         };
+    }
 }

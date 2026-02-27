@@ -63,7 +63,8 @@ class RaidAttackTypesValue
         return $this->value === self::BANSHEE_SCREAM_ATTACK;
     }
 
-    public function isEnragedHate(): bool {
+    public function isEnragedHate(): bool
+    {
         return $this->value === self::ENRAGED_HATE;
     }
 }

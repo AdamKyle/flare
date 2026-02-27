@@ -322,7 +322,8 @@ class ClassAttackValue
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
-    public function buildPlagueSurge() {
+    public function buildPlagueSurge()
+    {
         $this->chance['type'] = self::PLAGUE_SURGE;
         $this->chance['only'] = 'Censer or Dagger';
         $this->chance['class_name'] = 'Apothecary';

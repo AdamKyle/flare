@@ -307,19 +307,17 @@ class ItemEffectsValue
 
     /**
      * Allows player to access Delve based locations.
-     *
-     * @return bool
      */
-    public function accessDelves(): bool {
+    public function accessDelves(): bool
+    {
         return $this->value === self::DELVE;
     }
 
     /**
      * Allows player to access Delve based locations.
-     *
-     * @return bool
      */
-    public function canChooseDelvePack(): bool {
-        return $this->value === self::DELVE_PACK_CHOICE    ;
+    public function canChooseDelvePack(): bool
+    {
+        return $this->value === self::DELVE_PACK_CHOICE;
     }
 }

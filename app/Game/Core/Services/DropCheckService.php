@@ -101,8 +101,6 @@ class DropCheckService
     /**
      * Handles the drops themselves based on chance.
      *
-     * @param Character $character
-     * @return void
      *
      * @throws Exception
      */
@@ -149,7 +147,7 @@ class DropCheckService
      */
     private function makeLocationWithEffectCacheKey(Map $map): string
     {
-        return $map->game_map_id . ':' . $map->character_position_x . ':' . $map->character_position_y;
+        return $map->game_map_id.':'.$map->character_position_x.':'.$map->character_position_y;
     }
 
     /**

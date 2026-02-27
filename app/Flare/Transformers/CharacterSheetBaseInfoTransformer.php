@@ -103,7 +103,6 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         return $this->item($character, new CharacterInventoryCountTransformer);
     }
 
-
     private function getFactionTasks(?FactionLoyalty $factionLoyalty = null): ?array
     {
 

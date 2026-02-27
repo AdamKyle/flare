@@ -15,6 +15,7 @@ class RaidType
     const FROZEN_KING = 'frozen-king';
 
     const CORRUPTED_BISHOP = 'corrupted-bishop';
+
     const ENRAGED_LITTLE_GIRL = 'enraged-little-girl';
 
     private string $value;
@@ -84,7 +85,8 @@ class RaidType
         return $this->value === self::CORRUPTED_BISHOP;
     }
 
-    public function isEnragedLittleGirl(): bool {
+    public function isEnragedLittleGirl(): bool
+    {
         return $this->value === self::ENRAGED_LITTLE_GIRL;
     }
 }

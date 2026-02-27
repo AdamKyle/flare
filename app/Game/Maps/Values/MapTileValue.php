@@ -27,7 +27,8 @@ class MapTileValue
         112219255, // Delusional Memories
     ];
 
-    public function setUp(Character $character, GameMap $gameMap): MapTileValue {
+    public function setUp(Character $character, GameMap $gameMap): MapTileValue
+    {
         $this->itemEffects = $character->inventory->slots()
             ->join('items', 'inventory_slots.item_id', '=', 'items.id')
             ->whereNotNull('items.effect')
@@ -110,31 +111,31 @@ class MapTileValue
     {
         $mapType = $this->gameMap->mapType();
 
-        if (($mapType->isSurface() || $mapType->isLabyrinth()) && !$this->canWalkOnWater($x, $y)) {
+        if (($mapType->isSurface() || $mapType->isLabyrinth()) && ! $this->canWalkOnWater($x, $y)) {
             return false;
         }
 
-        if ($mapType->isDungeons() && !$this->canWalkOnDeathWater($x, $y)) {
+        if ($mapType->isDungeons() && ! $this->canWalkOnDeathWater($x, $y)) {
             return false;
         }
 
-        if ($mapType->isHell() && !$this->canWalkOnMagma($x, $y)) {
+        if ($mapType->isHell() && ! $this->canWalkOnMagma($x, $y)) {
             return false;
         }
 
-        if ($mapType->isTheIcePlane() && !$this->canWalkOnIcePlaneIce($x, $y)) {
+        if ($mapType->isTheIcePlane() && ! $this->canWalkOnIcePlaneIce($x, $y)) {
             return false;
         }
 
-        if ($mapType->isDelusionalMemories() && !$this->canWalkOnDelusionalMemoriesWater($x, $y)) {
+        if ($mapType->isDelusionalMemories() && ! $this->canWalkOnDelusionalMemoriesWater($x, $y)) {
             return false;
         }
 
-        if ($mapType->isPurgatory() && !$this->canWalkOnPurgatoryWater($x, $y)) {
+        if ($mapType->isPurgatory() && ! $this->canWalkOnPurgatoryWater($x, $y)) {
             return false;
         }
 
-        if ($mapType->isTwistedMemories() && !$this->canWalkOnTwistedMemoriesWater($x, $y)) {
+        if ($mapType->isTwistedMemories() && ! $this->canWalkOnTwistedMemoriesWater($x, $y)) {
             return false;
         }
 

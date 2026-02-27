@@ -8,15 +8,12 @@ use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\LocationType;
 use App\Game\Exploration\Requests\DelveExplorationRequest;
-use App\Game\Exploration\Requests\ExplorationRequest;
 use App\Game\Exploration\Services\DelveExplorationAutomationService;
-use App\Game\Exploration\Services\ExplorationAutomationService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
 class DelveExplorationController extends Controller
 {
-
     public function __construct(private readonly DelveExplorationAutomationService $delveExplorationAutomationService) {}
 
     public function begin(DelveExplorationRequest $request, Character $character): JsonResponse
@@ -29,10 +26,10 @@ class DelveExplorationController extends Controller
         }
 
         if ($character->currentAutomations()
-                ->where('type', AutomationType::DELVE)
-                ->orWhere('type', AutomationType::EXPLORING)
-                ->where('character_id', $character->id)
-                ->count() > 0
+            ->where('type', AutomationType::DELVE)
+            ->orWhere('type', AutomationType::EXPLORING)
+            ->where('character_id', $character->id)
+            ->count() > 0
         ) {
             return response()->json([
                 'message' => 'Nope. You already have one in progress.',
@@ -45,7 +42,7 @@ class DelveExplorationController extends Controller
             ->where('type', LocationType::CAVE_OF_MEMORIES)
             ->first();
 
-        if ( is_null($location)) {
+        if (is_null($location)) {
             return response()->json([
                 'message' => 'You may only delve in locations that allow such an action child.',
             ], 422);
