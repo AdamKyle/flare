@@ -132,6 +132,12 @@ class ClassBonusInformation
             $details['description'] = 'Fear, it\'s what keeps us alive child. Fear is what makes you lash out and violently stab your enemy over and over and over again, just to live.';
         }
 
+        if ($classAttackValue->isApothecary()) {
+            $details['type'] = Str::ucfirst(ClassAttackValue::PLAGUE_SURGE);
+            $details['requires'] = 'Censor & Dagger';
+            $details['description'] = 'In the shadows, the magics you cast to heal the sick become corrupted and twisted. A plague seeps into the light, posioning the innocent and the wicked alike.';
+        }
+
         return $details;
     }
 }

@@ -37,6 +37,8 @@ class CharacterClassValue
 
     const BOOK_BINDER = 'Book Binder';
 
+    const APOTHECARY = 'Apothecary';
+
     private string $value;
 
     /**
@@ -58,6 +60,7 @@ class CharacterClassValue
         self::DANCER => 'Dancer',
         self::CLERIC => 'Cleric',
         self::BOOK_BINDER => 'Book Binder',
+        self::APOTHECARY => 'Apothecary',
     ];
 
     protected $nonCaster = [
@@ -78,12 +81,14 @@ class CharacterClassValue
         self::ARCANE_ALCHEMIST,
         self::BOOK_BINDER,
         self::CLERIC,
+        self::APOTHECARY,
     ];
 
     protected $healers = [
         self::PROPHET,
         self::RANGER,
         self::CLERIC,
+        self::APOTHECARY,
     ];
 
     /**
@@ -231,6 +236,15 @@ class CharacterClassValue
     public function isMerchant(): bool
     {
         return $this->value === self::MERCHANT;
+    }
+
+    /**
+     * Is Apothecary class?
+     *
+     * @return bool
+     */
+    public function isApothecary(): bool {
+        return $this->value === self::APOTHECARY;
     }
 
     /**

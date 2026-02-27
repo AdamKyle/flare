@@ -97,7 +97,7 @@ class QuestsController extends Controller
 
         $message = 'Created: '.$quest->name;
 
-        if ($request->id !== 0) {
+        if (!is_null($request->id) && $request->id !== 0) {
             $message = 'Updated: '.$quest->name;
         }
 

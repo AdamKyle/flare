@@ -2,6 +2,16 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
+use App\Flare\Models\CapitalCityUnitQueue;
+use App\Flare\Models\Character;
+use App\Flare\Models\Item;
+use App\Flare\Models\Monster;
+use App\Flare\Models\UnitInQueue;
+use Exception;
+use Illuminate\Console\Command;
+use Illuminate\Http\File;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Storage;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
 use App\Flare\Models\Survey;
@@ -33,6 +43,37 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
+        Artisan::call('import:game-data Core');
+        Artisan::call('import:game-data Npcs');
+        Artisan::call('import:game-data Items');
+        Artisan::call('import:game-data Weapons');
+        Artisan::call('import:game-data Armour');
+        Artisan::call('import:game-data Locations');
+        Artisan::call('import:game-data Monsters');
+        Artisan::call('import:game-data Items');
+        Artisan::call('import:game-data Skills');
+        Artisan::call('import:game-data Raids');
+        Artisan::call('import:game-data Quests');
+        Artisan::call('assign:new-npcs-to-faction-loyalty');
+
+        Monster::where('is_celestial_entity', false)
+            ->where('is_raid_monster', false)
+            ->where('is_raid_boss', false)
+            ->where('game_map_id', 8)
+            ->whereNull('only_for_location_type')
+            ->update(['raid_special_attack_type' => null]);
+
+        Character::first()->inventory->slots()->create(['item_id' => Item::where('name', '=', 'Twisted Tree Branch')->first()->id]);
+
+        Artisan::call('create:quest-cache');
+        Artisan::call('generate:monster-cache');
+        Artisan::call('create:location-data-cache');
+        Artisan::call('fix:kingdom-max-resources-based-on-passive-skill');
+        Artisan::call('clean-up:invalid-events');
+
+        UnitInQueue::truncate();
+        CapitalCityUnitQueue::truncate();
+
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
@@ -67,7 +108,7 @@ class MassImportCustomData extends Command
         $sourceDirectory = resource_path('backup/info-sections-images');
         $destinationDirectory = storage_path('app/public');
 
-        $deleteCommand = 'rm -rf '.escapeshellarg($destinationDirectory).'./info-sections-images';
+        $deleteCommand = 'rm -rf ' . escapeshellarg($destinationDirectory) . './info-sections-images';
         exec($deleteCommand, $output, $exitCode);
 
         if ($exitCode !== 0) {
@@ -76,7 +117,7 @@ class MassImportCustomData extends Command
             return;
         }
 
-        $command = 'cp -R '.escapeshellarg($sourceDirectory).' '.escapeshellarg($destinationDirectory);
+        $command = 'cp -R ' . escapeshellarg($sourceDirectory) . ' ' . escapeshellarg($destinationDirectory);
         exec($command, $output, $exitCode);
 
         if ($exitCode === 0) {
@@ -134,7 +175,7 @@ class MassImportCustomData extends Command
         foreach ($files as $file) {
             $fileName = pathinfo($file, PATHINFO_FILENAME);
 
-            $path = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps').'/'.$file));
+            $path = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps') . '/' . $file));
 
             $mapValue = new MapNameValue($fileName);
 

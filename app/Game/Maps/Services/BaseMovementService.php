@@ -232,31 +232,34 @@ class BaseMovementService
     {
         $gameMap = $character->map->gameMap;
 
+        $this->mapTileValue = $this->mapTileValue->setUp($character, $gameMap);
+
         if ($gameMap->mapType()->isSurface() || $gameMap->mapType()->isLabyrinth()) {
-            return $this->mapTileValue->canWalkOnWater($character, $this->x, $this->y);
+            return $this->mapTileValue->canWalkOnWater($this->x, $this->y);
         }
 
         if ($gameMap->mapType()->isDungeons()) {
-            return $this->mapTileValue->canWalkOnDeathWater($character, $this->x, $this->y);
+            return $this->mapTileValue->canWalkOnDeathWater($this->x, $this->y);
         }
 
         if ($gameMap->mapType()->isHell()) {
-            return $this->mapTileValue->canWalkOnMagma($character, $this->x, $this->y);
+            return $this->mapTileValue->canWalkOnMagma($this->x, $this->y);
         }
 
         if ($gameMap->mapType()->isTheIcePlane()) {
+            return $this->mapTileValue->canWalkOnIcePlaneIce($this->x, $this->y);
         }
 
         if ($gameMap->mapType()->isPurgatory()) {
-            return $this->mapTileValue->canWalkOnPurgatoryWater($character, $this->x, $this->y);
+            return $this->mapTileValue->canWalkOnPurgatoryWater($this->x, $this->y);
         }
 
         if ($gameMap->mapType()->isTwistedMemories()) {
-            return $this->mapTileValue->canWalkOnTwistedMemoriesWater($character, $this->x, $this->y);
+            return $this->mapTileValue->canWalkOnTwistedMemoriesWater($this->x, $this->y);
         }
 
         if ($gameMap->mapType()->isDelusionalMemories()) {
-            return $this->mapTileValue->canWalkOnDelusionalMemoriesWater($character, $this->x, $this->y);
+            return $this->mapTileValue->canWalkOnDelusionalMemoriesWater($this->x, $this->y);
         }
 
         return true;

@@ -90,6 +90,8 @@ class ItemsService
                 ItemEffectsValue::TWISTED_TREE_BRANCH,
                 ItemEffectsValue::TWISTED_DUNGEONS,
                 ItemEffectsValue::THE_OLD_CHURCH,
+                ItemEffectsValue::DELVE,
+                ItemEffectsValue::DELVE_PACK_CHOICE,
             ],
             'specialtyTypes' => [
                 ItemSpecialtyType::HELL_FORGED,
@@ -98,6 +100,7 @@ class ItemsService
                 ItemSpecialtyType::CORRUPTED_ICE,
                 ItemSpecialtyType::TWISTED_EARTH,
                 ItemSpecialtyType::DELUSIONAL_SILVER,
+                ItemSpecialtyType::LABYRINTH_CLOTH,
             ],
             'itemSkills' => ItemSkill::whereNull('parent_id')->get(),
             'locations' => Location::select('name', 'id')->get(),

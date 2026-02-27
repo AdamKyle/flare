@@ -106,16 +106,20 @@ class BuildQuestCacheService
     {
         $eventQuests = [];
 
-        if (! is_null($eventWithRaid)) {
-            $raidQuests = $this->getRaidQuests();
-
-            if (! is_null($raidQuests)) {
-                if (isset($raidQuests[$eventWithRaid->raid_id])) {
-                    $eventQuests = $raidQuests[$eventWithRaid->raid_id];
-                }
-            }
+        if (is_null($eventWithRaid)) {
+            return $eventQuests;
         }
 
-        return $eventQuests;
+        $raidQuests = $this->getRaidQuests();
+
+        if (is_null($raidQuests)) {
+            return $eventQuests;
+        }
+
+        if (!isset($raidQuests[$eventWithRaid->raid_id])) {
+            return $eventQuests;
+        }
+
+        return $raidQuests[$eventWithRaid->raid_id];
     }
 }

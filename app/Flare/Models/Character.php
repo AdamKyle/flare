@@ -188,42 +188,42 @@ class Character extends Model
 
     public function kingdomAttackLogs()
     {
-        return $this->hasMany(KingdomLog::class);
+        return $this->hasMany(KingdomLog::class, 'character_id', 'id');
     }
 
     public function unitMovementQueues()
     {
-        return $this->hasMany(UnitMovementQueue::class);
+        return $this->hasMany(UnitMovementQueue::class, 'character_id', 'id');
     }
 
     public function boons()
     {
-        return $this->hasMany(CharacterBoon::class);
+        return $this->hasMany(CharacterBoon::class, 'character_id', 'id');
     }
 
     public function questsCompleted()
     {
-        return $this->hasMany(QuestsCompleted::class);
+        return $this->hasMany(QuestsCompleted::class, 'character_id', 'id');
     }
 
     public function currentAutomations()
     {
-        return $this->hasMany(CharacterAutomation::class);
+        return $this->hasMany(CharacterAutomation::class, 'character_id', 'id');
     }
 
     public function passiveSkills()
     {
-        return $this->hasMany(CharacterPassiveSkill::class);
+        return $this->hasMany(CharacterPassiveSkill::class, 'character_id', 'id');
     }
 
     public function classRanks()
     {
-        return $this->hasMany(CharacterClassRank::class);
+        return $this->hasMany(CharacterClassRank::class, 'character_id', 'id');
     }
 
     public function classSpecialsEquipped()
     {
-        return $this->hasMany(CharacterClassSpecialtiesEquipped::class);
+        return $this->hasMany(CharacterClassSpecialtiesEquipped::class, 'character_id', 'id');
     }
 
     public function globalEventParticipation()

@@ -5,9 +5,13 @@ namespace App\Game\Battle\Events;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\GameSkill;
+use App\Flare\Models\Item;
+use App\Flare\Models\Location;
 use App\Flare\Models\Skill;
 use App\Flare\Models\User;
 use App\Flare\Values\AutomationType;
+use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Values\LocationType;
 use App\Game\Events\Concerns\ShouldShowCraftingEventButton;
 use App\Game\Events\Concerns\ShouldShowEnchantingEventButton;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -44,18 +48,21 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
             'can_engage_celestials_again_at' => now()->diffInSeconds($character->can_engage_celestials_again_at),
             'is_dead' => $character->is_dead,
             'is_automation_running' => $character->currentAutomations()->where('character_id', $character->id)->get()->isNotEmpty(),
+            'is_delve_running' => $character->currentAutomations()->where('character_id', $character->id)->where('type', AutomationType::DELVE)->get()->isNotEmpty(),
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
             'is_silenced' => $character->is_silenced,
             'can_move' => $character->can_move,
             'is_alchemy_locked' => $this->isAlchemyLocked($character),
             'show_craft_for_event' => $this->shouldShowCraftingEventButton($character),
             'show_enchanting_for_event' => $this->shouldShowEnchantingEventButton($character),
+            'is_at_delve_location' => $this->isAtDelveLocation($character),
+            'can_set_delve_pack' => $this->canSetPactOptionsForDelve($character),
         ];
 
         $this->user = $character->user;
     }
 
-    protected function getTimeLeftOnAutomation(Character $character)
+    private function getTimeLeftOnAutomation(Character $character)
     {
         $automation = $character->currentAutomations()->where('type', AutomationType::EXPLORING)->first();
 
@@ -66,7 +73,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
         return 0;
     }
 
-    protected function isAlchemyLocked(Character $character): bool
+    private function isAlchemyLocked(Character $character): bool
     {
 
         $alchemySkill = Skill::where('character_id', $character->id)
@@ -80,6 +87,38 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
         }
 
         return $alchemySkill->is_locked;
+    }
+
+    private function isAtDelveLocation(Character $character): bool {
+        $characterMap = $character->map;
+
+        $questItemForDelve = Item::where('effect', ItemEffectsValue::DELVE)->first();
+
+        if (is_null($questItemForDelve)) {
+            return false;
+        }
+
+        $location = Location::where('game_map_id', $characterMap->game_map_id)->where('x', $characterMap->character_position_x)->where('y', $characterMap->character_position_y)
+            ->where('type', LocationType::CAVE_OF_MEMORIES)->first();
+
+        $characterHasItem = $character->inventory->slots->filter(function($slot) use ($questItemForDelve) {
+            return $slot->item_id === $questItemForDelve->id;
+        })->isNotEmpty();
+
+        return !is_null($location) && $characterHasItem;
+    }
+
+    private function canSetPactOptionsForDelve(Character $character): bool {
+
+        $questItemForDelve = Item::where('effect', ItemEffectsValue::DELVE_PACK_CHOICE)->first();
+
+        if (is_null($questItemForDelve)) {
+            return false;
+        }
+
+        return $character->inventory->slots->filter(function($slot) use ($questItemForDelve) {
+            return $slot->item_id === $questItemForDelve->id;
+        })->isNotEmpty();
     }
 
     /**

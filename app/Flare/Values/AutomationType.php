@@ -10,12 +10,14 @@ class AutomationType
     private $value;
 
     const EXPLORING = 0;
+    const DELVE = 1;
 
     /**
      * @var int[]
      */
     protected static $values = [
         0 => self::EXPLORING,
+        1 => self::DELVE,
     ];
 
     /**
@@ -37,5 +39,9 @@ class AutomationType
     public function isExploring(): bool
     {
         return $this->value === self::EXPLORING;
+    }
+
+    public function isDelve(): bool {
+        return $this->value === self::DELVE;
     }
 }

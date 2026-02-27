@@ -112,7 +112,10 @@ class MovementService
         $gameMaps = GameMap::select('id', 'required_location_id', 'only_during_event_type', 'name', 'can_traverse')->get();
         $xPosition = $character->map->character_position_x;
         $yPosition = $character->map->character_position_y;
-        $location = Location::where('x', $xPosition)->where('y', $yPosition)->first();
+        $location = Location::where('game_map_id', $character->map->game_map_id)
+            ->where('x', $xPosition)
+            ->where('y', $yPosition)
+            ->first();
 
         return $this->filterTraversableMaps($character, $gameMaps, $location);
     }
@@ -130,7 +133,8 @@ class MovementService
 
         $character = $character->refresh();
 
-        $location = Location::where('x', $character->map->character_position_x)
+        $location = Location::where('game_map_id', $character->map->game_map_id)
+            ->where('x', $character->map->character_position_x)
             ->where('y', $character->map->character_position_y)
             ->whereNotNull('quest_reward_item_id')
             ->first();

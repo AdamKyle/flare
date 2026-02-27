@@ -219,6 +219,7 @@
     </div>
   </div>
 
+<<<<<<< HEAD
   <div class="menu-detail" data-menu="events">
     <div class="menu-detail-wrapper">
       <h6 class="uppercase">Events</h6>
@@ -230,6 +231,56 @@
         <span class="fas fa-bars text-sm"></span>
         Global Event Goals
       </a>
+=======
+    <!-- Map -->
+    <div class="menu-detail" data-menu="map">
+        <div class="menu-detail-wrapper">
+            <a href="{{ route('info.page', ['pageName' => 'planes']) }}">
+                <span class="fas fa-layer-group"></span>
+                Planes
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'exploration']) }}">
+                <span class="fas fa-map-signs"></span>
+                Exploration
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'delve']) }}">
+                <span class="fas fa-dungeon"></span>
+                Delve
+            </a>
+            <hr />
+            <h6 class="uppercase">Map Movement</h6>
+            <a href="{{ route('info.page', ['pageName' => 'movement']) }}">
+                <span class="far fa-compass"></span>
+                Movement Actions
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'traverse']) }}">
+                <span class="ra ra-player-pyromaniac"></span>
+                Traverse Action
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'set-sail']) }}">
+                <span class="fas fa-ship"></span>
+                Set Sail Action
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'locations']) }}">
+                <span class="fas fa-search-location"></span>
+                Map Locations
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'special-locations']) }}">
+                <span class="fas fa-dungeon"></span>
+                Special Locations
+            </a>
+            <hr />
+            <h6 class="uppercase">Factions</h6>
+            <a href="{{ route('info.page', ['pageName' => 'factions']) }}">
+                <span class="ra ra-arrow-cluster"></span>
+                Factions
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'faction-loyalty']) }}">
+                <span class="ra ra-double-team"></span>
+                Factions Loyalty
+            </a>
+        </div>
+>>>>>>> master
     </div>
     <hr />
     <div class="menu-detail-wrapper">
@@ -301,6 +352,7 @@
     </div>
   </div>
 
+<<<<<<< HEAD
   <!-- Kingdom -->
   <div class="menu-detail" data-menu="kingdom">
     <div class="menu-detail-wrapper">
@@ -361,6 +413,60 @@
         <span class="fas fa-university"></span>
         Manageing Gold Bars
       </a>
+=======
+    <!-- Gear Sets -->
+    <div class="menu-detail" data-menu="gear-sets">
+        <div class="menu-detail-wrapper">
+            <a href="{{ route('info.page', ['pageName' => 'unique-items']) }}">
+                <span class="ra ra-chain"></span>
+                Uniques (AKA Legendaries)
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'mythical-items']) }}">
+                <span class="ra ra-chain"></span>
+                Mythics
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'cosmic-items']) }}">
+                <span class="ra ra-chain"></span>
+                Cosmic Items
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'hell-forged-set']) }}">
+                <span class="ra ra-axe"></span>
+                Hell Forged
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'purgatory-chains-set']) }}">
+                <span class="ra ra-lightning-sword"></span>
+                Purgatory Chains
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'pirate-lord-leather-set']) }}">
+                <span class="ra ra-dervish-swords"></span>
+                Pirate Lord Leather
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'labyrinth-cloth']) }}">
+                <span class="ra ra-dervish-swords"></span>
+                Labyrinth Cloth
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'corrupted-ice']) }}">
+                <span class="ra ra-kaleidoscope"></span>
+                Corrupted Ice
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'twisted-earth']) }}">
+                <span class="ra ra-kaleidoscope"></span>
+                Twisted Earth
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'delusional-silver']) }}">
+                <span class="ra ra-kaleidoscope"></span>
+                Delusional Silver
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'faithless-plate']) }}">
+                <span class="ra ra-kaleidoscope"></span>
+                Faithless Plate
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'ancestral-items']) }}">
+                <span class="ra ra-crowned-heart"></span>
+                Ancestral Items
+            </a>
+        </div>
+>>>>>>> master
     </div>
   </div>
 

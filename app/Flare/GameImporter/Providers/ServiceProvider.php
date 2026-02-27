@@ -14,7 +14,7 @@ class ServiceProvider extends ApplicationServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->app->bind(ExcelMapper::class, function () {
             return new ExcelMapper;
@@ -27,8 +27,6 @@ class ServiceProvider extends ApplicationServiceProvider
     }
 
     /**
-     * Bootstrap any application services.
-     *
      * @return void
      */
     public function boot() {}

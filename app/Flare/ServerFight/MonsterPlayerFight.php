@@ -11,11 +11,12 @@ use App\Flare\ServerFight\Fight\Attack;
 use App\Flare\ServerFight\Fight\Voidance;
 use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\ServerFight\Monster\ServerMonster;
+use App\Flare\Services\BuildMonsterCacheService;
+use App\Flare\Services\DelveMonsterService;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Monsters\Services\BuildMonsterCacheService;
-use App\Game\Monsters\Services\MonsterListService;
 use Illuminate\Support\Facades\Cache;
 
 class MonsterPlayerFight
@@ -32,15 +33,34 @@ class MonsterPlayerFight
 
     private bool $tookTooLong;
 
-    public function __construct(
-        private readonly BuildMonster $buildMonster,
-        private readonly MonsterListService $monsterListService,
-        private readonly CharacterCacheData $characterCacheData,
-        private readonly Voidance $voidance,
-        private readonly Ambush $ambush,
-        private readonly Attack $attack
-    ) {
+    private Character $character;
 
+    private BuildMonster $buildMonster;
+
+    private CharacterCacheData $characterCacheData;
+
+    private DelveMonsterService $delveMonsterService;
+
+    private Voidance $voidance;
+
+    private Ambush $ambush;
+
+    private Attack $attack;
+
+    public function __construct(
+        BuildMonster $buildMonster,
+        CharacterCacheData $characterCacheData,
+        DelveMonsterService $delveMonsterService,
+        Voidance $voidance,
+        Ambush $ambush,
+        Attack $attack
+    ) {
+        $this->buildMonster = $buildMonster;
+        $this->characterCacheData = $characterCacheData;
+        $this->delveMonsterService = $delveMonsterService;
+        $this->voidance = $voidance;
+        $this->ambush = $ambush;
+        $this->attack = $attack;
         $this->battleMessages = [];
         $this->tookTooLong = false;
     }
@@ -64,15 +84,25 @@ class MonsterPlayerFight
      *
      * @return array|$this
      */
-    public function setUpFight(Character $character, array $params): MonsterPlayerFight|array
+    public function setUpFight(Character $character, array $params, bool $shouldIncreaseStrength = false): MonsterPlayerFight|array
     {
 
         $this->character = $character;
-        $this->monster = $this->monsterListService->getMonsterForFight($character, $params['selected_monster_id']);
+        $this->monster = $params['cached_monster'] ?? $this->fetchMonster($character->map, $params['selected_monster_id']);
+
         $this->attackType = $params['attack_type'];
 
         if (empty($this->monster)) {
             return $this->errorResult('No monster was found.');
+        }
+
+        if ($shouldIncreaseStrength && !isset($params['cached_monster'])) {
+
+            $this->monster = $this->delveMonsterService->createMonster($this->monster, $character);
+
+            if ($params['pack_size'] > 1) {
+                Cache::put('delve-monster-' . $character->id . '-' . $this->monster['id'] . '-fight', $this->monster, 900);
+            }
         }
 
         return $this;
@@ -201,11 +231,10 @@ class MonsterPlayerFight
             $this->attackType = $attackType;
         }
 
-        if (Cache::has('monster-fight-'.$this->character->id)) {
-            $data = Cache::get('monster-fight-'.$this->character->id);
+        if (Cache::has('monster-fight-' . $this->character->id)) {
+            $data = Cache::get('monster-fight-' . $this->character->id);
 
             $this->monster = $data['monster'];
-
         } else {
 
             $data = $this->fightSetUp();
@@ -227,6 +256,11 @@ class MonsterPlayerFight
         $isPlayerVoided = $data['player_voided'];
         $isEnemyVoided = $data['enemy_voided'];
 
+        $this->attack = $this->attack->setHealth($health)
+            ->setIsCharacterVoided($isPlayerVoided)
+            ->setIsEnemyVoided($isEnemyVoided)
+            ->onlyAttackOnce($onlyOnce);
+
         if ($health['current_character_health'] <= 0) {
             $this->battleMessages[] = [
                 'message' => 'The enemies ambush has slaughtered you!',
@@ -245,19 +279,16 @@ class MonsterPlayerFight
             return true;
         }
 
-        return $this->doAttack($monster, $health, $isPlayerVoided, $isEnemyVoided, $onlyOnce);
+        return $this->doAttack($monster);
     }
 
     /**
      * Do the actual attack
      */
-    protected function doAttack(ServerMonster $monster, array $health, bool $isPlayerVoided, bool $isEnemyVoided, bool $onlyOnce): bool
+    protected function doAttack(ServerMonster $monster): bool
     {
 
-        $this->attack->setHealth($health)
-            ->setIsCharacterVoided($isPlayerVoided)
-            ->setIsEnemyVoided($isEnemyVoided)
-            ->onlyAttackOnce($onlyOnce)
+        $this->attack
             ->attack($this->character, $monster, $this->attackType, 'character');
 
         $this->mergeMessages($this->attack->getMessages());
@@ -278,6 +309,36 @@ class MonsterPlayerFight
     }
 
     /**
+<<<<<<< HEAD
+=======
+     * Fetch the monster.
+     */
+    protected function fetchMonster(Map $map, int $monsterId): array
+    {
+        $regularMonster = $this->fetchRegularMonster($map, $monsterId);
+
+        if (! is_null($regularMonster)) {
+            return $regularMonster;
+        }
+
+        $celestial = $this->fetchCelestial($map, $monsterId);
+
+        if (! is_null($celestial)) {
+            return $celestial;
+        }
+
+        $locationBasedMonster = $this->fetchLocationTypeSpecialMonster($map, $monsterId);
+
+        if (! is_null($locationBasedMonster)) {
+
+            return $locationBasedMonster;
+        }
+
+        return [];
+    }
+
+    /**
+>>>>>>> master
      * Fetches a regular monster.
      */
     protected function fetchRegularMonster(Map $map, int $monsterId): ?array
@@ -363,8 +424,8 @@ class MonsterPlayerFight
 
         $monstersForLocation = Cache::get('special-location-monsters');
 
-        if (isset($monstersForLocation['location-type-'.$locationWithType->type])) {
-            $monsters = $monstersForLocation['location-type-'.$locationWithType->type];
+        if (isset($monstersForLocation['location-type-' . $locationWithType->type])) {
+            $monsters = $monstersForLocation['location-type-' . $locationWithType->type];
 
             foreach ($monsters as $monster) {
                 if ($monster['id'] === $monsterId) {

@@ -17,6 +17,7 @@ use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateMap;
 use App\Game\Maps\Events\UpdateMonsterList;
+use App\Game\Maps\Jobs\UpdateMapLocationsJob;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -76,44 +77,50 @@ class TraverseService
     {
         $gameMap = GameMap::find($mapId);
 
-        if ($gameMap->mapType()->isLabyrinth()) {
-            $hasItem = $character->inventory->slots->filter(function ($slot) {
-                return $slot->item->effect === ItemEffectsValue::LABYRINTH;
-            })->all();
-
-            return ! empty($hasItem);
+        if (is_null($gameMap)) {
+            return false;
         }
 
-        if ($gameMap->mapType()->isDungeons()) {
-            $hasItem = $character->inventory->slots->filter(function ($slot) {
-                return $slot->item->effect === ItemEffectsValue::DUNGEON;
-            })->all();
+        $mapType = $gameMap->mapType();
 
-            return ! empty($hasItem);
+        if ($mapType->isLabyrinth()) {
+            return $character->inventory->slots()
+                ->whereHas('item', function ($query) {
+                    $query->where('effect', ItemEffectsValue::LABYRINTH);
+                })
+                ->exists();
         }
 
-        if ($gameMap->mapType()->isShadowPlane()) {
-            $hasItem = $character->inventory->slots->filter(function ($slot) {
-                return $slot->item->effect === ItemEffectsValue::SHADOW_PLANE;
-            })->all();
-
-            return ! empty($hasItem);
+        if ($mapType->isDungeons()) {
+            return $character->inventory->slots()
+                ->whereHas('item', function ($query) {
+                    $query->where('effect', ItemEffectsValue::DUNGEON);
+                })
+                ->exists();
         }
 
-        if ($gameMap->mapType()->isHell()) {
-            $hasItem = $character->inventory->slots->filter(function ($slot) {
-                return $slot->item->effect === ItemEffectsValue::HELL;
-            })->all();
-
-            return ! empty($hasItem);
+        if ($mapType->isShadowPlane()) {
+            return $character->inventory->slots()
+                ->whereHas('item', function ($query) {
+                    $query->where('effect', ItemEffectsValue::SHADOW_PLANE);
+                })
+                ->exists();
         }
 
-        if ($gameMap->mapType()->isPurgatory()) {
-            $hasItem = $character->inventory->slots->filter(function ($slot) {
-                return $slot->item->effect === ItemEffectsValue::PURGATORY;
-            })->all();
+        if ($mapType->isHell()) {
+            return $character->inventory->slots()
+                ->whereHas('item', function ($query) {
+                    $query->where('effect', ItemEffectsValue::HELL);
+                })
+                ->exists();
+        }
 
-            return ! empty($hasItem);
+        if ($mapType->isPurgatory()) {
+            return $character->inventory->slots()
+                ->whereHas('item', function ($query) {
+                    $query->where('effect', ItemEffectsValue::PURGATORY);
+                })
+                ->exists();
         }
 
         if (! is_null($gameMap->only_during_event_type)) {
@@ -143,6 +150,8 @@ class TraverseService
         $oldMap = $character->map->gameMap;
 
         $this->updateCharactersPosition($character, $mapId);
+
+        $character = $character->refresh();
 
         $this->updateMap($character);
         $this->updateActions($mapId, $character, $oldMap);
@@ -253,80 +262,54 @@ class TraverseService
      */
     protected function updateCharactersPosition(Character $character, int $mapId): void
     {
-        $character->map()->update([
-            'game_map_id' => $mapId,
-        ]);
+        $destinationGameMap = GameMap::find($mapId);
 
-        $character = $character->refresh();
-
-        $xPosition = $character->map->character_position_x;
-        $yPosition = $character->map->character_position_y;
+        if (is_null($destinationGameMap)) {
+            return;
+        }
 
         $cache = CoordinatesCache::getFromCache();
 
-        $x = $cache['x'];
-        $y = $cache['y'];
+        $xCoordinates = $cache['x'];
+        $yCoordinates = $cache['y'];
+
+        $xMaxIndex = count($xCoordinates) - 1;
+        $yMaxIndex = count($yCoordinates) - 1;
+
+        $this->mapTileValue->setUp($character, $destinationGameMap);
+
+        $candidateX = $xCoordinates[rand(0, $xMaxIndex)];
+        $candidateY = $yCoordinates[rand(0, $yMaxIndex)];
+
+        $didReroll = false;
+
+        while (true) {
+            if ($this->mapTileValue->canWalk($candidateX, $candidateY)) {
+                $location = Location::where('x', $candidateX)
+                    ->where('y', $candidateY)
+                    ->where('game_map_id', $mapId)
+                    ->first();
+
+                if (is_null($location) || $location->can_players_enter) {
+                    break;
+                }
+            }
+
+            $didReroll = true;
+
+            $candidateX = $xCoordinates[rand(0, $xMaxIndex)];
+            $candidateY = $yCoordinates[rand(0, $yMaxIndex)];
+        }
 
         $character->map()->update([
-            'character_position_x' => $x[rand(0, count($x) - 1)],
-            'character_position_y' => $y[rand(0, count($y) - 1)],
+            'game_map_id' => $mapId,
+            'character_position_x' => $candidateX,
+            'character_position_y' => $candidateY,
         ]);
 
-        $character = $character->refresh();
-
-        $character = $this->changeLocation($character, $cache);
-
-        $newXPosition = $character->map->character_position_x;
-        $newYPosition = $character->map->character_position_y;
-
-        if ($newXPosition !== $xPosition || $newYPosition !== $yPosition) {
+        if ($didReroll) {
             ServerMessageHandler::handleMessage($character->user, MovementMessageTypes::MOVE_LOCATION, 'Your character was moved as you are missing the appropriate quest item or were not allowed to enter the area.');
         }
-    }
-
-    /**
-     * Change the players' location if they cannot walk on the planes water.
-     *
-     * We do this till we find ground.
-     */
-    protected function changeLocation(Character $character, array $cache): Character
-    {
-
-        $x = $cache['x'];
-        $y = $cache['y'];
-
-        if (
-            ! $this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
-            ! $this->mapTileValue->canWalkOnDeathWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
-            ! $this->mapTileValue->canWalkOnMagma($character, $character->map->character_position_x, $character->map->character_position_y) ||
-            $this->mapTileValue->isPurgatoryWater((int) $this->mapTileValue->getTileColor($character->map->gameMap, $character->map->character_position_x, $character->map->character_position_y)) ||
-            $this->mapTileValue->isTwistedMemoriesWater((int) $this->mapTileValue->getTileColor($character->map->gameMap, $character->map->character_position_x, $character->map->character_position_y)) ||
-            $this->mapTileValue->isDelusionalMemoriesWater((int) $this->mapTileValue->getTileColor($character->map->gameMap, $character->map->character_position_x, $character->map->character_position_y))
-        ) {
-            // Update the players location, call the method again to validate that we are not at a invalid location.
-            // repeat until we are in a non-invalid location,
-            $character->map()->update([
-                'character_position_x' => $x[rand(0, count($x) - 1)],
-                'character_position_y' => $y[rand(0, count($y) - 1)],
-            ]);
-
-            return $this->changeLocation($character->refresh(), $cache);
-        }
-
-        $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->where('game_map_id', $character->map->game_map_id)->first();
-
-        if (! is_null($location)) {
-            if (! $location->can_players_enter) {
-                $character->map()->update([
-                    'character_position_x' => $x[rand(0, count($x) - 1)],
-                    'character_position_y' => $y[rand(0, count($y) - 1)],
-                ]);
-
-                return $this->changeLocation($character->refresh(), $cache);
-            }
-        }
-
-        return $character->refresh();
     }
 
     /**
@@ -445,6 +428,8 @@ class TraverseService
      */
     protected function updateMap(Character $character): void
     {
-        event(new UpdateMap($character->user));
+        UpdateMapLocationsJob::dispatch($character->id)->delay(now()->addSecond());
+
+        event(new UpdateMap($character->user, false));
     }
 }

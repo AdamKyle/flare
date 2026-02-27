@@ -4,7 +4,7 @@ namespace App\Game\Events\Services;
 
 use App\Flare\Events\UpdateScheduledEvents;
 use App\Flare\Models\ScheduledEvent;
-use App\Flare\Services\EventSchedulerService;
+use App\Game\Events\Services\EventSchedulerService;
 
 class ScheduleEventFinalizerService
 {

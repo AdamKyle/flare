@@ -59,6 +59,10 @@ class ItemEffectsValue
 
     const TWISTED_DUNGEONS = 'twisted-dungeons';
 
+    const DELVE = 'delve';
+
+    const DELVE_PACK_CHOICE = 'delve-pack-choice';
+
     /**
      * @var string[]
      */
@@ -88,6 +92,8 @@ class ItemEffectsValue
         self::WALK_ON_DELUSIONAL_MEMORIES_WATER => 'walk-on-delusional-memories-water',
         self::TWISTED_TREE_BRANCH => 'access-twisted-memories',
         self::TWISTED_DUNGEONS => 'twisted-dungeons',
+        self::DELVE => 'delve',
+        self::DELVE_PACK_CHOICE => 'delve-pack-choice',
     ];
 
     /**
@@ -297,5 +303,23 @@ class ItemEffectsValue
     public function accessTwistedDungeons(): bool
     {
         return $this->value === self::TWISTED_DUNGEONS;
+    }
+
+    /**
+     * Allows player to access Delve based locations.
+     *
+     * @return bool
+     */
+    public function accessDelves(): bool {
+        return $this->value === self::DELVE;
+    }
+
+    /**
+     * Allows player to access Delve based locations.
+     *
+     * @return bool
+     */
+    public function canChooseDelvePack(): bool {
+        return $this->value === self::DELVE_PACK_CHOICE    ;
     }
 }

@@ -23,6 +23,7 @@ use App\Game\Maps\Services\TraverseService;
 use App\Game\Maps\Services\UpdateRaidMonsters;
 use App\Game\Maps\Services\WalkingService;
 use App\Game\Maps\Transformers\LocationsTransformer;
+use App\Game\Maps\Transformers\LocationTransformer;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Monsters\Services\BuildMonsterCacheService;
 use App\Game\Monsters\Services\MonsterListService;
@@ -39,6 +40,11 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function register()
     {
+
+        $this->app->bind(LocationTransformer::class, function () {
+            return new LocationTransformer();
+        });
+
         $this->app->bind(DistanceCalculation::class, function ($app) {
             return new DistanceCalculation;
         });

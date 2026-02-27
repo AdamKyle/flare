@@ -16,11 +16,14 @@ class RaidAttackTypesValue
 
     const BANSHEE_SCREAM_ATTACK = 3;
 
+    const ENRAGED_HATE = 4;
+
     protected static array $values = [
         self::PHYSICAL_ATTACK => self::PHYSICAL_ATTACK,
         self::MAGICAL_ICE_ATTACK => self::MAGICAL_ICE_ATTACK,
         self::DELUSIONAL_MEMORIES_ATTACK => self::DELUSIONAL_MEMORIES_ATTACK,
         self::BANSHEE_SCREAM_ATTACK => self::BANSHEE_SCREAM_ATTACK,
+        self::ENRAGED_HATE => self::ENRAGED_HATE,
     ];
 
     public static $attackTypeNames = [
@@ -28,6 +31,7 @@ class RaidAttackTypesValue
         self::MAGICAL_ICE_ATTACK => 'Magical Ice Attack',
         self::DELUSIONAL_MEMORIES_ATTACK => 'Delusional Memories Attack',
         self::BANSHEE_SCREAM_ATTACK => 'Banshee Scream Attack',
+        self::ENRAGED_HATE => 'Enraged Hate',
     ];
 
     public function __construct(int $value)
@@ -57,5 +61,9 @@ class RaidAttackTypesValue
     public function isBansheeScreamAttack(): bool
     {
         return $this->value === self::BANSHEE_SCREAM_ATTACK;
+    }
+
+    public function isEnragedHate(): bool {
+        return $this->value === self::ENRAGED_HATE;
     }
 }

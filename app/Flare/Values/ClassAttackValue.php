@@ -44,6 +44,8 @@ class ClassAttackValue
 
     const HOLY_SMITE = 'holy smite';
 
+    const PLAGUE_SURGE = 'plugue surge';
+
     private CharacterClassValue $classType;
 
     private Character $character;
@@ -153,6 +155,12 @@ class ClassAttackValue
 
         if ($this->classType->isCleric()) {
             $this->buildHolySmite();
+
+            return $this->chance;
+        }
+
+        if ($this->classType->isApothecary()) {
+            $this->buildPlagueSurge();
 
             return $this->chance;
         }
@@ -310,6 +318,18 @@ class ClassAttackValue
         $this->chance['amount'] = $this->getItemCollectionCountForTypes([
             ItemType::STAVE->value,
             ItemType::BOW->value,
+        ]);
+        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+    }
+
+    public function buildPlagueSurge() {
+        $this->chance['type'] = self::PLAGUE_SURGE;
+        $this->chance['only'] = 'Censer or Dagger';
+        $this->chance['class_name'] = 'Apothecary';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::CENSER->value) && $this->hasItemTypeEquipped(ItemType::DAGGER->value);
+        $this->chance['amount'] = $this->getItemCollectionCountForTypes([
+            ItemType::CENSER->value,
+            ItemType::DAGGER->value,
         ]);
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }

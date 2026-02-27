@@ -9,6 +9,7 @@ use App\Game\Events\Services\ScheduleEventFinalizerService;
 use App\Game\Events\Values\EventType;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 
 class EndScheduledEvent extends Command
 {

@@ -101,6 +101,8 @@ class DropCheckService
     /**
      * Handles the drops themselves based on chance.
      *
+     * @param Character $character
+     * @return void
      *
      * @throws Exception
      */
@@ -111,6 +113,8 @@ class DropCheckService
         $this->battleDrop->handleDrop($character, $canGetDrop);
 
         $this->battleDrop->handleMonsterQuestDrop($character);
+
+        $this->battleDrop->handleDelveLocationQuestItems($character);
 
         if (! is_null($this->locationWithEffect)) {
             $this->battleDrop->handleSpecialLocationQuestItem($character);
@@ -145,7 +149,7 @@ class DropCheckService
      */
     private function makeLocationWithEffectCacheKey(Map $map): string
     {
-        return $map->game_map_id.':'.$map->character_position_x.':'.$map->character_position_y;
+        return $map->game_map_id . ':' . $map->character_position_x . ':' . $map->character_position_y;
     }
 
     /**

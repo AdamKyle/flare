@@ -55,7 +55,8 @@ class AddHolyStacksToItems extends Command
                             $type->isCorruptedIce() ||
                             $type->isDelusionalSilver() ||
                             $type->isTwistedEarth() ||
-                            $type->isFaithlessPlate()) {
+                            $type->isFaithlessPlate() ||
+                            $type->isLabyrinthCloth()) {
 
                             $maxStacks = 20;
                         }

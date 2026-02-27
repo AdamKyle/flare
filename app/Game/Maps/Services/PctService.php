@@ -34,6 +34,8 @@ class PctService
     {
         $celestialFight = $this->findCelestialFight($character);
 
+        $this->mapTileValue = $this->mapTileValue->setUp($character, $character->map->gameMap);
+
         if (is_null($celestialFight)) {
             return false;
         }
@@ -46,7 +48,7 @@ class PctService
 
         if ($this->isCharacterOnTheSameMap($celestialFight->gameMapName(), $character->map->gameMap->name)) {
 
-            if (! $this->mapTileValue->canWalk($character, $celestialFight->x_position, $celestialFight->y_position)) {
+            if (! $this->mapTileValue->canWalk($celestialFight->x_position, $celestialFight->y_position)) {
                 event(new ServerMessageEvent($character->user, 'Child. You are missing the required item to travel to this location.'));
 
                 return false;
@@ -112,7 +114,7 @@ class PctService
 
         $character = $character->refresh();
 
-        if (! $this->mapTileValue->canWalk($character, $celestialFight->x_position, $celestialFight->y_position)) {
+        if (! $this->mapTileValue->canWalk($celestialFight->x_position, $celestialFight->y_position)) {
             $character->map()->update([
                 'game_map_id' => $oldMapId,
             ]);

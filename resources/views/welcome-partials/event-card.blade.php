@@ -33,9 +33,15 @@
     $href = route('event.type', ['event_type' => 'delusional-memories']);
   }
 
+<<<<<<< HEAD
   if ($eventRunning->getTitleOfEvent() === 'The Jester of Time') {
     $href = route('event.type', ['event_type' => 'jester-of-time']);
   }
+=======
+    if ($eventRunning->getTitleOfEvent() === 'The Jester of Time') {
+        $href = route('event.type', ['event_type' => 'jester-of-time-raid']);
+    }
+>>>>>>> master
 
   if ($eventRunning->getTitleOfEvent() === 'The Smugglers Are Back!') {
     $href = route('event.type', ['event_type' => 'the-smugglers-are-back-raid']);
@@ -53,10 +59,21 @@
     $href = route('event.type', ['event_type' => 'corrupted-bishop-raid']);
   }
 
+<<<<<<< HEAD
   if ($eventRunning->getTitleOfEvent() === 'Tlessa\'s Feedback Event') {
     $href = route('event.type', ['event_type' => 'tlessas-feedback-event']);
     $icon = 'ra-campfire';
   }
+=======
+        if ($eventRunning->getTitleOfEvent() === 'The Labyrinth Monster') {
+        $href = route('event.type', ['event_type' => 'labyrinth-monster-raid']);
+    }
+
+    if ($eventRunning->getTitleOfEvent() === 'Tlessa\'s Feedback Event') {
+        $href = route('event.type', ['event_type' => 'tlessas-feedback-event']);
+        $icon = 'ra-campfire';
+    }
+>>>>>>> master
 @endphp
 
 <x-core.cards.feature-card>

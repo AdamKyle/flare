@@ -164,7 +164,12 @@ class QuestHandlerService
             CharacterAttackTypesCacheBuilder::dispatch($character);
         }
 
-        if (! $this->mapTileValue->canWalk($character, $npc->x_position, $npc->y_position)) {
+        $character = $character->refresh();
+
+        $this->mapTileValue->setUp($character, $character->map->gameMap);
+
+        if (! $this->mapTileValue->canWalk($npc->x_position, $npc->y_position)) {
+
             $character->map->update(['game_map_id' => $oldMapDetails->game_map_id]);
 
             return $this->errorResult('You can traverse to the NPC, but not move to their location as you are

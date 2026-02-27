@@ -30,4 +30,9 @@ class RaidAttackTypeTest extends TestCase
     {
         $this->assertTrue((new RaidAttackTypes(RaidAttackTypes::WATER_ATTACK))->isWaterAttack());
     }
+
+    public function testIsEnragedHate()
+    {
+        $this->assertTrue((new RaidAttackTypes(RaidAttackTypes::ENRAGED_HATE))->isEnragedHate());
+    }
 }

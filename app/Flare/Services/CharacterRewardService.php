@@ -2,56 +2,33 @@
 
 namespace App\Flare\Services;
 
-use App\Flare\Models\Character;
-use App\Flare\Models\Location;
-use App\Flare\Models\Map;
-use App\Flare\Models\Monster;
-use App\Flare\Values\LocationType;
-use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
-use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Game\Core\Services\CharacterService;
-use App\Game\Skills\Services\SkillService;
+use App\Flare\Builders\BuildCosmicItem;
+use App\Flare\Builders\BuildMythicItem;
+use App\Flare\Builders\BuildUniqueItem;
+use App\Flare\Values\RandomAffixDetails;
 use Exception;
-use League\Fractal\Manager;
+use App\Flare\Models\Character;
+use App\Flare\Models\Item as ItemModel;
+use App\Flare\Models\Monster;
+use App\Game\Skills\Services\SkillService;
+
 
 class CharacterRewardService
 {
-    private Character $character;
 
-    private CharacterService $characterService;
-
-    private SkillService $skillService;
-
-    private CharacterXPService $characterXpService;
-
-    private Manager $manager;
-
-    private CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer;
-
-    private BattleMessageHandler $battleMessageHandler;
-
-    private CharacterCurrencyRewardService $characterCurrencyRewardService;
+    private ?Character $character = null;
 
     /**
      * Constructor
      */
     public function __construct(
-        CharacterXPService $characterXpService,
-        CharacterCurrencyRewardService $characterCurrencyRewardService,
-        CharacterService $characterService,
-        SkillService $skillService,
-        Manager $manager,
-        CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer,
-        BattleMessageHandler $battleMessageHandler,
-    ) {
-        $this->characterXpService = $characterXpService;
-        $this->characterService = $characterService;
-        $this->skillService = $skillService;
-        $this->characterSheetBaseInfoTransformer = $characterSheetBaseInfoTransformer;
-        $this->manager = $manager;
-        $this->battleMessageHandler = $battleMessageHandler;
-        $this->characterCurrencyRewardService = $characterCurrencyRewardService;
-    }
+        private readonly CharacterXPService $characterXpService,
+        private readonly CharacterCurrencyRewardService $characterCurrencyRewardService,
+        private readonly SkillService $skillService,
+        private readonly BuildUniqueItem $buildUniqueItem,
+        private readonly BuildMythicItem $buildMythicItem,
+        private readonly BuildCosmicItem $buildCosmicItem,
+    ) {}
 
     /**
      * Set the character.
@@ -132,9 +109,11 @@ class CharacterRewardService
     }
 
     /**
-     * Are we at a location with an effect (special location)?
+     * @param int $amountPaid
+     * @return ItemModel
+     * @throws Exception
      */
-    private function purgatoryDungeons(Map $map): ?Location
+    public function getSpecialGearDrop(int $amountPaid): ItemModel
     {
         return Location::whereNotNull('enemy_strength_increase')
             ->where('x', $map->character_position_x)

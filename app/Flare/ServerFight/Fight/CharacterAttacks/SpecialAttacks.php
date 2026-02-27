@@ -14,6 +14,7 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\GunslingersAssas
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\HammerSmash;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\HolySmite;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\MerchantSupply;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\PlagueSurge;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\PrisonerRage;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\SensualDance;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\TripleAttack;
@@ -152,6 +153,10 @@ class SpecialAttacks extends BattleMessages
 
         if ($character->classType()->isCleric()) {
             return $this->holySmite($character, $attackData);
+        }
+
+        if ($character->classType()->isApothecary()) {
+            return $this->plagueSurge($character, $attackData);
         }
 
         return null;
@@ -486,5 +491,22 @@ class SpecialAttacks extends BattleMessages
         $this->monsterHealth = $holySmite->getMonsterHealth();
 
         $holySmite->clearMessages();
+    }
+
+    public function plagueSurge(Character $character, array $attackData)
+    {
+        $plagueSurge = resolve(PlagueSurge::class);
+
+        $plagueSurge->setIsRaidBoss($this->isRaidBoss);
+        $plagueSurge->setCharacterHealth($this->characterHealth);
+        $plagueSurge->setMonsterHealth($this->monsterHealth);
+        $plagueSurge->handleAttack($character, $attackData);
+
+        $this->mergeMessages($plagueSurge->getMessages());
+
+        $this->characterHealth = $plagueSurge->getCharacterHealth();
+        $this->monsterHealth = $plagueSurge->getMonsterHealth();
+
+        $plagueSurge->clearMessages();
     }
 }

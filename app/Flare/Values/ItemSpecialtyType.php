@@ -22,6 +22,8 @@ class ItemSpecialtyType
 
     const FAITHLESS_PLATE = 'Faithless Plate';
 
+    const LABYRINTH_CLOTH = 'Labyrinth Cloth';
+
     /**
      * @var string[]
      */
@@ -33,6 +35,7 @@ class ItemSpecialtyType
         self::DELUSIONAL_SILVER => 'Delusional Silver',
         self::TWISTED_EARTH => 'Twisted Earth',
         self::FAITHLESS_PLATE => 'Faithless Plate',
+        self::LABYRINTH_CLOTH => 'Labyrinth Cloth',
     ];
 
     /**
@@ -126,6 +129,10 @@ class ItemSpecialtyType
         return $this->value === self::FAITHLESS_PLATE;
     }
 
+        public function isLabyrinthCloth(): bool {
+        return $this->value === self::LABYRINTH_CLOTH;
+    }
+
     /**
      * Get the gold cost for types that have one.
      *
@@ -135,11 +142,11 @@ class ItemSpecialtyType
     {
         return match ($this->value) {
             self::PIRATE_LORD_LEATHER => 75_000_000_000,
+            self::LABYRINTH_CLOTH => 75_000_000_000,
             self::CORRUPTED_ICE => 275_000_000_000,
             self::DELUSIONAL_SILVER => 280_000_000_000,
             self::FAITHLESS_PLATE => 300_000_000_000,
             default => null,
 
         };
-    }
 }

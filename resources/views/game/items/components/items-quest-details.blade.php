@@ -103,6 +103,7 @@
         </x-core.dl.dl>
       @endif
 
+<<<<<<< HEAD
       @if (! is_null($quest))
         <div
           class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
@@ -153,6 +154,53 @@
           </x-core.dl.dd>
         </x-core.dl.dl>
       @endif
+=======
+                    </dd>
+                    <dt>X/Y: </dt>
+                    <dd>
+                        {{$location->x}} / {{$location->y}}
+                    </dd>
+                </dl>
+            @endif
+            @if (!is_null($quest))
+                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                <p class="mb-4">This quest item is used in the following quest:</p>
+                <dl>
+                    <dt>Quest Name: </dt>
+                    <dd>
+                        @guest
+                            <a href="{{route('info.page.quest', [
+                                                            'quest' => $quest->id
+                                                        ])}}" target="_blank"><i class="fas fa-external-link-alt"></i> {{$quest->name}}</a>
+                        @else
+                            @if (auth()->user()->hasRole('Admin'))
+                                <a href="{{route('quests.show', [
+                                                            'quest' => $quest->id
+                                                        ])}}" target="_blank"><i class="fas fa-external-link-alt"></i> {{$quest->name}}</a>
+                            @else
+                                <a href="{{route('info.page.quest', [
+                                                            'quest' => $quest->id
+                                                        ])}}" target="_blank"><i class="fas fa-external-link-alt"></i> {{$quest->name}}</a>
+                            @endif
+                        @endguest
+                    </dd>
+                </dl>
+            @endif
+            @if (!is_null($item->dropLocation) && !is_null($item->dropLocation->locationType()))
+                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                @if ($item->dropLocation->locationType()->isCaveOfMemories())
+                    <h4>Delve is the only way to get this item.</h4>
+                    <p class="my-4">
+                        You must be at a special location which offers Delve for exploration. For example this item tells you where it drops,
+                        that would mean this location has Delve. When you go to explore you will be given the option to pick Delve.
+                        Only when you survive for a minimum of <strong>{{$item->dropLocation->hours_to_drop}} hour(s)</strong> before the item will drop. After that any quest item
+                        that drops from this location will start to drop as normal.
+                    </p>
+                @else
+                    <p class="mb-4">Players cannot be auto battling for this item to drop. Looting in this location is capped at 45%.
+                    All drop chances are 1/100. Players may also eed to do relevant quests to access this location.</p>
+                @endif
+>>>>>>> master
 
       @if (! is_null($item->dropLocation))
         <div

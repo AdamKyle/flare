@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Console\AfterDeployment\CreateLocationDataCache;
+use App\Console\AfterDeployment\FixKingdomMaxResourcesBasedOnPassiveSkill;
+use App\Console\DevelopmentCommands\GivePlayerDelveLocationQuestItems;
 use App\Console\AfterDeployment\AddHolyStacksToItems;
 use App\Console\AfterDeployment\AssignNewBuildingsToExistingKingdoms;
 use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
@@ -23,7 +26,6 @@ use App\Console\DevelopmentCommands\ManageKingdomResources;
 use App\Console\DevelopmentCommands\MaxOutCharacter;
 use App\Console\DevelopmentCommands\MaxOutCharactersPassiveSkills;
 use App\Console\DevelopmentCommands\ReincarnateCharacter;
-use App\Console\DevelopmentCommands\SeedMarketHistoryForItemType;
 use App\Console\DevelopmentCommands\TestExploration;
 use App\Console\DevelopmentCommands\UpdateUsersForDevelopment;
 use App\Game\Monsters\Console\Commands\CreateMonsterCache;
@@ -53,6 +55,8 @@ class AppServiceProvider extends ServiceProvider
             CleanInvalidWeapons::class,
             CleanMarketPlaceOfInvalidWeapons::class,
             CreateQuestChainRelationships::class,
+            CreateLocationDataCache::class,
+            FixKingdomMaxResourcesBasedOnPassiveSkill::class,
 
             // Development Commands:
             CreateCharacter::class,
@@ -68,7 +72,7 @@ class AppServiceProvider extends ServiceProvider
             CompleteGuideQuestForCharacter::class,
             MaxOutCharactersPassiveSkills::class,
             CreateEventsForDevelopment::class,
-            SeedMarketHistoryForItemType::class,
+            GivePlayerDelveLocationQuestItems::class,
         ]);
     }
 
@@ -88,7 +92,7 @@ class AppServiceProvider extends ServiceProvider
 
             $headers = [
                 'Content-type' => 'text/json',
-                'Content-Disposition' => 'attachment; filename='.$fileName.'.json',
+                'Content-Disposition' => 'attachment; filename=' . $fileName . '.json',
             ];
 
             return \Response::make($content, 200, $headers);

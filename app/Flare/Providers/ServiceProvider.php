@@ -2,6 +2,13 @@
 
 namespace App\Flare\Providers;
 
+use App\Admin\Services\SiteStatisticsService;
+use App\Flare\Builders\AffixAttributeBuilder;
+use App\Flare\Builders\BuildCosmicItem;
+use App\Flare\Builders\BuildMythicItem;
+use App\Flare\Builders\BuildUniqueItem;
+use App\Flare\Builders\RandomAffixGenerator;
+use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Handlers\MessageThrottledHandler;
 use App\Flare\Items\Builders\AffixAttributeBuilder;
@@ -33,6 +40,7 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleHeal;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\GunslingersAssassination;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\HammerSmash;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\MerchantSupply;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\PlagueSurge;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\SensualDance;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\ThiefBackStab;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\TripleAttack;
@@ -57,6 +65,7 @@ use App\Flare\Services\CharacterRewardService;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Services\CreateSurveySnapshot;
 use App\Flare\Services\DailyGoldDustService;
+use App\Flare\Services\DelveMonsterService;
 use App\Flare\Services\EventSchedulerService;
 use App\Flare\Services\SiteAccessStatisticService;
 use App\Flare\Services\SkillBonusContextService;
@@ -209,11 +218,10 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CharacterRewardService(
                 $app->make(CharacterXPService::class),
                 $app->make(CharacterCurrencyRewardService::class),
-                $app->make(CharacterService::class),
                 $app->make(SkillService::class),
-                $app->make(Manager::class),
-                $app->make(CharacterSheetBaseInfoTransformer::class),
-                $app->make(BattleMessageHandler::class)
+                $app->make(BuildUniqueItem::class),
+                $app->make(BuildMythicItem::class),
+                $app->make(BuildCosmicItem::class)
             );
         });
 
@@ -400,6 +408,10 @@ class ServiceProvider extends ApplicationServiceProvider
             return new MerchantSupply($app->make(CharacterCacheData::class));
         });
 
+        $this->app->bind(PlagueSurge::class, function ($app) {
+            return new PlagueSurge($app->make(CharacterCacheData::class));
+        });
+
         $this->app->bind(GunslingersAssassination::class, function ($app) {
             return new GunslingersAssassination($app->make(CharacterCacheData::class));
         });
@@ -412,11 +424,24 @@ class ServiceProvider extends ApplicationServiceProvider
             return new BookBindersFear($app->make(CharacterCacheData::class));
         });
 
+        $this->app->bind(DelveMonsterService::class, function () {
+            return new DelveMonsterService();
+        });
+
+        $this->app->bind(BuildCosmicItem::class, function ($app) {
+            return new BuildCosmicItem($app->make(RandomAffixGenerator::class));
+        });
+
+        $this->app->bind(BuildUniqueItem::class, function ($app) {
+            return new BuildUniqueItem($app->make(RandomAffixGenerator::class));
+        });
+
         $this->app->bind(MonsterPlayerFight::class, function ($app) {
             return new MonsterPlayerFight(
                 $app->make(BuildMonster::class),
                 $app->make(MonsterListService::class),
                 $app->make(CharacterCacheData::class),
+                $app->make(DelveMonsterService::class),
                 $app->make(Voidance::class),
                 $app->make(Ambush::class),
                 $app->make(Attack::class),

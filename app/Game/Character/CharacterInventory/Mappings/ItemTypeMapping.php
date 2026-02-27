@@ -2,7 +2,8 @@
 
 namespace App\Game\Character\CharacterInventory\Mappings;
 
-use App\Flare\Items\Values\ItemType;
+use App\Game\Character\CharacterInventory\Values\ArmourType;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 
 final class ItemTypeMapping
 {
@@ -24,13 +25,15 @@ final class ItemTypeMapping
             'thief' => [ItemType::DAGGER->value, ItemType::BOW->value],
             'blacksmith' => ItemType::HAMMER->value,
             'arcane alchemist' => [ItemType::STAVE->value, ItemType::SPELL_DAMAGE->value],
-            'prisoner' => array_map(fn ($case) => $case->value, ItemType::cases()),
-            'merchant' => [ItemType::BOW->value, ItemType::STAVE->value],
-            'dancer' => ItemType::FAN->value,
-            'cleric' => ItemType::MACE->value,
-            'gunslinger' => ItemType::GUN->value,
-            'book binder' => ItemType::SCRATCH_AWL->value,
-            default => null,
+            'prisoner'         => array_map(fn($case) => $case->value, ItemType::cases()),
+            'merchant'         => [ItemType::BOW->value, ItemType::STAVE->value],
+            'dancer'           => ItemType::FAN->value,
+            'cleric'           => ItemType::MACE->value,
+            'gunslinger'       => ItemType::GUN->value,
+            'book binder'      => ItemType::SCRATCH_AWL->value,
+            'apothecary'       => [ItemType::CENSER->value, ItemType::DAGGER->value],
+            'alcoholic'        => ArmourType::SHIELD->value,
+            default            => null,
         };
     }
 }

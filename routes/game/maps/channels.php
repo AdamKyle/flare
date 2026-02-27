@@ -10,6 +10,13 @@ Broadcast::channel('update-map-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;
 });
 
+// When updating the map location data for a user.
+// - traverse
+// - /pct
+Broadcast::channel('location-data-for-maps-{userId}', function ($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
 // When we update the monsters list based on location.
 Broadcast::channel('update-monsters-list-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;

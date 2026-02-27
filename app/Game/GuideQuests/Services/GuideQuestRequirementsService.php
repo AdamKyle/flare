@@ -3,6 +3,8 @@
 namespace App\Game\GuideQuests\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\DelveExploration;
+use App\Flare\Models\DelveLog;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GuideQuest;
@@ -38,6 +40,65 @@ class GuideQuestRequirementsService
         if (! is_null($quest->required_level)) {
             if ($character->level >= $quest->required_level) {
                 $this->finishedRequirements[] = 'required_level';
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Does character meet the required level?
+     */
+    public function requiredReincarnatedAmount(Character $character, GuideQuest $quest): GuideQuestRequirementsService
+    {
+        if (! is_null($quest->required_reincarnation_amount)) {
+            if ($character->times_reincarnated >= $quest->required_reincarnation_amount) {
+                $this->finishedRequirements[] = 'required_reincarnation_amount';
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Has the player survived the required hours?
+     *
+     * @param Character $character
+     * @param GuideQuest $quest
+     * @return $this
+     */
+    public function requiredDelveSurvivalTime(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
+        if (!is_null($quest->required_delve_survival_time)) {
+            $lastDelveExploration = DelveExploration::where('character_id', $character->id)->orderBy('started_at', 'desc')->first();
+
+            if (is_null($lastDelveExploration)) {
+                return $this;
+            }
+
+            if ($lastDelveExploration->started_at->diffInHours($lastDelveExploration->completed_at) >= $quest->required_delve_survival_time) {
+                $this->finishedRequirements[] = 'required_delve_survival_time';
+            }
+        }
+
+        return $this;
+    }
+
+    public function requiredDelvePackSize(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
+        if (!is_null($quest->required_delve_pack_size)) {
+            $lastDelveExploration = DelveExploration::where('character_id', $character->id)->orderBy('started_at', 'desc')->first();
+
+            if (is_null($lastDelveExploration->completed_at)) {
+                return $this;
+            }
+
+            $lasDelveLog = DelveLog::where('character_id', $character->id)->where('delve_exploration_id', $lastDelveExploration->id)->first();
+
+            if (is_null($lastDelveExploration)) {
+                return $this;
+            }
+
+            if ($lasDelveLog->pack_size >= $quest->required_delve_pack_size) {
+                $this->finishedRequirements[] = 'required_delve_pack_size';
             }
         }
 

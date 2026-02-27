@@ -133,6 +133,14 @@ trait ItemsShowInformation
             if ($effect->accessTwistedDungeons()) {
                 $effects = 'Allows the player to access the Dungeons of twisted maidens in Twisted Memories';
             }
+
+            if ($effect->accessDelves()) {
+                $effects = 'Allows you to enter locations that have the Delve status on them to use a special form of exploration';
+            }
+
+            if ($effect->canChooseDelvePack()) {
+                $effects = 'Allows you to select how many monsters you want to fight in Delve.';
+            }
         }
 
         if ($item->usable && ! is_null($item->affects_skill_type)) {

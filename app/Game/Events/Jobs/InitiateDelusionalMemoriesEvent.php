@@ -5,6 +5,7 @@ namespace App\Game\Events\Jobs;
 use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GlobalEventGoal;
+use App\Flare\Models\Raid;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Values\MapNameValue;
 use App\Game\Events\Values\EventType;
@@ -12,6 +13,7 @@ use App\Game\Events\Values\GlobalEventForEventTypeValue;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Quests\Services\BuildQuestCacheService;
+use Carbon\Carbon;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -69,6 +71,8 @@ class InitiateDelusionalMemoriesEvent implements ShouldQueue
         event(new GlobalMessageEvent('Guide quests will also have a set of new quests to introduce them to the Delusional Memories Event. These are geared at new and existing players.'));
 
         $buildQuestCacheService->buildQuestCache(true);
+
+        $this->scheduleNextYearsEvent($event);
     }
 
     public function kickOffGlobalEventGoal(): void
@@ -89,5 +93,56 @@ class InitiateDelusionalMemoriesEvent implements ShouldQueue
             ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile)'.' '.
             'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items.'.
             ' You can see the event goal for the map specified by being on the map and clicking the Event Goal tab from the map.'));
+    }
+
+    private function scheduleNextYearsEvent(ScheduledEvent $scheduledEvent): void
+    {
+        $scheduledEvent = ScheduledEvent::create([
+            'event_type' => $scheduledEvent->event_type,
+            'raid_id' => $scheduledEvent->raid_id,
+            'start_date' => $scheduledEvent->start_date->addYear(),
+            'end_date' => $scheduledEvent->end_date->addYear(),
+            'description' => $scheduledEvent->description,
+            'raids_for_event' => $scheduledEvent->raids_for_event,
+        ]);
+
+        $this->createRaidEventsForScheduledEventWith($scheduledEvent);
+    }
+
+    private function createRaidEventsForScheduledEventWith(ScheduledEvent $scheduledEvent): void
+    {
+        $raidsForEvent = $scheduledEvent->raids_for_event;
+
+        if (is_null($raidsForEvent)) {
+            return;
+        }
+
+        $newRaidForEventData = [];
+
+        foreach ($raidsForEvent as $raidForEvent) {
+
+            $raid = Raid::find($raidForEvent['selected_raid']);
+
+            $startDate = Carbon::parse($raidForEvent['start_date'])->addYear()->format('Y-m-d\TH:i:s.u\Z');
+            $endDate = Carbon::parse($raidForEvent['end_date'])->addYear()->format('Y-m-d\TH:i:s.u\Z');
+
+            $scheduledEvent = ScheduledEvent::create([
+                'event_type' => EventType::RAID_EVENT,
+                'raid_id' => $raidForEvent['selected_raid'],
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+                'description' => $raid->scheduled_event_description,
+            ]);
+
+            $newRaidForEventData[] = [
+                ...$raidForEvent,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+            ];
+        }
+
+        $scheduledEvent->update([
+            'raids_for_event' => $newRaidForEventData
+        ]);
     }
 }

@@ -48,7 +48,29 @@ class MonsterSpecialAttack extends BattleBase
         if ($specialAttackType->isBansheeScreamAttack()) {
             $this->doBansheeScreamAttack($damageStat, $ac);
         }
+
+        if ($specialAttackType->isEnragedHate()) {
+            $this->doEnragedHateDamage($damageStat, $ac);
+        }
     }
+
+     private function doEnragedHateDamage(int $damageStat, int $ac): void {
+         $newDamage = $damageStat * self::PHYSICAL_DAMAGE_AMOUNT;
+
+         if ($ac > $newDamage) {
+             $this->addMessage('You manage to block the enemies special attack!', 'player-action');
+
+             return;
+         }
+
+         $newDamage = $newDamage - $ac;
+
+         $this->characterHealth -= $newDamage;
+
+         $this->addMessage('The enemy is enraged with an unending hate child. Protected your self!', 'enemy-action');
+         $this->addMessage('You block: ' . number_format($ac) . ' of the enemies special attack damage!', 'player-action');
+         $this->addMessage('You take: ' . number_format($newDamage) . ' damage from the enemies special attack (Enraged Hate)!', 'enemy-action');
+     }
 
     private function doPhysicalDamage(int $damageStat, int $ac): void
     {

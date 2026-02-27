@@ -24,6 +24,7 @@ class GuideQuest extends Model
         'desktop_instructions',
         'mobile_instructions',
         'required_level',
+        'required_reincarnation_amount',
         'required_skill',
         'required_skill_level',
         'required_secondary_skill',
@@ -74,6 +75,8 @@ class GuideQuest extends Model
         'must_be_pledged_to_faction',
         'must_be_assisting_npc',
         'required_fame_level',
+        'required_delve_survival_time',
+        'required_delve_pack_size',
     ];
 
     /**
@@ -86,6 +89,7 @@ class GuideQuest extends Model
         'desktop_instructions' => 'array',
         'mobile_instructions' => 'array',
         'required_level' => 'integer',
+        'required_reincarnation_amount' => 'integer',
         'required_skill' => 'integer',
         'required_skill_level' => 'integer',
         'required_required_skill' => 'integer',
@@ -133,6 +137,8 @@ class GuideQuest extends Model
         'required_holy_stacks' => 'integer',
         'required_attached_gems' => 'integer',
         'required_fame_level' => 'integer',
+        'required_delve_survival_time' => 'integer',
+        'required_delve_pack_size' => 'integer',
     ];
 
     protected $appends = [
