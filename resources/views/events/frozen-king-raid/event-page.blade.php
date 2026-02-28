@@ -19,9 +19,9 @@
                 </p>
             @else
                 <div class="w-1/3 mx-auto">
-                <x-core.alerts.info-alert title="Not yet scheduled">
-                    This event hasn't been scheduled yet. Don't worry The Creator will schedule it soon! Below you can learn more about it for when it is scheduled!
-                </x-core.alerts.info-alert>
+                    <x-core.alerts.info-alert title="Not yet scheduled">
+                        This event hasn't been scheduled yet. Don't worry The Creator will schedule it soon! Below you can learn more about it for when it is scheduled!
+                    </x-core.alerts.info-alert>
                 </div>
             @endif
             <div class="text-center grid md:grid-cols-3 gap-2 md:w-2/3 w-full mr-auto ml-auto">

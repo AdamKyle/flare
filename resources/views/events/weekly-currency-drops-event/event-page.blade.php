@@ -9,10 +9,18 @@
         <div class="text-center mb-10 lg:mt-10">
             <h3 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800 text-4xl md:text-7xl">Weekly Currency Drops!</h3>
             <p class="mb-5 dark:text-gray-300 text-gray-800 italic">Slaughter the creatures before you and live in a wealth of currencies child! Alchemy awaits!</p>
-            <p class="mb-10 text-orange-600 dark:text-orange-300 my-2">
-                <strong>Runs from</strong>: {{$event->start_date->format('l, j \of F, Y \a\t g:iA')}}
-                <strong>until</strong>: {{$event->end_date->format('l, j \of F, Y \a\t g:iA')}}
-            </p>
+            @if (!is_null($event))
+                <p class="mb-10 text-orange-600 dark:text-orange-300 my-2 text-center">
+                    <strong>Runs from</strong>: {{$event->start_date->format('l, j \of F, Y \a\t g:iA')}}
+                    <strong>until</strong>: {{$event->end_date->format('l, j \of F, Y \a\t g:iA')}}
+                </p>
+            @else
+                <div class="w-1/3 mx-auto">
+                    <x-core.alerts.info-alert title="Not yet scheduled">
+                        This event hasn't been scheduled yet. Don't worry The Creator will schedule it soon! Below you can learn more about it for when it is scheduled!
+                    </x-core.alerts.info-alert>
+                </div>
+            @endif
             <div class="grid md:grid-cols-3 gap-2 md:w-2/3 w-full mr-auto ml-auto">
                 <x-core.buttons.link-buttons.primary-button css="mr-2" href="{{ route('register') }}">
                     Join Today!
