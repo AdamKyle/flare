@@ -56,6 +56,10 @@ class CapitalCityRequestResourcesHandler
         $kingdomWhoCanAfford = $this->getKingdomWhoCanAffordCosts($character, $kingdom, $summedMissingCosts);
 
         if (is_null($kingdomWhoCanAfford)) {
+            Log::channel('capital_city_building_upgrades')->info('$kingdomWhoCanAfford is null, what is request data?', [
+                'request_data' => $requestData,
+            ]);
+
             $requestData = $this->markRequestsAsRejected($requestData);
             $this->messages[] = 'Resource Request Rejected: No kingdom could be found to request the resources for these buildings.';
 
@@ -67,10 +71,6 @@ class CapitalCityRequestResourcesHandler
 
             return;
         }
-
-        Log::channel('capital_city_building_upgrades')->info('handleResourceRequests', [
-            '$kingdomWhoCanAfford' => $kingdomWhoCanAfford->id,
-        ]);
 
         if (!$this->resourceTransferService->bothKingdomsHaveAMarketPlace($kingdom, $kingdomWhoCanAfford)) {
             $requestData = $this->markRequestsAsRejected($requestData);
@@ -84,6 +84,10 @@ class CapitalCityRequestResourcesHandler
 
             return;
         }
+
+        Log::channel('capital_city_building_upgrades')->info('handleResourceRequests', [
+            '$kingdomWhoCanAfford' => $kingdomWhoCanAfford->id,
+        ]);
 
         if (!$this->resourceTransferService->canAffordPopulationCost($kingdomWhoCanAfford)) {
             $requestData = $this->markRequestsAsRejected($requestData);
