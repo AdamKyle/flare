@@ -12,6 +12,9 @@ import KingdomCard from "./kingdom-card";
 import Pagination from "../../components/pagination";
 import CapitalCityUnitRecruitmentEvent from "../../../event-listeners/capital-city-unit-recruitment-event ";
 import CapitalCityUnitRecruitmentEventDefinition from "../../../event-listeners/capital-city-unit-recruitment-event-definition";
+import CapitalCityUnitRecruitmentQueueRequestEventDefinition from "../../../event-listeners/capital-city-unit-recruitment-queue-request-event-definition";
+import CapitalCityUnitRecruitmentQueueRequestEvent from "../../../event-listeners/capital-city-unit-recruitment-queue-request-event";
+import InfoAlert from "../../../../ui/alerts/simple-alerts/info-alert";
 
 const MAX_ITEMS_PER_PAGE = 10;
 
@@ -22,6 +25,8 @@ export default class UnitRecruitment extends React.Component<any, any> {
 
     private unitRecruitmentEvent: CapitalCityUnitRecruitmentEventDefinition;
 
+    private unitRecruitmentQueueRequest: CapitalCityUnitRecruitmentQueueRequestEventDefinition;
+
     constructor(props: any) {
         super(props);
 
@@ -30,6 +35,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
             processing_request: false,
             success_message: null,
             error_message: null,
+            info_message: null,
             unit_recruitment_data: [],
             filtered_unit_recruitment_data: [],
             open_kingdom_ids: new Set(),
@@ -54,8 +60,16 @@ export default class UnitRecruitment extends React.Component<any, any> {
                 CapitalCityUnitRecruitmentEvent,
             );
 
+        this.unitRecruitmentQueueRequest =
+            serviceContainer().fetch<CapitalCityUnitRecruitmentQueueRequestEventDefinition>(
+                CapitalCityUnitRecruitmentQueueRequestEvent,
+            );
+
         this.unitRecruitmentEvent.initialize(this, this.props.user_id);
         this.unitRecruitmentEvent.register();
+
+        this.unitRecruitmentQueueRequest.initialize(this, this.props.user_id);
+        this.unitRecruitmentQueueRequest.register();
     }
 
     componentDidMount() {
@@ -66,6 +80,8 @@ export default class UnitRecruitment extends React.Component<any, any> {
         );
 
         this.unitRecruitmentEvent.listen();
+
+        this.unitRecruitmentQueueRequest.listen();
     }
 
     componentDidUpdate(prevProps: any, prevState: any) {
@@ -390,6 +406,11 @@ export default class UnitRecruitment extends React.Component<any, any> {
                     <DangerAlert additional_css={"my-2"}>
                         {this.state.error_message}
                     </DangerAlert>
+                ) : null}
+                {this.state.info_message !== null ? (
+                    <InfoAlert additional_css={"my-2"}>
+                        {this.state.info_message}
+                    </InfoAlert>
                 ) : null}
 
                 <UnitTopLevelActions

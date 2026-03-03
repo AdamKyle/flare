@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Game\Kingdoms\Jobs\CapitalCityQueueUpBuildingRequests;
+use App\Game\Kingdoms\Jobs\CapitalCityQueueUpUnitRequests;
 use App\Game\Kingdoms\Requests\BuildingUpgradeRequestsRequest;
 use App\Game\Kingdoms\Requests\CapitalCityCancelBuildingRequest;
 use App\Game\Kingdoms\Requests\PurchaseGoldBarsRequest;
@@ -107,12 +108,9 @@ class CapitalCityManagementController extends Controller
             '$kingdom' => $kingdom->id,
         ]);
 
-        $result = $this->capitalCityManagementService->sendOffUnitRecruitmentOrders($character, $kingdom, $recruitUnitRequestsRequest->request_data);
+        CapitalCityQueueUpUnitRequests::dispatch($character->id, $kingdom->id, $recruitUnitRequestsRequest->request_data)->onQueue('default_long')->delay(now()->addSecond());
 
-        $status = $result['status'];
-        unset($result['status']);
-
-        return response()->json($result, $status);
+        return response()->json([]);
     }
 
     public function cancelUnitRecruitOrders(RecruitUnitCancellationRequest $request, Character $character, Kingdom $kingdom)

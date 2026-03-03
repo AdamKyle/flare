@@ -21,7 +21,12 @@ Broadcast::channel('kingdoms-list-data-{userId}', function ($user, $userId) {
 });
 
 // When the request building upgrade queue status updates for the request
-Broadcast::channel('capital-city-building-queue-request-{buildingId}', function ($user, $userId) {
+Broadcast::channel('capital-city-building-queue-request-{userId}', function ($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
+// When the request for the units to queue updates
+Broadcast::channel('capital-city-unit-queue-request-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;
 });
 

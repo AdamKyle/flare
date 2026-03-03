@@ -28,8 +28,6 @@ export default class ProcessUnitRequestAjax {
                 "post",
                 (result: AxiosResponse) => {
                     component.setState({
-                        processing_request: false,
-                        success_message: result.data.message,
                         unit_queue: [],
                         bulk_input_values: {},
                     });

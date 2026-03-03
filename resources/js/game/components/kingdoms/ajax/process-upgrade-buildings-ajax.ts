@@ -34,15 +34,7 @@ export default class ProcessUpgradeBuildingsAjax {
             .doAjaxCall(
                 "post",
                 (result: AxiosResponse) => {
-                    component.setState(
-                        {
-                            processing_request: false,
-                            success_message: result.data.message,
-                        },
-                        () => {
-                            component.reset();
-                        },
-                    );
+                    component.reset();
                 },
                 (error: AxiosError) => {
                     component.setState({
