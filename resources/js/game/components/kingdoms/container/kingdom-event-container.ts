@@ -1,6 +1,7 @@
 import CapitalCityBuildingUpgradeRepairTableEvent from "../event-listeners/capital-city-building-upgrade-repair-table-event";
 import { CoreContainer } from "../../../lib/containers/core-container";
 import CapitalCityBuildingQueuesTableEvent from "../event-listeners/capital-city-building-queues-table-event";
+import CapitalCityBuildingQueueRequestEvent from "../event-listeners/capital-city-building-queue-request-event";
 
 /**
  * Register game event listeners here.
@@ -15,6 +16,10 @@ function kingdomEventContainer(container: CoreContainer) {
 
     container.register("CapitalCityBuildingQueueTableEventDefinition", {
         useeClass: CapitalCityBuildingQueuesTableEvent,
+    });
+
+    container.register("CapitalCityBuildingQueueRequestEventDefinition", {
+        useeClass: CapitalCityBuildingQueueRequestEvent,
     });
 }
 

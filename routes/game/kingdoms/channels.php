@@ -20,6 +20,11 @@ Broadcast::channel('kingdoms-list-data-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;
 });
 
+// When the request building upgrade queue status updates for the request
+Broadcast::channel('capital-city-building-queue-request-{buildingId}', function ($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
 // When the kingdoms capital city building upgrade/repair table should update.
 Broadcast::channel('capital-city-update-kingdom-building-data-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;

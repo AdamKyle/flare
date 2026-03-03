@@ -6,6 +6,7 @@ export default interface BuildingsToUpgradeSectionState {
     processing_request: boolean;
     success_message: string | null;
     error_message: string | null;
+    info_message: string | null;
     building_data: KingdomWithBuildings[];
     filtered_building_data: KingdomWithBuildings[];
     open_kingdom_ids: Set<number>;

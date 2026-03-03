@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
+use App\Game\Kingdoms\Jobs\CapitalCityQueueUpBuildingRequests;
 use App\Game\Kingdoms\Requests\BuildingUpgradeRequestsRequest;
 use App\Game\Kingdoms\Requests\CapitalCityCancelBuildingRequest;
 use App\Game\Kingdoms\Requests\PurchaseGoldBarsRequest;
@@ -75,12 +76,9 @@ class CapitalCityManagementController extends Controller
             '$kingdom' => $kingdom->id,
         ]);
 
-        $result = $this->capitalCityManagementService->sendoffBuildingRequests($character, $kingdom, $buildingUpgradeRequestsRequest->request_data, $buildingUpgradeRequestsRequest->request_type);
+        CapitalCityQueueUpBuildingRequests::dispatch($character->id, $kingdom->id, $buildingUpgradeRequestsRequest->request_data, $buildingUpgradeRequestsRequest->request_type)->onQueue('default_long')->delay(now()->addSecond());
 
-        $status = $result['status'];
-        unset($result['status']);
-
-        return response()->json($result, $status);
+        return response()->json([]);
     }
 
     public function fetchKingdomBuildingManagementQueues(Character $character, Kingdom $kingdom)

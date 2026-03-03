@@ -16,6 +16,9 @@ import Kingdom from "./deffinitions/kingdom-with-buildings";
 import BuildingToUpgradeService from "./services/building-to-upgrade-service";
 import OpenKingdomCardForBuildingManagement from "./partials/building-management/open-kingdom-card-for-building-management";
 import PrimaryButton from "../../ui/buttons/primary-button";
+import InfoAlert from "../../ui/alerts/simple-alerts/info-alert";
+import CapitalCityBuildingQueueRequestEventDefinition from "../event-listeners/capital-city-building-queue-request-event-definition";
+import CapitalCityBuildingQueueRequestEvent from "../event-listeners/capital-city-building-queue-request-event";
 
 const MAX_ITEMS_PER_PAGE = 10;
 
@@ -25,6 +28,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
 > {
     private fetchUpgradableKingdomsAjax: FetchUpgradableKingdomsAjax;
     private updateBuildingTable: CapitalCityBuildingUpgradeRepairTableEventDefinition;
+    private capitalCityQueueProcessing: CapitalCityBuildingQueueRequestEventDefinition;
     private readonly buildingToUpgradeService: BuildingToUpgradeService;
 
     constructor(props: any) {
@@ -35,6 +39,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
             processing_request: false,
             success_message: null,
             error_message: null,
+            info_message: null,
             building_data: [],
             filtered_building_data: [],
             open_kingdom_ids: new Set(),
@@ -52,6 +57,12 @@ export default class BuildingsToUpgradeSection extends React.Component<
             serviceContainer().fetch<CapitalCityBuildingUpgradeRepairTableEventDefinition>(
                 CapitalCityBuildingUpgradeRepairTableEvent,
             );
+
+        this.capitalCityQueueProcessing =
+            serviceContainer().fetch<CapitalCityBuildingQueueRequestEventDefinition>(
+                CapitalCityBuildingQueueRequestEvent,
+            );
+
         this.buildingToUpgradeService = serviceContainer().fetch(
             BuildingToUpgradeService,
         );
@@ -60,6 +71,9 @@ export default class BuildingsToUpgradeSection extends React.Component<
 
         this.updateBuildingTable.initialize(this, this.props.user_id);
         this.updateBuildingTable.register();
+
+        this.capitalCityQueueProcessing.initialize(this, this.props.user_id);
+        this.capitalCityQueueProcessing.register();
     }
 
     componentDidMount() {
@@ -69,6 +83,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
             this.props.kingdom.id,
         );
         this.updateBuildingTable.listen();
+        this.capitalCityQueueProcessing.listen();
     }
 
     componentDidUpdate(
@@ -119,6 +134,10 @@ export default class BuildingsToUpgradeSection extends React.Component<
 
                 {this.state.error_message !== null ? (
                     <DangerAlert>{this.state.error_message}</DangerAlert>
+                ) : null}
+
+                {this.state.info_message !== null ? (
+                    <InfoAlert>{this.state.info_message}</InfoAlert>
                 ) : null}
 
                 <input
