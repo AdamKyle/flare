@@ -61,7 +61,7 @@ class CapitalCityRequestResourcesHandler
             ]);
 
             $requestData = $this->markRequestsAsRejected($requestData);
-            $this->messages[] = 'Resource Request Rejected: No kingdom could be found to request the resources for these buildings.';
+            $this->messages[] = 'Resource Request Rejected: No kingdom could be found to request the resources for these rquests.';
 
             $queue = $this->updateQueueData($queue, $requestData, CapitalCityQueueStatus::REJECTED);
 

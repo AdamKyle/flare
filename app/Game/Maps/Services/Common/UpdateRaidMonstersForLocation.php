@@ -46,6 +46,7 @@ trait UpdateRaidMonstersForLocation
 
         if (! is_null($location)) {
             if (! is_null($location->enemy_strength_type)) {
+
                 $locationMonsters = Cache::get('monsters')[$location->name];
 
                 if (! $hasAccessToPurgatory && ! is_null($character->map->gameMap->only_during_event_type)) {

@@ -214,6 +214,7 @@ class BuildMonsterCacheService
                 ->where('game_map_id', $location->game_map_id)
                 ->where('is_raid_monster', false)
                 ->where('is_raid_boss', false)
+                ->whereNull('only_for_location_type')
                 ->get();
 
             $monsters = $this->transformMonsterForLocation(

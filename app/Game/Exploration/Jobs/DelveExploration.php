@@ -486,6 +486,10 @@ class DelveExploration implements ShouldQueue
 
             $this->rewardPlayer($character, $delveExploration->refresh());
         }
+
+        if (is_null($delveExploration) || is_null($automation)) {
+            $this->character->currentAutomations()->delete();
+        }
     }
 
     /**

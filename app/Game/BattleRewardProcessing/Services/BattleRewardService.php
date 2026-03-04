@@ -228,6 +228,8 @@ class BattleRewardService
 
             $this->character = $this->character->refresh();
 
+            event(new FactionLoyaltyUpdate($this->character->user, $this->factionLoyaltyService->getLoyaltyInfoForPlane($this->character)));
+
             return;
         }
 
