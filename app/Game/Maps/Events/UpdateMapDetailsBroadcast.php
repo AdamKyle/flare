@@ -26,7 +26,9 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
      */
     public function __construct(User $user, LocationService $service)
     {
-        $this->map_data = $service->getLocationData($user->character);
+        $character = $user->character->refresh();
+
+        $this->map_data = $service->getLocationData($character);
 
         $this->user = $user;
     }
