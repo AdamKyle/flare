@@ -21,7 +21,7 @@ export default class MapStateManager {
         component: MapSection | Game,
     ): MapState {
         let state: MapState = {
-            ...this.setState(data),
+            ...this.setState(data, (component as any).state),
             ...{ map_id: data.character_map.game_map.id },
         };
 
@@ -84,7 +84,7 @@ export default class MapStateManager {
      */
     static buildCoreState(data: MapData, component: Game): MapState {
         let state: MapState = {
-            ...this.setState(data),
+            ...this.setState(data, (component as any).state),
             ...{ map_id: data.character_map.game_map.id },
         };
 
@@ -122,7 +122,10 @@ export default class MapStateManager {
      *
      * @param data
      */
-    static setState(data: MapData): MapState {
+    static setState(
+        data: MapData,
+        previousState?: Partial<MapState>,
+    ): MapState {
         return {
             map_id: data.character_map.id,
             map_url: data.map_url,
@@ -149,8 +152,14 @@ export default class MapStateManager {
             bottom_bounds: 0,
             right_bounds: 0,
             loading: false,
-            automation_time_out: 0,
-            celestial_time_out: 0,
+            automation_time_out:
+                (data as any).automation_time_out ??
+                previousState?.automation_time_out ??
+                0,
+            celestial_time_out:
+                (data as any).celestial_time_out ??
+                previousState?.celestial_time_out ??
+                0,
             is_event_based: data.is_event_based,
             can_access_hell_forged_shop: data.can_access_hell_forged_shop,
             can_access_purgatory_chains_shop:
