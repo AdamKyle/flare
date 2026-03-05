@@ -338,7 +338,7 @@ export default class Actions extends React.Component<
                             />
                         </div>
 
-                        {this.props.celestial_id !== 0 &&
+                        {this.props.celestial_id > 0 &&
                             !this.state.show_exploration &&
                             this.props.can_engage_celestial && (
                                 <div className="w-full">
