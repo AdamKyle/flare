@@ -12,6 +12,8 @@ use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityUnitCancellation;
 use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Character;
+use App\Flare\Models\CharacterPassiveSkill;
+use App\Flare\Models\GameBuildingUnit;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
@@ -84,32 +86,73 @@ class CapitalCityManagementService
 
     public function fetchBuildingQueueData(Character $character, ?Kingdom $kingdom = null): array
     {
-        $queues = CapitalCityBuildingQueue::where('character_id', $character->id)
+        $currentTime = now();
+
+        $queues = CapitalCityBuildingQueue::query()
+            ->where('character_id', $character->id)
             ->when($kingdom, function ($query) use ($kingdom) {
                 return $query->whereHas('kingdom', function ($query) use ($kingdom) {
                     $query->where('game_map_id', $kingdom->game_map_id);
                 })->where('kingdom_id', '!=', $kingdom->id);
             })
+            ->with(['kingdom.gameMap:id,name'])
+            ->select(['id', 'kingdom_id', 'character_id', 'status', 'building_request_data', 'completed_at'])
             ->get();
 
-        $buildingQueueData = $queues->map(function ($queue) {
-            $kingdom = $queue->kingdom;
-            $queueTimeLeftInSeconds = now()->diffInSeconds($queue->completed_at);
+        $missingBuildingIdsByKingdomId = [];
 
-            if ($queue->completed_at->lte(now())) {
-                $queueTimeLeftInSeconds = 0;
+        foreach ($queues as $queue) {
+            $queueKingdomId = $queue->kingdom_id;
+
+            foreach ($queue->building_request_data as $request) {
+                if (! array_key_exists('building_name', $request) || empty($request['building_name'])) {
+                    $missingBuildingIdsByKingdomId[$queueKingdomId][] = (int) $request['building_id'];
+                }
+            }
+        }
+
+        $buildingNamesByKingdomId = [];
+
+        foreach ($missingBuildingIdsByKingdomId as $queueKingdomId => $buildingIds) {
+            $uniqueBuildingIds = array_values(array_unique($buildingIds));
+
+            if (empty($uniqueBuildingIds)) {
+                continue;
             }
 
-            $buildingRequests = collect($queue->building_request_data)->map(function ($request) use ($kingdom) {
+            $buildings = KingdomBuilding::query()
+                ->where('kingdom_id', $queueKingdomId)
+                ->whereIn('id', $uniqueBuildingIds)
+                ->select(['id', 'kingdom_id', 'name'])
+                ->get();
 
-                $building = KingdomBuilding::where('kingdom_id', $kingdom->id)
-                    ->where('id', $request['building_id'])
-                    ->first();
+            foreach ($buildings as $building) {
+                $buildingNamesByKingdomId[$queueKingdomId][$building->id] = $building->name;
+            }
+        }
+
+        $buildingQueueData = $queues->map(function ($queue) use ($currentTime, $buildingNamesByKingdomId) {
+            $kingdom = $queue->kingdom;
+
+            $queueTimeLeftInSeconds = 0;
+
+            if (! $queue->completed_at->lte($currentTime)) {
+                $queueTimeLeftInSeconds = $currentTime->diffInSeconds($queue->completed_at);
+            }
+
+            $buildingRequests = collect($queue->building_request_data)->map(function ($request) use ($kingdom, $buildingNamesByKingdomId) {
+                $buildingId = (int) $request['building_id'];
+
+                $buildingName = $request['building_name'] ?? null;
+
+                if (empty($buildingName)) {
+                    $buildingName = $buildingNamesByKingdomId[$kingdom->id][$buildingId] ?? '';
+                }
 
                 return [
-                    'building_name' => $building->name,
+                    'building_name' => $buildingName,
                     'secondary_status' => $request['secondary_status'],
-                    'building_id' => $building->id,
+                    'building_id' => $buildingId,
                     'from_level' => $request['from_level'],
                     'to_level' => $request['to_level'],
                 ];
@@ -302,7 +345,9 @@ class CapitalCityManagementService
         return $character->kingdoms()
             ->whereDoesntHave('capitalCityBuildingQueue')
             ->where('id', '!=', $kingdom->id)
-            ->where('game_map_id', $kingdom->game_map_id)->get();
+            ->where('game_map_id', $kingdom->game_map_id)
+            ->with('gameMap:id,name')
+            ->get();
     }
 
     /**
@@ -314,9 +359,36 @@ class CapitalCityManagementService
     {
         $kingdomBuildingData = [];
 
+        if ($kingdoms->isEmpty()) {
+            return $kingdomBuildingData;
+        }
+
+        $kingdomIds = $kingdoms->pluck('id')->values()->toArray();
+
+        $buildings = KingdomBuilding::query()
+            ->whereIn('kingdom_buildings.kingdom_id', $kingdomIds)
+            ->join('game_buildings', 'game_buildings.id', '=', 'kingdom_buildings.game_building_id')
+            ->where('kingdom_buildings.is_locked', false)
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('buildings_in_queue')
+                    ->whereColumn('buildings_in_queue.kingdom_id', 'kingdom_buildings.kingdom_id')
+                    ->whereColumn('buildings_in_queue.building_id', 'kingdom_buildings.id');
+            })
+            ->whereColumn('game_buildings.max_level', '>', 'kingdom_buildings.level')
+            ->select('kingdom_buildings.*')
+            ->with(['gameBuilding.passive'])
+            ->get();
+
+        $buildings = $this->filterOutCapitalCityBuildingsInQueue($buildings);
+
+        $this->primeCapitalCityKingdomBuildingTransformer($kingdom->character_id, $buildings);
+
+        $buildingsByKingdomId = $buildings->groupBy('kingdom_id');
+
         foreach ($kingdoms as $otherKingdom) {
-            $buildings = $this->fetchBuildings($otherKingdom);
-            $kingdomBuildingData[] = $this->formatKingdomBuildingData($kingdom, $otherKingdom, $buildings);
+            $buildingsForKingdom = $buildingsByKingdomId->get($otherKingdom->id, collect());
+            $kingdomBuildingData[] = $this->formatKingdomBuildingData($kingdom, $otherKingdom, $buildingsForKingdom);
         }
 
         return $kingdomBuildingData;
@@ -356,17 +428,32 @@ class CapitalCityManagementService
      */
     private function filterOutCapitalCityBuildingsInQueue(EloquentCollection $kingdomBuildings): SupportCollection
     {
-        $buildingIds = $kingdomBuildings->pluck('id')->toArray();
+        if ($kingdomBuildings->isEmpty()) {
+            return $kingdomBuildings;
+        }
 
-        $capitalCityBuildingQueues = CapitalCityBuildingQueue::whereIn('kingdom_id', $kingdomBuildings->pluck('kingdom_id'))
+        $buildingIds = $kingdomBuildings->pluck('id')->toArray();
+        $kingdomIds = $kingdomBuildings->pluck('kingdom_id')->unique()->values()->toArray();
+
+        $capitalCityBuildingQueues = CapitalCityBuildingQueue::query()
+            ->whereIn('kingdom_id', $kingdomIds)
+            ->select(['id', 'kingdom_id', 'building_request_data'])
             ->get();
+
+        if ($capitalCityBuildingQueues->isEmpty()) {
+            return $kingdomBuildings;
+        }
 
         $invalidBuildingIds = $capitalCityBuildingQueues->flatMap(function ($queue) use ($buildingIds) {
             return collect($queue->building_request_data)->pluck('building_id')->intersect($buildingIds);
         })->unique()->toArray();
 
+        if (empty($invalidBuildingIds)) {
+            return $kingdomBuildings;
+        }
+
         return $kingdomBuildings->reject(function ($building) use ($invalidBuildingIds) {
-            return in_array($building->id, $invalidBuildingIds);
+            return in_array($building->id, $invalidBuildingIds, true);
         });
     }
 
@@ -430,7 +517,7 @@ class CapitalCityManagementService
         })->unique()->toArray();
 
         return $kingdomUnits->reject(function ($unit) use ($invalidUnitIds) {
-            return in_array($unit->id, $invalidUnitIds);
+            return in_array($unit->id, $invalidUnitIds, true);
         });
     }
 
@@ -453,5 +540,53 @@ class CapitalCityManagementService
         return 'Your kingdom: ' . $kingdom->name . ' on plane: ' . $kingdom->gameMap->name . ' is now a capital city. ' .
             'You can manage all your cities on this plane from this kingdom. This kingdom will also appear at the top ' .
             'of your kingdom list with a special icon.';
+    }
+
+    private function primeCapitalCityKingdomBuildingTransformer(int $characterId, EloquentCollection $buildings): void
+    {
+        $gameBuildingIds = $buildings->pluck('game_building_id')->unique()->values()->toArray();
+
+        if (empty($gameBuildingIds)) {
+            $this->capitalCityKingdomBuildingTransformer->primeCaches([], [], $characterId);
+
+            return;
+        }
+
+        $unitsForBuildings = GameBuildingUnit::query()
+            ->whereIn('game_building_id', $gameBuildingIds)
+            ->with('gameUnit:id,name')
+            ->get(['game_building_id', 'game_unit_id', 'required_level']);
+
+        $unitsForBuildingByGameBuildingId = [];
+
+        foreach ($unitsForBuildings as $unitForBuilding) {
+            $unitsForBuildingByGameBuildingId[$unitForBuilding->game_building_id][] = [
+                'unit_name' => $unitForBuilding->gameUnit->name,
+                'at_building_level' => $unitForBuilding->required_level,
+            ];
+        }
+
+        $passiveSkillIds = $buildings->map(function (KingdomBuilding $building) {
+            return $building->gameBuilding?->passive?->id;
+        })->filter()->unique()->values()->toArray();
+
+        $characterPassiveSkillsBySkillId = [];
+
+        if (! empty($passiveSkillIds)) {
+            $characterPassiveSkills = CharacterPassiveSkill::query()
+                ->where('character_id', $characterId)
+                ->whereIn('passive_skill_id', $passiveSkillIds)
+                ->get(['passive_skill_id', 'current_level']);
+
+            foreach ($characterPassiveSkills as $characterPassiveSkill) {
+                $characterPassiveSkillsBySkillId[$characterPassiveSkill->passive_skill_id] = $characterPassiveSkill->current_level;
+            }
+        }
+
+        $this->capitalCityKingdomBuildingTransformer->primeCaches(
+            $unitsForBuildingByGameBuildingId,
+            $characterPassiveSkillsBySkillId,
+            $characterId
+        );
     }
 }

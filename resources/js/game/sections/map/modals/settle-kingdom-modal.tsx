@@ -54,10 +54,13 @@ export default class SettleKingdomModal extends React.Component<
                     .doAjaxCall(
                         "post",
                         (response: AxiosResponse) => {
-                            this.setState({
-                                loading: false,
-                                success_message: response.data.message,
-                            });
+                            this.setState(
+                                {
+                                    loading: false,
+                                    success_message: response.data.message,
+                                },
+                                () => this.props.handle_close(),
+                            );
                         },
                         (error: AxiosError) => {
                             if (typeof error.response !== "undefined") {
