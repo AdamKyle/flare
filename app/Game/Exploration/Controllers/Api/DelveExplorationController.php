@@ -25,10 +25,14 @@ class DelveExplorationController extends Controller
             ], 422);
         }
 
-        if ($character->currentAutomations()
-            ->where('type', AutomationType::DELVE)
-            ->orWhere('type', AutomationType::EXPLORING)
+        if (
+            $character->currentAutomations()
             ->where('character_id', $character->id)
+            ->where('completed_at', '>', now())
+            ->where(function ($query) {
+                $query->where('type', AutomationType::DELVE)
+                    ->orWhere('type', AutomationType::EXPLORING);
+            })
             ->count() > 0
         ) {
             return response()->json([

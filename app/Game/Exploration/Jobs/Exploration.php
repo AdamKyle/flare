@@ -383,7 +383,11 @@ class Exploration implements ShouldQueue
             event(new UpdateCharacterStatus($character));
 
             event(new ExplorationTimeOut($character->user, 0));
+
+            return;
         }
+
+        $this->character->currentAutomations()->delete();
     }
 
     /**

@@ -7,6 +7,7 @@ use App\Console\AfterDeployment\AssignNewBuildingsToExistingKingdoms;
 use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
 use App\Console\AfterDeployment\CleanInvalidWeapons;
 use App\Console\AfterDeployment\CleanMarketPlaceOfInvalidWeapons;
+use App\Console\AfterDeployment\CleanUpInvalidBrokenQueues;
 use App\Console\AfterDeployment\ClearInvalidCapitalCityQueues;
 use App\Console\AfterDeployment\CreateLocationDataCache;
 use App\Console\AfterDeployment\CreateQuestChainRelationships;
@@ -57,6 +58,7 @@ class AppServiceProvider extends ServiceProvider
             CreateQuestChainRelationships::class,
             CreateLocationDataCache::class,
             FixKingdomMaxResourcesBasedOnPassiveSkill::class,
+            CleanUpInvalidBrokenQueues::class,
 
             // Development Commands:
             CreateCharacter::class,
@@ -92,7 +94,7 @@ class AppServiceProvider extends ServiceProvider
 
             $headers = [
                 'Content-type' => 'text/json',
-                'Content-Disposition' => 'attachment; filename='.$fileName.'.json',
+                'Content-Disposition' => 'attachment; filename=' . $fileName . '.json',
             ];
 
             return \Response::make($content, 200, $headers);

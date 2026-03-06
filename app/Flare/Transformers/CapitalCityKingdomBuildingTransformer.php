@@ -10,6 +10,19 @@ use League\Fractal\TransformerAbstract;
 
 class CapitalCityKingdomBuildingTransformer extends TransformerAbstract
 {
+    private array $unitsForBuildingByGameBuildingId = [];
+
+    private array $characterPassiveSkillsBySkillId = [];
+
+    private ?int $characterId = null;
+
+    public function primeCaches(array $unitsForBuildingByGameBuildingId, array $characterPassiveSkillsBySkillId, int $characterId): void
+    {
+        $this->unitsForBuildingByGameBuildingId = $unitsForBuildingByGameBuildingId;
+        $this->characterPassiveSkillsBySkillId = $characterPassiveSkillsBySkillId;
+        $this->characterId = $characterId;
+    }
+
     /**
      * Gets the response data for the character sheet
      *
@@ -60,6 +73,11 @@ class CapitalCityKingdomBuildingTransformer extends TransformerAbstract
 
     private function getUnitDetailsForBuilding(KingdomBuilding $building): array
     {
+        $gameBuildingId = $building->game_building_id;
+
+        if (array_key_exists($gameBuildingId, $this->unitsForBuildingByGameBuildingId)) {
+            return $this->unitsForBuildingByGameBuildingId[$gameBuildingId];
+        }
 
         $unitsForBuilding = GameBuildingUnit::where('game_building_id', $building->game_building_id)->get();
 
@@ -81,6 +99,20 @@ class CapitalCityKingdomBuildingTransformer extends TransformerAbstract
         $passiveSkill = $building->gameBuilding->passive;
 
         if (! is_null($passiveSkill)) {
+
+            if (! is_null($this->characterId) && array_key_exists($passiveSkill->id, $this->characterPassiveSkillsBySkillId)) {
+                $currentLevel = $this->characterPassiveSkillsBySkillId[$passiveSkill->id];
+
+                return [
+                    'name' => $passiveSkill->name,
+                    'is_trained' => $currentLevel >= $passiveSkill->max_level,
+                    'required_level' => $passiveSkill->max_level,
+                ];
+            }
+
+            if (! is_null($this->characterId) && ! array_key_exists($passiveSkill->id, $this->characterPassiveSkillsBySkillId)) {
+                return [];
+            }
 
             $character = $building->kingdom->character;
 

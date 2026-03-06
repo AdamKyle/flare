@@ -38,36 +38,8 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
-        Artisan::call('import:game-data Core');
-        Artisan::call('import:game-data Npcs');
-        Artisan::call('import:game-data Items');
-        Artisan::call('import:game-data Weapons');
-        Artisan::call('import:game-data Armour');
-        Artisan::call('import:game-data Locations');
-        Artisan::call('import:game-data Monsters');
-        Artisan::call('import:game-data Items');
-        Artisan::call('import:game-data Skills');
-        Artisan::call('import:game-data Raids');
-        Artisan::call('import:game-data Quests');
-        Artisan::call('assign:new-npcs-to-faction-loyalty');
 
-        Monster::where('is_celestial_entity', false)
-            ->where('is_raid_monster', false)
-            ->where('is_raid_boss', false)
-            ->where('game_map_id', 8)
-            ->whereNull('only_for_location_type')
-            ->update(['raid_special_attack_type' => null]);
-
-        Character::first()->inventory->slots()->create(['item_id' => Item::where('name', '=', 'Twisted Tree Branch')->first()->id]);
-
-        Artisan::call('create:quest-cache');
-        Artisan::call('generate:monster-cache');
-        Artisan::call('create:location-data-cache');
-        Artisan::call('fix:kingdom-max-resources-based-on-passive-skill');
-        Artisan::call('clean-up:invalid-events');
-
-        UnitInQueue::truncate();
-        CapitalCityUnitQueue::truncate();
+        Artisan::call('clean-up:invalid-broken-queues');
 
         $this->importInformationSection();
 

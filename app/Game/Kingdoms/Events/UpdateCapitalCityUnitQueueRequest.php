@@ -14,25 +14,28 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class UpdateCapitalCityBuildingUpgrades implements ShouldBroadcastNow
+class UpdateCapitalCityUnitQueueRequest implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, KingdomCache, SerializesModels;
 
-    private User $user;
+    private int $userId;
 
-    public array $kingdomBuildingData;
+    public bool $isLoading;
+
+    public string $message;
+
+    public string $type;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(Character $character, Kingdom $kingdom)
+    public function __construct(int $userId, bool $isLoading, string $message, string $type)
     {
 
-        $kingdomBuildingData = resolve(CapitalCityManagementService::class)
-            ->fetchBuildingsForUpgradesOrRepairs($character, $kingdom, true);
-
-        $this->user = $character->user;
-        $this->kingdomBuildingData = $kingdomBuildingData;
+        $this->userId = $userId;
+        $this->isLoading = $isLoading;
+        $this->message = $message;
+        $this->type = $type;
     }
 
     /**
@@ -40,6 +43,6 @@ class UpdateCapitalCityBuildingUpgrades implements ShouldBroadcastNow
      */
     public function broadcastOn(): Channel|array
     {
-        return new PrivateChannel('capital-city-update-kingdom-building-data-'.$this->user->id);
+        return new PrivateChannel('capital-city-unit-queue-request-'.$this->userId);
     }
 }
