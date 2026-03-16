@@ -39,7 +39,7 @@ class MassImportCustomData extends Command
     public function handle()
     {
 
-        Artisan::call('clean-up:invalid-broken-queues');
+        // Artisan::call('clean-up:invalid-broken-queues');
 
         $this->importInformationSection();
 

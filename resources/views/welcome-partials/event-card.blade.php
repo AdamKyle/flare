@@ -112,6 +112,10 @@
             him gets a new Ancestral item!
         @endif
 
+          @if ($eventRunning->getTitleOfEvent() === 'The Labyrinth Monster')
+            Join the Labyrinth Monster raid and help the Little Girl uncover the truth of her parents and the curse The Witch put on them. Alas not all is what it seems.
+          @endif
+
         @if ($eventRunning->getTitleOfEvent() === 'The Ice Queens Reign')
             Join The Ice Queens Reign raid! Head to The Fathers Tomb on The Ice Plane and band together! The player
             who kills her gets a new Ancestral item!
