@@ -18,7 +18,7 @@ class CapitalCityQueueUpBuildingRequests implements ShouldQueue
 
     public function __construct(protected readonly int $characterId, protected readonly int $kingdomId, protected readonly array $requestData, protected readonly string $requestType) {}
 
-    public function handle(CapitalCityManagementService $capitalCityManagementService,): void
+    public function handle(CapitalCityManagementService $capitalCityManagementService): void
     {
         $character = Character::find($this->characterId);
         $kingdom = Kingdom::find($this->kingdomId);

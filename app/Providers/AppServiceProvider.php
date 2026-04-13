@@ -94,7 +94,7 @@ class AppServiceProvider extends ServiceProvider
 
             $headers = [
                 'Content-type' => 'text/json',
-                'Content-Disposition' => 'attachment; filename=' . $fileName . '.json',
+                'Content-Disposition' => 'attachment; filename='.$fileName.'.json',
             ];
 
             return \Response::make($content, 200, $headers);

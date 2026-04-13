@@ -23,10 +23,9 @@ use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
 use App\Game\Maps\Services\Common\LiveCharacterCount;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 use App\Game\Maps\Transformers\LocationsTransformer;
-use App\Game\Maps\Transformers\LocationTransformer;
+use Illuminate\Support\Facades\Storage;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection as LeagueCollection;
-use League\Fractal\Resource\Item;
 
 class LocationService
 {
@@ -84,11 +83,57 @@ class LocationService
         ];
     }
 
-    public function getLocationData(Location $location): array
+    public function getLocationData(Character $character, bool $includeLocationData = true, ?Raid $raid = null): array
     {
-        $locationData = new Item($location, new LocationTransformer());
 
-        return $this->manager->createData($locationData)->toArray();
+        $this->locationBasedEvents($character);
+
+        $this->kingdomManagement();
+
+        $lockedLocation = $this->getLockedLocation($character);
+
+        $map = $character->map->gameMap;
+
+        $locationData = [
+            'map_url' => Storage::disk('maps')->url($character->map_url),
+            'locations' => [],
+            'character_map' => $character->map,
+            'can_move' => $character->can_move,
+            'can_move_again_at' => $character->can_move_again_at,
+            'coordinates' => $this->coordinatesCache->getFromCache(),
+            'celestial_id' => $this->getCelestialEntityId($character),
+            'can_settle_kingdom' => $this->canSettle,
+            'my_kingdoms' => $this->getKingdoms($character),
+            'npc_kingdoms' => Kingdom::select('id', 'x_position', 'y_position', 'npc_owned', 'name')->whereNull('character_id')->where('game_map_id', $character->map->game_map_id)->where('npc_owned', true)->get(),
+            'other_kingdoms' => $this->getEnemyKingdoms($character),
+            'characters_on_map' => $this->getActiveUsersCountForMap($character),
+            'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type,
+            'is_event_based' => $this->isEventBasedUpdate,
+            'can_access_hell_forged_shop' => $map->mapType()->isHell(),
+            'can_access_purgatory_chains_shop' => $map->mapType()->isPurgatory(),
+            'can_access_twisted_earth_shop' => $map->mapType()->isTwistedMemories(),
+            'can_access_hell_forged' => $map->mapType()->isHell(),
+            'can_access_purgatory_chains' => $map->mapType()->isPurgatory(),
+            'can_access_twisted_memories' => $map->mapType()->isTwistedMemories(),
+        ];
+
+        if ($includeLocationData) {
+            $locationData['locations'] = array_merge($this->fetchLocationData($character), $this->fetchCorruptedLocationData($raid));
+        }
+
+        return $locationData;
+    }
+
+    /**
+     * Gets locked location details.
+     */
+    protected function getLockedLocation(Character $character): ?Location
+    {
+        return Location::where('x', $character->map->character_position_x)
+            ->where('y', $character->map->character_position_y)
+            ->where('game_map_id', $character->map->game_map_id)
+            ->whereNotNull('required_quest_item_id')
+            ->first();
     }
 
     public function getDroppableItems(Location $location, int $perPage = 10, int $page = 1, string $searchText = ''): array
@@ -137,12 +182,6 @@ class LocationService
             'time_left' => $timeLeft,
             'show_timer' => $timeLeft > 0,
         ];
-
-        if ($includeLocationData) {
-            $locationData['locations'] = $this->fetchLocationData($character->map->game_map_id)->merge($this->fetchCorruptedLocationData($raid));
-        }
-
-        return $locationData;
     }
 
     /**
@@ -185,8 +224,13 @@ class LocationService
     /**
      * Find corrupted locations for a raid.
      */
-    public function fetchCorruptedLocationData(Raid $raid): array
+    public function fetchCorruptedLocationData(?Raid $raid): array
     {
+
+        if (is_null($raid)) {
+            return [];
+        }
+
         $locations = Location::where('is_corrupted', true)->whereIn('id', $raid->corrupted_location_ids)->get();
 
         $this->manager->setSerializer($this->plainArraySerializer);

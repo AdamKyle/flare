@@ -143,7 +143,7 @@ class CapitalCityBuildingManagementRequestHandler
      */
     private function dispatchQueueMovement(CapitalCityBuildingQueue $queue, Carbon $dispatchTime): void
     {
-        CapitalCityBuildingRequestMovement::dispatch($queue->id)->delay($dispatchTime)->onQueue('default_long');;
+        CapitalCityBuildingRequestMovement::dispatch($queue->id)->delay($dispatchTime)->onQueue('default_long');
     }
 
     /**

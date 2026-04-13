@@ -4,7 +4,6 @@ namespace App\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
-use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueRequest;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueRequest;
 use App\Game\Kingdoms\Service\CapitalCityManagementService;
 use Illuminate\Bus\Queueable;

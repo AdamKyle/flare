@@ -2,14 +2,9 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
-use App\Flare\Models\CapitalCityUnitQueue;
-use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
-use App\Flare\Models\Item;
-use App\Flare\Models\Monster;
 use App\Flare\Models\Survey;
-use App\Flare\Models\UnitInQueue;
 use App\Flare\Values\MapNameValue;
 use Exception;
 use Illuminate\Console\Command;

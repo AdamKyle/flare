@@ -2,11 +2,7 @@
 
 namespace App\Game\Kingdoms\Events;
 
-use App\Flare\Models\Character;
-use App\Flare\Models\Kingdom;
-use App\Flare\Models\User;
 use App\Game\Core\Traits\KingdomCache;
-use App\Game\Kingdoms\Service\CapitalCityManagementService;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
