@@ -33,15 +33,9 @@
     $href = route('event.type', ['event_type' => 'delusional-memories']);
   }
 
-<<<<<<< HEAD
-  if ($eventRunning->getTitleOfEvent() === 'The Jester of Time') {
-    $href = route('event.type', ['event_type' => 'jester-of-time']);
-  }
-=======
     if ($eventRunning->getTitleOfEvent() === 'The Jester of Time') {
         $href = route('event.type', ['event_type' => 'jester-of-time-raid']);
     }
->>>>>>> master
 
   if ($eventRunning->getTitleOfEvent() === 'The Smugglers Are Back!') {
     $href = route('event.type', ['event_type' => 'the-smugglers-are-back-raid']);
@@ -59,13 +53,7 @@
     $href = route('event.type', ['event_type' => 'corrupted-bishop-raid']);
   }
 
-<<<<<<< HEAD
-  if ($eventRunning->getTitleOfEvent() === 'Tlessa\'s Feedback Event') {
-    $href = route('event.type', ['event_type' => 'tlessas-feedback-event']);
-    $icon = 'ra-campfire';
-  }
-=======
-        if ($eventRunning->getTitleOfEvent() === 'The Labyrinth Monster') {
+    if ($eventRunning->getTitleOfEvent() === 'The Labyrinth Monster') {
         $href = route('event.type', ['event_type' => 'labyrinth-monster-raid']);
     }
 
@@ -73,7 +61,6 @@
         $href = route('event.type', ['event_type' => 'tlessas-feedback-event']);
         $icon = 'ra-campfire';
     }
->>>>>>> master
 @endphp
 
 <x-core.cards.feature-card>
@@ -135,11 +122,14 @@
         band together! The player who kills him gets a new Ancestral item!
     @endif
 
-    @if ($eventRunning->getTitleOfEvent() === 'The Ice Queens Reign')
-        Join The Ice Queens Reign raid! Head to The Fathers Tomb on The Ice
-        Plane and band together! The player who kills her gets a new Ancestral
-        item!
-    @endif
+          @if ($eventRunning->getTitleOfEvent() === 'The Labyrinth Monster')
+            Join the Labyrinth Monster raid and help the Little Girl uncover the truth of her parents and the curse The Witch put on them. Alas not all is what it seems.
+          @endif
+
+        @if ($eventRunning->getTitleOfEvent() === 'The Ice Queens Reign')
+            Join The Ice Queens Reign raid! Head to The Fathers Tomb on The Ice Plane and band together! The player
+            who kills her gets a new Ancestral item!
+        @endif
 
     @if ($eventRunning->getTitleOfEvent() === 'The Frozen King')
         Join The Frozen King raid! head to The Frozen Christmas Tree Lot on The
