@@ -33,9 +33,8 @@ class GiveKingdomsToNpcHandler
             'character_id' => null,
             'npc_owned' => true,
             'current_morale' => 0.01,
+            'is_capital' => false,
         ]);
-
-        $map = $character->map;
 
         event(new UpdateMapDetailsBroadcast($character->user, $this->locationService));
 
