@@ -31,19 +31,36 @@ export default class ReincarnationCheckModal extends React.Component<
                         happen:
                     </p>
                     <p className="mb-4">
-                        Your level will be reset to one, you will{" "}
-                        <strong>lose nothing else</strong>. 20% of your current
-                        raw stats will be applied to your level 1 base raw
-                        stats. You will then level back up to max level and
-                        reincarnate again to get even stronger.
+                        When{" "}
+                        <a href="/information/reincarnation" target="_blank">
+                            Reincarnating{" "}
+                            <i className="fas fa-external-link-alt"></i>
+                        </a>{" "}
+                        Your character will be reset to level 1, you will carry
+                        over 5% of your base unmodded stats at the time you
+                        choose to reincarnate which can only be level 5,000.
                     </p>
                     <p className="mb-4">
-                        You can reincarnate at anytime, for the cost of 50,000
-                        Copper Coins. Each time you do we add 5%, which stacks
-                        with how many times you have reincarnated, to your XP
-                        required to level up, which over time can make it take
-                        longer and longer to level up, but your character gets
-                        even stronger.
+                        You can reincarnate as many times as you would like
+                        until your base stats reach 9,999,999. As you
+                        reincarnate your base stats will increase by 5% each
+                        time making you slightly more powerful each time you
+                        reincarnate. Add onto this your{" "}
+                        <a href="/information/gear-progression" target="_blank">
+                            gear <i className="fas fa-external-link-alt"></i>
+                        </a>{" "}
+                        ,{" "}
+                        <a href="/information/holy-items" target="_blank">
+                            holy oils{" "}
+                            <i className="fas fa-external-link-alt"></i>
+                        </a>{" "}
+                        ,{" "}
+                        <a href="/information/enchanting" target="_blank">
+                            enchantments{" "}
+                            <i className="fas fa-external-link-alt"></i>
+                        </a>{" "}
+                        and so on and your character will be able to take on
+                        stronger more powerful creatures.
                     </p>
                 </div>
             </Dialogue>
