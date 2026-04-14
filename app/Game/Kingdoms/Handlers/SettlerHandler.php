@@ -60,6 +60,7 @@ class SettlerHandler
             $defendingKingdom->update([
                 'character_id' => $attackingKingdom->character->id,
                 'current_morale' => 0.10,
+                'is_capital' => false,
             ]);
 
             $defendingKingdom = $defendingKingdom->refresh();

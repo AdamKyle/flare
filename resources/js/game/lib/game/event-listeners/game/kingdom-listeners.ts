@@ -257,10 +257,9 @@ export default class KingdomListeners implements GameListener {
                     },
                 );
 
-                mapData.enemy_kingdoms.concat(enemyKingdoms);
-
-                mapData.npc_kingdoms.concat(event.npcKingdoms);
-                mapData.player_kingdoms.concat(playerKingdomsFilter);
+                mapData.enemy_kingdoms = enemyKingdoms;
+                mapData.npc_kingdoms = event.npcKingdoms;
+                mapData.player_kingdoms = playerKingdomsFilter;
 
                 this.component.setState({
                     map_data: mapData,
