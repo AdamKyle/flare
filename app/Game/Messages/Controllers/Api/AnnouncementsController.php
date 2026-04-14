@@ -20,6 +20,10 @@ class AnnouncementsController extends Controller
         return response()->json(Announcement::orderByDesc('id')->get()->transform(function ($announcement) {
             $announcement->expires_at_formatted = (new Carbon($announcement->expires_at))->format('l, j \of F \a\t h:ia \G\M\TP');
 
+            if (is_null($announcement->event)) {
+                return $announcement;
+            }
+
             $eventType = new EventType($announcement->event->type);
             $eventName = $eventType->getNameForEvent();
 

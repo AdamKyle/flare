@@ -1,70 +1,54 @@
-import React, { ReactNode } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { ReactNode, useState } from 'react';
 
+import { ScreenMapper } from './component-mapping/screen-registery';
+import { CraftingTypes } from './enums/crafting-types';
 import { useManageCraftingCardVisibility } from './hooks/use-manage-crafting-card-visibility';
 import FloatingCard from '../../../components/icon-section/floating-card';
-
-import Button from 'ui/buttons/button';
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 
 const CraftingCard = (): ReactNode => {
   const { closeCraftingCard } = useManageCraftingCardVisibility();
 
+  const [activeCraftingType, setActiveCraftingType] = useState<CraftingTypes>(
+    CraftingTypes.HOME
+  );
+
+  const ActiveScreen = ScreenMapper[activeCraftingType];
+
+  const renderBackAction = () => {
+    if (activeCraftingType === CraftingTypes.HOME) {
+      return;
+    }
+
+    return setActiveCraftingType(CraftingTypes.HOME);
+  };
+
+  if (!ActiveScreen) {
+    return null;
+  }
+
   return (
-    <FloatingCard title="Crafting" close_action={closeCraftingCard}>
-      <Button
-        label="Craft"
-        on_click={() => {}}
-        variant={ButtonVariant.PRIMARY}
-        additional_css="w-full my-2"
-      />
-      <Button
-        label="Enchant"
-        on_click={() => {}}
-        variant={ButtonVariant.PRIMARY}
-        additional_css="w-full my-2"
-      />
-      <Button
-        label="Alchemy"
-        on_click={() => {}}
-        variant={ButtonVariant.PRIMARY}
-        additional_css="w-full my-2"
-      />
-      <Button
-        label="Trinketry"
-        on_click={() => {}}
-        variant={ButtonVariant.PRIMARY}
-        additional_css="w-full my-2"
-      />
-      <Button
-        label="Gem Crafting"
-        on_click={() => {}}
-        variant={ButtonVariant.PRIMARY}
-        additional_css="w-full my-2"
-      />
-      <Button
-        label="Queen of Hearts"
-        on_click={() => {}}
-        variant={ButtonVariant.PRIMARY}
-        additional_css="w-full my-2"
-      />
-      <Button
-        label="Seer Camp"
-        on_click={() => {}}
-        variant={ButtonVariant.PRIMARY}
-        additional_css="w-full my-2"
-      />
-      <Button
-        label="Work Bench"
-        on_click={() => {}}
-        variant={ButtonVariant.PRIMARY}
-        additional_css="w-full my-2"
-      />
-      <Button
-        label="Labyrinth Oracle"
-        on_click={() => {}}
-        variant={ButtonVariant.PRIMARY}
-        additional_css="w-full my-2"
-      />
+    <FloatingCard
+      title={activeCraftingType}
+      close_action={closeCraftingCard}
+      back_action={
+        activeCraftingType === CraftingTypes.HOME ? undefined : renderBackAction
+      }
+    >
+      <div className="relative overflow-hidden">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={activeCraftingType}
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ duration: 0.25 }}
+            className="w-full"
+          >
+            <ActiveScreen setActiveCraftingType={setActiveCraftingType} />
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </FloatingCard>
   );
 };
