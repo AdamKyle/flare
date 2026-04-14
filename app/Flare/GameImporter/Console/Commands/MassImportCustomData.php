@@ -2,6 +2,7 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
+use App\Flare\Models\Announcement;
 use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
@@ -39,7 +40,8 @@ class MassImportCustomData extends Command
     public function handle()
     {
 
-        // Artisan::call('clean-up:invalid-broken-queues');
+        Artisan::call('assign:new-buildings-to-existing-kingdoms');
+        Announcement::truncate();
 
         $this->importInformationSection();
 
