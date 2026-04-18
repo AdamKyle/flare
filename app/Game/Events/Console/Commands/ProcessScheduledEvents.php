@@ -12,6 +12,8 @@ use App\Game\Events\Jobs\InitiateWinterEvent;
 use App\Game\Events\Values\EventType;
 use App\Game\Raids\Jobs\InitiateRaid;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
+use Throwable;
 
 class ProcessScheduledEvents extends Command
 {
@@ -34,41 +36,54 @@ class ProcessScheduledEvents extends Command
      */
     public function handle()
     {
-        $targetEventStart = now()->copy()->addMinutes(5);
+        $now = now();
+        $targetEventStart = $now->copy()->addMinutes(5);
 
-        $scheduledEvents = ScheduledEvent::where('start_date', '>=', now())
+        $scheduledEvents = ScheduledEvent::where('start_date', '>', $now)
             ->where('start_date', '<=', $targetEventStart)
             ->get();
 
         foreach ($scheduledEvents as $event) {
-            $eventType = new EventType($event->event_type);
+            $cacheKey = 'scheduled-event-dispatch:' . $event->id;
 
-            if ($eventType->isRaidEvent()) {
-                InitiateRaid::dispatch($event->id, preg_split('/(?<=[.!?])\s+/', $event->raid->story))->delay(now()->addMinutes(5));
+            if (! Cache::add($cacheKey, true, $event->start_date->copy()->addMinutes(10))) {
+                continue;
             }
 
-            if ($eventType->isWeeklyCelestials()) {
-                InitiateWeeklyCelestialSpawnEvent::dispatch($event->id)->delay(now()->addMinutes(5));
-            }
+            try {
+                $eventType = new EventType($event->event_type);
 
-            if ($eventType->isWeeklyCurrencyDrops()) {
-                InitiateWeeklyCurrencyDropEvent::dispatch($event->id)->delay(now()->addMinutes(5));
-            }
+                if ($eventType->isRaidEvent()) {
+                    InitiateRaid::dispatch($event->id, preg_split('/(?<=[.!?])\s+/', $event->raid->story))->delay($now->copy()->addMinutes(5));
+                }
 
-            if ($eventType->isWinterEvent()) {
-                InitiateWinterEvent::dispatch($event->id)->delay(now()->addMinutes(5));
-            }
+                if ($eventType->isWeeklyCelestials()) {
+                    InitiateWeeklyCelestialSpawnEvent::dispatch($event->id)->delay($now->copy()->addMinutes(5));
+                }
 
-            if ($eventType->isDelusionalMemoriesEvent()) {
-                InitiateDelusionalMemoriesEvent::dispatch($event->id)->delay(now()->addMinutes(5));
-            }
+                if ($eventType->isWeeklyCurrencyDrops()) {
+                    InitiateWeeklyCurrencyDropEvent::dispatch($event->id)->delay($now->copy()->addMinutes(5));
+                }
 
-            if ($eventType->isWeeklyFactionLoyaltyEvent()) {
-                InitiateWeeklyFactionLoyaltyEvent::dispatch($event->id)->delay(now()->addMinutes(5));
-            }
+                if ($eventType->isWinterEvent()) {
+                    InitiateWinterEvent::dispatch($event->id)->delay($now->copy()->addMinutes(5));
+                }
 
-            if ($eventType->isFeedbackEvent()) {
-                InitiateFeedbackEvent::dispatch($event->id)->delay(now()->addMinutes(5));
+                if ($eventType->isDelusionalMemoriesEvent()) {
+                    InitiateDelusionalMemoriesEvent::dispatch($event->id)->delay($now->copy()->addMinutes(5));
+                }
+
+                if ($eventType->isWeeklyFactionLoyaltyEvent()) {
+                    InitiateWeeklyFactionLoyaltyEvent::dispatch($event->id)->delay($now->copy()->addMinutes(5));
+                }
+
+                if ($eventType->isFeedbackEvent()) {
+                    InitiateFeedbackEvent::dispatch($event->id)->delay($now->copy()->addMinutes(5));
+                }
+            } catch (Throwable $throwable) {
+                Cache::forget($cacheKey);
+
+                throw $throwable;
             }
         }
     }

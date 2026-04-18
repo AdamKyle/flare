@@ -128,83 +128,95 @@ class EndScheduledEvent extends Command
             $eventType = new EventType($event->event_type);
 
             if ($eventType->isRaidEvent()) {
+                try {
+                    $this->endRaid($event, $locationService, $updateRaidMonsters);
 
-                $this->endRaid($event, $locationService, $updateRaidMonsters);
+                    $buildQuestCacheService->buildRaidQuestCache(true);
+                } finally {
+                    $event->update([
+                        'currently_running' => false,
+                    ]);
 
-                $buildQuestCacheService->buildRaidQuestCache(true);
-
-                $event->update([
-                    'currently_running' => false,
-                ]);
-
-                event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+                    event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+                }
             }
 
             if ($eventType->isWeeklyCurrencyDrops()) {
-                $this->endWeeklyCurrencyDrops($currentEvent);
+                try {
+                    $this->endWeeklyCurrencyDrops($currentEvent);
+                } finally {
+                    $event->update([
+                        'currently_running' => false,
+                    ]);
 
-                $event->update([
-                    'currently_running' => false,
-                ]);
-
-                event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+                    event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+                }
             }
 
             if ($eventType->isWeeklyCelestials()) {
-                $this->endWeeklySpawnEvent($currentEvent);
+                try {
+                    $this->endWeeklySpawnEvent($currentEvent);
+                } finally {
+                    $event->update([
+                        'currently_running' => false,
+                    ]);
 
-                $event->update([
-                    'currently_running' => false,
-                ]);
-
-                event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+                    event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+                }
             }
 
             if ($eventType->isWeeklyFactionLoyaltyEvent()) {
-                $this->endWeeklyFactionLoyaltyEvent($currentEvent);
+                try {
+                    $this->endWeeklyFactionLoyaltyEvent($currentEvent);
+                } finally {
+                    $event->update([
+                        'currently_running' => false,
+                    ]);
 
-                $event->update([
-                    'currently_running' => false,
-                ]);
-
-                event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+                    event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+                }
             }
 
             if ($eventType->isWinterEvent()) {
-                $this->endWinterEvent($kingdomEventService, $traverseService, $explorationAutomationService, $factionLoyaltyService, $currentEvent);
+                try {
+                    $this->endWinterEvent($kingdomEventService, $traverseService, $explorationAutomationService, $factionLoyaltyService, $currentEvent);
 
-                $buildQuestCacheService->buildQuestCache(true);
-                $buildQuestCacheService->buildRaidQuestCache(true);
+                    $buildQuestCacheService->buildQuestCache(true);
+                    $buildQuestCacheService->buildRaidQuestCache(true);
+                } finally {
+                    $event->update([
+                        'currently_running' => false,
+                    ]);
 
-                $event->update([
-                    'currently_running' => false,
-                ]);
-
-                event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+                    event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+                }
             }
 
             if ($eventType->isDelusionalMemoriesEvent()) {
-                $this->endDelusionalEvent($kingdomEventService, $traverseService, $explorationAutomationService, $factionLoyaltyService, $currentEvent);
+                try {
+                    $this->endDelusionalEvent($kingdomEventService, $traverseService, $explorationAutomationService, $factionLoyaltyService, $currentEvent);
 
-                $buildQuestCacheService->buildQuestCache(true);
-                $buildQuestCacheService->buildRaidQuestCache(true);
+                    $buildQuestCacheService->buildQuestCache(true);
+                    $buildQuestCacheService->buildRaidQuestCache(true);
+                } finally {
+                    $event->update([
+                        'currently_running' => false,
+                    ]);
 
-                $event->update([
-                    'currently_running' => false,
-                ]);
-
-                event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+                    event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+                }
             }
 
             if ($eventType->isFeedbackEvent()) {
+                try {
+                    $this->endFeedBackEvent($createSurveySnapshot);
+                } finally {
+                    $event->update([
+                        'currently_running' => false,
+                    ]);
 
-                $this->endFeedBackEvent($createSurveySnapshot);
-
-                $event->update([
-                    'currently_running' => false,
-                ]);
-
-                event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+                    event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+                }
             }
 
             $this->cleanUpEvent($currentEvent);
@@ -273,7 +285,8 @@ class EndScheduledEvent extends Command
         $this->cleanUpEvent($event);
     }
 
-    protected function cleanUpEvent(?Event $event = null): void {
+    protected function cleanUpEvent(?Event $event = null): void
+    {
         if (! is_null($event)) {
             $announcement = Announcement::where('event_id', $event->id)->first();
 
@@ -334,13 +347,7 @@ class EndScheduledEvent extends Command
 
         event(new GlobalMessageEvent('The Queen of Ice calls forth her twisted memories and magics to seal the gates to her realm. "My son! You have stolen the memories of my son!" She bellows as she banishes you and others from her realm!'));
 
-        $announcement = Announcement::where('event_id', $event->id)->first();
-
-        event(new DeleteAnnouncementEvent($announcement->id));
-
-        $announcement->delete();
-
-        $event->delete();
+        $this->cleanUpEvent($event);
 
         $this->cleanUpEventGoals();
 
@@ -394,13 +401,7 @@ class EndScheduledEvent extends Command
 
         event(new GlobalMessageEvent('The voice of Fliniguss echos in your ears: "Child, I grow weary of your games." The twisted mother laughs: Ooooh hooo hooo hoo. A chill falls in the air.'));
 
-        $announcement = Announcement::where('event_id', $event->id)->first();
-
-        event(new DeleteAnnouncementEvent($announcement->id));
-
-        $announcement->delete();
-
-        $event->delete();
+        $this->cleanUpEvent($event);
 
         $this->cleanUpEventGoals();
 

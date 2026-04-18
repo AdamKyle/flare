@@ -85,15 +85,17 @@ class InitiateRaid implements ShouldQueue
 
         $this->corruptLocations($raid, $locationService);
 
-        $endDate = $this->createEvent($eventSchedulerService);
+        $createdEvent = $this->createEvent($eventSchedulerService);
 
         $this->createRaidBoss($raid);
 
         $this->updateMonstersForCharactersAtRaidLocations($raid, $updateRaidMonsters);
 
+        $endDate = $createdEvent->ends_at->format('l, j \of F \a\t h:ia \G\M\TP');
+
         event(new GlobalMessageEvent('Raid has started! and will end on: '.$endDate));
 
-        AnnouncementHandler::createAnnouncement('raid_announcement');
+        AnnouncementHandler::createAnnouncement('raid_announcement', $createdEvent);
     }
 
     /**
@@ -186,16 +188,13 @@ class InitiateRaid implements ShouldQueue
      * - Update the scheduled event to currently running.
      * - Create a new event record
      * - Update the calendar with the updated scheduled events.
-     * - Returns the end date - formatted.
+     * - Returns the created event.
      */
-    private function createEvent(EventSchedulerService $eventSchedulerService): string
+    private function createEvent(EventSchedulerService $eventSchedulerService): Event
     {
-
         $scheduledEvent = ScheduledEvent::find($this->eventId);
 
-        $formattedDate = $scheduledEvent->end_date->format('l, j \of F \a\t h:ia \G\M\TP');
-
-        Event::create([
+        $createdEvent = Event::create([
             'type' => EventType::RAID_EVENT,
             'started_at' => now(),
             'ends_at' => $scheduledEvent->end_date,
@@ -208,6 +207,6 @@ class InitiateRaid implements ShouldQueue
 
         event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
 
-        return $formattedDate;
+        return $createdEvent;
     }
 }

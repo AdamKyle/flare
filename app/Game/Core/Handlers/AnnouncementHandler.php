@@ -39,7 +39,7 @@ class AnnouncementHandler
     protected function buildAnnouncementForType(string $type, ?Event $event = null): void
     {
         match ($type) {
-            'raid_announcement' => $this->buildRaidAnnouncementMessage(),
+            'raid_announcement' => $this->buildRaidAnnouncementMessage($event),
             'weekly_celestial_spawn' => $this->buildWeeklyCelestialMessage($event),
             'weekly_currency_drop' => $this->buildWeeklyCurrencyDrop($event),
             'winter_event' => $this->buildWinterEventMessage($event),
@@ -53,9 +53,11 @@ class AnnouncementHandler
         };
     }
 
-    private function buildRaidAnnouncementMessage(): void
+    private function buildRaidAnnouncementMessage(?Event $event = null): void
     {
-        $event = Event::where('type', EventType::RAID_EVENT)->first();
+        if (is_null($event)) {
+            $event = Event::where('type', EventType::RAID_EVENT)->first();
+        }
 
         if (is_null($event)) {
             throw new Exception('Cannot create message for raid event, when no event exists.');
