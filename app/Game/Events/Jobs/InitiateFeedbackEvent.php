@@ -29,11 +29,9 @@ class InitiateFeedbackEvent implements ShouldQueue
 
     public function handle(): void
     {
-
         $event = ScheduledEvent::find($this->eventId);
 
         if (is_null($event)) {
-
             return;
         }
 
@@ -43,7 +41,7 @@ class InitiateFeedbackEvent implements ShouldQueue
 
         $event = $event->refresh();
 
-        Event::create([
+        $createdEvent = Event::create([
             'type' => EventType::FEEDBACK_EVENT,
             'started_at' => $event->start_date,
             'ends_at' => $event->end_date,
@@ -56,7 +54,6 @@ class InitiateFeedbackEvent implements ShouldQueue
             'After 1 hour of combined playtime (does NOT need to be consecutive), players of all skill levels will be asked to participate in a survey to help make Tlessa a better game. Upon completing the survey, you will be rewarded with a Mythical Item!'
         ));
 
-
-        AnnouncementHandler::createAnnouncement('tlessas_feedback_event');
+        AnnouncementHandler::createAnnouncement('tlessas_feedback_event', $createdEvent);
     }
 }

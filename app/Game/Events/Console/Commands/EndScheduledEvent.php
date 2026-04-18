@@ -207,17 +207,7 @@ class EndScheduledEvent extends Command
                 event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
             }
 
-            $announcement = Announcement::where('event_id', $currentEvent->id)->first();
-
-            if (is_null($announcement)) {
-                continue;
-            }
-
-            event(new DeleteAnnouncementEvent($announcement->id));
-
-            $announcement->delete();
-
-            $currentEvent->delete();
+            $this->cleanUpEvent($currentEvent);
         }
     }
 
@@ -248,6 +238,42 @@ class EndScheduledEvent extends Command
 
         $this->updateMonstersForCharactersAtRaidLocations($raid, $updateRaidMonsters);
 
+        $this->cleanUpEvent($event);
+    }
+
+    /**
+     * Ends a weekly currency event
+     */
+    protected function endWeeklyCurrencyDrops(Event $event): void
+    {
+
+        event(new GlobalMessageEvent('Weekly currency drops have come to an end! Come back next sunday for another chance!'));
+
+        $this->cleanUpEvent($event);
+    }
+
+    /**
+     * End Faction Loyalty Event.
+     */
+    protected function endWeeklyFactionLoyaltyEvent(Event $event): void
+    {
+
+        event(new GlobalMessageEvent('Weekly Faction Loyalty Event has come to an end. Next time Npc Tasks refresh from level up, they will be back to normal.'));
+
+        $this->cleanUpEvent($event);
+    }
+
+    /**
+     * End Weekly Celestial Spawn Event
+     */
+    protected function endWeeklySpawnEvent(Event $event): void
+    {
+        event(new GlobalMessageEvent('The Creator has managed to close the gates and lock the Celestials away behind the doors of Kalitorm! Come back next week for another chance at the hunt!'));
+
+        $this->cleanUpEvent($event);
+    }
+
+    protected function cleanUpEvent(?Event $event = null): void {
         if (! is_null($event)) {
             $announcement = Announcement::where('event_id', $event->id)->first();
 
@@ -259,56 +285,6 @@ class EndScheduledEvent extends Command
 
             $event->delete();
         }
-    }
-
-    /**
-     * Ends a weekly currency event
-     */
-    protected function endWeeklyCurrencyDrops(Event $event): void
-    {
-
-        event(new GlobalMessageEvent('Weekly currency drops have come to an end! Come back next sunday for another chance!'));
-
-        $announcement = Announcement::where('event_id', $event->id)->first();
-
-        event(new DeleteAnnouncementEvent($announcement->id));
-
-        $announcement->delete();
-
-        $event->delete();
-    }
-
-    /**
-     * End Faction Loyalty Event.
-     */
-    protected function endWeeklyFactionLoyaltyEvent(Event $event): void
-    {
-
-        event(new GlobalMessageEvent('Weekly Faction Loyalty Event has come to an end. Next time Npc Tasks refresh from level up, they will be back to normal.'));
-
-        $announcement = Announcement::where('event_id', $event->id)->first();
-
-        event(new DeleteAnnouncementEvent($announcement->id));
-
-        $announcement->delete();
-
-        $event->delete();
-    }
-
-    /**
-     * End Weekly Celestial Spawn Event
-     */
-    protected function endWeeklySpawnEvent(Event $event): void
-    {
-        event(new GlobalMessageEvent('The Creator has managed to close the gates and lock the Celestials away behind the doors of Kalitorm! Come back next week for another chance at the hunt!'));
-
-        $announcement = Announcement::where('event_id', $event->id)->first();
-
-        event(new DeleteAnnouncementEvent($announcement->id));
-
-        $announcement->delete();
-
-        $event->delete();
     }
 
     /**
