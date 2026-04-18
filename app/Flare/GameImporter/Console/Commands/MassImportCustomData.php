@@ -68,7 +68,7 @@ class MassImportCustomData extends Command
         $sourceDirectory = resource_path('backup/info-sections-images');
         $destinationDirectory = storage_path('app/public');
 
-        $deleteCommand = 'rm -rf ' . escapeshellarg($destinationDirectory) . './info-sections-images';
+        $deleteCommand = 'rm -rf '.escapeshellarg($destinationDirectory).'./info-sections-images';
         exec($deleteCommand, $output, $exitCode);
 
         if ($exitCode !== 0) {
@@ -77,7 +77,7 @@ class MassImportCustomData extends Command
             return;
         }
 
-        $command = 'cp -R ' . escapeshellarg($sourceDirectory) . ' ' . escapeshellarg($destinationDirectory);
+        $command = 'cp -R '.escapeshellarg($sourceDirectory).' '.escapeshellarg($destinationDirectory);
         exec($command, $output, $exitCode);
 
         if ($exitCode === 0) {
@@ -135,7 +135,7 @@ class MassImportCustomData extends Command
         foreach ($files as $file) {
             $fileName = pathinfo($file, PATHINFO_FILENAME);
 
-            $path = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps') . '/' . $file));
+            $path = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps').'/'.$file));
 
             $mapValue = new MapNameValue($fileName);
 
