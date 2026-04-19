@@ -7,6 +7,7 @@ use App\Console\AfterDeployment\CreateLocationDataCache;
 use App\Console\AfterDeployment\FixFactionLoyaltyCraftingTasks;
 use App\Console\AfterDeployment\FixKingdomMaxResourcesBasedOnPassiveSkill;
 use App\Console\AfterDeployment\FixWeaponMasteryTypes;
+use App\Console\AfterDeployment\RebuildKingdomCache;
 use App\Console\DevelopmentCommands\GivePlayerDelveLocationQuestItems;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Mail;
@@ -101,6 +102,7 @@ class AppServiceProvider extends ServiceProvider
             CreateLocationDataCache::class,
             FixKingdomMaxResourcesBasedOnPassiveSkill::class,
             CleanUpInvalidBrokenQueues::class,
+            RebuildKingdomCache::class,
 
             // Development Commands:
             CreateCharacter::class,

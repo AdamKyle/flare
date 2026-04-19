@@ -79,6 +79,7 @@ class WalkingService extends BaseMovementService
         }
 
         $this->updateMonstersList($character, $location);
+        $this->updateKingdomOwnedKingdom($character);
 
         event(new MoveTimeOutEvent($character));
 

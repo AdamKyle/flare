@@ -46,25 +46,26 @@ class GiveKingdomsToNpcHandler
      */
     public function giveKingdoms(User $user): void
     {
-        $kingdoms = $user->character->kingdoms;
+        $character = $user->character;
+        $kingdoms = $character->kingdoms;
 
         if ($kingdoms->isEmpty()) {
             return;
         }
 
         foreach ($kingdoms as $kingdom) {
-
             $kingdom->update([
                 'character_id' => null,
                 'npc_owned' => true,
                 'current_morale' => 0.01,
+                'is_capital' => false,
             ]);
         }
 
-        $map = $user->character->map;
+        $this->rebuildCharacterKingdomCache($character);
 
         event(new UpdateMapDetailsBroadcast($user, $this->locationService));
 
-        event(new UpdateGlobalMap($user->character));
+        event(new UpdateGlobalMap($character));
     }
 }
