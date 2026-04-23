@@ -26,8 +26,8 @@ use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
-use App\Game\Exploration\Events\ExplorationLogUpdate;
-use App\Game\Exploration\Events\ExplorationTimeOut;
+use App\Game\Exploration\Events\AutomationLogUpdate;
+use App\Game\Exploration\Events\AutomationTimeOut;
 use App\Game\Skills\Services\SkillService;
 use Psr\SimpleCache\InvalidArgumentException;
 
@@ -35,9 +35,9 @@ class DelveExploration implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    const MAX_ATTEMPTS = 10;
+    const int MAX_ATTEMPTS = 10;
 
-    const MAX_INCREASE_PERCENTAGE = 1000.00;
+    const float MAX_INCREASE_PERCENTAGE = 1000.00;
 
     public ?Character $character = null;
 
@@ -179,7 +179,7 @@ class DelveExploration implements ShouldQueue
 
             event(new UpdateCharacterStatus($character));
 
-            event(new ExplorationTimeOut($character->user, 0));
+            event(new AutomationTimeOut($character->user, 0));
 
             return;
         }
@@ -190,7 +190,7 @@ class DelveExploration implements ShouldQueue
             'completed_at' => now(),
         ]);
 
-        event(new ExplorationTimeOut($this->character->user, 0));
+        event(new AutomationTimeOut($this->character->user, 0));
     }
 
     private function deletePackCache(): void {
@@ -397,7 +397,7 @@ class DelveExploration implements ShouldQueue
 
             $this->deletePackCache();
 
-            event(new ExplorationTimeOut($this->character->user, 0));
+            event(new AutomationTimeOut($this->character->user, 0));
 
             return true;
         }
@@ -467,7 +467,7 @@ class DelveExploration implements ShouldQueue
 
             event(new UpdateCharacterStatus($character));
 
-            event(new ExplorationTimeOut($character->user, 0));
+            event(new AutomationTimeOut($character->user, 0));
         }
 
         if (! is_null($delveExploration)) {
@@ -548,7 +548,7 @@ class DelveExploration implements ShouldQueue
     private function sendOutEventLogUpdate(string $message, bool $makeItalic = false, bool $isReward = false): void
     {
         if ($this->character->isLoggedIn()) {
-            event(new ExplorationLogUpdate($this->character->user->id, $message, $makeItalic, $isReward));
+            event(new AutomationLogUpdate($this->character->user->id, $message, $makeItalic, $isReward));
         }
     }
 

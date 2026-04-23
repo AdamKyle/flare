@@ -1,4 +1,4 @@
-export default interface ExplorationMessageType {
+export default interface AutomationMessageType {
     id: number;
 
     message: string;

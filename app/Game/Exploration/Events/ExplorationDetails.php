@@ -37,6 +37,6 @@ class ExplorationDetails implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('exploration-attack-details-'.$this->user->id);
+        return new PrivateChannel('automation-attack-details-'.$this->user->id);
     }
 }

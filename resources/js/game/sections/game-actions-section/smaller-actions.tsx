@@ -71,7 +71,7 @@ export default class SmallerActions extends React.Component<
 
         // @ts-ignore
         this.explorationTimeOut = Echo.private(
-            "exploration-timeout-" + this.props.character.user_id,
+            "automation-timeout-" + this.props.character.user_id,
         );
 
         // @ts-ignore
@@ -139,7 +139,7 @@ export default class SmallerActions extends React.Component<
 
         // // @ts-ignore
         this.explorationTimeOut.listen(
-            "Game.Exploration.Events.ExplorationTimeOut",
+            "Game.Exploration.Events.AutomationTimeOut",
             (event: any) => {
                 this.setState({
                     automation_time_out: event.forLength,

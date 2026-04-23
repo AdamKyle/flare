@@ -10,20 +10,24 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ExplorationStatus implements ShouldBroadcast
+class AutomationStatus implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * @var User
      */
-    public $user;
+    private User $user;
 
     /**
      * @var bool
      */
-    public $isRunning;
+    public bool $isRunning;
 
+    /**
+     * @param User $user
+     * @param bool $isRunning
+     */
     public function __construct(User $user, bool $isRunning)
     {
         $this->user = $user;
@@ -37,6 +41,6 @@ class ExplorationStatus implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('exploration-status-'.$this->user->id);
+        return new PrivateChannel('automation-status-'.$this->user->id);
     }
 }

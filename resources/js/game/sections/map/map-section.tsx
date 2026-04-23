@@ -76,7 +76,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
         // @ts-ignore
         this.explorationTimeOut = Echo.private(
-            "exploration-timeout-" + this.props.user_id,
+            "automation-timeout-" + this.props.user_id,
         );
 
         // @ts-ignore
@@ -118,7 +118,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         );
 
         this.explorationTimeOut.listen(
-            "Game.Exploration.Events.ExplorationTimeOut",
+            "Game.Exploration.Events.AutomationTimeOut",
             (event: any) => {
                 this.setState({
                     automation_time_out: event.forLength,

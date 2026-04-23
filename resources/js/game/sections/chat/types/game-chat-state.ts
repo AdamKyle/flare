@@ -1,13 +1,13 @@
 import ChatType from "./deffinitions/chat-type";
 import ServerMessageType from "./deffinitions/server-message-type";
 import TabsType from "../../../lib/game/types/tabs-type";
-import ExplorationMessageType from "./deffinitions/exploration-message-type";
+import AutomationMessageType from "./deffinitions/automation-message-type";
 
 export default interface GameChatState {
     chat: ChatType[] | [];
     announcements: AnnouncementType[] | [];
     server_messages: ServerMessageType[] | [];
-    exploration_messages: ExplorationMessageType[] | [];
+    automation_messages: AutomationMessageType[] | [];
     message: string;
     is_silenced: boolean;
     can_talk_again_at: string | null;

@@ -7,7 +7,7 @@ import { AxiosError, AxiosResponse } from "axios";
 import Chat from "./chat";
 import GameChatProps from "./types/game-chat-props";
 import GameChatState from "./types/game-chat-state";
-import ExplorationMessages from "./exploration-messages";
+import AutomationMessages from "./automation-messages";
 import { DateTime } from "luxon";
 import AnnouncementMessages from "./announcement-messages";
 import DropDown from "../../components/ui/drop-down/drop-down";
@@ -26,7 +26,7 @@ export default class GameChat extends React.Component<
 
     private npcMessage: any;
 
-    private explorationMessage: any;
+    private automationMessage: any;
 
     private announcements: any;
 
@@ -39,7 +39,7 @@ export default class GameChat extends React.Component<
             chat: [],
             announcements: [],
             server_messages: [],
-            exploration_messages: [],
+            automation_messages: [],
             message: "",
             is_silenced: false,
             can_talk_again_at: null,
@@ -57,8 +57,8 @@ export default class GameChat extends React.Component<
                     updated: false,
                 },
                 {
-                    key: "exploration-messages",
-                    name: "Exploration",
+                    key: "automation-messages",
+                    name: "Automation",
                     updated: false,
                 },
                 {
@@ -78,8 +78,8 @@ export default class GameChat extends React.Component<
         );
 
         // @ts-ignore
-        this.explorationMessage = Echo.private(
-            "exploration-log-update-" + this.props.user_id,
+        this.automationMessage = Echo.private(
+            "automation-log-update-" + this.props.user_id,
         );
 
         // @ts-ignore
@@ -164,15 +164,15 @@ export default class GameChat extends React.Component<
         );
 
         // @ts-ignore
-        this.explorationMessage.listen(
-            "Game.Exploration.Events.ExplorationLogUpdate",
+        this.automationMessage.listen(
+            "Game.Exploration.Events.AutomationLogUpdate",
             (event: any) => {
                 let messages = JSON.parse(
-                    JSON.stringify(this.state.exploration_messages),
+                    JSON.stringify(this.state.automation_messages),
                 );
 
                 if (messages.length > 1000) {
-                    messages.length = 250; // Remove the last 3/4's worth of messages
+                    messages.length = 250;
                 }
 
                 messages.unshift({
@@ -184,13 +184,13 @@ export default class GameChat extends React.Component<
 
                 this.setState(
                     {
-                        exploration_messages: messages,
-                        updated_tabs: this.canUpdateTabs("Exploration")
-                            ? [...this.state.updated_tabs, "Exploration"]
+                        automation_messages: messages,
+                        updated_tabs: this.canUpdateTabs("Automation")
+                            ? [...this.state.updated_tabs, "Automation"]
                             : this.state.updated_tabs,
                     },
                     () => {
-                        this.setTabToUpdated("exploration-messages");
+                        this.setTabToUpdated("automation-messages");
                     },
                 );
             },
@@ -209,7 +209,7 @@ export default class GameChat extends React.Component<
                 );
 
                 if (messages.length > 1000) {
-                    messages.length = 250; // Remove the last 3/4's worth of messages
+                    messages.length = 250;
                 }
 
                 messages.unshift({
@@ -530,9 +530,9 @@ export default class GameChat extends React.Component<
                 on_click: () => this.switchChat("Server Messages"),
             },
             {
-                name: "Exploration",
+                name: "Automation",
                 icon_class: "fas fa-dragon",
-                on_click: () => this.switchChat("Exploration"),
+                on_click: () => this.switchChat("Automation"),
             },
             {
                 name: "Announcements",
@@ -550,10 +550,10 @@ export default class GameChat extends React.Component<
                         announcements={this.state.announcements}
                     />
                 );
-            case "Exploration":
+            case "Automation":
                 return (
-                    <ExplorationMessages
-                        exploration_messages={this.state.exploration_messages}
+                    <AutomationMessages
+                        automation_messages={this.state.automation_messages}
                     />
                 );
             case "Server Messages":
@@ -651,10 +651,10 @@ export default class GameChat extends React.Component<
                             />
                         </TabPanel>
 
-                        <TabPanel key={"exploration-messages"}>
-                            <ExplorationMessages
-                                exploration_messages={
-                                    this.state.exploration_messages
+                        <TabPanel key={"automation-messages"}>
+                            <AutomationMessages
+                                automation_messages={
+                                    this.state.automation_messages
                                 }
                             />
                         </TabPanel>

@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ExplorationLogUpdate implements ShouldBroadcast
+class AutomationLogUpdate implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -19,14 +19,17 @@ class ExplorationLogUpdate implements ShouldBroadcast
     /**
      * @var string
      */
-    public $message;
+    public string $message;
 
-    public $makeItalic;
+    public bool $makeItalic;
 
-    public $isReward;
+    public bool $isReward;
 
     /**
-     * @param  User  $user
+     * @param int $userId
+     * @param string $message
+     * @param bool $makeItalic
+     * @param bool $isReward
      */
     public function __construct(int $userId, string $message, bool $makeItalic = false, bool $isReward = false)
     {
@@ -43,6 +46,6 @@ class ExplorationLogUpdate implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('exploration-log-update-'.$this->userId);
+        return new PrivateChannel('automation-log-update-'.$this->userId);
     }
 }

@@ -1,19 +1,19 @@
 import React from "react";
 import Messages from "./components/messages";
-import ExplorationMessagesComponentProps from "./types/components/exploration-messages-component-props";
-import ExplorationMessageType from "./types/deffinitions/exploration-message-type";
+import AutomationMessagesComponentProps from "./types/components/automation-messages-component-props";
+import ExplorationMessageType from "./types/deffinitions/automation-message-type";
 import clsx from "clsx";
 
-export default class ExplorationMessages extends React.Component<
-    ExplorationMessagesComponentProps,
+export default class AutomationMessages extends React.Component<
+    AutomationMessagesComponentProps,
     any
 > {
-    constructor(props: ExplorationMessagesComponentProps) {
+    constructor(props: AutomationMessagesComponentProps) {
         super(props);
     }
 
     buildMessages() {
-        return this.props.exploration_messages.map(
+        return this.props.automation_messages.map(
             (message: ExplorationMessageType) => {
                 if (message.id !== 0 && message.id !== null) {
                     return (

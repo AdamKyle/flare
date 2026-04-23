@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ExplorationTimeOut implements ShouldBroadcast
+class AutomationTimeOut implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -23,11 +23,6 @@ class ExplorationTimeOut implements ShouldBroadcast
      * @var int
      */
     public $forLength;
-
-    /**
-     * @var bool
-     */
-    public $activateBar;
 
     /**
      * Create a new event instance.
@@ -48,6 +43,6 @@ class ExplorationTimeOut implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('exploration-timeout-'.$this->user->id);
+        return new PrivateChannel('automation-timeout-'.$this->user->id);
     }
 }

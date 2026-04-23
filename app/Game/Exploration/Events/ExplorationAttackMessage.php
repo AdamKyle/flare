@@ -43,6 +43,6 @@ class ExplorationAttackMessage implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('exploration-attack-messages-'.$this->user->id);
+        return new PrivateChannel('automation-attack-messages-'.$this->user->id);
     }
 }
