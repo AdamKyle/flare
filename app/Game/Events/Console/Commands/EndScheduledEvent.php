@@ -27,7 +27,7 @@ use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\Events\Services\KingdomEventService;
 use App\Game\Events\Values\EventType;
-use App\Game\Exploration\Services\ExplorationAutomationService;
+use App\Game\Automation\Services\ExplorationAutomationService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\TraverseService;

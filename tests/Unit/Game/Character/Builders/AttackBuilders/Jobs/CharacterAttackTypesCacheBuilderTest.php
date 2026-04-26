@@ -7,7 +7,7 @@ use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
-use App\Game\Exploration\Events\AutomationLogUpdate;
+use App\Game\Automation\Events\AutomationLogUpdate;
 use Cache;
 use Event;
 use Illuminate\Foundation\Testing\RefreshDatabase;

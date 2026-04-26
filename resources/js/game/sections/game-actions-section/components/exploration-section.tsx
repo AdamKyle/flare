@@ -273,7 +273,7 @@ export default class ExplorationSection extends React.Component<any, any> {
             () => {
                 new Ajax()
                     .setRoute(
-                        "exploration/" + this.props.character.id + "/start",
+                        "automation/" + this.props.character.id + "/start",
                     )
                     .setParameters({
                         auto_attack_length: this.state.time_selected,
@@ -349,9 +349,7 @@ export default class ExplorationSection extends React.Component<any, any> {
             },
             () => {
                 new Ajax()
-                    .setRoute(
-                        "exploration/" + this.props.character.id + "/stop",
-                    )
+                    .setRoute("automation/" + this.props.character.id + "/stop")
                     .doAjaxCall(
                         "post",
                         (result: AxiosResponse) => {

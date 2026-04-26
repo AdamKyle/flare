@@ -9,7 +9,7 @@ use App\Flare\Models\GameRace;
 use App\Flare\Models\Monster;
 use App\Flare\Models\User;
 use App\Game\Character\CharacterCreation\Services\CharacterBuilderService;
-use App\Game\Exploration\Services\ExplorationAutomationService;
+use App\Game\Automation\Services\ExplorationAutomationService;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;

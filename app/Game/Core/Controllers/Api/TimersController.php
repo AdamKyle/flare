@@ -6,7 +6,7 @@ use App\Flare\Models\Character;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\ShowCraftingTimeOutEvent;
 use App\Game\Core\Events\ShowTimeOutEvent as EventsShowTimeOutEvent;
-use App\Game\Exploration\Events\AutomationTimeOut;
+use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Maps\Events\ShowTimeOutEvent;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;

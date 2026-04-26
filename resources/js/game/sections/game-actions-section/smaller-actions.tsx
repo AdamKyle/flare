@@ -139,7 +139,7 @@ export default class SmallerActions extends React.Component<
 
         // // @ts-ignore
         this.explorationTimeOut.listen(
-            "Game.Exploration.Events.AutomationTimeOut",
+            "Game.Automation.Events.AutomationTimeOut",
             (event: any) => {
                 this.setState({
                     automation_time_out: event.forLength,

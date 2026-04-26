@@ -165,7 +165,7 @@ export default class GameChat extends React.Component<
 
         // @ts-ignore
         this.automationMessage.listen(
-            "Game.Exploration.Events.AutomationLogUpdate",
+            "Game.Automation.Events.AutomationLogUpdate",
             (event: any) => {
                 let messages = JSON.parse(
                     JSON.stringify(this.state.automation_messages),
