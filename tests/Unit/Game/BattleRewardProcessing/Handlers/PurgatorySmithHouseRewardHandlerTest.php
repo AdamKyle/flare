@@ -231,7 +231,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
             ],
         ]);
 
-        $this->createExploringAutomation([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
         ]);
 
@@ -832,7 +832,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
         ]);
 
-        $this->createExploringAutomation([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
         ]);
 

@@ -181,7 +181,7 @@ class GoldMinesRewardHandlerTest extends TestCase
             ],
         ]);
 
-        $this->createExploringAutomation([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
         ]);
 

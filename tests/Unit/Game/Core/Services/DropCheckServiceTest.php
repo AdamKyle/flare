@@ -262,7 +262,7 @@ class DropCheckServiceTest extends TestCase
 
         $this->createSpecialLocation($character, LocationType::PURGATORY_DUNGEONS);
 
-        $this->createExploringAutomation([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
         ]);
 

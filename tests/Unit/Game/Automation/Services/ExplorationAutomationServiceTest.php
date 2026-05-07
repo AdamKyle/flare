@@ -2,19 +2,19 @@
 
 namespace Tests\Unit\Game\Automation\Services;
 
-use Carbon\Carbon;
-use App\Game\Skills\Values\SkillTypeValue;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Monster;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
-use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationStatus;
 use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Jobs\Exploration;
 use App\Game\Automation\Services\ExplorationAutomationService;
+use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Skills\Values\SkillTypeValue;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
@@ -22,9 +22,11 @@ use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Monster\MonsterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterAutomation;
 
 class ExplorationAutomationServiceTest extends TestCase
 {
+    use CreateCharacterAutomation;
     use RefreshDatabase;
 
     private ExplorationAutomationService $service;
@@ -32,6 +34,8 @@ class ExplorationAutomationServiceTest extends TestCase
     private Character $character;
 
     private Monster $monster;
+
+    private CharacterAutomation $automation;
 
     public function setUp(): void
     {
@@ -47,6 +51,17 @@ class ExplorationAutomationServiceTest extends TestCase
         $this->monster = (new MonsterFactory)
             ->buildMonster()
             ->getMonster();
+
+        $this->automation = $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'move_down_monster_list_every' => 10,
+            'previous_level' => $this->character->level,
+            'current_level' => $this->character->level,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
     }
 
     public function testBeginAutomationCreatesExplorationAutomation(): void
@@ -56,7 +71,7 @@ class ExplorationAutomationServiceTest extends TestCase
 
         $this->service->beginAutomation($this->character, $this->params());
 
-        $automation = CharacterAutomation::first();
+        $automation = CharacterAutomation::query()->latest('id')->first();
 
         $this->assertEquals($this->character->id, $automation->character_id);
         $this->assertEquals($this->monster->id, $automation->monster_id);
@@ -107,20 +122,7 @@ class ExplorationAutomationServiceTest extends TestCase
     {
         Event::fake();
 
-        CharacterAutomation::create([
-            'character_id' => $this->character->id,
-            'monster_id' => $this->monster->id,
-            'type' => AutomationType::EXPLORING,
-            'started_at' => now(),
-            'completed_at' => now()->addHour(),
-            'move_down_monster_list_every' => 10,
-            'previous_level' => $this->character->level,
-            'current_level' => $this->character->level,
-            'attack_type' => AttackTypeValue::ATTACK,
-        ]);
-
         $this->service->stopExploration($this->character);
-
 
         $this->assertNull(
             CharacterAutomation::where('character_id', $this->character->id)
@@ -133,6 +135,8 @@ class ExplorationAutomationServiceTest extends TestCase
     {
         Event::fake();
 
+        $this->automation->delete();
+
         $response = $this->service->stopExploration($this->character);
 
         $this->assertEquals(422, $response->getStatusCode());
@@ -141,18 +145,6 @@ class ExplorationAutomationServiceTest extends TestCase
     public function testStopExplorationClearsCharacterSurvivalCache(): void
     {
         Event::fake();
-
-        CharacterAutomation::create([
-            'character_id' => $this->character->id,
-            'monster_id' => $this->monster->id,
-            'type' => AutomationType::EXPLORING,
-            'started_at' => now(),
-            'completed_at' => now()->addHour(),
-            'move_down_monster_list_every' => 10,
-            'previous_level' => $this->character->level,
-            'current_level' => $this->character->level,
-            'attack_type' => AttackTypeValue::ATTACK,
-        ]);
 
         Cache::put('can-character-survive-' . $this->character->id, true);
 
@@ -164,18 +156,6 @@ class ExplorationAutomationServiceTest extends TestCase
     public function testStopExplorationDispatchesAutomationStatus(): void
     {
         Event::fake();
-
-        CharacterAutomation::create([
-            'character_id' => $this->character->id,
-            'monster_id' => $this->monster->id,
-            'type' => AutomationType::EXPLORING,
-            'started_at' => now(),
-            'completed_at' => now()->addHour(),
-            'move_down_monster_list_every' => 10,
-            'previous_level' => $this->character->level,
-            'current_level' => $this->character->level,
-            'attack_type' => AttackTypeValue::ATTACK,
-        ]);
 
         $this->service->stopExploration($this->character);
 
@@ -203,7 +183,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'auto_attack_length' => 3,
         ]);
 
-        $automation = CharacterAutomation::first();
+        $automation = CharacterAutomation::query()->latest('id')->first();
 
         $this->assertEquals($now->copy()->addHours(3)->toDateTimeString(), $automation->completed_at->toDateTimeString());
 
@@ -220,7 +200,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'attack_type' => AttackTypeValue::CAST,
         ]);
 
-        $automation = CharacterAutomation::first();
+        $automation = CharacterAutomation::query()->latest('id')->first();
 
         $this->assertEquals(AttackTypeValue::CAST, $automation->attack_type);
     }
@@ -235,7 +215,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'move_down_the_list_every' => 25,
         ]);
 
-        $automation = CharacterAutomation::first();
+        $automation = CharacterAutomation::query()->latest('id')->first();
 
         $this->assertEquals(25, $automation->move_down_monster_list_every);
     }
@@ -253,7 +233,7 @@ class ExplorationAutomationServiceTest extends TestCase
 
         $this->service->beginAutomation($this->character, $this->params());
 
-        $automation = CharacterAutomation::first();
+        $automation = CharacterAutomation::query()->latest('id')->first();
 
         $this->assertEquals(10, $automation->previous_level);
         $this->assertEquals(10, $automation->current_level);
@@ -262,8 +242,6 @@ class ExplorationAutomationServiceTest extends TestCase
     public function testStopExplorationDispatchesAutomationTimeOut(): void
     {
         Event::fake();
-
-        $this->createAutomation();
 
         $this->service->stopExploration($this->character);
 
@@ -274,8 +252,6 @@ class ExplorationAutomationServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->createAutomation();
-
         $this->service->stopExploration($this->character);
 
         Event::assertDispatched(UpdateCharacterStatus::class);
@@ -285,8 +261,6 @@ class ExplorationAutomationServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->createAutomation();
-
         $this->service->stopExploration($this->character);
 
         Event::assertDispatched(AutomationLogUpdate::class);
@@ -295,8 +269,6 @@ class ExplorationAutomationServiceTest extends TestCase
     public function testStopExplorationClearsCharacterSheetCache(): void
     {
         Event::fake();
-
-        $this->createAutomation();
 
         Cache::put('character-sheet-' . $this->character->id, ['level' => 1]);
 
@@ -308,8 +280,6 @@ class ExplorationAutomationServiceTest extends TestCase
     public function testStopExplorationClearsCharacterDefenceCache(): void
     {
         Event::fake();
-
-        $this->createAutomation();
 
         Cache::put('character-defence-' . $this->character->id, 100);
 
@@ -343,20 +313,5 @@ class ExplorationAutomationServiceTest extends TestCase
             'move_down_the_list_every' => 10,
             'attack_type' => AttackTypeValue::ATTACK,
         ];
-    }
-
-    private function createAutomation(): CharacterAutomation
-    {
-        return CharacterAutomation::create([
-            'character_id' => $this->character->id,
-            'monster_id' => $this->monster->id,
-            'type' => AutomationType::EXPLORING,
-            'started_at' => now(),
-            'completed_at' => now()->addHour(),
-            'move_down_monster_list_every' => 10,
-            'previous_level' => $this->character->level,
-            'current_level' => $this->character->level,
-            'attack_type' => AttackTypeValue::ATTACK,
-        ]);
     }
 }

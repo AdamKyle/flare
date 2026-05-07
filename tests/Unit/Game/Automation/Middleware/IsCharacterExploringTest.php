@@ -52,7 +52,7 @@ class IsCharacterExploringTest extends TestCase
     {
         Event::fake();
 
-        $this->createExploringAutomation();
+        $this->createCharacterAutomation();
 
         $response = $this->middleware->handle($this->jsonRequest(), function () {
             return response()->json([
@@ -73,7 +73,7 @@ class IsCharacterExploringTest extends TestCase
     {
         Event::fake();
 
-        $this->createExploringAutomation();
+        $this->createCharacterAutomation();
 
         $this->middleware->handle($this->jsonRequest(), function () {
             return response()->json([
@@ -100,7 +100,7 @@ class IsCharacterExploringTest extends TestCase
     {
         Event::fake();
 
-        $this->createExploringAutomation();
+        $this->createCharacterAutomation();
 
         $response = $this->middleware->handle($this->webRequest(), function () {
             return response('continued');
@@ -113,7 +113,7 @@ class IsCharacterExploringTest extends TestCase
     {
         Event::fake();
 
-        $this->createExploringAutomation();
+        $this->createCharacterAutomation();
 
         $this->middleware->handle($this->webRequest(), function () {
             return response('continued');
@@ -136,7 +136,7 @@ class IsCharacterExploringTest extends TestCase
         ]);
     }
 
-    private function createExploringAutomation(): CharacterAutomation
+    private function createCharacterAutomation(): CharacterAutomation
     {
         return CharacterAutomation::factory()->create([
             'character_id' => $this->character->id,

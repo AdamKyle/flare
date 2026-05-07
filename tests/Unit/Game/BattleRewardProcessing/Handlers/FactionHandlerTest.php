@@ -81,7 +81,7 @@ class FactionHandlerTest extends TestCase
      * @param array $options
      * @return void
      */
-    private function createExploringAutomation(array $options): void
+    private function createCharacterAutomation(array $options): void
     {
         $this->assertNotNull($this->character);
 
@@ -503,7 +503,7 @@ class FactionHandlerTest extends TestCase
         $faction->maxed = false;
         $faction->save();
 
-        $this->createExploringAutomation([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'monster_id' => $this->monster->id,
         ]);

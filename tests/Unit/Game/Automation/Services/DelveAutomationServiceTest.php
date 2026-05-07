@@ -10,12 +10,12 @@ use App\Flare\Models\Monster;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\LocationType;
-use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationStatus;
 use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Jobs\DelveExploration as DelveExplorationProcessing;
 use App\Game\Automation\Services\DelveExplorationAutomationService;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -24,9 +24,13 @@ use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Monster\MonsterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterAutomation;
+use Tests\Traits\CreateDelveAutomation;
 
 class DelveAutomationServiceTest extends TestCase
 {
+    use CreateCharacterAutomation;
+    use CreateDelveAutomation;
     use RefreshDatabase;
 
     private DelveExplorationAutomationService $service;
@@ -36,6 +40,10 @@ class DelveAutomationServiceTest extends TestCase
     private Monster $monster;
 
     private Location $location;
+
+    private CharacterAutomation $characterAutomation;
+
+    private DelveExploration $delveExploration;
 
     public function setUp(): void
     {
@@ -65,6 +73,23 @@ class DelveAutomationServiceTest extends TestCase
             'type' => LocationType::CAVE_OF_MEMORIES,
             'minutes_between_delve_fights' => 7,
         ]);
+
+        $this->characterAutomation = $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHours(8),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $this->delveExploration = $this->createDelveAutomation([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'started_at' => now(),
+            'completed_at' => null,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
     }
 
     public function testBeginAutomationCreatesDelveAutomation(): void
@@ -74,7 +99,7 @@ class DelveAutomationServiceTest extends TestCase
 
         $this->service->beginAutomation($this->character, $this->location, $this->params());
 
-        $automation = CharacterAutomation::first();
+        $automation = CharacterAutomation::query()->latest('id')->first();
 
         $this->assertEquals(AutomationType::DELVE, $automation->type);
     }
@@ -86,7 +111,7 @@ class DelveAutomationServiceTest extends TestCase
 
         $this->service->beginAutomation($this->character, $this->location, $this->params());
 
-        $automation = CharacterAutomation::first();
+        $automation = CharacterAutomation::query()->latest('id')->first();
 
         $this->assertEquals($this->monster->id, $automation->monster_id);
     }
@@ -101,7 +126,7 @@ class DelveAutomationServiceTest extends TestCase
             'attack_type' => AttackTypeValue::CAST,
         ]);
 
-        $automation = CharacterAutomation::first();
+        $automation = CharacterAutomation::query()->latest('id')->first();
 
         $this->assertEquals(AttackTypeValue::CAST, $automation->attack_type);
     }
@@ -117,7 +142,7 @@ class DelveAutomationServiceTest extends TestCase
 
         $this->service->beginAutomation($this->character, $this->location, $this->params());
 
-        $automation = CharacterAutomation::first();
+        $automation = CharacterAutomation::query()->latest('id')->first();
 
         $this->assertEquals($now->copy()->addHours(8)->toDateTimeString(), $automation->completed_at->toDateTimeString());
 
@@ -131,7 +156,7 @@ class DelveAutomationServiceTest extends TestCase
 
         $this->service->beginAutomation($this->character, $this->location, $this->params());
 
-        $delveExploration = DelveExploration::first();
+        $delveExploration = DelveExploration::query()->latest('id')->first();
 
         $this->assertEquals($this->character->id, $delveExploration->character_id);
         $this->assertEquals($this->monster->id, $delveExploration->monster_id);
@@ -182,9 +207,6 @@ class DelveAutomationServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->createAutomation();
-        $this->createDelveExploration();
-
         $this->service->stopExploration($this->character);
 
         $this->assertNull(
@@ -198,19 +220,19 @@ class DelveAutomationServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->createAutomation();
-        $this->createDelveExploration();
-
         $this->service->stopExploration($this->character);
 
-        $delveExploration = DelveExploration::first();
+        $this->delveExploration->refresh();
 
-        $this->assertNotNull($delveExploration->completed_at);
+        $this->assertNotNull($this->delveExploration->completed_at);
     }
 
     public function testStopExplorationReturns422WhenNoAutomationExists(): void
     {
         Event::fake();
+
+        $this->characterAutomation->delete();
+        $this->delveExploration->delete();
 
         $response = $this->service->stopExploration($this->character);
 
@@ -220,9 +242,6 @@ class DelveAutomationServiceTest extends TestCase
     public function testStopExplorationClearsCharacterSurvivalCache(): void
     {
         Event::fake();
-
-        $this->createAutomation();
-        $this->createDelveExploration();
 
         Cache::put('can-character-survive-' . $this->character->id, true);
 
@@ -235,9 +254,6 @@ class DelveAutomationServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->createAutomation();
-        $this->createDelveExploration();
-
         $this->service->stopExploration($this->character);
 
         Event::assertDispatched(AutomationTimeOut::class);
@@ -246,9 +262,6 @@ class DelveAutomationServiceTest extends TestCase
     public function testStopExplorationDispatchesAutomationStatus(): void
     {
         Event::fake();
-
-        $this->createAutomation();
-        $this->createDelveExploration();
 
         $this->service->stopExploration($this->character);
 
@@ -259,9 +272,6 @@ class DelveAutomationServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->createAutomation();
-        $this->createDelveExploration();
-
         $this->service->stopExploration($this->character);
 
         Event::assertDispatched(UpdateCharacterStatus::class);
@@ -270,9 +280,6 @@ class DelveAutomationServiceTest extends TestCase
     public function testStopExplorationDispatchesAutomationLogUpdate(): void
     {
         Event::fake();
-
-        $this->createAutomation();
-        $this->createDelveExploration();
 
         $this->service->stopExploration($this->character);
 
@@ -303,27 +310,5 @@ class DelveAutomationServiceTest extends TestCase
             'attack_type' => AttackTypeValue::ATTACK,
             'pack_size' => 5,
         ];
-    }
-
-    private function createAutomation(): CharacterAutomation
-    {
-        return CharacterAutomation::create([
-            'character_id' => $this->character->id,
-            'monster_id' => $this->monster->id,
-            'type' => AutomationType::DELVE,
-            'started_at' => now(),
-            'completed_at' => now()->addHours(8),
-            'attack_type' => AttackTypeValue::ATTACK,
-        ]);
-    }
-
-    private function createDelveExploration(): DelveExploration
-    {
-        return DelveExploration::create([
-            'character_id' => $this->character->id,
-            'monster_id' => $this->monster->id,
-            'started_at' => now(),
-            'attack_type' => AttackTypeValue::ATTACK,
-        ]);
     }
 }

@@ -106,7 +106,7 @@ class CharacterCurrencyRewardServiceTest extends TestCase
 
         $character = $characterFactory->getCharacter();
 
-        $this->createExploringAutomation([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
         ]);
 
@@ -282,7 +282,7 @@ class CharacterCurrencyRewardServiceTest extends TestCase
 
         $character = $this->character->getCharacter();
 
-        $this->createExploringAutomation([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
         ]);
 
