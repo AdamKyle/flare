@@ -136,7 +136,7 @@ class ExplorationControllerTest extends TestCase
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertEquals(422, $response->getStatusCode());
-        $this->assertEquals('Nope. You already have one in progress.', $jsonData['message']);
+        $this->assertEquals('Nope. You already have one automation in progress.', $jsonData['message']);
     }
 
     public function testBeginReturns422WhenCharacterIsOnBlockedLocation(): void

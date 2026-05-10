@@ -109,4 +109,23 @@ trait FactionLoyalty
             ->intersect($craftingTypeArray)
             ->isNotEmpty();
     }
+
+    /**
+     * Do we have any incomplete tasks for a Faction Loyalty NPC?
+     *
+     * @param FactionLoyaltyNpc $factionLoyaltyNpc
+     * @return bool
+     */
+    public function hasIncompleteTasks(FactionLoyaltyNpc $factionLoyaltyNpc): bool
+    {
+        $factionLoyaltyNpcTask = $factionLoyaltyNpc->factionLoyaltyNpcTasks;
+
+        if (is_null($factionLoyaltyNpcTask)) {
+            return false;
+        }
+
+        return collect($factionLoyaltyNpcTask->fame_tasks)->contains(function (array $task): bool {
+            return $task['current_amount'] < $task['required_amount'];
+        });
+    }
 }

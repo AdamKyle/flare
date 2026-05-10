@@ -35,11 +35,12 @@ class ExplorationController extends Controller
                 ->where('completed_at', '>', now())
                 ->where(function ($query) {
                     $query->where('type', AutomationType::DELVE)
-                        ->orWhere('type', AutomationType::EXPLORING);
+                        ->orWhere('type', AutomationType::EXPLORING)
+                        ->orWhere('type', AutomationType::FACTION_LOYALTY);
                 })
                 ->count() > 0) {
             return response()->json([
-                'message' => 'Nope. You already have one in progress.',
+                'message' => 'Nope. You already have one automation in progress.',
             ], 422);
         }
 

@@ -52,7 +52,7 @@ class FactionLoyaltyAutomation extends Model
     }
 
     public function failedFactionCraftingItem() {
-        return $this->belongsTo(Item::class, 'failed_faction_crafting_item_id', 'id');
+        return $this->belongsTo(Item::class, 'failed_crafting_item_id', 'id');
     }
 
     protected static function newFactory()

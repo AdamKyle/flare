@@ -2,6 +2,8 @@
 
 namespace App\Game\Automation\Providers;
 
+use App\Game\Automation\Services\DelveExplorationAutomationService;
+use App\Game\Automation\Services\FactionLoyaltyAutomationService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Automation\Middleware\IsCharacterExploring;
@@ -21,6 +23,16 @@ class ServiceProvider extends ApplicationServiceProvider
             return new ExplorationAutomationService(
                 $app->make(CharacterCacheData::class)
             );
+        });
+
+        $this->app->bind(DelveExplorationAutomationService::class, function ($app) {
+            return new DelveExplorationAutomationService(
+                $app->make(CharacterCacheData::class)
+            );
+        });
+
+        $this->app->bind(FactionLoyaltyAutomationService::class, function ($app) {
+            return new FactionLoyaltyAutomationService();
         });
     }
 

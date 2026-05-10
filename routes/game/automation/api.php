@@ -12,5 +12,8 @@ Route::middleware([
 
         Route::post('/delve/{character}/start', ['as' => 'delve.start', 'uses' => 'Api\DelveExplorationController@begin']);
         Route::post('/delve/{character}/stop', ['as' => 'delve.stop', 'uses' => 'Api\DelveExplorationController@stop']);
+
+        Route::post('/faction-loyalty-automation/{character}/start', ['as' => 'faction-loyalty-automation.start', 'uses' => 'Api\FactionLoyaltyAutomationController@begin']);
+        Route::post('/faction-loyalty-automation/{character}/stop', ['as' => 'faction-loyalty-automation.stop', 'uses' => 'Api\FactionLoyaltyAutomationController@stop']);
     });
 });
