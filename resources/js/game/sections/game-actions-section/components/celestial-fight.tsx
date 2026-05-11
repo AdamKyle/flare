@@ -1,9 +1,7 @@
-import clsx from "clsx";
 import React from "react";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
 import { AxiosError, AxiosResponse } from "axios";
 import Ajax from "../../../lib/ajax/ajax";
-import { BattleMessage } from "./types/battle-message-type";
 import ServerFight from "./fight-section/server-fight";
 import BattleMesages from "./fight-section/battle-mesages";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
@@ -69,17 +67,31 @@ export default class CelestialFight extends React.Component<any, any> {
 
         this.celestialFight.listen(
             "Game.Battle.Events.UpdateCelestialFight",
-            (event: any) => {
-                this.props.update_celestial(0);
-
-                this.setState({
-                    monster_health: event.data.celestial_fight_over
-                        ? 0
-                        : event.data.monster_current_health,
-                    battle_messages: [event.data.who_killed],
-                });
-            },
+            this.handleCelestialFightUpdate.bind(this),
         );
+    }
+
+    componentWillUnmount() {
+        this.celestialFight.stopListening(
+            "Game.Battle.Events.UpdateCelestialFight",
+        );
+
+        (window as any).Echo.leave("celestial-fight-changes");
+    }
+
+    handleCelestialFightUpdate(event: any) {
+        if (event.data.celestial_fight_id !== this.props.celestial_id) {
+            return;
+        }
+
+        this.props.update_celestial(0);
+
+        this.setState({
+            monster_health: event.data.celestial_fight_over
+                ? 0
+                : event.data.monster_current_health,
+            battle_messages: [event.data.who_killed],
+        });
     }
 
     attack(type: string) {
