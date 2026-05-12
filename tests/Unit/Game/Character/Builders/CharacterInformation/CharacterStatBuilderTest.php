@@ -14,6 +14,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
+use Tests\Traits\CreateGameClassSpecial;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
@@ -21,7 +22,7 @@ use Tests\Traits\CreateItemAffix;
 
 class CharacterStatBuilderTest extends TestCase
 {
-    use CreateClass, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateClass, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, CreateGameClassSpecial, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -2308,5 +2309,137 @@ class CharacterStatBuilderTest extends TestCase
         $resistance = $this->characterStatBuilder->setCharacter($character)->buildResistanceReductionChance();
 
         $this->assertEquals(1, $resistance);
+    }
+
+    public function testSpellDamageUsesClassSpecialtyBaseSpellDamageMod()
+    {
+        $item = $this->createItem([
+            'name' => 'spell',
+            'type' => ItemType::SPELL_DAMAGE->value,
+            'base_damage' => 100,
+        ]);
+
+        $class = $this->createClass([
+            'name' => 'Vampire',
+        ]);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->equipItem('spell-one', 'spell')
+            ->getCharacter();
+
+        $character->update([
+            'game_class_id' => $class->id,
+        ]);
+
+        $classSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $class->id,
+            'base_damage_mod' => 0,
+            'base_spell_damage_mod' => 0.10,
+        ]);
+
+        $character->classSpecialsEquipped()->create([
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 10,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::SPELL_DAMAGE->value);
+
+        $this->assertEquals(200, $damage);
+    }
+
+    public function testSpellDamageDoesNotUseClassSpecialtyBaseDamageMod()
+    {
+        $item = $this->createItem([
+            'name' => 'spell',
+            'type' => ItemType::SPELL_DAMAGE->value,
+            'base_damage' => 100,
+        ]);
+
+        $class = $this->createClass([
+            'name' => 'Vampire',
+        ]);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->equipItem('spell-one', 'spell')
+            ->getCharacter();
+
+        $character->update([
+            'game_class_id' => $class->id,
+        ]);
+
+        $classSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $class->id,
+            'base_damage_mod' => 0.10,
+            'base_spell_damage_mod' => 0,
+        ]);
+
+        $character->classSpecialsEquipped()->create([
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 10,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::SPELL_DAMAGE->value);
+
+        $this->assertEquals(100, $damage);
+    }
+
+    public function testPositionalSpellDamageUsesClassSpecialtyBaseSpellDamageMod()
+    {
+        $item = $this->createItem([
+            'name' => 'spell',
+            'type' => ItemType::SPELL_DAMAGE->value,
+            'base_damage' => 100,
+        ]);
+
+        $class = $this->createClass([
+            'name' => 'Vampire',
+        ]);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->equipItem('spell-one', 'spell')
+            ->getCharacter();
+
+        $character->update([
+            'game_class_id' => $class->id,
+        ]);
+
+        $classSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $class->id,
+            'base_damage_mod' => 0,
+            'base_spell_damage_mod' => 0.10,
+        ]);
+
+        $character->classSpecialsEquipped()->create([
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 10,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->positionalSpellDamage('spell-one');
+
+        $this->assertEquals(200, $damage);
     }
 }
