@@ -42,6 +42,7 @@ class MassImportCustomData extends Command
 
 
         Artisan::call('fix:invalid-progression-levels');
+        Artisan::call('import:game-data Core Imports');
 
         $this->importInformationSection();
 

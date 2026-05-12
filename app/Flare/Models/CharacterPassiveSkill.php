@@ -2,10 +2,15 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\CharacterPassiveSkillFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class CharacterPassiveSkill extends Model
 {
+
+    use HasFactory;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -99,5 +104,10 @@ class CharacterPassiveSkill extends Model
     protected function getClampedCurrentLevel(): int
     {
         return min(max($this->current_level, 0), $this->passiveSkill->max_level);
+    }
+
+    protected static function newFactory()
+    {
+        return CharacterPassiveSkillFactory::new();
     }
 }

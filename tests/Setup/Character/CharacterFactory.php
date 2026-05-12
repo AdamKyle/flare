@@ -378,6 +378,16 @@ class CharacterFactory
     }
 
     /**
+     * Allows you to configure passive skills on the character.
+     *
+     * @return PassiveSkillManagement
+     */
+    public function passiveSkillManagement(): PassiveSkillManagement
+    {
+        return new PassiveSkillManagement($this->character, $this);
+    }
+
+    /**
      * Lets you update the character
      *
      * @param  array  $changes  | []
@@ -750,6 +760,7 @@ class CharacterFactory
 
         return $this;
     }
+
 
     /**
      * Create the core inventory.
