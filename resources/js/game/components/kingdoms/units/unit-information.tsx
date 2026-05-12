@@ -36,13 +36,18 @@ export default class UnitInformation extends React.Component<
             return "ERROR";
         }
 
-        let cost = baseCost * amount;
+        const cost = baseCost * amount;
 
         if (is_iron && cost > 1) {
-            return cost - cost * this.props.kingdom_iron_cost_reduction;
+            return (
+                cost -
+                cost *
+                    (this.props.unit_cost_reduction +
+                        this.props.kingdom_iron_cost_reduction)
+            );
         }
 
-        return cost;
+        return cost - cost * this.props.unit_cost_reduction;
     }
 
     setResourceAmount(amount: number, timeNeeded: number) {
