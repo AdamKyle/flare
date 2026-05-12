@@ -213,9 +213,9 @@ class SkillServiceTest extends TestCase
 
         $this->skillService->setSkillInTraining($character)->assignXPToTrainingSkill($character, 1500);
 
-        $skill = $character->refresh()->skills->where('currently_training', true)->first();
+        $skill = $character->refresh()->skills->first();
 
-        $this->assertGreaterThan(2, $skill->level); // should be enough xp to go two or more levels.
+        $this->assertGreaterThan(2, $skill->level);
 
         Event::assertDispatched(SkillLeveledUpServerMessageEvent::class);
     }
@@ -271,6 +271,7 @@ class SkillServiceTest extends TestCase
         $craftingSkill = $this->createGameSkill([
             'type' => SkillTypeValue::CRAFTING->value,
             'name' => 'Weapon Crafting',
+            'max_level' => 400,
         ]);
 
         $character = $this->character->assignSkill($craftingSkill, 1)->getCharacter();
@@ -324,6 +325,7 @@ class SkillServiceTest extends TestCase
         $craftingSkill = $this->createGameSkill([
             'type' => SkillTypeValue::TRAINING->value,
             'name' => 'Accuracy',
+            'max_level' => 400,
         ]);
 
         $character = $this->character->assignSkill($craftingSkill, 400, false, [
@@ -342,6 +344,7 @@ class SkillServiceTest extends TestCase
         $craftingSkill = $this->createGameSkill([
             'type' => SkillTypeValue::TRAINING->value,
             'name' => 'Accuracy',
+            'max_level' => 400,
         ]);
 
         $character = $this->character->assignSkill($craftingSkill, 399, false, [
@@ -353,5 +356,26 @@ class SkillServiceTest extends TestCase
 
         $this->assertEquals(400, $skill->refresh()->level);
         $this->assertEquals(0, $skill->refresh()->xp);
+    }
+
+    public function testGetSkillUsesClampedLevelWhenSkillIsAboveMaxLevel()
+    {
+        $character = $this->character->getCharacter();
+
+        $skill = $character->skills->first();
+
+        $skill->baseSkill->update([
+            'skill_bonus_per_level' => 0.1,
+            'max_level' => 5,
+        ]);
+
+        $skill->update([
+            'level' => 10,
+            'skill_bonus' => 0.0,
+        ]);
+
+        $result = $this->skillService->getSkill($skill->refresh());
+
+        $this->assertSame(1.0, $result['skill_bonus']);
     }
 }

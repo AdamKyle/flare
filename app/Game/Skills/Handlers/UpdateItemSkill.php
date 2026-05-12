@@ -16,6 +16,9 @@ class UpdateItemSkill
 
     public function updateItemSkill(Character $character, Item $item, int $killCount = 1): void
     {
+        if ($killCount <= 0) {
+            return;
+        }
 
         if ($killCount === 1) {
             $skillProgressionToUpdate = $item->itemSkillProgressions->where('is_training', true)->first();
@@ -24,7 +27,7 @@ class UpdateItemSkill
                 return;
             }
 
-            if ($skillProgressionToUpdate->current_level >= $skillProgressionToUpdate->itemSkill->max_level) {
+            if ($this->normalizeMaxLevelProgression($skillProgressionToUpdate)) {
                 return;
             }
 
@@ -47,7 +50,7 @@ class UpdateItemSkill
             return;
         }
 
-        if ($skillProgressionToUpdate->current_level >= $skillProgressionToUpdate->itemSkill->max_level) {
+        if ($this->normalizeMaxLevelProgression($skillProgressionToUpdate)) {
             return;
         }
 
@@ -77,6 +80,7 @@ class UpdateItemSkill
         $skillProgressionToUpdate->update([
             'current_level' => $newLevel,
             'current_kill' => $newKillCount,
+            'is_training' => $newLevel >= $maxLevel ? false : $skillProgressionToUpdate->is_training,
         ]);
 
         $skillProgressionToUpdate = $skillProgressionToUpdate->refresh();
@@ -109,12 +113,24 @@ class UpdateItemSkill
         }
     }
 
-    protected function levelUpSkill(Character $character, ItemSkillProgression $itemSkillProgression)
+    protected function levelUpSkill(Character $character, ItemSkillProgression $itemSkillProgression): void
     {
+        if ($this->normalizeMaxLevelProgression($itemSkillProgression)) {
+            return;
+        }
+
+        if ($itemSkillProgression->itemSkill->total_kills_needed <= 0) {
+            return;
+        }
+
         if ($itemSkillProgression->current_kill >= $itemSkillProgression->itemSkill->total_kills_needed) {
+            $maxLevel = $itemSkillProgression->itemSkill->max_level;
+            $newLevel = min($itemSkillProgression->current_level + 1, $maxLevel);
+
             $itemSkillProgression->update([
-                'current_level' => $itemSkillProgression->current_level + 1,
+                'current_level' => $newLevel,
                 'current_kill' => 0,
+                'is_training' => $newLevel >= $maxLevel ? false : $itemSkillProgression->is_training,
             ]);
 
             $character = $character->refresh();
@@ -185,5 +201,22 @@ class UpdateItemSkill
         }
 
         return [$currentLevel, $remainingKills, $currentLevel - $startingLevel];
+    }
+
+    private function normalizeMaxLevelProgression(ItemSkillProgression $itemSkillProgression): bool
+    {
+        $maxLevel = $itemSkillProgression->itemSkill->max_level;
+
+        if ($itemSkillProgression->current_level < $maxLevel) {
+            return false;
+        }
+
+        $itemSkillProgression->update([
+            'current_level' => $maxLevel,
+            'current_kill' => 0,
+            'is_training' => false,
+        ]);
+
+        return true;
     }
 }

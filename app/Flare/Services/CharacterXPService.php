@@ -88,6 +88,11 @@ class CharacterXPService
      */
     public function distributeSpecifiedXp(int $xp): CharacterXPService
     {
+        if (! $this->canCharacterGainXP($this->character)) {
+            $this->character = $this->normalizeCharacterMaxLevel($this->character);
+
+            return $this;
+        }
 
         $this->character->update([
             'xp' => $this->character->xp + $xp,
@@ -109,6 +114,12 @@ class CharacterXPService
      */
     public function handleLevelUp(): void
     {
+        if (! $this->canCharacterGainXP($this->character)) {
+            $this->character = $this->normalizeCharacterMaxLevel($this->character);
+
+            return;
+        }
+
         if ($this->character->xp >= $this->character->xp_next) {
             $leftOverXP = $this->character->xp - $this->character->xp_next;
 
@@ -141,7 +152,19 @@ class CharacterXPService
      */
     public function handleCharacterLevelUp(int $leftOverXP, bool $shouldBuildCache = false): void
     {
+        if (! $this->canCharacterGainXP($this->character)) {
+            $this->character = $this->normalizeCharacterMaxLevel($this->character);
+
+            return;
+        }
+
         $this->characterService->levelUpCharacter($this->character, $leftOverXP);
+        $this->character = $this->character->refresh();
+
+        if (! $this->canCharacterGainXP($this->character)) {
+            $this->character = $this->normalizeCharacterMaxLevel($this->character);
+        }
+
         $character = $this->character->refresh();
 
         if ($shouldBuildCache || $leftOverXP < $character->xp_next) {
@@ -168,6 +191,8 @@ class CharacterXPService
         $addBonus = true;
 
         if (! $this->canCharacterGainXP($this->character)) {
+            $this->character = $this->normalizeCharacterMaxLevel($this->character);
+
             return 0;
         }
 
@@ -241,20 +266,7 @@ class CharacterXPService
      */
     public function canCharacterGainXP(Character $character): bool
     {
-
-        $canContinueLeveling = $this->canContinueLeveling($character);
-
-        if ($canContinueLeveling) {
-            $config = MaxLevelConfiguration::first();
-
-            if (is_null($config)) {
-                return $character->level !== MaxLevel::MAX_LEVEL;
-            }
-
-            return $character->level !== $config->max_level;
-        }
-
-        return $character->level !== MaxLevel::MAX_LEVEL;
+        return $character->level < $this->getCharacterMaxLevel($character);
     }
 
     /**
@@ -298,6 +310,14 @@ class CharacterXPService
 
         $this->handleCharacterLevelUp($leftOverXP, $shouldBuildCache);
 
+        $this->character = $this->character->refresh();
+
+        if (! $this->canCharacterGainXP($this->character)) {
+            $this->character = $this->normalizeCharacterMaxLevel($this->character);
+
+            return;
+        }
+
         if ($leftOverXP >= $this->character->xp_next) {
             $leftOverXP = $this->character->xp - $this->character->xp_next;
 
@@ -327,6 +347,12 @@ class CharacterXPService
      */
     private function distributeXP(Monster $monster): void
     {
+
+        if (! $this->canCharacterGainXP($this->character)) {
+            $this->character = $this->normalizeCharacterMaxLevel($this->character);
+
+            return;
+        }
 
         $xp = $this->fetchXpForMonster($monster);
 
@@ -493,5 +519,50 @@ class CharacterXPService
         }
 
         return $questItems->where('item.ignores_caps', $ignoreCaps)->sum('item.xp_bonus');
+    }
+
+    /**
+     * Get the character max level.
+     */
+    private function getCharacterMaxLevel(Character $character): int
+    {
+        if (! $this->canContinueLeveling($character)) {
+            return MaxLevel::MAX_LEVEL;
+        }
+
+        $config = MaxLevelConfiguration::first();
+
+        if (is_null($config)) {
+            return MaxLevel::MAX_LEVEL;
+        }
+
+        return $config->max_level;
+    }
+
+    /**
+     * Normalize character level and XP when maxed.
+     */
+    private function normalizeCharacterMaxLevel(Character $character): Character
+    {
+        $maxLevel = $this->getCharacterMaxLevel($character);
+
+        if ($character->level > $maxLevel) {
+            $character->update([
+                'level' => $maxLevel,
+                'xp' => 0,
+            ]);
+
+            return $character->refresh();
+        }
+
+        if ($character->level === $maxLevel && $character->xp !== 0) {
+            $character->update([
+                'xp' => 0,
+            ]);
+
+            return $character->refresh();
+        }
+
+        return $character->refresh();
     }
 }

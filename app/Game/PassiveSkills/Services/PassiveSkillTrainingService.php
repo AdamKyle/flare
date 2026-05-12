@@ -20,8 +20,19 @@ class PassiveSkillTrainingService
     /**
      * Train a passive skill.
      */
-    public function trainSkill(CharacterPassiveSkill $skill, Character $character): void
+    public function trainSkill(CharacterPassiveSkill $skill, Character $character): bool
     {
+        if ($skill->current_level >= $skill->passiveSkill->max_level) {
+            $skill->update([
+                'current_level' => $skill->passiveSkill->max_level,
+                'hours_to_next' => 0,
+                'started_at' => null,
+                'completed_at' => null,
+            ]);
+
+            return false;
+        }
+
         $time = now()->addHours($skill->hours_to_next);
 
         if (env('APP_ENV') === 'local') {
@@ -46,5 +57,7 @@ class PassiveSkillTrainingService
         TrainPassiveSkill::dispatch($character, $skill)->delay($delayTime);
 
         event(new UpdateTopBarEvent($character));
+
+        return true;
     }
 }

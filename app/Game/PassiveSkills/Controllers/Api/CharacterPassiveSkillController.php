@@ -36,6 +36,12 @@ class CharacterPassiveSkillController extends Controller
             return response()->json(['message' => 'You do not own that.'], 422);
         }
 
+        if ($characterPassiveSkill->current_level >= $characterPassiveSkill->passiveSkill->max_level) {
+            $this->passiveSkillTrainingService->trainSkill($characterPassiveSkill, $character);
+
+            return response()->json(['message' => 'This passive skill is already maxed and cannot be trained.'], 422);
+        }
+
         $passivesRunning = CharacterPassiveSkill::where('character_id', $character->id)
             ->whereNotNull('started_at')
             ->count();
@@ -44,7 +50,9 @@ class CharacterPassiveSkillController extends Controller
             return response()->json(['message' => 'Only one passive allowed to train at a time.'], 422);
         }
 
-        $this->passiveSkillTrainingService->trainSkill($characterPassiveSkill, $character);
+        if (! $this->passiveSkillTrainingService->trainSkill($characterPassiveSkill, $character)) {
+            return response()->json(['message' => 'This passive skill is already maxed and cannot be trained.'], 422);
+        }
 
         $character = $character->refresh();
 

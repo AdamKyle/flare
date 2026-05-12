@@ -239,6 +239,11 @@ class ClassRankService
             $classRank = $character->classRanks()->where('game_class_id', $character->game_class_id)->first();
 
             if ($classRank->level >= ClassRankValue::MAX_LEVEL) {
+                $classRank->update([
+                    'level' => ClassRankValue::MAX_LEVEL,
+                    'current_xp' => 0,
+                ]);
+
                 return;
             }
 
@@ -252,7 +257,7 @@ class ClassRankService
 
             if ($classRank->current_xp >= $classRank->required_xp) {
                 $classRank->update([
-                    'level' => $classRank->level + 1,
+                    'level' => min($classRank->level + 1, ClassRankValue::MAX_LEVEL),
                     'current_xp' => 0,
                 ]);
 
@@ -264,7 +269,16 @@ class ClassRankService
 
         $classRank = $character->classRanks()->where('game_class_id', $character->game_class_id)->first();
 
-        if (is_null($classRank) || $classRank->level >= ClassRankValue::MAX_LEVEL) {
+        if (is_null($classRank)) {
+            return;
+        }
+
+        if ($classRank->level >= ClassRankValue::MAX_LEVEL) {
+            $classRank->update([
+                'level' => ClassRankValue::MAX_LEVEL,
+                'current_xp' => 0,
+            ]);
+
             return;
         }
 
@@ -323,6 +337,11 @@ class ClassRankService
 
             foreach ($equippedSpecials as $special) {
                 if ($special->level >= ClassSpecialValue::MAX_LEVEL) {
+                    $special->update([
+                        'level' => ClassSpecialValue::MAX_LEVEL,
+                        'current_xp' => 0,
+                    ]);
+
                     continue;
                 }
 
@@ -336,9 +355,11 @@ class ClassRankService
 
                 if ($special->current_xp >= $special->required_xp) {
                     $special->update([
-                        'level' => $special->level + 1,
+                        'level' => min($special->level + 1, ClassSpecialValue::MAX_LEVEL),
                         'current_xp' => 0,
                     ]);
+
+                    $special = $special->refresh();
 
                     event(new ServerMessageEvent($character->user, 'Your class special:  ' . $special->gameClassSpecial->name . ' has gained a new level is now level: ' . $special->level));
 
@@ -355,6 +376,11 @@ class ClassRankService
 
         foreach ($equippedSpecials as $special) {
             if ($special->level >= ClassSpecialValue::MAX_LEVEL) {
+                $special->update([
+                    'level' => ClassSpecialValue::MAX_LEVEL,
+                    'current_xp' => 0,
+                ]);
+
                 continue;
             }
 
@@ -437,7 +463,16 @@ class ClassRankService
                 if (! is_null($inventorySlot)) {
                     $weaponMastery = $classRank->weaponMasteries()->where('weapon_type', $type)->first();
 
+                    if (is_null($weaponMastery)) {
+                        continue;
+                    }
+
                     if ($weaponMastery->level >= WeaponMasteryValue::MAX_LEVEL) {
+                        $weaponMastery->update([
+                            'level' => WeaponMasteryValue::MAX_LEVEL,
+                            'current_xp' => 0,
+                        ]);
+
                         continue;
                     }
 
@@ -453,7 +488,7 @@ class ClassRankService
 
                     if ($weaponMastery->current_xp >= $weaponMastery->required_xp) {
                         $weaponMastery->update([
-                            'level' => $weaponMastery->level + 1,
+                            'level' => min($weaponMastery->level + 1, WeaponMasteryValue::MAX_LEVEL),
                             'current_xp' => 0,
                         ]);
 
@@ -492,7 +527,16 @@ class ClassRankService
             if (! is_null($inventorySlot)) {
                 $weaponMastery = $classRank->weaponMasteries()->where('weapon_type', $type)->first();
 
-                if (is_null($weaponMastery) || $weaponMastery->level >= WeaponMasteryValue::MAX_LEVEL) {
+                if (is_null($weaponMastery)) {
+                    continue;
+                }
+
+                if ($weaponMastery->level >= WeaponMasteryValue::MAX_LEVEL) {
+                    $weaponMastery->update([
+                        'level' => WeaponMasteryValue::MAX_LEVEL,
+                        'current_xp' => 0,
+                    ]);
+
                     continue;
                 }
 
@@ -566,7 +610,7 @@ class ClassRankService
             $secondaryClassRank = $character->classRanks->where('game_class_id', $secondaryRequiredClassId)->first();
 
             return ! (($primaryClassRank->level >= $classRank->gameClass->primary_required_class_level) &&
-                ($secondaryClassRank->level >= $classRank->gameClass->secondary_required_class_level));
+                ($secondaryClassRank->level >= $classRank->gameClass->secondary_required_level));
         }
 
         return false;
@@ -585,7 +629,7 @@ class ClassRankService
         }
 
         if ($currentLevel >= $maxLevel) {
-            return [$currentLevel, 0, 0];
+            return [$maxLevel, 0, 0];
         }
 
         if ($requiredXp <= 0 || $xpPerKill <= 0) {

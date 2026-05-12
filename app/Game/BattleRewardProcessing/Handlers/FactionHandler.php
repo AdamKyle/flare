@@ -304,6 +304,10 @@ class FactionHandler
         event(new GlobalMessageEvent($character->name . ' Has maxed out the faction for: ' . $mapName . ' They are considered legendary among the people of this land.'));
 
         $faction->update([
+            'current_level' => FactionLevel::MAX_LEVEL,
+            'current_points' => 0,
+            'points_needed' => FactionLevel::getPointsNeeded(FactionLevel::MAX_LEVEL),
+            'title' => FactionType::getTitle(FactionLevel::MAX_LEVEL),
             'maxed' => true,
         ]);
     }
@@ -314,7 +318,7 @@ class FactionHandler
     protected function updateFaction(Faction $faction): Faction
     {
 
-        $newLevel = $faction->current_level + 1;
+        $newLevel = min($faction->current_level + 1, FactionLevel::MAX_LEVEL);
 
         $pointsNeeded = FactionLevel::getPointsNeeded($newLevel);
 

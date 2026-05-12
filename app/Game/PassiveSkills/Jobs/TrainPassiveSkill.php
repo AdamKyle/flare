@@ -43,6 +43,19 @@ class TrainPassiveSkill implements ShouldQueue
             return;
         }
 
+        $maxLevel = $this->characterPassiveSkill->passiveSkill->max_level;
+
+        if ($this->characterPassiveSkill->current_level >= $maxLevel) {
+            $this->characterPassiveSkill->update([
+                'started_at' => null,
+                'completed_at' => null,
+                'current_level' => $maxLevel,
+                'hours_to_next' => 0,
+            ]);
+
+            return;
+        }
+
         if (! $this->characterPassiveSkill->completed_at->lessThanOrEqualTo(now())) {
             // @codeCoverageIgnoreStart
             $timeLeft = $this->characterPassiveSkill->completed_at->diffInMinutes(now());
@@ -62,17 +75,16 @@ class TrainPassiveSkill implements ShouldQueue
             // @codeCoverageIgnoreEnd
         }
 
-        $newLevel = $this->characterPassiveSkill->current_level + 1;
-
-        if ($newLevel > $this->characterPassiveSkill->passiveSkill->max_level) {
-            $newLevel = $this->characterPassiveSkill->passiveSkill->max_level;
-        }
+        $newLevel = min($this->characterPassiveSkill->current_level + 1, $maxLevel);
+        $hoursToNext = $newLevel >= $maxLevel
+            ? 0
+            : ($newLevel + 1) * $this->characterPassiveSkill->passiveSkill->hours_per_level;
 
         $this->characterPassiveSkill->update([
             'started_at' => null,
             'completed_at' => null,
             'current_level' => $newLevel,
-            'hours_to_next' => ($newLevel + 1) * $this->characterPassiveSkill->passiveSkill->hours_per_level,
+            'hours_to_next' => $hoursToNext,
         ]);
 
         $newPassive = $this->characterPassiveSkill->refresh();

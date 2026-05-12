@@ -2,13 +2,15 @@
 
 namespace App\Console\AfterDeployment;
 
-use Illuminate\Console\Command;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterClassRank;
+use App\Flare\Models\CharacterClassRankWeaponMastery;
 use App\Flare\Models\GameClass;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
 use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\ClassRanks\Values\ClassRankValue;
+use App\Game\ClassRanks\Values\WeaponMasteryValue;
+use Illuminate\Console\Command;
 
 class UpdateCharactersForClassRanks extends Command
 {
@@ -28,7 +30,7 @@ class UpdateCharactersForClassRanks extends Command
                 foreach ($gameClasses as $gameClass) {
                     $classRank = $character->classRanks->firstWhere('game_class_id', $gameClass->id);
 
-                    if (!$classRank) {
+                    if (! $classRank) {
                         $classRank = $character->classRanks()->create([
                             'character_id' => $character->id,
                             'game_class_id' => $gameClass->id,
@@ -53,8 +55,11 @@ class UpdateCharactersForClassRanks extends Command
     protected function syncWeaponMasteries(CharacterClassRank $classRank): void
     {
         $existing = [];
+
         foreach ($classRank->weaponMasteries as $mastery) {
-            $existing[$mastery->weapon_type] = $mastery;
+            $this->normalizeWeaponMastery($mastery);
+
+            $existing[$mastery->weapon_type] = $mastery->refresh();
         }
 
         $className = strtolower(trim($classRank->gameClass->name));
@@ -72,12 +77,21 @@ class UpdateCharactersForClassRanks extends Command
             }
 
             if ($misalignedIndex < $misaligned->count()) {
-                $misaligned->get($misalignedIndex)->update(['weapon_type' => $type]);
+                $misalignedMastery = $misaligned->get($misalignedIndex);
+
+                $misalignedMastery->update([
+                    'weapon_type' => $type,
+                ]);
+
+                $this->normalizeWeaponMastery($misalignedMastery->refresh());
+
                 $misalignedIndex++;
+
                 continue;
             }
 
             $level = 0;
+
             if ($firstPreferred && $firstPreferred === $type) {
                 $level = 5;
             } elseif (in_array($type, $preferred)) {
@@ -87,9 +101,31 @@ class UpdateCharactersForClassRanks extends Command
             $classRank->weaponMasteries()->create([
                 'character_class_rank_id' => $classRank->id,
                 'weapon_type' => $type,
-                'current_xp' => $level * ClassRankValue::XP_PER_LEVEL,
-                'required_xp' => ClassRankValue::XP_PER_LEVEL,
+                'current_xp' => 0,
+                'required_xp' => WeaponMasteryValue::XP_PER_LEVEL,
+                'level' => min($level, WeaponMasteryValue::MAX_LEVEL),
+            ]);
+        }
+    }
+
+    protected function normalizeWeaponMastery(CharacterClassRankWeaponMastery $weaponMastery): void
+    {
+        $level = min($weaponMastery->level, WeaponMasteryValue::MAX_LEVEL);
+        $currentXp = $weaponMastery->current_xp;
+
+        if ($level >= WeaponMasteryValue::MAX_LEVEL || $currentXp >= WeaponMasteryValue::XP_PER_LEVEL) {
+            $currentXp = 0;
+        }
+
+        if (
+            $weaponMastery->level !== $level ||
+            $weaponMastery->current_xp !== $currentXp ||
+            $weaponMastery->required_xp !== WeaponMasteryValue::XP_PER_LEVEL
+        ) {
+            $weaponMastery->update([
                 'level' => $level,
+                'current_xp' => $currentXp,
+                'required_xp' => WeaponMasteryValue::XP_PER_LEVEL,
             ]);
         }
     }
