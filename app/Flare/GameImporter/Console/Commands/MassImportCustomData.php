@@ -40,9 +40,9 @@ class MassImportCustomData extends Command
     public function handle()
     {
 
-//        Artisan::call('assign:new-buildings-to-existing-kingdoms');
-//        Announcement::truncate();
-        Artisan::call('rebuild:kingdom-cache');
+
+        Artisan::call('fix:invalid-progression-levels');
+        Artisan::call('import:game-data "Core Imports"');
 
         $this->importInformationSection();
 

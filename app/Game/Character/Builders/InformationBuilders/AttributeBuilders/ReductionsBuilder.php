@@ -14,7 +14,9 @@ class ReductionsBuilder extends BaseAttribute
 
         $value = ! is_null($maxValue) ? $maxValue : 0;
 
-        $value += $this->character->classSpecialsEquipped->sum($type);
+        $value += $this->character->classSpecialsEquipped
+            ->where('equipped', true)
+            ->sum($type);
 
         return $value;
     }
@@ -34,7 +36,9 @@ class ReductionsBuilder extends BaseAttribute
 
         $value = ! is_null($value) ? $value : 0;
 
-        $value += $this->character->classSpecialsEquipped->sum($type);
+        $value += $this->character->classSpecialsEquipped
+            ->where('equipped', true)
+            ->sum($type);
 
         return $value;
     }

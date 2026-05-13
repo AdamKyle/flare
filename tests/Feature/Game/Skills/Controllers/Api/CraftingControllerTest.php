@@ -30,6 +30,7 @@ class CraftingControllerTest extends TestCase
         $craftingSkill = $this->createGameSkill([
             'name' => 'Weapon Crafting',
             'type' => SkillTypeValue::CRAFTING->value,
+            'max_level' => 400,
         ]);
 
         $this->character = (new CharacterFactory)->createBaseCharacter()

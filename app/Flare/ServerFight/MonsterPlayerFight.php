@@ -47,6 +47,10 @@ class MonsterPlayerFight
 
     private Attack $attack;
 
+    private ?int $forcedCurrentMonsterHealth = null;
+
+    private ?int $forcedMaxMonsterHealth = null;
+
     public function __construct(
         BuildMonster $buildMonster,
         CharacterCacheData $characterCacheData,
@@ -73,6 +77,8 @@ class MonsterPlayerFight
     public function setCharacter(Character $character): MonsterPlayerFight
     {
         $this->character = $character;
+        $this->forcedCurrentMonsterHealth = null;
+        $this->forcedMaxMonsterHealth = null;
 
         return $this;
     }
@@ -91,6 +97,8 @@ class MonsterPlayerFight
         $this->monster = $params['cached_monster'] ?? $this->fetchMonster($character->map, $params['selected_monster_id']);
 
         $this->attackType = $params['attack_type'];
+        $this->forcedCurrentMonsterHealth = $params['current_monster_health'] ?? null;
+        $this->forcedMaxMonsterHealth = $params['max_monster_health'] ?? null;
 
         if (empty($this->monster)) {
             return $this->errorResult('No monster was found.');
@@ -117,6 +125,8 @@ class MonsterPlayerFight
         $this->monster = $raidMonster;
         $this->character = $character;
         $this->attackType = $attackType;
+        $this->forcedCurrentMonsterHealth = null;
+        $this->forcedMaxMonsterHealth = null;
 
         return $this;
     }
@@ -196,6 +206,16 @@ class MonsterPlayerFight
 
         $monster = $this->buildMonster->buildMonster($this->monster, $characterStatReductionAffixes, $skillReduction, $resistanceReduction);
 
+        if (! is_null($this->forcedCurrentMonsterHealth)) {
+            $currentMonsterHealth = $this->forcedCurrentMonsterHealth;
+
+            if (! is_null($this->forcedMaxMonsterHealth)) {
+                $currentMonsterHealth = min($currentMonsterHealth, $this->forcedMaxMonsterHealth);
+            }
+
+            $monster->setHealth(max($currentMonsterHealth, 0));
+        }
+
         $this->voidance->void($this->character, $this->characterCacheData, $monster);
 
         $this->mergeMessages($this->voidance->getMessages());
@@ -211,8 +231,12 @@ class MonsterPlayerFight
 
         $health['max_character_health'] = (int) $this->characterCacheData->getCachedCharacterData($this->character, 'health');
         $health['current_character_health'] = max($health['current_character_health'], 0);
-        $health['max_monster_health'] = $monster->getHealth();
+        $health['max_monster_health'] = $this->forcedMaxMonsterHealth ?? $monster->getHealth();
         $health['current_monster_health'] = max($health['current_monster_health'], 0);
+
+        if (! is_null($this->forcedMaxMonsterHealth)) {
+            $health['current_monster_health'] = min($health['current_monster_health'], $this->forcedMaxMonsterHealth);
+        }
 
         $this->mergeMessages($this->ambush->getMessages());
 
@@ -250,7 +274,7 @@ class MonsterPlayerFight
             $this->attackType = $attackType;
         }
 
-        if (Cache::has('monster-fight-' . $this->character->id)) {
+        if (Cache::has('monster-fight-' . $this->character->id) && is_null($this->forcedCurrentMonsterHealth)) {
             $data = Cache::get('monster-fight-' . $this->character->id);
 
             $this->monster = $data['monster'];

@@ -50,6 +50,8 @@ class MonsterFightService
 
         $data = $data->fightSetUp();
 
+        $data['health']['current_monster_health'] = max($data['health']['current_monster_health'], 0);
+
         if ($data['health']['current_monster_health'] <= 0) {
 
             if (!$returnData) {
@@ -154,22 +156,28 @@ class MonsterFightService
             $this->battleEventHandler->processDeadCharacter($character, $monster);
         }
 
-        $monsterHealth = $this->monsterPlayerFight->getMonsterHealth();
+        $monsterHealth = max($this->monsterPlayerFight->getMonsterHealth(), 0);
         $characterHealth = $this->monsterPlayerFight->getCharacterHealth();
 
         $cache['health']['current_character_health'] = $characterHealth;
         $cache['health']['current_monster_health'] = $monsterHealth;
         $cache['messages'] = $this->monsterPlayerFight->getBattleMessages();
 
-        if ($monsterHealth >= 0) {
+        if ($monsterHealth > 0) {
             Cache::put('monster-fight-' . $character->id, $cache, 900);
+
+            if ($returnData) {
+                return $cache;
+            }
+
+            return $this->successResult($cache);
         }
 
         if ($returnData) {
             return $cache;
         }
 
-//        Cache::delete('monster-fight-' . $character->id);
+        Cache::delete('monster-fight-' . $character->id);
         BattleAttackHandler::dispatch($character->id, $this->monsterPlayerFight->getMonster()['id'])->onQueue('default_long')->delay(now()->addSeconds(2));
 
         return $this->successResult($cache);

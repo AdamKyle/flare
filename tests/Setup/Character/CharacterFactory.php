@@ -14,7 +14,7 @@ use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\CharacterInventory\Values\ItemType;
-use App\Game\ClassRanks\Values\WeaponMasteryValue;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
@@ -53,6 +53,8 @@ class CharacterFactory
     private Character $character;
 
     private ?InventorySetManagement $inventorySetManagement = null;
+
+    private ?AttackDataManagement $attackDataManagement = null;
 
     private array $userAttributes = [];
 
@@ -358,6 +360,31 @@ class CharacterFactory
         }
 
         return $this->inventorySetManagement;
+    }
+
+    /**
+     * Fetches attack data management.
+     *
+     * Use existing instantiation if it exists.
+     */
+    public function attackDataManagement(): AttackDataManagement
+    {
+
+        if (is_null($this->attackDataManagement)) {
+            $this->attackDataManagement = new AttackDataManagement($this->character, $this);
+        }
+
+        return $this->attackDataManagement;
+    }
+
+    /**
+     * Allows you to configure passive skills on the character.
+     *
+     * @return PassiveSkillManagement
+     */
+    public function passiveSkillManagement(): PassiveSkillManagement
+    {
+        return new PassiveSkillManagement($this->character, $this);
     }
 
     /**
@@ -717,6 +744,23 @@ class CharacterFactory
     {
         return $this->character->user;
     }
+
+    /**
+     * Cache character sheet data.
+     *
+     * @param  array  $data  | []
+     */
+    public function cacheCharacterSheet(array $data = []): CharacterFactory
+    {
+        $characterSheet = resolve(CharacterCacheData::class)->getCharacterSheetCache($this->character);
+
+        $characterSheet = array_replace_recursive($characterSheet, $data);
+
+        Cache::put('character-sheet-' . $this->character->id, $characterSheet);
+
+        return $this;
+    }
+
 
     /**
      * Create the core inventory.

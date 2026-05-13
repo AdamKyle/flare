@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Console\AfterDeployment\CleanUpInvalidBrokenQueues;
 use App\Console\AfterDeployment\CreateLocationDataCache;
 use App\Console\AfterDeployment\FixFactionLoyaltyCraftingTasks;
+use App\Console\AfterDeployment\FixInvalidProgressionLevels;
 use App\Console\AfterDeployment\FixKingdomMaxResourcesBasedOnPassiveSkill;
 use App\Console\AfterDeployment\FixWeaponMasteryTypes;
 use App\Console\AfterDeployment\RebuildKingdomCache;
@@ -103,6 +104,7 @@ class AppServiceProvider extends ServiceProvider
             FixKingdomMaxResourcesBasedOnPassiveSkill::class,
             CleanUpInvalidBrokenQueues::class,
             RebuildKingdomCache::class,
+            FixInvalidProgressionLevels::class,
 
             // Development Commands:
             CreateCharacter::class,

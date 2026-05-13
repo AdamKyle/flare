@@ -19,10 +19,11 @@ class UpdateCelestialFight implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      */
-    public function __construct(string $characterName, ?MonsterPlayerFight $celestialFight = null)
+    public function __construct(?MonsterPlayerFight $celestialFight = null, ?int $monsterCurrentHealth = null, ?int $celestialFightId = null)
     {
         $this->data = [
-            'monster_current_health' => is_null($celestialFight) ? 0 : $celestialFight->getMonsterHealth(),
+            'celestial_fight_id' => $celestialFightId,
+            'monster_current_health' => $monsterCurrentHealth ?? (is_null($celestialFight) ? 0 : $celestialFight->getMonsterHealth()),
             'celestial_fight_over' => is_null($celestialFight),
             'who_killed' => [
                 'message' => 'Processing Fight',

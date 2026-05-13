@@ -1156,9 +1156,9 @@ class FactionHandlerTest extends TestCase
             ->first();
 
         $this->assertNotNull($factionAfter);
-        $this->assertTrue((bool) $factionAfter->maxed);
+        $this->assertTrue($factionAfter->maxed);
         $this->assertSame($maxLevel, $factionAfter->current_level);
-        $this->assertSame(100, $factionAfter->current_points);
+        $this->assertSame(0, $factionAfter->current_points);
     }
 
     public function test_award_faction_points_caps_new_points_to_points_needed(): void
@@ -1320,9 +1320,9 @@ class FactionHandlerTest extends TestCase
             ->first();
 
         $this->assertNotNull($factionAfter);
-        $this->assertTrue((bool) $factionAfter->maxed);
+        $this->assertTrue($factionAfter->maxed);
         $this->assertSame($maxLevel, $factionAfter->current_level);
-        $this->assertSame(100, $factionAfter->current_points);
+        $this->assertSame(0, $factionAfter->current_points);
     }
 
 

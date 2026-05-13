@@ -175,7 +175,7 @@ class ClassAttackValue
         $this->chance['class_name'] = 'Fighter';
         $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::SWORD->value);
         $this->chance['amount'] = $this->getItemCollection(ItemType::SWORD->value)->count();
-        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+        $this->addClassBonusChance();
 
     }
 
@@ -186,7 +186,7 @@ class ClassAttackValue
         $this->chance['class_name'] = 'Prophet';
         $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::CENSER->value);
         $this->chance['amount'] = $this->getItemCollection(ItemType::CENSER->value)->count();
-        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+        $this->addClassBonusChance();
     }
 
     public function buildThiefChance()
@@ -196,7 +196,7 @@ class ClassAttackValue
         $this->chance['class_name'] = 'Thief';
         $this->chance['has_item'] = $this->hasMultipleOfSameType(ItemType::DAGGER->value, 2);
         $this->chance['amount'] = $this->getItemCollection(ItemType::DAGGER->value)->count();
-        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+        $this->addClassBonusChance();
     }
 
     public function buildHereticChance()
@@ -206,7 +206,7 @@ class ClassAttackValue
         $this->chance['class_name'] = 'Heretic';
         $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::WAND->value);
         $this->chance['amount'] = $this->getItemCollection(ItemType::WAND->value)->count();
-        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+        $this->addClassBonusChance();
     }
 
     public function buildRangersChance()
@@ -216,7 +216,7 @@ class ClassAttackValue
         $this->chance['class_name'] = 'Ranger';
         $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::BOW->value);
         $this->chance['amount'] = $this->getItemCollection(ItemType::BOW->value)->count();
-        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+        $this->addClassBonusChance();
     }
 
     public function buildVampiresChance()
@@ -226,7 +226,7 @@ class ClassAttackValue
         $this->chance['class_name'] = 'Vampire';
         $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::CLAW->value);
         $this->chance['amount'] = $this->getItemCollection(ItemType::CLAW->value)->count();
-        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+        $this->addClassBonusChance();
     }
 
     public function buildBlacksmithsChance()
@@ -236,7 +236,7 @@ class ClassAttackValue
         $this->chance['class_name'] = 'Blacksmith';
         $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::HAMMER->value);
         $this->chance['amount'] = $this->getItemCollection(ItemType::HAMMER->value)->count();
-        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+        $this->addClassBonusChance();
     }
 
     public function buildArcaneAlchemistChance()
@@ -246,7 +246,7 @@ class ClassAttackValue
         $this->chance['class_name'] = 'Arcane Alchemist';
         $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::STAVE->value);
         $this->chance['amount'] = $this->getItemCollection(ItemType::STAVE->value)->count();
-        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+        $this->addClassBonusChance();
     }
 
     public function buildPrisonerChance()
@@ -256,7 +256,7 @@ class ClassAttackValue
         $this->chance['class_name'] = 'Prisoner';
         $this->chance['has_item'] = $this->hasAnyWeaponEquipped();
         $this->chance['amount'] = $this->getItemCollectionCountForAnyType();
-        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+        $this->addClassBonusChance();
     }
 
     public function buildAlcoholicsChance()
@@ -266,7 +266,7 @@ class ClassAttackValue
         $this->chance['class_name'] = 'Alcoholic';
         $this->chance['has_item'] = $this->hasNoWeaponEquipped();
         $this->chance['amount'] = $this->getItemCollectionCountForAnyType();
-        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+        $this->addClassBonusChance();
     }
 
     public function buildGunSlingersChance()
@@ -276,7 +276,7 @@ class ClassAttackValue
         $this->chance['class_name'] = 'Gunslinger';
         $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::GUN->value);
         $this->chance['amount'] = $this->getItemCollection(ItemType::GUN->value)->count();
-        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+        $this->addClassBonusChance();
     }
 
     public function buildSensualDance()
@@ -286,7 +286,7 @@ class ClassAttackValue
         $this->chance['class_name'] = 'Dancer';
         $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::FAN->value);
         $this->chance['amount'] = $this->getItemCollection(ItemType::FAN->value)->count();
-        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+        $this->addClassBonusChance();
     }
 
     public function buildBookBindersFear()
@@ -296,7 +296,7 @@ class ClassAttackValue
         $this->chance['class_name'] = 'Book Binder';
         $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::SCRATCH_AWL->value);
         $this->chance['amount'] = $this->getItemCollection(ItemType::SCRATCH_AWL->value)->count();
-        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+        $this->addClassBonusChance();
     }
 
     public function buildHolySmite()
@@ -306,7 +306,7 @@ class ClassAttackValue
         $this->chance['class_name'] = 'Cleric';
         $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::MACE->value) && $this->hasItemTypeEquipped(ArmourType::SHIELD->value);
         $this->chance['amount'] = $this->getItemCollection(ItemType::MACE->value)->count();
-        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+        $this->addClassBonusChance();
     }
 
     public function buildMerchantsPlace()
@@ -319,7 +319,7 @@ class ClassAttackValue
             ItemType::STAVE->value,
             ItemType::BOW->value,
         ]);
-        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+        $this->addClassBonusChance();
     }
 
     public function buildPlagueSurge() {
@@ -331,7 +331,12 @@ class ClassAttackValue
             ItemType::CENSER->value,
             ItemType::DAGGER->value,
         ]);
-        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+        $this->addClassBonusChance();
+    }
+
+    private function addClassBonusChance(): void
+    {
+        $this->chance['chance'] = min(1, $this->chance['chance'] + $this->characterInfo->classBonus());
     }
 
     private function hasItemTypeEquipped(string $type): bool
