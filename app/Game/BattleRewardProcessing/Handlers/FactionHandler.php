@@ -194,16 +194,14 @@ class FactionHandler
             $factionPointsToReward += 50;
         }
 
-        $newPointsToAssign = $faction->current_points + $factionPointsToReward;
-
-        if ($newPointsToAssign > $faction->points_needed) {
-            $newPointsToAssign = $faction->points_needed;
-        }
+        $newPointsToAssign = min(
+            $faction->current_points + $factionPointsToReward,
+            $faction->points_needed
+        );
 
         $faction->current_points = $newPointsToAssign;
 
         $this->battleMessageHandler->handleFactionPointGain($character->user, $factionPointsToReward, $newPointsToAssign, $faction->points_needed);
-
 
         if ($faction->current_points === $faction->points_needed && ! FactionLevel::isMaxLevel($faction->current_level)) {
             $this->handleFactionLevelUp($character, $faction, $map->name);
@@ -226,12 +224,15 @@ class FactionHandler
 
             $guideQuests = $guideQuest['quests'];
 
-            if (!empty($guideQuest)) {
+            if (! empty($guideQuest)) {
 
                 foreach ($guideQuests as $guideQuest) {
                     if (! is_null($guideQuest->faction_points_per_kill) && ! is_null($guideQuest->required_faction_level)) {
                         if ($faction->game_map_id === $guideQuest->required_faction_id && $guideQuest->required_faction_level !== $faction->current_level) {
-                            $faction->current_points += $guideQuest->faction_points_per_kill;
+                            $faction->current_points = min(
+                                $faction->current_points + $guideQuest->faction_points_per_kill,
+                                $faction->points_needed
+                            );
 
                             event(new ServerMessageEvent($character->user, 'You gained additional ' . $guideQuest->faction_points_per_kill . ' faction points for the current guide quest. This will end once you reach the faction level requirements.'));
 
@@ -240,6 +241,16 @@ class FactionHandler
                     }
                 }
             }
+        }
+
+        if ($faction->current_points >= $faction->points_needed && ! FactionLevel::isMaxLevel($faction->current_level)) {
+            $this->handleFactionLevelUp($character, $faction, $map->name);
+
+            return;
+        } elseif (FactionLevel::isMaxLevel($faction->current_level) && ! $faction->maxed) {
+            $this->handleFactionMaxedOut($character, $faction, $map->name);
+
+            return;
         }
 
         $faction->save();
@@ -266,15 +277,23 @@ class FactionHandler
             $amount *= 10;
         }
 
-        $newAmount = $faction->current_points + $amount;
+        $newAmount = min(
+            $faction->current_points + $amount,
+            $faction->points_needed
+        );
 
         $faction->update(['current_points' => $newAmount]);
 
         $faction = $faction->refresh();
 
         if ($faction->current_points >= $faction->points_needed && ! FactionLevel::isMaxLevel($faction->current_level)) {
-
             $this->handleFactionLevelUp($character, $faction, $gameMap->name);
+
+            return;
+        } elseif (FactionLevel::isMaxLevel($faction->current_level) && ! $faction->maxed) {
+            $this->handleFactionMaxedOut($character, $faction, $gameMap->name);
+
+            return;
         }
     }
 
