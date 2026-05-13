@@ -426,7 +426,9 @@ class Skill extends Model
                 continue;
             }
 
-            $newBonus += $value;
+            $amountUsed = $itemUsed->can_stack ? $boon->amount_used : 1;
+
+            $newBonus += $value * $amountUsed;
         }
 
         return $newBonus;

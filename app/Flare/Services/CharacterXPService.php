@@ -247,7 +247,17 @@ class CharacterXPService
         $canContinueLeveling = $this->canContinueLeveling($character);
 
         $xpBonusQuestSlots = $this->findAllItemsThatGiveXpBonus($character);
-        $boonBonus = $character->boons->sum('itemUsed.xp_bonus');
+        $boonBonus = $character->boons->sum(function ($boon): float {
+            $itemUsed = $boon->itemUsed;
+
+            if (is_null($itemUsed) || is_null($itemUsed->xp_bonus)) {
+                return 0.0;
+            }
+
+            $amountUsed = $itemUsed->can_stack ? $boon->amount_used : 1;
+
+            return $itemUsed->xp_bonus * $amountUsed;
+        });
         $map = $character->map->gameMap;
         $mapBonus = ! is_null($map->xp_bonus) ? $map->xp_bonus : 0;
 

@@ -14,11 +14,12 @@ use Tests\TestCase;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateGameSkill;
+use Tests\Traits\CreateItem;
 use Tests\Traits\CreateScheduledEvent;
 
 class SkillServiceTest extends TestCase
 {
-    use CreateClass, CreateGameSkill, CreateEvent, CreateScheduledEvent, RefreshDatabase;
+    use CreateClass, CreateGameSkill, CreateEvent, CreateScheduledEvent, CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -377,5 +378,101 @@ class SkillServiceTest extends TestCase
         $result = $this->skillService->getSkill($skill->refresh());
 
         $this->assertSame(1.0, $result['skill_bonus']);
+    }
+
+    public function testGetSkillStacksBoonSkillBonusByAmountUsed()
+    {
+        $character = $this->character->getCharacter();
+
+        $skill = $character->skills->where('game_skill_id', $this->skill->id)->first();
+
+        $skill->baseSkill->update([
+            'skill_bonus_per_level' => 0.10,
+            'max_level' => 10,
+        ]);
+
+        $skill->update([
+            'level' => 1,
+            'skill_bonus' => 0.0,
+        ]);
+
+        $boon = $this->createItem([
+            'name' => 'Stacked Skill Bonus Boon',
+            'increase_skill_bonus_by' => 0.15,
+            'can_stack' => true,
+        ]);
+
+        $character->boons()->create([
+            'character_id' => $character->id,
+            'item_id' => $boon->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(120),
+            'last_for_minutes' => 120,
+            'amount_used' => 4,
+        ]);
+
+        $result = $this->skillService->getSkill($skill->refresh());
+
+        $this->assertEqualsWithDelta(0.60, $result['skill_bonus'], 0.00001);
+    }
+
+    public function testGetSkillStacksBoonSkillTrainingBonusByAmountUsed()
+    {
+        $character = $this->character->getCharacter();
+
+        $skill = $character->skills->where('game_skill_id', $this->skill->id)->first();
+
+        $boon = $this->createItem([
+            'name' => 'Stacked Skill Training Boon',
+            'increase_skill_training_bonus_by' => 0.15,
+            'can_stack' => true,
+        ]);
+
+        $character->boons()->create([
+            'character_id' => $character->id,
+            'item_id' => $boon->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(120),
+            'last_for_minutes' => 120,
+            'amount_used' => 4,
+        ]);
+
+        $result = $this->skillService->getSkill($skill->refresh());
+
+        $this->assertEqualsWithDelta(0.60, $result['skill_xp_bonus'], 0.00001);
+    }
+
+    public function testGetSkillStacksBoonBaseDamageModByAmountUsed()
+    {
+        $character = $this->character->getCharacter();
+
+        $skill = $character->skills->where('game_skill_id', $this->skill->id)->first();
+
+        $skill->baseSkill->update([
+            'base_damage_mod_bonus_per_level' => 0.10,
+        ]);
+
+        $skill->update([
+            'level' => 1,
+        ]);
+
+        $boon = $this->createItem([
+            'name' => 'Stacked Base Damage Boon',
+            'base_damage_mod_bonus' => 0.15,
+            'can_stack' => true,
+        ]);
+
+        $character->boons()->create([
+            'character_id' => $character->id,
+            'item_id' => $boon->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(120),
+            'last_for_minutes' => 120,
+            'amount_used' => 4,
+        ]);
+
+        $result = $this->skillService->getSkill($skill->refresh());
+
+        $this->assertEqualsWithDelta(0.70, $result['base_damage_mod'], 0.00001);
     }
 }

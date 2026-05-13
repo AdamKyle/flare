@@ -2442,4 +2442,30 @@ class CharacterStatBuilderTest extends TestCase
 
         $this->assertEquals(200, $damage);
     }
+
+    public function testStackedStatBoonMultipliesByAmountUsed()
+    {
+        $character = $this->character->getCharacter();
+
+        $str = $character->str;
+
+        $boon = $this->createItem([
+            'name' => 'Stacked Stat Boon',
+            'increase_stat_by' => 0.15,
+            'can_stack' => true,
+        ]);
+
+        $character->boons()->create([
+            'character_id' => $character->id,
+            'item_id' => $boon->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(120),
+            'last_for_minutes' => 120,
+            'amount_used' => 4,
+        ]);
+
+        $moddedStr = $this->characterStatBuilder->setCharacter($character)->statMod('str');
+
+        $this->assertEqualsWithDelta($str + ($str * 0.60), $moddedStr, 0.00001);
+    }
 }

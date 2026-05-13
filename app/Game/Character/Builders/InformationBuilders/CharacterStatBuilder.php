@@ -869,11 +869,25 @@ class CharacterStatBuilder
         $totalPercent = 0;
 
         if ($this->characterBoons->isNotEmpty()) {
-            if (is_null($statAttribute)) {
-                $totalPercent = $this->characterBoons->sum('itemUsed.increase_stat_by');
-            } else {
-                $totalPercent = $this->characterBoons->sum('itemUsed.'.$statAttribute);
-            }
+            $attribute = is_null($statAttribute) ? 'increase_stat_by' : $statAttribute;
+
+            $totalPercent = $this->characterBoons->sum(function ($boon) use ($attribute): float {
+                $itemUsed = $boon->itemUsed;
+
+                if (is_null($itemUsed)) {
+                    return 0.0;
+                }
+
+                $value = $itemUsed->{$attribute};
+
+                if (is_null($value)) {
+                    return 0.0;
+                }
+
+                $amountUsed = $itemUsed->can_stack ? $boon->amount_used : 1;
+
+                return $value * $amountUsed;
+            });
         }
 
         return $base + $base * $totalPercent;
