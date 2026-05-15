@@ -2,22 +2,30 @@
 
 namespace App\Game\Automation\Providers;
 
+use App\Flare\Services\CharacterRewardService;
 use App\Game\Automation\Coordinators\FactionLoyaltyAutomationActionCoordinator;
 use App\Game\Automation\Coordinators\FactionLoyaltyNpcTaskCoordinator;
+use App\Game\Automation\Handlers\AutomatedBountyFightHandler;
 use App\Game\Automation\Handlers\AutomatedCraftingHandler;
 use App\Game\Automation\Loggers\FactionLoyaltyAutomationCraftingLogger;
+use App\Game\Automation\Loggers\FactionLoyaltyAutomationFightLogger;
 use App\Game\Automation\Middleware\IsCharacterExploring;
 use App\Game\Automation\Services\DelveExplorationAutomationService;
 use App\Game\Automation\Services\ExplorationAutomationService;
 use App\Game\Automation\Services\FactionLoyaltyAutomationService;
 use App\Game\Automation\Values\AutomatedCraftingAttemptTracker;
 use App\Game\Automation\Values\AutomatedCraftingResult;
+use App\Game\Automation\Values\AutomatedFightResult;
+use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\Battle\Services\MonsterFightService;
+use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Maps\Services\MovementService;
 use App\Game\Maps\Services\TraverseService;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\CraftingService;
+use App\Game\Skills\Services\SkillService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -68,8 +76,16 @@ class ServiceProvider extends ApplicationServiceProvider
             return new AutomatedCraftingResult();
         });
 
+        $this->app->bind(AutomatedFightResult::class, function () {
+            return new AutomatedFightResult();
+        });
+
         $this->app->bind(FactionLoyaltyAutomationCraftingLogger::class, function () {
             return new FactionLoyaltyAutomationCraftingLogger();
+        });
+
+        $this->app->bind(FactionLoyaltyAutomationFightLogger::class, function () {
+            return new FactionLoyaltyAutomationFightLogger();
         });
 
         $this->app->bind(AutomatedCraftingHandler::class, function ($app) {
@@ -78,6 +94,17 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(ShopService::class),
                 $app->make(AutomatedCraftingAttemptTracker::class),
                 $app->make(AutomatedCraftingResult::class)
+            );
+        });
+
+        $this->app->bind(AutomatedBountyFightHandler::class, function ($app) {
+            return new AutomatedBountyFightHandler(
+                $app->make(MonsterFightService::class),
+                $app->make(BattleEventHandler::class),
+                $app->make(CharacterRewardService::class),
+                $app->make(SkillService::class),
+                $app->make(FactionHandler::class),
+                $app->make(AutomatedFightResult::class)
             );
         });
     }

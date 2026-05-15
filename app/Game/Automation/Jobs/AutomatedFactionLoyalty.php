@@ -9,13 +9,17 @@ use App\Flare\Models\FactionLoyaltyNpc;
 use App\Game\Automation\Coordinators\FactionLoyaltyAutomationActionCoordinator;
 use App\Game\Automation\Coordinators\FactionLoyaltyNpcTaskCoordinator;
 use App\Game\Automation\Enums\AutomatedCraftingResultType;
+use App\Game\Automation\Enums\AutomatedFightResultType;
 use App\Game\Automation\Enums\FactionLoyaltyCoordinatorAction;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationStatus;
 use App\Game\Automation\Events\AutomationTimeOut;
+use App\Game\Automation\Handlers\AutomatedBountyFightHandler;
 use App\Game\Automation\Handlers\AutomatedCraftingHandler;
 use App\Game\Automation\Loggers\FactionLoyaltyAutomationCraftingLogger;
+use App\Game\Automation\Loggers\FactionLoyaltyAutomationFightLogger;
 use App\Game\Automation\Values\AutomatedCraftingResult;
+use App\Game\Automation\Values\AutomatedFightResult;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use Exception;
@@ -70,6 +74,8 @@ class AutomatedFactionLoyalty implements ShouldQueue
      * @param FactionLoyaltyAutomationActionCoordinator $factionLoyaltyAutomationActionCoordinator
      * @param AutomatedCraftingHandler $automatedCraftingHandler
      * @param FactionLoyaltyAutomationCraftingLogger $factionLoyaltyAutomationCraftingLogger
+     * @param AutomatedBountyFightHandler $automatedBountyFightHandler
+     * @param FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger
      * @return void
      */
     public function handle(
@@ -78,6 +84,8 @@ class AutomatedFactionLoyalty implements ShouldQueue
         FactionLoyaltyAutomationActionCoordinator $factionLoyaltyAutomationActionCoordinator,
         AutomatedCraftingHandler $automatedCraftingHandler,
         FactionLoyaltyAutomationCraftingLogger $factionLoyaltyAutomationCraftingLogger,
+        AutomatedBountyFightHandler $automatedBountyFightHandler,
+        FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger,
     ): void {
         $this->character = Character::find($this->characterId);
 
@@ -121,6 +129,8 @@ class AutomatedFactionLoyalty implements ShouldQueue
                 $factionLoyaltyAutomationAction,
                 $automatedCraftingHandler,
                 $factionLoyaltyAutomationCraftingLogger,
+                $automatedBountyFightHandler,
+                $factionLoyaltyAutomationFightLogger,
                 $characterCacheData
             );
         } catch (Exception $exception) {
@@ -171,6 +181,8 @@ class AutomatedFactionLoyalty implements ShouldQueue
      * @param array $factionLoyaltyAutomationAction
      * @param AutomatedCraftingHandler $automatedCraftingHandler
      * @param FactionLoyaltyAutomationCraftingLogger $factionLoyaltyAutomationCraftingLogger
+     * @param AutomatedBountyFightHandler $automatedBountyFightHandler
+     * @param FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger
      * @param CharacterCacheData $characterCacheData
      * @return void
      */
@@ -178,6 +190,8 @@ class AutomatedFactionLoyalty implements ShouldQueue
         array $factionLoyaltyAutomationAction,
         AutomatedCraftingHandler $automatedCraftingHandler,
         FactionLoyaltyAutomationCraftingLogger $factionLoyaltyAutomationCraftingLogger,
+        AutomatedBountyFightHandler $automatedBountyFightHandler,
+        FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger,
         CharacterCacheData $characterCacheData,
     ): void {
         if ($factionLoyaltyAutomationAction['type'] === FactionLoyaltyCoordinatorAction::CRAFT->value) {
@@ -185,6 +199,8 @@ class AutomatedFactionLoyalty implements ShouldQueue
                 $factionLoyaltyAutomationAction,
                 $automatedCraftingHandler,
                 $factionLoyaltyAutomationCraftingLogger,
+                $automatedBountyFightHandler,
+                $factionLoyaltyAutomationFightLogger,
                 $characterCacheData
             );
 
@@ -192,7 +208,12 @@ class AutomatedFactionLoyalty implements ShouldQueue
         }
 
         if ($factionLoyaltyAutomationAction['type'] === FactionLoyaltyCoordinatorAction::FIGHT->value) {
-            $this->handleFightAction($characterCacheData);
+            $this->handleFightAction(
+                $factionLoyaltyAutomationAction,
+                $automatedBountyFightHandler,
+                $factionLoyaltyAutomationFightLogger,
+                $characterCacheData
+            );
 
             return;
         }
@@ -208,6 +229,8 @@ class AutomatedFactionLoyalty implements ShouldQueue
      * @param array $factionLoyaltyAutomationAction
      * @param AutomatedCraftingHandler $automatedCraftingHandler
      * @param FactionLoyaltyAutomationCraftingLogger $factionLoyaltyAutomationCraftingLogger
+     * @param AutomatedBountyFightHandler $automatedBountyFightHandler
+     * @param FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger
      * @param CharacterCacheData $characterCacheData
      * @return void
      */
@@ -215,6 +238,8 @@ class AutomatedFactionLoyalty implements ShouldQueue
         array $factionLoyaltyAutomationAction,
         AutomatedCraftingHandler $automatedCraftingHandler,
         FactionLoyaltyAutomationCraftingLogger $factionLoyaltyAutomationCraftingLogger,
+        AutomatedBountyFightHandler $automatedBountyFightHandler,
+        FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger,
         CharacterCacheData $characterCacheData,
     ): void {
         $task = $factionLoyaltyAutomationAction['task'] ?? [];
@@ -237,18 +262,29 @@ class AutomatedFactionLoyalty implements ShouldQueue
             ->setFactionLoyaltyNpc($this->factionLoyaltyNpc)
             ->handle();
 
-        $this->handleCraftingResult($automatedCraftingResult, $characterCacheData);
+        $this->handleCraftingResult(
+            $automatedCraftingResult,
+            $automatedBountyFightHandler,
+            $factionLoyaltyAutomationFightLogger,
+            $characterCacheData
+        );
     }
 
     /**
      * Handle the automated crafting result.
      *
      * @param AutomatedCraftingResult $automatedCraftingResult
+     * @param AutomatedBountyFightHandler $automatedBountyFightHandler
+     * @param FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger
      * @param CharacterCacheData $characterCacheData
      * @return void
      */
-    private function handleCraftingResult(AutomatedCraftingResult $automatedCraftingResult, CharacterCacheData $characterCacheData): void
-    {
+    private function handleCraftingResult(
+        AutomatedCraftingResult $automatedCraftingResult,
+        AutomatedBountyFightHandler $automatedBountyFightHandler,
+        FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger,
+        CharacterCacheData $characterCacheData,
+    ): void {
         if ($automatedCraftingResult->hasStartedBelowTargetLevel()) {
             $this->setFailedCraftingItem($automatedCraftingResult->getTargetItemId());
         }
@@ -281,7 +317,22 @@ class AutomatedFactionLoyalty implements ShouldQueue
                 true
             );
 
-            $this->handleFightAction($characterCacheData);
+            $factionLoyaltyAutomationAction = $this->getBountyFightActionFromCurrentNpc();
+
+            if (is_null($factionLoyaltyAutomationAction)) {
+                $this->sendOutEventLogUpdate('No bounty task is available to earn more gold. Automation canceled.', true);
+
+                $this->endAutomation($characterCacheData, false);
+
+                return;
+            }
+
+            $this->handleFightAction(
+                $factionLoyaltyAutomationAction,
+                $automatedBountyFightHandler,
+                $factionLoyaltyAutomationFightLogger,
+                $characterCacheData
+            );
 
             return;
         }
@@ -289,6 +340,58 @@ class AutomatedFactionLoyalty implements ShouldQueue
         $this->sendOutEventLogUpdate('Automated crafting could not continue. Automation canceled.', true);
 
         $this->endAutomation($characterCacheData, false);
+    }
+
+    /**
+     * Get a bounty fight action from the current NPC.
+     *
+     * @return array|null
+     */
+    private function getBountyFightActionFromCurrentNpc(): ?array
+    {
+        if (is_null($this->factionLoyaltyNpc)) {
+            return null;
+        }
+
+        $this->factionLoyaltyNpc = $this->factionLoyaltyNpc->refresh();
+
+        $fameTasks = $this->factionLoyaltyNpc->factionLoyaltyNpcTasks?->fame_tasks ?? [];
+
+        foreach ($fameTasks as $fameTask) {
+            if (($fameTask['type'] ?? null) !== 'bounty') {
+                continue;
+            }
+
+            if ($fameTask['current_amount'] >= $fameTask['required_amount']) {
+                continue;
+            }
+
+            if (! is_null($this->factionLoyaltyAutomation?->failed_bounty_monster_id) && $fameTask['monster_id'] !== $this->factionLoyaltyAutomation->failed_bounty_monster_id) {
+                continue;
+            }
+
+            return [
+                'type' => FactionLoyaltyCoordinatorAction::FIGHT->value,
+                'task' => $fameTask,
+            ];
+        }
+
+        foreach ($fameTasks as $fameTask) {
+            if (($fameTask['type'] ?? null) !== 'bounty') {
+                continue;
+            }
+
+            if ($fameTask['current_amount'] >= $fameTask['required_amount']) {
+                continue;
+            }
+
+            return [
+                'type' => FactionLoyaltyCoordinatorAction::FIGHT->value,
+                'task' => $fameTask,
+            ];
+        }
+
+        return null;
     }
 
     /**
@@ -313,17 +416,117 @@ class AutomatedFactionLoyalty implements ShouldQueue
     /**
      * Handle the fight action.
      *
+     * @param array $factionLoyaltyAutomationAction
+     * @param AutomatedBountyFightHandler $automatedBountyFightHandler
+     * @param FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger
      * @param CharacterCacheData $characterCacheData
      * @return void
      */
-    private function handleFightAction(CharacterCacheData $characterCacheData): void
-    {
-        $this->sendOutEventLogUpdate(
-            'Bounty fighting is the next automation action, but the automated fight handler has not been implemented yet.',
-            true
-        );
+    private function handleFightAction(
+        array $factionLoyaltyAutomationAction,
+        AutomatedBountyFightHandler $automatedBountyFightHandler,
+        FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger,
+        CharacterCacheData $characterCacheData,
+    ): void {
+        if (is_null($this->character) || is_null($this->characterAutomation) || is_null($this->factionLoyaltyAutomation) || is_null($this->factionLoyaltyNpc)) {
+            $this->endAutomation($characterCacheData, false);
 
-        $this->recallJob($characterCacheData);
+            return;
+        }
+
+        $task = $factionLoyaltyAutomationAction['task'] ?? [];
+
+        if (! isset($task['monster_id'])) {
+            $this->sendOutEventLogUpdate('Faction loyalty bounty task is missing a monster id. Automation canceled.', true);
+
+            $this->endAutomation($characterCacheData, false);
+
+            return;
+        }
+
+        $automatedFightResult = $automatedBountyFightHandler
+            ->setUp(
+                $this->character,
+                $this->factionLoyaltyAutomation,
+                $this->factionLoyaltyNpc,
+                $task,
+                $this->characterAutomation->attack_type,
+                $factionLoyaltyAutomationFightLogger->setUp($this->factionLoyaltyAutomation)
+            )
+            ->handle();
+
+        $this->handleFightResult($automatedFightResult, $characterCacheData);
+    }
+
+    /**
+     * Handle the automated fight result.
+     *
+     * @param AutomatedFightResult $automatedFightResult
+     * @param CharacterCacheData $characterCacheData
+     * @return void
+     */
+    private function handleFightResult(AutomatedFightResult $automatedFightResult, CharacterCacheData $characterCacheData): void
+    {
+        if ($this->shouldClearFailedBountyMonster($automatedFightResult)) {
+            $this->clearFailedBountyMonster();
+        }
+
+        if ($automatedFightResult->getResultType() === AutomatedFightResultType::BOUNTY_COMPLETED) {
+            $this->recallJob($characterCacheData);
+
+            return;
+        }
+
+        if ($automatedFightResult->getResultType() === AutomatedFightResultType::TRAINING_BATCH_COMPLETED) {
+            $this->recallJob($characterCacheData);
+
+            return;
+        }
+
+        if ($automatedFightResult->getResultType() === AutomatedFightResultType::DIED_TO_BOUNTY_STARTED_TRAINING) {
+            $this->recallJob($characterCacheData);
+
+            return;
+        }
+
+        $this->endAutomation($characterCacheData, false);
+    }
+
+    /**
+     * Should the failed bounty monster be cleared?
+     *
+     * @param AutomatedFightResult $automatedFightResult
+     * @return bool
+     */
+    private function shouldClearFailedBountyMonster(AutomatedFightResult $automatedFightResult): bool
+    {
+        if (is_null($this->factionLoyaltyAutomation->failed_bounty_monster_id)) {
+            return false;
+        }
+
+        if ($automatedFightResult->getBountyKills() <= 0) {
+            return false;
+        }
+
+        return $automatedFightResult->getMonsterId() === $this->factionLoyaltyAutomation->failed_bounty_monster_id;
+    }
+
+    /**
+     * Clear the failed bounty monster.
+     *
+     * @return void
+     */
+    private function clearFailedBountyMonster(): void
+    {
+        if (is_null($this->factionLoyaltyAutomation)) {
+            return;
+        }
+
+        $this->factionLoyaltyAutomation->update([
+            'failed_bounty_monster_id' => null,
+        ]);
+
+        $this->factionLoyaltyAutomation = $this->factionLoyaltyAutomation->refresh();
     }
 
     /**
