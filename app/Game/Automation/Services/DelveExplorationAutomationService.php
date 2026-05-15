@@ -15,10 +15,13 @@ use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationStatus;
 use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Jobs\DelveExploration as DelveExplorationProcessing;
+use App\Game\Core\Traits\ResponseBuilder;
 use Illuminate\Support\Facades\Cache;
 
 class DelveExplorationAutomationService
 {
+
+    use ResponseBuilder;
 
     private int $timeDelay = 5;
 
@@ -71,9 +74,7 @@ class DelveExplorationAutomationService
         $characterAutomation = CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::DELVE)->first();
 
         if (is_null($characterAutomation)) {
-            return response()->json([
-                'message' => 'Nope. You don\'t own that.',
-            ], 422);
+            return $this->errorResult('Nope. You don\'t own that.');
         }
 
         $characterAutomation->delete();

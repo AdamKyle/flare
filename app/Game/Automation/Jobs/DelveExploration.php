@@ -2,14 +2,26 @@
 
 namespace App\Game\Automation\Jobs;
 
+use App\Flare\Models\Character;
+use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\DelveExploration as DelveExplorationModel;
 use App\Flare\Models\Location;
+use App\Flare\Models\Monster;
+use App\Flare\Services\CharacterRewardService;
 use App\Flare\Values\AutomationType;
-use App\Game\Automation\Values\DelveOutcome;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
+use App\Game\Automation\Enums\DelveOutcome;
+use App\Game\Automation\Events\AutomationLogUpdate;
+use App\Game\Automation\Events\AutomationTimeOut;
+use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Skills\Services\SkillService;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -17,18 +29,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
-use App\Flare\Models\Character;
-use App\Flare\Models\CharacterAutomation;
-use App\Flare\Models\Monster;
-use App\Flare\Services\CharacterRewardService;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Battle\Handlers\BattleEventHandler;
-use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
-use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
-use App\Game\Automation\Events\AutomationLogUpdate;
-use App\Game\Automation\Events\AutomationTimeOut;
-use App\Game\Skills\Services\SkillService;
 use Psr\SimpleCache\InvalidArgumentException;
 
 class DelveExploration implements ShouldQueue

@@ -44,7 +44,7 @@ export default class FactionLoyaltyListeners implements FactionLoyaltyListener {
         }
 
         this.factionLoyaltyUpdate.listen(
-            "Game.Factions.FactionLoyalty.Events.FactionLoyaltyUpdate",
+            "Game.Factions.AutomatedFactionLoyalty.Events.FactionLoyaltyUpdate",
             (event: any) => {
                 if (!this.component) {
                     return;

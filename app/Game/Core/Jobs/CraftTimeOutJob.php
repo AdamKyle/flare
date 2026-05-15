@@ -3,6 +3,7 @@
 namespace App\Game\Core\Jobs;
 
 use App\Flare\Models\Character;
+use App\Flare\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\ShowCraftingTimeOutEvent;
 use Illuminate\Bus\Queueable;
@@ -18,7 +19,7 @@ class CraftTimeOutJob implements ShouldQueue
     /**
      * @var Character
      */
-    protected $character;
+    protected Character $character;
 
     /**
      * Create a new job instance.
@@ -35,8 +36,11 @@ class CraftTimeOutJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
+        if ($this->hasActiveFactionLoyaltyAutomation()) {
+            return;
+        }
 
         $this->character->update([
             'can_craft' => true,
@@ -46,5 +50,18 @@ class CraftTimeOutJob implements ShouldQueue
         broadcast(new UpdateCharacterStatus($this->character->refresh()));
 
         broadcast(new ShowCraftingTimeOutEvent($this->character->user, 0));
+    }
+
+    /**
+     * Has active faction loyalty automation.
+     *
+     * @return bool
+     */
+    private function hasActiveFactionLoyaltyAutomation(): bool
+    {
+        return $this->character->currentAutomations()
+            ->where('type', AutomationType::FACTION_LOYALTY)
+            ->where('completed_at', '>', now())
+            ->exists();
     }
 }

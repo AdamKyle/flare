@@ -25,7 +25,7 @@ class FactionLoyaltyAutomationFactory extends Factory
         return [
             'character_automation_id' => null,
             'character_id' => null,
-            'faction_loyalty_npc_task_id' => null,
+            'faction_loyalty_npc_id' => null,
             'failed_bounty_monster_id' => null,
             'failed_crafting_item_id' => null,
             'started_at' => now(),

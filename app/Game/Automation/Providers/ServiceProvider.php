@@ -2,12 +2,23 @@
 
 namespace App\Game\Automation\Providers;
 
-use App\Game\Automation\Services\DelveExplorationAutomationService;
-use App\Game\Automation\Services\FactionLoyaltyAutomationService;
-use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
-use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Automation\Coordinators\FactionLoyaltyAutomationActionCoordinator;
+use App\Game\Automation\Coordinators\FactionLoyaltyNpcTaskCoordinator;
+use App\Game\Automation\Handlers\AutomatedCraftingHandler;
+use App\Game\Automation\Loggers\FactionLoyaltyAutomationCraftingLogger;
 use App\Game\Automation\Middleware\IsCharacterExploring;
+use App\Game\Automation\Services\DelveExplorationAutomationService;
 use App\Game\Automation\Services\ExplorationAutomationService;
+use App\Game\Automation\Services\FactionLoyaltyAutomationService;
+use App\Game\Automation\Values\AutomatedCraftingAttemptTracker;
+use App\Game\Automation\Values\AutomatedCraftingResult;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
+use App\Game\Maps\Services\MovementService;
+use App\Game\Maps\Services\TraverseService;
+use App\Game\Shop\Services\ShopService;
+use App\Game\Skills\Services\CraftingService;
+use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -32,7 +43,42 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(FactionLoyaltyAutomationService::class, function ($app) {
-            return new FactionLoyaltyAutomationService();
+            return new FactionLoyaltyAutomationService(
+                $app->make(CharacterCacheData::class)
+            );
+        });
+
+        $this->app->bind(FactionLoyaltyNpcTaskCoordinator::class, function ($app) {
+            return new FactionLoyaltyNpcTaskCoordinator(
+                $app->make(FactionLoyaltyService::class),
+                $app->make(MovementService::class),
+                $app->make(TraverseService::class)
+            );
+        });
+
+        $this->app->bind(FactionLoyaltyAutomationActionCoordinator::class, function () {
+            return new FactionLoyaltyAutomationActionCoordinator();
+        });
+
+        $this->app->bind(AutomatedCraftingAttemptTracker::class, function () {
+            return new AutomatedCraftingAttemptTracker();
+        });
+
+        $this->app->bind(AutomatedCraftingResult::class, function () {
+            return new AutomatedCraftingResult();
+        });
+
+        $this->app->bind(FactionLoyaltyAutomationCraftingLogger::class, function () {
+            return new FactionLoyaltyAutomationCraftingLogger();
+        });
+
+        $this->app->bind(AutomatedCraftingHandler::class, function ($app) {
+            return new AutomatedCraftingHandler(
+                $app->make(CraftingService::class),
+                $app->make(ShopService::class),
+                $app->make(AutomatedCraftingAttemptTracker::class),
+                $app->make(AutomatedCraftingResult::class)
+            );
         });
     }
 

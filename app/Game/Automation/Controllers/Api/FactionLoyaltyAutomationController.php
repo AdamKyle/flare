@@ -24,7 +24,8 @@ class FactionLoyaltyAutomationController
      * @param Character $character
      * @return JsonResponse
      */
-    public function begin(FactionLoyaltyAutomationRequest $request, Character $character) {
+    public function begin(FactionLoyaltyAutomationRequest $request, Character $character): JsonResponse
+    {
         if (! AttackTypeValue::attackTypeExists($request->attack_type)) {
             return response()->json([
                 'message' => 'Invalid attack type was selected. Please select from the drop down.',
@@ -68,20 +69,30 @@ class FactionLoyaltyAutomationController
             ], 422);
         }
 
-        if (!$this->hasIncompleteTasks($factionLoyaltyNpc)) {
+        if (! $this->hasIncompleteTasks($factionLoyaltyNpc)) {
             return response()->json([
                 'message' => 'This NPC does not have any incomplete tasks for you to automate.'
             ], 422);
         }
 
-        $this->factionLoyaltyAutomationService->beginAutomation($character);
+        $this->factionLoyaltyAutomationService->beginAutomation($character, $factionLoyaltyNpc, $request->attack_type);
 
         return response()->json([
-            'message' => 'You have now begun automation to help out: ' . $factionLoyaltyNpc->npc->real_name . ' This will automatically end in 8 hours. You can manually end it at any time. Keep an eye on the Automation tab to see your progress.',
+            'message' => 'You have now begun automation to help out: ' . $factionLoyaltyNpc->npc->real_name . ' This will automatically end in 8 hours. You can manually end it at any time. Crafting has been disabled while faction loyalty automation is running. Keep an eye on the Automation tab to see your progress.',
         ]);
     }
 
-    public function stop(Character $character) {
+    /**
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function stop(Character $character): JsonResponse
+    {
+        $result = $this->factionLoyaltyAutomationService->stopAutomation($character);
 
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
     }
 }

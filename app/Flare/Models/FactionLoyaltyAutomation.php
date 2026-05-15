@@ -2,11 +2,9 @@
 
 namespace App\Flare\Models;
 
-use Database\Factories\DelveExplorationFactory;
 use Database\Factories\FactionLoyaltyAutomationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class FactionLoyaltyAutomation extends Model
 {
@@ -21,7 +19,7 @@ class FactionLoyaltyAutomation extends Model
     protected $fillable = [
         'character_automation_id',
         'character_id',
-        'faction_loyalty_npc_task_id',
+        'faction_loyalty_npc_id',
         'failed_bounty_monster_id',
         'failed_crafting_item_id',
         'started_at',
@@ -43,8 +41,18 @@ class FactionLoyaltyAutomation extends Model
         return $this->belongsTo(Character::class);
     }
 
-    public function factionLoyaltyNpcTask() {
-        return $this->belongsTo(FactionLoyaltyNpcTask::class);
+    public function characterAutomation()
+    {
+        return $this->belongsTo(CharacterAutomation::class);
+    }
+
+    public function log()
+    {
+        return $this->hasOne(FactionLoyaltyAutomationLog::class);
+    }
+
+    public function factionLoyaltyNpc() {
+        return $this->belongsTo(FactionLoyaltyNpc::class);
     }
 
     public function failedBountyMonster() {
