@@ -236,7 +236,7 @@ class DelveAutomationServiceTest extends TestCase
 
         $response = $this->service->stopExploration($this->character);
 
-        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals(422, $response['status']);
     }
 
     public function testStopExplorationClearsCharacterSurvivalCache(): void

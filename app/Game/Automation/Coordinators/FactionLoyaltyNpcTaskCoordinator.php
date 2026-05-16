@@ -24,6 +24,8 @@ class FactionLoyaltyNpcTaskCoordinator
 
     private bool $shouldEndAutomation = false;
 
+    private bool $skippedUnmaxedFactionWithIncompleteTasks = false;
+
     public function __construct(
         private readonly FactionLoyaltyService $factionLoyaltyService,
         private readonly MovementService $movementService,
@@ -42,6 +44,7 @@ class FactionLoyaltyNpcTaskCoordinator
         $this->character = $character;
         $this->factionLoyaltyAutomation = $factionLoyaltyAutomation;
         $this->shouldEndAutomation = false;
+        $this->skippedUnmaxedFactionWithIncompleteTasks = false;
 
         return $this;
     }
@@ -80,10 +83,7 @@ class FactionLoyaltyNpcTaskCoordinator
 
         $this->shouldEndAutomation = true;
 
-        $this->sendOutEventLogUpdate(
-            'No incomplete faction loyalty tasks were found for any available NPC. Automation has ended.',
-            true
-        );
+        $this->sendOutEventLogUpdate($this->getNoAvailableFactionMessage(), true);
 
         return null;
     }
@@ -139,6 +139,10 @@ class FactionLoyaltyNpcTaskCoordinator
             $factionLoyaltyNpc = $this->findNpcWithIncompleteTasks($factionLoyalty);
 
             if (is_null($factionLoyaltyNpc)) {
+                continue;
+            }
+
+            if (! $this->canPledgeToFaction($factionLoyalty->faction)) {
                 continue;
             }
 
@@ -215,7 +219,11 @@ class FactionLoyaltyNpcTaskCoordinator
             return null;
         }
 
-        $this->factionLoyaltyService->pledgeLoyalty($this->character->refresh(), $faction);
+        $pledgeResult = $this->factionLoyaltyService->pledgeLoyalty($this->character->refresh(), $faction);
+
+        if ($pledgeResult['status'] !== 200) {
+            return null;
+        }
 
         return $this->assistNpcAfterMapChange($factionLoyaltyNpc->refresh());
     }
@@ -233,7 +241,11 @@ class FactionLoyaltyNpcTaskCoordinator
             return null;
         }
 
-        $this->factionLoyaltyService->pledgeLoyalty($this->character->refresh(), $faction);
+        $pledgeResult = $this->factionLoyaltyService->pledgeLoyalty($this->character->refresh(), $faction);
+
+        if ($pledgeResult['status'] !== 200) {
+            return null;
+        }
 
         $factionLoyalty = $this->character
             ->refresh()
@@ -288,6 +300,23 @@ class FactionLoyaltyNpcTaskCoordinator
     }
 
     /**
+     * Can the character pledge to the faction?
+     *
+     * @param Faction $faction
+     * @return bool
+     */
+    private function canPledgeToFaction(Faction $faction): bool
+    {
+        if ($faction->maxed) {
+            return true;
+        }
+
+        $this->skippedUnmaxedFactionWithIncompleteTasks = true;
+
+        return false;
+    }
+
+    /**
      * Can the character travel to the faction map?
      *
      * @param Faction $faction
@@ -327,6 +356,20 @@ class FactionLoyaltyNpcTaskCoordinator
     private function getSameMapSwitchMessage(FactionLoyaltyNpc $currentFactionLoyaltyNpc, FactionLoyaltyNpc $nextFactionLoyaltyNpc): string
     {
         return 'You have completed all tasks for ' . $currentFactionLoyaltyNpc->npc->real_name . '. You are now assisting ' . $nextFactionLoyaltyNpc->npc->real_name . '.';
+    }
+
+    /**
+     * Get the no available faction message.
+     *
+     * @return string
+     */
+    private function getNoAvailableFactionMessage(): string
+    {
+        if ($this->skippedUnmaxedFactionWithIncompleteTasks) {
+            return 'There are no other factions for you to pledge to. You have not maxed out other factions on other maps.';
+        }
+
+        return 'No incomplete faction loyalty tasks were found for any available NPC. Automation has ended.';
     }
 
     /**

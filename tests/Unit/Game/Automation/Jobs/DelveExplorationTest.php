@@ -438,6 +438,7 @@ class DelveExplorationTest extends TestCase
         $this->bindWinningFight();
 
         $automation = $this->createAutomation();
+
         $delve = $this->createDelve([
             'increase_enemy_strength' => 999.99,
         ]);

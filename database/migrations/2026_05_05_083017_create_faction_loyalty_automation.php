@@ -20,6 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('failed_crafting_item_id')->nullable();
             $table->dateTime('started_at');
             $table->dateTime('completed_at')->nullable();
+            $table->timestamps();
         });
 
     }
