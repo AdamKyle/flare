@@ -149,10 +149,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
      */
     private function resolveFactionLoyaltyNpc(FactionLoyaltyNpcTaskCoordinator $factionLoyaltyNpcTaskCoordinator): ?FactionLoyaltyNpc
     {
-        if (is_null($this->character) || is_null($this->factionLoyaltyAutomation)) {
-            return null;
-        }
-
         return $factionLoyaltyNpcTaskCoordinator
             ->setUp($this->character, $this->factionLoyaltyAutomation)
             ->resolveNpc();
@@ -166,10 +162,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
      */
     private function resolveFactionLoyaltyAutomationAction(FactionLoyaltyAutomationActionCoordinator $factionLoyaltyAutomationActionCoordinator): ?array
     {
-        if (is_null($this->factionLoyaltyAutomation) || is_null($this->factionLoyaltyNpc)) {
-            return null;
-        }
-
         return $factionLoyaltyAutomationActionCoordinator
             ->setUp($this->factionLoyaltyAutomation, $this->factionLoyaltyNpc)
             ->resolveAction();
@@ -349,10 +341,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
      */
     private function getBountyFightActionFromCurrentNpc(): ?array
     {
-        if (is_null($this->factionLoyaltyNpc)) {
-            return null;
-        }
-
         $this->factionLoyaltyNpc = $this->factionLoyaltyNpc->refresh();
 
         $fameTasks = $this->factionLoyaltyNpc->factionLoyaltyNpcTasks?->fame_tasks ?? [];
@@ -366,7 +354,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
                 continue;
             }
 
-            if (! is_null($this->factionLoyaltyAutomation?->failed_bounty_monster_id) && $fameTask['monster_id'] !== $this->factionLoyaltyAutomation->failed_bounty_monster_id) {
+            if (! is_null($this->factionLoyaltyAutomation->failed_bounty_monster_id) && $fameTask['monster_id'] !== $this->factionLoyaltyAutomation->failed_bounty_monster_id) {
                 continue;
             }
 
@@ -402,10 +390,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
      */
     private function setFailedCraftingItem(int $itemId): void
     {
-        if (is_null($this->factionLoyaltyAutomation)) {
-            return;
-        }
-
         $this->factionLoyaltyAutomation->update([
             'failed_crafting_item_id' => $itemId,
         ]);
@@ -428,12 +412,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
         FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger,
         CharacterCacheData $characterCacheData,
     ): void {
-        if (is_null($this->character) || is_null($this->characterAutomation) || is_null($this->factionLoyaltyAutomation) || is_null($this->factionLoyaltyNpc)) {
-            $this->endAutomation($characterCacheData, false);
-
-            return;
-        }
-
         $task = $factionLoyaltyAutomationAction['task'] ?? [];
 
         if (! isset($task['monster_id'])) {
@@ -518,10 +496,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
      */
     private function clearFailedBountyMonster(): void
     {
-        if (is_null($this->factionLoyaltyAutomation)) {
-            return;
-        }
-
         $this->factionLoyaltyAutomation->update([
             'failed_bounty_monster_id' => null,
         ]);
@@ -536,10 +510,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
      */
     private function clearFailedCraftingItem(): void
     {
-        if (is_null($this->factionLoyaltyAutomation)) {
-            return;
-        }
-
         $this->factionLoyaltyAutomation->update([
             'failed_crafting_item_id' => null,
         ]);
@@ -555,12 +525,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
      */
     private function recallJob(CharacterCacheData $characterCacheData): void
     {
-        if (is_null($this->characterAutomation) || is_null($this->factionLoyaltyAutomation)) {
-            $this->endAutomation($characterCacheData, false);
-
-            return;
-        }
-
         if (now()->greaterThanOrEqualTo($this->characterAutomation->completed_at)) {
             $this->endAutomation($characterCacheData);
 
