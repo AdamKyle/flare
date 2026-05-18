@@ -4,6 +4,7 @@ import OrangeProgressBar from "../../components/ui/progress-bars/orange-progress
 import { FameTasks } from "./deffinitions/faction-loaylaty";
 import SuccessOutlineButton from "../../components/ui/buttons/success-outline-button";
 import PrimaryOutlineButton from "../../components/ui/buttons/primary-outline-button";
+import DangerOutlineButton from "../../components/ui/buttons/danger-outline-button";
 import BountyFightAjax from "./ajax/bounty-fight-ajax";
 import { serviceContainer } from "../../lib/containers/core-container";
 import LoadingProgressBar from "../ui/progress-bars/loading-progress-bar";
@@ -16,6 +17,7 @@ import { ItemType } from "../items/enums/item-type";
 import InfoAlert from "../ui/alerts/simple-alerts/info-alert";
 import DropDown from "../ui/drop-down/drop-down";
 import { startCase, toLower } from "lodash";
+import TimerProgressBar from "../ui/progress-bars/timer-progress-bar";
 
 export default class FactionNpcTasks extends React.Component<
     FactionNpcSectionProps,
@@ -34,12 +36,20 @@ export default class FactionNpcTasks extends React.Component<
             success_message: null,
             error_message: null,
             must_revive: false,
-            attack_type_selected: "attack",
+            attack_type_selected: this.props.attack_type ?? "attack",
         };
 
         this.fightAjax = serviceContainer().fetch(BountyFightAjax);
 
         this.craftingAjax = serviceContainer().fetch(HandleCraftingAjax);
+    }
+
+    componentDidUpdate(previousProps: FactionNpcSectionProps): void {
+        if (previousProps.attack_type !== this.props.attack_type) {
+            this.setState({
+                attack_type_selected: this.props.attack_type ?? "attack",
+            });
+        }
     }
 
     bountyTask(monsterId?: number) {
@@ -134,6 +144,7 @@ export default class FactionNpcTasks extends React.Component<
             !this.props.can_attack ||
             this.state.attacking ||
             this.state.must_revive ||
+            this.isAnyAutomationRunning() ||
             !(
                 this.props.faction_loyalty_npc.npc.game_map_id ===
                 this.props.character_map_id
@@ -224,6 +235,10 @@ export default class FactionNpcTasks extends React.Component<
         this.setState({
             attack_type_selected: attackType,
         });
+
+        if (typeof this.props.set_attack_type !== "undefined") {
+            this.props.set_attack_type(attackType);
+        }
     }
 
     createTypeFilterDropDown() {
@@ -262,6 +277,90 @@ export default class FactionNpcTasks extends React.Component<
         return "Current Attack Type: " + attackType;
     }
 
+    isAnyAutomationRunning(): boolean {
+        return (
+            this.props.is_automation_running === true ||
+            this.props.is_faction_loyalty_automation_running === true ||
+            this.props.is_delve_running === true
+        );
+    }
+
+    showAutomationScreen() {
+        if (typeof this.props.show_automation_screen !== "undefined") {
+            this.props.show_automation_screen();
+        }
+    }
+
+    stopAutomation() {
+        if (typeof this.props.stop_automation !== "undefined") {
+            this.props.stop_automation();
+        }
+    }
+
+    renderAutomationAction(): ReactNode {
+        if (this.props.is_faction_loyalty_automation_running) {
+            return (
+                <div className="mt-3 w-full" aria-live="polite">
+                    {this.props.automation_time_out &&
+                    this.props.automation_time_out > 0 ? (
+                        <TimerProgressBar
+                            time_remaining={this.props.automation_time_out}
+                            time_out_label={"Faction Loyalty Automation"}
+                            update_time_remaining={
+                                this.props.update_automation_timer
+                            }
+                        />
+                    ) : (
+                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                            Faction Loyalty Automation is running. Timer details
+                            are refreshing.
+                        </p>
+                    )}
+                    <div className="mt-4 text-center">
+                        <DangerOutlineButton
+                            button_label={"Stop Automation"}
+                            on_click={this.stopAutomation.bind(this)}
+                            disabled={
+                                this.props.is_automation_processing === true
+                            }
+                            additional_css={"w-full sm:w-auto"}
+                        />
+                    </div>
+                </div>
+            );
+        }
+
+        return (
+            <div className="mt-3 w-full" aria-live="polite">
+                <button
+                    type="button"
+                    className="w-full py-2 px-3 text-xs border-blue-500 border-2 font-medium text-center text-gray-900 dark:text-gray-200 hover:text-gray-200 dark:hover:text-gray-300 hover:bg-blue-600 rounded-sm focus:ring-4 focus:ring-blue-300 dark:hover:bg-blue-600 dark:focus:ring-blue-800 disabled:bg-blue-600 disabled:bg-opacity-75 dark:disabled:bg-opacity-50 dark:disabled:bg-blue-500 disabled:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-200 dark:focus-visible:ring-white focus-visible:ring-opacity-75"
+                    onClick={this.showAutomationScreen.bind(this)}
+                    disabled={
+                        this.props.automation_disabled_reason != null ||
+                        this.props.is_automation_processing === true
+                    }
+                    aria-describedby={
+                        this.props.automation_disabled_reason != null
+                            ? "faction-loyalty-automation-disabled-reason"
+                            : undefined
+                    }
+                    aria-busy={this.props.is_automation_processing}
+                >
+                    Automate Faction Loyalty
+                </button>
+                {this.props.automation_disabled_reason != null ? (
+                    <p
+                        id="faction-loyalty-automation-disabled-reason"
+                        className="mt-2 text-sm text-red-700 dark:text-red-300"
+                    >
+                        {this.props.automation_disabled_reason}
+                    </p>
+                ) : null}
+            </div>
+        );
+    }
+
     renderTaskSection(): ReactNode {
         return (
             <div>
@@ -270,20 +369,23 @@ export default class FactionNpcTasks extends React.Component<
                     {this.props.character_map_id !==
                     this.props.faction_loyalty_npc.npc.game_map_id ? (
                         <WarningAlert additional_css={"my-2"}>
-                            You are not on the same plane as this NPC, you
-                            cannot take part in the bounty tasks.
+                            You are not on the same plane as this NPC. You
+                            cannot complete bounty tasks or start Faction
+                            Loyalty Automation until you are on this NPC&apos;s
+                            plane.
                         </WarningAlert>
                     ) : null}
                     <InfoAlert additional_css="my-2">
                         <p>
-                            By default we will use <strong>Attack</strong> as
-                            your default attack type unless you select one of
-                            the attack types below.
+                            Bounties must be completed on the NPC&apos;s plane.
+                            Faction Loyalty Automation can handle bounty and
+                            crafting tasks while it is running.
                         </p>
                     </InfoAlert>
                     <DropDown
                         menu_items={this.createTypeFilterDropDown()}
                         button_title={this.buildDropDownTitle()}
+                        disabled={this.isAnyAutomationRunning()}
                     />
                     <dl>
                         {this.renderTasks(
@@ -305,6 +407,8 @@ export default class FactionNpcTasks extends React.Component<
                         )}
                     </dl>
                     {this.state.crafting ? <LoadingProgressBar /> : null}
+                    <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
+                    {this.renderAutomationAction()}
                 </div>
             </div>
         );
@@ -352,13 +456,7 @@ export default class FactionNpcTasks extends React.Component<
 
                 {this.props.faction_loyalty_npc.faction_loyalty_npc_tasks
                     .fame_tasks.length > 0 ? (
-                    <div>
-                        {this.renderTaskSection()}
-                        <p className="my-4">
-                            Bounties must be completed on the respective plane
-                            and manually. Automation will not work for this.
-                        </p>
-                    </div>
+                    <div>{this.renderTaskSection()}</div>
                 ) : (
                     <SuccessAlert additional_css={"my-2"}>
                         You have completed all this NPC's tasks. By being

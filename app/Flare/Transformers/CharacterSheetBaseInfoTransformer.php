@@ -5,9 +5,11 @@ namespace App\Flare\Transformers;
 use App\Flare\Models\Character;
 use App\Flare\Models\FactionLoyalty;
 use App\Flare\Models\GameClass;
+use App\Flare\Models\Item;
 use App\Flare\Models\Survey;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\ClassAttackValue;
+use App\Flare\Values\ItemEffectsValue;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use Exception;
 
@@ -75,7 +77,9 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'can_craft_again_at' => now()->diffInSeconds($character->can_craft_again_at),
             'can_spin_again_at' => now()->diffInSeconds($character->can_spin_again_at),
             'is_automation_running' => $character->currentAutomations()->where('character_id', $character->id)->get()->isNotEmpty(),
+            'is_faction_loyalty_automation_running' => $character->isFactionLoyaltyAutomationRunning(),
             'is_delve_running' => $character->currentAutomations()->where('character_id', $character->id)->where('type', AutomationType::DELVE)->get()->isNotEmpty(),
+            'can_set_delve_pack' => $this->canSetPactOptionsForDelve($character),
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
             'is_silenced' => $character->user->is_silenced,
             'can_talk_again_at' => $character->user->can_talk_again_at,
@@ -131,5 +135,18 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         }
 
         return 0;
+    }
+
+    private function canSetPactOptionsForDelve(Character $character): bool
+    {
+        $questItemForDelve = Item::where('effect', ItemEffectsValue::DELVE_PACK_CHOICE)->first();
+
+        if (is_null($questItemForDelve)) {
+            return false;
+        }
+
+        return $character->inventory->slots->filter(function ($slot) use ($questItemForDelve) {
+            return $slot->item_id === $questItemForDelve->id;
+        })->isNotEmpty();
     }
 }

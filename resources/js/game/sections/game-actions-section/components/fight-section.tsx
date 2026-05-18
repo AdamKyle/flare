@@ -186,6 +186,9 @@ export default class FightSection extends React.Component<
             this.state.monster_current_health <= 0 ||
             this.state.character_current_health <= 0 ||
             this.props.character?.is_dead ||
+            this.props.character?.is_automation_running ||
+            this.props.character?.is_faction_loyalty_automation_running ||
+            this.props.character?.is_delve_running ||
             !this.props.character?.can_attack
         );
     }
@@ -210,7 +213,7 @@ export default class FightSection extends React.Component<
     render() {
         if (this.state.setting_up_regular_fight) {
             return (
-                <div className="flex items-center justify-center my-4">
+                <div className="mx-auto my-4 w-full md:w-2/3">
                     <LoadingProgressBar />
                 </div>
             );
@@ -218,14 +221,14 @@ export default class FightSection extends React.Component<
 
         if (this.state.error_message !== "") {
             return (
-                <div className="ml-auto mr-auto my-4 md:max-w-3/4">
+                <div className="mx-auto my-4 w-full md:w-2/3">
                     <DangerAlert>{this.state.error_message}</DangerAlert>
                 </div>
             );
         }
 
         return (
-            <div className="m-auto max-w-[75%]">
+            <div className="mx-auto w-full md:w-2/3">
                 {this.state.monster_to_fight?.highest_element !== "UNKNOWN" && (
                     <div className="flex items-center justify-center mt-4 mb-4">
                         <div className="text-center">
@@ -316,7 +319,7 @@ export default class FightSection extends React.Component<
 
                 {(this.state.processing_rank_battle ||
                     this.state.processing_regular_fight) && (
-                    <div className="w-1/2 mx-auto">
+                    <div className="w-full">
                         <LoadingProgressBar />
                     </div>
                 )}

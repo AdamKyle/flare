@@ -19,4 +19,7 @@ export default interface FactionLoyaltyState {
     faction_loyalty: FactionLoyalty | null;
     selected_faction_loyalty_npc: FactionLoyaltyNpc | null;
     attack_type: string | null;
+    show_automation_screen: boolean;
+    is_faction_loyalty_automation_running: boolean;
+    automation_time_out: number;
 }

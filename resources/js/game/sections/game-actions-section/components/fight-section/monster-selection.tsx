@@ -14,9 +14,9 @@ export default class MonsterSelection extends React.Component<
 
     render() {
         return (
-            <div className="mt-4 lg:mt-2 lg:ml-[120px]">
-                <div className="lg:grid lg:grid-cols-3 lg:gap-2">
-                    <div className="w-full md:w-2/3 lg:w-full mr-auto ml-auto lg:ml-0 lg:mr-0 lg:col-start-1 lg:col-span-2">
+            <div className="mx-auto w-full md:w-2/3">
+                <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-2 items-start">
+                    <div>
                         <Select
                             onChange={this.props.set_monster_to_fight}
                             options={this.props.monsters}
@@ -34,7 +34,7 @@ export default class MonsterSelection extends React.Component<
                         />
                     </div>
 
-                    <div className="text-center mt-4 lg:mt-0 lg:text-left lg:cols-start-3 lg:cols-end-3">
+                    <div className="text-center mt-4 lg:mt-0 lg:text-left">
                         <PrimaryButton
                             button_label={"Attack"}
                             on_click={this.props.attack}

@@ -16,6 +16,10 @@ export default interface MapProps {
 
     is_automaton_running: boolean;
 
+    is_faction_loyalty_automation_running: boolean;
+
+    is_delve_running: boolean;
+
     automation_completed_at: number;
 
     can_engage_celestials_again_at: number;

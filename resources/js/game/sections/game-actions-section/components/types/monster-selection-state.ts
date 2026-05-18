@@ -4,4 +4,6 @@ export default interface MonsterSelectionState {
     monster_to_fight: MonsterType | null;
 
     monsters: MonsterType[] | [];
+
+    loading: boolean;
 }

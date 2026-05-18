@@ -11,6 +11,7 @@ import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
 import WarningAlert from "../../../components/ui/alerts/simple-alerts/warning-alert";
 import { match } from "ts-pattern";
 import { startCase } from "lodash";
+import { updateTimers } from "../../../lib/ajax/update-timers";
 
 export default class ExplorationSection extends React.Component<any, any> {
     constructor(props: any) {
@@ -353,9 +354,14 @@ export default class ExplorationSection extends React.Component<any, any> {
                     .doAjaxCall(
                         "post",
                         (result: AxiosResponse) => {
-                            this.setState({
-                                loading: false,
-                            });
+                            this.setState(
+                                {
+                                    loading: false,
+                                },
+                                () => {
+                                    updateTimers(this.props.character.id);
+                                },
+                            );
                         },
                         (error: AxiosError) => {},
                     );
@@ -375,11 +381,51 @@ export default class ExplorationSection extends React.Component<any, any> {
                     .doAjaxCall(
                         "post",
                         (result: AxiosResponse) => {
+                            this.setState(
+                                {
+                                    loading: false,
+                                },
+                                () => {
+                                    updateTimers(this.props.character.id);
+                                },
+                            );
+                        },
+                        (error: AxiosError) => {},
+                    );
+            },
+        );
+    }
+
+    stopFactionLoyaltyAutomation() {
+        this.setState(
+            {
+                loading: true,
+                error_message: null,
+            },
+            () => {
+                new Ajax()
+                    .setRoute(
+                        "faction-loyalty-automation/" +
+                            this.props.character.id +
+                            "/stop",
+                    )
+                    .doAjaxCall(
+                        "post",
+                        (result: AxiosResponse) => {
+                            this.setState(
+                                {
+                                    loading: false,
+                                },
+                                () => {
+                                    updateTimers(this.props.character.id);
+                                },
+                            );
+                        },
+                        (error: AxiosError) => {
                             this.setState({
                                 loading: false,
                             });
                         },
-                        (error: AxiosError) => {},
                     );
             },
         );
@@ -422,11 +468,53 @@ export default class ExplorationSection extends React.Component<any, any> {
     }
 
     renderAudotmationIsRunning() {
+        if (this.props.character.is_faction_loyalty_automation_running) {
+            return (
+                <Fragment>
+                    <div
+                        className="mb-4 lg:ml-[120px] text-center lg:text-left"
+                        aria-live="polite"
+                    >
+                        <p className="my-2">
+                            Sorry, you cannot do this right now because Faction
+                            Loyalty Automation is running.
+                        </p>
+                        <p className="my-2">Would you like to stop it?</p>
+                    </div>
+
+                    {this.state.loading ? <LoadingProgressBar /> : null}
+
+                    <div className="text-center">
+                        <DangerButton
+                            button_label={"Stop Faction Loyalty Automation"}
+                            on_click={this.stopFactionLoyaltyAutomation.bind(
+                                this,
+                            )}
+                            disabled={this.state.loading}
+                            additional_css={"mr-2 mb-4"}
+                        />
+                        <PrimaryButton
+                            button_label={"Close Exploration"}
+                            on_click={this.closeExploration.bind(this)}
+                            disabled={this.state.loading}
+                        />
+                    </div>
+                </Fragment>
+            );
+        }
+
         if (this.props.character.is_delve_running) {
             return (
                 <Fragment>
-                    <div className="mb-4 lg:ml-[120px] text-center lg:text-left">
-                        Delve is running. You can cancel it below.{" "}
+                    <div
+                        className="mb-4 lg:ml-[120px] text-center lg:text-left"
+                        aria-live="polite"
+                    >
+                        <p className="my-2">
+                            Sorry, you cannot do this right now because Delve is
+                            running.
+                        </p>
+                        <p className="my-2">Would you like to stop it?</p>
                         <a href="/information/delve" target="_blank">
                             See Delve Help{" "}
                             <i className="fas fa-external-link-alt"></i>
@@ -456,8 +544,15 @@ export default class ExplorationSection extends React.Component<any, any> {
         if (this.props.character.is_automation_running) {
             return (
                 <Fragment>
-                    <div className="mb-4 lg:ml-[120px] text-center lg:text-left">
-                        Automation is running. You can cancel it below.{" "}
+                    <div
+                        className="mb-4 lg:ml-[120px] text-center lg:text-left"
+                        aria-live="polite"
+                    >
+                        <p className="my-2">
+                            Sorry, you cannot do this right now because
+                            Exploration is running.
+                        </p>
+                        <p className="my-2">Would you like to stop it?</p>
                         <a href="/information/automation" target="_blank">
                             See Exploration Help{" "}
                             <i className="fas fa-external-link-alt"></i>
@@ -671,7 +766,7 @@ export default class ExplorationSection extends React.Component<any, any> {
         }
 
         return (
-            <div className="mt-2 grid lg:grid-cols-1 gap-2 lg:ml-[120px]">
+            <div className="mx-auto w-full md:w-2/3 mt-2 grid gap-2">
                 <Select
                     onChange={this.setDelvePackSize.bind(this)}
                     options={this.packSize()}
@@ -695,7 +790,7 @@ export default class ExplorationSection extends React.Component<any, any> {
     renderSetUpDelveExploration() {
         return (
             <Fragment>
-                <div className="mt-2 grid lg:grid-cols-1 gap-2 lg:ml-[120px]">
+                <div className="mx-auto w-full md:w-2/3 mt-2 grid gap-2">
                     <Select
                         onChange={this.setAttackType.bind(this)}
                         options={this.attackTypes()}
@@ -715,7 +810,11 @@ export default class ExplorationSection extends React.Component<any, any> {
 
                 {this.renderPackSizeOption()}
 
-                <div className={"lg:text-center mt-3 mb-3"}>
+                <div
+                    className={
+                        "mx-auto w-full md:w-2/3 lg:text-center mt-3 mb-3"
+                    }
+                >
                     <PrimaryButton
                         button_label={"Delve"}
                         on_click={this.startDelveExploration.bind(this)}
@@ -734,13 +833,13 @@ export default class ExplorationSection extends React.Component<any, any> {
                     />
 
                     {this.state.loading ? (
-                        <div className="w-1/2 ml-auto mr-auto">
+                        <div className="w-full">
                             <LoadingProgressBar />
                         </div>
                     ) : null}
 
                     {this.state.error_message !== null ? (
-                        <div className="w-1/2 ml-auto mr-auto mt-4">
+                        <div className="w-full mt-4">
                             <DangerAlert>
                                 {this.state.error_message}
                             </DangerAlert>
@@ -764,6 +863,7 @@ export default class ExplorationSection extends React.Component<any, any> {
 
     render() {
         if (
+            this.props.character.is_faction_loyalty_automation_running ||
             this.props.character.is_automation_running ||
             this.props.character.is_delve_running
         ) {

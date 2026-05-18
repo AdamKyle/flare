@@ -13,5 +13,15 @@ export default interface CharacterStatusType {
 
     automation_locked: boolean;
 
+    is_automation_running: boolean;
+
+    is_faction_loyalty_automation_running: boolean;
+
+    is_delve_running: boolean;
+
+    is_at_delve_location: boolean;
+
+    can_set_delve_pack: boolean;
+
     is_silenced: boolean;
 }

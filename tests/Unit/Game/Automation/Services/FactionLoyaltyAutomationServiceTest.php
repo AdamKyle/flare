@@ -161,6 +161,18 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         Event::assertDispatched(UpdateCharacterStatus::class);
     }
 
+    public function testBeginAutomationDispatchesUpdateCharacterStatusWithFactionLoyaltyAutomationRunning(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->service->beginAutomation($this->character, $this->factionLoyaltyNpc, AttackTypeValue::ATTACK);
+
+        Event::assertDispatched(UpdateCharacterStatus::class, function (UpdateCharacterStatus $event): bool {
+            return $event->characterStatuses['is_faction_loyalty_automation_running'] === true;
+        });
+    }
+
     public function testBeginAutomationDispatchesAutomationLogUpdate(): void
     {
         Queue::fake();
@@ -370,6 +382,19 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         $this->service->stopAutomation($this->character);
 
         Event::assertDispatched(UpdateCharacterStatus::class);
+    }
+
+    public function testStopAutomationDispatchesUpdateCharacterStatusWithoutFactionLoyaltyAutomationRunning(): void
+    {
+        Event::fake();
+
+        $this->factionLoyaltyFactory->createAutomation();
+
+        $this->service->stopAutomation($this->character);
+
+        Event::assertDispatched(UpdateCharacterStatus::class, function (UpdateCharacterStatus $event): bool {
+            return $event->characterStatuses['is_faction_loyalty_automation_running'] === false;
+        });
     }
 
     public function testStopAutomationDispatchesAutomationLogUpdate(): void

@@ -4,6 +4,11 @@ import MonsterType from "../../../lib/game/types/actions/monster/monster-type";
 import MonsterSelectionProps from "./types/monster-selection-props";
 import MonsterSelectionState from "./types/monster-selection-state";
 import CritterSelection from "./fight-section/monster-selection";
+import WarningAlert from "../../../components/ui/alerts/simple-alerts/warning-alert";
+import DangerOutlineButton from "../../../components/ui/buttons/danger-outline-button";
+import Ajax from "../../../lib/ajax/ajax";
+import { AxiosError, AxiosResponse } from "axios";
+import { updateTimers } from "../../../lib/ajax/update-timers";
 
 export default class MonsterSelection extends React.Component<
     MonsterSelectionProps,
@@ -15,6 +20,7 @@ export default class MonsterSelection extends React.Component<
         this.state = {
             monster_to_fight: null,
             monsters: [],
+            loading: false,
         };
     }
 
@@ -89,8 +95,108 @@ export default class MonsterSelection extends React.Component<
         return (
             this.props.character.is_dead ||
             this.props.character.is_automation_running ||
+            this.props.character.is_faction_loyalty_automation_running ||
+            this.props.character.is_delve_running ||
             !this.props.character.can_attack ||
             this.state.monster_to_fight === null
+        );
+    }
+
+    isAnyAutomationRunning(): boolean {
+        return (
+            this.props.character.is_automation_running ||
+            this.props.character.is_faction_loyalty_automation_running ||
+            this.props.character.is_delve_running
+        );
+    }
+
+    automationName(): string {
+        if (this.props.character.is_faction_loyalty_automation_running) {
+            return "Faction Loyalty Automation";
+        }
+
+        if (this.props.character.is_delve_running) {
+            return "Delve";
+        }
+
+        return "Exploration";
+    }
+
+    automationRestrictionMessage(): string {
+        if (this.props.character.is_faction_loyalty_automation_running) {
+            return "Faction Loyalty Automation is running. You cannot Delve, Explore, manually Fight, or Craft while it is running.";
+        }
+
+        if (this.props.character.is_delve_running) {
+            return "Delve is running. You cannot Explore, manually Fight, or use Faction Loyalty while it is running.";
+        }
+
+        return "Exploration is running. You cannot Delve, use Faction Loyalty, or manually Fight while it is running.";
+    }
+
+    automationStopRoute(): string {
+        if (this.props.character.is_faction_loyalty_automation_running) {
+            return (
+                "faction-loyalty-automation/" +
+                this.props.character.id +
+                "/stop"
+            );
+        }
+
+        if (this.props.character.is_delve_running) {
+            return "delve/" + this.props.character.id + "/stop";
+        }
+
+        return "automation/" + this.props.character.id + "/stop";
+    }
+
+    stopRunningAutomation() {
+        this.setState(
+            {
+                loading: true,
+            },
+            () => {
+                new Ajax().setRoute(this.automationStopRoute()).doAjaxCall(
+                    "post",
+                    (result: AxiosResponse) => {
+                        this.setState(
+                            {
+                                loading: false,
+                            },
+                            () => {
+                                updateTimers(this.props.character.id);
+                            },
+                        );
+                    },
+                    (error: AxiosError) => {
+                        this.setState({
+                            loading: false,
+                        });
+                    },
+                );
+            },
+        );
+    }
+
+    renderAutomationWarning() {
+        if (!this.isAnyAutomationRunning()) {
+            return null;
+        }
+
+        return (
+            <div className="mx-auto w-full md:w-2/3" aria-live="polite">
+                <WarningAlert additional_css={"mt-3"}>
+                    <p className="my-2">
+                        {this.automationRestrictionMessage()}
+                    </p>
+                    <DangerOutlineButton
+                        button_label={"Stop " + this.automationName()}
+                        on_click={this.stopRunningAutomation.bind(this)}
+                        disabled={this.state.loading}
+                        additional_css={"mt-2"}
+                    />
+                </WarningAlert>
+            </div>
         );
     }
 
@@ -99,6 +205,10 @@ export default class MonsterSelection extends React.Component<
     }
 
     render() {
+        if (this.isAnyAutomationRunning()) {
+            return this.renderAutomationWarning();
+        }
+
         return (
             <CritterSelection
                 set_monster_to_fight={this.setMonsterToFight.bind(this)}

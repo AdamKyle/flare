@@ -106,7 +106,7 @@ class BattleController extends Controller
 
         if ($this->monsterFightService->isAtDelveLocation($character)) {
             return response()->json([
-                'message' => 'You may not fight here. This is a place to delve (click Exploration to set up Delve)',
+                'message' => 'You may not fight here. This is a place to delve (click Delve to set up Delve)',
             ], 422);
         }
 

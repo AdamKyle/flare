@@ -126,6 +126,9 @@ export default class ActionsManager {
 
         return (
             state.crafting_time_out > 0 ||
+            props.character.is_automation_running ||
+            props.character.is_faction_loyalty_automation_running ||
+            props.character.is_delve_running ||
             !props.character_status.can_craft ||
             props.character_status.is_dead
         );

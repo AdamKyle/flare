@@ -3,9 +3,12 @@ import CraftingSection from "../../components/crafting/base-components/crafting-
 import { CraftingOptions } from "../../components/crafting/base-components/types/crafting-type-options";
 import ActionsTimers from "../../components/timers/actions-timers";
 import SuccessOutlineButton from "../../components/ui/buttons/success-outline-button";
+import DangerOutlineButton from "../../components/ui/buttons/danger-outline-button";
 import DropDown from "../../components/ui/drop-down/drop-down";
 import ComponentLoading from "../../components/ui/loading/component-loading";
 import { updateTimers } from "../../lib/ajax/update-timers";
+import Ajax from "../../lib/ajax/ajax";
+import { AxiosError, AxiosResponse } from "axios";
 import ActionsManager from "../../lib/game/actions/actions-manager";
 import { GameActionState } from "../../lib/game/types/game-state";
 import CelestialFight from "./components/celestial-fight";
@@ -236,6 +239,104 @@ export default class Actions extends React.Component<
         this.actionsManager.removeCraftingSection();
     }
 
+    isFactionLoyaltyAutomationRunning(): boolean {
+        return this.props.character.is_faction_loyalty_automation_running;
+    }
+
+    isDelveRunning(): boolean {
+        return this.props.character.is_delve_running;
+    }
+
+    isAnyAutomationRunning(): boolean {
+        return (
+            this.props.character.is_automation_running ||
+            this.isFactionLoyaltyAutomationRunning() ||
+            this.isDelveRunning()
+        );
+    }
+
+    automationName(): string {
+        if (this.isFactionLoyaltyAutomationRunning()) {
+            return "Faction Loyalty Automation";
+        }
+
+        if (this.isDelveRunning()) {
+            return "Delve";
+        }
+
+        return "Exploration";
+    }
+
+    automationStopRoute(): string {
+        if (this.isFactionLoyaltyAutomationRunning()) {
+            return (
+                "faction-loyalty-automation/" +
+                this.props.character.id +
+                "/stop"
+            );
+        }
+
+        if (this.isDelveRunning()) {
+            return "delve/" + this.props.character.id + "/stop";
+        }
+
+        return "automation/" + this.props.character.id + "/stop";
+    }
+
+    stopRunningAutomation() {
+        this.setState(
+            {
+                loading: true,
+            },
+            () => {
+                new Ajax().setRoute(this.automationStopRoute()).doAjaxCall(
+                    "post",
+                    (result: AxiosResponse) => {
+                        this.setState(
+                            {
+                                loading: false,
+                                crafting_type: null,
+                                show_exploration: false,
+                            },
+                            () => {
+                                updateTimers(this.props.character.id);
+                            },
+                        );
+                    },
+                    (error: AxiosError) => {
+                        this.setState({
+                            loading: false,
+                        });
+                    },
+                );
+            },
+        );
+    }
+
+    renderAutomationBlockedNotice() {
+        return (
+            <div className="my-4" aria-live="polite">
+                <p className="my-2">
+                    Sorry, you cannot do this right now because{" "}
+                    {this.automationName()} is running.
+                </p>
+                {this.isFactionLoyaltyAutomationRunning() ? (
+                    <p className="my-2">
+                        While Faction Loyalty Automation is running, you cannot
+                        craft or enchant items.
+                    </p>
+                ) : null}
+                <p className="my-2">Would you like to stop it?</p>
+                <DangerOutlineButton
+                    button_label={"Stop " + this.automationName()}
+                    on_click={this.stopRunningAutomation.bind(this)}
+                    disabled={this.state.loading}
+                    additional_css={""}
+                />
+            </div>
+        );
+    }
+
     getTypeOfSpecialtyGear() {
         if (this.state.show_hell_forged_section) {
             return "Hell Forged";
@@ -259,7 +360,7 @@ export default class Actions extends React.Component<
 
         return (
             <div className="p-4">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
                     <div className="md:col-span-1 space-y-4">
                         {!this.state.show_exploration &&
                             !this.state.show_celestial_fight &&
@@ -277,10 +378,17 @@ export default class Actions extends React.Component<
                             )}
 
                         {!this.state.show_celestial_fight &&
-                            !this.state.show_exploration && (
+                            !this.state.show_exploration &&
+                            !this.isFactionLoyaltyAutomationRunning() &&
+                            !this.isDelveRunning() && (
                                 <div className="w-full">
                                     <SuccessOutlineButton
-                                        button_label={"Exploration"}
+                                        button_label={
+                                            this.props.character
+                                                .is_at_delve_location
+                                                ? "Delve"
+                                                : "Exploration"
+                                        }
                                         on_click={this.manageExploration.bind(
                                             this,
                                         )}
@@ -358,7 +466,7 @@ export default class Actions extends React.Component<
                                 </div>
                             )}
                     </div>
-                    <div className="md:col-span-3 mt-4">
+                    <div className="md:col-span-3 self-start">
                         {!this.state.show_exploration &&
                             !this.state.show_celestial_fight &&
                             this.state.raid_monsters.length === 0 && (
@@ -370,7 +478,10 @@ export default class Actions extends React.Component<
                                     }
                                     is_small={false}
                                 >
-                                    {this.state.crafting_type !== null && (
+                                    {this.state.crafting_type !== null &&
+                                    this.isAnyAutomationRunning() ? (
+                                        this.renderAutomationBlockedNotice()
+                                    ) : this.state.crafting_type !== null ? (
                                         <CraftingSection
                                             remove_crafting={this.removeCraftingType.bind(
                                                 this,
@@ -386,7 +497,7 @@ export default class Actions extends React.Component<
                                             fame_tasks={this.props.fame_tasks}
                                             is_small={false}
                                         />
-                                    )}
+                                    ) : null}
 
                                     {(this.state.show_hell_forged_section ||
                                         this.state
@@ -427,7 +538,10 @@ export default class Actions extends React.Component<
                                         this.props.character.health
                                     }
                                 >
-                                    {this.state.crafting_type !== null && (
+                                    {this.state.crafting_type !== null &&
+                                    this.isAnyAutomationRunning() ? (
+                                        this.renderAutomationBlockedNotice()
+                                    ) : this.state.crafting_type !== null ? (
                                         <CraftingSection
                                             remove_crafting={this.removeCraftingType.bind(
                                                 this,
@@ -442,7 +556,7 @@ export default class Actions extends React.Component<
                                             cannot_craft={this.actionsManager.cannotCraft()}
                                             fame_tasks={this.props.fame_tasks}
                                         />
-                                    )}
+                                    ) : null}
 
                                     {(this.state.show_hell_forged_section ||
                                         this.state

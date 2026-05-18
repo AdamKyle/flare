@@ -3,6 +3,7 @@ import React, { Fragment } from "react";
 import PledgeLoyalty from "../../../components/faction-loyalty/modals/pledge-loyalty";
 import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
+import WarningAlert from "../../../components/ui/alerts/simple-alerts/warning-alert";
 import DangerButton from "../../../components/ui/buttons/danger-button";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
 import Table from "../../../components/ui/data-tables/table";
@@ -49,6 +50,10 @@ export default class CharacterFactions extends React.Component<any, any> {
     }
 
     handlePledge(pledging: boolean) {
+        if (this.props.is_faction_loyalty_automation_running) {
+            return;
+        }
+
         if (this.props.update_pledge_tab) {
             this.setState(
                 {
@@ -188,6 +193,10 @@ export default class CharacterFactions extends React.Component<any, any> {
                             <DangerButton
                                 button_label={"Un-pledge"}
                                 on_click={() => this.handlePledge(false)}
+                                disabled={
+                                    this.props
+                                        .is_faction_loyalty_automation_running
+                                }
                             />
                         ) : (
                             <PrimaryButton
@@ -195,7 +204,11 @@ export default class CharacterFactions extends React.Component<any, any> {
                                 on_click={() => {
                                     this.pledgeLoyalty(row);
                                 }}
-                                disabled={!row.maxed}
+                                disabled={
+                                    !row.maxed ||
+                                    this.props
+                                        .is_faction_loyalty_automation_running
+                                }
                             />
                         )}
                     </span>
@@ -205,6 +218,10 @@ export default class CharacterFactions extends React.Component<any, any> {
     }
 
     pledgeLoyalty(row: any): void {
+        if (this.props.is_faction_loyalty_automation_running) {
+            return;
+        }
+
         this.setState({
             pledge_faction: row,
         });
@@ -249,6 +266,13 @@ export default class CharacterFactions extends React.Component<any, any> {
                         <SuccessAlert additional_css={"mb-4"}>
                             {this.state.success_message}
                         </SuccessAlert>
+                    ) : null}
+
+                    {this.props.is_faction_loyalty_automation_running ? (
+                        <WarningAlert additional_css={"mb-4"}>
+                            Faction Loyalty Automation is running. You cannot
+                            pledge or un-pledge while it is running.
+                        </WarningAlert>
                     ) : null}
 
                     {this.state.pledge_faction === null &&

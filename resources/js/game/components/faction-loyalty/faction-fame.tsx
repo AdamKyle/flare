@@ -8,6 +8,7 @@ import DropDown from "../../components/ui/drop-down/drop-down";
 import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
 import Ajax from "../../lib/ajax/ajax";
 import ActionsTimers from "../timers/actions-timers";
+import { updateTimers } from "../../lib/ajax/update-timers";
 import {
     FactionLoyalty,
     FactionLoyaltyNpc,
@@ -15,6 +16,7 @@ import {
 } from "./deffinitions/faction-loaylaty";
 import FactionNpcSection from "./faction-npc-section";
 import FactionNpcTasks from "./faction-npc-tasks";
+import FactionLoyaltyAutomation from "./faction-loyalty-automation";
 import FactionLoyaltyProps from "./types/faction-loyalty-props";
 import FactionLoyaltyState, {
     FactionLoyaltyNpcListItem,
@@ -22,11 +24,15 @@ import FactionLoyaltyState, {
 import FactionLoyaltyListeners from "./event-listeners/faction-loyalty-listeners";
 import { serviceContainer } from "../../lib/containers/core-container";
 
+declare const Echo: any;
+
 export default class FactionFame extends React.Component<
     FactionLoyaltyProps,
     FactionLoyaltyState
 > {
     private factionLoyaltyListeners: FactionLoyaltyListeners;
+
+    private automationTimeOut: any;
 
     constructor(props: FactionLoyaltyProps) {
         super(props);
@@ -41,7 +47,11 @@ export default class FactionFame extends React.Component<
             game_map_name: null,
             faction_loyalty: null,
             selected_faction_loyalty_npc: null,
-            attack_type: null,
+            attack_type: "attack",
+            show_automation_screen: false,
+            is_faction_loyalty_automation_running:
+                this.props.is_faction_loyalty_automation_running,
+            automation_time_out: 0,
         };
 
         this.factionLoyaltyListeners = serviceContainer().fetch(
@@ -49,6 +59,10 @@ export default class FactionFame extends React.Component<
         );
         this.factionLoyaltyListeners.initialize(this, this.props.user_id);
         this.factionLoyaltyListeners.register();
+
+        this.automationTimeOut = Echo.private(
+            "automation-timeout-" + this.props.user_id,
+        );
     }
 
     componentDidMount() {
@@ -63,7 +77,9 @@ export default class FactionFame extends React.Component<
                             npcs: result.data.npcs,
                             game_map_name: result.data.map_name,
                             faction_loyalty: result.data.faction_loyalty,
-                            attack_type: result.data.attack_type,
+                            attack_type: this.normalizeAttackType(
+                                result.data.attack_type,
+                            ),
                         },
                         () => {
                             this.setInitialSelectedFactionInfo(
@@ -87,10 +103,38 @@ export default class FactionFame extends React.Component<
             );
 
         this.factionLoyaltyListeners.listen();
+        this.automationTimeOut.listen(
+            "Game.Automation.Events.AutomationTimeOut",
+            (event: any) => {
+                this.setState({
+                    automation_time_out: event.forLength,
+                });
+            },
+        );
+
+        if (this.isFactionLoyaltyAutomationRunning()) {
+            updateTimers(this.props.character_id);
+        }
+    }
+
+    componentDidUpdate(previousProps: FactionLoyaltyProps): void {
+        if (
+            previousProps.is_faction_loyalty_automation_running !==
+            this.props.is_faction_loyalty_automation_running
+        ) {
+            this.setState({
+                is_faction_loyalty_automation_running:
+                    this.props.is_faction_loyalty_automation_running,
+            });
+        }
     }
 
     manageAssistingNpc(isHelping: boolean) {
         if (!this.state.selected_faction_loyalty_npc) {
+            return;
+        }
+
+        if (isHelping && this.isFactionLoyaltyAutomationRunning()) {
             return;
         }
 
@@ -224,6 +268,152 @@ export default class FactionFame extends React.Component<
         return this.state.selected_faction_loyalty_npc.currently_helping;
     }
 
+    normalizeAttackType(attackType: string | null): string {
+        if (attackType === null) {
+            return "attack";
+        }
+
+        return attackType.toLowerCase().split(" ").join("_");
+    }
+
+    setAttackType(attackType: string): void {
+        this.setState({
+            attack_type: attackType,
+        });
+    }
+
+    showAutomationScreen(): void {
+        this.setState({
+            show_automation_screen: true,
+            success_message: null,
+            error_message: null,
+        });
+    }
+
+    returnToTasks(successMessage?: string): void {
+        this.setState({
+            show_automation_screen: false,
+            success_message:
+                typeof successMessage !== "undefined"
+                    ? successMessage
+                    : this.state.success_message,
+        });
+    }
+
+    updateAutomationRunning(isRunning: boolean): void {
+        this.setState({
+            is_faction_loyalty_automation_running: isRunning,
+            automation_time_out: isRunning ? this.state.automation_time_out : 0,
+        });
+    }
+
+    updateAutomationTimer(timeLeft: number): void {
+        this.setState({
+            automation_time_out: timeLeft,
+        });
+    }
+
+    stopAutomation(): void {
+        this.setState(
+            {
+                is_processing: true,
+                success_message: null,
+                error_message: null,
+            },
+            () => {
+                new Ajax()
+                    .setRoute(
+                        "faction-loyalty-automation/" +
+                            this.props.character_id +
+                            "/stop",
+                    )
+                    .doAjaxCall(
+                        "post",
+                        (result: AxiosResponse) => {
+                            this.setState(
+                                {
+                                    is_processing: false,
+                                    success_message:
+                                        result.data.message ??
+                                        "Faction Loyalty Automation stopped.",
+                                    automation_time_out: 0,
+                                    is_faction_loyalty_automation_running:
+                                        false,
+                                    show_automation_screen: false,
+                                },
+                                () => {
+                                    updateTimers(this.props.character_id);
+                                },
+                            );
+                        },
+                        (error: AxiosError) => {
+                            this.setState({
+                                is_processing: false,
+                            });
+
+                            if (typeof error.response !== "undefined") {
+                                const response: AxiosResponse = error.response;
+
+                                this.setState({
+                                    error_message: response.data.message,
+                                });
+                            }
+                        },
+                    );
+            },
+        );
+    }
+
+    isFactionLoyaltyAutomationRunning(): boolean {
+        return this.state.is_faction_loyalty_automation_running;
+    }
+
+    selectedNpcHasIncompleteTasks(): boolean {
+        if (!this.state.selected_faction_loyalty_npc) {
+            return false;
+        }
+
+        return this.state.selected_faction_loyalty_npc.faction_loyalty_npc_tasks.fame_tasks.some(
+            (fameTask: FameTasks) => {
+                return fameTask.current_amount < fameTask.required_amount;
+            },
+        );
+    }
+
+    getAutomationDisabledReason(): string | null {
+        if (this.state.is_processing) {
+            return "Please wait for the current request to finish.";
+        }
+
+        if (!this.state.selected_faction_loyalty_npc) {
+            return "Select an NPC before starting automation.";
+        }
+
+        if (!this.state.selected_faction_loyalty_npc.currently_helping) {
+            return "Assist this NPC before starting automation.";
+        }
+
+        if (
+            this.state.selected_faction_loyalty_npc.npc.game_map_id !==
+            this.props.character_map_id
+        ) {
+            return "You must be on the same plane as the NPC you are assisting to start Faction Loyalty Automation.";
+        }
+
+        if (!this.selectedNpcHasIncompleteTasks()) {
+            return "This NPC has no incomplete tasks to automate.";
+        }
+
+        if (
+            this.props.is_automation_running &&
+            !this.isFactionLoyaltyAutomationRunning()
+        ) {
+            return "Another automation is already running.";
+        }
+
+        return null;
+    }
+
     render() {
         if (this.state.is_loading || this.state.faction_loyalty === null) {
             return (
@@ -252,6 +442,21 @@ export default class FactionFame extends React.Component<
             );
         }
 
+        if (this.state.show_automation_screen) {
+            return (
+                <FactionLoyaltyAutomation
+                    character_id={this.props.character_id}
+                    attack_type={this.state.attack_type ?? "attack"}
+                    return_to_tasks={this.returnToTasks.bind(this)}
+                    update_automation_running={this.updateAutomationRunning.bind(
+                        this,
+                    )}
+                />
+            );
+        }
+
+        const automationDisabledReason = this.getAutomationDisabledReason();
+
         return (
             <div>
                 <div className="py-4">
@@ -259,8 +464,9 @@ export default class FactionFame extends React.Component<
                     <p className="my-4">
                         Below you can select an NPC to assist. Each NPC will
                         have it's own set of tasks to complete. Crafting tasks
-                        can be done any where, bounty tasks must be done
-                        manually and on the map of the NPC you are assisting.
+                        can be done any where. Bounties must be completed on the
+                        NPC&apos;s plane. Faction Loyalty Automation can handle
+                        bounty and crafting tasks while it is running.
                     </p>
                     <p className="my-4">
                         In order to gain fame, you must assist the NPC and by
@@ -273,6 +479,7 @@ export default class FactionFame extends React.Component<
                         <a
                             href="/information/faction-loyalty"
                             target="_blank"
+                            rel="noopener noreferrer"
                             className="my-2"
                         >
                             Learn more about Faction Loyalties{" "}
@@ -312,6 +519,7 @@ export default class FactionFame extends React.Component<
                                                 this.manageAssistingNpc(true)
                                             }
                                             additional_css={"mt-[18px] ml-4"}
+                                            disabled={this.isFactionLoyaltyAutomationRunning()}
                                         />
                                     ) : (
                                         <PrimaryOutlineButton
@@ -351,6 +559,28 @@ export default class FactionFame extends React.Component<
                                 can_attack={this.props.can_attack}
                                 character_map_id={this.props.character_map_id}
                                 attack_type={this.state.attack_type}
+                                set_attack_type={this.setAttackType.bind(this)}
+                                automation_disabled_reason={
+                                    automationDisabledReason
+                                }
+                                is_faction_loyalty_automation_running={this.isFactionLoyaltyAutomationRunning()}
+                                is_automation_running={
+                                    this.props.is_automation_running
+                                }
+                                is_delve_running={this.props.is_delve_running}
+                                automation_time_out={
+                                    this.state.automation_time_out
+                                }
+                                is_automation_processing={
+                                    this.state.is_processing
+                                }
+                                show_automation_screen={this.showAutomationScreen.bind(
+                                    this,
+                                )}
+                                stop_automation={this.stopAutomation.bind(this)}
+                                update_automation_timer={this.updateAutomationTimer.bind(
+                                    this,
+                                )}
                             />
                         </div>
                     </div>

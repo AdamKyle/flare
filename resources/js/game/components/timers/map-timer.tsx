@@ -24,7 +24,9 @@ export default class MapTimer extends React.Component<MapTimerProps, {}> {
                         <div>
                             <TimerProgressBar
                                 time_remaining={this.props.automation_time_out}
-                                time_out_label={"Exploration"}
+                                time_out_label={
+                                    this.props.automation_time_out_label
+                                }
                             />
                         </div>
                     </div>
@@ -61,7 +63,7 @@ export default class MapTimer extends React.Component<MapTimerProps, {}> {
             <Fragment>
                 <TimerProgressBar
                     time_remaining={this.props.automation_time_out}
-                    time_out_label={"Exploration"}
+                    time_out_label={this.props.automation_time_out_label}
                 />
                 <TimerProgressBar
                     time_remaining={this.props.time_left}

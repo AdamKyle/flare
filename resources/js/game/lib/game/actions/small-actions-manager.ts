@@ -99,20 +99,33 @@ export default class SmallActionsManager {
      */
     buildOptions(): SelectedData[] {
         const props = this.component.props;
-        const state = this.component.state;
+        const isAnyAutomationRunning =
+            props.character.is_automation_running ||
+            props.character.is_faction_loyalty_automation_running ||
+            props.character.is_delve_running;
 
-        const options = [
-            {
-                label: "Exploration",
+        const options: SelectedData[] = [];
+
+        if (
+            !props.character.is_faction_loyalty_automation_running &&
+            !props.character.is_delve_running
+        ) {
+            options.push({
+                label: props.character.is_at_delve_location
+                    ? "Delve"
+                    : "Exploration",
                 value: "explore",
-            },
-            {
+            });
+        }
+
+        if (!isAnyAutomationRunning) {
+            options.push({
                 label: "Craft",
                 value: "craft",
-            },
-        ];
+            });
+        }
 
-        if (!props.character.is_automation_running) {
+        if (!isAnyAutomationRunning) {
             options.unshift({
                 label: "Fight",
                 value: "fight",
@@ -171,6 +184,18 @@ export default class SmallActionsManager {
             typeof state.selected_action !== "undefined" &&
             state.selected_action !== null
         ) {
+            if (state.selected_action === "explore") {
+                return [
+                    {
+                        label: this.component.props.character
+                            .is_at_delve_location
+                            ? "Delve"
+                            : "Exploration",
+                        value: state.selected_action,
+                    },
+                ];
+            }
+
             return [
                 {
                     label: capitalize(state.selected_action),

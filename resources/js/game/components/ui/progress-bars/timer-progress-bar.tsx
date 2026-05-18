@@ -15,8 +15,7 @@ export default class TimerProgressBar extends React.Component<
         this.state = {
             time_left: 0,
             percentage_left: 0,
-            label: "seconds",
-            time_left_label: 0,
+            time_left_label: "0:00:00",
             initial_time: 0,
         };
 
@@ -52,7 +51,6 @@ export default class TimerProgressBar extends React.Component<
             {
                 time_left: this.props.time_remaining,
                 percentage_left: this.props.time_remaining > 0 ? 1.0 : 0.0,
-                label: this.getLabel(),
                 time_left_label: this.getTimeLabel(this.props.time_remaining),
                 initial_time: this.props.time_remaining,
             },
@@ -65,8 +63,7 @@ export default class TimerProgressBar extends React.Component<
                             this.setState({
                                 time_left: 0,
                                 percentage_left: 0,
-                                label: "seconds",
-                                time_left_label: 0,
+                                time_left_label: "0:00:00",
                             });
 
                             if (
@@ -82,7 +79,6 @@ export default class TimerProgressBar extends React.Component<
                                 time_left: newTime,
                                 percentage_left:
                                     newTime / this.props.time_remaining,
-                                label: this.getLabel(newTime),
                                 time_left_label: this.getTimeLabel(newTime),
                             });
                         }
@@ -94,33 +90,19 @@ export default class TimerProgressBar extends React.Component<
         );
     }
 
-    getLabel(newTime?: number): string {
-        let label = "seconds";
-        let time = this.props.time_remaining;
+    getTimeLabel(newTime: number): string {
+        const time = Math.max(0, Math.floor(newTime));
+        const hours = Math.floor(time / 3600);
+        const minutes = Math.floor((time % 3600) / 60);
+        const seconds = time % 60;
 
-        if (newTime) {
-            time = newTime;
-        }
-
-        if (time / 3600 >= 1) {
-            label = "hour(s)";
-        } else if (time / 60 >= 1) {
-            label = "minute(s)";
-        }
-
-        return label;
-    }
-
-    getTimeLabel(newTime: number): number {
-        let timeLeftLabel = newTime;
-
-        if (newTime / 3600 >= 1) {
-            timeLeftLabel = parseInt((newTime / 3600).toFixed(0));
-        } else if (newTime / 60 >= 1) {
-            timeLeftLabel = parseInt((newTime / 60).toFixed(0));
-        }
-
-        return timeLeftLabel;
+        return (
+            hours +
+            ":" +
+            minutes.toString().padStart(2, "0") +
+            ":" +
+            seconds.toString().padStart(2, "0")
+        );
     }
 
     render() {
@@ -152,7 +134,7 @@ export default class TimerProgressBar extends React.Component<
                         {this.props.time_out_label}
                     </span>
                     <span className="text-sm font-medium text-gray-800 dark:text-white mt-[3px]">
-                        {this.state.time_left_label} {this.state.label} left
+                        {this.state.time_left_label} left
                     </span>
                 </div>
                 <div

@@ -597,6 +597,18 @@ export default class Game extends React.Component<GameProps, GameState> {
                                             this,
                                         )}
                                         character_map_id={gameMapId}
+                                        is_automation_running={
+                                            this.state.character
+                                                .is_automation_running
+                                        }
+                                        is_faction_loyalty_automation_running={
+                                            this.state.character
+                                                .is_faction_loyalty_automation_running
+                                        }
+                                        is_delve_running={
+                                            this.state.character
+                                                .is_delve_running
+                                        }
                                     >
                                         <ActionSection
                                             character={this.state.character}
@@ -697,6 +709,14 @@ export default class Game extends React.Component<GameProps, GameState> {
                                             is_automaton_running={
                                                 this.state.character
                                                     .is_automation_running
+                                            }
+                                            is_faction_loyalty_automation_running={
+                                                this.state.character
+                                                    .is_faction_loyalty_automation_running
+                                            }
+                                            is_delve_running={
+                                                this.state.character
+                                                    .is_delve_running
                                             }
                                             can_engage_celestial={
                                                 this.state.character

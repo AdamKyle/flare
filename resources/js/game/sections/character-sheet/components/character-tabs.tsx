@@ -62,6 +62,10 @@ export default class CharacterTabs extends React.Component<
                             pledged_faction_id={
                                 this.props.character?.pledged_to_faction_id
                             }
+                            is_faction_loyalty_automation_running={
+                                this.props.character
+                                    ?.is_faction_loyalty_automation_running
+                            }
                             update_faction_action_tasks={
                                 this.props.update_faction_action_tasks
                             }

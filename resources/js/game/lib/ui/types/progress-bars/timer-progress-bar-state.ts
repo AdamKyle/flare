@@ -3,9 +3,7 @@ export default interface TimerProgressBarState {
 
     percentage_left: number;
 
-    label: string;
-
-    time_left_label: number;
+    time_left_label: string;
 
     initial_time: number;
 }

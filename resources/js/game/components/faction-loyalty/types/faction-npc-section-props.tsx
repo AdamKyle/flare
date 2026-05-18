@@ -7,4 +7,14 @@ export default interface FactionNpcSectionProps {
     can_attack: boolean;
     character_map_id: number | null;
     attack_type: string | null;
+    set_attack_type?: (attackType: string) => void;
+    automation_disabled_reason?: string | null;
+    is_automation_running?: boolean;
+    is_faction_loyalty_automation_running?: boolean;
+    is_delve_running?: boolean;
+    automation_time_out?: number;
+    is_automation_processing?: boolean;
+    show_automation_screen?: () => void;
+    stop_automation?: () => void;
+    update_automation_timer?: (timeLeft: number) => void;
 }

@@ -12,4 +12,10 @@ export default interface FactionLoyaltyProps {
     can_attack: boolean;
 
     character_map_id: number | null;
+
+    is_automation_running: boolean;
+
+    is_faction_loyalty_automation_running: boolean;
+
+    is_delve_running: boolean;
 }

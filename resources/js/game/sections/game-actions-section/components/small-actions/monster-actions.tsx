@@ -74,7 +74,30 @@ export default class MonsterActions extends React.Component<
         });
     }
 
+    isAnyAutomationRunning(): boolean {
+        return (
+            this.props.character.is_automation_running ||
+            this.props.character.is_faction_loyalty_automation_running ||
+            this.props.character.is_delve_running
+        );
+    }
+
     render() {
+        if (this.isAnyAutomationRunning()) {
+            return (
+                <div className="relative">
+                    <MonsterSelection
+                        monsters={this.state.monsters}
+                        update_monster_to_fight={this.setSelectedMonster.bind(
+                            this,
+                        )}
+                        character={this.props.character}
+                        close_monster_section={this.props.close_monster_section}
+                    />
+                </div>
+            );
+        }
+
         return (
             <div className="relative">
                 <MonsterSelection

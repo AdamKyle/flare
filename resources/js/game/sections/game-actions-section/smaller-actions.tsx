@@ -15,6 +15,9 @@ import SmallerSpecialtyShop from "./components/small-actions/smaller-specialty-s
 import SmallActionsProps from "./types/small-actions-props";
 import SmallActionsState from "./types/small-actions-state";
 import DangerOutlineButton from "../../components/ui/buttons/danger-outline-button";
+import Ajax from "../../lib/ajax/ajax";
+import { AxiosError, AxiosResponse } from "axios";
+import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
 
 export default class SmallerActions extends React.Component<
     SmallActionsProps,
@@ -259,6 +262,150 @@ export default class SmallerActions extends React.Component<
         });
     }
 
+    isFactionLoyaltyAutomationRunning(): boolean {
+        return this.props.character.is_faction_loyalty_automation_running;
+    }
+
+    isDelveRunning(): boolean {
+        return this.props.character.is_delve_running;
+    }
+
+    isAnyAutomationRunning(): boolean {
+        return (
+            this.props.character.is_automation_running ||
+            this.isFactionLoyaltyAutomationRunning() ||
+            this.isDelveRunning()
+        );
+    }
+
+    automationName(): string {
+        if (this.isFactionLoyaltyAutomationRunning()) {
+            return "Faction Loyalty Automation";
+        }
+
+        if (this.isDelveRunning()) {
+            return "Delve";
+        }
+
+        return "Exploration";
+    }
+
+    automationTimerLabel(): string {
+        if (this.isFactionLoyaltyAutomationRunning()) {
+            return "Faction Loyalty";
+        }
+
+        if (this.isDelveRunning()) {
+            return "Delve";
+        }
+
+        return "Exploration";
+    }
+
+    automationRestrictionMessage(): string {
+        if (this.isFactionLoyaltyAutomationRunning()) {
+            return "Faction Loyalty Automation is running. You cannot Delve, Explore, manually Fight, or Craft while it is running.";
+        }
+
+        if (this.isDelveRunning()) {
+            return "Delve is running. You cannot Explore, manually Fight, or use Faction Loyalty while it is running.";
+        }
+
+        return "Exploration is running. You cannot Delve, use Faction Loyalty, or manually Fight while it is running.";
+    }
+
+    automationStopRoute(): string {
+        if (this.isFactionLoyaltyAutomationRunning()) {
+            return (
+                "faction-loyalty-automation/" +
+                this.props.character.id +
+                "/stop"
+            );
+        }
+
+        if (this.isDelveRunning()) {
+            return "delve/" + this.props.character.id + "/stop";
+        }
+
+        return "automation/" + this.props.character.id + "/stop";
+    }
+
+    stopRunningAutomation() {
+        this.setState(
+            {
+                loading: true,
+            },
+            () => {
+                new Ajax().setRoute(this.automationStopRoute()).doAjaxCall(
+                    "post",
+                    (result: AxiosResponse) => {
+                        this.setState(
+                            {
+                                loading: false,
+                                selected_action: null,
+                                crafting_type: null,
+                            },
+                            () => {
+                                updateTimers(this.props.character.id);
+                            },
+                        );
+                    },
+                    (error: AxiosError) => {
+                        this.setState({
+                            loading: false,
+                        });
+                    },
+                );
+            },
+        );
+    }
+
+    renderAutomationBlockedNotice(isCrafting: boolean) {
+        return (
+            <div className="my-4 text-center" aria-live="polite">
+                <p className="my-2">
+                    Sorry, you cannot do this right now because{" "}
+                    {this.automationName()} is running.
+                </p>
+                {isCrafting && this.isFactionLoyaltyAutomationRunning() ? (
+                    <p className="my-2">
+                        While Faction Loyalty Automation is running, you cannot
+                        craft or enchant items.
+                    </p>
+                ) : null}
+                <p className="my-2">Would you like to stop it?</p>
+                <DangerOutlineButton
+                    button_label={"Stop " + this.automationName()}
+                    on_click={this.stopRunningAutomation.bind(this)}
+                    disabled={this.state.loading}
+                    additional_css={""}
+                />
+            </div>
+        );
+    }
+
+    renderFightAutomationWarning() {
+        if (!this.isAnyAutomationRunning()) {
+            return null;
+        }
+
+        return (
+            <div aria-live="polite">
+                <WarningAlert additional_css={"mb-4"}>
+                    <p className="my-2">
+                        {this.automationRestrictionMessage()}
+                    </p>
+                    <DangerOutlineButton
+                        button_label={"Stop " + this.automationName()}
+                        on_click={this.stopRunningAutomation.bind(this)}
+                        disabled={this.state.loading}
+                        additional_css={""}
+                    />
+                </WarningAlert>
+            </div>
+        );
+    }
+
     createMonster() {
         if (this.state.raid_monsters.length > 0) {
             return (
@@ -287,6 +434,10 @@ export default class SmallerActions extends React.Component<
     }
 
     showCrafting() {
+        if (this.isAnyAutomationRunning()) {
+            return this.renderAutomationBlockedNotice(true);
+        }
+
         return (
             <SmallCraftingSection
                 close_crafting_section={this.closeCraftingSection.bind(this)}
@@ -299,6 +450,10 @@ export default class SmallerActions extends React.Component<
     }
 
     renderExploration() {
+        if (this.isFactionLoyaltyAutomationRunning() || this.isDelveRunning()) {
+            return this.renderAutomationBlockedNotice(false);
+        }
+
         return (
             <SmallExplorationSection
                 close_exploration_section={this.closeExplorationSection.bind(
@@ -408,6 +563,7 @@ export default class SmallerActions extends React.Component<
                     </>
                 ) : (
                     <Fragment>
+                        {this.renderFightAutomationWarning()}
                         <Select
                             onChange={this.showAction.bind(this)}
                             options={this.smallActionsManager.buildOptions()}
@@ -444,6 +600,7 @@ export default class SmallerActions extends React.Component<
                                 automation_time_out={
                                     this.state.automation_time_out
                                 }
+                                automation_time_out_label={this.automationTimerLabel()}
                                 celestial_time_out={
                                     this.state.celestial_time_out
                                 }

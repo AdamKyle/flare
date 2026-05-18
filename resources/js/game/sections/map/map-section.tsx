@@ -229,6 +229,18 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         this.props.set_map_data(this.state);
     }
 
+    automationTimerLabel(): string {
+        if (this.props.is_faction_loyalty_automation_running) {
+            return "Faction Loyalty";
+        }
+
+        if (this.props.is_delve_running) {
+            return "Delve";
+        }
+
+        return "Exploration";
+    }
+
     setStateFromData(data: MapData, callback?: () => void) {
         const state = MapStateManager.buildChangeState(data, this);
 
@@ -446,6 +458,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                     <MapTimer
                         time_left={this.state.time_left}
                         automation_time_out={this.state.automation_time_out}
+                        automation_time_out_label={this.automationTimerLabel()}
                         celestial_time_out={this.state.celestial_time_out}
                     />
                 </div>

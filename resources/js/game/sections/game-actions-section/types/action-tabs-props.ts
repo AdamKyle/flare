@@ -17,4 +17,10 @@ export default interface ActionTabsProps {
     can_attack: boolean;
 
     can_craft: boolean;
+
+    is_automation_running: boolean;
+
+    is_faction_loyalty_automation_running: boolean;
+
+    is_delve_running: boolean;
 }
