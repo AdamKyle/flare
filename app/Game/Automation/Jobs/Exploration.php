@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Monster;
@@ -226,33 +227,13 @@ class Exploration implements ShouldQueue
 
         $this->sendOutEventLogUpdate('"Child, I can see a small group of these creature. If we slaughter them we might learn something." The guide insists. "Theres ten of them. Quick, kill them. We will continue the hunt!"');
 
-        $totalXpToReward = 0;
-        $totalSkillXpToReward = 0;
-        $totalFactionPoints = 0;
-
-        $characterRewardService = $this->characterRewardService->setCharacter($this->character);
-        $characterSkillService = $this->skillService->setSkillInTraining($this->character);
-
         for ($i = 1; $i <= 10; $i++) {
             if (!$this->fightAutomationMonster($automation, $params)) {
                 return false;
             }
 
-            if (!is_null($this->monster)) {
-                $totalXpToReward += $characterRewardService->fetchXpForMonster($this->monster);
-                $totalSkillXpToReward += $characterSkillService->getXpForSkillIntraining($this->character, $this->monster->xp);
-                $totalFactionPoints += $this->factionHandler->getFactionPointsPerKill($this->character);
-            }
-
             $this->attempts = 0;
         }
-
-        $this->battleData = [
-            'total_creatures' => 10,
-            'total_xp' => $totalXpToReward,
-            'total_skill_xp' => $totalSkillXpToReward,
-            'total_faction_points' => $totalFactionPoints,
-        ];
 
         Cache::put('can-character-survive-' . $this->character->id, true);
 
@@ -273,6 +254,8 @@ class Exploration implements ShouldQueue
         $data = $this->setUpFightForMonster($params);
 
         if (! $this->hasRequiredHealthData($data)) {
+            $this->logMalformedBattleData($automation, 'setupMonster', $data);
+
             return false;
         }
 
@@ -289,6 +272,8 @@ class Exploration implements ShouldQueue
         }
 
         if (! $this->hasRequiredHealthData($data)) {
+            $this->logMalformedBattleData($automation, 'fightMonster', $data);
+
             return false;
         }
 
@@ -341,10 +326,29 @@ class Exploration implements ShouldQueue
 
     private function hasRequiredHealthData(array $data): bool
     {
-        return isset($data['health']) &&
-            is_array($data['health']) &&
-            array_key_exists('current_character_health', $data['health']) &&
-            array_key_exists('current_monster_health', $data['health']);
+        return empty($this->missingRequiredHealthData($data));
+    }
+
+    private function missingRequiredHealthData(array $data): array
+    {
+        if (! isset($data['health']) || ! is_array($data['health'])) {
+            return ['health'];
+        }
+
+        return array_values(array_filter([
+            'health.current_character_health',
+            'health.current_monster_health',
+        ], fn (string $key): bool => ! array_key_exists(str_replace('health.', '', $key), $data['health'])));
+    }
+
+    private function logMalformedBattleData(CharacterAutomation $automation, string $source, array $data): void
+    {
+        Log::error('Exploration automation received malformed battle data.', [
+            'character_id' => $this->character->id,
+            'automation_id' => $automation->id,
+            'source' => $source,
+            'missing_or_invalid_payload' => $this->missingRequiredHealthData($data),
+        ]);
     }
 
     /**

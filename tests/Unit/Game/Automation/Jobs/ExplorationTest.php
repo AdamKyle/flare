@@ -24,6 +24,7 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 use Mockery;
 use Tests\Setup\Character\CharacterFactory;
@@ -584,6 +585,64 @@ class ExplorationTest extends TestCase
         $this->assertTrue(Cache::has('can-character-survive-' . $this->character->id));
     }
 
+    public function testHandleUsesVisibleEncounterCreatureCountForRewardData(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $successfulFightData = [
+            'health' => [
+                'current_character_health' => 100,
+                'current_monster_health' => 0,
+            ],
+            'monster' => [
+                'id' => $this->monster->id,
+            ],
+        ];
+
+        $monsterFightService = Mockery::mock(MonsterFightService::class);
+        $monsterFightService->shouldReceive('setupMonster')->andReturn($successfulFightData);
+        $monsterFightService->shouldReceive('fightMonster')->andReturn($successfulFightData);
+        $monsterFightService->shouldReceive('getMonster')->andReturn($this->monster);
+
+        $automation = CharacterAutomation::factory()->create([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'type' => AutomationType::EXPLORING,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'move_down_monster_list_every' => null,
+            'previous_level' => $this->character->level,
+            'current_level' => $this->character->level,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $battleEventHandler = Mockery::mock(BattleEventHandler::class);
+        $battleEventHandler->shouldReceive('processMonsterDeath')
+            ->once()
+            ->withArgs(function (int $characterId, int $monsterId, array $context): bool {
+                return $characterId === $this->character->id &&
+                    $monsterId === $this->monster->id &&
+                    preg_match('/there are: ([0-9]+) of them/', Event::dispatched(AutomationLogUpdate::class)
+                        ->map(fn (array $event): string => $event[0]->message)
+                        ->first(fn (string $message): bool => str_contains($message, 'there are:')) ?? '', $matches) === 1 &&
+                    $context['total_creatures'] === (int) $matches[1];
+            });
+
+        $job = new Exploration($this->character, $automation->id, AttackTypeValue::ATTACK, 5);
+
+        $job->handle(
+            $monsterFightService,
+            $battleEventHandler,
+            resolve(CharacterCacheData::class),
+            resolve(CharacterRewardService::class),
+            resolve(SkillService::class),
+            resolve(FactionHandler::class),
+        );
+
+        Queue::assertPushed(Exploration::class);
+    }
+
     public function testHandleDeletesAutomationWhenCharacterDiesDuringExploration(): void
     {
         Event::fake();
@@ -662,6 +721,15 @@ class ExplorationTest extends TestCase
 
         $job = new Exploration($this->character, $automation->id, AttackTypeValue::ATTACK, 5);
 
+        Log::shouldReceive('error')
+            ->once()
+            ->with('Exploration automation received malformed battle data.', [
+                'character_id' => $this->character->id,
+                'automation_id' => $automation->id,
+                'source' => 'setupMonster',
+                'missing_or_invalid_payload' => ['health'],
+            ]);
+
         $job->handle(
             $monsterFightService,
             resolve(BattleEventHandler::class),
@@ -720,6 +788,15 @@ class ExplorationTest extends TestCase
         ]);
 
         $job = new Exploration($this->character, $automation->id, AttackTypeValue::ATTACK, 5);
+
+        Log::shouldReceive('error')
+            ->once()
+            ->with('Exploration automation received malformed battle data.', [
+                'character_id' => $this->character->id,
+                'automation_id' => $automation->id,
+                'source' => 'fightMonster',
+                'missing_or_invalid_payload' => ['health'],
+            ]);
 
         $job->handle(
             $monsterFightService,
