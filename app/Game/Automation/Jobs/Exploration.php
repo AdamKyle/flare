@@ -272,6 +272,10 @@ class Exploration implements ShouldQueue
 
         $data = $this->setUpFightForMonster($params);
 
+        if (! $this->hasRequiredHealthData($data)) {
+            return false;
+        }
+
         $endedAutomationDueToCharacterDeath = $this->handleWhenCharacterDies($automation, $data);
 
         if ($endedAutomationDueToCharacterDeath) {
@@ -281,6 +285,10 @@ class Exploration implements ShouldQueue
         $data = $this->fightMonster();
 
         if (empty($data)) {
+            return false;
+        }
+
+        if (! $this->hasRequiredHealthData($data)) {
             return false;
         }
 
@@ -320,11 +328,23 @@ class Exploration implements ShouldQueue
 
     private function shouldAttackAgain(array $data): bool {
 
+        if (! $this->hasRequiredHealthData($data)) {
+            return false;
+        }
+
         if ($data['health']['current_monster_health'] > 0) {
             return true;
         }
 
         return false;
+    }
+
+    private function hasRequiredHealthData(array $data): bool
+    {
+        return isset($data['health']) &&
+            is_array($data['health']) &&
+            array_key_exists('current_character_health', $data['health']) &&
+            array_key_exists('current_monster_health', $data['health']);
     }
 
     /**

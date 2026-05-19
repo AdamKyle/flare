@@ -625,6 +625,115 @@ class ExplorationTest extends TestCase
         $this->assertNull(CharacterAutomation::find($automation->id));
     }
 
+    public function testHandleEndsAutomationWhenSetupDataIsMissingHealthPayload(): void
+    {
+        Event::fake();
+
+        $monsterFightService = Mockery::mock(MonsterFightService::class);
+        $monsterFightService->shouldReceive('setupMonster')->andReturn([
+            'monster' => [
+                'id' => $this->monster->id,
+            ],
+        ]);
+
+        $automation = CharacterAutomation::factory()->create([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'type' => AutomationType::EXPLORING,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'move_down_monster_list_every' => null,
+            'previous_level' => $this->character->level,
+            'current_level' => $this->character->level,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $unrelatedAutomation = CharacterAutomation::factory()->create([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'type' => AutomationType::EXPLORING,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'move_down_monster_list_every' => null,
+            'previous_level' => $this->character->level,
+            'current_level' => $this->character->level,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $job = new Exploration($this->character, $automation->id, AttackTypeValue::ATTACK, 5);
+
+        $job->handle(
+            $monsterFightService,
+            resolve(BattleEventHandler::class),
+            resolve(CharacterCacheData::class),
+            resolve(CharacterRewardService::class),
+            resolve(SkillService::class),
+            resolve(FactionHandler::class),
+        );
+
+        $this->assertNull(CharacterAutomation::find($automation->id));
+        $this->assertNotNull(CharacterAutomation::find($unrelatedAutomation->id));
+    }
+
+    public function testHandleEndsAutomationWhenFightDataIsMissingHealthPayload(): void
+    {
+        Event::fake();
+
+        $monsterFightService = Mockery::mock(MonsterFightService::class);
+        $monsterFightService->shouldReceive('setupMonster')->andReturn([
+            'health' => [
+                'current_character_health' => 100,
+                'current_monster_health' => 100,
+            ],
+            'monster' => [
+                'id' => $this->monster->id,
+            ],
+        ]);
+        $monsterFightService->shouldReceive('fightMonster')->andReturn([
+            'monster' => [
+                'id' => $this->monster->id,
+            ],
+        ]);
+
+        $automation = CharacterAutomation::factory()->create([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'type' => AutomationType::EXPLORING,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'move_down_monster_list_every' => null,
+            'previous_level' => $this->character->level,
+            'current_level' => $this->character->level,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $unrelatedAutomation = CharacterAutomation::factory()->create([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'type' => AutomationType::EXPLORING,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'move_down_monster_list_every' => null,
+            'previous_level' => $this->character->level,
+            'current_level' => $this->character->level,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $job = new Exploration($this->character, $automation->id, AttackTypeValue::ATTACK, 5);
+
+        $job->handle(
+            $monsterFightService,
+            resolve(BattleEventHandler::class),
+            resolve(CharacterCacheData::class),
+            resolve(CharacterRewardService::class),
+            resolve(SkillService::class),
+            resolve(FactionHandler::class),
+        );
+
+        $this->assertNull(CharacterAutomation::find($automation->id));
+        $this->assertNotNull(CharacterAutomation::find($unrelatedAutomation->id));
+    }
+
     public function testHandleDeletesAutomationWhenFightCannotBeProcessed(): void
     {
         Event::fake();
