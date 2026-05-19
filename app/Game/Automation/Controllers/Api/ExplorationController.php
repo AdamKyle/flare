@@ -5,15 +5,18 @@ namespace App\Game\Automation\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Flare\Values\AttackTypeValue;
-use App\Flare\Values\AutomationType;
 use App\Flare\Values\LocationType;
+use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Requests\ExplorationRequest;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Automation\Services\ExplorationAutomationService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
 class ExplorationController extends Controller
 {
+    use ChecksAutomationRestrictions;
+
     private ExplorationAutomationService $explorationAutomationService;
 
     public function __construct(ExplorationAutomationService $explorationAutomationService)
@@ -30,18 +33,10 @@ class ExplorationController extends Controller
             ], 422);
         }
 
-        if ($character->currentAutomations()
-                ->where('character_id', $character->id)
-                ->where('completed_at', '>', now())
-                ->where(function ($query) {
-                    $query->where('type', AutomationType::DELVE)
-                        ->orWhere('type', AutomationType::EXPLORING)
-                        ->orWhere('type', AutomationType::FACTION_LOYALTY);
-                })
-                ->count() > 0) {
-            return response()->json([
-                'message' => 'Nope. You already have one automation in progress.',
-            ], 422);
+        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::START_EXPLORATION);
+
+        if (! is_null($restriction)) {
+            return $restriction;
         }
 
         $location = Location::where('x', $character->map->character_position_x)

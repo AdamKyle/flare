@@ -7,6 +7,8 @@ use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Values\ItemEffectsValue;
+use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
@@ -18,6 +20,8 @@ use Illuminate\Support\Facades\Cache;
 
 class BattleController extends Controller
 {
+    use ChecksAutomationRestrictions;
+
     private MonsterFightService $monsterFightService;
 
     private BattleEventHandler $battleEventHandler;
@@ -103,6 +107,11 @@ class BattleController extends Controller
 
     public function setupMonster(AttackTypeRequest $attackTypeRequest, Character $character, Monster $monster): JsonResponse
     {
+        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::MANUAL_FIGHTING);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
 
         if ($this->monsterFightService->isAtDelveLocation($character)) {
             return response()->json([
@@ -135,6 +144,12 @@ class BattleController extends Controller
 
     public function fightMonster(AttackTypeRequest $attackTypeRequest, Character $character): JsonResponse
     {
+        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::MANUAL_FIGHTING);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         $result = $this->monsterFightService->fightMonster($character, $attackTypeRequest->attack_type);
 
         $status = $result['status'];

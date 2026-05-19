@@ -4,15 +4,16 @@ namespace App\Game\Automation\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Values\AttackTypeValue;
-use App\Flare\Values\AutomationType;
+use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Requests\FactionLoyaltyAutomationRequest;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Automation\Services\FactionLoyaltyAutomationService;
 use App\Game\Factions\FactionLoyalty\Concerns\FactionLoyalty;
 use Illuminate\Http\JsonResponse;
 
 class FactionLoyaltyAutomationController
 {
-    use FactionLoyalty;
+    use ChecksAutomationRestrictions, FactionLoyalty;
 
     /**
      * @param FactionLoyaltyAutomationService $factionLoyaltyAutomationService
@@ -32,19 +33,10 @@ class FactionLoyaltyAutomationController
             ], 422);
         }
 
-        if ($character->currentAutomations()
-                ->where('character_id', $character->id)
-                ->where('completed_at', '>', now())
-                ->where(function ($query) {
-                    $query->where('type', AutomationType::DELVE)
-                        ->orWhere('type', AutomationType::EXPLORING)
-                        ->orWhere('type', AutomationType::FACTION_LOYALTY);
-                })
-                ->count() > 0
-        ) {
-            return response()->json([
-                'message' => 'Nope. You already have one automation in progress.',
-            ], 422);
+        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::START_FACTION_LOYALTY);
+
+        if (! is_null($restriction)) {
+            return $restriction;
         }
 
         $factionLoyalty = $this->getFactionLoyalty($character);

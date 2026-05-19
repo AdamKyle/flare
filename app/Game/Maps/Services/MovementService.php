@@ -10,6 +10,8 @@ use App\Flare\Models\Location;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Core\Traits\CanHaveQuestItem;
@@ -25,7 +27,7 @@ use League\Fractal\Manager;
 
 class MovementService
 {
-    use CanHaveQuestItem, CanPlayerMassEmbezzle, LiveCharacterCount, ResponseBuilder;
+    use CanHaveQuestItem, CanPlayerMassEmbezzle, ChecksAutomationRestrictions, LiveCharacterCount, ResponseBuilder;
 
     /**
      * @var PortService
@@ -133,6 +135,12 @@ class MovementService
      */
     public function updateCharacterPlane(int $mapId, Character $character): array
     {
+        $restriction = $this->automationRestrictionErrorResult($character, AutomationRestrictionService::TRAVERSE);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         if (! $this->traverseService->canTravel($mapId, $character)) {
             return $this->errorResult('You are missing a required item to travel to that plane.');
         }
@@ -231,4 +239,5 @@ class MovementService
             return ! $gameMap->can_traverse;
         })->values()->toArray();
     }
+
 }

@@ -8,6 +8,8 @@ use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Models\Map;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Events\UpdateCelestialFight;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
@@ -25,7 +27,7 @@ use Facades\App\Flare\Cache\CoordinatesCache;
 
 class CelestialFightService
 {
-    use ResponseBuilder;
+    use ChecksAutomationRestrictions, ResponseBuilder;
 
     private BattleEventHandler $battleEventHandler;
 
@@ -75,6 +77,12 @@ class CelestialFightService
 
     public function fight(Character $character, CelestialFight $celestialFight, CharacterInCelestialFight $characterInCelestialFight, string $attackType): array
     {
+        $restriction = $this->automationRestrictionErrorResult($character, AutomationRestrictionService::CELESTIAL_FIGHTING);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         if (! $this->isPlayerAtSameLocationAsCelestialFight($character->map, $celestialFight)) {
             return $this->errorResult('You are not at the same location as the celestial.
             Use /pc to see the location or /pct if you have the quest item to be auto transported to the celestial.');

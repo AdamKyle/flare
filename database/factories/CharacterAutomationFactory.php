@@ -32,6 +32,7 @@ class CharacterAutomationFactory extends Factory
             'previous_level' => null,
             'current_level' => null,
             'attack_type' => null,
+            'started_in_special_location' => false,
         ];
     }
 }

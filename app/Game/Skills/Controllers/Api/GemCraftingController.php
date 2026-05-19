@@ -3,6 +3,8 @@
 namespace App\Game\Skills\Controllers\Api;
 
 use App\Flare\Models\Character;
+use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Skills\Requests\GemCraftingValidation;
 use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\GemService;
@@ -11,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 
 class GemCraftingController extends Controller
 {
+    use ChecksAutomationRestrictions;
 
     public function __construct(private GemService $gemService, private CraftingService $craftingService) {}
 
@@ -34,6 +37,11 @@ class GemCraftingController extends Controller
      */
     public function craftGem(Character $character, GemCraftingValidation $request): JsonResponse
     {
+        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::START_CRAFTING);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
 
         $result = $this->gemService->generateGem($character, $request->tier);
 

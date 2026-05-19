@@ -4,11 +4,12 @@ namespace App\Game\Battle\Controllers\Api;
 
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
-use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Npc;
 use App\Flare\Values\NpcTypes;
+use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Request\CelestialFightRequest;
 use App\Game\Battle\Request\ConjureRequest;
 use App\Game\Battle\Services\CelestialFightService;
@@ -20,6 +21,8 @@ use App\Http\Controllers\Controller;
 
 class CelestialBattleController extends Controller
 {
+    use ChecksAutomationRestrictions;
+
     private $conjureService;
 
     private $npcServerMessage;
@@ -80,8 +83,7 @@ class CelestialBattleController extends Controller
             return response()->json([], 200);
         }
 
-        if (CharacterAutomation::where('character_id', $character->id)->count() !== 0) {
-            event(new ServerMessageEvent($character->user, 'You are exploring and cannot participate.'));
+        if ($this->sendAutomationRestrictionMessage($character, AutomationRestrictionService::CELESTIAL_FIGHTING)) {
 
             return response()->json([], 200);
         }
@@ -111,8 +113,7 @@ class CelestialBattleController extends Controller
             return response()->json([], 200);
         }
 
-        if (CharacterAutomation::where('character_id', $character->id)->count() !== 0) {
-            event(new ServerMessageEvent($character->user, 'You are exploring and cannot participate.'));
+        if ($this->sendAutomationRestrictionMessage($character, AutomationRestrictionService::CELESTIAL_FIGHTING)) {
 
             return response()->json([], 200);
         }

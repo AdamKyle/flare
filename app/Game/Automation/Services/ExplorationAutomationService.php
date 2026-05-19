@@ -4,6 +4,7 @@ namespace App\Game\Automation\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
+use App\Flare\Models\Location;
 use App\Flare\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
@@ -36,6 +37,7 @@ class ExplorationAutomationService
             'previous_level' => $character->level,
             'current_level' => $character->level,
             'attack_type' => $params['attack_type'],
+            'started_in_special_location' => $this->startedInSpecialLocation($character),
         ]);
 
         $this->setTimeDelay($character);
@@ -89,5 +91,19 @@ class ExplorationAutomationService
     {
 
         Exploration::dispatch($character, $automationId, $attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
+    }
+
+    private function startedInSpecialLocation(Character $character): bool
+    {
+        $location = Location::where('x', $character->map->character_position_x)
+            ->where('y', $character->map->character_position_y)
+            ->where('game_map_id', $character->map->game_map_id)
+            ->first();
+
+        if (is_null($location)) {
+            return false;
+        }
+
+        return ! is_null($location->type) || ! is_null($location->enemy_strength_type);
     }
 }

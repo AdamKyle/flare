@@ -4,9 +4,12 @@ namespace Tests\Unit\Game\Automation\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
+use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
+use App\Flare\Values\LocationEffectValue;
+use App\Flare\Values\LocationType;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationStatus;
 use App\Game\Automation\Events\AutomationTimeOut;
@@ -237,6 +240,39 @@ class ExplorationAutomationServiceTest extends TestCase
 
         $this->assertEquals(10, $automation->previous_level);
         $this->assertEquals(10, $automation->current_level);
+    }
+
+    public function testBeginAutomationPersistsSpecialStartContext(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        Location::factory()->create([
+            'name' => 'Gold Mine',
+            'game_map_id' => $this->character->map->game_map_id,
+            'x' => $this->character->map->character_position_x,
+            'y' => $this->character->map->character_position_y,
+            'type' => LocationType::GOLD_MINES,
+            'enemy_strength_type' => LocationEffectValue::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY,
+        ]);
+
+        $this->service->beginAutomation($this->character, $this->params());
+
+        $automation = CharacterAutomation::query()->latest('id')->first();
+
+        $this->assertTrue($automation->started_in_special_location);
+    }
+
+    public function testBeginAutomationPersistsRegularStartContext(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->service->beginAutomation($this->character, $this->params());
+
+        $automation = CharacterAutomation::query()->latest('id')->first();
+
+        $this->assertFalse($automation->started_in_special_location);
     }
 
     public function testStopExplorationDispatchesAutomationTimeOut(): void

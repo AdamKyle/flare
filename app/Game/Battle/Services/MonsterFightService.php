@@ -7,6 +7,8 @@ use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Values\LocationType;
+use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
@@ -17,7 +19,7 @@ use Psr\SimpleCache\InvalidArgumentException;
 
 class MonsterFightService
 {
-    use ResponseBuilder;
+    use ChecksAutomationRestrictions, ResponseBuilder;
 
     /**
      * @param MonsterPlayerFight $monsterPlayerFight
@@ -37,6 +39,12 @@ class MonsterFightService
      */
     public function setupMonster(Character $character, array $params, bool $returnData = false, bool $isDelve = false): array
     {
+        $restriction = $this->automationRestrictionErrorResult($character, AutomationRestrictionService::MANUAL_FIGHTING);
+
+        if (! $returnData && ! is_null($restriction)) {
+            return $restriction;
+        }
+
         Cache::delete('monster-fight-' . $character->id);
         Cache::delete('character-sheet-' . $character->id);
 
@@ -106,6 +114,12 @@ class MonsterFightService
      */
     public function fightMonster(Character $character, string $attackType, bool $onlyOnce = true, bool $returnData = false): array
     {
+        $restriction = $this->automationRestrictionErrorResult($character, AutomationRestrictionService::MANUAL_FIGHTING);
+
+        if (! $returnData && ! is_null($restriction)) {
+            return $restriction;
+        }
+
         $cache = Cache::get('monster-fight-' . $character->id);
 
         if (is_null($cache)) {

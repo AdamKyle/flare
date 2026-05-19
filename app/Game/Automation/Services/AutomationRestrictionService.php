@@ -1,0 +1,160 @@
+<?php
+
+namespace App\Game\Automation\Services;
+
+use App\Flare\Models\Character;
+use App\Flare\Models\CharacterAutomation;
+use App\Flare\Models\Location;
+use App\Flare\Values\AutomationType;
+
+class AutomationRestrictionService
+{
+    public const MANUAL_FIGHTING = 'manual_fighting';
+
+    public const CELESTIAL_FIGHTING = 'celestial_fighting';
+
+    public const PCT = 'pct';
+
+    public const DIRECTIONAL_MOVEMENT = 'directional_movement';
+
+    public const TELEPORT = 'teleport';
+
+    public const SET_SAIL = 'set_sail';
+
+    public const TRAVERSE = 'traverse';
+
+    public const ENTER_LOCATION = 'enter_location';
+
+    public const START_DELVE = 'start_delve';
+
+    public const START_EXPLORATION = 'start_exploration';
+
+    public const START_FACTION_LOYALTY = 'start_faction_loyalty';
+
+    public const START_CRAFTING = 'start_crafting';
+
+    public function activeAutomation(Character $character): ?CharacterAutomation
+    {
+        return $character->currentAutomations()
+            ->where('completed_at', '>', now())
+            ->orderByDesc('started_at')
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    public function isBlocked(Character $character, string $action, ?Location $destinationLocation = null): bool
+    {
+        return ! is_null($this->blockedContext($character, $action, $destinationLocation));
+    }
+
+    public function blockedContext(Character $character, string $action, ?Location $destinationLocation = null): ?array
+    {
+        $automation = $this->activeAutomation($character);
+
+        if (is_null($automation)) {
+            return null;
+        }
+
+        if (! $this->automationBlocksAction($automation, $action, $destinationLocation)) {
+            return null;
+        }
+
+        return [
+            'automation' => $automation,
+            'automation_name' => $this->automationName($automation),
+            'message' => $this->blockedMessage($automation),
+        ];
+    }
+
+    public function blockedMessage(CharacterAutomation $automation): string
+    {
+        return 'You cannot do that while ' . $this->automationName($automation) . ' automation is running. Cancel it first.';
+    }
+
+    public function isSpecialExplorationLocation(?Location $location): bool
+    {
+        if (is_null($location)) {
+            return false;
+        }
+
+        return ! is_null($location->type) || ! is_null($location->enemy_strength_type);
+    }
+
+    private function automationBlocksAction(CharacterAutomation $automation, string $action, ?Location $destinationLocation = null): bool
+    {
+        $automationType = new AutomationType($automation->type);
+
+        if ($automationType->isFactionLoyalty()) {
+            return in_array($action, [
+                self::START_DELVE,
+                self::START_EXPLORATION,
+                self::MANUAL_FIGHTING,
+                self::START_CRAFTING,
+                self::PCT,
+                self::CELESTIAL_FIGHTING,
+                self::START_FACTION_LOYALTY,
+            ]);
+        }
+
+        if ($automationType->isDelve()) {
+            return in_array($action, [
+                self::START_EXPLORATION,
+                self::MANUAL_FIGHTING,
+                self::START_FACTION_LOYALTY,
+                self::PCT,
+                self::CELESTIAL_FIGHTING,
+                self::START_DELVE,
+            ]);
+        }
+
+        return $this->explorationBlocksAction($automation, $action, $destinationLocation);
+    }
+
+    private function explorationBlocksAction(CharacterAutomation $automation, string $action, ?Location $destinationLocation = null): bool
+    {
+        if (in_array($action, [
+            self::START_DELVE,
+            self::START_FACTION_LOYALTY,
+            self::MANUAL_FIGHTING,
+            self::PCT,
+            self::CELESTIAL_FIGHTING,
+            self::TELEPORT,
+            self::SET_SAIL,
+            self::TRAVERSE,
+            self::START_EXPLORATION,
+        ])) {
+            return true;
+        }
+
+        if ($automation->started_in_special_location) {
+            return in_array($action, [
+                self::DIRECTIONAL_MOVEMENT,
+                self::ENTER_LOCATION,
+            ]);
+        }
+
+        if (in_array($action, [
+            self::DIRECTIONAL_MOVEMENT,
+            self::ENTER_LOCATION,
+        ])) {
+            return $this->isSpecialExplorationLocation($destinationLocation);
+        }
+
+        return false;
+    }
+
+    private function automationName(CharacterAutomation $automation): string
+    {
+        $automationType = new AutomationType($automation->type);
+
+        if ($automationType->isExploring()) {
+            return 'Exploration';
+        }
+
+        if ($automationType->isDelve()) {
+            return 'Delve';
+        }
+
+        return 'Faction Loyalty';
+    }
+}
