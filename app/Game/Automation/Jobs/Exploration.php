@@ -84,6 +84,10 @@ class Exploration implements ShouldQueue
 
         $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
 
+        if (is_null($automation)) {
+            return;
+        }
+
         if ($this->shouldBail($automation)) {
             $this->endAutomation($automation, $characterCacheData);
 
@@ -326,16 +330,11 @@ class Exploration implements ShouldQueue
     /**
      * Should we bail?
      *
-     * @param CharacterAutomation|null $automation
+     * @param CharacterAutomation $automation
      * @return bool
      */
-    private function shouldBail(?CharacterAutomation $automation = null): bool
+    private function shouldBail(CharacterAutomation $automation): bool
     {
-
-        if (is_null($automation)) {
-            return true;
-        }
-
         if (now()->greaterThanOrEqualTo($automation->completed_at)) {
             return true;
         }
@@ -380,36 +379,32 @@ class Exploration implements ShouldQueue
     /**
      * End automation.
      *
-     * @param CharacterAutomation|null $automation
+     * @param CharacterAutomation $automation
      * @param CharacterCacheData $characterCacheData
      * @return void
      */
-    private function endAutomation(?CharacterAutomation $automation, CharacterCacheData $characterCacheData): void
+    private function endAutomation(CharacterAutomation $automation, CharacterCacheData $characterCacheData): void
     {
-        if (! is_null($automation)) {
-            $automation->delete();
+        $automation->delete();
 
-            $characterCacheData->deleteCharacterSheet($this->character);
+        $characterCacheData->deleteCharacterSheet($this->character);
 
-            $this->sendOutEventLogUpdate('"Phew, child! I did not think we would survive all of your shenanigans.
+        $this->sendOutEventLogUpdate('"Phew, child! I did not think we would survive all of your shenanigans.
             So many times I could have died! Do you ever think about anyone other than yourself? No? Didn\'t think so." The Guide storms off and you follow him in silence.', true);
 
-            $this->sendOutEventLogUpdate('Your adventures over, you head to back to the nearest town. Upon arriving, you and The Guide spot the closest Inn. Soaked in the
+        $this->sendOutEventLogUpdate('Your adventures over, you head to back to the nearest town. Upon arriving, you and The Guide spot the closest Inn. Soaked in the
             blood of your enemies, the sweat of the lingers on you like a bad smell. Entering the establishment and finding a table, you are greeted by a big busty women with shaggy long red hair messily tied in a pony tail.
             She leans down to the table, her cleavage close enough to your face that you can see the freckles and lines of age. Her grin missing a tooth, she states: "What can I get the both of ya?" You shutter on the inside.', true);
 
-            $character = $this->character->refresh();
+        $character = $this->character->refresh();
 
-            $this->rewardPlayer($character);
+        $this->rewardPlayer($character);
 
-            event(new UpdateCharacterStatus($character));
+        event(new UpdateCharacterStatus($character));
 
-            event(new AutomationTimeOut($character->user, 0));
+        event(new AutomationTimeOut($character->user, 0));
 
-            return;
-        }
-
-        $this->character->currentAutomations()->delete();
+        return;
     }
 
     /**
