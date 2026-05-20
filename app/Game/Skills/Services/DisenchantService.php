@@ -7,6 +7,7 @@ use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
+use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
@@ -32,6 +33,8 @@ class DisenchantService
 
     private CharacterInventoryService $characterInventoryService;
 
+    private ?InventorySlot $questSlot = null;
+
     public function __construct(SkillCheckService $skillCheckService, CharacterInventoryService $characterInventoryService)
     {
         $this->skillCheckService = $skillCheckService;
@@ -48,6 +51,10 @@ class DisenchantService
 
         $this->disenchantingSkill = $character->skills->filter(function ($skill) {
             return $skill->type()->isDisenchanting();
+        })->first();
+
+        $this->questSlot = $character->inventory->slots->filter(function ($slot) {
+            return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::GOLD_DUST_RUSH;
         })->first();
 
         return $this;
@@ -195,29 +202,20 @@ class DisenchantService
     /**
      * Update the characters gold dust.
      */
-    public function updateGoldDust(Character $character, bool $failedCheck = false): int
+    public function updateGoldDust(Character $character, bool $failedCheck = false, bool $canRollGoldDustRush = true): int
     {
 
-        $goldDust = ! $failedCheck ? rand(2, 1150) : 1;
+        $goldDust = ! $failedCheck ? $this->fetchGoldDustAmount() : 1;
 
-        $goldDust = $goldDust + $goldDust * $this->disenchantingSkill->bonus;
+        $goldDust = (int) ($goldDust + $goldDust * $this->disenchantingSkill->bonus);
 
         $characterTotalGoldDust = $character->gold_dust + $goldDust;
+        $goldDustRushAwarded = false;
+
         if (! $failedCheck) {
-
-            $dc = 500 - 500 * 0.10;
-            $roll = $this->fetchDCRoll();
-
-            if ($roll >= $dc) {
-                $characterTotalGoldDust = $characterTotalGoldDust + $characterTotalGoldDust * 0.05;
-
-                if ($characterTotalGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
-                    $characterTotalGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
-
-                    event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. You are now capped!'));
-                } else {
-                    event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. Your new total is: ' . number_format($characterTotalGoldDust)));
-                }
+            if ($canRollGoldDustRush && $this->canAwardGoldDustRush() && $this->fetchDCRoll() === 100) {
+                $characterTotalGoldDust += (int) floor($goldDust * 0.05);
+                $goldDustRushAwarded = true;
             }
         }
 
@@ -231,7 +229,48 @@ class DisenchantService
 
         event(new UpdateTopBarEvent($character->refresh()));
 
+        if ($goldDustRushAwarded) {
+            if ($characterTotalGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
+                event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% bonus gold dust from disenchanting. You are now capped!'));
+            } else {
+                event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% bonus gold dust from disenchanting. Your new total is: ' . number_format($characterTotalGoldDust)));
+            }
+        }
+
         return $goldDust;
+    }
+
+    public function applyGoldDustRushBonus(Character $character, int $goldDustGain): void
+    {
+        if ($goldDustGain <= 0 || ! $this->canAwardGoldDustRush()) {
+            return;
+        }
+
+        if ($this->fetchDCRoll() !== 100) {
+            return;
+        }
+
+        $characterTotalGoldDust = $character->gold_dust + (int) floor($goldDustGain * 0.05);
+
+        if ($characterTotalGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
+            $characterTotalGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
+        }
+
+        $character->update([
+            'gold_dust' => $characterTotalGoldDust,
+        ]);
+
+        event(new UpdateTopBarEvent($character->refresh()));
+    }
+
+    private function canAwardGoldDustRush(): bool
+    {
+        return ! is_null($this->questSlot);
+    }
+
+    protected function fetchGoldDustAmount(): int
+    {
+        return rand(2, 1150);
     }
 
     /**
@@ -239,6 +278,6 @@ class DisenchantService
      */
     protected function fetchDCRoll(): int
     {
-        return rand(1, 500);
+        return rand(1, 100);
     }
 }

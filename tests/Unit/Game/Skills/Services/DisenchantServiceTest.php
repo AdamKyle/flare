@@ -6,6 +6,7 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Character\CharacterInventory\Jobs\DisenchantMany;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -184,10 +185,13 @@ class DisenchantServiceTest extends TestCase
             ->shouldAllowMockingProtectedMethods()
             ->shouldReceive('fetchDCRoll')
             ->once()
-            ->andReturn(1000)
+            ->andReturn(100)
             ->getMock();
 
-        $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->getCharacter();
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::GOLD_DUST_RUSH,
+        ]))->getCharacter();
 
         $character->update([
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST - 1,
@@ -201,7 +205,7 @@ class DisenchantServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertEmpty($character->inventory->slots);
+        $this->assertCount(1, $character->inventory->slots);
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
 
         Event::assertDispatched(UpdateCharacterEnchantingList::class);
@@ -226,10 +230,13 @@ class DisenchantServiceTest extends TestCase
             ->shouldAllowMockingProtectedMethods()
             ->shouldReceive('fetchDCRoll')
             ->once()
-            ->andReturn(1)
+            ->andReturn(99)
             ->getMock();
 
-        $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->getCharacter();
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::GOLD_DUST_RUSH,
+        ]))->getCharacter();
 
         $character->update([
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST - 1,
@@ -243,7 +250,7 @@ class DisenchantServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertEmpty($character->inventory->slots);
+        $this->assertCount(1, $character->inventory->slots);
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
 
         Event::assertDispatched(UpdateCharacterEnchantingList::class);
@@ -299,7 +306,7 @@ class DisenchantServiceTest extends TestCase
 
         $disenchantingService->shouldAllowMockingProtectedMethods()
             ->shouldReceive('fetchDCRoll')
-            ->andReturn(1000);
+            ->andReturn(100);
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->giveItem($this->createItem([
             'type' => 'quest',
@@ -356,6 +363,181 @@ class DisenchantServiceTest extends TestCase
 
         Event::assertDispatched(UpdateCharacterEnchantingList::class);
         Event::assertDispatched(UpdateSkillEvent::class);
+    }
+
+    public function testGoldDustRushRequiresQuestEffect(): void
+    {
+        Event::fake();
+
+        $skillCheckServiceMock = Mockery::mock(SkillCheckService::class);
+        $skillCheckServiceMock->shouldReceive('getDCCheck')->once()->andReturn(1);
+        $skillCheckServiceMock->shouldReceive('characterRoll')->once()->andReturn(100);
+
+        $disenchantingService = Mockery::mock(
+            DisenchantService::class,
+            [$skillCheckServiceMock, $this->app->make(CharacterInventoryService::class)]
+        )->makePartial()->shouldAllowMockingProtectedMethods();
+
+        $disenchantingService->shouldReceive('fetchGoldDustAmount')->once()->andReturn(1000);
+        $disenchantingService->shouldReceive('fetchDCRoll')->never();
+
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->getCharacter();
+
+        $slot = $character->inventory->slots->first();
+
+        $disenchantingService->setUp($character)->disenchantWithSkill($slot);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(1000, $character->gold_dust);
+    }
+
+    public function testGoldDustRushDoesNotProcAtNinetyNine(): void
+    {
+        Event::fake();
+
+        $skillCheckServiceMock = Mockery::mock(SkillCheckService::class);
+        $skillCheckServiceMock->shouldReceive('getDCCheck')->once()->andReturn(1);
+        $skillCheckServiceMock->shouldReceive('characterRoll')->once()->andReturn(100);
+
+        $disenchantingService = Mockery::mock(
+            DisenchantService::class,
+            [$skillCheckServiceMock, $this->app->make(CharacterInventoryService::class)]
+        )->makePartial()->shouldAllowMockingProtectedMethods();
+
+        $disenchantingService->shouldReceive('fetchGoldDustAmount')->once()->andReturn(1000);
+        $disenchantingService->shouldReceive('fetchDCRoll')->once()->andReturn(99);
+
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::GOLD_DUST_RUSH,
+        ]))->getCharacter();
+
+        $slot = $character->inventory->slots->first();
+
+        $disenchantingService->setUp($character)->disenchantWithSkill($slot);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(1000, $character->gold_dust);
+    }
+
+    public function testGoldDustRushBonusUsesDisenchantGain(): void
+    {
+        Event::fake();
+
+        $skillCheckServiceMock = Mockery::mock(SkillCheckService::class);
+        $skillCheckServiceMock->shouldReceive('getDCCheck')->once()->andReturn(1);
+        $skillCheckServiceMock->shouldReceive('characterRoll')->once()->andReturn(100);
+
+        $disenchantingService = Mockery::mock(
+            DisenchantService::class,
+            [$skillCheckServiceMock, $this->app->make(CharacterInventoryService::class)]
+        )->makePartial()->shouldAllowMockingProtectedMethods();
+
+        $disenchantingService->shouldReceive('fetchGoldDustAmount')->once()->andReturn(1000);
+        $disenchantingService->shouldReceive('fetchDCRoll')->once()->andReturn(100);
+
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::GOLD_DUST_RUSH,
+        ]))->getCharacter();
+
+        $character->update([
+            'gold_dust' => 100000,
+        ]);
+
+        $character = $character->refresh();
+
+        $slot = $character->inventory->slots->first();
+
+        $disenchantingService->setUp($character)->disenchantWithSkill($slot);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(101050, $character->gold_dust);
+    }
+
+    public function testSelectedDisenchantRollsGoldDustRushOnceForTheAction(): void
+    {
+        Event::fake();
+
+        $skillCheckServiceMock = Mockery::mock(SkillCheckService::class);
+        $skillCheckServiceMock->shouldReceive('getDCCheck')->once()->andReturn(1);
+        $skillCheckServiceMock->shouldReceive('characterRoll')->once()->andReturn(100);
+
+        $disenchantingService = Mockery::mock(
+            DisenchantService::class,
+            [$skillCheckServiceMock, $this->app->make(CharacterInventoryService::class)]
+        )->makePartial()->shouldAllowMockingProtectedMethods();
+
+        $disenchantingService->shouldReceive('fetchGoldDustAmount')->twice()->andReturn(1000);
+        $disenchantingService->shouldReceive('fetchDCRoll')->once()->andReturn(100);
+
+        $character = $this->character->inventoryManagement()->giveItemMultipleTimes($this->itemToDisenchant, 2)->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::GOLD_DUST_RUSH,
+        ]))->getCharacter();
+
+        (new DisenchantMany($character, [$this->itemToDisenchant->id, $this->itemToDisenchant->id]))->handle($disenchantingService, $skillCheckServiceMock);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(2100, $character->gold_dust);
+    }
+
+    public function testFailedSelectedDisenchantDoesNotTriggerGoldDustRush(): void
+    {
+        Event::fake();
+
+        $skillCheckServiceMock = Mockery::mock(SkillCheckService::class);
+        $skillCheckServiceMock->shouldReceive('getDCCheck')->once()->andReturn(100);
+        $skillCheckServiceMock->shouldReceive('characterRoll')->once()->andReturn(1);
+
+        $disenchantingService = Mockery::mock(
+            DisenchantService::class,
+            [$skillCheckServiceMock, $this->app->make(CharacterInventoryService::class)]
+        )->makePartial()->shouldAllowMockingProtectedMethods();
+
+        $disenchantingService->shouldReceive('fetchDCRoll')->never();
+
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::GOLD_DUST_RUSH,
+        ]))->getCharacter();
+
+        (new DisenchantMany($character, [$this->itemToDisenchant->id]))->handle($disenchantingService, $skillCheckServiceMock);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(1, $character->gold_dust);
+    }
+
+    public function testFailedSelectedDisenchantDoesNotCountFailedGoldDustTowardRushBonus(): void
+    {
+        Event::fake();
+
+        $skillCheckServiceMock = Mockery::mock(SkillCheckService::class);
+        $skillCheckServiceMock->shouldReceive('getDCCheck')->once()->andReturn(100);
+        $skillCheckServiceMock->shouldReceive('characterRoll')->once()->andReturn(1);
+
+        $disenchantingService = Mockery::mock(
+            DisenchantService::class,
+            [$skillCheckServiceMock, $this->app->make(CharacterInventoryService::class)]
+        )->makePartial()->shouldAllowMockingProtectedMethods();
+
+        $disenchantingService->shouldReceive('fetchDCRoll')->never();
+
+        $character = $this->character->inventoryManagement()->giveItemMultipleTimes($this->itemToDisenchant, 20)->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::GOLD_DUST_RUSH,
+        ]))->getCharacter();
+
+        (new DisenchantMany($character, array_fill(0, 20, $this->itemToDisenchant->id)))->handle($disenchantingService, $skillCheckServiceMock);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(20, $character->gold_dust);
     }
 
     public function testCallDisenchantItemAndSucceed()

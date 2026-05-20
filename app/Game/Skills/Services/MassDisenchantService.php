@@ -16,6 +16,8 @@ class MassDisenchantService
 {
     private int $goldDust = 0;
 
+    private int $goldDustRushGain = 0;
+
     private int $skillXP = 0;
 
     private int $disenchantingLeveledTimes = 0;
@@ -95,6 +97,10 @@ class MassDisenchantService
 
         foreach ($slots as $slot) {
             $this->disenchantItem($slot);
+        }
+
+        if ($this->goldDustRushGain > 0 && ! is_null($this->questSlot) && $this->fetchDCRoll() === 100) {
+            $this->goldDust += (int) floor($this->goldDustRushGain * 0.05);
         }
 
         $newGoldDust = $this->character->gold_dust + $this->goldDust;
@@ -192,7 +198,9 @@ class MassDisenchantService
         if ($roll > $dcCheck) {
 
             if (! ($this->goldDust >= MaxCurrenciesValue::MAX_GOLD_DUST)) {
-                $this->goldDust += $this->updateGoldDust();
+                $goldDust = $this->updateGoldDust();
+                $this->goldDust += $goldDust;
+                $this->goldDustRushGain += $goldDust;
             }
 
             $this->skillXP += $this->getSkillXp();
@@ -203,7 +211,7 @@ class MassDisenchantService
         }
 
         if (! ($this->goldDust >= MaxCurrenciesValue::MAX_GOLD_DUST)) {
-            $this->goldDust += $this->updateGoldDust();
+            $this->goldDust += $this->updateGoldDust(true);
         }
 
         $slot->delete();
@@ -230,25 +238,18 @@ class MassDisenchantService
      */
     protected function updateGoldDust(bool $failedCheck = false): int
     {
-        $goldDust = ! $failedCheck ? rand(2, 1150) : 1;
+        $goldDust = ! $failedCheck ? $this->fetchGoldDustAmount() : 1;
 
         if (! $failedCheck) {
-            $goldDust = $goldDust + $goldDust * $this->disenchantingSkill->bonus;
-        }
-
-        $characterTotalGoldDust = $this->character->gold_dust;
-
-        if (! is_null($this->questSlot) && ! $failedCheck) {
-            $dc = 1000 - 1000 * 0.02;
-            $roll = $this->fetchDCRoll();
-
-            if ($roll > $dc) {
-
-                return $characterTotalGoldDust * 0.05;
-            }
+            $goldDust = (int) ($goldDust + $goldDust * $this->disenchantingSkill->bonus);
         }
 
         return $goldDust;
+    }
+
+    protected function fetchGoldDustAmount(): int
+    {
+        return rand(2, 1150);
     }
 
     /**
@@ -256,7 +257,7 @@ class MassDisenchantService
      */
     protected function fetchDCRoll(): int
     {
-        return rand(1, 1000);
+        return rand(1, 100);
     }
 
     protected function normalizeMaxLevelSkill(Skill $skill, string $leveledType): Skill

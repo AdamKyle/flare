@@ -48,6 +48,7 @@ class DisenchantMany implements ShouldQueue
         $dcCheck = $skillCheckService->getDCCheck($disenchantingSkill);
 
         $disenchanted = $characterRoll >= $dcCheck;
+        $goldDustGained = 0;
 
         foreach ($this->itemIds as $itemId) {
             $item = Item::find($itemId);
@@ -60,10 +61,12 @@ class DisenchantMany implements ShouldQueue
                 continue;
             }
 
-            $this->processDisenchant($disenchantService, $character, $disenchantingSkill, $item, $disenchanted);
+            $goldDustGained += $this->processDisenchant($disenchantService, $character, $disenchantingSkill, $item, $disenchanted);
 
             $character = $character->refresh();
         }
+
+        $disenchantService->setUp($character)->applyGoldDustRushBonus($character, $goldDustGained);
 
         ServerMessageHandler::sendBasicMessage($character->user, 'Look at that! disenchanted all your valid items!');
     }
@@ -78,7 +81,7 @@ class DisenchantMany implements ShouldQueue
         ServerMessageHandler::sendBasicMessage($character->user, $message);
     }
 
-    private function processDisenchant(DisenchantService $disenchantService, Character $character, Skill $disenchantingSkill, Item $item, bool $disenchanted): void
+    private function processDisenchant(DisenchantService $disenchantService, Character $character, Skill $disenchantingSkill, Item $item, bool $disenchanted): int
     {
         event(new UpdateSkillEvent($disenchantingSkill));
 
@@ -89,10 +92,12 @@ class DisenchantMany implements ShouldQueue
 
         ServerMessageHandler::sendBasicMessage($character->user, $message);
 
-        $goldDust = $disenchantService->setUp($character)->updateGoldDust($character, !$disenchanted);
+        $goldDust = $disenchantService->setUp($character)->updateGoldDust($character, !$disenchanted, false);
 
         $message = 'You also gained: ' . number_format($goldDust) . ' Gold Dust!';
 
         ServerMessageHandler::sendBasicMessage($character->user, $message);
+
+        return $disenchanted ? $goldDust : 0;
     }
 }

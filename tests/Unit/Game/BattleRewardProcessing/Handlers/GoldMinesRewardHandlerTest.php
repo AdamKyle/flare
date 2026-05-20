@@ -4,15 +4,18 @@ namespace Tests\Unit\Game\BattleRewardProcessing\Handlers;
 
 use App\Flare\Models\Event as FlareEvent;
 use App\Flare\Models\Location;
+use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\LocationType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\BattleRewardProcessing\Handlers\GoldMinesRewardHandler;
 use App\Game\Events\Values\EventType;
+use App\Game\Messages\Events\ServerMessageEvent;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterAutomation;
@@ -149,6 +152,33 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD, $result->gold);
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $result->gold_dust);
         $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $result->shards);
+    }
+
+    public function testCurrencyRewardDoesNotTriggerGoldDustRush(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+
+        RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(100);
+
+        $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $character = $characterFactory->inventoryManagement()->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::GOLD_DUST_RUSH,
+        ]))->getCharacter();
+
+        $character->update([
+            'gold' => 0,
+            'gold_dust' => 100000,
+            'shards' => 0,
+        ]);
+
+        $result = $this->handler->currencyReward($character->refresh(), null)->refresh();
+
+        $this->assertEquals(100100, $result->gold_dust);
+
+        Event::assertNotDispatched(function (ServerMessageEvent $event) {
+            return str_contains($event->message, 'Gold Dust Rush');
+        });
     }
 
     public function testHandleRewardsCurrencyButReturnsEarlyWhenAutomationsAreRunning(): void
