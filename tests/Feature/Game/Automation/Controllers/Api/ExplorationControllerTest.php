@@ -58,7 +58,7 @@ class ExplorationControllerTest extends TestCase
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertEquals(
-            'Exploration has started. Check the exploration tab (beside server messages) for update. The tab will every 5 minutes, rewards are handed to you or disenchanted automatically.',
+            'Exploration has started. Check the exploration tab (beside server messages) for update. The tab will every 1 minutes, rewards are handed to you or disenchanted automatically.',
             $jsonData['message']
         );
     }

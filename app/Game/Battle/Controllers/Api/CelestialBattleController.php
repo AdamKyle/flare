@@ -18,6 +18,7 @@ use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\NpcMessageTypes;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 
 class CelestialBattleController extends Controller
 {
@@ -50,8 +51,14 @@ class CelestialBattleController extends Controller
         ], 200);
     }
 
-    public function conjure(ConjureRequest $request, Character $character)
+    public function conjure(ConjureRequest $request, Character $character): JsonResponse
     {
+        $restrictionResponse = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::CELESTIAL_CONJURING);
+
+        if (! is_null($restrictionResponse)) {
+            return $restrictionResponse;
+        }
+
         $npc = Npc::where('type', NpcTypes::SUMMONER)->first();
 
         if (! $this->conjureService->canConjure($character, $npc, $request->type)) {

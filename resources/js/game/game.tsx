@@ -304,10 +304,9 @@ export default class Game extends React.Component<GameProps, GameState> {
     }
 
     setMapState(mapData: Partial<MapState>): void {
-        this.setState((prevState) => ({
-            ...prevState,
-            ...mapData,
-        }));
+        this.setState({
+            map_data: mapData,
+        });
     }
 
     setCanSeeFactionLoyaltyTab(canSee: boolean, factionId?: number) {

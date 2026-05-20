@@ -10,7 +10,12 @@ import DirectionalMovement from "./actions/directional-movement";
 import MapActions from "./actions/map-actions";
 import MovePlayer from "./lib/ajax/move-player";
 import { getStyle, playerIconPosition } from "./lib/map-management";
-import { dragMap, fetchLeftBounds, getNewXPosition } from "./lib/map-position";
+import {
+    dragMap,
+    fetchLeftBounds,
+    getNewXPosition,
+    getNewYPosition,
+} from "./lib/map-position";
 import MapData from "./lib/request-types/MapData";
 import MapStateManager from "./lib/state/map-state-manager";
 import MapState from "./types/map-state";
@@ -138,23 +143,28 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         this.pctCommand.listen(
             "Game.Maps.Events.UpdateMapDetailsBroadcast",
             (event: any) => {
-                this.setState({
+                const state = {
                     ...event.map_data,
                     character_position: {
                         x: event.map_data.character_map.character_position_x,
                         y: event.map_data.character_map.character_position_y,
+                        game_map_id: event.map_data.character_map.game_map_id,
                     },
                     map_position: {
                         x: getNewXPosition(
                             event.map_data.character_map.character_position_x,
                             event.map_data.character_map.position_x,
                         ),
-                        y: getNewXPosition(
+                        y: getNewYPosition(
                             event.map_data.character_map.character_position_y,
                             event.map_data.character_map.position_y,
                         ),
                     },
-                });
+                };
+
+                this.props.set_map_data(state);
+
+                this.setState(state);
             },
         );
     }
@@ -210,7 +220,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
             if (
                 this.props.map_data.is_event_based !==
-                    this.state.is_event_based &&
+                    this.state.is_event_based ||
                 !isEqual(
                     this.props.map_data.character_position,
                     this.state.character_position,
@@ -218,7 +228,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             ) {
                 this.setState({
                     character_position: this.props.map_data.character_position,
-                    is_event_based: this.state.is_event_based,
+                    is_event_based: this.props.map_data.is_event_based,
                     map_position: this.props.map_data.map_position,
                 });
             }
@@ -226,7 +236,14 @@ export default class MapSection extends React.Component<MapProps, MapState> {
     }
 
     componentWillUnmount(): void {
-        this.props.set_map_data(this.state);
+        if (this.props.map_data === null) {
+            return;
+        }
+
+        this.props.set_map_data({
+            ...this.props.map_data,
+            map_position: this.state.map_position,
+        });
     }
 
     automationTimerLabel(): string {
@@ -244,7 +261,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
     setStateFromData(data: MapData, callback?: () => void) {
         const state = MapStateManager.buildChangeState(data, this);
 
-        this.props.set_map_data(data);
+        this.props.set_map_data(state);
 
         this.setState(state, () => {
             if (typeof callback === "function") {

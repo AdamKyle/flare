@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Feature\Http\Controllers;
 
 use App\Flare\Jobs\AccountDeletionJob;
 use App\Flare\Models\GameMap;

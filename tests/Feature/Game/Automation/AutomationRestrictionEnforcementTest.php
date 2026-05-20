@@ -13,6 +13,7 @@ use App\Game\Battle\Values\CelestialConjureType;
 use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Maps\Services\PctService;
 use App\Game\Skills\Values\SkillTypeValue;
+use App\Game\Automation\Middleware\IsCharacterExploring;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -522,5 +523,106 @@ class AutomationRestrictionEnforcementTest extends TestCase
 
         $this->assertEquals(422, $response['status']);
         $this->assertNotNull(CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::FACTION_LOYALTY)->first());
+    }
+
+    public function testCelestialConjuringIsBlockedWhileExplorationIsRunning(): void
+    {
+        $this->withoutMiddleware(IsCharacterExploring::class);
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $monster = (new MonsterFactory)
+            ->buildMonster()
+            ->updateMonster([
+                'game_map_id' => $character->map->game_map_id,
+                'is_celestial_entity' => true,
+            ])
+            ->getMonster();
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::EXPLORING,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/conjure/' . $character->id, [
+                'monster_id' => $monster->id,
+                'type' => 'public',
+            ], [], [], [
+                'HTTP_ACCEPT' => 'application/json',
+            ]);
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('You cannot do that while Exploration automation is running. Cancel it first.', $jsonData['message']);
+        $this->assertNull(CelestialFight::where('character_id', $character->id)->first());
+    }
+
+    public function testCelestialConjuringIsBlockedWhileDelveIsRunning(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $monster = (new MonsterFactory)
+            ->buildMonster()
+            ->updateMonster([
+                'game_map_id' => $character->map->game_map_id,
+                'is_celestial_entity' => true,
+            ])
+            ->getMonster();
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/conjure/' . $character->id, [
+                'monster_id' => $monster->id,
+                'type' => 'public',
+            ], [], [], [
+                'HTTP_ACCEPT' => 'application/json',
+            ]);
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('You cannot do that while Delve automation is running. Cancel it first.', $jsonData['message']);
+        $this->assertNull(CelestialFight::where('character_id', $character->id)->first());
+    }
+
+    public function testCelestialConjuringIsBlockedWhileFactionLoyaltyIsRunning(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $monster = (new MonsterFactory)
+            ->buildMonster()
+            ->updateMonster([
+                'game_map_id' => $character->map->game_map_id,
+                'is_celestial_entity' => true,
+            ])
+            ->getMonster();
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::FACTION_LOYALTY,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/conjure/' . $character->id, [
+                'monster_id' => $monster->id,
+                'type' => 'public',
+            ], [], [], [
+                'HTTP_ACCEPT' => 'application/json',
+            ]);
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('You cannot do that while Faction Loyalty automation is running. Cancel it first.', $jsonData['message']);
+        $this->assertNull(CelestialFight::where('character_id', $character->id)->first());
     }
 }

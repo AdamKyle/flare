@@ -13,6 +13,8 @@ class AutomationRestrictionService
 
     public const CELESTIAL_FIGHTING = 'celestial_fighting';
 
+    public const CELESTIAL_CONJURING = 'celestial_conjuring';
+
     public const PCT = 'pct';
 
     public const DIRECTIONAL_MOVEMENT = 'directional_movement';
@@ -92,6 +94,7 @@ class AutomationRestrictionService
                 self::START_CRAFTING,
                 self::PCT,
                 self::CELESTIAL_FIGHTING,
+                self::CELESTIAL_CONJURING,
                 self::START_FACTION_LOYALTY,
             ]);
         }
@@ -103,6 +106,7 @@ class AutomationRestrictionService
                 self::START_FACTION_LOYALTY,
                 self::PCT,
                 self::CELESTIAL_FIGHTING,
+                self::CELESTIAL_CONJURING,
                 self::START_DELVE,
             ]);
         }
@@ -118,6 +122,7 @@ class AutomationRestrictionService
             self::MANUAL_FIGHTING,
             self::PCT,
             self::CELESTIAL_FIGHTING,
+            self::CELESTIAL_CONJURING,
             self::TELEPORT,
             self::SET_SAIL,
             self::TRAVERSE,

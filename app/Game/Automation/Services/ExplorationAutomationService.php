@@ -6,18 +6,16 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Location;
 use App\Flare\Values\AutomationType;
-use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationStatus;
 use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Jobs\Exploration;
-use App\Game\Skills\Values\SkillTypeValue;
+use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use Illuminate\Support\Facades\Cache;
 
 class ExplorationAutomationService
 {
-
     private int $timeDelay = 0;
 
     public function __construct(
@@ -26,7 +24,6 @@ class ExplorationAutomationService
 
     public function beginAutomation(Character $character, array $params)
     {
-
         $automation = CharacterAutomation::create([
             'character_id' => $character->id,
             'monster_id' => $params['selected_monster_id'],
@@ -40,11 +37,11 @@ class ExplorationAutomationService
             'started_in_special_location' => $this->startedInSpecialLocation($character),
         ]);
 
-        $this->setTimeDelay($character);
+        $this->setTimeDelay();
 
         event(new UpdateCharacterStatus($character));
 
-        event(new AutomationLogUpdate($character->user->id, 'The exploration will begin in ' . $this->timeDelay . ' minutes. Every ' . $this->timeDelay . ' minutes you will encounter the enemy up to a maximum of 50 times in a single "encounter"'));
+        event(new AutomationLogUpdate($character->user->id, 'The exploration will begin in 1 minute. Every 1 minute you will encounter between 6 and 12 enemies based on your fight timeout modifier.'));
 
         event(new AutomationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
 
@@ -80,16 +77,13 @@ class ExplorationAutomationService
         return $this->timeDelay;
     }
 
-    public function setTimeDelay(Character $character): void
+    public function setTimeDelay(): void
     {
-        $fightTimeOutSkill = $character->skills->where('baseSkill.type', SkillTypeValue::EFFECTS_BATTLE_TIMER->value)->first();
-
-        $this->timeDelay = 5 - (5 * $fightTimeOutSkill->fight_time_out_mod);
+        $this->timeDelay = 1;
     }
 
-    protected function startAutomation(Character $character, int $automationId, string $attackType)
+    protected function startAutomation(Character $character, int $automationId, string $attackType): void
     {
-
         Exploration::dispatch($character, $automationId, $attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
     }
 

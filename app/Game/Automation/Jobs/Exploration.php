@@ -19,6 +19,7 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationTimeOut;
@@ -40,6 +41,8 @@ class Exploration implements ShouldQueue
     private MonsterFightService $monsterFightService;
 
     private FactionHandler $factionHandler;
+
+    private CharacterCacheData $characterCacheData;
 
     private ?Monster $monster = null;
 
@@ -83,6 +86,8 @@ class Exploration implements ShouldQueue
 
         $this->factionHandler = $factionHandler;
 
+        $this->characterCacheData = $characterCacheData;
+
         $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
 
         if (is_null($automation)) {
@@ -123,28 +128,22 @@ class Exploration implements ShouldQueue
                 'total_skill_xp' => $this->battleData['total_skill_xp'],
             ]);
 
-            Exploration::dispatch($this->character, $this->automationId, $this->attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
+            Exploration::dispatch($this->character, $this->automationId, $this->attackType, 1)->delay(now()->addMinute())->onQueue('default_long');
 
+            return;
+        }
+
+        if (is_null(CharacterAutomation::find($automation->id))) {
             return;
         }
 
         if ($this->attempts >= self::MAX_ATTEMPTS) {
-            $automation->delete();
-
-            $character = $this->character->refresh();
-
-            event(new UpdateCharacterStatus($character));
-
-            event(new AutomationTimeOut($character->user, 0));
+            $this->cancelAutomation($automation);
 
             return;
         }
 
-        $automation->delete();
-
-        $this->sendOutEventLogUpdate('Something went wrong with automation. Could not process fight. Automation Canceled.');
-
-        event(new AutomationTimeOut($this->character->user, 0));
+        $this->cancelAutomation($automation, 'Something went wrong with automation. Could not process fight. Automation Canceled.');
     }
 
     /**
@@ -159,83 +158,44 @@ class Exploration implements ShouldQueue
     private function encounter(CharacterAutomation $automation, array $params, int $timeDelay): bool
     {
 
-        $canSurviveFights = $this->canSurviveFight($automation, $params);
+        $this->sendOutEventLogUpdate('You and The Guide search the area looking for any other signs of them. That\'s when The Guide spots them and points', true);
 
-        if ($canSurviveFights) {
+        $enemies = $this->creatureCount();
 
-            $this->sendOutEventLogUpdate('You and The Guide search the area looking for any other signs of them. That\'s when The Guide spots them and points', true);
+        $this->sendOutEventLogUpdate('"Chirst, child there are: ' . $enemies . ' of them ..."
+        The Guide hisses at you from the shadows. You ignore his words and prepare for battle. One right after the other ...', true);
 
-            $enemies = rand(10, 25);
+        $totalXpToReward = 0;
+        $totalSkillXpToReward = 0;
+        $totalFactionPoints = 0;
+        $characterRewardService = $this->characterRewardService->setCharacter($this->character);
+        $characterSkillService = $this->skillService->setSkillInTraining($this->character);
 
-            $this->sendOutEventLogUpdate('"Chirst, child there are: ' . $enemies . ' of them ..."
-            The Guide hisses at you from the shadows. You ignore his words and prepare for battle. One right after the other ...', true);
-
-            $totalXpToReward = 0;
-            $totalSkillXpToReward = 0;
-            $totalFactionPoints = 0;
-            $characterRewardService = $this->characterRewardService->setCharacter($this->character);
-            $characterSkillService = $this->skillService->setSkillInTraining($this->character);
-
-            for ($i = 1; $i <= $enemies; $i++) {
-                $totalXpToReward += $characterRewardService->fetchXpForMonster($this->monster);
-                $totalSkillXpToReward += $characterSkillService->getXpForSkillIntraining($this->character, $this->monster->xp);
-                $totalFactionPoints += $this->factionHandler->getFactionPointsPerKill($this->character);
-            }
-
-            $delta = [
-                'total_creatures' => $enemies,
-                'total_xp' => $totalXpToReward,
-                'total_faction_points' => $totalFactionPoints,
-                'total_skill_xp' => $totalSkillXpToReward,
-            ];
-
-            foreach ($delta as $key => $value) {
-                $this->battleData[$key] += $value;
-            }
-
-            $this->sendOutEventLogUpdate('The last of the enemies fall. Covered in blood, exhausted, you look around for any signs of more of their friends. The area is silent. "Another day, another battle.
-            We managed to survive." The Guide states as he walks from the shadows. The pair of you set off in search of the next adventure ...
-            (Exploration will begin again in ' . $timeDelay . ' minutes)', true);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Fight and process rewards and return true or false.
-     *
-     * - Uses a cached version to make this faster.
-     *
-     * @param CharacterAutomation $automation
-     * @param array $params
-     * @return bool
-     * @throws InvalidArgumentException
-     */
-    private function canSurviveFight(CharacterAutomation $automation, array $params): bool
-    {
-
-        if (Cache::has('can-character-survive-' . $this->character->id)) {
-
-            if (is_null($this->monster)) {
-                $this->monster = Monster::find($automation->monster_id);
-            }
-
-            return true;
-        }
-
-        $this->sendOutEventLogUpdate('"Child, I can see a small group of these creature. If we slaughter them we might learn something." The guide insists. "Theres ten of them. Quick, kill them. We will continue the hunt!"');
-
-        for ($i = 1; $i <= 10; $i++) {
-            if (!$this->fightAutomationMonster($automation, $params)) {
+        for ($creatureCount = 1; $creatureCount <= $enemies; $creatureCount++) {
+            if (! $this->fightAutomationMonster($automation, $params)) {
                 return false;
             }
 
             $this->attempts = 0;
+            $totalXpToReward += $characterRewardService->fetchXpForMonster($this->monster);
+            $totalSkillXpToReward += $characterSkillService->getXpForSkillIntraining($this->character, $this->monster->xp);
+            $totalFactionPoints += $this->factionHandler->getFactionPointsPerKill($this->character);
         }
 
-        Cache::put('can-character-survive-' . $this->character->id, true);
+        $delta = [
+            'total_creatures' => $enemies,
+            'total_xp' => $totalXpToReward,
+            'total_faction_points' => $totalFactionPoints,
+            'total_skill_xp' => $totalSkillXpToReward,
+        ];
+
+        foreach ($delta as $key => $value) {
+            $this->battleData[$key] += $value;
+        }
+
+        $this->sendOutEventLogUpdate('The last of the enemies fall. Covered in blood, exhausted, you look around for any signs of more of their friends. The area is silent. "Another day, another battle.
+        We managed to survive." The Guide states as he walks from the shadows. The pair of you set off in search of the next adventure ...
+        (Exploration will begin again in ' . $timeDelay . ' minutes)', true);
 
         return true;
     }
@@ -290,6 +250,20 @@ class Exploration implements ShouldQueue
         return true;
     }
 
+    private function creatureCount(): int
+    {
+        $fightTimeOutModifier = resolve(CharacterStatBuilder::class)
+            ->setCharacter($this->character->refresh())
+            ->buildTimeOutModifier('fight_time_out');
+        $timeoutSeconds = 10 - (5 * $fightTimeOutModifier);
+
+        if ($timeoutSeconds <= 0) {
+            return 12;
+        }
+
+        return max(6, min(12, (int) floor(60 / $timeoutSeconds)));
+    }
+
     /**
      * Handle when a character dies in automation.
      *
@@ -299,11 +273,7 @@ class Exploration implements ShouldQueue
      */
     private function handleWhenCharacterDies(CharacterAutomation $automation, array $data): bool {
         if ($data['health']['current_character_health'] <= 0) {
-            $automation->delete();
-
-            $this->sendOutEventLogUpdate('You died during exploration. Exploration has ended.');
-
-            event(new AutomationTimeOut($this->character->user, 0));
+            $this->cancelAutomation($automation, 'You died during exploration. Exploration has ended.');
 
             return true;
         }
@@ -413,6 +383,8 @@ class Exploration implements ShouldQueue
 
         $characterCacheData->deleteCharacterSheet($this->character);
 
+        Cache::delete('can-character-survive-' . $this->character->id);
+
         $this->sendOutEventLogUpdate('"Phew, child! I did not think we would survive all of your shenanigans.
             So many times I could have died! Do you ever think about anyone other than yourself? No? Didn\'t think so." The Guide storms off and you follow him in silence.', true);
 
@@ -429,6 +401,33 @@ class Exploration implements ShouldQueue
         event(new AutomationTimeOut($character->user, 0));
 
         return;
+    }
+
+
+    /**
+     * Cancel automation without rewarding the player.
+     *
+     * @param CharacterAutomation $automation
+     * @param string|null $message
+     * @return void
+     */
+    private function cancelAutomation(CharacterAutomation $automation, ?string $message = null): void
+    {
+        $automation->delete();
+
+        $this->characterCacheData->deleteCharacterSheet($this->character);
+
+        Cache::delete('can-character-survive-' . $this->character->id);
+
+        if (! is_null($message)) {
+            $this->sendOutEventLogUpdate($message);
+        }
+
+        $character = $this->character->refresh();
+
+        event(new UpdateCharacterStatus($character));
+
+        event(new AutomationTimeOut($character->user, 0));
     }
 
     /**
