@@ -5,13 +5,21 @@ namespace Feature\Game\Automation;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\CharacterInCelestialFight;
+use App\Flare\Models\GameMap;
+use App\Flare\Models\Location;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
+use App\Flare\Values\MapNameValue;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Services\CelestialFightService;
 use App\Game\Battle\Services\MonsterFightService;
 use App\Game\Battle\Values\CelestialConjureType;
 use App\Game\Character\CharacterInventory\Values\ItemType;
+use App\Game\Maps\Services\MovementService;
 use App\Game\Maps\Services\PctService;
+use App\Game\Maps\Services\SetSailService;
+use App\Game\Maps\Services\TeleportService;
+use App\Game\Maps\Services\WalkingService;
 use App\Game\Skills\Values\SkillTypeValue;
 use App\Game\Automation\Middleware\IsCharacterExploring;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -294,6 +302,124 @@ class AutomationRestrictionEnforcementTest extends TestCase
 
         $this->assertFalse(resolve(PctService::class)->usePCT($character, true));
         $this->assertNotNull(CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::DELVE)->first());
+    }
+
+    public function testDirectMovementIsBlockedWhileDelveIsRunning(): void
+    {
+        Event::fake();
+
+        $gameMap = GameMap::factory()->create([
+            'name' => MapNameValue::SURFACE,
+            'path' => 'surface.png',
+            'default' => false,
+            'can_traverse' => true,
+        ]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation(16, 16, $gameMap)->getCharacter();
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $walkingService = resolve(WalkingService::class);
+        $walkingService->setCoordinatesToTravelTo(32, 16);
+
+        $response = $walkingService->movePlayerToNewLocation($character);
+
+        $this->assertEquals(422, $response['status']);
+        $this->assertEquals(16, $character->refresh()->map->character_position_x);
+    }
+
+    public function testEnterLocationIsBlockedWhileDelveIsRunning(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $location = Location::factory()->create([
+            'game_map_id' => $character->map->game_map_id,
+            'x' => 32,
+            'y' => 16,
+        ]);
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $blockedContext = resolve(AutomationRestrictionService::class)->blockedContext(
+            $character,
+            AutomationRestrictionService::ENTER_LOCATION,
+            $location
+        );
+
+        $this->assertEquals('You cannot do that while Delve automation is running. Cancel it first.', $blockedContext['message']);
+    }
+
+    public function testTeleportIsBlockedWhileDelveIsRunning(): void
+    {
+        Event::fake();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $response = resolve(TeleportService::class)->teleport($character);
+
+        $this->assertEquals(422, $response['status']);
+    }
+
+    public function testSetSailIsBlockedWhileDelveIsRunning(): void
+    {
+        Event::fake();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $response = resolve(SetSailService::class)->setSail($character);
+
+        $this->assertEquals(422, $response['status']);
+    }
+
+    public function testTraverseIsBlockedWhileDelveIsRunning(): void
+    {
+        Event::fake();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $gameMap = GameMap::factory()->create([
+            'name' => MapNameValue::HELL,
+            'path' => 'hell.png',
+            'default' => false,
+            'can_traverse' => true,
+        ]);
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $response = resolve(MovementService::class)->updateCharacterPlane($gameMap->id, $character);
+
+        $this->assertEquals(422, $response['status']);
     }
 
     public function testPctIsBlockedWhileFactionLoyaltyIsRunning(): void

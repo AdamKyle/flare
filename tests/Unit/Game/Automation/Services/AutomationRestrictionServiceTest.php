@@ -282,6 +282,96 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::PCT));
     }
 
+    public function testDelveBlocksDirectionalMovement(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::DIRECTIONAL_MOVEMENT));
+    }
+
+    public function testDelveBlocksEnterLocation(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::ENTER_LOCATION));
+    }
+
+    public function testDelveBlocksTeleport(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::TELEPORT));
+    }
+
+    public function testDelveBlocksSetSail(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::SET_SAIL));
+    }
+
+    public function testDelveBlocksTraverse(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::TRAVERSE));
+    }
+
+    public function testDelveBlocksCelestialConjuring(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::CELESTIAL_CONJURING));
+    }
+
     public function testDelveBlocksCelestialFighting(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();

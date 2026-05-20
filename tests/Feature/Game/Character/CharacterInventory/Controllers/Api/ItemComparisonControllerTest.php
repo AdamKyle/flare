@@ -76,6 +76,36 @@ class ItemComparisonControllerTest extends TestCase
         $this->assertNotEmpty($jsonData['details']);
     }
 
+    public function testGetComparisonForTrinket()
+    {
+        $trinketForEquipment = $this->createItem([
+            'type' => 'trinket',
+            'str_mod' => .10,
+        ]);
+
+        $trinketToCompare = $this->createItem([
+            'type' => 'trinket',
+            'str_mod' => .30,
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($trinketForEquipment, true, 'trinket')
+            ->giveItem($trinketToCompare)
+            ->getCharacter();
+
+        $slot = $character->inventory->slots->where('item_id', $trinketToCompare->id)->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory/comparison', [
+                'item_to_equip_type' => 'trinket',
+                'slot_id' => $slot->id,
+            ]);
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertNotEmpty($jsonData['details']);
+    }
+
     public function testFailToCompareItemFromChatWhenEquipped()
     {
         $spellForEquipment = $this->createItem([

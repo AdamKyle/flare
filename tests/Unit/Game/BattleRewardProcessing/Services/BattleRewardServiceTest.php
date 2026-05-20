@@ -11,6 +11,7 @@ use App\Game\BattleRewardProcessing\Jobs\Events\WinterEventChristmasGiftHandler;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Events\Values\EventType;
+use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -189,6 +190,28 @@ class BattleRewardServiceTest extends TestCase
         $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
 
         Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
+    }
+
+    public function testBattleRewardsPassActualGoldGainedIntoGoldRush(): void
+    {
+        GoldRushCheckCalculator::shouldReceive('fetchGoldRushChance')->once()->andReturnTrue();
+
+        $character = $this->characterFactory->getCharacter();
+        $character->update([
+            'gold' => 100000,
+        ]);
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'gold' => 1000,
+        ]);
+
+        Event::fake();
+        Queue::fake();
+
+        $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
+
+        $this->assertEquals(101050, $character->refresh()->gold);
     }
 
     public function testShouldGetFactionPoints(): void

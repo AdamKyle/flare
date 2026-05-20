@@ -111,6 +111,46 @@ class ComparisonServiceTest extends TestCase
         $this->assertNotEmpty($comparisonData['details']);
     }
 
+    public function testTrinketComparisonDetailsIsNotEmptyWhenTrinketEquipped()
+    {
+        $item = $this->createItem([
+            'type' => 'trinket',
+            'str_mod' => 0.25,
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->giveItem(
+            $this->createItem([
+                'type' => 'trinket',
+                'str_mod' => 0.10,
+            ]), true, 'trinket'
+        )->getCharacter();
+
+        $slot = $character->inventory->slots->first();
+
+        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot, 'trinket');
+
+        $this->assertNotEmpty($comparisonData['details']);
+        $this->assertEquals('trinket', $comparisonData['details'][0]['position']);
+    }
+
+    public function testUnsupportedComparisonTypeReturnsEmptyDetails()
+    {
+        $item = $this->createItem(['type' => 'artifact']);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->giveItem(
+            $this->createItem([
+                'type' => 'artifact',
+                'str_mod' => 0.10,
+            ]), true, 'artifact'
+        )->getCharacter();
+
+        $slot = $character->inventory->slots->first();
+
+        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot, 'artifact');
+
+        $this->assertEmpty($comparisonData['details']);
+    }
+
     public function testBuildShopDataForBow()
     {
         $item = $this->createItem(['type' => ItemType::BOW->value]);

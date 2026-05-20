@@ -5,7 +5,6 @@ namespace App\Game\Core\Providers;
 use App\Game\Core\Events\CharacterLevelUpEvent;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Events\DropsCheckEvent;
-use App\Game\Core\Events\GoldRushCheckEvent;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateCharacterEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
@@ -13,7 +12,6 @@ use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Listeners\CharacterLevelUpListener;
 use App\Game\Core\Listeners\CraftedItemTimeOutListener;
 use App\Game\Core\Listeners\DropsCheckListener;
-use App\Game\Core\Listeners\GoldRushCheckListener;
 use App\Game\Core\Listeners\UpdateCharacterCurrenciesListener;
 use App\Game\Core\Listeners\UpdateCharacterInventoryCountListener;
 use App\Game\Core\Listeners\UpdateCharacterListener;
@@ -52,11 +50,6 @@ class EventsProvider extends ServiceProvider
         // Assign them to the character.
         DropsCheckEvent::class => [
             DropsCheckListener::class,
-        ],
-
-        // When a battle is over, check if we got a gold rush.
-        GoldRushCheckEvent::class => [
-            GoldRushCheckListener::class,
         ],
 
         // When the character levels up:

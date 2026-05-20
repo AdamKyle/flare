@@ -39,6 +39,7 @@ class ItemComparison
             'spell-healing' => ['spell-one', 'spell-two'],
             'shield' => ['left-hand', 'right-hand'],
             'ring' => ['ring-one', 'ring-two'],
+            'trinket' => ['trinket'],
             default => null
         };
 
@@ -52,6 +53,10 @@ class ItemComparison
             $armourPositions = ArmourType::getArmourPositions();
 
             $positions = $armourPositions[$toCompare->type] ?? null;
+        }
+
+        if (is_null($positions)) {
+            return [];
         }
 
         $foundInventorySlots = $inventorySlots->filter(function ($slot) use ($positions) {

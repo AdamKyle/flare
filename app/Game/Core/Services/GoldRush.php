@@ -3,6 +3,8 @@
 namespace App\Game\Core\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\Location;
+use App\Flare\Values\LocationEffectValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
@@ -17,25 +19,21 @@ class GoldRush
     /**
      * Process potential gold rush
      *
-     * @param Character $character
      * @return void
      * @throws Exception
      */
-    public function processPotentialGoldRush(Character $character): void
+    public function processPotentialGoldRush(Character $character, int $goldGained): void
     {
+        if ($goldGained <= 0) {
+            return;
+        }
 
         if ($character->gold >= MaxCurrenciesValue::MAX_GOLD) {
             return;
         }
 
-        if ($character->gold === MaxCurrenciesValue::MAX_GOLD) {
-            return;
-        }
-
-        $gameMapBonus = $this->getGameMapBonus($character);
-
-        if (GoldRushCheckCalculator::fetchGoldRushChance($gameMapBonus)) {
-            $this->giveGoldRush($character);
+        if (GoldRushCheckCalculator::fetchGoldRushChance($this->getGameMapBonus($character), $this->getLocationBonus($character))) {
+            $this->giveGoldRush($character, $goldGained);
 
             if (! $character->is_auto_battling && $character->isLoggedIn()) {
                 event(new UpdateCharacterCurrenciesEvent($character->refresh()));
@@ -48,10 +46,10 @@ class GoldRush
      *
      * @throws Exception
      */
-    private function giveGoldRush(Character $character): void
+    private function giveGoldRush(Character $character, int $goldGained): void
     {
 
-        $amountGiven = ($character->gold * 0.05);
+        $amountGiven = (int) floor($goldGained * 0.05);
 
         $goldRush = $character->gold + $amountGiven;
 
@@ -74,18 +72,31 @@ class GoldRush
         ServerMessageHandler::handleMessageWithNewValue($character->user, $type, number_format($amountGiven), number_format($character->gold));
     }
 
-    /**
-     * Get the gameMap Bonus.
-     */
-    protected function getGameMapBonus(Character $character): float
+    private function getGameMapBonus(Character $character): float
     {
         $gameMap = $character->map->gameMap;
-        $gameMapBonus = 0.0;
 
-        if (! is_null($gameMap->drop_chance_bonus)) {
-            $gameMapBonus = $gameMap->drop_chance_bonus;
+        if (is_null($gameMap->drop_chance_bonus)) {
+            return 0.0;
         }
 
-        return $gameMapBonus;
+        return $gameMap->drop_chance_bonus;
+    }
+
+    private function getLocationBonus(Character $character): float
+    {
+        $map = $character->map;
+
+        $location = Location::whereNotNull('enemy_strength_type')
+            ->where('x', $map->character_position_x)
+            ->where('y', $map->character_position_y)
+            ->where('game_map_id', $map->game_map_id)
+            ->first();
+
+        if (is_null($location)) {
+            return 0.0;
+        }
+
+        return (new LocationEffectValue($location->enemy_strength_type))->fetchDropRate();
     }
 }

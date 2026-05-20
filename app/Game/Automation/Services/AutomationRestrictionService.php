@@ -107,6 +107,11 @@ class AutomationRestrictionService
                 self::PCT,
                 self::CELESTIAL_FIGHTING,
                 self::CELESTIAL_CONJURING,
+                self::DIRECTIONAL_MOVEMENT,
+                self::ENTER_LOCATION,
+                self::TELEPORT,
+                self::SET_SAIL,
+                self::TRAVERSE,
                 self::START_DELVE,
             ]);
         }
