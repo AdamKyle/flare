@@ -434,6 +434,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                         can_move={this.state.can_player_move}
                         is_dead={this.props.is_dead}
                         is_automation_running={this.props.is_automaton_running}
+                        is_delve_running={this.props.is_delve_running}
                         can_engage_celestial={this.props.can_engage_celestial}
                         port_location={this.state.port_location}
                         locations={this.state.locations}
@@ -461,6 +462,8 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                         view_port={this.props.view_port}
                         is_dead={this.props.is_dead}
                         is_automation_running={this.props.is_automaton_running}
+                        is_delve_running={this.props.is_delve_running}
+                        locations={this.state.locations}
                         character_id={this.props.character_id}
                         map_id={this.state.map_id}
                         update_map_state={this.setStateFromData.bind(this)}

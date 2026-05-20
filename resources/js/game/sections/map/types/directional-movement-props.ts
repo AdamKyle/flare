@@ -1,4 +1,5 @@
 import MapData from "../lib/request-types/MapData";
+import LocationDetails from "./location-details";
 
 export default interface DirectionalMovementProps {
     update_map_state: (data: MapData, callback?: () => void) => void;
@@ -12,6 +13,10 @@ export default interface DirectionalMovementProps {
     is_dead: boolean;
 
     is_automation_running: boolean;
+
+    is_delve_running: boolean;
+
+    locations: LocationDetails[] | null;
 
     character_id: number;
 

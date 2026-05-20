@@ -11,6 +11,8 @@ export default interface MapActionsProps {
 
     is_automation_running: boolean;
 
+    is_delve_running: boolean;
+
     can_engage_celestial: boolean;
 
     port_location: LocationDetails | null;

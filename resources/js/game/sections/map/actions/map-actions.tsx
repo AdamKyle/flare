@@ -85,6 +85,7 @@ export default class MapActions extends React.Component<
         return (
             !this.props.can_move ||
             this.props.is_dead ||
+            this.props.is_delve_running ||
             this.props.is_automation_running ||
             this.props.port_location === null
         );
@@ -94,6 +95,7 @@ export default class MapActions extends React.Component<
         return (
             !this.props.can_move ||
             this.props.is_dead ||
+            this.props.is_delve_running ||
             this.props.is_automation_running
         );
     }
