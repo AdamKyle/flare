@@ -112,7 +112,7 @@ class CharacterReincarnateService
         event(new UpdateTopBarEvent($character));
 
         return $this->successResult([
-            'message' => 'Reincarnated character and applied 20% of your current level (base) stats toward your new (base) stats.',
+            'message' => 'Reincarnated character and applied 5% of your current level (base) stats toward your new (base) stats.',
         ]);
     }
 }

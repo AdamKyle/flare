@@ -3,7 +3,7 @@
 namespace App\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\CapitalCityUnitQueue;
-use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
+use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Illuminate\Bus\Queueable;
@@ -54,7 +54,7 @@ class CapitalCityUnitRequestMovement implements ShouldQueue
 
         $queueData = $queueData->refresh();
 
-        event(new UpdateCapitalCityBuildingQueueTable($queueData->character));
+        event(new UpdateCapitalCityUnitQueueTable($queueData->character));
 
         Log::channel('capital_city_unit_recruitments')->info('Processing Unit request', [
             '$queueData' => $queueData,

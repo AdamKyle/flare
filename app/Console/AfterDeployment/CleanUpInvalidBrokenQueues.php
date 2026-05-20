@@ -2,9 +2,8 @@
 
 namespace App\Console\AfterDeployment;
 
-use App\Flare\Models\CapitalCityBuildingQueue;
-use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\CharacterAutomation;
+use App\Game\Kingdoms\Service\CapitalCityQueueCleanupService;
 use App\Flare\Values\AutomationType;
 use Illuminate\Console\Command;
 
@@ -15,7 +14,7 @@ class CleanUpInvalidBrokenQueues extends Command
      *
      * @var string
      */
-    protected $signature = 'clean-up:invalid-broken-queues';
+    protected $signature = 'clean:invalid-broken-queues';
 
     /**
      * The console command description.
@@ -27,19 +26,9 @@ class CleanUpInvalidBrokenQueues extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): void
+    public function handle(CapitalCityQueueCleanupService $capitalCityQueueCleanupService): void
     {
-        $cutoff = now()->addHour();
-
-        CapitalCityBuildingQueue::query()
-            ->whereNotNull('completed_at')
-            ->where('completed_at', '<=', $cutoff)
-            ->delete();
-
-        CapitalCityUnitQueue::query()
-            ->whereNotNull('completed_at')
-            ->where('completed_at', '<=', $cutoff)
-            ->delete();
+        $capitalCityQueueCleanupService->clean();
 
         $startedAtCutoff = now()->subHours(8);
         $completedAtCutoff = now()->subMinutes(10);

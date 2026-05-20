@@ -71,6 +71,7 @@ class CapitalCityProcessBuildingRequestHandler
 
             $capitalCityBuildingQueue->update([
                 'building_request_data' => $requestData,
+                'status' => CapitalCityQueueStatus::REJECTED,
                 'messages' => array_merge($capitalCityBuildingQueue->messages, [
                     'Buildings were rejected because even after requesting resources, you still do not have enough resources for one or more buildings so the entire request was canceled out of frustration.'
                 ])

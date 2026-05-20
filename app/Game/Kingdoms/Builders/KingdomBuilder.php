@@ -6,9 +6,12 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
+use App\Game\Kingdoms\Service\KingdomMaxResourceRecalculationService;
 
 class KingdomBuilder
 {
+    public function __construct(private readonly KingdomMaxResourceRecalculationService $kingdomMaxResourceRecalculationService) {}
+
     /**
      * Creates the kingdom
      */
@@ -18,6 +21,7 @@ class KingdomBuilder
         $isOnIcePlane = $character->map->gameMap->mapType()->isTheIcePlane();
         $characterKingdomCount = $character->kingdoms()->count();
         $skill = $character->passiveSkills->where('passiveSkill.effect_type', PassiveSkillTypeValue::RESOURCE_INCREASE)->first();
+        $resourceIncreaseAmount = is_null($skill) ? 0 : $skill->resource_increase_amount;
         $protectedUntil = null;
 
         if (! $isOnIcePlane && $characterKingdomCount === 0) {
@@ -33,10 +37,10 @@ class KingdomBuilder
             'color' => $color,
             'character_id' => $character->id,
             'game_map_id' => $character->map->gameMap->id,
-            'max_stone' => 2000 + $skill->resource_increase_amount,
-            'max_wood' => 2000 + $skill->resource_increase_amount,
-            'max_clay' => 2000 + $skill->resource_increase_amount,
-            'max_iron' => 2000 + $skill->resource_increase_amount,
+            'max_stone' => 2000 + $resourceIncreaseAmount,
+            'max_wood' => 2000 + $resourceIncreaseAmount,
+            'max_clay' => 2000 + $resourceIncreaseAmount,
+            'max_iron' => 2000 + $resourceIncreaseAmount,
             'max_steel' => 31000,
             'current_stone' => 2000,
             'current_wood' => 2000,
@@ -44,7 +48,7 @@ class KingdomBuilder
             'current_iron' => 2000,
             'current_steel' => 0,
             'current_population' => 100,
-            'max_population' => 100 + $skill->resource_increase_amount,
+            'max_population' => 100 + $resourceIncreaseAmount,
             'current_morale' => .50,
             'max_morale' => 1.0,
             'treasury' => 0,
@@ -54,6 +58,6 @@ class KingdomBuilder
             'protected_until' => $protectedUntil,
         ];
 
-        return Kingdom::create($kingdom);
+        return $this->kingdomMaxResourceRecalculationService->recalculate(Kingdom::create($kingdom));
     }
 }

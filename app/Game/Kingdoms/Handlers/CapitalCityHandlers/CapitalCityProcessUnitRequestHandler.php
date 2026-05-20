@@ -72,6 +72,7 @@ class CapitalCityProcessUnitRequestHandler
 
             $capitalCityUnitQueue->update([
                 'unit_request_data' => $requestData,
+                'status' => CapitalCityQueueStatus::REJECTED,
                 'messages' => array_merge($capitalCityUnitQueue->messages, [
                     'Units were rejected because even after requesting resources, you still do not have enough resources for one or more units so the entire request was canceled out of frustration.'
                 ])
@@ -112,13 +113,13 @@ class CapitalCityProcessUnitRequestHandler
     {
 
         foreach ($requestData as $index => $unitRequest) {
-            $gameUnit = GameUnit::where('name', $unitRequest['name'])->first();
-            $gameBuildingRelation = GameBuildingUnit::where('game_unit_id', $gameUnit->id)->first();
-            $building = $kingdom->buildings()->where('game_building_id', $gameBuildingRelation->game_building_id)->first();
-
             if ($unitRequest['secondary_status'] === CapitalCityQueueStatus::CANCELLED) {
                 continue;
             }
+
+            $gameUnit = GameUnit::where('name', $unitRequest['name'])->first();
+            $gameBuildingRelation = GameBuildingUnit::where('game_unit_id', $gameUnit->id)->first();
+            $building = $kingdom->buildings()->where('game_building_id', $gameBuildingRelation->game_building_id)->first();
 
             if ($this->isBuildingLocked($building, $kingdom, $unitRequest['name'])) {
                 $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
@@ -401,7 +402,7 @@ class CapitalCityProcessUnitRequestHandler
         $messages = $capitalCityUnitQueue->messages ?? [];
 
         $capitalCityUnitQueue->update([
-            'building_request_data' => $capitalCityUnitQueue->building_request_data,
+            'unit_request_data' => $capitalCityUnitQueue->unit_request_data,
             'messages' => array_merge($messages, $this->messages),
         ]);
 

@@ -150,7 +150,7 @@ class CharacterReincarnationServiceTest extends TestCase
         $result = $this->reincarnationService->reincarnate($character->refresh());
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('Reincarnated character and applied 20% of your current level (base) stats toward your new (base) stats.', $result['message']);
+        $this->assertEquals('Reincarnated character and applied 5% of your current level (base) stats toward your new (base) stats.', $result['message']);
 
         $character = $character->refresh();
 
@@ -197,7 +197,7 @@ class CharacterReincarnationServiceTest extends TestCase
         $result = $this->reincarnationService->reincarnate($character->refresh());
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('Reincarnated character and applied 20% of your current level (base) stats toward your new (base) stats.', $result['message']);
+        $this->assertEquals('Reincarnated character and applied 5% of your current level (base) stats toward your new (base) stats.', $result['message']);
 
         $character = $character->refresh();
 

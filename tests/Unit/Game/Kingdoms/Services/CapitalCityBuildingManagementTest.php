@@ -3,9 +3,11 @@
 namespace Tests\Unit\Game\Kingdoms\Services;
 
 use App\Flare\Models\CapitalCityBuildingQueue;
+use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityRequestResourcesHandler;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Values\BuildingCosts;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
+use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -280,5 +282,50 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->assertSame(5408, $targetKingdom->current_wood);
         $this->assertSame(6556, $targetKingdom->current_iron);
         $this->assertSame(9440, $targetKingdom->current_population);
+    }
+
+    public function testCapitalCityBuildingResourceRejectionUpdatesBuildingRequestDataAndTopLevelStatus(): void
+    {
+        Event::fake();
+
+        $character = $this->character->getCharacter();
+        $kingdom = $this->character
+            ->kingdomManagement()
+            ->assignKingdom()
+            ->assignBuilding()
+            ->getKingdom();
+        $building = $kingdom->buildings->first();
+        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+            'character_id' => $character->id,
+            'kingdom_id' => $kingdom->id,
+            'requested_kingdom' => $kingdom->id,
+            'building_request_data' => [[
+                'building_id' => $building->id,
+                'building_name' => 'Keep',
+                'missing_costs' => ['stone' => 100],
+                'secondary_status' => CapitalCityQueueStatus::REQUESTING,
+                'from_level' => 1,
+                'to_level' => 2,
+                'type' => 'upgrade',
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::PROCESSING,
+            'started_at' => now(),
+            'completed_at' => now(),
+        ]);
+
+        resolve(CapitalCityRequestResourcesHandler::class)->handleResourceRequests(
+            $capitalCityBuildingQueue,
+            $character,
+            ['stone' => 100],
+            $capitalCityBuildingQueue->building_request_data,
+            $kingdom,
+            CapitalCityResourceRequestType::BUILDING_QUEUE,
+        );
+
+        $capitalCityBuildingQueue = $capitalCityBuildingQueue->refresh();
+
+        $this->assertSame(CapitalCityQueueStatus::REJECTED, $capitalCityBuildingQueue->status);
+        $this->assertSame(CapitalCityQueueStatus::REJECTED, $capitalCityBuildingQueue->building_request_data[0]['secondary_status']);
     }
 }

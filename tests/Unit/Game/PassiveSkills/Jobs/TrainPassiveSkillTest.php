@@ -101,8 +101,6 @@ class TrainPassiveSkillTest extends TestCase
             'parent_skill_id' => null,
             'current_level' => 0,
             'hours_to_next' => 1,
-            'started_at' => null,
-            'completed_at' => null,
             'is_locked' => false,
             'started_at' => now()->subMinute(),
             'completed_at' => now()->subMinute(),
@@ -114,5 +112,48 @@ class TrainPassiveSkillTest extends TestCase
         $building = $character->kingdoms->first()->buildings->first();
 
         $this->assertFalse($building->is_locked);
+    }
+
+    public function testPassiveTrainingRecalculatesAllOwnedKingdomCaps()
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->kingdomManagement()
+            ->assignKingdom([
+                'max_stone' => 2000,
+                'max_wood' => 2000,
+                'max_clay' => 2000,
+                'max_iron' => 2000,
+                'max_population' => 100,
+                'current_population' => 100,
+            ])
+            ->getCharacter();
+
+        $passiveSkill = $this->createPassiveSkill([
+            'effect_type' => PassiveSkillTypeValue::RESOURCE_INCREASE,
+            'resource_bonus_per_level' => 10,
+            'max_level' => 5,
+        ]);
+        $passive = $character->passiveSkills()->create([
+            'character_id' => $character->id,
+            'passive_skill_id' => $passiveSkill->id,
+            'parent_skill_id' => null,
+            'current_level' => 0,
+            'hours_to_next' => 1,
+            'started_at' => now()->subMinute(),
+            'completed_at' => now()->subMinute(),
+            'is_locked' => false,
+        ]);
+
+        TrainPassiveSkill::dispatch($character, $passive);
+
+        $kingdom = $character->refresh()->kingdoms->first();
+
+        $this->assertSame(2010, $kingdom->max_stone);
+        $this->assertSame(2010, $kingdom->max_wood);
+        $this->assertSame(2010, $kingdom->max_clay);
+        $this->assertSame(2010, $kingdom->max_iron);
+        $this->assertSame(110, $kingdom->max_population);
     }
 }

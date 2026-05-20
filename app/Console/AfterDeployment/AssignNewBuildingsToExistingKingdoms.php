@@ -4,6 +4,7 @@ namespace App\Console\AfterDeployment;
 
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\Kingdom;
+use App\Game\Kingdoms\Service\KingdomBuildingUnlockSyncService;
 use Illuminate\Console\Command;
 
 class AssignNewBuildingsToExistingKingdoms extends Command
@@ -25,11 +26,12 @@ class AssignNewBuildingsToExistingKingdoms extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(KingdomBuildingUnlockSyncService $kingdomBuildingUnlockSyncService)
     {
-        Kingdom::chunkById(150, function ($kingdoms) {
+        Kingdom::chunkById(150, function ($kingdoms) use ($kingdomBuildingUnlockSyncService) {
             foreach ($kingdoms as $kingdom) {
                 $this->assignNewBuildingsToExistingKingdoms($kingdom);
+                $kingdomBuildingUnlockSyncService->syncForKingdom($kingdom->refresh());
             }
         });
     }

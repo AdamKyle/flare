@@ -10,10 +10,10 @@ use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\User;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
+use App\Game\Kingdoms\Service\KingdomMaxResourceRecalculationService;
 use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Messages\Types\KingdomMessageTypes;
-use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Exception;
 use Facades\App\Flare\Values\UserOnlineValue;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -73,13 +73,14 @@ class UpgradeBuilding implements ShouldQueue
      *
      * @throws Exception
      */
-    public function handle(UpdateKingdom $updateKingdom, CapitalCityBuildingManagement $capitalCityBuildingManagement)
+    public function handle(
+        UpdateKingdom $updateKingdom,
+        CapitalCityBuildingManagement $capitalCityBuildingManagement,
+        KingdomMaxResourceRecalculationService $kingdomMaxResourceRecalculationService
+    )
     {
 
         $queue = BuildingInQueue::find($this->queueId);
-
-        $skill = $this->character->passiveSkills->where('passiveSkill.effect_type', PassiveSkillTypeValue::RESOURCE_INCREASE)->first();
-
 
         if (is_null($queue)) {
             return;
@@ -118,7 +119,6 @@ class UpgradeBuilding implements ShouldQueue
             }
             // @codeCoverageIgnoreEnd
 
-            $this->building->kingdom->{'max_' . $type} += (1000 + $skill->resource_increase_amount);
         }
 
         $this->building->kingdom->save();
@@ -140,11 +140,7 @@ class UpgradeBuilding implements ShouldQueue
 
         $building = $this->building->refresh();
 
-        if ($building->is_farm) {
-            $building->kingdom->update([
-                'max_population' => $building->kingdom->max_population + (($building->level * 100) + 100) + $skill->resource_increase_amount,
-            ]);
-        }
+        $kingdomMaxResourceRecalculationService->recalculate($building->kingdom);
 
         $characterId = $this->building->kingdom->character_id;
 

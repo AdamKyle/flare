@@ -39,6 +39,10 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
+        Artisan::call('fix:kingdom-max-resources-based-on-passive-skill');
+        Artisan::call('assign:new-buildings-to-existing-kingdoms');
+        Artisan::call('clean:invalid-broken-queues');
+
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {

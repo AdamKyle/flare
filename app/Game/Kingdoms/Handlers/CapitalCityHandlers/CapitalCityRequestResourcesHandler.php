@@ -131,22 +131,27 @@ class CapitalCityRequestResourcesHandler
         $this->logAndTriggerEvents($queue);
     }
 
-    private function updateQueueData(CapitalCityBuildingQueue | CapitalCityUnitQueue $queue, array $requestData, string $type): CapitalCityBuildingQueue | CapitalCityUnitQueue
+    private function updateQueueData(CapitalCityBuildingQueue | CapitalCityUnitQueue $queue, array $requestData, string $status): CapitalCityBuildingQueue | CapitalCityUnitQueue
     {
 
         $requestData = collect($requestData)
-            ->map(function ($item) use ($type) {
+            ->map(function ($item) use ($status) {
                 if (!in_array($item['secondary_status'], [CapitalCityQueueStatus::REJECTED, CapitalCityQueueStatus::CANCELLED])) {
-                    return array_merge($item, ['secondary_status' => $type]);
+                    return array_merge($item, ['secondary_status' => $status]);
                 }
 
                 return $item;
             })
             ->toArray();
 
+        $requestDataColumn = $queue instanceof CapitalCityBuildingQueue
+            ? 'building_request_data'
+            : 'unit_request_data';
+
         $queue->update([
-            'unit_request_data' => $requestData,
+            $requestDataColumn => $requestData,
             'messages' => $this->messages,
+            'status' => $status,
         ]);
 
         return $queue->refresh();
@@ -239,13 +244,17 @@ class CapitalCityRequestResourcesHandler
     {
 
         if ($queue instanceof CapitalCityUnitQueue) {
-            $this->capitalCityKingdomLogHandler->possiblyCreateLogForUnitQueue($queue);
+            if ($queue->status !== CapitalCityQueueStatus::REJECTED) {
+                $this->capitalCityKingdomLogHandler->possiblyCreateLogForUnitQueue($queue);
+            }
 
             event(new UpdateCapitalCityUnitQueueTable($queue->character->refresh()));
         }
 
         if ($queue instanceof CapitalCityBuildingQueue) {
-            $this->capitalCityKingdomLogHandler->possiblyCreateLogForBuildingQueue($queue);
+            if ($queue->status !== CapitalCityQueueStatus::REJECTED) {
+                $this->capitalCityKingdomLogHandler->possiblyCreateLogForBuildingQueue($queue);
+            }
 
             event(new UpdateCapitalCityBuildingQueueTable($queue->character->refresh()));
         }
