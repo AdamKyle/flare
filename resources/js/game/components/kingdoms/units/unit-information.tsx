@@ -136,11 +136,16 @@ export default class UnitInformation extends React.Component<
         return (
             <Fragment>
                 <BasicCard>
-                    <div className="text-right cursor-pointer text-red-500">
-                        <button onClick={() => this.props.close()}>
+                    <div className="flex items-start justify-between gap-4">
+                        <h3>{this.props.unit.name}</h3>
+                        <button
+                            className="cursor-pointer text-red-500"
+                            onClick={() => this.props.close()}
+                        >
                             <i className="fas fa-minus-circle"></i>
                         </button>
                     </div>
+                    <p className="my-4">{this.props.unit.description}</p>
                     {this.cannotBeRecruited(this.props.unit) ? (
                         <div className="mt-4 mb-4">
                             <DangerAlert>
@@ -159,8 +164,6 @@ export default class UnitInformation extends React.Component<
                             <h3>Basic Info</h3>
                             <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6"></div>
                             <dl>
-                                <dt>Name</dt>
-                                <dd>{this.props.unit.name}</dd>
                                 <dt>Attack</dt>
                                 <dd>{this.props.unit.attack}</dd>
                                 <dt>Defence</dt>

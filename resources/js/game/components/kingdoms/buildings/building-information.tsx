@@ -302,11 +302,16 @@ export default class BuildingInformation extends React.Component<
         return (
             <Fragment>
                 <BasicCard>
-                    <div className="text-right cursor-pointer text-red-500">
-                        <button onClick={() => this.props.close()}>
+                    <div className="flex items-start justify-between gap-4">
+                        <h3>{this.props.building.name}</h3>
+                        <button
+                            className="cursor-pointer text-red-500"
+                            onClick={() => this.props.close()}
+                        >
                             <i className="fas fa-minus-circle"></i>
                         </button>
                     </div>
+                    <p className="my-4">{this.props.building.description}</p>
                     {this.props.building.is_locked ? (
                         <DangerAlert>
                             You must train the appropriate Kingdom Passive skill

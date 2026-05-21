@@ -41,6 +41,7 @@ use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
 use App\Game\Kingdoms\Service\ExpandResourceBuildingService;
 use App\Game\Kingdoms\Service\KingdomAttackService;
 use App\Game\Kingdoms\Service\KingdomBuildingService;
+use App\Game\Kingdoms\Service\KingdomMaxResourceRecalculationService;
 use App\Game\Kingdoms\Service\KingdomMovementTimeCalculationService;
 use App\Game\Kingdoms\Service\KingdomQueueService;
 use App\Game\Kingdoms\Service\KingdomService;
@@ -193,8 +194,10 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
 
-        $this->app->bind(KingdomBuilder::class, function () {
-            return new KingdomBuilder;
+        $this->app->bind(KingdomBuilder::class, function ($app) {
+            return new KingdomBuilder(
+                $app->make(KingdomMaxResourceRecalculationService::class)
+            );
         });
 
         $this->app->bind(SteelSmeltingService::class, function ($app) {
