@@ -190,7 +190,7 @@ class DropCheckService
                 $lootingBonus = 0.45;
             }
 
-            $chance = min($lootingBonus + ($this->monster->drop_check * 0.25), 0.55);
+            $chance = min($lootingBonus + ($this->monster->drop_check * 0.25), 0.45);
 
             return DropCheckCalculator::fetchDifficultItemChance($chance, 100);
         }

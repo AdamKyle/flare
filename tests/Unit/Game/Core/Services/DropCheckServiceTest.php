@@ -109,7 +109,7 @@ class DropCheckServiceTest extends TestCase
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
             ->once()
             ->withArgs(function ($chance, $maxRoll) {
-                return abs($chance - 0.55) < 0.00001 && $maxRoll === 100;
+                return abs($chance - 0.45) < 0.00001 && $maxRoll === 100;
             })
             ->andReturnFalse();
 
@@ -133,12 +133,12 @@ class DropCheckServiceTest extends TestCase
         $this->assertEquals($beforeSlots, $afterSlots);
     }
 
-    public function testProcessCapsSpecialLocationChanceAtPointFiveFive(): void
+    public function testProcessCapsSpecialLocationChanceAtPointFourFiveWithHighLootingAndMonsterDropCheck(): void
     {
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
             ->once()
             ->withArgs(function ($chance, $maxRoll) {
-                return abs($chance - 0.55) < 0.00001 && $maxRoll === 100;
+                return abs($chance - 0.45) < 0.00001 && $maxRoll === 100;
             })
             ->andReturnFalse();
 
@@ -232,7 +232,7 @@ class DropCheckServiceTest extends TestCase
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
             ->once()
             ->withArgs(function ($chance, $maxRoll) {
-                return abs($chance - 0.55) < 0.00001 && $maxRoll === 100;
+                return abs($chance - 0.45) < 0.00001 && $maxRoll === 100;
             })
             ->andReturnFalse();
 
@@ -284,7 +284,7 @@ class DropCheckServiceTest extends TestCase
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
             ->once()
             ->withArgs(function ($chance, $maxRoll) {
-                return abs($chance - 0.55) < 0.00001 && $maxRoll === 100;
+                return abs($chance - 0.45) < 0.00001 && $maxRoll === 100;
             })
             ->andReturnFalse();
 
