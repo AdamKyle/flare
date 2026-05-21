@@ -107,10 +107,17 @@ export const BuildInventoryTableColumns = (
             sortable: true,
         },
         {
-            name: "Attack",
-            selector: (row: { attack: number }) => row.attack,
+            name: "Attack / Healing",
+            selector: (row: {
+                attack: number;
+                healing: number;
+                type: string;
+            }) => (row.type === "spell-healing" ? row.healing : row.attack),
             sortable: true,
-            format: (row: any) => formatNumber(row.attack),
+            format: (row: any) =>
+                formatNumber(
+                    row.type === "spell-healing" ? row.healing : row.attack,
+                ),
         },
         {
             name: "AC",

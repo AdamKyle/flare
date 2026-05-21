@@ -3,6 +3,7 @@
 namespace Tests\Feature\Game\Character\CharacterInventory\Controllers\Api;
 
 use App\Flare\Values\WeaponTypes;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
@@ -42,6 +43,27 @@ class CharacterInventoryControllerTest extends TestCase
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertNotEmpty($jsonData['inventory']);
+    }
+
+    public function testGetCharacterInventoryApiRequestReturnsHealingForEquippedHealingSpell()
+    {
+        $item = $this->createItem([
+            'name' => 'sample',
+            'type' => ItemType::SPELL_HEALING->value,
+            'base_healing' => 100,
+        ]);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($item, true, 'spell-one')
+            ->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory');
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertGreaterThan(0, $jsonData['equipped'][0]['healing']);
     }
 
     public function testFailToGetApiItemDetails()

@@ -60,6 +60,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'focus_modded' => $characterStatBuilder->statMod('focus'),
             'attack' => $characterStatBuilder->buildTotalAttack(),
             'health' => $characterStatBuilder->buildHealth(),
+            'heal_for' => $characterStatBuilder->buildHealing(),
             'ac' => $characterStatBuilder->buildDefence(),
             'extra_action_chance' => (new ClassAttackValue($character))->buildAttackData(),
             'gold' => number_format($character->gold),

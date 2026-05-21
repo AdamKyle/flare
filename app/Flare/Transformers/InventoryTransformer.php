@@ -27,6 +27,7 @@ class InventoryTransformer extends TransformerAbstract
             'has_holy_stacks_applied' => $slot->item->holy_stacks_applied,
             'ac' => $slot->item->getTotalDefence(),
             'attack' => $slot->item->getTotalDamage(),
+            'healing' => $slot->item->getTotalHealing(),
             'usable' => $slot->item->usable,
             'holy_stacks' => $slot->item->holy_stacks,
             'position' => ucfirst(str_replace('-', ' ', $slot->position)),

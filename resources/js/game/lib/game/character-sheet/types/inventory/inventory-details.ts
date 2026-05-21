@@ -27,6 +27,8 @@ export default interface InventoryDetails extends DataTableBaseData {
 
     attack: number;
 
+    healing: number;
+
     has_holy_stacks_applied: number;
 
     usable: boolean;
