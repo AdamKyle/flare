@@ -3,6 +3,7 @@ import BuildingDetails from "../buildings/deffinitions/building-details";
 import UnitMovementDetails from "../queues/deffinitions/unit-movement-details";
 import BuildingInQueueDetails from "./building-in-queue-details";
 import CurrentUnitDetails from "./current-unit-details";
+import KingdomHourlyProduction from "./kingdom-hourly-production";
 import UnitDetails from "./unit-details";
 
 export default interface KingdomDetails extends DataTableBaseData {
@@ -45,6 +46,8 @@ export default interface KingdomDetails extends DataTableBaseData {
     current_units: CurrentUnitDetails[] | [];
 
     current_wood: number;
+
+    estimated_hourly_production: KingdomHourlyProduction;
 
     smelting_time_left: number;
 

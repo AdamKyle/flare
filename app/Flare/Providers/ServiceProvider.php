@@ -73,6 +73,7 @@ use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\ItemTransformer;
 use App\Game\Kingdoms\Transformers\KingdomAttackLogsTransformer;
 use App\Game\Kingdoms\Transformers\KingdomBuildingTransformer;
+use App\Game\Kingdoms\Transformers\KingdomResourceHourlyProductionTransformer;
 use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use App\Flare\Transformers\MarketItemsTransformer;
 use App\Flare\Transformers\MonsterTransformer;
@@ -155,8 +156,14 @@ class ServiceProvider extends ApplicationServiceProvider
             return new BasicKingdomTransformer;
         });
 
+        $this->app->bind(KingdomResourceHourlyProductionTransformer::class, function () {
+            return new KingdomResourceHourlyProductionTransformer;
+        });
+
         $this->app->bind(KingdomTransformer::class, function ($app) {
-            return new KingdomTransformer;
+            return new KingdomTransformer(
+                $app->make(KingdomResourceHourlyProductionTransformer::class)
+            );
         });
 
         $this->app->bind(KingdomBuildingTransformer::class, function ($app) {

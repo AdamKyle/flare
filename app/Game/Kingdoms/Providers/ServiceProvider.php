@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Providers;
 use App\Flare\Transformers\CapitalCityKingdomBuildingTransformer;
 use App\Game\Kingdoms\Transformers\KingdomAttackLogsTransformer;
 use App\Game\Kingdoms\Transformers\KingdomBuildingTransformer;
+use App\Game\Kingdoms\Transformers\KingdomResourceHourlyProductionTransformer;
 use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Transformers\UnitMovementTransformer;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
@@ -269,8 +270,14 @@ class ServiceProvider extends ApplicationServiceProvider
             return new SelectedKingdom;
         });
 
-        $this->app->bind(KingdomTransformer::class, function () {
-            return new KingdomTransformer;
+        $this->app->bind(KingdomResourceHourlyProductionTransformer::class, function () {
+            return new KingdomResourceHourlyProductionTransformer;
+        });
+
+        $this->app->bind(KingdomTransformer::class, function ($app) {
+            return new KingdomTransformer(
+                $app->make(KingdomResourceHourlyProductionTransformer::class)
+            );
         });
 
         $this->app->bind(AttackWithItemsService::class, function ($app) {
