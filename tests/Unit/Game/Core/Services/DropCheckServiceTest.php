@@ -109,7 +109,7 @@ class DropCheckServiceTest extends TestCase
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
             ->once()
             ->withArgs(function ($chance, $maxRoll) {
-                return abs($chance - 0.45) < 0.00001 && $maxRoll === 100;
+                return abs($chance - 0.55) < 0.00001 && $maxRoll === 100;
             })
             ->andReturnFalse();
 
@@ -121,6 +121,36 @@ class DropCheckServiceTest extends TestCase
         $monster = $this->createMonster([
             'game_map_id' => $character->map->game_map_id,
             'quest_item_id' => null,
+            'drop_check' => 1,
+        ]);
+
+        $beforeSlots = $character->inventory->slots()->count();
+
+        $this->service?->process($character->refresh(), $monster->refresh());
+
+        $afterSlots = $character->refresh()->inventory->slots()->count();
+
+        $this->assertEquals($beforeSlots, $afterSlots);
+    }
+
+    public function testProcessCapsSpecialLocationChanceAtPointFiveFive(): void
+    {
+        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
+            ->once()
+            ->withArgs(function ($chance, $maxRoll) {
+                return abs($chance - 0.55) < 0.00001 && $maxRoll === 100;
+            })
+            ->andReturnFalse();
+
+        $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $character = $this->setLootingToBonus($characterFactory->getCharacter(), 0.45);
+
+        $this->createSpecialLocation($character, null);
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'quest_item_id' => null,
+            'drop_check' => 2,
         ]);
 
         $beforeSlots = $character->inventory->slots()->count();
@@ -202,7 +232,7 @@ class DropCheckServiceTest extends TestCase
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
             ->once()
             ->withArgs(function ($chance, $maxRoll) {
-                return abs($chance - 0.30) < 0.00001 && $maxRoll === 100;
+                return abs($chance - 0.55) < 0.00001 && $maxRoll === 100;
             })
             ->andReturnFalse();
 
@@ -230,6 +260,7 @@ class DropCheckServiceTest extends TestCase
         $monster = $this->createMonster([
             'game_map_id' => $character->map->game_map_id,
             'quest_item_id' => null,
+            'drop_check' => 1,
         ]);
 
         $beforeSlots = $character->inventory->slots()->count();
@@ -253,7 +284,7 @@ class DropCheckServiceTest extends TestCase
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
             ->once()
             ->withArgs(function ($chance, $maxRoll) {
-                return abs($chance - 0.30) < 0.00001 && $maxRoll === 100;
+                return abs($chance - 0.55) < 0.00001 && $maxRoll === 100;
             })
             ->andReturnFalse();
 
@@ -271,6 +302,7 @@ class DropCheckServiceTest extends TestCase
         $monster = $this->createMonster([
             'game_map_id' => $character->map->game_map_id,
             'quest_item_id' => null,
+            'drop_check' => 1,
         ]);
 
         $beforeSlots = $character->inventory->slots()->count();
@@ -287,7 +319,7 @@ class DropCheckServiceTest extends TestCase
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
             ->twice()
             ->withArgs(function ($chance, $maxRoll) {
-                return abs($chance - 0.10) < 0.00001 && $maxRoll === 100;
+                return abs($chance - 0.35) < 0.00001 && $maxRoll === 100;
             })
             ->andReturnFalse();
 
@@ -302,6 +334,7 @@ class DropCheckServiceTest extends TestCase
         $monster = $this->createMonster([
             'game_map_id' => $character->map->game_map_id,
             'quest_item_id' => null,
+            'drop_check' => 1,
         ]);
 
         $beforeSlots = $character->inventory->slots()->count();

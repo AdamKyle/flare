@@ -1419,7 +1419,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $amount = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
 
-        $this->assertEquals(.99, $amount);
+        $this->assertEquals(.75, $amount);
     }
 
     public function testBuildAffixLifeStealingNonStackingWithNoEnchantments()
@@ -1501,7 +1501,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $amount = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
 
-        $this->assertEquals(.99, $amount);
+        $this->assertEquals(.75, $amount);
     }
 
     public function testBuildAffixLifeStealingVampireInPurgatory()
@@ -1544,7 +1544,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $amount = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
 
-        $this->assertEquals((.99 - (.99 * .20)), $amount);
+        $this->assertEquals((.75 - (.75 * .20)), $amount);
     }
 
     public function testBuildAffixLifeStealingVampireInHell()
@@ -1587,7 +1587,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $amount = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
 
-        $this->assertEquals((.99 - (.99 * .10)), $amount);
+        $this->assertEquals((.75 - (.75 * .10)), $amount);
     }
 
     public function testBuildAffixLifeStealingVampireInTwistedMemories()
@@ -1630,7 +1630,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $amount = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
 
-        $this->assertEquals((.99 - (.99 * .25)), $amount);
+        $this->assertEquals((.75 - (.75 * .25)), $amount);
     }
 
     public function testBuildAffixLifeStealingVampireInEventMapIcePlaneWithAccessToPurgatory()
@@ -1678,7 +1678,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $amount = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
 
-        $this->assertEquals((.99 - (.99 * .20)), $amount);
+        $this->assertEquals((.75 - (.75 * .20)), $amount);
     }
 
     public function testBuildAffixLifeStealingVampireInEventMapDelusionalMemoriesWithAccessToPurgatory()
@@ -1726,7 +1726,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $amount = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
 
-        $this->assertEquals((.99 - (.99 * .25)), $amount);
+        $this->assertEquals((.75 - (.75 * .25)), $amount);
     }
 
     public function testBuildInvalidAffixDamage()

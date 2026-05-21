@@ -119,22 +119,19 @@ class SecondaryAttacks extends BattleBase
 
         $this->affixes->setIsRaidBoss($this->isRaidBoss);
 
+        $currentMonsterHealth = $this->monsterHealth;
         $lifeStealingDamage = $this->affixes->getAffixLifeSteal($character, $this->attackData, $this->monsterHealth, $resistance);
 
         if (! is_null($monster)) {
             $monsterData = $monster->getMonster();
-            $lifeStealingResistance = $monsterData['life_stealing_resistance'];
-            $damageResistance = 0.0;
+            $lifeStealingResistance = $monsterData['life_stealing_resistance'] ?? null;
 
-            if (($monsterData['is_raid_monster'] || $monsterData['is_raid_boss']) && ! is_null($lifeStealingResistance)) {
+            if (! is_null($lifeStealingResistance) && $lifeStealingResistance > 0 && $lifeStealingDamage > 0) {
+                $attemptedPercent = ($lifeStealingDamage / $currentMonsterHealth) * 100;
+                $lifeStealingDamage -= $lifeStealingDamage * $lifeStealingResistance;
+                $finalPercent = ($lifeStealingDamage / $currentMonsterHealth) * 100;
 
-                $damageResistance = $lifeStealingResistance;
-            }
-
-            if ($damageResistance > 0) {
-                $lifeStealingDamage -= $lifeStealingDamage * $damageResistance;
-
-                $this->addMessage('The enemy manages to resist (' . ($damageResistance * 100) . '%) some of the life stealing damage!', 'enemy-action');
+                $this->addMessage('The enemy resisted your attempt to steal ' . number_format($attemptedPercent, 2) . '% of their health and instead you stole ' . number_format($finalPercent, 2) . '%, dealing ' . number_format($lifeStealingDamage) . ' damage.', 'enemy-action');
             }
         }
 
