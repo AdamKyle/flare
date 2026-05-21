@@ -3,6 +3,7 @@
 namespace Tests\Unit\Game\Kingdoms\Services;
 
 use Exception;
+use App\Flare\Models\BuildingExpansionQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use App\Flare\Models\GameMap;
@@ -10,6 +11,7 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
 use App\Flare\Values\NpcTypes;
 use App\Game\Kingdoms\Service\KingdomUpdateService;
+use App\Game\Kingdoms\Service\KingdomQueueService;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -654,6 +656,26 @@ class KingdomUpdateServiceTest extends TestCase
 
         // Character should have lost their kingdom
         $this->assertEmpty($character->kingdoms);
+    }
+
+    public function testKingdomUpdateDoesNotCrashWhenOrphanedExpansionQueueExists(): void
+    {
+        $kingdom = $this->createKingdomForCharacter($this->character);
+
+        BuildingExpansionQueue::create([
+            'character_id' => $kingdom->character_id,
+            'kingdom_id' => $kingdom->id,
+            'building_id' => 999999,
+            'completed_at' => now()->addHour(),
+            'started_at' => now(),
+        ]);
+
+        $this->kingdomUpdateService->setKingdom($kingdom)->updateKingdom();
+
+        $result = resolve(KingdomQueueService::class)->fetchKingdomQueues($kingdom->refresh());
+
+        $this->assertNotNull($this->kingdomUpdateService->getKingdom());
+        $this->assertSame([], $result['building_expansion_queues']);
     }
 
     protected function bailIfMissingKeyElements(?Kingdom $kingdom)

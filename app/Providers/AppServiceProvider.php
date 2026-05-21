@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Console\AfterDeployment\CleanUpInvalidBrokenQueues;
+use App\Console\AfterDeployment\CleanOrphanedBuildingExpansionQueues;
 use App\Console\AfterDeployment\CreateLocationDataCache;
 use App\Console\AfterDeployment\FixFactionLoyaltyCraftingTasks;
 use App\Console\AfterDeployment\FixInvalidProgressionLevels;
@@ -103,6 +104,7 @@ class AppServiceProvider extends ServiceProvider
             CreateLocationDataCache::class,
             FixKingdomMaxResourcesBasedOnPassiveSkill::class,
             CleanUpInvalidBrokenQueues::class,
+            CleanOrphanedBuildingExpansionQueues::class,
             RebuildKingdomCache::class,
             FixInvalidProgressionLevels::class,
 

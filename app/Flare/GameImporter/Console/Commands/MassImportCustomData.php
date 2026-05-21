@@ -42,6 +42,7 @@ class MassImportCustomData extends Command
         Artisan::call('fix:kingdom-max-resources-based-on-passive-skill');
         Artisan::call('assign:new-buildings-to-existing-kingdoms');
         Artisan::call('clean:invalid-broken-queues');
+        Artisan::call('clean:orphaned-building-expansion-queues');
 
         $this->importInformationSection();
 
