@@ -44,6 +44,8 @@ class MassImportCustomData extends Command
         Artisan::call('clean:invalid-broken-queues');
         Artisan::call('clean:orphaned-building-expansion-queues');
 
+        Artisan::call('import:game-data Monsters');
+
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
