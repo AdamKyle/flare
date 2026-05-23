@@ -25,8 +25,6 @@ class LevelUpValue
     {
 
         $gainsAdditionalLevel = $this->gainsAdditionalLevelOnLevelUp($character);
-        $baseStatMod = $this->addModifier($character, self::BASE_STAT_MODIFIER, $gainsAdditionalLevel);
-        $baseDamageStatMod = $this->addModifier($character, self::BASE_STAT_DAMAGE_MODIFIER, $gainsAdditionalLevel);
         $newLevel = $character->level + ($gainsAdditionalLevel ? $this->additionalLevelsToGain($character) : 1);
         $maxLevel = $this->getMaxLevel($character);
 
@@ -35,6 +33,8 @@ class LevelUpValue
         }
 
         $levelsGained = $newLevel - $character->level;
+        $baseStatMod = $this->addModifier($character, self::BASE_STAT_MODIFIER, $levelsGained);
+        $baseDamageStatMod = $this->addModifier($character, self::BASE_STAT_DAMAGE_MODIFIER, $levelsGained);
 
         return [
             'level' => $newLevel,
@@ -47,8 +47,8 @@ class LevelUpValue
             'int' => $this->addValue($character, 'int', $levelsGained),
             'agi' => $this->addValue($character, 'agi', $levelsGained),
             'focus' => $this->addValue($character, 'focus', $levelsGained),
-            'base_stat_mod' => min($baseStatMod, 5.0),
-            'base_damage_stat_mod' => min($baseDamageStatMod, 10.0),
+            'base_stat_mod' => min($baseStatMod, 0.60),
+            'base_damage_stat_mod' => min($baseDamageStatMod, 0.50),
         ];
     }
 
@@ -70,11 +70,11 @@ class LevelUpValue
     /**
      * Add to the stat modifier pool when the stats are maxed out.
      */
-    protected function addModifier(Character $character, string $stat, bool $gainAdditionalLevel = false): float
+    protected function addModifier(Character $character, string $stat, int $levelsGained = 1): float
     {
 
         if ($character->{$character->damage_stat} >= MaxReincarnationStats::MAX_STATS && $stat === self::BASE_STAT_DAMAGE_MODIFIER) {
-            $damageStatBonus = $character->{$stat} + ($gainAdditionalLevel ? 0.0002 : 0.0001);
+            $damageStatBonus = $character->{$stat} + (0.0001 * $levelsGained);
 
             if ($damageStatBonus > 0.50) {
                 return 0.50;
@@ -85,7 +85,7 @@ class LevelUpValue
 
 
         if ($character->str >= MaxReincarnationStats::MAX_STATS && $stat === self::BASE_STAT_MODIFIER) {
-            $baseStatBonus = $character->{$stat} + ($gainAdditionalLevel ? 0.00024 : 0.00012);
+            $baseStatBonus = $character->{$stat} + (0.00012 * $levelsGained);
 
             if ($baseStatBonus > 0.60) {
                 return 0.60;
@@ -94,7 +94,7 @@ class LevelUpValue
             return $baseStatBonus;
         }
 
-        return 0.0;
+        return $character->{$stat};
     }
 
     /**

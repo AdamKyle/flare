@@ -245,6 +245,235 @@ class LevelUpValueTest extends TestCase
         $this->assertSame(MaxReincarnationStats::MAX_STATS, $levelUpValue['dex']);
     }
 
+    public function testCappedNormalStatsIncreaseBaseStatModifierByOneLevelWithoutBoon(): void
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
+            ->getCharacter();
+
+        $character->update([
+            'str' => MaxReincarnationStats::MAX_STATS,
+            'base_stat_mod' => 0.25,
+        ]);
+
+        $levelUpValue = resolve(LevelUpValue::class)->createValueObject($character->refresh());
+
+        $this->assertEqualsWithDelta(0.25012, $levelUpValue['base_stat_mod'], 0.00000001);
+    }
+
+    public function testCappedDamageStatIncreasesBaseDamageStatModifierByOneLevelWithoutBoon(): void
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
+            ->getCharacter();
+
+        $character->update([
+            'dex' => MaxReincarnationStats::MAX_STATS,
+            'base_damage_stat_mod' => 0.25,
+        ]);
+
+        $levelUpValue = resolve(LevelUpValue::class)->createValueObject($character->refresh());
+
+        $this->assertEqualsWithDelta(0.2501, $levelUpValue['base_damage_stat_mod'], 0.00000001);
+    }
+
+    public function testCappedNormalStatsIncreaseBaseStatModifierByFiveLevelsWithStackableExtraLevelBoon(): void
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
+            ->getCharacter();
+
+        $boon = $this->createItem([
+            'name' => 'Capped Normal Stat Extra Level Boon',
+            'type' => 'quest',
+            'can_stack' => true,
+            'gains_additional_level' => true,
+        ]);
+
+        $character->update([
+            'str' => MaxReincarnationStats::MAX_STATS,
+            'base_stat_mod' => 0.25,
+        ]);
+
+        $character->boons()->create([
+            'character_id' => $character->id,
+            'item_id' => $boon->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(120),
+            'last_for_minutes' => 120,
+            'amount_used' => 4,
+        ]);
+
+        $levelUpValue = resolve(LevelUpValue::class)->createValueObject($character->refresh());
+
+        $this->assertEqualsWithDelta(0.2506, $levelUpValue['base_stat_mod'], 0.00000001);
+    }
+
+    public function testCappedDamageStatIncreasesBaseDamageStatModifierByFiveLevelsWithStackableExtraLevelBoon(): void
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
+            ->getCharacter();
+
+        $boon = $this->createItem([
+            'name' => 'Capped Damage Stat Extra Level Boon',
+            'type' => 'quest',
+            'can_stack' => true,
+            'gains_additional_level' => true,
+        ]);
+
+        $character->update([
+            'dex' => MaxReincarnationStats::MAX_STATS,
+            'base_damage_stat_mod' => 0.25,
+        ]);
+
+        $character->boons()->create([
+            'character_id' => $character->id,
+            'item_id' => $boon->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(120),
+            'last_for_minutes' => 120,
+            'amount_used' => 4,
+        ]);
+
+        $levelUpValue = resolve(LevelUpValue::class)->createValueObject($character->refresh());
+
+        $this->assertEqualsWithDelta(0.2505, $levelUpValue['base_damage_stat_mod'], 0.00000001);
+    }
+
+    public function testBaseStatModifierDoesNotExceedCap(): void
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
+            ->getCharacter();
+
+        $character->update([
+            'str' => MaxReincarnationStats::MAX_STATS,
+            'base_stat_mod' => 0.59999,
+        ]);
+
+        $levelUpValue = resolve(LevelUpValue::class)->createValueObject($character->refresh());
+
+        $this->assertSame(0.60, $levelUpValue['base_stat_mod']);
+    }
+
+    public function testBaseDamageStatModifierDoesNotExceedCap(): void
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
+            ->getCharacter();
+
+        $character->update([
+            'dex' => MaxReincarnationStats::MAX_STATS,
+            'base_damage_stat_mod' => 0.49999,
+        ]);
+
+        $levelUpValue = resolve(LevelUpValue::class)->createValueObject($character->refresh());
+
+        $this->assertSame(0.50, $levelUpValue['base_damage_stat_mod']);
+    }
+
+    public function testReturnedBaseStatModifierUsesInternalCap(): void
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
+            ->getCharacter();
+
+        $character->update([
+            'str' => MaxReincarnationStats::MAX_STATS,
+            'base_stat_mod' => 0.75,
+        ]);
+
+        $levelUpValue = resolve(LevelUpValue::class)->createValueObject($character->refresh());
+
+        $this->assertSame(0.60, $levelUpValue['base_stat_mod']);
+    }
+
+    public function testReturnedBaseDamageStatModifierUsesInternalCap(): void
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
+            ->getCharacter();
+
+        $character->update([
+            'dex' => MaxReincarnationStats::MAX_STATS,
+            'base_damage_stat_mod' => 0.75,
+        ]);
+
+        $levelUpValue = resolve(LevelUpValue::class)->createValueObject($character->refresh());
+
+        $this->assertSame(0.50, $levelUpValue['base_damage_stat_mod']);
+    }
+
+    public function testReturnedBaseStatModifierIsCappedWhenNormalStatIsNotCapped(): void
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
+            ->getCharacter();
+
+        $character->update([
+            'str' => 1,
+            'base_stat_mod' => 0.75,
+        ]);
+
+        $levelUpValue = resolve(LevelUpValue::class)->createValueObject($character->refresh());
+
+        $this->assertSame(0.60, $levelUpValue['base_stat_mod']);
+    }
+
+    public function testReturnedBaseDamageStatModifierIsCappedWhenDamageStatIsNotCapped(): void
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
+            ->getCharacter();
+
+        $character->update([
+            'dex' => 1,
+            'base_damage_stat_mod' => 0.75,
+        ]);
+
+        $levelUpValue = resolve(LevelUpValue::class)->createValueObject($character->refresh());
+
+        $this->assertSame(0.50, $levelUpValue['base_damage_stat_mod']);
+    }
+
+    public function testCharacterAlreadyAtMaxLevelWithCappedStatsGainsNoModifierProgress(): void
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
+            ->getCharacter();
+
+        $boon = $this->createItem([
+            'name' => 'Max Level Modifier Extra Level Boon',
+            'type' => 'quest',
+            'can_stack' => true,
+            'gains_additional_level' => true,
+        ]);
+
+        $character->update([
+            'level' => 1000,
+            'str' => MaxReincarnationStats::MAX_STATS,
+            'dex' => MaxReincarnationStats::MAX_STATS,
+            'base_stat_mod' => 0.25,
+            'base_damage_stat_mod' => 0.35,
+        ]);
+
+        $character->boons()->create([
+            'character_id' => $character->id,
+            'item_id' => $boon->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(120),
+            'last_for_minutes' => 120,
+            'amount_used' => 4,
+        ]);
+
+        $levelUpValue = resolve(LevelUpValue::class)->createValueObject($character->refresh());
+
+        $this->assertSame(1000, $levelUpValue['level']);
+        $this->assertSame(0.25, $levelUpValue['base_stat_mod']);
+        $this->assertSame(0.35, $levelUpValue['base_damage_stat_mod']);
+    }
+
     public function testCharacterAlreadyAtMaxLevelGainsNoExtraRawStats(): void
     {
         $character = (new CharacterFactory)
