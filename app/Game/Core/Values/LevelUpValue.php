@@ -34,17 +34,19 @@ class LevelUpValue
             $newLevel = $maxLevel;
         }
 
+        $levelsGained = $newLevel - $character->level;
+
         return [
             'level' => $newLevel,
             'xp' => $newLevel === $maxLevel ? 0 : $leftOverXP,
             'xp_next' => 100,
-            'str' => $this->addValue($character, 'str', $gainsAdditionalLevel),
-            'dur' => $this->addValue($character, 'dur', $gainsAdditionalLevel),
-            'dex' => $this->addValue($character, 'dex', $gainsAdditionalLevel),
-            'chr' => $this->addValue($character, 'chr', $gainsAdditionalLevel),
-            'int' => $this->addValue($character, 'int', $gainsAdditionalLevel),
-            'agi' => $this->addValue($character, 'agi', $gainsAdditionalLevel),
-            'focus' => $this->addValue($character, 'focus', $gainsAdditionalLevel),
+            'str' => $this->addValue($character, 'str', $levelsGained),
+            'dur' => $this->addValue($character, 'dur', $levelsGained),
+            'dex' => $this->addValue($character, 'dex', $levelsGained),
+            'chr' => $this->addValue($character, 'chr', $levelsGained),
+            'int' => $this->addValue($character, 'int', $levelsGained),
+            'agi' => $this->addValue($character, 'agi', $levelsGained),
+            'focus' => $this->addValue($character, 'focus', $levelsGained),
             'base_stat_mod' => min($baseStatMod, 5.0),
             'base_damage_stat_mod' => min($baseDamageStatMod, 10.0),
         ];
@@ -55,18 +57,14 @@ class LevelUpValue
      *
      * Regular stats get +1 and the damage stat gets a +2
      */
-    protected function addValue(Character $character, string $currenStat, bool $gainsAdditionalLevel = false): int
+    protected function addValue(Character $character, string $currenStat, int $levelsGained = 1): int
     {
 
-        if ($character->{$currenStat} >= 999999) {
-            return $character->{$currenStat};
-        }
-
         if ($character->damage_stat === $currenStat) {
-            return $character->{$currenStat} += ($gainsAdditionalLevel ? 4 : 2);
+            return min($character->{$currenStat} + ($levelsGained * 2), MaxReincarnationStats::MAX_STATS);
         }
 
-        return $character->{$currenStat} += ($gainsAdditionalLevel ? 2 : 1);
+        return min($character->{$currenStat} + $levelsGained, MaxReincarnationStats::MAX_STATS);
     }
 
     /**
