@@ -8,7 +8,6 @@ use App\Flare\Values\BaseStatValue;
 use App\Flare\Values\FeatureTypes;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Core\Services\CharacterStatRepairService;
 use App\Game\Core\Traits\CharacterMaxLevel;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Reincarnate\Values\MaxReincarnationStats;
@@ -19,7 +18,6 @@ class CharacterReincarnationService
 
     public function __construct(
         private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
-        private readonly CharacterStatRepairService $characterStatRepairService,
         private readonly BaseStatValue $baseStatValue
     ) {}
 
@@ -61,9 +59,6 @@ class CharacterReincarnationService
             return $this->errorResult('You have maxed all stats to ' . number_format(MaxReincarnationStats::MAX_STATS) . '.');
         }
 
-        $this->characterStatRepairService->repair($character);
-        $character = $character->refresh();
-
         return $this->doReincarnation($character, $baseStatsToReincarnate);
     }
 
@@ -72,6 +67,7 @@ class CharacterReincarnationService
         $skipMaxedStats = is_null($baseStats);
         $baseStats = $baseStats ?? ['str', 'dur', 'dex', 'chr', 'int', 'agi', 'focus'];
         $updatedStats = [];
+        $lastReincarnatedStatBonus = 0;
         $baseStat = $this->baseStatValue->setRace($character->race)->setClass($character->class);
 
         foreach ($baseStats as $stat) {
@@ -85,6 +81,7 @@ class CharacterReincarnationService
             $base = $baseStat->{$stat}() + $character->reincarnated_stat_increase;
 
             $characterBonus = $characterStat * 0.05;
+            $lastReincarnatedStatBonus = $characterBonus;
             $base = $base + $characterBonus;
 
             if ($base >= MaxReincarnationStats::MAX_STATS) {
@@ -98,7 +95,7 @@ class CharacterReincarnationService
             return $this->errorResult('You have maxed all stats to ' . number_format(MaxReincarnationStats::MAX_STATS) . '.');
         }
 
-        $newReincarnatedStatBonus = $character->reincarnated_stat_increase + $characterBonus;
+        $newReincarnatedStatBonus = $character->reincarnated_stat_increase + $lastReincarnatedStatBonus;
 
         if ($newReincarnatedStatBonus > MaxReincarnationStats::MAX_STATS) {
             $newReincarnatedStatBonus = MaxReincarnationStats::MAX_STATS;

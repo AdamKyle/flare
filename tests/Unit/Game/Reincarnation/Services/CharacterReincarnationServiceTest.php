@@ -247,101 +247,6 @@ class CharacterReincarnationServiceTest extends TestCase
         $this->assertEquals('You have maxed all stats to 9,999,999,999.', $result['message']);
     }
 
-    public function testUnderStattedMaxLevelCharacterIsRepairedBeforeReincarnation(): void
-    {
-        $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
-
-        $character = (new CharacterFactory)
-            ->createBaseCharacter(
-                raceOptions: [
-                    'str_mod' => 11,
-                    'focus_mod' => 11,
-                ],
-                classOptions: ['damage_stat' => 'dex']
-            )
-            ->givePlayerLocation()
-            ->inventoryManagement()
-            ->giveItem($item)
-            ->getCharacter();
-
-        $quest = $this->createQuest([
-            'unlocks_feature' => FeatureTypes::REINCARNATION,
-            'npc_id' => $this->createNpc()->id,
-        ]);
-
-        $character->questsCompleted()->create([
-            'character_id' => $character->id,
-            'quest_id' => $quest->id,
-        ]);
-
-        $character->update([
-            'level' => 2000,
-            'str' => 1,
-            'dur' => 1,
-            'dex' => 1,
-            'chr' => 1,
-            'int' => 1,
-            'agi' => 1,
-            'focus' => 1,
-            'copper_coins' => 100000,
-        ]);
-
-        $result = $this->reincarnationService->reincarnate($character->refresh());
-
-        $character = $character->refresh();
-
-        $this->assertEquals(200, $result['status']);
-        $this->assertSame(122, $character->str);
-    }
-
-    public function testReincarnationUsesCorrectedRawStatsWhenCalculatingFivePercentCarryover(): void
-    {
-        $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
-
-        $character = (new CharacterFactory)
-            ->createBaseCharacter(
-                raceOptions: [
-                    'str_mod' => 11,
-                    'focus_mod' => 11,
-                ],
-                classOptions: ['damage_stat' => 'dex']
-            )
-            ->givePlayerLocation()
-            ->inventoryManagement()
-            ->giveItem($item)
-            ->getCharacter();
-
-        $quest = $this->createQuest([
-            'unlocks_feature' => FeatureTypes::REINCARNATION,
-            'npc_id' => $this->createNpc()->id,
-        ]);
-
-        $character->questsCompleted()->create([
-            'character_id' => $character->id,
-            'quest_id' => $quest->id,
-        ]);
-
-        $character->update([
-            'level' => 2000,
-            'reincarnated_stat_increase' => 20,
-            'str' => 1,
-            'dur' => 1,
-            'dex' => 1,
-            'chr' => 1,
-            'int' => 1,
-            'agi' => 1,
-            'focus' => 1,
-            'copper_coins' => 100000,
-        ]);
-
-        $result = $this->reincarnationService->reincarnate($character->refresh());
-
-        $character = $character->refresh();
-
-        $this->assertEquals(200, $result['status']);
-        $this->assertSame(143, $character->str);
-    }
-
     public function testAlreadyCorrectCharacterKeepsExistingReincarnationBehavior(): void
     {
         $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
@@ -394,71 +299,35 @@ class CharacterReincarnationServiceTest extends TestCase
         $this->assertSame(1, $character->times_reincarnated);
     }
 
-    public function testRepairNeverLowersOverStattedRawStatsBeforeReincarnation(): void
+    public function testReincarnatedStatIncreaseUsesBonusFromLastProcessedStat(): void
     {
-        $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
-
-        $character = (new CharacterFactory)
-            ->createBaseCharacter(
-                raceOptions: [
-                    'str_mod' => 11,
-                    'focus_mod' => 11,
-                ],
-                classOptions: ['damage_stat' => 'dex']
-            )
-            ->givePlayerLocation()
-            ->inventoryManagement()
-            ->giveItem($item)
-            ->getCharacter();
-
-        $quest = $this->createQuest([
-            'unlocks_feature' => FeatureTypes::REINCARNATION,
-            'npc_id' => $this->createNpc()->id,
-        ]);
-
-        $character->questsCompleted()->create([
-            'character_id' => $character->id,
-            'quest_id' => $quest->id,
-        ]);
+        $character = $this->character->getCharacter();
 
         $character->update([
-            'level' => 2000,
             'reincarnated_stat_increase' => 20,
-            'str' => 3040,
-            'dur' => 3040,
-            'dex' => 5040,
-            'chr' => 3040,
-            'int' => 3040,
-            'agi' => 3040,
-            'focus' => 3060,
+            'str' => 100000,
+            'dur' => 200000,
+            'dex' => 300000,
+            'chr' => 400000,
+            'int' => 500000,
+            'agi' => 600000,
+            'focus' => 700000,
             'copper_coins' => 100000,
         ]);
 
-        $result = $this->reincarnationService->reincarnate($character->refresh());
+        $result = $this->reincarnationService->doReincarnation($character->refresh());
 
         $character = $character->refresh();
 
         $this->assertEquals(200, $result['status']);
-        $this->assertSame(193, $character->str);
-        $this->assertSame(173, $character->reincarnated_stat_increase);
+        $this->assertSame(35020, $character->reincarnated_stat_increase);
     }
 
-    public function testRepairHappensBeforeReincarnatedStatIncreaseIsCalculated(): void
+    public function testFocusIsTheLastProcessedStatWhenIncludedInReincarnation(): void
     {
         $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
 
-        $character = (new CharacterFactory)
-            ->createBaseCharacter(
-                raceOptions: [
-                    'str_mod' => 11,
-                    'focus_mod' => 11,
-                ],
-                classOptions: ['damage_stat' => 'dex']
-            )
-            ->givePlayerLocation()
-            ->inventoryManagement()
-            ->giveItem($item)
-            ->getCharacter();
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
         $quest = $this->createQuest([
             'unlocks_feature' => FeatureTypes::REINCARNATION,
@@ -473,13 +342,13 @@ class CharacterReincarnationServiceTest extends TestCase
         $character->update([
             'level' => 2000,
             'reincarnated_stat_increase' => 20,
-            'str' => 2040,
-            'dur' => 2029,
-            'dex' => 4028,
-            'chr' => 2029,
-            'int' => 2029,
-            'agi' => 2029,
-            'focus' => 1,
+            'str' => 100000,
+            'dur' => 200000,
+            'dex' => 300000,
+            'chr' => 400000,
+            'int' => 500000,
+            'agi' => 600000,
+            'focus' => 700000,
             'copper_coins' => 100000,
         ]);
 
@@ -488,6 +357,67 @@ class CharacterReincarnationServiceTest extends TestCase
         $character = $character->refresh();
 
         $this->assertEquals(200, $result['status']);
-        $this->assertSame(122, $character->reincarnated_stat_increase);
+        $this->assertSame(35020, $character->reincarnated_stat_increase);
+    }
+
+    public function testFocusMaxedBeforeReincarnationChangesSelectedBonusToAgility(): void
+    {
+        $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $quest = $this->createQuest([
+            'unlocks_feature' => FeatureTypes::REINCARNATION,
+            'npc_id' => $this->createNpc()->id,
+        ]);
+
+        $character->questsCompleted()->create([
+            'character_id' => $character->id,
+            'quest_id' => $quest->id,
+        ]);
+
+        $character->update([
+            'level' => 2000,
+            'reincarnated_stat_increase' => 20,
+            'str' => 100000,
+            'dur' => 200000,
+            'dex' => 300000,
+            'chr' => 400000,
+            'int' => 500000,
+            'agi' => 600000,
+            'focus' => MaxReincarnationStats::MAX_STATS,
+            'copper_coins' => 100000,
+        ]);
+
+        $result = $this->reincarnationService->reincarnate($character->refresh());
+
+        $character = $character->refresh();
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertSame(30020, $character->reincarnated_stat_increase);
+    }
+
+    public function testReincarnatedStatIncreaseIsCappedAtMaxReincarnationStats(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $character->update([
+            'reincarnated_stat_increase' => MaxReincarnationStats::MAX_STATS - 10,
+            'str' => 100,
+            'dur' => 200,
+            'dex' => 300,
+            'chr' => 400,
+            'int' => 500,
+            'agi' => 600,
+            'focus' => 1000,
+            'copper_coins' => 100000,
+        ]);
+
+        $result = $this->reincarnationService->doReincarnation($character->refresh());
+
+        $character = $character->refresh();
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertSame(MaxReincarnationStats::MAX_STATS, $character->reincarnated_stat_increase);
     }
 }
