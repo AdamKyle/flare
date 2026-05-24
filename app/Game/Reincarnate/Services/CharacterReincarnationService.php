@@ -8,20 +8,20 @@ use App\Flare\Values\BaseStatValue;
 use App\Flare\Values\FeatureTypes;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Services\CharacterStatRepairService;
 use App\Game\Core\Traits\CharacterMaxLevel;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Reincarnate\Values\MaxReincarnationStats;
 
-class CharacterReincarnateService
+class CharacterReincarnationService
 {
     use CharacterMaxLevel, ResponseBuilder;
 
-    private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
-
-    public function __construct(UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes)
-    {
-        $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
-    }
+    public function __construct(
+        private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
+        private readonly CharacterStatRepairService $characterStatRepairService,
+        private readonly BaseStatValue $baseStatValue
+    ) {}
 
     public function reincarnate(Character $character): array
     {
@@ -48,20 +48,37 @@ class CharacterReincarnateService
             return $this->errorResult('Reincarnation costs 50,000 Copper Coins');
         }
 
-        return $this->doReincarnation($character);
+        $baseStats = ['str', 'dur', 'dex', 'chr', 'int', 'agi', 'focus'];
+        $baseStatsToReincarnate = [];
+
+        foreach ($baseStats as $stat) {
+            if ($character->{$stat} < MaxReincarnationStats::MAX_STATS) {
+                $baseStatsToReincarnate[] = $stat;
+            }
+        }
+
+        if (empty($baseStatsToReincarnate)) {
+            return $this->errorResult('You have maxed all stats to ' . number_format(MaxReincarnationStats::MAX_STATS) . '.');
+        }
+
+        $this->characterStatRepairService->repair($character);
+        $character = $character->refresh();
+
+        return $this->doReincarnation($character, $baseStatsToReincarnate);
     }
 
-    public function doReincarnation(Character $character): array
+    public function doReincarnation(Character $character, ?array $baseStats = null): array
     {
-        $baseStats = ['str', 'dur', 'dex', 'chr', 'int', 'agi', 'focus'];
+        $skipMaxedStats = is_null($baseStats);
+        $baseStats = $baseStats ?? ['str', 'dur', 'dex', 'chr', 'int', 'agi', 'focus'];
         $updatedStats = [];
-        $baseStat = resolve(BaseStatValue::class)->setRace($character->race)->setClass($character->class);
+        $baseStat = $this->baseStatValue->setRace($character->race)->setClass($character->class);
 
         foreach ($baseStats as $stat) {
 
             $characterStat = $character->{$stat};
 
-            if ($characterStat >= MaxReincarnationStats::MAX_STATS) {
+            if ($skipMaxedStats && $characterStat >= MaxReincarnationStats::MAX_STATS) {
                 continue;
             }
 

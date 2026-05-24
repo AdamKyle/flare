@@ -69,6 +69,17 @@ Before changing code, inspect the existing implementation, nearby files, related
 - Use config values for environment-specific behavior.
 - Do not hard-code values that already exist in config, enums, constants, or value objects.
 
+## Dependency Injection
+
+- Do not use `resolve()`, `app()`, or container lookups inside production classes, services, handlers, jobs, commands, value objects, or domain code.
+- Dependencies must be injected through the constructor using constructor property promotion.
+- Constructor dependencies must use `private readonly ClassName $className` whenever possible.
+- If the class is manually bound in a module service provider, update that provider when adding constructor dependencies.
+- If the class is not manually bound and no relevant binding exists, create/register the binding in the appropriate module service provider.
+- Controllers must also use constructor injection, but do not require service-provider binding updates solely for controller dependencies.
+- Tests may use `resolve()` when following existing project test patterns.
+- Do not replace existing container lookups outside the requested scope unless the task explicitly asks for that cleanup.
+
 ## Database And Persistence
 
 - Prefer Eloquent model methods, relationships, scopes, and query builders over raw SQL.
