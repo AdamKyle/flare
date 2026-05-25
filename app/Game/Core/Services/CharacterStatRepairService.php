@@ -8,13 +8,15 @@ use App\Game\Reincarnate\Values\MaxReincarnationStats;
 
 class CharacterStatRepairService
 {
+    public function __construct(private readonly BaseStatValue $baseStatValue) {}
+
     public function repair(Character $character): void
     {
         $baseStats = ['str', 'dur', 'dex', 'chr', 'int', 'agi', 'focus'];
         $levelUps = max($character->level - 1, 0);
         $reincarnatedStatIncrease = $character->reincarnated_stat_increase;
         $updates = [];
-        $baseStatValue = resolve(BaseStatValue::class)->setRace($character->race)->setClass($character->class);
+        $baseStatValue = $this->baseStatValue->setRace($character->race)->setClass($character->class);
 
         foreach ($baseStats as $stat) {
             $levelUpFloor = $character->damage_stat === $stat ? $levelUps * 2 : $levelUps;

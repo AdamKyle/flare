@@ -18,8 +18,10 @@ class RepairCharacterStats extends Command
 
     private array $baseStats = ['str', 'dur', 'dex', 'chr', 'int', 'agi', 'focus'];
 
-    public function __construct(private readonly CharacterStatRepairService $characterStatRepairService)
-    {
+    public function __construct(
+        private readonly CharacterStatRepairService $characterStatRepairService,
+        private readonly BaseStatValue $baseStatValue,
+    ) {
         parent::__construct();
     }
 
@@ -139,7 +141,7 @@ class RepairCharacterStats extends Command
 
         $levelUps = max($character->level - 1, 0);
         $updates = [];
-        $baseStatValue = resolve(BaseStatValue::class)->setRace($character->race)->setClass($character->class);
+        $baseStatValue = $this->baseStatValue->setRace($character->race)->setClass($character->class);
 
         foreach ($this->baseStats as $stat) {
             $levelUpFloor = $character->damage_stat === $stat ? $levelUps * 2 : $levelUps;

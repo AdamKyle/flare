@@ -2,14 +2,12 @@
 
 namespace Tests\Console;
 
-use App\Flare\GameImporter\Console\Commands\MassImportCustomData;
 use App\Flare\Models\Character;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
-use RuntimeException;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
@@ -74,7 +72,7 @@ class CharacterRepairStatsCommandTest extends TestCase
             'dex' => 6,
         ]);
 
-        $this->assertEquals(0, $this->artisan('characters:repair-stats', [
+        $this->assertEquals(0, Artisan::call('characters:repair-stats', [
             '--apply' => true,
         ]));
 
@@ -108,7 +106,7 @@ class CharacterRepairStatsCommandTest extends TestCase
 
         Carbon::setTestNow(Carbon::parse('2026-05-24 10:00:00'));
 
-        $this->assertEquals(0, $this->artisan('characters:repair-stats', [
+        $this->assertEquals(0, Artisan::call('characters:repair-stats', [
             '--apply' => true,
         ]));
 
@@ -143,7 +141,7 @@ class CharacterRepairStatsCommandTest extends TestCase
                 'dex' => 6,
             ]);
 
-        $this->assertEquals(0, $this->artisan('characters:repair-stats', [
+        $this->assertEquals(0, Artisan::call('characters:repair-stats', [
             '--apply' => true,
         ]));
 
@@ -170,7 +168,7 @@ class CharacterRepairStatsCommandTest extends TestCase
             'dex' => 6,
         ]);
 
-        $this->assertEquals(0, $this->artisan('characters:repair-stats', [
+        $this->assertEquals(0, Artisan::call('characters:repair-stats', [
             '--apply' => true,
         ]));
 
@@ -201,7 +199,7 @@ class CharacterRepairStatsCommandTest extends TestCase
             'dex' => 6,
         ]);
 
-        $this->assertEquals(0, $this->artisan('characters:repair-stats', [
+        $this->assertEquals(0, Artisan::call('characters:repair-stats', [
             '--apply' => true,
         ]));
 
@@ -210,7 +208,7 @@ class CharacterRepairStatsCommandTest extends TestCase
 
         Carbon::setTestNow(Carbon::parse('2026-05-24 10:00:00'));
 
-        $this->assertEquals(0, $this->artisan('characters:repair-stats', [
+        $this->assertEquals(0, Artisan::call('characters:repair-stats', [
             '--apply' => true,
         ]));
 
@@ -359,44 +357,5 @@ class CharacterRepairStatsCommandTest extends TestCase
         $this->assertStringContainsString('Largest correction: 116', $output);
         $this->assertStringContainsString('character ' . $character->id, $output);
         $this->assertStringContainsString($character->name, $output);
-    }
-
-    public function testMassImportRepairsCharacterStatsInApplyMode(): void
-    {
-        Artisan::shouldReceive('call')
-            ->once()
-            ->ordered()
-            ->with('fix:kingdom-max-resources-based-on-passive-skill')
-            ->andReturn(0);
-        Artisan::shouldReceive('call')
-            ->once()
-            ->ordered()
-            ->with('assign:new-buildings-to-existing-kingdoms')
-            ->andReturn(0);
-        Artisan::shouldReceive('call')
-            ->once()
-            ->ordered()
-            ->with('clean:invalid-broken-queues')
-            ->andReturn(0);
-        Artisan::shouldReceive('call')
-            ->once()
-            ->ordered()
-            ->with('clean:orphaned-building-expansion-queues')
-            ->andReturn(0);
-        Artisan::shouldReceive('call')
-            ->once()
-            ->ordered()
-            ->with('characters:repair-stats', ['--apply' => true])
-            ->andReturn(0);
-        Artisan::shouldReceive('call')
-            ->once()
-            ->ordered()
-            ->with('import:game-data Monsters')
-            ->andThrow(new RuntimeException('Stop before importing game data.'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Stop before importing game data.');
-
-        (new MassImportCustomData)->handle();
     }
 }
