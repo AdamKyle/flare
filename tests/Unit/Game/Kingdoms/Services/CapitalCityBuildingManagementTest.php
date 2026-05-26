@@ -3,6 +3,7 @@
 namespace Tests\Unit\Game\Kingdoms\Services;
 
 use App\Flare\Models\CapitalCityBuildingQueue;
+use App\Flare\Models\KingdomLog;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityRequestResourcesHandler;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Values\BuildingCosts;
@@ -12,6 +13,7 @@ use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 
@@ -69,6 +71,11 @@ class CapitalCityBuildingManagementTest extends TestCase
             ])
             ->assignPassiveSkill(PassiveSkillTypeValue::STEEL_SMELTING_TIME_REDUCTION, 0, [
                 'name' => 'Steel Smelting Time Reduction',
+                'bonus_per_level' => 0.0,
+                'max_level' => 5,
+            ])
+            ->assignPassiveSkill(PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_BUILD_TRAVEL_TIME_REDUCTION, 0, [
+                'name' => 'Capital City Building Request Travel Time Reduction',
                 'bonus_per_level' => 0.0,
                 'max_level' => 5,
             ]);
@@ -327,5 +334,278 @@ class CapitalCityBuildingManagementTest extends TestCase
 
         $this->assertSame(CapitalCityQueueStatus::REJECTED, $capitalCityBuildingQueue->status);
         $this->assertSame(CapitalCityQueueStatus::REJECTED, $capitalCityBuildingQueue->building_request_data[0]['secondary_status']);
+    }
+
+    public function testMixedValidAndMaxLevelBuildingRequestSkipsMaxLevelWithoutSpendingForIt(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $character = $this->character->getCharacter();
+        $capitalCity = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'is_capital' => true,
+                'x_position' => 16,
+                'y_position' => 16,
+            ])
+            ->getKingdom();
+        $targetKingdom = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 5000,
+                'current_clay' => 5000,
+                'current_stone' => 5000,
+                'current_iron' => 5000,
+                'current_population' => 5000,
+                'x_position' => 32,
+                'y_position' => 16,
+            ])
+            ->assignBuilding([
+                'name' => BuildingCosts::KEEP,
+                'max_level' => 5,
+                'stone_cost' => 100,
+                'clay_cost' => 100,
+                'wood_cost' => 100,
+                'iron_cost' => 100,
+                'steel_cost' => 0,
+                'required_population' => 10,
+            ], [
+                'level' => 1,
+            ])
+            ->assignBuilding([
+                'name' => BuildingCosts::FARM,
+                'max_level' => 1,
+                'stone_cost' => 1000,
+                'clay_cost' => 1000,
+                'wood_cost' => 1000,
+                'iron_cost' => 1000,
+                'steel_cost' => 0,
+                'required_population' => 100,
+            ], [
+                'level' => 1,
+            ])
+            ->getKingdom();
+        $validBuilding = $targetKingdom->buildings()->orderBy('id')->first();
+        $maxLevelBuilding = $targetKingdom->buildings()->orderBy('id')->get()->last();
+
+        $this->capitalCityBuildingManagement->createBuildingUpgradeRequestQueue($character, $capitalCity, [[
+            'kingdomId' => $targetKingdom->id,
+            'buildingIds' => [$validBuilding->id, $maxLevelBuilding->id],
+        ]], 'upgrade');
+
+        $capitalCityBuildingQueue = CapitalCityBuildingQueue::where('kingdom_id', $targetKingdom->id)->first();
+
+        $this->assertNotNull($capitalCityBuildingQueue);
+        $this->assertCount(1, $capitalCityBuildingQueue->building_request_data);
+        $this->assertSame($validBuilding->id, $capitalCityBuildingQueue->building_request_data[0]['building_id']);
+        $this->assertSame(5000, $targetKingdom->refresh()->current_wood);
+        $this->assertSame(5000, $targetKingdom->refresh()->current_clay);
+        $this->assertSame(5000, $targetKingdom->refresh()->current_stone);
+        $this->assertSame(5000, $targetKingdom->refresh()->current_iron);
+        $this->assertSame(5000, $targetKingdom->refresh()->current_population);
+    }
+
+    public function testNoResourcesAreSpentForRejectedMaxLevelBuildingsDuringProcessing(): void
+    {
+        Event::fake();
+
+        $character = $this->character->getCharacter();
+        $kingdom = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 5000,
+                'current_clay' => 5000,
+                'current_stone' => 5000,
+                'current_iron' => 5000,
+                'current_population' => 5000,
+            ])
+            ->assignBuilding([
+                'max_level' => 1,
+                'stone_cost' => 1000,
+                'clay_cost' => 1000,
+                'wood_cost' => 1000,
+                'iron_cost' => 1000,
+                'steel_cost' => 0,
+                'required_population' => 100,
+            ], [
+                'level' => 1,
+            ])
+            ->getKingdom();
+        $building = $kingdom->buildings()->first();
+        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+            'character_id' => $character->id,
+            'kingdom_id' => $kingdom->id,
+            'requested_kingdom' => $kingdom->id,
+            'building_request_data' => [[
+                'building_id' => $building->id,
+                'building_name' => $building->name,
+                'costs' => [
+                    'stone' => 1000,
+                    'clay' => 1000,
+                    'wood' => 1000,
+                    'iron' => 1000,
+                    'steel' => 0,
+                    'population' => 100,
+                ],
+                'type' => 'upgrade',
+                'missing_costs' => [],
+                'secondary_status' => CapitalCityQueueStatus::PROCESSING,
+                'from_level' => 1,
+                'to_level' => 2,
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::PROCESSING,
+            'started_at' => now(),
+            'completed_at' => now(),
+        ]);
+
+        $this->capitalCityBuildingManagement->processBuildingRequest($capitalCityBuildingQueue);
+
+        $kingdomLog = KingdomLog::where('character_id', $character->id)->latest('id')->first();
+
+        $this->assertNull(CapitalCityBuildingQueue::find($capitalCityBuildingQueue->id));
+        $this->assertSame(CapitalCityQueueStatus::REJECTED, $kingdomLog->additional_details['building_data'][0]['status']);
+        $this->assertSame(5000, $kingdom->refresh()->current_wood);
+        $this->assertSame(5000, $kingdom->refresh()->current_clay);
+        $this->assertSame(5000, $kingdom->refresh()->current_stone);
+        $this->assertSame(5000, $kingdom->refresh()->current_iron);
+        $this->assertSame(5000, $kingdom->refresh()->current_population);
+    }
+
+    public function testStaleProcessingPathRejectsAndDoesNotSpendResources(): void
+    {
+        Event::fake();
+
+        $character = $this->character->getCharacter();
+        $kingdom = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 5000,
+                'current_clay' => 5000,
+                'current_stone' => 5000,
+                'current_iron' => 5000,
+                'current_population' => 5000,
+            ])
+            ->assignBuilding([
+                'max_level' => 5,
+                'stone_cost' => 1000,
+                'clay_cost' => 1000,
+                'wood_cost' => 1000,
+                'iron_cost' => 1000,
+                'steel_cost' => 0,
+                'required_population' => 100,
+            ], [
+                'level' => 2,
+            ])
+            ->getKingdom();
+        $building = $kingdom->buildings()->first();
+        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+            'character_id' => $character->id,
+            'kingdom_id' => $kingdom->id,
+            'requested_kingdom' => $kingdom->id,
+            'building_request_data' => [[
+                'building_id' => $building->id,
+                'building_name' => $building->name,
+                'costs' => [
+                    'stone' => 1000,
+                    'clay' => 1000,
+                    'wood' => 1000,
+                    'iron' => 1000,
+                    'steel' => 0,
+                    'population' => 100,
+                ],
+                'type' => 'upgrade',
+                'missing_costs' => [],
+                'secondary_status' => CapitalCityQueueStatus::PROCESSING,
+                'from_level' => 1,
+                'to_level' => 3,
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::PROCESSING,
+            'started_at' => now(),
+            'completed_at' => now(),
+        ]);
+
+        $this->capitalCityBuildingManagement->processBuildingRequest($capitalCityBuildingQueue);
+
+        $kingdomLog = KingdomLog::where('character_id', $character->id)->latest('id')->first();
+
+        $this->assertSame(2, $building->refresh()->level);
+        $this->assertNull(CapitalCityBuildingQueue::find($capitalCityBuildingQueue->id));
+        $this->assertSame(CapitalCityQueueStatus::REJECTED, $kingdomLog->additional_details['building_data'][0]['status']);
+        $this->assertSame(5000, $kingdom->refresh()->current_wood);
+        $this->assertSame(5000, $kingdom->refresh()->current_clay);
+        $this->assertSame(5000, $kingdom->refresh()->current_stone);
+        $this->assertSame(5000, $kingdom->refresh()->current_iron);
+        $this->assertSame(5000, $kingdom->refresh()->current_population);
+    }
+
+    public function testOverMaxQueueDataRejectsDuringProcessingWithoutSpendingOrMutating(): void
+    {
+        Event::fake();
+
+        $character = $this->character->getCharacter();
+        $kingdom = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 5000,
+                'current_clay' => 5000,
+                'current_stone' => 5000,
+                'current_iron' => 5000,
+                'current_population' => 5000,
+            ])
+            ->assignBuilding([
+                'max_level' => 2,
+                'stone_cost' => 1000,
+                'clay_cost' => 1000,
+                'wood_cost' => 1000,
+                'iron_cost' => 1000,
+                'steel_cost' => 0,
+                'required_population' => 100,
+            ], [
+                'level' => 1,
+            ])
+            ->getKingdom();
+        $building = $kingdom->buildings()->first();
+        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+            'character_id' => $character->id,
+            'kingdom_id' => $kingdom->id,
+            'requested_kingdom' => $kingdom->id,
+            'building_request_data' => [[
+                'building_id' => $building->id,
+                'building_name' => $building->name,
+                'costs' => [
+                    'stone' => 1000,
+                    'clay' => 1000,
+                    'wood' => 1000,
+                    'iron' => 1000,
+                    'steel' => 0,
+                    'population' => 100,
+                ],
+                'type' => 'upgrade',
+                'missing_costs' => [],
+                'secondary_status' => CapitalCityQueueStatus::PROCESSING,
+                'from_level' => 1,
+                'to_level' => 3,
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::PROCESSING,
+            'started_at' => now(),
+            'completed_at' => now(),
+        ]);
+
+        $this->capitalCityBuildingManagement->processBuildingRequest($capitalCityBuildingQueue);
+
+        $kingdomLog = KingdomLog::where('character_id', $character->id)->latest('id')->first();
+
+        $this->assertSame(1, $building->refresh()->level);
+        $this->assertNull(CapitalCityBuildingQueue::find($capitalCityBuildingQueue->id));
+        $this->assertSame(CapitalCityQueueStatus::REJECTED, $kingdomLog->additional_details['building_data'][0]['status']);
+        $this->assertSame(5000, $kingdom->refresh()->current_wood);
+        $this->assertSame(5000, $kingdom->refresh()->current_clay);
+        $this->assertSame(5000, $kingdom->refresh()->current_stone);
+        $this->assertSame(5000, $kingdom->refresh()->current_iron);
+        $this->assertSame(5000, $kingdom->refresh()->current_population);
     }
 }

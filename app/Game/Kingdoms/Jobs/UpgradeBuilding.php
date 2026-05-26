@@ -106,9 +106,30 @@ class UpgradeBuilding implements ShouldQueue
             // @codeCoverageIgnoreEnd
         }
 
-        $level = $this->building->level + 1;
+        $building = $this->building->refresh();
+        $this->building = $building;
 
-        if ($this->building->gives_resources) {
+        if ($building->level >= $building->gameBuilding->max_level || $queue->to_level > $building->gameBuilding->max_level) {
+            $queue->delete();
+
+            return;
+        }
+
+        if (is_null($queue->from_level) || $building->level !== $queue->from_level) {
+            $queue->delete();
+
+            return;
+        }
+
+        $level = $queue->to_level;
+
+        if ($level > $building->gameBuilding->max_level) {
+            $queue->delete();
+
+            return;
+        }
+
+        if ($building->gives_resources) {
             $type = $this->getResourceType();
 
             // @codeCoverageIgnoreStart
@@ -121,9 +142,7 @@ class UpgradeBuilding implements ShouldQueue
 
         }
 
-        $this->building->kingdom->save();
-
-        $building = $this->building->refresh();
+        $building->kingdom->save();
 
         $building->Update([
             'level' => $level,

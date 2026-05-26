@@ -85,6 +85,12 @@ class CapitalCityBuildingRequest implements ShouldQueue
             $building = $kingdom->buildings()->find($requestData['building_id']);
 
             if ($requestData['type'] === 'upgrade') {
+                if ($this->isInvalidUpgradeRequest($building, $requestData)) {
+                    $buildingRequestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
+                    continue;
+                }
+
                 $this->handleUpgradingBuilding($building, $requestData['to_level']);
                 $kingdomMaxResourceRecalculationService->recalculate($kingdom);
 
@@ -124,6 +130,13 @@ class CapitalCityBuildingRequest implements ShouldQueue
             'max_durability'     => $building->durability,
         ]);
 
+    }
+
+    private function isInvalidUpgradeRequest(KingdomBuilding $building, array $requestData): bool
+    {
+        return $building->level >= $building->gameBuilding->max_level ||
+            (int) $requestData['to_level'] > $building->gameBuilding->max_level ||
+            (int) $requestData['from_level'] !== $building->level;
     }
 
     private function handleRebuildingBuilding(KingdomBuilding $building): void

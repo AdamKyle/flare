@@ -48,6 +48,7 @@ class KingdomBuildingService
             'character_id' => $character->id,
             'kingdom_id' => $building->kingdom->id,
             'building_id' => $building->id,
+            'from_level' => $building->level,
             'to_level' => $building->level + 1,
             'completed_at' => $timeToComplete,
             'type' => BuildingQueueType::UPGRADE,
@@ -57,6 +58,36 @@ class KingdomBuildingService
         event(new UpdateKingdomQueues($building->kingdom));
 
         UpgradeBuilding::dispatch($building, $character->user, $queue->id, $capitalCityQueueId)->delay($timeToComplete);
+    }
+
+    public function hasActiveBuildingUpgrade(KingdomBuilding $building): bool
+    {
+        return BuildingInQueue::where('kingdom_id', $building->kingdom_id)
+            ->where('building_id', $building->id)
+            ->where('type', BuildingQueueType::UPGRADE)
+            ->exists();
+    }
+
+    public function cannotUpgradePastMaxLevel(KingdomBuilding $building, int $toLevel): bool
+    {
+        if ($building->level >= $building->gameBuilding->max_level) {
+            return true;
+        }
+
+        if ($building->level + 1 > $building->gameBuilding->max_level) {
+            return true;
+        }
+
+        return $toLevel > $building->gameBuilding->max_level;
+    }
+
+    public function hasInvalidUpgradeLevels(KingdomBuilding $building, ?int $fromLevel, int $toLevel): bool
+    {
+        if (! is_null($fromLevel) && $fromLevel !== $building->level) {
+            return true;
+        }
+
+        return $toLevel !== $building->level + 1;
     }
 
     /**

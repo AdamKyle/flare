@@ -27,15 +27,30 @@ class KingdomBuildingsController extends Controller
 
     public function upgradeKingdomBuilding(KingdomUpgradeBuildingRequest $request, Character $character, KingdomBuilding $building): JsonResponse
     {
-        if (ResourceValidation::shouldRedirectKingdomBuilding($building, $building->kingdom)) {
+        if ($this->kingdomBuildingService->hasActiveBuildingUpgrade($building)) {
             return response()->json([
-                'message' => "You don't have the resources.",
+                'message' => 'Building is already in the process of upgrading.',
             ], 422);
         }
 
-        if ($building->level + 1 > $building->gameBuilding->max_level) {
+        $fromLevel = $request->has('from_level') ? (int) $request->from_level : null;
+        $toLevel = (int) $request->to_level;
+
+        if ($this->kingdomBuildingService->cannotUpgradePastMaxLevel($building, $toLevel)) {
             return response()->json([
                 'message' => 'Building is already max level.',
+            ], 422);
+        }
+
+        if ($this->kingdomBuildingService->hasInvalidUpgradeLevels($building, $fromLevel, $toLevel)) {
+            return response()->json([
+                'message' => 'Invalid building upgrade request.',
+            ], 422);
+        }
+
+        if (ResourceValidation::shouldRedirectKingdomBuilding($building, $building->kingdom)) {
+            return response()->json([
+                'message' => "You don't have the resources.",
             ], 422);
         }
 

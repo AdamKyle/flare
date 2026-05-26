@@ -137,6 +137,14 @@ class CapitalCityProcessBuildingRequestHandler
         KingdomBuilding $building,
         array $buildingUpgradeRequest
     ): array {
+        if ($buildingUpgradeRequest['type'] === 'upgrade' && $this->isInvalidUpgradeRequest($building, $buildingUpgradeRequest)) {
+            $this->messages[] = $building->name . ' has been rejected: Building is already max level.';
+            $buildingUpgradeRequest['missing_costs'] = [];
+            $buildingUpgradeRequest['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
+            return $buildingUpgradeRequest;
+        }
+
         if ($this->kingdomBuildingResourceValidation->isMissingResources($building)) {
             $requiredResources = $this->kingdomBuildingResourceValidation->getCostsForBuilding($building);
             $missingResources = $this->kingdomBuildingResourceValidation->getMissingCosts($kingdom, $requiredResources);
@@ -175,6 +183,13 @@ class CapitalCityProcessBuildingRequestHandler
         $buildingUpgradeRequest['secondary_status'] = ($buildingUpgradeRequest['type'] === 'repair' ? CapitalCityQueueStatus::REPAIRING : CapitalCityQueueStatus::BUILDING);
 
         return $buildingUpgradeRequest;
+    }
+
+    private function isInvalidUpgradeRequest(KingdomBuilding $building, array $buildingUpgradeRequest): bool
+    {
+        return $building->level >= $building->gameBuilding->max_level ||
+            (int) $buildingUpgradeRequest['to_level'] > $building->gameBuilding->max_level ||
+            (int) $buildingUpgradeRequest['from_level'] !== $building->level;
     }
 
     /**
@@ -235,7 +250,7 @@ class CapitalCityProcessBuildingRequestHandler
 
         if (!$hasBuildingOrRepairing) {
             Log::channel('capital_city_building_upgrades')->info('We have no buildings in BUILDING, REPAIRING or REQUESTING status');
-            $this->createLogAndTriggerEvents($capitalCityBuildingQueue);
+            $this->createLogAndTriggerEvents($capitalCityBuildingQueue, $requestData);
         } else {
             Log::channel('capital_city_building_upgrades')->info('Handling Upgrade or repair request');
             $this->createUpgradeOrRepairRequest($capitalCityBuildingQueue, $capitalCityBuildingQueue->kingdom, $requestData);
@@ -247,12 +262,13 @@ class CapitalCityProcessBuildingRequestHandler
      * Create a log and trigger events if no building or repairing requests are present.
      *
      * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
+     * @param array $requestData
      * @return void
      */
-    private function createLogAndTriggerEvents(CapitalCityBuildingQueue $capitalCityBuildingQueue): void
+    private function createLogAndTriggerEvents(CapitalCityBuildingQueue $capitalCityBuildingQueue, array $requestData): void
     {
         $capitalCityBuildingQueue->update([
-            'building_request_data' => $capitalCityBuildingQueue->building_request_data,
+            'building_request_data' => $requestData,
             'messages' => $this->messages,
         ]);
 
