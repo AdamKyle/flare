@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Values\BaseStatValue;
 use App\Game\Core\Services\CharacterStatRepairService;
 use App\Game\Reincarnate\Values\MaxReincarnationStats;
@@ -12,7 +13,7 @@ use Throwable;
 
 class RepairCharacterStats extends Command
 {
-    protected $signature = 'characters:repair-stats {--apply}';
+    protected $signature = 'characters:repair-stats {--apply} {--repair-reincarnation-bonus}';
 
     protected $description = 'Repairs existing character raw stats to their deterministic current-state floors.';
 
@@ -33,8 +34,12 @@ class RepairCharacterStats extends Command
         $charactersChanged = 0;
         $charactersSkipped = 0;
         $totalStatPoints = 0;
+        $totalReincarnationBonusGap = 0;
         $largestCorrection = 0;
         $largestCorrectionCharacter = null;
+        $maxLevelConfiguration = MaxLevelConfiguration::query()->first();
+        $repairReincarnationBonus = (bool) $this->option('repair-reincarnation-bonus');
+        $affectedCharacters = [];
         $skippedCharacters = [];
         $statTotals = [
             'str' => 0,
@@ -53,8 +58,12 @@ class RepairCharacterStats extends Command
             &$charactersChanged,
             &$charactersSkipped,
             &$totalStatPoints,
+            &$totalReincarnationBonusGap,
             &$largestCorrection,
             &$largestCorrectionCharacter,
+            $maxLevelConfiguration,
+            $repairReincarnationBonus,
+            &$affectedCharacters,
             &$skippedCharacters,
             &$statTotals
         ) {
@@ -74,12 +83,49 @@ class RepairCharacterStats extends Command
                     continue;
                 }
 
+                $reincarnationBonusGap = 0;
+                $expectedReincarnatedStatIncrease = $character->reincarnated_stat_increase;
+                $currentReincarnatedStatIncrease = $character->reincarnated_stat_increase;
+
+                if ($repairReincarnationBonus && ! is_null($maxLevelConfiguration)) {
+                    $minimumBonus = $this->characterStatRepairService->getMinimumReincarnationBonus($character, $maxLevelConfiguration->max_level);
+                    $reincarnationBonusGap = max($minimumBonus - $character->reincarnated_stat_increase, 0);
+                    $expectedReincarnatedStatIncrease = max($minimumBonus, $character->reincarnated_stat_increase);
+                    $totalReincarnationBonusGap += $reincarnationBonusGap;
+
+                    if ($apply && $reincarnationBonusGap > 0) {
+                        $this->characterStatRepairService->repairReincarnationBonus($character, $maxLevelConfiguration->max_level);
+                        $character = $character->refresh();
+                    } elseif ($reincarnationBonusGap > 0) {
+                        $character->setAttribute('reincarnated_stat_increase', $expectedReincarnatedStatIncrease);
+                    }
+                }
+
+                if ($repairReincarnationBonus && $reincarnationBonusGap > 0) {
+                    $repairPlan = $this->repairPlan($character);
+                }
+
                 if (empty($repairPlan)) {
-                    continue;
+                    if ($reincarnationBonusGap === 0) {
+                        continue;
+                    }
                 }
 
                 $charactersAffected++;
                 $characterCorrection = array_sum($repairPlan);
+                $statsToRepair = $this->formatStatsToRepair($repairPlan);
+                $affectedCharacters[] = [
+                    'character_id' => $character->id,
+                    'character_name' => $character->name,
+                    'level' => $character->level,
+                    'times_reincarnated' => $character->times_reincarnated,
+                    'current_reincarnated_stat_increase' => $currentReincarnatedStatIncrease,
+                    'expected_reincarnated_stat_increase' => $expectedReincarnatedStatIncrease,
+                    'reincarnation_bonus_missing' => $reincarnationBonusGap,
+                    'raw_stats_missing_total' => $characterCorrection,
+                    'stats_to_repair' => $statsToRepair,
+                    'change' => $this->formatAffectedCharacterChange($apply, $currentReincarnatedStatIncrease, $expectedReincarnatedStatIncrease, $statsToRepair),
+                ];
 
                 if ($characterCorrection > $largestCorrection) {
                     $largestCorrection = $characterCorrection;
@@ -112,10 +158,28 @@ class RepairCharacterStats extends Command
         $this->info('Characters changed: ' . $charactersChanged);
         $this->info('Characters skipped: ' . $charactersSkipped);
         $this->info('Total stat points to add: ' . $totalStatPoints);
+        $this->info('Total reincarnation bonus gap: ' . $totalReincarnationBonusGap);
         $this->info('Per-stat totals:');
 
         foreach ($statTotals as $stat => $total) {
             $this->info($stat . ': ' . $total);
+        }
+
+        if (empty($affectedCharacters)) {
+            $this->info('No affected characters found.');
+        } else {
+            $this->table([
+                'character_id',
+                'character_name',
+                'level',
+                'times_reincarnated',
+                'current_reincarnated_stat_increase',
+                'expected_reincarnated_stat_increase',
+                'reincarnation_bonus_missing',
+                'raw_stats_missing_total',
+                'stats_to_repair',
+                'change',
+            ], $affectedCharacters);
         }
 
         if (! is_null($largestCorrectionCharacter)) {
@@ -153,5 +217,44 @@ class RepairCharacterStats extends Command
         }
 
         return $updates;
+    }
+
+    private function formatStatsToRepair(array $repairPlan): string
+    {
+        if (empty($repairPlan)) {
+            return 'none';
+        }
+
+        $statsToRepair = [];
+
+        foreach ($repairPlan as $stat => $pointsToAdd) {
+            $statsToRepair[] = $stat . ' +' . $pointsToAdd;
+        }
+
+        return implode(', ', $statsToRepair);
+    }
+
+    private function formatAffectedCharacterChange(
+        bool $apply,
+        int $currentReincarnatedStatIncrease,
+        int $expectedReincarnatedStatIncrease,
+        string $statsToRepair
+    ): string {
+        $changes = [];
+        $verb = $apply ? 'fixed' : 'will change';
+
+        if ($expectedReincarnatedStatIncrease > $currentReincarnatedStatIncrease) {
+            $changes[] = 'reincarnated_stat_increase ' . $currentReincarnatedStatIncrease . ' -> ' . $expectedReincarnatedStatIncrease;
+        }
+
+        if ($statsToRepair !== 'none') {
+            $changes[] = 'raw stats: ' . $statsToRepair;
+        }
+
+        if (empty($changes)) {
+            return 'none';
+        }
+
+        return $verb . ' ' . implode('; ', $changes);
     }
 }

@@ -43,7 +43,10 @@ class MassImportCustomData extends Command
         Artisan::call('assign:new-buildings-to-existing-kingdoms');
         Artisan::call('clean:invalid-broken-queues');
         Artisan::call('clean:orphaned-building-expansion-queues');
-        // Artisan::call('characters:repair-stats', ['--apply' => true]);
+        Artisan::call('characters:repair-stats', [
+            '--repair-reincarnation-bonus' => true,
+            '--apply' => true,
+        ]);
 
         Artisan::call('import:game-data Monsters');
 

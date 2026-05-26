@@ -10,6 +10,32 @@ class CharacterStatRepairService
 {
     public function __construct(private readonly BaseStatValue $baseStatValue) {}
 
+    public function getMinimumReincarnationBonus(Character $character, int $maxLevel): int
+    {
+        $bonus = 0;
+
+        for ($reincarnationCount = 0; $reincarnationCount < $character->times_reincarnated; $reincarnationCount++) {
+            $stat = 10 + $bonus + ($maxLevel - 1);
+            $bonus += (int) floor($stat * 0.05);
+            $bonus = min($bonus, MaxReincarnationStats::MAX_STATS);
+        }
+
+        return $bonus;
+    }
+
+    public function repairReincarnationBonus(Character $character, int $maxLevel): void
+    {
+        $minimumBonus = $this->getMinimumReincarnationBonus($character, $maxLevel);
+
+        if ($character->reincarnated_stat_increase >= $minimumBonus) {
+            return;
+        }
+
+        $character->update([
+            'reincarnated_stat_increase' => $minimumBonus,
+        ]);
+    }
+
     public function repair(Character $character): void
     {
         $baseStats = ['str', 'dur', 'dex', 'chr', 'int', 'agi', 'focus'];

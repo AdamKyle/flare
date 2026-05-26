@@ -205,19 +205,10 @@ class GemService
             return true;
         }
 
-        $roll = rand(1, 100);
+        $roll = rand(1, 100) / 100;
+        $effectiveChance = min(1.0, $chance + $skill->skill_bonus);
 
-        $roll = $roll + $roll * $skill->skill_bonus;
-
-        // @codeCoverageIgnoreStart
-        if ($roll >= 100) {
-            return true;
-        }
-        // @codeCoverageIgnoreEnd
-
-        $dc = 100 - ($chance * 100);
-
-        return $roll > $dc;
+        return $roll <= $effectiveChance;
     }
 
     /**

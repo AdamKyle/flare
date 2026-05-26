@@ -3,6 +3,7 @@
 namespace Tests\Console;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\MaxLevelConfiguration;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -52,6 +53,17 @@ class CharacterRepairStatsCommandTest extends TestCase
         $this->assertStringContainsString('int: 17', $output);
         $this->assertStringContainsString('agi: 17', $output);
         $this->assertStringContainsString('focus: 17', $output);
+        $this->assertStringContainsString('character_id', $output);
+        $this->assertStringContainsString('character_name', $output);
+        $this->assertStringContainsString('current_reincarnated_stat_increase', $output);
+        $this->assertStringContainsString('expected_reincarnated_stat_increase', $output);
+        $this->assertStringContainsString('reincarnation_bonus_missing', $output);
+        $this->assertStringContainsString('raw_stats_missing_total', $output);
+        $this->assertStringContainsString('stats_to_repair', $output);
+        $this->assertStringContainsString((string) $character->id, $output);
+        $this->assertStringContainsString($character->name, $output);
+        $this->assertStringContainsString('str +14, dur +17, dex +17, chr +17, int +17, agi +17, focus +17', $output);
+        $this->assertStringContainsString('will change raw stats: str +14, dur +17, dex +17, chr +17, int +17, agi +17, focus +17', $output);
 
         $character = $character->refresh();
 
@@ -76,8 +88,15 @@ class CharacterRepairStatsCommandTest extends TestCase
             '--apply' => true,
         ]));
 
+        $output = Artisan::output();
         $character = $character->refresh();
 
+        $this->assertStringContainsString('character_id', $output);
+        $this->assertStringContainsString('character_name', $output);
+        $this->assertStringContainsString('stats_to_repair', $output);
+        $this->assertStringContainsString((string) $character->id, $output);
+        $this->assertStringContainsString($character->name, $output);
+        $this->assertStringContainsString('fixed raw stats: str +14, dur +17, dex +17, chr +17, int +17, agi +17, focus +17', $output);
         $this->assertSame(18, $character->str);
         $this->assertSame(23, $character->dex);
     }
@@ -110,8 +129,10 @@ class CharacterRepairStatsCommandTest extends TestCase
             '--apply' => true,
         ]));
 
+        $output = Artisan::output();
         $character = $character->refresh();
 
+        $this->assertStringContainsString('No affected characters found.', $output);
         $this->assertSame(18, $character->str);
         $this->assertSame(23, $character->dex);
         $this->assertTrue($updatedAtBeforeCommand->eq($character->updated_at));
@@ -357,5 +378,193 @@ class CharacterRepairStatsCommandTest extends TestCase
         $this->assertStringContainsString('Largest correction: 116', $output);
         $this->assertStringContainsString('character ' . $character->id, $output);
         $this->assertStringContainsString($character->name, $output);
+    }
+
+    public function testDryRunReportsReincarnationBonusGapButChangesNothing(): void
+    {
+        MaxLevelConfiguration::create([
+            'max_level' => 2000,
+            'half_way' => 1000,
+            'three_quarters' => 1500,
+            'last_leg' => 1900,
+        ]);
+
+        $character = (new CharacterFactory)
+            ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
+            ->getCharacter();
+
+        $character->update([
+            'level' => 6,
+            'times_reincarnated' => 2,
+            'reincarnated_stat_increase' => 50,
+            'str' => 65,
+            'dex' => 70,
+        ]);
+
+        $this->assertEquals(0, Artisan::call('characters:repair-stats', [
+            '--repair-reincarnation-bonus' => true,
+        ]));
+
+        $output = Artisan::output();
+        $character = $character->refresh();
+
+        $this->assertStringContainsString('Characters affected: 1', $output);
+        $this->assertStringContainsString('Total stat points to add: 1405', $output);
+        $this->assertStringContainsString('Total reincarnation bonus gap: 155', $output);
+        $this->assertStringContainsString('str: 155', $output);
+        $this->assertStringContainsString('dur: 219', $output);
+        $this->assertStringContainsString('dex: 155', $output);
+        $this->assertStringContainsString('chr: 219', $output);
+        $this->assertStringContainsString('int: 219', $output);
+        $this->assertStringContainsString('agi: 219', $output);
+        $this->assertStringContainsString('focus: 219', $output);
+        $this->assertStringContainsString('raw_stats_missing_total', $output);
+        $this->assertStringContainsString('1405', $output);
+        $this->assertStringContainsString('str +155, dur +219, dex +155, chr +219, int +219, agi +219, focus +219', $output);
+        $this->assertStringContainsString('will change reincarnated_stat_increase 50 -> 205; raw stats: str +155, dur +219, dex +155, chr +219, int +219, agi +219, focus +219', $output);
+        $this->assertStringContainsString('Largest correction: 1405', $output);
+        $this->assertSame(50, $character->reincarnated_stat_increase);
+        $this->assertSame(65, $character->str);
+        $this->assertSame(70, $character->dex);
+    }
+
+    public function testApplyRepairsReincarnationBonusThenRawStats(): void
+    {
+        MaxLevelConfiguration::create([
+            'max_level' => 2000,
+            'half_way' => 1000,
+            'three_quarters' => 1500,
+            'last_leg' => 1900,
+        ]);
+
+        $character = (new CharacterFactory)
+            ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
+            ->getCharacter();
+
+        $character->update([
+            'level' => 6,
+            'xp' => 75,
+            'xp_next' => 250,
+            'gold' => 123,
+            'gold_dust' => 456,
+            'shards' => 789,
+            'copper_coins' => 321,
+            'times_reincarnated' => 2,
+            'reincarnated_stat_increase' => 50,
+            'str' => 65,
+            'dex' => 70,
+        ]);
+
+        $this->assertEquals(0, Artisan::call('characters:repair-stats', [
+            '--apply' => true,
+            '--repair-reincarnation-bonus' => true,
+        ]));
+
+        $character = $character->refresh();
+
+        $this->assertSame(205, $character->reincarnated_stat_increase);
+        $this->assertSame(220, $character->str);
+        $this->assertSame(225, $character->dex);
+        $this->assertSame(6, $character->level);
+        $this->assertSame(75, $character->xp);
+        $this->assertSame(250, $character->xp_next);
+        $this->assertSame(123, $character->gold);
+        $this->assertSame(456, $character->gold_dust);
+        $this->assertSame(789, $character->shards);
+        $this->assertSame(321, $character->copper_coins);
+        $this->assertSame(2, $character->times_reincarnated);
+    }
+
+    public function testRepairReincarnationBonusDoesNotReduceExistingBonus(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-05-24 09:00:00'));
+
+        MaxLevelConfiguration::create([
+            'max_level' => 2000,
+            'half_way' => 1000,
+            'three_quarters' => 1500,
+            'last_leg' => 1900,
+        ]);
+
+        $character = (new CharacterFactory)
+            ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
+            ->getCharacter();
+
+        $character->update([
+            'level' => 6,
+            'times_reincarnated' => 2,
+            'reincarnated_stat_increase' => 250,
+            'str' => 265,
+            'dur' => 265,
+            'dex' => 270,
+            'chr' => 265,
+            'int' => 265,
+            'agi' => 265,
+            'focus' => 265,
+        ]);
+
+        $updatedAtBeforeCommand = $character->refresh()->updated_at;
+
+        Carbon::setTestNow(Carbon::parse('2026-05-24 10:00:00'));
+
+        $this->assertEquals(0, Artisan::call('characters:repair-stats', [
+            '--apply' => true,
+            '--repair-reincarnation-bonus' => true,
+        ]));
+
+        $output = Artisan::output();
+        $character = $character->refresh();
+
+        $this->assertStringContainsString('Total reincarnation bonus gap: 0', $output);
+        $this->assertSame(250, $character->reincarnated_stat_increase);
+        $this->assertSame(265, $character->str);
+        $this->assertSame(270, $character->dex);
+        $this->assertTrue($updatedAtBeforeCommand->eq($character->updated_at));
+    }
+
+    public function testRepairReincarnationBonusIsIdempotent(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-05-24 09:00:00'));
+
+        MaxLevelConfiguration::create([
+            'max_level' => 2000,
+            'half_way' => 1000,
+            'three_quarters' => 1500,
+            'last_leg' => 1900,
+        ]);
+
+        $character = (new CharacterFactory)
+            ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
+            ->getCharacter();
+
+        $character->update([
+            'level' => 6,
+            'times_reincarnated' => 2,
+            'reincarnated_stat_increase' => 50,
+            'str' => 65,
+            'dex' => 70,
+        ]);
+
+        $this->assertEquals(0, Artisan::call('characters:repair-stats', [
+            '--apply' => true,
+            '--repair-reincarnation-bonus' => true,
+        ]));
+
+        $character = $character->refresh();
+        $updatedAtAfterFirstRun = $character->updated_at;
+
+        Carbon::setTestNow(Carbon::parse('2026-05-24 10:00:00'));
+
+        $this->assertEquals(0, Artisan::call('characters:repair-stats', [
+            '--apply' => true,
+            '--repair-reincarnation-bonus' => true,
+        ]));
+
+        $character = $character->refresh();
+
+        $this->assertSame(205, $character->reincarnated_stat_increase);
+        $this->assertSame(220, $character->str);
+        $this->assertSame(225, $character->dex);
+        $this->assertTrue($updatedAtAfterFirstRun->eq($character->updated_at));
     }
 }
