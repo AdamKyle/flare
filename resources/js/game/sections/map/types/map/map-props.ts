@@ -22,6 +22,12 @@ export default interface MapProps {
 
     automation_completed_at: number;
 
+    active_automation: {
+        type: number;
+        name: string;
+        timer_seconds: number;
+    } | null;
+
     can_engage_celestials_again_at: number;
 
     show_celestial_fight_button: (id: number | null) => void;

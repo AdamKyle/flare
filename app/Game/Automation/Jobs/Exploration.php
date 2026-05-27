@@ -19,10 +19,10 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
-use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationTimeOut;
+use App\Game\Automation\Services\ExplorationCreatureCountCalculator;
 use App\Game\Skills\Services\SkillService;
 use Psr\SimpleCache\InvalidArgumentException;
 
@@ -43,6 +43,8 @@ class Exploration implements ShouldQueue
     private FactionHandler $factionHandler;
 
     private CharacterCacheData $characterCacheData;
+
+    private ExplorationCreatureCountCalculator $explorationCreatureCountCalculator;
 
     private ?Monster $monster = null;
 
@@ -76,6 +78,7 @@ class Exploration implements ShouldQueue
         CharacterRewardService $characterRewardService,
         SkillService $skillService,
         FactionHandler $factionHandler,
+        ExplorationCreatureCountCalculator $explorationCreatureCountCalculator,
     ): void {
 
         $this->characterRewardService = $characterRewardService;
@@ -87,6 +90,8 @@ class Exploration implements ShouldQueue
         $this->factionHandler = $factionHandler;
 
         $this->characterCacheData = $characterCacheData;
+
+        $this->explorationCreatureCountCalculator = $explorationCreatureCountCalculator;
 
         $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
 
@@ -160,7 +165,7 @@ class Exploration implements ShouldQueue
 
         $this->sendOutEventLogUpdate('You and The Guide search the area looking for any other signs of them. That\'s when The Guide spots them and points', true);
 
-        $enemies = $this->creatureCount();
+        $enemies = $this->explorationCreatureCountCalculator->calculate($this->character);
 
         $this->sendOutEventLogUpdate('"Chirst, child there are: ' . $enemies . ' of them ..."
         The Guide hisses at you from the shadows. You ignore his words and prepare for battle. One right after the other ...', true);
@@ -248,20 +253,6 @@ class Exploration implements ShouldQueue
         }
 
         return true;
-    }
-
-    private function creatureCount(): int
-    {
-        $fightTimeOutModifier = resolve(CharacterStatBuilder::class)
-            ->setCharacter($this->character->refresh())
-            ->buildTimeOutModifier('fight_time_out');
-        $timeoutSeconds = 10 - (5 * $fightTimeOutModifier);
-
-        if ($timeoutSeconds <= 0) {
-            return 12;
-        }
-
-        return max(6, min(12, (int) floor(60 / $timeoutSeconds)));
     }
 
     /**

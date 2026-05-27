@@ -120,7 +120,27 @@ class ExplorationAutomationServiceTest extends TestCase
         ]);
 
         Event::assertDispatched(AutomationLogUpdate::class, function (AutomationLogUpdate $event) {
-            return $event->message === 'The exploration will begin in 1 minute. Every 1 minute you will encounter between 6 and 12 enemies based on your fight timeout modifier.';
+            return $event->message === 'The exploration will begin in 1 minute. Every 1 minute you will encounter 6 enemies based on your fight timeout modifier.';
+        });
+    }
+
+    public function testBeginAutomationLogUpdateIncludesExactCreatureCountAndNoOldCopy(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        Event::assertDispatched(AutomationLogUpdate::class, function (AutomationLogUpdate $event) {
+            return $event->message === 'The exploration will begin in 1 minute. Every 1 minute you will encounter 6 enemies based on your fight timeout modifier.'
+                && ! str_contains($event->message, '2 minutes')
+                && ! str_contains($event->message, '50 encounters')
+                && ! str_contains($event->message, 'between 6 and 12');
         });
     }
 

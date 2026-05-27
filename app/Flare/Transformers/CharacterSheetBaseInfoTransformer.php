@@ -81,6 +81,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'is_faction_loyalty_automation_running' => $character->isFactionLoyaltyAutomationRunning(),
             'is_delve_running' => $character->currentAutomations()->where('character_id', $character->id)->where('type', AutomationType::DELVE)->get()->isNotEmpty(),
             'can_set_delve_pack' => $this->canSetPactOptionsForDelve($character),
+            'active_automation' => $this->activeAutomation($character),
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
             'is_silenced' => $character->user->is_silenced,
             'can_talk_again_at' => $character->user->can_talk_again_at,
@@ -129,13 +130,42 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
 
     private function getTimeLeftOnAutomation(Character $character)
     {
-        $automation = $character->currentAutomations()->where('type', AutomationType::EXPLORING)->first();
+        $automation = $this->activeAutomation($character);
 
         if (! is_null($automation)) {
-            return now()->diffInSeconds($automation->completed_at);
+            return $automation['timer_seconds'];
         }
 
         return 0;
+    }
+
+    private function activeAutomation(Character $character): ?array
+    {
+        $automation = $character->currentAutomations()
+            ->where('completed_at', '>', now())
+            ->orderBy('id')
+            ->first();
+
+        if (is_null($automation)) {
+            return null;
+        }
+
+        $name = match ($automation->type) {
+            AutomationType::EXPLORING => 'Exploration',
+            AutomationType::DELVE => 'Delve',
+            AutomationType::FACTION_LOYALTY => 'Faction Loyalty',
+            default => null,
+        };
+
+        if (is_null($name)) {
+            return null;
+        }
+
+        return [
+            'type' => $automation->type,
+            'name' => $name,
+            'timer_seconds' => now()->diffInSeconds($automation->completed_at),
+        ];
     }
 
     private function canSetPactOptionsForDelve(Character $character): bool

@@ -2,6 +2,7 @@ import { AxiosError, AxiosResponse } from "axios";
 import React from "react";
 import DangerAlert from "../../components/ui/alerts/simple-alerts/danger-alert";
 import SuccessAlert from "../../components/ui/alerts/simple-alerts/success-alert";
+import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
 import DangerOutlineButton from "../../components/ui/buttons/danger-outline-button";
 import PrimaryOutlineButton from "../../components/ui/buttons/primary-outline-button";
 import DropDown from "../../components/ui/drop-down/drop-down";
@@ -420,7 +421,15 @@ export default class FactionFame extends React.Component<
             this.props.is_automation_running &&
             !this.isFactionLoyaltyAutomationRunning()
         ) {
-            return "Another automation is already running.";
+            return "Exploration is running. Pledge/unpledge, allegiance switching, NPC assist, bounties, NPC crafting, and Faction Loyalty automation are unavailable until Exploration is canceled.";
+        }
+
+        if (this.props.is_delve_running) {
+            return "Delve is running. Pledge/unpledge, allegiance switching, NPC assist, bounties, NPC crafting, and Faction Loyalty automation are unavailable until Delve is canceled.";
+        }
+
+        if (this.isFactionLoyaltyAutomationRunning()) {
+            return "Faction Loyalty Automation is running. Pledge/unpledge, allegiance switching, NPC assist, bounties, NPC crafting, and Faction Loyalty automation are unavailable until Faction Loyalty Automation is canceled.";
         }
 
         return null;
@@ -468,6 +477,15 @@ export default class FactionFame extends React.Component<
         }
 
         const automationDisabledReason = this.getAutomationDisabledReason();
+        const factionLoyaltyActionsBlockedMessage =
+            this.props.is_automation_running &&
+            !this.isFactionLoyaltyAutomationRunning()
+                ? "Exploration is running. Pledge/unpledge, allegiance switching, NPC assist, bounties, NPC crafting, and Faction Loyalty automation are unavailable until Exploration is canceled."
+                : this.props.is_delve_running
+                  ? "Delve is running. Pledge/unpledge, allegiance switching, NPC assist, bounties, NPC crafting, and Faction Loyalty automation are unavailable until Delve is canceled."
+                  : this.isFactionLoyaltyAutomationRunning()
+                    ? "Faction Loyalty Automation is running. Pledge/unpledge, allegiance switching, NPC assist, bounties, NPC crafting, and Faction Loyalty automation are unavailable until Faction Loyalty Automation is canceled."
+                    : null;
 
         return (
             <div>
@@ -510,6 +528,11 @@ export default class FactionFame extends React.Component<
                             <LoadingProgressBar />
                         ) : null}
                     </div>
+                    {factionLoyaltyActionsBlockedMessage !== null ? (
+                        <WarningAlert additional_css={"my-4 text-center"}>
+                            {factionLoyaltyActionsBlockedMessage}
+                        </WarningAlert>
+                    ) : null}
                     <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
                     <div className="my-4 flex flex-wrap md:flex-nowrap gap-2">
                         <div className="flex-none mt-[-25px] md:w-1/2">

@@ -264,15 +264,7 @@ export default class Actions extends React.Component<
     }
 
     automationName(): string {
-        if (this.isFactionLoyaltyAutomationRunning()) {
-            return "Faction Loyalty Automation";
-        }
-
-        if (this.isDelveRunning()) {
-            return "Delve";
-        }
-
-        return "Exploration";
+        return this.props.character.active_automation?.name ?? "Automation";
     }
 
     automationStopRoute(): string {

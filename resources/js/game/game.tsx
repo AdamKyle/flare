@@ -725,6 +725,10 @@ export default class Game extends React.Component<GameProps, GameState> {
                                                 this.state.character
                                                     .automation_completed_at
                                             }
+                                            active_automation={
+                                                this.state.character
+                                                    .active_automation
+                                            }
                                             can_engage_celestials_again_at={
                                                 this.state.character
                                                     .can_engage_celestials_again_at

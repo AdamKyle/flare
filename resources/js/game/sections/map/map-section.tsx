@@ -247,15 +247,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
     }
 
     automationTimerLabel(): string {
-        if (this.props.is_faction_loyalty_automation_running) {
-            return "Faction Loyalty";
-        }
-
-        if (this.props.is_delve_running) {
-            return "Delve";
-        }
-
-        return "Exploration";
+        return this.props.active_automation?.name ?? "Automation";
     }
 
     setStateFromData(data: MapData, callback?: () => void) {

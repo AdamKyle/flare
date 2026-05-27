@@ -19,7 +19,8 @@ class ExplorationAutomationService
     private int $timeDelay = 0;
 
     public function __construct(
-        private readonly CharacterCacheData $characterCacheData
+        private readonly CharacterCacheData $characterCacheData,
+        private readonly ExplorationCreatureCountCalculator $explorationCreatureCountCalculator
     ) {}
 
     public function beginAutomation(Character $character, array $params)
@@ -41,7 +42,9 @@ class ExplorationAutomationService
 
         event(new UpdateCharacterStatus($character));
 
-        event(new AutomationLogUpdate($character->user->id, 'The exploration will begin in 1 minute. Every 1 minute you will encounter between 6 and 12 enemies based on your fight timeout modifier.'));
+        $creatureCount = $this->explorationCreatureCountCalculator->calculate($character);
+
+        event(new AutomationLogUpdate($character->user->id, 'The exploration will begin in 1 minute. Every 1 minute you will encounter ' . $creatureCount . ' enemies based on your fight timeout modifier.'));
 
         event(new AutomationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
 

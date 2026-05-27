@@ -40,8 +40,8 @@ export default class SmallActionsManager {
                               )
                             : 0,
                     automation_time_out:
-                        props.character.automation_completed_at !== null
-                            ? props.character.automation_completed_at
+                        props.character.active_automation !== null
+                            ? props.character.active_automation.timer_seconds
                             : 0,
                     celestial_time_out:
                         props.character.can_engage_celestials_again_at !== null

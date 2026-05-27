@@ -267,27 +267,11 @@ export default class SmallerActions extends React.Component<
     }
 
     automationName(): string {
-        if (this.isFactionLoyaltyAutomationRunning()) {
-            return "Faction Loyalty Automation";
-        }
-
-        if (this.isDelveRunning()) {
-            return "Delve";
-        }
-
-        return "Exploration";
+        return this.props.character.active_automation?.name ?? "Automation";
     }
 
     automationTimerLabel(): string {
-        if (this.isFactionLoyaltyAutomationRunning()) {
-            return "Faction Loyalty";
-        }
-
-        if (this.isDelveRunning()) {
-            return "Delve";
-        }
-
-        return "Exploration";
+        return this.props.character.active_automation?.name ?? "Automation";
     }
 
     automationRestrictionMessage(): string {

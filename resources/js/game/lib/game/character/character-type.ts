@@ -142,6 +142,12 @@ export interface CharacterType {
 
     automation_completed_at: number;
 
+    active_automation: {
+        type: number;
+        name: string;
+        timer_seconds: number;
+    } | null;
+
     xp: number;
 
     xp_next: number;

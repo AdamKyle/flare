@@ -471,27 +471,23 @@ export default class ExplorationSection extends React.Component<any, any> {
         if (this.props.character.is_faction_loyalty_automation_running) {
             return (
                 <Fragment>
-                    <div
-                        className="mb-4 lg:ml-[120px] text-center lg:text-left"
-                        aria-live="polite"
-                    >
+                    <WarningAlert additional_css={"mb-4 text-center"}>
                         <p className="my-2">
-                            Sorry, you cannot do this right now because Faction
-                            Loyalty Automation is running.
+                            Faction Loyalty Automation is running.
                         </p>
                         <p className="my-2">Would you like to stop it?</p>
-                    </div>
+                    </WarningAlert>
 
                     {this.state.loading ? <LoadingProgressBar /> : null}
 
-                    <div className="text-center">
+                    <div className="flex flex-wrap justify-center gap-2">
                         <DangerButton
                             button_label={"Stop Faction Loyalty Automation"}
                             on_click={this.stopFactionLoyaltyAutomation.bind(
                                 this,
                             )}
                             disabled={this.state.loading}
-                            additional_css={"mr-2 mb-4"}
+                            additional_css={"mb-4"}
                         />
                         <PrimaryButton
                             button_label={"Close Exploration"}
@@ -506,30 +502,24 @@ export default class ExplorationSection extends React.Component<any, any> {
         if (this.props.character.is_delve_running) {
             return (
                 <Fragment>
-                    <div
-                        className="mb-4 lg:ml-[120px] text-center lg:text-left"
-                        aria-live="polite"
-                    >
-                        <p className="my-2">
-                            Sorry, you cannot do this right now because Delve is
-                            running.
-                        </p>
+                    <WarningAlert additional_css={"mb-4 text-center"}>
+                        <p className="my-2">Delve is running.</p>
                         <p className="my-2">Would you like to stop it?</p>
                         <a href="/information/delve" target="_blank">
                             See Delve Help{" "}
                             <i className="fas fa-external-link-alt"></i>
                         </a>{" "}
                         for more details.
-                    </div>
+                    </WarningAlert>
 
                     {this.state.loading ? <LoadingProgressBar /> : null}
 
-                    <div className="text-center">
+                    <div className="flex flex-wrap justify-center gap-2">
                         <DangerButton
                             button_label={"Stop Delve"}
                             on_click={this.stopDelveExploration.bind(this)}
                             disabled={this.state.loading}
-                            additional_css={"mr-2 mb-4"}
+                            additional_css={"mb-4"}
                         />
                         <PrimaryButton
                             button_label={"Close Delve"}
@@ -544,30 +534,24 @@ export default class ExplorationSection extends React.Component<any, any> {
         if (this.props.character.is_automation_running) {
             return (
                 <Fragment>
-                    <div
-                        className="mb-4 lg:ml-[120px] text-center lg:text-left"
-                        aria-live="polite"
-                    >
-                        <p className="my-2">
-                            Sorry, you cannot do this right now because
-                            Exploration is running.
-                        </p>
+                    <WarningAlert additional_css={"mb-4 text-center"}>
+                        <p className="my-2">Exploration is running.</p>
                         <p className="my-2">Would you like to stop it?</p>
                         <a href="/information/automation" target="_blank">
                             See Exploration Help{" "}
                             <i className="fas fa-external-link-alt"></i>
                         </a>{" "}
                         for more details.
-                    </div>
+                    </WarningAlert>
 
                     {this.state.loading ? <LoadingProgressBar /> : null}
 
-                    <div className="text-center">
+                    <div className="flex flex-wrap justify-center gap-2">
                         <DangerButton
                             button_label={"Stop Exploration"}
                             on_click={this.stopExploration.bind(this)}
                             disabled={this.state.loading}
-                            additional_css={"mr-2 mb-4"}
+                            additional_css={"mb-4"}
                         />
                         <PrimaryButton
                             button_label={"Close Exploration"}

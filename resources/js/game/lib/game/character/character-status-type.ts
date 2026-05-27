@@ -19,6 +19,12 @@ export default interface CharacterStatusType {
 
     is_delve_running: boolean;
 
+    active_automation: {
+        type: number;
+        name: string;
+        timer_seconds: number;
+    } | null;
+
     is_at_delve_location: boolean;
 
     can_set_delve_pack: boolean;
