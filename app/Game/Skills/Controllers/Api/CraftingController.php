@@ -87,7 +87,9 @@ class CraftingController extends Controller
      */
     public function craft(CraftingValidation $request, Character $character, CraftingService $craftingService): JsonResponse
     {
-        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::START_ITEM_CRAFTING);
+        $action = $request->craft_for_npc ? AutomationRestrictionService::START_FACTION_LOYALTY : AutomationRestrictionService::START_ITEM_CRAFTING;
+
+        $restriction = $this->automationRestrictionJsonResponse($character, $action);
 
         if (! is_null($restriction)) {
             return $restriction;

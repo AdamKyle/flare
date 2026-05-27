@@ -134,6 +134,58 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         $this->assertEquals('You cannot do that while Faction Loyalty automation is running. Cancel it first.', $jsonData['message']);
     }
 
+    public function testBeginReturns422WhenExplorationIsRunning(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        CharacterAutomation::create([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::EXPLORING,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/start', [
+                '_token' => csrf_token(),
+                'attack_type' => AttackTypeValue::ATTACK,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('You are currently doing Exploration. This action cannot be completed right now. Please cancel Exploration first.', $jsonData['message']);
+        $this->assertNull(FactionLoyaltyAutomation::query()->latest('id')->first());
+    }
+
+    public function testBeginReturns422WhenDelveIsRunning(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        CharacterAutomation::create([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/start', [
+                '_token' => csrf_token(),
+                'attack_type' => AttackTypeValue::ATTACK,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('You are currently doing Delve. This action cannot be completed right now. Please cancel Delve first.', $jsonData['message']);
+        $this->assertNull(FactionLoyaltyAutomation::query()->latest('id')->first());
+    }
+
     public function testBeginReturns422WhenCharacterIsNotPledgedToAFaction(): void
     {
         Queue::fake();

@@ -28,8 +28,10 @@ use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Monster\MonsterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateFactionLoyalty;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateNpc;
 
 /**
  * This class is testing multiple enforcement restrictions when various automations are running
@@ -47,7 +49,7 @@ use Tests\Traits\CreateItem;
  */
 class AutomationRestrictionEnforcementTest extends TestCase
 {
-    use CreateGameSkill, CreateItem, RefreshDatabase;
+    use CreateFactionLoyalty, CreateGameSkill, CreateItem, CreateNpc, RefreshDatabase;
 
     public function testManualFightingIsBlockedWhileExplorationIsRunning(): void
     {
@@ -595,6 +597,252 @@ class AutomationRestrictionEnforcementTest extends TestCase
 
         $this->assertEquals(422, $response->getStatusCode());
         $this->assertEquals('You cannot do that while Faction Loyalty automation is running. Cancel it first.', $jsonData['message']);
+    }
+
+    public function testNpcFactionCraftingIsBlockedWhileExplorationIsRunning(): void
+    {
+        $craftingSkill = $this->createGameSkill([
+            'name' => 'Weapon Crafting',
+            'type' => SkillTypeValue::CRAFTING->value,
+            'max_level' => 400,
+        ]);
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignSkill($craftingSkill, 10)
+            ->getCharacter();
+        $character->update([
+            'gold' => 1000000,
+        ]);
+        $item = $this->createItem([
+            'type' => ItemType::DAGGER->value,
+            'crafting_type' => ItemType::DAGGER->value,
+            'can_craft' => true,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 25,
+        ]);
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::EXPLORING,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/craft/' . $character->id, [
+                'item_to_craft' => $item->id,
+                'type' => $item->crafting_type,
+                'craft_for_npc' => true,
+                'craft_for_event' => false,
+            ], [], [], [
+                'HTTP_ACCEPT' => 'application/json',
+            ]);
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('You are currently doing Exploration. This action cannot be completed right now. Please cancel Exploration first.', $jsonData['message']);
+    }
+
+    public function testNpcFactionCraftingIsBlockedWhileDelveIsRunning(): void
+    {
+        $craftingSkill = $this->createGameSkill([
+            'name' => 'Weapon Crafting',
+            'type' => SkillTypeValue::CRAFTING->value,
+            'max_level' => 400,
+        ]);
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignSkill($craftingSkill, 10)
+            ->getCharacter();
+        $character->update([
+            'gold' => 1000000,
+        ]);
+        $item = $this->createItem([
+            'type' => ItemType::DAGGER->value,
+            'crafting_type' => ItemType::DAGGER->value,
+            'can_craft' => true,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 25,
+        ]);
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/craft/' . $character->id, [
+                'item_to_craft' => $item->id,
+                'type' => $item->crafting_type,
+                'craft_for_npc' => true,
+                'craft_for_event' => false,
+            ], [], [], [
+                'HTTP_ACCEPT' => 'application/json',
+            ]);
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('You are currently doing Delve. This action cannot be completed right now. Please cancel Delve first.', $jsonData['message']);
+    }
+
+    public function testRegularCraftingIsAllowedWhileExplorationIsRunning(): void
+    {
+        $craftingSkill = $this->createGameSkill([
+            'name' => 'Weapon Crafting',
+            'type' => SkillTypeValue::CRAFTING->value,
+            'max_level' => 400,
+        ]);
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignSkill($craftingSkill, 10)
+            ->getCharacter();
+        $character->update([
+            'gold' => 1000000,
+        ]);
+        $item = $this->createItem([
+            'type' => ItemType::DAGGER->value,
+            'crafting_type' => ItemType::DAGGER->value,
+            'can_craft' => true,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 25,
+        ]);
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::EXPLORING,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/craft/' . $character->id, [
+                'item_to_craft' => $item->id,
+                'type' => $item->crafting_type,
+                'craft_for_npc' => false,
+                'craft_for_event' => false,
+            ], [], [], [
+                'HTTP_ACCEPT' => 'application/json',
+            ]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testRegularCraftingIsAllowedWhileDelveIsRunning(): void
+    {
+        $craftingSkill = $this->createGameSkill([
+            'name' => 'Weapon Crafting',
+            'type' => SkillTypeValue::CRAFTING->value,
+            'max_level' => 400,
+        ]);
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignSkill($craftingSkill, 10)
+            ->getCharacter();
+        $character->update([
+            'gold' => 1000000,
+        ]);
+        $item = $this->createItem([
+            'type' => ItemType::DAGGER->value,
+            'crafting_type' => ItemType::DAGGER->value,
+            'can_craft' => true,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 25,
+        ]);
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/craft/' . $character->id, [
+                'item_to_craft' => $item->id,
+                'type' => $item->crafting_type,
+                'craft_for_npc' => false,
+                'craft_for_event' => false,
+            ], [], [], [
+                'HTTP_ACCEPT' => 'application/json',
+            ]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testFactionLoyaltyBountyIsBlockedWhileExplorationIsRunning(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $npc = $this->createNpc([
+            'game_map_id' => $character->map->game_map_id,
+        ]);
+        $monster = (new MonsterFactory)
+            ->buildMonster()
+            ->updateMonster([
+                'game_map_id' => $character->map->game_map_id,
+            ])
+            ->getMonster();
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::EXPLORING,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/faction-loyalty-bounty/' . $character->id, [
+                'monster_id' => $monster->id,
+                'npc_id' => $npc->id,
+                'attack_type' => 'attack',
+            ], [], [], [
+                'HTTP_ACCEPT' => 'application/json',
+            ]);
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('You are currently doing Exploration. This action cannot be completed right now. Please cancel Exploration first.', $jsonData['message']);
+    }
+
+    public function testFactionLoyaltyBountyIsBlockedWhileDelveIsRunning(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $npc = $this->createNpc([
+            'game_map_id' => $character->map->game_map_id,
+        ]);
+        $monster = (new MonsterFactory)
+            ->buildMonster()
+            ->updateMonster([
+                'game_map_id' => $character->map->game_map_id,
+            ])
+            ->getMonster();
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/faction-loyalty-bounty/' . $character->id, [
+                'monster_id' => $monster->id,
+                'npc_id' => $npc->id,
+                'attack_type' => 'attack',
+            ], [], [], [
+                'HTTP_ACCEPT' => 'application/json',
+            ]);
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('You are currently doing Delve. This action cannot be completed right now. Please cancel Delve first.', $jsonData['message']);
     }
 
     public function testDirectManualFightExecutionIsBlockedWhileExplorationIsRunning(): void

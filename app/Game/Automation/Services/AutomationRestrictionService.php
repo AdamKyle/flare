@@ -72,12 +72,20 @@ class AutomationRestrictionService
         return [
             'automation' => $automation,
             'automation_name' => $this->automationName($automation),
-            'message' => $this->blockedMessage($automation),
+            'message' => $this->blockedMessage($automation, $action),
         ];
     }
 
-    public function blockedMessage(CharacterAutomation $automation): string
+    public function blockedMessage(CharacterAutomation $automation, ?string $action = null): string
     {
+        $automationType = new AutomationType($automation->type);
+
+        if ($action === self::START_FACTION_LOYALTY && ($automationType->isExploring() || $automationType->isDelve())) {
+            $automationName = $this->automationName($automation);
+
+            return 'You are currently doing ' . $automationName . '. This action cannot be completed right now. Please cancel ' . $automationName . ' first.';
+        }
+
         return 'You cannot do that while ' . $this->automationName($automation) . ' automation is running. Cancel it first.';
     }
 

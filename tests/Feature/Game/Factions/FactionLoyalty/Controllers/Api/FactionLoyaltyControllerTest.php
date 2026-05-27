@@ -3,6 +3,9 @@
 namespace Tests\Feature\Game\Factions\FactionLoyalty\Controllers\Api;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\CharacterAutomation;
+use App\Flare\Values\AttackTypeValue;
+use App\Flare\Values\AutomationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -154,6 +157,30 @@ class FactionLoyaltyControllerTest extends TestCase
         $this->assertEquals('Pledged to: '.$this->character->map->gameMap->name.'.', $response['message']);
     }
 
+    public function testPledgeLoyaltyReturns422WhenExplorationIsRunning()
+    {
+        $this->character->factions()->update(['maxed' => true]);
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::EXPLORING,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/faction-loyalty/pledge/'.$this->character->id.'/'.$this->character->factions->first()->id, [
+                '_token' => csrf_token(),
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('You are currently doing Exploration. This action cannot be completed right now. Please cancel Exploration first.', $jsonData['message']);
+        $this->assertFalse($this->character->factionLoyalties()->where('is_pledged', true)->exists());
+    }
+
     public function testRemovePledgedLoyalty()
     {
         $npc = $this->createNpc([
@@ -212,6 +239,34 @@ class FactionLoyaltyControllerTest extends TestCase
         $this->assertEquals('No longer pledged to: '.$this->character->map->gameMap->name.'.', $response['message']);
     }
 
+    public function testRemovePledgeReturns422WhenDelveIsRunning()
+    {
+        $factionLoyalty = $this->createFactionLoyalty([
+            'faction_id' => $this->character->factions->first()->id,
+            'character_id' => $this->character->id,
+            'is_pledged' => true,
+        ]);
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/faction-loyalty/remove-pledge/'.$this->character->id.'/'.$this->character->factions->first()->id, [
+                '_token' => csrf_token(),
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('You are currently doing Delve. This action cannot be completed right now. Please cancel Delve first.', $jsonData['message']);
+        $this->assertTrue($factionLoyalty->refresh()->is_pledged);
+    }
+
     public function testAssistNpcWithTasks()
     {
         $npc = $this->createNpc([
@@ -250,6 +305,54 @@ class FactionLoyaltyControllerTest extends TestCase
         $this->assertEquals('You are now assisting '.$factionNpc->npc->real_name.' with their tasks!', $response['message']);
     }
 
+    public function testAssistNpcReturns422WhenExplorationIsRunning()
+    {
+        $npc = $this->createNpc([
+            'game_map_id' => $this->character->map->game_map_id,
+        ]);
+
+        $factionLoyalty = $this->createFactionLoyalty([
+            'faction_id' => $this->character->factions->first()->id,
+            'character_id' => $this->character->id,
+            'is_pledged' => true,
+        ]);
+
+        $factionNpc = $this->createFactionLoyaltyNpc([
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => false,
+            'kingdom_item_defence_bonus' => 0.002,
+        ]);
+
+        $this->createFactionLoyaltyNpcTask([
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'fame_tasks' => [],
+        ]);
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::EXPLORING,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/faction-loyalty/assist/'.$this->character->id.'/'.$factionNpc->id, [
+                '_token' => csrf_token(),
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('You are currently doing Exploration. This action cannot be completed right now. Please cancel Exploration first.', $jsonData['message']);
+        $this->assertFalse($factionNpc->refresh()->currently_helping);
+    }
+
     public function testStopAssistingNpc()
     {
         $npc = $this->createNpc([
@@ -286,5 +389,53 @@ class FactionLoyaltyControllerTest extends TestCase
             ]);
 
         $this->assertEquals('You stopped assisting '.$factionNpc->npc->real_name.' with their tasks. They are sad but understand.', $response['message']);
+    }
+
+    public function testStopAssistingNpcReturns422WhenDelveIsRunning()
+    {
+        $npc = $this->createNpc([
+            'game_map_id' => $this->character->map->game_map_id,
+        ]);
+
+        $factionLoyalty = $this->createFactionLoyalty([
+            'faction_id' => $this->character->factions->first()->id,
+            'character_id' => $this->character->id,
+            'is_pledged' => true,
+        ]);
+
+        $factionNpc = $this->createFactionLoyaltyNpc([
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
+        ]);
+
+        $this->createFactionLoyaltyNpcTask([
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'fame_tasks' => [],
+        ]);
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/faction-loyalty/stop-assisting/'.$this->character->id.'/'.$factionNpc->id, [
+                '_token' => csrf_token(),
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('You are currently doing Delve. This action cannot be completed right now. Please cancel Delve first.', $jsonData['message']);
+        $this->assertTrue($factionNpc->refresh()->currently_helping);
     }
 }

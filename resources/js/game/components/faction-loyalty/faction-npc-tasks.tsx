@@ -53,6 +53,10 @@ export default class FactionNpcTasks extends React.Component<
     }
 
     bountyTask(monsterId?: number) {
+        if (this.isAnyAutomationRunning()) {
+            return;
+        }
+
         if (!monsterId) {
             return;
         }
@@ -82,6 +86,10 @@ export default class FactionNpcTasks extends React.Component<
     }
 
     craftingTask(itemType: string, itemId?: number) {
+        if (this.isAnyAutomationRunning()) {
+            return;
+        }
+
         if (!itemId) {
             return;
         }
@@ -158,6 +166,7 @@ export default class FactionNpcTasks extends React.Component<
             !this.props.can_craft ||
             this.state.crafting ||
             this.state.must_revive ||
+            this.isAnyAutomationRunning() ||
             fameTask.current_amount === fameTask.required_amount ||
             !this.props.faction_loyalty_npc.currently_helping ||
             !(
@@ -232,6 +241,10 @@ export default class FactionNpcTasks extends React.Component<
     }
 
     setAttackType(attackType: string) {
+        if (this.isAnyAutomationRunning()) {
+            return;
+        }
+
         this.setState({
             attack_type_selected: attackType,
         });
@@ -286,6 +299,10 @@ export default class FactionNpcTasks extends React.Component<
     }
 
     showAutomationScreen() {
+        if (this.props.automation_disabled_reason != null) {
+            return;
+        }
+
         if (typeof this.props.show_automation_screen !== "undefined") {
             this.props.show_automation_screen();
         }

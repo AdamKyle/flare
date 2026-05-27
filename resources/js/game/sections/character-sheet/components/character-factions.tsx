@@ -50,7 +50,7 @@ export default class CharacterFactions extends React.Component<any, any> {
     }
 
     handlePledge(pledging: boolean) {
-        if (this.props.is_faction_loyalty_automation_running) {
+        if (this.isFactionLoyaltyActionBlocked()) {
             return;
         }
 
@@ -195,7 +195,8 @@ export default class CharacterFactions extends React.Component<any, any> {
                                 on_click={() => this.handlePledge(false)}
                                 disabled={
                                     this.props
-                                        .is_faction_loyalty_automation_running
+                                        .is_faction_loyalty_automation_running ||
+                                    this.isFactionLoyaltyActionBlocked()
                                 }
                             />
                         ) : (
@@ -207,7 +208,8 @@ export default class CharacterFactions extends React.Component<any, any> {
                                 disabled={
                                     !row.maxed ||
                                     this.props
-                                        .is_faction_loyalty_automation_running
+                                        .is_faction_loyalty_automation_running ||
+                                    this.isFactionLoyaltyActionBlocked()
                                 }
                             />
                         )}
@@ -218,7 +220,7 @@ export default class CharacterFactions extends React.Component<any, any> {
     }
 
     pledgeLoyalty(row: any): void {
-        if (this.props.is_faction_loyalty_automation_running) {
+        if (this.isFactionLoyaltyActionBlocked()) {
             return;
         }
 
@@ -231,6 +233,14 @@ export default class CharacterFactions extends React.Component<any, any> {
         this.setState({
             pledge_faction: null,
         });
+    }
+
+    isFactionLoyaltyActionBlocked(): boolean {
+        return (
+            this.props.is_faction_loyalty_automation_running ||
+            this.props.is_automation_running ||
+            this.props.is_delve_running
+        );
     }
 
     render() {
@@ -268,10 +278,10 @@ export default class CharacterFactions extends React.Component<any, any> {
                         </SuccessAlert>
                     ) : null}
 
-                    {this.props.is_faction_loyalty_automation_running ? (
+                    {this.isFactionLoyaltyActionBlocked() ? (
                         <WarningAlert additional_css={"mb-4"}>
-                            Faction Loyalty Automation is running. You cannot
-                            pledge or un-pledge while it is running.
+                            You cannot pledge or un-pledge while automation is
+                            running.
                         </WarningAlert>
                     ) : null}
 
@@ -302,6 +312,7 @@ export default class CharacterFactions extends React.Component<any, any> {
                         faction={this.state.pledge_faction}
                         handle_pledge={() => this.handlePledge(true)}
                         pledging={this.state.pledging}
+                        disabled={this.isFactionLoyaltyActionBlocked()}
                     />
                 ) : null}
             </Fragment>

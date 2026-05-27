@@ -134,7 +134,7 @@ export default class FactionFame extends React.Component<
             return;
         }
 
-        if (isHelping && this.isFactionLoyaltyAutomationRunning()) {
+        if (this.isAnyFactionLoyaltyActionBlocked()) {
             return;
         }
 
@@ -245,6 +245,10 @@ export default class FactionFame extends React.Component<
     }
 
     switchToNpc(npc: FactionLoyaltyNpcListItem) {
+        if (this.isAnyFactionLoyaltyActionBlocked()) {
+            return;
+        }
+
         if (!this.state.faction_loyalty) {
             return;
         }
@@ -366,6 +370,14 @@ export default class FactionFame extends React.Component<
 
     isFactionLoyaltyAutomationRunning(): boolean {
         return this.state.is_faction_loyalty_automation_running;
+    }
+
+    isAnyFactionLoyaltyActionBlocked(): boolean {
+        return (
+            this.props.is_automation_running ||
+            this.props.is_delve_running ||
+            this.isFactionLoyaltyAutomationRunning()
+        );
     }
 
     selectedNpcHasIncompleteTasks(): boolean {
@@ -509,6 +521,7 @@ export default class FactionFame extends React.Component<
                                         )}
                                         button_title={"NPCs"}
                                         selected_name={this.selectedNpc()}
+                                        disabled={this.isAnyFactionLoyaltyActionBlocked()}
                                     />
                                 </div>
                                 <div>
@@ -519,7 +532,7 @@ export default class FactionFame extends React.Component<
                                                 this.manageAssistingNpc(true)
                                             }
                                             additional_css={"mt-[18px] ml-4"}
-                                            disabled={this.isFactionLoyaltyAutomationRunning()}
+                                            disabled={this.isAnyFactionLoyaltyActionBlocked()}
                                         />
                                     ) : (
                                         <PrimaryOutlineButton
@@ -528,6 +541,7 @@ export default class FactionFame extends React.Component<
                                                 this.manageAssistingNpc(false)
                                             }
                                             additional_css={"mt-[18px] ml-4"}
+                                            disabled={this.isAnyFactionLoyaltyActionBlocked()}
                                         />
                                     )}
                                 </div>

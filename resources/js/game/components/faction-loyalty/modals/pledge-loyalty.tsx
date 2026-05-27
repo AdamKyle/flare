@@ -14,7 +14,7 @@ export default class PledgeLoyalty extends React.Component<any, any> {
                 handle_close={this.props.manage_modal}
                 title={"Pledge Loyalty To: " + this.props.faction.map_name}
                 secondary_actions={{
-                    secondary_button_disabled: false,
+                    secondary_button_disabled: this.props.disabled,
                     secondary_button_label: "I pledge my allegiance",
                     handle_action: this.props.handle_pledge,
                 }}

@@ -66,6 +66,12 @@ export default class CharacterTabs extends React.Component<
                                 this.props.character
                                     ?.is_faction_loyalty_automation_running
                             }
+                            is_automation_running={
+                                this.props.character?.is_automation_running
+                            }
+                            is_delve_running={
+                                this.props.character?.is_delve_running
+                            }
                             update_faction_action_tasks={
                                 this.props.update_faction_action_tasks
                             }
