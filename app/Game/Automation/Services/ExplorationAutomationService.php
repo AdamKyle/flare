@@ -5,6 +5,8 @@ namespace App\Game\Automation\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Location;
+use App\Flare\Models\Monster;
+use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationStatus;
@@ -25,16 +27,31 @@ class ExplorationAutomationService
 
     public function beginAutomation(Character $character, array $params)
     {
+        $selectedMonsterId = $params['selected_monster_id'] ?? null;
+
+        if (empty($selectedMonsterId)) {
+            $selectedMonsterId = Monster::where('is_celestial_entity', false)
+                ->where('is_raid_monster', false)
+                ->where('is_raid_boss', false)
+                ->where('game_map_id', $character->map->game_map_id)
+                ->whereNull('only_for_location_type')
+                ->whereNull('raid_special_attack_type')
+                ->orderBy('max_level')
+                ->first()?->id;
+        }
+
+        $attackType = empty($params['attack_type']) ? AttackTypeValue::ATTACK : $params['attack_type'];
+
         $automation = CharacterAutomation::create([
             'character_id' => $character->id,
-            'monster_id' => $params['selected_monster_id'],
+            'monster_id' => $selectedMonsterId,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => now()->addHours($params['auto_attack_length']),
-            'move_down_monster_list_every' => $params['move_down_the_list_every'],
+            'completed_at' => now()->addHours($params['auto_attack_length'] ?? 1),
+            'move_down_monster_list_every' => $params['move_down_the_list_every'] ?? null,
             'previous_level' => $character->level,
             'current_level' => $character->level,
-            'attack_type' => $params['attack_type'],
+            'attack_type' => $attackType,
             'started_in_special_location' => $this->startedInSpecialLocation($character),
         ]);
 
@@ -48,7 +65,7 @@ class ExplorationAutomationService
 
         event(new AutomationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
 
-        $this->startAutomation($character, $automation->id, $params['attack_type']);
+        $this->startAutomation($character, $automation->id, $attackType);
     }
 
     public function stopExploration(Character $character)

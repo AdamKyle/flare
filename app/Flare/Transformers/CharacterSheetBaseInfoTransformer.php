@@ -21,6 +21,8 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         'inventory_count',
     ];
 
+    public function __construct(private readonly CharacterStatBuilder $characterStatBuilder) {}
+
     public function setIgnoreReductions(bool $ignoreReductions): void
     {
         $this->ignoreReductions = $ignoreReductions;
@@ -33,7 +35,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
      */
     public function transform(Character $character): array
     {
-        $characterStatBuilder = resolve(CharacterStatBuilder::class)->setCharacter($character, $this->ignoreReductions);
+        $characterStatBuilder = $this->characterStatBuilder->setCharacter($character, $this->ignoreReductions);
         $gameClass = GameClass::find($character->game_class_id);
         $factionLoyalty = $character->factionLoyalties()->where('is_pledged', '=', true)->first();
 
@@ -63,6 +65,8 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'heal_for' => $characterStatBuilder->buildHealing(),
             'ac' => $characterStatBuilder->buildDefence(),
             'extra_action_chance' => (new ClassAttackValue($character))->buildAttackData(),
+            'fight_time_out_mod_bonus' => $characterStatBuilder->buildTimeOutModifier('fight_time_out'),
+            'movement_time_out_mod_bonus' => $characterStatBuilder->buildTimeOutModifier('move_time_out'),
             'gold' => number_format($character->gold),
             'gold_dust' => number_format($character->gold_dust),
             'shards' => number_format($character->shards),

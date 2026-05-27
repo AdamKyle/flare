@@ -312,7 +312,10 @@ class AutomatedFactionLoyalty implements ShouldQueue
             $factionLoyaltyAutomationAction = $this->getBountyFightActionFromCurrentNpc();
 
             if (is_null($factionLoyaltyAutomationAction)) {
-                $this->sendOutEventLogUpdate('No bounty task is available to earn more gold. Automation canceled.', true);
+                $this->sendOutEventLogUpdate(
+                    $this->factionLoyaltyNpc->npc->real_name . ' does not like poor people who cannot craft for them.',
+                    true
+                );
 
                 $this->endAutomation($characterCacheData, false);
 

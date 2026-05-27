@@ -96,6 +96,46 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         $this->assertEquals(0, $data['automation_completed_at']);
     }
 
+    public function testTransformContainsZeroTimeoutModifierBonuses(): void
+    {
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character);
+
+        $this->assertEquals(0.0, $data['fight_time_out_mod_bonus']);
+        $this->assertEquals(0.0, $data['movement_time_out_mod_bonus']);
+    }
+
+    public function testTransformContainsTimeoutModifierBonuses(): void
+    {
+        $skill = $this->character->skills()->whereHas('baseSkill', function ($query) {
+            $query->where('name', 'Fighters Timeout');
+        })->first();
+        $skill->baseSkill()->update([
+            'fight_time_out_mod_bonus_per_level' => 0.1,
+            'move_time_out_mod_bonus_per_level' => 0.2,
+        ]);
+
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character->refresh());
+
+        $this->assertEquals(0.1, $data['fight_time_out_mod_bonus']);
+        $this->assertEquals(0.2, $data['movement_time_out_mod_bonus']);
+    }
+
+    public function testTransformTreatsNullTimeoutModifierBonusesAsZero(): void
+    {
+        $skill = $this->character->skills()->whereHas('baseSkill', function ($query) {
+            $query->where('name', 'Fighters Timeout');
+        })->first();
+        $skill->baseSkill()->update([
+            'fight_time_out_mod_bonus_per_level' => null,
+            'move_time_out_mod_bonus_per_level' => null,
+        ]);
+
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character->refresh());
+
+        $this->assertEquals(0.0, $data['fight_time_out_mod_bonus']);
+        $this->assertEquals(0.0, $data['movement_time_out_mod_bonus']);
+    }
+
     public function testTransformDoesNotDisplayExplorationForUnknownAutomationType(): void
     {
         $this->createCharacterAutomation([

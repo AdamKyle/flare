@@ -24,10 +24,10 @@ class ExplorationRequest extends FormRequest
     public function rules()
     {
         return [
-            'auto_attack_length' => 'required|integer',
+            'auto_attack_length' => 'nullable|integer',
             'move_down_the_list_every' => 'nullable|integer',
-            'selected_monster_id' => 'required|integer',
-            'attack_type' => 'required|string',
+            'selected_monster_id' => 'nullable|integer',
+            'attack_type' => 'nullable|string',
         ];
     }
 

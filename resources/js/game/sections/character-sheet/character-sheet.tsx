@@ -353,6 +353,24 @@ export default class CharacterSheet extends React.Component<
                                                 ).toFixed(2)}
                                                 %
                                             </dd>
+                                            <dt>Fight Time Out:</dt>
+                                            <dd>
+                                                {(
+                                                    (this.props.character
+                                                        .fight_time_out_mod_bonus ??
+                                                        0) * 100
+                                                ).toFixed(2)}
+                                                %
+                                            </dd>
+                                            <dt>Movement Time Out:</dt>
+                                            <dd>
+                                                {(
+                                                    (this.props.character
+                                                        .movement_time_out_mod_bonus ??
+                                                        0) * 100
+                                                ).toFixed(2)}
+                                                %
+                                            </dd>
                                         </dl>
                                         <p className="mt-4">
                                             Make sure you read up on your{" "}

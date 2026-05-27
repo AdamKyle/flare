@@ -13,7 +13,6 @@ use App\Game\Automation\Loggers\FactionLoyaltyAutomationFightLogger;
 use App\Game\Automation\Values\AutomatedFightResult;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
-use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\Skills\Services\SkillService;
 
 class AutomatedBountyFightHandler
@@ -44,8 +43,6 @@ class AutomatedBountyFightHandler
 
     private int $batchTotalSkillXp = 0;
 
-    private int $batchTotalFactionPoints = 0;
-
     private array $lastFightData = [];
 
     /**
@@ -55,7 +52,6 @@ class AutomatedBountyFightHandler
      * @param BattleEventHandler $battleEventHandler
      * @param CharacterRewardService $characterRewardService
      * @param SkillService $skillService
-     * @param FactionHandler $factionHandler
      * @param AutomatedFightResult $automatedFightResult
      */
     public function __construct(
@@ -63,7 +59,6 @@ class AutomatedBountyFightHandler
         private readonly BattleEventHandler $battleEventHandler,
         private readonly CharacterRewardService $characterRewardService,
         private readonly SkillService $skillService,
-        private readonly FactionHandler $factionHandler,
         private readonly AutomatedFightResult $automatedFightResult,
     ) {}
 
@@ -413,7 +408,6 @@ class AutomatedBountyFightHandler
 
         $this->batchTotalXp += $characterRewardService->fetchXpForMonster($monster);
         $this->batchTotalSkillXp += $characterSkillService->getXpForSkillIntraining($this->character, $monster->xp);
-        $this->batchTotalFactionPoints += $this->factionHandler->getFactionPointsPerKill($this->character);
     }
 
     /**
@@ -431,7 +425,7 @@ class AutomatedBountyFightHandler
         $this->battleEventHandler->processMonsterDeath($this->character->id, $monster->id, [
             'total_creatures' => $this->batchKills,
             'total_xp' => $this->batchTotalXp,
-            'total_faction_points' => $this->batchTotalFactionPoints,
+            'total_faction_points' => 0,
             'total_skill_xp' => $this->batchTotalSkillXp,
         ]);
     }
@@ -471,7 +465,7 @@ class AutomatedBountyFightHandler
             ->setTotalCreatures($this->batchKills)
             ->setTotalXp($this->batchTotalXp)
             ->setTotalSkillXp($this->batchTotalSkillXp)
-            ->setTotalFactionPoints($this->batchTotalFactionPoints)
+            ->setTotalFactionPoints(0)
             ->setCharacterDied($characterDied)
             ->setEndedAutomation($endedAutomation)
             ->setFightData($this->lastFightData);
@@ -493,7 +487,6 @@ class AutomatedBountyFightHandler
         $this->batchBountyKills = 0;
         $this->batchTotalXp = 0;
         $this->batchTotalSkillXp = 0;
-        $this->batchTotalFactionPoints = 0;
     }
 
     /**

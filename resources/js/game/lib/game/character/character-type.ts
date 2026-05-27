@@ -102,6 +102,10 @@ export interface CharacterType {
 
     extra_action_chance: ExtraActionType;
 
+    fight_time_out_mod_bonus: number | null;
+
+    movement_time_out_mod_bonus: number | null;
+
     healing_reduction: number;
 
     health: number;

@@ -40,6 +40,14 @@ export default class ExplorationSection extends React.Component<any, any> {
     }
 
     setMonsterToFight(data: any) {
+        if (data === null || data.value === "") {
+            this.setState({
+                monster_selected: null,
+            });
+
+            return;
+        }
+
         const foundMonster = this.props.monsters.filter(
             (monster: any) => monster.id === parseInt(data.value),
         );
@@ -84,31 +92,39 @@ export default class ExplorationSection extends React.Component<any, any> {
 
     setLengthOfTime(data: any) {
         this.setState({
-            time_selected: data.value !== "" ? data.value : null,
+            time_selected:
+                data !== null && data.value !== "" ? data.value : null,
         });
     }
 
     setAttackType(data: any) {
         this.setState({
-            attack_type: data.value !== "" ? data.value : null,
+            attack_type: data !== null && data.value !== "" ? data.value : null,
         });
     }
 
     setDelvePackSize(data: any) {
         this.setState({
             delve_pack_size:
-                data.value !== "" ? parseInt(data.value) || null : null,
+                data !== null && data.value !== ""
+                    ? parseInt(data.value) || null
+                    : null,
         });
     }
 
     setMoveDownList(data: any) {
         this.setState({
-            move_down_monster_list: data.value !== "" ? data.value : null,
+            move_down_monster_list:
+                data !== null && data.value !== "" ? data.value : null,
         });
     }
 
     timeOptions() {
         return [
+            {
+                label: "Default: 1 Hour",
+                value: "",
+            },
             {
                 label: "1 Hour(s)",
                 value: 1,
@@ -134,6 +150,10 @@ export default class ExplorationSection extends React.Component<any, any> {
 
     attackTypes() {
         return [
+            {
+                label: "Default: Attack",
+                value: "",
+            },
             {
                 label: "Attack",
                 value: "attack",
@@ -188,6 +208,10 @@ export default class ExplorationSection extends React.Component<any, any> {
 
     moveDownTheListEvery() {
         return [
+            {
+                label: "Do not move down",
+                value: "",
+            },
             {
                 label: "5 Levels",
                 value: 5,
@@ -280,7 +304,10 @@ export default class ExplorationSection extends React.Component<any, any> {
                         auto_attack_length: this.state.time_selected,
                         move_down_the_list_every:
                             this.state.move_down_monster_list,
-                        selected_monster_id: this.state.monster_selected.id,
+                        selected_monster_id:
+                            this.state.monster_selected !== null
+                                ? this.state.monster_selected.id
+                                : null,
                         attack_type: this.state.attack_type,
                     })
                     .doAjaxCall(
@@ -584,6 +611,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                                 }}
                                 menuPortalTarget={document.body}
                                 value={this.defaultSelectedMonster()}
+                                isClearable={true}
                             />
                         </div>
                         <div className="mb-3">
@@ -601,6 +629,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                                 }}
                                 menuPortalTarget={document.body}
                                 value={this.defaultSelectedTime()}
+                                isClearable={true}
                             />
                         </div>
                         <div className="mb-3">
@@ -618,6 +647,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                                 }}
                                 menuPortalTarget={document.body}
                                 value={this.defaultMoveDownList()}
+                                isClearable={true}
                             />
                         </div>
                         <div>
@@ -635,6 +665,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                                 }}
                                 menuPortalTarget={document.body}
                                 value={this.defaultAttackType()}
+                                isClearable={true}
                             />
                         </div>
                     </div>
@@ -645,9 +676,6 @@ export default class ExplorationSection extends React.Component<any, any> {
                         button_label={"Explore"}
                         on_click={this.startExploration.bind(this)}
                         disabled={
-                            this.state.monster_selected === null ||
-                            this.state.time_selected === null ||
-                            this.state.attack_type === null ||
                             this.state.loading ||
                             this.props.character.is_dead ||
                             !this.props.character.can_attack

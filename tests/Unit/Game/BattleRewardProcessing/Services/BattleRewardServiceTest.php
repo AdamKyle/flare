@@ -236,6 +236,34 @@ class BattleRewardServiceTest extends TestCase
         $this->assertGreaterThan(0, $faction->current_points);
     }
 
+    public function testProcessRewardsDoesNotAwardFactionPointsWhenBatchContextPassesZero(): void
+    {
+        $character = $this->characterFactory->assignFactionSystem()->getCharacter();
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+        ]);
+
+        Event::fake();
+        Queue::fake();
+
+        $this->battleRewardService
+            ->setUp($character->id, $monster->id)
+            ->setContext([
+                'total_creatures' => 1,
+                'total_xp' => $monster->xp,
+                'total_skill_xp' => 0,
+                'total_faction_points' => 0,
+            ])
+            ->processRewards();
+
+        $faction = $character->refresh()->factions()->where('game_map_id', $character->map->game_map_id)->first();
+
+        $this->assertNotNull($faction);
+        $this->assertEquals(0, $faction->current_points);
+    }
+
+
     public function testShouldNotUpdateGlobalEventParticipationWhenNoEventIsRunning(): void
     {
         $character = $this->characterFactory->getCharacter();

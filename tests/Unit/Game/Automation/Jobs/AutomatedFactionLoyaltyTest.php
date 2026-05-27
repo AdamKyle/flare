@@ -13,6 +13,7 @@ use App\Game\Automation\Coordinators\FactionLoyaltyNpcTaskCoordinator;
 use App\Game\Automation\Enums\AutomatedCraftingResultType;
 use App\Game\Automation\Enums\AutomatedFightResultType;
 use App\Game\Automation\Enums\FactionLoyaltyCoordinatorAction;
+use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationStatus;
 use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Handlers\AutomatedBountyFightHandler;
@@ -740,6 +741,9 @@ class AutomatedFactionLoyaltyTest extends TestCase
 
         $this->assertNull($this->characterAutomation->fresh());
         $this->assertNotNull($this->factionLoyaltyAutomation->refresh()->completed_at);
+        Event::assertDispatched(AutomationLogUpdate::class, function (AutomationLogUpdate $event): bool {
+            return $event->message === $this->factionLoyaltyNpc->npc->real_name . ' does not like poor people who cannot craft for them.';
+        });
     }
 
     public function testHandleEndsAutomationWhenCraftingResultCannotContinue(): void

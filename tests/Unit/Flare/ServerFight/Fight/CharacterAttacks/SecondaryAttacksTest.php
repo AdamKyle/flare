@@ -100,4 +100,183 @@ class SecondaryAttacksTest extends TestCase
             'type' => 'enemy-action',
         ], $secondaryAttacks->getMessages());
     }
+
+    public function testPlayerElementalDamageDoesNotFireWhenMonsterHasNoAtonement(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        Cache::put('character-sheet-' . $character->id, [
+            'level' => $character->level,
+            'health' => 1000,
+            'elemental_atonement' => [
+                'atonements' => [
+                    'fire' => 0.5,
+                    'ice' => 0,
+                    'water' => 0,
+                ],
+            ],
+            'weapon_attack' => 100,
+            'spell_attack' => 100,
+        ]);
+
+        $monster = $this->createMonster([
+            'fire_atonement' => null,
+            'ice_atonement' => null,
+            'water_atonement' => null,
+            'is_raid_monster' => false,
+            'is_raid_boss' => false,
+        ]);
+
+        $serverMonster = (new ServerMonster)->setHealth(1000)->setMonster($monster->toArray());
+        $secondaryAttacks = resolve(SecondaryAttacks::class);
+        $secondaryAttacks->setCharacterHealth(1000);
+        $secondaryAttacks->setMonsterHealth(1000);
+        $secondaryAttacks->setAttackData([
+            'attack_type' => AttackTypeValue::ATTACK,
+            'damage_deduction' => 0.0,
+            'affixes' => [],
+            'weapon_damage' => 100,
+            'special_damage' => [],
+            'ring_damage' => 0,
+        ]);
+
+        $secondaryAttacks->dealElementalDamage($character, $serverMonster, true);
+
+        $this->assertEquals(1000, $secondaryAttacks->getMonsterHealth());
+        $this->assertEmpty($secondaryAttacks->getMessages());
+    }
+
+    public function testPlayerElementalDamageUsesCorrectDamageSourceForAttackTypes(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        Cache::put('character-sheet-' . $character->id, [
+            'level' => $character->level,
+            'health' => 1000,
+            'elemental_atonement' => [
+                'atonements' => [
+                    'fire' => 0.5,
+                    'ice' => 0,
+                    'water' => 0,
+                ],
+            ],
+            'weapon_attack' => 200,
+            'spell_attack' => 100,
+        ]);
+
+        $monster = $this->createMonster([
+            'fire_atonement' => 0.5,
+            'ice_atonement' => 0,
+            'water_atonement' => 0,
+            'is_raid_monster' => false,
+            'is_raid_boss' => false,
+        ]);
+
+        $serverMonster = (new ServerMonster)->setHealth(1000)->setMonster($monster->toArray());
+        $secondaryAttacks = resolve(SecondaryAttacks::class);
+        $secondaryAttacks->setCharacterHealth(1000);
+        $secondaryAttacks->setMonsterHealth(1000);
+        $secondaryAttacks->setAttackData([
+            'attack_type' => AttackTypeValue::ATTACK,
+            'damage_deduction' => 0.0,
+            'affixes' => [],
+            'weapon_damage' => 200,
+            'special_damage' => [],
+            'ring_damage' => 0,
+        ]);
+        $secondaryAttacks->dealElementalDamage($character, $serverMonster, true);
+
+        $this->assertEquals(950, $secondaryAttacks->getMonsterHealth());
+
+        $secondaryAttacks = resolve(SecondaryAttacks::class);
+        $secondaryAttacks->setCharacterHealth(1000);
+        $secondaryAttacks->setMonsterHealth(1000);
+        $secondaryAttacks->setAttackData([
+            'attack_type' => AttackTypeValue::CAST,
+            'damage_deduction' => 0.0,
+            'affixes' => [],
+            'spell_damage' => 100,
+            'special_damage' => [],
+            'ring_damage' => 0,
+        ]);
+        $secondaryAttacks->dealElementalDamage($character, $serverMonster, true);
+
+        $this->assertEquals(975, $secondaryAttacks->getMonsterHealth());
+
+        $secondaryAttacks = resolve(SecondaryAttacks::class);
+        $secondaryAttacks->setCharacterHealth(1000);
+        $secondaryAttacks->setMonsterHealth(1000);
+        $secondaryAttacks->setAttackData([
+            'attack_type' => AttackTypeValue::ATTACK_AND_CAST,
+            'damage_deduction' => 0.0,
+            'affixes' => [],
+            'weapon_damage' => 200,
+            'spell_damage' => 100,
+            'special_damage' => [],
+            'ring_damage' => 0,
+        ]);
+        $secondaryAttacks->dealElementalDamage($character, $serverMonster, true);
+
+        $this->assertEquals(950, $secondaryAttacks->getMonsterHealth());
+
+        $secondaryAttacks = resolve(SecondaryAttacks::class);
+        $secondaryAttacks->setCharacterHealth(1000);
+        $secondaryAttacks->setMonsterHealth(1000);
+        $secondaryAttacks->setAttackData([
+            'attack_type' => AttackTypeValue::CAST_AND_ATTACK,
+            'damage_deduction' => 0.0,
+            'affixes' => [],
+            'weapon_damage' => 200,
+            'spell_damage' => 100,
+            'special_damage' => [],
+            'ring_damage' => 0,
+        ]);
+        $secondaryAttacks->dealElementalDamage($character, $serverMonster, true);
+
+        $this->assertEquals(975, $secondaryAttacks->getMonsterHealth());
+    }
+
+    public function testPlayerElementalDamageDoesNotFireWhenDefending(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        Cache::put('character-sheet-' . $character->id, [
+            'level' => $character->level,
+            'health' => 1000,
+            'elemental_atonement' => [
+                'atonements' => [
+                    'fire' => 0.5,
+                    'ice' => 0,
+                    'water' => 0,
+                ],
+            ],
+            'weapon_attack' => 200,
+            'spell_attack' => 100,
+        ]);
+
+        $monster = $this->createMonster([
+            'fire_atonement' => 0.5,
+            'ice_atonement' => 0,
+            'water_atonement' => 0,
+            'is_raid_monster' => false,
+            'is_raid_boss' => false,
+        ]);
+
+        $serverMonster = (new ServerMonster)->setHealth(1000)->setMonster($monster->toArray());
+        $secondaryAttacks = resolve(SecondaryAttacks::class);
+        $secondaryAttacks->setCharacterHealth(1000);
+        $secondaryAttacks->setMonsterHealth(1000);
+        $secondaryAttacks->setAttackData([
+            'attack_type' => AttackTypeValue::DEFEND,
+            'damage_deduction' => 0.0,
+            'affixes' => [],
+            'special_damage' => [],
+            'ring_damage' => 0,
+        ]);
+
+        $secondaryAttacks->dealElementalDamage($character, $serverMonster, true);
+
+        $this->assertEquals(1000, $secondaryAttacks->getMonsterHealth());
+        $this->assertEmpty($secondaryAttacks->getMessages());
+    }
 }

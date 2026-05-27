@@ -17,7 +17,6 @@ use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
-use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -48,8 +47,6 @@ class DelveExploration implements ShouldQueue
     private SkillService $skillService;
 
     private MonsterFightService $monsterFightService;
-
-    private FactionHandler $factionHandler;
 
     private ?Monster $monster = null;
 
@@ -91,7 +88,6 @@ class DelveExploration implements ShouldQueue
         CharacterCacheData $characterCacheData,
         CharacterRewardService $characterRewardService,
         SkillService $skillService,
-        FactionHandler $factionHandler,
     ): void {
 
         $this->characterRewardService = $characterRewardService;
@@ -99,8 +95,6 @@ class DelveExploration implements ShouldQueue
         $this->skillService = $skillService;
 
         $this->monsterFightService = $monsterFightService;
-
-        $this->factionHandler = $factionHandler;
 
         $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
 
@@ -272,7 +266,6 @@ class DelveExploration implements ShouldQueue
     private function fightMultipleEnemies(DelveExplorationModel $delveExploration, array $params): bool {
         $totalXpToReward = 0;
         $totalSkillXpToReward = 0;
-        $totalFactionPoints = 0;
         $characterRewardService = $this->characterRewardService->setCharacter($this->character);
         $characterSkillService = $this->skillService->setSkillInTraining($this->character);
 
@@ -289,13 +282,12 @@ class DelveExploration implements ShouldQueue
 
             $totalXpToReward += $characterRewardService->fetchXpForMonster($this->monster);
             $totalSkillXpToReward += $characterSkillService->getXpForSkillIntraining($this->character, $this->monster->xp);
-            $totalFactionPoints += $this->factionHandler->getFactionPointsPerKill($this->character);
         }
 
         $this->battleData = [
             'total_creatures' => $params['pack_size'],
             'total_xp' => $this->getPackSizeXp($packSize, $totalXpToReward),
-            'total_faction_points' => $totalFactionPoints,
+            'total_faction_points' => 0,
             'total_skill_xp' => $this->getPackSizeXp($packSize, $totalSkillXpToReward),
         ];
 
@@ -346,6 +338,10 @@ class DelveExploration implements ShouldQueue
         if ($endedAutomationDueToCharacterDeath) {
             return false;
         }
+
+        $this->battleData = [
+            'total_faction_points' => 0,
+        ];
 
         return true;
     }

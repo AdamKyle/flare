@@ -14,7 +14,6 @@ use App\Game\Automation\Loggers\FactionLoyaltyAutomationFightLogger;
 use App\Game\Automation\Values\AutomatedFightResult;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
-use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\Skills\Services\SkillService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -47,8 +46,6 @@ class AutomatedBountyFightHandlerTest extends TestCase
 
     private ?SkillService $skillService = null;
 
-    private ?FactionHandler $factionHandler = null;
-
     public function setUp(): void
     {
         parent::setUp();
@@ -71,14 +68,11 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->battleEventHandler = Mockery::mock(BattleEventHandler::class);
         $this->characterRewardService = Mockery::mock(CharacterRewardService::class);
         $this->skillService = Mockery::mock(SkillService::class);
-        $this->factionHandler = Mockery::mock(FactionHandler::class);
-
         $this->handler = new AutomatedBountyFightHandler(
             $this->monsterFightService,
             $this->battleEventHandler,
             $this->characterRewardService,
             $this->skillService,
-            $this->factionHandler,
             new AutomatedFightResult,
         );
     }
@@ -95,7 +89,6 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->battleEventHandler = null;
         $this->characterRewardService = null;
         $this->skillService = null;
-        $this->factionHandler = null;
 
         parent::tearDown();
     }
@@ -210,19 +203,13 @@ class AutomatedBountyFightHandlerTest extends TestCase
             ->with(Mockery::type(Character::class), $bountyMonster->xp)
             ->andReturn(5);
 
-        $this->factionHandler
-            ->shouldReceive('getFactionPointsPerKill')
-            ->once()
-            ->with(Mockery::type(Character::class))
-            ->andReturn(3);
-
         $this->battleEventHandler
             ->shouldReceive('processMonsterDeath')
             ->once()
             ->with($this->character->id, $bountyMonster->id, [
                 'total_creatures' => 1,
                 'total_xp' => 10,
-                'total_faction_points' => 3,
+                'total_faction_points' => 0,
                 'total_skill_xp' => 5,
             ]);
 
@@ -245,7 +232,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->assertEquals(1, $result->getBountyKills());
         $this->assertEquals(10, $result->getTotalXp());
         $this->assertEquals(5, $result->getTotalSkillXp());
-        $this->assertEquals(3, $result->getTotalFactionPoints());
+        $this->assertEquals(0, $result->getTotalFactionPoints());
     }
 
     public function testHandleReturnsInvalidStateWhenFightSetupReturnsEmptyData(): void
@@ -541,18 +528,13 @@ class AutomatedBountyFightHandlerTest extends TestCase
             ->with(Mockery::type(Character::class), $trainingMonster->xp)
             ->andReturn(5);
 
-        $this->factionHandler
-            ->shouldReceive('getFactionPointsPerKill')
-            ->times(50)
-            ->andReturn(3);
-
         $this->battleEventHandler
             ->shouldReceive('processMonsterDeath')
             ->once()
             ->with($this->character->id, $trainingMonster->id, [
                 'total_creatures' => 50,
                 'total_xp' => 500,
-                'total_faction_points' => 150,
+                'total_faction_points' => 0,
                 'total_skill_xp' => 250,
             ]);
 

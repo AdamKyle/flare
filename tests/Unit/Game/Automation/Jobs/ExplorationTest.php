@@ -12,6 +12,7 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Jobs\Exploration;
+use App\Game\Automation\Services\ExplorationAutomationService;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
@@ -206,6 +207,29 @@ class ExplorationTest extends TestCase
         Exploration::dispatchSync($this->character, $automation->id, AttackTypeValue::ATTACK, 5);
 
         $this->assertEquals(10010, $this->character->refresh()->gold);
+    }
+
+    public function testBeginExplorationAcceptsClearedSelectionsAndUsesDefaultValues(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        resolve(ExplorationAutomationService::class)->beginAutomation($this->character, [
+            'auto_attack_length' => null,
+            'move_down_the_list_every' => null,
+            'selected_monster_id' => null,
+            'attack_type' => null,
+        ]);
+
+        $automation = CharacterAutomation::where('character_id', $this->character->id)->first();
+        $monster = Monster::find($automation->monster_id);
+
+        $this->assertNotNull($automation);
+        $this->assertNotNull($monster);
+        $this->assertEquals($this->character->map->game_map_id, $monster->game_map_id);
+        $this->assertEquals(AttackTypeValue::ATTACK, $automation->attack_type);
+        $this->assertNull($automation->move_down_monster_list_every);
+        $this->assertTrue($automation->completed_at->greaterThan(now()));
     }
 
     public function testHandleCapsGoldWhenAutomationRewardWouldExceedMaxGold(): void

@@ -19,7 +19,6 @@ use App\Game\Automation\Values\AutomatedCraftingResult;
 use App\Game\Automation\Values\AutomatedFightResult;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
-use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Maps\Services\MovementService;
@@ -105,7 +104,6 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(BattleEventHandler::class),
                 $app->make(CharacterRewardService::class),
                 $app->make(SkillService::class),
-                $app->make(FactionHandler::class),
                 $app->make(AutomatedFightResult::class)
             );
         });

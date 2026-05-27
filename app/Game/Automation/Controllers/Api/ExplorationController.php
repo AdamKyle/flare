@@ -26,8 +26,10 @@ class ExplorationController extends Controller
 
     public function begin(ExplorationRequest $request, Character $character): JsonResponse
     {
+        $params = $request->all();
+        $params['attack_type'] = empty($params['attack_type']) ? AttackTypeValue::ATTACK : $params['attack_type'];
 
-        if (! AttackTypeValue::attackTypeExists($request->attack_type)) {
+        if (! AttackTypeValue::attackTypeExists($params['attack_type'])) {
             return response()->json([
                 'message' => 'Invalid attack type was selected. Please select from the drop down.',
             ], 422);
@@ -57,7 +59,7 @@ class ExplorationController extends Controller
             ], 422);
         }
 
-        $this->explorationAutomationService->beginAutomation($character, $request->all());
+        $this->explorationAutomationService->beginAutomation($character, $params);
 
         $timeDelay = $this->explorationAutomationService->getTimeDelay();
 

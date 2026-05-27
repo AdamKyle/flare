@@ -20,7 +20,6 @@ use App\Game\Automation\Jobs\DelveExploration;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
-use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -892,7 +891,6 @@ class DelveExplorationTest extends TestCase
             resolve(CharacterCacheData::class),
             resolve(CharacterRewardService::class),
             resolve(SkillService::class),
-            resolve(FactionHandler::class),
         );
     }
 

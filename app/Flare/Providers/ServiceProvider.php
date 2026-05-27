@@ -144,8 +144,10 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CharacterAttackTransformer;
         });
 
-        $this->app->bind(CharacterSheetBaseInfoTransformer::class, function () {
-            return new CharacterSheetBaseInfoTransformer;
+        $this->app->bind(CharacterSheetBaseInfoTransformer::class, function ($app) {
+            return new CharacterSheetBaseInfoTransformer(
+                $app->make(CharacterStatBuilder::class)
+            );
         });
 
         $this->app->bind(OtherKingdomTransformer::class, function ($app) {
