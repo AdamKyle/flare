@@ -31,6 +31,10 @@ export default class BuildingsTable extends React.Component<
     }
 
     viewBuilding(building: BuildingDetails) {
+        if (this.props.is_automation_locked) {
+            return;
+        }
+
         this.props.view_building(building);
     }
 
@@ -47,7 +51,7 @@ export default class BuildingsTable extends React.Component<
     }
 
     cancelBuildingQueue(queueId: number | null) {
-        if (queueId === null) {
+        if (this.props.is_automation_locked || queueId === null) {
             return;
         }
 
@@ -83,9 +87,7 @@ export default class BuildingsTable extends React.Component<
                         <LoadingProgressBar />
                     </div>
                 ) : null}
-                <div
-                    className={"max-w-[390px] md:max-w-full overflow-x-hidden"}
-                >
+                <div className={"max-w-[390px] md:max-w-full overflow-x-auto"}>
                     <Table
                         data={this.props.buildings}
                         columns={buildBuildingsColumns(
@@ -93,6 +95,7 @@ export default class BuildingsTable extends React.Component<
                             this.cancelBuildingQueue.bind(this),
                             this.props.buildings_in_queue,
                             this.props.view_port,
+                            this.props.is_automation_locked,
                         )}
                         dark_table={this.props.dark_tables}
                         conditional_row_styles={this.createConditionalRowStyles()}

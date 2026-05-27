@@ -61,7 +61,7 @@ class CapitalCityProcessUnitRequestHandler
         $kingdom = $capitalCityUnitQueue->kingdom;
         $character = $capitalCityUnitQueue->character;
 
-        $requestData = $this->processUnitRequests($kingdom, $requestData);
+        $requestData = $this->processUnitRequests($capitalCityUnitQueue, $kingdom, $requestData);
         $missingResources = $this->calculateMissingResources($requestData);
 
         if (!empty($missingResources) && $shouldFailForMissingCosts) {
@@ -109,8 +109,9 @@ class CapitalCityProcessUnitRequestHandler
      * @param array $requestData
      * @return array
      */
-    private function processUnitRequests(Kingdom $kingdom, array $requestData): array
+    private function processUnitRequests(CapitalCityUnitQueue $capitalCityUnitQueue, Kingdom $kingdom, array $requestData): array
     {
+        $requestedAmountsByUnitName = [];
 
         foreach ($requestData as $index => $unitRequest) {
             if ($unitRequest['secondary_status'] === CapitalCityQueueStatus::CANCELLED) {
@@ -135,6 +136,17 @@ class CapitalCityProcessUnitRequestHandler
 
             if ($this->isTimeGreaterThanSevenDays($kingdom->character, $kingdom, $gameUnit, $unitRequest['amount'])) {
                 $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
+                continue;
+            }
+
+            $requestedAmountsByUnitName[$unitRequest['name']] = ($requestedAmountsByUnitName[$unitRequest['name']] ?? 0) + $unitRequest['amount'];
+
+            if (! $this->unitService->canQueueUnits($kingdom, $gameUnit, $requestedAmountsByUnitName[$unitRequest['name']], null, $capitalCityUnitQueue->id)) {
+                $this->messages[] = $unitRequest['name'] . ' rejected because recruiting this amount would exceed the kingdom unit maximum.';
+                $unitRequest['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
+                $requestData[$index] = $unitRequest;
 
                 continue;
             }
@@ -355,10 +367,7 @@ class CapitalCityProcessUnitRequestHandler
                 'started_at' => now(),
                 'completed_at' => now()->addSeconds($totalTimeInSeconds),
                 'messages' => array_merge($messages, $this->messages),
-                'unit_request_data' => array_merge(
-                    $capitalCityUnitQueue->unit_request_data,
-                    $requestData
-                )
+                'unit_request_data' => $capitalCityUnitQueue->unit_request_data,
             ]);
 
             $capitalCityUnitQueue = $capitalCityUnitQueue->refresh();

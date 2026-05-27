@@ -4,13 +4,20 @@ namespace Tests\Unit\Game\Kingdoms\Services;
 
 use App\Flare\Models\CapitalCityResourceRequest as CapitalCityResourceRequestModel;
 use App\Flare\Models\CapitalCityUnitQueue;
+use App\Flare\Models\GameBuilding;
+use App\Flare\Models\GameBuildingUnit;
+use App\Flare\Models\GameUnit;
+use App\Flare\Models\KingdomBuilding;
+use App\Flare\Models\KingdomUnit;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityRequestResourcesHandler;
+use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessUnitRequestHandler;
 use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest;
 use App\Game\Kingdoms\Jobs\CapitalCityUnitRequestMovement;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
+use App\Game\Kingdoms\Values\KingdomMaxValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -184,5 +191,131 @@ class CapitalCityUnitManagementTest extends TestCase
         resolve(\App\Game\Kingdoms\Service\CapitalCityUnitManagement::class)->processUnitRequest($capitalCityUnitQueue);
 
         $this->assertSame(CapitalCityQueueStatus::CANCELLED, $capitalCityUnitQueue->refresh()->unit_request_data[0]['secondary_status']);
+    }
+
+    public function testDuplicateSameUnitRequestRowsAreNotDuplicatedWhenRecruitmentStarts(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $kingdom = $characterFactory->kingdomManagement()->assignKingdom([
+            'current_wood' => 1000,
+            'current_clay' => 1000,
+            'current_stone' => 1000,
+            'current_iron' => 1000,
+            'current_population' => 1000,
+        ])->getKingdom();
+        $character = $characterFactory->getCharacter();
+        $gameUnit = GameUnit::factory()->create(['name' => 'Settlers']);
+        $gameBuilding = GameBuilding::factory()->create(['name' => 'Church']);
+        GameBuildingUnit::factory()->create([
+            'game_building_id' => $gameBuilding->id,
+            'game_unit_id' => $gameUnit->id,
+            'required_level' => 1,
+        ]);
+        KingdomBuilding::factory()->create([
+            'kingdom_id' => $kingdom->id,
+            'game_building_id' => $gameBuilding->id,
+            'level' => 1,
+        ]);
+        $capitalCityUnitQueue = CapitalCityUnitQueue::create([
+            'character_id' => $character->id,
+            'kingdom_id' => $kingdom->id,
+            'requested_kingdom' => $kingdom->id,
+            'unit_request_data' => [
+                [
+                    'name' => $gameUnit->name,
+                    'unit_id' => $gameUnit->id,
+                    'amount' => 2,
+                    'costs' => ['wood' => 20],
+                    'missing_costs' => [],
+                    'secondary_status' => CapitalCityQueueStatus::PROCESSING,
+                ],
+                [
+                    'name' => $gameUnit->name,
+                    'unit_id' => $gameUnit->id,
+                    'amount' => 3,
+                    'costs' => ['wood' => 30],
+                    'missing_costs' => [],
+                    'secondary_status' => CapitalCityQueueStatus::PROCESSING,
+                ],
+            ],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::PROCESSING,
+            'started_at' => now(),
+            'completed_at' => now(),
+        ]);
+
+        resolve(CapitalCityProcessUnitRequestHandler::class)->handleUnitRequests($capitalCityUnitQueue);
+
+        $this->assertCount(2, $capitalCityUnitQueue->refresh()->unit_request_data);
+    }
+
+    public function testDuplicateSameUnitRequestRowsAreAggregatedBeforeMaxValidation(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $kingdom = $characterFactory->kingdomManagement()->assignKingdom([
+            'current_wood' => 1000,
+            'current_clay' => 1000,
+            'current_stone' => 1000,
+            'current_iron' => 1000,
+            'current_population' => 1000,
+        ])->getKingdom();
+        $character = $characterFactory->getCharacter();
+        $gameUnit = GameUnit::factory()->create(['name' => 'Settlers']);
+        $gameBuilding = GameBuilding::factory()->create(['name' => 'Church']);
+        GameBuildingUnit::factory()->create([
+            'game_building_id' => $gameBuilding->id,
+            'game_unit_id' => $gameUnit->id,
+            'required_level' => 1,
+        ]);
+        KingdomBuilding::factory()->create([
+            'kingdom_id' => $kingdom->id,
+            'game_building_id' => $gameBuilding->id,
+            'level' => 1,
+        ]);
+        KingdomUnit::factory()->create([
+            'kingdom_id' => $kingdom->id,
+            'game_unit_id' => $gameUnit->id,
+            'amount' => KingdomMaxValue::MAX_UNIT - 5,
+        ]);
+        $capitalCityUnitQueue = CapitalCityUnitQueue::create([
+            'character_id' => $character->id,
+            'kingdom_id' => $kingdom->id,
+            'requested_kingdom' => $kingdom->id,
+            'unit_request_data' => [
+                [
+                    'name' => $gameUnit->name,
+                    'unit_id' => $gameUnit->id,
+                    'amount' => 3,
+                    'costs' => ['wood' => 30],
+                    'missing_costs' => [],
+                    'secondary_status' => CapitalCityQueueStatus::PROCESSING,
+                ],
+                [
+                    'name' => $gameUnit->name,
+                    'unit_id' => $gameUnit->id,
+                    'amount' => 3,
+                    'costs' => ['wood' => 30],
+                    'missing_costs' => [],
+                    'secondary_status' => CapitalCityQueueStatus::PROCESSING,
+                ],
+            ],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::PROCESSING,
+            'started_at' => now(),
+            'completed_at' => now(),
+        ]);
+
+        resolve(CapitalCityProcessUnitRequestHandler::class)->handleUnitRequests($capitalCityUnitQueue);
+
+        $requestData = $capitalCityUnitQueue->refresh()->unit_request_data;
+
+        $this->assertSame(CapitalCityQueueStatus::RECRUITING, $requestData[0]['secondary_status']);
+        $this->assertSame(CapitalCityQueueStatus::REJECTED, $requestData[1]['secondary_status']);
     }
 }

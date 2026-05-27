@@ -11,4 +11,6 @@ export default interface BuildingsTableProps {
     view_building: (building?: BuildingDetails) => void;
 
     view_port: number;
+
+    is_automation_locked: boolean;
 }

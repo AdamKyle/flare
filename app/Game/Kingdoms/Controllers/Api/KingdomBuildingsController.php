@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Controllers\Api;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\KingdomBuilding;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Kingdoms\Requests\CancelBuildingRequest;
 use App\Game\Kingdoms\Requests\KingdomUpgradeBuildingRequest;
 use App\Game\Kingdoms\Service\KingdomBuildingService;
@@ -19,7 +20,11 @@ class KingdomBuildingsController extends Controller
 
     private KingdomBuildingService $kingdomBuildingService;
 
-    public function __construct(UpdateKingdom $updateKingdom, KingdomBuildingService $kingdomBuildingService)
+    public function __construct(
+        UpdateKingdom $updateKingdom,
+        KingdomBuildingService $kingdomBuildingService,
+        private readonly AutomationRestrictionService $automationRestrictionService
+    )
     {
         $this->updateKingdom = $updateKingdom;
         $this->kingdomBuildingService = $kingdomBuildingService;
@@ -27,6 +32,12 @@ class KingdomBuildingsController extends Controller
 
     public function upgradeKingdomBuilding(KingdomUpgradeBuildingRequest $request, Character $character, KingdomBuilding $building): JsonResponse
     {
+        $restriction = $this->automationRestrictionJsonResponse($character);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         if ($this->kingdomBuildingService->hasActiveBuildingUpgrade($building)) {
             return response()->json([
                 'message' => 'Building is already in the process of upgrading.',
@@ -67,6 +78,12 @@ class KingdomBuildingsController extends Controller
 
     public function rebuildKingdomBuilding(Character $character, KingdomBuilding $building): JsonResponse
     {
+        $restriction = $this->automationRestrictionJsonResponse($character);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         if (ResourceValidation::shouldRedirectKingdomBuilding($building, $building->kingdom)) {
             return response()->json([
                 'message' => "You don't have the resources.",
@@ -86,11 +103,20 @@ class KingdomBuildingsController extends Controller
 
     public function removeKingdomBuildingFromQueue(CancelBuildingRequest $request): JsonResponse
     {
+        $restriction = $this->automationRestrictionJsonResponse(auth()->user()->character);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
 
         $queue = BuildingInQueue::find($request->queue_id);
 
         if (is_null($queue)) {
             return response()->json(['message' => 'Invalid Input.'], 422);
+        }
+
+        if (! is_null($queue->capital_city_building_queue_id)) {
+            return response()->json(['message' => 'This queue is managed by your capital city. Cancel it from capital city management.'], 422);
         }
 
         $building = $queue->building;
@@ -108,5 +134,16 @@ class KingdomBuildingsController extends Controller
         return response()->json([
             'message' => 'Building has been removed from queue. Some resources or gold was given back to you based on percentage of time left.',
         ], 200);
+    }
+
+    private function automationRestrictionJsonResponse(Character $character): ?JsonResponse
+    {
+        $restriction = $this->automationRestrictionService->blockedContext($character, AutomationRestrictionService::KINGDOM_MANAGEMENT);
+
+        if (is_null($restriction)) {
+            return null;
+        }
+
+        return response()->json(['message' => $restriction['message']], 422);
     }
 }

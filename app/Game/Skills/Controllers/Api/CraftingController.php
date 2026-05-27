@@ -3,10 +3,10 @@
 namespace App\Game\Skills\Controllers\Api;
 
 use App\Flare\Models\Character;
-use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Services\AutomationRestrictionService;
+use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Events\Concerns\ShouldShowCraftingEventButton;
 use App\Game\Factions\FactionLoyalty\Concerns\FactionLoyalty;
 use App\Game\Skills\Requests\CraftingValidation;
@@ -87,7 +87,7 @@ class CraftingController extends Controller
      */
     public function craft(CraftingValidation $request, Character $character, CraftingService $craftingService): JsonResponse
     {
-        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::START_CRAFTING);
+        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::START_ITEM_CRAFTING);
 
         if (! is_null($restriction)) {
             return $restriction;

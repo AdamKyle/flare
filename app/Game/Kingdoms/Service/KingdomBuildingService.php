@@ -53,6 +53,7 @@ class KingdomBuildingService
             'completed_at' => $timeToComplete,
             'type' => BuildingQueueType::UPGRADE,
             'started_at' => now(),
+            'capital_city_building_queue_id' => $capitalCityQueueId,
         ]);
 
         event(new UpdateKingdomQueues($building->kingdom));
@@ -116,6 +117,7 @@ class KingdomBuildingService
             'completed_at' => $timeToComplete,
             'type' => BuildingQueueType::REPAIR,
             'started_at' => now(),
+            'capital_city_building_queue_id' => $capitalCityBuildingQueueId,
         ]);
 
         RebuildBuilding::dispatch($building, $character->user, $queue->id, $capitalCityBuildingQueueId)->delay($timeToComplete);
@@ -146,9 +148,17 @@ class KingdomBuildingService
             if ($type === KingdomResources::POPULATION->value) {
                 if (!$ignorePop) {
                     $populationCost = $building->required_population - $building->required_population * $building->kingdom->fetchPopulationCostReduction();
+                    if ($newResources['current_population'] < $populationCost) {
+                        return $building->kingdom->refresh();
+                    }
+
                     $newResources['current_population'] -= $populationCost;
                 }
             } else {
+                if ($newResources['current_' . strtolower($type)] < $cost) {
+                    return $building->kingdom->refresh();
+                }
+
                 $newResources['current_' . strtolower($type)] -= $cost;
             }
         }
@@ -207,7 +217,7 @@ class KingdomBuildingService
 
         $this->resourceCalculation($queue);
 
-        if ($this->completed === 0 || ! $this->totalResources >= .10) {
+        if ($this->totalResources <= 0 || $this->totalResources < .10) {
             return false;
         }
 
@@ -256,13 +266,16 @@ class KingdomBuildingService
         $end = Carbon::parse($queue->completed_at)->timestamp;
         $current = Carbon::parse(now())->timestamp;
 
+        if ($end <= $start) {
+            $this->completed = 1;
+            $this->totalResources = 0;
+
+            return;
+        }
+
         $this->completed = (($current - $start) / ($end - $start));
 
-        if ($this->completed === 0) {
-            $this->totalResources = 0;
-        } else {
-            $this->totalResources = 1 - $this->completed;
-        }
+        $this->totalResources = max(0, min(1, 1 - $this->completed));
     }
 
     /**
@@ -277,7 +290,8 @@ class KingdomBuildingService
         $updateData = [];
 
         foreach (KingdomResources::kingdomResources() as $resource) {
-            $newAmount = $kingdom->{'current_' . $resource} + ($building->{$resource . '_cost'} * $this->totalResources);
+            $cost = $resource === KingdomResources::POPULATION->value ? $building->required_population : $building->{$resource . '_cost'};
+            $newAmount = $kingdom->{'current_' . $resource} + ($cost * $this->totalResources);
             $maxValue = 'max_' . $resource;
 
             $updateData['current_' . $resource] = min($newAmount, $kingdom->{$maxValue});

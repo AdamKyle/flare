@@ -53,7 +53,10 @@ export default class SmallUnitsSection extends React.Component<
         return (
             <Fragment>
                 <div className="text-right cursor-pointer  text-red-500 mb-4">
-                    <button onClick={this.props.close_selected}>
+                    <button
+                        onClick={this.props.close_selected}
+                        disabled={this.props.is_automation_locked}
+                    >
                         <i className="fas fa-minus-circle"></i>
                     </button>
                 </div>
@@ -95,6 +98,9 @@ export default class SmallUnitsSection extends React.Component<
                             view_unit={this.viewSelectedBuilding.bind(this)}
                             units_in_queue={this.props.kingdom.unit_queue}
                             current_units={this.props.kingdom.current_units}
+                            is_automation_locked={
+                                this.props.is_automation_locked
+                            }
                         />
                     </BasicCard>
                 )}

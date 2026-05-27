@@ -16,4 +16,6 @@ export default interface KingdomProps {
     user_id: number;
 
     has_capital_city: boolean;
+
+    is_automation_locked: boolean;
 }

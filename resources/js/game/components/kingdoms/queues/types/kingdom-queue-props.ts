@@ -5,4 +5,5 @@ export interface KingdomQueueProps {
     character_id: number;
     kingdom_id: number;
     kingdoms: KingdomDetails[] | [];
+    is_automation_locked: boolean;
 }

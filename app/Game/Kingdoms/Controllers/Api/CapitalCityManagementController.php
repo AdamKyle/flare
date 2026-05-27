@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Kingdoms\Jobs\CapitalCityQueueUpBuildingRequests;
 use App\Game\Kingdoms\Jobs\CapitalCityQueueUpUnitRequests;
 use App\Game\Kingdoms\Requests\BuildingUpgradeRequestsRequest;
@@ -27,10 +28,17 @@ class CapitalCityManagementController extends Controller
         private readonly CancelBuildingRequestService $cancelBuildingRequestService,
         private readonly CancelUnitRequestService $cancelUnitRequestService,
         private readonly CapitalCityGoldBarManagementService $capitalCityGoldBarManagementService,
+        private readonly AutomationRestrictionService $automationRestrictionService,
     ) {}
 
     public function makeCapitalCity(Kingdom $kingdom, Character $character): JsonResponse
     {
+        $restriction = $this->automationRestrictionJsonResponse($character);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         $result = $this->capitalCityManagementService->makeCapitalCity($kingdom);
 
         $status = $result['status'];
@@ -41,6 +49,12 @@ class CapitalCityManagementController extends Controller
 
     public function fetchKingdomsWithUpgradableBuildingType(Character $character, Kingdom $kingdom)
     {
+        $restriction = $this->automationRestrictionJsonResponse($character);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         $result = $this->capitalCityManagementService->fetchBuildingsForUpgradesOrRepairs($character, $kingdom);
 
         $status = $result['status'];
@@ -51,6 +65,12 @@ class CapitalCityManagementController extends Controller
 
     public function fetchKingdomsWithRecruitableUnitType(Character $character, Kingdom $kingdom)
     {
+        $restriction = $this->automationRestrictionJsonResponse($character);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         $result = $this->capitalCityManagementService->fetchKingdomsForSelection($kingdom);
 
         $status = $result['status'];
@@ -61,6 +81,12 @@ class CapitalCityManagementController extends Controller
 
     public function walkAllKingdoms(Character $character, Kingdom $kingdom)
     {
+        $restriction = $this->automationRestrictionJsonResponse($character);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         $result = $this->capitalCityManagementService->walkAllKingdoms($character, $kingdom);
 
         $status = $result['status'];
@@ -71,6 +97,12 @@ class CapitalCityManagementController extends Controller
 
     public function upgradeBuildings(BuildingUpgradeRequestsRequest $buildingUpgradeRequestsRequest, Character $character, Kingdom $kingdom)
     {
+        $restriction = $this->automationRestrictionJsonResponse($character);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         Log::channel('capital_city_building_upgrades')->info('upgradeBuildings endpoint called', [
             '$buildingUpgradeRequestsRequest' => $buildingUpgradeRequestsRequest->all(),
             '$character' => $character->id,
@@ -84,6 +116,12 @@ class CapitalCityManagementController extends Controller
 
     public function fetchKingdomBuildingManagementQueues(Character $character, Kingdom $kingdom)
     {
+        $restriction = $this->automationRestrictionJsonResponse($character);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         $data = $this->capitalCityManagementService->fetchBuildingQueueData($character, $kingdom);
 
         return response()->json([
@@ -93,6 +131,12 @@ class CapitalCityManagementController extends Controller
 
     public function fetchKingdomUnitManagementQueues(Character $character, Kingdom $kingdom)
     {
+        $restriction = $this->automationRestrictionJsonResponse($character);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         $data = $this->capitalCityManagementService->fetchUnitQueueData($character, $kingdom);
 
         return response()->json([
@@ -102,6 +146,12 @@ class CapitalCityManagementController extends Controller
 
     public function recruitUnits(RecruitUnitRequestsRequest $recruitUnitRequestsRequest, Character $character, Kingdom $kingdom)
     {
+        $restriction = $this->automationRestrictionJsonResponse($character);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         Log::channel('capital_city_unit_recruitments')->info('recruitUnits endpoint called', [
             '$buildingUpgradeRequestsRequest' => $recruitUnitRequestsRequest->all(),
             '$character' => $character->id,
@@ -115,6 +165,12 @@ class CapitalCityManagementController extends Controller
 
     public function cancelUnitRecruitOrders(RecruitUnitCancellationRequest $request, Character $character, Kingdom $kingdom)
     {
+        $restriction = $this->automationRestrictionJsonResponse($character);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         $result = $this->cancelUnitRequestService->handleCancelRequest($character, $kingdom, $request->all());
 
         $status = $result['status'];
@@ -125,6 +181,12 @@ class CapitalCityManagementController extends Controller
 
     public function cancelBuildingOrdersOrders(CapitalCityCancelBuildingRequest $request, Character $character, Kingdom $kingdom)
     {
+        $restriction = $this->automationRestrictionJsonResponse($character);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         $result = $this->cancelBuildingRequestService->handleCancelRequest($character, $kingdom, $request->all());
 
         $status = $result['status'];
@@ -161,5 +223,16 @@ class CapitalCityManagementController extends Controller
         unset($result['status']);
 
         return response()->json($result, $status);
+    }
+
+    private function automationRestrictionJsonResponse(Character $character): ?JsonResponse
+    {
+        $restriction = $this->automationRestrictionService->blockedContext($character, AutomationRestrictionService::KINGDOM_MANAGEMENT);
+
+        if (is_null($restriction)) {
+            return null;
+        }
+
+        return response()->json(['message' => $restriction['message']], 422);
     }
 }

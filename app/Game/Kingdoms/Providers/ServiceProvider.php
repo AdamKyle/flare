@@ -10,6 +10,7 @@ use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Transformers\UnitMovementTransformer;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
 use App\Game\Kingdoms\Console\Commands\DeleteKingdomLogs;
+use App\Game\Kingdoms\Console\Commands\RepairKingdomData;
 use App\Game\Kingdoms\Console\Commands\ResetCapitalCityWalkingStatus;
 use App\Game\Kingdoms\Console\Commands\UpdateKingdoms;
 use App\Game\Kingdoms\Handlers\AttackKingdomWithUnitsHandler;
@@ -32,6 +33,7 @@ use App\Game\Kingdoms\Handlers\SettlerHandler;
 use App\Game\Kingdoms\Handlers\TooMuchPopulationHandler;
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\Kingdoms\Middleware\DoesKingdomBelongToAuthorizedUser;
+use App\Game\Kingdoms\Middleware\BlocksKingdomAutomationManagement;
 use App\Game\Kingdoms\Service\AbandonKingdomService;
 use App\Game\Kingdoms\Service\AttackWithItemsService;
 use App\Game\Kingdoms\Service\CancelBuildingRequestService;
@@ -387,8 +389,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->commands([
             DeleteKingdomLogs::class,
+            RepairKingdomData::class,
             UpdateKingdoms::class,
             ResetCapitalCityWalkingStatus::class,
+            RepairKingdomData::class,
         ]);
     }
 
@@ -400,5 +404,6 @@ class ServiceProvider extends ApplicationServiceProvider
         $router = $this->app['router'];
 
         $router->aliasMiddleware('character.owns.kingdom', DoesKingdomBelongToAuthorizedUser::class);
+        $router->aliasMiddleware('kingdom.automation.blocked', BlocksKingdomAutomationManagement::class);
     }
 }

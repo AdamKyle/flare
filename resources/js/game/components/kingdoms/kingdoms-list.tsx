@@ -2,6 +2,7 @@ import { AxiosError, AxiosResponse } from "axios";
 import { isEqual } from "lodash";
 import React, { Fragment } from "react";
 import DangerAlert from "../../components/ui/alerts/simple-alerts/danger-alert";
+import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
 import BasicCard from "../../components/ui/cards/basic-card";
 import Table from "../../components/ui/data-tables/table";
 import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
@@ -179,6 +180,26 @@ export default class KingdomsList extends React.Component<
         });
     }
 
+    isKingdomAutomationLocked(): boolean {
+        return (
+            this.props.is_automation_running ||
+            this.props.is_faction_loyalty_automation_running ||
+            this.props.is_delve_running
+        );
+    }
+
+    automationName(): string {
+        if (this.props.is_faction_loyalty_automation_running) {
+            return "Faction Loyalty";
+        }
+
+        if (this.props.is_delve_running) {
+            return "Delve";
+        }
+
+        return "Exploration";
+    }
+
     render() {
         if (this.state.loading) {
             return <LoadingProgressBar />;
@@ -195,6 +216,12 @@ export default class KingdomsList extends React.Component<
                         child! (head to Game tab and click Revive).
                     </DangerAlert>
                 ) : null}
+                {this.isKingdomAutomationLocked() ? (
+                    <WarningAlert additional_css={"my-4"}>
+                        {this.automationName()} automation is running. Kingdom
+                        management is disabled until it stops.
+                    </WarningAlert>
+                ) : null}
                 {this.state.selected_kingdom !== null ? (
                     this.props.view_port < 1600 ? (
                         <SmallKingdom
@@ -208,6 +235,7 @@ export default class KingdomsList extends React.Component<
                             has_capital_city={
                                 this.state.already_has_capital_city
                             }
+                            is_automation_locked={this.isKingdomAutomationLocked()}
                         />
                     ) : (
                         <Kingdom
@@ -221,6 +249,7 @@ export default class KingdomsList extends React.Component<
                             character_gold={this.props.character_gold}
                             view_port={this.props.view_port}
                             user_id={this.props.user_id}
+                            is_automation_locked={this.isKingdomAutomationLocked()}
                         />
                     )
                 ) : (

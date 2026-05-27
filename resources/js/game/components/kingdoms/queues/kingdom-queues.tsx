@@ -104,7 +104,7 @@ export default class KingdomQueues extends React.Component<
         queueIndex: number,
         queueKey: QueueTypes,
     ) {
-        if (this.state.queues === null) {
+        if (this.props.is_automation_locked || this.state.queues === null) {
             return;
         }
 
@@ -148,6 +148,7 @@ export default class KingdomQueues extends React.Component<
                                     );
                                 }}
                                 additional_css={"my-2"}
+                                disabled={this.props.is_automation_locked}
                             />
                         </BasicCard>
                     );
@@ -173,6 +174,7 @@ export default class KingdomQueues extends React.Component<
                                     );
                                 }}
                                 additional_css={"my-2"}
+                                disabled={this.props.is_automation_locked}
                             />
                         </BasicCard>
                     );
@@ -214,6 +216,7 @@ export default class KingdomQueues extends React.Component<
                                 );
                             }}
                             additional_css={"my-2"}
+                            disabled={this.props.is_automation_locked}
                         />
                     </BasicCard>
                 );
@@ -283,6 +286,7 @@ export default class KingdomQueues extends React.Component<
                             }}
                             additional_css={"my-2"}
                             disabled={
+                                this.props.is_automation_locked ||
                                 ((!canCancelAttack || !canCancelRecall) &&
                                     unitMovementQueue.reason ===
                                         "Returning from attack") ||
@@ -329,6 +333,7 @@ export default class KingdomQueues extends React.Component<
                                 );
                             }}
                             additional_css={"my-2"}
+                            disabled={this.props.is_automation_locked}
                         />
                     </BasicCard>
                 );
@@ -352,7 +357,7 @@ export default class KingdomQueues extends React.Component<
                 {this.state.success_message !== null ? (
                     <SuccessAlert>{this.state.success_message}</SuccessAlert>
                 ) : null}
-                <div className="w-[90%] mr-auto ml-auto max-h-[600px] overflow-y-auto">
+                <div className="w-full mr-auto ml-auto max-h-[520px] overflow-y-auto">
                     {this.renderBuildingQueues()}
                     {this.renderBuildingExpansionQueues()}
                     {this.renderUnitRecruitmentQueues()}

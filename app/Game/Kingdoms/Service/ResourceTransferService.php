@@ -263,6 +263,7 @@ class ResourceTransferService
                 ->whereHas('gameUnit', function ($query) {
                     $query->where('name', UnitNames::AIRSHIP);
                 })
+                ->where('amount', '>', 0)
                 ->first()?->decrement('amount');
         }
 
@@ -294,7 +295,7 @@ class ResourceTransferService
         $requestingFromKingdom->units()->whereHas('gameUnit', function ($query) {
             $query->where('name', UnitNames::SPEARMEN);
         })->update([
-            'amount' => $spearmen->amount - self::SPEARMEN_COST,
+            'amount' => max(0, $spearmen->amount - self::SPEARMEN_COST),
         ]);
 
         $airShip = $requestingFromKingdom->units()->whereHas('gameUnit', function ($query) {

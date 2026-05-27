@@ -47,6 +47,9 @@ class MassImportCustomData extends Command
             '--repair-reincarnation-bonus' => true,
             '--apply' => true,
         ]);
+        Artisan::call('kingdoms:repair-data', [
+            '--apply' => true,
+        ]);
 
         Artisan::call('import:game-data Monsters');
 

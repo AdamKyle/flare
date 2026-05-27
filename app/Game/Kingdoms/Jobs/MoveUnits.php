@@ -127,7 +127,7 @@ class MoveUnits implements ShouldQueue
             $newAmount = $foundUnit->amount + $unitMoving['amount'];
 
             if ($newAmount > KingdomMaxValue::MAX_UNIT) {
-                $newAmount = KingdomMaxValue::MAX_UNIT - $newAmount;
+                $newAmount = KingdomMaxValue::MAX_UNIT;
             }
 
             $foundUnit->update([

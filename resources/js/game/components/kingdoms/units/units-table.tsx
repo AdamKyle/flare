@@ -15,7 +15,7 @@ export default class UnitsTable extends React.Component<
     UnitsTableProps,
     UpgradeTablesState
 > {
-    constructor(props: any) {
+    constructor(props: UnitsTableProps) {
         super(props);
 
         this.state = {
@@ -26,6 +26,10 @@ export default class UnitsTable extends React.Component<
     }
 
     viewUnit(unit: UnitDetails) {
+        if (this.props.is_automation_locked) {
+            return;
+        }
+
         this.props.view_unit(unit);
     }
 
@@ -80,7 +84,7 @@ export default class UnitsTable extends React.Component<
     }
 
     cancelUnitRecruitment(queueId: number | null) {
-        if (queueId === null) {
+        if (this.props.is_automation_locked || queueId === null) {
             return;
         }
 
@@ -139,9 +143,7 @@ export default class UnitsTable extends React.Component<
                         <LoadingProgressBar />
                     </div>
                 ) : null}
-                <div
-                    className={"max-w-[390px] md:max-w-full overflow-x-hidden"}
-                >
+                <div className={"max-w-[390px] md:max-w-full overflow-x-auto"}>
                     <Table
                         data={this.getOrderedUnits(this.props.units)}
                         conditional_row_styles={this.createConditionalRowStyles()}
@@ -151,6 +153,7 @@ export default class UnitsTable extends React.Component<
                             this.props.units_in_queue,
                             this.props.current_units,
                             this.props.buildings,
+                            this.props.is_automation_locked,
                         )}
                         dark_table={this.props.dark_tables}
                     />

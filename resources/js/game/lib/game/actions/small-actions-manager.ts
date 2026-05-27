@@ -118,12 +118,10 @@ export default class SmallActionsManager {
             });
         }
 
-        if (!isAnyAutomationRunning) {
-            options.push({
-                label: "Craft",
-                value: "craft",
-            });
-        }
+        options.push({
+            label: "Craft",
+            value: "craft",
+        });
 
         if (!isAnyAutomationRunning) {
             options.unshift({

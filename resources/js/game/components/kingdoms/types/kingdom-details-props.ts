@@ -14,4 +14,6 @@ export default interface KingdomDetailsProps {
     reset_resource_transfer: boolean;
 
     has_capital_city: boolean;
+
+    is_automation_locked: boolean;
 }

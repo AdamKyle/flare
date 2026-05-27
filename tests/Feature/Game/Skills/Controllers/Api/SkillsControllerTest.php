@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Game\Skills\Controllers\Api;
 
+use App\Flare\Models\CharacterAutomation;
+use App\Flare\Values\AutomationType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -52,6 +54,48 @@ class SkillsControllerTest extends TestCase
 
         $this->assertNotEmpty($jsonData['training_skills']);
         $this->assertNotEmpty($jsonData['crafting_skills']);
+    }
+
+    public function testExplorationBlocksSkillList(): void
+    {
+        $character = $this->character->getCharacter();
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::EXPLORING,
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $response = $this->actingAs($character->user)->call('GET', '/api/character/skills/' . $character->id);
+
+        $response->assertStatus(422);
+    }
+
+    public function testDelveBlocksSkillList(): void
+    {
+        $character = $this->character->getCharacter();
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE,
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $response = $this->actingAs($character->user)->call('GET', '/api/character/skills/' . $character->id);
+
+        $response->assertStatus(422);
+    }
+
+    public function testFactionLoyaltyBlocksSkillList(): void
+    {
+        $character = $this->character->getCharacter();
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::FACTION_LOYALTY,
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $response = $this->actingAs($character->user)->call('GET', '/api/character/skills/' . $character->id);
+
+        $response->assertStatus(422);
     }
 
     public function testFailToGetSkillInformation()

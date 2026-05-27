@@ -53,7 +53,10 @@ export default class SmallBuildingsSection extends React.Component<
         return (
             <Fragment>
                 <div className="text-right cursor-pointer  text-red-500 mb-4">
-                    <button onClick={this.props.close_selected}>
+                    <button
+                        onClick={this.props.close_selected}
+                        disabled={this.props.is_automation_locked}
+                    >
                         <i className="fas fa-minus-circle"></i>
                     </button>
                 </div>
@@ -92,6 +95,9 @@ export default class SmallBuildingsSection extends React.Component<
                                 this.props.kingdom.building_queue
                             }
                             view_port={this.props.view_port}
+                            is_automation_locked={
+                                this.props.is_automation_locked
+                            }
                         />
                     </BasicCard>
                 )}

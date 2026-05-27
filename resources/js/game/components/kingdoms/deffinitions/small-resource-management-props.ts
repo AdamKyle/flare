@@ -8,4 +8,6 @@ export default interface SmallResourceManagementProps {
     close_selected: () => void;
 
     character_gold: number;
+
+    is_automation_locked: boolean;
 }

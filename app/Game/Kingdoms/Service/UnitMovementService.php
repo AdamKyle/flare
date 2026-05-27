@@ -104,11 +104,13 @@ class UnitMovementService
             return $this->errorResult('Invalid input.');
         }
 
-        $unitsToMove = $this->buildUnitsToMoveBasedOnKingdom($kingdom, $params['units_to_move']);
+        $validUnitsToMove = $this->removeUnitsFromKingdom($params['units_to_move']);
 
-        $this->removeUnitsFromKingdom($params['units_to_move']);
+        if (empty($validUnitsToMove)) {
+            return $this->errorResult('Invalid input.');
+        }
 
-        $this->createMovementQueues($character, $kingdom, $unitsToMove);
+        $this->createMovementQueues($character, $kingdom, $this->buildUnitsToMoveBasedOnKingdom($kingdom, $validUnitsToMove));
 
         $this->updateKingdom->updateKingdomAllKingdoms($character->refresh());
 
@@ -178,17 +180,31 @@ class UnitMovementService
     /**
      * Removes the units we want to move from the kingdom they come from.
      */
-    public function removeUnitsFromKingdom(array $unitData): void
+    public function removeUnitsFromKingdom(array $unitData): array
     {
+        $removedUnits = [];
+
         foreach ($unitData as $unitData) {
             $kingdom = Kingdom::find($unitData['kingdom_id']);
 
+            if (is_null($kingdom)) {
+                continue;
+            }
+
             $unit = $kingdom->units()->find($unitData['unit_id']);
+
+            if (is_null($unit) || $unit->amount < $unitData['amount']) {
+                continue;
+            }
 
             $unit->update([
                 'amount' => $unit->amount - $unitData['amount'],
             ]);
+
+            $removedUnits[] = $unitData;
         }
+
+        return $removedUnits;
     }
 
     /**

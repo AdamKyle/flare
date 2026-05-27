@@ -141,6 +141,10 @@ export default class KingdomDetails extends React.Component<
         });
     }
 
+    isActionDisabled(additionalCondition: boolean = false): boolean {
+        return this.props.is_automation_locked || additionalCondition;
+    }
+
     render() {
         return (
             <Fragment>
@@ -322,24 +326,29 @@ export default class KingdomDetails extends React.Component<
                             <PrimaryOutlineButton
                                 button_label={"Change Name"}
                                 on_click={this.showChangeName.bind(this)}
+                                disabled={this.isActionDisabled()}
                             />
                             <SuccessOutlineButton
                                 button_label={"Call for Reinforcements"}
                                 on_click={this.showCallForReinforcements.bind(
                                     this,
                                 )}
+                                disabled={this.isActionDisabled()}
                             />
                             <PrimaryOutlineButton
                                 button_label={"Buy Population"}
                                 on_click={this.showBuyPop.bind(this)}
+                                disabled={this.isActionDisabled()}
                             />
                             <SkyOutlineButton
                                 button_label={"Manage Treasury"}
                                 on_click={this.showManageTreasury.bind(this)}
+                                disabled={this.isActionDisabled()}
                             />
                             <DangerOutlineButton
                                 button_label={"Abandon Kingdom"}
                                 on_click={this.showAbandonKingdom.bind(this)}
+                                disabled={this.isActionDisabled()}
                             />
                         </div>
                     </div>
@@ -349,6 +358,7 @@ export default class KingdomDetails extends React.Component<
                             Specialty Actions{" "}
                             <button
                                 onClick={this.showSpecialtyHelpModal.bind(this)}
+                                disabled={this.props.is_automation_locked}
                             >
                                 <i className="fas fa-info-circle text-blue-500 dark:text-blue-400"></i>
                             </button>
@@ -368,22 +378,24 @@ export default class KingdomDetails extends React.Component<
                                     )
                                 }
                                 on_click={this.showSmelter.bind(this)}
-                                disabled={
-                                    !this.props.kingdom.can_access_smelter
-                                }
+                                disabled={this.isActionDisabled(
+                                    !this.props.kingdom.can_access_smelter,
+                                )}
                             />
                             <SkyOutlineButton
                                 button_label={"Manage Gold Bars"}
                                 on_click={this.showGoblinBank.bind(this)}
-                                disabled={this.canManageGoldBars()}
+                                disabled={this.isActionDisabled(
+                                    this.canManageGoldBars(),
+                                )}
                             />
                             <SuccessOutlineButton
                                 button_label={"Request Resources"}
                                 on_click={this.showRequestServices.bind(this)}
-                                disabled={
+                                disabled={this.isActionDisabled(
                                     !this.props.kingdom
-                                        .can_access_resource_request
-                                }
+                                        .can_access_resource_request,
+                                )}
                             />
                             {!this.props.has_capital_city ? (
                                 !this.props.kingdom.is_capital ? (
@@ -392,15 +404,16 @@ export default class KingdomDetails extends React.Component<
                                         on_click={this.showMakeCapitalCityModal.bind(
                                             this,
                                         )}
-                                        disabled={
+                                        disabled={this.isActionDisabled(
                                             !this.props.kingdom
-                                                .can_access_capital_city
-                                        }
+                                                .can_access_capital_city,
+                                        )}
                                     />
                                 ) : (
                                     <SuccessOutlineButton
                                         button_label={"Small Council"}
                                         on_click={this.props.show_small_council}
+                                        disabled={this.isActionDisabled()}
                                     />
                                 )
                             ) : null}

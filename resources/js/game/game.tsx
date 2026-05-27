@@ -787,6 +787,16 @@ export default class Game extends React.Component<GameProps, GameState> {
                             )}
                             user_id={this.state.character.user_id}
                             character_id={this.state.character.id}
+                            is_automation_running={
+                                this.state.character.is_automation_running
+                            }
+                            is_faction_loyalty_automation_running={
+                                this.state.character
+                                    .is_faction_loyalty_automation_running
+                            }
+                            is_delve_running={
+                                this.state.character.is_delve_running
+                            }
                         />
                     </TabPanel>
                 </Tabs>

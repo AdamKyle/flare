@@ -19,6 +19,7 @@ export const BuildUnitsColumns = (
     unitsInQueue: UnitsInQueue[] | [],
     currentUnits: CurrentUnitDetails[] | [],
     buildings: BuildingDetails[] | [],
+    actionsDisabled: boolean,
 ) => {
     return [
         {
@@ -27,7 +28,14 @@ export const BuildUnitsColumns = (
             cell: (row: UnitDetails) => (
                 <span className="m-auto">
                     <button
-                        onClick={() => onClick(row)}
+                        onClick={() => {
+                            if (actionsDisabled) {
+                                return;
+                            }
+
+                            onClick(row);
+                        }}
+                        disabled={actionsDisabled}
                         className={clsx({
                             "text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-500":
                                 !cannotBeRecruited(row, buildings),
@@ -82,14 +90,19 @@ export const BuildUnitsColumns = (
                                         "focus:outline-none focus-visible:ring-2 focus-visible:ring-red-200 dark:focus-visible:ring-white " +
                                         "focus-visible:ring-opacity-75"
                                     }
-                                    onClick={() =>
+                                    onClick={() => {
+                                        if (actionsDisabled) {
+                                            return;
+                                        }
+
                                         cancelUnitRecruitment(
                                             findUnitInQueue(
                                                 row.id,
                                                 unitsInQueue,
                                             ),
-                                        )
-                                    }
+                                        );
+                                    }}
+                                    disabled={actionsDisabled}
                                 >
                                     Cancel
                                 </button>

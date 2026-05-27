@@ -118,6 +118,7 @@ export default class SmallKingdom extends React.Component<
                         character_gold={this.props.character_gold}
                         view_port={this.props.view_port}
                         user_id={this.props.user_id}
+                        is_automation_locked={this.props.is_automation_locked}
                     />
                 );
             case "units":
@@ -127,6 +128,7 @@ export default class SmallKingdom extends React.Component<
                         dark_tables={this.props.dark_tables}
                         close_selected={this.closeSelected.bind(this)}
                         character_gold={this.props.character_gold}
+                        is_automation_locked={this.props.is_automation_locked}
                     />
                 );
             default:
@@ -160,152 +162,170 @@ export default class SmallKingdom extends React.Component<
 
         return (
             <Fragment>
-                <BasicCard>
-                    {this.state.show_small_council ? (
-                        <BasicCard>
-                            <div className="text-right cursor-pointer text-red-500">
-                                <button
-                                    onClick={this.manageSmallCouncil.bind(this)}
-                                >
-                                    <i className="fas fa-minus-circle"></i>
-                                </button>
-                            </div>
-                            <SmallCouncil
-                                kingdom={this.state.kingdom}
-                                user_id={this.props.user_id}
-                            />
-                        </BasicCard>
-                    ) : !this.state.show_kingdom_details ? (
-                        <div className="grid grid-cols-2">
-                            <span>
-                                <strong>Kingdom Details</strong>
-                            </span>
-                            <div className="text-right cursor-pointer text-blue-500">
-                                <button
-                                    onClick={this.manageKingdomDetails.bind(
-                                        this,
-                                    )}
-                                >
-                                    <i className="fas fa-plus-circle"></i>
-                                </button>
-                            </div>
-                        </div>
-                    ) : this.state.show_resource_transfer_panel ? (
-                        <Fragment>
-                            <div className="grid grid-cols-2 mb-5">
-                                <span>
-                                    <strong>Kingdom Details</strong>
-                                </span>
+                <fieldset disabled={this.props.is_automation_locked}>
+                    <BasicCard>
+                        {this.state.show_small_council ? (
+                            <BasicCard>
                                 <div className="text-right cursor-pointer text-red-500">
                                     <button
-                                        onClick={this.showResourceTransferPanel.bind(
+                                        onClick={this.manageSmallCouncil.bind(
                                             this,
                                         )}
                                     >
                                         <i className="fas fa-minus-circle"></i>
                                     </button>
                                 </div>
-                            </div>
-
-                            <KingdomResourceTransfer
-                                kingdom_id={this.props.kingdom.id}
-                                character_id={this.props.kingdom.character_id}
-                            />
-                        </Fragment>
-                    ) : this.state.show_small_council ? (
-                        <BasicCard>
-                            <div className="text-right cursor-pointer text-red-500">
-                                <button
-                                    onClick={this.manageSmallCouncil.bind(this)}
-                                >
-                                    <i className="fas fa-minus-circle"></i>
-                                </button>
-                            </div>
-                            <SmallCouncil
-                                kingdom={this.state.kingdom}
-                                user_id={this.props.user_id}
-                            />
-                        </BasicCard>
-                    ) : (
-                        <Fragment>
-                            <div className="grid grid-cols-2 mb-5">
+                                <SmallCouncil
+                                    kingdom={this.state.kingdom}
+                                    user_id={this.props.user_id}
+                                />
+                            </BasicCard>
+                        ) : !this.state.show_kingdom_details ? (
+                            <div className="grid grid-cols-2">
                                 <span>
                                     <strong>Kingdom Details</strong>
                                 </span>
-                                <div className="text-right cursor-pointer text-red-500">
+                                <div className="text-right cursor-pointer text-blue-500">
                                     <button
                                         onClick={this.manageKingdomDetails.bind(
                                             this,
                                         )}
                                     >
-                                        <i className="fas fa-minus-circle"></i>
+                                        <i className="fas fa-plus-circle"></i>
                                     </button>
                                 </div>
                             </div>
+                        ) : this.state.show_resource_transfer_panel ? (
+                            <Fragment>
+                                <div className="grid grid-cols-2 mb-5">
+                                    <span>
+                                        <strong>Kingdom Details</strong>
+                                    </span>
+                                    <div className="text-right cursor-pointer text-red-500">
+                                        <button
+                                            onClick={this.showResourceTransferPanel.bind(
+                                                this,
+                                            )}
+                                        >
+                                            <i className="fas fa-minus-circle"></i>
+                                        </button>
+                                    </div>
+                                </div>
 
-                            <KingdomDetails
-                                show_small_council={this.manageSmallCouncil.bind(
-                                    this,
-                                )}
-                                kingdom={this.state.kingdom}
-                                character_gold={this.props.character_gold}
-                                close_details={this.props.close_details}
-                                show_resource_transfer_card={this.showResourceTransferPanel.bind(
-                                    this,
-                                )}
-                                reset_resource_transfer={
-                                    this.state.should_reset_resource_transfer
-                                }
-                                has_capital_city={this.props.has_capital_city}
-                            />
-                        </Fragment>
-                    )}
-                </BasicCard>
-
-                <div className="mt-4">
-                    {this.state.which_selected !== null ? (
-                        this.renderSelected()
-                    ) : (
-                        <Fragment>
-                            <Select
-                                onChange={this.showSelected.bind(this)}
-                                options={[
-                                    {
-                                        label: "Building Management",
-                                        value: "buildings",
-                                    },
-                                    {
-                                        label: "Unit Management",
-                                        value: "units",
-                                    },
-                                ]}
-                                menuPosition={"absolute"}
-                                menuPlacement={"bottom"}
-                                styles={{
-                                    menuPortal: (base: any) => ({
-                                        ...base,
-                                        zIndex: 9999,
-                                        color: "#000000",
-                                    }),
-                                }}
-                                menuPortalTarget={document.body}
-                                value={[
-                                    {
-                                        label: "Please Select Section",
-                                        value: "",
-                                    },
-                                ]}
-                            />
-                            <div className="grid gap-3">
-                                <DangerButton
-                                    button_label={"Close"}
-                                    on_click={this.props.close_details}
-                                    additional_css={"mt-4"}
+                                <KingdomResourceTransfer
+                                    kingdom_id={this.props.kingdom.id}
+                                    character_id={
+                                        this.props.kingdom.character_id
+                                    }
                                 />
-                            </div>
-                        </Fragment>
-                    )}
-                </div>
+                            </Fragment>
+                        ) : this.state.show_small_council ? (
+                            <BasicCard>
+                                <div className="text-right cursor-pointer text-red-500">
+                                    <button
+                                        onClick={this.manageSmallCouncil.bind(
+                                            this,
+                                        )}
+                                    >
+                                        <i className="fas fa-minus-circle"></i>
+                                    </button>
+                                </div>
+                                <SmallCouncil
+                                    kingdom={this.state.kingdom}
+                                    user_id={this.props.user_id}
+                                />
+                            </BasicCard>
+                        ) : (
+                            <Fragment>
+                                <div className="grid grid-cols-2 mb-5">
+                                    <span>
+                                        <strong>Kingdom Details</strong>
+                                    </span>
+                                    <div className="text-right cursor-pointer text-red-500">
+                                        <button
+                                            onClick={this.manageKingdomDetails.bind(
+                                                this,
+                                            )}
+                                            disabled={
+                                                this.props.is_automation_locked
+                                            }
+                                        >
+                                            <i className="fas fa-minus-circle"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <KingdomDetails
+                                    show_small_council={this.manageSmallCouncil.bind(
+                                        this,
+                                    )}
+                                    kingdom={this.state.kingdom}
+                                    character_gold={this.props.character_gold}
+                                    close_details={this.props.close_details}
+                                    show_resource_transfer_card={this.showResourceTransferPanel.bind(
+                                        this,
+                                    )}
+                                    reset_resource_transfer={
+                                        this.state
+                                            .should_reset_resource_transfer
+                                    }
+                                    has_capital_city={
+                                        this.props.has_capital_city
+                                    }
+                                    is_automation_locked={
+                                        this.props.is_automation_locked
+                                    }
+                                />
+                            </Fragment>
+                        )}
+                    </BasicCard>
+
+                    <div className="mt-4">
+                        {this.state.which_selected !== null ? (
+                            this.renderSelected()
+                        ) : (
+                            <Fragment>
+                                <Select
+                                    isDisabled={this.props.is_automation_locked}
+                                    onChange={this.showSelected.bind(this)}
+                                    options={[
+                                        {
+                                            label: "Building Management",
+                                            value: "buildings",
+                                        },
+                                        {
+                                            label: "Unit Management",
+                                            value: "units",
+                                        },
+                                    ]}
+                                    menuPosition={"absolute"}
+                                    menuPlacement={"bottom"}
+                                    styles={{
+                                        menuPortal: (base: any) => ({
+                                            ...base,
+                                            zIndex: 9999,
+                                            color: "#000000",
+                                        }),
+                                    }}
+                                    menuPortalTarget={document.body}
+                                    value={[
+                                        {
+                                            label: "Please Select Section",
+                                            value: "",
+                                        },
+                                    ]}
+                                />
+                                <div className="grid gap-3">
+                                    <DangerButton
+                                        button_label={"Close"}
+                                        on_click={this.props.close_details}
+                                        additional_css={"mt-4"}
+                                    />
+                                </div>
+                            </Fragment>
+                        )}
+                    </div>
+                </fieldset>
             </Fragment>
         );
     }

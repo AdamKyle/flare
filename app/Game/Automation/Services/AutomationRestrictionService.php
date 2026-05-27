@@ -35,6 +35,14 @@ class AutomationRestrictionService
 
     public const START_CRAFTING = 'start_crafting';
 
+    public const START_ITEM_CRAFTING = 'start_item_crafting';
+
+    public const KINGDOM_MANAGEMENT = 'kingdom_management';
+
+    public const PLAYER_SKILLS = 'player_skills';
+
+    public const CLASS_RANKS = 'class_ranks';
+
     public function activeAutomation(Character $character): ?CharacterAutomation
     {
         return $character->currentAutomations()
@@ -91,11 +99,14 @@ class AutomationRestrictionService
                 self::START_DELVE,
                 self::START_EXPLORATION,
                 self::MANUAL_FIGHTING,
-                self::START_CRAFTING,
+                self::START_ITEM_CRAFTING,
                 self::PCT,
                 self::CELESTIAL_FIGHTING,
                 self::CELESTIAL_CONJURING,
                 self::START_FACTION_LOYALTY,
+                self::KINGDOM_MANAGEMENT,
+                self::PLAYER_SKILLS,
+                self::CLASS_RANKS,
             ]);
         }
 
@@ -113,6 +124,9 @@ class AutomationRestrictionService
                 self::SET_SAIL,
                 self::TRAVERSE,
                 self::START_DELVE,
+                self::KINGDOM_MANAGEMENT,
+                self::PLAYER_SKILLS,
+                self::CLASS_RANKS,
             ]);
         }
 
@@ -132,6 +146,9 @@ class AutomationRestrictionService
             self::SET_SAIL,
             self::TRAVERSE,
             self::START_EXPLORATION,
+            self::KINGDOM_MANAGEMENT,
+            self::PLAYER_SKILLS,
+            self::CLASS_RANKS,
         ])) {
             return true;
         }

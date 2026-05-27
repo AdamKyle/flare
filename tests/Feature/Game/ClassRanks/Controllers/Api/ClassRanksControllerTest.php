@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Game\ClassRanks\Controllers\Api;
 
+use App\Flare\Models\CharacterAutomation;
+use App\Flare\Values\AutomationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -38,6 +40,48 @@ class ClassRanksControllerTest extends TestCase
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertCount(1, $jsonData['class_ranks']);
+    }
+
+    public function testExplorationBlocksClassRankList(): void
+    {
+        $character = $this->character->getCharacter();
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::EXPLORING,
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $response = $this->actingAs($character->user)->call('GET', '/api/class-ranks/'.$character->id);
+
+        $response->assertStatus(422);
+    }
+
+    public function testDelveBlocksClassRankList(): void
+    {
+        $character = $this->character->getCharacter();
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE,
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $response = $this->actingAs($character->user)->call('GET', '/api/class-ranks/'.$character->id);
+
+        $response->assertStatus(422);
+    }
+
+    public function testFactionLoyaltyBlocksClassRankList(): void
+    {
+        $character = $this->character->getCharacter();
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::FACTION_LOYALTY,
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $response = $this->actingAs($character->user)->call('GET', '/api/class-ranks/'.$character->id);
+
+        $response->assertStatus(422);
     }
 
     public function testGetCharacterClassSpecials()

@@ -2,7 +2,9 @@
 
 namespace Tests\Unit\Game\Kingdoms\Services;
 
+use App\Flare\Models\BuildingInQueue;
 use App\Game\Kingdoms\Service\KingdomBuildingService;
+use App\Game\Kingdoms\Values\BuildingQueueType;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -94,5 +96,287 @@ class KingdomBuildingServiceTest extends TestCase
         $this->assertSame(7704, $kingdom->current_wood);
         $this->assertSame(8278, $kingdom->current_iron);
         $this->assertSame(9720, $kingdom->current_population);
+    }
+
+    public function testPendingQueueWithRefundableTimeLeftRefundsResourcesUpToKingdomMaxAndDeletesQueue(): void
+    {
+        $kingdomManagement = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_stone' => 950,
+                'current_clay' => 950,
+                'current_wood' => 950,
+                'current_iron' => 950,
+                'current_steel' => 0,
+                'current_population' => 950,
+                'max_stone' => 1000,
+                'max_clay' => 1000,
+                'max_wood' => 1000,
+                'max_iron' => 1000,
+                'max_steel' => 0,
+                'max_population' => 1000,
+            ])
+            ->assignBuilding([
+                'stone_cost' => 100,
+                'clay_cost' => 100,
+                'wood_cost' => 100,
+                'iron_cost' => 100,
+                'steel_cost' => 0,
+                'required_population' => 100,
+            ], [
+                'level' => 1,
+            ]);
+        $character = $kingdomManagement->getCharacter();
+        $kingdom = $kingdomManagement->getKingdom();
+        $building = $kingdom->buildings()->first();
+        $queue = BuildingInQueue::factory()->create([
+            'character_id' => $character->id,
+            'kingdom_id' => $kingdom->id,
+            'building_id' => $building->id,
+            'from_level' => 1,
+            'to_level' => 2,
+            'type' => BuildingQueueType::UPGRADE,
+            'started_at' => now()->subMinutes(10),
+            'completed_at' => now()->addMinutes(90),
+        ]);
+
+        $result = $this->kingdomBuildingService->cancelKingdomBuildingUpgrade($queue);
+
+        $kingdom = $kingdom->refresh();
+
+        $this->assertTrue($result);
+        $this->assertNull(BuildingInQueue::find($queue->id));
+        $this->assertSame(1000, $kingdom->current_stone);
+        $this->assertSame(1000, $kingdom->current_clay);
+        $this->assertSame(1000, $kingdom->current_wood);
+        $this->assertSame(1000, $kingdom->current_iron);
+        $this->assertSame(0, $kingdom->current_steel);
+        $this->assertSame(1000, $kingdom->current_population);
+    }
+
+    public function testCompleteQueueReturnsFalseLeavesResourcesUnchangedAndDoesNotDeleteQueue(): void
+    {
+        $kingdomManagement = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_stone' => 500,
+                'current_clay' => 500,
+                'current_wood' => 500,
+                'current_iron' => 500,
+                'current_steel' => 0,
+                'current_population' => 500,
+                'max_stone' => 1000,
+                'max_clay' => 1000,
+                'max_wood' => 1000,
+                'max_iron' => 1000,
+                'max_steel' => 0,
+                'max_population' => 1000,
+            ])
+            ->assignBuilding([
+                'stone_cost' => 100,
+                'clay_cost' => 100,
+                'wood_cost' => 100,
+                'iron_cost' => 100,
+                'steel_cost' => 0,
+                'required_population' => 100,
+            ], [
+                'level' => 1,
+            ]);
+        $character = $kingdomManagement->getCharacter();
+        $kingdom = $kingdomManagement->getKingdom();
+        $building = $kingdom->buildings()->first();
+        $queue = BuildingInQueue::factory()->create([
+            'character_id' => $character->id,
+            'kingdom_id' => $kingdom->id,
+            'building_id' => $building->id,
+            'from_level' => 1,
+            'to_level' => 2,
+            'type' => BuildingQueueType::UPGRADE,
+            'started_at' => now()->subMinutes(100),
+            'completed_at' => now()->subMinute(),
+        ]);
+
+        $result = $this->kingdomBuildingService->cancelKingdomBuildingUpgrade($queue);
+
+        $kingdom = $kingdom->refresh();
+
+        $this->assertFalse($result);
+        $this->assertNotNull(BuildingInQueue::find($queue->id));
+        $this->assertSame(500, $kingdom->current_stone);
+        $this->assertSame(500, $kingdom->current_clay);
+        $this->assertSame(500, $kingdom->current_wood);
+        $this->assertSame(500, $kingdom->current_iron);
+        $this->assertSame(0, $kingdom->current_steel);
+        $this->assertSame(500, $kingdom->current_population);
+    }
+
+    public function testRefundPercentBelowTenPercentReturnsFalseLeavesResourcesUnchangedAndDoesNotDeleteQueue(): void
+    {
+        $kingdomManagement = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_stone' => 500,
+                'current_clay' => 500,
+                'current_wood' => 500,
+                'current_iron' => 500,
+                'current_steel' => 0,
+                'current_population' => 500,
+                'max_stone' => 1000,
+                'max_clay' => 1000,
+                'max_wood' => 1000,
+                'max_iron' => 1000,
+                'max_steel' => 0,
+                'max_population' => 1000,
+            ])
+            ->assignBuilding([
+                'stone_cost' => 100,
+                'clay_cost' => 100,
+                'wood_cost' => 100,
+                'iron_cost' => 100,
+                'steel_cost' => 0,
+                'required_population' => 100,
+            ], [
+                'level' => 1,
+            ]);
+        $character = $kingdomManagement->getCharacter();
+        $kingdom = $kingdomManagement->getKingdom();
+        $building = $kingdom->buildings()->first();
+        $queue = BuildingInQueue::factory()->create([
+            'character_id' => $character->id,
+            'kingdom_id' => $kingdom->id,
+            'building_id' => $building->id,
+            'from_level' => 1,
+            'to_level' => 2,
+            'type' => BuildingQueueType::UPGRADE,
+            'started_at' => now()->subMinutes(95),
+            'completed_at' => now()->addMinutes(5),
+        ]);
+
+        $result = $this->kingdomBuildingService->cancelKingdomBuildingUpgrade($queue);
+
+        $kingdom = $kingdom->refresh();
+
+        $this->assertFalse($result);
+        $this->assertNotNull(BuildingInQueue::find($queue->id));
+        $this->assertSame(500, $kingdom->current_stone);
+        $this->assertSame(500, $kingdom->current_clay);
+        $this->assertSame(500, $kingdom->current_wood);
+        $this->assertSame(500, $kingdom->current_iron);
+        $this->assertSame(0, $kingdom->current_steel);
+        $this->assertSame(500, $kingdom->current_population);
+    }
+
+    public function testRepeatedFailedCancellationCannotMakeAnyCurrentResourceNegative(): void
+    {
+        $kingdomManagement = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_stone' => 5,
+                'current_clay' => 5,
+                'current_wood' => 5,
+                'current_iron' => 5,
+                'current_steel' => 0,
+                'current_population' => 5,
+                'max_stone' => 1000,
+                'max_clay' => 1000,
+                'max_wood' => 1000,
+                'max_iron' => 1000,
+                'max_steel' => 0,
+                'max_population' => 1000,
+            ])
+            ->assignBuilding([
+                'stone_cost' => 100,
+                'clay_cost' => 100,
+                'wood_cost' => 100,
+                'iron_cost' => 100,
+                'steel_cost' => 0,
+                'required_population' => 100,
+            ], [
+                'level' => 1,
+            ]);
+        $character = $kingdomManagement->getCharacter();
+        $kingdom = $kingdomManagement->getKingdom();
+        $building = $kingdom->buildings()->first();
+        $queue = BuildingInQueue::factory()->create([
+            'character_id' => $character->id,
+            'kingdom_id' => $kingdom->id,
+            'building_id' => $building->id,
+            'from_level' => 1,
+            'to_level' => 2,
+            'type' => BuildingQueueType::UPGRADE,
+            'started_at' => now()->subMinutes(100),
+            'completed_at' => now()->subMinute(),
+        ]);
+
+        $firstResult = $this->kingdomBuildingService->cancelKingdomBuildingUpgrade($queue);
+        $secondResult = $this->kingdomBuildingService->cancelKingdomBuildingUpgrade($queue->refresh());
+
+        $kingdom = $kingdom->refresh();
+
+        $this->assertFalse($firstResult);
+        $this->assertFalse($secondResult);
+        $this->assertNotNull(BuildingInQueue::find($queue->id));
+        $this->assertSame(5, $kingdom->current_stone);
+        $this->assertSame(5, $kingdom->current_clay);
+        $this->assertSame(5, $kingdom->current_wood);
+        $this->assertSame(5, $kingdom->current_iron);
+        $this->assertSame(0, $kingdom->current_steel);
+        $this->assertSame(5, $kingdom->current_population);
+    }
+
+    public function testInvalidCancellationTimingReturnsFalseLeavesResourcesUnchangedAndDoesNotDeleteQueue(): void
+    {
+        $kingdomManagement = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_stone' => 500,
+                'current_clay' => 500,
+                'current_wood' => 500,
+                'current_iron' => 500,
+                'current_steel' => 0,
+                'current_population' => 500,
+                'max_stone' => 1000,
+                'max_clay' => 1000,
+                'max_wood' => 1000,
+                'max_iron' => 1000,
+                'max_steel' => 0,
+                'max_population' => 1000,
+            ])
+            ->assignBuilding([
+                'stone_cost' => 100,
+                'clay_cost' => 100,
+                'wood_cost' => 100,
+                'iron_cost' => 100,
+                'steel_cost' => 0,
+                'required_population' => 100,
+            ], [
+                'level' => 1,
+            ]);
+        $character = $kingdomManagement->getCharacter();
+        $kingdom = $kingdomManagement->getKingdom();
+        $building = $kingdom->buildings()->first();
+        $queue = BuildingInQueue::factory()->create([
+            'character_id' => $character->id,
+            'kingdom_id' => $kingdom->id,
+            'building_id' => $building->id,
+            'from_level' => 1,
+            'to_level' => 2,
+            'type' => BuildingQueueType::UPGRADE,
+            'started_at' => now(),
+            'completed_at' => now(),
+        ]);
+
+        $result = $this->kingdomBuildingService->cancelKingdomBuildingUpgrade($queue);
+
+        $kingdom = $kingdom->refresh();
+
+        $this->assertFalse($result);
+        $this->assertNotNull(BuildingInQueue::find($queue->id));
+        $this->assertSame(500, $kingdom->current_stone);
+        $this->assertSame(500, $kingdom->current_clay);
+        $this->assertSame(500, $kingdom->current_wood);
+        $this->assertSame(500, $kingdom->current_iron);
+        $this->assertSame(0, $kingdom->current_steel);
+        $this->assertSame(500, $kingdom->current_population);
     }
 }

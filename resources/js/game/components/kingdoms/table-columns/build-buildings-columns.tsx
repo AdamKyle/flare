@@ -18,6 +18,7 @@ export const buildBuildingsColumns = (
     cancelBuilding: (queueId: number | null) => void,
     buildingsInQueue: BuildingInQueueDetails[] | [],
     viewPort: number,
+    actionsDisabled: boolean,
 ) => {
     return [
         {
@@ -25,7 +26,14 @@ export const buildBuildingsColumns = (
             selector: (row: BuildingDetails) => row.name,
             cell: (row: BuildingDetails) => (
                 <button
-                    onClick={() => onClick(row)}
+                    onClick={() => {
+                        if (actionsDisabled) {
+                            return;
+                        }
+
+                        onClick(row);
+                    }}
+                    disabled={actionsDisabled}
                     className={clsx({
                         "text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-500":
                             !row.is_locked,
@@ -82,14 +90,19 @@ export const buildBuildingsColumns = (
                                         "focus:outline-none focus-visible:ring-2 focus-visible:ring-red-200 dark:focus-visible:ring-white " +
                                         "focus-visible:ring-opacity-75"
                                     }
-                                    onClick={() =>
+                                    onClick={() => {
+                                        if (actionsDisabled) {
+                                            return;
+                                        }
+
                                         cancelBuilding(
                                             findBuildingInQueue(
                                                 row.id,
                                                 buildingsInQueue,
                                             ),
-                                        )
-                                    }
+                                        );
+                                    }}
+                                    disabled={actionsDisabled}
                                 >
                                     Cancel
                                 </button>

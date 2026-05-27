@@ -15,4 +15,6 @@ export default interface UnitsTableProps {
     units_in_queue: UnitsInQueue[] | [];
 
     current_units: CurrentUnitDetails[] | [];
+
+    is_automation_locked: boolean;
 }

@@ -33,4 +33,6 @@ export default interface InformationSectionProps {
     buildings: BuildingDetails[] | [];
 
     character_gold: number;
+
+    is_automation_locked: boolean;
 }

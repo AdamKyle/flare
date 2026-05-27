@@ -159,118 +159,153 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
                         This value does not include today.
                     </InfoAlert>
                 ) : null}
-                <div className="grid md:grid-cols-2 gap-4">
-                    {this.state.show_small_council ? (
-                        <BasicCard>
-                            <div className="text-right cursor-pointer text-red-500">
-                                <button
-                                    onClick={this.manageSmallCouncil.bind(this)}
-                                >
-                                    <i className="fas fa-minus-circle"></i>
-                                </button>
-                            </div>
-                            <SmallCouncil
-                                kingdom={this.state.kingdom}
-                                user_id={this.props.user_id}
-                            />
-                        </BasicCard>
-                    ) : this.state.show_resource_transfer_panel ? (
-                        <BasicCard>
-                            <div className="text-right cursor-pointer text-red-500">
-                                <button
-                                    onClick={this.showResourceTransferPanel.bind(
+                <fieldset disabled={this.props.is_automation_locked}>
+                    <div className="grid gap-4 xl:grid-cols-2 items-stretch">
+                        {this.state.show_small_council ? (
+                            <BasicCard additionalClasses={"h-full"}>
+                                <div className="text-right cursor-pointer text-red-500">
+                                    <button
+                                        onClick={this.manageSmallCouncil.bind(
+                                            this,
+                                        )}
+                                        disabled={
+                                            this.props.is_automation_locked
+                                        }
+                                    >
+                                        <i className="fas fa-minus-circle"></i>
+                                    </button>
+                                </div>
+                                <SmallCouncil
+                                    kingdom={this.state.kingdom}
+                                    user_id={this.props.user_id}
+                                />
+                            </BasicCard>
+                        ) : this.state.show_resource_transfer_panel ? (
+                            <BasicCard additionalClasses={"h-full"}>
+                                <div className="text-right cursor-pointer text-red-500">
+                                    <button
+                                        onClick={this.showResourceTransferPanel.bind(
+                                            this,
+                                        )}
+                                        disabled={
+                                            this.props.is_automation_locked
+                                        }
+                                    >
+                                        <i className="fas fa-minus-circle"></i>
+                                    </button>
+                                </div>
+                                <KingdomResourceTransfer
+                                    character_id={
+                                        this.props.kingdom.character_id
+                                    }
+                                    kingdom_id={this.props.kingdom.id}
+                                />
+                            </BasicCard>
+                        ) : (
+                            <BasicCard additionalClasses={"h-full"}>
+                                <div className="text-right cursor-pointer text-red-500">
+                                    <button
+                                        onClick={this.props.close_details}
+                                        disabled={
+                                            this.props.is_automation_locked
+                                        }
+                                    >
+                                        <i className="fas fa-minus-circle"></i>
+                                    </button>
+                                </div>
+                                <KingdomDetails
+                                    kingdom={this.state.kingdom}
+                                    character_gold={this.props.character_gold}
+                                    close_details={this.props.close_details}
+                                    show_resource_transfer_card={this.showResourceTransferPanel.bind(
                                         this,
                                     )}
-                                >
-                                    <i className="fas fa-minus-circle"></i>
-                                </button>
-                            </div>
-                            <KingdomResourceTransfer
-                                character_id={this.props.kingdom.character_id}
-                                kingdom_id={this.props.kingdom.id}
-                            />
-                        </BasicCard>
-                    ) : (
-                        <BasicCard additionalClasses={"max-h-[700px]"}>
-                            <div className="text-right cursor-pointer text-red-500">
-                                <button onClick={this.props.close_details}>
-                                    <i className="fas fa-minus-circle"></i>
-                                </button>
-                            </div>
-                            <KingdomDetails
-                                kingdom={this.state.kingdom}
-                                character_gold={this.props.character_gold}
-                                close_details={this.props.close_details}
-                                show_resource_transfer_card={this.showResourceTransferPanel.bind(
-                                    this,
-                                )}
-                                show_small_council={this.manageSmallCouncil.bind(
-                                    this,
-                                )}
-                                reset_resource_transfer={
-                                    this.state.should_reset_resource_transfer
-                                }
-                                has_capital_city={this.props.has_capital_city}
-                            />
-                        </BasicCard>
-                    )}
-
-                    <div>
-                        {this.state.building_to_view !== null ||
-                        this.state.unit_to_view !== null ? (
-                            <InformationSection
-                                sections={{
-                                    unit_to_view: this.state.unit_to_view,
-                                    building_to_view:
-                                        this.state.building_to_view,
-                                }}
-                                close={this.closeSection.bind(this)}
-                                cost_reduction={{
-                                    kingdom_building_time_reduction:
-                                        this.state.kingdom
-                                            .building_time_reduction,
-                                    kingdom_building_cost_reduction:
-                                        this.state.kingdom
-                                            .building_cost_reduction,
-                                    kingdom_iron_cost_reduction:
-                                        this.state.kingdom.iron_cost_reduction,
-                                    kingdom_population_cost_reduction:
-                                        this.state.kingdom
-                                            .population_cost_reduction,
-                                    kingdom_current_population:
-                                        this.state.kingdom.current_population,
-                                    kingdom_unit_cost_reduction:
-                                        this.state.kingdom.unit_cost_reduction,
-                                    kingdom_unit_time_reduction:
-                                        this.state.kingdom.unit_time_reduction,
-                                }}
-                                buildings={this.state.kingdom.buildings}
-                                queue={{
-                                    is_building_in_queue: this.isInQueue(),
-                                    is_unit_in_queue: this.isUnitInQueue(),
-                                }}
-                                character_id={this.state.kingdom.character_id}
-                                kingdom_id={this.state.kingdom.id}
-                                character_gold={this.props.character_gold}
-                                user_id={this.props.user_id}
-                            />
-                        ) : (
-                            <KingdomTabs
-                                kingdom={this.state.kingdom}
-                                kingdoms={this.props.kingdoms}
-                                dark_tables={this.props.dark_tables}
-                                manage_view_building={this.manageViewBuilding.bind(
-                                    this,
-                                )}
-                                manage_view_unit={this.manageViewUnit.bind(
-                                    this,
-                                )}
-                                view_port={this.props.view_port}
-                                user_id={this.props.user_id}
-                            />
+                                    show_small_council={this.manageSmallCouncil.bind(
+                                        this,
+                                    )}
+                                    reset_resource_transfer={
+                                        this.state
+                                            .should_reset_resource_transfer
+                                    }
+                                    has_capital_city={
+                                        this.props.has_capital_city
+                                    }
+                                    is_automation_locked={
+                                        this.props.is_automation_locked
+                                    }
+                                />
+                            </BasicCard>
                         )}
+
+                        <div className="min-w-0 h-full">
+                            {this.state.building_to_view !== null ||
+                            this.state.unit_to_view !== null ? (
+                                <InformationSection
+                                    sections={{
+                                        unit_to_view: this.state.unit_to_view,
+                                        building_to_view:
+                                            this.state.building_to_view,
+                                    }}
+                                    close={this.closeSection.bind(this)}
+                                    cost_reduction={{
+                                        kingdom_building_time_reduction:
+                                            this.state.kingdom
+                                                .building_time_reduction,
+                                        kingdom_building_cost_reduction:
+                                            this.state.kingdom
+                                                .building_cost_reduction,
+                                        kingdom_iron_cost_reduction:
+                                            this.state.kingdom
+                                                .iron_cost_reduction,
+                                        kingdom_population_cost_reduction:
+                                            this.state.kingdom
+                                                .population_cost_reduction,
+                                        kingdom_current_population:
+                                            this.state.kingdom
+                                                .current_population,
+                                        kingdom_unit_cost_reduction:
+                                            this.state.kingdom
+                                                .unit_cost_reduction,
+                                        kingdom_unit_time_reduction:
+                                            this.state.kingdom
+                                                .unit_time_reduction,
+                                    }}
+                                    buildings={this.state.kingdom.buildings}
+                                    queue={{
+                                        is_building_in_queue: this.isInQueue(),
+                                        is_unit_in_queue: this.isUnitInQueue(),
+                                    }}
+                                    character_id={
+                                        this.state.kingdom.character_id
+                                    }
+                                    kingdom_id={this.state.kingdom.id}
+                                    character_gold={this.props.character_gold}
+                                    user_id={this.props.user_id}
+                                    is_automation_locked={
+                                        this.props.is_automation_locked
+                                    }
+                                />
+                            ) : (
+                                <KingdomTabs
+                                    kingdom={this.state.kingdom}
+                                    kingdoms={this.props.kingdoms}
+                                    dark_tables={this.props.dark_tables}
+                                    manage_view_building={this.manageViewBuilding.bind(
+                                        this,
+                                    )}
+                                    manage_view_unit={this.manageViewUnit.bind(
+                                        this,
+                                    )}
+                                    view_port={this.props.view_port}
+                                    user_id={this.props.user_id}
+                                    is_automation_locked={
+                                        this.props.is_automation_locked
+                                    }
+                                />
+                            )}
+                        </div>
                     </div>
-                </div>
+                </fieldset>
             </Fragment>
         );
     }

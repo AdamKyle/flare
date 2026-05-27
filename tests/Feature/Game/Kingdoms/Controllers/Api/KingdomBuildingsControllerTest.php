@@ -13,6 +13,38 @@ class KingdomBuildingsControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function testManualCancelRejectsCapitalCityOwnedBuildingQueue(): void
+    {
+        $characterFactory = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation();
+        $kingdomManagement = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom()
+            ->assignBuilding();
+        $character = $kingdomManagement->getCharacter();
+        $kingdom = $kingdomManagement->getKingdom();
+        $building = $kingdom->buildings()->first();
+        $queue = BuildingInQueue::factory()->create([
+            'character_id' => $character->id,
+            'kingdom_id' => $kingdom->id,
+            'building_id' => $building->id,
+            'to_level' => $building->level + 1,
+            'type' => BuildingQueueType::UPGRADE,
+            'capital_city_building_queue_id' => 123,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdoms/building-upgrade/cancel', [
+                'queue_id' => $queue->id,
+            ]);
+
+        $response->assertStatus(422);
+        $this->assertNotNull(BuildingInQueue::find($queue->id));
+    }
+
     public function testManualUpgradeReturnsValidationErrorWhenActiveDuplicateUpgradeQueueExists(): void
     {
         Queue::fake();

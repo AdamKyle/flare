@@ -17,9 +17,6 @@ export default class CraftingSectionManager {
 
         return (
             props.crafting_time_out > 0 ||
-            props.character.is_automation_running ||
-            props.character.is_faction_loyalty_automation_running ||
-            props.character.is_delve_running ||
             !props.character_status.can_craft ||
             props.character_status.is_dead
         );
@@ -103,6 +100,12 @@ export default class CraftingSectionManager {
                     value: "queen",
                 });
             }
+        }
+
+        if (
+            this.component.props.character.is_faction_loyalty_automation_running
+        ) {
+            return options.filter((option) => option.value !== "craft");
         }
 
         return options;
@@ -198,6 +201,12 @@ export default class CraftingSectionManager {
                     on_click: () => handler("queen"),
                 });
             }
+        }
+
+        if (
+            this.component.props.character.is_faction_loyalty_automation_running
+        ) {
+            return options.filter((option) => option.name !== "Craft");
         }
 
         return options;

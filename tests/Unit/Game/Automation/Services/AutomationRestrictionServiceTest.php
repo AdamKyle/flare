@@ -117,6 +117,13 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_CRAFTING));
     }
 
+    public function testNoActiveAutomationAllowsStartItemCrafting(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_ITEM_CRAFTING));
+    }
+
     public function testFactionLoyaltyBlocksStartDelve(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
@@ -162,7 +169,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::MANUAL_FIGHTING));
     }
 
-    public function testFactionLoyaltyBlocksStartCrafting(): void
+    public function testFactionLoyaltyAllowsStartCrafting(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -174,7 +181,22 @@ class AutomationRestrictionServiceTest extends TestCase
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
-        $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::START_CRAFTING));
+        $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_CRAFTING));
+    }
+
+    public function testFactionLoyaltyBlocksStartItemCrafting(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::FACTION_LOYALTY,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::START_ITEM_CRAFTING));
     }
 
     public function testFactionLoyaltyBlocksPct(): void
@@ -402,6 +424,21 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_CRAFTING));
     }
 
+    public function testDelveAllowsStartItemCrafting(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_ITEM_CRAFTING));
+    }
+
     public function testExplorationBlocksStartDelve(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
@@ -544,6 +581,22 @@ class AutomationRestrictionServiceTest extends TestCase
         ]);
 
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_CRAFTING));
+    }
+
+    public function testExplorationAllowsStartItemCrafting(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::EXPLORING,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+            'started_in_special_location' => false,
+        ]);
+
+        $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_ITEM_CRAFTING));
     }
 
     public function testExplorationStartedInSpecialLocationBlocksDirectionalMovement(): void

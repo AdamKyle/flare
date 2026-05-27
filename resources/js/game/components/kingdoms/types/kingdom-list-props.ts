@@ -15,4 +15,10 @@ export default interface KingdomListProps {
     is_dead: boolean;
 
     character_id: number;
+
+    is_automation_running: boolean;
+
+    is_faction_loyalty_automation_running: boolean;
+
+    is_delve_running: boolean;
 }

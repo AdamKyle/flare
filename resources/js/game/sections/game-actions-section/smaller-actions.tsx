@@ -29,90 +29,71 @@ export default class SmallerActions extends React.Component<
 
     private mapTimeOut: any;
 
+    private celestialTimeout: any;
+
     private explorationTimeOut: any;
 
     private smallActionsManager: SmallActionsManager;
-
-    private celestialTimeout: any;
 
     constructor(props: SmallActionsProps) {
         super(props);
 
         this.state = {
-            selected_action: null,
             monsters: [],
             raid_monsters: [],
             attack_time_out: 0,
             crafting_time_out: 0,
+            selected_action: null,
+            loading: true,
+            movement_time_left: 0,
             automation_time_out: 0,
             celestial_time_out: 0,
-            movement_time_left: 0,
-            crafting_type: null,
-            loading: true,
-            show_exploration: false,
-            show_celestial_fight: false,
-            show_hell_forged_section: false,
-            show_purgatory_chains_section: false,
-            show_gambling_section: false,
-            show_twisted_earth_section: false,
         };
+
+        this.smallActionsManager = new SmallActionsManager(this);
 
         // @ts-ignore
         this.attackTimeOut = Echo.private(
-            "show-timeout-bar-" + this.props.character.user_id,
+            "update-plane-" + this.props.character.user_id,
         );
 
         // @ts-ignore
         this.craftingTimeOut = Echo.private(
-            "show-crafting-timeout-bar-" + this.props.character.user_id,
+            "update-plane-" + this.props.character.user_id,
         );
 
         // @ts-ignore
         this.mapTimeOut = Echo.private(
-            "show-timeout-move-" + this.props.character.user_id,
-        );
-
-        // @ts-ignore
-        this.explorationTimeOut = Echo.private(
-            "automation-timeout-" + this.props.character.user_id,
+            "update-plane-" + this.props.character.user_id,
         );
 
         // @ts-ignore
         this.celestialTimeout = Echo.private(
-            "update-character-celestial-timeout-" +
-                this.props.character.user_id,
-        );
-
-        this.smallActionsManager = new SmallActionsManager(this);
-    }
-
-    componentDidMount() {
-        this.setState(
-            {
-                ...this.state,
-                ...this.props.action_data,
-                ...{ loading: false },
-            },
-            () => {
-                updateTimers(this.props.character.id);
-
-                this.props.update_show_map_mobile(false);
-            },
+            "update-plane-" + this.props.character.user_id,
         );
 
         // @ts-ignore
+        this.explorationTimeOut = Echo.private(
+            "update-plane-" + this.props.character.user_id,
+        );
+    }
+
+    componentDidMount() {
+        this.smallActionsManager.initialFetch();
+
+        // @ts-ignore
         this.attackTimeOut.listen(
-            "Game.Core.Events.ShowTimeOutEvent",
+            "Game.Core.Events.UpdateCharacterAttackTimeOut",
             (event: any) => {
                 this.setState({
-                    attack_time_out: event.forLength,
+                    attack_time_out: event.timeOut,
                 });
             },
         );
 
         // @ts-ignore
         this.craftingTimeOut.listen(
-            "Game.Core.Events.ShowCraftingTimeOutEvent",
+            "Game.Core.Events.UpdateCharacterCraftingTimeOut",
             (event: any) => {
                 this.setState({
                     crafting_time_out: event.timeout,
@@ -140,7 +121,7 @@ export default class SmallerActions extends React.Component<
             },
         );
 
-        // // @ts-ignore
+        // @ts-ignore
         this.explorationTimeOut.listen(
             "Game.Automation.Events.AutomationTimeOut",
             (event: any) => {
@@ -304,7 +285,7 @@ export default class SmallerActions extends React.Component<
 
     automationRestrictionMessage(): string {
         if (this.isFactionLoyaltyAutomationRunning()) {
-            return "Faction Loyalty Automation is running. You cannot Delve, Explore, manually Fight, or Craft while it is running.";
+            return "Faction Loyalty Automation is running. You cannot Delve, Explore, manually Fight, or craft items while it is running.";
         }
 
         if (this.isDelveRunning()) {
@@ -343,7 +324,6 @@ export default class SmallerActions extends React.Component<
                             {
                                 loading: false,
                                 selected_action: null,
-                                crafting_type: null,
                             },
                             () => {
                                 updateTimers(this.props.character.id);
@@ -363,14 +343,13 @@ export default class SmallerActions extends React.Component<
     renderAutomationBlockedNotice(isCrafting: boolean) {
         return (
             <div className="my-4 text-center" aria-live="polite">
-                <p className="my-2">
-                    Sorry, you cannot do this right now because{" "}
-                    {this.automationName()} is running.
-                </p>
+                <p className="my-2">{this.automationRestrictionMessage()}</p>
                 {isCrafting && this.isFactionLoyaltyAutomationRunning() ? (
                     <p className="my-2">
                         While Faction Loyalty Automation is running, you cannot
-                        craft or enchant items.
+                        craft items. Enchanting, alchemy, trinketry, gem
+                        crafting, and other crafting-menu actions are still
+                        allowed.
                     </p>
                 ) : null}
                 <p className="my-2">Would you like to stop it?</p>
@@ -434,10 +413,6 @@ export default class SmallerActions extends React.Component<
     }
 
     showCrafting() {
-        if (this.isAnyAutomationRunning()) {
-            return this.renderAutomationBlockedNotice(true);
-        }
-
         return (
             <SmallCraftingSection
                 close_crafting_section={this.closeCraftingSection.bind(this)}

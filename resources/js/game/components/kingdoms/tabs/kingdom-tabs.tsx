@@ -30,7 +30,7 @@ export default class KingdomTabs extends React.Component<any, any> {
 
     render() {
         return (
-            <BasicCard>
+            <BasicCard additionalClasses={"h-full"}>
                 <Tabs tabs={this.tabs} full_width={true}>
                     <TabPanel key={"buildings"}>
                         <BuildingsTable
@@ -41,6 +41,9 @@ export default class KingdomTabs extends React.Component<any, any> {
                             }
                             view_building={this.props.manage_view_building}
                             view_port={this.props.view_port}
+                            is_automation_locked={
+                                this.props.is_automation_locked
+                            }
                         />
                     </TabPanel>
                     <TabPanel key={"units"}>
@@ -51,6 +54,9 @@ export default class KingdomTabs extends React.Component<any, any> {
                             view_unit={this.props.manage_view_unit}
                             units_in_queue={this.props.kingdom.unit_queue}
                             current_units={this.props.kingdom.current_units}
+                            is_automation_locked={
+                                this.props.is_automation_locked
+                            }
                         />
                     </TabPanel>
                     <TabPanel key={"current-queue"}>
@@ -59,6 +65,9 @@ export default class KingdomTabs extends React.Component<any, any> {
                             kingdom_id={this.props.kingdom.id}
                             character_id={this.props.kingdom.character_id}
                             kingdoms={this.props.kingdoms}
+                            is_automation_locked={
+                                this.props.is_automation_locked
+                            }
                         />
                     </TabPanel>
                 </Tabs>
