@@ -134,14 +134,51 @@ class RepairKingdomDataTest extends TestCase
 
         $kingdom = $kingdom->refresh();
         $building = $building->refresh();
-        $overMaxUnitQueue = $overMaxUnitQueue->refresh();
 
         $this->assertSame(0, $kingdom->current_stone);
         $this->assertSame(0, $kingdom->current_iron);
         $this->assertSame(3, $building->level);
-        $this->assertSame(1, BuildingInQueue::where('building_id', $building->id)->count());
-        $this->assertSame(5, $overMaxUnitQueue->amount);
+        $this->assertSame(0, BuildingInQueue::where('building_id', $building->id)->count());
+        $this->assertNull(UnitInQueue::find($overMaxUnitQueue->id));
         $this->assertNull(UnitInQueue::find($invalidUnitQueue->id));
+    }
+
+    public function testApplyRepairsDuplicateValidUnitQueuesReduceSafely(): void
+    {
+        $characterFactory = (new CharacterFactory)->createBaseCharacter([], [], true, false)->givePlayerLocation();
+        $kingdomManagement = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom()
+            ->assignUnits([], KingdomMaxValue::MAX_UNIT - 5);
+        $character = $kingdomManagement->getCharacter();
+        $kingdom = $kingdomManagement->getKingdom();
+        $gameUnit = $kingdom->units()->first()->gameUnit;
+        $firstUnitQueue = UnitInQueue::factory()->create([
+            'character_id' => $character->id,
+            'kingdom_id' => $kingdom->id,
+            'game_unit_id' => $gameUnit->id,
+            'amount' => 3,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+        $secondUnitQueue = UnitInQueue::factory()->create([
+            'character_id' => $character->id,
+            'kingdom_id' => $kingdom->id,
+            'game_unit_id' => $gameUnit->id,
+            'amount' => 3,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $this->assertEquals(0, Artisan::call('kingdoms:repair-data', [
+            '--apply' => true,
+        ]));
+
+        $firstUnitQueue = $firstUnitQueue->refresh();
+        $secondUnitQueue = $secondUnitQueue->refresh();
+
+        $this->assertSame(3, $firstUnitQueue->amount);
+        $this->assertSame(2, $secondUnitQueue->amount);
     }
 
     public function testApplyDoesNotChangeValidKingdomData(): void

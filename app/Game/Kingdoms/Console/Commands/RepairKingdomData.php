@@ -188,13 +188,14 @@ class RepairKingdomData extends Command
     {
         $count = 0;
         $trackedAmounts = [];
+        $acceptedQueueExists = [];
 
         UnitInQueue::query()
             ->where('completed_at', '>', now())
             ->with('kingdom')
             ->orderBy('id')
             ->get()
-            ->each(function (UnitInQueue $queue) use ($apply, &$count, &$trackedAmounts) {
+            ->each(function (UnitInQueue $queue) use ($apply, &$count, &$trackedAmounts, &$acceptedQueueExists) {
                 if (is_null($queue->kingdom) || $queue->amount <= 0) {
                     return;
                 }
@@ -206,6 +207,7 @@ class RepairKingdomData extends Command
                         ->where('kingdom_id', $queue->kingdom_id)
                         ->where('game_unit_id', $queue->game_unit_id)
                         ->sum('amount');
+                    $acceptedQueueExists[$key] = false;
                 }
 
                 $remaining = KingdomMaxValue::MAX_UNIT - $trackedAmounts[$key];
@@ -224,7 +226,11 @@ class RepairKingdomData extends Command
                     $count++;
 
                     if ($apply) {
-                        $queue->update(['amount' => $remaining]);
+                        if ($acceptedQueueExists[$key]) {
+                            $queue->update(['amount' => $remaining]);
+                        } else {
+                            $queue->delete();
+                        }
                     }
 
                     $trackedAmounts[$key] = KingdomMaxValue::MAX_UNIT;
@@ -233,6 +239,7 @@ class RepairKingdomData extends Command
                 }
 
                 $trackedAmounts[$key] += $queue->amount;
+                $acceptedQueueExists[$key] = true;
             });
 
         return $count;

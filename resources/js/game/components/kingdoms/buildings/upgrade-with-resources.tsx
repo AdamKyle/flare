@@ -27,6 +27,10 @@ export default class UpgradeWithResources extends React.Component<any, any> {
     }
 
     upgradeBuilding() {
+        if (this.props.is_automation_locked) {
+            return;
+        }
+
         this.setState(
             {
                 error_message: null,
@@ -107,7 +111,11 @@ export default class UpgradeWithResources extends React.Component<any, any> {
                     button_label={"Upgrade"}
                     additional_css={"mr-2"}
                     on_click={this.upgradeBuilding.bind(this)}
-                    disabled={this.state.loading || this.props.is_in_queue}
+                    disabled={
+                        this.state.loading ||
+                        this.props.is_in_queue ||
+                        this.props.is_automation_locked
+                    }
                 />
                 <DangerButton
                     button_label={"Cancel"}

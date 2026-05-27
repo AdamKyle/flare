@@ -10,8 +10,12 @@ import RecruitWithResources from "./recruit-with-resources";
 import UnitInformationProps from "../types/unit-information-props";
 import UnitDetails from "../deffinitions/unit-details";
 
+type LockedUnitInformationProps = UnitInformationProps & {
+    is_automation_locked?: boolean;
+};
+
 export default class UnitInformation extends React.Component<
-    UnitInformationProps,
+    LockedUnitInformationProps,
     any
 > {
     constructor(props: UnitInformationProps) {
@@ -62,6 +66,10 @@ export default class UnitInformation extends React.Component<
     }
 
     showSelectedForm(type: string) {
+        if (this.props.is_automation_locked) {
+            return;
+        }
+
         this.setState({
             upgrade_section: type,
         });
@@ -125,6 +133,7 @@ export default class UnitInformation extends React.Component<
                     manage_help_dialogue={this.manageHelpDialogue.bind(this)}
                     remove_selection={this.removeSelection.bind(this)}
                     set_resource_amount={this.setResourceAmount.bind(this)}
+                    is_automation_locked={this.props.is_automation_locked}
                 />
             );
         }
@@ -310,6 +319,9 @@ export default class UnitInformation extends React.Component<
                                         button_label={"Recruit Units"}
                                         on_click={() =>
                                             this.showSelectedForm("resources")
+                                        }
+                                        disabled={
+                                            this.props.is_automation_locked
                                         }
                                     />
                                 </Fragment>

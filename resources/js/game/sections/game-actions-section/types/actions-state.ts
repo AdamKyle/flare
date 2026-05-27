@@ -11,6 +11,8 @@ export default interface ActionsState {
 
     crafting_time_out: number;
 
+    celestial_time_out: number;
+
     crafting_type: string | null;
 
     loading: boolean;

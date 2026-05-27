@@ -88,6 +88,7 @@ export default class SmallUnitsSection extends React.Component<
                         kingdom_id={this.props.kingdom.id}
                         buildings={this.props.kingdom.buildings}
                         character_gold={this.props.character_gold}
+                        is_automation_locked={this.props.is_automation_locked}
                     />
                 ) : (
                     <BasicCard>

@@ -14,8 +14,12 @@ import BuildingInformationProps from "./types/building-information-props";
 import UpgradeWithResources from "./upgrade-with-resources";
 import BuildingInformationState from "./types/building-information-state";
 
+type LockedBuildingInformationProps = BuildingInformationProps & {
+    is_automation_locked?: boolean;
+};
+
 export default class BuildingInformation extends React.Component<
-    BuildingInformationProps,
+    LockedBuildingInformationProps,
     BuildingInformationState
 > {
     private buildingTimeCalculation: BuildingTimeCalculation;
@@ -64,6 +68,10 @@ export default class BuildingInformation extends React.Component<
     }
 
     showSelectedForm(type: string) {
+        if (this.props.is_automation_locked) {
+            return;
+        }
+
         this.setState({
             upgrade_section: type,
         });
@@ -83,6 +91,10 @@ export default class BuildingInformation extends React.Component<
     }
 
     repairBuilding() {
+        if (this.props.is_automation_locked) {
+            return;
+        }
+
         this.setState(
             {
                 loading: true,
@@ -172,6 +184,7 @@ export default class BuildingInformation extends React.Component<
                         building={this.props.building}
                         remove_section={this.removeSelection.bind(this)}
                         is_in_queue={this.props.is_in_queue}
+                        is_automation_locked={this.props.is_automation_locked}
                     />
                 );
             case "repair-building":
@@ -183,6 +196,7 @@ export default class BuildingInformation extends React.Component<
                                     button_label={"Repair"}
                                     on_click={this.repairBuilding.bind(this)}
                                     additional_css={"mr-2"}
+                                    disabled={this.props.is_automation_locked}
                                 />
                                 <DangerButton
                                     button_label={"Close section"}
@@ -416,6 +430,10 @@ export default class BuildingInformation extends React.Component<
                                                     )
                                                 }
                                                 additional_css={"mr-2"}
+                                                disabled={
+                                                    this.props
+                                                        .is_automation_locked
+                                                }
                                             />
                                             <PrimaryButton
                                                 button_label={"Repair"}
@@ -423,6 +441,10 @@ export default class BuildingInformation extends React.Component<
                                                     this.showSelectedForm(
                                                         "repair-building",
                                                     )
+                                                }
+                                                disabled={
+                                                    this.props
+                                                        .is_automation_locked
                                                 }
                                             />
                                             {this.props.building.is_special ? (

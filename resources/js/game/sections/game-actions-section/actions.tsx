@@ -36,6 +36,7 @@ export default class Actions extends React.Component<
             raid_monsters: [],
             attack_time_out: 0,
             crafting_time_out: 0,
+            celestial_time_out: 0,
             crafting_type: null,
             loading: true,
             show_exploration: false,
@@ -429,7 +430,6 @@ export default class Actions extends React.Component<
                         )}
                         button_title={"Crafting"}
                         disabled={this.actionsManager.cannotCraft()}
-                        button_icon={"ra ra-hammer"}
                     />
                     <SuccessOutlineButton
                         button_label={"Fight"}

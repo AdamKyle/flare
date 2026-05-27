@@ -23,6 +23,10 @@ export default class RecruitWithResources extends React.Component<any, any> {
     }
 
     recruitUnits() {
+        if (this.props.is_automation_locked) {
+            return;
+        }
+
         this.setState(
             {
                 error_message: null,
@@ -72,6 +76,10 @@ export default class RecruitWithResources extends React.Component<any, any> {
     }
 
     setResourceAmount(e: React.ChangeEvent<HTMLInputElement>) {
+        if (this.props.is_automation_locked) {
+            return;
+        }
+
         if (typeof this.props.unit_cost_reduction === "undefined") {
             this.setState({
                 error_message:
@@ -149,7 +157,10 @@ export default class RecruitWithResources extends React.Component<any, any> {
                             value={this.state.amount_to_recruit}
                             onChange={this.setResourceAmount.bind(this)}
                             className="form-control"
-                            disabled={this.state.loading}
+                            disabled={
+                                this.state.loading ||
+                                this.props.is_automation_locked
+                            }
                         />
                     </div>
                 </div>
@@ -159,7 +170,9 @@ export default class RecruitWithResources extends React.Component<any, any> {
                     additional_css={"mr-2"}
                     on_click={this.recruitUnits.bind(this)}
                     disabled={
-                        this.state.amount_to_recruit <= 0 || this.state.loading
+                        this.state.amount_to_recruit <= 0 ||
+                        this.state.loading ||
+                        this.props.is_automation_locked
                     }
                 />
                 <DangerButton

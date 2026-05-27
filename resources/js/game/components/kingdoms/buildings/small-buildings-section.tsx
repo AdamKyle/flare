@@ -84,6 +84,7 @@ export default class SmallBuildingsSection extends React.Component<
                         is_in_queue={this.isInQueue()}
                         character_gold={this.props.character_gold}
                         user_id={this.props.user_id}
+                        is_automation_locked={this.props.is_automation_locked}
                     />
                 ) : (
                     <BasicCard>

@@ -39,6 +39,7 @@ export default class InformationSection extends React.Component<
                     user_id={this.props.user_id}
                     is_in_queue={this.props.queue.is_building_in_queue}
                     character_gold={this.props.character_gold}
+                    is_automation_locked={this.props.is_automation_locked}
                 />
             );
         }
@@ -72,6 +73,7 @@ export default class InformationSection extends React.Component<
                     kingdom_id={this.props.kingdom_id}
                     buildings={this.props.buildings}
                     character_gold={this.props.character_gold}
+                    is_automation_locked={this.props.is_automation_locked}
                 />
             );
         }

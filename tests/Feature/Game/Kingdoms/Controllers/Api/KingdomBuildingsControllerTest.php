@@ -3,6 +3,7 @@
 namespace Tests\Feature\Game\Kingdoms\Controllers\Api;
 
 use App\Flare\Models\BuildingInQueue;
+use App\Flare\Values\AutomationType;
 use App\Game\Kingdoms\Values\BuildingQueueType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
@@ -32,6 +33,107 @@ class KingdomBuildingsControllerTest extends TestCase
             'to_level' => $building->level + 1,
             'type' => BuildingQueueType::UPGRADE,
             'capital_city_building_queue_id' => 123,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdoms/building-upgrade/cancel', [
+                'queue_id' => $queue->id,
+            ]);
+
+        $response->assertStatus(422);
+        $this->assertNotNull(BuildingInQueue::find($queue->id));
+    }
+
+    public function testManualUpgradeRejectsDuringAutomation(): void
+    {
+        Queue::fake();
+
+        $characterFactory = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation();
+        $kingdomManagement = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 2000,
+                'current_clay' => 2000,
+                'current_stone' => 2000,
+                'current_iron' => 2000,
+                'current_population' => 2000,
+            ])
+            ->assignBuilding();
+        $characterFactory->assignAutomation([
+            'type' => AutomationType::EXPLORING,
+        ]);
+        $character = $kingdomManagement->getCharacter();
+        $kingdom = $kingdomManagement->getKingdom();
+        $building = $kingdom->buildings()->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdoms/' . $character->id . '/upgrade-building/' . $building->id, [
+                'to_level' => $building->level + 1,
+            ]);
+
+        $response->assertStatus(422);
+        $this->assertSame(0, BuildingInQueue::where('kingdom_id', $kingdom->id)->count());
+    }
+
+    public function testManualRebuildRejectsDuringAutomation(): void
+    {
+        Queue::fake();
+
+        $characterFactory = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation();
+        $kingdomManagement = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 2000,
+                'current_clay' => 2000,
+                'current_stone' => 2000,
+                'current_iron' => 2000,
+                'current_population' => 2000,
+            ])
+            ->assignBuilding([], [
+                'current_durability' => 1,
+                'max_durability' => 100,
+            ]);
+        $characterFactory->assignAutomation([
+            'type' => AutomationType::EXPLORING,
+        ]);
+        $character = $kingdomManagement->getCharacter();
+        $kingdom = $kingdomManagement->getKingdom();
+        $building = $kingdom->buildings()->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdoms/' . $character->id . '/rebuild-building/' . $building->id);
+
+        $response->assertStatus(422);
+        $this->assertSame(0, BuildingInQueue::where('kingdom_id', $kingdom->id)->count());
+    }
+
+    public function testManualBuildingCancelRejectsDuringAutomation(): void
+    {
+        $characterFactory = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation();
+        $kingdomManagement = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom()
+            ->assignBuilding();
+        $characterFactory->assignAutomation([
+            'type' => AutomationType::EXPLORING,
+        ]);
+        $character = $kingdomManagement->getCharacter();
+        $kingdom = $kingdomManagement->getKingdom();
+        $building = $kingdom->buildings()->first();
+        $queue = BuildingInQueue::factory()->create([
+            'character_id' => $character->id,
+            'kingdom_id' => $kingdom->id,
+            'building_id' => $building->id,
+            'to_level' => $building->level + 1,
+            'type' => BuildingQueueType::UPGRADE,
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);

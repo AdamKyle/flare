@@ -392,7 +392,6 @@ class ServiceProvider extends ApplicationServiceProvider
             RepairKingdomData::class,
             UpdateKingdoms::class,
             ResetCapitalCityWalkingStatus::class,
-            RepairKingdomData::class,
         ]);
     }
 
