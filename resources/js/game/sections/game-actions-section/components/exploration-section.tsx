@@ -498,7 +498,7 @@ export default class ExplorationSection extends React.Component<any, any> {
         if (this.props.character.is_faction_loyalty_automation_running) {
             return (
                 <Fragment>
-                    <WarningAlert additional_css={"mb-4 text-center"}>
+                    <WarningAlert additional_css={"mb-4 text-left"}>
                         <p className="my-2">
                             Faction Loyalty Automation is running.
                         </p>
@@ -507,19 +507,20 @@ export default class ExplorationSection extends React.Component<any, any> {
 
                     {this.state.loading ? <LoadingProgressBar /> : null}
 
-                    <div className="flex flex-wrap justify-center gap-2">
+                    <div className="flex flex-wrap justify-center items-start gap-2">
                         <DangerButton
                             button_label={"Stop Faction Loyalty Automation"}
                             on_click={this.stopFactionLoyaltyAutomation.bind(
                                 this,
                             )}
                             disabled={this.state.loading}
-                            additional_css={"mb-4"}
+                            additional_css={"h-10"}
                         />
                         <PrimaryButton
                             button_label={"Close Exploration"}
                             on_click={this.closeExploration.bind(this)}
                             disabled={this.state.loading}
+                            additional_css={"h-10"}
                         />
                     </div>
                 </Fragment>
@@ -529,7 +530,7 @@ export default class ExplorationSection extends React.Component<any, any> {
         if (this.props.character.is_delve_running) {
             return (
                 <Fragment>
-                    <WarningAlert additional_css={"mb-4 text-center"}>
+                    <WarningAlert additional_css={"mb-4 text-left"}>
                         <p className="my-2">Delve is running.</p>
                         <p className="my-2">Would you like to stop it?</p>
                         <a href="/information/delve" target="_blank">
@@ -541,17 +542,18 @@ export default class ExplorationSection extends React.Component<any, any> {
 
                     {this.state.loading ? <LoadingProgressBar /> : null}
 
-                    <div className="flex flex-wrap justify-center gap-2">
+                    <div className="flex flex-wrap justify-center items-start gap-2">
                         <DangerButton
                             button_label={"Stop Delve"}
                             on_click={this.stopDelveExploration.bind(this)}
                             disabled={this.state.loading}
-                            additional_css={"mb-4"}
+                            additional_css={"h-10"}
                         />
                         <PrimaryButton
                             button_label={"Close Delve"}
                             on_click={this.closeExploration.bind(this)}
                             disabled={this.state.loading}
+                            additional_css={"h-10"}
                         />
                     </div>
                 </Fragment>
@@ -561,7 +563,7 @@ export default class ExplorationSection extends React.Component<any, any> {
         if (this.props.character.is_automation_running) {
             return (
                 <Fragment>
-                    <WarningAlert additional_css={"mb-4 text-center"}>
+                    <WarningAlert additional_css={"mb-4 text-left"}>
                         <p className="my-2">Exploration is running.</p>
                         <p className="my-2">Would you like to stop it?</p>
                         <a href="/information/automation" target="_blank">
@@ -573,17 +575,18 @@ export default class ExplorationSection extends React.Component<any, any> {
 
                     {this.state.loading ? <LoadingProgressBar /> : null}
 
-                    <div className="flex flex-wrap justify-center gap-2">
+                    <div className="flex flex-wrap justify-center items-start gap-2">
                         <DangerButton
                             button_label={"Stop Exploration"}
                             on_click={this.stopExploration.bind(this)}
                             disabled={this.state.loading}
-                            additional_css={"mb-4"}
+                            additional_css={"h-10"}
                         />
                         <PrimaryButton
                             button_label={"Close Exploration"}
                             on_click={this.closeExploration.bind(this)}
                             disabled={this.state.loading}
+                            additional_css={"h-10"}
                         />
                     </div>
                 </Fragment>
@@ -594,8 +597,8 @@ export default class ExplorationSection extends React.Component<any, any> {
     renderExplorationSection() {
         return (
             <Fragment>
-                <div className="mt-2 grid lg:grid-cols-3 gap-2 lg:ml-[120px]">
-                    <div className="cols-start-1 col-span-2">
+                <div className="mt-2">
+                    <div className="mx-auto w-full md:w-2/3">
                         <div className="mb-3">
                             <Select
                                 onChange={this.setMonsterToFight.bind(this)}
@@ -671,7 +674,11 @@ export default class ExplorationSection extends React.Component<any, any> {
                     </div>
                 </div>
 
-                <div className={"lg:text-center mt-3 mb-3"}>
+                <div
+                    className={
+                        "mx-auto w-full md:w-2/3 flex flex-wrap justify-center gap-2 mt-3 mb-3"
+                    }
+                >
                     <PrimaryButton
                         button_label={"Explore"}
                         on_click={this.startExploration.bind(this)}
@@ -680,29 +687,30 @@ export default class ExplorationSection extends React.Component<any, any> {
                             this.props.character.is_dead ||
                             !this.props.character.can_attack
                         }
-                        additional_css={"mr-2 mb-4"}
+                        additional_css={"h-10"}
                     />
                     <DangerButton
                         button_label={"Close"}
                         on_click={this.closeExploration.bind(this)}
                         disabled={this.state.loading}
+                        additional_css={"h-10"}
                     />
 
                     {this.state.loading ? (
-                        <div className="w-1/2 ml-auto mr-auto">
+                        <div className="w-full">
                             <LoadingProgressBar />
                         </div>
                     ) : null}
 
                     {this.state.error_message !== null ? (
-                        <div className="w-1/2 ml-auto mr-auto mt-4">
+                        <div className="w-full mt-4">
                             <DangerAlert>
                                 {this.state.error_message}
                             </DangerAlert>
                         </div>
                     ) : null}
 
-                    <div className="relative top-[24px] italic">
+                    <div className="relative top-[24px] italic w-full text-center">
                         <p>
                             For more help please the{" "}
                             <a href="/information/exploration" target="_blank">
@@ -824,7 +832,7 @@ export default class ExplorationSection extends React.Component<any, any> {
 
                 <div
                     className={
-                        "mx-auto w-full md:w-2/3 lg:text-center mt-3 mb-3"
+                        "mx-auto w-full md:w-2/3 flex flex-wrap justify-center gap-2 mt-3 mb-3"
                     }
                 >
                     <PrimaryButton
@@ -836,12 +844,13 @@ export default class ExplorationSection extends React.Component<any, any> {
                             this.props.character.is_dead ||
                             !this.props.character.can_attack
                         }
-                        additional_css={"mr-2 mb-4"}
+                        additional_css={"h-10"}
                     />
                     <DangerButton
                         button_label={"Close"}
                         on_click={this.closeDelve.bind(this)}
                         disabled={this.state.loading}
+                        additional_css={"h-10"}
                     />
 
                     {this.state.loading ? (

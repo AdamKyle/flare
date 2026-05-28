@@ -1,5 +1,5 @@
 import { AxiosError, AxiosResponse } from "axios";
-import React, { Fragment } from "react";
+import React from "react";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
 import Table from "../../../components/ui/data-tables/table";
@@ -125,25 +125,29 @@ export default class UnitsTable extends React.Component<
 
     render() {
         return (
-            <Fragment>
+            <div className="h-full min-h-0 flex flex-col">
                 {this.state.error_message !== null ? (
-                    <div className="mt-4 mb-4">
+                    <div className="mt-4 mb-4 shrink-0">
                         <DangerAlert>{this.state.error_message}</DangerAlert>
                     </div>
                 ) : null}
                 {this.state.success_message !== null ? (
-                    <div className="mt-4 mb-4">
+                    <div className="mt-4 mb-4 shrink-0">
                         <SuccessAlert>
                             {this.state.success_message}
                         </SuccessAlert>
                     </div>
                 ) : null}
                 {this.state.loading ? (
-                    <div className="mt-4 mb-4">
+                    <div className="mt-4 mb-4 shrink-0">
                         <LoadingProgressBar />
                     </div>
                 ) : null}
-                <div className={"max-w-[390px] md:max-w-full overflow-x-auto"}>
+                <div
+                    className={
+                        "max-w-[390px] md:max-w-full overflow-x-auto flex-1 min-h-0"
+                    }
+                >
                     <Table
                         data={this.getOrderedUnits(this.props.units)}
                         conditional_row_styles={this.createConditionalRowStyles()}
@@ -158,7 +162,7 @@ export default class UnitsTable extends React.Component<
                         dark_table={this.props.dark_tables}
                     />
                 </div>
-            </Fragment>
+            </div>
         );
     }
 }

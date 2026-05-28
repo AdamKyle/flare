@@ -133,7 +133,9 @@ export default class Tabs extends React.Component<TabProperties, any> {
                 >
                     {this.renderEachTab()}
                 </Tab.List>
-                <Tab.Panels className="mt-5">{this.props.children}</Tab.Panels>
+                <Tab.Panels className="mt-5 flex-1 min-h-0 flex flex-col">
+                    {this.props.children}
+                </Tab.Panels>
             </Tab.Group>
         );
     }

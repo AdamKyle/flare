@@ -168,6 +168,46 @@ export default class KingdomDetails extends React.Component<
                                 {formatNumber(this.props.kingdom.gold_bars)}
                             </dd>
                         </dl>
+                        <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6"></div>
+                        <h3>Estimated Hourly Production</h3>
+                        <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6"></div>
+                        <dl>
+                            <dt>Stone/hour</dt>
+                            <dd>
+                                {formatNumber(
+                                    this.props.kingdom
+                                        .estimated_hourly_production.stone,
+                                )}
+                            </dd>
+                            <dt>Clay/hour</dt>
+                            <dd>
+                                {formatNumber(
+                                    this.props.kingdom
+                                        .estimated_hourly_production.clay,
+                                )}
+                            </dd>
+                            <dt>Wood/hour</dt>
+                            <dd>
+                                {formatNumber(
+                                    this.props.kingdom
+                                        .estimated_hourly_production.wood,
+                                )}
+                            </dd>
+                            <dt>Iron/hour</dt>
+                            <dd>
+                                {formatNumber(
+                                    this.props.kingdom
+                                        .estimated_hourly_production.iron,
+                                )}
+                            </dd>
+                            <dt>Population/hour</dt>
+                            <dd>
+                                {formatNumber(
+                                    this.props.kingdom
+                                        .estimated_hourly_production.population,
+                                )}
+                            </dd>
+                        </dl>
                     </div>
                     <div className="border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6"></div>
                     <div>
@@ -217,46 +257,6 @@ export default class KingdomDetails extends React.Component<
                                     formatNumber(
                                         this.props.kingdom.max_population,
                                     )}
-                            </dd>
-                        </dl>
-                        <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6"></div>
-                        <h3>Estimated Hourly Production</h3>
-                        <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6"></div>
-                        <dl>
-                            <dt>Stone/hour</dt>
-                            <dd>
-                                {formatNumber(
-                                    this.props.kingdom
-                                        .estimated_hourly_production.stone,
-                                )}
-                            </dd>
-                            <dt>Clay/hour</dt>
-                            <dd>
-                                {formatNumber(
-                                    this.props.kingdom
-                                        .estimated_hourly_production.clay,
-                                )}
-                            </dd>
-                            <dt>Wood/hour</dt>
-                            <dd>
-                                {formatNumber(
-                                    this.props.kingdom
-                                        .estimated_hourly_production.wood,
-                                )}
-                            </dd>
-                            <dt>Iron/hour</dt>
-                            <dd>
-                                {formatNumber(
-                                    this.props.kingdom
-                                        .estimated_hourly_production.iron,
-                                )}
-                            </dd>
-                            <dt>Population/hour</dt>
-                            <dd>
-                                {formatNumber(
-                                    this.props.kingdom
-                                        .estimated_hourly_production.population,
-                                )}
                             </dd>
                         </dl>
                     </div>

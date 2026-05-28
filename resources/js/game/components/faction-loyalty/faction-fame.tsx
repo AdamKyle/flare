@@ -529,7 +529,7 @@ export default class FactionFame extends React.Component<
                         ) : null}
                     </div>
                     {factionLoyaltyActionsBlockedMessage !== null ? (
-                        <WarningAlert additional_css={"my-4 text-center"}>
+                        <WarningAlert additional_css={"my-4"}>
                             {factionLoyaltyActionsBlockedMessage}
                         </WarningAlert>
                     ) : null}

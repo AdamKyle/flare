@@ -173,9 +173,7 @@ export default class Actions extends React.Component<
     openCrafting(type: CraftingOptions) {
         this.setState(
             {
-                show_purgatory_chains_section: false,
-                show_hell_forged_section: false,
-                show_twisted_earth_section: false,
+                crafting_type: null,
             },
             () => {
                 this.actionsManager.setCraftingType(type);
@@ -184,27 +182,28 @@ export default class Actions extends React.Component<
     }
 
     manageExploration() {
+        const showExploration = !this.state.show_exploration;
+
         this.setState({
-            show_exploration: !this.state.show_exploration,
+            show_exploration: showExploration,
+            show_celestial_fight: false,
         });
     }
 
     manageHellForgedShop() {
         this.setState({
-            crafting_type: null,
-            show_exploration: false,
             show_celestial_fight: false,
             show_twisted_earth_section: false,
+            show_purgatory_chains_section: false,
             show_hell_forged_section: !this.state.show_hell_forged_section,
         });
     }
 
     managedPurgatoryChainsShop() {
         this.setState({
-            crafting_type: null,
-            show_exploration: false,
             show_celestial_fight: false,
             show_twisted_earth_section: false,
+            show_hell_forged_section: false,
             show_purgatory_chains_section:
                 !this.state.show_purgatory_chains_section,
         });
@@ -212,23 +211,30 @@ export default class Actions extends React.Component<
 
     managedTwistedEarthShop() {
         this.setState({
-            crafting_type: null,
-            show_exploration: false,
             show_celestial_fight: false,
             show_purgatory_chains_section: false,
+            show_hell_forged_section: false,
             show_twisted_earth_section: !this.state.show_twisted_earth_section,
         });
     }
 
     manageFightCelestial() {
+        const showCelestialFight = !this.state.show_celestial_fight;
+
         this.setState({
-            show_celestial_fight: !this.state.show_celestial_fight,
+            show_exploration: false,
+            show_celestial_fight: showCelestialFight,
+            show_hell_forged_section: false,
+            show_purgatory_chains_section: false,
+            show_twisted_earth_section: false,
         });
     }
 
     manageGamblingSection() {
+        const showGamblingSection = !this.state.show_gambling_section;
+
         this.setState({
-            show_gambling_section: !this.state.show_gambling_section,
+            show_gambling_section: showGamblingSection,
         });
     }
 
@@ -256,6 +262,13 @@ export default class Actions extends React.Component<
         );
     }
 
+    canOpenCraftingMenu(): boolean {
+        return (
+            this.state.crafting_time_out > 0 ||
+            this.props.character_status.is_dead
+        );
+    }
+
     selectedCraftingTypeIsBlockedByAutomation(): boolean {
         return (
             this.isFactionLoyaltyAutomationRunning() &&
@@ -263,8 +276,28 @@ export default class Actions extends React.Component<
         );
     }
 
+    canShowCelestialFight(): boolean {
+        return (
+            this.props.celestial_id !== 0 &&
+            this.props.celestial_id !== null &&
+            this.props.character.can_engage_celestials
+        );
+    }
+
     automationName(): string {
         return this.props.character.active_automation?.name ?? "Automation";
+    }
+
+    automationRestrictionMessage(): string {
+        if (this.isFactionLoyaltyAutomationRunning()) {
+            return "Faction Loyalty Automation is running. You cannot craft items while it is running.";
+        }
+
+        if (this.isDelveRunning()) {
+            return "Delve is running. You cannot Explore, manually Fight, or use Faction Loyalty while it is running.";
+        }
+
+        return "Exploration is running. You cannot Delve, use Faction Loyalty, or manually Fight while it is running.";
     }
 
     automationStopRoute(): string {
@@ -315,15 +348,14 @@ export default class Actions extends React.Component<
 
     renderAutomationBlockedNotice() {
         return (
-            <div className="my-4 text-center" aria-live="polite">
-                <p className="my-2">
-                    Faction Loyalty Automation is running. You cannot craft
-                    items while it is running.
-                </p>
-                <p className="my-2">
-                    Enchanting, alchemy, trinketry, gem crafting, and other
-                    crafting-menu actions are still allowed.
-                </p>
+            <div className="my-4 text-left" aria-live="polite">
+                <p className="my-2">{this.automationRestrictionMessage()}</p>
+                {this.isFactionLoyaltyAutomationRunning() ? (
+                    <p className="my-2">
+                        Enchanting, alchemy, trinketry, gem crafting, and other
+                        crafting-menu actions are still allowed.
+                    </p>
+                ) : null}
                 <p className="my-2">Would you like to stop it?</p>
                 <DangerOutlineButton
                     button_label={"Stop " + this.automationName()}
@@ -367,7 +399,6 @@ export default class Actions extends React.Component<
             <MonsterActions
                 monsters={this.state.monsters}
                 character={this.props.character}
-                close_monster_section={this.closeMonsterSection.bind(this)}
                 character_statuses={this.props.character_status}
                 is_small={false}
             />
@@ -408,6 +439,182 @@ export default class Actions extends React.Component<
         );
     }
 
+    renderActionButtons() {
+        return (
+            <div className="grid gap-2">
+                <DropDown
+                    menu_items={this.actionsManager.buildCraftingList(
+                        this.openCrafting.bind(this),
+                    )}
+                    button_title={"Craft/Enchant"}
+                    disabled={this.canOpenCraftingMenu()}
+                />
+                <SuccessOutlineButton
+                    button_label={
+                        this.props.character.is_at_delve_location
+                            ? "Delve"
+                            : "Exploration"
+                    }
+                    on_click={this.manageExploration.bind(this)}
+                    disabled={
+                        this.isFactionLoyaltyAutomationRunning() ||
+                        this.isDelveRunning()
+                    }
+                    additional_css={"w-full"}
+                />
+                <SuccessOutlineButton
+                    button_label={"Slots"}
+                    on_click={this.manageGamblingSection.bind(this)}
+                    disabled={this.props.character_status.is_dead}
+                    additional_css={"w-full"}
+                />
+                {this.canShowCelestialFight() ? (
+                    <SuccessOutlineButton
+                        button_label={"Celestial Fight"}
+                        on_click={this.manageFightCelestial.bind(this)}
+                        disabled={
+                            this.state.celestial_time_out > 0 ||
+                            this.isAnyAutomationRunning()
+                        }
+                        additional_css={"w-full"}
+                    />
+                ) : null}
+                {this.props.can_access_hell_forged_shop ? (
+                    <SuccessOutlineButton
+                        button_label={"Hell Forged Gear"}
+                        on_click={this.manageHellForgedShop.bind(this)}
+                        disabled={this.props.character_status.is_dead}
+                        additional_css={"w-full"}
+                    />
+                ) : null}
+                {this.props.can_access_purgatory_chains_shop ? (
+                    <SuccessOutlineButton
+                        button_label={"Purgatory Chains Gear"}
+                        on_click={this.managedPurgatoryChainsShop.bind(this)}
+                        disabled={this.props.character_status.is_dead}
+                        additional_css={"w-full"}
+                    />
+                ) : null}
+                {this.props.can_access_twisted_earth_shop ? (
+                    <SuccessOutlineButton
+                        button_label={"Twisted Earth"}
+                        on_click={this.managedTwistedEarthShop.bind(this)}
+                        disabled={this.props.character_status.is_dead}
+                        additional_css={"w-full"}
+                    />
+                ) : null}
+            </div>
+        );
+    }
+
+    renderCraftingSection() {
+        if (
+            this.state.crafting_type !== null &&
+            this.selectedCraftingTypeIsBlockedByAutomation()
+        ) {
+            return this.renderAutomationBlockedNotice();
+        }
+
+        if (this.state.crafting_type !== null) {
+            return (
+                <CraftingSection
+                    remove_crafting={this.removeCraftingType.bind(this)}
+                    character={this.props.character}
+                    character_status={this.props.character_status}
+                    crafting_time_out={this.state.crafting_time_out}
+                    crafting_type={this.state.crafting_type}
+                    update_crafting_time_out={this.actionsManager.updateCraftingTimer.bind(
+                        this.actionsManager,
+                    )}
+                    fame_tasks={this.props.fame_tasks}
+                />
+            );
+        }
+
+        return null;
+    }
+
+    renderActionContent() {
+        return (
+            <div className="grid gap-4">
+                <div className="lg:pt-4">{this.createMonster()}</div>
+                {this.renderCelestialFight()}
+                {this.state.show_exploration ? this.renderExploration() : null}
+                {this.state.show_gambling_section ? (
+                    <GamblingSection
+                        character={this.props.character}
+                        close_gambling_section={this.manageGamblingSection.bind(
+                            this,
+                        )}
+                        is_small={false}
+                    />
+                ) : null}
+                {this.renderCraftingSection()}
+                {this.renderSpecialtyShop()}
+            </div>
+        );
+    }
+
+    renderExploration() {
+        if (this.isFactionLoyaltyAutomationRunning() || this.isDelveRunning()) {
+            return this.renderAutomationBlockedNotice();
+        }
+
+        return (
+            <ExplorationSection
+                manage_exploration={this.manageExploration.bind(this)}
+                character={this.props.character}
+                monsters={this.state.monsters}
+            />
+        );
+    }
+
+    renderSpecialtyShop() {
+        if (
+            !this.state.show_hell_forged_section &&
+            !this.state.show_purgatory_chains_section &&
+            !this.state.show_twisted_earth_section
+        ) {
+            return null;
+        }
+
+        return (
+            <Shop
+                type={this.getTypeOfSpecialtyGear()}
+                manage_hell_forged_shop={this.manageHellForgedShop.bind(this)}
+                manage_purgatory_chains_shop={this.managedPurgatoryChainsShop.bind(
+                    this,
+                )}
+                manage_twisted_earth_shop={this.managedTwistedEarthShop.bind(
+                    this,
+                )}
+                show_hell_forged_section={this.state.show_hell_forged_section}
+                show_purgatory_chains_section={
+                    this.state.show_purgatory_chains_section
+                }
+                show_twisted_earth_section={
+                    this.state.show_twisted_earth_section
+                }
+                character={this.props.character}
+            />
+        );
+    }
+
+    renderCelestialFight() {
+        if (!this.state.show_celestial_fight || !this.canShowCelestialFight()) {
+            return null;
+        }
+
+        return (
+            <CelestialFight
+                character={this.props.character}
+                manage_celestial_fight={this.manageFightCelestial.bind(this)}
+                celestial_id={this.props.celestial_id}
+                update_celestial={this.props.update_celestial}
+            />
+        );
+    }
+
     render() {
         if (this.isLoading()) {
             return <ComponentLoading />;
@@ -415,185 +622,9 @@ export default class Actions extends React.Component<
 
         return (
             <div>
-                <div className="mb-5">
-                    <DropDown
-                        menu_items={this.actionsManager.buildCraftingList(
-                            this.openCrafting.bind(this),
-                        )}
-                        button_title={"Crafting"}
-                        disabled={this.actionsManager.cannotCraft()}
-                    />
-                    <SuccessOutlineButton
-                        button_label={"Fight"}
-                        on_click={this.closeMonsterSection.bind(this)}
-                        disabled={
-                            this.state.attack_time_out > 0 ||
-                            this.isAnyAutomationRunning() ||
-                            !this.props.character_status.can_attack ||
-                            this.props.character_status.is_dead
-                        }
-                        additional_css={"ml-2"}
-                    />
-                    <SuccessOutlineButton
-                        button_label={
-                            this.props.character.is_at_delve_location
-                                ? "Delve"
-                                : "Exploration"
-                        }
-                        on_click={this.manageExploration.bind(this)}
-                        disabled={
-                            this.isFactionLoyaltyAutomationRunning() ||
-                            this.isDelveRunning()
-                        }
-                        additional_css={"ml-2"}
-                    />
-                    <SuccessOutlineButton
-                        button_label={"Celestial Fight"}
-                        on_click={this.manageFightCelestial.bind(this)}
-                        disabled={
-                            this.state.celestial_time_out > 0 ||
-                            this.isAnyAutomationRunning() ||
-                            !this.props.character.can_engage_celestials
-                        }
-                        additional_css={"ml-2"}
-                    />
-                    <SuccessOutlineButton
-                        button_label={"Gamble"}
-                        on_click={this.manageGamblingSection.bind(this)}
-                        disabled={this.props.character_status.is_dead}
-                        additional_css={"ml-2"}
-                    />
-                    {this.props.can_access_hell_forged_shop ? (
-                        <SuccessOutlineButton
-                            button_label={"Hell Forged Gear"}
-                            on_click={this.manageHellForgedShop.bind(this)}
-                            disabled={this.props.character_status.is_dead}
-                            additional_css={"ml-2"}
-                        />
-                    ) : null}
-                    {this.props.can_access_purgatory_chains_shop ? (
-                        <SuccessOutlineButton
-                            button_label={"Purgatory Chains Gear"}
-                            on_click={this.managedPurgatoryChainsShop.bind(
-                                this,
-                            )}
-                            disabled={this.props.character_status.is_dead}
-                            additional_css={"ml-2"}
-                        />
-                    ) : null}
-                    {this.props.can_access_twisted_earth_shop ? (
-                        <SuccessOutlineButton
-                            button_label={"Twisted Earth"}
-                            on_click={this.managedTwistedEarthShop.bind(this)}
-                            disabled={this.props.character_status.is_dead}
-                            additional_css={"ml-2"}
-                        />
-                    ) : null}
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                        {this.state.show_gambling_section ? (
-                            <GamblingSection
-                                character={this.props.character}
-                                close_gambling_section={this.manageGamblingSection.bind(
-                                    this,
-                                )}
-                                is_small={false}
-                            />
-                        ) : null}
-
-                        {this.state.show_exploration ? (
-                            this.isFactionLoyaltyAutomationRunning() ||
-                            this.isDelveRunning() ? (
-                                this.renderAutomationBlockedNotice()
-                            ) : (
-                                <ExplorationSection
-                                    close_exploration_section={this.manageExploration.bind(
-                                        this,
-                                    )}
-                                    character={this.props.character}
-                                    monsters={this.state.monsters}
-                                />
-                            )
-                        ) : null}
-
-                        {this.state.show_celestial_fight ? (
-                            <CelestialFight
-                                character={this.props.character}
-                                manage_celestial_fight={this.manageFightCelestial.bind(
-                                    this,
-                                )}
-                                celestial_id={this.props.celestial_id}
-                                update_celestial={this.props.update_celestial}
-                            />
-                        ) : null}
-
-                        {this.state.show_hell_forged_section ||
-                        this.state.show_purgatory_chains_section ||
-                        this.state.show_twisted_earth_section ? (
-                            <Shop
-                                type={this.getTypeOfSpecialtyGear()}
-                                manage_hell_forged_shop={this.manageHellForgedShop.bind(
-                                    this,
-                                )}
-                                manage_purgatory_chains_shop={this.managedPurgatoryChainsShop.bind(
-                                    this,
-                                )}
-                                manage_twisted_earth_shop={this.managedTwistedEarthShop.bind(
-                                    this,
-                                )}
-                                show_hell_forged_section={
-                                    this.state.show_hell_forged_section
-                                }
-                                show_purgatory_chains_section={
-                                    this.state.show_purgatory_chains_section
-                                }
-                                show_twisted_earth_section={
-                                    this.state.show_twisted_earth_section
-                                }
-                                character={this.props.character}
-                            />
-                        ) : null}
-
-                        {!this.state.show_exploration &&
-                        !this.state.show_celestial_fight &&
-                        !this.state.show_gambling_section &&
-                        !this.state.show_hell_forged_section &&
-                        !this.state.show_purgatory_chains_section &&
-                        !this.state.show_twisted_earth_section ? (
-                            <MonsterActions
-                                monsters={this.state.monsters}
-                                character={this.props.character}
-                                close_monster_section={this.closeMonsterSection.bind(
-                                    this,
-                                )}
-                                character_statuses={this.props.character_status}
-                                is_small={false}
-                            />
-                        ) : null}
-                    </div>
-
-                    <div>
-                        {this.state.crafting_type !== null &&
-                        this.selectedCraftingTypeIsBlockedByAutomation() ? (
-                            this.renderAutomationBlockedNotice()
-                        ) : this.state.crafting_type !== null ? (
-                            <CraftingSection
-                                remove_crafting={this.removeCraftingType.bind(
-                                    this,
-                                )}
-                                character={this.props.character}
-                                character_status={this.props.character_status}
-                                crafting_time_out={this.state.crafting_time_out}
-                                crafting_type={this.state.crafting_type}
-                                update_crafting_time_out={this.actionsManager.updateCraftingTimer.bind(
-                                    this.actionsManager,
-                                )}
-                                fame_tasks={this.props.fame_tasks}
-                            />
-                        ) : null}
-                    </div>
+                <div className="grid lg:grid-cols-[220px_minmax(0,1fr)] gap-4 items-start">
+                    <div>{this.renderActionButtons()}</div>
+                    <div>{this.renderActionContent()}</div>
                 </div>
 
                 <div className="mt-4 mb-4">

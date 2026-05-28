@@ -279,7 +279,7 @@ export default class CharacterFactions extends React.Component<any, any> {
                     ) : null}
 
                     {this.isFactionLoyaltyActionBlocked() ? (
-                        <WarningAlert additional_css={"mb-4 text-center"}>
+                        <WarningAlert additional_css={"mb-4"}>
                             {this.props.is_faction_loyalty_automation_running
                                 ? "Faction Loyalty Automation is running. Pledge/unpledge, allegiance switching, NPC assist, bounties, NPC crafting, and Faction Loyalty automation are unavailable until Faction Loyalty Automation is canceled."
                                 : this.props.is_delve_running

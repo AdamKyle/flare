@@ -102,7 +102,10 @@ export default class DropDown extends React.Component<DropDownProps, any> {
     render() {
         return (
             <div className="my-2 md:my-4 lg:text-left grid">
-                <Menu as="div" className="relative inline-block text-left">
+                <Menu
+                    as="div"
+                    className="relative inline-block text-left w-full"
+                >
                     <div className="">
                         <Menu.Button
                             className={clsx(
@@ -135,9 +138,9 @@ export default class DropDown extends React.Component<DropDownProps, any> {
                     >
                         <Menu.Items
                             className={clsx(
-                                "absolute right-0 z-50 w-56 mt-2 origin-top-right dark:bg-gray-700 " +
+                                "absolute left-0 z-50 w-full min-w-full mt-2 origin-top-left dark:bg-gray-700 " +
                                     "bg-white divide-y dark:divide-gray-600 divide-gray-300 rounded-md shadow-lg ring-1 " +
-                                    "ring-black ring-opacity-5 focus:outline-none md:left-[-5px] w-full md:w-48",
+                                    "ring-black ring-opacity-5 focus:outline-none",
                                 {
                                     absolute: !this.props.use_relative,
                                     relative: this.props.use_relative,

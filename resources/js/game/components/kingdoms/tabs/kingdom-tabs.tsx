@@ -30,8 +30,12 @@ export default class KingdomTabs extends React.Component<any, any> {
 
     render() {
         return (
-            <BasicCard additionalClasses={"h-full"}>
-                <Tabs tabs={this.tabs} full_width={true}>
+            <BasicCard additionalClasses={"h-full flex flex-col min-h-0"}>
+                <Tabs
+                    tabs={this.tabs}
+                    full_width={true}
+                    additonal_css={"shrink-0"}
+                >
                     <TabPanel key={"buildings"}>
                         <BuildingsTable
                             buildings={this.props.kingdom.buildings}

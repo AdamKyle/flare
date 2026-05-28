@@ -67,6 +67,10 @@ export default class GamblingSection extends React.Component<
     }
 
     spin() {
+        if (this.state.spinning) {
+            return;
+        }
+
         const gold: number = parseFloat(
             this.props.character.gold.replace(/,/g, ""),
         );
@@ -198,7 +202,10 @@ export default class GamblingSection extends React.Component<
                         <SuccessButton
                             button_label={"Spin"}
                             on_click={this.spin.bind(this)}
-                            disabled={!this.props.character.can_spin}
+                            disabled={
+                                !this.props.character.can_spin ||
+                                this.state.spinning
+                            }
                         />
                         <DangerButton
                             button_label={"close"}

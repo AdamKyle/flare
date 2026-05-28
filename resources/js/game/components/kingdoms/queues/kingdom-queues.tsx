@@ -343,13 +343,13 @@ export default class KingdomQueues extends React.Component<
 
     render() {
         return (
-            <div>
-                <p className="my-2">
+            <div className="h-full min-h-0 flex flex-col">
+                <p className="my-2 shrink-0">
                     Below you will find the various queues. This could be
                     building expansions, repairs, upgrades, unit recruitment and
                     movement.
                 </p>
-                <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3"></div>
+                <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 shrink-0"></div>
                 {this.state.loading ? <LoadingProgressBar /> : null}
                 {this.state.error_message !== null ? (
                     <DangerAlert>{this.state.error_message}</DangerAlert>
@@ -357,7 +357,7 @@ export default class KingdomQueues extends React.Component<
                 {this.state.success_message !== null ? (
                     <SuccessAlert>{this.state.success_message}</SuccessAlert>
                 ) : null}
-                <div className="w-full mr-auto ml-auto max-h-[520px] overflow-y-auto">
+                <div className="w-full mr-auto ml-auto flex-1 min-h-0 overflow-y-auto">
                     {this.renderBuildingQueues()}
                     {this.renderBuildingExpansionQueues()}
                     {this.renderUnitRecruitmentQueues()}
