@@ -54,12 +54,6 @@ class CapitalCityManagementController extends Controller
 
     public function fetchKingdomsWithUpgradableBuildingType(Character $character, Kingdom $kingdom)
     {
-        $restriction = $this->automationRestrictionJsonResponse($character);
-
-        if (! is_null($restriction)) {
-            return $restriction;
-        }
-
         $result = $this->capitalCityManagementService->fetchBuildingsForUpgradesOrRepairs($character, $kingdom);
 
         $status = $result['status'];
@@ -70,12 +64,6 @@ class CapitalCityManagementController extends Controller
 
     public function fetchKingdomsWithRecruitableUnitType(Character $character, Kingdom $kingdom)
     {
-        $restriction = $this->automationRestrictionJsonResponse($character);
-
-        if (! is_null($restriction)) {
-            return $restriction;
-        }
-
         $result = $this->capitalCityManagementService->fetchKingdomsForSelection($kingdom);
 
         $status = $result['status'];
@@ -121,12 +109,6 @@ class CapitalCityManagementController extends Controller
 
     public function fetchKingdomBuildingManagementQueues(Character $character, Kingdom $kingdom)
     {
-        $restriction = $this->automationRestrictionJsonResponse($character);
-
-        if (! is_null($restriction)) {
-            return $restriction;
-        }
-
         $data = $this->capitalCityManagementService->fetchBuildingQueueData($character, $kingdom);
 
         return response()->json([
@@ -136,12 +118,6 @@ class CapitalCityManagementController extends Controller
 
     public function fetchKingdomUnitManagementQueues(Character $character, Kingdom $kingdom)
     {
-        $restriction = $this->automationRestrictionJsonResponse($character);
-
-        if (! is_null($restriction)) {
-            return $restriction;
-        }
-
         $data = $this->capitalCityManagementService->fetchUnitQueueData($character, $kingdom);
 
         return response()->json([

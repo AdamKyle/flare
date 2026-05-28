@@ -84,6 +84,12 @@ class KingdomBuildingsController extends Controller
             return $restriction;
         }
 
+        if ($this->kingdomBuildingService->hasActiveBuildingUpgrade($building)) {
+            return response()->json([
+                'message' => 'Building is already in the process of upgrading.',
+            ], 422);
+        }
+
         if (ResourceValidation::shouldRedirectKingdomBuilding($building, $building->kingdom)) {
             return response()->json([
                 'message' => "You don't have the resources.",

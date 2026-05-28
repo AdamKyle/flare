@@ -124,7 +124,7 @@ export default class MonsterSelection extends React.Component<
 
     automationRestrictionMessage(): string {
         if (this.props.character.is_faction_loyalty_automation_running) {
-            return "Faction Loyalty Automation is running. You cannot Delve, Explore, manually Fight, or Craft while it is running.";
+            return "Faction Loyalty Automation is running. You cannot Delve, Explore, manually Fight, or use Craft while it is running.";
         }
 
         if (this.props.character.is_delve_running) {

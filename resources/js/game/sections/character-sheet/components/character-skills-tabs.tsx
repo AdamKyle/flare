@@ -136,6 +136,11 @@ export default class CharacterSkillsTabs extends React.Component<
                         is_dead={this.props.is_dead}
                         character_id={this.props.character_id}
                         is_automation_running={this.props.is_automation_running}
+                        is_faction_loyalty_automation_running={
+                            this.props.is_faction_loyalty_automation_running
+                        }
+                        is_delve_running={this.props.is_delve_running}
+                        active_automation={this.props.active_automation}
                     />
                 </TabPanel>
             </Tabs>

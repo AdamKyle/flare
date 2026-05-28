@@ -188,8 +188,8 @@ export default class LabyrinthOracle extends React.Component<
     render() {
         return (
             <>
-                <div className="mt-2 lg:grid lg:grid-cols-3 lg:gap-2 lg:ml-[120px]">
-                    <div className="lg:cols-start-1 lg:col-span-2">
+                <div className="mt-2">
+                    <div>
                         {this.state.loading &&
                         this.state.inventory.length === 0 ? (
                             <LoadingProgressBar />
@@ -259,8 +259,8 @@ export default class LabyrinthOracle extends React.Component<
                 </div>
 
                 {this.state.error_message !== null ? (
-                    <div className="mt-2 lg:grid lg:grid-cols-3 lg:gap-2 lg:ml-[120px]">
-                        <div className="lg:cols-start-1 lg:col-span-2">
+                    <div className="mt-2">
+                        <div>
                             <DangerAlert>
                                 {this.state.error_message}
                             </DangerAlert>
@@ -269,8 +269,8 @@ export default class LabyrinthOracle extends React.Component<
                 ) : null}
 
                 {this.state.success_message !== null ? (
-                    <div className="mt-2 lg:grid lg:grid-cols-3 lg:gap-2 lg:ml-[120px]">
-                        <div className="lg:cols-start-1 lg:col-span-2">
+                    <div className="mt-2">
+                        <div>
                             <SuccessAlert>
                                 {this.state.success_message}
                             </SuccessAlert>

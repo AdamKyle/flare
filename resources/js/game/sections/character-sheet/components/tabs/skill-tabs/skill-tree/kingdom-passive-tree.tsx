@@ -26,9 +26,6 @@ export default class KingdomPassiveTree extends React.Component<any, any> {
                                 show_passive_modal={this.showTrainingModal.bind(
                                     this,
                                 )}
-                                is_automation_running={
-                                    this.props.is_automation_running
-                                }
                             />
                         }
                     >
@@ -61,9 +58,6 @@ export default class KingdomPassiveTree extends React.Component<any, any> {
                             show_passive_modal={this.showTrainingModal.bind(
                                 this,
                             )}
-                            is_automation_running={
-                                this.props.is_automation_running
-                            }
                         />
                     }
                 >
@@ -81,6 +75,9 @@ export default class KingdomPassiveTree extends React.Component<any, any> {
                         update_passives={this.props.update_passives}
                         character_id={this.props.character_id}
                         is_dead={this.props.is_dead}
+                        is_automation_running={this.props.is_automation_running}
+                        active_automation={this.props.active_automation}
+                        skill_in_training={this.props.skill_in_training}
                     />
                 ) : null}
             </div>

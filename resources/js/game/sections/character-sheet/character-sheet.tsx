@@ -435,6 +435,16 @@ export default class CharacterSheet extends React.Component<
                                 is_automation_running={
                                     this.props.character.is_automation_running
                                 }
+                                is_faction_loyalty_automation_running={
+                                    this.props.character
+                                        .is_faction_loyalty_automation_running
+                                }
+                                is_delve_running={
+                                    this.props.character.is_delve_running
+                                }
+                                active_automation={
+                                    this.props.character.active_automation
+                                }
                                 finished_loading={this.props.finished_loading}
                             />
                         </BasicCard>

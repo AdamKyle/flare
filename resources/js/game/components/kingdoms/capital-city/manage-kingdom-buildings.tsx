@@ -104,12 +104,14 @@ export default class ManageKingdomBuildings extends React.Component<any, any> {
                         user_id={this.props.user_id}
                         kingdom={this.props.kingdom}
                         repair={false}
+                        is_automation_locked={this.props.is_automation_locked}
                     />
                 ) : this.state.show_repair_building_list ? (
                     <BuildingsToUpgradeSection
                         user_id={this.props.user_id}
                         kingdom={this.props.kingdom}
                         repair={true}
+                        is_automation_locked={this.props.is_automation_locked}
                     />
                 ) : (
                     <>
@@ -120,6 +122,9 @@ export default class ManageKingdomBuildings extends React.Component<any, any> {
                             user_id={this.props.user_id}
                             kingdom_id={this.props.kingdom.id}
                             character_id={this.props.kingdom.character_id}
+                            is_automation_locked={
+                                this.props.is_automation_locked
+                            }
                         />
                     </>
                 )}

@@ -31,10 +31,6 @@ export default class BuildingsTable extends React.Component<
     }
 
     viewBuilding(building: BuildingDetails) {
-        if (this.props.is_automation_locked) {
-            return;
-        }
-
         this.props.view_building(building);
     }
 

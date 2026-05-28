@@ -54,6 +54,7 @@ export default class OpenKingdomCardForBuildingManagement extends React.Componen
                             : "Add All to Queue"
                     }
                     additional_css="w-full mb-4"
+                    disabled={this.props.is_automation_locked}
                 />
                 {this.props.kingdom.buildings.map((building: Building) => (
                     <BuildingDetails
@@ -61,6 +62,7 @@ export default class OpenKingdomCardForBuildingManagement extends React.Componen
                         kingdom={this.props.kingdom}
                         toggle_building_queue={this.props.toggle_building_queue}
                         has_building_in_queue={this.props.has_building_in_queue}
+                        is_automation_locked={this.props.is_automation_locked}
                     />
                 ))}
             </div>

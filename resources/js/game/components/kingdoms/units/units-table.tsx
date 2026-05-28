@@ -26,10 +26,6 @@ export default class UnitsTable extends React.Component<
     }
 
     viewUnit(unit: UnitDetails) {
-        if (this.props.is_automation_locked) {
-            return;
-        }
-
         this.props.view_unit(unit);
     }
 

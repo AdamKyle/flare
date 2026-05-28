@@ -12,6 +12,7 @@ interface BuildingDetailsProps {
     kingdom: Kingdom;
     toggle_building_queue: (kingdomId: number, buildingId: number) => void;
     has_building_in_queue: (kingdom: Kingdom, buildingId: Building) => boolean;
+    is_automation_locked?: boolean;
 }
 
 interface BuildingDetailsState {
@@ -210,6 +211,7 @@ export default class BuildingDetails extends React.Component<
                                     this.props.building.id,
                                 );
                             }}
+                            disabled={this.props.is_automation_locked}
                             additional_css={"my-2"}
                         />
                     ) : (
@@ -221,7 +223,10 @@ export default class BuildingDetails extends React.Component<
                                     this.props.building.id,
                                 );
                             }}
-                            disabled={this.isAddToQueueDisabled()}
+                            disabled={
+                                this.props.is_automation_locked ||
+                                this.isAddToQueueDisabled()
+                            }
                             additional_css={"my-2"}
                         />
                     )}

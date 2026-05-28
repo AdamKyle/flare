@@ -56,7 +56,7 @@ class SkillsControllerTest extends TestCase
         $this->assertNotEmpty($jsonData['crafting_skills']);
     }
 
-    public function testExplorationBlocksSkillList(): void
+    public function testExplorationAllowsSkillList(): void
     {
         $character = $this->character->getCharacter();
         CharacterAutomation::factory()->create([
@@ -67,10 +67,10 @@ class SkillsControllerTest extends TestCase
 
         $response = $this->actingAs($character->user)->call('GET', '/api/character/skills/' . $character->id);
 
-        $response->assertStatus(422);
+        $response->assertStatus(200);
     }
 
-    public function testDelveBlocksSkillList(): void
+    public function testDelveAllowsSkillList(): void
     {
         $character = $this->character->getCharacter();
         CharacterAutomation::factory()->create([
@@ -81,10 +81,10 @@ class SkillsControllerTest extends TestCase
 
         $response = $this->actingAs($character->user)->call('GET', '/api/character/skills/' . $character->id);
 
-        $response->assertStatus(422);
+        $response->assertStatus(200);
     }
 
-    public function testFactionLoyaltyBlocksSkillList(): void
+    public function testFactionLoyaltyAllowsSkillList(): void
     {
         $character = $this->character->getCharacter();
         CharacterAutomation::factory()->create([
@@ -95,7 +95,33 @@ class SkillsControllerTest extends TestCase
 
         $response = $this->actingAs($character->user)->call('GET', '/api/character/skills/' . $character->id);
 
-        $response->assertStatus(422);
+        $response->assertStatus(200);
+    }
+
+    public function testExplorationAllowsSkillInformation(): void
+    {
+        $trainingSkill = $this->createGameSkill([
+            'name' => 'training skill',
+            'type' => SkillTypeValue::TRAINING
+        ]);
+
+        $character = $this->character->assignSkill($trainingSkill)->getCharacter();
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::EXPLORING,
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $skill = $character->skills()->where('game_skill_id', $trainingSkill->id)->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/skill/' . $character->id . '/' . $skill->id);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $response->assertStatus(200);
+        $this->assertEquals($skill->id, $jsonData['id']);
     }
 
     public function testFailToGetSkillInformation()
@@ -168,6 +194,35 @@ class SkillsControllerTest extends TestCase
         $this->assertEquals(0.10, $skill->xp_towards);
     }
 
+    public function testExplorationBlocksSkillTraining(): void
+    {
+        $trainingSkill = $this->createGameSkill([
+            'name' => 'training skill',
+            'type' => SkillTypeValue::TRAINING
+        ]);
+
+        $character = $this->character->assignSkill($trainingSkill)->getCharacter();
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::EXPLORING,
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $skill = $character->skills()->where('game_skill_id', $trainingSkill->id)->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/skill/train/' . $character->id, [
+                'skill_id' => $skill->id,
+                'xp_percentage' => 0.10,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $response->assertStatus(422);
+        $this->assertEquals('You cannot do that while Exploration automation is running. Cancel it first.', $jsonData['message']);
+    }
+
     public function testFailToCancelSkillTraining()
     {
 
@@ -221,5 +276,36 @@ class SkillsControllerTest extends TestCase
 
         $this->assertFalse($skill->currently_training);
         $this->assertEquals(0, $skill->xp_towards);
+    }
+
+    public function testExplorationBlocksCancelSkillTraining(): void
+    {
+        $trainingSkill = $this->createGameSkill([
+            'name' => 'training skill',
+            'type' => SkillTypeValue::TRAINING
+        ]);
+
+        $character = $this->character->assignSkill($trainingSkill)->getCharacter();
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::EXPLORING,
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $skill = $character->skills()->where('game_skill_id', $trainingSkill->id)->first();
+
+        $skill->update([
+            'currently_training' => true,
+            'xp_percentage' => 0.10,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/skill/cancel-train/' . $character->id . '/' . $skill->id);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $response->assertStatus(422);
+        $this->assertEquals('You cannot do that while Exploration automation is running. Cancel it first.', $jsonData['message']);
     }
 }

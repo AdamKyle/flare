@@ -8,4 +8,5 @@ export default interface OpenKingdomCardForBuildingManagementProps {
     toggle_queue_all_buildings: (kingdomId: number) => void;
     has_building_in_queue: (kingdom: Kingdom, building: Building) => boolean;
     toggle_building_queue: (kingdomId: number, buildingId: number) => void;
+    is_automation_locked?: boolean;
 }

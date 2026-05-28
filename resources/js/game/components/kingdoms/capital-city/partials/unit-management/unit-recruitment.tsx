@@ -418,7 +418,10 @@ export default class UnitRecruitment extends React.Component<any, any> {
                     send_orders={this.sendOrders.bind(this)}
                     reset={this.reset.bind(this)}
                     handle_search_change={this.handleSearchChange.bind(this)}
-                    actions_disabled={this.state.processing_request}
+                    actions_disabled={
+                        this.props.is_automation_locked ||
+                        this.state.processing_request
+                    }
                     unit_queue={this.state.unit_queue}
                 />
 
@@ -445,7 +448,10 @@ export default class UnitRecruitment extends React.Component<any, any> {
                             )}
                             className="w-full mt-2 px-4 py-2 border rounded text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             aria-label="Global bulk recruitment for all kingdoms"
-                            disabled={this.state.processing_request}
+                            disabled={
+                                this.props.is_automation_locked ||
+                                this.state.processing_request
+                            }
                         />
                     </div>
                 ) : null}
@@ -483,6 +489,9 @@ export default class UnitRecruitment extends React.Component<any, any> {
                             get_kingdom_queue_summary={this.getKingdomQueueSummary.bind(
                                 this,
                             )}
+                            is_automation_locked={
+                                this.props.is_automation_locked
+                            }
                         />
                     ))}
                 </div>

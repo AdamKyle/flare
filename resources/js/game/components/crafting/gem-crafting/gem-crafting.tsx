@@ -176,8 +176,8 @@ export default class GemCrafting extends React.Component<any, any> {
     render() {
         return (
             <Fragment>
-                <div className="mt-2 lg:grid lg:grid-cols-3 lg:gap-2 lg:ml-[120px]">
-                    <div className="lg:cols-start-1 lg:col-span-2">
+                <div className="mt-2">
+                    <div>
                         {this.state.loading ? (
                             <LoadingProgressBar />
                         ) : (
@@ -247,8 +247,8 @@ export default class GemCrafting extends React.Component<any, any> {
                     </div>
                 </div>
                 {this.state.errorMessage !== null ? (
-                    <div className="mt-2 lg:grid lg:grid-cols-3 lg:gap-2 lg:ml-[120px]">
-                        <div className="lg:cols-start-1 lg:col-span-2">
+                    <div className="mt-2">
+                        <div>
                             <DangerAlert>{this.state.errorMessage}</DangerAlert>
                         </div>
                     </div>

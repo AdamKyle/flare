@@ -5,15 +5,21 @@ namespace Tests\Unit\Flare\Transformers;
 use App\Flare\Models\Character;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\AutomationType;
+use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Values\MapNameValue;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterAutomation;
+use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateItem;
 
 class CharacterSheetBaseInfoTransformerTest extends TestCase
 {
     use CreateCharacterAutomation;
+    use CreateGameMap;
+    use CreateItem;
     use RefreshDatabase;
 
     private Character $character;
@@ -161,5 +167,63 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
 
         $this->assertNull($data['active_automation']);
         $this->assertEquals(0, $data['automation_completed_at']);
+    }
+
+    public function testTransformAllowsQueenOfHeartsInHellWithQuestItem(): void
+    {
+        $hell = $this->createGameMap([
+            'name' => MapNameValue::HELL,
+            'path' => 'hell.png',
+            'default' => false,
+        ]);
+        $queenQuestItem = $this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::QUEEN_OF_HEARTS,
+        ]);
+        $this->character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation(gameMap: $hell)
+            ->inventoryManagement()
+            ->giveItem($queenQuestItem)
+            ->getCharacter();
+
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character->refresh());
+
+        $this->assertTrue($data['can_access_queen']);
+    }
+
+    public function testTransformDoesNotAllowQueenOfHeartsOutsideHellWithQuestItem(): void
+    {
+        $queenQuestItem = $this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::QUEEN_OF_HEARTS,
+        ]);
+        $this->character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($queenQuestItem)
+            ->getCharacter();
+
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character->refresh());
+
+        $this->assertFalse($data['can_access_queen']);
+    }
+
+    public function testTransformDoesNotAllowQueenOfHeartsInHellWithoutQuestItem(): void
+    {
+        $hell = $this->createGameMap([
+            'name' => MapNameValue::HELL,
+            'path' => 'hell.png',
+            'default' => false,
+        ]);
+        $this->character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation(gameMap: $hell)
+            ->getCharacter();
+
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character->refresh());
+
+        $this->assertFalse($data['can_access_queen']);
     }
 }

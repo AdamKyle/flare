@@ -1,5 +1,5 @@
 import React from "react";
-import ComponentLoading from "../../../components/ui/loading/component-loading";
+import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import { AxiosError, AxiosResponse } from "axios";
 import Ajax from "../../../lib/ajax/ajax";
 import ServerFight from "./fight-section/server-fight";
@@ -171,7 +171,9 @@ export default class CelestialFight extends React.Component<any, any> {
 
     render() {
         return this.state.loading ? (
-            <ComponentLoading />
+            <div className="mx-auto w-full md:w-2/3">
+                <LoadingProgressBar />
+            </div>
         ) : this.state.error_message === null ? (
             <ServerFight
                 monster_health={this.state.monster_health}

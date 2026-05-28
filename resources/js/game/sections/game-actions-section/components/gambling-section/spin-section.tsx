@@ -1,5 +1,4 @@
 import React from "react";
-import clsx from "clsx";
 import SuccessButton from "../../../../components/ui/buttons/success-button";
 import SpinSectionProps from "./types/spin-section-props";
 import { renderIcons } from "./helpers/render-icons";
@@ -25,11 +24,7 @@ export default class SpinSection extends React.Component<SpinSectionProps, {}> {
 
     render() {
         return (
-            <div
-                className={clsx("max-w-[450px] m-auto lg:mr-auto", {
-                    "ml-[150px]": !this.props.is_small,
-                })}
-            >
+            <div className="w-full mx-auto">
                 <div className="max-h-[150px] overflow-hidden mt-4">
                     <div className="grid grid-cols-3">
                         <div>

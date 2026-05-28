@@ -29,13 +29,8 @@ export const BuildUnitsColumns = (
                 <span className="m-auto">
                     <button
                         onClick={() => {
-                            if (actionsDisabled) {
-                                return;
-                            }
-
                             onClick(row);
                         }}
-                        disabled={actionsDisabled}
                         className={clsx({
                             "text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-500":
                                 !cannotBeRecruited(row, buildings),

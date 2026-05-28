@@ -19,7 +19,6 @@ export default class Node extends React.Component<any, any> {
                     onClick={() =>
                         this.props.show_passive_modal(this.props.passive)
                     }
-                    disabled={this.props.is_automation_running}
                 >
                     <h4
                         className={clsx({

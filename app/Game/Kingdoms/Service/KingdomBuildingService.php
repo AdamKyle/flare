@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Models\BuildingInQueue;
+use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
@@ -11,6 +12,7 @@ use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\Kingdoms\Jobs\RebuildBuilding;
 use App\Game\Kingdoms\Jobs\UpgradeBuilding;
 use App\Game\Kingdoms\Values\BuildingQueueType;
+use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\KingdomResources;
 use App\Game\Skills\Values\SkillTypeValue;
 use Carbon\Carbon;
@@ -63,10 +65,33 @@ class KingdomBuildingService
 
     public function hasActiveBuildingUpgrade(KingdomBuilding $building): bool
     {
-        return BuildingInQueue::where('kingdom_id', $building->kingdom_id)
+        if (BuildingInQueue::where('kingdom_id', $building->kingdom_id)
             ->where('building_id', $building->id)
-            ->where('type', BuildingQueueType::UPGRADE)
-            ->exists();
+            ->exists()) {
+            return true;
+        }
+
+        return CapitalCityBuildingQueue::query()
+            ->where('kingdom_id', $building->kingdom_id)
+            ->whereNotIn('status', [
+                CapitalCityQueueStatus::REJECTED,
+                CapitalCityQueueStatus::FINISHED,
+                CapitalCityQueueStatus::CANCELLED,
+                CapitalCityQueueStatus::CANCELLATION_REJECTED,
+            ])
+            ->get()
+            ->contains(function (CapitalCityBuildingQueue $queue) use ($building) {
+                return collect($queue->building_request_data)
+                    ->reject(function (array $request) {
+                        return in_array($request['secondary_status'] ?? null, [
+                            CapitalCityQueueStatus::REJECTED,
+                            CapitalCityQueueStatus::FINISHED,
+                            CapitalCityQueueStatus::CANCELLED,
+                            CapitalCityQueueStatus::CANCELLATION_REJECTED,
+                        ], true);
+                    })
+                    ->contains(fn (array $request) => ($request['name'] ?? $request['building_name'] ?? null) === $building->name);
+            });
     }
 
     public function cannotUpgradePastMaxLevel(KingdomBuilding $building, int $toLevel): bool

@@ -45,6 +45,9 @@ export default class UnitManagement extends React.Component<UnitManagementProps>
                         <UnitRecruitment
                             user_id={this.props.user_id}
                             kingdom={this.props.kingdom}
+                            is_automation_locked={
+                                this.props.is_automation_locked
+                            }
                             manage_unit_section={
                                 this.props.manage_show_unit_recruitment
                             }
@@ -55,6 +58,9 @@ export default class UnitManagement extends React.Component<UnitManagementProps>
                             user_id={this.props.user_id}
                             character_id={this.props.kingdom.character_id}
                             kingdom_id={this.props.kingdom.id}
+                            is_automation_locked={
+                                this.props.is_automation_locked
+                            }
                         />
                     </TabPanel>
                 </Tabs>

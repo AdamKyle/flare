@@ -242,8 +242,8 @@ export default class WorkBench extends React.Component<any, any> {
     render() {
         if (this.state.loading) {
             return (
-                <div className="mt-2 grid md:grid-cols-3 gap-2 md:ml-[120px]">
-                    <div className="col-start-1 col-span-2">
+                <div className="mt-2">
+                    <div>
                         <LoadingProgressBar />
                     </div>
                 </div>
@@ -252,8 +252,8 @@ export default class WorkBench extends React.Component<any, any> {
 
         return (
             <Fragment>
-                <div className="mt-2 grid md:grid-cols-3 gap-2 md:ml-[120px]">
-                    <div className="col-start-1 col-span-2">
+                <div className="mt-2">
+                    <div>
                         {this.state.inventory_items.length > 0 ? (
                             <Select
                                 onChange={this.setItem.bind(this)}
@@ -277,7 +277,7 @@ export default class WorkBench extends React.Component<any, any> {
                             </p>
                         )}
                     </div>
-                    <div className="col-start-1 col-span-2">
+                    <div>
                         {this.state.selected_item !== null &&
                         this.state.alchemy_items.length > 0 ? (
                             <Fragment>
@@ -325,7 +325,7 @@ export default class WorkBench extends React.Component<any, any> {
                     </div>
                 </div>
 
-                <div className="m-auto w-1/2 md:relative left-[-20px]">
+                <div className="m-auto w-full">
                     {this.state.applying_oil ? <LoadingProgressBar /> : null}
 
                     {this.state.error_message !== null ? (
@@ -335,7 +335,7 @@ export default class WorkBench extends React.Component<any, any> {
                     ) : null}
                 </div>
 
-                <div className={"text-center md:ml-[-100px] mt-3 mb-3"}>
+                <div className={"text-center mt-3 mb-3"}>
                     <PrimaryButton
                         button_label={"Apply Oil"}
                         on_click={this.applyHolyOil.bind(this)}

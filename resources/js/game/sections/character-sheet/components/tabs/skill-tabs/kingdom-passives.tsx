@@ -113,6 +113,22 @@ export default class KingdomPassives extends React.Component<any, any> {
         return 0;
     }
 
+    automationName(): string {
+        if (this.props.active_automation !== null) {
+            return this.props.active_automation.name;
+        }
+
+        if (this.props.is_faction_loyalty_automation_running) {
+            return "Faction Loyalty";
+        }
+
+        if (this.props.is_delve_running) {
+            return "Delve";
+        }
+
+        return "Exploration";
+    }
+
     render() {
         return (
             <Fragment>
@@ -144,8 +160,9 @@ export default class KingdomPassives extends React.Component<any, any> {
                         {this.props.is_automation_running ? (
                             <div className="mb-4">
                                 <WarningAlert>
-                                    Automation is running. You cannot manage
-                                    your passive skills.
+                                    {this.automationName()} automation is
+                                    running. Passive skill details are read-only
+                                    until it is stopped.
                                 </WarningAlert>
                             </div>
                         ) : null}
@@ -173,6 +190,8 @@ export default class KingdomPassives extends React.Component<any, any> {
                             is_automation_running={
                                 this.props.is_automation_running
                             }
+                            active_automation={this.props.active_automation}
+                            skill_in_training={this.state.skill_in_training}
                         />
                     </div>
                 )}

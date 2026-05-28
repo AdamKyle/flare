@@ -207,8 +207,8 @@ export default class SeerCamp extends React.Component<
     render() {
         return (
             <Fragment>
-                <div className="mt-2 lg:grid lg:grid-cols-3 lg:gap-2 lg:ml-[120px]">
-                    <div className="lg:cols-start-1 lg:col-span-2">
+                <div className="mt-2">
+                    <div>
                         {this.state.is_loading ? (
                             <LoadingProgressBar />
                         ) : (

@@ -24,12 +24,6 @@ class SkillsController extends Controller
      */
     public function fetchSkills(Character $character): JsonResponse
     {
-        $restriction = $this->automationRestrictionJsonResponse($character);
-
-        if (! is_null($restriction)) {
-            return $restriction;
-        }
-
         $trainableSkillIds = GameSkill::where('can_train', true)->pluck('id')->toArray();
         $craftingSkills = GameSkill::where('can_train', false)->pluck('id')->toArray();
 
@@ -46,12 +40,6 @@ class SkillsController extends Controller
      */
     public function skillInformation(Character $character, Skill $skill): JsonResponse
     {
-        $restriction = $this->automationRestrictionJsonResponse($character);
-
-        if (! is_null($restriction)) {
-            return $restriction;
-        }
-
         if ($character->id !== $skill->character_id) {
             return response()->json([
                 'message' => 'No. Not allowed to do that.',

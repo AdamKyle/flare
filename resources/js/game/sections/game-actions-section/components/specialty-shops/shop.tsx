@@ -215,8 +215,8 @@ export default class Shop extends React.Component<any, any> {
 
     render() {
         return (
-            <div className="mt-2 grid md:grid-cols-3 gap-2 md:ml-[120px]">
-                <div className="cols-start-1 col-span-2">
+            <div className="mx-auto mt-2 w-full md:w-2/3">
+                <div>
                     {this.state.fetching ? (
                         <LoadingProgressBar />
                     ) : (
@@ -260,11 +260,7 @@ export default class Shop extends React.Component<any, any> {
                                     <LoadingProgressBar />
                                 ) : null}
 
-                                <div
-                                    className={
-                                        "text-center md:ml-[-100px] my-3"
-                                    }
-                                >
+                                <div className={"text-center my-3"}>
                                     <PrimaryButton
                                         button_label={"Purchase Item"}
                                         on_click={this.purchase.bind(this)}

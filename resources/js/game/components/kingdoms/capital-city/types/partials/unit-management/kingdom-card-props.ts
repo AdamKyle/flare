@@ -21,4 +21,5 @@ export default interface KingdomCardProps {
         amount: number | string,
         returnArray: boolean,
     ) => void;
+    is_automation_locked?: boolean;
 }

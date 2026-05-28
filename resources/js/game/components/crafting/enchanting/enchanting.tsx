@@ -393,10 +393,10 @@ export default class Enchanting extends React.Component<
     render() {
         return (
             <Fragment>
-                <div className="mt-2 grid lg:grid-cols-3 gap-2 lg:ml-[120px]">
+                <div className="mt-2">
                     {this.state.show_enchanting_for_event &&
                     this.state.event_items.length > 0 ? (
-                        <div className="col-start-1 col-span-2">
+                        <div>
                             <Select
                                 onChange={this.setTypeOfEnchanting.bind(this)}
                                 options={this.renderEnchantmentTypes()}
@@ -414,7 +414,7 @@ export default class Enchanting extends React.Component<
                             />
                         </div>
                     ) : null}
-                    <div className="col-start-1 col-span-2">
+                    <div>
                         <Select
                             onChange={this.setSelectedItem.bind(this)}
                             options={this.renderItemsToEnchantSelection()}
@@ -436,9 +436,9 @@ export default class Enchanting extends React.Component<
                             }
                         />
                     </div>
-                    <div className="col-start-1 col-span-2">
-                        <div className="lg:hidden grid grid-cols-3">
-                            <div className="col-start-1 col-span-2">
+                    <div>
+                        <div className="lg:hidden">
+                            <div>
                                 <Select
                                     onChange={this.setPrefix.bind(this)}
                                     options={this.renderEnchantmentOptions(
@@ -464,7 +464,7 @@ export default class Enchanting extends React.Component<
                                     }
                                 />
                             </div>
-                            <div className="cols-start-3 cols-end-3 mt-2 ml-4">
+                            <div className="mt-2">
                                 <DangerLinkButton
                                     button_label={"Clear"}
                                     on_click={this.resetPrefixes.bind(this)}
@@ -497,15 +497,15 @@ export default class Enchanting extends React.Component<
                             />
                         </div>
                     </div>
-                    <div className="hidden lg:block cols-start-3 cols-end-3 mt-2">
+                    <div className="hidden lg:block mt-2">
                         <DangerLinkButton
                             button_label={"Clear"}
                             on_click={this.resetPrefixes.bind(this)}
                         />
                     </div>
-                    <div className="col-start-1 col-span-2">
-                        <div className="lg:hidden grid grid-cols-3">
-                            <div className="col-start-1 col-span-2">
+                    <div>
+                        <div className="lg:hidden">
+                            <div>
                                 <Select
                                     onChange={this.setSuffix.bind(this)}
                                     options={this.renderEnchantmentOptions(
@@ -531,7 +531,7 @@ export default class Enchanting extends React.Component<
                                     }
                                 />
                             </div>
-                            <div className="cols-start-3 cols-end-3 mt-2 ml-4">
+                            <div className="mt-2">
                                 <DangerLinkButton
                                     button_label={"Clear"}
                                     on_click={this.resetSuffixes.bind(this)}
@@ -564,14 +564,14 @@ export default class Enchanting extends React.Component<
                             />
                         </div>
                     </div>
-                    <div className="hidden lg:block cols-start-3 cols-end-3 mt-2">
+                    <div className="hidden lg:block mt-2">
                         <DangerLinkButton
                             button_label={"Clear"}
                             on_click={this.resetSuffixes.bind(this)}
                         />
                     </div>
                 </div>
-                <div className="m-auto lg:w-1/2 relative lg:left-[-60px]">
+                <div className="m-auto lg:w-1/2">
                     <InfoAlert
                         additional_css={clsx("my-4", {
                             hidden: this.state.hide_enchanting_help,
@@ -608,11 +608,11 @@ export default class Enchanting extends React.Component<
                         <p>Click Help below for more info.</p>
                     </InfoAlert>
                 </div>
-                <div className="m-auto lg:w-1/2 relative lg:left-[-60px]">
+                <div className="m-auto lg:w-1/2">
                     {this.state.loading ? <LoadingProgressBar /> : null}
 
                     {this.state.enchantments.length > 0 ? (
-                        <div className="ml-[25px] lg:ml-0 mb-2 lg:mb-0">
+                        <div className="mb-2 lg:mb-0">
                             <CraftingXp skill_xp={this.state.skill_xp} />
                             <InventoryCount
                                 inventory_count={this.state.inventory_count}
@@ -622,11 +622,7 @@ export default class Enchanting extends React.Component<
                 </div>
                 {this.state.event_items.length <= 0 &&
                 this.state.show_enchanting_for_event ? (
-                    <InfoAlert
-                        additional_css={
-                            "my-4 m-auto lg:w-1/2 relative lg:left-[-60px]"
-                        }
-                    >
+                    <InfoAlert additional_css={"my-4 m-auto lg:w-1/2"}>
                         You have no event crafted items. You can craft your own
                         items and either enchant them for your self or enchant
                         for event and participate in the event for a Legendary

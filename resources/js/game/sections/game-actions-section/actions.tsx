@@ -174,6 +174,10 @@ export default class Actions extends React.Component<
         this.setState(
             {
                 crafting_type: null,
+                show_exploration: false,
+                show_hell_forged_section: false,
+                show_purgatory_chains_section: false,
+                show_twisted_earth_section: false,
             },
             () => {
                 this.actionsManager.setCraftingType(type);
@@ -187,12 +191,17 @@ export default class Actions extends React.Component<
         this.setState({
             show_exploration: showExploration,
             show_celestial_fight: false,
+            crafting_type: null,
+            show_hell_forged_section: false,
+            show_purgatory_chains_section: false,
+            show_twisted_earth_section: false,
         });
     }
 
     manageHellForgedShop() {
         this.setState({
             show_celestial_fight: false,
+            crafting_type: null,
             show_twisted_earth_section: false,
             show_purgatory_chains_section: false,
             show_hell_forged_section: !this.state.show_hell_forged_section,
@@ -202,6 +211,7 @@ export default class Actions extends React.Component<
     managedPurgatoryChainsShop() {
         this.setState({
             show_celestial_fight: false,
+            crafting_type: null,
             show_twisted_earth_section: false,
             show_hell_forged_section: false,
             show_purgatory_chains_section:
@@ -212,6 +222,7 @@ export default class Actions extends React.Component<
     managedTwistedEarthShop() {
         this.setState({
             show_celestial_fight: false,
+            crafting_type: null,
             show_purgatory_chains_section: false,
             show_hell_forged_section: false,
             show_twisted_earth_section: !this.state.show_twisted_earth_section,
@@ -235,6 +246,11 @@ export default class Actions extends React.Component<
 
         this.setState({
             show_gambling_section: showGamblingSection,
+            show_exploration: false,
+            show_celestial_fight: false,
+            show_hell_forged_section: false,
+            show_purgatory_chains_section: false,
+            show_twisted_earth_section: false,
         });
     }
 
@@ -401,7 +417,9 @@ export default class Actions extends React.Component<
                 character={this.props.character}
                 character_statuses={this.props.character_status}
                 is_small={false}
-            />
+            >
+                {this.renderCraftingSection()}
+            </MonsterActions>
         );
     }
 
@@ -519,10 +537,11 @@ export default class Actions extends React.Component<
             return (
                 <CraftingSection
                     remove_crafting={this.removeCraftingType.bind(this)}
-                    character={this.props.character}
-                    character_status={this.props.character_status}
+                    type={this.state.crafting_type}
+                    character_id={this.props.character.id}
+                    user_id={this.props.character.user_id}
                     crafting_time_out={this.state.crafting_time_out}
-                    crafting_type={this.state.crafting_type}
+                    cannot_craft={this.actionsManager.cannotCraft()}
                     update_crafting_time_out={this.actionsManager.updateCraftingTimer.bind(
                         this.actionsManager,
                     )}
@@ -535,21 +554,27 @@ export default class Actions extends React.Component<
     }
 
     renderActionContent() {
+        const celestialFight = this.renderCelestialFight();
+        const fightContent = this.state.show_exploration
+            ? this.renderExploration()
+            : (celestialFight ?? (
+                  <div className="lg:pt-4">{this.createMonster()}</div>
+              ));
+
         return (
             <div className="grid gap-4">
-                <div className="lg:pt-4">{this.createMonster()}</div>
-                {this.renderCelestialFight()}
-                {this.state.show_exploration ? this.renderExploration() : null}
+                {fightContent}
                 {this.state.show_gambling_section ? (
-                    <GamblingSection
-                        character={this.props.character}
-                        close_gambling_section={this.manageGamblingSection.bind(
-                            this,
-                        )}
-                        is_small={false}
-                    />
+                    <div className="mx-auto w-full md:w-2/3">
+                        <GamblingSection
+                            character={this.props.character}
+                            close_gambling_section={this.manageGamblingSection.bind(
+                                this,
+                            )}
+                            is_small={false}
+                        />
+                    </div>
                 ) : null}
-                {this.renderCraftingSection()}
                 {this.renderSpecialtyShop()}
             </div>
         );
@@ -557,7 +582,11 @@ export default class Actions extends React.Component<
 
     renderExploration() {
         if (this.isFactionLoyaltyAutomationRunning() || this.isDelveRunning()) {
-            return this.renderAutomationBlockedNotice();
+            return (
+                <div className="mx-auto w-full md:w-2/3">
+                    {this.renderAutomationBlockedNotice()}
+                </div>
+            );
         }
 
         return (
@@ -581,21 +610,14 @@ export default class Actions extends React.Component<
         return (
             <Shop
                 type={this.getTypeOfSpecialtyGear()}
-                manage_hell_forged_shop={this.manageHellForgedShop.bind(this)}
-                manage_purgatory_chains_shop={this.managedPurgatoryChainsShop.bind(
+                close_hell_forged={this.manageHellForgedShop.bind(this)}
+                close_purgatory_chains={this.managedPurgatoryChainsShop.bind(
                     this,
                 )}
-                manage_twisted_earth_shop={this.managedTwistedEarthShop.bind(
-                    this,
-                )}
-                show_hell_forged_section={this.state.show_hell_forged_section}
-                show_purgatory_chains_section={
-                    this.state.show_purgatory_chains_section
-                }
-                show_twisted_earth_section={
-                    this.state.show_twisted_earth_section
-                }
-                character={this.props.character}
+                close_twisted_earth={this.managedTwistedEarthShop.bind(this)}
+                character_id={this.props.character.id}
+                is_dead={this.props.character.is_dead}
+                cannot_craft={this.actionsManager.cannotCraft()}
             />
         );
     }

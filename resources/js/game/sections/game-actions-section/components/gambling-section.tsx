@@ -8,7 +8,6 @@ import LoadingProgressBar from "../../../components/ui/progress-bars/loading-pro
 import DangerButton from "../../../components/ui/buttons/danger-button";
 import GamblingSectionState from "./types/gambling-section-state";
 import GamblingSectionProps from "./types/gambling-section-props";
-import clsx from "clsx";
 import SpinSection from "./gambling-section/spin-section";
 import StationarySpinSection from "./gambling-section/stationary-spin-section";
 import SuccessMessage from "./gambling-section/success-message";
@@ -183,11 +182,7 @@ export default class GamblingSection extends React.Component<
         }
 
         return (
-            <div
-                className={clsx("max-w-[450px] m-auto lg:mr-auto", {
-                    "ml-[150px]": !this.props.is_small,
-                })}
-            >
+            <div className="w-full mx-auto">
                 <StationarySpinSection
                     roll={this.state.roll}
                     icons={this.state.icons}

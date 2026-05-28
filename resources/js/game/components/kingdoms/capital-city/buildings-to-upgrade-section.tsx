@@ -182,7 +182,10 @@ export default class BuildingsToUpgradeSection extends React.Component<
                                 this.buildingToUpgradeService.sendOrders()
                             }
                             button_label="Send Orders"
-                            disabled={this.state.processing_request}
+                            disabled={
+                                this.props.is_automation_locked ||
+                                this.state.processing_request
+                            }
                         />
                     )}
                 </div>
@@ -204,6 +207,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
                         )}
                         additional_css={"w-full"}
                         disabled={
+                            this.props.is_automation_locked ||
                             this.state.processing_request ||
                             this.state.filtered_building_data.length <= 0
                         }
@@ -288,6 +292,9 @@ export default class BuildingsToUpgradeSection extends React.Component<
                                     toggle_building_queue={this.buildingToUpgradeService.toggleBuildingQueue.bind(
                                         this.buildingToUpgradeService,
                                     )}
+                                    is_automation_locked={
+                                        this.props.is_automation_locked
+                                    }
                                 />
                             )}
                         </div>

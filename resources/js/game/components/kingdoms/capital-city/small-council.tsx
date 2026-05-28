@@ -30,6 +30,10 @@ export default class SmallCouncil extends React.Component<any, any> {
     }
 
     walkKingdoms() {
+        if (this.props.is_automation_locked) {
+            return;
+        }
+
         if (this.props.kingdom.auto_walked) {
             return;
         }
@@ -88,6 +92,10 @@ export default class SmallCouncil extends React.Component<any, any> {
     }
 
     manageGoldBars() {
+        if (this.props.is_automation_locked) {
+            return;
+        }
+
         if (this.showGoldBarsAlert()) {
             return;
         }
@@ -103,6 +111,7 @@ export default class SmallCouncil extends React.Component<any, any> {
                 <ManageKingdomBuildings
                     user_id={this.props.user_id}
                     kingdom={this.props.kingdom}
+                    is_automation_locked={this.props.is_automation_locked}
                     manage_building_section={this.manageShowBuildingManagement.bind(
                         this,
                     )}
@@ -115,6 +124,7 @@ export default class SmallCouncil extends React.Component<any, any> {
                 <UnitManagement
                     user_id={this.props.user_id}
                     kingdom={this.props.kingdom}
+                    is_automation_locked={this.props.is_automation_locked}
                     manage_show_unit_recruitment={this.manageShowUnitRecruitment.bind(
                         this,
                     )}
@@ -127,6 +137,7 @@ export default class SmallCouncil extends React.Component<any, any> {
                 <GoldBarManagement
                     character_id={this.props.kingdom.character_id}
                     kingdom={this.props.kingdom}
+                    is_automation_locked={this.props.is_automation_locked}
                     manage_gold_bar_management={this.manageGoldBars.bind(this)}
                 />
             );

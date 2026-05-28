@@ -84,15 +84,18 @@ export default class ServerFight extends React.Component<ServerFightProps, {}> {
                     </a>
                 </div>
                 <div
-                    className={clsx("mt-1 text-xs text-center ml-[-50px]", {
-                        hidden: this.attackButtonDisabled(),
-                    })}
+                    className={clsx(
+                        "mt-1 flex justify-center gap-3 text-xs text-center",
+                        {
+                            hidden: this.attackButtonDisabled(),
+                        },
+                    )}
                 >
-                    <span className={"w-10 mr-4 ml-4"}>Atk</span>
-                    <span className={"w-10 ml-6"}>Cast</span>
-                    <span className={"w-10 ml-4"}>Cast & Atk</span>
-                    <span className={"w-10 ml-2"}>Atk & Cast</span>
-                    <span className={"w-10 ml-2"}>Defend</span>
+                    <span className={"w-10"}>Atk</span>
+                    <span className={"w-10"}>Cast</span>
+                    <span className={"w-16"}>Cast & Atk</span>
+                    <span className={"w-16"}>Atk & Cast</span>
+                    <span className={"w-10"}>Defend</span>
                 </div>
                 {this.props.monster_max_health > 0 ? (
                     <div

@@ -162,7 +162,7 @@ export default class SmallKingdom extends React.Component<
 
         return (
             <Fragment>
-                <fieldset disabled={this.props.is_automation_locked}>
+                <div>
                     <BasicCard>
                         {this.state.show_small_council ? (
                             <BasicCard>
@@ -178,6 +178,9 @@ export default class SmallKingdom extends React.Component<
                                 <SmallCouncil
                                     kingdom={this.state.kingdom}
                                     user_id={this.props.user_id}
+                                    is_automation_locked={
+                                        this.props.is_automation_locked
+                                    }
                                 />
                             </BasicCard>
                         ) : !this.state.show_kingdom_details ? (
@@ -233,6 +236,9 @@ export default class SmallKingdom extends React.Component<
                                 <SmallCouncil
                                     kingdom={this.state.kingdom}
                                     user_id={this.props.user_id}
+                                    is_automation_locked={
+                                        this.props.is_automation_locked
+                                    }
                                 />
                             </BasicCard>
                         ) : (
@@ -246,9 +252,6 @@ export default class SmallKingdom extends React.Component<
                                             onClick={this.manageKingdomDetails.bind(
                                                 this,
                                             )}
-                                            disabled={
-                                                this.props.is_automation_locked
-                                            }
                                         >
                                             <i className="fas fa-minus-circle"></i>
                                         </button>
@@ -286,7 +289,6 @@ export default class SmallKingdom extends React.Component<
                         ) : (
                             <Fragment>
                                 <Select
-                                    isDisabled={this.props.is_automation_locked}
                                     onChange={this.showSelected.bind(this)}
                                     options={[
                                         {
@@ -325,7 +327,7 @@ export default class SmallKingdom extends React.Component<
                             </Fragment>
                         )}
                     </div>
-                </fieldset>
+                </div>
             </Fragment>
         );
     }

@@ -40,6 +40,12 @@ class PctService
             return false;
         }
 
+        if ($teleport && ! $character->can_move) {
+            event(new ServerMessageEvent($character->user, 'Sorry child, you are exhausted from yuor last move, wait for the timer'));
+
+            return true;
+        }
+
         $celestialFight = $this->findCelestialFight($character);
 
         $this->mapTileValue = $this->mapTileValue->setUp($character, $character->map->gameMap);

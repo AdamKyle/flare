@@ -93,7 +93,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'force_name_change' => $character->force_name_change,
             'is_alchemy_locked' => $this->isAlchemyLocked($character),
             'can_use_work_bench' => false,
-            'can_access_queen' => false,
+            'can_access_queen' => $this->canAccessQueenOfHearts($character),
             'can_access_hell_forged' => $character->map->gameMap->mapType()->isHell(),
             'can_access_purgatory_chains' => $character->map->gameMap->mapType()->isPurgatory(),
             'can_access_labyrinth_oracle' => $character->map->gameMap->mapType()->isLabyrinth(),
@@ -183,5 +183,12 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         return $character->inventory->slots->filter(function ($slot) use ($questItemForDelve) {
             return $slot->item_id === $questItemForDelve->id;
         })->isNotEmpty();
+    }
+
+    private function canAccessQueenOfHearts(Character $character): bool
+    {
+        return $character->inventory->slots->filter(function ($slot) {
+            return $slot->item->effect === ItemEffectsValue::QUEEN_OF_HEARTS;
+        })->isNotEmpty() && $character->map->gameMap->mapType()->isHell();
     }
 }

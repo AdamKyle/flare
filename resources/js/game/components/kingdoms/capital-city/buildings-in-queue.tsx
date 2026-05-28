@@ -232,6 +232,10 @@ export default class BuildingsInQueue extends React.Component<
         queue: KingddomBuildingQueue,
         status: QueueStatus,
     ): boolean {
+        if (this.props.is_automation_locked) {
+            return true;
+        }
+
         if (queue.total_time <= 60) {
             return true;
         }
@@ -240,6 +244,10 @@ export default class BuildingsInQueue extends React.Component<
     }
 
     disableCancelAllButton(queue: KingddomBuildingQueue): boolean {
+        if (this.props.is_automation_locked) {
+            return true;
+        }
+
         if (this.state.search_query.length > 0) {
             return true;
         }

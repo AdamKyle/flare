@@ -193,6 +193,10 @@ export default class UnitQueue extends React.Component<
         kingdom: KingdomWithUnitRequests,
         status: QueueStatus,
     ): boolean {
+        if (this.props.is_automation_locked) {
+            return true;
+        }
+
         if (kingdom.total_time <= 60) {
             return true;
         }
@@ -330,6 +334,7 @@ export default class UnitQueue extends React.Component<
                                         button_label={"Cancel All Requests"}
                                         additional_css="my-4 w-full"
                                         disabled={
+                                            this.props.is_automation_locked ||
                                             kingdom.total_time <= 60 ||
                                             kingdom.status !==
                                                 QueueStatus.TRAVELING

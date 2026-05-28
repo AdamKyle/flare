@@ -108,7 +108,26 @@ export default class TrainPassive extends React.Component<any, any> {
         return this.props.skill.started_at !== null;
     }
 
+    hasAnotherPassiveTraining() {
+        return (
+            this.props.skill_in_training !== null &&
+            this.props.skill_in_training.id !== this.props.skill.id
+        );
+    }
+
+    automationName(): string {
+        return this.props.active_automation?.name ?? "Automation";
+    }
+
     render() {
+        const disableTrainingAction =
+            this.isMaxed() ||
+            this.props.skill.is_locked ||
+            this.state.loading ||
+            this.props.is_dead ||
+            this.props.is_automation_running ||
+            this.hasAnotherPassiveTraining();
+
         return (
             <Dialogue
                 is_open={this.props.is_open}
@@ -116,11 +135,7 @@ export default class TrainPassive extends React.Component<any, any> {
                 title={this.props.skill.name}
                 primary_button_disabled={this.state.loading}
                 secondary_actions={{
-                    secondary_button_disabled:
-                        this.isMaxed() ||
-                        this.props.skill.is_locked ||
-                        this.state.loading ||
-                        this.state.is_dead,
+                    secondary_button_disabled: disableTrainingAction,
                     secondary_button_label: this.isTraining()
                         ? "Stop Training"
                         : "Train",
@@ -137,6 +152,21 @@ export default class TrainPassive extends React.Component<any, any> {
                     <p className="mb-4 text-red-700 dark:text-red-500">
                         No no child! You dead! You ain't training nothing, till
                         you head to the Game tab and click revive.
+                    </p>
+                ) : null}
+
+                {this.props.is_automation_running ? (
+                    <p className="mb-4 text-orange-700 dark:text-orange-400">
+                        {this.automationName()} automation is running. You can
+                        inspect this passive, but you cannot train or stop
+                        passives until it is stopped.
+                    </p>
+                ) : null}
+
+                {this.hasAnotherPassiveTraining() ? (
+                    <p className="mb-4 text-orange-700 dark:text-orange-400">
+                        {this.props.skill_in_training.name} is already training.
+                        Only one passive can train at a time.
                     </p>
                 ) : null}
 

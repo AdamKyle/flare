@@ -174,7 +174,6 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
                             <div className="text-right cursor-pointer text-red-500">
                                 <button
                                     onClick={this.manageSmallCouncil.bind(this)}
-                                    disabled={this.props.is_automation_locked}
                                 >
                                     <i className="fas fa-minus-circle"></i>
                                 </button>
@@ -182,6 +181,9 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
                             <SmallCouncil
                                 kingdom={this.state.kingdom}
                                 user_id={this.props.user_id}
+                                is_automation_locked={
+                                    this.props.is_automation_locked
+                                }
                             />
                         </BasicCard>
                     ) : this.state.show_resource_transfer_panel ? (
@@ -191,7 +193,6 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
                                     onClick={this.showResourceTransferPanel.bind(
                                         this,
                                     )}
-                                    disabled={this.props.is_automation_locked}
                                 >
                                     <i className="fas fa-minus-circle"></i>
                                 </button>
@@ -204,10 +205,7 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
                     ) : (
                         <BasicCard additionalClasses={"h-full"}>
                             <div className="text-right cursor-pointer text-red-500">
-                                <button
-                                    onClick={this.props.close_details}
-                                    disabled={this.props.is_automation_locked}
-                                >
+                                <button onClick={this.props.close_details}>
                                     <i className="fas fa-minus-circle"></i>
                                 </button>
                             </div>

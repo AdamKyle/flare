@@ -358,7 +358,6 @@ export default class KingdomDetails extends React.Component<
                             Specialty Actions{" "}
                             <button
                                 onClick={this.showSpecialtyHelpModal.bind(this)}
-                                disabled={this.props.is_automation_locked}
                             >
                                 <i className="fas fa-info-circle text-blue-500 dark:text-blue-400"></i>
                             </button>
@@ -413,7 +412,6 @@ export default class KingdomDetails extends React.Component<
                                     <SuccessOutlineButton
                                         button_label={"Small Council"}
                                         on_click={this.props.show_small_council}
-                                        disabled={this.isActionDisabled()}
                                     />
                                 )
                             ) : null}

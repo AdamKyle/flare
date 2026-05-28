@@ -595,8 +595,8 @@ export default class QueenOfHearts extends React.Component<any, any> {
     render() {
         return (
             <Fragment>
-                <div className="mt-2 grid md:grid-cols-3 gap-2 md:ml-[120px]">
-                    <div className="cols-start-1 col-span-2">
+                <div className="mt-2">
+                    <div>
                         {this.state.loading ? <LoadingProgressBar /> : null}
 
                         {this.state.error_message !== null ? (
