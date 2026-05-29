@@ -96,7 +96,7 @@ class Exploration implements ShouldQueue
         if ($this->shouldBail($automation)) {
             $this->endAutomation($automation, $characterCacheData);
 
-            Cache::delete('can-character-survive-' . $this->character->id);
+            Cache::delete('can-character-survive-'.$this->character->id);
 
             return;
         }
@@ -157,7 +157,7 @@ class Exploration implements ShouldQueue
 
         $enemies = $this->explorationCreatureCountCalculator->calculate($this->character);
 
-        $this->sendOutEventLogUpdate('"Chirst, child there are: ' . $enemies . ' of them ..."
+        $this->sendOutEventLogUpdate('"Chirst, child there are: '.$enemies.' of them ..."
         The Guide hisses at you from the shadows. You ignore his words and prepare for battle. One right after the other ...', true);
 
         $totalXpToReward = 0;
@@ -188,7 +188,7 @@ class Exploration implements ShouldQueue
 
         $this->sendOutEventLogUpdate('The last of the enemies fall. Covered in blood, exhausted, you look around for any signs of more of their friends. The area is silent. "Another day, another battle.
         We managed to survive." The Guide states as he walks from the shadows. The pair of you set off in search of the next adventure ...
-        (Exploration will begin again in ' . $timeDelay . ' minutes)', true);
+        (Exploration will begin again in '.$timeDelay.' minutes)', true);
 
         return true;
     }
@@ -282,7 +282,7 @@ class Exploration implements ShouldQueue
         return array_values(array_filter([
             'health.current_character_health',
             'health.current_monster_health',
-        ], fn(string $key): bool => ! array_key_exists(str_replace('health.', '', $key), $data['health'])));
+        ], fn (string $key): bool => ! array_key_exists(str_replace('health.', '', $key), $data['health'])));
     }
 
     private function logMalformedBattleData(CharacterAutomation $automation, string $source, array $data): void
@@ -347,7 +347,7 @@ class Exploration implements ShouldQueue
 
         $characterCacheData->deleteCharacterSheet($this->character);
 
-        Cache::delete('can-character-survive-' . $this->character->id);
+        Cache::delete('can-character-survive-'.$this->character->id);
 
         $this->sendOutEventLogUpdate('"Phew, child! I did not think we would survive all of your shenanigans.
             So many times I could have died! Do you ever think about anyone other than yourself? No? Didn\'t think so." The Guide storms off and you follow him in silence.', true);
@@ -374,7 +374,7 @@ class Exploration implements ShouldQueue
 
         $this->characterCacheData->deleteCharacterSheet($this->character);
 
-        Cache::delete('can-character-survive-' . $this->character->id);
+        Cache::delete('can-character-survive-'.$this->character->id);
 
         if (! is_null($message)) {
             $this->sendOutEventLogUpdate($message);

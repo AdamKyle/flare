@@ -353,7 +353,7 @@ class KingdomUpdateServiceTest extends TestCase
         $types = ['wood', 'stone', 'iron', 'clay'];
 
         foreach ($types as $type) {
-            $this->assertEquals(0, $kingdom->{'current_' . $type});
+            $this->assertEquals(0, $kingdom->{'current_'.$type});
         }
     }
 
@@ -394,7 +394,7 @@ class KingdomUpdateServiceTest extends TestCase
         $types = ['wood', 'stone', 'iron', 'clay'];
 
         foreach ($types as $type) {
-            $this->assertGreaterThan(0, $kingdom->{'current_' . $type});
+            $this->assertGreaterThan(0, $kingdom->{'current_'.$type});
         }
     }
 
@@ -427,7 +427,7 @@ class KingdomUpdateServiceTest extends TestCase
         $types = ['wood', 'stone', 'iron', 'clay'];
 
         foreach ($types as $type) {
-            $this->assertEquals(100, $kingdom->{'current_' . $type});
+            $this->assertEquals(100, $kingdom->{'current_'.$type});
         }
     }
 

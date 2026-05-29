@@ -102,14 +102,14 @@ class UnitService
         ];
 
         foreach ($costs as $type => $cost) {
-            if ($newResources['current_' . strtolower($type)] < $cost) {
+            if ($newResources['current_'.strtolower($type)] < $cost) {
                 return $kingdom->refresh();
             }
 
-            $newResources['current_' . strtolower($type)] -= $cost;
+            $newResources['current_'.strtolower($type)] -= $cost;
         }
 
-        $kingdom->update(array_map(fn($value) => max($value, 0), $newResources));
+        $kingdom->update(array_map(fn ($value) => max($value, 0), $newResources));
 
         return $kingdom->refresh();
     }
@@ -129,14 +129,14 @@ class UnitService
         ];
 
         foreach ($totalCosts as $type => $cost) {
-            if ($newResources['current_' . strtolower($type)] < $cost) {
+            if ($newResources['current_'.strtolower($type)] < $cost) {
                 return $kingdom->refresh();
             }
 
-            $newResources['current_' . strtolower($type)] -= $cost;
+            $newResources['current_'.strtolower($type)] -= $cost;
         }
 
-        $kingdom->update(array_map(fn($value) => max($value, 0), $newResources));
+        $kingdom->update(array_map(fn ($value) => max($value, 0), $newResources));
 
         return $kingdom->refresh();
     }
@@ -253,7 +253,7 @@ class UnitService
             ->get()
             ->sum(function (CapitalCityUnitQueue $queue) use ($gameUnit) {
                 return collect($queue->unit_request_data)
-                    ->reject(fn($request) => in_array($request['secondary_status'], [CapitalCityQueueStatus::FINISHED, CapitalCityQueueStatus::REJECTED, CapitalCityQueueStatus::CANCELLED]))
+                    ->reject(fn ($request) => in_array($request['secondary_status'], [CapitalCityQueueStatus::FINISHED, CapitalCityQueueStatus::REJECTED, CapitalCityQueueStatus::CANCELLED]))
                     ->where('name', $gameUnit->name)
                     ->sum('amount');
             });
