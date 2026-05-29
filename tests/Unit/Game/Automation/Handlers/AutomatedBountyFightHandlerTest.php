@@ -93,6 +93,14 @@ class AutomatedBountyFightHandlerTest extends TestCase
         parent::tearDown();
     }
 
+    public function testAutomatedBountyFightHandlerResolvesFromContainer(): void
+    {
+        $this->assertInstanceOf(
+            AutomatedBountyFightHandler::class,
+            resolve(AutomatedBountyFightHandler::class),
+        );
+    }
+
     public function testHandleReturnsInvalidTaskWhenTaskIsMissingRequiredFields(): void
     {
         Event::fake();
