@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\Faction;
 use App\Flare\Models\FactionLoyalty;
+use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Models\FactionLoyaltyNpc;
 use App\Flare\Models\FactionLoyaltyNpcTask;
 use App\Flare\Models\GameMap;
@@ -53,6 +54,12 @@ class FactionLoyaltyService
             ];
         })->toArray();
 
+        $warningNotice = $this->getLatestUnreadWarningNotice($character);
+
+        $factionLoyalty->factionLoyaltyNpcs->each(function (FactionLoyaltyNpc $factionLoyaltyNpc) use ($warningNotice) {
+            $factionLoyaltyNpc->setAttribute('faction_loyalty_warning_notice', $warningNotice);
+        });
+
         return $this->successResult([
             'npcs' => $npcNames,
             'faction_loyalty' => $factionLoyalty,
@@ -60,6 +67,68 @@ class FactionLoyaltyService
             'must_revive' => $character->is_dead,
             'attack_type' => $character->classType()->isCaster() ? 'Cast and Attack' : 'Attack',
         ]);
+    }
+
+    /**
+     * Get the latest unread faction loyalty automation warning notice.
+     */
+    public function getLatestUnreadWarningNotice(Character $character): ?array
+    {
+        $factionLoyaltyAutomations = FactionLoyaltyAutomation::where('character_id', $character->id)
+            ->with('log')
+            ->orderByDesc('id')
+            ->get();
+
+        foreach ($factionLoyaltyAutomations as $factionLoyaltyAutomation) {
+            $fightLogs = $factionLoyaltyAutomation->log?->fight_logs ?? [];
+
+            foreach (array_reverse($fightLogs) as $fightLog) {
+                $warningNotice = $fightLog['warning_notice'] ?? null;
+
+                if (is_array($warningNotice) && ($warningNotice['read'] ?? true) === false) {
+                    return $warningNotice;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Mark the latest unread faction loyalty automation warning notice as read.
+     */
+    public function markLatestWarningNoticeRead(Character $character): void
+    {
+        $factionLoyaltyAutomations = FactionLoyaltyAutomation::where('character_id', $character->id)
+            ->with('log')
+            ->orderByDesc('id')
+            ->get();
+
+        foreach ($factionLoyaltyAutomations as $factionLoyaltyAutomation) {
+            $factionLoyaltyAutomationLog = $factionLoyaltyAutomation->log;
+
+            if (is_null($factionLoyaltyAutomationLog)) {
+                continue;
+            }
+
+            $fightLogs = $factionLoyaltyAutomationLog->fight_logs ?? [];
+
+            foreach (array_reverse($fightLogs, true) as $index => $fightLog) {
+                $warningNotice = $fightLog['warning_notice'] ?? null;
+
+                if (! is_array($warningNotice) || ($warningNotice['read'] ?? true) !== false) {
+                    continue;
+                }
+
+                $fightLogs[$index]['warning_notice']['read'] = true;
+
+                $factionLoyaltyAutomationLog->update([
+                    'fight_logs' => array_values($fightLogs),
+                ]);
+
+                return;
+            }
+        }
     }
 
     /**

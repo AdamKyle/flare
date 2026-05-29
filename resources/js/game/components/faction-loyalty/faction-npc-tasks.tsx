@@ -1,7 +1,11 @@
 import React, { ReactNode } from "react";
+import { AxiosError, AxiosResponse } from "axios";
 import FactionNpcSectionProps from "./types/faction-npc-section-props";
 import OrangeProgressBar from "../../components/ui/progress-bars/orange-progress-bar";
-import { FameTasks } from "./deffinitions/faction-loaylaty";
+import {
+    FameTasks,
+    FactionLoyaltyWarningNotice,
+} from "./deffinitions/faction-loaylaty";
 import SuccessOutlineButton from "../../components/ui/buttons/success-outline-button";
 import PrimaryOutlineButton from "../../components/ui/buttons/primary-outline-button";
 import DangerOutlineButton from "../../components/ui/buttons/danger-outline-button";
@@ -18,6 +22,7 @@ import InfoAlert from "../ui/alerts/simple-alerts/info-alert";
 import DropDown from "../ui/drop-down/drop-down";
 import { startCase, toLower } from "lodash";
 import TimerProgressBar from "../ui/progress-bars/timer-progress-bar";
+import Ajax from "../../lib/ajax/ajax";
 
 export default class FactionNpcTasks extends React.Component<
     FactionNpcSectionProps,
@@ -37,6 +42,10 @@ export default class FactionNpcTasks extends React.Component<
             error_message: null,
             must_revive: false,
             attack_type_selected: this.props.attack_type ?? "attack",
+            warning_notice:
+                this.props.faction_loyalty_npc.faction_loyalty_warning_notice ??
+                null,
+            dismissing_warning_notice: false,
         };
 
         this.fightAjax = serviceContainer().fetch(BountyFightAjax);
@@ -48,6 +57,17 @@ export default class FactionNpcTasks extends React.Component<
         if (previousProps.attack_type !== this.props.attack_type) {
             this.setState({
                 attack_type_selected: this.props.attack_type ?? "attack",
+            });
+        }
+
+        if (
+            previousProps.faction_loyalty_npc.faction_loyalty_warning_notice !==
+            this.props.faction_loyalty_npc.faction_loyalty_warning_notice
+        ) {
+            this.setState({
+                warning_notice:
+                    this.props.faction_loyalty_npc
+                        .faction_loyalty_warning_notice ?? null,
             });
         }
     }
@@ -314,6 +334,68 @@ export default class FactionNpcTasks extends React.Component<
         }
     }
 
+    dismissWarningNotice() {
+        this.setState(
+            {
+                dismissing_warning_notice: true,
+                error_message: null,
+            },
+            () => {
+                new Ajax()
+                    .setRoute(
+                        "faction-loyalty-automation/" +
+                            this.props.character_id +
+                            "/warning-notice/read",
+                    )
+                    .doAjaxCall(
+                        "post",
+                        (_result: AxiosResponse) => {
+                            this.setState({
+                                warning_notice: null,
+                                dismissing_warning_notice: false,
+                            });
+                        },
+                        (error: AxiosError) => {
+                            this.setState({
+                                dismissing_warning_notice: false,
+                            });
+
+                            if (error.response) {
+                                const response: AxiosResponse = error.response;
+
+                                this.setState({
+                                    error_message: response.data.message,
+                                });
+                            }
+                        },
+                    );
+            },
+        );
+    }
+
+    renderWarningNotice(): ReactNode {
+        const warningNotice: FactionLoyaltyWarningNotice | null =
+            this.state.warning_notice;
+
+        if (warningNotice === null) {
+            return null;
+        }
+
+        return (
+            <WarningAlert additional_css={"my-2"}>
+                <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
+                    <span>{warningNotice.message}</span>
+                    <DangerOutlineButton
+                        button_label={"Dismiss"}
+                        on_click={this.dismissWarningNotice.bind(this)}
+                        disabled={this.state.dismissing_warning_notice}
+                        additional_css={"w-full sm:w-auto"}
+                    />
+                </div>
+            </WarningAlert>
+        );
+    }
+
     renderAutomationAction(): ReactNode {
         if (this.props.is_faction_loyalty_automation_running) {
             return (
@@ -383,6 +465,7 @@ export default class FactionNpcTasks extends React.Component<
             <div>
                 <div>
                     <h3 className="my-2"> Bounties </h3>
+                    {this.renderWarningNotice()}
                     {this.props.character_map_id !==
                     this.props.faction_loyalty_npc.npc.game_map_id ? (
                         <WarningAlert additional_css={"my-2"}>

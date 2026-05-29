@@ -40,6 +40,10 @@ class AutomatedFightResult
 
     private array $fightData = [];
 
+    private int $stalledAttempt = 0;
+
+    private ?array $warningNotice = null;
+
     /**
      * Set up the result.
      *
@@ -65,6 +69,8 @@ class AutomatedFightResult
         $this->characterDied = false;
         $this->endedAutomation = false;
         $this->fightData = [];
+        $this->stalledAttempt = 0;
+        $this->warningNotice = null;
 
         return $this;
     }
@@ -278,6 +284,32 @@ class AutomatedFightResult
     }
 
     /**
+     * Set the stalled attempt.
+     *
+     * @param int $stalledAttempt
+     * @return AutomatedFightResult
+     */
+    public function setStalledAttempt(int $stalledAttempt): AutomatedFightResult
+    {
+        $this->stalledAttempt = $stalledAttempt;
+
+        return $this;
+    }
+
+    /**
+     * Set the warning notice.
+     *
+     * @param array|null $warningNotice
+     * @return AutomatedFightResult
+     */
+    public function setWarningNotice(?array $warningNotice): AutomatedFightResult
+    {
+        $this->warningNotice = $warningNotice;
+
+        return $this;
+    }
+
+    /**
      * Get the result type.
      *
      * @return AutomatedFightResultType
@@ -445,5 +477,25 @@ class AutomatedFightResult
     public function getFightData(): array
     {
         return $this->fightData;
+    }
+
+    /**
+     * Get the stalled attempt.
+     *
+     * @return int
+     */
+    public function getStalledAttempt(): int
+    {
+        return $this->stalledAttempt;
+    }
+
+    /**
+     * Get the warning notice.
+     *
+     * @return array|null
+     */
+    public function getWarningNotice(): ?array
+    {
+        return $this->warningNotice;
     }
 }

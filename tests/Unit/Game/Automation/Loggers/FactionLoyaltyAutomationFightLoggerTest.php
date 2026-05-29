@@ -96,6 +96,8 @@ class FactionLoyaltyAutomationFightLoggerTest extends TestCase
                 'character_died' => false,
                 'ended_automation' => false,
                 'fight_data' => [],
+                'stalled_attempt' => 0,
+                'warning_notice' => null,
                 'created_at' => $now->toDateTimeString(),
             ],
         ], $factionLoyaltyAutomationLog->fight_logs);
@@ -192,7 +194,12 @@ class FactionLoyaltyAutomationFightLoggerTest extends TestCase
             ->setTotalFactionPoints(45)
             ->setCharacterDied(true)
             ->setEndedAutomation(true)
-            ->setFightData($fightData);
+            ->setFightData($fightData)
+            ->setStalledAttempt(10)
+            ->setWarningNotice([
+                'message' => 'Warning message.',
+                'read' => false,
+            ]);
 
         $this->fightLogger->log($automatedFightResult);
 
@@ -217,6 +224,11 @@ class FactionLoyaltyAutomationFightLoggerTest extends TestCase
                 'character_died' => true,
                 'ended_automation' => true,
                 'fight_data' => $fightData,
+                'stalled_attempt' => 10,
+                'warning_notice' => [
+                    'message' => 'Warning message.',
+                    'read' => false,
+                ],
                 'created_at' => $now->toDateTimeString(),
             ],
         ], $factionLoyaltyAutomationLog->fight_logs);

@@ -13,6 +13,7 @@ use App\Game\Automation\Loggers\FactionLoyaltyAutomationFightLogger;
 use App\Game\Automation\Values\AutomatedFightResult;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
+use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\SkillService;
 
 class AutomatedBountyFightHandler
@@ -20,6 +21,8 @@ class AutomatedBountyFightHandler
     private const MAX_ATTACK_ATTEMPTS = 100;
 
     private const MAX_TRAINING_KILLS = 50;
+
+    private const MAX_STALLED_ATTEMPTS = 10;
 
     private Character $character;
 
@@ -44,6 +47,12 @@ class AutomatedBountyFightHandler
     private int $batchTotalSkillXp = 0;
 
     private array $lastFightData = [];
+
+    private bool $lastFightStalled = false;
+
+    private int $stalledAttempt = 0;
+
+    private ?array $warningNotice = null;
 
     /**
      * Create the automated bounty fight handler.
@@ -89,6 +98,9 @@ class AutomatedBountyFightHandler
         $this->factionLoyaltyAutomationFightLogger = $factionLoyaltyAutomationFightLogger;
         $this->resetBatchTotals();
         $this->lastFightData = [];
+        $this->lastFightStalled = false;
+        $this->stalledAttempt = 0;
+        $this->warningNotice = null;
 
         return $this;
     }
@@ -111,6 +123,10 @@ class AutomatedBountyFightHandler
         }
 
         $remainingKills = $this->getRemainingBountyKills();
+
+        if ($this->shouldRetryTrainingStalledFight()) {
+            return $this->attemptRecoveryTraining($bountyMonster, false, true);
+        }
 
         if ($remainingKills <= 0) {
             return $this->finish(AutomatedFightResultType::BOUNTY_COMPLETED, $bountyMonster, true);
@@ -139,6 +155,13 @@ class AutomatedBountyFightHandler
         }
 
         if ($fightResultType === AutomatedFightResultType::NOT_ENOUGH_HEALTH_OR_INVALID_STATE) {
+            return $this->finish($fightResultType, $bountyMonster, true, false, true);
+        }
+
+        if (in_array($fightResultType, [
+            AutomatedFightResultType::BOUNTY_STALLED_MAX_ATTEMPTS_REACHED,
+            AutomatedFightResultType::TRAINING_STALLED_MAX_ATTEMPTS_REACHED,
+        ], true)) {
             return $this->finish($fightResultType, $bountyMonster, true, false, true);
         }
 
@@ -175,10 +198,17 @@ class AutomatedBountyFightHandler
     private function fightBountyBatch(Monster $bountyMonster, int $remainingKills): AutomatedFightResultType
     {
         while ($this->batchBountyKills < $remainingKills) {
-            $fightData = $this->fightMonsterUntilResolved($bountyMonster);
+            $fightData = $this->fightMonsterUntilResolved(
+                $bountyMonster,
+                $this->shouldRetryStalledFight($bountyMonster, true, false)
+            );
 
             if (empty($fightData)) {
                 return AutomatedFightResultType::NOT_ENOUGH_HEALTH_OR_INVALID_STATE;
+            }
+
+            if ($this->lastFightStalled) {
+                return $this->prepareStalledResult($bountyMonster, true, false);
             }
 
             if ($this->hasCharacterDied($fightData)) {
@@ -205,11 +235,15 @@ class AutomatedBountyFightHandler
      * Attempt recovery training.
      *
      * @param Monster $failedBountyMonster
+     * @param bool $reviveCharacter
+     * @param bool $retryCachedFight
      * @return AutomatedFightResult
      */
-    private function attemptRecoveryTraining(Monster $failedBountyMonster): AutomatedFightResult
+    private function attemptRecoveryTraining(Monster $failedBountyMonster, bool $reviveCharacter = true, bool $retryCachedFight = false): AutomatedFightResult
     {
-        $this->character = $this->battleEventHandler->processRevive($this->character->refresh());
+        if ($reviveCharacter) {
+            $this->character = $this->battleEventHandler->processRevive($this->character->refresh());
+        }
 
         $this->resetBatchTotals();
 
@@ -224,10 +258,23 @@ class AutomatedBountyFightHandler
         $this->sendOutEventLogUpdate('Recovery training has started. Automation will fight up to 50 training monsters in this job run.', true);
 
         while ($this->batchTrainingKills < self::MAX_TRAINING_KILLS) {
-            $fightData = $this->fightMonsterUntilResolved($trainingMonster);
+            $fightData = $this->fightMonsterUntilResolved($trainingMonster, $retryCachedFight);
+            $retryCachedFight = false;
 
             if (empty($fightData)) {
                 return $this->finish(AutomatedFightResultType::NOT_ENOUGH_HEALTH_OR_INVALID_STATE, $trainingMonster, false, true, true);
+            }
+
+            if ($this->lastFightStalled) {
+                $fightResultType = $this->prepareStalledResult($trainingMonster, false, true);
+
+                return $this->finish(
+                    $fightResultType,
+                    $trainingMonster,
+                    false,
+                    true,
+                    $this->stalledAttempt >= self::MAX_STALLED_ATTEMPTS
+                );
             }
 
             if ($this->hasCharacterDied($fightData)) {
@@ -256,14 +303,21 @@ class AutomatedBountyFightHandler
      * Fight one monster until the monster dies, the character dies, or the attack limit is reached.
      *
      * @param Monster $monster
+     * @param bool $retryCachedFight
      * @return array
      */
-    private function fightMonsterUntilResolved(Monster $monster): array
+    private function fightMonsterUntilResolved(Monster $monster, bool $retryCachedFight = false): array
     {
-        $fightData = $this->monsterFightService->setupMonster($this->character, [
-            'selected_monster_id' => $monster->id,
-            'attack_type' => $this->attackType,
-        ], true);
+        $this->lastFightStalled = false;
+
+        if ($retryCachedFight) {
+            $fightData = $this->monsterFightService->fightMonster($this->character, $this->attackType, false, true);
+        } else {
+            $fightData = $this->monsterFightService->setupMonster($this->character, [
+                'selected_monster_id' => $monster->id,
+                'attack_type' => $this->attackType,
+            ], true);
+        }
 
         $this->lastFightData = $fightData;
 
@@ -271,7 +325,7 @@ class AutomatedBountyFightHandler
             return $fightData;
         }
 
-        $attackAttempts = 0;
+        $attackAttempts = $retryCachedFight ? 1 : 0;
 
         while ($this->shouldAttackAgain($fightData) && $attackAttempts < self::MAX_ATTACK_ATTEMPTS) {
             $fightData = $this->monsterFightService->fightMonster($this->character, $this->attackType, false, true);
@@ -284,7 +338,9 @@ class AutomatedBountyFightHandler
         }
 
         if ($this->shouldAttackAgain($fightData)) {
-            return [];
+            $this->lastFightStalled = true;
+
+            return $fightData;
         }
 
         return $fightData;
@@ -381,6 +437,117 @@ class AutomatedBountyFightHandler
     }
 
     /**
+     * Should the cached training fight be retried?
+     *
+     * @return bool
+     */
+    private function shouldRetryTrainingStalledFight(): bool
+    {
+        $fightLogs = $this->factionLoyaltyAutomation->log?->fight_logs ?? [];
+
+        $lastRelevantFightLog = collect($fightLogs)->reverse()->first(function (array $fightLog): bool {
+            return ($fightLog['is_training'] ?? false) === true;
+        });
+
+        if (is_null($lastRelevantFightLog)) {
+            return false;
+        }
+
+        return ($lastRelevantFightLog['outcome'] ?? null) === AutomatedFightResultType::TRAINING_STALLED_RETRY->value &&
+            (int) ($lastRelevantFightLog['stalled_attempt'] ?? 0) < self::MAX_STALLED_ATTEMPTS;
+    }
+
+    /**
+     * Should a stalled cached fight be retried?
+     *
+     * @param Monster $monster
+     * @param bool $bountyTarget
+     * @param bool $training
+     * @return bool
+     */
+    private function shouldRetryStalledFight(Monster $monster, bool $bountyTarget, bool $training): bool
+    {
+        $fightLogs = $this->factionLoyaltyAutomation->log?->fight_logs ?? [];
+
+        $lastRelevantFightLog = collect($fightLogs)->reverse()->first(function (array $fightLog) use ($monster, $bountyTarget, $training): bool {
+            return ($fightLog['monster_id'] ?? null) === $monster->id &&
+                ($fightLog['is_bounty_target'] ?? false) === $bountyTarget &&
+                ($fightLog['is_training'] ?? false) === $training;
+        });
+
+        if (is_null($lastRelevantFightLog)) {
+            return false;
+        }
+
+        return in_array($lastRelevantFightLog['outcome'] ?? null, [
+            AutomatedFightResultType::BOUNTY_STALLED_RETRY->value,
+            AutomatedFightResultType::TRAINING_STALLED_RETRY->value,
+        ], true) && (int) ($lastRelevantFightLog['stalled_attempt'] ?? 0) < self::MAX_STALLED_ATTEMPTS;
+    }
+
+    /**
+     * Prepare the stalled fight result.
+     *
+     * @param Monster $monster
+     * @param bool $bountyTarget
+     * @param bool $training
+     * @return AutomatedFightResultType
+     */
+    private function prepareStalledResult(Monster $monster, bool $bountyTarget, bool $training): AutomatedFightResultType
+    {
+        $this->stalledAttempt = $this->getStalledAttemptCount($monster, $bountyTarget, $training) + 1;
+        $this->warningNotice = null;
+
+        if ($this->stalledAttempt >= self::MAX_STALLED_ATTEMPTS) {
+            $this->warningNotice = [
+                'message' => $this->buildStalledWarningMessage($monster),
+                'read' => false,
+            ];
+
+            event(new ServerMessageEvent($this->character->user, $this->warningNotice['message']));
+
+            return $training
+                ? AutomatedFightResultType::TRAINING_STALLED_MAX_ATTEMPTS_REACHED
+                : AutomatedFightResultType::BOUNTY_STALLED_MAX_ATTEMPTS_REACHED;
+        }
+
+        return $training
+            ? AutomatedFightResultType::TRAINING_STALLED_RETRY
+            : AutomatedFightResultType::BOUNTY_STALLED_RETRY;
+    }
+
+    /**
+     * Get the stalled attempt count for the same monster and phase.
+     *
+     * @param Monster $monster
+     * @param bool $bountyTarget
+     * @param bool $training
+     * @return int
+     */
+    private function getStalledAttemptCount(Monster $monster, bool $bountyTarget, bool $training): int
+    {
+        $fightLogs = $this->factionLoyaltyAutomation->log?->fight_logs ?? [];
+
+        return collect($fightLogs)->filter(function (array $fightLog) use ($monster, $bountyTarget, $training): bool {
+            return ($fightLog['monster_id'] ?? null) === $monster->id &&
+                ($fightLog['is_bounty_target'] ?? false) === $bountyTarget &&
+                ($fightLog['is_training'] ?? false) === $training &&
+                (int) ($fightLog['stalled_attempt'] ?? 0) > 0;
+        })->count();
+    }
+
+    /**
+     * Build the stalled warning message.
+     *
+     * @param Monster $monster
+     * @return string
+     */
+    private function buildStalledWarningMessage(Monster $monster): string
+    {
+        return 'You tried to kill ' . $monster->name . ' 10 times and failed to do so. The NPC: ' . $this->factionLoyaltyNpc->npc->real_name . ', is now infuriated. Check your gear child. Go to Faction Loyalty.';
+    }
+
+    /**
      * Set the failed bounty monster.
      *
      * @param Monster $bountyMonster
@@ -468,7 +635,9 @@ class AutomatedBountyFightHandler
             ->setTotalFactionPoints(0)
             ->setCharacterDied($characterDied)
             ->setEndedAutomation($endedAutomation)
-            ->setFightData($this->lastFightData);
+            ->setFightData($this->lastFightData)
+            ->setStalledAttempt($this->stalledAttempt)
+            ->setWarningNotice($this->warningNotice);
 
         $this->factionLoyaltyAutomationFightLogger->log($automatedFightResult);
 

@@ -5,6 +5,7 @@ namespace Tests\Feature\Game\Automation\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomation;
+use App\Flare\Models\FactionLoyaltyAutomationLog;
 use App\Flare\Models\FactionLoyaltyNpc;
 use App\Flare\Models\GameMap;
 use App\Flare\Values\AttackTypeValue;
@@ -313,5 +314,42 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
 
         $this->assertEquals(422, $response->getStatusCode());
         $this->assertEquals('Nope. You don\'t own that.', $jsonData['message']);
+    }
+
+    public function testMarkWarningNoticeReadUpdatesLatestUnreadNotice(): void
+    {
+        Event::fake();
+
+        $characterAutomation = CharacterAutomation::create([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::FACTION_LOYALTY,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+        $factionLoyaltyAutomation = FactionLoyaltyAutomation::factory()->create([
+            'character_automation_id' => $characterAutomation->id,
+            'character_id' => $this->character->id,
+            'faction_loyalty_npc_id' => $this->factionLoyaltyNpc->id,
+        ]);
+        $factionLoyaltyAutomationLog = FactionLoyaltyAutomationLog::factory()->create([
+            'faction_loyalty_automation_id' => $factionLoyaltyAutomation->id,
+            'fight_logs' => [
+                [
+                    'warning_notice' => [
+                        'message' => 'Warning message.',
+                        'read' => false,
+                    ],
+                ],
+            ],
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/warning-notice/read', [
+                '_token' => csrf_token(),
+            ]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertTrue($factionLoyaltyAutomationLog->refresh()->fight_logs[0]['warning_notice']['read']);
     }
 }

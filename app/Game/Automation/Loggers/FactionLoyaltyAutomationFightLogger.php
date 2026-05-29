@@ -61,6 +61,8 @@ class FactionLoyaltyAutomationFightLogger
             'character_died' => $automatedFightResult->hasCharacterDied(),
             'ended_automation' => $automatedFightResult->hasEndedAutomation(),
             'fight_data' => $automatedFightResult->getFightData(),
+            'stalled_attempt' => $automatedFightResult->getStalledAttempt(),
+            'warning_notice' => $automatedFightResult->getWarningNotice(),
             'created_at' => now()->toDateTimeString(),
         ];
 

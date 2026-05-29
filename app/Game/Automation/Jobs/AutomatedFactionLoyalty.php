@@ -470,6 +470,15 @@ class AutomatedFactionLoyalty implements ShouldQueue
             return;
         }
 
+        if (in_array($automatedFightResult->getResultType(), [
+            AutomatedFightResultType::BOUNTY_STALLED_RETRY,
+            AutomatedFightResultType::TRAINING_STALLED_RETRY,
+        ], true)) {
+            $this->recallJob($characterCacheData);
+
+            return;
+        }
+
         $this->endAutomation($characterCacheData, false);
     }
 

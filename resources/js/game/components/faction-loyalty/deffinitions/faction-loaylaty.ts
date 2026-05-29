@@ -29,6 +29,12 @@ export interface FactionLoyaltyNpc {
     current_kingdom_item_defence_bonus: number;
     npc: NPC;
     faction_loyalty_npc_tasks: FactionLoyaltyNpcTask;
+    faction_loyalty_warning_notice?: FactionLoyaltyWarningNotice | null;
+}
+
+export interface FactionLoyaltyWarningNotice {
+    message: string;
+    read: boolean;
 }
 
 export interface FactionLoyaltyNpcTask {

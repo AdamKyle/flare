@@ -1084,6 +1084,50 @@ class AutomatedFactionLoyaltyTest extends TestCase
         Queue::assertPushed(AutomatedFactionLoyalty::class);
     }
 
+    public function testHandleHandlesBountyStalledRetryAndRecallsTheJob(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $bountyTask = collect($this->factionLoyaltyNpc->factionLoyaltyNpcTasks->fame_tasks)
+            ->first(fn (array $task): bool => ($task['type'] ?? null) === 'bounty');
+        $fightResult = (new AutomatedFightResult)
+            ->setUp(AutomatedFightResultType::BOUNTY_STALLED_RETRY)
+            ->setMonsterId($bountyTask['monster_id'])
+            ->setStalledAttempt(1);
+
+        $this->npcTaskCoordinator->shouldReceive('setUp')->once()->andReturnSelf();
+        $this->npcTaskCoordinator->shouldReceive('resolveNpc')->once()->andReturn($this->factionLoyaltyNpc);
+        $this->npcTaskCoordinator->shouldReceive('shouldEndAutomation')->once()->andReturnFalse();
+        $this->actionCoordinator->shouldReceive('setUp')->once()->andReturnSelf();
+        $this->actionCoordinator->shouldReceive('resolveAction')->once()->andReturn([
+            'type' => FactionLoyaltyCoordinatorAction::FIGHT->value,
+            'task' => $bountyTask,
+        ]);
+        $this->fightLogger->shouldReceive('setUp')->once()->andReturn($this->fightLogger);
+        $this->fightHandler->shouldReceive('setUp')->once()->andReturnSelf();
+        $this->fightHandler->shouldReceive('handle')->once()->andReturn($fightResult);
+
+        $job = new AutomatedFactionLoyalty(
+            $this->character->id,
+            $this->characterAutomation->id,
+            $this->factionLoyaltyAutomation->id,
+            1
+        );
+
+        $job->handle(
+            $this->characterCacheData,
+            $this->npcTaskCoordinator,
+            $this->actionCoordinator,
+            $this->craftingHandler,
+            $this->craftingLogger,
+            $this->fightHandler,
+            $this->fightLogger
+        );
+
+        Queue::assertPushed(AutomatedFactionLoyalty::class);
+    }
+
     public function testHandleClearsFailedBountyMonsterWhenFailedBountyMonsterIsKilled(): void
     {
         Queue::fake();
