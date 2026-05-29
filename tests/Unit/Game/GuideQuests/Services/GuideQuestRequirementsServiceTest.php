@@ -15,8 +15,6 @@ use App\Game\Events\Values\EventType;
 use App\Game\GuideQuests\Services\GuideQuestRequirementsService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Log;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;

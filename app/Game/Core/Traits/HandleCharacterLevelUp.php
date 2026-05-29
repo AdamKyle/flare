@@ -4,7 +4,6 @@ namespace App\Game\Core\Traits;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\MaxLevelConfiguration;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Battle\Values\MaxLevel;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;

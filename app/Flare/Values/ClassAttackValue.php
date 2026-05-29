@@ -2,8 +2,6 @@
 
 namespace App\Flare\Values;
 
-use App\Flare\Items\Values\ArmourType;
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
@@ -448,7 +446,7 @@ class ClassAttackValue
 
     private function hasAnyWeaponEquipped(): bool
     {
-        $itemTypes = array_map(fn ($case) => $case->value, ItemType::cases());
+        $itemTypes = array_map(fn($case) => $case->value, ItemType::cases());
 
         foreach ($itemTypes as $type) {
             if ($this->getItemCollection($type)->isNotEmpty()) {
@@ -461,7 +459,7 @@ class ClassAttackValue
 
     private function hasNoWeaponEquipped(): bool
     {
-        $itemTypes = array_map(fn ($case) => $case->value, ItemType::cases());
+        $itemTypes = array_map(fn($case) => $case->value, ItemType::cases());
         $typeIsNotEquipped = false;
 
         foreach ($itemTypes as $type) {
@@ -482,7 +480,7 @@ class ClassAttackValue
 
     private function getItemCollectionCountForAnyType(): int
     {
-        $itemTypes = array_map(fn ($case) => $case->value, ItemType::cases());
+        $itemTypes = array_map(fn($case) => $case->value, ItemType::cases());
         $count = 0;
 
         foreach ($itemTypes as $type) {

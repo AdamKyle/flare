@@ -13,7 +13,6 @@ use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Services\ConjureService;
-use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
@@ -193,12 +192,12 @@ class MovementService
             $questItem = $location->questRewardItem;
 
             if (! is_null($questItem->effect)) {
-                $message = $character->name.' has found: '.$questItem->affix_name;
+                $message = $character->name . ' has found: ' . $questItem->affix_name;
 
                 broadcast(new GlobalMessageEvent($message));
             }
 
-            event(new GameServerMessageEvent($character->user, 'You found: '.$questItem->affix_name, $slot->id));
+            event(new GameServerMessageEvent($character->user, 'You found: ' . $questItem->affix_name, $slot->id));
 
             event(new UpdateCharacterStatus($character));
         }

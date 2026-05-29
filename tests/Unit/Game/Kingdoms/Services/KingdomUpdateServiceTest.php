@@ -11,10 +11,7 @@ use App\Game\Kingdoms\Service\KingdomQueueService;
 use App\Game\Kingdoms\Service\KingdomUpdateService;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use Exception;
-use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\DB;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -356,7 +353,7 @@ class KingdomUpdateServiceTest extends TestCase
         $types = ['wood', 'stone', 'iron', 'clay'];
 
         foreach ($types as $type) {
-            $this->assertEquals(0, $kingdom->{'current_'.$type});
+            $this->assertEquals(0, $kingdom->{'current_' . $type});
         }
     }
 
@@ -397,7 +394,7 @@ class KingdomUpdateServiceTest extends TestCase
         $types = ['wood', 'stone', 'iron', 'clay'];
 
         foreach ($types as $type) {
-            $this->assertGreaterThan(0, $kingdom->{'current_'.$type});
+            $this->assertGreaterThan(0, $kingdom->{'current_' . $type});
         }
     }
 
@@ -430,7 +427,7 @@ class KingdomUpdateServiceTest extends TestCase
         $types = ['wood', 'stone', 'iron', 'clay'];
 
         foreach ($types as $type) {
-            $this->assertEquals(100, $kingdom->{'current_'.$type});
+            $this->assertEquals(100, $kingdom->{'current_' . $type});
         }
     }
 
