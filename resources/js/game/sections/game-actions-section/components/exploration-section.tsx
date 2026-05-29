@@ -565,7 +565,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                 <Fragment>
                     {this.state.loading ? <LoadingProgressBar /> : null}
 
-                    <div className="flex flex-wrap justify-center items-start gap-2">
+                    <div className="flex flex-wrap justify-center items-start gap-2 mt-4">
                         <DangerButton
                             button_label={"Stop Exploration"}
                             on_click={this.stopExploration.bind(this)}

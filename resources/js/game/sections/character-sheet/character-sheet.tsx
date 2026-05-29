@@ -614,6 +614,7 @@ export default class CharacterSheet extends React.Component<
                         extra_action_chance={
                             this.props.character.extra_action_chance
                         }
+                        character_id={this.props.character.id}
                     />
                 ) : null}
             </div>

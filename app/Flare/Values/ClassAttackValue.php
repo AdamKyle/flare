@@ -7,6 +7,7 @@ use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
 use App\Game\Character\CharacterInventory\Values\ArmourType;
 use App\Game\Character\CharacterInventory\Values\ItemType;
 use Exception;
@@ -72,100 +73,100 @@ class ClassAttackValue
         if ($this->classType->isFighter()) {
             $this->buildFighterChance();
 
-            return $this->chance;
+            return $this->addDisplayOnlyClassData();
         }
 
         if ($this->classType->isProphet()) {
             $this->buildProphetChance();
 
-            return $this->chance;
+            return $this->addDisplayOnlyClassData();
         }
 
         if ($this->classType->isThief()) {
             $this->buildThiefChance();
 
-            return $this->chance;
+            return $this->addDisplayOnlyClassData();
         }
 
         if ($this->classType->isRanger()) {
             $this->buildRangersChance();
 
-            return $this->chance;
+            return $this->addDisplayOnlyClassData();
         }
 
         if ($this->classType->isHeretic()) {
             $this->buildHereticChance();
 
-            return $this->chance;
+            return $this->addDisplayOnlyClassData();
         }
 
         if ($this->classType->isVampire()) {
             $this->buildVampiresChance();
 
-            return $this->chance;
+            return $this->addDisplayOnlyClassData();
         }
 
         if ($this->classType->isBlacksmith()) {
             $this->buildBlacksmithsChance();
 
-            return $this->chance;
+            return $this->addDisplayOnlyClassData();
         }
 
         if ($this->classType->isArcaneAlchemist()) {
             $this->buildArcaneAlchemistChance();
 
-            return $this->chance;
+            return $this->addDisplayOnlyClassData();
         }
 
         if ($this->classType->isPrisoner()) {
             $this->buildPrisonerChance();
 
-            return $this->chance;
+            return $this->addDisplayOnlyClassData();
         }
 
         if ($this->classType->isAlcoholic()) {
             $this->buildAlcoholicsChance();
 
-            return $this->chance;
+            return $this->addDisplayOnlyClassData();
         }
 
         if ($this->classType->isMerchant()) {
             $this->buildMerchantsPlace();
 
-            return $this->chance;
+            return $this->addDisplayOnlyClassData();
         }
 
         if ($this->classType->isGunslinger()) {
             $this->buildGunSlingersChance();
 
-            return $this->chance;
+            return $this->addDisplayOnlyClassData();
         }
 
         if ($this->classType->isDancer()) {
             $this->buildSensualDance();
 
-            return $this->chance;
+            return $this->addDisplayOnlyClassData();
         }
 
         if ($this->classType->isBookBinder()) {
             $this->buildBookBindersFear();
 
-            return $this->chance;
+            return $this->addDisplayOnlyClassData();
         }
 
         if ($this->classType->isCleric()) {
             $this->buildHolySmite();
 
-            return $this->chance;
+            return $this->addDisplayOnlyClassData();
         }
 
         if ($this->classType->isApothecary()) {
             $this->buildPlagueSurge();
 
-            return $this->chance;
+            return $this->addDisplayOnlyClassData();
         }
 
-        return $this->chance;
+        return $this->addDisplayOnlyClassData();
     }
 
     public function buildFighterChance()
@@ -337,6 +338,105 @@ class ClassAttackValue
     private function addClassBonusChance(): void
     {
         $this->chance['chance'] = min(1, $this->chance['chance'] + $this->characterInfo->classBonus());
+    }
+
+    private function addDisplayOnlyClassData(): array
+    {
+        $classWeapons = $this->getClassWeapons();
+
+        $this->chance['class_id'] = $this->character->game_class_id;
+        $this->chance['class_weapons'] = $classWeapons;
+        $this->chance['attack_type'] = $this->getAttackType();
+        $this->chance['equipped_class_items'] = $this->getEquippedClassItems($classWeapons);
+
+        return $this->chance;
+    }
+
+    private function getClassWeapons(): array
+    {
+        $classWeapons = ItemTypeMapping::getForClass($this->character->class->name);
+
+        if (is_null($classWeapons)) {
+            return [];
+        }
+
+        if (is_array($classWeapons)) {
+            return $classWeapons;
+        }
+
+        return [$classWeapons];
+    }
+
+    private function getAttackType(): string
+    {
+        if ($this->classType->isHeretic()) {
+            return $this->formatAttackType(AttackTypeValue::CAST);
+        }
+
+        if ($this->classType->isProphet()) {
+            return $this->formatAttackType(AttackTypeValue::CAST);
+        }
+
+        return $this->formatAttackType(AttackTypeValue::ATTACK);
+    }
+
+    private function formatAttackType(string $attackType): string
+    {
+        return match ($attackType) {
+            AttackTypeValue::ATTACK => 'Attack',
+            AttackTypeValue::CAST => 'Cast',
+            AttackTypeValue::ATTACK_AND_CAST => 'Attack and Cast',
+            AttackTypeValue::CAST_AND_ATTACK => 'Cast and Attack',
+            AttackTypeValue::DEFEND => 'Defend',
+        };
+    }
+
+    private function getEquippedClassItems(array $classWeapons): array
+    {
+        if (empty($classWeapons)) {
+            return [];
+        }
+
+        $inventory = Inventory::where('character_id', $this->character->id)->first();
+
+        $inventoryItems = InventorySlot::where('inventory_id', $inventory->id)
+            ->where('equipped', true)
+            ->whereHas('item', function ($query) use ($classWeapons) {
+                $query->whereIn('type', $classWeapons);
+            })
+            ->with('item')
+            ->get();
+
+        $setEquipped = $this->character->inventorySets->where('is_equipped', true)->first();
+
+        if (is_null($setEquipped)) {
+            return $this->mapEquippedClassItems($inventoryItems);
+        }
+
+        $setItems = SetSlot::where('inventory_set_id', $setEquipped->id)
+            ->whereHas('item', function ($query) use ($classWeapons) {
+                $query->whereIn('type', $classWeapons);
+            })
+            ->with('item')
+            ->get();
+
+        return $this->mapEquippedClassItems($inventoryItems->merge($setItems));
+    }
+
+    private function mapEquippedClassItems(Collection $items): array
+    {
+        return $items->map(function ($slot) {
+            return [
+                'item_id' => $slot->item->id,
+                'item_name' => $slot->item->affix_name,
+                'type' => $slot->item->type,
+                'attached_affixes_count' => $slot->item->affix_count,
+                'is_unique' => $slot->item->is_unique,
+                'is_mythic' => $slot->item->is_mythic,
+                'is_cosmic' => $slot->item->is_cosmic,
+                'has_holy_stacks_applied' => $slot->item->holy_stacks_applied,
+            ];
+        })->values()->toArray();
     }
 
     private function hasItemTypeEquipped(string $type): bool
