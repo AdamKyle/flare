@@ -1,6 +1,6 @@
 <?php
 
-namespace Feature\Game\Automation;
+namespace Tests\Feature\Game\Automation;
 
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\CharacterAutomation;

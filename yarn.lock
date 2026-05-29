@@ -5705,9 +5705,9 @@ react-drag-drop-files@^2.3.10:
     styled-components "^6.1.11"
 
 react-draggable@^4.1.0, react-draggable@^4.5.0:
-  version "4.5.0"
-  resolved "https://registry.yarnpkg.com/react-draggable/-/react-draggable-4.5.0.tgz#0b274ccb6965fcf97ed38fcf7e3cc223bc48cdf5"
-  integrity sha512-VC+HBLEZ0XJxnOxVAZsdRi8rD04Iz3SiiKOoYzamjylUcju/hP9np/aZdLHf/7WOD268WMoNJMvYfB5yAK45cw==
+  version "4.6.0"
+  resolved "https://registry.yarnpkg.com/react-draggable/-/react-draggable-4.6.0.tgz#bae07fc729afe1a80c6cedd4775cc0d6856a0e0b"
+  integrity sha512-g4vqY53xhmPrBnZvGP+1YQV0eYnB3o0VLzoi6q2IpwnQrxIZ34tYRKpVtsWIXPg4D/pvLn+oYCW5gOK2cWIrgA==
   dependencies:
     clsx "^2.1.1"
     prop-types "^15.8.1"
