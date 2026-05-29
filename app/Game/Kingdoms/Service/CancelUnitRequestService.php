@@ -36,6 +36,14 @@ class CancelUnitRequestService
             return $this->errorResult('You cannot cancel this request because it is on the doorstep of: '.$queue->kingdom->name);
         }
 
+        if ($this->isStaleBrokenQueue($queue)) {
+            $queue->delete();
+
+            return $this->successResult([
+                'message' => 'Successfully cleared the stale unit request for: ' . $kingdom->name . '.',
+            ]);
+        }
+
         $unitToDelete = $requestData['unit_name'] ?? null;
 
         if ($queue->status === CapitalCityQueueStatus::TRAVELING) {
@@ -144,5 +152,14 @@ class CancelUnitRequestService
             'message' => 'Successfully canceled the valid requests for: '
                 .$capitalCityUnitQueue->kingdom->name.'.',
         ]);
+    }
+
+    private function isStaleBrokenQueue(CapitalCityUnitQueue $capitalCityUnitQueue): bool
+    {
+        return $capitalCityUnitQueue->completed_at->lessThan(now()) &&
+            in_array($capitalCityUnitQueue->status, [
+                CapitalCityQueueStatus::PROCESSING,
+                CapitalCityQueueStatus::REQUESTING,
+            ]);
     }
 }

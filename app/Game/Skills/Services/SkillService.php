@@ -84,6 +84,17 @@ class SkillService
             return $this->errorResult('Invalid Input.');
         }
 
+        if ($skill->level >= $skill->baseSkill->max_level) {
+            $skill->update([
+                'level' => $skill->baseSkill->max_level,
+                'currently_training' => false,
+                'xp' => 0,
+                'xp_towards' => 0.0,
+            ]);
+
+            return $this->errorResult('This skill is already at max level.');
+        }
+
         $skillCurrentlyTraining = $character->skills->filter(function ($skill) {
             return $skill->currently_training;
         })->first();
@@ -103,7 +114,7 @@ class SkillService
         ]);
 
         return $this->successResult([
-            'message' => 'You are now training: '.$skill->name,
+            'message' => 'You are now training: ' . $skill->name,
         ]);
     }
 
@@ -115,6 +126,17 @@ class SkillService
     public function assignXPToTrainingSkill(Character $character, int $xp): void
     {
         if (is_null($this->skillInTraining)) {
+            return;
+        }
+
+        if ($this->skillInTraining->level >= $this->skillInTraining->baseSkill->max_level) {
+            $this->skillInTraining->update([
+                'level' => $this->skillInTraining->baseSkill->max_level,
+                'currently_training' => false,
+                'xp' => 0,
+                'xp_towards' => 0.0,
+            ]);
+
             return;
         }
 
@@ -139,6 +161,17 @@ class SkillService
             return;
         }
 
+        if ($this->skillInTraining->level >= $this->skillInTraining->baseSkill->max_level) {
+            $this->skillInTraining->update([
+                'level' => $this->skillInTraining->baseSkill->max_level,
+                'currently_training' => false,
+                'xp' => 0,
+                'xp_towards' => 0.0,
+            ]);
+
+            return;
+        }
+
         $newXp = $this->skillInTraining->xp + $totalXpToGive;
 
         $this->skillInTraining->update(['xp' => $newXp]);
@@ -160,7 +193,14 @@ class SkillService
             return 0;
         }
 
-        if ($this->skillInTraining->level === $this->skillInTraining->baseSkill->max_level) {
+        if ($this->skillInTraining->level >= $this->skillInTraining->baseSkill->max_level) {
+            $this->skillInTraining->update([
+                'level' => $this->skillInTraining->baseSkill->max_level,
+                'currently_training' => false,
+                'xp' => 0,
+                'xp_towards' => 0.0,
+            ]);
+
             return 0;
         }
 
@@ -184,7 +224,14 @@ class SkillService
             return $xp;
         }
 
-        if ($this->skillInTraining->level === $this->skillInTraining->baseSkill->max_level) {
+        if ($this->skillInTraining->level >= $this->skillInTraining->baseSkill->max_level) {
+            $this->skillInTraining->update([
+                'level' => $this->skillInTraining->baseSkill->max_level,
+                'currently_training' => false,
+                'xp' => 0,
+                'xp_towards' => 0.0,
+            ]);
+
             return $xp;
         }
 
@@ -202,8 +249,13 @@ class SkillService
      */
     public function assignXpToCraftingSkill(GameMap $gameMap, Skill $skill): void
     {
-        if ($skill->level >= 400) {
-            $skill->update(['xp' => 0]);
+        $maxLevel = $skill->baseSkill->max_level;
+
+        if ($skill->level >= $maxLevel) {
+            $skill->update([
+                'level' => $maxLevel,
+                'xp' => 0,
+            ]);
 
             return;
         }
@@ -233,7 +285,7 @@ class SkillService
 
             $skill = $this->levelUpSkill($skill);
 
-            if ($skill->level >= 400) {
+            if ($skill->level >= $maxLevel) {
                 $newXp = 0;
                 break;
             }
@@ -249,15 +301,31 @@ class SkillService
      */
     private function handlePossibleLevelUpForSkill(Skill $skillInTraining, int $newXp): void
     {
+        if ($skillInTraining->level >= $skillInTraining->baseSkill->max_level) {
+            $skillInTraining->update([
+                'level' => $skillInTraining->baseSkill->max_level,
+                'currently_training' => false,
+                'xp' => 0,
+                'xp_towards' => 0.0,
+            ]);
+
+            return;
+        }
+
         while ($newXp >= $skillInTraining->xp_max) {
             $newXp -= $skillInTraining->xp_max;
 
             $skillInTraining = $this->levelUpSkill($skillInTraining);
 
-            if ($skillInTraining->level === $skillInTraining->baseSkill->max_level) {
+            if ($skillInTraining->level >= $skillInTraining->baseSkill->max_level) {
                 $newXp = 0;
 
-                $skillInTraining->update(['xp' => $newXp]);
+                $skillInTraining->update([
+                    'level' => $skillInTraining->baseSkill->max_level,
+                    'currently_training' => false,
+                    'xp' => $newXp,
+                    'xp_towards' => 0.0,
+                ]);
 
                 $skillInTraining = $skillInTraining->refresh();
 
@@ -281,9 +349,20 @@ class SkillService
      */
     private function levelUpSkill(Skill $skill): Skill
     {
+        if ($skill->level >= $skill->baseSkill->max_level) {
+            $skill->update([
+                'level' => $skill->baseSkill->max_level,
+                'currently_training' => false,
+                'xp' => 0,
+                'xp_towards' => 0.0,
+            ]);
+
+            return $skill->refresh();
+        }
+
         if ($skill->xp >= $skill->xp_max) {
 
-            $level = $skill->level + 1;
+            $level = min($skill->level + 1, $skill->baseSkill->max_level);
 
             $bonus = $skill->skill_bonus + $skill->baseSkill->skill_bonus_per_level;
 

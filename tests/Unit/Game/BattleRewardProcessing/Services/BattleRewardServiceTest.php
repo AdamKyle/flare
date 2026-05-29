@@ -11,6 +11,7 @@ use App\Game\BattleRewardProcessing\Jobs\Events\WinterEventChristmasGiftHandler;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Events\Values\EventType;
+use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -191,7 +192,29 @@ class BattleRewardServiceTest extends TestCase
         Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
     }
 
-    public function test_should_get_faction_points(): void
+    public function testBattleRewardsPassActualGoldGainedIntoGoldRush(): void
+    {
+        GoldRushCheckCalculator::shouldReceive('fetchGoldRushChance')->once()->andReturnTrue();
+
+        $character = $this->characterFactory->getCharacter();
+        $character->update([
+            'gold' => 100000,
+        ]);
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'gold' => 1000,
+        ]);
+
+        Event::fake();
+        Queue::fake();
+
+        $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
+
+        $this->assertEquals(101050, $character->refresh()->gold);
+    }
+
+    public function testShouldGetFactionPoints(): void
     {
         $character = $this->characterFactory->assignFactionSystem()->getCharacter();
 
@@ -213,7 +236,35 @@ class BattleRewardServiceTest extends TestCase
         $this->assertGreaterThan(0, $faction->current_points);
     }
 
-    public function test_should_not_update_global_event_participation_when_no_event_is_running(): void
+    public function testProcessRewardsDoesNotAwardFactionPointsWhenBatchContextPassesZero(): void
+    {
+        $character = $this->characterFactory->assignFactionSystem()->getCharacter();
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+        ]);
+
+        Event::fake();
+        Queue::fake();
+
+        $this->battleRewardService
+            ->setUp($character->id, $monster->id)
+            ->setContext([
+                'total_creatures' => 1,
+                'total_xp' => $monster->xp,
+                'total_skill_xp' => 0,
+                'total_faction_points' => 0,
+            ])
+            ->processRewards();
+
+        $faction = $character->refresh()->factions()->where('game_map_id', $character->map->game_map_id)->first();
+
+        $this->assertNotNull($faction);
+        $this->assertEquals(0, $faction->current_points);
+    }
+
+
+    public function testShouldNotUpdateGlobalEventParticipationWhenNoEventIsRunning(): void
     {
         $character = $this->characterFactory->getCharacter();
 

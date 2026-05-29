@@ -26,6 +26,7 @@ class CharacterAutomation extends Model
         'previous_level',
         'current_level',
         'attack_type',
+        'started_in_special_location',
     ];
 
     /**
@@ -40,6 +41,7 @@ class CharacterAutomation extends Model
         'move_down_monster_list_every' => 'integer',
         'previous_level' => 'integer',
         'current_level' => 'integer',
+        'started_in_special_location' => 'boolean',
     ];
 
     public function character()

@@ -146,11 +146,19 @@ class UseItemService
     {
         $foundBoon = $character->boons()
             ->where('item_id', $slot->item_id)
-            ->where('last_for_minutes', '<=', self::MAX_TIME) // corrected where clause
-            ->orderBy('created_at', 'desc') // Order by creation time to ensure we check the latest boon first
+            ->where('last_for_minutes', '<=', self::MAX_TIME)
+            ->orderBy('created_at', 'desc')
             ->first();
 
-        if (! is_null($foundBoon) && $slot->item->can_stack && $foundBoon->amount_used <= self::MAX_AMOUNT) {
+        if (! is_null($foundBoon)) {
+            if (! $slot->item->can_stack) {
+                return false;
+            }
+
+            if ($foundBoon->amount_used >= self::MAX_AMOUNT) {
+                return false;
+            }
+
             $newLastsForMinutes = $foundBoon->last_for_minutes + $slot->item->lasts_for;
 
             if ($newLastsForMinutes > self::MAX_TIME) {
@@ -169,10 +177,6 @@ class UseItemService
             $slot->delete();
 
             return true;
-        }
-
-        if (! is_null($foundBoon) && ! $slot->item->can_stack) {
-            return false;
         }
 
         $completedAt = now()->addMinutes($slot->item->lasts_for);

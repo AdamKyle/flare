@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Handlers\CapitalCityHandlers;
 
+use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
@@ -12,6 +13,7 @@ use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingUpgrades;
 use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequestMovement;
 use App\Game\Kingdoms\Service\KingdomBuildingService;
 use App\Game\Kingdoms\Service\UnitMovementService;
+use App\Game\Kingdoms\Values\BuildingQueueType;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Carbon\Carbon;
@@ -46,6 +48,10 @@ class CapitalCityBuildingManagementRequestHandler
             $timeNeeded = $this->calculateTravelTime($character, $toKingdom, $kingdom->id);
 
             $buildingQueueData = $this->buildQueueData($buildings, $type);
+
+            if (empty($buildingQueueData)) {
+                return;
+            }
 
             $travelTimeNeeded = $currentTime->clone()->addMinutes($timeNeeded);
 
@@ -119,7 +125,13 @@ class CapitalCityBuildingManagementRequestHandler
      */
     private function buildQueueData(Collection $buildings, string $type): array
     {
-        return $buildings->map(function ($building) use ($type) {
+        return $buildings->filter(function ($building) use ($type) {
+            return $type !== 'upgrade' || (
+                $building->level < $building->gameBuilding->max_level &&
+                ! $this->hasActiveManualUpgradeQueue($building) &&
+                ! $this->hasActiveCapitalCityUpgradeQueue($building)
+            );
+        })->map(function ($building) use ($type) {
             $fromLevel = $type === 'upgrade' ? $building->level : null;
             $toLevel = $type === 'upgrade' ? $building->level + 1 : null;
 
@@ -134,6 +146,39 @@ class CapitalCityBuildingManagementRequestHandler
                 'to_level' => $toLevel,
             ];
         })->toArray();
+    }
+
+    private function hasActiveManualUpgradeQueue(KingdomBuilding $building): bool
+    {
+        return BuildingInQueue::query()
+            ->where('kingdom_id', $building->kingdom_id)
+            ->where('building_id', $building->id)
+            ->where('type', BuildingQueueType::UPGRADE)
+            ->exists();
+    }
+
+    private function hasActiveCapitalCityUpgradeQueue(KingdomBuilding $building): bool
+    {
+        return CapitalCityBuildingQueue::query()
+            ->where('kingdom_id', $building->kingdom_id)
+            ->whereNotIn('status', [
+                CapitalCityQueueStatus::REJECTED,
+                CapitalCityQueueStatus::FINISHED,
+                CapitalCityQueueStatus::CANCELLED,
+            ])
+            ->get()
+            ->contains(function (CapitalCityBuildingQueue $queue) use ($building) {
+                return collect($queue->building_request_data)
+                    ->contains(function (array $request) use ($building) {
+                        return $request['type'] === 'upgrade' &&
+                            (int) $request['building_id'] === $building->id &&
+                            ! in_array($request['secondary_status'], [
+                                CapitalCityQueueStatus::REJECTED,
+                                CapitalCityQueueStatus::FINISHED,
+                                CapitalCityQueueStatus::CANCELLED,
+                            ], true);
+                    });
+            });
     }
 
     /**

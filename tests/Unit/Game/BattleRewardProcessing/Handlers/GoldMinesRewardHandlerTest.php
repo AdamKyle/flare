@@ -4,15 +4,18 @@ namespace Tests\Unit\Game\BattleRewardProcessing\Handlers;
 
 use App\Flare\Models\Event as FlareEvent;
 use App\Flare\Models\Location;
+use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\LocationType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\BattleRewardProcessing\Handlers\GoldMinesRewardHandler;
 use App\Game\Events\Values\EventType;
+use App\Game\Messages\Events\ServerMessageEvent;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterAutomation;
@@ -109,7 +112,8 @@ class GoldMinesRewardHandlerTest extends TestCase
 
     public function test_currency_reward_caps_without_event(): void
     {
-        RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(1000);
+        RandomNumberGenerator::shouldReceive('generateRandomNumber')->twice()->with(1, 375)->andReturn(375);
+        RandomNumberGenerator::shouldReceive('generateRandomNumber')->once()->with(1, 750)->andReturn(750);
 
         $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
@@ -129,7 +133,8 @@ class GoldMinesRewardHandlerTest extends TestCase
 
     public function test_currency_reward_caps_with_event(): void
     {
-        RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(5000);
+        RandomNumberGenerator::shouldReceive('generateRandomNumber')->twice()->with(1, 750)->andReturn(750);
+        RandomNumberGenerator::shouldReceive('generateRandomNumber')->once()->with(1, 3750)->andReturn(3750);
 
         $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
@@ -151,7 +156,34 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $result->shards);
     }
 
-    public function test_handle_rewards_currency_but_returns_early_when_automations_are_running(): void
+    public function testCurrencyRewardDoesNotTriggerGoldDustRush(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+
+        RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(100);
+
+        $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $character = $characterFactory->inventoryManagement()->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::GOLD_DUST_RUSH,
+        ]))->getCharacter();
+
+        $character->update([
+            'gold' => 0,
+            'gold_dust' => 100000,
+            'shards' => 0,
+        ]);
+
+        $result = $this->handler->currencyReward($character->refresh(), null)->refresh();
+
+        $this->assertEquals(100100, $result->gold_dust);
+
+        Event::assertNotDispatched(function (ServerMessageEvent $event) {
+            return str_contains($event->message, 'Gold Dust Rush');
+        });
+    }
+
+    public function testHandleRewardsCurrencyButReturnsEarlyWhenAutomationsAreRunning(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(10);
 
@@ -181,7 +213,7 @@ class GoldMinesRewardHandlerTest extends TestCase
             ],
         ]);
 
-        $this->createExploringAutomation([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
         ]);
 
@@ -303,6 +335,9 @@ class GoldMinesRewardHandlerTest extends TestCase
 
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
             ->once()
+            ->withArgs(function ($chance, $maxRoll) {
+                return abs($chance - 0.30) < 0.00001 && $maxRoll === 1000;
+            })
             ->andReturnFalse();
 
         $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
@@ -365,7 +400,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
             ->once()
             ->withArgs(function ($chance, $maxRoll) {
-                return abs($chance - 0.30) < 0.00001 && $maxRoll == 500;
+                return abs($chance - 0.45) < 0.00001 && $maxRoll == 500;
             })
             ->andReturnFalse();
 
@@ -781,7 +816,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
             ->once()
             ->withArgs(function ($chance, $maxRoll) {
-                return abs($chance - 0.15) < 0.00001 && $maxRoll === 1000;
+                return abs($chance - 0.30) < 0.00001 && $maxRoll === 1000;
             })
             ->andReturnFalse();
 
@@ -835,6 +870,71 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertFalse(FlareEvent::where('type', EventType::GOLD_MINES)->exists());
     }
 
+    public function testHandleItemChanceIncludesPartialMonsterDropCheck(): void
+    {
+        RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(1);
+        RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->andReturn(0);
+
+        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
+            ->once()
+            ->withArgs(function ($chance, $maxRoll) {
+                return abs($chance - 0.25) < 0.00001 && $maxRoll === 1000;
+            })
+            ->andReturnFalse();
+
+        $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $character = $characterFactory->getCharacter();
+
+        $character->map()->update([
+            'character_position_x' => 12,
+            'character_position_y' => 12,
+        ]);
+
+        $lootingSkill = $character->skills()
+            ->whereHas('baseSkill', function ($query) {
+                $query->where('name', 'Looting');
+            })->first();
+
+        if (! is_null($lootingSkill)) {
+            $lootingSkill->update([
+                'skill_bonus' => 0.0,
+            ]);
+        }
+
+        $character = $character->refresh();
+        $location = $this->createGoldMinesLocation($character);
+
+        $monsters = [
+            $this->createMonster(['game_map_id' => $character->map->game_map_id]),
+            $this->createMonster(['game_map_id' => $character->map->game_map_id]),
+            $this->createMonster([
+                'game_map_id' => $character->map->game_map_id,
+                'drop_check' => 1,
+            ]),
+            $this->createMonster(['game_map_id' => $character->map->game_map_id]),
+        ];
+
+        $targetMonster = $monsters[2];
+
+        Cache::put('monsters', [
+            $location->name => [
+                ['id' => $monsters[0]->id],
+                ['id' => $monsters[1]->id],
+                ['id' => $monsters[2]->id],
+                ['id' => $monsters[3]->id],
+            ],
+        ]);
+
+        $beforeSlots = $character->inventory->slots()->count();
+
+        $result = $this->handler->handleFightingAtGoldMines($character->refresh(), $targetMonster)->refresh();
+
+        $afterSlots = $result->inventory->slots()->count();
+
+        $this->assertEquals($beforeSlots, $afterSlots);
+        $this->assertFalse(FlareEvent::where('type', EventType::GOLD_MINES)->exists());
+    }
+
     private function createGoldMinesLocation($character): Location
     {
         $map = $character->map->refresh();
@@ -844,7 +944,7 @@ class GoldMinesRewardHandlerTest extends TestCase
             'x' => $map->character_position_x,
             'y' => $map->character_position_y,
             'type' => LocationType::GOLD_MINES,
-            'name' => 'gold_mines_'.uniqid('', true),
+            'name' => 'gold_mines_' . uniqid('', true),
         ]);
     }
 

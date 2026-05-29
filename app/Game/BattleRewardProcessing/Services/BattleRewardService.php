@@ -225,11 +225,14 @@ class BattleRewardService
             $totalKills = $this->context['total_creatures'];
         }
 
+        $goldBeforeReward = $this->character->gold;
+
         $this->characterRewardService->setCharacter($this->character)->giveCurrencies($this->monster, $totalKills);
 
         $character = $this->character->refresh();
+        $goldGained = $character->gold - $goldBeforeReward;
 
-        $this->goldRush->processPotentialGoldRush($character);
+        $this->goldRush->processPotentialGoldRush($character, $goldGained);
 
         $this->character = $character->refresh();
     }

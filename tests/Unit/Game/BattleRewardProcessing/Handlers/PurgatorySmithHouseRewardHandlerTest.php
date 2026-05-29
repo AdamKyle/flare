@@ -154,7 +154,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
 
     public function test_currency_reward_caps_without_event_and_without_copper_coins_item(): void
     {
-        RandomNumberGenerator::shouldReceive('generateRandomNumber')->andReturn(1000);
+        RandomNumberGenerator::shouldReceive('generateRandomNumber')->twice()->with(1, 750)->andReturn(750);
 
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
@@ -174,7 +174,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
 
     public function test_currency_reward_caps_with_event_and_with_copper_coins_item(): void
     {
-        RandomNumberGenerator::shouldReceive('generateRandomNumber')->andReturn(5000);
+        RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->with(1, 3750)->andReturn(3750);
 
         $copperCoinsItem = $this->createItem([
             'effect' => ItemEffectsValue::GET_COPPER_COINS,
@@ -231,7 +231,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
             ],
         ]);
 
-        $this->createExploringAutomation([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
         ]);
 
@@ -639,7 +639,19 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->andReturn(1);
         RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->andReturn(0);
 
-        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')->andReturnTrue();
+        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
+            ->once()
+            ->withArgs(function ($chance, $maxRoll) {
+                return abs($chance - 0.30) < 0.00001 && $maxRoll === 500;
+            })
+            ->andReturnTrue();
+
+        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
+            ->once()
+            ->withArgs(function ($chance, $maxRoll) {
+                return abs($chance - 0.30) < 0.00001 && $maxRoll === 1000;
+            })
+            ->andReturnTrue();
 
         $this->createItemAffix([
             'type' => 'prefix',
@@ -714,7 +726,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
             ->once()
             ->withArgs(function ($chance, $maxRoll) {
-                return abs($chance - 0.30) < 0.00001 && $maxRoll === 250;
+                return abs($chance - 0.45) < 0.00001 && $maxRoll === 250;
             })
             ->andReturnFalse();
 
@@ -832,7 +844,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
         ]);
 
-        $this->createExploringAutomation([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
         ]);
 

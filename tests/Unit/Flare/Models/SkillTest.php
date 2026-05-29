@@ -595,6 +595,24 @@ class SkillTest extends TestCase
         $this->assertEqualsWithDelta(0.40, $skill->getSkillBonusAttribute(), 0.00001);
     }
 
+    public function testSkillBonusUsesClampedLevelWhenSkillIsAboveMaxLevel(): void
+    {
+        $skill = $this->getCharacterSkillByName($this->character, 'Accuracy');
+
+        $skill->baseSkill->update([
+            'skill_bonus_per_level' => 0.1,
+            'max_level' => 5,
+        ]);
+
+        $skill->update([
+            'level' => 10,
+        ]);
+
+        $skill = $this->reloadSkill($skill);
+
+        $this->assertSame(1.0, $skill->getSkillBonusAttribute());
+    }
+
     private function getCharacterSkillByName(Character $character, string $skillName): Skill
     {
         return Skill::query()

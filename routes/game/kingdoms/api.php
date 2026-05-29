@@ -1,7 +1,7 @@
 <?php
 
 Route::middleware(['auth'])->group(function () {
-    Route::middleware(['is.character.who.they.say.they.are', 'is.character.dead', 'character.owns.kingdom', 'throttle:500,1'])->group(function () {
+    Route::middleware(['is.character.who.they.say.they.are', 'is.character.dead', 'character.owns.kingdom', 'kingdom.automation.blocked', 'throttle:500,1'])->group(function () {
 
         Route::post('/kingdom/{kingdom}/rename', ['as' => 'kingdom.rename', 'uses' => 'Api\KingdomsController@rename']);
 
@@ -24,44 +24,44 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:25,1'
     Route::post('/kingdom/delete-all-logs/{character}', ['as' => 'kingdoms.delete-all-logs', 'uses' => 'Api\KingdomInformationController@deleteAllLogs']);
 });
 
-Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.are'])->group(function () {
+Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.are', 'kingdom.automation.blocked'])->group(function () {
     Route::post('/kingdoms/{character}/settle', ['as' => 'kingdoms.settle', 'uses' => 'Api\KingdomSettleController@settle']);
 });
 
-Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.are'])->group(function () {
+Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.are', 'kingdom.automation.blocked'])->group(function () {
     Route::post('/kingdoms/{character}/purchase-npc-kingdom', ['as' => 'kingdoms.purchase.npc.kingdom', 'uses' => 'Api\NpcKingdomController@purchase']);
 });
 
-Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.are'])->group(function () {
+Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.are', 'kingdom.automation.blocked'])->group(function () {
     Route::post('/kingdoms/{character}/upgrade-building/{building}', ['as' => 'kingdoms.building.upgrade', 'uses' => 'Api\KingdomBuildingsController@upgradeKingdomBuilding']);
     Route::post('/kingdoms/building-upgrade/cancel', ['as' => 'kingdoms.building.queue.delete', 'uses' => 'Api\KingdomBuildingsController@removeKingdomBuildingFromQueue']);
     Route::post('/kingdoms/{character}/rebuild-building/{building}', ['as' => 'kingdoms.building.rebuild', 'uses' => 'Api\KingdomBuildingsController@rebuildKingdomBuilding']);
 });
 
-Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.are', 'character.owns.kingdom'])->group(function () {
+Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.are', 'character.owns.kingdom', 'kingdom.automation.blocked'])->group(function () {
     Route::post('/kingdoms/{kingdom}/recruit-units/{gameUnit}', ['as' => 'kingdoms.recruit.units', 'uses' => 'Api\KingdomUnitsController@recruitUnits']);
     Route::post('/kingdoms/recruit-units/cancel', ['as' => 'kingdoms.recruit.units.cancel', 'uses' => 'Api\KingdomUnitsController@cancelRecruit']);
 });
 
-Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.are', 'character.owns.kingdom', 'throttle:25,1'])->group(function () {
+Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.are', 'character.owns.kingdom', 'kingdom.automation.blocked', 'throttle:25,1'])->group(function () {
     Route::post('/kingdoms/embezzle/{kingdom}', ['as' => 'kingdom.embezzle', 'uses' => 'Api\KingdomTreasuryController@embezzle']);
     Route::post('/kingdoms/mass-embezzle/{character}', ['as' => 'kingdom.mass.embezzle', 'uses' => 'Api\KingdomTreasuryController@massEmbezzle']);
     Route::post('/kingdoms/deposit/{kingdom}', ['as' => 'kingdom.deposit', 'uses' => 'Api\KingdomTreasuryController@deposit']);
 });
 
-Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.are', 'character.owns.kingdom', 'throttle:25,1'])->group(function () {
+Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.are', 'character.owns.kingdom', 'kingdom.automation.blocked', 'throttle:25,1'])->group(function () {
     Route::post('/kingdoms/purchase-gold-bars/{kingdom}', ['as' => 'kingdom.purchase.bars', 'uses' => 'Api\KingdomGoldBarsController@purchaseGoldBars']);
     Route::post('/kingdoms/withdraw-bars-as-gold/{kingdom}', ['as' => 'kingdom.withdraw.bars', 'uses' => 'Api\KingdomGoldBarsController@withdrawGoldBars']);
 });
 
-Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.are', 'character.owns.kingdom', 'throttle:25,1'])->group(function () {
+Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.are', 'character.owns.kingdom', 'kingdom.automation.blocked', 'throttle:25,1'])->group(function () {
     Route::post('/kingdoms/smelt-iron/{kingdom}', ['as' => 'kingdom.smelt.iron', 'uses' => 'Api\KingdomSteelController@smeltSteel']);
     Route::post('/kingdoms/cancel-smelting/{kingdom}', ['as' => 'kingdom.cancel.smelting', 'uses' => 'Api\KingdomSteelController@cancelSmelting']);
 });
 
 Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.are', 'character.owns.kingdom'])->group(function () {
     Route::get('/kingdoms/units/{character}/{kingdom}/call-reinforcements', ['as' => 'kingdom.fetch.units', 'uses' => 'Api\UnitMovementController@fetchAvailableKingdomsAndUnits']);
-    Route::post('/kingdom/move-reinforcements/{character}/{kingdom}', ['as' => 'kingdom.call.reinforcements', 'uses' => 'Api\UnitMovementController@moveUnitsBetweenOwnKingdom']);
+    Route::post('/kingdom/move-reinforcements/{character}/{kingdom}', ['as' => 'kingdom.call.reinforcements', 'uses' => 'Api\UnitMovementController@moveUnitsBetweenOwnKingdom'])->middleware('kingdom.automation.blocked');
 });
 
 Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.are'])->group(function () {
@@ -69,9 +69,9 @@ Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.
         Route::get('/fetch-attacking-data/{kingdom}/{character}', ['as' => 'kingdom.fetch.attacking-data', 'uses' => 'Api\AttackKingdom@fetchAttackingData']);
     });
 
-    Route::post('/drop-items-on-kingdom/{kingdom}/{character}', ['as' => 'drop.items.on.kingdoms', 'uses' => 'Api\AttackKingdom@dropItems']);
-    Route::post('/attack-kingdom-with-units/{kingdom}/{character}', ['as' => 'attack.kingdom', 'uses' => 'Api\AttackKingdom@attackWithUnits']);
-    Route::post('/recall-units/{unitMovementQueue}/{character}', ['as' => 'recall.units', 'uses' => 'Api\UnitMovementController@recallUnits']);
+    Route::post('/drop-items-on-kingdom/{kingdom}/{character}', ['as' => 'drop.items.on.kingdoms', 'uses' => 'Api\AttackKingdom@dropItems'])->middleware('kingdom.automation.blocked');
+    Route::post('/attack-kingdom-with-units/{kingdom}/{character}', ['as' => 'attack.kingdom', 'uses' => 'Api\AttackKingdom@attackWithUnits'])->middleware('kingdom.automation.blocked');
+    Route::post('/recall-units/{unitMovementQueue}/{character}', ['as' => 'recall.units', 'uses' => 'Api\UnitMovementController@recallUnits'])->middleware('kingdom.automation.blocked');
 });
 
 Route::middleware(['auth', 'is.character.who.they.say.they.are'])->group(function () {
@@ -79,7 +79,7 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are'])->group(functio
         Route::get('/kingdom/building-expansion/details/{kingdomBuilding}/{character}', ['as' => 'kingdom.fetch.building-expansion', 'uses' => 'Api\ResourceBuildingExpansionController@getBuildingExpansionDetails']);
     });
 
-    Route::middleware(['character.owns.kingdom', 'is.character.dead'])->group(function () {
+    Route::middleware(['character.owns.kingdom', 'is.character.dead', 'kingdom.automation.blocked'])->group(function () {
         Route::post('/kingdom/building-expansion/expand/{kingdomBuilding}/{character}', ['as' => 'kingdom.expand.building-expansion', 'uses' => 'Api\ResourceBuildingExpansionController@expandBuilding']);
         Route::post('/kingdom/building-expansion/cancel-expand/{kingdomBuilding}/{character}', ['as' => 'kingdom.cancel-expansion.building-expansion', 'uses' => 'Api\ResourceBuildingExpansionController@cancelExpansionBuilding']);
     });
@@ -87,7 +87,7 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are'])->group(functio
 
 Route::middleware(['auth', 'is.character.who.they.say.they.are', 'character.owns.kingdom', 'throttle:500,1', 'is.character.dead'])->group(function () {
     Route::get('/kingdoms/{kingdom}/{character}/resource-transfer-request', ['as' => 'kingdom.resource-transfer-request', 'uses' => 'Api\ResourceTransferController@getKingdomsForResourceTransferRequest']);
-    Route::post('/kingdom/{character}/send-request-for-resources', ['as' => 'kingdom.send-request-for-resources', 'uses' => 'Api\ResourceTransferController@transferResources']);
+    Route::post('/kingdom/{character}/send-request-for-resources', ['as' => 'kingdom.send-request-for-resources', 'uses' => 'Api\ResourceTransferController@transferResources'])->middleware('kingdom.automation.blocked');
 });
 
 Route::middleware([
@@ -99,12 +99,12 @@ Route::middleware([
     Route::get('/kingdom/capital-city/building-queues/{character}/{kingdom}', ['as' => 'kingdom.capital-city.building-queues.units', 'uses' => 'Api\CapitalCityManagementController@fetchKingdomBuildingManagementQueues']);
     Route::get('/kingdom/capital-city/unit-queues/{character}/{kingdom}', ['as' => 'kingdom.capital-city.unit-queues.units', 'uses' => 'Api\CapitalCityManagementController@fetchKingdomUnitManagementQueues']);
     Route::get('/kingdom/capital-city/{character}/{kingdom}/gold-bar-details', ['as' => 'kingdom.capital-city.gold-bar-management', 'uses' => 'Api\CapitalCityManagementController@fetchGoldBarData']);
-    Route::post('/kingdom/make-capital-city/{kingdom}/{character}', ['as' => 'kingdom.make.capital-city', 'uses' => 'Api\CapitalCityManagementController@makeCapitalCity']);
-    Route::post('/kingdom/capital-city/walk-all-cities/{character}/{kingdom}', ['as' => 'capital.city.walk-kingdoms', 'uses' => 'Api\CapitalCityManagementController@walkAllKingdoms']);
-    Route::post('/kingdom/capital-city/upgrade-building-requests/{character}/{kingdom}', ['as' => 'capital.city.building-upgrade-request', 'uses' => 'Api\CapitalCityManagementController@upgradeBuildings']);
-    Route::post('/kingdom/capital-city/recruit-unit-requests/{character}/{kingdom}', ['as' => 'capital.city.recruit-unit-request', 'uses' => 'Api\CapitalCityManagementController@recruitUnits']);
-    Route::post('/kingdom/capital-city/cancel-building-request/{character}/{kingdom}', ['as' => 'capital.city-cancel-building-request', 'uses' => 'Api\CapitalCityManagementController@cancelBuildingOrdersOrders']);
-    Route::post('/kingdom/capital-city/cancel-unit-request/{character}/{kingdom}', ['as' => 'capital.city-cancel-unit-request', 'uses' => 'Api\CapitalCityManagementController@cancelUnitRecruitOrders']);
-    Route::post('/kingdom/capital-city/deposit-gold-bars/{character}/{kingdom}', ['as' => 'capital.city.deposit.gold.bars', 'uses' => 'Api\CapitalCityManagementController@depositGoldBars']);
-    Route::post('/kingdom/capital-city/withdraw-gold-bars/{character}/{kingdom}', ['as' => 'capital.city.withdraw.gold.bars', 'uses' => 'Api\CapitalCityManagementController@withDrawGoldBars']);
+    Route::post('/kingdom/make-capital-city/{kingdom}/{character}', ['as' => 'kingdom.make.capital-city', 'uses' => 'Api\CapitalCityManagementController@makeCapitalCity'])->middleware('kingdom.automation.blocked');
+    Route::post('/kingdom/capital-city/walk-all-cities/{character}/{kingdom}', ['as' => 'capital.city.walk-kingdoms', 'uses' => 'Api\CapitalCityManagementController@walkAllKingdoms'])->middleware('kingdom.automation.blocked');
+    Route::post('/kingdom/capital-city/upgrade-building-requests/{character}/{kingdom}', ['as' => 'capital.city.building-upgrade-request', 'uses' => 'Api\CapitalCityManagementController@upgradeBuildings'])->middleware('kingdom.automation.blocked');
+    Route::post('/kingdom/capital-city/recruit-unit-requests/{character}/{kingdom}', ['as' => 'capital.city.recruit-unit-request', 'uses' => 'Api\CapitalCityManagementController@recruitUnits'])->middleware('kingdom.automation.blocked');
+    Route::post('/kingdom/capital-city/cancel-building-request/{character}/{kingdom}', ['as' => 'capital.city-cancel-building-request', 'uses' => 'Api\CapitalCityManagementController@cancelBuildingOrdersOrders'])->middleware('kingdom.automation.blocked');
+    Route::post('/kingdom/capital-city/cancel-unit-request/{character}/{kingdom}', ['as' => 'capital.city-cancel-unit-request', 'uses' => 'Api\CapitalCityManagementController@cancelUnitRecruitOrders'])->middleware('kingdom.automation.blocked');
+    Route::post('/kingdom/capital-city/deposit-gold-bars/{character}/{kingdom}', ['as' => 'capital.city.deposit.gold.bars', 'uses' => 'Api\CapitalCityManagementController@depositGoldBars'])->middleware('kingdom.automation.blocked');
+    Route::post('/kingdom/capital-city/withdraw-gold-bars/{character}/{kingdom}', ['as' => 'capital.city.withdraw.gold.bars', 'uses' => 'Api\CapitalCityManagementController@withDrawGoldBars'])->middleware('kingdom.automation.blocked');
 });

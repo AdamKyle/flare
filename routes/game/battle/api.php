@@ -15,8 +15,6 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:150,2
 
             Route::get('/raid-fight-participation/{character}/{monster}', ['uses' => 'Api\RaidBattleController@fetchRaidMonster']);
             Route::post('/raid-fight/{character}/{monster}', ['uses' => 'Api\RaidBattleController@fightMonster']);
-
-            Route::post('/faction-loyalty-bounty/{character}', ['uses' => 'Api\FactionLoyaltyBattleController@handleBountyTask']);
         });
 
         Route::get('/celestial-beings/{character}', ['uses' => 'Api\CelestialBattleController@celestialMonsters']);
@@ -26,6 +24,10 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:150,2
 
     Route::middleware(['throttle:fighting', 'is.globally.timed.out', 'is.character.exploring'])->group(function () {
         Route::post('/battle-results/{character}', ['uses' => 'Api\BattleController@battleResults']);
+    });
+
+    Route::middleware(['is.character.dead', 'throttle:fighting'])->group(function () {
+        Route::post('/faction-loyalty-bounty/{character}', ['uses' => 'Api\FactionLoyaltyBattleController@handleBountyTask']);
     });
 
     Route::post('/battle-revive/{character}', ['uses' => 'Api\BattleController@revive']);

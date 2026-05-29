@@ -32,6 +32,10 @@ class ElementalAttack extends BattleBase
             return;
         }
 
+        if (! $isMonster && $this->getHighestElementDamage($defenderElements) <= 0) {
+            return;
+        }
+
         if (empty($defenderElements)) {
             $damage = floor($damage * $highestElement);
 

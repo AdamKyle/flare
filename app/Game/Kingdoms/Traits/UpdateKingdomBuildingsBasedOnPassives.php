@@ -2,8 +2,8 @@
 
 namespace App\Game\Kingdoms\Traits;
 
-use App\Flare\Models\GameBuilding;
 use App\Flare\Models\Kingdom;
+use App\Game\Kingdoms\Service\KingdomBuildingUnlockSyncService;
 
 trait UpdateKingdomBuildingsBasedOnPassives
 {
@@ -14,27 +14,6 @@ trait UpdateKingdomBuildingsBasedOnPassives
      */
     public function updateBuildings(Kingdom $kingdom): Kingdom
     {
-        $character = $kingdom->character;
-
-        foreach (GameBuilding::all() as $building) {
-
-            $isLocked = $building->is_locked;
-
-            if ($isLocked) {
-                $passive = $character->passiveSkills()->where('passive_skill_id', $building->passive_skill_id)->first();
-
-                if (! is_null($passive)) {
-                    if ($passive->current_level === $building->level_required) {
-                        $building = $kingdom->buildings->where('game_building_id', $building->id)->first();
-
-                        $building->update([
-                            'is_locked' => false,
-                        ]);
-                    }
-                }
-            }
-        }
-
-        return $kingdom->refresh();
+        return resolve(KingdomBuildingUnlockSyncService::class)->syncForKingdom($kingdom);
     }
 }

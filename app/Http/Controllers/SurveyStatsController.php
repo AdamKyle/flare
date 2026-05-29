@@ -23,6 +23,11 @@ class SurveyStatsController extends Controller
         }
 
         $surveySnapShot = SurveySnapshot::latest()->first();
+
+        if (is_null($surveySnapShot)) {
+            return view('survey.stats', ['surveyExists' => false]);
+        }
+
         $surveysSubmittedCount = $surveySnapShot->submitted_survey_count;
 
         if ($surveysSubmittedCount <= 0) {

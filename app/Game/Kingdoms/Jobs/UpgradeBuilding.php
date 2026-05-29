@@ -10,10 +10,10 @@ use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\User;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
+use App\Game\Kingdoms\Service\KingdomMaxResourceRecalculationService;
 use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Messages\Types\KingdomMessageTypes;
-use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Exception;
 use Facades\App\Flare\Values\UserOnlineValue;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -70,12 +70,13 @@ class UpgradeBuilding implements ShouldQueue
      *
      * @throws Exception
      */
-    public function handle(UpdateKingdom $updateKingdom, CapitalCityBuildingManagement $capitalCityBuildingManagement)
-    {
+    public function handle(
+        UpdateKingdom $updateKingdom,
+        CapitalCityBuildingManagement $capitalCityBuildingManagement,
+        KingdomMaxResourceRecalculationService $kingdomMaxResourceRecalculationService
+    ) {
 
         $queue = BuildingInQueue::find($this->queueId);
-
-        $skill = $this->character->passiveSkills->where('passiveSkill.effect_type', PassiveSkillTypeValue::RESOURCE_INCREASE)->first();
 
         if (is_null($queue)) {
             return;
@@ -101,9 +102,30 @@ class UpgradeBuilding implements ShouldQueue
             // @codeCoverageIgnoreEnd
         }
 
-        $level = $this->building->level + 1;
+        $building = $this->building->refresh();
+        $this->building = $building;
 
-        if ($this->building->gives_resources) {
+        if ($building->level >= $building->gameBuilding->max_level || $queue->to_level > $building->gameBuilding->max_level) {
+            $queue->delete();
+
+            return;
+        }
+
+        if (is_null($queue->from_level) || $building->level !== $queue->from_level) {
+            $queue->delete();
+
+            return;
+        }
+
+        $level = $queue->to_level;
+
+        if ($level > $building->gameBuilding->max_level) {
+            $queue->delete();
+
+            return;
+        }
+
+        if ($building->gives_resources) {
             $type = $this->getResourceType();
 
             // @codeCoverageIgnoreStart
@@ -114,12 +136,9 @@ class UpgradeBuilding implements ShouldQueue
             }
             // @codeCoverageIgnoreEnd
 
-            $this->building->kingdom->{'max_'.$type} += (1000 + $skill->resource_increase_amount);
         }
 
-        $this->building->kingdom->save();
-
-        $building = $this->building->refresh();
+        $building->kingdom->save();
 
         $building->Update([
             'level' => $level,
@@ -136,11 +155,7 @@ class UpgradeBuilding implements ShouldQueue
 
         $building = $this->building->refresh();
 
-        if ($building->is_farm) {
-            $building->kingdom->update([
-                'max_population' => $building->kingdom->max_population + (($building->level * 100) + 100) + $skill->resource_increase_amount,
-            ]);
-        }
+        $kingdomMaxResourceRecalculationService->recalculate($building->kingdom);
 
         $characterId = $this->building->kingdom->character_id;
 
@@ -160,9 +175,9 @@ class UpgradeBuilding implements ShouldQueue
             $y = $this->building->kingdom->y_position;
 
             if ($this->user->show_building_upgrade_messages) {
-                $message = $this->building->name.' finished upgrading for kingdom: '.
-                    $this->building->kingdom->name.' on plane: '.$plane.
-                    ' At (X/Y) '.$x.'/'.$y.' and is now level: '.$level;
+                $message = $this->building->name . ' finished upgrading for kingdom: ' .
+                    $this->building->kingdom->name . ' on plane: ' . $plane .
+                    ' At (X/Y) ' . $x . '/' . $y . ' and is now level: ' . $level;
 
                 ServerMessageHandler::handleMessage($this->user, KingdomMessageTypes::BUILDING_UPGRADE_FINISHED, $message);
             }
@@ -172,7 +187,7 @@ class UpgradeBuilding implements ShouldQueue
             $capitalCityQueue = CapitalCityBuildingQueue::where('id', $this->capitalCityQueueId)->where('kingdom_id', $building->kingdom_id)->first();
 
             if (is_null($capitalCityQueue)) {
-                throw new Exception('Capital City Queue is Null: Building Id: '.$this->capitalCityQueueId.' Kingdom Id: '.$building->kingdom_id);
+                throw new Exception('Capital City Queue is Null: Building Id: ' . $this->capitalCityQueueId . ' Kingdom Id: ' . $building->kingdom_id);
             }
 
             $buildingRequestData = $capitalCityQueue->building_request_data;
@@ -196,6 +211,6 @@ class UpgradeBuilding implements ShouldQueue
 
     protected function getResourceType()
     {
-        return collect($this->resourceTypes)->first(fn ($type) => $this->building->{'increase_in_'.$type} !== 0.0);
+        return collect($this->resourceTypes)->first(fn($type) => $this->building->{'increase_in_' . $type} !== 0.0);
     }
 }

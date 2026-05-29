@@ -4,6 +4,10 @@ namespace App\Game\Battle\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
+use App\Flare\Services\BuildMonsterCacheService;
+use App\Flare\Values\ItemEffectsValue;
+use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Request\AttackTypeRequest;
@@ -13,6 +17,8 @@ use Illuminate\Http\JsonResponse;
 
 class BattleController extends Controller
 {
+    use ChecksAutomationRestrictions;
+
     private MonsterFightService $monsterFightService;
 
     private BattleEventHandler $battleEventHandler;
@@ -28,10 +34,15 @@ class BattleController extends Controller
 
     public function setupMonster(AttackTypeRequest $attackTypeRequest, Character $character, Monster $monster): JsonResponse
     {
+        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::MANUAL_FIGHTING);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
 
         if ($this->monsterFightService->isAtDelveLocation($character)) {
             return response()->json([
-                'message' => 'You may not fight here. This is a place to delve (click Exploration to set up Delve)',
+                'message' => 'You may not fight here. This is a place to delve (click Delve to set up Delve)',
             ], 422);
         }
 
@@ -60,6 +71,12 @@ class BattleController extends Controller
 
     public function fightMonster(AttackTypeRequest $attackTypeRequest, Character $character): JsonResponse
     {
+        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::MANUAL_FIGHTING);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         $result = $this->monsterFightService->fightMonster($character, $attackTypeRequest->attack_type);
 
         $status = $result['status'];

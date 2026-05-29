@@ -8,7 +8,7 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;
 use App\Flare\Models\UnitMovementQueue;
 use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Kingdoms\Transformers\UnitMovementTransformer;
+use Illuminate\Support\Facades\Log;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 
@@ -62,7 +62,15 @@ class KingdomQueueService
             $fromSlot = 0;
             $toSlot = 1;
 
-            $buildingExpansion = $buildingExpansionQueue->building->buildingExpansion;
+            $building = $buildingExpansionQueue->building;
+
+            if (is_null($building)) {
+                $this->logSkippedBuildingExpansionQueue($buildingExpansionQueue, 'missing_building');
+
+                return null;
+            }
+
+            $buildingExpansion = $building->buildingExpansion;
 
             if (! is_null($buildingExpansion)) {
                 $fromSlot = $buildingExpansion->expansion_count;
@@ -70,13 +78,25 @@ class KingdomQueueService
             }
 
             return [
-                'name' => $buildingExpansionQueue->building->name,
+                'name' => $building->name,
                 'id' => $buildingExpansionQueue->id,
                 'from_slot' => $fromSlot,
                 'to_slot' => $toSlot,
                 'time_remaining' => now()->diffInSeconds($buildingExpansionQueue->completed_at),
             ];
-        })->toArray();
+        })->filter()->values()->toArray();
+    }
+
+    private function logSkippedBuildingExpansionQueue(BuildingExpansionQueue $buildingExpansionQueue, string $reason): void
+    {
+        Log::warning('Skipping invalid building expansion queue.', [
+            'building_expansion_queue_id' => $buildingExpansionQueue->id,
+            'building_id' => $buildingExpansionQueue->building_id,
+            'kingdom_id' => $buildingExpansionQueue->kingdom_id,
+            'character_id' => $buildingExpansionQueue->character_id,
+            'completed_at' => $buildingExpansionQueue->completed_at,
+            'reason' => $reason,
+        ]);
     }
 
     protected function fetchUnitRecruitmentQueues(Kingdom $kingdom): array

@@ -1,0 +1,428 @@
+<?php
+
+namespace Tests\Unit\Game\Automation\Services;
+
+use App\Flare\Models\Character;
+use App\Flare\Models\CharacterAutomation;
+use App\Flare\Models\Location;
+use App\Flare\Models\Monster;
+use App\Flare\Values\AttackTypeValue;
+use App\Flare\Values\AutomationType;
+use App\Flare\Values\LocationEffectValue;
+use App\Flare\Values\LocationType;
+use App\Game\Automation\Events\AutomationLogUpdate;
+use App\Game\Automation\Events\AutomationStatus;
+use App\Game\Automation\Events\AutomationTimeOut;
+use App\Game\Automation\Jobs\Exploration;
+use App\Game\Automation\Services\ExplorationAutomationService;
+use App\Game\Battle\Events\UpdateCharacterStatus;
+use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
+use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\Monster\MonsterFactory;
+use Tests\TestCase;
+use Tests\Traits\CreateCharacterAutomation;
+
+class ExplorationAutomationServiceTest extends TestCase
+{
+    use CreateCharacterAutomation;
+    use RefreshDatabase;
+
+    private ExplorationAutomationService $service;
+
+    private Character $character;
+
+    private Monster $monster;
+
+    private CharacterAutomation $automation;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->service = resolve(ExplorationAutomationService::class);
+
+        $this->character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $this->monster = (new MonsterFactory)
+            ->buildMonster()
+            ->getMonster();
+
+        $this->automation = $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'move_down_monster_list_every' => 10,
+            'previous_level' => $this->character->level,
+            'current_level' => $this->character->level,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+    }
+
+    public function tearDown(): void
+    {
+        Carbon::setTestNow();
+
+        parent::tearDown();
+    }
+
+    public function testBeginAutomationCreatesExplorationAutomation(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $automation = CharacterAutomation::query()->latest('id')->first();
+
+        $this->assertEquals($this->character->id, $automation->character_id);
+        $this->assertEquals($this->monster->id, $automation->monster_id);
+        $this->assertEquals(AutomationType::EXPLORING, $automation->type);
+    }
+
+    public function testBeginAutomationDispatchesUpdateCharacterStatus(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        Event::assertDispatched(UpdateCharacterStatus::class);
+    }
+
+    public function testBeginAutomationDispatchesAutomationLogUpdate(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        Event::assertDispatched(AutomationLogUpdate::class, function (AutomationLogUpdate $event) {
+            return $event->message === 'The exploration will begin in 1 minute. Every 1 minute you will encounter 6 enemies based on your fight timeout modifier.';
+        });
+    }
+
+    public function testBeginAutomationLogUpdateIncludesExactCreatureCountAndNoOldCopy(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        Event::assertDispatched(AutomationLogUpdate::class, function (AutomationLogUpdate $event) {
+            return $event->message === 'The exploration will begin in 1 minute. Every 1 minute you will encounter 6 enemies based on your fight timeout modifier.'
+                && ! str_contains($event->message, '2 minutes')
+                && ! str_contains($event->message, '50 encounters')
+                && ! str_contains($event->message, 'between 6 and 12');
+        });
+    }
+
+    public function testBeginAutomationDispatchesAutomationTimeOut(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        Event::assertDispatched(AutomationTimeOut::class);
+    }
+
+    public function testBeginAutomationDispatchesExplorationJob(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        Queue::assertPushed(Exploration::class);
+    }
+
+    public function testStopExplorationDeletesExplorationAutomation(): void
+    {
+        Event::fake();
+
+        $this->service->stopExploration($this->character);
+
+        $this->assertNull(
+            CharacterAutomation::where('character_id', $this->character->id)
+                ->where('type', AutomationType::EXPLORING)
+                ->first()
+        );
+    }
+
+    public function testStopExplorationReturns422WhenNoAutomationExists(): void
+    {
+        Event::fake();
+
+        $this->automation->delete();
+
+        $response = $this->service->stopExploration($this->character);
+
+        $this->assertEquals(422, $response->getStatusCode());
+    }
+
+    public function testStopExplorationClearsCharacterSurvivalCache(): void
+    {
+        Event::fake();
+
+        Cache::put('can-character-survive-' . $this->character->id, true);
+
+        $this->service->stopExploration($this->character);
+
+        $this->assertFalse(Cache::has('can-character-survive-' . $this->character->id));
+    }
+
+    public function testStopExplorationDispatchesAutomationStatus(): void
+    {
+        Event::fake();
+
+        $this->service->stopExploration($this->character);
+
+        Event::assertDispatched(AutomationStatus::class);
+    }
+
+    public function testSetTimeDelaySetsDefaultDelay(): void
+    {
+        $this->service->setTimeDelay();
+
+        $this->assertEquals(1, $this->service->getTimeDelay());
+    }
+
+    public function testBeginAutomationSetsCompletedAtFromAutoAttackLength(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $now = Carbon::parse('2026-01-01 12:00:00');
+
+        Carbon::setTestNow($now);
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 3,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $automation = CharacterAutomation::query()->latest('id')->first();
+
+        $this->assertEquals($now->copy()->addHours(3)->toDateTimeString(), $automation->completed_at->toDateTimeString());
+
+        Carbon::setTestNow();
+    }
+
+    public function testBeginAutomationPersistsAttackType(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackTypeValue::CAST,
+        ]);
+
+        $automation = CharacterAutomation::query()->latest('id')->first();
+
+        $this->assertEquals(AttackTypeValue::CAST, $automation->attack_type);
+    }
+
+    public function testBeginAutomationPersistsMoveDownMonsterListEvery(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 25,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $automation = CharacterAutomation::query()->latest('id')->first();
+
+        $this->assertEquals(25, $automation->move_down_monster_list_every);
+    }
+
+    public function testBeginAutomationPersistsPreviousAndCurrentLevel(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->character->update([
+            'level' => 10,
+        ]);
+
+        $this->character = $this->character->refresh();
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $automation = CharacterAutomation::query()->latest('id')->first();
+
+        $this->assertEquals(10, $automation->previous_level);
+        $this->assertEquals(10, $automation->current_level);
+    }
+
+    public function testBeginAutomationPersistsSpecialStartContext(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        Location::factory()->create([
+            'name' => 'Gold Mine',
+            'game_map_id' => $this->character->map->game_map_id,
+            'x' => $this->character->map->character_position_x,
+            'y' => $this->character->map->character_position_y,
+            'type' => LocationType::GOLD_MINES,
+            'enemy_strength_type' => LocationEffectValue::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY,
+        ]);
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $automation = CharacterAutomation::query()->latest('id')->first();
+
+        $this->assertTrue($automation->started_in_special_location);
+    }
+
+    public function testBeginAutomationPersistsRegularStartContext(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $automation = CharacterAutomation::query()->latest('id')->first();
+
+        $this->assertFalse($automation->started_in_special_location);
+    }
+
+    public function testStopExplorationDispatchesAutomationTimeOut(): void
+    {
+        Event::fake();
+
+        $this->service->stopExploration($this->character);
+
+        Event::assertDispatched(AutomationTimeOut::class);
+    }
+
+    public function testStopExplorationDispatchesUpdateCharacterStatus(): void
+    {
+        Event::fake();
+
+        $this->service->stopExploration($this->character);
+
+        Event::assertDispatched(UpdateCharacterStatus::class);
+    }
+
+    public function testStopExplorationDispatchesAutomationLogUpdate(): void
+    {
+        Event::fake();
+
+        $this->service->stopExploration($this->character);
+
+        Event::assertDispatched(AutomationLogUpdate::class);
+    }
+
+    public function testStopExplorationClearsCharacterSheetCache(): void
+    {
+        Event::fake();
+
+        Cache::put('character-sheet-' . $this->character->id, ['level' => 1]);
+
+        $this->service->stopExploration($this->character);
+
+        $this->assertFalse(Cache::has('character-sheet-' . $this->character->id));
+    }
+
+    public function testStopExplorationClearsCharacterDefenceCache(): void
+    {
+        Event::fake();
+
+        Cache::put('character-defence-' . $this->character->id, 100);
+
+        $this->service->stopExploration($this->character);
+
+        $this->assertFalse(Cache::has('character-defence-' . $this->character->id));
+    }
+
+    public function testSetTimeDelayIsAlwaysOneMinute(): void
+    {
+        $this->service->setTimeDelay($this->character);
+
+        $this->assertEquals(1, $this->service->getTimeDelay());
+    }
+
+    public function testBeginAutomationDispatchesExplorationJobAfterOneMinute(): void
+    {
+        Queue::fake();
+        Event::fake();
+        $now = Carbon::parse('2026-01-01 12:00:00');
+        Carbon::setTestNow($now);
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        Queue::assertPushed(Exploration::class, function (Exploration $job) use ($now): bool {
+            return $job->delay->toDateTimeString() === $now->copy()->addMinute()->toDateTimeString();
+        });
+
+        Carbon::setTestNow();
+    }
+}

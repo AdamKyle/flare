@@ -3,7 +3,7 @@
 namespace App\Console\DevelopmentCommands;
 
 use App\Flare\Models\Character;
-use App\Game\Reincarnate\Services\CharacterReincarnateService;
+use App\Game\Reincarnate\Services\CharacterReincarnationService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 
@@ -28,7 +28,7 @@ class ReincarnateCharacter extends Command
      *
      * @return void
      */
-    public function handle(CharacterReincarnateService $characterReincarnateService)
+    public function handle(CharacterReincarnationService $characterReincarnateService)
     {
         $name = $this->argument('characterName');
         $character = Character::where('name', $name)->first();
@@ -51,7 +51,7 @@ class ReincarnateCharacter extends Command
     /**
      * Reincarnate character.
      */
-    protected function reincarnateCharacter(Character $character, CharacterReincarnateService $characterReincarnateService): Character
+    protected function reincarnateCharacter(Character $character, CharacterReincarnationService $characterReincarnateService): Character
     {
         $result = $characterReincarnateService->doReincarnation($character);
 

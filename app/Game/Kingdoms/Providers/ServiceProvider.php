@@ -3,8 +3,14 @@
 namespace App\Game\Kingdoms\Providers;
 
 use App\Flare\Transformers\CapitalCityKingdomBuildingTransformer;
+use App\Game\Kingdoms\Transformers\KingdomAttackLogsTransformer;
+use App\Game\Kingdoms\Transformers\KingdomBuildingTransformer;
+use App\Game\Kingdoms\Transformers\KingdomResourceHourlyProductionTransformer;
+use App\Game\Kingdoms\Transformers\KingdomTransformer;
+use App\Game\Kingdoms\Transformers\UnitMovementTransformer;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
 use App\Game\Kingdoms\Console\Commands\DeleteKingdomLogs;
+use App\Game\Kingdoms\Console\Commands\RepairKingdomData;
 use App\Game\Kingdoms\Console\Commands\ResetCapitalCityWalkingStatus;
 use App\Game\Kingdoms\Console\Commands\UpdateKingdoms;
 use App\Game\Kingdoms\Handlers\AttackKingdomWithUnitsHandler;
@@ -27,6 +33,7 @@ use App\Game\Kingdoms\Handlers\SettlerHandler;
 use App\Game\Kingdoms\Handlers\TooMuchPopulationHandler;
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\Kingdoms\Middleware\DoesKingdomBelongToAuthorizedUser;
+use App\Game\Kingdoms\Middleware\BlocksKingdomAutomationManagement;
 use App\Game\Kingdoms\Service\AbandonKingdomService;
 use App\Game\Kingdoms\Service\AttackWithItemsService;
 use App\Game\Kingdoms\Service\CancelBuildingRequestService;
@@ -37,6 +44,7 @@ use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
 use App\Game\Kingdoms\Service\ExpandResourceBuildingService;
 use App\Game\Kingdoms\Service\KingdomAttackService;
 use App\Game\Kingdoms\Service\KingdomBuildingService;
+use App\Game\Kingdoms\Service\KingdomMaxResourceRecalculationService;
 use App\Game\Kingdoms\Service\KingdomMovementTimeCalculationService;
 use App\Game\Kingdoms\Service\KingdomQueueService;
 use App\Game\Kingdoms\Service\KingdomService;
@@ -191,8 +199,11 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(KingdomBuilder::class, function () {
-            return new KingdomBuilder;
+
+        $this->app->bind(KingdomBuilder::class, function ($app) {
+            return new KingdomBuilder(
+                $app->make(KingdomMaxResourceRecalculationService::class)
+            );
         });
 
         $this->app->bind(SteelSmeltingService::class, function ($app) {
@@ -264,8 +275,14 @@ class ServiceProvider extends ApplicationServiceProvider
             return new SelectedKingdom;
         });
 
-        $this->app->bind(KingdomTransformer::class, function () {
-            return new KingdomTransformer;
+        $this->app->bind(KingdomResourceHourlyProductionTransformer::class, function () {
+            return new KingdomResourceHourlyProductionTransformer;
+        });
+
+        $this->app->bind(KingdomTransformer::class, function ($app) {
+            return new KingdomTransformer(
+                $app->make(KingdomResourceHourlyProductionTransformer::class)
+            );
         });
 
         $this->app->bind(AttackWithItemsService::class, function ($app) {
@@ -375,6 +392,7 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->commands([
             DeleteKingdomLogs::class,
+            RepairKingdomData::class,
             UpdateKingdoms::class,
             ResetCapitalCityWalkingStatus::class,
         ]);
@@ -388,5 +406,6 @@ class ServiceProvider extends ApplicationServiceProvider
         $router = $this->app['router'];
 
         $router->aliasMiddleware('character.owns.kingdom', DoesKingdomBelongToAuthorizedUser::class);
+        $router->aliasMiddleware('kingdom.automation.blocked', BlocksKingdomAutomationManagement::class);
     }
 }

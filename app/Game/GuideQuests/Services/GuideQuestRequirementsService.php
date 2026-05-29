@@ -359,6 +359,10 @@ class GuideQuestRequirementsService
         if (! is_null($quest->required_kingdom_building_level) && ! is_null($quest->required_kingdom_building_id)) {
             $gameBuilding = GameBuilding::find($quest->required_kingdom_building_id);
 
+            if (is_null($gameBuilding)) {
+                return $this;
+            }
+
             $count = $character->kingdoms()->whereHas('buildings', function ($query) use ($gameBuilding, $quest) {
                 $query->where('game_building_id', $gameBuilding->id)
                     ->where('level', '>=', $quest->required_kingdom_building_level);

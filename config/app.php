@@ -231,7 +231,7 @@ return [
          * Game Related
          */
         App\Game\Events\Providers\ServiceProvider::class,
-        App\Game\Exploration\Providers\ServiceProvider::class,
+        App\Game\Automation\Providers\ServiceProvider::class,
         App\Game\Character\Providers\ServiceProvider::class,
         App\Game\Character\Builders\AttackBuilders\Providers\ServiceProvider::class,
         App\Game\Character\Builders\InformationBuilders\Providers\ServiceProvider::class,

@@ -178,7 +178,7 @@ class MassDisenchantServiceTest extends TestCase
         );
 
         $massDisenchantService = Mockery::mock(MassDisenchantService::class, function (MockInterface $mock) {
-            $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('fetchDCRoll')->andReturn(1000);
+            $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('fetchDCRoll')->andReturn(100);
         });
 
         $massDisenchantService->__construct(resolve(SkillCheckService::class));
@@ -194,7 +194,102 @@ class MassDisenchantServiceTest extends TestCase
         $this->assertGreaterThan(1, $enchantingSkill->level);
     }
 
-    public function test_get_gold_dust_rush_disenchanting_items_does_not_go_abovemax()
+    public function testMassDisenchantRollsGoldDustRushOnceForTheAction(): void
+    {
+        $character = $this->character->inventoryManagement()->giveItem(
+            $this->createItem([
+                'name' => 'sample',
+                'type' => 'quest',
+                'effect' => ItemEffectsValue::GOLD_DUST_RUSH,
+            ])
+        )->giveItemMultipleTimes($this->itemToDisenchant, 2)->getCharacter();
+
+        $character->skills->where('baseSkill.type', SkillTypeValue::DISENCHANTING->value)->first()->baseSkill->update([
+            'skill_bonus_per_level' => 0,
+        ]);
+
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('getDCCheck')->twice()->andReturn(1);
+                $mock->shouldReceive('characterRoll')->twice()->andReturn(100);
+            }),
+        );
+
+        $massDisenchantService = Mockery::mock(MassDisenchantService::class, function (MockInterface $mock) {
+            $mock->makePartial()->shouldAllowMockingProtectedMethods();
+        });
+
+        $massDisenchantService->__construct(resolve(SkillCheckService::class));
+        $massDisenchantService->shouldReceive('fetchGoldDustAmount')->twice()->andReturn(1000);
+        $massDisenchantService->shouldReceive('fetchDCRoll')->once()->andReturn(100);
+
+        $massDisenchantService->setUp($character->refresh())->disenchantItems($character->refresh()->inventory->slots->where('item.type', 'weapon'));
+
+        $character = $character->refresh();
+
+        $this->assertEquals(2100, $character->gold_dust);
+    }
+
+    public function testFailedMassDisenchantUsesFailedGoldDustGain(): void
+    {
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('getDCCheck')->once()->andReturn(100);
+                $mock->shouldReceive('characterRoll')->once()->andReturn(1);
+            }),
+        );
+
+        $massDisenchantService = Mockery::mock(MassDisenchantService::class, function (MockInterface $mock) {
+            $mock->makePartial()->shouldAllowMockingProtectedMethods();
+        });
+
+        $massDisenchantService->__construct(resolve(SkillCheckService::class));
+        $massDisenchantService->shouldReceive('fetchGoldDustAmount')->never();
+        $massDisenchantService->shouldReceive('fetchDCRoll')->never();
+
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->getCharacter();
+
+        $massDisenchantService->setUp($character)->disenchantItems($character->inventory->slots);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(1, $character->gold_dust);
+    }
+
+    public function testFailedMassDisenchantDoesNotTriggerGoldDustRush(): void
+    {
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('getDCCheck')->once()->andReturn(100);
+                $mock->shouldReceive('characterRoll')->once()->andReturn(1);
+            }),
+        );
+
+        $massDisenchantService = Mockery::mock(MassDisenchantService::class, function (MockInterface $mock) {
+            $mock->makePartial()->shouldAllowMockingProtectedMethods();
+        });
+
+        $massDisenchantService->__construct(resolve(SkillCheckService::class));
+        $massDisenchantService->shouldReceive('fetchGoldDustAmount')->never();
+        $massDisenchantService->shouldReceive('fetchDCRoll')->never();
+
+        $character = $this->character->inventoryManagement()->giveItem($this->createItem([
+            'name' => 'sample',
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::GOLD_DUST_RUSH,
+        ]))->giveItem($this->itemToDisenchant)->getCharacter();
+
+        $massDisenchantService->setUp($character)->disenchantItems($character->inventory->slots->where('item.type', 'weapon'));
+
+        $character = $character->refresh();
+
+        $this->assertEquals(1, $character->gold_dust);
+    }
+
+    public function testGetGoldDustRushDisenchantingItemsDoesNotGoAbovemax()
     {
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([
@@ -225,7 +320,7 @@ class MassDisenchantServiceTest extends TestCase
         );
 
         $massDisenchantService = Mockery::mock(MassDisenchantService::class, function (MockInterface $mock) {
-            $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('fetchDCRoll')->andReturn(1000);
+            $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('fetchDCRoll')->andReturn(100);
         });
 
         $massDisenchantService->__construct(resolve(SkillCheckService::class));
@@ -259,7 +354,7 @@ class MassDisenchantServiceTest extends TestCase
         ]);
 
         $massDisenchantService = Mockery::mock(MassDisenchantService::class, function (MockInterface $mock) {
-            $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('fetchDCRoll')->andReturn(1000);
+            $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('fetchDCRoll')->andReturn(100);
         });
 
         $massDisenchantService->__construct(resolve(SkillCheckService::class));
@@ -308,7 +403,7 @@ class MassDisenchantServiceTest extends TestCase
         );
 
         $massDisenchantService = Mockery::mock(MassDisenchantService::class, function (MockInterface $mock) {
-            $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('fetchDCRoll')->andReturn(1000);
+            $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('fetchDCRoll')->andReturn(100);
         });
 
         $massDisenchantService->__construct(resolve(SkillCheckService::class));

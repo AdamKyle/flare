@@ -34,6 +34,10 @@ class ItemSkillService
             return $this->errorResult('No skill found on said item.');
         }
 
+        if ($this->normalizeMaxLevelProgression($foundSkill)) {
+            return $this->errorResult('This item skill is already at max level.');
+        }
+
         if (! $this->canTrainSkill($foundSkill)) {
             return $this->errorResult('You must train the parent skill first.');
         }
@@ -144,5 +148,22 @@ class ItemSkillService
     protected function stopTrainingOtherSkills(Item $item): void
     {
         $item->itemSkillProgressions()->update(['is_training' => false]);
+    }
+
+    protected function normalizeMaxLevelProgression(ItemSkillProgression $itemSkillProgression): bool
+    {
+        $maxLevel = $itemSkillProgression->itemSkill->max_level;
+
+        if ($itemSkillProgression->current_level < $maxLevel) {
+            return false;
+        }
+
+        $itemSkillProgression->update([
+            'current_level' => $maxLevel,
+            'current_kill' => 0,
+            'is_training' => false,
+        ]);
+
+        return true;
     }
 }

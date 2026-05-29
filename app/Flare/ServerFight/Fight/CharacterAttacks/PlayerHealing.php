@@ -63,7 +63,13 @@ class PlayerHealing extends BattleBase
             $this->monsterHealth -= $damage;
             $this->characterHealth += $damage;
 
-            $this->addMessage('You lash out in rage and grip the enemies neck. Take what you need child! You deal and heal for: '.number_format($damage), 'player-action');
+            $maxCharacterHealth = $this->characterCacheData->getCachedCharacterData($character, 'health');
+
+            if ($this->characterHealth >= $maxCharacterHealth) {
+                $this->characterHealth = $maxCharacterHealth;
+            }
+
+            $this->addMessage('You lash out in rage and grip the enemies neck. Take what you need child! You deal and heal for: ' . number_format($damage), 'player-action');
         }
     }
 }

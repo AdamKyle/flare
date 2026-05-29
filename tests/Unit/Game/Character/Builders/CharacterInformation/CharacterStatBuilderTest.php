@@ -14,6 +14,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
+use Tests\Traits\CreateGameClassSpecial;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
@@ -21,7 +22,7 @@ use Tests\Traits\CreateItemAffix;
 
 class CharacterStatBuilderTest extends TestCase
 {
-    use CreateClass, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateClass, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, CreateGameClassSpecial, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -1418,7 +1419,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $amount = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
 
-        $this->assertEquals(.99, $amount);
+        $this->assertEquals(.75, $amount);
     }
 
     public function test_build_affix_life_stealing_non_stacking_with_no_enchantments()
@@ -1500,7 +1501,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $amount = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
 
-        $this->assertEquals(.99, $amount);
+        $this->assertEquals(.75, $amount);
     }
 
     public function test_build_affix_life_stealing_vampire_in_purgatory()
@@ -1543,7 +1544,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $amount = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
 
-        $this->assertEquals((.99 - (.99 * .20)), $amount);
+        $this->assertEquals((.75 - (.75 * .20)), $amount);
     }
 
     public function test_build_affix_life_stealing_vampire_in_hell()
@@ -1586,7 +1587,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $amount = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
 
-        $this->assertEquals((.99 - (.99 * .10)), $amount);
+        $this->assertEquals((.75 - (.75 * .10)), $amount);
     }
 
     public function test_build_affix_life_stealing_vampire_in_twisted_memories()
@@ -1629,7 +1630,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $amount = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
 
-        $this->assertEquals((.99 - (.99 * .25)), $amount);
+        $this->assertEquals((.75 - (.75 * .25)), $amount);
     }
 
     public function test_build_affix_life_stealing_vampire_in_event_map_ice_plane_with_access_to_purgatory()
@@ -1677,7 +1678,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $amount = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
 
-        $this->assertEquals((.99 - (.99 * .20)), $amount);
+        $this->assertEquals((.75 - (.75 * .20)), $amount);
     }
 
     public function test_build_affix_life_stealing_vampire_in_event_map_delusional_memories_with_access_to_purgatory()
@@ -1725,7 +1726,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $amount = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
 
-        $this->assertEquals((.99 - (.99 * .25)), $amount);
+        $this->assertEquals((.75 - (.75 * .25)), $amount);
     }
 
     public function test_build_invalid_affix_damage()
@@ -2308,5 +2309,163 @@ class CharacterStatBuilderTest extends TestCase
         $resistance = $this->characterStatBuilder->setCharacter($character)->buildResistanceReductionChance();
 
         $this->assertEquals(1, $resistance);
+    }
+
+    public function testSpellDamageUsesClassSpecialtyBaseSpellDamageMod()
+    {
+        $item = $this->createItem([
+            'name' => 'spell',
+            'type' => ItemType::SPELL_DAMAGE->value,
+            'base_damage' => 100,
+        ]);
+
+        $class = $this->createClass([
+            'name' => 'Vampire',
+        ]);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->equipItem('spell-one', 'spell')
+            ->getCharacter();
+
+        $character->update([
+            'game_class_id' => $class->id,
+        ]);
+
+        $classSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $class->id,
+            'base_damage_mod' => 0,
+            'base_spell_damage_mod' => 0.10,
+        ]);
+
+        $character->classSpecialsEquipped()->create([
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 10,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::SPELL_DAMAGE->value);
+
+        $this->assertEquals(200, $damage);
+    }
+
+    public function testSpellDamageDoesNotUseClassSpecialtyBaseDamageMod()
+    {
+        $item = $this->createItem([
+            'name' => 'spell',
+            'type' => ItemType::SPELL_DAMAGE->value,
+            'base_damage' => 100,
+        ]);
+
+        $class = $this->createClass([
+            'name' => 'Vampire',
+        ]);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->equipItem('spell-one', 'spell')
+            ->getCharacter();
+
+        $character->update([
+            'game_class_id' => $class->id,
+        ]);
+
+        $classSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $class->id,
+            'base_damage_mod' => 0.10,
+            'base_spell_damage_mod' => 0,
+        ]);
+
+        $character->classSpecialsEquipped()->create([
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 10,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::SPELL_DAMAGE->value);
+
+        $this->assertEquals(100, $damage);
+    }
+
+    public function testPositionalSpellDamageUsesClassSpecialtyBaseSpellDamageMod()
+    {
+        $item = $this->createItem([
+            'name' => 'spell',
+            'type' => ItemType::SPELL_DAMAGE->value,
+            'base_damage' => 100,
+        ]);
+
+        $class = $this->createClass([
+            'name' => 'Vampire',
+        ]);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->equipItem('spell-one', 'spell')
+            ->getCharacter();
+
+        $character->update([
+            'game_class_id' => $class->id,
+        ]);
+
+        $classSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $class->id,
+            'base_damage_mod' => 0,
+            'base_spell_damage_mod' => 0.10,
+        ]);
+
+        $character->classSpecialsEquipped()->create([
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 10,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->positionalSpellDamage('spell-one');
+
+        $this->assertEquals(200, $damage);
+    }
+
+    public function testStackedStatBoonMultipliesByAmountUsed()
+    {
+        $character = $this->character->getCharacter();
+
+        $str = $character->str;
+
+        $boon = $this->createItem([
+            'name' => 'Stacked Stat Boon',
+            'increase_stat_by' => 0.15,
+            'can_stack' => true,
+        ]);
+
+        $character->boons()->create([
+            'character_id' => $character->id,
+            'item_id' => $boon->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(120),
+            'last_for_minutes' => 120,
+            'amount_used' => 4,
+        ]);
+
+        $moddedStr = $this->characterStatBuilder->setCharacter($character)->statMod('str');
+
+        $this->assertEqualsWithDelta($str + ($str * 0.60), $moddedStr, 0.00001);
     }
 }

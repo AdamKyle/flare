@@ -1,0 +1,25 @@
+<?php
+
+namespace Feature\Http\Controllers;
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+use Tests\Traits\CreateReleaseNotes;
+
+class ReleasePageControllerTest extends TestCase
+{
+    use CreateReleaseNotes, RefreshDatabase;
+
+    public function test_view_release_notes()
+    {
+        $releaseNotes = $this->createReleaseNotes([
+            'name' => 'Sample',
+            'version' => '1.0.0',
+            'url' => 'http://google.ca',
+            'release_date' => now(),
+            'body' => 'Sample',
+        ]);
+
+        $this->visitRoute('releases.list')->see($releaseNotes->name);
+    }
+}

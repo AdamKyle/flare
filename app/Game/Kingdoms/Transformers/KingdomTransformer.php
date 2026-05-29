@@ -15,6 +15,8 @@ use League\Fractal\TransformerAbstract;
 
 class KingdomTransformer extends TransformerAbstract
 {
+    public function __construct(private readonly KingdomResourceHourlyProductionTransformer $kingdomResourceHourlyProductionTransformer) {}
+
     /**
      * @var string[]
      */
@@ -84,6 +86,7 @@ class KingdomTransformer extends TransformerAbstract
             'is_capital' => $kingdom->is_capital,
             'auto_walked' => $kingdom->auto_walked,
             'small_council_data' => $this->getSmallCouncilData($kingdom),
+            'estimated_hourly_production' => $this->kingdomResourceHourlyProductionTransformer->transform($kingdom),
         ];
     }
 

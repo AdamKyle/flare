@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Jobs;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\KingdomBuilding;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityKingdomLogHandler;
+use App\Game\Kingdoms\Service\KingdomMaxResourceRecalculationService;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -25,8 +26,10 @@ class CapitalCityBuildingRequest implements ShouldQueue
 
     public function __construct(protected readonly int $capitalCityQueueId) {}
 
-    public function handle(CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler): void
-    {
+    public function handle(
+        CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler,
+        KingdomMaxResourceRecalculationService $kingdomMaxResourceRecalculationService
+    ): void {
 
         $queueData = CapitalCityBuildingQueue::find($this->capitalCityQueueId);
 
@@ -54,11 +57,14 @@ class CapitalCityBuildingRequest implements ShouldQueue
             }
         }
 
-        $this->handleBuilding($queueData, $capitalCityKingdomLogHandler);
+        $this->handleBuilding($queueData, $capitalCityKingdomLogHandler, $kingdomMaxResourceRecalculationService);
     }
 
-    private function handleBuilding(CapitalCityBuildingQueue $queueData, CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler): void
-    {
+    private function handleBuilding(
+        CapitalCityBuildingQueue $queueData,
+        CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler,
+        KingdomMaxResourceRecalculationService $kingdomMaxResourceRecalculationService
+    ): void {
         $buildingRequestData = $queueData->building_request_data;
         $kingdom = $queueData->kingdom;
 
@@ -77,7 +83,14 @@ class CapitalCityBuildingRequest implements ShouldQueue
             $building = $kingdom->buildings()->find($requestData['building_id']);
 
             if ($requestData['type'] === 'upgrade') {
+                if ($this->isInvalidUpgradeRequest($building, $requestData)) {
+                    $buildingRequestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
+                    continue;
+                }
+
                 $this->handleUpgradingBuilding($building, $requestData['to_level']);
+                $kingdomMaxResourceRecalculationService->recalculate($kingdom);
 
                 $buildingRequestData[$index]['secondary_status'] = CapitalCityQueueStatus::FINISHED;
 
@@ -104,13 +117,6 @@ class CapitalCityBuildingRequest implements ShouldQueue
     private function handleUpgradingBuilding(KingdomBuilding $building, int $toLevel): void
     {
 
-        if ($building->gives_resources) {
-            $type = $this->getResourceType($building);
-
-            $building->kingdom->{'max_'.$type} += 1000;
-            $building->kingdom->save();
-        }
-
         $building->update(['level' => $toLevel]);
 
         $building = $building->refresh();
@@ -121,10 +127,13 @@ class CapitalCityBuildingRequest implements ShouldQueue
             'max_defence' => $building->defence,
             'max_durability' => $building->durability,
         ]);
+    }
 
-        if ($building->is_farm) {
-            $building->kingdom->increment('max_population', ($building->level * 100) + 100);
-        }
+    private function isInvalidUpgradeRequest(KingdomBuilding $building, array $requestData): bool
+    {
+        return $building->level >= $building->gameBuilding->max_level ||
+            (int) $requestData['to_level'] > $building->gameBuilding->max_level ||
+            (int) $requestData['from_level'] !== $building->level;
     }
 
     private function handleRebuildingBuilding(KingdomBuilding $building): void
@@ -148,10 +157,5 @@ class CapitalCityBuildingRequest implements ShouldQueue
                 'current_morale' => $newMorale,
             ]);
         }
-    }
-
-    private function getResourceType(KingdomBuilding $building)
-    {
-        return collect($this->resourceTypes)->first(fn ($type) => $building->{'increase_in_'.$type} !== 0.0);
     }
 }

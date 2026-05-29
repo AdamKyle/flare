@@ -751,7 +751,7 @@ class BattleDropTest extends TestCase
 
         $character = $characterFactory->getCharacter()->refresh();
 
-        $this->createExploringAutomation(['character_id' => $character->id]);
+        $this->createCharacterAutomation(['character_id' => $character->id]);
 
         $location = $this->createLocation();
 

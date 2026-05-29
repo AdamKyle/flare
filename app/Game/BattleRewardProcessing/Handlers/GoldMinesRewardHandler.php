@@ -48,7 +48,7 @@ class GoldMinesRewardHandler
         }
 
         if ($this->isMonsterAtLeastHalfWayOrMore($location, $monster)) {
-            $character = $this->handleItemReward($character, $event, $killCount);
+            $character = $this->handleItemReward($character, $monster, $event, $killCount);
         }
 
         return $character->refresh();
@@ -76,12 +76,12 @@ class GoldMinesRewardHandler
      */
     public function currencyReward(Character $character, ?Event $event = null, int $killCount = 1): Character
     {
-        $maximumAmount = 500;
-        $maximumGold = 1000;
+        $maximumAmount = 375;
+        $maximumGold = 750;
 
         if (! is_null($event)) {
-            $maximumAmount = 1000;
-            $maximumGold = 5000;
+            $maximumAmount = 750;
+            $maximumGold = 3750;
         }
 
         $goldDustToReward = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount) * $killCount;
@@ -124,10 +124,11 @@ class GoldMinesRewardHandler
      *
      * @throws Exception
      */
-    protected function handleItemReward(Character $character, ?Event $event = null, int $killCount = 1): Character
+    protected function handleItemReward(Character $character, Monster $monster, ?Event $event = null, int $killCount = 1): Character
     {
         $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->first()->skill_bonus;
         $maxRoll = 1_000;
+        $maximumChance = 0.30;
 
         if ($lootingChance > 0.15) {
             $lootingChance = 0.15;
@@ -136,7 +137,10 @@ class GoldMinesRewardHandler
         if (! is_null($event)) {
             $lootingChance = .30;
             $maxRoll = (int) ($maxRoll / 2);
+            $maximumChance = 0.45;
         }
+
+        $lootingChance = min($lootingChance + ($monster->drop_check * 0.25), $maximumChance);
 
         for ($iterationIndex = 0; $iterationIndex < $killCount; $iterationIndex++) {
             if ($character->isInventoryFull()) {

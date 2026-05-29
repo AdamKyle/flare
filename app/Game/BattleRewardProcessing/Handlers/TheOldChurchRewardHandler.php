@@ -58,7 +58,7 @@ class TheOldChurchRewardHandler
         }
 
         if ($this->isMonsterAtLeastHalfWayOrMore($location, $monster)) {
-            $character = $this->handleItemReward($character, $event, $killCount);
+            $character = $this->handleItemReward($character, $monster, $event, $killCount);
         }
 
         return $character;
@@ -87,12 +87,12 @@ class TheOldChurchRewardHandler
      */
     public function currencyReward(Character $character, ?Event $event = null, int $killCount = 1): Character
     {
-        $maximumAmount = 1_000;
-        $maximumGold = 20_000;
+        $maximumAmount = 750;
+        $maximumGold = 15_000;
 
         if (! is_null($event)) {
-            $maximumAmount = 5_000;
-            $maximumGold = 40_000;
+            $maximumAmount = 3_750;
+            $maximumGold = 30_000;
         }
 
         $goldDustToReward = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount) * $killCount;
@@ -137,10 +137,11 @@ class TheOldChurchRewardHandler
      *
      * @throws Exception
      */
-    private function handleItemReward(Character $character, ?Event $event = null, int $killCount = 1): Character
+    private function handleItemReward(Character $character, Monster $monster, ?Event $event = null, int $killCount = 1): Character
     {
         $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->first()->skill_bonus;
         $maxRoll = 1_000;
+        $maximumChance = 0.30;
 
         if ($lootingChance > 0.15) {
             $lootingChance = 0.15;
@@ -149,7 +150,10 @@ class TheOldChurchRewardHandler
         if (! is_null($event)) {
             $lootingChance = .30;
             $maxRoll = (int) ($maxRoll / 2);
+            $maximumChance = 0.45;
         }
+
+        $lootingChance = min($lootingChance + ($monster->drop_check * 0.25), $maximumChance);
 
         for ($iterationIndex = 0; $iterationIndex < $killCount; $iterationIndex++) {
             if ($character->isInventoryFull()) {

@@ -2,7 +2,6 @@
 
 namespace App\Game\Kingdoms\Handlers\CapitalCityHandlers;
 
-use App\Flare\Models\CapitalCityResourceRequest;
 use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameBuildingUnit;
@@ -11,7 +10,6 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Handlers\Traits\CanAffordPopulationCost;
-use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest as CapitalCityResourceRequestJob;
 use App\Game\Kingdoms\Jobs\CapitalCityUnitRequest;
 use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Validation\KingdomUnitResourceValidation;
@@ -46,16 +44,17 @@ class CapitalCityProcessUnitRequestHandler
         $kingdom = $capitalCityUnitQueue->kingdom;
         $character = $capitalCityUnitQueue->character;
 
-        $requestData = $this->processUnitRequests($kingdom, $requestData);
+        $requestData = $this->processUnitRequests($capitalCityUnitQueue, $kingdom, $requestData);
         $missingResources = $this->calculateMissingResources($requestData);
 
         if (! empty($missingResources) && $shouldFailForMissingCosts) {
             $requestData = collect($requestData)
-                ->map(fn ($item) => array_merge($item, ['secondary_status' => CapitalCityQueueStatus::REJECTED]))
+                ->map(fn($item) => array_merge($item, ['secondary_status' => CapitalCityQueueStatus::REJECTED]))
                 ->toArray();
 
             $capitalCityUnitQueue->update([
                 'unit_request_data' => $requestData,
+                'status' => CapitalCityQueueStatus::REJECTED,
                 'messages' => array_merge($capitalCityUnitQueue->messages, [
                     'Units were rejected because even after requesting resources, you still do not have enough resources for one or more units so the entire request was canceled out of frustration.',
                 ]),
@@ -88,17 +87,18 @@ class CapitalCityProcessUnitRequestHandler
     /**
      * Process each unit request.
      */
-    private function processUnitRequests(Kingdom $kingdom, array $requestData): array
+    private function processUnitRequests(CapitalCityUnitQueue $capitalCityUnitQueue, Kingdom $kingdom, array $requestData): array
     {
+        $requestedAmountsByUnitName = [];
 
         foreach ($requestData as $index => $unitRequest) {
-            $gameUnit = GameUnit::where('name', $unitRequest['name'])->first();
-            $gameBuildingRelation = GameBuildingUnit::where('game_unit_id', $gameUnit->id)->first();
-            $building = $kingdom->buildings()->where('game_building_id', $gameBuildingRelation->game_building_id)->first();
-
             if ($unitRequest['secondary_status'] === CapitalCityQueueStatus::CANCELLED) {
                 continue;
             }
+
+            $gameUnit = GameUnit::where('name', $unitRequest['name'])->first();
+            $gameBuildingRelation = GameBuildingUnit::where('game_unit_id', $gameUnit->id)->first();
+            $building = $kingdom->buildings()->where('game_building_id', $gameBuildingRelation->game_building_id)->first();
 
             if ($this->isBuildingLocked($building, $kingdom, $unitRequest['name'])) {
                 $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
@@ -118,6 +118,17 @@ class CapitalCityProcessUnitRequestHandler
                 continue;
             }
 
+            $requestedAmountsByUnitName[$unitRequest['name']] = ($requestedAmountsByUnitName[$unitRequest['name']] ?? 0) + $unitRequest['amount'];
+
+            if (! $this->unitService->canQueueUnits($kingdom, $gameUnit, $requestedAmountsByUnitName[$unitRequest['name']], null, $capitalCityUnitQueue->id)) {
+                $this->messages[] = $unitRequest['name'] . ' rejected because recruiting this amount would exceed the kingdom unit maximum.';
+                $unitRequest['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
+                $requestData[$index] = $unitRequest;
+
+                continue;
+            }
+
             $unitRequest = $this->processPotentialResourceRequests($kingdom, $gameUnit, $unitRequest);
 
             $requestData[$index] = $unitRequest;
@@ -133,7 +144,7 @@ class CapitalCityProcessUnitRequestHandler
     {
         if ($building->is_locked) {
 
-            $this->messages[] = $unitName.' rejected because: Building is locked in '.$kingdom->name.'. You need to unlock the building: '.$building->name.' first by leveling a passive of the same name to level 1.';
+            $this->messages[] = $unitName . ' rejected because: Building is locked in ' . $kingdom->name . '. You need to unlock the building: ' . $building->name . ' first by leveling a passive of the same name to level 1.';
 
             return true;
         }
@@ -148,7 +159,7 @@ class CapitalCityProcessUnitRequestHandler
     {
         if ($building->level < $gameBuildingRelation->required_level) {
 
-            $this->messages[] = $unitName.' rejected because: Building is under level in '.$kingdom->name.'. You need to level the building: '.$building->name.' to level: '.$gameBuildingRelation->required_level.' first.';
+            $this->messages[] = $unitName . ' rejected because: Building is under level in ' . $kingdom->name . '. You need to level the building: ' . $building->name . ' to level: ' . $gameBuildingRelation->required_level . ' first.';
 
             return true;
         }
@@ -191,7 +202,7 @@ class CapitalCityProcessUnitRequestHandler
     {
         return collect($requestData)
             ->pluck('missing_costs')
-            ->reduce(fn ($carry, $costs) => $carry->merge($costs)->map(fn ($value, $key) => $carry->get($key, 0) + $value), collect())
+            ->reduce(fn($carry, $costs) => $carry->merge($costs)->map(fn($value, $key) => $carry->get($key, 0) + $value), collect())
             ->toArray();
     }
 
@@ -224,7 +235,7 @@ class CapitalCityProcessUnitRequestHandler
 
             $totalTimeInSeconds = 0;
 
-            $filteredRequestData = collect($requestData)->filter(fn ($item) => in_array($item['secondary_status'], [
+            $filteredRequestData = collect($requestData)->filter(fn($item) => in_array($item['secondary_status'], [
                 CapitalCityQueueStatus::RECRUITING,
             ]))->toArray();
 
@@ -246,7 +257,7 @@ class CapitalCityProcessUnitRequestHandler
     private function hasRecruitingUnits(array $requestData): bool
     {
         return collect($requestData)
-            ->contains(fn ($item) => $item['secondary_status'] === CapitalCityQueueStatus::RECRUITING);
+            ->contains(fn($item) => $item['secondary_status'] === CapitalCityQueueStatus::RECRUITING);
     }
 
     /**
@@ -292,10 +303,7 @@ class CapitalCityProcessUnitRequestHandler
                 'started_at' => now(),
                 'completed_at' => now()->addSeconds($totalTimeInSeconds),
                 'messages' => array_merge($messages, $this->messages),
-                'unit_request_data' => array_merge(
-                    $capitalCityUnitQueue->unit_request_data,
-                    $requestData
-                ),
+                'unit_request_data' => $capitalCityUnitQueue->unit_request_data,
             ]);
 
             $capitalCityUnitQueue = $capitalCityUnitQueue->refresh();
@@ -320,8 +328,8 @@ class CapitalCityProcessUnitRequestHandler
     private function sumTotalCostsForUnits(array $requestData): array
     {
         return collect($requestData)
-            ->map(fn ($costs) => collect($costs['costs']))
-            ->reduce(fn ($carry, $costs) => $carry->merge($costs)->map(fn ($value, $key) => $carry->get($key, 0) + $value), collect())
+            ->map(fn($costs) => collect($costs['costs']))
+            ->reduce(fn($carry, $costs) => $carry->merge($costs)->map(fn($value, $key) => $carry->get($key, 0) + $value), collect())
             ->toArray();
     }
 
@@ -333,7 +341,7 @@ class CapitalCityProcessUnitRequestHandler
         $messages = $capitalCityUnitQueue->messages ?? [];
 
         $capitalCityUnitQueue->update([
-            'building_request_data' => $capitalCityUnitQueue->building_request_data,
+            'unit_request_data' => $capitalCityUnitQueue->unit_request_data,
             'messages' => array_merge($messages, $this->messages),
         ]);
 
@@ -349,66 +357,6 @@ class CapitalCityProcessUnitRequestHandler
     private function sendOffEvents(CapitalCityUnitQueue $capitalCityUnitQueue): void
     {
         event(new UpdateCapitalCityUnitQueueTable($capitalCityUnitQueue->character));
-    }
-
-    /**
-     * Prepare units for the queue.
-     */
-    private function prepareUnitsInQueue(array $requestData): array
-    {
-        return collect($requestData)
-            ->filter(fn ($request) => $request['secondary_status'] === CapitalCityQueueStatus::RECRUITING)
-            ->map(fn ($request) => ['unit_id' => $request['unit_id'], 'amount' => $request['amount']])
-            ->toArray();
-    }
-
-    /**
-     * Mark all unit requests as rejected.
-     */
-    private function markRequestsAsRejected(array $requestData): array
-    {
-        return collect($requestData)
-            ->map(function ($unitRequest) {
-                $unitRequest['secondary_status'] = CapitalCityQueueStatus::REJECTED;
-
-                return $unitRequest;
-            })
-            ->toArray();
-    }
-
-    /**
-     * Create a resource request for recruitment.
-     */
-    private function createResourceRequest(
-        Character $character,
-        CapitalCityUnitQueue $capitalCityUnitQueue,
-        Kingdom $providingKingdom,
-        Kingdom $requestingKingdom,
-        array $missingResources
-    ): void {
-        $timeToKingdom = $this->getTimeToKingdom($character, $requestingKingdom, $providingKingdom);
-
-        $timeTillFinished = now()->addMinutes($timeToKingdom);
-        $startTime = now();
-
-        $resourceRequest = CapitalCityResourceRequest::create([
-            'kingdom_requesting_id' => $requestingKingdom->id,
-            'request_from_kingdom_id' => $providingKingdom->id,
-            'resources' => $missingResources,
-            'started_at' => $startTime,
-            'completed_at' => $timeTillFinished,
-        ]);
-
-        $capitalCityUnitQueue->update([
-            'started_at' => $startTime,
-            'completed_at' => $timeTillFinished,
-        ]);
-
-        $capitalCityUnitQueue = $capitalCityUnitQueue->refresh();
-
-        $delayJobTime = $timeToKingdom >= 15 ? $startTime->clone()->addMinutes(15) : $timeTillFinished;
-
-        CapitalCityResourceRequestJob::dispatch($capitalCityUnitQueue->id, $resourceRequest->id, CapitalCityResourceRequestType::UNIT_QUEUE)->delay($delayJobTime);
     }
 
     /**
@@ -456,7 +404,7 @@ class CapitalCityProcessUnitRequestHandler
         $timeTillDone = now()->addSeconds($timeTillDone);
 
         if (now()->diffInDays($timeTillDone) > self::MAX_DAYS) {
-            $this->messages[] = $gameUnit->name.' for kingdom: '.$kingdom->name.' would take longer then 7 (Real World) Days. The kingdom has rejected this recruitment order. If you want this amount of units, you must recruit it from the kingdom it\'s self.';
+            $this->messages[] = $gameUnit->name . ' for kingdom: ' . $kingdom->name . ' would take longer then 7 (Real World) Days. The kingdom has rejected this recruitment order. If you want this amount of units, you must recruit it from the kingdom it\'s self.';
 
             return true;
         }

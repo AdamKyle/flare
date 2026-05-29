@@ -143,7 +143,7 @@ class ExpandResourceBuildingService
     {
 
         $buildingExpansion = $building->buildingExpansion;
-        $queue = BuildingExpansionQueue::where('building');
+        $queue = BuildingExpansionQueue::where('building_id', $building->id)->first();
 
         if (is_null($buildingExpansion)) {
             return $this->errorResult('This building has never been expanded.');

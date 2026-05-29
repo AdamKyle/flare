@@ -16,6 +16,8 @@ class MassDisenchantService
 {
     private int $goldDust = 0;
 
+    private int $goldDustRushGain = 0;
+
     private int $skillXP = 0;
 
     private int $disenchantingLeveledTimes = 0;
@@ -97,6 +99,10 @@ class MassDisenchantService
             $this->disenchantItem($slot);
         }
 
+        if ($this->goldDustRushGain > 0 && ! is_null($this->questSlot) && $this->fetchDCRoll() === 100) {
+            $this->goldDust += (int) floor($this->goldDustRushGain * 0.05);
+        }
+
         $newGoldDust = $this->character->gold_dust + $this->goldDust;
 
         if ($newGoldDust > MaxCurrenciesValue::MAX_GOLD_DUST) {
@@ -106,13 +112,9 @@ class MassDisenchantService
         $character = $this->character;
         $this->skillXP += $this->disenchantingSkill->xp;
 
-        if ($this->disenchantingSkill->level < $this->disenchantingSkill->baseSkill->max_level) {
-            $this->giveXpToSkill($this->disenchantingSkill, $this->skillXP, 'disenchantingLeveledTimes');
-        }
+        $this->disenchantingSkill = $this->giveXpToSkill($this->disenchantingSkill, $this->skillXP, 'disenchantingLeveledTimes');
 
-        if ($this->enchantingSkill->level < $this->enchantingSkill->baseSkill->max_level) {
-            $this->giveXpToSkill($this->enchantingSkill, $this->skillXP / 2, 'enchantingLevelTimes');
-        }
+        $this->enchantingSkill = $this->giveXpToSkill($this->enchantingSkill, $this->skillXP / 2, 'enchantingLevelTimes');
 
         $character->update([
             'gold_dust' => $newGoldDust,
@@ -132,34 +134,37 @@ class MassDisenchantService
      */
     protected function giveXpToSkill(Skill $skill, int $leftOver, string $leveledType): Skill
     {
+        if ($skill->level >= $skill->baseSkill->max_level) {
+            return $this->normalizeMaxLevelSkill($skill, $leveledType);
+        }
 
-        if ($leftOver >= $skill->xp_max) {
-
-            $leftOver = $leftOver - $skill->xp_max;
+        while ($leftOver >= $skill->xp_max && $skill->level < $skill->baseSkill->max_level) {
+            $leftOver -= $skill->xp_max;
             $this->levelUpSkill($skill, $leveledType);
 
             $skill = $skill->refresh();
-
-            if ($leftOver >= $skill->xp_max && ($skill->level < $skill->baseSkill->max_level)) {
-                $this->giveXpToSkill($skill, $leftOver, $leveledType);
-            }
         }
 
-        if ($leveledType === 'enchantingLevelTimes') {
-            $this->enchantingSkill = $skill->refresh();
-
-            return $skill;
+        if ($skill->level >= $skill->baseSkill->max_level) {
+            return $this->normalizeMaxLevelSkill($skill, $leveledType);
         }
 
-        $this->disenchantingSkill = $skill->refresh();
+        $skill->update([
+            'xp' => $leftOver,
+        ]);
 
-        return $skill;
+        return $this->refreshSkillForLeveledType($skill, $leveledType);
     }
 
     protected function levelUpSkill(Skill $skill, string $leveledType): void
     {
+        if ($skill->level >= $skill->baseSkill->max_level) {
+            $this->normalizeMaxLevelSkill($skill, $leveledType);
 
-        $level = $skill->level + 1;
+            return;
+        }
+
+        $level = min($skill->level + 1, $skill->baseSkill->max_level);
 
         $bonus = $skill->skill_bonus + $skill->baseSkill->skill_bonus_per_level;
 
@@ -193,7 +198,9 @@ class MassDisenchantService
         if ($roll > $dcCheck) {
 
             if (! ($this->goldDust >= MaxCurrenciesValue::MAX_GOLD_DUST)) {
-                $this->goldDust += $this->updateGoldDust();
+                $goldDust = $this->updateGoldDust();
+                $this->goldDust += $goldDust;
+                $this->goldDustRushGain += $goldDust;
             }
 
             $this->skillXP += $this->getSkillXp();
@@ -204,7 +211,7 @@ class MassDisenchantService
         }
 
         if (! ($this->goldDust >= MaxCurrenciesValue::MAX_GOLD_DUST)) {
-            $this->goldDust += $this->updateGoldDust();
+            $this->goldDust += $this->updateGoldDust(true);
         }
 
         $slot->delete();
@@ -231,25 +238,18 @@ class MassDisenchantService
      */
     protected function updateGoldDust(bool $failedCheck = false): int
     {
-        $goldDust = ! $failedCheck ? rand(2, 1150) : 1;
+        $goldDust = ! $failedCheck ? $this->fetchGoldDustAmount() : 1;
 
         if (! $failedCheck) {
-            $goldDust = $goldDust + $goldDust * $this->disenchantingSkill->bonus;
-        }
-
-        $characterTotalGoldDust = $this->character->gold_dust;
-
-        if (! is_null($this->questSlot) && ! $failedCheck) {
-            $dc = 1000 - 1000 * 0.02;
-            $roll = $this->fetchDCRoll();
-
-            if ($roll > $dc) {
-
-                return $characterTotalGoldDust * 0.05;
-            }
+            $goldDust = (int) ($goldDust + $goldDust * $this->disenchantingSkill->bonus);
         }
 
         return $goldDust;
+    }
+
+    protected function fetchGoldDustAmount(): int
+    {
+        return rand(2, 1150);
     }
 
     /**
@@ -257,6 +257,31 @@ class MassDisenchantService
      */
     protected function fetchDCRoll(): int
     {
-        return rand(1, 1000);
+        return rand(1, 100);
+    }
+
+    protected function normalizeMaxLevelSkill(Skill $skill, string $leveledType): Skill
+    {
+        $skill->update([
+            'level' => $skill->baseSkill->max_level,
+            'xp' => 0,
+        ]);
+
+        return $this->refreshSkillForLeveledType($skill, $leveledType);
+    }
+
+    protected function refreshSkillForLeveledType(Skill $skill, string $leveledType): Skill
+    {
+        $skill = $skill->refresh();
+
+        if ($leveledType === 'enchantingLevelTimes') {
+            $this->enchantingSkill = $skill;
+
+            return $skill;
+        }
+
+        $this->disenchantingSkill = $skill;
+
+        return $skill;
     }
 }

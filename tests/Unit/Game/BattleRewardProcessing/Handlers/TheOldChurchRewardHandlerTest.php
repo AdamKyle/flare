@@ -182,7 +182,8 @@ class TheOldChurchRewardHandlerTest extends TestCase
 
     public function test_currency_reward_caps_without_event(): void
     {
-        RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(100000);
+        RandomNumberGenerator::shouldReceive('generateRandomNumber')->twice()->with(1, 750)->andReturn(750);
+        RandomNumberGenerator::shouldReceive('generateRandomNumber')->once()->with(1, 15000)->andReturn(15000);
 
         $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
@@ -202,7 +203,8 @@ class TheOldChurchRewardHandlerTest extends TestCase
 
     public function test_currency_reward_caps_with_event(): void
     {
-        RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(100000);
+        RandomNumberGenerator::shouldReceive('generateRandomNumber')->twice()->with(1, 3750)->andReturn(3750);
+        RandomNumberGenerator::shouldReceive('generateRandomNumber')->once()->with(1, 30000)->andReturn(30000);
 
         $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
@@ -256,7 +258,7 @@ class TheOldChurchRewardHandlerTest extends TestCase
             ],
         ]);
 
-        $this->createExploringAutomation([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
         ]);
 
@@ -385,7 +387,7 @@ class TheOldChurchRewardHandlerTest extends TestCase
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
             ->once()
             ->withArgs(function ($chance, $maxRoll) {
-                return abs($chance - 0.15) < 0.00001 && (int) $maxRoll === 1000;
+                return abs($chance - 0.30) < 0.00001 && (int) $maxRoll === 1000;
             })
             ->andReturnFalse();
 
@@ -448,7 +450,7 @@ class TheOldChurchRewardHandlerTest extends TestCase
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
             ->once()
             ->withArgs(function ($chance, $maxRoll) {
-                return abs($chance - 0.30) < 0.00001 && (int) $maxRoll === 500;
+                return abs($chance - 0.45) < 0.00001 && (int) $maxRoll === 500;
             })
             ->andReturnFalse();
 

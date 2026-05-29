@@ -2,29 +2,16 @@
 
 namespace App\Flare\Calculators;
 
-use App\Flare\Models\Monster;
 use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 
 class GoldRushCheckCalculator
 {
-    /**
-     * Fetches the gold rush check chance.
-     *
-     * Fetches the adventure bonus if applicable and applies it to the looting bonus against the monster's drop check.
-     *
-     * If true, the check passed and the character should be rewarded.
-     *
-     * Players have a 5% chance by default to get a gold rush.
-     *
-     * @param  Monster  $monster
-     * @return bool
-     */
-    public function fetchGoldRushChance(float $gameMapBonus = 0.0)
+    public function fetchGoldRushChance(float $gameMapBonus = 0.0, float $locationBonus = 0.0): bool
     {
-        $bonus = $gameMapBonus + 0.05;
+        $chance = max(0.0, min(1.0, 0.01 + $gameMapBonus + $locationBonus));
+        $chanceBasisPoints = (int) round($chance * 10000);
+        $roll = RandomNumberGenerator::generateTrueRandomNumber(10000);
 
-        $roll = RandomNumberGenerator::generateTrueRandomNumber(100, $bonus);
-
-        return $roll >= 100;
+        return $roll <= $chanceBasisPoints;
     }
 }

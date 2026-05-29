@@ -6,6 +6,9 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\ServerFight\MonsterPlayerFight;
+use App\Flare\Values\LocationType;
+use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
@@ -16,7 +19,7 @@ use Psr\SimpleCache\InvalidArgumentException;
 
 class MonsterFightService
 {
-    use ResponseBuilder;
+    use ChecksAutomationRestrictions, ResponseBuilder;
 
     public function __construct(private readonly MonsterPlayerFight $monsterPlayerFight, private readonly BattleEventHandler $battleEventHandler, private readonly WeeklyBattleService $weeklyBattleService) {}
 
@@ -25,8 +28,14 @@ class MonsterFightService
      */
     public function setupMonster(Character $character, array $params, bool $returnData = false, bool $isDelve = false): array
     {
-        Cache::delete('monster-fight-'.$character->id);
-        Cache::delete('character-sheet-'.$character->id);
+        $restriction = $this->automationRestrictionErrorResult($character, AutomationRestrictionService::MANUAL_FIGHTING);
+
+        if (! $returnData && ! is_null($restriction)) {
+            return $restriction;
+        }
+
+        Cache::delete('monster-fight-' . $character->id);
+        Cache::delete('character-sheet-' . $character->id);
 
         $params = $this->fetchPossibleDelveMonsterId($character, $params, $isDelve);
 
@@ -38,6 +47,8 @@ class MonsterFightService
 
         $data = $data->fightSetUp();
 
+        $data['health']['current_monster_health'] = max($data['health']['current_monster_health'], 0);
+
         if ($data['health']['current_monster_health'] <= 0) {
 
             if (! $returnData) {
@@ -46,7 +57,7 @@ class MonsterFightService
                 event(new AttackTimeOutEvent($character));
             }
 
-            Cache::put('monster-fight-'.$character->id, $data, 900);
+            Cache::put('monster-fight-' . $character->id, $data, 900);
 
             if ($returnData) {
                 return $data;
@@ -61,7 +72,7 @@ class MonsterFightService
             $this->battleEventHandler->processDeadCharacter($character, $monster);
         }
 
-        Cache::put('monster-fight-'.$character->id, $data, 900);
+        Cache::put('monster-fight-' . $character->id, $data, 900);
 
         if ($returnData) {
             return $data;
@@ -85,7 +96,13 @@ class MonsterFightService
      */
     public function fightMonster(Character $character, string $attackType, bool $onlyOnce = true, bool $returnData = false): array
     {
-        $cache = Cache::get('monster-fight-'.$character->id);
+        $restriction = $this->automationRestrictionErrorResult($character, AutomationRestrictionService::MANUAL_FIGHTING);
+
+        if (! $returnData && ! is_null($restriction)) {
+            return $restriction;
+        }
+
+        $cache = Cache::get('monster-fight-' . $character->id);
 
         if (is_null($cache)) {
 
@@ -135,22 +152,28 @@ class MonsterFightService
             $this->battleEventHandler->processDeadCharacter($character, $monster);
         }
 
-        $monsterHealth = $this->monsterPlayerFight->getMonsterHealth();
+        $monsterHealth = max($this->monsterPlayerFight->getMonsterHealth(), 0);
         $characterHealth = $this->monsterPlayerFight->getCharacterHealth();
 
         $cache['health']['current_character_health'] = $characterHealth;
         $cache['health']['current_monster_health'] = $monsterHealth;
         $cache['attack_messages'] = $this->monsterPlayerFight->getBattleMessages();
 
-        if ($monsterHealth >= 0) {
-            Cache::put('monster-fight-'.$character->id, $cache, 900);
+        if ($monsterHealth > 0) {
+            Cache::put('monster-fight-' . $character->id, $cache, 900);
+
+            if ($returnData) {
+                return $cache;
+            }
+
+            return $this->successResult($cache);
         }
 
         if ($returnData) {
             return $cache;
         }
 
-        Cache::delete('monster-fight-'.$character->id);
+        Cache::delete('monster-fight-' . $character->id);
         BattleAttackHandler::dispatch($character->id, $this->monsterPlayerFight->getMonster()['id'])->onQueue('default_long')->delay(now()->addSeconds(2));
 
         return $this->successResult($cache);
@@ -199,7 +222,7 @@ class MonsterFightService
         $selectedMonsterId = $params['selected_monster_id'];
         $packSize = $params['pack_size'] ?? 0;
 
-        $cachedMonsterForDelve = Cache::get('delve-monster-'.$character->id.'-'.$selectedMonsterId.'-fight');
+        $cachedMonsterForDelve = Cache::get('delve-monster-' . $character->id . '-' . $selectedMonsterId . '-fight');
 
         if (! is_null($cachedMonsterForDelve) && $packSize > 1) {
 

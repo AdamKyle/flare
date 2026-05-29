@@ -140,7 +140,7 @@ class ServerMessageBuilderTest extends TestCase
     {
         $message = $this->serverMessageBuilder->buildWithAdditionalInformation(CurrenciesMessageTypes::GOLD_RUSH, 1, number_format(1000));
 
-        $this->assertEquals('Gold Rush! Your gold has increased by: 1 Gold! 5% of your total gold has been awarded to you. You now have: 1,000 Gold!', $message);
+        $this->assertEquals('Gold Rush! Your gold has increased by: 1 Gold! 5% of your battle gold reward has been awarded to you. You now have: 1,000 Gold!', $message);
     }
 
     public function test_crafted()

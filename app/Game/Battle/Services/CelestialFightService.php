@@ -8,6 +8,8 @@ use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Models\Map;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Events\UpdateCelestialFight;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
@@ -25,7 +27,7 @@ use Facades\App\Flare\Cache\CoordinatesCache;
 
 class CelestialFightService
 {
-    use ResponseBuilder;
+    use ChecksAutomationRestrictions, ResponseBuilder;
 
     private BattleEventHandler $battleEventHandler;
 
@@ -35,7 +37,8 @@ class CelestialFightService
 
     private ?MonsterPlayerFight $monsterPlayerFight;
 
-    public function __construct(BattleEventHandler $battleEventHandler,
+    public function __construct(
+        BattleEventHandler $battleEventHandler,
         CharacterCacheData $characterCacheData,
         MonsterPlayerFight $monsterPlayerFight,
         MapTileValue $mapTileValue
@@ -74,6 +77,11 @@ class CelestialFightService
 
     public function fight(Character $character, CelestialFight $celestialFight, CharacterInCelestialFight $characterInCelestialFight, string $attackType): array
     {
+        $restriction = $this->automationRestrictionErrorResult($character, AutomationRestrictionService::CELESTIAL_FIGHTING);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
 
         if (! $this->isPlayerAtSameLocationAsCelestialFight($character->map, $celestialFight)) {
             return $this->errorResult('You are not at the same location as the celestial.
@@ -83,10 +91,11 @@ class CelestialFightService
         $result = $this->monsterPlayerFight->setUpFight($character, [
             'attack_type' => $attackType,
             'selected_monster_id' => $celestialFight->monster_id,
+            'current_monster_health' => $celestialFight->current_health,
+            'max_monster_health' => $celestialFight->max_health,
         ])->fightMonster(true);
 
         if ($result) {
-
             $messages = $this->monsterPlayerFight->getBattleMessages();
 
             $this->monsterPlayerFight = null;
@@ -104,33 +113,37 @@ class CelestialFightService
             ]);
         }
 
-        $characterHealth = $this->monsterPlayerFight->getCharacterHealth();
-        $monsterHealth = $this->monsterPlayerFight->getMonsterHealth();
-        $characterHealth = $characterHealth <= 0 ? 0 : $characterHealth;
+        $characterHealth = max($this->monsterPlayerFight->getCharacterHealth(), 0);
+        $monsterHealth = min(
+            max($this->monsterPlayerFight->getMonsterHealth(), 0),
+            $celestialFight->max_health
+        );
 
         if ($characterHealth <= 0) {
-            $this->moveCelestial($character, $celestialFight);
+            $celestialFight = $this->moveCelestial($character, $celestialFight);
+            $monsterHealth = $celestialFight->current_health;
 
             $this->battleEventHandler->processDeadCharacter($character);
 
-            event(new UpdateCelestialFight($character->name, $this->monsterPlayerFight));
+            event(new UpdateCelestialFight($this->monsterPlayerFight, $monsterHealth, $celestialFight->id));
         }
 
         $characterInCelestialFight->update([
-            'character_current_health' => $this->monsterPlayerFight->getCharacterHealth(),
+            'character_current_health' => $characterHealth,
         ]);
 
         if ($characterHealth > 0 && $monsterHealth > 0) {
-            $this->moveCelestial($character, $celestialFight);
+            $celestialFight = $this->moveCelestial($character, $celestialFight);
+            $monsterHealth = $celestialFight->current_health;
 
-            event(new UpdateCelestialFight($character->name, $this->monsterPlayerFight));
+            event(new UpdateCelestialFight($this->monsterPlayerFight, $monsterHealth, $celestialFight->id));
         }
 
         return $this->successResult([
             'logs' => $this->monsterPlayerFight->getBattleMessages(),
             'health' => [
                 'current_character_health' => $characterHealth,
-                'current_monster_health' => $this->monsterPlayerFight->getMonsterHealth(),
+                'current_monster_health' => $monsterHealth,
             ],
         ]);
     }
@@ -168,7 +181,7 @@ class CelestialFightService
 
     protected function handleMonsterDeath(Character $character, CelestialFight $celestialFight)
     {
-        event(new UpdateCelestialFight($character->name, $this->monsterPlayerFight));
+        event(new UpdateCelestialFight(null, 0, $celestialFight->id));
 
         $character = $this->timeOutCelestialEvent($character);
 
@@ -213,7 +226,6 @@ class CelestialFightService
 
     protected function giveShards(Character $character, CelestialFight $celestialFight)
     {
-
         $monsterShards = $celestialFight->monster->shards;
 
         $shards = $character->shards + $monsterShards;
@@ -247,13 +259,15 @@ class CelestialFightService
         return $characterInCelestialFight->refresh();
     }
 
-    protected function moveCelestial(Character $character, CelestialFight $celestialFight)
+    protected function moveCelestial(Character $character, CelestialFight $celestialFight): CelestialFight
     {
         $monster = $celestialFight->monster;
 
         $celestialFight->update(array_merge([
-            'current_health' => $celestialFight->current_health,
+            'current_health' => $celestialFight->max_health,
         ], $this->getCelestialCoordinates($celestialFight)));
+
+        $celestialFight = $celestialFight->refresh();
 
         $celestialFightType = new CelestialConjureType($celestialFight->type);
 
@@ -262,6 +276,8 @@ class CelestialFightService
         } else {
             event(new ServerMessageEvent($character->user, 'You Have caused: '.$monster->name.' to flee to the far ends of Tlessa (use /pct or /pc to find the new coordinates).'));
         }
+
+        return $celestialFight;
     }
 
     /**
@@ -275,11 +291,11 @@ class CelestialFightService
 
         if ($gameMap->mapType()->isTwistedMemories() || $gameMap->mapType()->isDelusionalMemories()) {
             $isTwistedMemoriesWater = $this->mapTileValue->isTwistedMemoriesWater(
-                $this->mapTileValue->getTileColor($gameMap, $xPosition, $yPosition)
+                $this->mapTileValue->getTileColor($xPosition, $yPosition)
             );
 
             $isDelusionalMemoriesWater = $this->mapTileValue->isDelusionalMemoriesWater(
-                $this->mapTileValue->getTileColor($gameMap, $xPosition, $yPosition)
+                $this->mapTileValue->getTileColor($xPosition, $yPosition)
             );
 
             if ($isTwistedMemoriesWater || $isDelusionalMemoriesWater) {

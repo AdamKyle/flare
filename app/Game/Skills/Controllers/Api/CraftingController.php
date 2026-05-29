@@ -4,6 +4,8 @@ namespace App\Game\Skills\Controllers\Api;
 
 use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
+use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
 use App\Game\Events\Concerns\ShouldShowCraftingEventButton;
 use App\Game\Factions\FactionLoyalty\Concerns\FactionLoyalty;
@@ -16,7 +18,7 @@ use Illuminate\Http\Request;
 
 class CraftingController extends Controller
 {
-    use FactionLoyalty, ShouldShowCraftingEventButton;
+    use ChecksAutomationRestrictions, FactionLoyalty, ShouldShowCraftingEventButton;
 
     public function __construct(private CraftingService $craftingService) {}
 
@@ -76,6 +78,14 @@ class CraftingController extends Controller
      */
     public function craft(CraftingValidation $request, Character $character, CraftingService $craftingService): JsonResponse
     {
+        $action = $request->craft_for_npc ? AutomationRestrictionService::START_FACTION_LOYALTY : AutomationRestrictionService::START_ITEM_CRAFTING;
+
+        $restriction = $this->automationRestrictionJsonResponse($character, $action);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         if (! $character->can_craft) {
             return response()->json(['message' => 'You must wait to craft again.'], 422);
         }

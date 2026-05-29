@@ -21,6 +21,9 @@ class SteelSmeltingService
 
     public function smeltSteel(int $amount, Kingdom $kingdom): array
     {
+        if ($amount <= 0) {
+            return $this->errorResult('Not enough iron.');
+        }
 
         $newAmount = $amount * 2;
 
@@ -48,6 +51,10 @@ class SteelSmeltingService
         $start = Carbon::parse($smeltingQueue->started_at)->timestamp;
         $end = Carbon::parse($smeltingQueue->completed_at)->timestamp;
         $current = Carbon::parse(now())->timestamp;
+
+        if ($end <= $start) {
+            return $this->errorResult('Cannot cancel this smelting event. Almost done.');
+        }
 
         $completed = (($current - $start) / ($end - $start));
 
@@ -93,7 +100,7 @@ class SteelSmeltingService
         $time = $time - ($time * $kingdom->fetchSmeltingTimeReduction());
 
         $kingdom->update([
-            'current_iron' => $kingdom->current_iron - $amount,
+            'current_iron' => max(0, $kingdom->current_iron - $amount),
         ]);
 
         $kingdom = $kingdom->refresh();

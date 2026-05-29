@@ -266,9 +266,11 @@ class Skill extends Model
             return 0.0;
         }
 
-        $bonus = ($this->baseSkill->skill_bonus_per_level * ($this->level - 1));
+        $level = min(max($this->level, 1), $this->baseSkill->max_level);
 
-        if ($this->level === $this->baseSkill->max_level) {
+        $bonus = ($this->baseSkill->skill_bonus_per_level * ($level - 1));
+
+        if ($level >= $this->baseSkill->max_level) {
             $bonus = 1.0;
         }
 
@@ -422,7 +424,9 @@ class Skill extends Model
                 continue;
             }
 
-            $newBonus += $value;
+            $amountUsed = $itemUsed->can_stack ? $boon->amount_used : 1;
+
+            $newBonus += $value * $amountUsed;
         }
 
         return $newBonus;

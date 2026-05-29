@@ -3,7 +3,7 @@
 namespace App\Console\AfterDeployment;
 
 use App\Flare\Models\Kingdom;
-use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
+use App\Game\Kingdoms\Service\KingdomMaxResourceRecalculationService;
 use Illuminate\Console\Command;
 
 class FixKingdomMaxResourcesBasedOnPassiveSkill extends Command
@@ -25,23 +25,11 @@ class FixKingdomMaxResourcesBasedOnPassiveSkill extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(KingdomMaxResourceRecalculationService $kingdomMaxResourceRecalculationService)
     {
-        Kingdom::where('npc_owned', false)->chunk(500, function ($kingdoms) {
+        Kingdom::where('npc_owned', false)->chunk(500, function ($kingdoms) use ($kingdomMaxResourceRecalculationService) {
             foreach ($kingdoms as $kingdom) {
-                $skill = $kingdom->character->passiveSkills->where('passiveSkill.effect_type', PassiveSkillTypeValue::RESOURCE_INCREASE)->first();
-
-                if (is_null($skill)) {
-                    return;
-                }
-
-                $kingdom->update([
-                    'max_stone' => $kingdom->max_stone + $skill->resource_increase_amount,
-                    'max_iron' => $kingdom->max_iron + $skill->resource_increase_amount,
-                    'max_wood' => $kingdom->max_wood + $skill->resource_increase_amount,
-                    'max_clay' => $kingdom->max_clas + $skill->resource_increase_amount,
-                    'max_population' => $kingdom->max_population + $skill->resource_increase_amount,
-                ]);
+                $kingdomMaxResourceRecalculationService->recalculate($kingdom, true);
             }
         });
     }

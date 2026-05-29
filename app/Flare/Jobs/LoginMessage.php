@@ -5,6 +5,7 @@ namespace App\Flare\Jobs;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Game\Events\Values\EventType;
+use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Carbon\Carbon;
@@ -46,6 +47,12 @@ class LoginMessage implements ShouldQueue
         if (! is_null($celestialEvent)) {
             $endTime = Carbon::parse($celestialEvent->ends_at)->setTimeFrom(env('TIME_ZONE'))->format('g A T');
             event(new ServerMessageEvent($user, 'Celestials have been set free till tomorrow at: '.$endTime.'. All you have to do is move around to watch them spawn (80% chance). Celestials Drop Valuable shards for Alchemy crafting!'));
+        }
+
+        $warningNotice = resolve(FactionLoyaltyService::class)->getLatestUnreadWarningNotice($this->character);
+
+        if (! is_null($warningNotice)) {
+            event(new ServerMessageEvent($user, $warningNotice['message']));
         }
     }
 }

@@ -5,6 +5,7 @@ namespace Tests\Unit\Game\Skills\Services;
 use App\Flare\Models\GameSkill;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Gems\Builders\GemBuilder;
+use App\Game\Gems\Values\GemTierValue;
 use App\Game\Gems\Values\GemTypeValue;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Events\UpdateSkillEvent;
@@ -40,6 +41,7 @@ class GemServiceTest extends TestCase
         $this->gemSkill = $this->createGameSkill([
             'name' => 'Gem Crafting',
             'type' => SkillTypeValue::GEM_CRAFTING->value,
+            'max_level' => 100,
         ]);
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(
@@ -101,7 +103,133 @@ class GemServiceTest extends TestCase
         $this->assertEquals(200, $result['status']);
     }
 
-    public function test_fail_to_craft_the_gem()
+    public function testGemTierChancesProduceExpectedDcs()
+    {
+        $tierOne = (new GemTierValue(GemTierValue::TIER_ONE))->maxForTier();
+        $tierTwo = (new GemTierValue(GemTierValue::TIER_TWO))->maxForTier();
+        $tierThree = (new GemTierValue(GemTierValue::TIER_THREE))->maxForTier();
+        $tierFour = (new GemTierValue(GemTierValue::TIER_FOUR))->maxForTier();
+
+        $this->assertEqualsWithDelta(25.0, 100 - ($tierOne['chance'] * 100), 0.0001);
+        $this->assertEqualsWithDelta(45.0, 100 - ($tierTwo['chance'] * 100), 0.0001);
+        $this->assertEqualsWithDelta(65.0, 100 - ($tierThree['chance'] * 100), 0.0001);
+        $this->assertEqualsWithDelta(75.0, 100 - ($tierFour['chance'] * 100), 0.0001);
+    }
+
+    public function testHighSkillBonusGuaranteesGemCraftingSuccess()
+    {
+        Event::fake();
+
+        $character = $this->character->getCharacter();
+
+        $character->skills()->where('game_skill_id', $this->gemSkill->id)->update([
+            'level' => 76,
+        ]);
+
+        $character->update([
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+        ]);
+
+        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class)], function (MockInterface $mock) {
+            $mock->makePartial()
+                ->shouldAllowMockingProtectedMethods()
+                ->shouldReceive('canCraft')
+                ->once()
+                ->with(Mockery::on(function ($skill) {
+                    return min(1.0, .25 + $skill->skill_bonus) === 1.0;
+                }), .25)
+                ->andReturn(true);
+        });
+
+        $result = $gemService->generateGem($character->refresh(), 4);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals(1, $character->gemBag->gemSlots->first()->amount);
+    }
+
+    public function testLowRollSucceedsWhenEffectiveChanceIsOne()
+    {
+        Event::fake();
+
+        $character = $this->character->getCharacter();
+
+        $character->skills()->where('game_skill_id', $this->gemSkill->id)->update([
+            'level' => 26,
+        ]);
+
+        $character->update([
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+        ]);
+
+        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class)], function (MockInterface $mock) {
+            $mock->makePartial()
+                ->shouldAllowMockingProtectedMethods()
+                ->shouldReceive('canCraft')
+                ->once()
+                ->with(Mockery::on(function ($skill) {
+                    return min(1.0, .75 + $skill->skill_bonus) === 1.0;
+                }), .75)
+                ->andReturn(true);
+        });
+
+        $result = $gemService->generateGem($character->refresh(), 1);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals(1, $character->gemBag->gemSlots->first()->amount);
+    }
+
+    public function testGemCraftingCanStillFailWhenRollExceedsEffectiveChance()
+    {
+        Event::fake();
+
+        $character = $this->character->getCharacter();
+
+        $this->gemSkill->update([
+            'skill_bonus_per_level' => 0,
+        ]);
+
+        $character->skills()->where('game_skill_id', $this->gemSkill->id)->update([
+            'level' => 75,
+        ]);
+
+        $character->update([
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+        ]);
+
+        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class)], function (MockInterface $mock) {
+            $mock->makePartial()
+                ->shouldAllowMockingProtectedMethods()
+                ->shouldReceive('canCraft')
+                ->once()
+                ->with(Mockery::on(function ($skill) {
+                    return min(1.0, .25 + $skill->skill_bonus) === .25;
+                }), .25)
+                ->andReturn(false);
+        });
+
+        $result = $gemService->generateGem($character->refresh(), 4);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEmpty($character->gemBag->gemSlots);
+
+        Event::assertDispatched(function (ServerMessageEvent $event) {
+            return $event->message === 'You failed to craft the gem, the item explodes before you into a pile of wasted effort and time.';
+        });
+    }
+
+    public function testFailToCraftTheGem()
     {
         Event::fake();
 
@@ -133,6 +261,10 @@ class GemServiceTest extends TestCase
     {
         Event::fake();
 
+        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class)], function (MockInterface $mock) {
+            $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('canCraft')->once()->andReturn(false);
+        });
+
         $character = $this->character->getCharacter();
 
         $character->update([
@@ -141,7 +273,7 @@ class GemServiceTest extends TestCase
             'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
         ]);
 
-        $result = $this->gemService->generateGem($character, 1);
+        $result = $gemService->generateGem($character, 1);
 
         $character = $character->refresh();
 

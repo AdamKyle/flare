@@ -271,7 +271,7 @@ class DamageBuilder extends BaseAttribute
             $lifeStealAmount = $itemSuffix + $itemPrefix;
 
             if ($lifeStealAmount >= 1) {
-                $lifeStealAmount = 0.99;
+                $lifeStealAmount = 0.75;
             }
 
             $lifeStealAmount = $this->getLifeStealAfterPlaneReductions($gameMap, $lifeStealAmount);

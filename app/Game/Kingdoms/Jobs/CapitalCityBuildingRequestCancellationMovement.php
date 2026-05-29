@@ -40,6 +40,8 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
         $queueData = CapitalCityBuildingQueue::find($this->capitalCityQueueId);
 
         if (is_null($queueData)) {
+            CapitalCityBuildingCancellation::where('id', $this->capitalCityCancellationQueueId)->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
+
             return;
         }
 
@@ -47,7 +49,9 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
             return;
         }
 
-        CapitalCityBuildingQueue::where('id', $this->capitalCityQueueId)->update(['status' => CapitalCityQueueStatus::PROCESSING]);
+        CapitalCityBuildingCancellation::where('id', $this->capitalCityCancellationQueueId)->update(['status' => CapitalCityQueueStatus::PROCESSING]);
+
+        event(new UpdateCapitalCityBuildingQueueTable($queueData->character));
 
         $responseData = $this->processCancellations($queueData, $kingdomBuildingService);
 
@@ -60,7 +64,9 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
         event(new UpdateCapitalCityBuildingQueueTable($queueData->character));
         $capitalCityKingdomLogHandler->possiblyCreateLogForBuildingQueue($queueData);
 
-        $this->cleanupCancellationRecords();
+        if (! collect($responseData)->contains(fn($response) => $response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED)) {
+            $this->cleanupCancellationRecords();
+        }
     }
 
     /**
@@ -76,8 +82,10 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
 
                 // @codeCoverageIgnoreStart
                 CapitalCityBuildingRequestCancellationMovement::dispatch(
+                    $this->capitalCityCancellationQueueId,
                     $this->capitalCityQueueId,
-                    $this->characterId
+                    $this->characterId,
+                    $this->dataForCancellation
                 )->delay($time);
 
                 return true;
@@ -106,17 +114,22 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
 
             $building = KingdomBuilding::find($buildingId);
 
-            if (is_null($buildingInQueue)) {
+            if (is_null($buildingInQueue) || $buildingInQueue->completed_at->lessThanOrEqualTo(now())) {
 
-                CapitalCityBuildingQueue::where('id', $this->capitalCityCancellationQueueId)->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
+                CapitalCityBuildingCancellation::where('id', $this->capitalCityCancellationQueueId)->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
 
                 event(new UpdateCapitalCityBuildingQueueTable($character));
 
-                $queueDataMessages[] = 'Failed to cancel the request for building: '.$building->name.'. The building finished before the cancellation could arrive.';
+                $buildingName = is_null($building) ? 'Unknown Building' : $building->name;
+
+                $queueDataMessages[] = 'Failed to cancel the request for building: ' . $buildingName . '. The building finished before the cancellation could arrive.';
 
                 $queueData->update(['messages' => $queueDataMessages]);
 
-                return [];
+                return [
+                    'building_id' => $buildingId,
+                    'status' => CapitalCityQueueStatus::CANCELLATION_REJECTED,
+                ];
             }
 
             $result = $kingdomBuildingService->cancelKingdomBuildingUpgrade($buildingInQueue);
@@ -134,13 +147,12 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
     private function updateQueueData(CapitalCityBuildingQueue $queueData, array $responseData): void
     {
         $responseLookup = collect($responseData)
-            ->reject(fn ($response) => $response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED)
             ->pluck('status', 'building_id')
             ->toArray();
 
         $buildingRequestData = collect($queueData->building_request_data)->map(function ($request) use ($responseLookup) {
             if (isset($responseLookup[$request['building_id']])) {
-                $request['secondary_status'] = CapitalCityQueueStatus::CANCELLED;
+                $request['secondary_status'] = $responseLookup[$request['building_id']];
             }
 
             return $request;
@@ -149,7 +161,7 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
         $queueData->update(['building_request_data' => $buildingRequestData]);
         $queueData->refresh();
 
-        if (collect($responseData)->contains(fn ($response) => $response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED)) {
+        if (collect($responseData)->contains(fn($response) => $response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED)) {
             $messages = $queueData->messages ?? [];
             $messages[] = 'Cancellation request for one of your buildings was rejected (See the building that states Cancellation Rejected) because it was too close to being done. No need to waste resources child!';
 
@@ -163,6 +175,10 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
     private function cleanupCancellationRecords(): void
     {
         $capitalCityBuildingCancellationQueue = CapitalCityBuildingCancellation::where('id', $this->capitalCityCancellationQueueId)->first();
+
+        if (is_null($capitalCityBuildingCancellationQueue)) {
+            return;
+        }
 
         $character = $capitalCityBuildingCancellationQueue->character;
 

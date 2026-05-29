@@ -3,14 +3,14 @@
 namespace App\Game\Reincarnate\Controllers\Api;
 
 use App\Flare\Models\Character;
-use App\Game\Reincarnate\Services\CharacterReincarnateService;
+use App\Game\Reincarnate\Services\CharacterReincarnationService;
 use App\Http\Controllers\Controller;
 
 class ReincarnateController extends Controller
 {
-    private CharacterReincarnateService $reincarnateService;
+    private CharacterReincarnationService $reincarnateService;
 
-    public function __construct(CharacterReincarnateService $reincarnateService)
+    public function __construct(CharacterReincarnationService $reincarnateService)
     {
         $this->reincarnateService = $reincarnateService;
     }

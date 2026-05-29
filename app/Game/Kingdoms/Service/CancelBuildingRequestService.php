@@ -39,6 +39,14 @@ class CancelBuildingRequestService
             return $this->errorResult('You cannot cancel this request because it is on the doorstep of: '.$queue->kingdom->name);
         }
 
+        if ($this->isStaleBrokenQueue($queue)) {
+            $queue->delete();
+
+            return $this->successResult([
+                'message' => 'Successfully cleared the stale building request for: ' . $kingdom->name . '.',
+            ]);
+        }
+
         $buildingToDelete = $requestData['building_id'] ?? null;
 
         if ($queue->status === CapitalCityQueueStatus::TRAVELING) {
@@ -129,7 +137,7 @@ class CancelBuildingRequestService
             })
             ->toArray();
 
-        $messages = $capitalCityUnitQueue->messages ?? [];
+        $messages = $capitalCityBuildingQueue->messages ?? [];
 
         $capitalCityBuildingQueue->update([
             'building_request_data' => $requestData,
@@ -151,5 +159,14 @@ class CancelBuildingRequestService
             'message' => 'Successfully canceled the valid requests for: '
                 .$capitalCityBuildingQueue->kingdom->name.'.',
         ]);
+    }
+
+    private function isStaleBrokenQueue(CapitalCityBuildingQueue $capitalCityBuildingQueue): bool
+    {
+        return $capitalCityBuildingQueue->completed_at->lessThan(now()) &&
+            in_array($capitalCityBuildingQueue->status, [
+                CapitalCityQueueStatus::PROCESSING,
+                CapitalCityQueueStatus::REQUESTING,
+            ]);
     }
 }

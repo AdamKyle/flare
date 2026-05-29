@@ -73,7 +73,7 @@ class NpcQuestRewardHandler
             if ($quest->unlocksFeature()->isReincarnation()) {
 
                 event(new ServerMessageEvent($character->user, 'You can now reincarnate your character for a cost of 50,000 Copper Coins per Reincarnation. This allows
-                you to set your character level back to level 1 and keep 20% of your base stats, but you are penalized by having 5% (that stacks per reincarnation)
+                you to set your character level back to level 1 and keep 5% of your base stats, but you are penalized by having 5% (that stacks per reincarnation)
                 added to your XP. You can now use this feature on your Character Sheet!'));
 
                 GlobalMessageEvent::dispatch($character->name.' has unlocked: Reincarnation! A powerful new way to grow!');

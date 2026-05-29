@@ -4,6 +4,7 @@ namespace App\Game\Maps\Services;
 
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Character;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
@@ -38,6 +39,15 @@ class WalkingService extends BaseMovementService
      */
     public function movePlayerToNewLocation(Character $character): array
     {
+        $location = $this->getLocationForCoordinates($character);
+
+        $restriction = $this->automationRestrictionErrorResult($character, AutomationRestrictionService::DIRECTIONAL_MOVEMENT, $location);
+
+        if (! is_null($restriction)) {
+            event(new ServerMessageEvent($character->user, $restriction['message']));
+
+            return $restriction;
+        }
 
         if (! $this->validateCoordinates()) {
             return $this->errorResult('You cannot go any further that way.');
@@ -51,8 +61,6 @@ class WalkingService extends BaseMovementService
 
             return $this->errorResult('Missing item to do that.');
         }
-
-        $location = $this->getLocationForCoordinates($character);
 
         if (! is_null($location)) {
             if (! $this->canPlayerEnterLocation($character, $location)) {
@@ -74,6 +82,9 @@ class WalkingService extends BaseMovementService
 
             $this->movementService->giveLocationReward($character, $location);
         }
+
+        $this->updateMonstersList($character, $location);
+        $this->updateKingdomOwnedKingdom($character);
 
         event(new MoveTimeOutEvent($character));
 

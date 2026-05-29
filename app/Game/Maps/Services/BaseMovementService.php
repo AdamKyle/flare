@@ -12,6 +12,8 @@ use App\Flare\Models\User;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\LocationType;
 use App\Flare\Values\MapNameValue;
+use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Maps\Events\UpdateCharacterBasePosition;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
@@ -23,7 +25,7 @@ use Illuminate\Support\Facades\Cache;
 
 class BaseMovementService
 {
-    use UpdateRaidMonstersForLocation;
+    use ChecksAutomationRestrictions, UpdateRaidMonstersForLocation;
 
     protected MapTileValue $mapTileValue;
 
@@ -189,7 +191,12 @@ class BaseMovementService
      */
     protected function canPlayerEnterLocation(Character $character, Location $location): bool
     {
-        if (! is_null($location->enemy_strength_increase) && $character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty()) {
+        if ($this->sendAutomationRestrictionMessage($character, AutomationRestrictionService::ENTER_LOCATION, $location)) {
+
+            return false;
+        }
+
+        if (! is_null($location->enemy_strength_type) && $character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty()) {
 
             if (! is_null($location->type)) {
                 $locationType = new LocationType($location->type);
@@ -210,7 +217,7 @@ class BaseMovementService
             $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
 
             if (is_null($slot)) {
-                event(new ServerMessageEvent($character->user, 'Cannot enter this location without a '.$item->name));
+                event(new ServerMessageEvent($character->user, 'Cannot enter this location without a ' . $item->name));
 
                 return false;
             }

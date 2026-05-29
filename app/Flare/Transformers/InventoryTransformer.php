@@ -27,6 +27,7 @@ class InventoryTransformer extends TransformerAbstract
             'max_holy_stacks' => $slot->item->holy_stacks,
             'ac' => $slot->item->getTotalDefence(),
             'attack' => $slot->item->getTotalDamage(),
+            'healing' => $slot->item->getTotalHealing(),
             'usable' => $slot->item->usable,
             'damages_kingdoms' => $slot->item->damages_kingdoms,
             'kingdom_damage' => $slot->item->kingdom_damage,

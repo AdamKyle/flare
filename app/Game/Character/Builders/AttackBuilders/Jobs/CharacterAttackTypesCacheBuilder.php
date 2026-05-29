@@ -4,7 +4,7 @@ namespace App\Game\Character\Builders\AttackBuilders\Jobs;
 
 use App\Flare\Models\Character;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
-use App\Game\Exploration\Events\ExplorationLogUpdate;
+use App\Game\Automation\Events\AutomationLogUpdate;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -38,7 +38,7 @@ class CharacterAttackTypesCacheBuilder implements ShouldQueue
         $updateCharacterAttackTypes->updateCache($this->character);
 
         if ($this->alertStatsUpdated) {
-            event(new ExplorationLogUpdate($this->character->user->id, 'Character stats have been updated.', false, true));
+            event(new AutomationLogUpdate($this->character->user->id, 'Character stats have been updated.', false, true));
         }
     }
 }

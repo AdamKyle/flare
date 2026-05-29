@@ -5,9 +5,11 @@ namespace App\Flare\Transformers;
 use App\Flare\Models\Character;
 use App\Flare\Models\FactionLoyalty;
 use App\Flare\Models\GameClass;
+use App\Flare\Models\Item;
 use App\Flare\Models\Survey;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\ClassAttackValue;
+use App\Flare\Values\ItemEffectsValue;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use Exception;
 
@@ -18,6 +20,8 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
     protected array $defaultIncludes = [
         'inventory_count',
     ];
+
+    public function __construct(private readonly CharacterStatBuilder $characterStatBuilder) {}
 
     public function setIgnoreReductions(bool $ignoreReductions): void
     {
@@ -31,7 +35,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
      */
     public function transform(Character $character): array
     {
-        $characterStatBuilder = resolve(CharacterStatBuilder::class)->setCharacter($character, $this->ignoreReductions);
+        $characterStatBuilder = $this->characterStatBuilder->setCharacter($character, $this->ignoreReductions);
         $gameClass = GameClass::find($character->game_class_id);
         $factionLoyalty = $character->factionLoyalties()->where('is_pledged', '=', true)->first();
 
@@ -58,8 +62,11 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'focus_modded' => $characterStatBuilder->statMod('focus'),
             'attack' => $characterStatBuilder->buildTotalAttack(),
             'health' => $characterStatBuilder->buildHealth(),
+            'heal_for' => $characterStatBuilder->buildHealing(),
             'ac' => $characterStatBuilder->buildDefence(),
             'extra_action_chance' => (new ClassAttackValue($character))->buildAttackData(),
+            'fight_time_out_mod_bonus' => $characterStatBuilder->buildTimeOutModifier('fight_time_out'),
+            'movement_time_out_mod_bonus' => $characterStatBuilder->buildTimeOutModifier('move_time_out'),
             'gold' => number_format($character->gold),
             'gold_dust' => number_format($character->gold_dust),
             'shards' => number_format($character->shards),
@@ -75,7 +82,10 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'can_craft_again_at' => now()->diffInSeconds($character->can_craft_again_at),
             'can_spin_again_at' => now()->diffInSeconds($character->can_spin_again_at),
             'is_automation_running' => $character->currentAutomations()->where('character_id', $character->id)->get()->isNotEmpty(),
+            'is_faction_loyalty_automation_running' => $character->isFactionLoyaltyAutomationRunning(),
             'is_delve_running' => $character->currentAutomations()->where('character_id', $character->id)->where('type', AutomationType::DELVE)->get()->isNotEmpty(),
+            'can_set_delve_pack' => $this->canSetPactOptionsForDelve($character),
+            'active_automation' => $this->activeAutomation($character),
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
             'is_silenced' => $character->user->is_silenced,
             'can_talk_again_at' => $character->user->can_talk_again_at,
@@ -83,7 +93,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'force_name_change' => $character->force_name_change,
             'is_alchemy_locked' => $this->isAlchemyLocked($character),
             'can_use_work_bench' => false,
-            'can_access_queen' => false,
+            'can_access_queen' => $this->canAccessQueenOfHearts($character),
             'can_access_hell_forged' => $character->map->gameMap->mapType()->isHell(),
             'can_access_purgatory_chains' => $character->map->gameMap->mapType()->isPurgatory(),
             'can_access_labyrinth_oracle' => $character->map->gameMap->mapType()->isLabyrinth(),
@@ -123,12 +133,61 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
 
     private function getTimeLeftOnAutomation(Character $character)
     {
-        $automation = $character->currentAutomations()->where('type', AutomationType::EXPLORING)->first();
+        $automation = $this->activeAutomation($character);
 
         if (! is_null($automation)) {
-            return now()->diffInSeconds($automation->completed_at);
+            return $automation['timer_seconds'];
         }
 
         return 0;
+    }
+
+    private function activeAutomation(Character $character): ?array
+    {
+        $automation = $character->currentAutomations()
+            ->where('completed_at', '>', now())
+            ->orderBy('id')
+            ->first();
+
+        if (is_null($automation)) {
+            return null;
+        }
+
+        $name = match ($automation->type) {
+            AutomationType::EXPLORING => 'Exploration',
+            AutomationType::DELVE => 'Delve',
+            AutomationType::FACTION_LOYALTY => 'Faction Loyalty',
+            default => null,
+        };
+
+        if (is_null($name)) {
+            return null;
+        }
+
+        return [
+            'type' => $automation->type,
+            'name' => $name,
+            'timer_seconds' => now()->diffInSeconds($automation->completed_at),
+        ];
+    }
+
+    private function canSetPactOptionsForDelve(Character $character): bool
+    {
+        $questItemForDelve = Item::where('effect', ItemEffectsValue::DELVE_PACK_CHOICE)->first();
+
+        if (is_null($questItemForDelve)) {
+            return false;
+        }
+
+        return $character->inventory->slots->filter(function ($slot) use ($questItemForDelve) {
+            return $slot->item_id === $questItemForDelve->id;
+        })->isNotEmpty();
+    }
+
+    private function canAccessQueenOfHearts(Character $character): bool
+    {
+        return $character->inventory->slots->filter(function ($slot) {
+            return $slot->item->effect === ItemEffectsValue::QUEEN_OF_HEARTS;
+        })->isNotEmpty() && $character->map->gameMap->mapType()->isHell();
     }
 }

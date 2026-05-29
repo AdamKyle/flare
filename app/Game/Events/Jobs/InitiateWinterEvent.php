@@ -36,11 +36,9 @@ class InitiateWinterEvent implements ShouldQueue
 
     public function handle(BuildQuestCacheService $buildQuestCacheService): void
     {
-
         $event = ScheduledEvent::find($this->eventId);
 
         if (is_null($event) || $event->currently_running) {
-
             return;
         }
 
@@ -50,7 +48,7 @@ class InitiateWinterEvent implements ShouldQueue
 
         $event = $event->refresh();
 
-        Event::create([
+        $createdEvent = Event::create([
             'type' => EventType::WINTER_EVENT,
             'started_at' => $event->start_date,
             'ends_at' => $event->end_date,
@@ -58,7 +56,7 @@ class InitiateWinterEvent implements ShouldQueue
 
         event(new GlobalMessageEvent('A winter chill sets over you. You turn and see the gates to the Ice Queens Realm is open. Do you dare enter? (Players just have to traverse to the new plane, you can do with this the traverse on desktop or Map Movement -> Traverse on Mobile.)'));
 
-        AnnouncementHandler::createAnnouncement('winter_event');
+        AnnouncementHandler::createAnnouncement('winter_event', $createdEvent);
 
         $this->kickOffGlobalEventGoal();
 
@@ -110,13 +108,12 @@ class InitiateWinterEvent implements ShouldQueue
         $newRaidForEventData = [];
 
         foreach ($raidsForEvent as $raidForEvent) {
-
             $raid = Raid::find($raidForEvent['selected_raid']);
 
             $startDate = Carbon::parse($raidForEvent['start_date'])->addYear()->format('Y-m-d\TH:i:s.u\Z');
             $endDate = Carbon::parse($raidForEvent['end_date'])->addYear()->format('Y-m-d\TH:i:s.u\Z');
 
-            $scheduledEvent = ScheduledEvent::create([
+            ScheduledEvent::create([
                 'event_type' => EventType::RAID_EVENT,
                 'raid_id' => $raidForEvent['selected_raid'],
                 'start_date' => $startDate,

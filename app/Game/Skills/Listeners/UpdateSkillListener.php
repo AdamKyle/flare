@@ -35,7 +35,7 @@ class UpdateSkillListener
      */
     public function handle(UpdateSkillEvent $event)
     {
-        if ($event->skill->level >= $event->skill->baseSkill->max_level) {
+        if ($this->normalizeMaxLevelSkill($event->skill)) {
             return;
         }
 
@@ -50,7 +50,7 @@ class UpdateSkillListener
 
             $xp = ceil($this->getSkillXp($enchantingSkill) / 2);
 
-            if ($enchantingSkill->level < $enchantingSkill->baseSkill->max_level) {
+            if (! $this->normalizeMaxLevelSkill($enchantingSkill)) {
                 $this->updateSkill($enchantingSkill, $xp);
             }
         }
@@ -71,6 +71,10 @@ class UpdateSkillListener
 
     protected function updateSkill(Skill $skill, int $skillXP)
     {
+        if ($this->normalizeMaxLevelSkill($skill)) {
+            return;
+        }
+
         $newXp = $skill->xp + $skillXP;
 
         $event = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
@@ -85,7 +89,7 @@ class UpdateSkillListener
         }
 
         while ($newXp >= $skill->xp_max) {
-            $level = $skill->level + 1;
+            $level = min($skill->level + 1, $skill->baseSkill->max_level);
 
             $bonus = $skill->skill_bonus + $skill->baseSkill->skill_bonus_per_level;
 
@@ -107,6 +111,7 @@ class UpdateSkillListener
                 'xp' => 0,
             ]);
 
+            $skill = $skill->refresh();
             $character = $skill->character->refresh();
 
             event(new SkillLeveledUpServerMessageEvent($skill->character->user, $skill->refresh()));
@@ -155,5 +160,19 @@ class UpdateSkillListener
         $characterData = resolve(Manager::class)->createData($characterData)->toArray();
 
         event(new UpdateBaseCharacterInformation($character->user, $characterData));
+    }
+
+    protected function normalizeMaxLevelSkill(Skill $skill): bool
+    {
+        if ($skill->level < $skill->baseSkill->max_level) {
+            return false;
+        }
+
+        $skill->update([
+            'level' => $skill->baseSkill->max_level,
+            'xp' => 0,
+        ]);
+
+        return true;
     }
 }

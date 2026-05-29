@@ -54,6 +54,14 @@ class CapitalCityBuildingRequestHandler
             }
 
             $building = $kingdom->buildings()->find($buildingRequest['building_id']);
+
+            if ($buildingRequest['type'] === 'upgrade' && $this->isInvalidUpgradeRequest($building, $buildingRequest)) {
+                $this->messages[] = $building->name . ' has been rejected: Building is already max level.';
+                $buildingsToUpgradeOrRepair[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
+                continue;
+            }
+
             $minutesToRebuild = $this->calculateRebuildTime($building, $buildingRequest['secondary_status']);
 
             $timeTillFinished += $minutesToRebuild;
@@ -124,6 +132,13 @@ class CapitalCityBuildingRequestHandler
         }
 
         return false;
+    }
+
+    private function isInvalidUpgradeRequest(KingdomBuilding $building, array $buildingRequest): bool
+    {
+        return $building->level >= $building->gameBuilding->max_level ||
+            (int) $buildingRequest['to_level'] > $building->gameBuilding->max_level ||
+            (int) $buildingRequest['from_level'] !== $building->level;
     }
 
     /**

@@ -4,6 +4,8 @@ namespace App\Game\Skills\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
+use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Skills\Requests\TrinketCraftingValidation;
 use App\Game\Skills\Services\CraftingService;
@@ -13,6 +15,8 @@ use Illuminate\Http\JsonResponse;
 
 class TrinketCraftingController extends Controller
 {
+    use ChecksAutomationRestrictions;
+
     public function __construct(private TrinketCraftingService $trinketCraftingService, private CraftingService $craftingService) {}
 
     public function fetchItemsToCraft(Character $character): JsonResponse
@@ -27,6 +31,12 @@ class TrinketCraftingController extends Controller
 
     public function craftTrinket(TrinketCraftingValidation $request, Character $character): JsonResponse
     {
+        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::START_CRAFTING);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         event(new CraftedItemTimeOutEvent($character));
 
         $item = Item::find($request->item_to_craft);

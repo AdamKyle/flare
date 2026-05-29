@@ -30,13 +30,11 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.a
         // Stop Training Skills
         Route::post('/item-skills/stop-training/{character}/{itemId}/{itemSkillProgressionId}', ['uses' => 'Api\ItemSkillController@stopTrainingSkill']);
 
-        Route::middleware(['is.character.exploring'])->group(function () {
-            // Handle Training a specific skill.
-            Route::post('/skill/train/{character}', ['uses' => 'Api\SkillsController@train']);
+        // Handle Training a specific skill.
+        Route::post('/skill/train/{character}', ['uses' => 'Api\SkillsController@train']);
 
-            // Handle Canceling the train of that skill.
-            Route::post('/skill/cancel-train/{character}/{skill}', ['uses' => 'Api\SkillsController@cancelTrain']);
-        });
+        // Handle Canceling the train of that skill.
+        Route::post('/skill/cancel-train/{character}/{skill}', ['uses' => 'Api\SkillsController@cancelTrain']);
 
         Route::group(['middleware' => 'throttle:crafting'], function () {
             // Craft Item

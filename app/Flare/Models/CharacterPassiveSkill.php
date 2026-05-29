@@ -2,10 +2,15 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\CharacterPassiveSkillFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class CharacterPassiveSkill extends Model
 {
+
+    use HasFactory;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -63,17 +68,17 @@ class CharacterPassiveSkill extends Model
 
     public function getIsMaxLevelAttribute()
     {
-        return $this->current_level === $this->passiveSkill->max_level;
+        return $this->current_level >= $this->passiveSkill->max_level;
     }
 
     public function getCurrentBonusAttribute()
     {
-        return $this->current_level * $this->passiveSkill->bonus_per_level;
+        return $this->getClampedCurrentLevel() * $this->passiveSkill->bonus_per_level;
     }
 
     public function getResourceIncreaseAmountAttribute()
     {
-        return $this->current_level * $this->passiveSkill->resource_bonus_per_level;
+        return $this->getClampedCurrentLevel() * $this->passiveSkill->resource_bonus_per_level;
     }
 
     public function getNameAttribute()
@@ -83,16 +88,26 @@ class CharacterPassiveSkill extends Model
 
     public function getResourceRequestTimeReductionAttribute()
     {
-        return $this->current_level * $this->passiveSkill->resource_request_time_reduction;
+        return $this->getClampedCurrentLevel() * $this->passiveSkill->resource_request_time_reduction;
     }
 
     public function getCapitalCityBuildingRequestTravelTimeReductionAttribute()
     {
-        return $this->current_level * $this->passiveSkill->capital_city_building_request_travel_time_reduction;
+        return $this->getClampedCurrentLevel() * $this->passiveSkill->capital_city_building_request_travel_time_reduction;
     }
 
     public function getCapitalCityUnitRequestTravelTimeReductionAttribute()
     {
-        return $this->level * $this->passiveSkill->capital_city_unit_request_travel_time_reduction;
+        return $this->getClampedCurrentLevel() * $this->passiveSkill->capital_city_unit_request_travel_time_reduction;
+    }
+
+    protected function getClampedCurrentLevel(): int
+    {
+        return min(max($this->current_level, 0), $this->passiveSkill->max_level);
+    }
+
+    protected static function newFactory()
+    {
+        return CharacterPassiveSkillFactory::new();
     }
 }

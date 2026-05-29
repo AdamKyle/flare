@@ -60,7 +60,9 @@ class ComparisonServiceTest extends TestCase
                 'type' => ItemType::SWORD->value,
                 'base_damage' => 25,
                 'str_mod' => 0.10,
-            ]), true, 'left-hand'
+            ]),
+            true,
+            'left-hand'
         )->getCharacter();
 
         $slot = $character->inventory->slots->first();
@@ -80,7 +82,9 @@ class ComparisonServiceTest extends TestCase
                 'type' => ItemType::WAND->value,
                 'base_damage' => 25,
                 'str_mod' => 0.10,
-            ]), true, 'left-hand'
+            ]),
+            true,
+            'left-hand'
         )->getCharacter();
 
         $slot = $character->inventory->slots->first();
@@ -100,7 +104,9 @@ class ComparisonServiceTest extends TestCase
                 'type' => ItemType::SWORD->value,
                 'base_damage' => 25,
                 'str_mod' => 0.10,
-            ]), true, 'left-hand'
+            ]),
+            true,
+            'left-hand'
         )->getCharacter();
 
         $slot = $character->inventory->slots->first();
@@ -110,7 +116,51 @@ class ComparisonServiceTest extends TestCase
         $this->assertNotEmpty($comparisonData['details']);
     }
 
-    public function test_build_shop_data_for_bow()
+    public function testTrinketComparisonDetailsIsNotEmptyWhenTrinketEquipped()
+    {
+        $item = $this->createItem([
+            'type' => 'trinket',
+            'str_mod' => 0.25,
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->giveItem(
+            $this->createItem([
+                'type' => 'trinket',
+                'str_mod' => 0.10,
+            ]),
+            true,
+            'trinket'
+        )->getCharacter();
+
+        $slot = $character->inventory->slots->first();
+
+        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot, 'trinket');
+
+        $this->assertNotEmpty($comparisonData['details']);
+        $this->assertEquals('trinket', $comparisonData['details'][0]['position']);
+    }
+
+    public function testUnsupportedComparisonTypeReturnsEmptyDetails()
+    {
+        $item = $this->createItem(['type' => 'artifact']);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->giveItem(
+            $this->createItem([
+                'type' => 'artifact',
+                'str_mod' => 0.10,
+            ]),
+            true,
+            'artifact'
+        )->getCharacter();
+
+        $slot = $character->inventory->slots->first();
+
+        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot, 'artifact');
+
+        $this->assertEmpty($comparisonData['details']);
+    }
+
+    public function testBuildShopDataForBow()
     {
         $item = $this->createItem(['type' => ItemType::BOW->value]);
 
@@ -119,7 +169,9 @@ class ComparisonServiceTest extends TestCase
                 'type' => ItemType::SWORD->value,
                 'base_damage' => 25,
                 'str_mod' => 0.10,
-            ]), true, 'left-hand'
+            ]),
+            true,
+            'left-hand'
         )->getCharacter();
 
         $comparisonData = $this->comparisonService->buildShopData($character, $item, ItemType::BOW->value);
@@ -138,7 +190,9 @@ class ComparisonServiceTest extends TestCase
                 'type' => ArmourTypes::SHIELD,
                 'base_ac' => 25,
                 'str_mod' => 0.10,
-            ]), true, 'left-hand'
+            ]),
+            true,
+            'left-hand'
         )->getCharacter();
 
         $comparisonData = $this->comparisonService->buildShopData($character, $item, ArmourTypes::SHIELD);
@@ -157,7 +211,9 @@ class ComparisonServiceTest extends TestCase
                 'type' => SpellTypes::HEALING,
                 'base_healing' => 25,
                 'str_mod' => 0.10,
-            ]), true, 'spell-one'
+            ]),
+            true,
+            'spell-one'
         )->getCharacter();
 
         $comparisonData = $this->comparisonService->buildShopData($character, $item, ItemType::SPELL_DAMAGE->value);

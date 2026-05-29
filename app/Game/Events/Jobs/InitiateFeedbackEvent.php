@@ -29,11 +29,9 @@ class InitiateFeedbackEvent implements ShouldQueue
 
     public function handle(): void
     {
-
         $event = ScheduledEvent::find($this->eventId);
 
         if (is_null($event)) {
-
             return;
         }
 
@@ -43,19 +41,19 @@ class InitiateFeedbackEvent implements ShouldQueue
 
         $event = $event->refresh();
 
-        Event::create([
+        $createdEvent = Event::create([
             'type' => EventType::FEEDBACK_EVENT,
             'started_at' => $event->start_date,
             'ends_at' => $event->end_date,
         ]);
 
         event(new GlobalMessageEvent(
-            'The feedback event has started! '.
-            'New and returning players will gain +75 XP per kill under level 1,000, and +150 XP from Level 1,000 - 5,000. For those who have reincarnated, you will gain +500 XP per kill. '.
-            'Players will also gain +150 XP in training skills such as Accuracy, Looting and so on, with a bonus of +175 XP per crafting skills such as trinketry, gem crafting, regular crafting and enchanting as well as other crafting skills '.
-            'After 1 hour of combined playtime (does NOT need to be consecutive), players of all skill levels will be asked to participate in a survey to help make Tlessa a better game. Upon completing the survey, you will be rewarded with a Mythical Item!'
+            'The feedback event has started! ' .
+                'New and returning players will gain +75 XP per kill under level 1,000, and +150 XP from Level 1,000 - 5,000. For those who have reincarnated, you will gain +500 XP per kill. ' .
+                'Players will also gain +150 XP in training skills such as Accuracy, Looting and so on, with a bonus of +175 XP per crafting skills such as trinketry, gem crafting, regular crafting and enchanting as well as other crafting skills ' .
+                'After 1 hour of combined playtime (does NOT need to be consecutive), players of all skill levels will be asked to participate in a survey to help make Tlessa a better game. Upon completing the survey, you will be rewarded with a Mythical Item!'
         ));
 
-        AnnouncementHandler::createAnnouncement('tlessas_feedback_event');
+        AnnouncementHandler::createAnnouncement('tlessas_feedback_event', $createdEvent);
     }
 }

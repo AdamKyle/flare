@@ -49,7 +49,7 @@ class UpdateSkillEventTest extends TestCase
         $skill = $skill->refresh();
 
         $this->assertEquals($gameSkill->max_level, $skill->level);
-        $this->assertEquals(999, $skill->xp);
+        $this->assertEquals(0, $skill->xp);
     }
 
     public function test_update_skill()

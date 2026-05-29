@@ -68,6 +68,10 @@ use App\Flare\Transformers\BasicKingdomTransformer;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\ItemTransformer;
+use App\Game\Kingdoms\Transformers\KingdomAttackLogsTransformer;
+use App\Game\Kingdoms\Transformers\KingdomBuildingTransformer;
+use App\Game\Kingdoms\Transformers\KingdomResourceHourlyProductionTransformer;
+use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use App\Flare\Transformers\MarketItemsTransformer;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Flare\Transformers\UsableItemTransformer;
@@ -143,8 +147,10 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CharacterAttackTransformer;
         });
 
-        $this->app->bind(CharacterSheetBaseInfoTransformer::class, function () {
-            return new CharacterSheetBaseInfoTransformer;
+        $this->app->bind(CharacterSheetBaseInfoTransformer::class, function ($app) {
+            return new CharacterSheetBaseInfoTransformer(
+                $app->make(CharacterStatBuilder::class)
+            );
         });
 
         $this->app->bind(OtherKingdomTransformer::class, function ($app) {
@@ -155,8 +161,14 @@ class ServiceProvider extends ApplicationServiceProvider
             return new BasicKingdomTransformer;
         });
 
+        $this->app->bind(KingdomResourceHourlyProductionTransformer::class, function () {
+            return new KingdomResourceHourlyProductionTransformer;
+        });
+
         $this->app->bind(KingdomTransformer::class, function ($app) {
-            return new KingdomTransformer;
+            return new KingdomTransformer(
+                $app->make(KingdomResourceHourlyProductionTransformer::class)
+            );
         });
 
         $this->app->bind(KingdomBuildingTransformer::class, function ($app) {

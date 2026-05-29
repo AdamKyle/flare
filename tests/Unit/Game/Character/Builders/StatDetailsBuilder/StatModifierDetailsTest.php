@@ -544,6 +544,148 @@ class StatModifierDetailsTest extends TestCase
         $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
     }
 
+    public function testWeaponDamageBreakDownShowsClassSpecialtyBaseDamageModAmount()
+    {
+        $character = $this->character->getCharacter();
+
+        $classSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $character->game_class_id,
+            'base_damage_mod' => 0.20,
+            'base_damage_stat_increase' => 0,
+        ]);
+
+        $character->classSpecialsEquipped()->create([
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 1,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown(ItemType::SWORD->value, false);
+
+        $this->assertEqualsWithDelta(0.20, $data['class_specialties'][0]['amount'], 0.000001);
+    }
+
+    public function testSpellDamageBreakDownShowsClassSpecialtyBaseSpellDamageModAmount()
+    {
+        $character = $this->character->getCharacter();
+
+        $classSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $character->game_class_id,
+            'base_damage_mod' => 0,
+            'base_spell_damage_mod' => 0.20,
+            'base_damage_stat_increase' => 0,
+        ]);
+
+        $character->classSpecialsEquipped()->create([
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 1,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown(ItemType::SPELL_DAMAGE->value, false);
+
+        $this->assertNotNull($data['class_specialties']);
+        $this->assertEqualsWithDelta(0.20, $data['class_specialties'][0]['amount'], 0.000001);
+    }
+
+    public function testSpellHealingBreakDownShowsClassSpecialtyBaseHealingModAmount()
+    {
+        $item = $this->createItem([
+            'type' => ItemType::SPELL_HEALING->value,
+            'base_healing' => 100,
+        ]);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($item, true, 'spell-one')
+            ->getCharacter();
+
+        $classSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $character->game_class_id,
+            'base_damage_mod' => 0,
+            'base_healing_mod' => 0.20,
+            'base_damage_stat_increase' => 0,
+        ]);
+
+        $character->classSpecialsEquipped()->create([
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 1,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $data = $this->statModifierDetails->setCharacter($character)->buildDamageBreakDown(ItemType::SPELL_HEALING->value, false);
+
+        $this->assertNotNull($data['class_specialties']);
+        $this->assertEqualsWithDelta(0.20, $data['class_specialties'][0]['amount'], 0.000001);
+    }
+
+    public function testDefenceBreakDownShowsClassSpecialtyBaseAcModAmount()
+    {
+        $character = $this->character->getCharacter();
+
+        $classSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $character->game_class_id,
+            'base_ac_mod' => 0.20,
+            'base_damage_stat_increase' => 0,
+        ]);
+
+        $character->classSpecialsEquipped()->create([
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 1,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $data = $this->statModifierDetails->setCharacter($character)->buildDefenceBreakDown(false);
+
+        $this->assertEqualsWithDelta(0.20, $data['class_specialties'][0]['amount'], 0.000001);
+    }
+
+    public function testHealthBreakDownShowsClassSpecialtyHealthModAmount()
+    {
+        $character = $this->character->getCharacter();
+
+        $classSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $character->game_class_id,
+            'health_mod' => 0.20,
+            'base_damage_stat_increase' => 0,
+        ]);
+
+        $character->classSpecialsEquipped()->create([
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 1,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $data = $this->statModifierDetails->setCharacter($character)->fetchHealthBreakDown(false);
+
+        $this->assertEqualsWithDelta(0.20, $data['class_specialties'][0]['amount'], 0.000001);
+    }
+
     private function createCharacterForData(CharacterFactory $characterFactory): Character
     {
 

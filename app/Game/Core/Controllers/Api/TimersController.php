@@ -6,7 +6,7 @@ use App\Flare\Models\Character;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\ShowCraftingTimeOutEvent;
 use App\Game\Core\Events\ShowTimeOutEvent as EventsShowTimeOutEvent;
-use App\Game\Exploration\Events\ExplorationTimeOut;
+use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Maps\Events\ShowTimeOutEvent;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
@@ -18,7 +18,7 @@ class TimersController extends Controller
         $characterAutomation = $character->currentAutomations()->first();
 
         if ($characterAutomation) {
-            event(new ExplorationTimeOut($character->user, now()->diffInSeconds($characterAutomation->completed_at)));
+            event(new AutomationTimeOut($character->user, now()->diffInSeconds($characterAutomation->completed_at)));
         }
 
         if (! is_null($character->can_move_again_at)) {

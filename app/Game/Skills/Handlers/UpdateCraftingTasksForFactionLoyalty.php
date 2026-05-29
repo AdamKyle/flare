@@ -62,6 +62,10 @@ class UpdateCraftingTasksForFactionLoyalty
             return $character;
         }
 
+        if ($this->normalizeMaxLevelNpc($helpingNpc)) {
+            return $character;
+        }
+
         if (! $this->hasMatchingTask($helpingNpc, 'item_id', $item->id)) {
             return $character;
         }
@@ -82,7 +86,7 @@ class UpdateCraftingTasksForFactionLoyalty
             ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name.' is elated at your ability to craft: '.$item->affix_name.'. "Thank you child! Only: '.$amountLeft.' Left to go!"');
         }
 
-        if ($this->canLevelUpFame($helpingNpc) && $helpingNpc->current_level !== $helpingNpc->max_level) {
+        if ($this->canLevelUpFame($helpingNpc)) {
             $this->handleFameLevelUp($character, $helpingNpc);
         }
 
@@ -97,15 +101,15 @@ class UpdateCraftingTasksForFactionLoyalty
     protected function handleFameLevelUp(Character $character, FactionLoyaltyNpc $helpingNpc): void
     {
 
+        if ($this->normalizeMaxLevelNpc($helpingNpc)) {
+            return;
+        }
+
         $this->handOutXp($character, $helpingNpc);
         $this->handOutCurrencies($character, $helpingNpc);
         $this->rewardTheUniqueItem($character);
 
-        $newLevel = $helpingNpc->current_level + 1;
-
-        if ($newLevel >= $helpingNpc->max_level) {
-            $newLevel = $helpingNpc->max_level;
-        }
+        $newLevel = min($helpingNpc->current_level + 1, $helpingNpc->max_level);
 
         $helpingNpc->update([
             'current_level' => $newLevel,
@@ -213,6 +217,31 @@ class UpdateCraftingTasksForFactionLoyalty
      */
     protected function canLevelUpFame(FactionLoyaltyNpc $factionLoyaltyNpc): bool
     {
+        if ($factionLoyaltyNpc->current_level >= $factionLoyaltyNpc->max_level) {
+            return false;
+        }
+
         return $factionLoyaltyNpc->current_fame >= $factionLoyaltyNpc->next_level_fame;
+    }
+
+    protected function normalizeMaxLevelNpc(FactionLoyaltyNpc $factionLoyaltyNpc): bool
+    {
+        if ($factionLoyaltyNpc->current_level < $factionLoyaltyNpc->max_level) {
+            return false;
+        }
+
+        if ($factionLoyaltyNpc->current_level !== $factionLoyaltyNpc->max_level) {
+            $factionLoyaltyNpc->update([
+                'current_level' => $factionLoyaltyNpc->max_level,
+            ]);
+        }
+
+        if (! is_null($factionLoyaltyNpc->factionLoyaltyNpcTasks)) {
+            $factionLoyaltyNpc->factionLoyaltyNpcTasks->update([
+                'fame_tasks' => [],
+            ]);
+        }
+
+        return true;
     }
 }

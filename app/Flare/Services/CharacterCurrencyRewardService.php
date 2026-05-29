@@ -70,15 +70,15 @@ class CharacterCurrencyRewardService
                 return $slot->item->effect === ItemEffectsValue::GET_COPPER_COINS;
             })->isNotEmpty();
 
-            $shards = rand(1, 500) * $killCount;
+            $shards = rand(1, 375) * $killCount;
 
-            $goldDust = rand(1, 500) * $killCount;
+            $goldDust = rand(1, 375) * $killCount;
 
             $characterShards = $this->character->shards + $shards;
             $characterGoldDust = $this->character->gold_dust + $goldDust;
 
             if ($canHaveCopperCoins) {
-                $copperCoins = rand(1, 150) * $killCount;
+                $copperCoins = rand(1, 115) * $killCount;
 
                 $characterCopperCoins = $this->character->copper_coins + $copperCoins;
             } else {

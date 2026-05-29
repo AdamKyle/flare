@@ -224,13 +224,15 @@ class RaidBattleService
 
         $raid = Raid::where('raid_boss_id', $monsterId)->first();
 
-        if (! is_null($raid)) {
-            RaidBossRewardHandler::dispatch($character->id, $monsterId, is_null($raid) ? null : $raid->id);
-        }
-
         $resultData['monster_current_health'] = 0;
 
         $this->deleteMonsterCacheHealth($character->id, $monsterId);
+
+        if (! is_null($raid)) {
+            RaidBossRewardHandler::dispatch($character->id, $monsterId, $raid->id);
+
+            return $this->successResult($resultData);
+        }
 
         BattleAttackHandler::dispatch($character->id, $monsterId);
 
@@ -244,7 +246,7 @@ class RaidBattleService
     {
         return [
             'character_current_health' => $this->monsterPlayerFight->getCharacterHealth(),
-            'monster_current_health' => $this->monsterPlayerFight->getMonsterHealth(),
+            'monster_current_health' => max($this->monsterPlayerFight->getMonsterHealth(), 0),
             'messages' => $this->monsterPlayerFight->getBattleMessages(),
         ];
     }
@@ -313,7 +315,9 @@ class RaidBattleService
             $raid = Raid::where('raid_boss_id', $monsterId)->first();
 
             if (is_null($raid)) {
-                BattleAttackHandler::dispatch($character->id, $this->monsterPlayerFight->getMonster()['id'])->onQueue('default_long')->delay(now()->addSeconds(2));
+                BattleAttackHandler::dispatch($character->id, $this->monsterPlayerFight->getMonster()['id'])
+                    ->onQueue('default_long')
+                    ->delay(now()->addSeconds(2));
 
                 return $this->successResult([
                     'character_current_health' => $health['current_character_health'],
@@ -322,7 +326,9 @@ class RaidBattleService
                 ]);
             }
 
-            RaidBossRewardHandler::dispatch($character->id, $raid->id, $monsterId)->onQueue('default_long')->delay(now()->addSeconds(2));
+            RaidBossRewardHandler::dispatch($character->id, $monsterId, $raid->id)
+                ->onQueue('default_long')
+                ->delay(now()->addSeconds(2));
 
             return $this->successResult([
                 'character_current_health' => $health['current_character_health'],
@@ -354,7 +360,6 @@ class RaidBattleService
      */
     protected function handleRaidBossHealth(Character $character, int $monsterId, bool $shouldUpdateHealth, array $health = []): void
     {
-
         if (! $shouldUpdateHealth) {
             return;
         }
@@ -362,7 +367,7 @@ class RaidBattleService
         $raidBoss = RaidBoss::where('raid_boss_id', $monsterId)->first();
         $oldHealth = $raidBoss->boss_current_hp;
 
-        $currentHealth = empty($health) ? $this->monsterPlayerFight->getMonsterHealth() : $health['current_monster_health'];
+        $currentHealth = max(empty($health) ? $this->monsterPlayerFight->getMonsterHealth() : $health['current_monster_health'], 0);
 
         $this->updateRaidBossHealth($raidBoss, $currentHealth);
 

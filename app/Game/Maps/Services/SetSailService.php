@@ -5,6 +5,7 @@ namespace App\Game\Maps\Services;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -41,6 +42,12 @@ class SetSailService extends BaseMovementService
      */
     public function setSail(Character $character): array
     {
+        $restriction = $this->automationRestrictionErrorResult($character, AutomationRestrictionService::SET_SAIL);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         $toPort = $this->getToLocation($character);
         $fromPort = $this->getFromLocation($character);
 

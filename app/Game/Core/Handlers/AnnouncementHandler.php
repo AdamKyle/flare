@@ -14,9 +14,9 @@ use Exception;
 
 class AnnouncementHandler
 {
-    public function createAnnouncement(string $type): void
+    public function createAnnouncement(string $type, ?Event $event = null): void
     {
-        $this->buildAnnouncementForType($type);
+        $this->buildAnnouncementForType($type, $event);
     }
 
     public function getNameForType(int $type): ?string
@@ -36,26 +36,28 @@ class AnnouncementHandler
         };
     }
 
-    protected function buildAnnouncementForType(string $type): void
+    protected function buildAnnouncementForType(string $type, ?Event $event = null): void
     {
         match ($type) {
-            'raid_announcement' => $this->buildRaidAnnouncementMessage(),
-            'weekly_celestial_spawn' => $this->buildWeeklyCelestialMessage(),
-            'weekly_currency_drop' => $this->buildWeeklyCurrencyDrop(),
-            'winter_event' => $this->buildWinterEventMessage(),
+            'raid_announcement' => $this->buildRaidAnnouncementMessage($event),
+            'weekly_celestial_spawn' => $this->buildWeeklyCelestialMessage($event),
+            'weekly_currency_drop' => $this->buildWeeklyCurrencyDrop($event),
+            'winter_event' => $this->buildWinterEventMessage($event),
             'purgatory_house' => $this->buildPurgatoryHouseMessage(),
             'gold_mines' => $this->buildTheGoldMinesMessage(),
             'the_old_church' => $this->buildTheOldChurchMessage(),
-            'delusional_memories_event' => $this->buildDelusionalMemoriesMessage(),
-            'weekly_faction_loyalty_event' => $this->buildWeeklyFactionLoyaltyEvent(),
-            'tlessas_feedback_event' => $this->buildFeedbackAnnouncement(),
+            'delusional_memories_event' => $this->buildDelusionalMemoriesMessage($event),
+            'weekly_faction_loyalty_event' => $this->buildWeeklyFactionLoyaltyEvent($event),
+            'tlessas_feedback_event' => $this->buildFeedbackAnnouncement($event),
             default => throw new Exception('Cannot determine announcement type'),
         };
     }
 
-    private function buildRaidAnnouncementMessage(): void
+    private function buildRaidAnnouncementMessage(?Event $event = null): void
     {
-        $event = Event::where('type', EventType::RAID_EVENT)->first();
+        if (is_null($event)) {
+            $event = Event::where('type', EventType::RAID_EVENT)->first();
+        }
 
         if (is_null($event)) {
             throw new Exception('Cannot create message for raid event, when no event exists.');
@@ -130,10 +132,8 @@ class AnnouncementHandler
         event(new AnnouncementMessageEvent($announcement));
     }
 
-    private function buildWeeklyCelestialMessage(): void
+    private function buildWeeklyCelestialMessage(?Event $event = null): void
     {
-        $event = Event::where('type', EventType::WEEKLY_CELESTIALS)->first();
-
         if (is_null($event)) {
             throw new Exception('Cannot create message for weekly celestial event, when no event exists.');
         }
@@ -153,10 +153,8 @@ class AnnouncementHandler
         event(new AnnouncementMessageEvent($announcement));
     }
 
-    private function buildWeeklyCurrencyDrop(): void
+    private function buildWeeklyCurrencyDrop(?Event $event = null): void
     {
-        $event = Event::where('type', EventType::WEEKLY_CURRENCY_DROPS)->first();
-
         if (is_null($event)) {
             throw new Exception('Cannot create message for weekly celestial event, when no event exists.');
         }
@@ -175,10 +173,8 @@ class AnnouncementHandler
         event(new AnnouncementMessageEvent($announcement));
     }
 
-    public function buildWeeklyFactionLoyaltyEvent(): void
+    public function buildWeeklyFactionLoyaltyEvent(?Event $event = null): void
     {
-        $event = Event::where('type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->first();
-
         if (is_null($event)) {
             throw new Exception('Cannot create message for weekly celestial event, when no event exists.');
         }
@@ -198,10 +194,8 @@ class AnnouncementHandler
         event(new AnnouncementMessageEvent($announcement));
     }
 
-    private function buildWinterEventMessage(): void
+    private function buildWinterEventMessage(?Event $event = null): void
     {
-        $event = Event::where('type', EventType::WINTER_EVENT)->first();
-
         if (is_null($event)) {
             throw new Exception('Cannot create message for Winter Event, when no event exists.');
         }
@@ -222,10 +216,8 @@ class AnnouncementHandler
         event(new AnnouncementMessageEvent($announcement));
     }
 
-    private function buildDelusionalMemoriesMessage(): void
+    private function buildDelusionalMemoriesMessage(?Event $event = null): void
     {
-        $event = Event::where('type', EventType::DELUSIONAL_MEMORIES_EVENT)->first();
-
         if (is_null($event)) {
             throw new Exception('Cannot create message for Delusional Memories Event, when no event exists.');
         }
@@ -269,10 +261,8 @@ class AnnouncementHandler
         event(new AnnouncementMessageEvent($announcement));
     }
 
-    private function buildFeedbackAnnouncement(): void
+    private function buildFeedbackAnnouncement(?Event $event = null): void
     {
-        $event = Event::where('type', EventType::FEEDBACK_EVENT)->first();
-
         if (is_null($event)) {
             throw new Exception('Cannot create message for Feedback event, when no event exists.');
         }

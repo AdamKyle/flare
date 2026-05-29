@@ -7,6 +7,8 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MapNameValue;
+use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Values\CelestialConjureType;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Maps\Events\UpdateMap;
@@ -17,6 +19,8 @@ use Illuminate\Foundation\Bus\PendingDispatch;
 
 class PctService
 {
+    use ChecksAutomationRestrictions;
+
     private TraverseService $traverseService;
 
     private MapTileValue $mapTileValue;
@@ -32,6 +36,16 @@ class PctService
      */
     public function usePCT(Character $character, bool $teleport = false): bool
     {
+        if ($this->sendAutomationRestrictionMessage($character, AutomationRestrictionService::PCT)) {
+            return false;
+        }
+
+        if ($teleport && ! $character->can_move) {
+            event(new ServerMessageEvent($character->user, 'Sorry child, you are exhausted from yuor last move, wait for the timer'));
+
+            return true;
+        }
+
         $celestialFight = $this->findCelestialFight($character);
 
         $this->mapTileValue = $this->mapTileValue->setUp($character, $character->map->gameMap);

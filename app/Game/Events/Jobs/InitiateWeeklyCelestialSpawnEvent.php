@@ -30,11 +30,9 @@ class InitiateWeeklyCelestialSpawnEvent implements ShouldQueue
 
     public function handle(): void
     {
-
         $event = ScheduledEvent::find($this->eventId);
 
         if (is_null($event)) {
-
             return;
         }
 
@@ -47,7 +45,7 @@ class InitiateWeeklyCelestialSpawnEvent implements ShouldQueue
         Cache::put('celestial-spawn-rate', .8);
         Cache::put('celestial-event-date', now()->addDay());
 
-        Event::create([
+        $createdEvent = Event::create([
             'type' => EventType::WEEKLY_CELESTIALS,
             'started_at' => $event->start_date,
             'ends_at' => $event->end_date,
@@ -55,10 +53,10 @@ class InitiateWeeklyCelestialSpawnEvent implements ShouldQueue
 
         event(new GlobalMessageEvent(
             'The gates have swung open and the Celestial\'s are free.
-        get your weapons ready! (Celestials have a 80% chance to spawn regardless of plane based on any
-        movement type except traverse - for the next 24 hours! Only one will spawn per hour unless it is killed.)'
+    get your weapons ready! (Celestials have a 80% chance to spawn regardless of plane based on any
+    movement type except traverse - for the next 24 hours! Only one will spawn per hour unless it is killed.)'
         ));
 
-        AnnouncementHandler::createAnnouncement('weekly_celestial_spawn');
+        AnnouncementHandler::createAnnouncement('weekly_celestial_spawn', $createdEvent);
     }
 }

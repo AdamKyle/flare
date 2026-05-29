@@ -375,12 +375,15 @@ class CharacterStatBuilder
         $spellDamage = $this->getSpellDamage($types, $voided);
         $weaponDamage = $this->getWeaponDamage($stat, $types, $validWeaponTypes, $voided);
 
-        $damage = $ringDamage + $spellDamage + $weaponDamage;
-
-        $classSpecialsBonus = $this->character->classSpecialsEquipped
+        $baseDamageClassSpecialsBonus = $this->character->classSpecialsEquipped
             ->where('equipped', true)
             ->where('base_damage_mod', '>', 0)
             ->sum('base_damage_mod');
+
+        $baseSpellDamageClassSpecialsBonus = $this->character->classSpecialsEquipped
+            ->where('equipped', true)
+            ->where('base_spell_damage_mod', '>', 0)
+            ->sum('base_spell_damage_mod');
 
         $itemSkillBonus = 0;
 
@@ -388,7 +391,13 @@ class CharacterStatBuilder
             $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, 'base_damage');
         }
 
-        return ceil($damage + ($damage * ($this->holyInfo()->fetchAttackBonus() + $classSpecialsBonus + $itemSkillBonus)));
+        $attackBonus = $this->holyInfo()->fetchAttackBonus() + $itemSkillBonus;
+        $weaponAndRingDamage = $weaponDamage + $ringDamage;
+
+        return ceil(
+            $weaponAndRingDamage + ($weaponAndRingDamage * ($attackBonus + $baseDamageClassSpecialsBonus)) +
+            $spellDamage + ($spellDamage * ($attackBonus + $baseSpellDamageClassSpecialsBonus))
+        );
     }
 
     private function getRingDamage(array $types): int
@@ -543,8 +552,8 @@ class CharacterStatBuilder
 
         $classSpecialsBonus = $this->character->classSpecialsEquipped
             ->where('equipped', true)
-            ->where('base_damage_mod', '>', 0)
-            ->sum('base_damage_mod');
+            ->where('base_spell_damage_mod', '>', 0)
+            ->sum('base_spell_damage_mod');
 
         return ceil($damage + ($damage * ($this->holyInfo()->fetchAttackBonus() + $classSpecialsBonus)));
     }
@@ -862,11 +871,25 @@ class CharacterStatBuilder
         $totalPercent = 0;
 
         if ($this->characterBoons->isNotEmpty()) {
-            if (is_null($statAttribute)) {
-                $totalPercent = $this->characterBoons->sum('itemUsed.increase_stat_by');
-            } else {
-                $totalPercent = $this->characterBoons->sum('itemUsed.'.$statAttribute);
-            }
+            $attribute = is_null($statAttribute) ? 'increase_stat_by' : $statAttribute;
+
+            $totalPercent = $this->characterBoons->sum(function ($boon) use ($attribute): float {
+                $itemUsed = $boon->itemUsed;
+
+                if (is_null($itemUsed)) {
+                    return 0.0;
+                }
+
+                $value = $itemUsed->{$attribute};
+
+                if (is_null($value)) {
+                    return 0.0;
+                }
+
+                $amountUsed = $itemUsed->can_stack ? $boon->amount_used : 1;
+
+                return $value * $amountUsed;
+            });
         }
 
         return $base + $base * $totalPercent;

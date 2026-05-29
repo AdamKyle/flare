@@ -2,6 +2,9 @@
 
 namespace Tests\Unit\Game\GuideQuests\Services;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
+use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
@@ -569,9 +572,10 @@ class GuideQuestRequirementsServiceTest extends TestCase
         $character = $this->character->kingdomManagement()->assignKingdom()->assignBuilding([], [
             'level' => 5,
         ])->getCharacter();
+        $building = $character->kingdoms()->first()->buildings()->first();
 
         $guideQuest = $this->createGuideQuest([
-            'required_kingdom_building_id' => $character->kingdoms()->first()->buildings()->first()->id,
+            'required_kingdom_building_id' => $building->game_building_id,
             'required_kingdom_building_level' => 2,
         ]);
 
@@ -580,7 +584,23 @@ class GuideQuestRequirementsServiceTest extends TestCase
         $this->assertContains('required_kingdom_building_level', $finishedRequirements);
     }
 
-    public function test_fetch_required_kingdom_unit_amount()
+    public function testStaleRequiredSpecificKingdomBuildingDataDoesNotFatal()
+    {
+        $character = $this->character->kingdomManagement()->assignKingdom()->assignBuilding([], [
+            'level' => 5
+        ])->getCharacter();
+
+        $guideQuest = $this->createGuideQuest([
+            'required_kingdom_building_id' => GameBuilding::max('id') + 1,
+            'required_kingdom_building_level' => 2,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredKingdomSpecificBuildingLevel($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_kingdom_building_level', $finishedRequirements);
+    }
+
+    public function testFetchRequiredKingdomUnitAmount()
     {
         $character = $this->character->kingdomManagement()->assignKingdom()->assignUnits([], 1000)->getCharacter();
 

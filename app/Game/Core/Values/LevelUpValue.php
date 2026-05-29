@@ -26,8 +26,6 @@ class LevelUpValue
     {
 
         $gainsAdditionalLevel = $this->gainsAdditionalLevelOnLevelUp($character);
-        $baseStatMod = $this->addModifier($character, self::BASE_STAT_MODIFIER, $gainsAdditionalLevel);
-        $baseDamageStatMod = $this->addModifier($character, self::BASE_STAT_DAMAGE_MODIFIER, $gainsAdditionalLevel);
         $newLevel = $character->level + ($gainsAdditionalLevel ? $this->additionalLevelsToGain($character) : 1);
         $maxLevel = $this->getMaxLevel($character);
 
@@ -35,19 +33,23 @@ class LevelUpValue
             $newLevel = $maxLevel;
         }
 
+        $levelsGained = $newLevel - $character->level;
+        $baseStatMod = $this->addModifier($character, self::BASE_STAT_MODIFIER, $levelsGained);
+        $baseDamageStatMod = $this->addModifier($character, self::BASE_STAT_DAMAGE_MODIFIER, $levelsGained);
+
         return [
             'level' => $newLevel,
             'xp' => $newLevel === $maxLevel ? 0 : $leftOverXP,
             'xp_next' => 100,
-            'str' => $this->addValue($character, 'str', $gainsAdditionalLevel),
-            'dur' => $this->addValue($character, 'dur', $gainsAdditionalLevel),
-            'dex' => $this->addValue($character, 'dex', $gainsAdditionalLevel),
-            'chr' => $this->addValue($character, 'chr', $gainsAdditionalLevel),
-            'int' => $this->addValue($character, 'int', $gainsAdditionalLevel),
-            'agi' => $this->addValue($character, 'agi', $gainsAdditionalLevel),
-            'focus' => $this->addValue($character, 'focus', $gainsAdditionalLevel),
-            'base_stat_mod' => min($baseStatMod, 5.0),
-            'base_damage_stat_mod' => min($baseDamageStatMod, 10.0),
+            'str' => $this->addValue($character, 'str', $levelsGained),
+            'dur' => $this->addValue($character, 'dur', $levelsGained),
+            'dex' => $this->addValue($character, 'dex', $levelsGained),
+            'chr' => $this->addValue($character, 'chr', $levelsGained),
+            'int' => $this->addValue($character, 'int', $levelsGained),
+            'agi' => $this->addValue($character, 'agi', $levelsGained),
+            'focus' => $this->addValue($character, 'focus', $levelsGained),
+            'base_stat_mod' => min($baseStatMod, 0.60),
+            'base_damage_stat_mod' => min($baseDamageStatMod, 0.50),
         ];
     }
 
@@ -56,28 +58,24 @@ class LevelUpValue
      *
      * Regular stats get +1 and the damage stat gets a +2
      */
-    protected function addValue(Character $character, string $currenStat, bool $gainsAdditionalLevel = false): int
+    protected function addValue(Character $character, string $currenStat, int $levelsGained = 1): int
     {
 
-        if ($character->{$currenStat} >= 999999) {
-            return $character->{$currenStat};
-        }
-
         if ($character->damage_stat === $currenStat) {
-            return $character->{$currenStat} += ($gainsAdditionalLevel ? 4 : 2);
+            return min($character->{$currenStat} + ($levelsGained * 2), MaxReincarnationStats::MAX_STATS);
         }
 
-        return $character->{$currenStat} += ($gainsAdditionalLevel ? 2 : 1);
+        return min($character->{$currenStat} + $levelsGained, MaxReincarnationStats::MAX_STATS);
     }
 
     /**
      * Add to the stat modifier pool when the stats are maxed out.
      */
-    protected function addModifier(Character $character, string $stat, bool $gainAdditionalLevel = false): float
+    protected function addModifier(Character $character, string $stat, int $levelsGained = 1): float
     {
 
         if ($character->{$character->damage_stat} >= MaxReincarnationStats::MAX_STATS && $stat === self::BASE_STAT_DAMAGE_MODIFIER) {
-            $damageStatBonus = $character->{$stat} + ($gainAdditionalLevel ? 0.0002 : 0.0001);
+            $damageStatBonus = $character->{$stat} + (0.0001 * $levelsGained);
 
             if ($damageStatBonus > 0.50) {
                 return 0.50;
@@ -87,7 +85,7 @@ class LevelUpValue
         }
 
         if ($character->str >= MaxReincarnationStats::MAX_STATS && $stat === self::BASE_STAT_MODIFIER) {
-            $baseStatBonus = $character->{$stat} + ($gainAdditionalLevel ? 0.00024 : 0.00012);
+            $baseStatBonus = $character->{$stat} + (0.00012 * $levelsGained);
 
             if ($baseStatBonus > 0.60) {
                 return 0.60;
@@ -96,7 +94,7 @@ class LevelUpValue
             return $baseStatBonus;
         }
 
-        return 0.0;
+        return $character->{$stat};
     }
 
     /**

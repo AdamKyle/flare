@@ -50,11 +50,12 @@ class CapitalCityProcessBuildingRequestHandler
 
         if (! empty($summedMissingCosts) && $shouldFailForMissingCosts) {
             $requestData = collect($requestData)
-                ->map(fn ($item) => array_merge($item, ['secondary_status' => CapitalCityQueueStatus::REJECTED]))
+                ->map(fn($item) => array_merge($item, ['secondary_status' => CapitalCityQueueStatus::REJECTED]))
                 ->toArray();
 
             $capitalCityBuildingQueue->update([
                 'building_request_data' => $requestData,
+                'status' => CapitalCityQueueStatus::REJECTED,
                 'messages' => array_merge($capitalCityBuildingQueue->messages, [
                     'Buildings were rejected because even after requesting resources, you still do not have enough resources for one or more buildings so the entire request was canceled out of frustration.',
                 ]),
@@ -112,6 +113,14 @@ class CapitalCityProcessBuildingRequestHandler
         KingdomBuilding $building,
         array $buildingUpgradeRequest
     ): array {
+        if ($buildingUpgradeRequest['type'] === 'upgrade' && $this->isInvalidUpgradeRequest($building, $buildingUpgradeRequest)) {
+            $this->messages[] = $building->name . ' has been rejected: Building is already max level.';
+            $buildingUpgradeRequest['missing_costs'] = [];
+            $buildingUpgradeRequest['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
+            return $buildingUpgradeRequest;
+        }
+
         if ($this->kingdomBuildingResourceValidation->isMissingResources($building)) {
             $requiredResources = $this->kingdomBuildingResourceValidation->getCostsForBuilding($building);
             $missingResources = $this->kingdomBuildingResourceValidation->getMissingCosts($kingdom, $requiredResources);
@@ -129,9 +138,9 @@ class CapitalCityProcessBuildingRequestHandler
             }
 
             if (! $canAffordPopulation) {
-                $this->messages[] = $building->name.' has been rejected for reason of: Cannot afford to use: '.
-                    $kingdom->name.'\'s treasury to purchase an extra: '.
-                    $missingResources['population'].' population.';
+                $this->messages[] = $building->name . ' has been rejected for reason of: Cannot afford to use: ' .
+                    $kingdom->name . '\'s treasury to purchase an extra: ' .
+                    $missingResources['population'] . ' population.';
 
                 $buildingUpgradeRequest['secondary_status'] = CapitalCityQueueStatus::REJECTED;
 
@@ -154,14 +163,21 @@ class CapitalCityProcessBuildingRequestHandler
         return $buildingUpgradeRequest;
     }
 
+    private function isInvalidUpgradeRequest(KingdomBuilding $building, array $buildingUpgradeRequest): bool
+    {
+        return $building->level >= $building->gameBuilding->max_level ||
+            (int) $buildingUpgradeRequest['to_level'] > $building->gameBuilding->max_level ||
+            (int) $buildingUpgradeRequest['from_level'] !== $building->level;
+    }
+
     /**
      * Calculate the total missing costs.
      */
     private function calculateSummedMissingCosts(array $requestData): array
     {
         return collect($requestData)
-            ->map(fn ($costs) => collect($costs['missing_costs'])->except('population'))
-            ->reduce(fn ($carry, $costs) => $carry->merge($costs)->map(fn ($value, $key) => $carry->get($key, 0) + $value), collect())
+            ->map(fn($costs) => collect($costs['missing_costs'])->except('population'))
+            ->reduce(fn($carry, $costs) => $carry->merge($costs)->map(fn($value, $key) => $carry->get($key, 0) + $value), collect())
             ->toArray();
     }
 
@@ -190,7 +206,7 @@ class CapitalCityProcessBuildingRequestHandler
      */
     private function handleNoResourceRequests(CapitalCityBuildingQueue $capitalCityBuildingQueue, array $requestData): void
     {
-        $hasBuildingOrRepairing = collect($requestData)->contains(fn ($item) => in_array($item['secondary_status'], [
+        $hasBuildingOrRepairing = collect($requestData)->contains(fn($item) => in_array($item['secondary_status'], [
             CapitalCityQueueStatus::BUILDING,
             CapitalCityQueueStatus::REPAIRING,
             CapitalCityQueueStatus::REQUESTING,
@@ -198,7 +214,7 @@ class CapitalCityProcessBuildingRequestHandler
 
         if (! $hasBuildingOrRepairing) {
             Log::channel('capital_city_building_upgrades')->info('We have no buildings in BUILDING, REPAIRING or REQUESTING status');
-            $this->createLogAndTriggerEvents($capitalCityBuildingQueue);
+            $this->createLogAndTriggerEvents($capitalCityBuildingQueue, $requestData);
         } else {
             Log::channel('capital_city_building_upgrades')->info('Handling Upgrade or repair request');
             $this->createUpgradeOrRepairRequest($capitalCityBuildingQueue, $capitalCityBuildingQueue->kingdom, $requestData);
@@ -208,11 +224,15 @@ class CapitalCityProcessBuildingRequestHandler
 
     /**
      * Create a log and trigger events if no building or repairing requests are present.
+     *
+     * @param CapitalCityBuildingQueue $capitalCityBuildingQueue
+     * @param array $requestData
+     * @return void
      */
-    private function createLogAndTriggerEvents(CapitalCityBuildingQueue $capitalCityBuildingQueue): void
+    private function createLogAndTriggerEvents(CapitalCityBuildingQueue $capitalCityBuildingQueue, array $requestData): void
     {
         $capitalCityBuildingQueue->update([
-            'building_request_data' => $capitalCityBuildingQueue->building_request_data,
+            'building_request_data' => $requestData,
             'messages' => $this->messages,
         ]);
 

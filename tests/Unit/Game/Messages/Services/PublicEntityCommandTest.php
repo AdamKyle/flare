@@ -142,7 +142,45 @@ class PublicEntityCommandTest extends TestCase
         });
     }
 
-    public function test_use_the_pct_command()
+    public function testPctDoesNotMoveWhenCharacterCannotMove()
+    {
+        Event::fake();
+
+        $character = $this->character->inventoryManagement()->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::TELEPORT_TO_CELESTIAL,
+        ]))->getCharacter();
+        $character->update([
+            'can_move' => false,
+            'can_move_again_at' => now()->addMinute(),
+        ]);
+        $x = $character->map->character_position_x;
+        $y = $character->map->character_position_y;
+
+        $this->createCelestialFight([
+            'monster_id' => $this->createMonster()->id,
+            'character_id' => $character->id,
+            'conjured_at' => now(),
+            'x_position' => $x + 1,
+            'y_position' => $y + 1,
+            'damaged_kingdom' => false,
+            'stole_treasury' => false,
+            'weakened_morale' => false,
+            'current_health' => 1000,
+            'max_health' => 1000,
+            'type' => CelestialConjureType::PUBLIC,
+        ]);
+
+        $this->publicEntityCommand->setCharacter($character->refresh()->user)->usePCTCommand();
+
+        Event::assertDispatched(function (ServerMessageEvent $event) {
+            return $event->message === 'Sorry child, you are exhausted from yuor last move, wait for the timer';
+        });
+        $this->assertSame($x, $character->map->refresh()->character_position_x);
+        $this->assertSame($y, $character->map->refresh()->character_position_y);
+    }
+
+    public function testUseThePctCommand()
     {
         Event::fake();
 

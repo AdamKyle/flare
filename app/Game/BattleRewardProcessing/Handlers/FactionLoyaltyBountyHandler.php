@@ -50,6 +50,10 @@ class FactionLoyaltyBountyHandler
             return $character;
         }
 
+        if ($this->normalizeMaxLevelNpc($helpingNpc)) {
+            return $character;
+        }
+
         if ($helpingNpc->npc->gameMap->id !== $character->map->game_map_id) {
             return $character;
         }
@@ -63,12 +67,12 @@ class FactionLoyaltyBountyHandler
         if ($this->wasCurrentFameForTaskUpdated()) {
             $matchingTask = $this->getMatchingTask($helpingNpc, 'monster_id', $monster->id);
 
-            ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name.
-                ' is happy that you slaughtered another one of the enemies on their hit list. "Only: '.
-                ($matchingTask['required_amount'] - $matchingTask['current_amount']).' to go child!"');
+            ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name .
+                ' is happy that you slaughtered another one of the enemies on their hit list. "Only: ' .
+                ($matchingTask['required_amount'] - $matchingTask['current_amount']) . ' to go child!"');
         }
 
-        while ($this->canLevelUpFame($helpingNpc) && $helpingNpc->current_level !== $helpingNpc->max_level) {
+        while ($this->canLevelUpFame($helpingNpc)) {
             $this->handleFameLevelUp($character, $helpingNpc);
 
             $helpingNpc = $helpingNpc->refresh();
@@ -79,24 +83,24 @@ class FactionLoyaltyBountyHandler
 
     private function handleFameLevelUp(Character $character, FactionLoyaltyNpc $helpingNpc): void
     {
-        $newLevel = $helpingNpc->current_level + 1;
+        if ($this->normalizeMaxLevelNpc($helpingNpc)) {
+            return;
+        }
+
+        $newLevel = min($helpingNpc->current_level + 1, $helpingNpc->max_level);
         $helpingNpcName = $helpingNpc->npc->real_name;
 
         ServerMessageHandler::sendBasicMessage(
             $character->user,
-            'Your fame with: '.$helpingNpc->npc->real_name.
-                ' on Plane: '.$helpingNpc->npc->gameMap->name.
-                ' is now level: '.$helpingNpc->current_level.
-                ' out of: '.$helpingNpc->max_level.'. You also got some XP and other rewards!'
+            'Your fame with: ' . $helpingNpc->npc->real_name .
+                ' on Plane: ' . $helpingNpc->npc->gameMap->name .
+                ' is now level: ' . $helpingNpc->current_level .
+                ' out of: ' . $helpingNpc->max_level . '. You also got some XP and other rewards!'
         );
 
         $this->handOutXp($character, $helpingNpc, $newLevel, $helpingNpcName);
         $this->handOutCurrencies($character, $helpingNpc);
         $this->rewardTheUniqueItem($character);
-
-        if ($newLevel >= $helpingNpc->max_level) {
-            $newLevel = $helpingNpc->max_level;
-        }
 
         $helpingNpc->update([
             'current_level' => $newLevel,
@@ -197,7 +201,7 @@ class FactionLoyaltyBountyHandler
             'item_id' => $newItem->id,
         ]);
 
-        event(new ServerMessageEvent($character->user, 'You found something of Unique child: '.$item->affix_name, $slot->id));
+        event(new ServerMessageEvent($character->user, 'You found something of Unique child: ' . $item->affix_name, $slot->id));
     }
 
     private function canLevelUpFame(FactionLoyaltyNpc $factionLoyaltyNpc): bool
@@ -207,5 +211,26 @@ class FactionLoyaltyBountyHandler
         }
 
         return $factionLoyaltyNpc->current_fame >= $factionLoyaltyNpc->next_level_fame;
+    }
+
+    private function normalizeMaxLevelNpc(FactionLoyaltyNpc $factionLoyaltyNpc): bool
+    {
+        if ($factionLoyaltyNpc->current_level < $factionLoyaltyNpc->max_level) {
+            return false;
+        }
+
+        if ($factionLoyaltyNpc->current_level !== $factionLoyaltyNpc->max_level) {
+            $factionLoyaltyNpc->update([
+                'current_level' => $factionLoyaltyNpc->max_level,
+            ]);
+        }
+
+        if (! is_null($factionLoyaltyNpc->factionLoyaltyNpcTasks)) {
+            $factionLoyaltyNpc->factionLoyaltyNpcTasks->update([
+                'fame_tasks' => [],
+            ]);
+        }
+
+        return true;
     }
 }

@@ -7,7 +7,7 @@ use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
-use App\Game\Exploration\Events\ExplorationLogUpdate;
+use App\Game\Automation\Events\AutomationLogUpdate;
 use Cache;
 use Event;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -64,7 +64,7 @@ class CharacterAttackTypesCacheBuilderTest extends TestCase
 
         CharacterAttackTypesCacheBuilder::dispatch($character, true);
 
-        Event::assertDispatched(ExplorationLogUpdate::class);
+        Event::assertDispatched(AutomationLogUpdate::class);
     }
 
     public function test_update_character_attack_types_cache()

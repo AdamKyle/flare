@@ -23,7 +23,7 @@ class CapitalCityResourceRequest implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(protected readonly int $capitalCityQueueId, protected readonly int $characterId, protected string $type) {}
+    public function __construct(protected readonly int $capitalCityQueueId, protected readonly int $resourceRequestId, protected string $type) {}
 
     public function handle(
         CapitalCityProcessBuildingRequestHandler $capitalCityProcessBuildingRequestHandler,
@@ -55,9 +55,9 @@ class CapitalCityResourceRequest implements ShouldQueue
                 }
 
                 // @codeCoverageIgnoreStart
-                CapitalCityBuildingRequestMovement::dispatch(
+                CapitalCityResourceRequest::dispatch(
                     $this->capitalCityQueueId,
-                    $this->characterId,
+                    $this->resourceRequestId,
                     $this->type
                 )->delay($time);
 
@@ -66,10 +66,31 @@ class CapitalCityResourceRequest implements ShouldQueue
             }
         }
 
-        $capitalCityResourceRequestData = CapitalCityResourceRequestModel::where(
-            'kingdom_requesting_id',
-            $queueData->kingdom_id,
-        )->first();
+        $capitalCityResourceRequestData = CapitalCityResourceRequestModel::find($this->resourceRequestId);
+
+        if (is_null($capitalCityResourceRequestData)) {
+            $this->markQueueAsRejected($queueData);
+
+            return;
+        }
+
+        if (! $capitalCityResourceRequestData->completed_at->lessThanOrEqualTo(now())) {
+            $timeLeft = $capitalCityResourceRequestData->completed_at->diffInMinutes(now());
+
+            if ($timeLeft <= 15) {
+                $time = now()->addMinutes($timeLeft);
+            } else {
+                $time = now()->addMinutes(15);
+            }
+
+            CapitalCityResourceRequest::dispatch(
+                $this->capitalCityQueueId,
+                $this->resourceRequestId,
+                $this->type
+            )->delay($time);
+
+            return;
+        }
 
         $resourcesForKingdom = $capitalCityResourceRequestData->resources;
 
@@ -175,5 +196,46 @@ class CapitalCityResourceRequest implements ShouldQueue
         ]);
 
         return $queue->refresh();
+    }
+
+    private function markQueueAsRejected(CapitalCityUnitQueue|CapitalCityBuildingQueue $queue): void
+    {
+        if ($queue instanceof CapitalCityBuildingQueue) {
+            $requestData = collect($queue->building_request_data)
+                ->map(function ($buildingRequest) {
+                    if ($buildingRequest['secondary_status'] === CapitalCityQueueStatus::REQUESTING) {
+                        return array_merge($buildingRequest, ['secondary_status' => CapitalCityQueueStatus::REJECTED]);
+                    }
+
+                    return $buildingRequest;
+                })
+                ->toArray();
+
+            $queue->update([
+                'building_request_data' => $requestData,
+                'status' => CapitalCityQueueStatus::REJECTED,
+            ]);
+
+            event(new UpdateCapitalCityBuildingQueueTable($queue->character->refresh()));
+
+            return;
+        }
+
+        $requestData = collect($queue->unit_request_data)
+            ->map(function ($unitRequest) {
+                if ($unitRequest['secondary_status'] === CapitalCityQueueStatus::REQUESTING) {
+                    return array_merge($unitRequest, ['secondary_status' => CapitalCityQueueStatus::REJECTED]);
+                }
+
+                return $unitRequest;
+            })
+            ->toArray();
+
+        $queue->update([
+            'unit_request_data' => $requestData,
+            'status' => CapitalCityQueueStatus::REJECTED,
+        ]);
+
+        event(new UpdateCapitalCityUnitQueueTable($queue->character->refresh()));
     }
 }

@@ -12,21 +12,25 @@ class BuildingsUnitsSheet implements ToCollection
 {
     public function collection(Collection $rows)
     {
-        GameBuildingUnit::query()->delete();
-
         foreach ($rows as $index => $row) {
-            if ($index !== 0) {
+            if ($index === 0) {
+                continue;
+            }
 
-                $gameBuilding = GameBuilding::where('name', $row[1])->first();
-                $gameUnit = GameUnit::where('name', $row[2])->first();
+            if (empty($row[1]) || empty($row[2])) {
+                continue;
+            }
 
-                if (! is_null($gameUnit) && ! is_null($gameBuilding)) {
-                    GameBuildingUnit::create([
-                        'game_building_id' => $gameBuilding->id,
-                        'game_unit_id' => $gameUnit->id,
-                        'required_level' => $row[3],
-                    ]);
-                }
+            $gameBuilding = GameBuilding::where('name', $row[1])->first();
+            $gameUnit = GameUnit::where('name', $row[2])->first();
+
+            if (! is_null($gameUnit) && ! is_null($gameBuilding)) {
+                GameBuildingUnit::updateOrCreate([
+                    'game_building_id' => $gameBuilding->id,
+                    'game_unit_id' => $gameUnit->id,
+                ], [
+                    'required_level' => $row[3],
+                ]);
             }
         }
     }

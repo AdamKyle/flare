@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\Quest;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Events\Values\EventType;
 use App\Game\Quests\Services\BuildQuestCacheService;
 use App\Game\Quests\Services\QuestHandlerService;
@@ -18,8 +19,11 @@ class QuestsController extends Controller
 
     private BuildQuestCacheService $buildQuestCacheService;
 
-    public function __construct(QuestHandlerService $questHandlerService, BuildQuestCacheService $buildQuestCacheService)
-    {
+    public function __construct(
+        QuestHandlerService $questHandlerService,
+        BuildQuestCacheService $buildQuestCacheService,
+        private readonly AutomationRestrictionService $automationRestrictionService
+    ) {
         $this->questHandler = $questHandlerService;
         $this->buildQuestCacheService = $buildQuestCacheService;
     }
@@ -76,6 +80,14 @@ class QuestsController extends Controller
 
     public function handInQuest(Quest $quest, Character $character)
     {
+        $restriction = $this->automationRestrictionService->blockedContext($character, AutomationRestrictionService::REGULAR_QUESTS);
+
+        if (! is_null($restriction)) {
+            return response()->json([
+                'message' => $restriction['message'],
+            ], 422);
+        }
+
         if ($this->questHandler->shouldBailOnQuest($character, $quest)) {
             return response()->json([
                 'message' => $this->questHandler->getBailMessage(),

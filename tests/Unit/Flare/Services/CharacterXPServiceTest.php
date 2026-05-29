@@ -709,4 +709,28 @@ class CharacterXPServiceTest extends TestCase
 
         $this->assertEquals(0, $xp);
     }
+
+    public function testStackedXpBoonMultipliesByAmountUsed()
+    {
+        $character = $this->character->getCharacter();
+
+        $boon = $this->createItem([
+            'name' => 'Stacked XP Boon',
+            'xp_bonus' => 0.15,
+            'can_stack' => true,
+        ]);
+
+        $character->boons()->create([
+            'character_id' => $character->id,
+            'item_id' => $boon->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(120),
+            'last_for_minutes' => 120,
+            'amount_used' => 4,
+        ]);
+
+        $xp = $this->characterXPService->determineXPToAward($character->refresh(), 100);
+
+        $this->assertEquals(160, $xp);
+    }
 }

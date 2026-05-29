@@ -47,6 +47,8 @@ class CraftingService
 
     private bool $craftForEvent = false;
 
+    private ?int $lastCraftedInventorySlotId = null;
+
     public function __construct(
         RandomEnchantmentService $randomEnchantmentService,
         SkillService $skillService,
@@ -128,14 +130,17 @@ class CraftingService
      * The params are the request params.
      *
      * Gold is only taken from a player if they can pick up the item they crafted or
-     * if they fail to craft them item.
+     * if they fail to craft the item.
      *
-     * @param  array  $params  params
+     * @param Character $character
+     * @param array $params
+     * @return bool
      *
      * @throws Exception
      */
     public function craft(Character $character, array $params): bool
     {
+        $this->lastCraftedInventorySlotId = null;
 
         $this->craftForNpc = $params['craft_for_npc'];
 
@@ -151,7 +156,9 @@ class CraftingService
             return false;
         }
 
-        $this->handleCraftingTimeOut($character, $item);
+        if (! ($params['skip_crafting_timeout'] ?? false)) {
+            $this->handleCraftingTimeOut($character, $item);
+        }
 
         $cost = $this->getItemCost($character, $item);
 
@@ -162,6 +169,52 @@ class CraftingService
         }
 
         return $this->attemptToCraftItem($character, $skill, $item);
+    }
+
+    /**
+     * Get the last crafted inventory slot id.
+     *
+     * @return int|null
+     */
+    public function getLastCraftedInventorySlotId(): ?int
+    {
+        return $this->lastCraftedInventorySlotId;
+    }
+
+    /**
+     * Get crafting skill for automation.
+     *
+     * @param Character $character
+     * @param string $craftingType
+     * @return Skill|null
+     */
+    public function getCraftingSkillForAutomation(Character $character, string $craftingType): ?Skill
+    {
+        if (in_array($craftingType, ItemType::validWeapons())) {
+            $craftingType = 'weapon';
+        }
+
+        $gameSkill = GameSkill::where('name', ucfirst($craftingType) . ' Crafting')->first();
+
+        if (is_null($gameSkill)) {
+            return null;
+        }
+
+        return Skill::where('game_skill_id', $gameSkill->id)
+            ->where('character_id', $character->id)
+            ->first();
+    }
+
+    /**
+     * Get item cost for automation.
+     *
+     * @param Character $character
+     * @param Item $item
+     * @return int
+     */
+    public function getItemCostForAutomation(Character $character, Item $item): int
+    {
+        return $this->getItemCost($character, $item);
     }
 
     /**
@@ -395,19 +448,22 @@ class CraftingService
 
     /**
      * Attempt to pick up the item.
+     *
+     * @param Character $character
+     * @param Item $item
+     * @return bool
      */
     private function attemptToPickUpItem(Character $character, Item $item): bool
     {
-
-        if ($this->craftForNpc) {
-        }
+        $this->lastCraftedInventorySlotId = null;
 
         if (! $character->isInventoryFull()) {
-
             $slot = $character->inventory->slots()->create([
                 'item_id' => $item->id,
                 'inventory_id' => $character->inventory->id,
             ]);
+
+            $this->lastCraftedInventorySlotId = $slot->id;
 
             event(new UpdateCharacterInventoryCountEvent($character));
 

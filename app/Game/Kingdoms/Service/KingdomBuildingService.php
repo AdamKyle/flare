@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Models\BuildingInQueue;
+use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
@@ -11,6 +12,7 @@ use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\Kingdoms\Jobs\RebuildBuilding;
 use App\Game\Kingdoms\Jobs\UpgradeBuilding;
 use App\Game\Kingdoms\Values\BuildingQueueType;
+use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\KingdomResources;
 use App\Game\Skills\Values\SkillTypeValue;
 use Carbon\Carbon;
@@ -36,15 +38,71 @@ class KingdomBuildingService
             'character_id' => $character->id,
             'kingdom_id' => $building->kingdom->id,
             'building_id' => $building->id,
+            'from_level' => $building->level,
             'to_level' => $building->level + 1,
             'completed_at' => $timeToComplete,
             'type' => BuildingQueueType::UPGRADE,
             'started_at' => now(),
+            'capital_city_building_queue_id' => $capitalCityQueueId,
         ]);
 
         event(new UpdateKingdomQueues($building->kingdom));
 
         UpgradeBuilding::dispatch($building, $character->user, $queue->id, $capitalCityQueueId)->delay($timeToComplete);
+    }
+
+    public function hasActiveBuildingUpgrade(KingdomBuilding $building): bool
+    {
+        if (BuildingInQueue::where('kingdom_id', $building->kingdom_id)
+            ->where('building_id', $building->id)
+            ->exists()
+        ) {
+            return true;
+        }
+
+        return CapitalCityBuildingQueue::query()
+            ->where('kingdom_id', $building->kingdom_id)
+            ->whereNotIn('status', [
+                CapitalCityQueueStatus::REJECTED,
+                CapitalCityQueueStatus::FINISHED,
+                CapitalCityQueueStatus::CANCELLED,
+                CapitalCityQueueStatus::CANCELLATION_REJECTED,
+            ])
+            ->get()
+            ->contains(function (CapitalCityBuildingQueue $queue) use ($building) {
+                return collect($queue->building_request_data)
+                    ->reject(function (array $request) {
+                        return in_array($request['secondary_status'] ?? null, [
+                            CapitalCityQueueStatus::REJECTED,
+                            CapitalCityQueueStatus::FINISHED,
+                            CapitalCityQueueStatus::CANCELLED,
+                            CapitalCityQueueStatus::CANCELLATION_REJECTED,
+                        ], true);
+                    })
+                    ->contains(fn(array $request) => ($request['name'] ?? $request['building_name'] ?? null) === $building->name);
+            });
+    }
+
+    public function cannotUpgradePastMaxLevel(KingdomBuilding $building, int $toLevel): bool
+    {
+        if ($building->level >= $building->gameBuilding->max_level) {
+            return true;
+        }
+
+        if ($building->level + 1 > $building->gameBuilding->max_level) {
+            return true;
+        }
+
+        return $toLevel > $building->gameBuilding->max_level;
+    }
+
+    public function hasInvalidUpgradeLevels(KingdomBuilding $building, ?int $fromLevel, int $toLevel): bool
+    {
+        if (! is_null($fromLevel) && $fromLevel !== $building->level) {
+            return true;
+        }
+
+        return $toLevel !== $building->level + 1;
     }
 
     /**
@@ -70,6 +128,7 @@ class KingdomBuildingService
             'completed_at' => $timeToComplete,
             'type' => BuildingQueueType::REPAIR,
             'started_at' => now(),
+            'capital_city_building_queue_id' => $capitalCityBuildingQueueId,
         ]);
 
         RebuildBuilding::dispatch($building, $character->user, $queue->id, $capitalCityBuildingQueueId)->delay($timeToComplete);
@@ -97,14 +156,22 @@ class KingdomBuildingService
             if ($type === KingdomResources::POPULATION->value) {
                 if (! $ignorePop) {
                     $populationCost = $building->required_population - $building->required_population * $building->kingdom->fetchPopulationCostReduction();
+                    if ($newResources['current_population'] < $populationCost) {
+                        return $building->kingdom->refresh();
+                    }
+
                     $newResources['current_population'] -= $populationCost;
                 }
             } else {
-                $newResources['current_'.strtolower($type)] -= $cost;
+                if ($newResources['current_' . strtolower($type)] < $cost) {
+                    return $building->kingdom->refresh();
+                }
+
+                $newResources['current_' . strtolower($type)] -= $cost;
             }
         }
 
-        $building->kingdom->update(array_map(fn ($value) => max($value, 0), $newResources));
+        $building->kingdom->update(array_map(fn($value) => max($value, 0), $newResources));
 
         return $building->kingdom->refresh();
     }
@@ -123,20 +190,23 @@ class KingdomBuildingService
         $buildingCosts = [];
 
         foreach (KingdomResources::kingdomResources() as $type) {
+            if ($type === KingdomResources::POPULATION->value) {
+                $buildingCosts[$type] = intVal(
+                    $building->required_population - ($building->required_population * $populationCostReduction)
+                );
+
+                continue;
+            }
+
+            $costReduction = $buildingCostReduction;
 
             if ($type === KingdomResources::IRON->value) {
-                $buildingCosts[$type] = intval($building->{$type.'_cost'} * ($buildingCostReduction + $ironCostReduction));
-
-                continue;
+                $costReduction += $ironCostReduction;
             }
 
-            if ($type === KingdomResources::POPULATION->value) {
-                $buildingCosts[$type] = intval($building->{$type.'_cost'} * ($buildingCostReduction + $populationCostReduction));
+            $cost = $building->{$type . '_cost'};
 
-                continue;
-            }
-
-            $buildingCosts[$type] = intval($building->{$type.'_cost'} * $buildingCostReduction);
+            $buildingCosts[$type] = intVal($cost - ($cost * $costReduction));
         }
 
         return $buildingCosts;
@@ -152,7 +222,7 @@ class KingdomBuildingService
 
         $this->resourceCalculation($queue);
 
-        if ($this->completed === 0 || ! $this->totalResources >= .10) {
+        if ($this->totalResources <= 0 || $this->totalResources < .10) {
             return false;
         }
 
@@ -194,13 +264,16 @@ class KingdomBuildingService
         $end = Carbon::parse($queue->completed_at)->timestamp;
         $current = Carbon::parse(now())->timestamp;
 
+        if ($end <= $start) {
+            $this->completed = 1;
+            $this->totalResources = 0;
+
+            return;
+        }
+
         $this->completed = (($current - $start) / ($end - $start));
 
-        if ($this->completed === 0) {
-            $this->totalResources = 0;
-        } else {
-            $this->totalResources = 1 - $this->completed;
-        }
+        $this->totalResources = max(0, min(1, 1 - $this->completed));
     }
 
     /**
@@ -211,10 +284,11 @@ class KingdomBuildingService
         $updateData = [];
 
         foreach (KingdomResources::kingdomResources() as $resource) {
-            $newAmount = $kingdom->{'current_'.$resource} + ($building->{$resource.'_cost'} * $this->totalResources);
-            $maxValue = 'max_'.$resource;
+            $cost = $resource === KingdomResources::POPULATION->value ? $building->required_population : $building->{$resource . '_cost'};
+            $newAmount = $kingdom->{'current_' . $resource} + ($cost * $this->totalResources);
+            $maxValue = 'max_' . $resource;
 
-            $updateData['current_'.$resource] = min($newAmount, $kingdom->{$maxValue});
+            $updateData['current_' . $resource] = min($newAmount, $kingdom->{$maxValue});
         }
 
         $kingdom->update($updateData);

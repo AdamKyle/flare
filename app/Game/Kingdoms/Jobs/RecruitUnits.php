@@ -7,9 +7,9 @@ use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;
 use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
+use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
-use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Messages\Types\KingdomMessageTypes;
 use Facades\App\Flare\Values\UserOnlineValue;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -37,7 +37,7 @@ class RecruitUnits implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(UpdateKingdom $updateKingdom, CapitalCityUnitManagement $capitalCityUnitManagement): void
+    public function handle(UpdateKingdom $updateKingdom, CapitalCityUnitManagement $capitalCityUnitManagement, UnitService $unitService): void
     {
 
         $queue = UnitInQueue::find($this->queueId);
@@ -68,29 +68,50 @@ class RecruitUnits implements ShouldQueue
             // @codeCoverageIgnoreEnd
         }
 
+        $kingdom = $queue->kingdom;
+
+        if (! $unitService->canQueueUnits($kingdom, $this->unit, $queue->amount, $queue->id)) {
+            $unitService->refundUnitRecruitment($kingdom, $this->unit, $queue->amount);
+            $queue->delete();
+
+            if (! is_null($this->capitalCityQueueId)) {
+                $capitalCityQueue = CapitalCityUnitQueue::find($this->capitalCityQueueId);
+
+                if (! is_null($capitalCityQueue)) {
+                    $unitRequests = $capitalCityQueue->unit_request_data;
+
+                    foreach ($unitRequests as $index => $request) {
+                        if ($request['name'] === $this->unit->name) {
+                            $unitRequests[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+                        }
+                    }
+
+                    $capitalCityQueue->update(['unit_request_data' => $unitRequests]);
+                }
+            }
+
+            return;
+        }
+
         $amount = $this->amount;
 
-        if ($this->kingdom->units->isEmpty()) {
-            $this->kingdom->units()->create([
-                'kingdom_id' => $this->kingdom->id,
+        if ($kingdom->units->isEmpty()) {
+            $kingdom->units()->create([
+                'kingdom_id' => $kingdom->id,
                 'game_unit_id' => $this->unit->id,
                 'amount' => $amount,
             ]);
         } else {
-            $found = $this->kingdom->units()->where('game_unit_id', $this->unit->id)->first();
+            $found = $kingdom->units()->where('game_unit_id', $this->unit->id)->first();
 
             if (is_null($found)) {
-                $this->kingdom->units()->create([
-                    'kingdom_id' => $this->kingdom->id,
+                $kingdom->units()->create([
+                    'kingdom_id' => $kingdom->id,
                     'game_unit_id' => $this->unit->id,
                     'amount' => $amount,
                 ]);
             } else {
                 $amount += $found->amount;
-
-                if ($amount >= KingdomMaxValue::MAX_UNIT) {
-                    $amount = KingdomMaxValue::MAX_UNIT;
-                }
 
                 $found->update([
                     'amount' => $amount,
@@ -100,7 +121,7 @@ class RecruitUnits implements ShouldQueue
 
         $queue->delete();
 
-        $kingdom = $this->kingdom->refresh();
+        $kingdom = $kingdom->refresh();
 
         $updateKingdom->updateKingdom($kingdom);
 

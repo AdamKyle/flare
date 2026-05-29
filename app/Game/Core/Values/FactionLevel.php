@@ -30,7 +30,7 @@ class FactionLevel
 
     public static function isMaxLevel(int $currentLevel): bool
     {
-        return $currentLevel === self::MAX_LEVEL;
+        return $currentLevel >= self::MAX_LEVEL;
     }
 
     public static function gatPointsPerLevel(int $currentLevel): int

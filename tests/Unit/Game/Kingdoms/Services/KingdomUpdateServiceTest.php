@@ -2,11 +2,16 @@
 
 namespace Tests\Unit\Game\Kingdoms\Services;
 
+use Exception;
+use App\Flare\Models\BuildingExpansionQueue;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
 use App\Flare\Values\NpcTypes;
 use App\Game\Kingdoms\Service\KingdomUpdateService;
+use App\Game\Kingdoms\Service\KingdomQueueService;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -351,7 +356,7 @@ class KingdomUpdateServiceTest extends TestCase
         $types = ['wood', 'stone', 'iron', 'clay'];
 
         foreach ($types as $type) {
-            $this->assertEquals(0, $kingdom->{'current_'.$type});
+            $this->assertEquals(0, $kingdom->{'current_' . $type});
         }
     }
 
@@ -392,7 +397,7 @@ class KingdomUpdateServiceTest extends TestCase
         $types = ['wood', 'stone', 'iron', 'clay'];
 
         foreach ($types as $type) {
-            $this->assertGreaterThan(0, $kingdom->{'current_'.$type});
+            $this->assertGreaterThan(0, $kingdom->{'current_' . $type});
         }
     }
 
@@ -425,7 +430,7 @@ class KingdomUpdateServiceTest extends TestCase
         $types = ['wood', 'stone', 'iron', 'clay'];
 
         foreach ($types as $type) {
-            $this->assertEquals(100, $kingdom->{'current_'.$type});
+            $this->assertEquals(100, $kingdom->{'current_' . $type});
         }
     }
 
@@ -658,6 +663,26 @@ class KingdomUpdateServiceTest extends TestCase
 
         // Character should have lost their kingdom
         $this->assertEmpty($character->kingdoms);
+    }
+
+    public function testKingdomUpdateDoesNotCrashWhenOrphanedExpansionQueueExists(): void
+    {
+        $kingdom = $this->createKingdomForCharacter($this->character);
+
+        BuildingExpansionQueue::create([
+            'character_id' => $kingdom->character_id,
+            'kingdom_id' => $kingdom->id,
+            'building_id' => 999999,
+            'completed_at' => now()->addHour(),
+            'started_at' => now(),
+        ]);
+
+        $this->kingdomUpdateService->setKingdom($kingdom)->updateKingdom();
+
+        $result = resolve(KingdomQueueService::class)->fetchKingdomQueues($kingdom->refresh());
+
+        $this->assertNotNull($this->kingdomUpdateService->getKingdom());
+        $this->assertSame([], $result['building_expansion_queues']);
     }
 
     protected function bailIfMissingKeyElements(?Kingdom $kingdom)

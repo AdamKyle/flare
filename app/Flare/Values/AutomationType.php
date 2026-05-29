@@ -2,6 +2,8 @@
 
 namespace App\Flare\Values;
 
+use Exception;
+
 class AutomationType
 {
     /**
@@ -9,9 +11,9 @@ class AutomationType
      */
     private $value;
 
-    const EXPLORING = 0;
-
-    const DELVE = 1;
+    const int EXPLORING = 0;
+    const int DELVE = 1;
+    const int FACTION_LOYALTY = 2;
 
     /**
      * @var int[]
@@ -19,19 +21,20 @@ class AutomationType
     protected static $values = [
         0 => self::EXPLORING,
         1 => self::DELVE,
+        2 => self::FACTION_LOYALTY,
     ];
 
     /**
      * Throws if the value does not exist in the array of const values.
      *
-     * @param  string  $value
+     * @param int $value
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct(int $value)
     {
         if (! in_array($value, self::$values)) {
-            throw new \Exception($value.' does not exist.');
+            throw new Exception($value . ' does not exist.');
         }
 
         $this->value = $value;
@@ -45,5 +48,10 @@ class AutomationType
     public function isDelve(): bool
     {
         return $this->value === self::DELVE;
+    }
+
+    public function isFactionLoyalty(): bool
+    {
+        return $this->value === self::FACTION_LOYALTY;
     }
 }

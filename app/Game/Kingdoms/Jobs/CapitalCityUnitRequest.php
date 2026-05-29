@@ -10,7 +10,6 @@ use App\Game\Kingdoms\Events\UpdateCapitalCityUnitRecruitments;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityKingdomLogHandler;
 use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
-use App\Game\Kingdoms\Values\KingdomMaxValue;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -54,11 +53,25 @@ class CapitalCityUnitRequest implements ShouldQueue
             }
         }
 
-        $kingdom = $this->handleCost($queueData->kingdom, $unitService, $this->totalCosts);
-
         $requestData = $queueData->unit_request_data;
+        $kingdom = $queueData->kingdom;
 
-        $updatedRequestData = $this->handleRecruitment($kingdom, $requestData);
+        $updatedRequestData = $this->rejectInvalidOverMaxRecruitment($queueData, $requestData, $unitService);
+
+        if (! $this->hasRecruitableRequests($updatedRequestData)) {
+            $queueData->update([
+                'unit_request_data' => $updatedRequestData,
+                'status' => CapitalCityQueueStatus::REJECTED,
+            ]);
+
+            $capitalCityKingdomLogHandler->possiblyCreateLogForUnitQueue($queueData->refresh());
+
+            return;
+        }
+
+        $kingdom = $this->handleCost($kingdom, $unitService, $this->sumAcceptedCosts($updatedRequestData));
+
+        $updatedRequestData = $this->handleRecruitment($queueData, $kingdom, $updatedRequestData, $unitService);
 
         $queueData->update([
             'unit_request_data' => $updatedRequestData,
@@ -75,7 +88,7 @@ class CapitalCityUnitRequest implements ShouldQueue
         $capitalCityKingdomLogHandler->possiblyCreateLogForUnitQueue($queueData);
     }
 
-    private function handleRecruitment(Kingdom $kingdom, array $requestData): array
+    private function handleRecruitment(CapitalCityUnitQueue $queueData, Kingdom $kingdom, array $requestData, UnitService $unitService): array
     {
 
         foreach ($requestData as $index => $data) {
@@ -85,6 +98,12 @@ class CapitalCityUnitRequest implements ShouldQueue
             }
 
             $gameUnit = GameUnit::where('name', $data['name'])->first();
+
+            if (! $unitService->canQueueUnits($kingdom, $gameUnit, $data['amount'], null, $queueData->id)) {
+                $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
+                continue;
+            }
 
             $unit = $kingdom->units()->where('game_unit_id', $gameUnit->id)->first();
 
@@ -104,10 +123,6 @@ class CapitalCityUnitRequest implements ShouldQueue
 
             $newAmount = $unit->amount + $data['amount'];
 
-            if ($newAmount > KingdomMaxValue::MAX_UNIT) {
-                $newAmount = KingdomMaxValue::MAX_UNIT;
-            }
-
             $unit->update([
                 'amount' => $newAmount,
             ]);
@@ -120,8 +135,47 @@ class CapitalCityUnitRequest implements ShouldQueue
         return $requestData;
     }
 
+    private function rejectInvalidOverMaxRecruitment(CapitalCityUnitQueue $queueData, array $requestData, UnitService $unitService): array
+    {
+        $kingdom = $queueData->kingdom;
+        $requestedAmountsByUnitName = [];
+
+        foreach ($requestData as $index => $data) {
+            if (in_array($data['secondary_status'], [CapitalCityQueueStatus::REJECTED, CapitalCityQueueStatus::CANCELLED])) {
+                continue;
+            }
+
+            $gameUnit = GameUnit::where('name', $data['name'])->first();
+            $requestedAmountsByUnitName[$data['name']] = ($requestedAmountsByUnitName[$data['name']] ?? 0) + $data['amount'];
+
+            if (is_null($gameUnit) || ! $unitService->canQueueUnits($kingdom, $gameUnit, $requestedAmountsByUnitName[$data['name']], null, $queueData->id)) {
+                $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+            }
+        }
+
+        return $requestData;
+    }
+
+    private function hasRecruitableRequests(array $requestData): bool
+    {
+        return collect($requestData)
+            ->contains(fn($data) => ! in_array($data['secondary_status'], [CapitalCityQueueStatus::REJECTED, CapitalCityQueueStatus::CANCELLED]));
+    }
+
     private function handleCost(Kingdom $kingdom, UnitService $unitService, array $totalCosts): Kingdom
     {
         return $unitService->updateKingdomResourcesForTotalCost($kingdom, $totalCosts);
+    }
+
+    private function sumAcceptedCosts(array $requestData): array
+    {
+        $costs = collect($requestData)
+            ->reject(fn($request) => in_array($request['secondary_status'], [CapitalCityQueueStatus::REJECTED, CapitalCityQueueStatus::CANCELLED]))
+            ->filter(fn($request) => isset($request['costs']))
+            ->map(fn($request) => collect($request['costs']))
+            ->reduce(fn($carry, $requestCosts) => $carry->merge($requestCosts)->map(fn($value, $key) => $carry->get($key, 0) + $value), collect())
+            ->toArray();
+
+        return empty($costs) ? $this->totalCosts : $costs;
     }
 }

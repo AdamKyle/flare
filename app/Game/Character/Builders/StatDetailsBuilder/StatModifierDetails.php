@@ -129,14 +129,10 @@ class StatModifierDetails
         if ($this->character->classType()->isAlcoholic()) {
             $value = $damageStatAmount * 0.25;
 
-            $details['non_equipped_damage_amount'] = max($value, 5);
-            $details['non_equipped_percentage_of_stat_used'] = 0.25;
-        } elseif ($this->character->classType()->isFighter()) {
-            $value = $damageStatAmount * 0.05;
-
-            $details['non_equipped_damage_amount'] = max($value, 5);
-            $details['non_equipped_percentage_of_stat_used'] = 0.05;
-        } elseif ($this->character->classType()->isHeretic()) {
+        if (is_null($equipped)) {
+            if (in_array($type, ItemType::validWeapons())) {
+                if ($this->character->classType()->isAlcoholic()) {
+                    $value = $damageStatAmount * 0.25;
 
             $value = $damageStatAmount * 0.15;
 
@@ -147,14 +143,29 @@ class StatModifierDetails
         } else {
             $value = $damageStatAmount * 0.02;
 
-            $details['non_equipped_damage_amount'] = max($value, 5);
-            $details['non_equipped_percentage_of_stat_used'] = 0.02;
+                    $details['non_equipped_damage_amount'] = number_format(max($value, 5));
+                    $details['non_equipped_percentage_of_stat_used'] = 0.02;
+                }
+            }
+
+            if ($type === ItemType::SPELL_DAMAGE->value && $this->character->classType()->isHeretic()) {
+                $value = $damageStatAmount * 0.15;
+
+                $details['spell_damage_stat_amount_to_use'] = number_format(max($value, 5));
+                $details['percentage_of_stat_used'] = 0.15;
+            }
         }
 
-        $details['class_bonus_details'] = $this->fetchClassBonusesEffecting('base_damage');
-        $details['boon_details'] = $this->fetchBoonDetails('base_damage');
-        $details['class_specialties'] = $this->fetchClassRankSpecialtiesDetails('base_damage');
-        $details['ancestral_item_skill_data'] = $this->fetchAncestralItemSkills('base_damage');
+        $classSpecialtyStat = match ($type) {
+            ItemType::SPELL_DAMAGE->value => 'base_spell_damage',
+            ItemType::SPELL_HEALING->value => 'base_healing',
+            default => 'base_damage',
+        };
+
+        $details['class_bonus_details'] = $type === 'ring' ? null : $this->fetchClassBonusesEffecting('base_damage');
+        $details['boon_details'] = $type === 'ring' ? null : $this->fetchBoonDetails('base_damage');
+        $details['class_specialties'] = $type === 'ring' ? null : $this->fetchClassRankSpecialtiesDetails($classSpecialtyStat);
+        $details['ancestral_item_skill_data'] = $type === 'ring' ? null : $this->fetchAncestralItemSkills('base_damage');
 
         $typeAttributes = match (true) {
             in_array(ItemType::SPELL_DAMAGE->value, $types) => $this->character->getInformation()->getDamageBuilder()->buildSpellDamageBreakDownDetails($isVoided),
@@ -269,7 +280,6 @@ class StatModifierDetails
      */
     private function fetchClassRankSpecialtiesDetails(string $stat): ?array
     {
-
         $details = [];
 
         if ($this->character->damage_stat === $stat) {
@@ -291,14 +301,16 @@ class StatModifierDetails
             return $details;
         }
 
+        $modifier = $stat.'_mod';
+
         $classSpecialties = $this->character->classSpecialsEquipped
             ->where('equipped', '=', true)
-            ->where($stat.'_mod', '>', 0);
+            ->where($modifier, '>', 0);
 
         foreach ($classSpecialties as $classSpecialty) {
             $details[] = [
                 'name' => $classSpecialty->gameClassSpecial->name,
-                'amount' => $classSpecialty->base_damage_stat_increase,
+                'amount' => $classSpecialty->{$modifier},
             ];
         }
 
@@ -314,22 +326,27 @@ class StatModifierDetails
      */
     private function fetchClassRankSpecialtiesForHealth(): ?array
     {
+        $details = [];
+
         $classSpecialties = $this->character->classSpecialsEquipped
             ->where('equipped', '=', true)
             ->where('base_damage_stat_increase', '>', 0);
-
-        $healthSpecialties = $this->character->classSpecialsEquipped
-            ->where('equipped', '=', true)
-            ->where('health_mod', '>', 0);
-
-        $classSpecialties = $classSpecialties->merge($healthSpecialties);
-
-        $details = [];
 
         foreach ($classSpecialties as $classSpecialty) {
             $details[] = [
                 'name' => $classSpecialty->gameClassSpecial->name,
                 'amount' => $classSpecialty->base_damage_stat_increase,
+            ];
+        }
+
+        $healthSpecialties = $this->character->classSpecialsEquipped
+            ->where('equipped', '=', true)
+            ->where('health_mod', '>', 0);
+
+        foreach ($healthSpecialties as $classSpecialty) {
+            $details[] = [
+                'name' => $classSpecialty->gameClassSpecial->name,
+                'amount' => $classSpecialty->health_mod,
             ];
         }
 

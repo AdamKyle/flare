@@ -53,11 +53,11 @@ class PurgatorySmithHouseRewardHandler
         $shouldAttemptMythic = $this->isMonsterTheFinalMonster($location, $monster);
 
         if ($shouldAttemptLegendary) {
-            $this->attemptLegendaryRewardsForKillCount($character, $event, $killCount);
+            $this->attemptLegendaryRewardsForKillCount($character, $monster, $event, $killCount);
         }
 
         if ($shouldAttemptMythic) {
-            $this->attemptMythicRewardsForKillCountCappedToOne($character, $event, $killCount);
+            $this->attemptMythicRewardsForKillCountCappedToOne($character, $monster, $event, $killCount);
         }
 
         if ($shouldAttemptLegendary || $shouldAttemptMythic) {
@@ -88,10 +88,10 @@ class PurgatorySmithHouseRewardHandler
 
     public function currencyReward(Character $character, ?Event $event = null, int $killCount = 1): Character
     {
-        $maximumAmount = 1_000;
+        $maximumAmount = 750;
 
         if (! is_null($event)) {
-            $maximumAmount = 5_000;
+            $maximumAmount = 3_750;
         }
 
         $goldDustToGain = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount) * $killCount;
@@ -138,27 +138,27 @@ class PurgatorySmithHouseRewardHandler
         return $character;
     }
 
-    private function attemptLegendaryRewardsForKillCount(Character $character, ?Event $event, int $killCount): void
+    private function attemptLegendaryRewardsForKillCount(Character $character, Monster $monster, ?Event $event, int $killCount): void
     {
-        $this->attemptItemRewardsForKillCount($character, false, $event, $killCount, false);
+        $this->attemptItemRewardsForKillCount($character, $monster, false, $event, $killCount, false);
     }
 
-    private function attemptMythicRewardsForKillCountCappedToOne(Character $character, ?Event $event, int $killCount): void
+    private function attemptMythicRewardsForKillCountCappedToOne(Character $character, Monster $monster, ?Event $event, int $killCount): void
     {
-        $this->attemptItemRewardsForKillCount($character, true, $event, $killCount, true);
+        $this->attemptItemRewardsForKillCount($character, $monster, true, $event, $killCount, true);
     }
 
     /**
      * @throws Exception
      */
-    private function attemptItemRewardsForKillCount(Character $character, bool $isMythic, ?Event $event, int $killCount, bool $capToOneReward): void
+    private function attemptItemRewardsForKillCount(Character $character, Monster $monster, bool $isMythic, ?Event $event, int $killCount, bool $capToOneReward): void
     {
         for ($iterationIndex = 0; $iterationIndex < $killCount; $iterationIndex++) {
             if ($character->isInventoryFull()) {
                 break;
             }
 
-            $wasRewarded = $this->attemptItemReward($character, $isMythic, $event);
+            $wasRewarded = $this->attemptItemReward($character, $monster, $isMythic, $event);
 
             if ($capToOneReward && $wasRewarded) {
                 break;
@@ -169,10 +169,11 @@ class PurgatorySmithHouseRewardHandler
     /**
      * @throws Exception
      */
-    private function attemptItemReward(Character $character, bool $isMythic, ?Event $event): bool
+    private function attemptItemReward(Character $character, Monster $monster, bool $isMythic, ?Event $event): bool
     {
         $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->first()->skill_bonus;
         $maxRoll = $isMythic ? 1_000 : 5_00;
+        $maximumChance = 0.30;
 
         if ($lootingChance > 0.15) {
             $lootingChance = 0.15;
@@ -181,7 +182,10 @@ class PurgatorySmithHouseRewardHandler
         if (! is_null($event)) {
             $lootingChance = .30;
             $maxRoll = (int) ($maxRoll / 2);
+            $maximumChance = 0.45;
         }
+
+        $lootingChance = min($lootingChance + ($monster->drop_check * 0.25), $maximumChance);
 
         if (! DropCheckCalculator::fetchDifficultItemChance($lootingChance, $maxRoll)) {
             return false;

@@ -4,10 +4,10 @@ namespace App\Game\PassiveSkills\Jobs;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterPassiveSkill;
-use App\Flare\Models\GameBuilding;
-use App\Game\Core\Services\CharacterPassiveSkills;
-use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Game\Kingdoms\Transformers\KingdomTransformer;
+use App\Game\Kingdoms\Events\UpdateKingdom;
+use App\Game\Kingdoms\Service\KingdomBuildingUnlockSyncService;
+use App\Game\Kingdoms\Service\KingdomMaxResourceRecalculationService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\PassiveSkills\Events\UpdatePassiveTree;
 use Illuminate\Bus\Queueable;
@@ -37,10 +37,27 @@ class TrainPassiveSkill implements ShouldQueue
      *
      * @return void
      */
-    public function handle(Manager $manager, KingdomTransformer $kingdomTransformer, CharacterPassiveSkills $characterPassiveSkills)
-    {
+    public function handle(
+        Manager $manager,
+        KingdomTransformer $kingdomTransformer,
+        KingdomMaxResourceRecalculationService $kingdomMaxResourceRecalculationService,
+        KingdomBuildingUnlockSyncService $kingdomBuildingUnlockSyncService
+    ) {
 
         if (is_null($this->characterPassiveSkill->started_at)) {
+            return;
+        }
+
+        $maxLevel = $this->characterPassiveSkill->passiveSkill->max_level;
+
+        if ($this->characterPassiveSkill->current_level >= $maxLevel) {
+            $this->characterPassiveSkill->update([
+                'started_at' => null,
+                'completed_at' => null,
+                'current_level' => $maxLevel,
+                'hours_to_next' => 0,
+            ]);
+
             return;
         }
 
@@ -63,17 +80,16 @@ class TrainPassiveSkill implements ShouldQueue
             // @codeCoverageIgnoreEnd
         }
 
-        $newLevel = $this->characterPassiveSkill->current_level + 1;
-
-        if ($newLevel > $this->characterPassiveSkill->passiveSkill->max_level) {
-            $newLevel = $this->characterPassiveSkill->passiveSkill->max_level;
-        }
+        $newLevel = min($this->characterPassiveSkill->current_level + 1, $maxLevel);
+        $hoursToNext = $newLevel >= $maxLevel
+            ? 0
+            : ($newLevel + 1) * $this->characterPassiveSkill->passiveSkill->hours_per_level;
 
         $this->characterPassiveSkill->update([
             'started_at' => null,
             'completed_at' => null,
             'current_level' => $newLevel,
-            'hours_to_next' => ($newLevel + 1) * $this->characterPassiveSkill->passiveSkill->hours_per_level,
+            'hours_to_next' => $hoursToNext,
         ]);
 
         $newPassive = $this->characterPassiveSkill->refresh();
@@ -94,13 +110,10 @@ class TrainPassiveSkill implements ShouldQueue
 
         if ($newPassive->passiveSkill->passiveType()->unlocksBuilding()) {
             $kingdoms = $this->character->kingdoms;
-            $gameBuilding = GameBuilding::where('name', $newPassive->passiveSkill->name)->first();
 
             foreach ($kingdoms as $kingdom) {
 
-                $kingdom->buildings()->where('game_building_id', $gameBuilding->id)->update([
-                    'is_locked' => false,
-                ]);
+                $kingdomBuildingUnlockSyncService->syncForKingdom($kingdom);
 
                 $kingdom = new Item($kingdom->refresh(), $kingdomTransformer);
                 $kingdom = $manager->createData($kingdom)->toArray();
@@ -114,13 +127,7 @@ class TrainPassiveSkill implements ShouldQueue
             $kingdoms = $this->character->kingdoms;
 
             foreach ($kingdoms as $kingdom) {
-                $kingdom->update([
-                    'max_stone' => $kingdom->max_stone + $newPassive->passiveSkill->resource_bonus_per_level,
-                    'max_wood' => $kingdom->max_wood + $newPassive->passiveSkill->resource_bonus_per_level,
-                    'max_clay' => $kingdom->max_clay + $newPassive->passiveSkill->resource_bonus_per_level,
-                    'max_iron' => $kingdom->max_iron + $newPassive->passiveSkill->resource_bonus_per_level,
-                    'max_population' => $kingdom->max_population + $newPassive->passiveSkill->resource_bonus_per_level,
-                ]);
+                $kingdomMaxResourceRecalculationService->recalculate($kingdom);
 
                 $kingdom = new Item($kingdom->refresh(), $kingdomTransformer);
                 $kingdom = $manager->createData($kingdom)->toArray();
@@ -148,7 +155,7 @@ class TrainPassiveSkill implements ShouldQueue
 
         $character = $this->character->Refresh();
 
-        event(new ServerMessageEvent($character->user, $newPassive->passiveSkill->name.' skill has gained a new level! Check your character sheet!'));
+        event(new ServerMessageEvent($character->user, $newPassive->passiveSkill->name . ' skill has gained a new level! Check your character sheet!'));
 
         event(new UpdatePassiveTree($character->user, $characterPassiveSkills->getPassiveSkills($character)));
     }

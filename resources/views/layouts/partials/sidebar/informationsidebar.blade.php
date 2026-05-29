@@ -279,6 +279,10 @@
                 <span class="ra ra-double-team"></span>
                 Factions Loyalty
             </a>
+            <a href="{{ route('info.page', ['pageName' => 'faction-loyalty-automation']) }}">
+                <span class="ra ra-player-thunder-struck"></span>
+                Factions Loyalty Automation
+            </a>
         </div>
 >>>>>>> master
     </div>

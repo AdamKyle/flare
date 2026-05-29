@@ -5,6 +5,7 @@ namespace App\Game\Maps\Services;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
@@ -46,6 +47,12 @@ class TeleportService extends BaseMovementService
      */
     public function teleport(Character $character, bool $usingPCTCommand = false): array
     {
+        $restriction = $this->automationRestrictionErrorResult($character, AutomationRestrictionService::TELEPORT);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         if (! $this->canPlayerMoveToLocation($character)) {
             $this->generateCannotWalkServerMessage($character);
 

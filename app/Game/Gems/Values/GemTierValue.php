@@ -63,7 +63,7 @@ class GemTierValue
                     'shards' => 250,
                     'copper_coins' => 100,
                 ],
-                'chance' => .30,
+                'chance' => .75,
             ];
         }
 
@@ -83,7 +83,7 @@ class GemTierValue
                     'shards' => 500,
                     'copper_coins' => 250,
                 ],
-                'chance' => .15,
+                'chance' => .55,
             ];
         }
 
@@ -103,7 +103,7 @@ class GemTierValue
                     'shards' => 1000,
                     'copper_coins' => 500,
                 ],
-                'chance' => .05,
+                'chance' => .35,
             ];
         }
 
@@ -123,7 +123,7 @@ class GemTierValue
                     'shards' => 2500,
                     'copper_coins' => 1000,
                 ],
-                'chance' => 0.01,
+                'chance' => .25,
             ];
         }
 

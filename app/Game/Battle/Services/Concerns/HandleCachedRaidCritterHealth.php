@@ -75,7 +75,7 @@ trait HandleCachedRaidCritterHealth
         $cacheName = 'character-'.$characterId.'-raid-monster-'.$monsterId;
 
         Cache::put($cacheName, [
-            'monster_current_health' => $health,
+            'monster_current_health' => max($health, 0),
             'server_monster' => $serverMonster->getMonster(),
             'fight_data' => $fightData,
         ], now()->addMinutes(20));

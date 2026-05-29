@@ -8,6 +8,9 @@ use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
@@ -24,7 +27,7 @@ use League\Fractal\Manager;
 
 class MovementService
 {
-    use CanHaveQuestItem, CanPlayerMassEmbezzle, LiveCharacterCount, ResponseBuilder;
+    use CanHaveQuestItem, CanPlayerMassEmbezzle, ChecksAutomationRestrictions, LiveCharacterCount, ResponseBuilder;
 
     /**
      * @var PortService
@@ -125,6 +128,12 @@ class MovementService
      */
     public function updateCharacterPlane(int $mapId, Character $character): array
     {
+        $restriction = $this->automationRestrictionErrorResult($character, AutomationRestrictionService::TRAVERSE);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         if (! $this->traverseService->canTravel($mapId, $character)) {
             return $this->errorResult('You are missing a required item to travel to that plane.');
         }
@@ -184,12 +193,12 @@ class MovementService
             $questItem = $location->questRewardItem;
 
             if (! is_null($questItem->effect)) {
-                $message = $character->name.' has found: '.$questItem->affix_name;
+                $message = $character->name . ' has found: ' . $questItem->affix_name;
 
                 broadcast(new GlobalMessageEvent($message));
             }
 
-            event(new GameServerMessageEvent($character->user, 'You found: '.$questItem->affix_name, $slot->id));
+            event(new GameServerMessageEvent($character->user, 'You found: ' . $questItem->affix_name, $slot->id));
 
             event(new UpdateCharacterStatus($character));
         }
@@ -209,14 +218,18 @@ class MovementService
     protected function filterTraversableMaps(Character $character, Collection $gameMaps, ?Location $location = null): array
     {
         return $gameMaps->reject(function ($gameMap) use ($character, $location) {
-            if (! is_null($gameMap->required_location_id) &&
+            if (
+                ! is_null($gameMap->required_location_id) &&
                 ! $character->map->gameMap->mapType()->isPurgatory() &&
-                (is_null($location) || $location->id !== $gameMap->required_location_id)) {
+                (is_null($location) || $location->id !== $gameMap->required_location_id)
+            ) {
                 return true;
             }
 
-            if (! is_null($gameMap->only_during_event_type) &&
-                is_null(Event::where('type', $gameMap->only_during_event_type)->first())) {
+            if (
+                ! is_null($gameMap->only_during_event_type) &&
+                is_null(Event::where('type', $gameMap->only_during_event_type)->first())
+            ) {
                 return true;
             }
 

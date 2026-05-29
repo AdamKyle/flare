@@ -106,7 +106,7 @@ class CharacterCurrencyRewardServiceTest extends TestCase
 
         $character = $characterFactory->getCharacter();
 
-        $this->createExploringAutomation([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
         ]);
 
@@ -230,12 +230,52 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         $character = $this->characterCurrencyRewardService->getCharacter();
 
         $this->assertGreaterThanOrEqual(1, $character->shards);
-        $this->assertLessThanOrEqual(500, $character->shards);
+        $this->assertLessThanOrEqual(375, $character->shards);
 
         $this->assertGreaterThanOrEqual(1, $character->gold_dust);
-        $this->assertLessThanOrEqual(500, $character->gold_dust);
+        $this->assertLessThanOrEqual(375, $character->gold_dust);
 
         $this->assertEquals(0, $character->copper_coins);
+    }
+
+    public function test_currency_event_reward_uses_reduced_weekly_currency_maximums(): void
+    {
+        $this->createScheduledEvent([
+            'event_type' => EventType::WEEKLY_CURRENCY_DROPS,
+            'currently_running' => true,
+        ]);
+
+        $copperCoinsItem = $this->createItem([
+            'effect' => ItemEffectsValue::GET_COPPER_COINS,
+            'type' => 'quest',
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($copperCoinsItem)->getCharacter();
+        $character->update([
+            'shards' => 0,
+            'gold_dust' => 0,
+            'copper_coins' => 0,
+        ]);
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'is_celestial_entity' => false,
+        ]);
+
+        $this->characterCurrencyRewardService
+            ->setCharacter($character->refresh())
+            ->currencyEventReward($monster);
+
+        $character = $this->characterCurrencyRewardService->getCharacter();
+
+        $this->assertGreaterThanOrEqual(1, $character->gold_dust);
+        $this->assertLessThanOrEqual(375, $character->gold_dust);
+
+        $this->assertGreaterThanOrEqual(1, $character->shards);
+        $this->assertLessThanOrEqual(375, $character->shards);
+
+        $this->assertGreaterThanOrEqual(1, $character->copper_coins);
+        $this->assertLessThanOrEqual(115, $character->copper_coins);
     }
 
     public function test_currency_event_reward_rewards_and_caps_with_copper_coins_item()
@@ -282,7 +322,7 @@ class CharacterCurrencyRewardServiceTest extends TestCase
 
         $character = $this->character->getCharacter();
 
-        $this->createExploringAutomation([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
         ]);
 
@@ -304,10 +344,10 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         $character = $this->characterCurrencyRewardService->getCharacter();
 
         $this->assertGreaterThanOrEqual(1, $character->shards);
-        $this->assertLessThanOrEqual(500, $character->shards);
+        $this->assertLessThanOrEqual(375, $character->shards);
 
         $this->assertGreaterThanOrEqual(1, $character->gold_dust);
-        $this->assertLessThanOrEqual(500, $character->gold_dust);
+        $this->assertLessThanOrEqual(375, $character->gold_dust);
     }
 
     public function test_distribute_copper_coins_does_nothing_when_not_purgatory()
@@ -567,10 +607,10 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         $character = $this->characterCurrencyRewardService->getCharacter();
 
         $this->assertGreaterThanOrEqual(5, $character->shards);
-        $this->assertLessThanOrEqual(2500, $character->shards);
+        $this->assertLessThanOrEqual(1875, $character->shards);
 
         $this->assertGreaterThanOrEqual(5, $character->gold_dust);
-        $this->assertLessThanOrEqual(2500, $character->gold_dust);
+        $this->assertLessThanOrEqual(1875, $character->gold_dust);
 
         $this->assertEquals(0, $character->copper_coins);
     }

@@ -2,9 +2,12 @@
 
 namespace App\Game\Kingdoms\Service;
 
+use Carbon\Carbon;
+use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
+use App\Flare\Models\KingdomUnit;
 use App\Flare\Models\Skill;
 use App\Flare\Models\UnitInQueue;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -12,6 +15,8 @@ use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\Kingdoms\Jobs\RecruitUnits;
 use App\Game\Kingdoms\Validation\KingdomUnitResourceValidation;
+use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
+use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Skills\Values\SkillTypeValue;
 use Carbon\Carbon;
 
@@ -28,6 +33,10 @@ class UnitService
 
     public function handlePayment(GameUnit $gameUnit, Kingdom $kingdom, int $amount): array
     {
+        if (! $this->canQueueUnits($kingdom, $gameUnit, $amount)) {
+            return $this->errorResult('Too many units');
+        }
+
         if ($this->kingdomUnitResourceValidation->isMissingResources($kingdom, $gameUnit, $amount)) {
             return $this->errorResult("You don't have the resources.");
         }
@@ -54,6 +63,7 @@ class UnitService
             'amount' => $amount,
             'completed_at' => $timeTillFinished,
             'started_at' => now(),
+            'capital_city_unit_queue_id' => $capitalCityQueueId,
         ]);
 
         event(new UpdateKingdomQueues($kingdom));
@@ -93,10 +103,14 @@ class UnitService
         ];
 
         foreach ($costs as $type => $cost) {
-            $newResources['current_'.strtolower($type)] -= $cost;
+            if ($newResources['current_' . strtolower($type)] < $cost) {
+                return $kingdom->refresh();
+            }
+
+            $newResources['current_' . strtolower($type)] -= $cost;
         }
 
-        $kingdom->update(array_map(fn ($value) => max($value, 0), $newResources));
+        $kingdom->update(array_map(fn($value) => max($value, 0), $newResources));
 
         return $kingdom->refresh();
     }
@@ -116,10 +130,14 @@ class UnitService
         ];
 
         foreach ($totalCosts as $type => $cost) {
-            $newResources['current_'.strtolower($type)] -= $cost;
+            if ($newResources['current_' . strtolower($type)] < $cost) {
+                return $kingdom->refresh();
+            }
+
+            $newResources['current_' . strtolower($type)] -= $cost;
         }
 
-        $kingdom->update(array_map(fn ($value) => max($value, 0), $newResources));
+        $kingdom->update(array_map(fn($value) => max($value, 0), $newResources));
 
         return $kingdom->refresh();
     }
@@ -157,9 +175,15 @@ class UnitService
         $end = Carbon::parse($queue->completed_at)->timestamp;
         $current = Carbon::parse(now())->timestamp;
 
+        if ($end <= $start) {
+            $this->totalResources = 0;
+
+            return;
+        }
+
         $completed = (($current - $start) / ($end - $start));
 
-        $this->totalResources = 1 - $completed;
+        $this->totalResources = max(0, min(1, 1 - $completed));
     }
 
     /**
@@ -188,5 +212,53 @@ class UnitService
         ]);
 
         return $kingdom->refresh();
+    }
+
+    public function canQueueUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount, ?int $excludedQueueId = null, ?int $excludedCapitalCityQueueId = null): bool
+    {
+        return $this->queuedAndOwnedUnitAmount($kingdom, $gameUnit, $excludedQueueId, $excludedCapitalCityQueueId) + $amount <= KingdomMaxValue::MAX_UNIT;
+    }
+
+    public function refundUnitRecruitment(Kingdom $kingdom, GameUnit $unit, int $amount): Kingdom
+    {
+        $kingdom->update([
+            'current_wood' => min($kingdom->current_wood + ($unit->wood_cost * $amount), $kingdom->max_wood),
+            'current_clay' => min($kingdom->current_clay + ($unit->clay_cost * $amount), $kingdom->max_clay),
+            'current_stone' => min($kingdom->current_stone + ($unit->stone_cost * $amount), $kingdom->max_stone),
+            'current_iron' => min($kingdom->current_iron + ($unit->iron_cost * $amount), $kingdom->max_iron),
+            'current_steel' => min($kingdom->current_steel + ($unit->steel_cost * $amount), $kingdom->max_steel),
+            'current_population' => min($kingdom->current_population + ($unit->required_population * $amount), $kingdom->max_population),
+        ]);
+
+        return $kingdom->refresh();
+    }
+
+    public function queuedAndOwnedUnitAmount(Kingdom $kingdom, GameUnit $gameUnit, ?int $excludedQueueId = null, ?int $excludedCapitalCityQueueId = null): int
+    {
+        $ownedAmount = KingdomUnit::where('kingdom_id', $kingdom->id)
+            ->where('game_unit_id', $gameUnit->id)
+            ->sum('amount');
+
+        $queuedAmount = UnitInQueue::where('kingdom_id', $kingdom->id)
+            ->where('game_unit_id', $gameUnit->id)
+            ->when($excludedQueueId, function ($query) use ($excludedQueueId) {
+                return $query->where('id', '!=', $excludedQueueId);
+            })
+            ->sum('amount');
+
+        $capitalCityQueuedAmount = CapitalCityUnitQueue::where('kingdom_id', $kingdom->id)
+            ->whereNotIn('status', [CapitalCityQueueStatus::FINISHED, CapitalCityQueueStatus::REJECTED, CapitalCityQueueStatus::CANCELLED])
+            ->when($excludedCapitalCityQueueId, function ($query) use ($excludedCapitalCityQueueId) {
+                return $query->where('id', '!=', $excludedCapitalCityQueueId);
+            })
+            ->get()
+            ->sum(function (CapitalCityUnitQueue $queue) use ($gameUnit) {
+                return collect($queue->unit_request_data)
+                    ->reject(fn($request) => in_array($request['secondary_status'], [CapitalCityQueueStatus::FINISHED, CapitalCityQueueStatus::REJECTED, CapitalCityQueueStatus::CANCELLED]))
+                    ->where('name', $gameUnit->name)
+                    ->sum('amount');
+            });
+
+        return (int) $ownedAmount + (int) $queuedAmount + (int) $capitalCityQueuedAmount;
     }
 }
