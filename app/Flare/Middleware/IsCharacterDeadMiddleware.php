@@ -3,13 +3,14 @@
 namespace App\Flare\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 
 class IsCharacterDeadMiddleware
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  string|null  $guard
      * @return mixed
      */

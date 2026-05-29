@@ -14,7 +14,7 @@ class CharacterPassiveSkillControllerTest extends TestCase
 
     private ?CharacterFactory $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -22,14 +22,14 @@ class CharacterPassiveSkillControllerTest extends TestCase
             ->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testExplorationAllowsKingdomPassives(): void
+    public function test_exploration_allows_kingdom_passives(): void
     {
         $character = $this->character->getCharacter();
 
@@ -40,7 +40,7 @@ class CharacterPassiveSkillControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/kingdom-passives/' . $character->id);
+            ->call('GET', '/api/character/kingdom-passives/'.$character->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -48,7 +48,7 @@ class CharacterPassiveSkillControllerTest extends TestCase
         $this->assertNotEmpty($jsonData['kingdom_passives']);
     }
 
-    public function testExplorationBlocksPassiveTraining(): void
+    public function test_exploration_blocks_passive_training(): void
     {
         $character = $this->character->getCharacter();
         $passive = $character->passiveSkills()->first();
@@ -60,7 +60,7 @@ class CharacterPassiveSkillControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/train/passive/' . $passive->id . '/' . $character->id);
+            ->call('POST', '/api/train/passive/'.$passive->id.'/'.$character->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -68,7 +68,7 @@ class CharacterPassiveSkillControllerTest extends TestCase
         $this->assertEquals('You cannot do that while Exploration automation is running. Cancel it first.', $jsonData['message']);
     }
 
-    public function testExplorationBlocksStoppingPassiveTraining(): void
+    public function test_exploration_blocks_stopping_passive_training(): void
     {
         $character = $this->character->getCharacter();
         $passive = $character->passiveSkills()->first();
@@ -85,7 +85,7 @@ class CharacterPassiveSkillControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/stop-training/passive/' . $passive->id . '/' . $character->id);
+            ->call('POST', '/api/stop-training/passive/'.$passive->id.'/'.$character->id);
 
         $jsonData = json_decode($response->getContent(), true);
 

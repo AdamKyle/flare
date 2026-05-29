@@ -12,7 +12,7 @@ class KingdomMaxResourceRecalculationServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testRecalculatingMaxResourcesIsIdempotent(): void
+    public function test_recalculating_max_resources_is_idempotent(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter([], [], true, false)
@@ -54,7 +54,7 @@ class KingdomMaxResourceRecalculationServiceTest extends TestCase
         $this->assertSame($firstRecalculation->max_population, $secondRecalculation->max_population);
     }
 
-    public function testOldKingdomWithMaxedBountifulResourcesGetsCorrectCaps(): void
+    public function test_old_kingdom_with_maxed_bountiful_resources_gets_correct_caps(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter([], [], true, false)
@@ -87,7 +87,7 @@ class KingdomMaxResourceRecalculationServiceTest extends TestCase
         $this->assertSame(150, $kingdom->max_population);
     }
 
-    public function testBuildingUpgradesDoNotDoubleApplyBountifulResources(): void
+    public function test_building_upgrades_do_not_double_apply_bountiful_resources(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter([], [], true, false)
@@ -118,7 +118,7 @@ class KingdomMaxResourceRecalculationServiceTest extends TestCase
         $this->assertSame(2050, $kingdom->max_wood);
     }
 
-    public function testFarmUpgradesPreserveExistingPopulationMath(): void
+    public function test_farm_upgrades_preserve_existing_population_math(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter([], [], true, false)
@@ -144,7 +144,7 @@ class KingdomMaxResourceRecalculationServiceTest extends TestCase
         $this->assertSame(1350, $kingdom->refresh()->max_population);
     }
 
-    public function testNormalModeRecalculatesExactMaxResourcesWhenCurrentResourcesAreHigher(): void
+    public function test_normal_mode_recalculates_exact_max_resources_when_current_resources_are_higher(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter([], [], true, false)
@@ -174,7 +174,7 @@ class KingdomMaxResourceRecalculationServiceTest extends TestCase
         $this->assertSame(2050, $kingdom->max_iron);
     }
 
-    public function testRepairModePreservesMaxResourcesAndPopulationAboveCurrentValues(): void
+    public function test_repair_mode_preserves_max_resources_and_population_above_current_values(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter([], [], true, false)

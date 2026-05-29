@@ -90,7 +90,7 @@ class FactionLoyaltyControllerTest extends TestCase
         $character = $this->character->refresh();
 
         $response = $this->actingAs($this->character->user)
-            ->call('GET', '/api/faction-loyalty/' . $this->character->id);
+            ->call('GET', '/api/faction-loyalty/'.$this->character->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -150,14 +150,14 @@ class FactionLoyaltyControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty/pledge/' . $this->character->id . '/' . $this->character->factions->first()->id, [
+            ->call('POST', '/api/faction-loyalty/pledge/'.$this->character->id.'/'.$this->character->factions->first()->id, [
                 '_token' => csrf_token(),
             ]);
 
-        $this->assertEquals('Pledged to: ' . $this->character->map->gameMap->name . '.', $response['message']);
+        $this->assertEquals('Pledged to: '.$this->character->map->gameMap->name.'.', $response['message']);
     }
 
-    public function testPledgeLoyaltyReturns422WhenExplorationIsRunning()
+    public function test_pledge_loyalty_returns422_when_exploration_is_running()
     {
         $this->character->factions()->update(['maxed' => true]);
 
@@ -170,7 +170,7 @@ class FactionLoyaltyControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty/pledge/' . $this->character->id . '/' . $this->character->factions->first()->id, [
+            ->call('POST', '/api/faction-loyalty/pledge/'.$this->character->id.'/'.$this->character->factions->first()->id, [
                 '_token' => csrf_token(),
             ]);
 
@@ -181,7 +181,7 @@ class FactionLoyaltyControllerTest extends TestCase
         $this->assertFalse($this->character->factionLoyalties()->where('is_pledged', true)->exists());
     }
 
-    public function testRemovePledgedLoyalty()
+    public function test_remove_pledged_loyalty()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -232,14 +232,14 @@ class FactionLoyaltyControllerTest extends TestCase
         $this->character = $this->character->refresh();
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty/remove-pledge/' . $this->character->id . '/' . $this->character->factions->first()->id, [
+            ->call('POST', '/api/faction-loyalty/remove-pledge/'.$this->character->id.'/'.$this->character->factions->first()->id, [
                 '_token' => csrf_token(),
             ]);
 
-        $this->assertEquals('No longer pledged to: ' . $this->character->map->gameMap->name . '.', $response['message']);
+        $this->assertEquals('No longer pledged to: '.$this->character->map->gameMap->name.'.', $response['message']);
     }
 
-    public function testRemovePledgeReturns422WhenDelveIsRunning()
+    public function test_remove_pledge_returns422_when_delve_is_running()
     {
         $factionLoyalty = $this->createFactionLoyalty([
             'faction_id' => $this->character->factions->first()->id,
@@ -256,7 +256,7 @@ class FactionLoyaltyControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty/remove-pledge/' . $this->character->id . '/' . $this->character->factions->first()->id, [
+            ->call('POST', '/api/faction-loyalty/remove-pledge/'.$this->character->id.'/'.$this->character->factions->first()->id, [
                 '_token' => csrf_token(),
             ]);
 
@@ -267,7 +267,7 @@ class FactionLoyaltyControllerTest extends TestCase
         $this->assertTrue($factionLoyalty->refresh()->is_pledged);
     }
 
-    public function testAssistNpcWithTasks()
+    public function test_assist_npc_with_tasks()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -298,14 +298,14 @@ class FactionLoyaltyControllerTest extends TestCase
         $this->character = $this->character->refresh();
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty/assist/' . $this->character->id . '/' . $factionNpc->id, [
+            ->call('POST', '/api/faction-loyalty/assist/'.$this->character->id.'/'.$factionNpc->id, [
                 '_token' => csrf_token(),
             ]);
 
-        $this->assertEquals('You are now assisting ' . $factionNpc->npc->real_name . ' with their tasks!', $response['message']);
+        $this->assertEquals('You are now assisting '.$factionNpc->npc->real_name.' with their tasks!', $response['message']);
     }
 
-    public function testAssistNpcReturns422WhenExplorationIsRunning()
+    public function test_assist_npc_returns422_when_exploration_is_running()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -342,7 +342,7 @@ class FactionLoyaltyControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty/assist/' . $this->character->id . '/' . $factionNpc->id, [
+            ->call('POST', '/api/faction-loyalty/assist/'.$this->character->id.'/'.$factionNpc->id, [
                 '_token' => csrf_token(),
             ]);
 
@@ -353,7 +353,7 @@ class FactionLoyaltyControllerTest extends TestCase
         $this->assertFalse($factionNpc->refresh()->currently_helping);
     }
 
-    public function testStopAssistingNpc()
+    public function test_stop_assisting_npc()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -384,14 +384,14 @@ class FactionLoyaltyControllerTest extends TestCase
         $this->character = $this->character->refresh();
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty/stop-assisting/' . $this->character->id . '/' . $factionNpc->id, [
+            ->call('POST', '/api/faction-loyalty/stop-assisting/'.$this->character->id.'/'.$factionNpc->id, [
                 '_token' => csrf_token(),
             ]);
 
-        $this->assertEquals('You stopped assisting ' . $factionNpc->npc->real_name . ' with their tasks. They are sad but understand.', $response['message']);
+        $this->assertEquals('You stopped assisting '.$factionNpc->npc->real_name.' with their tasks. They are sad but understand.', $response['message']);
     }
 
-    public function testStopAssistingNpcReturns422WhenDelveIsRunning()
+    public function test_stop_assisting_npc_returns422_when_delve_is_running()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -428,7 +428,7 @@ class FactionLoyaltyControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty/stop-assisting/' . $this->character->id . '/' . $factionNpc->id, [
+            ->call('POST', '/api/faction-loyalty/stop-assisting/'.$this->character->id.'/'.$factionNpc->id, [
                 '_token' => csrf_token(),
             ]);
 

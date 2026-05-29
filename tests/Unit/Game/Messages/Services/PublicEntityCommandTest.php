@@ -142,7 +142,7 @@ class PublicEntityCommandTest extends TestCase
         });
     }
 
-    public function testPctDoesNotMoveWhenCharacterCannotMove()
+    public function test_pct_does_not_move_when_character_cannot_move()
     {
         Event::fake();
 
@@ -180,7 +180,7 @@ class PublicEntityCommandTest extends TestCase
         $this->assertSame($y, $character->map->refresh()->character_position_y);
     }
 
-    public function testUseThePctCommand()
+    public function test_use_the_pct_command()
     {
         Event::fake();
 

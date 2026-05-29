@@ -5,7 +5,6 @@ namespace App\Game\PassiveSkills\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterPassiveSkill;
 use App\Game\Automation\Services\AutomationRestrictionService;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\PassiveSkills\Services\PassiveSkillTrainingService;
 use App\Http\Controllers\Controller;
@@ -60,7 +59,7 @@ class CharacterPassiveSkillController extends Controller
         $character = $character->refresh();
 
         return response()->json([
-            'message' => 'Started training ' . $characterPassiveSkill->passiveSkill->name,
+            'message' => 'Started training '.$characterPassiveSkill->passiveSkill->name,
             'kingdom_passives' => $this->characterPassiveSkills->getPassiveSkills($character),
             'passive_training' => $this->characterPassiveSkills->getPassiveInTraining($character),
         ]);
@@ -90,7 +89,7 @@ class CharacterPassiveSkillController extends Controller
         event(new UpdateCharacterBaseDetailsEvent($character));
 
         return response()->json([
-            'message' => 'Stopped training ' . $characterPassiveSkill->passiveSkill->name,
+            'message' => 'Stopped training '.$characterPassiveSkill->passiveSkill->name,
             'kingdom_passives' => $this->characterPassiveSkills->getPassiveSkills($character),
         ]);
     }

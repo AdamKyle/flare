@@ -2,10 +2,12 @@
 
 namespace Tests\Unit\Game\Monsters\Services;
 
+use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MapNameValue;
 use App\Game\Monsters\Services\BuildMonsterCacheService;
 use App\Game\Monsters\Services\MonsterStatsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -339,13 +341,13 @@ class MonsterStatsServiceTest extends TestCase
 
     private function givePurgatoryAccess($character)
     {
-        $slots = collect([['item' => ['effect' => \App\Flare\Values\ItemEffectsValue::PURGATORY]]]);
+        $slots = collect([['item' => ['effect' => ItemEffectsValue::PURGATORY]]]);
 
         $inventory = new class($slots)
         {
-            public \Illuminate\Support\Collection $slots;
+            public Collection $slots;
 
-            public function __construct(\Illuminate\Support\Collection $slots)
+            public function __construct(Collection $slots)
             {
                 $this->slots = $slots;
             }

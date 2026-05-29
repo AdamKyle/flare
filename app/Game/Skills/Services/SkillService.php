@@ -114,7 +114,7 @@ class SkillService
         ]);
 
         return $this->successResult([
-            'message' => 'You are now training: ' . $skill->name,
+            'message' => 'You are now training: '.$skill->name,
         ]);
     }
 

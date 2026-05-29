@@ -4,6 +4,7 @@ namespace App\Flare\Middleware;
 
 use App\Flare\Models\UserLoginDuration;
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class TrackSessionLifeMiddleware
@@ -11,7 +12,7 @@ class TrackSessionLifeMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return mixed
      */
     public function handle($request, Closure $next)

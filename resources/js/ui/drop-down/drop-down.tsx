@@ -285,7 +285,7 @@ const Dropdown = ({
           'w-full text-black dark:text-white',
           !use_pagination && 'max-h-60 overflow-auto',
           !use_pagination &&
-            'scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 scrollbar-thumb-rounded-md'
+            'scrollbar-thumb-rounded-md scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800'
         )}
       >
         {renderItems()}

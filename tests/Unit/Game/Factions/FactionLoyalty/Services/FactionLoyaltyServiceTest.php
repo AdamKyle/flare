@@ -7,9 +7,9 @@ use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Models\FactionLoyaltyAutomationLog;
 use App\Flare\Models\GameMap;
+use App\Flare\Models\Monster;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
-use App\Flare\Models\Monster;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MapNameValue;
 use App\Game\Events\Values\EventType;
@@ -95,7 +95,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertEquals($this->character->map->gameMap->name, $result['map_name']);
     }
 
-    public function testGetLoyaltyInfoForPlaneIncludesLatestUnreadWarningNotice(): void
+    public function test_get_loyalty_info_for_plane_includes_latest_unread_warning_notice(): void
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -153,7 +153,7 @@ class FactionLoyaltyServiceTest extends TestCase
         ], $warningNotice);
     }
 
-    public function testMarkLatestWarningNoticeReadUpdatesFightLogNotice(): void
+    public function test_mark_latest_warning_notice_read_updates_fight_log_notice(): void
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -201,7 +201,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertTrue($automationLog->refresh()->fight_logs[0]['warning_notice']['read']);
     }
 
-    public function testHasPlaneLoyaltyForNpcCurrentlyHelping()
+    public function test_has_plane_loyalty_for_npc_currently_helping()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -325,7 +325,7 @@ class FactionLoyaltyServiceTest extends TestCase
 
         $character = $this->character->refresh();
 
-        $this->assertEquals('Pledged to: ' . $character->map->gameMap->name . '.', $result['message']);
+        $this->assertEquals('Pledged to: '.$character->map->gameMap->name.'.', $result['message']);
 
         $character = $character->refresh();
 
@@ -382,7 +382,7 @@ class FactionLoyaltyServiceTest extends TestCase
 
             $character = $this->character->refresh();
 
-            $this->assertEquals('Pledged to: ' . $character->map->gameMap->name . '.', $result['message']);
+            $this->assertEquals('Pledged to: '.$character->map->gameMap->name.'.', $result['message']);
         }
     }
 
@@ -444,7 +444,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $character = $this->character->refresh();
         $factionLoyalty = $factionLoyalty->refresh();
 
-        $this->assertEquals('Pledged to: ' . $character->map->gameMap->name . '.', $result['message']);
+        $this->assertEquals('Pledged to: '.$character->map->gameMap->name.'.', $result['message']);
         $this->assertTrue($factionLoyalty->is_pledged);
     }
 
@@ -503,7 +503,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $character = $this->character->refresh();
         $factionLoyalty = $factionLoyalty->refresh();
 
-        $this->assertEquals('No longer pledged to: ' . $character->map->gameMap->name . '.', $result['message']);
+        $this->assertEquals('No longer pledged to: '.$character->map->gameMap->name.'.', $result['message']);
         $this->assertFalse($factionLoyalty->is_pledged);
     }
 
@@ -902,7 +902,7 @@ class FactionLoyaltyServiceTest extends TestCase
             $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->currently_helping
         );
 
-        $this->assertEquals('You are now assisting ' . $factionNpc->npc->real_name . ' with their tasks!', $result['message']);
+        $this->assertEquals('You are now assisting '.$factionNpc->npc->real_name.' with their tasks!', $result['message']);
     }
 
     public function test_fail_to_stop_assisting_npc_character_does_not_own()
@@ -963,6 +963,6 @@ class FactionLoyaltyServiceTest extends TestCase
             $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->currently_helping
         );
 
-        $this->assertEquals('You stopped assisting ' . $factionNpc->npc->real_name . ' with their tasks. They are sad but understand.', $result['message']);
+        $this->assertEquals('You stopped assisting '.$factionNpc->npc->real_name.' with their tasks. They are sad but understand.', $result['message']);
     }
 }

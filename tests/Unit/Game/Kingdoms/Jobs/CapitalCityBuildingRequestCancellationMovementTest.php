@@ -5,8 +5,8 @@ namespace Tests\Unit\Game\Kingdoms\Jobs;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingCancellation;
 use App\Flare\Models\CapitalCityBuildingQueue;
-use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequestCancellationMovement;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityKingdomLogHandler;
+use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequestCancellationMovement;
 use App\Game\Kingdoms\Service\KingdomBuildingService;
 use App\Game\Kingdoms\Values\BuildingQueueType;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
@@ -20,7 +20,7 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testDelayedRedispatchPassesAllConstructorArguments(): void
+    public function test_delayed_redispatch_passes_all_constructor_arguments(): void
     {
         Queue::fake();
         Event::fake();
@@ -67,15 +67,15 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
         Queue::assertPushed(CapitalCityBuildingRequestCancellationMovement::class, function (CapitalCityBuildingRequestCancellationMovement $queuedJob) use ($capitalCityBuildingCancellation, $capitalCityBuildingQueue, $character, $building) {
             $serializedJob = serialize($queuedJob);
 
-            return str_contains($serializedJob, 'capitalCityCancellationQueueId";i:' . $capitalCityBuildingCancellation->id) &&
-                str_contains($serializedJob, 'capitalCityQueueId";i:' . $capitalCityBuildingQueue->id) &&
-                str_contains($serializedJob, 'characterId";i:' . $character->id) &&
+            return str_contains($serializedJob, 'capitalCityCancellationQueueId";i:'.$capitalCityBuildingCancellation->id) &&
+                str_contains($serializedJob, 'capitalCityQueueId";i:'.$capitalCityBuildingQueue->id) &&
+                str_contains($serializedJob, 'characterId";i:'.$character->id) &&
                 str_contains($serializedJob, 'building_ids') &&
-                str_contains($serializedJob, 'i:' . $building->id);
+                str_contains($serializedJob, 'i:'.$building->id);
         });
     }
 
-    public function testMissingBuildingInQueueUpdatesCancellationRecordInsteadOfSourceQueue(): void
+    public function test_missing_building_in_queue_updates_cancellation_record_instead_of_source_queue(): void
     {
         Event::fake();
 
@@ -123,7 +123,7 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
         $this->assertSame(CapitalCityQueueStatus::CANCELLATION_REJECTED, $capitalCityBuildingQueue->refresh()->building_request_data[0]['secondary_status']);
     }
 
-    public function testMissingSourceQueueMarksCancellationRejected(): void
+    public function test_missing_source_queue_marks_cancellation_rejected(): void
     {
         Event::fake();
 
@@ -152,7 +152,7 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
         $this->assertSame(CapitalCityQueueStatus::CANCELLATION_REJECTED, $capitalCityBuildingCancellation->refresh()->status);
     }
 
-    public function testCompletedBuildingInQueueMarksCancellationRejectedWithoutCorruptingSourceQueue(): void
+    public function test_completed_building_in_queue_marks_cancellation_rejected_without_corrupting_source_queue(): void
     {
         Event::fake();
 
@@ -217,7 +217,7 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
         $this->assertSame(1500, $kingdom->refresh()->current_wood);
     }
 
-    public function testRetryIsIdempotentAfterSuccessfulCancellation(): void
+    public function test_retry_is_idempotent_after_successful_cancellation(): void
     {
         Event::fake();
 

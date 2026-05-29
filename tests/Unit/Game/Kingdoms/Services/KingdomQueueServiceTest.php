@@ -15,7 +15,7 @@ class KingdomQueueServiceTest extends TestCase
 {
     use CreateGameBuilding, RefreshDatabase;
 
-    public function testFetchKingdomQueuesSkipsMissingBuildingQueueAndLogsWarningContext(): void
+    public function test_fetch_kingdom_queues_skips_missing_building_queue_and_logs_warning_context(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
@@ -46,7 +46,7 @@ class KingdomQueueServiceTest extends TestCase
         $this->assertSame([], $result['building_expansion_queues']);
     }
 
-    public function testFetchKingdomQueuesRendersExistingBuildingWithNullBuildingExpansionAsFirstExpansion(): void
+    public function test_fetch_kingdom_queues_renders_existing_building_with_null_building_expansion_as_first_expansion(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();

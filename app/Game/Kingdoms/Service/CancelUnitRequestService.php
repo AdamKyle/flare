@@ -40,7 +40,7 @@ class CancelUnitRequestService
             $queue->delete();
 
             return $this->successResult([
-                'message' => 'Successfully cleared the stale unit request for: ' . $kingdom->name . '.',
+                'message' => 'Successfully cleared the stale unit request for: '.$kingdom->name.'.',
             ]);
         }
 

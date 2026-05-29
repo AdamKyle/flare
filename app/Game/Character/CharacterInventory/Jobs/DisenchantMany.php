@@ -72,9 +72,9 @@ class DisenchantMany implements ShouldQueue
 
     private function processCappedGoldDust(Character $character, Item $item, bool $disenchanted): void
     {
-        $message = 'You are maxed on gold dust and ' . (
-            $disenchanted ? ' you still managed to disenchant the item: ' . $item->affix_name :
-            'you failed to disenchant the item: ' . $item->affix_name
+        $message = 'You are maxed on gold dust and '.(
+            $disenchanted ? ' you still managed to disenchant the item: '.$item->affix_name :
+            'you failed to disenchant the item: '.$item->affix_name
         );
 
         ServerMessageHandler::sendBasicMessage($character->user, $message);
@@ -84,16 +84,16 @@ class DisenchantMany implements ShouldQueue
     {
         event(new UpdateSkillEvent($disenchantingSkill));
 
-        $message = 'You ' . (
-            $disenchanted ? 'disenchanted the item: ' . $item->affix_name :
-            'failed to disenchant the item: ' . $item->affix_name
+        $message = 'You '.(
+            $disenchanted ? 'disenchanted the item: '.$item->affix_name :
+            'failed to disenchant the item: '.$item->affix_name
         );
 
         ServerMessageHandler::sendBasicMessage($character->user, $message);
 
-        $goldDust = $disenchantService->setUp($character)->updateGoldDust($character, !$disenchanted, false);
+        $goldDust = $disenchantService->setUp($character)->updateGoldDust($character, ! $disenchanted, false);
 
-        $message = 'You also gained: ' . number_format($goldDust) . ' Gold Dust!';
+        $message = 'You also gained: '.number_format($goldDust).' Gold Dust!';
 
         ServerMessageHandler::sendBasicMessage($character->user, $message);
 

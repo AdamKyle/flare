@@ -9,7 +9,7 @@ use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 
 class KingdomService
 {
-    private updateKingdomHandler $updateKingdomHandle;
+    private UpdateKingdomHandler $updateKingdomHandle;
 
     public function __construct(UpdateKingdomHandler $updateKingdomHandler)
     {

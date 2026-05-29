@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 class ExplorationDetailsTest extends TestCase
 {
-    public function testConstructorSetsUser(): void
+    public function test_constructor_sets_user(): void
     {
         $user = $this->user();
 
@@ -18,7 +18,7 @@ class ExplorationDetailsTest extends TestCase
         $this->assertEquals($user, $event->user);
     }
 
-    public function testConstructorSetsDetails(): void
+    public function test_constructor_sets_details(): void
     {
         $details = [
             'current_character_health' => 100,
@@ -30,7 +30,7 @@ class ExplorationDetailsTest extends TestCase
         $this->assertEquals($details, $event->details);
     }
 
-    public function testBroadcastOnReturnsPrivateAutomationAttackDetailsChannel(): void
+    public function test_broadcast_on_returns_private_automation_attack_details_channel(): void
     {
         $event = new ExplorationDetails($this->user(), []);
 

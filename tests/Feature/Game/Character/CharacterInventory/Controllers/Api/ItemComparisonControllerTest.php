@@ -33,7 +33,7 @@ class ItemComparisonControllerTest extends TestCase
         $character = $this->character->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/' . $character->id . '/inventory/comparison', [
+            ->call('GET', '/api/character/'.$character->id.'/inventory/comparison', [
                 'item_to_equip_type' => 'spell-damage',
                 'slot_id' => 999,
             ]);
@@ -66,7 +66,7 @@ class ItemComparisonControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/' . $character->id . '/inventory/comparison', [
+            ->call('GET', '/api/character/'.$character->id.'/inventory/comparison', [
                 'item_to_equip_type' => 'spell-damage',
                 'slot_id' => $character->inventory->slots->first()->id,
             ]);
@@ -76,7 +76,7 @@ class ItemComparisonControllerTest extends TestCase
         $this->assertNotEmpty($jsonData['details']);
     }
 
-    public function testGetComparisonForTrinket()
+    public function test_get_comparison_for_trinket()
     {
         $trinketForEquipment = $this->createItem([
             'type' => 'trinket',
@@ -96,7 +96,7 @@ class ItemComparisonControllerTest extends TestCase
         $slot = $character->inventory->slots->where('item_id', $trinketToCompare->id)->first();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/' . $character->id . '/inventory/comparison', [
+            ->call('GET', '/api/character/'.$character->id.'/inventory/comparison', [
                 'item_to_equip_type' => 'trinket',
                 'slot_id' => $slot->id,
             ]);
@@ -106,7 +106,7 @@ class ItemComparisonControllerTest extends TestCase
         $this->assertNotEmpty($jsonData['details']);
     }
 
-    public function testFailToCompareItemFromChatWhenEquipped()
+    public function test_fail_to_compare_item_from_chat_when_equipped()
     {
         $spellForEquipment = $this->createItem([
             'type' => 'spell-damage',
@@ -129,7 +129,7 @@ class ItemComparisonControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/' . $character->id . '/inventory/comparison-from-chat', [
+            ->call('GET', '/api/character/'.$character->id.'/inventory/comparison-from-chat', [
                 'id' => $character->inventory->slots->first()->id,
             ]);
 
@@ -161,7 +161,7 @@ class ItemComparisonControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/' . $character->id . '/inventory/comparison-from-chat', [
+            ->call('GET', '/api/character/'.$character->id.'/inventory/comparison-from-chat', [
                 'id' => 978,
             ]);
 
@@ -193,7 +193,7 @@ class ItemComparisonControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/' . $character->id . '/inventory/comparison-from-chat', [
+            ->call('GET', '/api/character/'.$character->id.'/inventory/comparison-from-chat', [
                 'id' => $character->inventory->slots->first()->id,
             ]);
 
@@ -217,7 +217,7 @@ class ItemComparisonControllerTest extends TestCase
         })->first()->id;
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/' . $character->id . '/inventory/comparison-from-chat', [
+            ->call('GET', '/api/character/'.$character->id.'/inventory/comparison-from-chat', [
                 'id' => $gemSlotId,
             ]);
 

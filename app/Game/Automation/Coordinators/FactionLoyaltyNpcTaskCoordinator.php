@@ -34,10 +34,6 @@ class FactionLoyaltyNpcTaskCoordinator
 
     /**
      * Set up the coordinator.
-     *
-     * @param Character $character
-     * @param FactionLoyaltyAutomation $factionLoyaltyAutomation
-     * @return FactionLoyaltyNpcTaskCoordinator
      */
     public function setUp(Character $character, FactionLoyaltyAutomation $factionLoyaltyAutomation): FactionLoyaltyNpcTaskCoordinator
     {
@@ -52,7 +48,6 @@ class FactionLoyaltyNpcTaskCoordinator
     /**
      * Resolve the next NPC to assist.
      *
-     * @return FactionLoyaltyNpc|null
      * @throws Exception
      */
     public function resolveNpc(): ?FactionLoyaltyNpc
@@ -90,8 +85,6 @@ class FactionLoyaltyNpcTaskCoordinator
 
     /**
      * Should the automation end?
-     *
-     * @return bool
      */
     public function shouldEndAutomation(): bool
     {
@@ -100,9 +93,6 @@ class FactionLoyaltyNpcTaskCoordinator
 
     /**
      * Find an NPC on the same map with incomplete tasks.
-     *
-     * @param FactionLoyaltyNpc $currentFactionLoyaltyNpc
-     * @return FactionLoyaltyNpc|null
      */
     private function findSameMapNpcWithIncompleteTasks(FactionLoyaltyNpc $currentFactionLoyaltyNpc): ?FactionLoyaltyNpc
     {
@@ -123,9 +113,6 @@ class FactionLoyaltyNpcTaskCoordinator
 
     /**
      * Find an existing faction loyalty NPC with incomplete tasks.
-     *
-     * @param FactionLoyaltyNpc $currentFactionLoyaltyNpc
-     * @return FactionLoyaltyNpc|null
      */
     private function findExistingFactionLoyaltyNpcWithIncompleteTasks(FactionLoyaltyNpc $currentFactionLoyaltyNpc): ?FactionLoyaltyNpc
     {
@@ -158,8 +145,6 @@ class FactionLoyaltyNpcTaskCoordinator
 
     /**
      * Find a new faction loyalty NPC with incomplete tasks.
-     *
-     * @return FactionLoyaltyNpc|null
      */
     private function findNewFactionLoyaltyNpcWithIncompleteTasks(): ?FactionLoyaltyNpc
     {
@@ -189,9 +174,6 @@ class FactionLoyaltyNpcTaskCoordinator
 
     /**
      * Find an NPC with incomplete tasks.
-     *
-     * @param FactionLoyaltyModel $factionLoyalty
-     * @return FactionLoyaltyNpc|null
      */
     private function findNpcWithIncompleteTasks(FactionLoyaltyModel $factionLoyalty): ?FactionLoyaltyNpc
     {
@@ -207,8 +189,6 @@ class FactionLoyaltyNpcTaskCoordinator
     /**
      * Travel, pledge, and assist an existing NPC.
      *
-     * @param FactionLoyaltyNpc $factionLoyaltyNpc
-     * @return FactionLoyaltyNpc|null
      * @throws Exception
      */
     private function travelPledgeAndAssist(FactionLoyaltyNpc $factionLoyaltyNpc): ?FactionLoyaltyNpc
@@ -231,8 +211,6 @@ class FactionLoyaltyNpcTaskCoordinator
     /**
      * Travel, pledge, and find the first incomplete NPC.
      *
-     * @param Faction $faction
-     * @return FactionLoyaltyNpc|null
      * @throws Exception
      */
     private function travelPledgeAndFindNpc(Faction $faction): ?FactionLoyaltyNpc
@@ -263,9 +241,6 @@ class FactionLoyaltyNpcTaskCoordinator
 
     /**
      * Assist an NPC after changing maps.
-     *
-     * @param FactionLoyaltyNpc $factionLoyaltyNpc
-     * @return FactionLoyaltyNpc
      */
     private function assistNpcAfterMapChange(FactionLoyaltyNpc $factionLoyaltyNpc): FactionLoyaltyNpc
     {
@@ -273,16 +248,12 @@ class FactionLoyaltyNpcTaskCoordinator
 
         return $this->switchToNpc(
             $factionLoyaltyNpc,
-            'You have traveled to ' . $faction->gameMap->name . ', pledged to that faction, and are now assisting ' . $factionLoyaltyNpc->npc->real_name . '.'
+            'You have traveled to '.$faction->gameMap->name.', pledged to that faction, and are now assisting '.$factionLoyaltyNpc->npc->real_name.'.'
         );
     }
 
     /**
      * Switch assistance to an NPC.
-     *
-     * @param FactionLoyaltyNpc $factionLoyaltyNpc
-     * @param string $message
-     * @return FactionLoyaltyNpc
      */
     private function switchToNpc(FactionLoyaltyNpc $factionLoyaltyNpc, string $message): FactionLoyaltyNpc
     {
@@ -301,9 +272,6 @@ class FactionLoyaltyNpcTaskCoordinator
 
     /**
      * Can the character pledge to the faction?
-     *
-     * @param Faction $faction
-     * @return bool
      */
     private function canPledgeToFaction(Faction $faction): bool
     {
@@ -318,9 +286,6 @@ class FactionLoyaltyNpcTaskCoordinator
 
     /**
      * Can the character travel to the faction map?
-     *
-     * @param Faction $faction
-     * @return bool
      */
     private function canTravelToFaction(Faction $faction): bool
     {
@@ -329,9 +294,6 @@ class FactionLoyaltyNpcTaskCoordinator
 
     /**
      * Travel to the faction map.
-     *
-     * @param Faction $faction
-     * @return bool
      */
     private function travelToFaction(Faction $faction): bool
     {
@@ -348,20 +310,14 @@ class FactionLoyaltyNpcTaskCoordinator
 
     /**
      * Get same map switch message.
-     *
-     * @param FactionLoyaltyNpc $currentFactionLoyaltyNpc
-     * @param FactionLoyaltyNpc $nextFactionLoyaltyNpc
-     * @return string
      */
     private function getSameMapSwitchMessage(FactionLoyaltyNpc $currentFactionLoyaltyNpc, FactionLoyaltyNpc $nextFactionLoyaltyNpc): string
     {
-        return 'You have completed all tasks for ' . $currentFactionLoyaltyNpc->npc->real_name . '. You are now assisting ' . $nextFactionLoyaltyNpc->npc->real_name . '.';
+        return 'You have completed all tasks for '.$currentFactionLoyaltyNpc->npc->real_name.'. You are now assisting '.$nextFactionLoyaltyNpc->npc->real_name.'.';
     }
 
     /**
      * Get the no available faction message.
-     *
-     * @return string
      */
     private function getNoAvailableFactionMessage(): string
     {
@@ -374,11 +330,6 @@ class FactionLoyaltyNpcTaskCoordinator
 
     /**
      * Send the automation log update.
-     *
-     * @param string $message
-     * @param bool $makeItalic
-     * @param bool $isReward
-     * @return void
      */
     private function sendOutEventLogUpdate(string $message, bool $makeItalic = false, bool $isReward = false): void
     {

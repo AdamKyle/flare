@@ -710,7 +710,7 @@ class CharacterXPServiceTest extends TestCase
         $this->assertEquals(0, $xp);
     }
 
-    public function testStackedXpBoonMultipliesByAmountUsed()
+    public function test_stacked_xp_boon_multiplies_by_amount_used()
     {
         $character = $this->character->getCharacter();
 

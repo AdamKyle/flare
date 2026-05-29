@@ -16,20 +16,11 @@ class FactionLoyaltyAutomationController
 {
     use ChecksAutomationRestrictions, FactionLoyalty;
 
-    /**
-     * @param FactionLoyaltyAutomationService $factionLoyaltyAutomationService
-     * @param FactionLoyaltyService $factionLoyaltyService
-     */
     public function __construct(
         private readonly FactionLoyaltyAutomationService $factionLoyaltyAutomationService,
         private readonly FactionLoyaltyService $factionLoyaltyService,
     ) {}
 
-    /**
-     * @param FactionLoyaltyAutomationRequest $request
-     * @param Character $character
-     * @return JsonResponse
-     */
     public function begin(FactionLoyaltyAutomationRequest $request, Character $character): JsonResponse
     {
         if (! AttackTypeValue::attackTypeExists($request->attack_type)) {
@@ -68,21 +59,17 @@ class FactionLoyaltyAutomationController
 
         if (! $this->hasIncompleteTasks($factionLoyaltyNpc)) {
             return response()->json([
-                'message' => 'This NPC does not have any incomplete tasks for you to automate.'
+                'message' => 'This NPC does not have any incomplete tasks for you to automate.',
             ], 422);
         }
 
         $this->factionLoyaltyAutomationService->beginAutomation($character, $factionLoyaltyNpc, $request->attack_type);
 
         return response()->json([
-            'message' => 'You have now begun automation to help out: ' . $factionLoyaltyNpc->npc->real_name . ' This will automatically end in 8 hours. You can manually end it at any time. Crafting has been disabled while faction loyalty automation is running. Keep an eye on the Automation tab to see your progress.',
+            'message' => 'You have now begun automation to help out: '.$factionLoyaltyNpc->npc->real_name.' This will automatically end in 8 hours. You can manually end it at any time. Crafting has been disabled while faction loyalty automation is running. Keep an eye on the Automation tab to see your progress.',
         ]);
     }
 
-    /**
-     * @param Character $character
-     * @return JsonResponse
-     */
     public function stop(Character $character): JsonResponse
     {
         $result = $this->factionLoyaltyAutomationService->stopAutomation($character);
@@ -93,10 +80,6 @@ class FactionLoyaltyAutomationController
         return response()->json($result, $status);
     }
 
-    /**
-     * @param Character $character
-     * @return JsonResponse
-     */
     public function markWarningNoticeRead(Character $character): JsonResponse
     {
         $this->factionLoyaltyService->markLatestWarningNoticeRead($character);

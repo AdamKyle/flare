@@ -17,7 +17,7 @@ class CapitalCityBuildingRequestTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testCompletionRejectsToLevelOverMaxAndDoesNotMutateBuilding(): void
+    public function test_completion_rejects_to_level_over_max_and_does_not_mutate_building(): void
     {
         Event::fake();
 
@@ -67,7 +67,7 @@ class CapitalCityBuildingRequestTest extends TestCase
         $this->assertSame(CapitalCityQueueStatus::REJECTED, $kingdomLog->additional_details['building_data'][0]['status']);
     }
 
-    public function testStaleCompletionWhereCurrentLevelDiffersFromFromLevelRejectsAndDoesNotMutateBuilding(): void
+    public function test_stale_completion_where_current_level_differs_from_from_level_rejects_and_does_not_mutate_building(): void
     {
         Event::fake();
 

@@ -2,8 +2,8 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
-use App\Flare\Models\Character;
 use App\Flare\Models\CapitalCityUnitQueue;
+use App\Flare\Models\Character;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;
@@ -149,7 +149,7 @@ class CapitalCityManagementController extends Controller
                     continue;
                 }
 
-                $key = $targetKingdom->id . ':' . $gameUnit->id;
+                $key = $targetKingdom->id.':'.$gameUnit->id;
                 $requestedAmounts[$key] = ($requestedAmounts[$key] ?? 0) + (int) ($unitRequest['unit_amount'] ?? 0);
 
                 $ownedAmount = $targetKingdom->units()

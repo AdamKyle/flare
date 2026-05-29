@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 class ExplorationAttackMessageTest extends TestCase
 {
-    public function testConstructorSetsUser(): void
+    public function test_constructor_sets_user(): void
     {
         $user = $this->user();
 
@@ -18,7 +18,7 @@ class ExplorationAttackMessageTest extends TestCase
         $this->assertEquals($user, $event->user);
     }
 
-    public function testConstructorSetsMessages(): void
+    public function test_constructor_sets_messages(): void
     {
         $messages = [
             'Character attacked the monster.',
@@ -30,7 +30,7 @@ class ExplorationAttackMessageTest extends TestCase
         $this->assertEquals($messages, $event->messages);
     }
 
-    public function testBroadcastOnReturnsPrivateAutomationAttackMessagesChannel(): void
+    public function test_broadcast_on_returns_private_automation_attack_messages_channel(): void
     {
         $event = new ExplorationAttackMessage($this->user(), []);
 

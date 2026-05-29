@@ -4,6 +4,7 @@ namespace App\Flare\Middleware;
 
 use App\Admin\Events\RefreshUserScreenEvent;
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class IsCharacterLoggedInMiddleware
@@ -11,7 +12,7 @@ class IsCharacterLoggedInMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  string|null  $guard
      * @return mixed
      */

@@ -38,7 +38,7 @@ class CharacterInventoryControllerTest extends TestCase
         $character = $this->character->inventoryManagement()->giveItem($this->createItem())->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/' . $character->id . '/inventory', [
+            ->call('GET', '/api/character/'.$character->id.'/inventory', [
                 'per_page' => 10,
                 'page' => 1,
                 'search_text' => '',
@@ -49,7 +49,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertNotEmpty($jsonData['data']);
     }
 
-    public function testGetCharacterInventoryApiRequestReturnsHealingForEquippedHealingSpell()
+    public function test_get_character_inventory_api_request_returns_healing_for_equipped_healing_spell()
     {
         $item = $this->createItem([
             'name' => 'sample',
@@ -63,19 +63,19 @@ class CharacterInventoryControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/' . $character->id . '/inventory');
+            ->call('GET', '/api/character/'.$character->id.'/inventory');
 
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertGreaterThan(0, $jsonData['equipped'][0]['healing']);
     }
 
-    public function testFailToGetApiItemDetails()
+    public function test_fail_to_get_api_item_details()
     {
         $character = $this->character->inventoryManagement()->giveItem($this->createItem())->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/' . $character->id . '/inventory/item', [
+            ->call('GET', '/api/character/'.$character->id.'/inventory/item', [
                 'slot_id' => 999999,
             ]);
 
@@ -95,7 +95,7 @@ class CharacterInventoryControllerTest extends TestCase
         $slotId = $character->inventory->slots->first()->id;
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/' . $character->id . '/inventory/item', [
+            ->call('GET', '/api/character/'.$character->id.'/inventory/item', [
                 'slot_id' => $slotId,
             ]);
 
@@ -113,13 +113,13 @@ class CharacterInventoryControllerTest extends TestCase
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/' . $character->id . '/inventory/destroy', [
+            ->call('POST', '/api/character/'.$character->id.'/inventory/destroy', [
                 'item_id' => $item->id,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals('Destroyed item: ' . $item->affix_name . '.', $jsonData['message']);
+        $this->assertEquals('Destroyed item: '.$item->affix_name.'.', $jsonData['message']);
     }
 
     public function test_destroy_all_items()
@@ -129,7 +129,7 @@ class CharacterInventoryControllerTest extends TestCase
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/' . $character->id . '/inventory/destroy-all');
+            ->call('POST', '/api/character/'.$character->id.'/inventory/destroy-all');
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -147,7 +147,7 @@ class CharacterInventoryControllerTest extends TestCase
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/' . $character->id . '/inventory/disenchant-all');
+            ->call('POST', '/api/character/'.$character->id.'/inventory/disenchant-all');
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -176,7 +176,7 @@ class CharacterInventoryControllerTest extends TestCase
         $inventorySlotId = $character->inventory->slots()->first()->id;
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/' . $character->id . '/inventory/move-item-to-set', [
+            ->call('POST', '/api/character/'.$character->id.'/inventory/move-item-to-set', [
                 'set_id' => $inventorySetId,
                 'slot_id' => $inventorySlotId,
             ]);
@@ -195,7 +195,7 @@ class CharacterInventoryControllerTest extends TestCase
         $character = $character->refresh();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/' . $character->id . '/inventory-set/rename-set', [
+            ->call('POST', '/api/character/'.$character->id.'/inventory-set/rename-set', [
                 'set_id' => $character->inventorySets->first()->id,
                 'set_name' => 'Apples',
             ]);
@@ -212,13 +212,13 @@ class CharacterInventoryControllerTest extends TestCase
         $set = $character->inventorySets->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/' . $character->id . '/inventory/save-equipped-as-set', [
+            ->call('POST', '/api/character/'.$character->id.'/inventory/save-equipped-as-set', [
                 'move_to_set' => $character->inventorySets->first()->id,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals($set->refresh()->name . ' is now equipped (equipment has been moved to the set).', $jsonData['message']);
+        $this->assertEquals($set->refresh()->name.' is now equipped (equipment has been moved to the set).', $jsonData['message']);
     }
 
     public function test_remove_item_from_set()
@@ -233,7 +233,7 @@ class CharacterInventoryControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/' . $character->id . '/inventory-set/remove', [
+            ->call('POST', '/api/character/'.$character->id.'/inventory-set/remove', [
                 'inventory_set_id' => $character->inventorySets->first()->id,
                 'slot_id' => $character->inventorySets->first()->slots->first()->id,
             ]);
@@ -244,7 +244,7 @@ class CharacterInventoryControllerTest extends TestCase
 
         $setName = $character->inventorySets->first()->name;
 
-        $this->assertEquals('Removed ' . $itemToRemove->affix_name . ' from ' . $setName . ' and placed back into your inventory.', $jsonData['message']);
+        $this->assertEquals('Removed '.$itemToRemove->affix_name.' from '.$setName.' and placed back into your inventory.', $jsonData['message']);
     }
 
     public function test_empty_set()
@@ -261,14 +261,14 @@ class CharacterInventoryControllerTest extends TestCase
         $character = $character->refresh();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/' . $character->id . '/inventory-set/' . $set->id . '/remove-all', [
+            ->call('POST', '/api/character/'.$character->id.'/inventory-set/'.$set->id.'/remove-all', [
                 'inventory_set_id' => $character->inventorySets->first()->id,
                 'slot_id' => $character->inventorySets->first()->slots->first()->id,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals('Removed ' . 2 . ' of ' . 2 . ' items from ' . $set->name . '. If all items were not moved over, it is because your inventory became full.', $jsonData['message']);
+        $this->assertEquals('Removed '. 2 .' of '. 2 .' items from '.$set->name.'. If all items were not moved over, it is because your inventory became full.', $jsonData['message']);
     }
 
     public function test_cannot_equip_item()
@@ -289,7 +289,7 @@ class CharacterInventoryControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/' . $character->id . '/inventory/equip-item', [
+            ->call('POST', '/api/character/'.$character->id.'/inventory/equip-item', [
                 'position' => 'left-hand',
                 'equip_type' => $character->inventory->slots->first()->item->type,
                 'slot_id' => 88477,
@@ -318,7 +318,7 @@ class CharacterInventoryControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/' . $character->id . '/inventory/equip-item', [
+            ->call('POST', '/api/character/'.$character->id.'/inventory/equip-item', [
                 'position' => 'left-hand',
                 'equip_type' => $character->inventory->slots->first()->item->type,
                 'slot_id' => $character->inventory->slots->first()->id,
@@ -337,14 +337,14 @@ class CharacterInventoryControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/' . $character->id . '/inventory/unequip', [
+            ->call('POST', '/api/character/'.$character->id.'/inventory/unequip', [
                 'inventory_set_equipped' => true,
                 'item_to_remove' => $character->inventorySets->first()->slots->first()->id,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals('Unequipped ' . $character->inventorySets->first()->name . '.', $jsonData['message']);
+        $this->assertEquals('Unequipped '.$character->inventorySets->first()->name.'.', $jsonData['message']);
     }
 
     public function test_unequip_item()
@@ -355,14 +355,14 @@ class CharacterInventoryControllerTest extends TestCase
         $slot = $character->inventory->slots()->where('equipped', true)->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/' . $character->id . '/inventory/unequip', [
+            ->call('POST', '/api/character/'.$character->id.'/inventory/unequip', [
                 'inventory_set_equipped' => false,
                 'item_to_remove' => $slot->id,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals('Unequipped item: ' . $slot->item->affix_name, $jsonData['message']);
+        $this->assertEquals('Unequipped item: '.$slot->item->affix_name, $jsonData['message']);
     }
 
     public function test_when_unequip_all_unequip_the_set()
@@ -373,13 +373,13 @@ class CharacterInventoryControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/' . $character->id . '/inventory/unequip-all', [
+            ->call('POST', '/api/character/'.$character->id.'/inventory/unequip-all', [
                 'is_set_equipped' => true,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals('Unequipped ' . $character->inventorySets->first()->name . '.', $jsonData['message']);
+        $this->assertEquals('Unequipped '.$character->inventorySets->first()->name.'.', $jsonData['message']);
     }
 
     public function test_unequip_all_non_set_items()
@@ -388,7 +388,7 @@ class CharacterInventoryControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/' . $character->id . '/inventory/unequip-all', [
+            ->call('POST', '/api/character/'.$character->id.'/inventory/unequip-all', [
                 'is_set_equipped' => false,
             ]);
 
@@ -407,11 +407,11 @@ class CharacterInventoryControllerTest extends TestCase
         $set = $character->inventorySets()->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/' . $character->id . '/inventory-set/equip/' . $set->id);
+            ->call('POST', '/api/character/'.$character->id.'/inventory-set/equip/'.$set->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals($set->name . ' is now equipped', $jsonData['message']);
+        $this->assertEquals($set->name.' is now equipped', $jsonData['message']);
     }
 
     public function test_use_many_items()
@@ -432,7 +432,7 @@ class CharacterInventoryControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/' . $character->id . '/inventory/use-many-items', [
+            ->call('POST', '/api/character/'.$character->id.'/inventory/use-many-items', [
                 'items_to_use' => [
                     $character->inventory->slots->first()->id,
                 ],
@@ -461,7 +461,7 @@ class CharacterInventoryControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/' . $character->id . '/inventory/use-item/' . $item->id);
+            ->call('POST', '/api/character/'.$character->id.'/inventory/use-item/'.$item->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -484,13 +484,13 @@ class CharacterInventoryControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/' . $character->id . '/inventory/destroy-alchemy-item', [
+            ->call('POST', '/api/character/'.$character->id.'/inventory/destroy-alchemy-item', [
                 'slot_id' => $character->inventory->slots->first()->id,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals('Destroyed Alchemy Item: ' . $item->affix_name . '.', $jsonData['message']);
+        $this->assertEquals('Destroyed Alchemy Item: '.$item->affix_name.'.', $jsonData['message']);
     }
 
     public function test_destroy_all_alchemy_items()
@@ -509,7 +509,7 @@ class CharacterInventoryControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/' . $character->id . '/inventory/destroy-all-alchemy-items', [
+            ->call('POST', '/api/character/'.$character->id.'/inventory/destroy-all-alchemy-items', [
                 'slot_id' => $character->inventory->slots->first()->id,
             ]);
 

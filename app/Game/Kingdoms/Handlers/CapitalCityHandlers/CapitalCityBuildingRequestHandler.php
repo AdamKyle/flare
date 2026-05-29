@@ -56,7 +56,7 @@ class CapitalCityBuildingRequestHandler
             $building = $kingdom->buildings()->find($buildingRequest['building_id']);
 
             if ($buildingRequest['type'] === 'upgrade' && $this->isInvalidUpgradeRequest($building, $buildingRequest)) {
-                $this->messages[] = $building->name . ' has been rejected: Building is already max level.';
+                $this->messages[] = $building->name.' has been rejected: Building is already max level.';
                 $buildingsToUpgradeOrRepair[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
 
                 continue;

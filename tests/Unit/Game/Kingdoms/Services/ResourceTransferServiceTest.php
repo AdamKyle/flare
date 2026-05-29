@@ -14,7 +14,7 @@ class ResourceTransferServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testExactResourceTransferSpendIsAllowed(): void
+    public function test_exact_resource_transfer_spend_is_allowed(): void
     {
         Queue::fake();
 
@@ -34,7 +34,7 @@ class ResourceTransferServiceTest extends TestCase
         $this->assertSame(0, $providingKingdom->refresh()->current_wood);
     }
 
-    public function testOverdrawnResourceTransferIsRejectedWithoutMutatingResources(): void
+    public function test_overdrawn_resource_transfer_is_rejected_without_mutating_resources(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $requestingKingdom = $characterFactory->kingdomManagement()->assignKingdom()->assignBuilding(['name' => BuildingCosts::MARKET_PLACE], ['level' => 5])->getKingdom();

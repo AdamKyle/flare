@@ -15,9 +15,6 @@ class AlchemyController extends Controller
 {
     use ChecksAutomationRestrictions;
 
-    /**
-     * @param AlchemyService $alchemyService
-     */
     public function __construct(private AlchemyService $alchemyService, private CraftingService $craftingService) {}
 
     public function alchemyItems(Character $character): JsonResponse

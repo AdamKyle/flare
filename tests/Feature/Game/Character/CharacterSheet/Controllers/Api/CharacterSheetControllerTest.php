@@ -12,7 +12,7 @@ class CharacterSheetControllerTest extends TestCase
 {
     use CreateItem, RefreshDatabase;
 
-    public function testCharacterSheetReturnsHealForWhenHealingSpellIsEquipped()
+    public function test_character_sheet_returns_heal_for_when_healing_spell_is_equipped()
     {
         $item = $this->createItem([
             'name' => 'sample',

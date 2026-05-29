@@ -1,6 +1,6 @@
 <?php
 
-namespace Feature\Game\Automation;
+namespace Tests\Feature\Game\Automation;
 
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\CharacterAutomation;
@@ -10,6 +10,7 @@ use App\Flare\Models\Location;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\MapNameValue;
+use App\Game\Automation\Middleware\IsCharacterExploring;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Services\CelestialFightService;
 use App\Game\Battle\Services\MonsterFightService;
@@ -21,7 +22,6 @@ use App\Game\Maps\Services\SetSailService;
 use App\Game\Maps\Services\TeleportService;
 use App\Game\Maps\Services\WalkingService;
 use App\Game\Skills\Values\SkillTypeValue;
-use App\Game\Automation\Middleware\IsCharacterExploring;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -51,7 +51,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
 {
     use CreateFactionLoyalty, CreateGameSkill, CreateItem, CreateNpc, RefreshDatabase;
 
-    public function testManualFightingIsBlockedWhileExplorationIsRunning(): void
+    public function test_manual_fighting_is_blocked_while_exploration_is_running(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = (new MonsterFactory)
@@ -78,7 +78,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertNotNull(CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::EXPLORING)->first());
     }
 
-    public function testManualFightingIsBlockedWhileDelveIsRunning(): void
+    public function test_manual_fighting_is_blocked_while_delve_is_running(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = (new MonsterFactory)
@@ -105,7 +105,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertNotNull(CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::DELVE)->first());
     }
 
-    public function testManualFightingIsBlockedWhileFactionLoyaltyIsRunning(): void
+    public function test_manual_fighting_is_blocked_while_faction_loyalty_is_running(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = (new MonsterFactory)
@@ -132,7 +132,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertNotNull(CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::FACTION_LOYALTY)->first());
     }
 
-    public function testCelestialFightingIsBlockedWhileExplorationIsRunning(): void
+    public function test_celestial_fighting_is_blocked_while_exploration_is_running(): void
     {
         Event::fake();
 
@@ -178,7 +178,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertNotNull(CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::EXPLORING)->first());
     }
 
-    public function testCelestialFightingIsBlockedWhileDelveIsRunning(): void
+    public function test_celestial_fighting_is_blocked_while_delve_is_running(): void
     {
         Event::fake();
 
@@ -224,7 +224,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertNotNull(CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::DELVE)->first());
     }
 
-    public function testCelestialFightingIsBlockedWhileFactionLoyaltyIsRunning(): void
+    public function test_celestial_fighting_is_blocked_while_faction_loyalty_is_running(): void
     {
         Event::fake();
 
@@ -270,7 +270,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertNotNull(CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::FACTION_LOYALTY)->first());
     }
 
-    public function testPctIsBlockedWhileExplorationIsRunning(): void
+    public function test_pct_is_blocked_while_exploration_is_running(): void
     {
         Event::fake();
 
@@ -288,7 +288,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertNotNull(CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::EXPLORING)->first());
     }
 
-    public function testPctIsBlockedWhileDelveIsRunning(): void
+    public function test_pct_is_blocked_while_delve_is_running(): void
     {
         Event::fake();
 
@@ -306,7 +306,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertNotNull(CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::DELVE)->first());
     }
 
-    public function testDirectMovementIsBlockedWhileDelveIsRunning(): void
+    public function test_direct_movement_is_blocked_while_delve_is_running(): void
     {
         Event::fake();
 
@@ -335,7 +335,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertEquals(16, $character->refresh()->map->character_position_x);
     }
 
-    public function testEnterLocationIsBlockedWhileDelveIsRunning(): void
+    public function test_enter_location_is_blocked_while_delve_is_running(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $location = Location::factory()->create([
@@ -361,7 +361,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertEquals('You cannot do that while Delve automation is running. Cancel it first.', $blockedContext['message']);
     }
 
-    public function testTeleportIsBlockedWhileDelveIsRunning(): void
+    public function test_teleport_is_blocked_while_delve_is_running(): void
     {
         Event::fake();
 
@@ -380,7 +380,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertEquals(422, $response['status']);
     }
 
-    public function testSetSailIsBlockedWhileDelveIsRunning(): void
+    public function test_set_sail_is_blocked_while_delve_is_running(): void
     {
         Event::fake();
 
@@ -399,7 +399,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertEquals(422, $response['status']);
     }
 
-    public function testTraverseIsBlockedWhileDelveIsRunning(): void
+    public function test_traverse_is_blocked_while_delve_is_running(): void
     {
         Event::fake();
 
@@ -424,7 +424,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertEquals(422, $response['status']);
     }
 
-    public function testPctIsBlockedWhileFactionLoyaltyIsRunning(): void
+    public function test_pct_is_blocked_while_faction_loyalty_is_running(): void
     {
         Event::fake();
 
@@ -442,7 +442,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertNotNull(CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::FACTION_LOYALTY)->first());
     }
 
-    public function testStartingDelveIsBlockedWhileExplorationIsRunning(): void
+    public function test_starting_delve_is_blocked_while_exploration_is_running(): void
     {
         Queue::fake();
 
@@ -457,7 +457,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/delve/' . $character->id . '/start', [
+            ->call('POST', '/api/delve/'.$character->id.'/start', [
                 '_token' => csrf_token(),
                 'attack_type' => AttackTypeValue::ATTACK,
                 'pack_size' => 5,
@@ -467,7 +467,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertNotNull(CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::EXPLORING)->first());
     }
 
-    public function testStartingFactionLoyaltyIsBlockedWhileExplorationIsRunning(): void
+    public function test_starting_faction_loyalty_is_blocked_while_exploration_is_running(): void
     {
         Queue::fake();
 
@@ -482,7 +482,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/faction-loyalty-automation/' . $character->id . '/start', [
+            ->call('POST', '/api/faction-loyalty-automation/'.$character->id.'/start', [
                 '_token' => csrf_token(),
                 'attack_type' => AttackTypeValue::ATTACK,
             ]);
@@ -491,7 +491,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertNotNull(CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::EXPLORING)->first());
     }
 
-    public function testStartingExplorationIsBlockedWhileDelveIsRunning(): void
+    public function test_starting_exploration_is_blocked_while_delve_is_running(): void
     {
         Queue::fake();
 
@@ -512,7 +512,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/automation/' . $character->id . '/start', [
+            ->call('POST', '/api/automation/'.$character->id.'/start', [
                 '_token' => csrf_token(),
                 'auto_attack_length' => 1,
                 'move_down_the_list_every' => 10,
@@ -524,7 +524,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertNotNull(CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::DELVE)->first());
     }
 
-    public function testStartingExplorationIsBlockedWhileFactionLoyaltyIsRunning(): void
+    public function test_starting_exploration_is_blocked_while_faction_loyalty_is_running(): void
     {
         Queue::fake();
 
@@ -545,7 +545,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/automation/' . $character->id . '/start', [
+            ->call('POST', '/api/automation/'.$character->id.'/start', [
                 '_token' => csrf_token(),
                 'auto_attack_length' => 1,
                 'move_down_the_list_every' => 10,
@@ -557,7 +557,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertNotNull(CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::FACTION_LOYALTY)->first());
     }
 
-    public function testCraftingIsBlockedWhileFactionLoyaltyIsRunning(): void
+    public function test_crafting_is_blocked_while_faction_loyalty_is_running(): void
     {
         $craftingSkill = $this->createGameSkill([
             'name' => 'Weapon Crafting',
@@ -585,7 +585,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/craft/' . $character->id, [
+            ->call('POST', '/api/craft/'.$character->id, [
                 'item_to_craft' => $item->id,
                 'type' => $item->crafting_type,
                 'craft_for_npc' => false,
@@ -599,7 +599,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertEquals('You cannot do that while Faction Loyalty automation is running. Cancel it first.', $jsonData['message']);
     }
 
-    public function testNpcFactionCraftingIsBlockedWhileExplorationIsRunning(): void
+    public function test_npc_faction_crafting_is_blocked_while_exploration_is_running(): void
     {
         $craftingSkill = $this->createGameSkill([
             'name' => 'Weapon Crafting',
@@ -630,7 +630,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/craft/' . $character->id, [
+            ->call('POST', '/api/craft/'.$character->id, [
                 'item_to_craft' => $item->id,
                 'type' => $item->crafting_type,
                 'craft_for_npc' => true,
@@ -644,7 +644,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertEquals('You are currently doing Exploration. This action cannot be completed right now. Please cancel Exploration first.', $jsonData['message']);
     }
 
-    public function testNpcFactionCraftingIsBlockedWhileDelveIsRunning(): void
+    public function test_npc_faction_crafting_is_blocked_while_delve_is_running(): void
     {
         $craftingSkill = $this->createGameSkill([
             'name' => 'Weapon Crafting',
@@ -675,7 +675,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/craft/' . $character->id, [
+            ->call('POST', '/api/craft/'.$character->id, [
                 'item_to_craft' => $item->id,
                 'type' => $item->crafting_type,
                 'craft_for_npc' => true,
@@ -689,7 +689,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertEquals('You are currently doing Delve. This action cannot be completed right now. Please cancel Delve first.', $jsonData['message']);
     }
 
-    public function testRegularCraftingIsAllowedWhileExplorationIsRunning(): void
+    public function test_regular_crafting_is_allowed_while_exploration_is_running(): void
     {
         $craftingSkill = $this->createGameSkill([
             'name' => 'Weapon Crafting',
@@ -720,7 +720,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/craft/' . $character->id, [
+            ->call('POST', '/api/craft/'.$character->id, [
                 'item_to_craft' => $item->id,
                 'type' => $item->crafting_type,
                 'craft_for_npc' => false,
@@ -732,7 +732,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function testRegularCraftingIsAllowedWhileDelveIsRunning(): void
+    public function test_regular_crafting_is_allowed_while_delve_is_running(): void
     {
         $craftingSkill = $this->createGameSkill([
             'name' => 'Weapon Crafting',
@@ -763,7 +763,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/craft/' . $character->id, [
+            ->call('POST', '/api/craft/'.$character->id, [
                 'item_to_craft' => $item->id,
                 'type' => $item->crafting_type,
                 'craft_for_npc' => false,
@@ -775,7 +775,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function testFactionLoyaltyBountyIsBlockedWhileExplorationIsRunning(): void
+    public function test_faction_loyalty_bounty_is_blocked_while_exploration_is_running(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $npc = $this->createNpc([
@@ -797,7 +797,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/faction-loyalty-bounty/' . $character->id, [
+            ->call('POST', '/api/faction-loyalty-bounty/'.$character->id, [
                 'monster_id' => $monster->id,
                 'npc_id' => $npc->id,
                 'attack_type' => 'attack',
@@ -810,7 +810,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertEquals('You are currently doing Exploration. This action cannot be completed right now. Please cancel Exploration first.', $jsonData['message']);
     }
 
-    public function testFactionLoyaltyBountyIsBlockedWhileDelveIsRunning(): void
+    public function test_faction_loyalty_bounty_is_blocked_while_delve_is_running(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $npc = $this->createNpc([
@@ -832,7 +832,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/faction-loyalty-bounty/' . $character->id, [
+            ->call('POST', '/api/faction-loyalty-bounty/'.$character->id, [
                 'monster_id' => $monster->id,
                 'npc_id' => $npc->id,
                 'attack_type' => 'attack',
@@ -845,7 +845,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertEquals('You are currently doing Delve. This action cannot be completed right now. Please cancel Delve first.', $jsonData['message']);
     }
 
-    public function testDirectManualFightExecutionIsBlockedWhileExplorationIsRunning(): void
+    public function test_direct_manual_fight_execution_is_blocked_while_exploration_is_running(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -863,7 +863,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertNotNull(CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::EXPLORING)->first());
     }
 
-    public function testDirectManualFightExecutionIsBlockedWhileDelveIsRunning(): void
+    public function test_direct_manual_fight_execution_is_blocked_while_delve_is_running(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -881,7 +881,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertNotNull(CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::DELVE)->first());
     }
 
-    public function testDirectManualFightExecutionIsBlockedWhileFactionLoyaltyIsRunning(): void
+    public function test_direct_manual_fight_execution_is_blocked_while_faction_loyalty_is_running(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -899,7 +899,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertNotNull(CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::FACTION_LOYALTY)->first());
     }
 
-    public function testCelestialConjuringIsBlockedWhileExplorationIsRunning(): void
+    public function test_celestial_conjuring_is_blocked_while_exploration_is_running(): void
     {
         $this->withoutMiddleware(IsCharacterExploring::class);
 
@@ -921,7 +921,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/conjure/' . $character->id, [
+            ->call('POST', '/api/conjure/'.$character->id, [
                 'monster_id' => $monster->id,
                 'type' => 'public',
             ], [], [], [
@@ -934,7 +934,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertNull(CelestialFight::where('character_id', $character->id)->first());
     }
 
-    public function testCelestialConjuringIsBlockedWhileDelveIsRunning(): void
+    public function test_celestial_conjuring_is_blocked_while_delve_is_running(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = (new MonsterFactory)
@@ -954,7 +954,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/conjure/' . $character->id, [
+            ->call('POST', '/api/conjure/'.$character->id, [
                 'monster_id' => $monster->id,
                 'type' => 'public',
             ], [], [], [
@@ -967,7 +967,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         $this->assertNull(CelestialFight::where('character_id', $character->id)->first());
     }
 
-    public function testCelestialConjuringIsBlockedWhileFactionLoyaltyIsRunning(): void
+    public function test_celestial_conjuring_is_blocked_while_faction_loyalty_is_running(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = (new MonsterFactory)
@@ -987,7 +987,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/conjure/' . $character->id, [
+            ->call('POST', '/api/conjure/'.$character->id, [
                 'monster_id' => $monster->id,
                 'type' => 'public',
             ], [], [], [

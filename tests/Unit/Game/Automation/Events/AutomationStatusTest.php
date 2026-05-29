@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 class AutomationStatusTest extends TestCase
 {
-    public function testConstructorSetsIsRunningToTrue(): void
+    public function test_constructor_sets_is_running_to_true(): void
     {
         $user = $this->user();
 
@@ -18,7 +18,7 @@ class AutomationStatusTest extends TestCase
         $this->assertTrue($event->isRunning);
     }
 
-    public function testConstructorSetsIsRunningToFalse(): void
+    public function test_constructor_sets_is_running_to_false(): void
     {
         $user = $this->user();
 
@@ -27,7 +27,7 @@ class AutomationStatusTest extends TestCase
         $this->assertFalse($event->isRunning);
     }
 
-    public function testBroadcastOnReturnsPrivateAutomationStatusChannel(): void
+    public function test_broadcast_on_returns_private_automation_status_channel(): void
     {
         $user = $this->user();
 

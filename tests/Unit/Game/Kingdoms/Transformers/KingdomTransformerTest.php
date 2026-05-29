@@ -13,7 +13,7 @@ class KingdomTransformerTest extends TestCase
 {
     use CreateGameBuilding, CreateKingdom, RefreshDatabase;
 
-    public function testTransformIncludesEstimatedHourlyProduction(): void
+    public function test_transform_includes_estimated_hourly_production(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $kingdom = $this->createKingdom([

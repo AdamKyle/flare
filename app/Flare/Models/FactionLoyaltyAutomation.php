@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class FactionLoyaltyAutomation extends Model
 {
-
     use HasFactory;
 
     /**
@@ -51,15 +50,18 @@ class FactionLoyaltyAutomation extends Model
         return $this->hasOne(FactionLoyaltyAutomationLog::class);
     }
 
-    public function factionLoyaltyNpc() {
+    public function factionLoyaltyNpc()
+    {
         return $this->belongsTo(FactionLoyaltyNpc::class);
     }
 
-    public function failedBountyMonster() {
+    public function failedBountyMonster()
+    {
         return $this->belongsTo(Monster::class, 'failed_bounty_monster_id', 'id');
     }
 
-    public function failedFactionCraftingItem() {
+    public function failedFactionCraftingItem()
+    {
         return $this->belongsTo(Item::class, 'failed_crafting_item_id', 'id');
     }
 

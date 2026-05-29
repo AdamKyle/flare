@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class CharacterPassiveSkill extends Model
 {
-
     use HasFactory;
 
     /**

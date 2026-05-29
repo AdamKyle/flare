@@ -7,15 +7,12 @@ use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Models\FactionLoyaltyNpc;
 use App\Flare\Values\AttackTypeValue;
-use App\Flare\Values\AutomationType;
 use App\Game\Automation\Coordinators\FactionLoyaltyAutomationActionCoordinator;
 use App\Game\Automation\Coordinators\FactionLoyaltyNpcTaskCoordinator;
 use App\Game\Automation\Enums\AutomatedCraftingResultType;
 use App\Game\Automation\Enums\AutomatedFightResultType;
 use App\Game\Automation\Enums\FactionLoyaltyCoordinatorAction;
 use App\Game\Automation\Events\AutomationLogUpdate;
-use App\Game\Automation\Events\AutomationStatus;
-use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Handlers\AutomatedBountyFightHandler;
 use App\Game\Automation\Handlers\AutomatedCraftingHandler;
 use App\Game\Automation\Jobs\AutomatedFactionLoyalty;
@@ -23,7 +20,6 @@ use App\Game\Automation\Loggers\FactionLoyaltyAutomationCraftingLogger;
 use App\Game\Automation\Loggers\FactionLoyaltyAutomationFightLogger;
 use App\Game\Automation\Values\AutomatedCraftingResult;
 use App\Game\Automation\Values\AutomatedFightResult;
-use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use Carbon\Carbon;
 use Exception;
@@ -65,7 +61,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
 
     private MockInterface|FactionLoyaltyAutomationFightLogger|null $fightLogger = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -95,7 +91,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->fightLogger = Mockery::mock(FactionLoyaltyAutomationFightLogger::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Carbon::setTestNow();
 
@@ -117,7 +113,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         parent::tearDown();
     }
 
-    public function testHandleBailsWhenCharacterCannotBeFound(): void
+    public function test_handle_bails_when_character_cannot_be_found(): void
     {
         Event::fake();
 
@@ -141,7 +137,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNull($this->factionLoyaltyAutomation->refresh()->completed_at);
     }
 
-    public function testHandleBailsWhenCharacterAutomationCannotBeFound(): void
+    public function test_handle_bails_when_character_automation_cannot_be_found(): void
     {
         Event::fake();
 
@@ -165,7 +161,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNotNull($this->factionLoyaltyAutomation->refresh()->completed_at);
     }
 
-    public function testHandleBailsWhenFactionLoyaltyAutomationCannotBeFound(): void
+    public function test_handle_bails_when_faction_loyalty_automation_cannot_be_found(): void
     {
         Event::fake();
 
@@ -189,7 +185,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNull($this->characterAutomation->fresh());
     }
 
-    public function testHandleBailsWhenFactionLoyaltyAutomationIsAlreadyCompleted(): void
+    public function test_handle_bails_when_faction_loyalty_automation_is_already_completed(): void
     {
         Event::fake();
 
@@ -217,7 +213,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNull($this->characterAutomation->fresh());
     }
 
-    public function testHandleBailsWhenCharacterAutomationIsExpired(): void
+    public function test_handle_bails_when_character_automation_is_expired(): void
     {
         Event::fake();
 
@@ -245,7 +241,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNull($this->characterAutomation->fresh());
     }
 
-    public function testHandleEndsAutomationWhenNoNpcCanBeResolved(): void
+    public function test_handle_ends_automation_when_no_npc_can_be_resolved(): void
     {
         Event::fake();
 
@@ -273,7 +269,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNotNull($this->factionLoyaltyAutomation->refresh()->completed_at);
     }
 
-    public function testHandleEndsAutomationWhenNpcTaskCoordinatorSaysAutomationShouldEnd(): void
+    public function test_handle_ends_automation_when_npc_task_coordinator_says_automation_should_end(): void
     {
         Event::fake();
 
@@ -302,7 +298,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNotNull($this->factionLoyaltyAutomation->refresh()->completed_at);
     }
 
-    public function testHandleEndsAutomationWhenNoAutomationActionCanBeResolved(): void
+    public function test_handle_ends_automation_when_no_automation_action_can_be_resolved(): void
     {
         Event::fake();
 
@@ -333,7 +329,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNotNull($this->factionLoyaltyAutomation->refresh()->completed_at);
     }
 
-    public function testHandleEndsAutomationWhenResolvedActionTypeIsUnknown(): void
+    public function test_handle_ends_automation_when_resolved_action_type_is_unknown(): void
     {
         Event::fake();
 
@@ -367,7 +363,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNotNull($this->factionLoyaltyAutomation->refresh()->completed_at);
     }
 
-    public function testHandleEndsAutomationWhenCraftActionIsMissingItemId(): void
+    public function test_handle_ends_automation_when_craft_action_is_missing_item_id(): void
     {
         Event::fake();
 
@@ -403,7 +399,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNotNull($this->factionLoyaltyAutomation->refresh()->completed_at);
     }
 
-    public function testHandleHandlesCraftedTargetItemAndRecallsTheJob(): void
+    public function test_handle_handles_crafted_target_item_and_recalls_the_job(): void
     {
         Queue::fake();
         Event::fake();
@@ -447,7 +443,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         Queue::assertPushed(AutomatedFactionLoyalty::class);
     }
 
-    public function testHandleHandlesCraftedTrainingItemAndRecallsTheJob(): void
+    public function test_handle_handles_crafted_training_item_and_recalls_the_job(): void
     {
         Queue::fake();
         Event::fake();
@@ -491,7 +487,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         Queue::assertPushed(AutomatedFactionLoyalty::class);
     }
 
-    public function testHandleHandlesMaxAttemptsReachedAndRecallsTheJob(): void
+    public function test_handle_handles_max_attempts_reached_and_recalls_the_job(): void
     {
         Queue::fake();
         Event::fake();
@@ -535,7 +531,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         Queue::assertPushed(AutomatedFactionLoyalty::class);
     }
 
-    public function testHandleSetsFailedCraftingItemWhenCraftingStartedBelowTargetLevel(): void
+    public function test_handle_sets_failed_crafting_item_when_crafting_started_below_target_level(): void
     {
         Queue::fake();
         Event::fake();
@@ -580,7 +576,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertEquals($craftingTask['item_id'], $this->factionLoyaltyAutomation->refresh()->failed_crafting_item_id);
     }
 
-    public function testHandleClearsFailedCraftingItemWhenTargetItemIsCrafted(): void
+    public function test_handle_clears_failed_crafting_item_when_target_item_is_crafted(): void
     {
         Queue::fake();
         Event::fake();
@@ -628,7 +624,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNull($this->factionLoyaltyAutomation->refresh()->failed_crafting_item_id);
     }
 
-    public function testHandleSwitchesFromCraftingToBountyFightingWhenCraftingCannotContinueBecauseOfNotEnoughGold(): void
+    public function test_handle_switches_from_crafting_to_bounty_fighting_when_crafting_cannot_continue_because_of_not_enough_gold(): void
     {
         Queue::fake();
         Event::fake();
@@ -688,7 +684,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         Queue::assertPushed(AutomatedFactionLoyalty::class);
     }
 
-    public function testHandleEndsAutomationWhenCraftingCannotContinueBecauseOfNotEnoughGoldAndNoBountyTaskExists(): void
+    public function test_handle_ends_automation_when_crafting_cannot_continue_because_of_not_enough_gold_and_no_bounty_task_exists(): void
     {
         Event::fake();
 
@@ -742,11 +738,11 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNull($this->characterAutomation->fresh());
         $this->assertNotNull($this->factionLoyaltyAutomation->refresh()->completed_at);
         Event::assertDispatched(AutomationLogUpdate::class, function (AutomationLogUpdate $event): bool {
-            return $event->message === $this->factionLoyaltyNpc->npc->real_name . ' does not like poor people who cannot craft for them.';
+            return $event->message === $this->factionLoyaltyNpc->npc->real_name.' does not like poor people who cannot craft for them.';
         });
     }
 
-    public function testHandleEndsAutomationWhenCraftingResultCannotContinue(): void
+    public function test_handle_ends_automation_when_crafting_result_cannot_continue(): void
     {
         Event::fake();
 
@@ -790,7 +786,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNotNull($this->factionLoyaltyAutomation->refresh()->completed_at);
     }
 
-    public function testHandleUsesMatchingFailedBountyTaskWhenCraftingCannotContinueBecauseOfNotEnoughGold(): void
+    public function test_handle_uses_matching_failed_bounty_task_when_crafting_cannot_continue_because_of_not_enough_gold(): void
     {
         Queue::fake();
         Event::fake();
@@ -855,7 +851,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         Queue::assertPushed(AutomatedFactionLoyalty::class);
     }
 
-    public function testHandleFallsBackToAnyBountyTaskWhenFailedBountyTaskIsNotAvailableAfterNotEnoughGold(): void
+    public function test_handle_falls_back_to_any_bounty_task_when_failed_bounty_task_is_not_available_after_not_enough_gold(): void
     {
         Queue::fake();
         Event::fake();
@@ -918,7 +914,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         Queue::assertPushed(AutomatedFactionLoyalty::class);
     }
 
-    public function testHandleEndsAutomationWhenFightActionIsMissingMonsterId(): void
+    public function test_handle_ends_automation_when_fight_action_is_missing_monster_id(): void
     {
         Event::fake();
 
@@ -954,7 +950,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNotNull($this->factionLoyaltyAutomation->refresh()->completed_at);
     }
 
-    public function testHandleHandlesBountyCompletedAndRecallsTheJob(): void
+    public function test_handle_handles_bounty_completed_and_recalls_the_job(): void
     {
         Queue::fake();
         Event::fake();
@@ -998,7 +994,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         Queue::assertPushed(AutomatedFactionLoyalty::class);
     }
 
-    public function testHandleHandlesTrainingBatchCompletedAndRecallsTheJob(): void
+    public function test_handle_handles_training_batch_completed_and_recalls_the_job(): void
     {
         Queue::fake();
         Event::fake();
@@ -1041,7 +1037,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         Queue::assertPushed(AutomatedFactionLoyalty::class);
     }
 
-    public function testHandleHandlesDiedToBountyStartedTrainingAndRecallsTheJob(): void
+    public function test_handle_handles_died_to_bounty_started_training_and_recalls_the_job(): void
     {
         Queue::fake();
         Event::fake();
@@ -1084,7 +1080,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         Queue::assertPushed(AutomatedFactionLoyalty::class);
     }
 
-    public function testHandleHandlesBountyStalledRetryAndRecallsTheJob(): void
+    public function test_handle_handles_bounty_stalled_retry_and_recalls_the_job(): void
     {
         Queue::fake();
         Event::fake();
@@ -1128,7 +1124,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         Queue::assertPushed(AutomatedFactionLoyalty::class);
     }
 
-    public function testHandleClearsFailedBountyMonsterWhenFailedBountyMonsterIsKilled(): void
+    public function test_handle_clears_failed_bounty_monster_when_failed_bounty_monster_is_killed(): void
     {
         Queue::fake();
         Event::fake();
@@ -1175,7 +1171,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNull($this->factionLoyaltyAutomation->refresh()->failed_bounty_monster_id);
     }
 
-    public function testHandleDoesNotClearFailedBountyMonsterWhenFightResultDoesNotMatchFailedMonster(): void
+    public function test_handle_does_not_clear_failed_bounty_monster_when_fight_result_does_not_match_failed_monster(): void
     {
         Queue::fake();
         Event::fake();
@@ -1222,7 +1218,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertEquals($bountyTask['monster_id'], $this->factionLoyaltyAutomation->refresh()->failed_bounty_monster_id);
     }
 
-    public function testHandleDoesNotClearFailedBountyMonsterWhenNoBountyKillsWereMade(): void
+    public function test_handle_does_not_clear_failed_bounty_monster_when_no_bounty_kills_were_made(): void
     {
         Queue::fake();
         Event::fake();
@@ -1269,7 +1265,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertEquals($bountyTask['monster_id'], $this->factionLoyaltyAutomation->refresh()->failed_bounty_monster_id);
     }
 
-    public function testHandleEndsAutomationForNonRecallFightResults(): void
+    public function test_handle_ends_automation_for_non_recall_fight_results(): void
     {
         Event::fake();
 
@@ -1312,7 +1308,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNotNull($this->factionLoyaltyAutomation->refresh()->completed_at);
     }
 
-    public function testHandleEndsAutomationInsteadOfRecallingWhenAutomationExpiresAfterCraftingResult(): void
+    public function test_handle_ends_automation_instead_of_recalling_when_automation_expires_after_crafting_result(): void
     {
         Queue::fake();
         Event::fake();
@@ -1368,7 +1364,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNull($this->characterAutomation->fresh());
     }
 
-    public function testHandleLogsAndEndsAutomationOnException(): void
+    public function test_handle_logs_and_ends_automation_on_exception(): void
     {
         Event::fake();
 

@@ -13,12 +13,12 @@ class PlayerHealingTest extends TestCase
 {
     use CreateClass, RefreshDatabase;
 
-    public function testLifeStealDoesNotHealAboveMaxHealth(): void
+    public function test_life_steal_does_not_heal_above_max_health(): void
     {
         $class = $this->createClass(['name' => 'Vampire']);
         $character = (new CharacterFactory)->createBaseCharacter([], $class)->givePlayerLocation()->getCharacter();
 
-        Cache::put('character-sheet-' . $character->id, [
+        Cache::put('character-sheet-'.$character->id, [
             'level' => $character->level,
             'health' => 1000,
             'dur_modded' => 1000,

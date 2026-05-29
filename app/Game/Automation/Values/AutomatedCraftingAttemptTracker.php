@@ -22,9 +22,6 @@ class AutomatedCraftingAttemptTracker
 
     /**
      * Set up the tracker.
-     *
-     * @param bool $startedBelowTargetLevel
-     * @return AutomatedCraftingAttemptTracker
      */
     public function setUp(bool $startedBelowTargetLevel): AutomatedCraftingAttemptTracker
     {
@@ -41,12 +38,6 @@ class AutomatedCraftingAttemptTracker
 
     /**
      * Track a crafting attempt.
-     *
-     * @param Item $item
-     * @param int $goldSpent
-     * @param bool $crafted
-     * @param bool $craftedTargetItem
-     * @return void
      */
     public function trackAttempt(Item $item, int $goldSpent, bool $crafted, bool $craftedTargetItem): void
     {
@@ -71,8 +62,6 @@ class AutomatedCraftingAttemptTracker
 
     /**
      * Get the number of attempts.
-     *
-     * @return int
      */
     public function getAttempts(): int
     {
@@ -81,8 +70,6 @@ class AutomatedCraftingAttemptTracker
 
     /**
      * Get the number of failed rolls.
-     *
-     * @return int
      */
     public function getFailedRolls(): int
     {
@@ -91,8 +78,6 @@ class AutomatedCraftingAttemptTracker
 
     /**
      * Get the amount of gold spent.
-     *
-     * @return int
      */
     public function getGoldSpent(): int
     {
@@ -101,8 +86,6 @@ class AutomatedCraftingAttemptTracker
 
     /**
      * Has the character started below the target item level?
-     *
-     * @return bool
      */
     public function hasStartedBelowTargetLevel(): bool
     {
@@ -111,8 +94,6 @@ class AutomatedCraftingAttemptTracker
 
     /**
      * Has a target item been crafted?
-     *
-     * @return bool
      */
     public function hasCraftedTargetItem(): bool
     {
@@ -121,8 +102,6 @@ class AutomatedCraftingAttemptTracker
 
     /**
      * Has a training item been crafted?
-     *
-     * @return bool
      */
     public function hasCraftedTrainingItem(): bool
     {
@@ -131,8 +110,6 @@ class AutomatedCraftingAttemptTracker
 
     /**
      * Get successful target crafts.
-     *
-     * @return int
      */
     public function getSuccessfulTargetCrafts(): int
     {
@@ -141,8 +118,6 @@ class AutomatedCraftingAttemptTracker
 
     /**
      * Get successful training crafts.
-     *
-     * @return int
      */
     public function getSuccessfulTrainingCrafts(): int
     {
@@ -151,8 +126,6 @@ class AutomatedCraftingAttemptTracker
 
     /**
      * Get the last attempted item.
-     *
-     * @return Item|null
      */
     public function getLastAttemptedItem(): ?Item
     {

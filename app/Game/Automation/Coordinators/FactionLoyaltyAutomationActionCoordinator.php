@@ -14,10 +14,6 @@ class FactionLoyaltyAutomationActionCoordinator
 
     /**
      * Set up the coordinator.
-     *
-     * @param FactionLoyaltyAutomation $factionLoyaltyAutomation
-     * @param FactionLoyaltyNpc $factionLoyaltyNpc
-     * @return FactionLoyaltyAutomationActionCoordinator
      */
     public function setUp(FactionLoyaltyAutomation $factionLoyaltyAutomation, FactionLoyaltyNpc $factionLoyaltyNpc): FactionLoyaltyAutomationActionCoordinator
     {
@@ -29,8 +25,6 @@ class FactionLoyaltyAutomationActionCoordinator
 
     /**
      * Resolve the next automation action.
-     *
-     * @return array|null
      */
     public function resolveAction(): ?array
     {
@@ -72,8 +66,6 @@ class FactionLoyaltyAutomationActionCoordinator
 
     /**
      * Get incomplete tasks.
-     *
-     * @return array
      */
     private function getIncompleteTasks(): array
     {
@@ -90,9 +82,6 @@ class FactionLoyaltyAutomationActionCoordinator
 
     /**
      * Get failed crafting task.
-     *
-     * @param array $incompleteTasks
-     * @return array|null
      */
     private function getFailedCraftingTask(array $incompleteTasks): ?array
     {
@@ -115,9 +104,6 @@ class FactionLoyaltyAutomationActionCoordinator
 
     /**
      * Get failed bounty task.
-     *
-     * @param array $incompleteTasks
-     * @return array|null
      */
     private function getFailedBountyTask(array $incompleteTasks): ?array
     {
@@ -140,9 +126,6 @@ class FactionLoyaltyAutomationActionCoordinator
 
     /**
      * Get crafting task.
-     *
-     * @param array $incompleteTasks
-     * @return array|null
      */
     private function getCraftingTask(array $incompleteTasks): ?array
     {
@@ -157,9 +140,6 @@ class FactionLoyaltyAutomationActionCoordinator
 
     /**
      * Get bounty task.
-     *
-     * @param array $incompleteTasks
-     * @return array|null
      */
     private function getBountyTask(array $incompleteTasks): ?array
     {
@@ -174,10 +154,6 @@ class FactionLoyaltyAutomationActionCoordinator
 
     /**
      * Resolve rotating action.
-     *
-     * @param array $craftingTask
-     * @param array $bountyTask
-     * @return array
      */
     private function resolveRotatingAction(array $craftingTask, array $bountyTask): array
     {
@@ -196,8 +172,6 @@ class FactionLoyaltyAutomationActionCoordinator
 
     /**
      * Get last automation action.
-     *
-     * @return FactionLoyaltyCoordinatorAction|null
      */
     private function getLastAction(): ?FactionLoyaltyCoordinatorAction
     {
@@ -231,9 +205,6 @@ class FactionLoyaltyAutomationActionCoordinator
 
     /**
      * Build craft action.
-     *
-     * @param array $task
-     * @return array
      */
     private function buildCraftAction(array $task): array
     {
@@ -245,9 +216,6 @@ class FactionLoyaltyAutomationActionCoordinator
 
     /**
      * Build fight action.
-     *
-     * @param array $task
-     * @return array
      */
     private function buildFightAction(array $task): array
     {

@@ -14,7 +14,7 @@ class KingdomBuildingsControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testManualCancelRejectsCapitalCityOwnedBuildingQueue(): void
+    public function test_manual_cancel_rejects_capital_city_owned_building_queue(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -46,7 +46,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $this->assertNotNull(BuildingInQueue::find($queue->id));
     }
 
-    public function testManualUpgradeRejectsDuringAutomation(): void
+    public function test_manual_upgrade_rejects_during_automation(): void
     {
         Queue::fake();
 
@@ -71,7 +71,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $building = $kingdom->buildings()->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdoms/' . $character->id . '/upgrade-building/' . $building->id, [
+            ->call('POST', '/api/kingdoms/'.$character->id.'/upgrade-building/'.$building->id, [
                 'to_level' => $building->level + 1,
             ]);
 
@@ -79,7 +79,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $this->assertSame(0, BuildingInQueue::where('kingdom_id', $kingdom->id)->count());
     }
 
-    public function testManualRebuildRejectsDuringAutomation(): void
+    public function test_manual_rebuild_rejects_during_automation(): void
     {
         Queue::fake();
 
@@ -107,13 +107,13 @@ class KingdomBuildingsControllerTest extends TestCase
         $building = $kingdom->buildings()->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdoms/' . $character->id . '/rebuild-building/' . $building->id);
+            ->call('POST', '/api/kingdoms/'.$character->id.'/rebuild-building/'.$building->id);
 
         $response->assertStatus(422);
         $this->assertSame(0, BuildingInQueue::where('kingdom_id', $kingdom->id)->count());
     }
 
-    public function testManualBuildingCancelRejectsDuringAutomation(): void
+    public function test_manual_building_cancel_rejects_during_automation(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -147,7 +147,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $this->assertNotNull(BuildingInQueue::find($queue->id));
     }
 
-    public function testManualUpgradeReturnsValidationErrorWhenActiveDuplicateUpgradeQueueExists(): void
+    public function test_manual_upgrade_returns_validation_error_when_active_duplicate_upgrade_queue_exists(): void
     {
         Queue::fake();
 
@@ -179,7 +179,7 @@ class KingdomBuildingsControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdoms/' . $character->id . '/upgrade-building/' . $building->id, [
+            ->call('POST', '/api/kingdoms/'.$character->id.'/upgrade-building/'.$building->id, [
                 'to_level' => $building->level + 1,
             ]);
 
@@ -197,7 +197,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $this->assertSame(2000, $kingdom->refresh()->current_iron);
     }
 
-    public function testRawAuthenticatedJsonRequestRejectsDuplicateManualUpgradeQueue(): void
+    public function test_raw_authenticated_json_request_rejects_duplicate_manual_upgrade_queue(): void
     {
         Queue::fake();
 
@@ -231,7 +231,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $this->actingAs($character->user);
         $response = $this->call(
             'POST',
-            '/api/kingdoms/' . $character->id . '/upgrade-building/' . $building->id,
+            '/api/kingdoms/'.$character->id.'/upgrade-building/'.$building->id,
             [],
             [],
             [],
@@ -255,7 +255,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $this->assertSame(2000, $kingdom->refresh()->current_wood);
     }
 
-    public function testPendingUpgradeQueueBlocksAnotherManualQueueForSameBuilding(): void
+    public function test_pending_upgrade_queue_blocks_another_manual_queue_for_same_building(): void
     {
         Queue::fake();
 
@@ -287,7 +287,7 @@ class KingdomBuildingsControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdoms/' . $character->id . '/upgrade-building/' . $building->id, [
+            ->call('POST', '/api/kingdoms/'.$character->id.'/upgrade-building/'.$building->id, [
                 'to_level' => $building->level + 1,
             ]);
 
@@ -301,7 +301,7 @@ class KingdomBuildingsControllerTest extends TestCase
             ->count());
     }
 
-    public function testBuildingCanBeQueuedAgainAfterExistingUpgradeQueueIsRemoved(): void
+    public function test_building_can_be_queued_again_after_existing_upgrade_queue_is_removed(): void
     {
         Queue::fake();
 
@@ -334,7 +334,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $queue->delete();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdoms/' . $character->id . '/upgrade-building/' . $building->id, [
+            ->call('POST', '/api/kingdoms/'.$character->id.'/upgrade-building/'.$building->id, [
                 'to_level' => $building->level + 1,
             ]);
 
@@ -348,7 +348,7 @@ class KingdomBuildingsControllerTest extends TestCase
             ->count());
     }
 
-    public function testRawAuthenticatedJsonRequestCannotQueueMaxLevelBuilding(): void
+    public function test_raw_authenticated_json_request_cannot_queue_max_level_building(): void
     {
         Queue::fake();
 
@@ -376,7 +376,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $this->actingAs($character->user);
         $response = $this->call(
             'POST',
-            '/api/kingdoms/' . $character->id . '/upgrade-building/' . $building->id,
+            '/api/kingdoms/'.$character->id.'/upgrade-building/'.$building->id,
             [],
             [],
             [],
@@ -401,7 +401,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $this->assertSame(2000, $kingdom->refresh()->current_wood);
     }
 
-    public function testManualEndpointCannotQueueMaxLevelBuilding(): void
+    public function test_manual_endpoint_cannot_queue_max_level_building(): void
     {
         Queue::fake();
 
@@ -427,7 +427,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $building = $kingdom->buildings()->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdoms/' . $character->id . '/upgrade-building/' . $building->id, [
+            ->call('POST', '/api/kingdoms/'.$character->id.'/upgrade-building/'.$building->id, [
                 'to_level' => 2,
             ]);
 
@@ -443,7 +443,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $this->assertSame(2000, $kingdom->refresh()->current_wood);
     }
 
-    public function testQueueWithToLevelAboveMaxIsRejectedAndDoesNotMutateBuilding(): void
+    public function test_queue_with_to_level_above_max_is_rejected_and_does_not_mutate_building(): void
     {
         Queue::fake();
 
@@ -469,7 +469,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $building = $kingdom->buildings()->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdoms/' . $character->id . '/upgrade-building/' . $building->id, [
+            ->call('POST', '/api/kingdoms/'.$character->id.'/upgrade-building/'.$building->id, [
                 'to_level' => 3,
             ]);
 
@@ -485,7 +485,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $this->assertSame(2000, $kingdom->refresh()->current_wood);
     }
 
-    public function testQueueCreationStoresFromLevelAndToLevel(): void
+    public function test_queue_creation_stores_from_level_and_to_level(): void
     {
         Queue::fake();
 
@@ -511,7 +511,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $building = $kingdom->buildings()->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdoms/' . $character->id . '/upgrade-building/' . $building->id, [
+            ->call('POST', '/api/kingdoms/'.$character->id.'/upgrade-building/'.$building->id, [
                 'to_level' => 2,
             ]);
 
@@ -526,7 +526,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $this->assertSame(2, $queue->to_level);
     }
 
-    public function testRawAuthenticatedJsonRequestCannotForceInvalidFromLevelOrToLevel(): void
+    public function test_raw_authenticated_json_request_cannot_force_invalid_from_level_or_to_level(): void
     {
         Queue::fake();
 
@@ -554,7 +554,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $this->actingAs($character->user);
         $response = $this->call(
             'POST',
-            '/api/kingdoms/' . $character->id . '/upgrade-building/' . $building->id,
+            '/api/kingdoms/'.$character->id.'/upgrade-building/'.$building->id,
             [],
             [],
             [],

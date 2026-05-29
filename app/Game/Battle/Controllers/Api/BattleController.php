@@ -4,8 +4,6 @@ namespace App\Game\Battle\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
-use App\Flare\Services\BuildMonsterCacheService;
-use App\Flare\Values\ItemEffectsValue;
 use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Events\AttackTimeOutEvent;

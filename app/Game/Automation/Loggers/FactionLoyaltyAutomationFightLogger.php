@@ -12,9 +12,6 @@ class FactionLoyaltyAutomationFightLogger
 
     /**
      * Set up the logger.
-     *
-     * @param FactionLoyaltyAutomation $factionLoyaltyAutomation
-     * @return FactionLoyaltyAutomationFightLogger
      */
     public function setUp(FactionLoyaltyAutomation $factionLoyaltyAutomation): FactionLoyaltyAutomationFightLogger
     {
@@ -25,9 +22,6 @@ class FactionLoyaltyAutomationFightLogger
 
     /**
      * Log the automated fight result.
-     *
-     * @param AutomatedFightResult $automatedFightResult
-     * @return void
      */
     public function log(AutomatedFightResult $automatedFightResult): void
     {

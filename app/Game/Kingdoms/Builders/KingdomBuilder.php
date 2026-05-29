@@ -4,9 +4,9 @@ namespace App\Game\Kingdoms\Builders;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
+use App\Game\Kingdoms\Service\KingdomMaxResourceRecalculationService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
-use App\Game\Kingdoms\Service\KingdomMaxResourceRecalculationService;
 
 class KingdomBuilder
 {

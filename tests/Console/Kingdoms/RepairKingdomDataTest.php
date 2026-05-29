@@ -20,7 +20,7 @@ class RepairKingdomDataTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testDryRunReportsInvalidKingdomDataWithoutMutatingIt(): void
+    public function test_dry_run_reports_invalid_kingdom_data_without_mutating_it(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter([], [], true, false)->givePlayerLocation();
         $kingdomManagement = $characterFactory
@@ -73,7 +73,7 @@ class RepairKingdomDataTest extends TestCase
         $this->assertSame(2, BuildingInQueue::where('building_id', $building->id)->count());
     }
 
-    public function testApplyRepairsInvalidKingdomDataOnly(): void
+    public function test_apply_repairs_invalid_kingdom_data_only(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter([], [], true, false)->givePlayerLocation();
         $kingdomManagement = $characterFactory
@@ -143,7 +143,7 @@ class RepairKingdomDataTest extends TestCase
         $this->assertNull(UnitInQueue::find($invalidUnitQueue->id));
     }
 
-    public function testApplyRepairsDuplicateValidUnitQueuesReduceSafely(): void
+    public function test_apply_repairs_duplicate_valid_unit_queues_reduce_safely(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter([], [], true, false)->givePlayerLocation();
         $kingdomManagement = $characterFactory
@@ -181,7 +181,7 @@ class RepairKingdomDataTest extends TestCase
         $this->assertSame(2, $secondUnitQueue->amount);
     }
 
-    public function testApplyDoesNotChangeValidKingdomData(): void
+    public function test_apply_does_not_change_valid_kingdom_data(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter([], [], true, false)->givePlayerLocation();
         $kingdomManagement = $characterFactory
@@ -236,7 +236,7 @@ class RepairKingdomDataTest extends TestCase
         $this->assertSame(10, $unitQueue->amount);
     }
 
-    public function testApplyRepairsStaleCapitalCityRowsAndStuckCancellations(): void
+    public function test_apply_repairs_stale_capital_city_rows_and_stuck_cancellations(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter([], [], true, false)->givePlayerLocation();
         $kingdomManagement = $characterFactory

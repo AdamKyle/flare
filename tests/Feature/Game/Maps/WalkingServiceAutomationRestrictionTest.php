@@ -26,7 +26,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Cache::forget('celestial-spawn-rate');
         Cache::forget('monsters');
@@ -35,7 +35,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
         parent::tearDown();
     }
 
-    public function testExplorationStartedInGoldMineBlocksDirectionalMovement(): void
+    public function test_exploration_started_in_gold_mine_blocks_directional_movement(): void
     {
         $gameMap = GameMap::factory()->create([
             'name' => MapNameValue::SURFACE,
@@ -78,7 +78,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
         $this->assertEquals(16, $character->refresh()->map->character_position_y);
     }
 
-    public function testExplorationStartedInPurgatoryDungeonBlocksDirectionalMovement(): void
+    public function test_exploration_started_in_purgatory_dungeon_blocks_directional_movement(): void
     {
         $gameMap = GameMap::factory()->create([
             'name' => MapNameValue::SURFACE,
@@ -121,7 +121,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
         $this->assertEquals(16, $character->refresh()->map->character_position_y);
     }
 
-    public function testExplorationStartedInPurgatorySmithHouseBlocksDirectionalMovement(): void
+    public function test_exploration_started_in_purgatory_smith_house_blocks_directional_movement(): void
     {
         $gameMap = GameMap::factory()->create([
             'name' => MapNameValue::SURFACE,
@@ -164,7 +164,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
         $this->assertEquals(16, $character->refresh()->map->character_position_y);
     }
 
-    public function testExplorationStartedInRegularContextAllowsDirectionalMovementToRegularLocation(): void
+    public function test_exploration_started_in_regular_context_allows_directional_movement_to_regular_location(): void
     {
         $this->instance(
             MapTileValue::class,
@@ -217,7 +217,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
         $this->assertEquals(16, $character->refresh()->map->character_position_y);
     }
 
-    public function testExplorationStartedInRegularContextAllowsDirectionalMovementToPort(): void
+    public function test_exploration_started_in_regular_context_allows_directional_movement_to_port(): void
     {
         $this->instance(
             MapTileValue::class,
@@ -270,7 +270,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
         $this->assertEquals(16, $character->refresh()->map->character_position_y);
     }
 
-    public function testExplorationStartedInRegularContextBlocksEntryIntoGoldMine(): void
+    public function test_exploration_started_in_regular_context_blocks_entry_into_gold_mine(): void
     {
         $gameMap = GameMap::factory()->create([
             'name' => MapNameValue::SURFACE,
@@ -313,7 +313,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
         $this->assertEquals(16, $character->refresh()->map->character_position_y);
     }
 
-    public function testExplorationStartedInRegularContextBlocksEntryIntoPurgatoryDungeon(): void
+    public function test_exploration_started_in_regular_context_blocks_entry_into_purgatory_dungeon(): void
     {
         $gameMap = GameMap::factory()->create([
             'name' => MapNameValue::SURFACE,
@@ -356,7 +356,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
         $this->assertEquals(16, $character->refresh()->map->character_position_y);
     }
 
-    public function testExplorationStartedInRegularContextBlocksEntryIntoPurgatorySmithHouse(): void
+    public function test_exploration_started_in_regular_context_blocks_entry_into_purgatory_smith_house(): void
     {
         $gameMap = GameMap::factory()->create([
             'name' => MapNameValue::SURFACE,
@@ -399,7 +399,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
         $this->assertEquals(16, $character->refresh()->map->character_position_y);
     }
 
-    public function testBlockedSpecialLocationEntryDoesNotDeleteCurrentExplorationAutomation(): void
+    public function test_blocked_special_location_entry_does_not_delete_current_exploration_automation(): void
     {
         $gameMap = GameMap::factory()->create([
             'name' => MapNameValue::SURFACE,
@@ -440,7 +440,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
         $this->assertNotNull(CharacterAutomation::find($automation->id));
     }
 
-    public function testBlockedSpecialLocationEntryDoesNotDeleteUnrelatedAutomation(): void
+    public function test_blocked_special_location_entry_does_not_delete_unrelated_automation(): void
     {
         $gameMap = GameMap::factory()->create([
             'name' => MapNameValue::SURFACE,
@@ -496,7 +496,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
         $this->assertNotNull(CharacterAutomation::find($unrelatedAutomation->id));
     }
 
-    public function testAllowedRegularMovementDoesNotCorruptActiveExplorationAutomation(): void
+    public function test_allowed_regular_movement_does_not_corrupt_active_exploration_automation(): void
     {
         $this->instance(
             MapTileValue::class,

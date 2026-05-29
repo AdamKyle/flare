@@ -74,10 +74,6 @@ class FactionHandlerTest extends TestCase
         return 0;
     }
 
-    /**
-     * @param array $options
-     * @return void
-     */
     private function createCharacterAutomation(array $options): void
     {
         $this->assertNotNull($this->character);

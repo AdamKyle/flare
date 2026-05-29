@@ -47,7 +47,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
 
     private ?SkillService $skillService = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -78,7 +78,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         );
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->handler = null;
         $this->factionLoyaltyFactory = null;
@@ -94,7 +94,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         parent::tearDown();
     }
 
-    public function testAutomatedBountyFightHandlerResolvesFromContainer(): void
+    public function test_automated_bounty_fight_handler_resolves_from_container(): void
     {
         $this->assertInstanceOf(
             AutomatedBountyFightHandler::class,
@@ -102,7 +102,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         );
     }
 
-    public function testHandleReturnsInvalidTaskWhenTaskIsMissingRequiredFields(): void
+    public function test_handle_returns_invalid_task_when_task_is_missing_required_fields(): void
     {
         Event::fake();
 
@@ -121,7 +121,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->assertTrue($result->hasEndedAutomation());
     }
 
-    public function testHandleReturnsMonsterNotFoundWhenBountyMonsterDoesNotExist(): void
+    public function test_handle_returns_monster_not_found_when_bounty_monster_does_not_exist(): void
     {
         Event::fake();
 
@@ -144,7 +144,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->assertTrue($result->hasEndedAutomation());
     }
 
-    public function testHandleReturnsBountyCompletedWhenTaskAlreadyHasEnoughKills(): void
+    public function test_handle_returns_bounty_completed_when_task_already_has_enough_kills(): void
     {
         Event::fake();
 
@@ -170,7 +170,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->assertTrue($result->isBountyTarget());
     }
 
-    public function testHandleCompletesBountyWhenBountyMonsterDies(): void
+    public function test_handle_completes_bounty_when_bounty_monster_dies(): void
     {
         Event::fake();
 
@@ -244,7 +244,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->assertEquals(0, $result->getTotalFactionPoints());
     }
 
-    public function testHandleReturnsInvalidStateWhenFightSetupReturnsEmptyData(): void
+    public function test_handle_returns_invalid_state_when_fight_setup_returns_empty_data(): void
     {
         Event::fake();
 
@@ -274,7 +274,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->assertTrue($result->hasEndedAutomation());
     }
 
-    public function testHandleReturnsBountyStalledRetryWhenAttackLimitIsReached(): void
+    public function test_handle_returns_bounty_stalled_retry_when_attack_limit_is_reached(): void
     {
         Event::fake();
 
@@ -316,7 +316,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->assertFalse($result->hasEndedAutomation());
     }
 
-    public function testHandleRetriesCachedBountyFightWithoutSettingUpMonsterWhenBountyStalled(): void
+    public function test_handle_retries_cached_bounty_fight_without_setting_up_monster_when_bounty_stalled(): void
     {
         Event::fake();
 
@@ -369,7 +369,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->assertEquals(2, $result->getStalledAttempt());
     }
 
-    public function testHandleEndsAutomationAndDispatchesWarningWhenBountyStalledMaxAttemptsIsReached(): void
+    public function test_handle_ends_automation_and_dispatches_warning_when_bounty_stalled_max_attempts_is_reached(): void
     {
         Event::fake();
 
@@ -421,7 +421,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
             )
             ->handle();
 
-        $message = 'You tried to kill ' . $bountyMonster->name . ' 10 times and failed to do so. The NPC: ' . $this->factionLoyaltyNpc->npc->real_name . ', is now infuriated. Check your gear child. Go to Faction Loyalty.';
+        $message = 'You tried to kill '.$bountyMonster->name.' 10 times and failed to do so. The NPC: '.$this->factionLoyaltyNpc->npc->real_name.', is now infuriated. Check your gear child. Go to Faction Loyalty.';
 
         $this->assertEquals(AutomatedFightResultType::BOUNTY_STALLED_MAX_ATTEMPTS_REACHED, $result->getResultType());
         $this->assertEquals(10, $result->getStalledAttempt());
@@ -433,7 +433,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class, fn (ServerMessageEvent $event): bool => $event->message === $message);
     }
 
-    public function testHandleReturnsNoTrainingMonsterFoundWhenBountyKillsCharacterAndNoTrainingMonsterExists(): void
+    public function test_handle_returns_no_training_monster_found_when_bounty_kills_character_and_no_training_monster_exists(): void
     {
         Event::fake();
 
@@ -480,7 +480,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->assertTrue($result->hasEndedAutomation());
     }
 
-    public function testHandleReturnsDiedDuringTrainingWhenTrainingMonsterKillsCharacter(): void
+    public function test_handle_returns_died_during_training_when_training_monster_kills_character(): void
     {
         Event::fake();
 
@@ -539,7 +539,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->assertTrue($result->hasCharacterDied());
     }
 
-    public function testHandleReturnsInvalidStateWhenTrainingFightDoesNotResolve(): void
+    public function test_handle_returns_invalid_state_when_training_fight_does_not_resolve(): void
     {
         Event::fake();
 
@@ -596,7 +596,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->assertTrue($result->isTraining());
     }
 
-    public function testHandleReturnsTrainingStalledRetryWhenTrainingAttackLimitIsReached(): void
+    public function test_handle_returns_training_stalled_retry_when_training_attack_limit_is_reached(): void
     {
         Event::fake();
 
@@ -662,7 +662,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->assertFalse($result->hasEndedAutomation());
     }
 
-    public function testHandleCompletesTrainingBatchWhenFiftyTrainingMonstersDie(): void
+    public function test_handle_completes_training_batch_when_fifty_training_monsters_die(): void
     {
         Event::fake();
 
@@ -751,7 +751,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->assertTrue($result->hasTrainedForFailedBounty());
     }
 
-    public function testHandleEndsAutomationWhenBountyKillsCharacterAfterCompletedTraining(): void
+    public function test_handle_ends_automation_when_bounty_kills_character_after_completed_training(): void
     {
         Event::fake();
 

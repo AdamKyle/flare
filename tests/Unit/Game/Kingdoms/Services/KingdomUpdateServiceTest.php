@@ -2,19 +2,19 @@
 
 namespace Tests\Unit\Game\Kingdoms\Services;
 
-use Exception;
 use App\Flare\Models\BuildingExpansionQueue;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
 use App\Flare\Values\NpcTypes;
-use App\Game\Kingdoms\Service\KingdomUpdateService;
 use App\Game\Kingdoms\Service\KingdomQueueService;
+use App\Game\Kingdoms\Service\KingdomUpdateService;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use Exception;
+use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\DB;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -356,7 +356,7 @@ class KingdomUpdateServiceTest extends TestCase
         $types = ['wood', 'stone', 'iron', 'clay'];
 
         foreach ($types as $type) {
-            $this->assertEquals(0, $kingdom->{'current_' . $type});
+            $this->assertEquals(0, $kingdom->{'current_'.$type});
         }
     }
 
@@ -397,7 +397,7 @@ class KingdomUpdateServiceTest extends TestCase
         $types = ['wood', 'stone', 'iron', 'clay'];
 
         foreach ($types as $type) {
-            $this->assertGreaterThan(0, $kingdom->{'current_' . $type});
+            $this->assertGreaterThan(0, $kingdom->{'current_'.$type});
         }
     }
 
@@ -430,7 +430,7 @@ class KingdomUpdateServiceTest extends TestCase
         $types = ['wood', 'stone', 'iron', 'clay'];
 
         foreach ($types as $type) {
-            $this->assertEquals(100, $kingdom->{'current_' . $type});
+            $this->assertEquals(100, $kingdom->{'current_'.$type});
         }
     }
 
@@ -665,7 +665,7 @@ class KingdomUpdateServiceTest extends TestCase
         $this->assertEmpty($character->kingdoms);
     }
 
-    public function testKingdomUpdateDoesNotCrashWhenOrphanedExpansionQueueExists(): void
+    public function test_kingdom_update_does_not_crash_when_orphaned_expansion_queue_exists(): void
     {
         $kingdom = $this->createKingdomForCharacter($this->character);
 

@@ -39,7 +39,7 @@ class ServiceProvider extends ApplicationServiceProvider implements DeferrablePr
         });
 
         $this->app->bind(ImageManager::class, function ($app) {
-            return new ImageManager($app->make(GdDriver::class));
+            return new ImageManager($app->make(GDDriver::class));
         });
 
         $this->app->bind(ImageTilerService::class, function ($app) {

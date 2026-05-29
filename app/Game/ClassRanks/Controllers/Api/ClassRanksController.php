@@ -22,8 +22,7 @@ class ClassRanksController extends Controller
         ClassRankService $classRankService,
         UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
         private readonly AutomationRestrictionService $automationRestrictionService
-    )
-    {
+    ) {
         $this->classRankService = $classRankService;
         $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
     }

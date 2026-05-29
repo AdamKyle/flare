@@ -193,12 +193,12 @@ class MovementService
             $questItem = $location->questRewardItem;
 
             if (! is_null($questItem->effect)) {
-                $message = $character->name . ' has found: ' . $questItem->affix_name;
+                $message = $character->name.' has found: '.$questItem->affix_name;
 
                 broadcast(new GlobalMessageEvent($message));
             }
 
-            event(new GameServerMessageEvent($character->user, 'You found: ' . $questItem->affix_name, $slot->id));
+            event(new GameServerMessageEvent($character->user, 'You found: '.$questItem->affix_name, $slot->id));
 
             event(new UpdateCharacterStatus($character));
         }

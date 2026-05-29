@@ -12,7 +12,9 @@ class AutomationType
     private $value;
 
     const int EXPLORING = 0;
+
     const int DELVE = 1;
+
     const int FACTION_LOYALTY = 2;
 
     /**
@@ -27,14 +29,13 @@ class AutomationType
     /**
      * Throws if the value does not exist in the array of const values.
      *
-     * @param int $value
      *
      * @throws Exception
      */
     public function __construct(int $value)
     {
         if (! in_array($value, self::$values)) {
-            throw new Exception($value . ' does not exist.');
+            throw new Exception($value.' does not exist.');
         }
 
         $this->value = $value;

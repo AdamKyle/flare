@@ -12,7 +12,7 @@ class SteelSmeltingServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testExactIronSpendIsAllowed(): void
+    public function test_exact_iron_spend_is_allowed(): void
     {
         Queue::fake();
 
@@ -28,7 +28,7 @@ class SteelSmeltingServiceTest extends TestCase
         $this->assertSame(0, $kingdom->refresh()->current_iron);
     }
 
-    public function testOverspendIsRejectedWithoutMutatingIron(): void
+    public function test_overspend_is_rejected_without_mutating_iron(): void
     {
         $kingdom = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->kingdomManagement()->assignKingdom([
             'current_iron' => 19,

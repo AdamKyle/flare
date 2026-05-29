@@ -2,8 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Flare\Models\Event;
-use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Models\FactionLoyaltyAutomationLog;
 use Illuminate\Database\Eloquent\Factories\Factory;
 

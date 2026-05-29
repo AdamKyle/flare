@@ -14,7 +14,7 @@ class CancelBuildingRequestServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testCancelAllBuildingsNoLongerReferencesUndefinedVariable(): void
+    public function test_cancel_all_buildings_no_longer_references_undefined_variable(): void
     {
         Event::fake();
 
@@ -47,7 +47,7 @@ class CancelBuildingRequestServiceTest extends TestCase
         $this->assertSame(200, $result['status']);
     }
 
-    public function testStaleBrokenBuildingQueueCanBeSafelyCleared(): void
+    public function test_stale_broken_building_queue_can_be_safely_cleared(): void
     {
         Event::fake();
 

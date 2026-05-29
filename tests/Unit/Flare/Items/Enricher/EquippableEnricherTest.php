@@ -254,7 +254,7 @@ class EquippableEnricherTest extends TestCase
         $enriched = $this->enricher->enrich($this->item->fresh());
 
         // Resolve the schema via the attribute on the method:
-        $ref = new \ReflectionMethod(\App\Flare\Items\Enricher\EquippableEnricher::class, 'enrich');
+        $ref = new \ReflectionMethod(EquippableEnricher::class, 'enrich');
 
         /** @var AutoManifest $meta */
         $meta = $ref->getAttributes(AutoManifest::class)[0]->newInstance();

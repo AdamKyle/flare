@@ -13,7 +13,7 @@ class KingdomBuildingUnlockSyncServiceTest extends TestCase
 {
     use CreatePassiveSkill, RefreshDatabase;
 
-    public function testPassiveLevelGreaterThanRequiredUnlocksExistingBuildingRows(): void
+    public function test_passive_level_greater_than_required_unlocks_existing_building_rows(): void
     {
         $passiveSkill = $this->createPassiveSkill([
             'name' => 'Marketplace',
@@ -50,7 +50,7 @@ class KingdomBuildingUnlockSyncServiceTest extends TestCase
         $this->assertFalse($kingdom->refresh()->buildings->first()->is_locked);
     }
 
-    public function testNameFallbackUnlocksExistingBuildingRows(): void
+    public function test_name_fallback_unlocks_existing_building_rows(): void
     {
         $passiveSkill = $this->createPassiveSkill([
             'name' => 'Marketplace',

@@ -26,7 +26,7 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
 
     private ?FactionLoyaltyAutomation $factionLoyaltyAutomation = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -46,7 +46,7 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
         $this->factionLoyaltyAutomation = $this->factionLoyaltyFactory->getFactionLoyaltyAutomation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->coordinator = null;
         $this->factionLoyaltyFactory = null;
@@ -57,7 +57,7 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
         parent::tearDown();
     }
 
-    public function testResolveActionReturnsNullWhenNpcHasNoTaskRecord(): void
+    public function test_resolve_action_returns_null_when_npc_has_no_task_record(): void
     {
         $this->factionLoyaltyNpc->factionLoyaltyNpcTasks()->delete();
 
@@ -68,7 +68,7 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testResolveActionReturnsNullWhenAllTasksAreComplete(): void
+    public function test_resolve_action_returns_null_when_all_tasks_are_complete(): void
     {
         $fameTasks = $this->factionLoyaltyNpc->factionLoyaltyNpcTasks->fame_tasks;
 
@@ -87,7 +87,7 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testResolveActionPrioritizesFailedCraftingTask(): void
+    public function test_resolve_action_prioritizes_failed_crafting_task(): void
     {
         $fameTasks = $this->factionLoyaltyNpc->factionLoyaltyNpcTasks->fame_tasks;
         $craftingTask = collect($fameTasks)->first(function (array $fameTask): bool {
@@ -106,7 +106,7 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
         $this->assertEquals($craftingTask['item_id'], $result['task']['item_id']);
     }
 
-    public function testResolveActionPrioritizesFailedCraftingTaskBeforeFailedBountyTask(): void
+    public function test_resolve_action_prioritizes_failed_crafting_task_before_failed_bounty_task(): void
     {
         $fameTasks = $this->factionLoyaltyNpc->factionLoyaltyNpcTasks->fame_tasks;
         $craftingTask = collect($fameTasks)->first(function (array $fameTask): bool {
@@ -129,7 +129,7 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
         $this->assertEquals($craftingTask['item_id'], $result['task']['item_id']);
     }
 
-    public function testResolveActionPrioritizesFailedBountyTask(): void
+    public function test_resolve_action_prioritizes_failed_bounty_task(): void
     {
         $fameTasks = $this->factionLoyaltyNpc->factionLoyaltyNpcTasks->fame_tasks;
         $bountyTask = collect($fameTasks)->first(function (array $fameTask): bool {
@@ -148,7 +148,7 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
         $this->assertEquals($bountyTask['monster_id'], $result['task']['monster_id']);
     }
 
-    public function testResolveActionFallsBackWhenFailedCraftingTaskIsNotIncomplete(): void
+    public function test_resolve_action_falls_back_when_failed_crafting_task_is_not_incomplete(): void
     {
         $this->factionLoyaltyAutomation->update([
             'failed_crafting_item_id' => 999999,
@@ -161,7 +161,7 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
         $this->assertEquals(FactionLoyaltyCoordinatorAction::CRAFT->value, $result['type']);
     }
 
-    public function testResolveActionFallsBackWhenFailedBountyTaskIsNotIncomplete(): void
+    public function test_resolve_action_falls_back_when_failed_bounty_task_is_not_incomplete(): void
     {
         $this->factionLoyaltyAutomation->update([
             'failed_bounty_monster_id' => 999999,
@@ -174,7 +174,7 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
         $this->assertEquals(FactionLoyaltyCoordinatorAction::CRAFT->value, $result['type']);
     }
 
-    public function testResolveActionReturnsCraftWhenBothTaskTypesExistAndNoLogExists(): void
+    public function test_resolve_action_returns_craft_when_both_task_types_exist_and_no_log_exists(): void
     {
         $this->factionLoyaltyAutomation->log()->delete();
 
@@ -185,7 +185,7 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
         $this->assertEquals(FactionLoyaltyCoordinatorAction::CRAFT->value, $result['type']);
     }
 
-    public function testResolveActionReturnsCraftWhenBothTaskTypesExistAndLogsAreEmpty(): void
+    public function test_resolve_action_returns_craft_when_both_task_types_exist_and_logs_are_empty(): void
     {
         $this->factionLoyaltyAutomation->log()->update([
             'crafting_logs' => [],
@@ -199,7 +199,7 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
         $this->assertEquals(FactionLoyaltyCoordinatorAction::CRAFT->value, $result['type']);
     }
 
-    public function testResolveActionReturnsFightWhenLastActionWasCrafting(): void
+    public function test_resolve_action_returns_fight_when_last_action_was_crafting(): void
     {
         $this->factionLoyaltyAutomation->log()->update([
             'crafting_logs' => [
@@ -217,7 +217,7 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
         $this->assertEquals(FactionLoyaltyCoordinatorAction::FIGHT->value, $result['type']);
     }
 
-    public function testResolveActionReturnsCraftWhenLastActionWasFighting(): void
+    public function test_resolve_action_returns_craft_when_last_action_was_fighting(): void
     {
         $this->factionLoyaltyAutomation->log()->update([
             'crafting_logs' => [],
@@ -235,7 +235,7 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
         $this->assertEquals(FactionLoyaltyCoordinatorAction::CRAFT->value, $result['type']);
     }
 
-    public function testResolveActionReturnsFightWhenCraftingLogIsNewerThanFightLog(): void
+    public function test_resolve_action_returns_fight_when_crafting_log_is_newer_than_fight_log(): void
     {
         $this->factionLoyaltyAutomation->log()->update([
             'crafting_logs' => [
@@ -257,7 +257,7 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
         $this->assertEquals(FactionLoyaltyCoordinatorAction::FIGHT->value, $result['type']);
     }
 
-    public function testResolveActionReturnsCraftWhenFightLogIsNewerThanCraftingLog(): void
+    public function test_resolve_action_returns_craft_when_fight_log_is_newer_than_crafting_log(): void
     {
         $this->factionLoyaltyAutomation->log()->update([
             'crafting_logs' => [
@@ -279,7 +279,7 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
         $this->assertEquals(FactionLoyaltyCoordinatorAction::CRAFT->value, $result['type']);
     }
 
-    public function testResolveActionReturnsCraftWhenOnlyCraftingTasksExist(): void
+    public function test_resolve_action_returns_craft_when_only_crafting_tasks_exist(): void
     {
         $fameTasks = $this->factionLoyaltyNpc->factionLoyaltyNpcTasks->fame_tasks;
         $craftingTasks = collect($fameTasks)->filter(function (array $fameTask): bool {
@@ -297,7 +297,7 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
         $this->assertEquals(FactionLoyaltyCoordinatorAction::CRAFT->value, $result['type']);
     }
 
-    public function testResolveActionReturnsFightWhenOnlyBountyTasksExist(): void
+    public function test_resolve_action_returns_fight_when_only_bounty_tasks_exist(): void
     {
         $fameTasks = $this->factionLoyaltyNpc->factionLoyaltyNpcTasks->fame_tasks;
         $bountyTasks = collect($fameTasks)->filter(function (array $fameTask): bool {

@@ -49,7 +49,7 @@ class CapitalCityProcessUnitRequestHandler
 
         if (! empty($missingResources) && $shouldFailForMissingCosts) {
             $requestData = collect($requestData)
-                ->map(fn($item) => array_merge($item, ['secondary_status' => CapitalCityQueueStatus::REJECTED]))
+                ->map(fn ($item) => array_merge($item, ['secondary_status' => CapitalCityQueueStatus::REJECTED]))
                 ->toArray();
 
             $capitalCityUnitQueue->update([
@@ -121,7 +121,7 @@ class CapitalCityProcessUnitRequestHandler
             $requestedAmountsByUnitName[$unitRequest['name']] = ($requestedAmountsByUnitName[$unitRequest['name']] ?? 0) + $unitRequest['amount'];
 
             if (! $this->unitService->canQueueUnits($kingdom, $gameUnit, $requestedAmountsByUnitName[$unitRequest['name']], null, $capitalCityUnitQueue->id)) {
-                $this->messages[] = $unitRequest['name'] . ' rejected because recruiting this amount would exceed the kingdom unit maximum.';
+                $this->messages[] = $unitRequest['name'].' rejected because recruiting this amount would exceed the kingdom unit maximum.';
                 $unitRequest['secondary_status'] = CapitalCityQueueStatus::REJECTED;
 
                 $requestData[$index] = $unitRequest;
@@ -144,7 +144,7 @@ class CapitalCityProcessUnitRequestHandler
     {
         if ($building->is_locked) {
 
-            $this->messages[] = $unitName . ' rejected because: Building is locked in ' . $kingdom->name . '. You need to unlock the building: ' . $building->name . ' first by leveling a passive of the same name to level 1.';
+            $this->messages[] = $unitName.' rejected because: Building is locked in '.$kingdom->name.'. You need to unlock the building: '.$building->name.' first by leveling a passive of the same name to level 1.';
 
             return true;
         }
@@ -159,7 +159,7 @@ class CapitalCityProcessUnitRequestHandler
     {
         if ($building->level < $gameBuildingRelation->required_level) {
 
-            $this->messages[] = $unitName . ' rejected because: Building is under level in ' . $kingdom->name . '. You need to level the building: ' . $building->name . ' to level: ' . $gameBuildingRelation->required_level . ' first.';
+            $this->messages[] = $unitName.' rejected because: Building is under level in '.$kingdom->name.'. You need to level the building: '.$building->name.' to level: '.$gameBuildingRelation->required_level.' first.';
 
             return true;
         }
@@ -202,7 +202,7 @@ class CapitalCityProcessUnitRequestHandler
     {
         return collect($requestData)
             ->pluck('missing_costs')
-            ->reduce(fn($carry, $costs) => $carry->merge($costs)->map(fn($value, $key) => $carry->get($key, 0) + $value), collect())
+            ->reduce(fn ($carry, $costs) => $carry->merge($costs)->map(fn ($value, $key) => $carry->get($key, 0) + $value), collect())
             ->toArray();
     }
 
@@ -235,7 +235,7 @@ class CapitalCityProcessUnitRequestHandler
 
             $totalTimeInSeconds = 0;
 
-            $filteredRequestData = collect($requestData)->filter(fn($item) => in_array($item['secondary_status'], [
+            $filteredRequestData = collect($requestData)->filter(fn ($item) => in_array($item['secondary_status'], [
                 CapitalCityQueueStatus::RECRUITING,
             ]))->toArray();
 
@@ -257,7 +257,7 @@ class CapitalCityProcessUnitRequestHandler
     private function hasRecruitingUnits(array $requestData): bool
     {
         return collect($requestData)
-            ->contains(fn($item) => $item['secondary_status'] === CapitalCityQueueStatus::RECRUITING);
+            ->contains(fn ($item) => $item['secondary_status'] === CapitalCityQueueStatus::RECRUITING);
     }
 
     /**
@@ -328,8 +328,8 @@ class CapitalCityProcessUnitRequestHandler
     private function sumTotalCostsForUnits(array $requestData): array
     {
         return collect($requestData)
-            ->map(fn($costs) => collect($costs['costs']))
-            ->reduce(fn($carry, $costs) => $carry->merge($costs)->map(fn($value, $key) => $carry->get($key, 0) + $value), collect())
+            ->map(fn ($costs) => collect($costs['costs']))
+            ->reduce(fn ($carry, $costs) => $carry->merge($costs)->map(fn ($value, $key) => $carry->get($key, 0) + $value), collect())
             ->toArray();
     }
 
@@ -404,7 +404,7 @@ class CapitalCityProcessUnitRequestHandler
         $timeTillDone = now()->addSeconds($timeTillDone);
 
         if (now()->diffInDays($timeTillDone) > self::MAX_DAYS) {
-            $this->messages[] = $gameUnit->name . ' for kingdom: ' . $kingdom->name . ' would take longer then 7 (Real World) Days. The kingdom has rejected this recruitment order. If you want this amount of units, you must recruit it from the kingdom it\'s self.';
+            $this->messages[] = $gameUnit->name.' for kingdom: '.$kingdom->name.' would take longer then 7 (Real World) Days. The kingdom has rejected this recruitment order. If you want this amount of units, you must recruit it from the kingdom it\'s self.';
 
             return true;
         }

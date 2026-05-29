@@ -35,7 +35,7 @@ class KingdomMaxResourceRecalculationService
         foreach ($kingdom->buildings as $building) {
             if ($building->gives_resources && $building->level > 1) {
                 foreach ($this->resourceTypes as $resourceType) {
-                    if ($building->gameBuilding->{'increase_' . $resourceType . '_amount'} > 0) {
+                    if ($building->gameBuilding->{'increase_'.$resourceType.'_amount'} > 0) {
                         $maxResources[$resourceType] += ($building->level - 1) * self::RESOURCE_BUILDING_CAPACITY_PER_LEVEL;
                     }
                 }
@@ -64,7 +64,7 @@ class KingdomMaxResourceRecalculationService
         if ($preserveCurrentCapacity) {
             foreach ($this->resourceTypes as $resourceType) {
                 $calculatedMaxResources[$resourceType] = max(
-                    $kingdom->{'current_' . $resourceType},
+                    $kingdom->{'current_'.$resourceType},
                     $calculatedMaxResources[$resourceType]
                 );
             }

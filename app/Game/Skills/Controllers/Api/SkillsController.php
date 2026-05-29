@@ -76,7 +76,7 @@ class SkillsController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'You stopped training: ' . $skill->name,
+            'message' => 'You stopped training: '.$skill->name,
             'skills' => [
                 'training_skills' => $this->skillService->getSkills($character->refresh(), GameSkill::where('can_train', true)->pluck('id')->toArray()),
             ],

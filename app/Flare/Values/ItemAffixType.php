@@ -104,12 +104,12 @@ class ItemAffixType
     /**
      * Throws if the value does not exist in the array of const values.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct(string $value)
     {
         if (! in_array($value, self::$values)) {
-            throw new \Exception($value.' does not exist on ItemAffixType');
+            throw new Exception($value.' does not exist on ItemAffixType');
         }
 
         $this->value = $value;

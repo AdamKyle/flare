@@ -27,7 +27,7 @@ class DelveExplorationControllerTest extends TestCase
 
     private Monster $monster;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -57,13 +57,13 @@ class DelveExplorationControllerTest extends TestCase
             ->getMonster();
     }
 
-    public function testBeginStartsDelve(): void
+    public function test_begin_starts_delve(): void
     {
         Queue::fake();
         Event::fake();
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/delve/' . $this->character->id . '/start', [
+            ->call('POST', '/api/delve/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
                 'attack_type' => AttackTypeValue::ATTACK,
                 'pack_size' => 5,
@@ -74,7 +74,7 @@ class DelveExplorationControllerTest extends TestCase
         $this->assertEquals('Delve has started child. Let us see how long you last shall we? (Max delve time is 8 hours.)', $jsonData['message']);
     }
 
-    public function testStopStopsDelve(): void
+    public function test_stop_stops_delve(): void
     {
         Event::fake();
 
@@ -95,20 +95,20 @@ class DelveExplorationControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/delve/' . $this->character->id . '/stop', [
+            ->call('POST', '/api/delve/'.$this->character->id.'/stop', [
                 '_token' => csrf_token(),
             ]);
 
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function testBeginReturns422WhenAttackTypeIsInvalid(): void
+    public function test_begin_returns422_when_attack_type_is_invalid(): void
     {
         Queue::fake();
         Event::fake();
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/delve/' . $this->character->id . '/start', [
+            ->call('POST', '/api/delve/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
                 'attack_type' => 'invalid',
                 'pack_size' => 5,
@@ -120,7 +120,7 @@ class DelveExplorationControllerTest extends TestCase
         $this->assertEquals('Invalid attack type was selected. Please select from the drop down.', $jsonData['message']);
     }
 
-    public function testBeginReturns422WhenAutomationIsAlreadyRunning(): void
+    public function test_begin_returns422_when_automation_is_already_running(): void
     {
         Queue::fake();
         Event::fake();
@@ -135,7 +135,7 @@ class DelveExplorationControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/delve/' . $this->character->id . '/start', [
+            ->call('POST', '/api/delve/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
                 'attack_type' => AttackTypeValue::ATTACK,
                 'pack_size' => 5,
@@ -147,7 +147,7 @@ class DelveExplorationControllerTest extends TestCase
         $this->assertEquals('You cannot do that while Delve automation is running. Cancel it first.', $jsonData['message']);
     }
 
-    public function testBeginReturns422WhenCharacterIsNotOnCaveOfMemoriesLocation(): void
+    public function test_begin_returns422_when_character_is_not_on_cave_of_memories_location(): void
     {
         Queue::fake();
         Event::fake();
@@ -155,7 +155,7 @@ class DelveExplorationControllerTest extends TestCase
         $this->location->delete();
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/delve/' . $this->character->id . '/start', [
+            ->call('POST', '/api/delve/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
                 'attack_type' => AttackTypeValue::ATTACK,
                 'pack_size' => 5,

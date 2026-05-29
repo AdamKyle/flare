@@ -19,14 +19,14 @@ class CharacterRepairStatsCommandTest extends TestCase
 {
     use CreateClass, CreateRace, CreateUser, RefreshDatabase;
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Carbon::setTestNow();
 
         parent::tearDown();
     }
 
-    public function testDryRunScansAffectedCharactersButChangesNoStats(): void
+    public function test_dry_run_scans_affected_characters_but_changes_no_stats(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -71,7 +71,7 @@ class CharacterRepairStatsCommandTest extends TestCase
         $this->assertSame(6, $character->dex);
     }
 
-    public function testApplyRepairsUnderStattedCharacters(): void
+    public function test_apply_repairs_under_statted_characters(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -101,7 +101,7 @@ class CharacterRepairStatsCommandTest extends TestCase
         $this->assertSame(23, $character->dex);
     }
 
-    public function testApplyLeavesCorrectlyStattedCharactersUnchanged(): void
+    public function test_apply_leaves_correctly_statted_characters_unchanged(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-05-24 09:00:00'));
 
@@ -138,7 +138,7 @@ class CharacterRepairStatsCommandTest extends TestCase
         $this->assertTrue($updatedAtBeforeCommand->eq($character->updated_at));
     }
 
-    public function testCommandProcessesMoreThanOneHundredCharacters(): void
+    public function test_command_processes_more_than_one_hundred_characters(): void
     {
         $race = $this->createRace();
         $class = $this->createClass([
@@ -148,8 +148,8 @@ class CharacterRepairStatsCommandTest extends TestCase
 
         Character::factory()
             ->count(101)
-            ->sequence(fn(Sequence $sequence) => [
-                'name' => 'repair-stat-' . $sequence->index,
+            ->sequence(fn (Sequence $sequence) => [
+                'name' => 'repair-stat-'.$sequence->index,
             ])
             ->create([
                 'user_id' => $user->id,
@@ -169,7 +169,7 @@ class CharacterRepairStatsCommandTest extends TestCase
         $this->assertSame(101, Character::where('str', 18)->where('dex', 23)->count());
     }
 
-    public function testCommandDoesNotChangeXpLevelCurrenciesOrReincarnationCount(): void
+    public function test_command_does_not_change_xp_level_currencies_or_reincarnation_count(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -205,7 +205,7 @@ class CharacterRepairStatsCommandTest extends TestCase
         $this->assertSame(2, $character->times_reincarnated);
     }
 
-    public function testRunningApplyTwiceIsIdempotent(): void
+    public function test_running_apply_twice_is_idempotent(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-05-24 09:00:00'));
 
@@ -240,7 +240,7 @@ class CharacterRepairStatsCommandTest extends TestCase
         $this->assertTrue($updatedAtAfterFirstRun->eq($character->updated_at));
     }
 
-    public function testDryRunReportsSkippedCountForOneBadCharacter(): void
+    public function test_dry_run_reports_skipped_count_for_one_bad_character(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -258,11 +258,11 @@ class CharacterRepairStatsCommandTest extends TestCase
 
         $this->assertStringContainsString('Characters scanned: 1', $output);
         $this->assertStringContainsString('Characters skipped: 1', $output);
-        $this->assertStringContainsString('Skipped character ' . $character->id, $output);
+        $this->assertStringContainsString('Skipped character '.$character->id, $output);
         $this->assertStringContainsString($character->name, $output);
     }
 
-    public function testApplyReportsSkippedCountForOneBadCharacter(): void
+    public function test_apply_reports_skipped_count_for_one_bad_character(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -282,11 +282,11 @@ class CharacterRepairStatsCommandTest extends TestCase
 
         $this->assertStringContainsString('Characters scanned: 1', $output);
         $this->assertStringContainsString('Characters skipped: 1', $output);
-        $this->assertStringContainsString('Skipped character ' . $character->id, $output);
+        $this->assertStringContainsString('Skipped character '.$character->id, $output);
         $this->assertStringContainsString($character->name, $output);
     }
 
-    public function testOneBadCharacterDoesNotStopLaterValidCharactersFromBeingScanned(): void
+    public function test_one_bad_character_does_not_stop_later_valid_characters_from_being_scanned(): void
     {
         $badCharacter = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -322,7 +322,7 @@ class CharacterRepairStatsCommandTest extends TestCase
         $this->assertStringContainsString('Characters skipped: 1', $output);
     }
 
-    public function testOneBadCharacterDoesNotStopLaterValidAffectedCharactersFromBeingRepaired(): void
+    public function test_one_bad_character_does_not_stop_later_valid_affected_characters_from_being_repaired(): void
     {
         $badCharacter = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -358,7 +358,7 @@ class CharacterRepairStatsCommandTest extends TestCase
         $this->assertSame(23, $affectedCharacter->dex);
     }
 
-    public function testDryRunPrintsAuditDetailForLargestCorrection(): void
+    public function test_dry_run_prints_audit_detail_for_largest_correction(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -376,11 +376,11 @@ class CharacterRepairStatsCommandTest extends TestCase
         $output = Artisan::output();
 
         $this->assertStringContainsString('Largest correction: 116', $output);
-        $this->assertStringContainsString('character ' . $character->id, $output);
+        $this->assertStringContainsString('character '.$character->id, $output);
         $this->assertStringContainsString($character->name, $output);
     }
 
-    public function testDryRunReportsReincarnationBonusGapButChangesNothing(): void
+    public function test_dry_run_reports_reincarnation_bonus_gap_but_changes_nothing(): void
     {
         MaxLevelConfiguration::create([
             'max_level' => 2000,
@@ -428,7 +428,7 @@ class CharacterRepairStatsCommandTest extends TestCase
         $this->assertSame(70, $character->dex);
     }
 
-    public function testApplyRepairsReincarnationBonusThenRawStats(): void
+    public function test_apply_repairs_reincarnation_bonus_then_raw_stats(): void
     {
         MaxLevelConfiguration::create([
             'max_level' => 2000,
@@ -475,7 +475,7 @@ class CharacterRepairStatsCommandTest extends TestCase
         $this->assertSame(2, $character->times_reincarnated);
     }
 
-    public function testRepairReincarnationBonusDoesNotReduceExistingBonus(): void
+    public function test_repair_reincarnation_bonus_does_not_reduce_existing_bonus(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-05-24 09:00:00'));
 
@@ -522,7 +522,7 @@ class CharacterRepairStatsCommandTest extends TestCase
         $this->assertTrue($updatedAtBeforeCommand->eq($character->updated_at));
     }
 
-    public function testRepairReincarnationBonusIsIdempotent(): void
+    public function test_repair_reincarnation_bonus_is_idempotent(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-05-24 09:00:00'));
 

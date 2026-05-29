@@ -13,9 +13,6 @@ class FactionLoyaltyAutomationCraftingLogger implements AutomatedCraftingLogger
 
     /**
      * Set up the logger.
-     *
-     * @param FactionLoyaltyAutomation $factionLoyaltyAutomation
-     * @return FactionLoyaltyAutomationCraftingLogger
      */
     public function setUp(FactionLoyaltyAutomation $factionLoyaltyAutomation): FactionLoyaltyAutomationCraftingLogger
     {
@@ -26,9 +23,6 @@ class FactionLoyaltyAutomationCraftingLogger implements AutomatedCraftingLogger
 
     /**
      * Log the automated crafting result.
-     *
-     * @param AutomatedCraftingResult $automatedCraftingResult
-     * @return void
      */
     public function log(AutomatedCraftingResult $automatedCraftingResult): void
     {

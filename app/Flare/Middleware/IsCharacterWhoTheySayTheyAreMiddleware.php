@@ -4,13 +4,14 @@ namespace App\Flare\Middleware;
 
 use App\Flare\Models\Character;
 use Closure;
+use Illuminate\Http\Request;
 
 class IsCharacterWhoTheySayTheyAreMiddleware
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  string|null  $guard
      * @return mixed
      */

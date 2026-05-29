@@ -19,7 +19,7 @@ use Tests\Traits\CreateScheduledEvent;
 
 class SkillServiceTest extends TestCase
 {
-    use CreateClass, CreateGameSkill, CreateEvent, CreateScheduledEvent, CreateItem, RefreshDatabase;
+    use CreateClass, CreateEvent, CreateGameSkill, CreateItem, CreateScheduledEvent, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -88,7 +88,7 @@ class SkillServiceTest extends TestCase
         $this->assertTrue($skillToTrain->currently_training);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('You are now training: ' . $skillToTrain->name, $result['message']);
+        $this->assertEquals('You are now training: '.$skillToTrain->name, $result['message']);
     }
 
     public function test_switch_training_skills()
@@ -119,7 +119,7 @@ class SkillServiceTest extends TestCase
         $this->assertFalse($secondarySkillTraining->currently_training);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('You are now training: ' . $skillToTrain->name, $result['message']);
+        $this->assertEquals('You are now training: '.$skillToTrain->name, $result['message']);
     }
 
     public function test_do_not_assign_xp_to_a_skill_that_doesnt_exist()
@@ -359,7 +359,7 @@ class SkillServiceTest extends TestCase
         $this->assertEquals(0, $skill->refresh()->xp);
     }
 
-    public function testGetSkillUsesClampedLevelWhenSkillIsAboveMaxLevel()
+    public function test_get_skill_uses_clamped_level_when_skill_is_above_max_level()
     {
         $character = $this->character->getCharacter();
 
@@ -380,7 +380,7 @@ class SkillServiceTest extends TestCase
         $this->assertSame(1.0, $result['skill_bonus']);
     }
 
-    public function testGetSkillStacksBoonSkillBonusByAmountUsed()
+    public function test_get_skill_stacks_boon_skill_bonus_by_amount_used()
     {
         $character = $this->character->getCharacter();
 
@@ -416,7 +416,7 @@ class SkillServiceTest extends TestCase
         $this->assertEqualsWithDelta(0.60, $result['skill_bonus'], 0.00001);
     }
 
-    public function testGetSkillStacksBoonSkillTrainingBonusByAmountUsed()
+    public function test_get_skill_stacks_boon_skill_training_bonus_by_amount_used()
     {
         $character = $this->character->getCharacter();
 
@@ -442,7 +442,7 @@ class SkillServiceTest extends TestCase
         $this->assertEqualsWithDelta(0.60, $result['skill_xp_bonus'], 0.00001);
     }
 
-    public function testGetSkillStacksBoonBaseDamageModByAmountUsed()
+    public function test_get_skill_stacks_boon_base_damage_mod_by_amount_used()
     {
         $character = $this->character->getCharacter();
 

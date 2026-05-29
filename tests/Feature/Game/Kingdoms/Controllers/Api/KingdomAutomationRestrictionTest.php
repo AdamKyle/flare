@@ -16,7 +16,7 @@ class KingdomAutomationRestrictionTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testKingdomDetailsCanBeFetchedDuringExploration(): void
+    public function test_kingdom_details_can_be_fetched_during_exploration(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -32,13 +32,13 @@ class KingdomAutomationRestrictionTest extends TestCase
         $character = $characterFactory->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/player-kingdom/' . $character->id . '/' . $kingdom->id);
+            ->call('GET', '/api/player-kingdom/'.$character->id.'/'.$kingdom->id);
 
         $response->assertOk();
         $response->assertJsonPath('kingdom.id', $kingdom->id);
     }
 
-    public function testKingdomListCanBeFetchedDuringExploration(): void
+    public function test_kingdom_list_can_be_fetched_during_exploration(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -52,13 +52,13 @@ class KingdomAutomationRestrictionTest extends TestCase
         $character = $characterFactory->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/player-kingdoms/' . $character->id);
+            ->call('GET', '/api/player-kingdoms/'.$character->id);
 
         $response->assertOk();
         $this->assertArrayHasKey('kingdoms', $response->json());
     }
 
-    public function testKingdomDetailsCanBeFetchedDuringDelve(): void
+    public function test_kingdom_details_can_be_fetched_during_delve(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -74,13 +74,13 @@ class KingdomAutomationRestrictionTest extends TestCase
         $character = $characterFactory->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/player-kingdom/' . $character->id . '/' . $kingdom->id);
+            ->call('GET', '/api/player-kingdom/'.$character->id.'/'.$kingdom->id);
 
         $response->assertOk();
         $response->assertJsonPath('kingdom.id', $kingdom->id);
     }
 
-    public function testKingdomDetailsCanBeFetchedDuringFactionLoyalty(): void
+    public function test_kingdom_details_can_be_fetched_during_faction_loyalty(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -96,13 +96,13 @@ class KingdomAutomationRestrictionTest extends TestCase
         $character = $characterFactory->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/player-kingdom/' . $character->id . '/' . $kingdom->id);
+            ->call('GET', '/api/player-kingdom/'.$character->id.'/'.$kingdom->id);
 
         $response->assertOk();
         $response->assertJsonPath('kingdom.id', $kingdom->id);
     }
 
-    public function testKingdomMutationRejectsDuringAutomation(): void
+    public function test_kingdom_mutation_rejects_during_automation(): void
     {
         Queue::fake();
 
@@ -127,7 +127,7 @@ class KingdomAutomationRestrictionTest extends TestCase
         $building = $kingdom->buildings()->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdoms/' . $character->id . '/upgrade-building/' . $building->id, [
+            ->call('POST', '/api/kingdoms/'.$character->id.'/upgrade-building/'.$building->id, [
                 'to_level' => $building->level + 1,
             ]);
 
@@ -138,7 +138,7 @@ class KingdomAutomationRestrictionTest extends TestCase
         $this->assertSame(0, BuildingInQueue::where('kingdom_id', $kingdom->id)->count());
     }
 
-    public function testCapitalCityBuildingReadsCanBeFetchedDuringAutomation(): void
+    public function test_capital_city_building_reads_can_be_fetched_during_automation(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -157,13 +157,13 @@ class KingdomAutomationRestrictionTest extends TestCase
         $character = $characterFactory->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/kingdom/capital-city/building-queues/' . $character->id . '/' . $capitalCity->id);
+            ->call('GET', '/api/kingdom/capital-city/building-queues/'.$character->id.'/'.$capitalCity->id);
 
         $response->assertOk();
         $this->assertArrayHasKey('building_queues', $response->json());
     }
 
-    public function testCapitalCityUnitReadsCanBeFetchedDuringAutomation(): void
+    public function test_capital_city_unit_reads_can_be_fetched_during_automation(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -182,13 +182,13 @@ class KingdomAutomationRestrictionTest extends TestCase
         $character = $characterFactory->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/kingdom/capital-city/unit-queues/' . $character->id . '/' . $capitalCity->id);
+            ->call('GET', '/api/kingdom/capital-city/unit-queues/'.$character->id.'/'.$capitalCity->id);
 
         $response->assertOk();
         $this->assertArrayHasKey('unit_queues', $response->json());
     }
 
-    public function testBuildingMutationRejectsWhenCapitalCityQueueExists(): void
+    public function test_building_mutation_rejects_when_capital_city_queue_exists(): void
     {
         Queue::fake();
 
@@ -234,7 +234,7 @@ class KingdomAutomationRestrictionTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdoms/' . $character->id . '/upgrade-building/' . $building->id, [
+            ->call('POST', '/api/kingdoms/'.$character->id.'/upgrade-building/'.$building->id, [
                 'to_level' => $building->level + 1,
             ]);
 
@@ -245,7 +245,7 @@ class KingdomAutomationRestrictionTest extends TestCase
         $this->assertSame(0, BuildingInQueue::where('kingdom_id', $kingdom->id)->count());
     }
 
-    public function testUnitMutationRejectsWhenManualQueueExists(): void
+    public function test_unit_mutation_rejects_when_manual_queue_exists(): void
     {
         Queue::fake();
 
@@ -276,7 +276,7 @@ class KingdomAutomationRestrictionTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdoms/' . $kingdom->id . '/recruit-units/' . $gameUnit->id, [
+            ->call('POST', '/api/kingdoms/'.$kingdom->id.'/recruit-units/'.$gameUnit->id, [
                 'amount' => 1,
             ]);
 

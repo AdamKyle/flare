@@ -4,8 +4,6 @@ namespace Tests\Traits;
 
 use App\Flare\Models\DelveExploration;
 use App\Flare\Models\DelveLog;
-use App\Flare\Models\FactionLoyalty;
-use App\Flare\Models\FactionLoyaltyNpc;
 
 trait CreateDelveAutomation
 {

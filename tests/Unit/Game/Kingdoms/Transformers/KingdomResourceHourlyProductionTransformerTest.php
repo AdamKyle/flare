@@ -13,7 +13,7 @@ class KingdomResourceHourlyProductionTransformerTest extends TestCase
 {
     use CreateGameBuilding, CreateKingdom, RefreshDatabase;
 
-    public function testTransformReturnsFullProduction(): void
+    public function test_transform_returns_full_production(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $kingdom = $this->createKingdom([
@@ -78,7 +78,7 @@ class KingdomResourceHourlyProductionTransformerTest extends TestCase
         ], $result);
     }
 
-    public function testTransformReturnsPartialDamagedProduction(): void
+    public function test_transform_returns_partial_damaged_production(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $kingdom = $this->createKingdom([
@@ -143,7 +143,7 @@ class KingdomResourceHourlyProductionTransformerTest extends TestCase
         ], $result);
     }
 
-    public function testTransformReturnsZeroForDestroyedBuildings(): void
+    public function test_transform_returns_zero_for_destroyed_buildings(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $kingdom = $this->createKingdom([
@@ -208,7 +208,7 @@ class KingdomResourceHourlyProductionTransformerTest extends TestCase
         ], $result);
     }
 
-    public function testTransformReturnsZeroForMissingBuildings(): void
+    public function test_transform_returns_zero_for_missing_buildings(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $kingdom = $this->createKingdom([

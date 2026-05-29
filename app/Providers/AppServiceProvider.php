@@ -2,26 +2,16 @@
 
 namespace App\Providers;
 
-use App\Console\AfterDeployment\CleanUpInvalidBrokenQueues;
-use App\Console\AfterDeployment\CleanOrphanedBuildingExpansionQueues;
-use App\Console\AfterDeployment\CreateLocationDataCache;
-use App\Console\AfterDeployment\FixInvalidProgressionLevels;
-use App\Console\AfterDeployment\FixKingdomMaxResourcesBasedOnPassiveSkill;
-use App\Console\AfterDeployment\RebuildKingdomCache;
-use App\Console\DevelopmentCommands\GivePlayerDelveLocationQuestItems;
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\ServiceProvider;
 use App\Console\AfterDeployment\AddHolyStacksToItems;
 use App\Console\AfterDeployment\AssignNewBuildingsToExistingKingdoms;
 use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
 use App\Console\AfterDeployment\CleanInvalidWeapons;
 use App\Console\AfterDeployment\CleanMarketPlaceOfInvalidWeapons;
-use App\Console\AfterDeployment\CleanUpInvalidBrokenQueues;
+use App\Console\AfterDeployment\CleanOrphanedBuildingExpansionQueues;
 use App\Console\AfterDeployment\ClearInvalidCapitalCityQueues;
-use App\Console\AfterDeployment\CreateLocationDataCache;
 use App\Console\AfterDeployment\CreateQuestChainRelationships;
-use App\Console\AfterDeployment\FixKingdomMaxResourcesBasedOnPassiveSkill;
+use App\Console\AfterDeployment\FixInvalidProgressionLevels;
+use App\Console\AfterDeployment\RebuildKingdomCache;
 use App\Console\AfterDeployment\RemoveInvalidQuestItems;
 use App\Console\AfterDeployment\UpdateCharactersForClassRanks;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
@@ -66,9 +56,6 @@ class AppServiceProvider extends ServiceProvider
             CleanInvalidWeapons::class,
             CleanMarketPlaceOfInvalidWeapons::class,
             CreateQuestChainRelationships::class,
-            CreateLocationDataCache::class,
-            FixKingdomMaxResourcesBasedOnPassiveSkill::class,
-            CleanUpInvalidBrokenQueues::class,
             CleanOrphanedBuildingExpansionQueues::class,
             RebuildKingdomCache::class,
             FixInvalidProgressionLevels::class,
@@ -107,7 +94,7 @@ class AppServiceProvider extends ServiceProvider
 
             $headers = [
                 'Content-type' => 'text/json',
-                'Content-Disposition' => 'attachment; filename=' . $fileName . '.json',
+                'Content-Disposition' => 'attachment; filename='.$fileName.'.json',
             ];
 
             return \Response::make($content, 200, $headers);

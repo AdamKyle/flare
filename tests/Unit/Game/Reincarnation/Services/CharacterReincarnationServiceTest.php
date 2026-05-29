@@ -247,7 +247,7 @@ class CharacterReincarnationServiceTest extends TestCase
         $this->assertEquals('You have maxed all stats to 9,999,999,999.', $result['message']);
     }
 
-    public function testAlreadyCorrectCharacterKeepsExistingReincarnationBehavior(): void
+    public function test_already_correct_character_keeps_existing_reincarnation_behavior(): void
     {
         $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
 
@@ -299,7 +299,7 @@ class CharacterReincarnationServiceTest extends TestCase
         $this->assertSame(1, $character->times_reincarnated);
     }
 
-    public function testReincarnatedStatIncreaseUsesBonusFromLastProcessedStat(): void
+    public function test_reincarnated_stat_increase_uses_bonus_from_last_processed_stat(): void
     {
         $character = $this->character->getCharacter();
 
@@ -323,7 +323,7 @@ class CharacterReincarnationServiceTest extends TestCase
         $this->assertSame(35020, $character->reincarnated_stat_increase);
     }
 
-    public function testFocusIsTheLastProcessedStatWhenIncludedInReincarnation(): void
+    public function test_focus_is_the_last_processed_stat_when_included_in_reincarnation(): void
     {
         $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
 
@@ -360,7 +360,7 @@ class CharacterReincarnationServiceTest extends TestCase
         $this->assertSame(35020, $character->reincarnated_stat_increase);
     }
 
-    public function testFocusMaxedBeforeReincarnationChangesSelectedBonusToAgility(): void
+    public function test_focus_maxed_before_reincarnation_changes_selected_bonus_to_agility(): void
     {
         $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
 
@@ -397,7 +397,7 @@ class CharacterReincarnationServiceTest extends TestCase
         $this->assertSame(30020, $character->reincarnated_stat_increase);
     }
 
-    public function testReincarnatedStatIncreaseIsCappedAtMaxReincarnationStats(): void
+    public function test_reincarnated_stat_increase_is_capped_at_max_reincarnation_stats(): void
     {
         $character = $this->character->getCharacter();
 

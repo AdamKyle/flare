@@ -13,9 +13,9 @@ use App\Flare\Models\Quest;
 use App\Flare\Models\User;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\CharacterInventory\Values\ItemType;
-use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
@@ -136,7 +136,7 @@ class CharacterFactory
 
         $character = $this->character->refresh();
 
-        Cache::put('character-attack-data-' . $character->id, (new AttackDataCacheSetUp)->getCacheObject());
+        Cache::put('character-attack-data-'.$character->id, (new AttackDataCacheSetUp)->getCacheObject());
 
         return $this;
     }
@@ -184,7 +184,7 @@ class CharacterFactory
             'level' => 0,
         ]);
 
-        $itemTypes = array_map(fn($case) => $case->value, ItemType::cases());
+        $itemTypes = array_map(fn ($case) => $case->value, ItemType::cases());
 
         foreach ($itemTypes as $type) {
             $classRank->weaponMasteries()->create([
@@ -203,7 +203,7 @@ class CharacterFactory
 
     public function addAdditionalClassRanks(array $gameClassIds): CharacterFactory
     {
-        $itemTypes = array_map(fn($case) => $case->value, ItemType::cases());
+        $itemTypes = array_map(fn ($case) => $case->value, ItemType::cases());
 
         foreach ($gameClassIds as $gameClassId) {
             $classRank = $this->character->classRanks()->create([
@@ -375,8 +375,6 @@ class CharacterFactory
 
     /**
      * Allows you to configure passive skills on the character.
-     *
-     * @return PassiveSkillManagement
      */
     public function passiveSkillManagement(): PassiveSkillManagement
     {
@@ -574,7 +572,7 @@ class CharacterFactory
         $skill = $this->character->skills->where('name', $name)->first();
 
         if (is_null($skill)) {
-            throw new Exception($name . ' not found.');
+            throw new Exception($name.' not found.');
         }
 
         $skill->update($changes);
@@ -750,11 +748,10 @@ class CharacterFactory
 
         $characterSheet = array_replace_recursive($characterSheet, $data);
 
-        Cache::put('character-sheet-' . $this->character->id, $characterSheet);
+        Cache::put('character-sheet-'.$this->character->id, $characterSheet);
 
         return $this;
     }
-
 
     /**
      * Create the core inventory.

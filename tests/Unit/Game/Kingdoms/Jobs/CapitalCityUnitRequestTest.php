@@ -18,7 +18,7 @@ class CapitalCityUnitRequestTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testOverMaximumCompletionIsRejectedWithoutSpendingResources(): void
+    public function test_over_maximum_completion_is_rejected_without_spending_resources(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom([
@@ -59,7 +59,7 @@ class CapitalCityUnitRequestTest extends TestCase
         $this->assertSame(100, $kingdom->refresh()->current_wood);
     }
 
-    public function testRejectedRowsAreNotChargedWhenAcceptedRowsComplete(): void
+    public function test_rejected_rows_are_not_charged_when_accepted_rows_complete(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom([
@@ -103,7 +103,7 @@ class CapitalCityUnitRequestTest extends TestCase
         $this->assertSame(90, $kingdom->refresh()->current_wood);
     }
 
-    public function testDuplicateAcceptedRowsCannotCompleteOverMaximumUnits(): void
+    public function test_duplicate_accepted_rows_cannot_complete_over_maximum_units(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom([

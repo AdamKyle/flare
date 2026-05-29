@@ -6,6 +6,7 @@ use App\Flare\Models\SubmittedSurvey;
 use App\Flare\Models\Survey;
 use App\Flare\Models\SurveySnapshot;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use PHPUnit\Event\Telemetry\Snapshot;
 
 class CreateSurveySnapshot
@@ -81,7 +82,7 @@ class CreateSurveySnapshot
     /**
      * Get responses for the given survey ID.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     private function getSurveyResponses(int $surveyId)
     {
@@ -103,7 +104,7 @@ class CreateSurveySnapshot
     /**
      * Process a section of the survey.
      *
-     * @param  \Illuminate\Support\Collection  $responses
+     * @param  Collection  $responses
      */
     private function processSection(array $section, $responses): array
     {
@@ -123,7 +124,7 @@ class CreateSurveySnapshot
     /**
      * Process a field within a section.
      *
-     * @param  \Illuminate\Support\Collection  $responses
+     * @param  Collection  $responses
      */
     private function processField(array $field, $responses): array
     {
@@ -165,7 +166,7 @@ class CreateSurveySnapshot
     /**
      * Calculate the value percentage for selectable fields.
      *
-     * @param  \Illuminate\Support\Collection  $responses
+     * @param  Collection  $responses
      */
     private function calculateValuePercentage(array $field, $responses): array
     {

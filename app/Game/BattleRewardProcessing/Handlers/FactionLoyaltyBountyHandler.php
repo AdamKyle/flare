@@ -67,9 +67,9 @@ class FactionLoyaltyBountyHandler
         if ($this->wasCurrentFameForTaskUpdated()) {
             $matchingTask = $this->getMatchingTask($helpingNpc, 'monster_id', $monster->id);
 
-            ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name .
-                ' is happy that you slaughtered another one of the enemies on their hit list. "Only: ' .
-                ($matchingTask['required_amount'] - $matchingTask['current_amount']) . ' to go child!"');
+            ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name.
+                ' is happy that you slaughtered another one of the enemies on their hit list. "Only: '.
+                ($matchingTask['required_amount'] - $matchingTask['current_amount']).' to go child!"');
         }
 
         while ($this->canLevelUpFame($helpingNpc)) {
@@ -92,10 +92,10 @@ class FactionLoyaltyBountyHandler
 
         ServerMessageHandler::sendBasicMessage(
             $character->user,
-            'Your fame with: ' . $helpingNpc->npc->real_name .
-                ' on Plane: ' . $helpingNpc->npc->gameMap->name .
-                ' is now level: ' . $helpingNpc->current_level .
-                ' out of: ' . $helpingNpc->max_level . '. You also got some XP and other rewards!'
+            'Your fame with: '.$helpingNpc->npc->real_name.
+                ' on Plane: '.$helpingNpc->npc->gameMap->name.
+                ' is now level: '.$helpingNpc->current_level.
+                ' out of: '.$helpingNpc->max_level.'. You also got some XP and other rewards!'
         );
 
         $this->handOutXp($character, $helpingNpc, $newLevel, $helpingNpcName);
@@ -201,7 +201,7 @@ class FactionLoyaltyBountyHandler
             'item_id' => $newItem->id,
         ]);
 
-        event(new ServerMessageEvent($character->user, 'You found something of Unique child: ' . $item->affix_name, $slot->id));
+        event(new ServerMessageEvent($character->user, 'You found something of Unique child: '.$item->affix_name, $slot->id));
     }
 
     private function canLevelUpFame(FactionLoyaltyNpc $factionLoyaltyNpc): bool

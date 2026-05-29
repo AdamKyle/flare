@@ -21,7 +21,7 @@ class IsCharacterExploringTest extends TestCase
 
     private IsCharacterExploring $middleware;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -34,7 +34,7 @@ class IsCharacterExploringTest extends TestCase
         $this->actingAs($this->character->user);
     }
 
-    public function testHandleContinuesJsonRequestWhenCharacterIsNotExploring(): void
+    public function test_handle_continues_json_request_when_character_is_not_exploring(): void
     {
         Event::fake();
 
@@ -48,7 +48,7 @@ class IsCharacterExploringTest extends TestCase
         $this->assertEquals('continued', json_decode($response->getContent(), true)['message']);
     }
 
-    public function testHandleReturnsJsonResponseWhenCharacterIsExploring(): void
+    public function test_handle_returns_json_response_when_character_is_exploring(): void
     {
         Event::fake();
 
@@ -69,7 +69,7 @@ class IsCharacterExploringTest extends TestCase
         );
     }
 
-    public function testHandleDispatchesServerMessageEventForJsonRequestWhenCharacterIsExploring(): void
+    public function test_handle_dispatches_server_message_event_for_json_request_when_character_is_exploring(): void
     {
         Event::fake();
 
@@ -84,7 +84,7 @@ class IsCharacterExploringTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testHandleContinuesWebRequestWhenCharacterIsNotExploring(): void
+    public function test_handle_continues_web_request_when_character_is_not_exploring(): void
     {
         Event::fake();
 
@@ -96,7 +96,7 @@ class IsCharacterExploringTest extends TestCase
         $this->assertEquals('continued', $response->getContent());
     }
 
-    public function testHandleRedirectsWebRequestWhenCharacterIsExploring(): void
+    public function test_handle_redirects_web_request_when_character_is_exploring(): void
     {
         Event::fake();
 
@@ -109,7 +109,7 @@ class IsCharacterExploringTest extends TestCase
         $this->assertEquals(302, $response->getStatusCode());
     }
 
-    public function testHandleDispatchesServerMessageEventForWebRequestWhenCharacterIsExploring(): void
+    public function test_handle_dispatches_server_message_event_for_web_request_when_character_is_exploring(): void
     {
         Event::fake();
 

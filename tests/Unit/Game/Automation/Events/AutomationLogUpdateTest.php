@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class AutomationLogUpdateTest extends TestCase
 {
-    public function testConstructorSetsDefaultPayloadValues(): void
+    public function test_constructor_sets_default_payload_values(): void
     {
         $event = new AutomationLogUpdate(1, 'Test automation message');
 
@@ -17,7 +17,7 @@ class AutomationLogUpdateTest extends TestCase
         $this->assertFalse($event->isReward);
     }
 
-    public function testConstructorSetsCustomPayloadValues(): void
+    public function test_constructor_sets_custom_payload_values(): void
     {
         $event = new AutomationLogUpdate(1, 'Reward automation message', true, true);
 
@@ -26,7 +26,7 @@ class AutomationLogUpdateTest extends TestCase
         $this->assertTrue($event->isReward);
     }
 
-    public function testBroadcastOnReturnsPrivateAutomationLogUpdateChannel(): void
+    public function test_broadcast_on_returns_private_automation_log_update_channel(): void
     {
         $event = new AutomationLogUpdate(123, 'Test automation message');
 

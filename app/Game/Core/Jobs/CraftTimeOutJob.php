@@ -16,9 +16,6 @@ class CraftTimeOutJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * @var Character
-     */
     protected Character $character;
 
     /**
@@ -33,8 +30,6 @@ class CraftTimeOutJob implements ShouldQueue
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
     public function handle(): void
     {
@@ -54,8 +49,6 @@ class CraftTimeOutJob implements ShouldQueue
 
     /**
      * Has active faction loyalty automation.
-     *
-     * @return bool
      */
     private function hasActiveFactionLoyaltyAutomation(): bool
     {

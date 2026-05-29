@@ -20,7 +20,7 @@ export default interface LineChartProps<
   TData extends object = Record<string, unknown>,
 > {
   data: TData[];
-  x_axis_data_key: keyof TData & string;
+  x_axis_data_key: NonNullable<XAxisProps<TData>['dataKey']>;
   lines: Array<LineChartLineDefinition<TData>>;
   tooltip_content: ReactElement;
 
@@ -30,7 +30,7 @@ export default interface LineChartProps<
 
   cartesian_grid_props?: CartesianGridProps;
 
-  x_axis_props?: Omit<XAxisProps, 'dataKey'>;
+  x_axis_props?: Omit<XAxisProps<TData>, 'dataKey'>;
   y_axis_props?: YAxisProps;
 
   tooltip_props?: Omit<ComponentProps<RechartsTooltipComponent>, 'content'>;

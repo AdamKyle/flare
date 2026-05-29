@@ -9,18 +9,17 @@ use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\LocationType;
-use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationStatus;
 use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Jobs\DelveExploration as DelveExplorationProcessing;
+use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Traits\ResponseBuilder;
 use Illuminate\Support\Facades\Cache;
 
 class DelveExplorationAutomationService
 {
-
     use ResponseBuilder;
 
     private int $timeDelay = 5;
@@ -62,7 +61,7 @@ class DelveExplorationAutomationService
 
         event(new UpdateCharacterStatus($character));
 
-        event(new AutomationLogUpdate($character->user->id, 'The Delve will begin in ' . $location->minutes_between_delve_fights . ' minutes. every three minutes you will fight ' . $params['pack_size'] . ' enemy(ies). You will fight a new pack of or creature every 3 minutes (randomly chosen beast). A pack is always made up of the same creature.'));
+        event(new AutomationLogUpdate($character->user->id, 'The Delve will begin in '.$location->minutes_between_delve_fights.' minutes. every three minutes you will fight '.$params['pack_size'].' enemy(ies). You will fight a new pack of or creature every 3 minutes (randomly chosen beast). A pack is always made up of the same creature.'));
 
         event(new AutomationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
 
@@ -87,7 +86,7 @@ class DelveExplorationAutomationService
 
         $character = $character->refresh();
 
-        Cache::delete('can-character-survive-' . $character->id);
+        Cache::delete('can-character-survive-'.$character->id);
 
         event(new AutomationTimeOut($character->user, 0));
         event(new AutomationStatus($character->user, false));

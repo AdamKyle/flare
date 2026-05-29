@@ -21,7 +21,7 @@ class CapitalCityManagementControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testDirectApiCannotQueueMaxLevelBuilding(): void
+    public function test_direct_api_cannot_queue_max_level_building(): void
     {
         Queue::fake();
 
@@ -59,7 +59,7 @@ class CapitalCityManagementControllerTest extends TestCase
         $this->actingAs($character->user);
         $response = $this->call(
             'POST',
-            '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id,
+            '/api/kingdom/capital-city/upgrade-building-requests/'.$character->id.'/'.$capitalCity->id,
             [],
             [],
             [],
@@ -89,7 +89,7 @@ class CapitalCityManagementControllerTest extends TestCase
         $this->assertSame(2000, $targetKingdom->refresh()->current_population);
     }
 
-    public function testDirectApiRejectsBuildingAlreadyQueuedManually(): void
+    public function test_direct_api_rejects_building_already_queued_manually(): void
     {
         Queue::fake();
 
@@ -138,7 +138,7 @@ class CapitalCityManagementControllerTest extends TestCase
         $this->actingAs($character->user);
         $response = $this->call(
             'POST',
-            '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id,
+            '/api/kingdom/capital-city/upgrade-building-requests/'.$character->id.'/'.$capitalCity->id,
             [],
             [],
             [],
@@ -164,7 +164,7 @@ class CapitalCityManagementControllerTest extends TestCase
         $this->assertSame(2000, $targetKingdom->refresh()->current_wood);
     }
 
-    public function testDirectApiRejectsBuildingAlreadyQueuedByCapitalCity(): void
+    public function test_direct_api_rejects_building_already_queued_by_capital_city(): void
     {
         Queue::fake();
 
@@ -221,7 +221,7 @@ class CapitalCityManagementControllerTest extends TestCase
         $this->actingAs($character->user);
         $response = $this->call(
             'POST',
-            '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id,
+            '/api/kingdom/capital-city/upgrade-building-requests/'.$character->id.'/'.$capitalCity->id,
             [],
             [],
             [],
@@ -247,7 +247,7 @@ class CapitalCityManagementControllerTest extends TestCase
         $this->assertSame(2000, $targetKingdom->refresh()->current_wood);
     }
 
-    public function testDirectApiRejectsUnitRequestsThatWouldExceedMaxBeforeDispatch(): void
+    public function test_direct_api_rejects_unit_requests_that_would_exceed_max_before_dispatch(): void
     {
         Queue::fake();
 
@@ -299,7 +299,7 @@ class CapitalCityManagementControllerTest extends TestCase
         $this->actingAs($character->user);
         $response = $this->call(
             'POST',
-            '/api/kingdom/capital-city/recruit-unit-requests/' . $character->id . '/' . $capitalCity->id,
+            '/api/kingdom/capital-city/recruit-unit-requests/'.$character->id.'/'.$capitalCity->id,
             [],
             [],
             [],
@@ -332,7 +332,7 @@ class CapitalCityManagementControllerTest extends TestCase
         $this->assertSame(1, CapitalCityUnitQueue::where('kingdom_id', $targetKingdom->id)->count());
     }
 
-    public function testCapitalCityBuildingQueueRejectsDuringAutomation(): void
+    public function test_capital_city_building_queue_rejects_during_automation(): void
     {
         Queue::fake();
 
@@ -363,7 +363,7 @@ class CapitalCityManagementControllerTest extends TestCase
         $this->actingAs($character->user);
         $response = $this->call(
             'POST',
-            '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id,
+            '/api/kingdom/capital-city/upgrade-building-requests/'.$character->id.'/'.$capitalCity->id,
             [],
             [],
             [],
@@ -385,7 +385,7 @@ class CapitalCityManagementControllerTest extends TestCase
         $this->assertSame(0, CapitalCityBuildingQueue::where('kingdom_id', $targetKingdom->id)->count());
     }
 
-    public function testCapitalCityUnitQueueRejectsDuringAutomation(): void
+    public function test_capital_city_unit_queue_rejects_during_automation(): void
     {
         Queue::fake();
 
@@ -412,7 +412,7 @@ class CapitalCityManagementControllerTest extends TestCase
         $this->actingAs($character->user);
         $response = $this->call(
             'POST',
-            '/api/kingdom/capital-city/recruit-unit-requests/' . $character->id . '/' . $capitalCity->id,
+            '/api/kingdom/capital-city/recruit-unit-requests/'.$character->id.'/'.$capitalCity->id,
             [],
             [],
             [],
@@ -436,7 +436,7 @@ class CapitalCityManagementControllerTest extends TestCase
         $this->assertSame(0, CapitalCityUnitQueue::where('kingdom_id', $targetKingdom->id)->count());
     }
 
-    public function testCapitalCityBuildingCancelRejectsDuringAutomation(): void
+    public function test_capital_city_building_cancel_rejects_during_automation(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -472,7 +472,7 @@ class CapitalCityManagementControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdom/capital-city/cancel-building-request/' . $character->id . '/' . $capitalCity->id, [
+            ->call('POST', '/api/kingdom/capital-city/cancel-building-request/'.$character->id.'/'.$capitalCity->id, [
                 'queue_id' => $capitalCityBuildingQueue->id,
             ]);
 
@@ -480,7 +480,7 @@ class CapitalCityManagementControllerTest extends TestCase
         $this->assertNotNull(CapitalCityBuildingQueue::find($capitalCityBuildingQueue->id));
     }
 
-    public function testCapitalCityUnitCancelRejectsDuringAutomation(): void
+    public function test_capital_city_unit_cancel_rejects_during_automation(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -513,7 +513,7 @@ class CapitalCityManagementControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdom/capital-city/cancel-unit-request/' . $character->id . '/' . $capitalCity->id, [
+            ->call('POST', '/api/kingdom/capital-city/cancel-unit-request/'.$character->id.'/'.$capitalCity->id, [
                 'queue_id' => $capitalCityUnitQueue->id,
             ]);
 

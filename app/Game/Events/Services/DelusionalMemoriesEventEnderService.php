@@ -7,6 +7,7 @@ use App\Flare\Models\Event as ActiveEvent;
 use App\Flare\Models\Faction;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\ScheduledEvent;
+use App\Flare\Values\MapNameValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Events\Services\Concerns\EventEnder;
 use App\Game\Events\Values\EventType;
@@ -30,9 +31,9 @@ class DelusionalMemoriesEventEnderService implements EventEnder
 
     public function end(EventType $type, ScheduledEvent $scheduled, ActiveEvent $current): void
     {
-        $this->kingdomEventService->handleKingdomRewardsForEvent(\App\Flare\Values\MapNameValue::DELUSIONAL_MEMORIES);
+        $this->kingdomEventService->handleKingdomRewardsForEvent(MapNameValue::DELUSIONAL_MEMORIES);
 
-        $map = GameMap::query()->where('name', \App\Flare\Values\MapNameValue::DELUSIONAL_MEMORIES)->first();
+        $map = GameMap::query()->where('name', MapNameValue::DELUSIONAL_MEMORIES)->first();
 
         if (is_null($map)) {
             $this->announcementCleanup->deleteByEventId($current->id);
@@ -41,7 +42,7 @@ class DelusionalMemoriesEventEnderService implements EventEnder
             return;
         }
 
-        $surfaceMap = GameMap::query()->where('name', \App\Flare\Values\MapNameValue::SURFACE)->first();
+        $surfaceMap = GameMap::query()->where('name', MapNameValue::SURFACE)->first();
 
         if (is_null($surfaceMap)) {
             $this->announcementCleanup->deleteByEventId($current->id);

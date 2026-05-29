@@ -26,6 +26,7 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\LocationType;
 use App\Game\Core\Values\View\ClassBonusInformation;
 use Facades\App\Game\Maps\Calculations\LocationBasedEnemyDropChanceBonus;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Storage;
 
@@ -53,7 +54,7 @@ class InfoPageController extends Controller
     /**
      * Show the application dashboard.
      *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * @return Renderable
      */
     public function viewPage(Request $request, string $pageName)
     {

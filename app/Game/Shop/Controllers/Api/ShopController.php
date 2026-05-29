@@ -13,6 +13,7 @@ use App\Game\Shop\Requests\ShopReplaceItemValidation;
 use App\Game\Shop\Services\ShopService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as FractalItem;
@@ -50,7 +51,7 @@ class ShopController extends Controller
         );
     }
 
-    public function buy(Request $request, Character $character): JsonResponse|\Illuminate\Http\RedirectResponse
+    public function buy(Request $request, Character $character): JsonResponse|RedirectResponse
     {
 
         if ($character->gold === 0) {
@@ -91,7 +92,7 @@ class ShopController extends Controller
         ]);
     }
 
-    public function buyMultiple(ShopPurchaseMultipleValidation $request, Character $character): JsonResponse|\Illuminate\Http\RedirectResponse
+    public function buyMultiple(ShopPurchaseMultipleValidation $request, Character $character): JsonResponse|RedirectResponse
     {
         $item = Item::find($request->item_id);
         $amount = $request->amount;
@@ -124,7 +125,7 @@ class ShopController extends Controller
         ]);
     }
 
-    public function buyAndReplace(ShopReplaceItemValidation $request, Character $character): JsonResponse|\Illuminate\Http\RedirectResponse
+    public function buyAndReplace(ShopReplaceItemValidation $request, Character $character): JsonResponse|RedirectResponse
     {
 
         $item = Item::find($request->item_id_to_buy);

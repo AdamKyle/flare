@@ -46,9 +46,6 @@ class AutomatedFightResult
 
     /**
      * Set up the result.
-     *
-     * @param AutomatedFightResultType $resultType
-     * @return AutomatedFightResult
      */
     public function setUp(AutomatedFightResultType $resultType): AutomatedFightResult
     {
@@ -77,9 +74,6 @@ class AutomatedFightResult
 
     /**
      * Set the monster id.
-     *
-     * @param int|null $monsterId
-     * @return AutomatedFightResult
      */
     public function setMonsterId(?int $monsterId): AutomatedFightResult
     {
@@ -90,9 +84,6 @@ class AutomatedFightResult
 
     /**
      * Set the monster name.
-     *
-     * @param string|null $monsterName
-     * @return AutomatedFightResult
      */
     public function setMonsterName(?string $monsterName): AutomatedFightResult
     {
@@ -103,9 +94,6 @@ class AutomatedFightResult
 
     /**
      * Set whether this is the bounty target.
-     *
-     * @param bool $bountyTarget
-     * @return AutomatedFightResult
      */
     public function setBountyTarget(bool $bountyTarget): AutomatedFightResult
     {
@@ -116,9 +104,6 @@ class AutomatedFightResult
 
     /**
      * Set whether this is training.
-     *
-     * @param bool $training
-     * @return AutomatedFightResult
      */
     public function setTraining(bool $training): AutomatedFightResult
     {
@@ -129,9 +114,6 @@ class AutomatedFightResult
 
     /**
      * Set the failed bounty monster id.
-     *
-     * @param int|null $failedBountyMonsterId
-     * @return AutomatedFightResult
      */
     public function setFailedBountyMonsterId(?int $failedBountyMonsterId): AutomatedFightResult
     {
@@ -142,9 +124,6 @@ class AutomatedFightResult
 
     /**
      * Set whether training has completed for the failed bounty.
-     *
-     * @param bool $trainedForFailedBounty
-     * @return AutomatedFightResult
      */
     public function setTrainedForFailedBounty(bool $trainedForFailedBounty): AutomatedFightResult
     {
@@ -155,9 +134,6 @@ class AutomatedFightResult
 
     /**
      * Set the total kills.
-     *
-     * @param int $kills
-     * @return AutomatedFightResult
      */
     public function setKills(int $kills): AutomatedFightResult
     {
@@ -168,9 +144,6 @@ class AutomatedFightResult
 
     /**
      * Set the training kills.
-     *
-     * @param int $trainingKills
-     * @return AutomatedFightResult
      */
     public function setTrainingKills(int $trainingKills): AutomatedFightResult
     {
@@ -181,9 +154,6 @@ class AutomatedFightResult
 
     /**
      * Set the bounty kills.
-     *
-     * @param int $bountyKills
-     * @return AutomatedFightResult
      */
     public function setBountyKills(int $bountyKills): AutomatedFightResult
     {
@@ -194,9 +164,6 @@ class AutomatedFightResult
 
     /**
      * Set the total creatures.
-     *
-     * @param int $totalCreatures
-     * @return AutomatedFightResult
      */
     public function setTotalCreatures(int $totalCreatures): AutomatedFightResult
     {
@@ -207,9 +174,6 @@ class AutomatedFightResult
 
     /**
      * Set the total XP.
-     *
-     * @param int $totalXp
-     * @return AutomatedFightResult
      */
     public function setTotalXp(int $totalXp): AutomatedFightResult
     {
@@ -220,9 +184,6 @@ class AutomatedFightResult
 
     /**
      * Set the total skill XP.
-     *
-     * @param int $totalSkillXp
-     * @return AutomatedFightResult
      */
     public function setTotalSkillXp(int $totalSkillXp): AutomatedFightResult
     {
@@ -233,9 +194,6 @@ class AutomatedFightResult
 
     /**
      * Set the total faction points.
-     *
-     * @param int $totalFactionPoints
-     * @return AutomatedFightResult
      */
     public function setTotalFactionPoints(int $totalFactionPoints): AutomatedFightResult
     {
@@ -246,9 +204,6 @@ class AutomatedFightResult
 
     /**
      * Set whether the character died.
-     *
-     * @param bool $characterDied
-     * @return AutomatedFightResult
      */
     public function setCharacterDied(bool $characterDied): AutomatedFightResult
     {
@@ -259,9 +214,6 @@ class AutomatedFightResult
 
     /**
      * Set whether automation ended.
-     *
-     * @param bool $endedAutomation
-     * @return AutomatedFightResult
      */
     public function setEndedAutomation(bool $endedAutomation): AutomatedFightResult
     {
@@ -272,9 +224,6 @@ class AutomatedFightResult
 
     /**
      * Set the fight data.
-     *
-     * @param array $fightData
-     * @return AutomatedFightResult
      */
     public function setFightData(array $fightData): AutomatedFightResult
     {
@@ -285,9 +234,6 @@ class AutomatedFightResult
 
     /**
      * Set the stalled attempt.
-     *
-     * @param int $stalledAttempt
-     * @return AutomatedFightResult
      */
     public function setStalledAttempt(int $stalledAttempt): AutomatedFightResult
     {
@@ -298,9 +244,6 @@ class AutomatedFightResult
 
     /**
      * Set the warning notice.
-     *
-     * @param array|null $warningNotice
-     * @return AutomatedFightResult
      */
     public function setWarningNotice(?array $warningNotice): AutomatedFightResult
     {
@@ -311,8 +254,6 @@ class AutomatedFightResult
 
     /**
      * Get the result type.
-     *
-     * @return AutomatedFightResultType
      */
     public function getResultType(): AutomatedFightResultType
     {
@@ -321,8 +262,6 @@ class AutomatedFightResult
 
     /**
      * Get the monster id.
-     *
-     * @return int|null
      */
     public function getMonsterId(): ?int
     {
@@ -331,8 +270,6 @@ class AutomatedFightResult
 
     /**
      * Get the monster name.
-     *
-     * @return string|null
      */
     public function getMonsterName(): ?string
     {
@@ -341,8 +278,6 @@ class AutomatedFightResult
 
     /**
      * Is this the bounty target?
-     *
-     * @return bool
      */
     public function isBountyTarget(): bool
     {
@@ -351,8 +286,6 @@ class AutomatedFightResult
 
     /**
      * Is this training?
-     *
-     * @return bool
      */
     public function isTraining(): bool
     {
@@ -361,8 +294,6 @@ class AutomatedFightResult
 
     /**
      * Get the failed bounty monster id.
-     *
-     * @return int|null
      */
     public function getFailedBountyMonsterId(): ?int
     {
@@ -371,8 +302,6 @@ class AutomatedFightResult
 
     /**
      * Has training completed for the failed bounty?
-     *
-     * @return bool
      */
     public function hasTrainedForFailedBounty(): bool
     {
@@ -381,8 +310,6 @@ class AutomatedFightResult
 
     /**
      * Get the total kills.
-     *
-     * @return int
      */
     public function getKills(): int
     {
@@ -391,8 +318,6 @@ class AutomatedFightResult
 
     /**
      * Get the training kills.
-     *
-     * @return int
      */
     public function getTrainingKills(): int
     {
@@ -401,8 +326,6 @@ class AutomatedFightResult
 
     /**
      * Get the bounty kills.
-     *
-     * @return int
      */
     public function getBountyKills(): int
     {
@@ -411,8 +334,6 @@ class AutomatedFightResult
 
     /**
      * Get the total creatures.
-     *
-     * @return int
      */
     public function getTotalCreatures(): int
     {
@@ -421,8 +342,6 @@ class AutomatedFightResult
 
     /**
      * Get the total XP.
-     *
-     * @return int
      */
     public function getTotalXp(): int
     {
@@ -431,8 +350,6 @@ class AutomatedFightResult
 
     /**
      * Get the total skill XP.
-     *
-     * @return int
      */
     public function getTotalSkillXp(): int
     {
@@ -441,8 +358,6 @@ class AutomatedFightResult
 
     /**
      * Get the total faction points.
-     *
-     * @return int
      */
     public function getTotalFactionPoints(): int
     {
@@ -451,8 +366,6 @@ class AutomatedFightResult
 
     /**
      * Did the character die?
-     *
-     * @return bool
      */
     public function hasCharacterDied(): bool
     {
@@ -461,8 +374,6 @@ class AutomatedFightResult
 
     /**
      * Did automation end?
-     *
-     * @return bool
      */
     public function hasEndedAutomation(): bool
     {
@@ -471,8 +382,6 @@ class AutomatedFightResult
 
     /**
      * Get the fight data.
-     *
-     * @return array
      */
     public function getFightData(): array
     {
@@ -481,8 +390,6 @@ class AutomatedFightResult
 
     /**
      * Get the stalled attempt.
-     *
-     * @return int
      */
     public function getStalledAttempt(): int
     {
@@ -491,8 +398,6 @@ class AutomatedFightResult
 
     /**
      * Get the warning notice.
-     *
-     * @return array|null
      */
     public function getWarningNotice(): ?array
     {

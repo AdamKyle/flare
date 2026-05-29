@@ -4,13 +4,14 @@ namespace App\Game\Market\Middleware;
 
 use App\Flare\Models\Location;
 use Closure;
+use Illuminate\Http\Request;
 
 class CanCharacterAccessMarket
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  string|null  $guard
      * @return mixed
      */

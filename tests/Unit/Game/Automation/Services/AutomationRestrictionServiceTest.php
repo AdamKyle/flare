@@ -19,112 +19,112 @@ class AutomationRestrictionServiceTest extends TestCase
 
     private AutomationRestrictionService $service;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->service = resolve(AutomationRestrictionService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         unset($this->service);
     }
 
-    public function testNoActiveAutomationAllowsManualFighting(): void
+    public function test_no_active_automation_allows_manual_fighting(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::MANUAL_FIGHTING));
     }
 
-    public function testNoActiveAutomationAllowsCelestialFighting(): void
+    public function test_no_active_automation_allows_celestial_fighting(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::CELESTIAL_FIGHTING));
     }
 
-    public function testNoActiveAutomationAllowsPct(): void
+    public function test_no_active_automation_allows_pct(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::PCT));
     }
 
-    public function testNoActiveAutomationAllowsDirectionalMovement(): void
+    public function test_no_active_automation_allows_directional_movement(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::DIRECTIONAL_MOVEMENT));
     }
 
-    public function testNoActiveAutomationAllowsTeleport(): void
+    public function test_no_active_automation_allows_teleport(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::TELEPORT));
     }
 
-    public function testNoActiveAutomationAllowsSetSail(): void
+    public function test_no_active_automation_allows_set_sail(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::SET_SAIL));
     }
 
-    public function testNoActiveAutomationAllowsTraverse(): void
+    public function test_no_active_automation_allows_traverse(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::TRAVERSE));
     }
 
-    public function testNoActiveAutomationAllowsEnterLocation(): void
+    public function test_no_active_automation_allows_enter_location(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::ENTER_LOCATION));
     }
 
-    public function testNoActiveAutomationAllowsStartDelve(): void
+    public function test_no_active_automation_allows_start_delve(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_DELVE));
     }
 
-    public function testNoActiveAutomationAllowsStartExploration(): void
+    public function test_no_active_automation_allows_start_exploration(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_EXPLORATION));
     }
 
-    public function testNoActiveAutomationAllowsStartFactionLoyalty(): void
+    public function test_no_active_automation_allows_start_faction_loyalty(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_FACTION_LOYALTY));
     }
 
-    public function testNoActiveAutomationAllowsStartCrafting(): void
+    public function test_no_active_automation_allows_start_crafting(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_CRAFTING));
     }
 
-    public function testNoActiveAutomationAllowsStartItemCrafting(): void
+    public function test_no_active_automation_allows_start_item_crafting(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_ITEM_CRAFTING));
     }
 
-    public function testFactionLoyaltyBlocksStartDelve(): void
+    public function test_faction_loyalty_blocks_start_delve(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -139,7 +139,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::START_DELVE));
     }
 
-    public function testFactionLoyaltyBlocksStartExploration(): void
+    public function test_faction_loyalty_blocks_start_exploration(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -154,7 +154,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::START_EXPLORATION));
     }
 
-    public function testFactionLoyaltyBlocksManualFighting(): void
+    public function test_faction_loyalty_blocks_manual_fighting(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -169,7 +169,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::MANUAL_FIGHTING));
     }
 
-    public function testFactionLoyaltyAllowsStartCrafting(): void
+    public function test_faction_loyalty_allows_start_crafting(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -184,7 +184,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_CRAFTING));
     }
 
-    public function testFactionLoyaltyBlocksStartItemCrafting(): void
+    public function test_faction_loyalty_blocks_start_item_crafting(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -199,7 +199,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::START_ITEM_CRAFTING));
     }
 
-    public function testFactionLoyaltyBlocksPct(): void
+    public function test_faction_loyalty_blocks_pct(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -214,7 +214,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::PCT));
     }
 
-    public function testFactionLoyaltyBlocksCelestialFighting(): void
+    public function test_faction_loyalty_blocks_celestial_fighting(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -229,7 +229,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::CELESTIAL_FIGHTING));
     }
 
-    public function testFactionLoyaltyAllowsDirectionalMovement(): void
+    public function test_faction_loyalty_allows_directional_movement(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -244,7 +244,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::DIRECTIONAL_MOVEMENT));
     }
 
-    public function testDelveBlocksStartExploration(): void
+    public function test_delve_blocks_start_exploration(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -259,7 +259,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::START_EXPLORATION));
     }
 
-    public function testDelveBlocksManualFighting(): void
+    public function test_delve_blocks_manual_fighting(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -274,7 +274,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::MANUAL_FIGHTING));
     }
 
-    public function testDelveBlocksStartFactionLoyalty(): void
+    public function test_delve_blocks_start_faction_loyalty(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -289,7 +289,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::START_FACTION_LOYALTY));
     }
 
-    public function testDelveBlocksPct(): void
+    public function test_delve_blocks_pct(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -304,7 +304,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::PCT));
     }
 
-    public function testDelveBlocksDirectionalMovement(): void
+    public function test_delve_blocks_directional_movement(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -319,7 +319,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::DIRECTIONAL_MOVEMENT));
     }
 
-    public function testDelveBlocksEnterLocation(): void
+    public function test_delve_blocks_enter_location(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -334,7 +334,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::ENTER_LOCATION));
     }
 
-    public function testDelveBlocksTeleport(): void
+    public function test_delve_blocks_teleport(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -349,7 +349,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::TELEPORT));
     }
 
-    public function testDelveBlocksSetSail(): void
+    public function test_delve_blocks_set_sail(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -364,7 +364,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::SET_SAIL));
     }
 
-    public function testDelveBlocksTraverse(): void
+    public function test_delve_blocks_traverse(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -379,7 +379,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::TRAVERSE));
     }
 
-    public function testDelveBlocksCelestialConjuring(): void
+    public function test_delve_blocks_celestial_conjuring(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -394,7 +394,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::CELESTIAL_CONJURING));
     }
 
-    public function testDelveBlocksCelestialFighting(): void
+    public function test_delve_blocks_celestial_fighting(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -409,7 +409,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::CELESTIAL_FIGHTING));
     }
 
-    public function testDelveAllowsStartCrafting(): void
+    public function test_delve_allows_start_crafting(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -424,7 +424,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_CRAFTING));
     }
 
-    public function testDelveAllowsStartItemCrafting(): void
+    public function test_delve_allows_start_item_crafting(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -439,7 +439,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_ITEM_CRAFTING));
     }
 
-    public function testExplorationBlocksStartDelve(): void
+    public function test_exploration_blocks_start_delve(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -455,7 +455,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::START_DELVE));
     }
 
-    public function testExplorationBlocksStartFactionLoyalty(): void
+    public function test_exploration_blocks_start_faction_loyalty(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -471,7 +471,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::START_FACTION_LOYALTY));
     }
 
-    public function testExplorationBlocksManualFighting(): void
+    public function test_exploration_blocks_manual_fighting(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -487,7 +487,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::MANUAL_FIGHTING));
     }
 
-    public function testExplorationBlocksPct(): void
+    public function test_exploration_blocks_pct(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -503,7 +503,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::PCT));
     }
 
-    public function testExplorationBlocksCelestialFighting(): void
+    public function test_exploration_blocks_celestial_fighting(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -519,7 +519,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::CELESTIAL_FIGHTING));
     }
 
-    public function testExplorationBlocksTeleport(): void
+    public function test_exploration_blocks_teleport(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -535,7 +535,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::TELEPORT));
     }
 
-    public function testExplorationBlocksSetSail(): void
+    public function test_exploration_blocks_set_sail(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -551,7 +551,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::SET_SAIL));
     }
 
-    public function testExplorationBlocksTraverse(): void
+    public function test_exploration_blocks_traverse(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -567,7 +567,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::TRAVERSE));
     }
 
-    public function testExplorationAllowsStartCrafting(): void
+    public function test_exploration_allows_start_crafting(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -583,7 +583,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_CRAFTING));
     }
 
-    public function testExplorationAllowsStartItemCrafting(): void
+    public function test_exploration_allows_start_item_crafting(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -599,7 +599,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_ITEM_CRAFTING));
     }
 
-    public function testExplorationStartedInSpecialLocationBlocksDirectionalMovement(): void
+    public function test_exploration_started_in_special_location_blocks_directional_movement(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -615,7 +615,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::DIRECTIONAL_MOVEMENT));
     }
 
-    public function testExplorationStartedInSpecialLocationBlocksEnteringLocation(): void
+    public function test_exploration_started_in_special_location_blocks_entering_location(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $location = Location::factory()->create([
@@ -638,7 +638,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::ENTER_LOCATION, $location));
     }
 
-    public function testExplorationStartedInRegularContextAllowsDirectionalMovement(): void
+    public function test_exploration_started_in_regular_context_allows_directional_movement(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -654,7 +654,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::DIRECTIONAL_MOVEMENT));
     }
 
-    public function testExplorationStartedInRegularContextAllowsEnteringRegularLocation(): void
+    public function test_exploration_started_in_regular_context_allows_entering_regular_location(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $regularLocation = Location::factory()->create([
@@ -678,7 +678,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::ENTER_LOCATION, $regularLocation));
     }
 
-    public function testExplorationStartedInRegularContextAllowsEnteringPort(): void
+    public function test_exploration_started_in_regular_context_allows_entering_port(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $port = Location::factory()->create([
@@ -702,7 +702,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::ENTER_LOCATION, $port));
     }
 
-    public function testExplorationStartedInRegularContextBlocksGoldMine(): void
+    public function test_exploration_started_in_regular_context_blocks_gold_mine(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $location = Location::factory()->create([
@@ -725,7 +725,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::ENTER_LOCATION, $location));
     }
 
-    public function testExplorationStartedInRegularContextBlocksPurgatoryDungeon(): void
+    public function test_exploration_started_in_regular_context_blocks_purgatory_dungeon(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $location = Location::factory()->create([
@@ -748,7 +748,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::ENTER_LOCATION, $location));
     }
 
-    public function testExplorationStartedInRegularContextBlocksPurgatorySmithHouse(): void
+    public function test_exploration_started_in_regular_context_blocks_purgatory_smith_house(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $location = Location::factory()->create([
@@ -771,7 +771,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::ENTER_LOCATION, $location));
     }
 
-    public function testExplorationStartedInRegularContextBlocksEnemyStrengthModifyingLocation(): void
+    public function test_exploration_started_in_regular_context_blocks_enemy_strength_modifying_location(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $location = Location::factory()->create([
@@ -794,7 +794,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::ENTER_LOCATION, $location));
     }
 
-    public function testBlockedContextReturnsAutomationMessageAndAutomation(): void
+    public function test_blocked_context_returns_automation_message_and_automation(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $automation = CharacterAutomation::factory()->create([
@@ -812,7 +812,7 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertEquals('You cannot do that while Exploration automation is running. Cancel it first.', $context['message']);
     }
 
-    public function testActiveAutomationSelectsNewestActiveAutomation(): void
+    public function test_active_automation_selects_newest_active_automation(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 

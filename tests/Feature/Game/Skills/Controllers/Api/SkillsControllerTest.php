@@ -48,7 +48,7 @@ class SkillsControllerTest extends TestCase
         $character = $this->character->assignSkill($trainingSkill)->assignSkill($craftingSkill)->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/skills/' . $character->id);
+            ->call('GET', '/api/character/skills/'.$character->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -56,7 +56,7 @@ class SkillsControllerTest extends TestCase
         $this->assertNotEmpty($jsonData['crafting_skills']);
     }
 
-    public function testExplorationAllowsSkillList(): void
+    public function test_exploration_allows_skill_list(): void
     {
         $character = $this->character->getCharacter();
         CharacterAutomation::factory()->create([
@@ -65,12 +65,12 @@ class SkillsControllerTest extends TestCase
             'completed_at' => now()->addHour(),
         ]);
 
-        $response = $this->actingAs($character->user)->call('GET', '/api/character/skills/' . $character->id);
+        $response = $this->actingAs($character->user)->call('GET', '/api/character/skills/'.$character->id);
 
         $response->assertStatus(200);
     }
 
-    public function testDelveAllowsSkillList(): void
+    public function test_delve_allows_skill_list(): void
     {
         $character = $this->character->getCharacter();
         CharacterAutomation::factory()->create([
@@ -79,12 +79,12 @@ class SkillsControllerTest extends TestCase
             'completed_at' => now()->addHour(),
         ]);
 
-        $response = $this->actingAs($character->user)->call('GET', '/api/character/skills/' . $character->id);
+        $response = $this->actingAs($character->user)->call('GET', '/api/character/skills/'.$character->id);
 
         $response->assertStatus(200);
     }
 
-    public function testFactionLoyaltyAllowsSkillList(): void
+    public function test_faction_loyalty_allows_skill_list(): void
     {
         $character = $this->character->getCharacter();
         CharacterAutomation::factory()->create([
@@ -93,16 +93,16 @@ class SkillsControllerTest extends TestCase
             'completed_at' => now()->addHour(),
         ]);
 
-        $response = $this->actingAs($character->user)->call('GET', '/api/character/skills/' . $character->id);
+        $response = $this->actingAs($character->user)->call('GET', '/api/character/skills/'.$character->id);
 
         $response->assertStatus(200);
     }
 
-    public function testExplorationAllowsSkillInformation(): void
+    public function test_exploration_allows_skill_information(): void
     {
         $trainingSkill = $this->createGameSkill([
             'name' => 'training skill',
-            'type' => SkillTypeValue::TRAINING
+            'type' => SkillTypeValue::TRAINING,
         ]);
 
         $character = $this->character->assignSkill($trainingSkill)->getCharacter();
@@ -116,7 +116,7 @@ class SkillsControllerTest extends TestCase
         $skill = $character->skills()->where('game_skill_id', $trainingSkill->id)->first();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/skill/' . $character->id . '/' . $skill->id);
+            ->call('GET', '/api/character/skill/'.$character->id.'/'.$skill->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -124,7 +124,7 @@ class SkillsControllerTest extends TestCase
         $this->assertEquals($skill->id, $jsonData['id']);
     }
 
-    public function testFailToGetSkillInformation()
+    public function test_fail_to_get_skill_information()
     {
 
         $trainingSkill = $this->createGameSkill([
@@ -139,7 +139,7 @@ class SkillsControllerTest extends TestCase
         $skill = $secondaryCharacter->skills()->where('game_skill_id', $trainingSkill->id)->first();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/skill/' . $character->id . '/' . $skill->id);
+            ->call('GET', '/api/character/skill/'.$character->id.'/'.$skill->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -159,7 +159,7 @@ class SkillsControllerTest extends TestCase
         $skill = $character->skills()->where('game_skill_id', $trainingSkill->id)->first();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/skill/' . $character->id . '/' . $skill->id);
+            ->call('GET', '/api/character/skill/'.$character->id.'/'.$skill->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -178,14 +178,14 @@ class SkillsControllerTest extends TestCase
         $skill = $character->skills()->where('game_skill_id', $trainingSkill->id)->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/skill/train/' . $character->id, [
+            ->call('POST', '/api/skill/train/'.$character->id, [
                 'skill_id' => $skill->id,
                 'xp_percentage' => 0.10,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals('You are now training: ' . $skill->name, $jsonData['message']);
+        $this->assertEquals('You are now training: '.$skill->name, $jsonData['message']);
 
         $character = $character->refresh();
         $skill = $character->skills()->where('game_skill_id', $trainingSkill->id)->first();
@@ -194,11 +194,11 @@ class SkillsControllerTest extends TestCase
         $this->assertEquals(0.10, $skill->xp_towards);
     }
 
-    public function testExplorationBlocksSkillTraining(): void
+    public function test_exploration_blocks_skill_training(): void
     {
         $trainingSkill = $this->createGameSkill([
             'name' => 'training skill',
-            'type' => SkillTypeValue::TRAINING
+            'type' => SkillTypeValue::TRAINING,
         ]);
 
         $character = $this->character->assignSkill($trainingSkill)->getCharacter();
@@ -212,7 +212,7 @@ class SkillsControllerTest extends TestCase
         $skill = $character->skills()->where('game_skill_id', $trainingSkill->id)->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/skill/train/' . $character->id, [
+            ->call('POST', '/api/skill/train/'.$character->id, [
                 'skill_id' => $skill->id,
                 'xp_percentage' => 0.10,
             ]);
@@ -223,7 +223,7 @@ class SkillsControllerTest extends TestCase
         $this->assertEquals('You cannot do that while Exploration automation is running. Cancel it first.', $jsonData['message']);
     }
 
-    public function testFailToCancelSkillTraining()
+    public function test_fail_to_cancel_skill_training()
     {
 
         $trainingSkill = $this->createGameSkill([
@@ -238,7 +238,7 @@ class SkillsControllerTest extends TestCase
         $skill = $secondaryCharacter->skills()->where('game_skill_id', $trainingSkill->id)->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/skill/cancel-train/' . $character->id . '/' . $skill->id);
+            ->call('POST', '/api/skill/cancel-train/'.$character->id.'/'.$skill->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -265,11 +265,11 @@ class SkillsControllerTest extends TestCase
         $skill = $character->skills()->where('game_skill_id', $trainingSkill->id)->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/skill/cancel-train/' . $character->id . '/' . $skill->id);
+            ->call('POST', '/api/skill/cancel-train/'.$character->id.'/'.$skill->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals('You stopped training: ' . $skill->name, $jsonData['message']);
+        $this->assertEquals('You stopped training: '.$skill->name, $jsonData['message']);
 
         $character = $character->refresh();
         $skill = $character->skills()->where('game_skill_id', $trainingSkill->id)->first();
@@ -278,11 +278,11 @@ class SkillsControllerTest extends TestCase
         $this->assertEquals(0, $skill->xp_towards);
     }
 
-    public function testExplorationBlocksCancelSkillTraining(): void
+    public function test_exploration_blocks_cancel_skill_training(): void
     {
         $trainingSkill = $this->createGameSkill([
             'name' => 'training skill',
-            'type' => SkillTypeValue::TRAINING
+            'type' => SkillTypeValue::TRAINING,
         ]);
 
         $character = $this->character->assignSkill($trainingSkill)->getCharacter();
@@ -301,7 +301,7 @@ class SkillsControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/skill/cancel-train/' . $character->id . '/' . $skill->id);
+            ->call('POST', '/api/skill/cancel-train/'.$character->id.'/'.$skill->id);
 
         $jsonData = json_decode($response->getContent(), true);
 

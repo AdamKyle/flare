@@ -46,7 +46,7 @@ class DelveExplorationTest extends TestCase
 
     private Monster $monster;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -85,7 +85,7 @@ class DelveExplorationTest extends TestCase
         ]);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Carbon::setTestNow();
         Cache::flush();
@@ -94,7 +94,7 @@ class DelveExplorationTest extends TestCase
         parent::tearDown();
     }
 
-    public function testHandleDeletesCurrentAutomationsWhenAutomationDoesNotExist(): void
+    public function test_handle_deletes_current_automations_when_automation_does_not_exist(): void
     {
         Event::fake();
 
@@ -105,7 +105,7 @@ class DelveExplorationTest extends TestCase
         $this->assertEquals(0, $this->character->currentAutomations()->count());
     }
 
-    public function testHandleDeletesAutomationWhenDelveDoesNotExist(): void
+    public function test_handle_deletes_automation_when_delve_does_not_exist(): void
     {
         Event::fake();
 
@@ -116,7 +116,7 @@ class DelveExplorationTest extends TestCase
         $this->assertNull(CharacterAutomation::find($automation->id));
     }
 
-    public function testHandleDeletesAutomationWhenLocationDoesNotExist(): void
+    public function test_handle_deletes_automation_when_location_does_not_exist(): void
     {
         Event::fake();
 
@@ -128,7 +128,7 @@ class DelveExplorationTest extends TestCase
         $this->assertNull(CharacterAutomation::find($automation->id));
     }
 
-    public function testHandleDoesNotChangeCompletedDelveCompletedAt(): void
+    public function test_handle_does_not_change_completed_delve_completed_at(): void
     {
         Event::fake();
 
@@ -144,7 +144,7 @@ class DelveExplorationTest extends TestCase
         $this->assertEquals($completedAt->toDateTimeString(), $delve->refresh()->completed_at->toDateTimeString());
     }
 
-    public function testHandleCompletesDelveWhenAutomationExpired(): void
+    public function test_handle_completes_delve_when_automation_expired(): void
     {
         Event::fake();
 
@@ -159,7 +159,7 @@ class DelveExplorationTest extends TestCase
         $this->assertNotNull($delve->refresh()->completed_at);
     }
 
-    public function testHandleClearsSurvivalCacheWhenAutomationExpired(): void
+    public function test_handle_clears_survival_cache_when_automation_expired(): void
     {
         Event::fake();
 
@@ -169,14 +169,14 @@ class DelveExplorationTest extends TestCase
 
         $delve = $this->createDelve();
 
-        Cache::put('can-character-survive-' . $this->character->id, true);
+        Cache::put('can-character-survive-'.$this->character->id, true);
 
         $this->runJob($automation->id, $delve->id);
 
-        $this->assertFalse(Cache::has('can-character-survive-' . $this->character->id));
+        $this->assertFalse(Cache::has('can-character-survive-'.$this->character->id));
     }
 
-    public function testHandleRewardsBaseGoldWhenAutomationEnds(): void
+    public function test_handle_rewards_base_gold_when_automation_ends(): void
     {
         Event::fake();
 
@@ -191,7 +191,7 @@ class DelveExplorationTest extends TestCase
         $this->assertEquals(1010, $this->character->refresh()->gold);
     }
 
-    public function testHandleCapsGoldWhenAutomationRewardWouldExceedMaxGold(): void
+    public function test_handle_caps_gold_when_automation_reward_would_exceed_max_gold(): void
     {
         Event::fake();
 
@@ -212,7 +212,7 @@ class DelveExplorationTest extends TestCase
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD, $this->character->refresh()->gold);
     }
 
-    public function testHandleDispatchesCurrencyUpdateWhenAutomationEnds(): void
+    public function test_handle_dispatches_currency_update_when_automation_ends(): void
     {
         Event::fake();
 
@@ -227,7 +227,7 @@ class DelveExplorationTest extends TestCase
         Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
     }
 
-    public function testHandleDispatchesUpdateCharacterStatusWhenAutomationEnds(): void
+    public function test_handle_dispatches_update_character_status_when_automation_ends(): void
     {
         Event::fake();
 
@@ -242,7 +242,7 @@ class DelveExplorationTest extends TestCase
         Event::assertDispatched(UpdateCharacterStatus::class);
     }
 
-    public function testHandleDispatchesAutomationTimeoutWhenAutomationEnds(): void
+    public function test_handle_dispatches_automation_timeout_when_automation_ends(): void
     {
         Event::fake();
 
@@ -257,7 +257,7 @@ class DelveExplorationTest extends TestCase
         Event::assertDispatched(AutomationTimeOut::class);
     }
 
-    public function testHandleDispatchesAutomationLogUpdateWhenCharacterIsLoggedIn(): void
+    public function test_handle_dispatches_automation_log_update_when_character_is_logged_in(): void
     {
         Event::fake();
 
@@ -272,7 +272,7 @@ class DelveExplorationTest extends TestCase
         Event::assertDispatched(AutomationLogUpdate::class);
     }
 
-    public function testHandleDoesNotDispatchAutomationLogUpdateWhenCharacterIsNotLoggedIn(): void
+    public function test_handle_does_not_dispatch_automation_log_update_when_character_is_not_logged_in(): void
     {
         Event::fake();
 
@@ -289,7 +289,7 @@ class DelveExplorationTest extends TestCase
         Event::assertNotDispatched(AutomationLogUpdate::class);
     }
 
-    public function testHandleDispatchesNextDelveJobAfterSurvivedEncounter(): void
+    public function test_handle_dispatches_next_delve_job_after_survived_encounter(): void
     {
         Queue::fake();
         Event::fake();
@@ -304,7 +304,7 @@ class DelveExplorationTest extends TestCase
         Queue::assertPushed(DelveExploration::class);
     }
 
-    public function testHandleDoesNotDispatchNextDelveJobWhenPackMemberDoesNotSurvive(): void
+    public function test_handle_does_not_dispatch_next_delve_job_when_pack_member_does_not_survive(): void
     {
         Queue::fake();
         Event::fake();
@@ -329,7 +329,7 @@ class DelveExplorationTest extends TestCase
         Queue::assertNotPushed(DelveExploration::class);
     }
 
-    public function testHandleDelaysNextDelveJobByTimeDelay(): void
+    public function test_handle_delays_next_delve_job_by_time_delay(): void
     {
         Queue::fake();
         Event::fake();
@@ -353,7 +353,7 @@ class DelveExplorationTest extends TestCase
         });
     }
 
-    public function testHandleCreatesSurvivedDelveLog(): void
+    public function test_handle_creates_survived_delve_log(): void
     {
         Queue::fake();
         Event::fake();
@@ -368,7 +368,7 @@ class DelveExplorationTest extends TestCase
         $this->assertDelveLogExists($delve, DelveOutcome::SURVIVED, 1);
     }
 
-    public function testHandleDoesNotCreateSecondDelveLogWhenSameJobInstanceRunsAgain(): void
+    public function test_handle_does_not_create_second_delve_log_when_same_job_instance_runs_again(): void
     {
         Queue::fake();
         Event::fake();
@@ -412,7 +412,7 @@ class DelveExplorationTest extends TestCase
         );
     }
 
-    public function testHandleIncreasesEnemyStrengthAfterSurvivedEncounter(): void
+    public function test_handle_increases_enemy_strength_after_survived_encounter(): void
     {
         Queue::fake();
         Event::fake();
@@ -429,7 +429,7 @@ class DelveExplorationTest extends TestCase
         $this->assertEqualsWithDelta(0.05, $delve->refresh()->increase_enemy_strength, 0.0001);
     }
 
-    public function testHandleCapsEnemyStrengthAfterSurvivedEncounter(): void
+    public function test_handle_caps_enemy_strength_after_survived_encounter(): void
     {
         Queue::fake();
         Event::fake();
@@ -447,7 +447,7 @@ class DelveExplorationTest extends TestCase
         $this->assertEquals(DelveExploration::MAX_INCREASE_PERCENTAGE, $delve->refresh()->increase_enemy_strength);
     }
 
-    public function testHandleDoesNotIncreaseEnemyStrengthWhenAlreadyAtCap(): void
+    public function test_handle_does_not_increase_enemy_strength_when_already_at_cap(): void
     {
         Queue::fake();
         Event::fake();
@@ -464,7 +464,7 @@ class DelveExplorationTest extends TestCase
         $this->assertEquals(DelveExploration::MAX_INCREASE_PERCENTAGE, $delve->refresh()->increase_enemy_strength);
     }
 
-    public function testHandleUpdatesMonsterForNextFight(): void
+    public function test_handle_updates_monster_for_next_fight(): void
     {
         Queue::fake();
         Event::fake();
@@ -479,7 +479,7 @@ class DelveExplorationTest extends TestCase
         $this->assertTrue(Monster::where('id', $delve->refresh()->monster_id)->exists());
     }
 
-    public function testHandleDeletesPackCacheAfterSurvivedEncounter(): void
+    public function test_handle_deletes_pack_cache_after_survived_encounter(): void
     {
         Queue::fake();
         Event::fake();
@@ -489,16 +489,16 @@ class DelveExplorationTest extends TestCase
         $automation = $this->createAutomation();
         $delve = $this->createDelve();
 
-        Cache::put('delve-monster-' . $this->character->id . '-' . $this->monster->id . '-fight', [
+        Cache::put('delve-monster-'.$this->character->id.'-'.$this->monster->id.'-fight', [
             'id' => $this->monster->id,
         ]);
 
         $this->runJob($automation->id, $delve->id);
 
-        $this->assertFalse(Cache::has('delve-monster-' . $this->character->id . '-' . $this->monster->id . '-fight'));
+        $this->assertFalse(Cache::has('delve-monster-'.$this->character->id.'-'.$this->monster->id.'-fight'));
     }
 
-    public function testHandleCompletesDelveWhenEncounterHasNoTimeRemaining(): void
+    public function test_handle_completes_delve_when_encounter_has_no_time_remaining(): void
     {
         Queue::fake();
         Event::fake();
@@ -516,7 +516,7 @@ class DelveExplorationTest extends TestCase
         $this->assertNotNull($delve->refresh()->completed_at);
     }
 
-    public function testHandleCreatesDeathLogWhenCharacterDiesDuringSetup(): void
+    public function test_handle_creates_death_log_when_character_dies_during_setup(): void
     {
         Event::fake();
 
@@ -530,7 +530,7 @@ class DelveExplorationTest extends TestCase
         $this->assertDelveLogExists($delve, DelveOutcome::DIED);
     }
 
-    public function testHandleDeletesAutomationWhenCharacterDiesDuringSetup(): void
+    public function test_handle_deletes_automation_when_character_dies_during_setup(): void
     {
         Event::fake();
 
@@ -544,7 +544,7 @@ class DelveExplorationTest extends TestCase
         $this->assertNull(CharacterAutomation::find($automation->id));
     }
 
-    public function testHandleCompletesDelveWhenCharacterDiesDuringSetup(): void
+    public function test_handle_completes_delve_when_character_dies_during_setup(): void
     {
         Event::fake();
 
@@ -558,7 +558,7 @@ class DelveExplorationTest extends TestCase
         $this->assertNotNull($delve->refresh()->completed_at);
     }
 
-    public function testHandleCreatesDeathLogWhenCharacterDiesAfterFight(): void
+    public function test_handle_creates_death_log_when_character_dies_after_fight(): void
     {
         Event::fake();
 
@@ -572,7 +572,7 @@ class DelveExplorationTest extends TestCase
         $this->assertDelveLogExists($delve, DelveOutcome::DIED);
     }
 
-    public function testHandleDeletesAutomationWhenCharacterDiesAfterFight(): void
+    public function test_handle_deletes_automation_when_character_dies_after_fight(): void
     {
         Event::fake();
 
@@ -586,7 +586,7 @@ class DelveExplorationTest extends TestCase
         $this->assertNull(CharacterAutomation::find($automation->id));
     }
 
-    public function testHandleCompletesDelveWhenCharacterDiesAfterFight(): void
+    public function test_handle_completes_delve_when_character_dies_after_fight(): void
     {
         Event::fake();
 
@@ -600,7 +600,7 @@ class DelveExplorationTest extends TestCase
         $this->assertNotNull($delve->refresh()->completed_at);
     }
 
-    public function testHandleCreatesTimeoutLogWhenFightExceedsMaximumAttempts(): void
+    public function test_handle_creates_timeout_log_when_fight_exceeds_maximum_attempts(): void
     {
         Event::fake();
 
@@ -614,7 +614,7 @@ class DelveExplorationTest extends TestCase
         $this->assertDelveLogExists($delve, DelveOutcome::TIMEOUT);
     }
 
-    public function testHandleDeletesAutomationWhenFightExceedsMaximumAttempts(): void
+    public function test_handle_deletes_automation_when_fight_exceeds_maximum_attempts(): void
     {
         Event::fake();
 
@@ -628,7 +628,7 @@ class DelveExplorationTest extends TestCase
         $this->assertNull(CharacterAutomation::find($automation->id));
     }
 
-    public function testHandleCompletesDelveWhenFightExceedsMaximumAttempts(): void
+    public function test_handle_completes_delve_when_fight_exceeds_maximum_attempts(): void
     {
         Event::fake();
 
@@ -642,7 +642,7 @@ class DelveExplorationTest extends TestCase
         $this->assertNotNull($delve->refresh()->completed_at);
     }
 
-    public function testHandleCreatesPackSizeTwoSurvivedLog(): void
+    public function test_handle_creates_pack_size_two_survived_log(): void
     {
         Queue::fake();
         Event::fake();
@@ -659,7 +659,7 @@ class DelveExplorationTest extends TestCase
         $this->assertDelveLogExists($delve, DelveOutcome::SURVIVED, 2);
     }
 
-    public function testHandleCreatesPackSizeFiveSurvivedLog(): void
+    public function test_handle_creates_pack_size_five_survived_log(): void
     {
         Queue::fake();
         Event::fake();
@@ -676,7 +676,7 @@ class DelveExplorationTest extends TestCase
         $this->assertDelveLogExists($delve, DelveOutcome::SURVIVED, 5);
     }
 
-    public function testHandleCreatesPackSizeTenSurvivedLog(): void
+    public function test_handle_creates_pack_size_ten_survived_log(): void
     {
         Queue::fake();
         Event::fake();
@@ -693,7 +693,7 @@ class DelveExplorationTest extends TestCase
         $this->assertDelveLogExists($delve, DelveOutcome::SURVIVED, 10);
     }
 
-    public function testHandleCreatesPackSizeTwentySurvivedLog(): void
+    public function test_handle_creates_pack_size_twenty_survived_log(): void
     {
         Queue::fake();
         Event::fake();
@@ -710,7 +710,7 @@ class DelveExplorationTest extends TestCase
         $this->assertDelveLogExists($delve, DelveOutcome::SURVIVED, 20);
     }
 
-    public function testHandleCreatesPackSizeTwentyFiveSurvivedLog(): void
+    public function test_handle_creates_pack_size_twenty_five_survived_log(): void
     {
         Queue::fake();
         Event::fake();
@@ -727,7 +727,7 @@ class DelveExplorationTest extends TestCase
         $this->assertDelveLogExists($delve, DelveOutcome::SURVIVED, 25);
     }
 
-    public function testHandleDispatchesPackEncounterMessageOnce(): void
+    public function test_handle_dispatches_pack_encounter_message_once(): void
     {
         Queue::fake();
         Event::fake();
@@ -746,7 +746,7 @@ class DelveExplorationTest extends TestCase
         });
     }
 
-    public function testHandleDispatchesEnemyStrengthMessageWhenEnemyStrengthIsIncreased(): void
+    public function test_handle_dispatches_enemy_strength_message_when_enemy_strength_is_increased(): void
     {
         Queue::fake();
         Event::fake();
@@ -765,7 +765,7 @@ class DelveExplorationTest extends TestCase
         });
     }
 
-    public function testHandleRewardsUniqueItemAfterMoreThanTwoHours(): void
+    public function test_handle_rewards_unique_item_after_more_than_two_hours(): void
     {
         $initialSlots = $this->character->inventory->slots()->count();
 
@@ -774,7 +774,7 @@ class DelveExplorationTest extends TestCase
         $this->assertEquals($initialSlots + 1, $this->character->inventory->slots()->count());
     }
 
-    public function testHandleDispatchesUniqueServerMessageAfterMoreThanTwoHours(): void
+    public function test_handle_dispatches_unique_server_message_after_more_than_two_hours(): void
     {
         $this->runCompletedPackRewardJob(3);
 
@@ -783,7 +783,7 @@ class DelveExplorationTest extends TestCase
         });
     }
 
-    public function testHandleRewardsMythicAndUniqueItemsAfterMoreThanFourHours(): void
+    public function test_handle_rewards_mythic_and_unique_items_after_more_than_four_hours(): void
     {
         $initialSlots = $this->character->inventory->slots()->count();
 
@@ -792,7 +792,7 @@ class DelveExplorationTest extends TestCase
         $this->assertEquals($initialSlots + 2, $this->character->inventory->slots()->count());
     }
 
-    public function testHandleDispatchesMythicServerMessageAfterMoreThanFourHours(): void
+    public function test_handle_dispatches_mythic_server_message_after_more_than_four_hours(): void
     {
         $this->runCompletedPackRewardJob(5);
 
@@ -801,7 +801,7 @@ class DelveExplorationTest extends TestCase
         });
     }
 
-    public function testHandleRewardsCosmicAndUniqueItemsAfterMoreThanSixHours(): void
+    public function test_handle_rewards_cosmic_and_unique_items_after_more_than_six_hours(): void
     {
         $initialSlots = $this->character->inventory->slots()->count();
 
@@ -810,7 +810,7 @@ class DelveExplorationTest extends TestCase
         $this->assertEquals($initialSlots + 2, $this->character->inventory->slots()->count());
     }
 
-    public function testHandleDispatchesCosmicServerMessageAfterMoreThanSixHours(): void
+    public function test_handle_dispatches_cosmic_server_message_after_more_than_six_hours(): void
     {
         $this->runCompletedPackRewardJob(7);
 
@@ -819,7 +819,7 @@ class DelveExplorationTest extends TestCase
         });
     }
 
-    public function testHandleDoesNotDispatchDelveRewardServerMessageWhenCharacterIsNotLoggedIn(): void
+    public function test_handle_does_not_dispatch_delve_reward_server_message_when_character_is_not_logged_in(): void
     {
         $this->runCompletedPackRewardJob(3, false);
 

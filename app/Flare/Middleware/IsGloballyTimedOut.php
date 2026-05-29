@@ -3,6 +3,7 @@
 namespace App\Flare\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 class IsGloballyTimedOut
@@ -10,7 +11,7 @@ class IsGloballyTimedOut
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  string|null  $guard
      * @return mixed
      */

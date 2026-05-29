@@ -121,7 +121,7 @@ class AttackDataManagement
      */
     public function cacheAttackData(): AttackDataManagement
     {
-        Cache::put('character-attack-data-' . $this->character->id, $this->attackData);
+        Cache::put('character-attack-data-'.$this->character->id, $this->attackData);
 
         return $this;
     }

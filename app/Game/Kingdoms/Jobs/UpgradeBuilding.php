@@ -175,9 +175,9 @@ class UpgradeBuilding implements ShouldQueue
             $y = $this->building->kingdom->y_position;
 
             if ($this->user->show_building_upgrade_messages) {
-                $message = $this->building->name . ' finished upgrading for kingdom: ' .
-                    $this->building->kingdom->name . ' on plane: ' . $plane .
-                    ' At (X/Y) ' . $x . '/' . $y . ' and is now level: ' . $level;
+                $message = $this->building->name.' finished upgrading for kingdom: '.
+                    $this->building->kingdom->name.' on plane: '.$plane.
+                    ' At (X/Y) '.$x.'/'.$y.' and is now level: '.$level;
 
                 ServerMessageHandler::handleMessage($this->user, KingdomMessageTypes::BUILDING_UPGRADE_FINISHED, $message);
             }
@@ -187,7 +187,7 @@ class UpgradeBuilding implements ShouldQueue
             $capitalCityQueue = CapitalCityBuildingQueue::where('id', $this->capitalCityQueueId)->where('kingdom_id', $building->kingdom_id)->first();
 
             if (is_null($capitalCityQueue)) {
-                throw new Exception('Capital City Queue is Null: Building Id: ' . $this->capitalCityQueueId . ' Kingdom Id: ' . $building->kingdom_id);
+                throw new Exception('Capital City Queue is Null: Building Id: '.$this->capitalCityQueueId.' Kingdom Id: '.$building->kingdom_id);
             }
 
             $buildingRequestData = $capitalCityQueue->building_request_data;
@@ -211,6 +211,6 @@ class UpgradeBuilding implements ShouldQueue
 
     protected function getResourceType()
     {
-        return collect($this->resourceTypes)->first(fn($type) => $this->building->{'increase_in_' . $type} !== 0.0);
+        return collect($this->resourceTypes)->first(fn ($type) => $this->building->{'increase_in_'.$type} !== 0.0);
     }
 }

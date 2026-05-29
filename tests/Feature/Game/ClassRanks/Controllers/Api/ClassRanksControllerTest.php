@@ -35,14 +35,14 @@ class ClassRanksControllerTest extends TestCase
         $character = $this->character->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/class-ranks/' . $character->id);
+            ->call('GET', '/api/class-ranks/'.$character->id);
 
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertCount(1, $jsonData['class_ranks']);
     }
 
-    public function testExplorationBlocksClassRankList(): void
+    public function test_exploration_blocks_class_rank_list(): void
     {
         $character = $this->character->getCharacter();
         CharacterAutomation::factory()->create([
@@ -51,12 +51,12 @@ class ClassRanksControllerTest extends TestCase
             'completed_at' => now()->addHour(),
         ]);
 
-        $response = $this->actingAs($character->user)->call('GET', '/api/class-ranks/' . $character->id);
+        $response = $this->actingAs($character->user)->call('GET', '/api/class-ranks/'.$character->id);
 
         $response->assertStatus(422);
     }
 
-    public function testDelveBlocksClassRankList(): void
+    public function test_delve_blocks_class_rank_list(): void
     {
         $character = $this->character->getCharacter();
         CharacterAutomation::factory()->create([
@@ -65,12 +65,12 @@ class ClassRanksControllerTest extends TestCase
             'completed_at' => now()->addHour(),
         ]);
 
-        $response = $this->actingAs($character->user)->call('GET', '/api/class-ranks/' . $character->id);
+        $response = $this->actingAs($character->user)->call('GET', '/api/class-ranks/'.$character->id);
 
         $response->assertStatus(422);
     }
 
-    public function testFactionLoyaltyBlocksClassRankList(): void
+    public function test_faction_loyalty_blocks_class_rank_list(): void
     {
         $character = $this->character->getCharacter();
         CharacterAutomation::factory()->create([
@@ -79,12 +79,12 @@ class ClassRanksControllerTest extends TestCase
             'completed_at' => now()->addHour(),
         ]);
 
-        $response = $this->actingAs($character->user)->call('GET', '/api/class-ranks/' . $character->id);
+        $response = $this->actingAs($character->user)->call('GET', '/api/class-ranks/'.$character->id);
 
         $response->assertStatus(422);
     }
 
-    public function testGetCharacterClassSpecials()
+    public function test_get_character_class_specials()
     {
 
         $character = $this->character->getCharacter();
@@ -94,7 +94,7 @@ class ClassRanksControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/class-ranks/' . $character->id . '/specials');
+            ->call('GET', '/api/class-ranks/'.$character->id.'/specials');
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -114,13 +114,13 @@ class ClassRanksControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/equip-specialty/' . $character->id . '/' . $classSpecial->id, [
+            ->call('POST', '/api/equip-specialty/'.$character->id.'/'.$classSpecial->id, [
                 '_token' => csrf_token(),
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals('Equipped class special: ' . $classSpecial->name, $jsonData['message']);
+        $this->assertEquals('Equipped class special: '.$classSpecial->name, $jsonData['message']);
     }
 
     public function test_unequip_special()
@@ -146,12 +146,12 @@ class ClassRanksControllerTest extends TestCase
         $character = $character->refresh();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/unequip-specialty/' . $character->id . '/' . $specialtyEquipped->id, [
+            ->call('POST', '/api/unequip-specialty/'.$character->id.'/'.$specialtyEquipped->id, [
                 '_token' => csrf_token(),
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals('Unequipped class special: ' . $classSpecial->name, $jsonData['message']);
+        $this->assertEquals('Unequipped class special: '.$classSpecial->name, $jsonData['message']);
     }
 }

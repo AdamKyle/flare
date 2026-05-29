@@ -132,9 +132,6 @@ class CraftingService
      * Gold is only taken from a player if they can pick up the item they crafted or
      * if they fail to craft the item.
      *
-     * @param Character $character
-     * @param array $params
-     * @return bool
      *
      * @throws Exception
      */
@@ -173,8 +170,6 @@ class CraftingService
 
     /**
      * Get the last crafted inventory slot id.
-     *
-     * @return int|null
      */
     public function getLastCraftedInventorySlotId(): ?int
     {
@@ -183,10 +178,6 @@ class CraftingService
 
     /**
      * Get crafting skill for automation.
-     *
-     * @param Character $character
-     * @param string $craftingType
-     * @return Skill|null
      */
     public function getCraftingSkillForAutomation(Character $character, string $craftingType): ?Skill
     {
@@ -194,7 +185,7 @@ class CraftingService
             $craftingType = 'weapon';
         }
 
-        $gameSkill = GameSkill::where('name', ucfirst($craftingType) . ' Crafting')->first();
+        $gameSkill = GameSkill::where('name', ucfirst($craftingType).' Crafting')->first();
 
         if (is_null($gameSkill)) {
             return null;
@@ -207,10 +198,6 @@ class CraftingService
 
     /**
      * Get item cost for automation.
-     *
-     * @param Character $character
-     * @param Item $item
-     * @return int
      */
     public function getItemCostForAutomation(Character $character, Item $item): int
     {
@@ -448,10 +435,6 @@ class CraftingService
 
     /**
      * Attempt to pick up the item.
-     *
-     * @param Character $character
-     * @param Item $item
-     * @return bool
      */
     private function attemptToPickUpItem(Character $character, Item $item): bool
     {

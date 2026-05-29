@@ -2,6 +2,7 @@
 
 namespace App\Game\Events\Services;
 
+use App\Flare\Models\Character;
 use App\Flare\Models\Event as ActiveEvent;
 use App\Flare\Models\Location;
 use App\Flare\Models\Raid;
@@ -88,7 +89,7 @@ class RaidEventEnderService implements EventEnder
         }
 
         foreach ($locations as $location) {
-            $characters = \App\Flare\Models\Character::leftJoin('maps', 'characters.id', '=', 'maps.character_id')
+            $characters = Character::leftJoin('maps', 'characters.id', '=', 'maps.character_id')
                 ->where('maps.character_position_x', $location->x)
                 ->where('maps.character_position_y', $location->y)
                 ->where('maps.game_map_id', $location->game_map_id)

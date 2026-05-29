@@ -150,7 +150,7 @@ class DropCheckServiceTest extends TestCase
         $this->assertEquals($beforeSlots, $afterSlots);
     }
 
-    public function testProcessCapsSpecialLocationChanceAtPointFourFiveWithHighLootingAndMonsterDropCheck(): void
+    public function test_process_caps_special_location_chance_at_point_four_five_with_high_looting_and_monster_drop_check(): void
     {
         DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
             ->once()

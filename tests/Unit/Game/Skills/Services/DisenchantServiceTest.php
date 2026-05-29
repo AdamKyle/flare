@@ -296,7 +296,7 @@ class DisenchantServiceTest extends TestCase
             })
         );
 
-        $disenchantingService = \Mockery::mock(DisenchantService::class)->makePartial();
+        $disenchantingService = Mockery::mock(DisenchantService::class)->makePartial();
 
         $disenchantingService->__construct(resolve(SkillCheckService::class));
 
@@ -361,7 +361,7 @@ class DisenchantServiceTest extends TestCase
         Event::assertDispatched(UpdateSkillEvent::class);
     }
 
-    public function testGoldDustRushRequiresQuestEffect(): void
+    public function test_gold_dust_rush_requires_quest_effect(): void
     {
         Event::fake();
 
@@ -388,7 +388,7 @@ class DisenchantServiceTest extends TestCase
         $this->assertEquals(1000, $character->gold_dust);
     }
 
-    public function testGoldDustRushDoesNotProcAtNinetyNine(): void
+    public function test_gold_dust_rush_does_not_proc_at_ninety_nine(): void
     {
         Event::fake();
 
@@ -418,7 +418,7 @@ class DisenchantServiceTest extends TestCase
         $this->assertEquals(1000, $character->gold_dust);
     }
 
-    public function testGoldDustRushBonusUsesDisenchantGain(): void
+    public function test_gold_dust_rush_bonus_uses_disenchant_gain(): void
     {
         Event::fake();
 
@@ -454,7 +454,7 @@ class DisenchantServiceTest extends TestCase
         $this->assertEquals(101050, $character->gold_dust);
     }
 
-    public function testSelectedDisenchantRollsGoldDustRushOnceForTheAction(): void
+    public function test_selected_disenchant_rolls_gold_dust_rush_once_for_the_action(): void
     {
         Event::fake();
 
@@ -482,7 +482,7 @@ class DisenchantServiceTest extends TestCase
         $this->assertEquals(2100, $character->gold_dust);
     }
 
-    public function testFailedSelectedDisenchantDoesNotTriggerGoldDustRush(): void
+    public function test_failed_selected_disenchant_does_not_trigger_gold_dust_rush(): void
     {
         Event::fake();
 
@@ -509,7 +509,7 @@ class DisenchantServiceTest extends TestCase
         $this->assertEquals(1, $character->gold_dust);
     }
 
-    public function testFailedSelectedDisenchantDoesNotCountFailedGoldDustTowardRushBonus(): void
+    public function test_failed_selected_disenchant_does_not_count_failed_gold_dust_toward_rush_bonus(): void
     {
         Event::fake();
 
@@ -536,7 +536,7 @@ class DisenchantServiceTest extends TestCase
         $this->assertEquals(20, $character->gold_dust);
     }
 
-    public function testCallDisenchantItemAndSucceed()
+    public function test_call_disenchant_item_and_succeed()
     {
         Event::fake();
 
@@ -650,7 +650,7 @@ class DisenchantServiceTest extends TestCase
 
         $result = $disenchantingService->setUp($character)->disenchantItem($slot);
 
-        $this->assertEquals('Disenchanted item ' . $item->affix_name . ' Check server message tab for Gold Dust output.', $result['message']);
+        $this->assertEquals('Disenchanted item '.$item->affix_name.' Check server message tab for Gold Dust output.', $result['message']);
         $this->assertEquals(200, $result['status']);
 
         $character = $character->refresh();
@@ -705,7 +705,7 @@ class DisenchantServiceTest extends TestCase
 
         $result = $disenchantingService->setUp($character)->disenchantItem($slot);
 
-        $this->assertEquals('Disenchanted item ' . $this->itemToDisenchant->affix_name . ' Check server message tab for Gold Dust output.', $result['message']);
+        $this->assertEquals('Disenchanted item '.$this->itemToDisenchant->affix_name.' Check server message tab for Gold Dust output.', $result['message']);
         $this->assertEquals(200, $result['status']);
     }
 }

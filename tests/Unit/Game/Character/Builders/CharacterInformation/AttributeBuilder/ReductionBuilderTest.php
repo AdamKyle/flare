@@ -15,7 +15,7 @@ use Tests\Traits\CreateItemAffix;
 
 class ReductionBuilderTest extends TestCase
 {
-    use CreateClass, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, CreateGameClassSpecial, RefreshDatabase;
+    use CreateClass, CreateGameClassSpecial, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -93,7 +93,7 @@ class ReductionBuilderTest extends TestCase
         $this->assertEquals(0.10, $reduction);
     }
 
-    public function testGetRingReductionUsesEquippedClassSpecial()
+    public function test_get_ring_reduction_uses_equipped_class_special()
     {
         $item = $this->createItem([
             'type' => 'ring',
@@ -123,7 +123,7 @@ class ReductionBuilderTest extends TestCase
         $this->assertEqualsWithDelta(0.30, $reduction, 0.000001);
     }
 
-    public function testGetRingReductionIgnoresUnequippedClassSpecial()
+    public function test_get_ring_reduction_ignores_unequipped_class_special()
     {
         $item = $this->createItem([
             'type' => 'ring',
@@ -153,7 +153,7 @@ class ReductionBuilderTest extends TestCase
         $this->assertEqualsWithDelta(0.10, $reduction, 0.000001);
     }
 
-    public function testGetAffixReductionUsesEquippedClassSpecial()
+    public function test_get_affix_reduction_uses_equipped_class_special()
     {
         $itemAffix = $this->createItemAffix([
             'skill_reduction' => 0.10,
@@ -187,7 +187,7 @@ class ReductionBuilderTest extends TestCase
         $this->assertEqualsWithDelta(0.30, $reduction, 0.000001);
     }
 
-    public function testGetAffixReductionIgnoresUnequippedClassSpecial()
+    public function test_get_affix_reduction_ignores_unequipped_class_special()
     {
         $itemAffix = $this->createItemAffix([
             'skill_reduction' => 0.10,

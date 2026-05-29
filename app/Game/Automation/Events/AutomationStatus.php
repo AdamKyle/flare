@@ -14,20 +14,10 @@ class AutomationStatus implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * @var User
-     */
     private User $user;
 
-    /**
-     * @var bool
-     */
     public bool $isRunning;
 
-    /**
-     * @param User $user
-     * @param bool $isRunning
-     */
     public function __construct(User $user, bool $isRunning)
     {
         $this->user = $user;

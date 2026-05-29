@@ -34,7 +34,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
 
     private ?FactionLoyaltyNpc $factionLoyaltyNpc = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -74,7 +74,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         $this->factionLoyaltyNpc = $this->factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Cache::forget('monsters');
 
@@ -87,7 +87,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         parent::tearDown();
     }
 
-    public function testResolveNpcKeepsCurrentNpcWhenItHasIncompleteTasks(): void
+    public function test_resolve_npc_keeps_current_npc_when_it_has_incomplete_tasks(): void
     {
         Event::fake();
 
@@ -99,7 +99,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         $this->assertFalse($this->coordinator->shouldEndAutomation());
     }
 
-    public function testResolveNpcSwitchesToSameMapNpcWhenCurrentNpcIsComplete(): void
+    public function test_resolve_npc_switches_to_same_map_npc_when_current_npc_is_complete(): void
     {
         Event::fake();
 
@@ -129,7 +129,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         $this->assertFalse($this->factionLoyaltyNpc->refresh()->currently_helping);
     }
 
-    public function testResolveNpcDispatchesLogWhenSwitchingToSameMapNpc(): void
+    public function test_resolve_npc_dispatches_log_when_switching_to_same_map_npc(): void
     {
         Event::fake();
 
@@ -150,7 +150,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         Event::assertDispatched(AutomationLogUpdate::class);
     }
 
-    public function testResolveNpcTravelsPledgesAndAssistsExistingFactionLoyaltyNpc(): void
+    public function test_resolve_npc_travels_pledges_and_assists_existing_faction_loyalty_npc(): void
     {
         Event::fake();
 
@@ -191,7 +191,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         $this->assertTrue($resolvedNpc->refresh()->currently_helping);
     }
 
-    public function testResolveNpcEndsWhenExistingFactionLoyaltyNpcCannotBeReached(): void
+    public function test_resolve_npc_ends_when_existing_faction_loyalty_npc_cannot_be_reached(): void
     {
         Event::fake();
 
@@ -217,7 +217,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         $this->assertTrue($this->coordinator->shouldEndAutomation());
     }
 
-    public function testResolveNpcEndsWhenExistingFactionLoyaltyNpcFactionIsNotMaxed(): void
+    public function test_resolve_npc_ends_when_existing_faction_loyalty_npc_faction_is_not_maxed(): void
     {
         Event::fake();
 
@@ -231,7 +231,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         $this->assertTrue($this->coordinator->shouldEndAutomation());
     }
 
-    public function testResolveNpcDoesNotTravelToExistingFactionLoyaltyNpcFactionWhenFactionIsNotMaxed(): void
+    public function test_resolve_npc_does_not_travel_to_existing_faction_loyalty_npc_faction_when_faction_is_not_maxed(): void
     {
         Event::fake();
 
@@ -246,7 +246,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         $this->assertEquals($gameMaps[0]->id, $this->character->refresh()->map->game_map_id);
     }
 
-    public function testResolveNpcDoesNotPledgeExistingFactionLoyaltyWhenFactionIsNotMaxed(): void
+    public function test_resolve_npc_does_not_pledge_existing_faction_loyalty_when_faction_is_not_maxed(): void
     {
         Event::fake();
 
@@ -259,7 +259,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         $this->assertFalse($existingFactionLoyalty->refresh()->is_pledged);
     }
 
-    public function testResolveNpcDoesNotAssistExistingFactionLoyaltyNpcWhenFactionIsNotMaxed(): void
+    public function test_resolve_npc_does_not_assist_existing_faction_loyalty_npc_when_faction_is_not_maxed(): void
     {
         Event::fake();
 
@@ -272,7 +272,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         $this->assertFalse($existingFactionLoyalty->refresh()->factionLoyaltyNpcs()->where('currently_helping', true)->exists());
     }
 
-    public function testResolveNpcDispatchesNoAvailableFactionMessageWhenExistingFactionLoyaltyNpcFactionIsNotMaxed(): void
+    public function test_resolve_npc_dispatches_no_available_faction_message_when_existing_faction_loyalty_npc_faction_is_not_maxed(): void
     {
         Event::fake();
 
@@ -287,7 +287,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         });
     }
 
-    public function testResolveNpcTravelsPledgesAndAssistsNewFactionLoyaltyNpc(): void
+    public function test_resolve_npc_travels_pledges_and_assists_new_faction_loyalty_npc(): void
     {
         Event::fake();
 
@@ -329,7 +329,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         $this->assertTrue($resolvedNpc->refresh()->currently_helping);
     }
 
-    public function testResolveNpcSkipsNewFactionWhenItCannotBeReached(): void
+    public function test_resolve_npc_skips_new_faction_when_it_cannot_be_reached(): void
     {
         Event::fake();
 
@@ -365,7 +365,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         $this->assertTrue($this->coordinator->shouldEndAutomation());
     }
 
-    public function testResolveNpcEndsWhenNoIncompleteTasksAreAvailable(): void
+    public function test_resolve_npc_ends_when_no_incomplete_tasks_are_available(): void
     {
         Event::fake();
 
@@ -389,7 +389,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         $this->assertTrue($this->coordinator->shouldEndAutomation());
     }
 
-    public function testResolveNpcDispatchesLogWhenAutomationEnds(): void
+    public function test_resolve_npc_dispatches_log_when_automation_ends(): void
     {
         Event::fake();
 
@@ -412,7 +412,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         Event::assertDispatched(AutomationLogUpdate::class);
     }
 
-    public function testShouldEndAutomationIsResetWhenCoordinatorIsSetUpAgain(): void
+    public function test_should_end_automation_is_reset_when_coordinator_is_set_up_again(): void
     {
         Event::fake();
 

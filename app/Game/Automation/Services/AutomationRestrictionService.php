@@ -85,10 +85,10 @@ class AutomationRestrictionService
         if ($action === self::START_FACTION_LOYALTY && ($automationType->isExploring() || $automationType->isDelve())) {
             $automationName = $this->automationName($automation);
 
-            return 'You are currently doing ' . $automationName . '. This action cannot be completed right now. Please cancel ' . $automationName . ' first.';
+            return 'You are currently doing '.$automationName.'. This action cannot be completed right now. Please cancel '.$automationName.' first.';
         }
 
-        return 'You cannot do that while ' . $this->automationName($automation) . ' automation is running. Cancel it first.';
+        return 'You cannot do that while '.$this->automationName($automation).' automation is running. Cancel it first.';
     }
 
     public function isSpecialExplorationLocation(?Location $location): bool

@@ -44,7 +44,7 @@ class ProcessScheduledEvents extends Command
             ->get();
 
         foreach ($scheduledEvents as $event) {
-            $cacheKey = 'scheduled-event-dispatch:' . $event->id;
+            $cacheKey = 'scheduled-event-dispatch:'.$event->id;
 
             if (! Cache::add($cacheKey, true, $event->start_date->copy()->addMinutes(10))) {
                 continue;

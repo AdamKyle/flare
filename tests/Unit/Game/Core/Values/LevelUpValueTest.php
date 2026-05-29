@@ -14,7 +14,7 @@ class LevelUpValueTest extends TestCase
 {
     use CreateItem, RefreshDatabase;
 
-    public function testLevelUpWithoutBoonIncreasesLevelAndStatsByOneLevel(): void
+    public function test_level_up_without_boon_increases_level_and_stats_by_one_level(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -32,7 +32,7 @@ class LevelUpValueTest extends TestCase
         $this->assertSame(2, $levelUpValue['focus']);
     }
 
-    public function testStackableExtraLevelBoonIncreasesStatsByActualLevelsGained(): void
+    public function test_stackable_extra_level_boon_increases_stats_by_actual_levels_gained(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -66,7 +66,7 @@ class LevelUpValueTest extends TestCase
         $this->assertSame(6, $levelUpValue['focus']);
     }
 
-    public function testExtraLevelBoonNearMaxLevelScalesStatsOnlyByActualLevelsGainedAfterClamp(): void
+    public function test_extra_level_boon_near_max_level_scales_stats_only_by_actual_levels_gained_after_clamp(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -104,7 +104,7 @@ class LevelUpValueTest extends TestCase
         $this->assertSame(2, $levelUpValue['focus']);
     }
 
-    public function testMultipleActiveStackableExtraLevelBoonsSumRawStatGains(): void
+    public function test_multiple_active_stackable_extra_level_boons_sum_raw_stat_gains(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -154,7 +154,7 @@ class LevelUpValueTest extends TestCase
         $this->assertSame(7, $levelUpValue['focus']);
     }
 
-    public function testExtraLevelBoonWithZeroAmountUsedDoesNotBreakRawStatGains(): void
+    public function test_extra_level_boon_with_zero_amount_used_does_not_break_raw_stat_gains(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -188,7 +188,7 @@ class LevelUpValueTest extends TestCase
         $this->assertSame(2, $levelUpValue['focus']);
     }
 
-    public function testStatsAtMaxStatCapDoNotIncreasePastProjectMaxStatConstant(): void
+    public function test_stats_at_max_stat_cap_do_not_increase_past_project_max_stat_constant(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -215,7 +215,7 @@ class LevelUpValueTest extends TestCase
         $this->assertSame(MaxReincarnationStats::MAX_STATS, $levelUpValue['focus']);
     }
 
-    public function testNormalStatOneBelowMaxStatCapDoesNotIncreasePastProjectMaxStatConstant(): void
+    public function test_normal_stat_one_below_max_stat_cap_does_not_increase_past_project_max_stat_constant(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -230,7 +230,7 @@ class LevelUpValueTest extends TestCase
         $this->assertSame(MaxReincarnationStats::MAX_STATS, $levelUpValue['str']);
     }
 
-    public function testDamageStatOneBelowMaxStatCapDoesNotIncreasePastProjectMaxStatConstant(): void
+    public function test_damage_stat_one_below_max_stat_cap_does_not_increase_past_project_max_stat_constant(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -245,7 +245,7 @@ class LevelUpValueTest extends TestCase
         $this->assertSame(MaxReincarnationStats::MAX_STATS, $levelUpValue['dex']);
     }
 
-    public function testCappedNormalStatsIncreaseBaseStatModifierByOneLevelWithoutBoon(): void
+    public function test_capped_normal_stats_increase_base_stat_modifier_by_one_level_without_boon(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -261,7 +261,7 @@ class LevelUpValueTest extends TestCase
         $this->assertEqualsWithDelta(0.25012, $levelUpValue['base_stat_mod'], 0.00000001);
     }
 
-    public function testCappedDamageStatIncreasesBaseDamageStatModifierByOneLevelWithoutBoon(): void
+    public function test_capped_damage_stat_increases_base_damage_stat_modifier_by_one_level_without_boon(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -277,7 +277,7 @@ class LevelUpValueTest extends TestCase
         $this->assertEqualsWithDelta(0.2501, $levelUpValue['base_damage_stat_mod'], 0.00000001);
     }
 
-    public function testCappedNormalStatsIncreaseBaseStatModifierByFiveLevelsWithStackableExtraLevelBoon(): void
+    public function test_capped_normal_stats_increase_base_stat_modifier_by_five_levels_with_stackable_extra_level_boon(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -309,7 +309,7 @@ class LevelUpValueTest extends TestCase
         $this->assertEqualsWithDelta(0.2506, $levelUpValue['base_stat_mod'], 0.00000001);
     }
 
-    public function testCappedDamageStatIncreasesBaseDamageStatModifierByFiveLevelsWithStackableExtraLevelBoon(): void
+    public function test_capped_damage_stat_increases_base_damage_stat_modifier_by_five_levels_with_stackable_extra_level_boon(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -341,7 +341,7 @@ class LevelUpValueTest extends TestCase
         $this->assertEqualsWithDelta(0.2505, $levelUpValue['base_damage_stat_mod'], 0.00000001);
     }
 
-    public function testBaseStatModifierDoesNotExceedCap(): void
+    public function test_base_stat_modifier_does_not_exceed_cap(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -357,7 +357,7 @@ class LevelUpValueTest extends TestCase
         $this->assertSame(0.60, $levelUpValue['base_stat_mod']);
     }
 
-    public function testBaseDamageStatModifierDoesNotExceedCap(): void
+    public function test_base_damage_stat_modifier_does_not_exceed_cap(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -373,7 +373,7 @@ class LevelUpValueTest extends TestCase
         $this->assertSame(0.50, $levelUpValue['base_damage_stat_mod']);
     }
 
-    public function testReturnedBaseStatModifierUsesInternalCap(): void
+    public function test_returned_base_stat_modifier_uses_internal_cap(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -389,7 +389,7 @@ class LevelUpValueTest extends TestCase
         $this->assertSame(0.60, $levelUpValue['base_stat_mod']);
     }
 
-    public function testReturnedBaseDamageStatModifierUsesInternalCap(): void
+    public function test_returned_base_damage_stat_modifier_uses_internal_cap(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -405,7 +405,7 @@ class LevelUpValueTest extends TestCase
         $this->assertSame(0.50, $levelUpValue['base_damage_stat_mod']);
     }
 
-    public function testReturnedBaseStatModifierIsCappedWhenNormalStatIsNotCapped(): void
+    public function test_returned_base_stat_modifier_is_capped_when_normal_stat_is_not_capped(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -421,7 +421,7 @@ class LevelUpValueTest extends TestCase
         $this->assertSame(0.60, $levelUpValue['base_stat_mod']);
     }
 
-    public function testReturnedBaseDamageStatModifierIsCappedWhenDamageStatIsNotCapped(): void
+    public function test_returned_base_damage_stat_modifier_is_capped_when_damage_stat_is_not_capped(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -437,7 +437,7 @@ class LevelUpValueTest extends TestCase
         $this->assertSame(0.50, $levelUpValue['base_damage_stat_mod']);
     }
 
-    public function testCharacterAlreadyAtMaxLevelWithCappedStatsGainsNoModifierProgress(): void
+    public function test_character_already_at_max_level_with_capped_stats_gains_no_modifier_progress(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -474,7 +474,7 @@ class LevelUpValueTest extends TestCase
         $this->assertSame(0.35, $levelUpValue['base_damage_stat_mod']);
     }
 
-    public function testCharacterAlreadyAtMaxLevelGainsNoExtraRawStats(): void
+    public function test_character_already_at_max_level_gains_no_extra_raw_stats(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -512,7 +512,7 @@ class LevelUpValueTest extends TestCase
         $this->assertSame(1, $levelUpValue['focus']);
     }
 
-    public function testExtraLevelBoonWithNullAmountUsedDoesNotBreakRawStatGains(): void
+    public function test_extra_level_boon_with_null_amount_used_does_not_break_raw_stat_gains(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)

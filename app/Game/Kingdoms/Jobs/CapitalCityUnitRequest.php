@@ -159,7 +159,7 @@ class CapitalCityUnitRequest implements ShouldQueue
     private function hasRecruitableRequests(array $requestData): bool
     {
         return collect($requestData)
-            ->contains(fn($data) => ! in_array($data['secondary_status'], [CapitalCityQueueStatus::REJECTED, CapitalCityQueueStatus::CANCELLED]));
+            ->contains(fn ($data) => ! in_array($data['secondary_status'], [CapitalCityQueueStatus::REJECTED, CapitalCityQueueStatus::CANCELLED]));
     }
 
     private function handleCost(Kingdom $kingdom, UnitService $unitService, array $totalCosts): Kingdom
@@ -170,10 +170,10 @@ class CapitalCityUnitRequest implements ShouldQueue
     private function sumAcceptedCosts(array $requestData): array
     {
         $costs = collect($requestData)
-            ->reject(fn($request) => in_array($request['secondary_status'], [CapitalCityQueueStatus::REJECTED, CapitalCityQueueStatus::CANCELLED]))
-            ->filter(fn($request) => isset($request['costs']))
-            ->map(fn($request) => collect($request['costs']))
-            ->reduce(fn($carry, $requestCosts) => $carry->merge($requestCosts)->map(fn($value, $key) => $carry->get($key, 0) + $value), collect())
+            ->reject(fn ($request) => in_array($request['secondary_status'], [CapitalCityQueueStatus::REJECTED, CapitalCityQueueStatus::CANCELLED]))
+            ->filter(fn ($request) => isset($request['costs']))
+            ->map(fn ($request) => collect($request['costs']))
+            ->reduce(fn ($carry, $requestCosts) => $carry->merge($requestCosts)->map(fn ($value, $key) => $carry->get($key, 0) + $value), collect())
             ->toArray();
 
         return empty($costs) ? $this->totalCosts : $costs;

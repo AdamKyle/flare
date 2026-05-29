@@ -445,7 +445,7 @@ final class ComparatorTest extends TestCase
 
     public function test_default_strategy_runs_when_type_is_unknown(): void
     {
-        $schema = $this->app->make(\App\Flare\Items\Comparison\Comparator::class);
+        $schema = $this->app->make(Comparator::class);
 
         $left = $this->newSword(['name' => 'Left']);
         $right = $this->newSword(['name' => 'Right']);
@@ -462,7 +462,7 @@ final class ComparatorTest extends TestCase
 
     public function test_index_rows_by_key_guard_branches(): void
     {
-        $comparator = $this->app->make(\App\Flare\Items\Comparison\Comparator::class);
+        $comparator = $this->app->make(Comparator::class);
 
         $left = $this->newSword();
         $right = $this->newSword();
@@ -514,7 +514,7 @@ final class ComparatorTest extends TestCase
 
     public function test_map_returning_null_skips_field(): void
     {
-        $schema = \Mockery::mock(\App\Flare\Items\Enricher\Manifest\Concerns\ManifestSchema::class);
+        $schema = Mockery::mock(ManifestSchema::class);
         $schema->shouldReceive('includes')->andReturn(['/^ghost$/']);
         $schema->shouldReceive('excludes')->andReturn([]);
         $schema->shouldReceive('map')->with('ghost')->andReturnNull();
@@ -522,8 +522,8 @@ final class ComparatorTest extends TestCase
         $schema->shouldReceive('compareFor')->never();
         $schema->shouldReceive('collections')->andReturn([]);
 
-        $this->app->instance(\App\Flare\Items\Enricher\Manifest\Concerns\ManifestSchema::class, $schema);
-        $comparator = $this->app->make(\App\Flare\Items\Comparison\Comparator::class);
+        $this->app->instance(ManifestSchema::class, $schema);
+        $comparator = $this->app->make(Comparator::class);
 
         $left = $this->newSword();
         $left->ghost = 123;
@@ -538,7 +538,7 @@ final class ComparatorTest extends TestCase
 
     public function test_collections_descriptor_missing_path_is_skipped(): void
     {
-        $schema = \Mockery::mock(ManifestSchema::class);
+        $schema = Mockery::mock(ManifestSchema::class);
         $schema->shouldReceive('includes')->andReturn([]);
         $schema->shouldReceive('excludes')->andReturn([]);
         $schema->shouldReceive('map')->andReturnNull();

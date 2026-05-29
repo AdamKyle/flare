@@ -17,7 +17,6 @@ class GoldRush
     /**
      * Process potential gold rush
      *
-     * @return void
      * @throws Exception
      */
     public function processPotentialGoldRush(Character $character, int $goldGained): void

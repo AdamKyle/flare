@@ -75,11 +75,6 @@ class FactionLoyaltyFactory
 
     /**
      * Set up faction loyalty data for a character.
-     *
-     * @param Character $character
-     * @param int $mapCount
-     * @param int $npcCountPerMap
-     * @return FactionLoyaltyFactory
      */
     public function setUp(Character $character, int $mapCount = 1, int $npcCountPerMap = 3): FactionLoyaltyFactory
     {
@@ -104,9 +99,6 @@ class FactionLoyaltyFactory
 
     /**
      * Set the required amount for generated tasks.
-     *
-     * @param int $requiredAmount
-     * @return FactionLoyaltyFactory
      */
     public function setRequiredAmount(int $requiredAmount): FactionLoyaltyFactory
     {
@@ -117,9 +109,6 @@ class FactionLoyaltyFactory
 
     /**
      * Create faction loyalty automation records.
-     *
-     * @param string $attackType
-     * @return FactionLoyaltyFactory
      */
     public function createAutomation(string $attackType = AttackTypeValue::ATTACK): FactionLoyaltyFactory
     {
@@ -152,9 +141,6 @@ class FactionLoyaltyFactory
 
     /**
      * Pledge the character to a faction loyalty.
-     *
-     * @param FactionLoyalty|null $factionLoyalty
-     * @return FactionLoyaltyFactory
      */
     public function pledgeToFactionLoyalty(?FactionLoyalty $factionLoyalty = null): FactionLoyaltyFactory
     {
@@ -176,9 +162,6 @@ class FactionLoyaltyFactory
 
     /**
      * Set the assisted faction loyalty NPC.
-     *
-     * @param FactionLoyaltyNpc|null $factionLoyaltyNpc
-     * @return FactionLoyaltyFactory
      */
     public function assistNpc(?FactionLoyaltyNpc $factionLoyaltyNpc = null): FactionLoyaltyFactory
     {
@@ -200,8 +183,6 @@ class FactionLoyaltyFactory
 
     /**
      * Get the character.
-     *
-     * @return Character
      */
     public function getCharacter(): Character
     {
@@ -210,8 +191,6 @@ class FactionLoyaltyFactory
 
     /**
      * Get the character automation.
-     *
-     * @return CharacterAutomation|null
      */
     public function getCharacterAutomation(): ?CharacterAutomation
     {
@@ -220,8 +199,6 @@ class FactionLoyaltyFactory
 
     /**
      * Get the faction loyalty automation.
-     *
-     * @return FactionLoyaltyAutomation|null
      */
     public function getFactionLoyaltyAutomation(): ?FactionLoyaltyAutomation
     {
@@ -230,8 +207,6 @@ class FactionLoyaltyFactory
 
     /**
      * Get the faction loyalty automation log.
-     *
-     * @return FactionLoyaltyAutomationLog|null
      */
     public function getFactionLoyaltyAutomationLog(): ?FactionLoyaltyAutomationLog
     {
@@ -240,8 +215,6 @@ class FactionLoyaltyFactory
 
     /**
      * Get the pledged faction loyalty.
-     *
-     * @return FactionLoyalty|null
      */
     public function getPledgedFactionLoyalty(): ?FactionLoyalty
     {
@@ -250,8 +223,6 @@ class FactionLoyaltyFactory
 
     /**
      * Get the assisting faction loyalty NPC.
-     *
-     * @return FactionLoyaltyNpc|null
      */
     public function getAssistingFactionLoyaltyNpc(): ?FactionLoyaltyNpc
     {
@@ -260,8 +231,6 @@ class FactionLoyaltyFactory
 
     /**
      * Get the game maps.
-     *
-     * @return array
      */
     public function getGameMaps(): array
     {
@@ -270,8 +239,6 @@ class FactionLoyaltyFactory
 
     /**
      * Get the factions.
-     *
-     * @return array
      */
     public function getFactions(): array
     {
@@ -280,8 +247,6 @@ class FactionLoyaltyFactory
 
     /**
      * Get the faction loyalties.
-     *
-     * @return array
      */
     public function getFactionLoyalties(): array
     {
@@ -290,8 +255,6 @@ class FactionLoyaltyFactory
 
     /**
      * Get the faction loyalty NPCs.
-     *
-     * @return array
      */
     public function getFactionLoyaltyNpcs(): array
     {
@@ -300,9 +263,6 @@ class FactionLoyaltyFactory
 
     /**
      * Get crafting items for a faction loyalty NPC.
-     *
-     * @param FactionLoyaltyNpc $factionLoyaltyNpc
-     * @return array
      */
     public function getCraftingItemsForNpc(FactionLoyaltyNpc $factionLoyaltyNpc): array
     {
@@ -311,9 +271,6 @@ class FactionLoyaltyFactory
 
     /**
      * Get training items for a game map.
-     *
-     * @param GameMap $gameMap
-     * @return array
      */
     public function getTrainingItemsForMap(GameMap $gameMap): array
     {
@@ -322,9 +279,6 @@ class FactionLoyaltyFactory
 
     /**
      * Get bounty monsters for a faction loyalty NPC.
-     *
-     * @param FactionLoyaltyNpc $factionLoyaltyNpc
-     * @return array
      */
     public function getBountyMonstersForNpc(FactionLoyaltyNpc $factionLoyaltyNpc): array
     {
@@ -333,9 +287,6 @@ class FactionLoyaltyFactory
 
     /**
      * Get training monsters for a game map.
-     *
-     * @param GameMap $gameMap
-     * @return array
      */
     public function getTrainingMonstersForMap(GameMap $gameMap): array
     {
@@ -344,9 +295,6 @@ class FactionLoyaltyFactory
 
     /**
      * Get unique reward items for a game map.
-     *
-     * @param GameMap $gameMap
-     * @return array
      */
     public function getUniqueRewardItemsForMap(GameMap $gameMap): array
     {
@@ -355,9 +303,6 @@ class FactionLoyaltyFactory
 
     /**
      * Create maps for the setup.
-     *
-     * @param int $mapCount
-     * @return void
      */
     private function createMaps(int $mapCount): void
     {
@@ -371,8 +316,6 @@ class FactionLoyaltyFactory
 
     /**
      * Get or create the character game map.
-     *
-     * @return GameMap
      */
     private function getCharacterGameMap(): GameMap
     {
@@ -405,9 +348,6 @@ class FactionLoyaltyFactory
 
     /**
      * Create the next game map.
-     *
-     * @param int $index
-     * @return GameMap
      */
     private function createNextGameMap(int $index): GameMap
     {
@@ -416,7 +356,7 @@ class FactionLoyaltyFactory
 
         return $this->createGameMap([
             'name' => $mapName,
-            'path' => 'faction-loyalty-map-' . $index,
+            'path' => 'faction-loyalty-map-'.$index,
             'default' => false,
             'can_traverse' => true,
         ]);
@@ -424,9 +364,6 @@ class FactionLoyaltyFactory
 
     /**
      * Create faction loyalties.
-     *
-     * @param int $npcCountPerMap
-     * @return void
      */
     private function createFactionLoyalties(int $npcCountPerMap): void
     {
@@ -440,9 +377,6 @@ class FactionLoyaltyFactory
 
     /**
      * Create a faction.
-     *
-     * @param GameMap $gameMap
-     * @return Faction
      */
     private function createFaction(GameMap $gameMap): Faction
     {
@@ -483,9 +417,6 @@ class FactionLoyaltyFactory
 
     /**
      * Create faction loyalty for a faction.
-     *
-     * @param Faction $faction
-     * @return FactionLoyalty
      */
     private function createFactionLoyaltyForFaction(Faction $faction): FactionLoyalty
     {
@@ -502,10 +433,6 @@ class FactionLoyaltyFactory
 
     /**
      * Create NPC data for a faction loyalty.
-     *
-     * @param FactionLoyalty $factionLoyalty
-     * @param int $npcCountPerMap
-     * @return void
      */
     private function createNpcDataForFactionLoyalty(FactionLoyalty $factionLoyalty, int $npcCountPerMap): void
     {
@@ -536,16 +463,12 @@ class FactionLoyaltyFactory
 
     /**
      * Create an NPC for a map.
-     *
-     * @param GameMap $gameMap
-     * @param int $npcNumber
-     * @return Npc
      */
     private function createNpcForMap(GameMap $gameMap, int $npcNumber): Npc
     {
         return $this->createNpc([
-            'name' => 'Faction Loyalty NPC ' . $gameMap->id . '-' . $npcNumber,
-            'real_name' => 'Faction Loyalty NPC ' . $gameMap->id . '-' . $npcNumber,
+            'name' => 'Faction Loyalty NPC '.$gameMap->id.'-'.$npcNumber,
+            'real_name' => 'Faction Loyalty NPC '.$gameMap->id.'-'.$npcNumber,
             'game_map_id' => $gameMap->id,
             'x_position' => 16,
             'y_position' => 16,
@@ -554,10 +477,6 @@ class FactionLoyaltyFactory
 
     /**
      * Create a faction loyalty NPC.
-     *
-     * @param FactionLoyalty $factionLoyalty
-     * @param Npc $npc
-     * @return FactionLoyaltyNpc
      */
     private function createFactionLoyaltyNpcForNpc(FactionLoyalty $factionLoyalty, Npc $npc): FactionLoyaltyNpc
     {
@@ -574,11 +493,6 @@ class FactionLoyaltyFactory
 
     /**
      * Create tasks for an NPC.
-     *
-     * @param FactionLoyaltyNpc $factionLoyaltyNpc
-     * @param GameMap $gameMap
-     * @param int $npcNumber
-     * @return array
      */
     private function createTasksForNpc(FactionLoyaltyNpc $factionLoyaltyNpc, GameMap $gameMap, int $npcNumber): array
     {
@@ -590,11 +504,6 @@ class FactionLoyaltyFactory
 
     /**
      * Create crafting tasks for an NPC.
-     *
-     * @param FactionLoyaltyNpc $factionLoyaltyNpc
-     * @param GameMap $gameMap
-     * @param int $npcNumber
-     * @return array
      */
     private function createCraftingTasksForNpc(FactionLoyaltyNpc $factionLoyaltyNpc, GameMap $gameMap, int $npcNumber): array
     {
@@ -621,10 +530,6 @@ class FactionLoyaltyFactory
 
     /**
      * Create bounty tasks for an NPC.
-     *
-     * @param FactionLoyaltyNpc $factionLoyaltyNpc
-     * @param GameMap $gameMap
-     * @return array
      */
     private function createBountyTasksForNpc(FactionLoyaltyNpc $factionLoyaltyNpc, GameMap $gameMap): array
     {
@@ -650,15 +555,11 @@ class FactionLoyaltyFactory
 
     /**
      * Create a crafting item.
-     *
-     * @param GameMap $gameMap
-     * @param array $itemDefinition
-     * @return Item
      */
     private function createCraftingItem(GameMap $gameMap, array $itemDefinition): Item
     {
         return $this->createItem(array_merge([
-            'name' => 'Faction Loyalty Crafting Item ' . $gameMap->id . ' ' . $itemDefinition['type'],
+            'name' => 'Faction Loyalty Crafting Item '.$gameMap->id.' '.$itemDefinition['type'],
             'cost' => 1,
             'can_craft' => true,
             'skill_level_required' => 1,
@@ -674,9 +575,6 @@ class FactionLoyaltyFactory
 
     /**
      * Create training crafting items for a map.
-     *
-     * @param GameMap $gameMap
-     * @return void
      */
     private function createTrainingItemsForMap(GameMap $gameMap): void
     {
@@ -684,7 +582,7 @@ class FactionLoyaltyFactory
 
         foreach ($this->getRotatedItemDefinitions($gameMap->id, count($this->getItemDefinitions())) as $itemDefinition) {
             $this->trainingItems[$gameMap->id][] = $this->createItem(array_merge([
-                'name' => 'Faction Loyalty Training Crafting Item ' . $gameMap->id . ' ' . $itemDefinition['type'],
+                'name' => 'Faction Loyalty Training Crafting Item '.$gameMap->id.' '.$itemDefinition['type'],
                 'cost' => 1,
                 'can_craft' => true,
                 'skill_level_required' => 1,
@@ -701,15 +599,11 @@ class FactionLoyaltyFactory
 
     /**
      * Create bounty monster.
-     *
-     * @param GameMap $gameMap
-     * @param int $monsterNumber
-     * @return Monster
      */
     private function createBountyMonster(GameMap $gameMap, int $monsterNumber): Monster
     {
         return $this->createMonster([
-            'name' => 'Faction Loyalty Bounty Monster ' . $gameMap->id . '-' . $monsterNumber,
+            'name' => 'Faction Loyalty Bounty Monster '.$gameMap->id.'-'.$monsterNumber,
             'game_map_id' => $gameMap->id,
             'max_level' => $this->character->level + 10 + $monsterNumber,
             'xp' => 10,
@@ -734,9 +628,6 @@ class FactionLoyaltyFactory
 
     /**
      * Create training monsters for a map.
-     *
-     * @param GameMap $gameMap
-     * @return void
      */
     private function createTrainingMonstersForMap(GameMap $gameMap): void
     {
@@ -744,7 +635,7 @@ class FactionLoyaltyFactory
 
         for ($monsterNumber = 1; $monsterNumber <= self::TASK_COUNT; $monsterNumber++) {
             $this->trainingMonsters[$gameMap->id][] = $this->createMonster([
-                'name' => 'Faction Loyalty Training Monster ' . $gameMap->id . '-' . $monsterNumber,
+                'name' => 'Faction Loyalty Training Monster '.$gameMap->id.'-'.$monsterNumber,
                 'game_map_id' => $gameMap->id,
                 'max_level' => $this->character->level + $monsterNumber,
                 'xp' => 10,
@@ -770,9 +661,6 @@ class FactionLoyaltyFactory
 
     /**
      * Create unique reward items for a map.
-     *
-     * @param GameMap $gameMap
-     * @return void
      */
     private function createUniqueRewardItemsForMap(GameMap $gameMap): void
     {
@@ -780,7 +668,7 @@ class FactionLoyaltyFactory
 
         foreach ($this->getRotatedItemDefinitions($gameMap->id, self::UNIQUE_REWARD_ITEM_COUNT) as $itemDefinition) {
             $this->uniqueRewardItems[$gameMap->id][] = $this->createItem(array_merge([
-                'name' => 'Faction Loyalty Unique Pool Item ' . $gameMap->id . ' ' . $itemDefinition['type'],
+                'name' => 'Faction Loyalty Unique Pool Item '.$gameMap->id.' '.$itemDefinition['type'],
                 'cost' => 1,
                 'skill_level_required' => 1,
                 'skill_level_trivial' => 100,
@@ -797,10 +685,6 @@ class FactionLoyaltyFactory
 
     /**
      * Get rotated item definitions.
-     *
-     * @param int $offset
-     * @param int $amount
-     * @return array
      */
     private function getRotatedItemDefinitions(int $offset, int $amount): array
     {
@@ -816,8 +700,6 @@ class FactionLoyaltyFactory
 
     /**
      * Get item definitions.
-     *
-     * @return array
      */
     private function getItemDefinitions(): array
     {

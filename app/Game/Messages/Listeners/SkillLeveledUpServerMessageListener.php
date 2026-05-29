@@ -3,6 +3,7 @@
 namespace App\Game\Messages\Listeners;
 
 use App\Flare\Events\SkillLeveledUpServerMessageEvent;
+use App\Game\Character\CharacterCreation\Events\CreateCharacterEvent;
 use App\Game\Messages\Events\ServerMessageEvent as ServerMessage;
 
 class SkillLeveledUpServerMessageListener
@@ -10,7 +11,7 @@ class SkillLeveledUpServerMessageListener
     /**
      * Handle the event.
      *
-     * @param  \App\Game\Character\CharacterCreation\Events\CreateCharacterEvent  $event
+     * @param  CreateCharacterEvent  $event
      * @return void
      */
     public function handle(SkillLeveledUpServerMessageEvent $event)

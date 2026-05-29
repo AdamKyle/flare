@@ -1,5 +1,7 @@
 <?php
 
+use App\Flare\Models\User;
+
 return [
 
     /*
@@ -70,7 +72,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Flare\Models\User::class,
+            'model' => User::class,
         ],
 
         // 'users' => [

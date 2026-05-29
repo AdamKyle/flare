@@ -11,10 +11,12 @@ use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\KingdomUnit;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
-use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityRequestResourcesHandler;
+use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessBuildingRequestHandler;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessUnitRequestHandler;
+use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityRequestResourcesHandler;
 use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest;
 use App\Game\Kingdoms\Jobs\CapitalCityUnitRequestMovement;
+use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
@@ -28,7 +30,7 @@ class CapitalCityUnitManagementTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testCapitalCityUnitResourceRejectionUpdatesUnitRequestDataAndTopLevelStatus(): void
+    public function test_capital_city_unit_resource_rejection_updates_unit_request_data_and_top_level_status(): void
     {
         Event::fake();
 
@@ -66,7 +68,7 @@ class CapitalCityUnitManagementTest extends TestCase
         $this->assertSame(CapitalCityQueueStatus::REJECTED, $capitalCityUnitQueue->unit_request_data[0]['secondary_status']);
     }
 
-    public function testCapitalCityResourceRequestReschedulesItselfWhileWaiting(): void
+    public function test_capital_city_resource_request_reschedules_itself_while_waiting(): void
     {
         Queue::fake();
 
@@ -102,14 +104,14 @@ class CapitalCityUnitManagementTest extends TestCase
             $resourceRequest->id,
             CapitalCityResourceRequestType::UNIT_QUEUE
         ))->handle(
-            resolve(\App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessBuildingRequestHandler::class),
-            resolve(\App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessUnitRequestHandler::class)
+            resolve(CapitalCityProcessBuildingRequestHandler::class),
+            resolve(CapitalCityProcessUnitRequestHandler::class)
         );
 
         Queue::assertPushed(CapitalCityResourceRequest::class);
     }
 
-    public function testMissingCapitalCityResourceRequestRowDoesNotLeaveQueueStuck(): void
+    public function test_missing_capital_city_resource_request_row_does_not_leave_queue_stuck(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
@@ -135,14 +137,14 @@ class CapitalCityUnitManagementTest extends TestCase
             999,
             CapitalCityResourceRequestType::UNIT_QUEUE
         ))->handle(
-            resolve(\App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessBuildingRequestHandler::class),
-            resolve(\App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessUnitRequestHandler::class)
+            resolve(CapitalCityProcessBuildingRequestHandler::class),
+            resolve(CapitalCityProcessUnitRequestHandler::class)
         );
 
         $this->assertSame(CapitalCityQueueStatus::REJECTED, $capitalCityUnitQueue->refresh()->status);
     }
 
-    public function testUnitMovementFiresTheUnitQueueTableEvent(): void
+    public function test_unit_movement_fires_the_unit_queue_table_event(): void
     {
         Event::fake();
 
@@ -161,13 +163,13 @@ class CapitalCityUnitManagementTest extends TestCase
         ]);
 
         (new CapitalCityUnitRequestMovement($capitalCityUnitQueue->id, $character->id))
-            ->handle(resolve(\App\Game\Kingdoms\Service\CapitalCityUnitManagement::class));
+            ->handle(resolve(CapitalCityUnitManagement::class));
 
         Event::assertDispatched(UpdateCapitalCityUnitQueueTable::class);
         Event::assertNotDispatched(UpdateCapitalCityBuildingQueueTable::class);
     }
 
-    public function testUnitRequestLoggingUpdatesUnitRequestData(): void
+    public function test_unit_request_logging_updates_unit_request_data(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
@@ -188,12 +190,12 @@ class CapitalCityUnitManagementTest extends TestCase
             'completed_at' => now(),
         ]);
 
-        resolve(\App\Game\Kingdoms\Service\CapitalCityUnitManagement::class)->processUnitRequest($capitalCityUnitQueue);
+        resolve(CapitalCityUnitManagement::class)->processUnitRequest($capitalCityUnitQueue);
 
         $this->assertSame(CapitalCityQueueStatus::CANCELLED, $capitalCityUnitQueue->refresh()->unit_request_data[0]['secondary_status']);
     }
 
-    public function testDuplicateSameUnitRequestRowsAreNotDuplicatedWhenRecruitmentStarts(): void
+    public function test_duplicate_same_unit_request_rows_are_not_duplicated_when_recruitment_starts(): void
     {
         Queue::fake();
         Event::fake();
@@ -252,7 +254,7 @@ class CapitalCityUnitManagementTest extends TestCase
         $this->assertCount(2, $capitalCityUnitQueue->refresh()->unit_request_data);
     }
 
-    public function testDuplicateSameUnitRequestRowsAreAggregatedBeforeMaxValidation(): void
+    public function test_duplicate_same_unit_request_rows_are_aggregated_before_max_validation(): void
     {
         Queue::fake();
         Event::fake();

@@ -4,12 +4,10 @@ namespace App\Game\Core\Providers;
 
 use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Values\BaseStatValue;
-use App\Flare\Transformers\Serializers\CoreSerializer;
 use App\Game\Battle\Services\BattleDrop;
-use App\Game\Core\Comparison\ItemComparison;
-use App\Game\Core\Services\CharacterStatRepairService;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\Core\Services\CharactersOnline;
+use App\Game\Core\Services\CharacterStatRepairService;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;

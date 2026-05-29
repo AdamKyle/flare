@@ -119,6 +119,8 @@ class StatModifierDetails
 
         $details['damage_stat_name'] = $this->character->damage_stat;
         $details['damage_stat_amount'] = $this->character->getInformation()->statMod($this->character->damage_stat, $isVoided);
+        $details['non_equipped_damage_amount'] = 0;
+        $details['non_equipped_percentage_of_stat_used'] = 0;
         $details['spell_damage_stat_amount_to_use'] = 0;
         $details['percentage_of_stat_used'] = 0;
         $details['total_damage_for_type'] = $this->character->getInformation()->buildDamage($types, $isVoided);
@@ -126,29 +128,27 @@ class StatModifierDetails
         $details['items_equipped'] = $this->fetchDamageOrHealingEquipmentBreakDown($types);
         $details['map_reduction'] = $this->getMapCharacterReductionsDetails();
 
-        if ($this->character->classType()->isAlcoholic()) {
-            $value = $damageStatAmount * 0.25;
-
-        if (is_null($equipped)) {
-            if (in_array($type, ItemType::validWeapons())) {
+        if (is_null($this->equipped)) {
+            if (! empty(array_intersect($types, ItemType::validWeapons()))) {
                 if ($this->character->classType()->isAlcoholic()) {
                     $value = $damageStatAmount * 0.25;
 
-            $value = $damageStatAmount * 0.15;
+                    $details['non_equipped_damage_amount'] = number_format(max($value, 5));
+                    $details['non_equipped_percentage_of_stat_used'] = 0.25;
+                } elseif ($this->character->classType()->isFighter()) {
+                    $value = $damageStatAmount * 0.05;
 
-            $details['non_equipped_damage_amount'] = max($value, 5);
-            $details['spell_damage_stat_amount_to_use'] = max($value, 5);
-            $details['percentage_of_stat_used'] = 0.15;
-            $details['non_equipped_percentage_of_stat_used'] = 0.15;
-        } else {
-            $value = $damageStatAmount * 0.02;
+                    $details['non_equipped_damage_amount'] = number_format(max($value, 5));
+                    $details['non_equipped_percentage_of_stat_used'] = 0.05;
+                } else {
+                    $value = $damageStatAmount * 0.02;
 
                     $details['non_equipped_damage_amount'] = number_format(max($value, 5));
                     $details['non_equipped_percentage_of_stat_used'] = 0.02;
                 }
             }
 
-            if ($type === ItemType::SPELL_DAMAGE->value && $this->character->classType()->isHeretic()) {
+            if (in_array(ItemType::SPELL_DAMAGE->value, $types) && $this->character->classType()->isHeretic()) {
                 $value = $damageStatAmount * 0.15;
 
                 $details['spell_damage_stat_amount_to_use'] = number_format(max($value, 5));
@@ -156,22 +156,25 @@ class StatModifierDetails
             }
         }
 
-        $classSpecialtyStat = match ($type) {
-            ItemType::SPELL_DAMAGE->value => 'base_spell_damage',
-            ItemType::SPELL_HEALING->value => 'base_healing',
+        $classSpecialtyStat = match (true) {
+            in_array(ItemType::SPELL_DAMAGE->value, $types) => 'base_spell_damage',
+            in_array(ItemType::SPELL_HEALING->value, $types) => 'base_healing',
             default => 'base_damage',
         };
 
-        $details['class_bonus_details'] = $type === 'ring' ? null : $this->fetchClassBonusesEffecting('base_damage');
-        $details['boon_details'] = $type === 'ring' ? null : $this->fetchBoonDetails('base_damage');
-        $details['class_specialties'] = $type === 'ring' ? null : $this->fetchClassRankSpecialtiesDetails($classSpecialtyStat);
-        $details['ancestral_item_skill_data'] = $type === 'ring' ? null : $this->fetchAncestralItemSkills('base_damage');
+        $isRingDamage = in_array(ItemType::RING->value, $types);
+
+        $details['class_bonus_details'] = $isRingDamage ? null : $this->fetchClassBonusesEffecting('base_damage');
+        $details['boon_details'] = $isRingDamage ? null : $this->fetchBoonDetails('base_damage');
+        $details['class_specialties'] = $isRingDamage ? null : $this->fetchClassRankSpecialtiesDetails($classSpecialtyStat);
+        $details['ancestral_item_skill_data'] = $isRingDamage ? null : $this->fetchAncestralItemSkills('base_damage');
 
         $typeAttributes = match (true) {
             in_array(ItemType::SPELL_DAMAGE->value, $types) => $this->character->getInformation()->getDamageBuilder()->buildSpellDamageBreakDownDetails($isVoided),
             in_array(ItemType::RING->value, $types) => $this->character->getInformation()->getDamageBuilder()->buildRingDamageBreakDown(),
             in_array(ItemType::SPELL_HEALING->value, $types) => $this->character->getInformation()->getHealingBuilder()->getHealingBuilder($isVoided),
-            default => $this->character->getInformation()->getDamageBuilder()->buildWeaponDamageBreakDown($damageStatAmount, $isVoided),
+            ! empty(array_intersect($types, ItemType::validWeapons())) => $this->character->getInformation()->getDamageBuilder()->buildWeaponDamageBreakDown($damageStatAmount, $isVoided),
+            default => [],
         };
 
         return array_merge($details, $typeAttributes);
@@ -219,7 +222,8 @@ class StatModifierDetails
     {
         $map = $this->character->map->gameMap;
 
-        if ($map->mapType()->isHell() ||
+        if (
+            $map->mapType()->isHell() ||
             $map->mapType()->isPurgatory() ||
             $map->mapType()->isTwistedMemories()
         ) {

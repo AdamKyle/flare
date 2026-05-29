@@ -14,7 +14,7 @@ class CancelUnitRequestServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testStaleBrokenUnitQueueCanBeSafelyCleared(): void
+    public function test_stale_broken_unit_queue_can_be_safely_cleared(): void
     {
         Event::fake();
 

@@ -103,7 +103,7 @@ class GemServiceTest extends TestCase
         $this->assertEquals(200, $result['status']);
     }
 
-    public function testGemTierChancesProduceExpectedDcs()
+    public function test_gem_tier_chances_produce_expected_dcs()
     {
         $tierOne = (new GemTierValue(GemTierValue::TIER_ONE))->maxForTier();
         $tierTwo = (new GemTierValue(GemTierValue::TIER_TWO))->maxForTier();
@@ -116,7 +116,7 @@ class GemServiceTest extends TestCase
         $this->assertEqualsWithDelta(75.0, 100 - ($tierFour['chance'] * 100), 0.0001);
     }
 
-    public function testHighSkillBonusGuaranteesGemCraftingSuccess()
+    public function test_high_skill_bonus_guarantees_gem_crafting_success()
     {
         Event::fake();
 
@@ -151,7 +151,7 @@ class GemServiceTest extends TestCase
         $this->assertEquals(1, $character->gemBag->gemSlots->first()->amount);
     }
 
-    public function testLowRollSucceedsWhenEffectiveChanceIsOne()
+    public function test_low_roll_succeeds_when_effective_chance_is_one()
     {
         Event::fake();
 
@@ -186,7 +186,7 @@ class GemServiceTest extends TestCase
         $this->assertEquals(1, $character->gemBag->gemSlots->first()->amount);
     }
 
-    public function testGemCraftingCanStillFailWhenRollExceedsEffectiveChance()
+    public function test_gem_crafting_can_still_fail_when_roll_exceeds_effective_chance()
     {
         Event::fake();
 
@@ -229,7 +229,7 @@ class GemServiceTest extends TestCase
         });
     }
 
-    public function testFailToCraftTheGem()
+    public function test_fail_to_craft_the_gem()
     {
         Event::fake();
 

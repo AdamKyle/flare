@@ -192,7 +192,7 @@ class BattleRewardServiceTest extends TestCase
         Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
     }
 
-    public function testBattleRewardsPassActualGoldGainedIntoGoldRush(): void
+    public function test_battle_rewards_pass_actual_gold_gained_into_gold_rush(): void
     {
         GoldRushCheckCalculator::shouldReceive('fetchGoldRushChance')->once()->andReturnTrue();
 
@@ -214,7 +214,7 @@ class BattleRewardServiceTest extends TestCase
         $this->assertEquals(101050, $character->refresh()->gold);
     }
 
-    public function testShouldGetFactionPoints(): void
+    public function test_should_get_faction_points(): void
     {
         $character = $this->characterFactory->assignFactionSystem()->getCharacter();
 
@@ -236,7 +236,7 @@ class BattleRewardServiceTest extends TestCase
         $this->assertGreaterThan(0, $faction->current_points);
     }
 
-    public function testProcessRewardsDoesNotAwardFactionPointsWhenBatchContextPassesZero(): void
+    public function test_process_rewards_does_not_award_faction_points_when_batch_context_passes_zero(): void
     {
         $character = $this->characterFactory->assignFactionSystem()->getCharacter();
 
@@ -263,8 +263,7 @@ class BattleRewardServiceTest extends TestCase
         $this->assertEquals(0, $faction->current_points);
     }
 
-
-    public function testShouldNotUpdateGlobalEventParticipationWhenNoEventIsRunning(): void
+    public function test_should_not_update_global_event_participation_when_no_event_is_running(): void
     {
         $character = $this->characterFactory->getCharacter();
 

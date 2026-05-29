@@ -126,7 +126,7 @@ class ClassRankService
             $classRank->secondary_class_required_level = $classRank->gameClass->secondary_required_class_level;
 
             return $classRank;
-        })->sortByDesc(fn($item) => $item->is_active)
+        })->sortByDesc(fn ($item) => $item->is_active)
             ->values();
 
         $result = [];
@@ -192,7 +192,7 @@ class ClassRankService
         event(new UpdateCharacterBaseDetailsEvent($character));
 
         return $this->successResult(array_merge([
-            'message' => 'Equipped class special: ' . $gameClassSpecial->name,
+            'message' => 'Equipped class special: '.$gameClassSpecial->name,
         ], $this->getSpecials($character)));
     }
 
@@ -218,7 +218,7 @@ class ClassRankService
         $this->updateCharacterAttackTypes->updateCache($character);
 
         return $this->successResult(array_merge([
-            'message' => 'Unequipped class special: ' . $classSpecialEquipped->gameClassSpecial->name,
+            'message' => 'Unequipped class special: '.$classSpecialEquipped->gameClassSpecial->name,
         ], $this->getSpecials($character)));
     }
 
@@ -259,7 +259,7 @@ class ClassRankService
                     'current_xp' => 0,
                 ]);
 
-                event(new ServerMessageEvent($character->user, 'You gained a new class rank in: ' . $character->class->name));
+                event(new ServerMessageEvent($character->user, 'You gained a new class rank in: '.$character->class->name));
             }
 
             return;
@@ -314,7 +314,7 @@ class ClassRankService
                     break;
                 }
 
-                event(new ServerMessageEvent($character->user, 'You gained a new class rank in: ' . $character->class->name));
+                event(new ServerMessageEvent($character->user, 'You gained a new class rank in: '.$character->class->name));
             }
         }
     }
@@ -359,7 +359,7 @@ class ClassRankService
 
                     $special = $special->refresh();
 
-                    event(new ServerMessageEvent($character->user, 'Your class special:  ' . $special->gameClassSpecial->name . ' has gained a new level is now level: ' . $special->level));
+                    event(new ServerMessageEvent($character->user, 'Your class special:  '.$special->gameClassSpecial->name.' has gained a new level is now level: '.$special->level));
 
                     $this->updateCharacterAttackTypes->updateCache($character->refresh());
                 }
@@ -422,7 +422,7 @@ class ClassRankService
 
                     event(new ServerMessageEvent(
                         $character->user,
-                        'Your class special:  ' . $special->gameClassSpecial->name . ' has gained a new level is now level: ' . $newMessageLevel
+                        'Your class special:  '.$special->gameClassSpecial->name.' has gained a new level is now level: '.$newMessageLevel
                     ));
                 }
             }
@@ -495,10 +495,10 @@ class ClassRankService
 
                         event(new ServerMessageEvent(
                             $character->user,
-                            'Your class: ' .
-                                $classRank->gameClass->name . ' has gained a new level in (Weapon Masteries): ' .
-                                $weaponMasteryName .
-                                ' and is now level: ' . $weaponMastery->level
+                            'Your class: '.
+                                $classRank->gameClass->name.' has gained a new level in (Weapon Masteries): '.
+                                $weaponMasteryName.
+                                ' and is now level: '.$weaponMastery->level
                         ));
                     }
                 }
@@ -578,10 +578,10 @@ class ClassRankService
 
                         event(new ServerMessageEvent(
                             $character->user,
-                            'Your class: ' .
-                                $classRank->gameClass->name . ' has gained a new level in (Weapon Masteries): ' .
-                                $weaponMasteryName .
-                                ' and is now level: ' . $newMessageLevel
+                            'Your class: '.
+                                $classRank->gameClass->name.' has gained a new level in (Weapon Masteries): '.
+                                $weaponMasteryName.
+                                ' and is now level: '.$newMessageLevel
                         ));
                     }
                 }

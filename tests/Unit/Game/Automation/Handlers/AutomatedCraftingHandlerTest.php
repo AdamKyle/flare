@@ -50,7 +50,7 @@ class AutomatedCraftingHandlerTest extends TestCase
 
     private ?GameSkill $weaponCraftingSkill = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -85,7 +85,7 @@ class AutomatedCraftingHandlerTest extends TestCase
         );
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->handler = null;
         $this->characterFactory = null;
@@ -101,7 +101,7 @@ class AutomatedCraftingHandlerTest extends TestCase
         parent::tearDown();
     }
 
-    public function testHandleReturnsItemNotFoundWhenTargetItemDoesNotExist(): void
+    public function test_handle_returns_item_not_found_when_target_item_does_not_exist(): void
     {
         Event::fake();
 
@@ -113,7 +113,7 @@ class AutomatedCraftingHandlerTest extends TestCase
         $this->assertEquals(999999, $result->getTargetItemId());
     }
 
-    public function testHandleReturnsNoCraftingSkillWhenCharacterDoesNotHaveRequiredCraftingSkill(): void
+    public function test_handle_returns_no_crafting_skill_when_character_does_not_have_required_crafting_skill(): void
     {
         Event::fake();
 
@@ -137,7 +137,7 @@ class AutomatedCraftingHandlerTest extends TestCase
         $this->assertEquals('armour', $result->getCraftingType());
     }
 
-    public function testHandleReturnsNotEnoughGoldWhenCharacterCannotAffordTargetItem(): void
+    public function test_handle_returns_not_enough_gold_when_character_cannot_afford_target_item(): void
     {
         Event::fake();
 
@@ -165,7 +165,7 @@ class AutomatedCraftingHandlerTest extends TestCase
         $this->assertEquals($targetItem->id, $result->getCraftedItemId());
     }
 
-    public function testHandleCraftsTargetItemWhenCraftingRollSucceeds(): void
+    public function test_handle_crafts_target_item_when_crafting_roll_succeeds(): void
     {
         Event::fake();
 
@@ -211,7 +211,7 @@ class AutomatedCraftingHandlerTest extends TestCase
         $this->assertEquals(10, $result->getGoldSpent());
     }
 
-    public function testHandleReturnsMaxAttemptsReachedWhenTargetCraftingFailsTooManyTimes(): void
+    public function test_handle_returns_max_attempts_reached_when_target_crafting_fails_too_many_times(): void
     {
         Event::fake();
 
@@ -257,7 +257,7 @@ class AutomatedCraftingHandlerTest extends TestCase
         $this->assertEquals(1, $result->getFailedRolls());
     }
 
-    public function testHandleReturnsNoTrainingItemWhenCharacterIsBelowTargetLevelAndNoTrainingItemExists(): void
+    public function test_handle_returns_no_training_item_when_character_is_below_target_level_and_no_training_item_exists(): void
     {
         Event::fake();
 
@@ -289,7 +289,7 @@ class AutomatedCraftingHandlerTest extends TestCase
         $this->assertTrue($result->hasStartedBelowTargetLevel());
     }
 
-    public function testHandleReturnsNotEnoughGoldWhenCharacterCannotAffordTrainingItem(): void
+    public function test_handle_returns_not_enough_gold_when_character_cannot_afford_training_item(): void
     {
         Event::fake();
 
@@ -317,7 +317,7 @@ class AutomatedCraftingHandlerTest extends TestCase
         $this->assertTrue($result->hasStartedBelowTargetLevel());
     }
 
-    public function testHandleReturnsMaxAttemptsReachedWhenTrainingCraftingFailsTooManyTimes(): void
+    public function test_handle_returns_max_attempts_reached_when_training_crafting_fails_too_many_times(): void
     {
         Event::fake();
 
@@ -362,7 +362,7 @@ class AutomatedCraftingHandlerTest extends TestCase
         $this->assertEquals(1, $result->getFailedRolls());
     }
 
-    public function testHandleCraftsMinimumTrainingItemsWhenCharacterStartsBelowTargetLevel(): void
+    public function test_handle_crafts_minimum_training_items_when_character_starts_below_target_level(): void
     {
         Event::fake();
 
@@ -407,7 +407,7 @@ class AutomatedCraftingHandlerTest extends TestCase
         $this->assertTrue($result->hasStartedBelowTargetLevel());
     }
 
-    public function testHandleCraftsTargetItemForFactionLoyaltyNpcWhenNpcTaskIsIncomplete(): void
+    public function test_handle_crafts_target_item_for_faction_loyalty_npc_when_npc_task_is_incomplete(): void
     {
         Event::fake();
 
@@ -446,7 +446,7 @@ class AutomatedCraftingHandlerTest extends TestCase
         $this->assertTrue($result->hasCraftedTargetItem());
     }
 
-    public function testHandleCraftsTargetItemForEventWhenCraftingRollSucceeds(): void
+    public function test_handle_crafts_target_item_for_event_when_crafting_roll_succeeds(): void
     {
         Event::fake();
 
@@ -499,7 +499,7 @@ class AutomatedCraftingHandlerTest extends TestCase
         $this->assertTrue($result->hasCraftedTargetItem());
     }
 
-    public function testHandleReturnsNotEnoughGoldForArmourTrainingItemWhenCharacterStartsBelowTargetLevel(): void
+    public function test_handle_returns_not_enough_gold_for_armour_training_item_when_character_starts_below_target_level(): void
     {
         Event::fake();
 

@@ -116,7 +116,7 @@ class ComparisonServiceTest extends TestCase
         $this->assertNotEmpty($comparisonData['details']);
     }
 
-    public function testTrinketComparisonDetailsIsNotEmptyWhenTrinketEquipped()
+    public function test_trinket_comparison_details_is_not_empty_when_trinket_equipped()
     {
         $item = $this->createItem([
             'type' => 'trinket',
@@ -140,7 +140,7 @@ class ComparisonServiceTest extends TestCase
         $this->assertEquals('trinket', $comparisonData['details'][0]['position']);
     }
 
-    public function testUnsupportedComparisonTypeReturnsEmptyDetails()
+    public function test_unsupported_comparison_type_returns_empty_details()
     {
         $item = $this->createItem(['type' => 'artifact']);
 
@@ -160,7 +160,7 @@ class ComparisonServiceTest extends TestCase
         $this->assertEmpty($comparisonData['details']);
     }
 
-    public function testBuildShopDataForBow()
+    public function test_build_shop_data_for_bow()
     {
         $item = $this->createItem(['type' => ItemType::BOW->value]);
 

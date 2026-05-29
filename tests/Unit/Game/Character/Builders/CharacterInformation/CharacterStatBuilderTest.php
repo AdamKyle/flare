@@ -22,7 +22,7 @@ use Tests\Traits\CreateItemAffix;
 
 class CharacterStatBuilderTest extends TestCase
 {
-    use CreateClass, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, CreateGameClassSpecial, RefreshDatabase;
+    use CreateClass, CreateGameClassSpecial, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -2311,7 +2311,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(1, $resistance);
     }
 
-    public function testSpellDamageUsesClassSpecialtyBaseSpellDamageMod()
+    public function test_spell_damage_uses_class_specialty_base_spell_damage_mod()
     {
         $item = $this->createItem([
             'name' => 'spell',
@@ -2355,7 +2355,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(200, $damage);
     }
 
-    public function testSpellDamageDoesNotUseClassSpecialtyBaseDamageMod()
+    public function test_spell_damage_does_not_use_class_specialty_base_damage_mod()
     {
         $item = $this->createItem([
             'name' => 'spell',
@@ -2399,7 +2399,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(100, $damage);
     }
 
-    public function testPositionalSpellDamageUsesClassSpecialtyBaseSpellDamageMod()
+    public function test_positional_spell_damage_uses_class_specialty_base_spell_damage_mod()
     {
         $item = $this->createItem([
             'name' => 'spell',
@@ -2443,7 +2443,7 @@ class CharacterStatBuilderTest extends TestCase
         $this->assertEquals(200, $damage);
     }
 
-    public function testStackedStatBoonMultipliesByAmountUsed()
+    public function test_stacked_stat_boon_multiplies_by_amount_used()
     {
         $character = $this->character->getCharacter();
 

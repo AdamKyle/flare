@@ -18,7 +18,7 @@ class UpdateCharacterStatusTest extends TestCase
 
     private Character $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -30,14 +30,14 @@ class UpdateCharacterStatusTest extends TestCase
             ->getCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Carbon::setTestNow();
 
         parent::tearDown();
     }
 
-    public function testPayloadContainsExplorationActiveAutomationMetadata(): void
+    public function test_payload_contains_exploration_active_automation_metadata(): void
     {
         $this->createCharacterAutomation([
             'character_id' => $this->character->id,
@@ -54,7 +54,7 @@ class UpdateCharacterStatusTest extends TestCase
         ], $event->characterStatuses['active_automation']);
     }
 
-    public function testPayloadContainsDelveActiveAutomationMetadata(): void
+    public function test_payload_contains_delve_active_automation_metadata(): void
     {
         $this->createCharacterAutomation([
             'character_id' => $this->character->id,
@@ -71,7 +71,7 @@ class UpdateCharacterStatusTest extends TestCase
         ], $event->characterStatuses['active_automation']);
     }
 
-    public function testPayloadContainsFactionLoyaltyActiveAutomationMetadata(): void
+    public function test_payload_contains_faction_loyalty_active_automation_metadata(): void
     {
         $this->createCharacterAutomation([
             'character_id' => $this->character->id,
@@ -88,7 +88,7 @@ class UpdateCharacterStatusTest extends TestCase
         ], $event->characterStatuses['active_automation']);
     }
 
-    public function testPayloadHasNullActiveAutomationWhenNoAutomationIsRunning(): void
+    public function test_payload_has_null_active_automation_when_no_automation_is_running(): void
     {
         $event = new UpdateCharacterStatus($this->character);
 
@@ -96,7 +96,7 @@ class UpdateCharacterStatusTest extends TestCase
         $this->assertEquals(0, $event->characterStatuses['automation_completed_at']);
     }
 
-    public function testPayloadDoesNotDisplayExplorationForUnknownAutomationType(): void
+    public function test_payload_does_not_display_exploration_for_unknown_automation_type(): void
     {
         $this->createCharacterAutomation([
             'character_id' => $this->character->id,
@@ -109,7 +109,7 @@ class UpdateCharacterStatusTest extends TestCase
         $this->assertNull($event->characterStatuses['active_automation']);
     }
 
-    public function testPayloadHasNullActiveAutomationWhenAutomationIsCompleted(): void
+    public function test_payload_has_null_active_automation_when_automation_is_completed(): void
     {
         $this->createCharacterAutomation([
             'character_id' => $this->character->id,

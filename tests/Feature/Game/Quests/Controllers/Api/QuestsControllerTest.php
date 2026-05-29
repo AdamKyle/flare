@@ -13,7 +13,7 @@ class QuestsControllerTest extends TestCase
 {
     use CreateNpc, CreateQuest, RefreshDatabase;
 
-    public function testRegularQuestListCanBeFetchedDuringExploration(): void
+    public function test_regular_quest_list_can_be_fetched_during_exploration(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -24,13 +24,13 @@ class QuestsControllerTest extends TestCase
         $character = $characterFactory->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/quests/' . $character->id);
+            ->call('GET', '/api/quests/'.$character->id);
 
         $response->assertOk();
         $this->assertArrayHasKey('quests', $response->json());
     }
 
-    public function testRegularQuestInfoCanBeFetchedDuringExploration(): void
+    public function test_regular_quest_info_can_be_fetched_during_exploration(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -44,13 +44,13 @@ class QuestsControllerTest extends TestCase
         $character = $characterFactory->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/quest/' . $quest->id . '/' . $character->id);
+            ->call('GET', '/api/quest/'.$quest->id.'/'.$character->id);
 
         $response->assertOk();
         $response->assertJsonPath('id', $quest->id);
     }
 
-    public function testRegularQuestHandInIsBlockedDuringExploration(): void
+    public function test_regular_quest_hand_in_is_blocked_during_exploration(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -64,7 +64,7 @@ class QuestsControllerTest extends TestCase
         $character = $characterFactory->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/quest/' . $quest->id . '/hand-in-quest/' . $character->id, [
+            ->call('POST', '/api/quest/'.$quest->id.'/hand-in-quest/'.$character->id, [
                 '_token' => csrf_token(),
             ]);
 
@@ -74,7 +74,7 @@ class QuestsControllerTest extends TestCase
         ]);
     }
 
-    public function testRegularQuestHandInIsBlockedDuringDelve(): void
+    public function test_regular_quest_hand_in_is_blocked_during_delve(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -88,7 +88,7 @@ class QuestsControllerTest extends TestCase
         $character = $characterFactory->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/quest/' . $quest->id . '/hand-in-quest/' . $character->id, [
+            ->call('POST', '/api/quest/'.$quest->id.'/hand-in-quest/'.$character->id, [
                 '_token' => csrf_token(),
             ]);
 
@@ -98,7 +98,7 @@ class QuestsControllerTest extends TestCase
         ]);
     }
 
-    public function testRegularQuestHandInIsBlockedDuringFactionLoyalty(): void
+    public function test_regular_quest_hand_in_is_blocked_during_faction_loyalty(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -112,7 +112,7 @@ class QuestsControllerTest extends TestCase
         $character = $characterFactory->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/quest/' . $quest->id . '/hand-in-quest/' . $character->id, [
+            ->call('POST', '/api/quest/'.$quest->id.'/hand-in-quest/'.$character->id, [
                 '_token' => csrf_token(),
             ]);
 

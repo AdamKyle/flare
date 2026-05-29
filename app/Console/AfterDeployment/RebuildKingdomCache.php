@@ -4,13 +4,12 @@ namespace App\Console\AfterDeployment;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
+use App\Game\Core\Traits\KingdomCache;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
-use App\Game\Core\Traits\KingdomCache;
 
 class RebuildKingdomCache extends Command
 {
-
     use KingdomCache;
 
     /**

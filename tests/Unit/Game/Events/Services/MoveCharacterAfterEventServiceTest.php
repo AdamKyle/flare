@@ -3,6 +3,7 @@
 namespace Tests\Unit\Game\Events\Services;
 
 use App\Flare\Values\MapNameValue;
+use App\Game\Core\Values\FactionLevel;
 use App\Game\Events\Services\MoveCharacterAfterEventService;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateMap;
@@ -150,7 +151,7 @@ class MoveCharacterAfterEventServiceTest extends TestCase
         $this->assertSame(0, (int) $factionAfterReset->current_points);
         $this->assertFalse((bool) $factionAfterReset->maxed);
         $this->assertNull($factionAfterReset->title);
-        $this->assertSame(\App\Game\Core\Values\FactionLevel::getPointsNeeded(0), (int) $factionAfterReset->points_needed);
+        $this->assertSame(FactionLevel::getPointsNeeded(0), (int) $factionAfterReset->points_needed);
     }
 
     public function test_move_all_to_surface_does_nothing_with_empty_collection(): void

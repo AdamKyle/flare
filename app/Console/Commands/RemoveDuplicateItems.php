@@ -8,6 +8,7 @@ use App\Flare\Models\MarketBoard;
 use App\Flare\Models\MarketHistory;
 use App\Flare\Models\SetSlot;
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 
@@ -150,7 +151,7 @@ class RemoveDuplicateItems extends Command
     /**
      * Finds items that have duplicates based on name and type.
      */
-    private function findDuplicateItems(): \Illuminate\Support\Collection
+    private function findDuplicateItems(): Collection
     {
         return Item::whereNull('item_suffix_id')
             ->whereNull('item_prefix_id')

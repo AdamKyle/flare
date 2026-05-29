@@ -36,10 +36,6 @@ class AutomatedCraftingResult
 
     /**
      * Set up the result.
-     *
-     * @param AutomatedCraftingResultType $resultType
-     * @param int $targetItemId
-     * @return AutomatedCraftingResult
      */
     public function setUp(AutomatedCraftingResultType $resultType, int $targetItemId): AutomatedCraftingResult
     {
@@ -63,9 +59,6 @@ class AutomatedCraftingResult
 
     /**
      * Set the crafted item id.
-     *
-     * @param int|null $craftedItemId
-     * @return AutomatedCraftingResult
      */
     public function setCraftedItemId(?int $craftedItemId): AutomatedCraftingResult
     {
@@ -76,9 +69,6 @@ class AutomatedCraftingResult
 
     /**
      * Set the crafted item name.
-     *
-     * @param string|null $craftedItemName
-     * @return AutomatedCraftingResult
      */
     public function setCraftedItemName(?string $craftedItemName): AutomatedCraftingResult
     {
@@ -89,9 +79,6 @@ class AutomatedCraftingResult
 
     /**
      * Set the crafting type.
-     *
-     * @param string $craftingType
-     * @return AutomatedCraftingResult
      */
     public function setCraftingType(string $craftingType): AutomatedCraftingResult
     {
@@ -102,9 +89,6 @@ class AutomatedCraftingResult
 
     /**
      * Set the target item level.
-     *
-     * @param int $targetItemLevel
-     * @return AutomatedCraftingResult
      */
     public function setTargetItemLevel(int $targetItemLevel): AutomatedCraftingResult
     {
@@ -115,9 +99,6 @@ class AutomatedCraftingResult
 
     /**
      * Set the current skill level.
-     *
-     * @param int $currentSkillLevel
-     * @return AutomatedCraftingResult
      */
     public function setCurrentSkillLevel(int $currentSkillLevel): AutomatedCraftingResult
     {
@@ -128,9 +109,6 @@ class AutomatedCraftingResult
 
     /**
      * Set whether the character started below the target item level.
-     *
-     * @param bool $startedBelowTargetLevel
-     * @return AutomatedCraftingResult
      */
     public function setStartedBelowTargetLevel(bool $startedBelowTargetLevel): AutomatedCraftingResult
     {
@@ -141,9 +119,6 @@ class AutomatedCraftingResult
 
     /**
      * Set whether the target item was crafted.
-     *
-     * @param bool $craftedTargetItem
-     * @return AutomatedCraftingResult
      */
     public function setCraftedTargetItem(bool $craftedTargetItem): AutomatedCraftingResult
     {
@@ -154,9 +129,6 @@ class AutomatedCraftingResult
 
     /**
      * Set the number of attempts.
-     *
-     * @param int $attempts
-     * @return AutomatedCraftingResult
      */
     public function setAttempts(int $attempts): AutomatedCraftingResult
     {
@@ -167,9 +139,6 @@ class AutomatedCraftingResult
 
     /**
      * Set the number of failed rolls.
-     *
-     * @param int $failedRolls
-     * @return AutomatedCraftingResult
      */
     public function setFailedRolls(int $failedRolls): AutomatedCraftingResult
     {
@@ -180,9 +149,6 @@ class AutomatedCraftingResult
 
     /**
      * Set the amount of gold spent.
-     *
-     * @param int $goldSpent
-     * @return AutomatedCraftingResult
      */
     public function setGoldSpent(int $goldSpent): AutomatedCraftingResult
     {
@@ -193,9 +159,6 @@ class AutomatedCraftingResult
 
     /**
      * Set successful target crafts.
-     *
-     * @param int $successfulTargetCrafts
-     * @return AutomatedCraftingResult
      */
     public function setSuccessfulTargetCrafts(int $successfulTargetCrafts): AutomatedCraftingResult
     {
@@ -206,9 +169,6 @@ class AutomatedCraftingResult
 
     /**
      * Set successful training crafts.
-     *
-     * @param int $successfulTrainingCrafts
-     * @return AutomatedCraftingResult
      */
     public function setSuccessfulTrainingCrafts(int $successfulTrainingCrafts): AutomatedCraftingResult
     {
@@ -219,8 +179,6 @@ class AutomatedCraftingResult
 
     /**
      * Get the result type.
-     *
-     * @return AutomatedCraftingResultType
      */
     public function getResultType(): AutomatedCraftingResultType
     {
@@ -229,8 +187,6 @@ class AutomatedCraftingResult
 
     /**
      * Get the target item id.
-     *
-     * @return int
      */
     public function getTargetItemId(): int
     {
@@ -239,8 +195,6 @@ class AutomatedCraftingResult
 
     /**
      * Get the crafted item id.
-     *
-     * @return int|null
      */
     public function getCraftedItemId(): ?int
     {
@@ -249,8 +203,6 @@ class AutomatedCraftingResult
 
     /**
      * Get the crafted item name.
-     *
-     * @return string|null
      */
     public function getCraftedItemName(): ?string
     {
@@ -259,8 +211,6 @@ class AutomatedCraftingResult
 
     /**
      * Get the crafting type.
-     *
-     * @return string
      */
     public function getCraftingType(): string
     {
@@ -269,8 +219,6 @@ class AutomatedCraftingResult
 
     /**
      * Get the target item level.
-     *
-     * @return int
      */
     public function getTargetItemLevel(): int
     {
@@ -279,8 +227,6 @@ class AutomatedCraftingResult
 
     /**
      * Get the current skill level.
-     *
-     * @return int
      */
     public function getCurrentSkillLevel(): int
     {
@@ -289,8 +235,6 @@ class AutomatedCraftingResult
 
     /**
      * Has the character started below the target item level?
-     *
-     * @return bool
      */
     public function hasStartedBelowTargetLevel(): bool
     {
@@ -299,8 +243,6 @@ class AutomatedCraftingResult
 
     /**
      * Has the target item been crafted?
-     *
-     * @return bool
      */
     public function hasCraftedTargetItem(): bool
     {
@@ -309,8 +251,6 @@ class AutomatedCraftingResult
 
     /**
      * Get the number of attempts.
-     *
-     * @return int
      */
     public function getAttempts(): int
     {
@@ -319,8 +259,6 @@ class AutomatedCraftingResult
 
     /**
      * Get the number of failed rolls.
-     *
-     * @return int
      */
     public function getFailedRolls(): int
     {
@@ -329,8 +267,6 @@ class AutomatedCraftingResult
 
     /**
      * Get the amount of gold spent.
-     *
-     * @return int
      */
     public function getGoldSpent(): int
     {
@@ -339,8 +275,6 @@ class AutomatedCraftingResult
 
     /**
      * Get successful target crafts.
-     *
-     * @return int
      */
     public function getSuccessfulTargetCrafts(): int
     {
@@ -349,8 +283,6 @@ class AutomatedCraftingResult
 
     /**
      * Get successful training crafts.
-     *
-     * @return int
      */
     public function getSuccessfulTrainingCrafts(): int
     {

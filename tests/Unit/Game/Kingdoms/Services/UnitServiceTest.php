@@ -17,7 +17,7 @@ class UnitServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testExactUnitMaximumCanBeQueued(): void
+    public function test_exact_unit_maximum_can_be_queued(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
@@ -31,7 +31,7 @@ class UnitServiceTest extends TestCase
         $this->assertTrue(resolve(UnitService::class)->canQueueUnits($kingdom, $unit, 10));
     }
 
-    public function testExactResourceSpendIsAllowed(): void
+    public function test_exact_resource_spend_is_allowed(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom([
@@ -57,7 +57,7 @@ class UnitServiceTest extends TestCase
         $this->assertSame(0, $kingdom->refresh()->current_wood);
     }
 
-    public function testOverspendIsRejectedWithoutMutatingResources(): void
+    public function test_overspend_is_rejected_without_mutating_resources(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom([
@@ -83,7 +83,7 @@ class UnitServiceTest extends TestCase
         $this->assertSame(9, $kingdom->refresh()->current_wood);
     }
 
-    public function testManualAndCapitalCityQueuedUnitsCountTowardMaximum(): void
+    public function test_manual_and_capital_city_queued_units_count_toward_maximum(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();

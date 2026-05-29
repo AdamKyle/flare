@@ -26,7 +26,7 @@ class FactionLoyaltyAutomationCraftingLoggerTest extends TestCase
 
     private ?FactionLoyaltyAutomationCraftingLogger $craftingLogger = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -45,7 +45,7 @@ class FactionLoyaltyAutomationCraftingLoggerTest extends TestCase
             ->setUp($this->factionLoyaltyAutomation);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Carbon::setTestNow();
 
@@ -57,7 +57,7 @@ class FactionLoyaltyAutomationCraftingLoggerTest extends TestCase
         parent::tearDown();
     }
 
-    public function testLogCreatesFactionLoyaltyAutomationLogRowWhenNoneExists(): void
+    public function test_log_creates_faction_loyalty_automation_log_row_when_none_exists(): void
     {
         $this->factionLoyaltyAutomation->log()->delete();
 
@@ -98,7 +98,7 @@ class FactionLoyaltyAutomationCraftingLoggerTest extends TestCase
         ], $factionLoyaltyAutomationLog->crafting_logs);
     }
 
-    public function testLogAppendsCraftingLogWhenLogRowAlreadyExists(): void
+    public function test_log_appends_crafting_log_when_log_row_already_exists(): void
     {
         $existingCraftingLog = [
             'result' => AutomatedCraftingResultType::NO_CRAFTING_SKILL->value,
@@ -127,7 +127,7 @@ class FactionLoyaltyAutomationCraftingLoggerTest extends TestCase
         $this->assertEquals('Training Sword', $factionLoyaltyAutomationLog->crafting_logs[1]['crafted_item_name']);
     }
 
-    public function testLogPreservesExistingFightLogsWhenAddingCraftingLogs(): void
+    public function test_log_preserves_existing_fight_logs_when_adding_crafting_logs(): void
     {
         $existingFightLogs = [
             [
@@ -153,7 +153,7 @@ class FactionLoyaltyAutomationCraftingLoggerTest extends TestCase
         $this->assertCount(1, $factionLoyaltyAutomationLog->crafting_logs);
     }
 
-    public function testLogStoresEveryCraftingPayloadField(): void
+    public function test_log_stores_every_crafting_payload_field(): void
     {
         $now = Carbon::parse('2026-02-03 04:05:06');
 
@@ -203,7 +203,7 @@ class FactionLoyaltyAutomationCraftingLoggerTest extends TestCase
         ], $factionLoyaltyAutomationLog->crafting_logs);
     }
 
-    public function testLogUsesEmptyCraftingLogsWhenExistingCraftingLogsAreNull(): void
+    public function test_log_uses_empty_crafting_logs_when_existing_crafting_logs_are_null(): void
     {
         $this->factionLoyaltyFactory->getFactionLoyaltyAutomationLog()->update([
             'crafting_logs' => null,

@@ -6,7 +6,6 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\ServerFight\MonsterPlayerFight;
-use App\Flare\Values\LocationType;
 use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Events\AttackTimeOutEvent;
@@ -34,8 +33,8 @@ class MonsterFightService
             return $restriction;
         }
 
-        Cache::delete('monster-fight-' . $character->id);
-        Cache::delete('character-sheet-' . $character->id);
+        Cache::delete('monster-fight-'.$character->id);
+        Cache::delete('character-sheet-'.$character->id);
 
         $params = $this->fetchPossibleDelveMonsterId($character, $params, $isDelve);
 
@@ -57,7 +56,7 @@ class MonsterFightService
                 event(new AttackTimeOutEvent($character));
             }
 
-            Cache::put('monster-fight-' . $character->id, $data, 900);
+            Cache::put('monster-fight-'.$character->id, $data, 900);
 
             if ($returnData) {
                 return $data;
@@ -72,7 +71,7 @@ class MonsterFightService
             $this->battleEventHandler->processDeadCharacter($character, $monster);
         }
 
-        Cache::put('monster-fight-' . $character->id, $data, 900);
+        Cache::put('monster-fight-'.$character->id, $data, 900);
 
         if ($returnData) {
             return $data;
@@ -102,7 +101,7 @@ class MonsterFightService
             return $restriction;
         }
 
-        $cache = Cache::get('monster-fight-' . $character->id);
+        $cache = Cache::get('monster-fight-'.$character->id);
 
         if (is_null($cache)) {
 
@@ -160,7 +159,7 @@ class MonsterFightService
         $cache['attack_messages'] = $this->monsterPlayerFight->getBattleMessages();
 
         if ($monsterHealth > 0) {
-            Cache::put('monster-fight-' . $character->id, $cache, 900);
+            Cache::put('monster-fight-'.$character->id, $cache, 900);
 
             if ($returnData) {
                 return $cache;
@@ -173,7 +172,7 @@ class MonsterFightService
             return $cache;
         }
 
-        Cache::delete('monster-fight-' . $character->id);
+        Cache::delete('monster-fight-'.$character->id);
         BattleAttackHandler::dispatch($character->id, $this->monsterPlayerFight->getMonster()['id'])->onQueue('default_long')->delay(now()->addSeconds(2));
 
         return $this->successResult($cache);
@@ -222,7 +221,7 @@ class MonsterFightService
         $selectedMonsterId = $params['selected_monster_id'];
         $packSize = $params['pack_size'] ?? 0;
 
-        $cachedMonsterForDelve = Cache::get('delve-monster-' . $character->id . '-' . $selectedMonsterId . '-fight');
+        $cachedMonsterForDelve = Cache::get('delve-monster-'.$character->id.'-'.$selectedMonsterId.'-fight');
 
         if (! is_null($cachedMonsterForDelve) && $packSize > 1) {
 

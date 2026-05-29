@@ -43,7 +43,7 @@ class CancelBuildingRequestService
             $queue->delete();
 
             return $this->successResult([
-                'message' => 'Successfully cleared the stale building request for: ' . $kingdom->name . '.',
+                'message' => 'Successfully cleared the stale building request for: '.$kingdom->name.'.',
             ]);
         }
 

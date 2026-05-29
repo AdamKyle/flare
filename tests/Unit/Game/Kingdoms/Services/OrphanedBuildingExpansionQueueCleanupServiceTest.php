@@ -14,7 +14,7 @@ class OrphanedBuildingExpansionQueueCleanupServiceTest extends TestCase
 {
     use CreateGameBuilding, RefreshDatabase;
 
-    public function testCleanDeletesMissingBuildingQueuesOnly(): void
+    public function test_clean_deletes_missing_building_queues_only(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
@@ -83,7 +83,7 @@ class OrphanedBuildingExpansionQueueCleanupServiceTest extends TestCase
         $this->assertNotNull(BuildingExpansionQueue::find($validQueue->id));
     }
 
-    public function testCleanKeepsValidFirstTimeExpansionQueues(): void
+    public function test_clean_keeps_valid_first_time_expansion_queues(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();

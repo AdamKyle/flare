@@ -2,8 +2,6 @@
 
 namespace Tests\Unit\Game\GuideQuests\Services;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Log;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameSkill;
@@ -17,6 +15,8 @@ use App\Game\Events\Values\EventType;
 use App\Game\GuideQuests\Services\GuideQuestRequirementsService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Log;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -584,10 +584,10 @@ class GuideQuestRequirementsServiceTest extends TestCase
         $this->assertContains('required_kingdom_building_level', $finishedRequirements);
     }
 
-    public function testStaleRequiredSpecificKingdomBuildingDataDoesNotFatal()
+    public function test_stale_required_specific_kingdom_building_data_does_not_fatal()
     {
         $character = $this->character->kingdomManagement()->assignKingdom()->assignBuilding([], [
-            'level' => 5
+            'level' => 5,
         ])->getCharacter();
 
         $guideQuest = $this->createGuideQuest([
@@ -600,7 +600,7 @@ class GuideQuestRequirementsServiceTest extends TestCase
         $this->assertNotContains('required_kingdom_building_level', $finishedRequirements);
     }
 
-    public function testFetchRequiredKingdomUnitAmount()
+    public function test_fetch_required_kingdom_unit_amount()
     {
         $character = $this->character->kingdomManagement()->assignKingdom()->assignUnits([], 1000)->getCharacter();
 

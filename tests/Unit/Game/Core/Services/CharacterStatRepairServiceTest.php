@@ -14,14 +14,14 @@ class CharacterStatRepairServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Carbon::setTestNow();
 
         parent::tearDown();
     }
 
-    public function testUnderStattedCharacterIsRepairedToExpectedFloor(): void
+    public function test_under_statted_character_is_repaired_to_expected_floor(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -52,7 +52,7 @@ class CharacterStatRepairServiceTest extends TestCase
         $this->assertSame(18, $character->focus);
     }
 
-    public function testCorrectlyStattedCharacterIsUnchanged(): void
+    public function test_correctly_statted_character_is_unchanged(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -83,7 +83,7 @@ class CharacterStatRepairServiceTest extends TestCase
         $this->assertSame(18, $character->focus);
     }
 
-    public function testOverStattedCharacterIsUnchanged(): void
+    public function test_over_statted_character_is_unchanged(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -114,7 +114,7 @@ class CharacterStatRepairServiceTest extends TestCase
         $this->assertSame(34, $character->focus);
     }
 
-    public function testDamageStatReceivesDoubleLevelUpFloor(): void
+    public function test_damage_stat_receives_double_level_up_floor(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'str'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -135,7 +135,7 @@ class CharacterStatRepairServiceTest extends TestCase
         $this->assertSame(18, $character->dex);
     }
 
-    public function testMaxStatCapIsRespected(): void
+    public function test_max_stat_cap_is_respected(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -156,7 +156,7 @@ class CharacterStatRepairServiceTest extends TestCase
         $this->assertSame(MaxReincarnationStats::MAX_STATS, $character->dex);
     }
 
-    public function testRunningRepairTwiceCausesNoSecondChange(): void
+    public function test_running_repair_twice_causes_no_second_change(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-05-23 09:00:00'));
 
@@ -187,7 +187,7 @@ class CharacterStatRepairServiceTest extends TestCase
         $this->assertTrue($updatedAtAfterFirstRepair->eq($character->updated_at));
     }
 
-    public function testRaceBaseStatsAreIncludedInRepairedFloor(): void
+    public function test_race_base_stats_are_included_in_repaired_floor(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(
@@ -211,7 +211,7 @@ class CharacterStatRepairServiceTest extends TestCase
         $this->assertSame(17, $character->str);
     }
 
-    public function testClassBaseStatsAreIncludedInRepairedFloor(): void
+    public function test_class_base_stats_are_included_in_repaired_floor(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(
@@ -237,7 +237,7 @@ class CharacterStatRepairServiceTest extends TestCase
         $this->assertSame(16, $character->str);
     }
 
-    public function testLevelOneCharactersUseZeroLevelUps(): void
+    public function test_level_one_characters_use_zero_level_ups(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -258,7 +258,7 @@ class CharacterStatRepairServiceTest extends TestCase
         $this->assertSame(13, $character->dex);
     }
 
-    public function testLevelZeroCharactersDoNotProduceNegativeLevelUpRepair(): void
+    public function test_level_zero_characters_do_not_produce_negative_level_up_repair(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -279,7 +279,7 @@ class CharacterStatRepairServiceTest extends TestCase
         $this->assertSame(13, $character->dex);
     }
 
-    public function testInvalidDamageStatDoesNotCrashRepairOrCorruptValidStats(): void
+    public function test_invalid_damage_stat_does_not_crash_repair_or_corrupt_valid_stats(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -301,7 +301,7 @@ class CharacterStatRepairServiceTest extends TestCase
         $this->assertSame(30, $character->dex);
     }
 
-    public function testMissingRaceRelationThrowsExistingBaseStatTypeError(): void
+    public function test_missing_race_relation_throws_existing_base_stat_type_error(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
@@ -314,7 +314,7 @@ class CharacterStatRepairServiceTest extends TestCase
         resolve(CharacterStatRepairService::class)->repair($character);
     }
 
-    public function testMissingClassRelationThrowsExistingBaseStatTypeError(): void
+    public function test_missing_class_relation_throws_existing_base_stat_type_error(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)

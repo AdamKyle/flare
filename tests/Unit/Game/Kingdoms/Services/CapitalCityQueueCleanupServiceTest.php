@@ -14,7 +14,7 @@ class CapitalCityQueueCleanupServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testBrokenStaleBuildingQueueCleanupRemovesOnlyBrokenStaleRows(): void
+    public function test_broken_stale_building_queue_cleanup_removes_only_broken_stale_rows(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
@@ -52,7 +52,7 @@ class CapitalCityQueueCleanupServiceTest extends TestCase
         $this->assertNotNull(CapitalCityBuildingQueue::find($validQueue->id));
     }
 
-    public function testBrokenStaleUnitQueueCleanupRemovesOnlyBrokenStaleRows(): void
+    public function test_broken_stale_unit_queue_cleanup_removes_only_broken_stale_rows(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
@@ -90,7 +90,7 @@ class CapitalCityQueueCleanupServiceTest extends TestCase
         $this->assertNotNull(CapitalCityUnitQueue::find($validQueue->id));
     }
 
-    public function testValidFutureQueuesAreNotRemoved(): void
+    public function test_valid_future_queues_are_not_removed(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();

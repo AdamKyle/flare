@@ -44,7 +44,7 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function chatSettings(request $request, User $user)
+    public function chatSettings(Request $request, User $user)
     {
 
         $user->update([
@@ -92,7 +92,7 @@ class SettingsController extends Controller
         return redirect()->back()->with('success', 'Updated auto disenchant preferences.');
     }
 
-    public function disableAttackTypePopOvers(request $request, User $user)
+    public function disableAttackTypePopOvers(Request $request, User $user)
     {
 
         $user->update([

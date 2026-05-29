@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class FactionLoyaltyAutomationLog extends Model
 {
-
     use HasFactory;
 
     /**

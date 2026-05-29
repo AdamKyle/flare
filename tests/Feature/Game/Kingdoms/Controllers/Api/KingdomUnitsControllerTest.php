@@ -13,7 +13,7 @@ class KingdomUnitsControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testManualCancelRejectsCapitalCityOwnedUnitQueue(): void
+    public function test_manual_cancel_rejects_capital_city_owned_unit_queue(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
@@ -38,7 +38,7 @@ class KingdomUnitsControllerTest extends TestCase
         $this->assertNotNull(UnitInQueue::find($queue->id));
     }
 
-    public function testManualRecruitRejectsDuringAutomation(): void
+    public function test_manual_recruit_rejects_during_automation(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->assignUnits([], 1)->getKingdom();
@@ -49,7 +49,7 @@ class KingdomUnitsControllerTest extends TestCase
         $gameUnit = $kingdom->units()->first()->gameUnit;
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdoms/' . $kingdom->id . '/recruit-units/' . $gameUnit->id, [
+            ->call('POST', '/api/kingdoms/'.$kingdom->id.'/recruit-units/'.$gameUnit->id, [
                 'amount' => 1,
                 'recruitment_type' => 'resources',
             ]);
@@ -58,7 +58,7 @@ class KingdomUnitsControllerTest extends TestCase
         $this->assertSame(0, UnitInQueue::where('kingdom_id', $kingdom->id)->count());
     }
 
-    public function testManualRecruitCancelRejectsDuringAutomation(): void
+    public function test_manual_recruit_cancel_rejects_during_automation(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();

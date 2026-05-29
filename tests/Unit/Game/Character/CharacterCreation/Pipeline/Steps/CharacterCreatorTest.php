@@ -63,7 +63,7 @@ class CharacterCreatorTest extends TestCase
 
         $character = $result->getCharacter();
 
-        $reloaded = \App\Flare\Models\Character::query()->find($character->id);
+        $reloaded = Character::query()->find($character->id);
         $this->assertNotNull($reloaded);
         $this->assertSame($characterName, $reloaded->name);
         $this->assertSame($user->id, $reloaded->user_id);
@@ -95,6 +95,6 @@ class CharacterCreatorTest extends TestCase
         });
 
         $this->assertNull($result->getCharacter());
-        $this->assertSame(0, \App\Flare\Models\Character::query()->count());
+        $this->assertSame(0, Character::query()->count());
     }
 }

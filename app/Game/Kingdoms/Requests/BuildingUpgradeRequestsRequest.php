@@ -56,7 +56,7 @@ class BuildingUpgradeRequestsRequest extends FormRequest
                     ->with('gameBuilding')
                     ->get();
 
-                if ($buildings->contains(fn(KingdomBuilding $building) => $building->level >= $building->gameBuilding->max_level)) {
+                if ($buildings->contains(fn (KingdomBuilding $building) => $building->level >= $building->gameBuilding->max_level)) {
                     $validator->errors()->add('request_data', 'One or more buildings are already max level.');
                 }
 

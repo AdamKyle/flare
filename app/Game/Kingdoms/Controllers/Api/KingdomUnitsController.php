@@ -27,8 +27,7 @@ class KingdomUnitsController extends Controller
         UpdateKingdom $updateKingdom,
         UnitService $unitService,
         private readonly AutomationRestrictionService $automationRestrictionService
-    )
-    {
+    ) {
 
         $this->updateKingdom = $updateKingdom;
         $this->unitService = $unitService;

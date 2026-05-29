@@ -7,16 +7,16 @@ use App\Game\Character\CharacterInventory\Values\ItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateItemAffix;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateItemAffix;
 
 class ClassAttackValueTest extends TestCase
 {
-    use CreateItemAffix;
     use CreateItem;
+    use CreateItemAffix;
     use RefreshDatabase;
 
-    public function testBuildAttackDataContainsLegacyAndDisplayOnlyFieldsForEquippedInventoryClassItem(): void
+    public function test_build_attack_data_contains_legacy_and_display_only_fields_for_equipped_inventory_class_item(): void
     {
         $characterFactory = new CharacterFactory;
         $characterFactory
@@ -73,7 +73,7 @@ class ClassAttackValueTest extends TestCase
         ]], $attackData['equipped_class_items']);
     }
 
-    public function testBuildAttackDataContainsDamageSpellAttackTypeAndActiveSetClassItemsForHeretic(): void
+    public function test_build_attack_data_contains_damage_spell_attack_type_and_active_set_class_items_for_heretic(): void
     {
         $characterFactory = new CharacterFactory;
         $characterFactory
@@ -121,7 +121,7 @@ class ClassAttackValueTest extends TestCase
         ]], $attackData['equipped_class_items']);
     }
 
-    public function testBuildAttackDataContainsHealingSpellAttackTypeForProphetWithoutRequiredItem(): void
+    public function test_build_attack_data_contains_healing_spell_attack_type_for_prophet_without_required_item(): void
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter([

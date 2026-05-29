@@ -156,7 +156,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $result->shards);
     }
 
-    public function testCurrencyRewardDoesNotTriggerGoldDustRush(): void
+    public function test_currency_reward_does_not_trigger_gold_dust_rush(): void
     {
         Event::fake([ServerMessageEvent::class]);
 
@@ -183,7 +183,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         });
     }
 
-    public function testHandleRewardsCurrencyButReturnsEarlyWhenAutomationsAreRunning(): void
+    public function test_handle_rewards_currency_but_returns_early_when_automations_are_running(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(10);
 
@@ -870,7 +870,7 @@ class GoldMinesRewardHandlerTest extends TestCase
         $this->assertFalse(FlareEvent::where('type', EventType::GOLD_MINES)->exists());
     }
 
-    public function testHandleItemChanceIncludesPartialMonsterDropCheck(): void
+    public function test_handle_item_chance_includes_partial_monster_drop_check(): void
     {
         RandomNumberGenerator::shouldReceive('generateRandomNumber')->times(3)->andReturn(1);
         RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->andReturn(0);
@@ -944,7 +944,7 @@ class GoldMinesRewardHandlerTest extends TestCase
             'x' => $map->character_position_x,
             'y' => $map->character_position_y,
             'type' => LocationType::GOLD_MINES,
-            'name' => 'gold_mines_' . uniqid('', true),
+            'name' => 'gold_mines_'.uniqid('', true),
         ]);
     }
 

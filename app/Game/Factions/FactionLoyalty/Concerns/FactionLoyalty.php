@@ -112,9 +112,6 @@ trait FactionLoyalty
 
     /**
      * Do we have any incomplete tasks for a Faction Loyalty NPC?
-     *
-     * @param FactionLoyaltyNpc $factionLoyaltyNpc
-     * @return bool
      */
     public function hasIncompleteTasks(FactionLoyaltyNpc $factionLoyaltyNpc): bool
     {

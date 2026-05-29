@@ -9,21 +9,21 @@ use Tests\TestCase;
 
 class AutomationTimeOutTest extends TestCase
 {
-    public function testConstructorSetsDefaultForLength(): void
+    public function test_constructor_sets_default_for_length(): void
     {
         $event = new AutomationTimeOut($this->user());
 
         $this->assertEquals(0, $event->forLength);
     }
 
-    public function testConstructorSetsCustomForLength(): void
+    public function test_constructor_sets_custom_for_length(): void
     {
         $event = new AutomationTimeOut($this->user(), 3600);
 
         $this->assertEquals(3600, $event->forLength);
     }
 
-    public function testBroadcastOnReturnsPrivateAutomationTimeoutChannel(): void
+    public function test_broadcast_on_returns_private_automation_timeout_channel(): void
     {
         $event = new AutomationTimeOut($this->user());
 

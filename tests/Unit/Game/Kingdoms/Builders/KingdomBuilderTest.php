@@ -16,7 +16,7 @@ class KingdomBuilderTest extends TestCase
 
     private ?KingdomBuilder $kingdomBuilder;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -32,7 +32,7 @@ class KingdomBuilderTest extends TestCase
         $this->kingdomBuilder = resolve(KingdomBuilder::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -40,7 +40,7 @@ class KingdomBuilderTest extends TestCase
         $this->kingdomBuilder = null;
     }
 
-    public function testCreateKingdomUsesClampedPassiveResourceIncreaseAmount()
+    public function test_create_kingdom_uses_clamped_passive_resource_increase_amount()
     {
         $character = $this->character->getCharacter();
 

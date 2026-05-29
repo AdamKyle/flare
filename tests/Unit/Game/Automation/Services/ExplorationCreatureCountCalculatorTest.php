@@ -14,7 +14,7 @@ class ExplorationCreatureCountCalculatorTest extends TestCase
 
     private Character $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -24,14 +24,14 @@ class ExplorationCreatureCountCalculatorTest extends TestCase
             ->getCharacter();
     }
 
-    public function testZeroFightTimeoutModifierReturnsSixCreatures(): void
+    public function test_zero_fight_timeout_modifier_returns_six_creatures(): void
     {
         $calculator = resolve(ExplorationCreatureCountCalculator::class);
 
         $this->assertEquals(6, $calculator->calculate($this->character));
     }
 
-    public function testHalfFightTimeoutModifierReturnsEightCreatures(): void
+    public function test_half_fight_timeout_modifier_returns_eight_creatures(): void
     {
         $skill = $this->character->skills->where('name', 'Fighters Timeout')->first();
         $skill->baseSkill->update([
@@ -43,7 +43,7 @@ class ExplorationCreatureCountCalculatorTest extends TestCase
         $this->assertEquals(8, $calculator->calculate($this->character));
     }
 
-    public function testFullFightTimeoutModifierReturnsTwelveCreatures(): void
+    public function test_full_fight_timeout_modifier_returns_twelve_creatures(): void
     {
         $skill = $this->character->skills->where('name', 'Fighters Timeout')->first();
         $skill->baseSkill->update([
@@ -55,7 +55,7 @@ class ExplorationCreatureCountCalculatorTest extends TestCase
         $this->assertEquals(12, $calculator->calculate($this->character));
     }
 
-    public function testCreatureCountHasMinimumOfSix(): void
+    public function test_creature_count_has_minimum_of_six(): void
     {
         $skill = $this->character->skills->where('name', 'Fighters Timeout')->first();
         $skill->baseSkill->update([
@@ -67,7 +67,7 @@ class ExplorationCreatureCountCalculatorTest extends TestCase
         $this->assertEquals(6, $calculator->calculate($this->character));
     }
 
-    public function testCreatureCountHasMaximumOfTwelve(): void
+    public function test_creature_count_has_maximum_of_twelve(): void
     {
         $skill = $this->character->skills->where('name', 'Fighters Timeout')->first();
         $skill->baseSkill->update([
@@ -79,7 +79,7 @@ class ExplorationCreatureCountCalculatorTest extends TestCase
         $this->assertEquals(12, $calculator->calculate($this->character));
     }
 
-    public function testDecimalFightTimeoutModifierReturnsFlooredCreatureCount(): void
+    public function test_decimal_fight_timeout_modifier_returns_floored_creature_count(): void
     {
         $skill = $this->character->skills->where('name', 'Fighters Timeout')->first();
         $skill->baseSkill->update([

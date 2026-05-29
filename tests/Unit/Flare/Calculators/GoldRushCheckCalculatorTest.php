@@ -18,28 +18,28 @@ class GoldRushCheckCalculatorTest extends TestCase
 {
     use CreateLocation, RefreshDatabase;
 
-    public function testBaseGoldRushProcsAtBoundary(): void
+    public function test_base_gold_rush_procs_at_boundary(): void
     {
         RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->with(10000)->andReturn(100);
 
         $this->assertTrue(resolve(GoldRushCheckCalculator::class)->fetchGoldRushChance());
     }
 
-    public function testBaseGoldRushDoesNotProcOutsideBoundary(): void
+    public function test_base_gold_rush_does_not_proc_outside_boundary(): void
     {
         RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->with(10000)->andReturn(101);
 
         $this->assertFalse(resolve(GoldRushCheckCalculator::class)->fetchGoldRushChance());
     }
 
-    public function testMapDropBonusIncreasesGoldRushChance(): void
+    public function test_map_drop_bonus_increases_gold_rush_chance(): void
     {
         RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->with(10000)->andReturn(1600);
 
         $this->assertTrue(resolve(GoldRushCheckCalculator::class)->fetchGoldRushChance(0.15));
     }
 
-    public function testSpecialLocationDropBonusIncreasesGoldRushChance(): void
+    public function test_special_location_drop_bonus_increases_gold_rush_chance(): void
     {
         RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->with(10000)->andReturn(600);
 
@@ -49,14 +49,14 @@ class GoldRushCheckCalculatorTest extends TestCase
         ));
     }
 
-    public function testCombinedGoldRushChanceClampsAtOneHundredPercent(): void
+    public function test_combined_gold_rush_chance_clamps_at_one_hundred_percent(): void
     {
         RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->with(10000)->andReturn(10000);
 
         $this->assertTrue(resolve(GoldRushCheckCalculator::class)->fetchGoldRushChance(0.60, 0.60));
     }
 
-    public function testGoldRushAddsFivePercentOfActualBattleGoldGained(): void
+    public function test_gold_rush_adds_five_percent_of_actual_battle_gold_gained(): void
     {
         Event::fake();
 
@@ -72,7 +72,7 @@ class GoldRushCheckCalculatorTest extends TestCase
         $this->assertEquals(100050, $character->refresh()->gold);
     }
 
-    public function testGoldRushDoesNotAddFivePercentOfTotalOwnedGold(): void
+    public function test_gold_rush_does_not_add_five_percent_of_total_owned_gold(): void
     {
         Event::fake();
 
@@ -88,7 +88,7 @@ class GoldRushCheckCalculatorTest extends TestCase
         $this->assertEquals(100100, $character->refresh()->gold);
     }
 
-    public function testGoldRushDoesNotRollWhenActualBattleGoldGainedIsZero(): void
+    public function test_gold_rush_does_not_roll_when_actual_battle_gold_gained_is_zero(): void
     {
         Event::fake();
 
@@ -104,7 +104,7 @@ class GoldRushCheckCalculatorTest extends TestCase
         $this->assertEquals(100000, $character->refresh()->gold);
     }
 
-    public function testGoldRushRespectsMaxGoldCap(): void
+    public function test_gold_rush_respects_max_gold_cap(): void
     {
         Event::fake();
 
@@ -120,7 +120,7 @@ class GoldRushCheckCalculatorTest extends TestCase
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD, $character->refresh()->gold);
     }
 
-    public function testGoldRushUsesMapDropBonusForChance(): void
+    public function test_gold_rush_uses_map_drop_bonus_for_chance(): void
     {
         Event::fake();
 
@@ -136,7 +136,7 @@ class GoldRushCheckCalculatorTest extends TestCase
         $this->assertEquals($character->gold, $character->refresh()->gold);
     }
 
-    public function testGoldRushUsesSpecialLocationDropBonusForChance(): void
+    public function test_gold_rush_uses_special_location_drop_bonus_for_chance(): void
     {
         Event::fake();
 

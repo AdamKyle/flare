@@ -114,7 +114,7 @@ class TrainPassiveSkillTest extends TestCase
         $this->assertFalse($building->is_locked);
     }
 
-    public function testPassiveTrainingRecalculatesAllOwnedKingdomCaps()
+    public function test_passive_training_recalculates_all_owned_kingdom_caps()
     {
         $character = (new CharacterFactory)
             ->createBaseCharacter()

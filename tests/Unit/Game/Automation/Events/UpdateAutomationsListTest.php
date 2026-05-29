@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 class UpdateAutomationsListTest extends TestCase
 {
-    public function testConstructorSetsUser(): void
+    public function test_constructor_sets_user(): void
     {
         $user = $this->user();
 
@@ -19,7 +19,7 @@ class UpdateAutomationsListTest extends TestCase
         $this->assertEquals($user, $event->user);
     }
 
-    public function testConstructorSetsAutomations(): void
+    public function test_constructor_sets_automations(): void
     {
         $automations = new Collection();
 
@@ -28,7 +28,7 @@ class UpdateAutomationsListTest extends TestCase
         $this->assertEquals($automations, $event->automations);
     }
 
-    public function testBroadcastOnReturnsPrivateAutomationsListChannel(): void
+    public function test_broadcast_on_returns_private_automations_list_channel(): void
     {
         $event = new UpdateAutomationsList($this->user(), new Collection());
 

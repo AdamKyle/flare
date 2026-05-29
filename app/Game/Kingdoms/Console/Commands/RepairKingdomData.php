@@ -60,10 +60,10 @@ class RepairKingdomData extends Command
         $this->info($apply ? 'Apply mode: repaired invalid kingdom data.' : 'Dry-run mode: no data was changed.');
 
         foreach ($counts as $label => $count) {
-            $this->info($label . ': ' . $count);
+            $this->info($label.': '.$count);
         }
 
-        $this->info('total_repairs: ' . array_sum($counts));
+        $this->info('total_repairs: '.array_sum($counts));
 
         return self::SUCCESS;
     }
@@ -147,7 +147,7 @@ class RepairKingdomData extends Command
             ->orderBy('id')
             ->get()
             ->each(function (BuildingInQueue $queue) use ($apply, &$count, &$seen) {
-                $key = $queue->kingdom_id . ':' . $queue->building_id . ':' . $queue->type;
+                $key = $queue->kingdom_id.':'.$queue->building_id.':'.$queue->type;
 
                 if (! isset($seen[$key])) {
                     $seen[$key] = true;
@@ -200,7 +200,7 @@ class RepairKingdomData extends Command
                     return;
                 }
 
-                $key = $queue->kingdom_id . ':' . $queue->game_unit_id;
+                $key = $queue->kingdom_id.':'.$queue->game_unit_id;
 
                 if (! isset($trackedAmounts[$key])) {
                     $trackedAmounts[$key] = KingdomUnit::query()
@@ -306,7 +306,7 @@ class RepairKingdomData extends Command
                         return $request;
                     }
 
-                    $key = $queue->kingdom_id . ':' . $gameUnit->id;
+                    $key = $queue->kingdom_id.':'.$gameUnit->id;
 
                     if (! isset($trackedAmounts[$key])) {
                         $trackedAmounts[$key] = KingdomUnit::query()

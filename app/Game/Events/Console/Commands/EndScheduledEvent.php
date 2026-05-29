@@ -4,22 +4,18 @@ namespace App\Game\Events\Console\Commands;
 
 use App\Flare\Models\Event;
 use App\Flare\Models\ScheduledEvent;
+use App\Game\Automation\Services\ExplorationAutomationService;
 use App\Game\Events\Registry\EventEnderRegistry;
 use App\Game\Events\Services\ScheduleEventFinalizerService;
 use App\Game\Events\Values\EventType;
-<<<<<<< HEAD
-=======
-use App\Game\Automation\Services\ExplorationAutomationService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\TraverseService;
 use App\Game\Maps\Services\UpdateRaidMonsters;
 use App\Game\Messages\Events\DeleteAnnouncementEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
-use App\Game\Quests\Services\BuildQuestCacheService;
 use App\Game\Raids\Events\CorruptLocations;
 use App\Game\Survey\Events\ShowSurvey;
->>>>>>> master
 use Exception;
 use Illuminate\Console\Command;
 
@@ -170,7 +166,7 @@ class EndScheduledEvent extends Command
 
         $raid = $event->raid;
 
-        event(new GlobalMessageEvent('The Raid: ' . $raid->name . ' is now ending! Don\'t worry, the raid will be back soon. Check the event calendar for the next time!'));
+        event(new GlobalMessageEvent('The Raid: '.$raid->name.' is now ending! Don\'t worry, the raid will be back soon. Check the event calendar for the next time!'));
 
         $this->unCorruptLocations($raid, $locationService);
 

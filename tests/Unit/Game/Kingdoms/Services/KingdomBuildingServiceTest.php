@@ -18,7 +18,7 @@ class KingdomBuildingServiceTest extends TestCase
 
     private ?KingdomBuildingService $kingdomBuildingService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -47,7 +47,7 @@ class KingdomBuildingServiceTest extends TestCase
         $this->kingdomBuildingService = resolve(KingdomBuildingService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -55,7 +55,7 @@ class KingdomBuildingServiceTest extends TestCase
         $this->kingdomBuildingService = null;
     }
 
-    public function testItConsumesDiscountedResourceCostsWhenTheBuildingManagementPassiveIsPartiallyTrained(): void
+    public function test_it_consumes_discounted_resource_costs_when_the_building_management_passive_is_partially_trained(): void
     {
         $kingdomManagement = $this->character
             ->kingdomManagement()
@@ -98,7 +98,7 @@ class KingdomBuildingServiceTest extends TestCase
         $this->assertSame(9720, $kingdom->current_population);
     }
 
-    public function testPendingQueueWithRefundableTimeLeftRefundsResourcesUpToKingdomMaxAndDeletesQueue(): void
+    public function test_pending_queue_with_refundable_time_left_refunds_resources_up_to_kingdom_max_and_deletes_queue(): void
     {
         $kingdomManagement = $this->character
             ->kingdomManagement()
@@ -154,7 +154,7 @@ class KingdomBuildingServiceTest extends TestCase
         $this->assertSame(1000, $kingdom->current_population);
     }
 
-    public function testCompleteQueueReturnsFalseLeavesResourcesUnchangedAndDoesNotDeleteQueue(): void
+    public function test_complete_queue_returns_false_leaves_resources_unchanged_and_does_not_delete_queue(): void
     {
         $kingdomManagement = $this->character
             ->kingdomManagement()
@@ -210,7 +210,7 @@ class KingdomBuildingServiceTest extends TestCase
         $this->assertSame(500, $kingdom->current_population);
     }
 
-    public function testRefundPercentBelowTenPercentReturnsFalseLeavesResourcesUnchangedAndDoesNotDeleteQueue(): void
+    public function test_refund_percent_below_ten_percent_returns_false_leaves_resources_unchanged_and_does_not_delete_queue(): void
     {
         $kingdomManagement = $this->character
             ->kingdomManagement()
@@ -266,7 +266,7 @@ class KingdomBuildingServiceTest extends TestCase
         $this->assertSame(500, $kingdom->current_population);
     }
 
-    public function testRepeatedFailedCancellationCannotMakeAnyCurrentResourceNegative(): void
+    public function test_repeated_failed_cancellation_cannot_make_any_current_resource_negative(): void
     {
         $kingdomManagement = $this->character
             ->kingdomManagement()
@@ -324,7 +324,7 @@ class KingdomBuildingServiceTest extends TestCase
         $this->assertSame(5, $kingdom->current_population);
     }
 
-    public function testInvalidCancellationTimingReturnsFalseLeavesResourcesUnchangedAndDoesNotDeleteQueue(): void
+    public function test_invalid_cancellation_timing_returns_false_leaves_resources_unchanged_and_does_not_delete_queue(): void
     {
         $kingdomManagement = $this->character
             ->kingdomManagement()

@@ -45,7 +45,7 @@ class DelveAutomationServiceTest extends TestCase
 
     private DelveExploration $delveExploration;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -92,7 +92,7 @@ class DelveAutomationServiceTest extends TestCase
         ]);
     }
 
-    public function testBeginAutomationCreatesDelveAutomation(): void
+    public function test_begin_automation_creates_delve_automation(): void
     {
         Queue::fake();
         Event::fake();
@@ -104,7 +104,7 @@ class DelveAutomationServiceTest extends TestCase
         $this->assertEquals(AutomationType::DELVE, $automation->type);
     }
 
-    public function testBeginAutomationUsesMatchingCaveMonster(): void
+    public function test_begin_automation_uses_matching_cave_monster(): void
     {
         Queue::fake();
         Event::fake();
@@ -116,7 +116,7 @@ class DelveAutomationServiceTest extends TestCase
         $this->assertEquals($this->monster->id, $automation->monster_id);
     }
 
-    public function testBeginAutomationPersistsAttackType(): void
+    public function test_begin_automation_persists_attack_type(): void
     {
         Queue::fake();
         Event::fake();
@@ -131,7 +131,7 @@ class DelveAutomationServiceTest extends TestCase
         $this->assertEquals(AttackTypeValue::CAST, $automation->attack_type);
     }
 
-    public function testBeginAutomationSetsCompletedAtEightHoursFromNow(): void
+    public function test_begin_automation_sets_completed_at_eight_hours_from_now(): void
     {
         Queue::fake();
         Event::fake();
@@ -149,7 +149,7 @@ class DelveAutomationServiceTest extends TestCase
         Carbon::setTestNow();
     }
 
-    public function testBeginAutomationCreatesDelveExploration(): void
+    public function test_begin_automation_creates_delve_exploration(): void
     {
         Queue::fake();
         Event::fake();
@@ -163,7 +163,7 @@ class DelveAutomationServiceTest extends TestCase
         $this->assertEquals(AttackTypeValue::ATTACK, $delveExploration->attack_type);
     }
 
-    public function testBeginAutomationDispatchesUpdateCharacterStatus(): void
+    public function test_begin_automation_dispatches_update_character_status(): void
     {
         Queue::fake();
         Event::fake();
@@ -173,7 +173,7 @@ class DelveAutomationServiceTest extends TestCase
         Event::assertDispatched(UpdateCharacterStatus::class);
     }
 
-    public function testBeginAutomationDispatchesAutomationLogUpdate(): void
+    public function test_begin_automation_dispatches_automation_log_update(): void
     {
         Queue::fake();
         Event::fake();
@@ -183,7 +183,7 @@ class DelveAutomationServiceTest extends TestCase
         Event::assertDispatched(AutomationLogUpdate::class);
     }
 
-    public function testBeginAutomationDispatchesAutomationTimeOut(): void
+    public function test_begin_automation_dispatches_automation_time_out(): void
     {
         Queue::fake();
         Event::fake();
@@ -193,7 +193,7 @@ class DelveAutomationServiceTest extends TestCase
         Event::assertDispatched(AutomationTimeOut::class);
     }
 
-    public function testBeginAutomationDispatchesDelveExplorationJob(): void
+    public function test_begin_automation_dispatches_delve_exploration_job(): void
     {
         Queue::fake();
         Event::fake();
@@ -203,7 +203,7 @@ class DelveAutomationServiceTest extends TestCase
         Queue::assertPushed(DelveExplorationProcessing::class);
     }
 
-    public function testStopExplorationDeletesDelveAutomation(): void
+    public function test_stop_exploration_deletes_delve_automation(): void
     {
         Event::fake();
 
@@ -216,7 +216,7 @@ class DelveAutomationServiceTest extends TestCase
         );
     }
 
-    public function testStopExplorationCompletesActiveDelveExploration(): void
+    public function test_stop_exploration_completes_active_delve_exploration(): void
     {
         Event::fake();
 
@@ -227,7 +227,7 @@ class DelveAutomationServiceTest extends TestCase
         $this->assertNotNull($this->delveExploration->completed_at);
     }
 
-    public function testStopExplorationReturns422WhenNoAutomationExists(): void
+    public function test_stop_exploration_returns422_when_no_automation_exists(): void
     {
         Event::fake();
 
@@ -239,18 +239,18 @@ class DelveAutomationServiceTest extends TestCase
         $this->assertEquals(422, $response['status']);
     }
 
-    public function testStopExplorationClearsCharacterSurvivalCache(): void
+    public function test_stop_exploration_clears_character_survival_cache(): void
     {
         Event::fake();
 
-        Cache::put('can-character-survive-' . $this->character->id, true);
+        Cache::put('can-character-survive-'.$this->character->id, true);
 
         $this->service->stopExploration($this->character);
 
-        $this->assertFalse(Cache::has('can-character-survive-' . $this->character->id));
+        $this->assertFalse(Cache::has('can-character-survive-'.$this->character->id));
     }
 
-    public function testStopExplorationDispatchesAutomationTimeOut(): void
+    public function test_stop_exploration_dispatches_automation_time_out(): void
     {
         Event::fake();
 
@@ -259,7 +259,7 @@ class DelveAutomationServiceTest extends TestCase
         Event::assertDispatched(AutomationTimeOut::class);
     }
 
-    public function testStopExplorationDispatchesAutomationStatus(): void
+    public function test_stop_exploration_dispatches_automation_status(): void
     {
         Event::fake();
 
@@ -268,7 +268,7 @@ class DelveAutomationServiceTest extends TestCase
         Event::assertDispatched(AutomationStatus::class);
     }
 
-    public function testStopExplorationDispatchesUpdateCharacterStatus(): void
+    public function test_stop_exploration_dispatches_update_character_status(): void
     {
         Event::fake();
 
@@ -277,7 +277,7 @@ class DelveAutomationServiceTest extends TestCase
         Event::assertDispatched(UpdateCharacterStatus::class);
     }
 
-    public function testStopExplorationDispatchesAutomationLogUpdate(): void
+    public function test_stop_exploration_dispatches_automation_log_update(): void
     {
         Event::fake();
 
@@ -286,7 +286,7 @@ class DelveAutomationServiceTest extends TestCase
         Event::assertDispatched(AutomationLogUpdate::class);
     }
 
-    public function testBeginAutomationDelaysDelveJobByLocationMinutesBetweenDelveFights(): void
+    public function test_begin_automation_delays_delve_job_by_location_minutes_between_delve_fights(): void
     {
         Queue::fake();
         Event::fake();

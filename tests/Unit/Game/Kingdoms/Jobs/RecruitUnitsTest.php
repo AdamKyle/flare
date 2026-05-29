@@ -18,7 +18,7 @@ class RecruitUnitsTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testCompletionRejectsOverMaximumQueueAndRefundsResources(): void
+    public function test_completion_rejects_over_maximum_queue_and_refunds_resources(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom([

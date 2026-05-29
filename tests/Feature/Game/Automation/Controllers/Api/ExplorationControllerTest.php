@@ -4,10 +4,10 @@ namespace Tests\Feature\Game\Automation\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
+use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
-use App\Flare\Models\Location;
 use App\Flare\Values\LocationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -24,7 +24,7 @@ class ExplorationControllerTest extends TestCase
 
     private Monster $monster;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -41,13 +41,13 @@ class ExplorationControllerTest extends TestCase
             ->getMonster();
     }
 
-    public function testBeginStartsExploration(): void
+    public function test_begin_starts_exploration(): void
     {
         Queue::fake();
         Event::fake();
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/automation/' . $this->character->id . '/start', [
+            ->call('POST', '/api/automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
                 'auto_attack_length' => 1,
                 'move_down_the_list_every' => 10,
@@ -63,7 +63,7 @@ class ExplorationControllerTest extends TestCase
         );
     }
 
-    public function testStopStopsExploration(): void
+    public function test_stop_stops_exploration(): void
     {
         Event::fake();
 
@@ -80,20 +80,20 @@ class ExplorationControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/automation/' . $this->character->id . '/stop', [
+            ->call('POST', '/api/automation/'.$this->character->id.'/stop', [
                 '_token' => csrf_token(),
             ]);
 
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function testBeginReturns422WhenAttackTypeIsInvalid(): void
+    public function test_begin_returns422_when_attack_type_is_invalid(): void
     {
         Queue::fake();
         Event::fake();
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/automation/' . $this->character->id . '/start', [
+            ->call('POST', '/api/automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
                 'auto_attack_length' => 1,
                 'move_down_the_list_every' => 10,
@@ -107,7 +107,7 @@ class ExplorationControllerTest extends TestCase
         $this->assertEquals('Invalid attack type was selected. Please select from the drop down.', $jsonData['message']);
     }
 
-    public function testBeginReturns422WhenAutomationIsAlreadyRunning(): void
+    public function test_begin_returns422_when_automation_is_already_running(): void
     {
         Queue::fake();
         Event::fake();
@@ -125,7 +125,7 @@ class ExplorationControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/automation/' . $this->character->id . '/start', [
+            ->call('POST', '/api/automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
                 'auto_attack_length' => 1,
                 'move_down_the_list_every' => 10,
@@ -139,7 +139,7 @@ class ExplorationControllerTest extends TestCase
         $this->assertEquals('You cannot do that while Exploration automation is running. Cancel it first.', $jsonData['message']);
     }
 
-    public function testBeginReturns422WhenCharacterIsOnBlockedLocation(): void
+    public function test_begin_returns422_when_character_is_on_blocked_location(): void
     {
         Queue::fake();
         Event::fake();
@@ -152,7 +152,7 @@ class ExplorationControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/automation/' . $this->character->id . '/start', [
+            ->call('POST', '/api/automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
                 'auto_attack_length' => 1,
                 'move_down_the_list_every' => 10,

@@ -102,7 +102,7 @@ class DelveExploration implements ShouldQueue
         if ($this->shouldBail($automation, $delveAutomation)) {
             $this->endAutomation($automation, $delveAutomation, $characterCacheData);
 
-            Cache::delete('can-character-survive-' . $this->character->id);
+            Cache::delete('can-character-survive-'.$this->character->id);
 
             return;
         }
@@ -187,7 +187,7 @@ class DelveExploration implements ShouldQueue
 
     private function deletePackCache(): void
     {
-        Cache::delete('delve-monster-' . $this->character->id . '-' . $this->monster->id . '-fight');
+        Cache::delete('delve-monster-'.$this->character->id.'-'.$this->monster->id.'-fight');
     }
 
     private function updateMonsterForNextFight(DelveExplorationModel $delveExploration): void
@@ -345,16 +345,16 @@ class DelveExploration implements ShouldQueue
             return;
         }
 
-        $this->sendOutEventLogUpdate('The Ever Burning Candle erupts forward and the light illuminates the foul beast: ' . $monsterName);
+        $this->sendOutEventLogUpdate('The Ever Burning Candle erupts forward and the light illuminates the foul beast: '.$monsterName);
 
         if ($packSize > 1) {
-            $this->sendOutEventLogUpdate('Holy shit child, there are ' . $packSize . ' of them. Hold your ground!');
+            $this->sendOutEventLogUpdate('Holy shit child, there are '.$packSize.' of them. Hold your ground!');
         }
 
         if ($increaseAmount > 0) {
             $percent = $increaseAmount * 100;
 
-            $this->sendOutEventLogUpdate('The beast(s) is radiant with magic, you know its strength has increased by: ' . $percent . '%');
+            $this->sendOutEventLogUpdate('The beast(s) is radiant with magic, you know its strength has increased by: '.$percent.'%');
         }
 
         $this->showedEncounterMessage = true;
@@ -576,7 +576,7 @@ class DelveExploration implements ShouldQueue
 
             $this->sendOutEventLogUpdate('Gained a cosmic item child! (Check Server Messages).', false, true);
 
-            $this->sendServerMessage('You were rewarded with a cosmic item: ' . $cosmicItem->affix_name . ' for surviving for more then 6 hours in a delve!', $slot->id);
+            $this->sendServerMessage('You were rewarded with a cosmic item: '.$cosmicItem->affix_name.' for surviving for more then 6 hours in a delve!', $slot->id);
         }
 
         if (! is_null($mythicItem)) {
@@ -590,7 +590,7 @@ class DelveExploration implements ShouldQueue
 
             $this->sendOutEventLogUpdate('Gained a mythic item child! (Check Server Messages).', false, true);
 
-            $this->sendServerMessage('You were rewarded with a mythic item: ' . $mythicItem->affix_name . ' for surviving for more then 4 hours in a delve!', $slot->id);
+            $this->sendServerMessage('You were rewarded with a mythic item: '.$mythicItem->affix_name.' for surviving for more then 4 hours in a delve!', $slot->id);
         }
 
         if (! is_null($uniqueItem)) {
@@ -604,7 +604,7 @@ class DelveExploration implements ShouldQueue
 
             $this->sendOutEventLogUpdate('Gained a unique item child! (Check Server Messages).', false, true);
 
-            $this->sendServerMessage('You were rewarded with a unique item: ' . $uniqueItem->affix_name . ' for surviving for more then 2 hours in a delve!', $slot->id);
+            $this->sendServerMessage('You were rewarded with a unique item: '.$uniqueItem->affix_name.' for surviving for more then 2 hours in a delve!', $slot->id);
         }
 
         if ($gold === 1_000) {

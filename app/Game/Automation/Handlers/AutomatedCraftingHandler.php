@@ -42,11 +42,6 @@ class AutomatedCraftingHandler
 
     /**
      * Create the automated crafting handler.
-     *
-     * @param CraftingService $craftingService
-     * @param ShopService $shopService
-     * @param AutomatedCraftingAttemptTracker $automatedCraftingAttemptTracker
-     * @param AutomatedCraftingResult $automatedCraftingResult
      */
     public function __construct(
         private readonly CraftingService $craftingService,
@@ -57,11 +52,6 @@ class AutomatedCraftingHandler
 
     /**
      * Set up the handler.
-     *
-     * @param Character $character
-     * @param int $targetItemId
-     * @param AutomatedCraftingLogger $automatedCraftingLogger
-     * @return AutomatedCraftingHandler
      */
     public function setUp(
         Character $character,
@@ -84,8 +74,6 @@ class AutomatedCraftingHandler
 
     /**
      * Set craft for NPC.
-     *
-     * @return AutomatedCraftingHandler
      */
     public function setCraftForNpc(): AutomatedCraftingHandler
     {
@@ -96,8 +84,6 @@ class AutomatedCraftingHandler
 
     /**
      * Set craft for event.
-     *
-     * @return AutomatedCraftingHandler
      */
     public function setCraftForEvent(): AutomatedCraftingHandler
     {
@@ -108,9 +94,6 @@ class AutomatedCraftingHandler
 
     /**
      * Set the faction loyalty NPC.
-     *
-     * @param FactionLoyaltyNpc $factionLoyaltyNpc
-     * @return AutomatedCraftingHandler
      */
     public function setFactionLoyaltyNpc(FactionLoyaltyNpc $factionLoyaltyNpc): AutomatedCraftingHandler
     {
@@ -121,9 +104,6 @@ class AutomatedCraftingHandler
 
     /**
      * Set max failed roll attempts.
-     *
-     * @param int $maxAttempts
-     * @return AutomatedCraftingHandler
      */
     public function setMaxAttempts(int $maxAttempts): AutomatedCraftingHandler
     {
@@ -136,8 +116,6 @@ class AutomatedCraftingHandler
 
     /**
      * Handle automated crafting.
-     *
-     * @return AutomatedCraftingResult
      */
     public function handle(): AutomatedCraftingResult
     {
@@ -162,8 +140,6 @@ class AutomatedCraftingHandler
 
     /**
      * Set the target item.
-     *
-     * @return bool
      */
     private function setTargetItem(): bool
     {
@@ -180,8 +156,6 @@ class AutomatedCraftingHandler
 
     /**
      * Set the crafting skill.
-     *
-     * @return bool
      */
     private function setCraftingSkill(): bool
     {
@@ -198,8 +172,6 @@ class AutomatedCraftingHandler
 
     /**
      * Attempt target item crafting.
-     *
-     * @return AutomatedCraftingResult
      */
     private function attemptTargetCrafting(): AutomatedCraftingResult
     {
@@ -237,8 +209,6 @@ class AutomatedCraftingHandler
 
     /**
      * Attempt training item crafting.
-     *
-     * @return AutomatedCraftingResult
      */
     private function attemptTrainingCrafting(): AutomatedCraftingResult
     {
@@ -277,8 +247,6 @@ class AutomatedCraftingHandler
 
     /**
      * Refresh the character state.
-     *
-     * @return void
      */
     private function refreshState(): void
     {
@@ -287,8 +255,6 @@ class AutomatedCraftingHandler
 
     /**
      * Should target crafting continue?
-     *
-     * @return bool
      */
     private function shouldContinueTargetCrafting(): bool
     {
@@ -301,8 +267,6 @@ class AutomatedCraftingHandler
 
     /**
      * Get the remaining target task amount.
-     *
-     * @return int
      */
     private function getRemainingTargetTaskAmount(): int
     {
@@ -325,8 +289,6 @@ class AutomatedCraftingHandler
 
     /**
      * Is the character below the target item level?
-     *
-     * @return bool
      */
     private function isBelowTargetLevel(): bool
     {
@@ -339,9 +301,6 @@ class AutomatedCraftingHandler
 
     /**
      * Can the character afford the item?
-     *
-     * @param Item $item
-     * @return bool
      */
     private function canAfford(Item $item): bool
     {
@@ -350,9 +309,6 @@ class AutomatedCraftingHandler
 
     /**
      * Craft the item.
-     *
-     * @param Item $item
-     * @return bool
      */
     private function craftItem(Item $item): bool
     {
@@ -385,9 +341,6 @@ class AutomatedCraftingHandler
 
     /**
      * Sell a crafted training item.
-     *
-     * @param int|null $inventorySlotId
-     * @return void
      */
     private function sellTrainingItem(?int $inventorySlotId): void
     {
@@ -402,9 +355,6 @@ class AutomatedCraftingHandler
 
     /**
      * Is the item the target item?
-     *
-     * @param Item $item
-     * @return bool
      */
     private function isTargetItem(Item $item): bool
     {
@@ -417,8 +367,6 @@ class AutomatedCraftingHandler
 
     /**
      * Get the training item.
-     *
-     * @return Item|null
      */
     private function getTrainingItem(): ?Item
     {
@@ -449,9 +397,6 @@ class AutomatedCraftingHandler
 
     /**
      * Is the item crafted through weapon crafting?
-     *
-     * @param Item $item
-     * @return bool
      */
     private function isWeaponCraftingItem(Item $item): bool
     {
@@ -460,9 +405,6 @@ class AutomatedCraftingHandler
 
     /**
      * Should use the crafting type instead of item type?
-     *
-     * @param Item $item
-     * @return bool
      */
     private function shouldUseCraftingType(Item $item): bool
     {
@@ -471,9 +413,6 @@ class AutomatedCraftingHandler
 
     /**
      * Get the crafting type.
-     *
-     * @param Item $item
-     * @return string
      */
     private function getCraftingType(Item $item): string
     {
@@ -502,11 +441,6 @@ class AutomatedCraftingHandler
 
     /**
      * Finish automated crafting.
-     *
-     * @param AutomatedCraftingResultType $automatedCraftingResultType
-     * @param Item|null $craftedItem
-     * @param bool $craftedTargetItem
-     * @return AutomatedCraftingResult
      */
     private function finish(
         AutomatedCraftingResultType $automatedCraftingResultType,

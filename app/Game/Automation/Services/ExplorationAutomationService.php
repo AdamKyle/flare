@@ -61,7 +61,7 @@ class ExplorationAutomationService
 
         $creatureCount = $this->explorationCreatureCountCalculator->calculate($character);
 
-        event(new AutomationLogUpdate($character->user->id, 'The exploration will begin in 1 minute. Every 1 minute you will encounter ' . $creatureCount . ' enemies based on your fight timeout modifier.'));
+        event(new AutomationLogUpdate($character->user->id, 'The exploration will begin in 1 minute. Every 1 minute you will encounter '.$creatureCount.' enemies based on your fight timeout modifier.'));
 
         event(new AutomationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
 
@@ -84,7 +84,7 @@ class ExplorationAutomationService
 
         $character = $character->refresh();
 
-        Cache::delete('can-character-survive-' . $character->id);
+        Cache::delete('can-character-survive-'.$character->id);
 
         event(new AutomationTimeOut($character->user, 0));
         event(new AutomationStatus($character->user, false));

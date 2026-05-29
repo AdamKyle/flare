@@ -24,8 +24,8 @@ class ServiceProvider extends ApplicationServiceProvider
     public function register()
     {
 
-        $this->app->bind(itemSkillAttribute::class, function () {
-            return new itemSkillAttribute;
+        $this->app->bind(ItemSkillAttribute::class, function () {
+            return new ItemSkillAttribute;
         });
 
         $this->app->bind(DefenceBuilder::class, function () {

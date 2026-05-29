@@ -89,7 +89,7 @@ class MassDisenchantServiceTest extends TestCase
     {
         $character = $this->character->inventoryManagement()->giveItemMultipleTimes($this->itemToDisenchant, 10)->getCharacter();
 
-        $massDisenchantmentService = \Mockery::mock(MassDisenchantService::class)->makePartial();
+        $massDisenchantmentService = Mockery::mock(MassDisenchantService::class)->makePartial();
 
         $massDisenchantmentService->__construct(resolve(SkillCheckService::class));
 
@@ -194,7 +194,7 @@ class MassDisenchantServiceTest extends TestCase
         $this->assertGreaterThan(1, $enchantingSkill->level);
     }
 
-    public function testMassDisenchantRollsGoldDustRushOnceForTheAction(): void
+    public function test_mass_disenchant_rolls_gold_dust_rush_once_for_the_action(): void
     {
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([
@@ -231,7 +231,7 @@ class MassDisenchantServiceTest extends TestCase
         $this->assertEquals(2100, $character->gold_dust);
     }
 
-    public function testFailedMassDisenchantUsesFailedGoldDustGain(): void
+    public function test_failed_mass_disenchant_uses_failed_gold_dust_gain(): void
     {
         $this->instance(
             SkillCheckService::class,
@@ -258,7 +258,7 @@ class MassDisenchantServiceTest extends TestCase
         $this->assertEquals(1, $character->gold_dust);
     }
 
-    public function testFailedMassDisenchantDoesNotTriggerGoldDustRush(): void
+    public function test_failed_mass_disenchant_does_not_trigger_gold_dust_rush(): void
     {
         $this->instance(
             SkillCheckService::class,
@@ -289,7 +289,7 @@ class MassDisenchantServiceTest extends TestCase
         $this->assertEquals(1, $character->gold_dust);
     }
 
-    public function testGetGoldDustRushDisenchantingItemsDoesNotGoAbovemax()
+    public function test_get_gold_dust_rush_disenchanting_items_does_not_go_abovemax()
     {
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([

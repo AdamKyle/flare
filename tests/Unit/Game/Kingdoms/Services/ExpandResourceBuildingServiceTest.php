@@ -13,7 +13,7 @@ class ExpandResourceBuildingServiceTest extends TestCase
 {
     use CreateGameBuilding, RefreshDatabase;
 
-    public function testCancelExpansionReturnsNoExpansionInProgressWhenNoQueueExists(): void
+    public function test_cancel_expansion_returns_no_expansion_in_progress_when_no_queue_exists(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();

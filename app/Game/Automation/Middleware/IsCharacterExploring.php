@@ -5,13 +5,14 @@ namespace App\Game\Automation\Middleware;
 use App\Flare\Values\AutomationType;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Closure;
+use Illuminate\Http\Request;
 
 class IsCharacterExploring
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  string|null  $guard
      * @return mixed
      */

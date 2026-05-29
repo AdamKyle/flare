@@ -153,16 +153,16 @@ class RepairCharacterStats extends Command
             }
         });
 
-        $this->info('Characters scanned: ' . $charactersScanned);
-        $this->info('Characters affected: ' . $charactersAffected);
-        $this->info('Characters changed: ' . $charactersChanged);
-        $this->info('Characters skipped: ' . $charactersSkipped);
-        $this->info('Total stat points to add: ' . $totalStatPoints);
-        $this->info('Total reincarnation bonus gap: ' . $totalReincarnationBonusGap);
+        $this->info('Characters scanned: '.$charactersScanned);
+        $this->info('Characters affected: '.$charactersAffected);
+        $this->info('Characters changed: '.$charactersChanged);
+        $this->info('Characters skipped: '.$charactersSkipped);
+        $this->info('Total stat points to add: '.$totalStatPoints);
+        $this->info('Total reincarnation bonus gap: '.$totalReincarnationBonusGap);
         $this->info('Per-stat totals:');
 
         foreach ($statTotals as $stat => $total) {
-            $this->info($stat . ': ' . $total);
+            $this->info($stat.': '.$total);
         }
 
         if (empty($affectedCharacters)) {
@@ -183,11 +183,11 @@ class RepairCharacterStats extends Command
         }
 
         if (! is_null($largestCorrectionCharacter)) {
-            $this->info('Largest correction: ' . $largestCorrection . ' for character ' . $largestCorrectionCharacter->id . ' (' . $largestCorrectionCharacter->name . ')');
+            $this->info('Largest correction: '.$largestCorrection.' for character '.$largestCorrectionCharacter->id.' ('.$largestCorrectionCharacter->name.')');
         }
 
         foreach ($skippedCharacters as $skippedCharacter) {
-            $this->error('Skipped character ' . $skippedCharacter['id'] . ' (' . $skippedCharacter['name'] . '): ' . $skippedCharacter['error']);
+            $this->error('Skipped character '.$skippedCharacter['id'].' ('.$skippedCharacter['name'].'): '.$skippedCharacter['error']);
         }
 
         return self::SUCCESS;
@@ -228,7 +228,7 @@ class RepairCharacterStats extends Command
         $statsToRepair = [];
 
         foreach ($repairPlan as $stat => $pointsToAdd) {
-            $statsToRepair[] = $stat . ' +' . $pointsToAdd;
+            $statsToRepair[] = $stat.' +'.$pointsToAdd;
         }
 
         return implode(', ', $statsToRepair);
@@ -244,17 +244,17 @@ class RepairCharacterStats extends Command
         $verb = $apply ? 'fixed' : 'will change';
 
         if ($expectedReincarnatedStatIncrease > $currentReincarnatedStatIncrease) {
-            $changes[] = 'reincarnated_stat_increase ' . $currentReincarnatedStatIncrease . ' -> ' . $expectedReincarnatedStatIncrease;
+            $changes[] = 'reincarnated_stat_increase '.$currentReincarnatedStatIncrease.' -> '.$expectedReincarnatedStatIncrease;
         }
 
         if ($statsToRepair !== 'none') {
-            $changes[] = 'raw stats: ' . $statsToRepair;
+            $changes[] = 'raw stats: '.$statsToRepair;
         }
 
         if (empty($changes)) {
             return 'none';
         }
 
-        return $verb . ' ' . implode('; ', $changes);
+        return $verb.' '.implode('; ', $changes);
     }
 }

@@ -14,7 +14,7 @@ class BuildingsUnitsSheetTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testCollectionPreservesOmittedRelationshipsAndUpsertsPresentRows(): void
+    public function test_collection_preserves_omitted_relationships_and_upserts_present_rows(): void
     {
         $church = GameBuilding::factory()->create(['name' => 'Church']);
         $farm = GameBuilding::factory()->create(['name' => 'Farm']);

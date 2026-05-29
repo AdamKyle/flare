@@ -41,7 +41,7 @@ class CelestialFightServiceTest extends TestCase
 
     private ?Monster $monster = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -91,7 +91,7 @@ class CelestialFightServiceTest extends TestCase
             ->getMonster();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->characterFactory = null;
         $this->character = null;
@@ -101,13 +101,13 @@ class CelestialFightServiceTest extends TestCase
         parent::tearDown();
     }
 
-    public function testItDoesNotAllowCelestialCurrentHealthToExceedCelestialMaxHealthAfterAttack(): void
+    public function test_it_does_not_allow_celestial_current_health_to_exceed_celestial_max_health_after_attack(): void
     {
         $celestialFight = $this->createCelestialFightForTest();
         $characterInCelestialFight = $this->createCharacterInCelestialFightForCharacter($this->character, $celestialFight);
 
         Cache::forget('celestials');
-        Cache::forget('monster-fight-' . $this->character->id);
+        Cache::forget('monster-fight-'.$this->character->id);
 
         Event::fake();
 
@@ -125,13 +125,13 @@ class CelestialFightServiceTest extends TestCase
         );
     }
 
-    public function testCharacterDoesNotKillCelestialButAnotherCharacterDoesKillCelestial(): void
+    public function test_character_does_not_kill_celestial_but_another_character_does_kill_celestial(): void
     {
         $celestialFight = $this->createCelestialFightForTest();
         $characterInCelestialFight = $this->createCharacterInCelestialFightForCharacter($this->character, $celestialFight);
 
         Cache::forget('celestials');
-        Cache::forget('monster-fight-' . $this->character->id);
+        Cache::forget('monster-fight-'.$this->character->id);
 
         Event::fake();
 
@@ -157,7 +157,7 @@ class CelestialFightServiceTest extends TestCase
         $secondCharacter = $secondCharacterFactory->getCharacter()->refresh();
         $secondCharacterInCelestialFight = $this->createCharacterInCelestialFightForCharacter($secondCharacter, $celestialFight);
 
-        Cache::forget('monster-fight-' . $secondCharacter->id);
+        Cache::forget('monster-fight-'.$secondCharacter->id);
 
         $celestialFightService = $this->mockCelestialFightServiceForMonsterDeath();
 
@@ -172,7 +172,7 @@ class CelestialFightServiceTest extends TestCase
         $this->assertSame(0, $secondResponse['health']['current_monster_health']);
     }
 
-    public function testCharacterKillsCelestial(): void
+    public function test_character_kills_celestial(): void
     {
         $this->characterFactory->attackDataManagement()
             ->setUpDeterministicAttackData()
@@ -184,7 +184,7 @@ class CelestialFightServiceTest extends TestCase
         $characterInCelestialFight = $this->createCharacterInCelestialFightForCharacter($this->character, $celestialFight);
 
         Cache::forget('celestials');
-        Cache::forget('monster-fight-' . $this->character->id);
+        Cache::forget('monster-fight-'.$this->character->id);
 
         Event::fake();
 

@@ -52,11 +52,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
     /**
      * Set up the job.
-     *
-     * @param int $characterId
-     * @param int $automationId
-     * @param int $factionLoyaltyAutomationId
-     * @param int $timeDelay
      */
     public function __construct(int $characterId, int $automationId, int $factionLoyaltyAutomationId, int $timeDelay)
     {
@@ -68,15 +63,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
     /**
      * Handle the automated faction loyalty job.
-     *
-     * @param CharacterCacheData $characterCacheData
-     * @param FactionLoyaltyNpcTaskCoordinator $factionLoyaltyNpcTaskCoordinator
-     * @param FactionLoyaltyAutomationActionCoordinator $factionLoyaltyAutomationActionCoordinator
-     * @param AutomatedCraftingHandler $automatedCraftingHandler
-     * @param FactionLoyaltyAutomationCraftingLogger $factionLoyaltyAutomationCraftingLogger
-     * @param AutomatedBountyFightHandler $automatedBountyFightHandler
-     * @param FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger
-     * @return void
      */
     public function handle(
         CharacterCacheData $characterCacheData,
@@ -143,8 +129,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
     /**
      * Resolve the faction loyalty NPC.
      *
-     * @param FactionLoyaltyNpcTaskCoordinator $factionLoyaltyNpcTaskCoordinator
-     * @return FactionLoyaltyNpc|null
      * @throws Exception
      */
     private function resolveFactionLoyaltyNpc(FactionLoyaltyNpcTaskCoordinator $factionLoyaltyNpcTaskCoordinator): ?FactionLoyaltyNpc
@@ -156,9 +140,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
     /**
      * Resolve the faction loyalty automation action.
-     *
-     * @param FactionLoyaltyAutomationActionCoordinator $factionLoyaltyAutomationActionCoordinator
-     * @return array|null
      */
     private function resolveFactionLoyaltyAutomationAction(FactionLoyaltyAutomationActionCoordinator $factionLoyaltyAutomationActionCoordinator): ?array
     {
@@ -169,14 +150,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
     /**
      * Handle the resolved automation action.
-     *
-     * @param array $factionLoyaltyAutomationAction
-     * @param AutomatedCraftingHandler $automatedCraftingHandler
-     * @param FactionLoyaltyAutomationCraftingLogger $factionLoyaltyAutomationCraftingLogger
-     * @param AutomatedBountyFightHandler $automatedBountyFightHandler
-     * @param FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger
-     * @param CharacterCacheData $characterCacheData
-     * @return void
      */
     private function handleFactionLoyaltyAutomationAction(
         array $factionLoyaltyAutomationAction,
@@ -217,14 +190,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
     /**
      * Handle the crafting action.
-     *
-     * @param array $factionLoyaltyAutomationAction
-     * @param AutomatedCraftingHandler $automatedCraftingHandler
-     * @param FactionLoyaltyAutomationCraftingLogger $factionLoyaltyAutomationCraftingLogger
-     * @param AutomatedBountyFightHandler $automatedBountyFightHandler
-     * @param FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger
-     * @param CharacterCacheData $characterCacheData
-     * @return void
      */
     private function handleCraftingAction(
         array $factionLoyaltyAutomationAction,
@@ -264,12 +229,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
     /**
      * Handle the automated crafting result.
-     *
-     * @param AutomatedCraftingResult $automatedCraftingResult
-     * @param AutomatedBountyFightHandler $automatedBountyFightHandler
-     * @param FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger
-     * @param CharacterCacheData $characterCacheData
-     * @return void
      */
     private function handleCraftingResult(
         AutomatedCraftingResult $automatedCraftingResult,
@@ -313,7 +272,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
             if (is_null($factionLoyaltyAutomationAction)) {
                 $this->sendOutEventLogUpdate(
-                    $this->factionLoyaltyNpc->npc->real_name . ' does not like poor people who cannot craft for them.',
+                    $this->factionLoyaltyNpc->npc->real_name.' does not like poor people who cannot craft for them.',
                     true
                 );
 
@@ -339,8 +298,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
     /**
      * Get a bounty fight action from the current NPC.
-     *
-     * @return array|null
      */
     private function getBountyFightActionFromCurrentNpc(): ?array
     {
@@ -387,9 +344,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
     /**
      * Set the failed crafting item.
-     *
-     * @param int $itemId
-     * @return void
      */
     private function setFailedCraftingItem(int $itemId): void
     {
@@ -402,12 +356,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
     /**
      * Handle the fight action.
-     *
-     * @param array $factionLoyaltyAutomationAction
-     * @param AutomatedBountyFightHandler $automatedBountyFightHandler
-     * @param FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger
-     * @param CharacterCacheData $characterCacheData
-     * @return void
      */
     private function handleFightAction(
         array $factionLoyaltyAutomationAction,
@@ -441,10 +389,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
     /**
      * Handle the automated fight result.
-     *
-     * @param AutomatedFightResult $automatedFightResult
-     * @param CharacterCacheData $characterCacheData
-     * @return void
      */
     private function handleFightResult(AutomatedFightResult $automatedFightResult, CharacterCacheData $characterCacheData): void
     {
@@ -484,9 +428,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
     /**
      * Should the failed bounty monster be cleared?
-     *
-     * @param AutomatedFightResult $automatedFightResult
-     * @return bool
      */
     private function shouldClearFailedBountyMonster(AutomatedFightResult $automatedFightResult): bool
     {
@@ -503,8 +444,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
     /**
      * Clear the failed bounty monster.
-     *
-     * @return void
      */
     private function clearFailedBountyMonster(): void
     {
@@ -517,8 +456,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
     /**
      * Clear the failed crafting item.
-     *
-     * @return void
      */
     private function clearFailedCraftingItem(): void
     {
@@ -531,9 +468,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
     /**
      * Recall the job.
-     *
-     * @param CharacterCacheData $characterCacheData
-     * @return void
      */
     private function recallJob(CharacterCacheData $characterCacheData): void
     {
@@ -553,8 +487,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
     /**
      * Should the job bail?
-     *
-     * @return bool
      */
     private function shouldBail(): bool
     {
@@ -579,10 +511,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
     /**
      * Handle an automation exception.
-     *
-     * @param Exception $exception
-     * @param CharacterCacheData $characterCacheData
-     * @return void
      */
     private function handleAutomationException(Exception $exception, CharacterCacheData $characterCacheData): void
     {
@@ -603,11 +531,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
     /**
      * Send the automation log update.
-     *
-     * @param string $message
-     * @param bool $makeItalic
-     * @param bool $isReward
-     * @return void
      */
     private function sendOutEventLogUpdate(string $message, bool $makeItalic = false, bool $isReward = false): void
     {
@@ -618,10 +541,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
     /**
      * End automation.
-     *
-     * @param CharacterCacheData $characterCacheData
-     * @param bool $sendCompletionMessages
-     * @return void
      */
     private function endAutomation(CharacterCacheData $characterCacheData, bool $sendCompletionMessages = true): void
     {
@@ -668,10 +587,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
     /**
      * Set whether the character can craft.
-     *
-     * @param Character $character
-     * @param bool $canCraft
-     * @return Character
      */
     private function setCharacterCanCraft(Character $character, bool $canCraft): Character
     {

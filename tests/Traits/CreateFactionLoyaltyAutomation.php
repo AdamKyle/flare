@@ -2,11 +2,8 @@
 
 namespace Tests\Traits;
 
-use App\Flare\Models\FactionLoyalty;
 use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Models\FactionLoyaltyAutomationLog;
-use App\Flare\Models\FactionLoyaltyNpc;
-use App\Flare\Models\FactionLoyaltyNpcTask;
 
 trait CreateFactionLoyaltyAutomation
 {

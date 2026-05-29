@@ -79,7 +79,7 @@ class GlobalEventGoal extends Model
         return new EventType($this->event_type);
     }
 
-    public function itemSpecialtyType(): itemSpecialtyType
+    public function itemSpecialtyType(): ItemSpecialtyType
     {
         return new ItemSpecialtyType($this->item_specialty_type_reward);
     }

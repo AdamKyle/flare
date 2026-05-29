@@ -4,6 +4,7 @@ namespace App\Game\Events\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
+use App\Game\Core\Values\FactionLevel;
 use App\Game\Exploration\Services\ExplorationAutomationService;
 use App\Game\Maps\Services\TraverseService;
 use Illuminate\Database\Eloquent\Collection;
@@ -57,7 +58,7 @@ class MoveCharacterAfterEventService
                 ->update([
                     'current_level' => 0,
                     'current_points' => 0,
-                    'points_needed' => \App\Game\Core\Values\FactionLevel::getPointsNeeded(0),
+                    'points_needed' => FactionLevel::getPointsNeeded(0),
                     'maxed' => false,
                     'title' => null,
                 ]);

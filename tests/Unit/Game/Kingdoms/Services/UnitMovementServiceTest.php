@@ -17,7 +17,7 @@ class UnitMovementServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testRemoveUnitsFromKingdomReturnsOnlyRowsActuallyRemoved(): void
+    public function test_remove_units_from_kingdom_returns_only_rows_actually_removed(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
@@ -50,7 +50,7 @@ class UnitMovementServiceTest extends TestCase
         $this->assertSame(2, $kingdomUnit->refresh()->amount);
     }
 
-    public function testMoveUnitsOnlyQueuesRowsActuallyRemovedFromSourceKingdom(): void
+    public function test_move_units_only_queues_rows_actually_removed_from_source_kingdom(): void
     {
         Queue::fake();
         Event::fake();

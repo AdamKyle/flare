@@ -16,7 +16,7 @@ class UpgradeBuildingTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testCompletionCannotPushBuildingAboveMax(): void
+    public function test_completion_cannot_push_building_above_max(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -53,7 +53,7 @@ class UpgradeBuildingTest extends TestCase
         $this->assertNull(BuildingInQueue::find($queue->id));
     }
 
-    public function testStaleQueuedUpgradeCannotCompletePastMax(): void
+    public function test_stale_queued_upgrade_cannot_complete_past_max(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -94,7 +94,7 @@ class UpgradeBuildingTest extends TestCase
         $this->assertNull(BuildingInQueue::find($queue->id));
     }
 
-    public function testValidCompletionAppliesQueuedToLevel(): void
+    public function test_valid_completion_applies_queued_to_level(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -132,7 +132,7 @@ class UpgradeBuildingTest extends TestCase
         $this->assertNull(BuildingInQueue::find($queue->id));
     }
 
-    public function testNullFromLevelUpgradeQueueDoesNotMutateBuilding(): void
+    public function test_null_from_level_upgrade_queue_does_not_mutate_building(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -170,7 +170,7 @@ class UpgradeBuildingTest extends TestCase
         $this->assertNull(BuildingInQueue::find($queue->id));
     }
 
-    public function testStaleNullFromLevelUpgradeQueueDeletesSafelyWithoutSpendingOrRefundingResources(): void
+    public function test_stale_null_from_level_upgrade_queue_deletes_safely_without_spending_or_refunding_resources(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -219,7 +219,7 @@ class UpgradeBuildingTest extends TestCase
         $this->assertSame(1500, $kingdom->refresh()->current_population);
     }
 
-    public function testStaleCompletionWhereCurrentLevelDiffersFromQueueFromLevelDoesNotMutateBuilding(): void
+    public function test_stale_completion_where_current_level_differs_from_queue_from_level_does_not_mutate_building(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -257,7 +257,7 @@ class UpgradeBuildingTest extends TestCase
         $this->assertNull(BuildingInQueue::find($queue->id));
     }
 
-    public function testStaleCompletionSafelyRemovesQueueAndDoesNotSpendOrRefundResourcesAgain(): void
+    public function test_stale_completion_safely_removes_queue_and_does_not_spend_or_refund_resources_again(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()

@@ -79,7 +79,7 @@ class KingdomBuildingService
                             CapitalCityQueueStatus::CANCELLATION_REJECTED,
                         ], true);
                     })
-                    ->contains(fn(array $request) => ($request['name'] ?? $request['building_name'] ?? null) === $building->name);
+                    ->contains(fn (array $request) => ($request['name'] ?? $request['building_name'] ?? null) === $building->name);
             });
     }
 
@@ -163,15 +163,15 @@ class KingdomBuildingService
                     $newResources['current_population'] -= $populationCost;
                 }
             } else {
-                if ($newResources['current_' . strtolower($type)] < $cost) {
+                if ($newResources['current_'.strtolower($type)] < $cost) {
                     return $building->kingdom->refresh();
                 }
 
-                $newResources['current_' . strtolower($type)] -= $cost;
+                $newResources['current_'.strtolower($type)] -= $cost;
             }
         }
 
-        $building->kingdom->update(array_map(fn($value) => max($value, 0), $newResources));
+        $building->kingdom->update(array_map(fn ($value) => max($value, 0), $newResources));
 
         return $building->kingdom->refresh();
     }
@@ -191,7 +191,7 @@ class KingdomBuildingService
 
         foreach (KingdomResources::kingdomResources() as $type) {
             if ($type === KingdomResources::POPULATION->value) {
-                $buildingCosts[$type] = intVal(
+                $buildingCosts[$type] = intval(
                     $building->required_population - ($building->required_population * $populationCostReduction)
                 );
 
@@ -204,9 +204,9 @@ class KingdomBuildingService
                 $costReduction += $ironCostReduction;
             }
 
-            $cost = $building->{$type . '_cost'};
+            $cost = $building->{$type.'_cost'};
 
-            $buildingCosts[$type] = intVal($cost - ($cost * $costReduction));
+            $buildingCosts[$type] = intval($cost - ($cost * $costReduction));
         }
 
         return $buildingCosts;
@@ -284,11 +284,11 @@ class KingdomBuildingService
         $updateData = [];
 
         foreach (KingdomResources::kingdomResources() as $resource) {
-            $cost = $resource === KingdomResources::POPULATION->value ? $building->required_population : $building->{$resource . '_cost'};
-            $newAmount = $kingdom->{'current_' . $resource} + ($cost * $this->totalResources);
-            $maxValue = 'max_' . $resource;
+            $cost = $resource === KingdomResources::POPULATION->value ? $building->required_population : $building->{$resource.'_cost'};
+            $newAmount = $kingdom->{'current_'.$resource} + ($cost * $this->totalResources);
+            $maxValue = 'max_'.$resource;
 
-            $updateData['current_' . $resource] = min($newAmount, $kingdom->{$maxValue});
+            $updateData['current_'.$resource] = min($newAmount, $kingdom->{$maxValue});
         }
 
         $kingdom->update($updateData);

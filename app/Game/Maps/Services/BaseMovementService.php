@@ -187,7 +187,7 @@ class BaseMovementService
     /**
      * Can the player enter this location?
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function canPlayerEnterLocation(Character $character, Location $location): bool
     {
@@ -217,7 +217,7 @@ class BaseMovementService
             $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
 
             if (is_null($slot)) {
-                event(new ServerMessageEvent($character->user, 'Cannot enter this location without a ' . $item->name));
+                event(new ServerMessageEvent($character->user, 'Cannot enter this location without a '.$item->name));
 
                 return false;
             }

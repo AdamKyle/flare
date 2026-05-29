@@ -2,6 +2,9 @@
 
 namespace App\Flare\Transformers\Serializer;
 
+use League\Fractal\Pagination\CursorInterface;
+use League\Fractal\Pagination\PaginatorInterface;
+use League\Fractal\Resource\ResourceInterface;
 use League\Fractal\Serializer\SerializerAbstract;
 
 class PlainDataSerializer extends SerializerAbstract
@@ -21,7 +24,7 @@ class PlainDataSerializer extends SerializerAbstract
         return null;
     }
 
-    public function includedData(\League\Fractal\Resource\ResourceInterface $resource, array $data): array
+    public function includedData(ResourceInterface $resource, array $data): array
     {
         return [];
     }
@@ -31,12 +34,12 @@ class PlainDataSerializer extends SerializerAbstract
         return [];
     }
 
-    public function paginator(\League\Fractal\Pagination\PaginatorInterface $paginator): array
+    public function paginator(PaginatorInterface $paginator): array
     {
         return [];
     }
 
-    public function cursor(\League\Fractal\Pagination\CursorInterface $cursor): array
+    public function cursor(CursorInterface $cursor): array
     {
         return [];
     }

@@ -75,7 +75,7 @@ class DisenchantService
         }
 
         return $this->successResult([
-            'message' => 'Disenchanted item ' . $itemName . ' Check server message tab for Gold Dust output.',
+            'message' => 'Disenchanted item '.$itemName.' Check server message tab for Gold Dust output.',
         ]);
     }
 
@@ -104,9 +104,9 @@ class DisenchantService
                 $affixData['character_inventory'],
             ));
 
-            $message = 'You are maxed on gold dust and ' . (
-                $disenchanted ? ' you still managed to disenchant the item: ' . $slot->item->affix_name :
-                'you failed to disenchant the item: ' . $slot->item->affix_name
+            $message = 'You are maxed on gold dust and '.(
+                $disenchanted ? ' you still managed to disenchant the item: '.$slot->item->affix_name :
+                'you failed to disenchant the item: '.$slot->item->affix_name
             );
 
             ServerMessageHandler::sendBasicMessage($this->character->user, $message);
@@ -215,7 +215,7 @@ class DisenchantService
             if ($characterTotalGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
                 event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% bonus gold dust from disenchanting. You are now capped!'));
             } else {
-                event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% bonus gold dust from disenchanting. Your new total is: ' . number_format($characterTotalGoldDust)));
+                event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% bonus gold dust from disenchanting. Your new total is: '.number_format($characterTotalGoldDust)));
             }
         }
 

@@ -544,7 +544,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertGreaterThan(0, $data['non_equipped_percentage_of_stat_used']);
     }
 
-    public function testWeaponDamageBreakDownShowsClassSpecialtyBaseDamageModAmount()
+    public function test_weapon_damage_break_down_shows_class_specialty_base_damage_mod_amount()
     {
         $character = $this->character->getCharacter();
 
@@ -570,7 +570,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertEqualsWithDelta(0.20, $data['class_specialties'][0]['amount'], 0.000001);
     }
 
-    public function testSpellDamageBreakDownShowsClassSpecialtyBaseSpellDamageModAmount()
+    public function test_spell_damage_break_down_shows_class_specialty_base_spell_damage_mod_amount()
     {
         $character = $this->character->getCharacter();
 
@@ -598,7 +598,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertEqualsWithDelta(0.20, $data['class_specialties'][0]['amount'], 0.000001);
     }
 
-    public function testSpellHealingBreakDownShowsClassSpecialtyBaseHealingModAmount()
+    public function test_spell_healing_break_down_shows_class_specialty_base_healing_mod_amount()
     {
         $item = $this->createItem([
             'type' => ItemType::SPELL_HEALING->value,
@@ -634,7 +634,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertEqualsWithDelta(0.20, $data['class_specialties'][0]['amount'], 0.000001);
     }
 
-    public function testDefenceBreakDownShowsClassSpecialtyBaseAcModAmount()
+    public function test_defence_break_down_shows_class_specialty_base_ac_mod_amount()
     {
         $character = $this->character->getCharacter();
 
@@ -660,7 +660,7 @@ class StatModifierDetailsTest extends TestCase
         $this->assertEqualsWithDelta(0.20, $data['class_specialties'][0]['amount'], 0.000001);
     }
 
-    public function testHealthBreakDownShowsClassSpecialtyHealthModAmount()
+    public function test_health_break_down_shows_class_specialty_health_mod_amount()
     {
         $character = $this->character->getCharacter();
 

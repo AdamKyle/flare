@@ -3,11 +3,6 @@
 namespace App\Game\Kingdoms\Providers;
 
 use App\Flare\Transformers\CapitalCityKingdomBuildingTransformer;
-use App\Game\Kingdoms\Transformers\KingdomAttackLogsTransformer;
-use App\Game\Kingdoms\Transformers\KingdomBuildingTransformer;
-use App\Game\Kingdoms\Transformers\KingdomResourceHourlyProductionTransformer;
-use App\Game\Kingdoms\Transformers\KingdomTransformer;
-use App\Game\Kingdoms\Transformers\UnitMovementTransformer;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
 use App\Game\Kingdoms\Console\Commands\DeleteKingdomLogs;
 use App\Game\Kingdoms\Console\Commands\RepairKingdomData;
@@ -32,8 +27,8 @@ use App\Game\Kingdoms\Handlers\ReturnSurvivingUnitHandler;
 use App\Game\Kingdoms\Handlers\SettlerHandler;
 use App\Game\Kingdoms\Handlers\TooMuchPopulationHandler;
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
-use App\Game\Kingdoms\Middleware\DoesKingdomBelongToAuthorizedUser;
 use App\Game\Kingdoms\Middleware\BlocksKingdomAutomationManagement;
+use App\Game\Kingdoms\Middleware\DoesKingdomBelongToAuthorizedUser;
 use App\Game\Kingdoms\Service\AbandonKingdomService;
 use App\Game\Kingdoms\Service\AttackWithItemsService;
 use App\Game\Kingdoms\Service\CancelBuildingRequestService;
@@ -59,6 +54,7 @@ use App\Game\Kingdoms\Service\UnitReturnService;
 use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Transformers\KingdomAttackLogsTransformer;
+use App\Game\Kingdoms\Transformers\KingdomResourceHourlyProductionTransformer;
 use App\Game\Kingdoms\Transformers\KingdomTableTransformer;
 use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Transformers\SelectedKingdom;
@@ -198,7 +194,6 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CapitalCityKingdomLogHandler::class),
             );
         });
-
 
         $this->app->bind(KingdomBuilder::class, function ($app) {
             return new KingdomBuilder(
