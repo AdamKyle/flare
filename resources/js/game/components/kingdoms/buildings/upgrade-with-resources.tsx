@@ -42,7 +42,7 @@ export default class UpgradeWithResources extends React.Component<any, any> {
                     this,
                     this.props.character_id,
                     this.props.building.id,
-                    1,
+                    this.props.building.level + 1,
                     false,
                 );
             },
