@@ -94,9 +94,7 @@ export default class MonsterActions extends React.Component<
                         character={this.props.character}
                         close_monster_section={this.props.close_monster_section}
                     />
-                    <div className="mx-auto w-full md:w-2/3">
-                        {this.props.children}
-                    </div>
+                    {this.props.children}
                 </div>
             );
         }
@@ -110,9 +108,7 @@ export default class MonsterActions extends React.Component<
                     close_monster_section={this.props.close_monster_section}
                 />
 
-                <div className="mx-auto w-full md:w-2/3">
-                    {this.props.children}
-                </div>
+                {this.props.children}
 
                 <Revive
                     can_attack={this.props.character_statuses.can_attack}

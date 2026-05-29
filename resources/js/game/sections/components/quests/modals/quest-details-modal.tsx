@@ -452,6 +452,14 @@ export default class QuestDetailsModal extends React.Component<any, any> {
         return text.replace(/\n/g, "<br/>");
     }
 
+    isAutomationRunning(): boolean {
+        return (
+            this.props.is_automation_running ||
+            this.props.is_faction_loyalty_automation_running ||
+            this.props.is_delve_running
+        );
+    }
+
     render() {
         const npcPLaneAccess = this.fetchNpcPlaneAccess();
 
@@ -462,7 +470,8 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                 secondary_actions={{
                     secondary_button_disabled:
                         !this.props.is_parent_complete ||
-                        this.props.is_quest_complete,
+                        this.props.is_quest_complete ||
+                        this.isAutomationRunning(),
                     secondary_button_label: "Hand in",
                     handle_action: this.handInQuest.bind(this),
                 }}

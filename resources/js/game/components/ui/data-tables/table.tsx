@@ -28,6 +28,10 @@ export default class Table extends React.Component<DataTableProps, any> {
                         },
                     }}
                     pagination
+                    paginationPerPage={this.props.pagination_per_page}
+                    paginationRowsPerPageOptions={
+                        this.props.pagination_rows_per_page_options
+                    }
                     responsive
                 />
             </div>

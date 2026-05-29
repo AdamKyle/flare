@@ -16,6 +16,9 @@ import AdditionalStatSection from "../../components/character-sheet/additional-s
 import DangerButton from "../../components/ui/buttons/danger-button";
 import OrangeButton from "../../components/ui/buttons/orange-button";
 import InventoryCountBreakdownModal from "./components/modals/inventory-count-breakdown-modal";
+import CharacterSheetStatHelpModal, {
+    CharacterSheetStatHelpType,
+} from "./components/modals/character-sheet-stat-help-modal";
 
 export default class CharacterSheet extends React.Component<
     CharacterSheetProps,
@@ -34,6 +37,7 @@ export default class CharacterSheet extends React.Component<
             error_message: null,
             reincarnation_check: false,
             show_inventory_breakdown: false,
+            stat_help_type: null,
         };
     }
 
@@ -98,6 +102,12 @@ export default class CharacterSheet extends React.Component<
     manageShowInventoryBreakdown() {
         this.setState({
             show_inventory_breakdown: !this.state.show_inventory_breakdown,
+        });
+    }
+
+    manageStatHelp(type: CharacterSheetStatHelpType | null) {
+        this.setState({
+            stat_help_type: type,
         });
     }
 
@@ -330,21 +340,57 @@ export default class CharacterSheet extends React.Component<
                                         />
                                         <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
                                         <dl>
-                                            <dt>Damage Stat:</dt>
+                                            <dt>
+                                                <button
+                                                    type="button"
+                                                    className="mr-2"
+                                                    onClick={this.manageStatHelp.bind(
+                                                        this,
+                                                        "damage-stat",
+                                                    )}
+                                                >
+                                                    <i className="fas fa-info-circle text-blue-500 dark:text-blue-400"></i>
+                                                </button>
+                                                Damage Stat:
+                                            </dt>
                                             <dd>
                                                 {
                                                     this.props.character
                                                         .damage_stat
                                                 }
                                             </dd>
-                                            <dt>To Hit:</dt>
+                                            <dt>
+                                                <button
+                                                    type="button"
+                                                    className="mr-2"
+                                                    onClick={this.manageStatHelp.bind(
+                                                        this,
+                                                        "to-hit",
+                                                    )}
+                                                >
+                                                    <i className="fas fa-info-circle text-blue-500 dark:text-blue-400"></i>
+                                                </button>
+                                                To Hit:
+                                            </dt>
                                             <dd>
                                                 {
                                                     this.props.character
                                                         .to_hit_stat
                                                 }
                                             </dd>
-                                            <dt>Class Bonus:</dt>
+                                            <dt>
+                                                <button
+                                                    type="button"
+                                                    className="mr-2"
+                                                    onClick={this.manageStatHelp.bind(
+                                                        this,
+                                                        "class-bonus",
+                                                    )}
+                                                >
+                                                    <i className="fas fa-info-circle text-blue-500 dark:text-blue-400"></i>
+                                                </button>
+                                                Class Bonus:
+                                            </dt>
                                             <dd>
                                                 {(
                                                     this.props.character
@@ -353,7 +399,19 @@ export default class CharacterSheet extends React.Component<
                                                 ).toFixed(2)}
                                                 %
                                             </dd>
-                                            <dt>Fight Time Out:</dt>
+                                            <dt>
+                                                <button
+                                                    type="button"
+                                                    className="mr-2"
+                                                    onClick={this.manageStatHelp.bind(
+                                                        this,
+                                                        "fight-time-out",
+                                                    )}
+                                                >
+                                                    <i className="fas fa-info-circle text-blue-500 dark:text-blue-400"></i>
+                                                </button>
+                                                Fight Time Out:
+                                            </dt>
                                             <dd>
                                                 {(
                                                     (this.props.character
@@ -362,7 +420,19 @@ export default class CharacterSheet extends React.Component<
                                                 ).toFixed(2)}
                                                 %
                                             </dd>
-                                            <dt>Movement Time Out:</dt>
+                                            <dt>
+                                                <button
+                                                    type="button"
+                                                    className="mr-2"
+                                                    onClick={this.manageStatHelp.bind(
+                                                        this,
+                                                        "movement-time-out",
+                                                    )}
+                                                >
+                                                    <i className="fas fa-info-circle text-blue-500 dark:text-blue-400"></i>
+                                                </button>
+                                                Movement Time Out:
+                                            </dt>
                                             <dd>
                                                 {(
                                                     (this.props.character
@@ -532,6 +602,17 @@ export default class CharacterSheet extends React.Component<
                         title="Inventory count breakdown"
                         inventory_breakdown={
                             this.props.character.inventory_count
+                        }
+                    />
+                ) : null}
+
+                {this.state.stat_help_type !== null ? (
+                    <CharacterSheetStatHelpModal
+                        is_open={this.state.stat_help_type !== null}
+                        manage_modal={this.manageStatHelp.bind(this, null)}
+                        type={this.state.stat_help_type}
+                        extra_action_chance={
+                            this.props.character.extra_action_chance
                         }
                     />
                 ) : null}

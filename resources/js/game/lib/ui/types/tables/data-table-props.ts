@@ -6,4 +6,6 @@ export default interface DataTableProps {
     data: any[] | [];
     dark_table: boolean;
     conditional_row_styles?: ConditionalDataTableRowsStyling[];
+    pagination_per_page?: number;
+    pagination_rows_per_page_options?: number[];
 }

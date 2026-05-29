@@ -140,6 +140,14 @@ export default class Quests extends React.Component<QuestsProps, QuestState> {
                                 character_id={this.props.character_id}
                                 plane={this.state.current_plane}
                                 update_quests={this.props.update_quests}
+                                is_automation_running={
+                                    this.props.is_automation_running
+                                }
+                                is_faction_loyalty_automation_running={
+                                    this.props
+                                        .is_faction_loyalty_automation_running
+                                }
+                                is_delve_running={this.props.is_delve_running}
                             />
                         </div>
                     </Fragment>

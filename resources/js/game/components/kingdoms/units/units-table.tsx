@@ -15,6 +15,10 @@ export default class UnitsTable extends React.Component<
     UnitsTableProps,
     UpgradeTablesState
 > {
+    private tableContainer: React.RefObject<HTMLDivElement>;
+
+    private resizeObserver: ResizeObserver | null = null;
+
     constructor(props: UnitsTableProps) {
         super(props);
 
@@ -22,7 +26,34 @@ export default class UnitsTable extends React.Component<
             error_message: null,
             success_message: null,
             loading: false,
+            rows_per_page: 5,
         };
+
+        this.tableContainer = React.createRef();
+    }
+
+    componentDidMount() {
+        const updateRowsPerPage = () => {
+            const height = this.tableContainer.current?.clientHeight ?? 0;
+            const rowsPerPage = Math.max(5, Math.floor((height - 120) / 48));
+
+            if (rowsPerPage !== this.state.rows_per_page) {
+                this.setState({
+                    rows_per_page: rowsPerPage,
+                });
+            }
+        };
+
+        updateRowsPerPage();
+
+        if (this.tableContainer.current !== null) {
+            this.resizeObserver = new ResizeObserver(updateRowsPerPage);
+            this.resizeObserver.observe(this.tableContainer.current);
+        }
+    }
+
+    componentWillUnmount() {
+        this.resizeObserver?.disconnect();
     }
 
     viewUnit(unit: UnitDetails) {
@@ -140,23 +171,33 @@ export default class UnitsTable extends React.Component<
                     </div>
                 ) : null}
                 <div
+                    ref={this.tableContainer}
                     className={
                         "max-w-[390px] md:max-w-full overflow-x-auto flex-1 min-h-0"
                     }
                 >
-                    <Table
-                        data={this.getOrderedUnits(this.props.units)}
-                        conditional_row_styles={this.createConditionalRowStyles()}
-                        columns={BuildUnitsColumns(
-                            this.viewUnit.bind(this),
-                            this.cancelUnitRecruitment.bind(this),
-                            this.props.units_in_queue,
-                            this.props.current_units,
-                            this.props.buildings,
-                            this.props.is_automation_locked,
-                        )}
-                        dark_table={this.props.dark_tables}
-                    />
+                    <div className="h-auto">
+                        <Table
+                            key={`units-table-${this.state.rows_per_page}`}
+                            data={this.getOrderedUnits(this.props.units)}
+                            conditional_row_styles={this.createConditionalRowStyles()}
+                            columns={BuildUnitsColumns(
+                                this.viewUnit.bind(this),
+                                this.cancelUnitRecruitment.bind(this),
+                                this.props.units_in_queue,
+                                this.props.current_units,
+                                this.props.buildings,
+                                this.props.is_automation_locked,
+                            )}
+                            dark_table={this.props.dark_tables}
+                            pagination_per_page={this.state.rows_per_page}
+                            pagination_rows_per_page_options={[
+                                this.state.rows_per_page,
+                                this.state.rows_per_page + 5,
+                                this.state.rows_per_page + 10,
+                            ]}
+                        />
+                    </div>
                 </div>
             </div>
         );

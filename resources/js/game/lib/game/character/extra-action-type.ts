@@ -8,4 +8,6 @@ export default interface ExtraActionType {
     only: string;
 
     type: string;
+
+    amount?: number;
 }

@@ -93,6 +93,13 @@ export default class QuestTree extends React.Component<
                             character_id={this.props.character_id}
                             completed_quests={this.props.completed_quests}
                             update_quests={this.props.update_quests}
+                            is_automation_running={
+                                this.props.is_automation_running
+                            }
+                            is_faction_loyalty_automation_running={
+                                this.props.is_faction_loyalty_automation_running
+                            }
+                            is_delve_running={this.props.is_delve_running}
                         />
                     }
                 >
@@ -173,6 +180,13 @@ export default class QuestTree extends React.Component<
                             character_id={this.props.character_id}
                             completed_quests={this.props.completed_quests}
                             update_quests={this.props.update_quests}
+                            is_automation_running={
+                                this.props.is_automation_running
+                            }
+                            is_faction_loyalty_automation_running={
+                                this.props.is_faction_loyalty_automation_running
+                            }
+                            is_delve_running={this.props.is_delve_running}
                         />
                     }
                 >
@@ -196,6 +210,14 @@ export default class QuestTree extends React.Component<
                                 character_id={this.props.character_id}
                                 completed_quests={this.props.completed_quests}
                                 update_quests={this.props.update_quests}
+                                is_automation_running={
+                                    this.props.is_automation_running
+                                }
+                                is_faction_loyalty_automation_running={
+                                    this.props
+                                        .is_faction_loyalty_automation_running
+                                }
+                                is_delve_running={this.props.is_delve_running}
                             />
                         }
                     >
@@ -220,6 +242,16 @@ export default class QuestTree extends React.Component<
                                         this.props.completed_quests
                                     }
                                     update_quests={this.props.update_quests}
+                                    is_automation_running={
+                                        this.props.is_automation_running
+                                    }
+                                    is_faction_loyalty_automation_running={
+                                        this.props
+                                            .is_faction_loyalty_automation_running
+                                    }
+                                    is_delve_running={
+                                        this.props.is_delve_running
+                                    }
                                 />
                             }
                         >

@@ -6,4 +6,10 @@ export default interface QuestsProps {
     character_id: number;
 
     update_quests: (quests: QuestType) => void;
+
+    is_automation_running: boolean;
+
+    is_faction_loyalty_automation_running: boolean;
+
+    is_delve_running: boolean;
 }

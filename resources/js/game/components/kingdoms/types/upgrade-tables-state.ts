@@ -4,4 +4,6 @@ export default interface UpgradeTablesState {
     error_message: string | null;
 
     loading: boolean;
+
+    rows_per_page: number;
 }

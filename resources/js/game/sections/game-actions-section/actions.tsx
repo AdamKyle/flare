@@ -200,8 +200,8 @@ export default class Actions extends React.Component<
 
     manageHellForgedShop() {
         this.setState({
-            show_celestial_fight: false,
             crafting_type: null,
+            show_exploration: false,
             show_twisted_earth_section: false,
             show_purgatory_chains_section: false,
             show_hell_forged_section: !this.state.show_hell_forged_section,
@@ -210,8 +210,8 @@ export default class Actions extends React.Component<
 
     managedPurgatoryChainsShop() {
         this.setState({
-            show_celestial_fight: false,
             crafting_type: null,
+            show_exploration: false,
             show_twisted_earth_section: false,
             show_hell_forged_section: false,
             show_purgatory_chains_section:
@@ -221,8 +221,8 @@ export default class Actions extends React.Component<
 
     managedTwistedEarthShop() {
         this.setState({
-            show_celestial_fight: false,
             crafting_type: null,
+            show_exploration: false,
             show_purgatory_chains_section: false,
             show_hell_forged_section: false,
             show_twisted_earth_section: !this.state.show_twisted_earth_section,
@@ -248,9 +248,6 @@ export default class Actions extends React.Component<
             show_gambling_section: showGamblingSection,
             show_exploration: false,
             show_celestial_fight: false,
-            show_hell_forged_section: false,
-            show_purgatory_chains_section: false,
-            show_twisted_earth_section: false,
         });
     }
 
@@ -418,7 +415,7 @@ export default class Actions extends React.Component<
                 character_statuses={this.props.character_status}
                 is_small={false}
             >
-                {this.renderCraftingSection()}
+                {this.renderActionSlot()}
             </MonsterActions>
         );
     }
@@ -555,11 +552,16 @@ export default class Actions extends React.Component<
 
     renderActionContent() {
         const celestialFight = this.renderCelestialFight();
-        const fightContent = this.state.show_exploration
-            ? this.renderExploration()
-            : (celestialFight ?? (
-                  <div className="lg:pt-4">{this.createMonster()}</div>
-              ));
+        const fightContent = this.state.show_exploration ? (
+            this.renderExploration()
+        ) : celestialFight === null ? (
+            this.createMonster()
+        ) : (
+            <div className="grid gap-4">
+                {this.renderActionSlot()}
+                {celestialFight}
+            </div>
+        );
 
         return (
             <div className="grid gap-4">
@@ -575,7 +577,6 @@ export default class Actions extends React.Component<
                         />
                     </div>
                 ) : null}
-                {this.renderSpecialtyShop()}
             </div>
         );
     }
@@ -620,6 +621,24 @@ export default class Actions extends React.Component<
                 cannot_craft={this.actionsManager.cannotCraft()}
             />
         );
+    }
+
+    renderActionSlot() {
+        const specialtyShop = this.renderSpecialtyShop();
+
+        if (specialtyShop !== null) {
+            return (
+                <div className="mx-auto w-full md:w-2/3">{specialtyShop}</div>
+            );
+        }
+
+        const craftingSection = this.renderCraftingSection();
+
+        if (craftingSection === null) {
+            return null;
+        }
+
+        return <div className="mx-auto w-full md:w-2/3">{craftingSection}</div>;
     }
 
     renderCelestialFight() {

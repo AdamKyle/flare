@@ -52,6 +52,7 @@ class MassImportCustomData extends Command
         ]);
 
         Artisan::call('import:game-data Monsters');
+        Artisan::call('import:game-data Kingdoms');
 
         $this->importInformationSection();
 

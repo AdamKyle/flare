@@ -777,6 +777,16 @@ export default class Game extends React.Component<GameProps, GameState> {
                                 update_quests={this.updateCharacterQuests.bind(
                                     this,
                                 )}
+                                is_automation_running={
+                                    this.state.character.is_automation_running
+                                }
+                                is_faction_loyalty_automation_running={
+                                    this.state.character
+                                        .is_faction_loyalty_automation_running
+                                }
+                                is_delve_running={
+                                    this.state.character.is_delve_running
+                                }
                             />
                         </BasicCard>
                     </TabPanel>

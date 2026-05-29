@@ -12,7 +12,6 @@ import Select from "react-select";
 import { formatNumber } from "../../../lib/game/format-number";
 import { isEqual } from "lodash";
 import { generateServerMessage } from "../../../lib/ajax/generate-server-message";
-import DangerLinkButton from "../../ui/buttons/danger-link-button";
 import {
     EnchantingState,
     Enchantment,
@@ -210,12 +209,24 @@ export default class Enchanting extends React.Component<
     }
 
     setPrefix(data: any) {
+        if (data === null || data.value === 0) {
+            this.resetPrefixes();
+
+            return;
+        }
+
         this.setState({
             selected_prefix: parseInt(data.value),
         });
     }
 
     setSuffix(data: any) {
+        if (data === null || data.value === 0) {
+            this.resetSuffixes();
+
+            return;
+        }
+
         this.setState({
             selected_suffix: parseInt(data.value),
         });
@@ -414,7 +425,7 @@ export default class Enchanting extends React.Component<
                             />
                         </div>
                     ) : null}
-                    <div>
+                    <div className={"mb-2"}>
                         <Select
                             onChange={this.setSelectedItem.bind(this)}
                             options={this.renderItemsToEnchantSelection()}
@@ -437,7 +448,7 @@ export default class Enchanting extends React.Component<
                         />
                     </div>
                     <div>
-                        <div className="lg:hidden">
+                        <div className="lg:hidden mb-2">
                             <div>
                                 <Select
                                     onChange={this.setPrefix.bind(this)}
@@ -455,6 +466,7 @@ export default class Enchanting extends React.Component<
                                     }}
                                     menuPortalTarget={document.body}
                                     value={this.selectedEnchantment("prefix")}
+                                    isClearable={true}
                                     isDisabled={
                                         (this.state.show_enchanting_for_event &&
                                             this.state.event_items.length > 0 &&
@@ -464,14 +476,8 @@ export default class Enchanting extends React.Component<
                                     }
                                 />
                             </div>
-                            <div className="mt-2">
-                                <DangerLinkButton
-                                    button_label={"Clear"}
-                                    on_click={this.resetPrefixes.bind(this)}
-                                />
-                            </div>
                         </div>
-                        <div className="hidden lg:block">
+                        <div className="hidden lg:block mb-2">
                             <Select
                                 onChange={this.setPrefix.bind(this)}
                                 options={this.renderEnchantmentOptions(
@@ -488,6 +494,7 @@ export default class Enchanting extends React.Component<
                                 }}
                                 menuPortalTarget={document.body}
                                 value={this.selectedEnchantment("prefix")}
+                                isClearable={true}
                                 isDisabled={
                                     (this.state.show_enchanting_for_event &&
                                         this.state.event_items.length > 0 &&
@@ -497,14 +504,8 @@ export default class Enchanting extends React.Component<
                             />
                         </div>
                     </div>
-                    <div className="hidden lg:block mt-2">
-                        <DangerLinkButton
-                            button_label={"Clear"}
-                            on_click={this.resetPrefixes.bind(this)}
-                        />
-                    </div>
                     <div>
-                        <div className="lg:hidden">
+                        <div className="lg:hidden mb-2">
                             <div>
                                 <Select
                                     onChange={this.setSuffix.bind(this)}
@@ -522,6 +523,7 @@ export default class Enchanting extends React.Component<
                                     }}
                                     menuPortalTarget={document.body}
                                     value={this.selectedEnchantment("suffix")}
+                                    isClearable={true}
                                     isDisabled={
                                         (this.state.show_enchanting_for_event &&
                                             this.state.event_items.length > 0 &&
@@ -529,12 +531,6 @@ export default class Enchanting extends React.Component<
                                                 null) ||
                                         this.state.selected_item === null
                                     }
-                                />
-                            </div>
-                            <div className="mt-2">
-                                <DangerLinkButton
-                                    button_label={"Clear"}
-                                    on_click={this.resetSuffixes.bind(this)}
                                 />
                             </div>
                         </div>
@@ -555,6 +551,7 @@ export default class Enchanting extends React.Component<
                                 }}
                                 menuPortalTarget={document.body}
                                 value={this.selectedEnchantment("suffix")}
+                                isClearable={true}
                                 isDisabled={
                                     (this.state.show_enchanting_for_event &&
                                         this.state.event_items.length > 0 &&
@@ -564,14 +561,8 @@ export default class Enchanting extends React.Component<
                             />
                         </div>
                     </div>
-                    <div className="hidden lg:block mt-2">
-                        <DangerLinkButton
-                            button_label={"Clear"}
-                            on_click={this.resetSuffixes.bind(this)}
-                        />
-                    </div>
                 </div>
-                <div className="m-auto lg:w-1/2">
+                <div className="w-full">
                     <InfoAlert
                         additional_css={clsx("my-4", {
                             hidden: this.state.hide_enchanting_help,
@@ -608,7 +599,7 @@ export default class Enchanting extends React.Component<
                         <p>Click Help below for more info.</p>
                     </InfoAlert>
                 </div>
-                <div className="m-auto lg:w-1/2">
+                <div className="w-full">
                     {this.state.loading ? <LoadingProgressBar /> : null}
 
                     {this.state.enchantments.length > 0 ? (
@@ -622,7 +613,7 @@ export default class Enchanting extends React.Component<
                 </div>
                 {this.state.event_items.length <= 0 &&
                 this.state.show_enchanting_for_event ? (
-                    <InfoAlert additional_css={"my-4 m-auto lg:w-1/2"}>
+                    <InfoAlert additional_css={"my-4 w-full"}>
                         You have no event crafted items. You can craft your own
                         items and either enchant them for your self or enchant
                         for event and participate in the event for a Legendary
@@ -630,7 +621,7 @@ export default class Enchanting extends React.Component<
                     </InfoAlert>
                 ) : null}
                 <div className={"text-center mt-3 mb-3"}>
-                    <div className="flex flex-col md:flex-row justify-center items-center">
+                    <div className="flex flex-col md:flex-row justify-center items-center gap-2">
                         <PrimaryButton
                             button_label={"Enchant"}
                             on_click={() => this.enchant(false)}
@@ -642,14 +633,14 @@ export default class Enchanting extends React.Component<
                                 button_label={"Enchant for event"}
                                 on_click={() => this.enchant(true)}
                                 disabled={this.cannotCraft()}
-                                additional_css={"w-full md:w-auto md:ml-2"}
+                                additional_css={"w-full md:w-auto"}
                             />
                         ) : null}
 
                         <DangerButton
                             button_label={"Close"}
                             on_click={this.clearCrafting.bind(this)}
-                            additional_css={"w-full md:w-auto md:ml-2"}
+                            additional_css={"w-full md:w-auto"}
                             disabled={
                                 this.state.loading || this.props.cannot_craft
                             }
@@ -659,7 +650,7 @@ export default class Enchanting extends React.Component<
                             <a
                                 href="/information/enchanting"
                                 target="_blank"
-                                className="block mt-2 md:ml-2"
+                                className="block mt-2"
                             >
                                 Help{" "}
                                 <i className="fas fa-external-link-alt"></i>
@@ -670,7 +661,7 @@ export default class Enchanting extends React.Component<
                         <a
                             href="/information/enchanting"
                             target="_blank"
-                            className="block mt-2 md:ml-2"
+                            className="block mt-2"
                         >
                             Help <i className="fas fa-external-link-alt"></i>
                         </a>

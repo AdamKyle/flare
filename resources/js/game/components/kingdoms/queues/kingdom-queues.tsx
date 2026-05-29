@@ -350,14 +350,24 @@ export default class KingdomQueues extends React.Component<
                     movement.
                 </p>
                 <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 shrink-0"></div>
-                {this.state.loading ? <LoadingProgressBar /> : null}
+                {this.state.loading ? (
+                    <div className="shrink-0">
+                        <LoadingProgressBar />
+                    </div>
+                ) : null}
                 {this.state.error_message !== null ? (
-                    <DangerAlert>{this.state.error_message}</DangerAlert>
+                    <div className="shrink-0">
+                        <DangerAlert>{this.state.error_message}</DangerAlert>
+                    </div>
                 ) : null}
                 {this.state.success_message !== null ? (
-                    <SuccessAlert>{this.state.success_message}</SuccessAlert>
+                    <div className="shrink-0">
+                        <SuccessAlert>
+                            {this.state.success_message}
+                        </SuccessAlert>
+                    </div>
                 ) : null}
-                <div className="w-full mr-auto ml-auto flex-1 min-h-0 overflow-y-auto">
+                <div className="w-full flex-1 min-h-0 overflow-y-auto">
                     {this.renderBuildingQueues()}
                     {this.renderBuildingExpansionQueues()}
                     {this.renderUnitRecruitmentQueues()}

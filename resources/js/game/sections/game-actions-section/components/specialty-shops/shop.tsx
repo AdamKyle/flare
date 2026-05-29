@@ -215,7 +215,7 @@ export default class Shop extends React.Component<any, any> {
 
     render() {
         return (
-            <div className="mx-auto mt-2 w-full md:w-2/3">
+            <div className="mt-2 w-full">
                 <div>
                     {this.state.fetching ? (
                         <LoadingProgressBar />
@@ -261,32 +261,35 @@ export default class Shop extends React.Component<any, any> {
                                 ) : null}
 
                                 <div className={"text-center my-3"}>
-                                    <PrimaryButton
-                                        button_label={"Purchase Item"}
-                                        on_click={this.purchase.bind(this)}
-                                        disabled={
-                                            this.state.loading ||
-                                            this.state.item_selected === null ||
-                                            this.props.is_dead
-                                        }
-                                    />
-                                    <DangerButton
-                                        button_label={"Close"}
-                                        on_click={this.closeSection.bind(this)}
-                                        additional_css={"ml-2"}
-                                        disabled={
-                                            this.state.loading ||
-                                            this.props.cannot_craft
-                                        }
-                                    />
-                                    <a
-                                        href="/information/gear-progression"
-                                        target="_blank"
-                                        className="ml-2"
-                                    >
-                                        Help{" "}
-                                        <i className="fas fa-external-link-alt"></i>
-                                    </a>
+                                    <div className="flex flex-col md:flex-row justify-center items-center gap-2">
+                                        <PrimaryButton
+                                            button_label={"Purchase Item"}
+                                            on_click={this.purchase.bind(this)}
+                                            disabled={
+                                                this.state.loading ||
+                                                this.state.item_selected ===
+                                                    null ||
+                                                this.props.is_dead
+                                            }
+                                        />
+                                        <DangerButton
+                                            button_label={"Close"}
+                                            on_click={this.closeSection.bind(
+                                                this,
+                                            )}
+                                            disabled={
+                                                this.state.loading ||
+                                                this.props.cannot_craft
+                                            }
+                                        />
+                                        <a
+                                            href="/information/gear-progression"
+                                            target="_blank"
+                                        >
+                                            Help{" "}
+                                            <i className="fas fa-external-link-alt"></i>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </Fragment>

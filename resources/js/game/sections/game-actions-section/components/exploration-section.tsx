@@ -563,16 +563,6 @@ export default class ExplorationSection extends React.Component<any, any> {
         if (this.props.character.is_automation_running) {
             return (
                 <Fragment>
-                    <WarningAlert additional_css={"mb-4 text-left"}>
-                        <p className="my-2">Exploration is running.</p>
-                        <p className="my-2">Would you like to stop it?</p>
-                        <a href="/information/automation" target="_blank">
-                            See Exploration Help{" "}
-                            <i className="fas fa-external-link-alt"></i>
-                        </a>{" "}
-                        for more details.
-                    </WarningAlert>
-
                     {this.state.loading ? <LoadingProgressBar /> : null}
 
                     <div className="flex flex-wrap justify-center items-start gap-2">
@@ -588,6 +578,12 @@ export default class ExplorationSection extends React.Component<any, any> {
                             disabled={this.state.loading}
                             additional_css={"h-10"}
                         />
+                    </div>
+                    <div className="mt-3 text-center">
+                        <a href="/information/automation" target="_blank">
+                            See Exploration Help{" "}
+                            <i className="fas fa-external-link-alt"></i>
+                        </a>
                     </div>
                 </Fragment>
             );

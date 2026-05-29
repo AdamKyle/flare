@@ -43,6 +43,8 @@ class AutomationRestrictionService
 
     public const CLASS_RANKS = 'class_ranks';
 
+    public const REGULAR_QUESTS = 'regular_quests';
+
     public function activeAutomation(Character $character): ?CharacterAutomation
     {
         return $character->currentAutomations()
@@ -115,6 +117,7 @@ class AutomationRestrictionService
                 self::KINGDOM_MANAGEMENT,
                 self::PLAYER_SKILLS,
                 self::CLASS_RANKS,
+                self::REGULAR_QUESTS,
             ]);
         }
 
@@ -135,6 +138,7 @@ class AutomationRestrictionService
                 self::KINGDOM_MANAGEMENT,
                 self::PLAYER_SKILLS,
                 self::CLASS_RANKS,
+                self::REGULAR_QUESTS,
             ]);
         }
 
@@ -157,6 +161,7 @@ class AutomationRestrictionService
             self::KINGDOM_MANAGEMENT,
             self::PLAYER_SKILLS,
             self::CLASS_RANKS,
+            self::REGULAR_QUESTS,
         ])) {
             return true;
         }
