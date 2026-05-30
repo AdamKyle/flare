@@ -21,7 +21,7 @@ import EnemyKingdoms from "../../components/kingdoms/map-pins/enemy-kingdoms";
 import Kingdoms from "../../components/kingdoms/map-pins/kingdoms";
 
 // @ts-ignore
-import Draggable from "react-draggable/build/web/react-draggable.min";
+import Draggable from "react-draggable";
 
 export default class MapSection extends React.Component<MapProps, MapState> {
     private mapTimeOut: any;
