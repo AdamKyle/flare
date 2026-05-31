@@ -781,9 +781,17 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertEquals($this->factionLoyaltyAutomation->refresh()->log->crafting_logs[0]['log_entry_id'], $warning->log_entry_id);
         $this->assertEquals(AutomatedCraftingResultType::NOT_ENOUGH_GOLD->value, $warning->type);
         $this->assertEquals('Not enough gold to craft and no bounty remains for this NPC. Automation has ended.', $warning->message);
-        Event::assertDispatched(FactionLoyaltyAutomationWarningState::class, function (FactionLoyaltyAutomationWarningState $event): bool {
+        Event::assertDispatched(FactionLoyaltyAutomationWarningState::class, function (FactionLoyaltyAutomationWarningState $event) use ($warning): bool {
             return $event->has_warning &&
+                $event->warning_notices === [
+                    [
+                        'id' => $warning->id,
+                        'type' => AutomatedCraftingResultType::NOT_ENOUGH_GOLD->value,
+                        'message' => 'Not enough gold to craft and no bounty remains for this NPC. Automation has ended.',
+                    ],
+                ] &&
                 $event->warning_notice === [
+                    'id' => $warning->id,
                     'type' => AutomatedCraftingResultType::NOT_ENOUGH_GOLD->value,
                     'message' => 'Not enough gold to craft and no bounty remains for this NPC. Automation has ended.',
                 ];

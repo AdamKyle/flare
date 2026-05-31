@@ -108,7 +108,15 @@ class FactionLoyaltyAutomationWarningControllerTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals([
             'has_warning' => true,
+            'warning_notices' => [
+                [
+                    'id' => $olderWarning->id,
+                    'type' => 'bounty',
+                    'message' => 'Older warning message.',
+                ],
+            ],
             'warning_notice' => [
+                'id' => $olderWarning->id,
                 'type' => 'bounty',
                 'message' => 'Older warning message.',
             ],
@@ -128,9 +136,17 @@ class FactionLoyaltyAutomationWarningControllerTest extends TestCase
                 'monster_id' => 30,
             ],
         ], $this->factionLoyaltyAutomationLog->refresh()->fight_logs);
-        Event::assertDispatched(FactionLoyaltyAutomationWarningState::class, function (FactionLoyaltyAutomationWarningState $event): bool {
+        Event::assertDispatched(FactionLoyaltyAutomationWarningState::class, function (FactionLoyaltyAutomationWarningState $event) use ($olderWarning): bool {
             return $event->has_warning &&
+                $event->warning_notices === [
+                    [
+                        'id' => $olderWarning->id,
+                        'type' => 'bounty',
+                        'message' => 'Older warning message.',
+                    ],
+                ] &&
                 $event->warning_notice === [
+                    'id' => $olderWarning->id,
                     'type' => 'bounty',
                     'message' => 'Older warning message.',
                 ];
@@ -170,12 +186,15 @@ class FactionLoyaltyAutomationWarningControllerTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals([
             'has_warning' => false,
+            'warning_notices' => [],
             'warning_notice' => null,
         ], $response->json());
         $this->assertNull($warning->fresh());
         $this->assertEquals([], $this->factionLoyaltyAutomationLog->refresh()->fight_logs);
         Event::assertDispatched(FactionLoyaltyAutomationWarningState::class, function (FactionLoyaltyAutomationWarningState $event): bool {
-            return ! $event->has_warning && is_null($event->warning_notice);
+            return ! $event->has_warning &&
+                $event->warning_notices === [] &&
+                is_null($event->warning_notice);
         });
     }
 

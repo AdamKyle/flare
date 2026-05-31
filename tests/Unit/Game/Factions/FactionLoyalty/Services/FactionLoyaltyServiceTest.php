@@ -146,7 +146,7 @@ class FactionLoyaltyServiceTest extends TestCase
                 ],
             ],
         ]);
-        $this->createFactionLoyaltyAutomationWarning([
+        $olderWarning = $this->createFactionLoyaltyAutomationWarning([
             'character_id' => $this->character->id,
             'faction_loyalty_automation_id' => $automation->id,
             'faction_loyalty_automation_log_id' => $automationLog->id,
@@ -156,7 +156,7 @@ class FactionLoyaltyServiceTest extends TestCase
             'type' => 'bounty',
             'message' => 'Older warning message.',
         ]);
-        $this->createFactionLoyaltyAutomationWarning([
+        $latestWarning = $this->createFactionLoyaltyAutomationWarning([
             'character_id' => $this->character->id,
             'faction_loyalty_automation_id' => $automation->id,
             'faction_loyalty_automation_log_id' => $automationLog->id,
@@ -168,12 +168,25 @@ class FactionLoyaltyServiceTest extends TestCase
         ]);
 
         $result = $this->factionLoyaltyService->getLoyaltyInfoForPlane($this->character->refresh());
-        $warningNotice = $result['faction_loyalty']->factionLoyaltyNpcs->first()->faction_loyalty_warning_notice;
+        $factionLoyaltyNpc = $result['faction_loyalty']->factionLoyaltyNpcs->first();
 
         $this->assertEquals([
+            'id' => $latestWarning->id,
             'type' => 'crafting',
             'message' => 'Latest warning message.',
-        ], $warningNotice);
+        ], $factionLoyaltyNpc->faction_loyalty_warning_notice);
+        $this->assertEquals([
+            [
+                'id' => $latestWarning->id,
+                'type' => 'crafting',
+                'message' => 'Latest warning message.',
+            ],
+            [
+                'id' => $olderWarning->id,
+                'type' => 'bounty',
+                'message' => 'Older warning message.',
+            ],
+        ], $factionLoyaltyNpc->faction_loyalty_warning_notices);
     }
 
     public function testDismissLatestWarningNoticeDeletesLatestWarningNoticeAndReferencedLogEntry(): void

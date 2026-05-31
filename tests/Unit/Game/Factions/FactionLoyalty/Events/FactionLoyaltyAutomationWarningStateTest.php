@@ -11,41 +11,45 @@ class FactionLoyaltyAutomationWarningStateTest extends TestCase
 {
     public function testConstructorSetsWarningPayload(): void
     {
-        $event = new FactionLoyaltyAutomationWarningState($this->user(), true, [
-            'type' => 'bounty',
-            'message' => 'Warning message.',
-        ]);
+        $user = new User();
+        $user->id = 123;
+        $warningNotices = [
+            [
+                'id' => 10,
+                'type' => 'bounty',
+                'message' => 'Warning message.',
+            ],
+        ];
+
+        $event = new FactionLoyaltyAutomationWarningState($user, true, $warningNotices);
 
         $this->assertTrue($event->has_warning);
-        $this->assertEquals([
-            'type' => 'bounty',
-            'message' => 'Warning message.',
-        ], $event->warning_notice);
+        $this->assertEquals($warningNotices, $event->warning_notices);
+        $this->assertEquals($warningNotices[0], $event->warning_notice);
     }
 
     public function testConstructorSetsClearedPayload(): void
     {
-        $event = new FactionLoyaltyAutomationWarningState($this->user(), false, null);
+        $user = new User();
+        $user->id = 123;
+
+        $event = new FactionLoyaltyAutomationWarningState($user, false, []);
 
         $this->assertFalse($event->has_warning);
+        $this->assertEquals([], $event->warning_notices);
         $this->assertNull($event->warning_notice);
     }
 
     public function testBroadcastOnReturnsPrivateFactionLoyaltyAutomationWarningChannel(): void
     {
-        $event = new FactionLoyaltyAutomationWarningState($this->user(), false, null);
+        $user = new User();
+        $user->id = 123;
+
+        $event = new FactionLoyaltyAutomationWarningState($user, false, []);
 
         $channel = $event->broadcastOn();
 
         $this->assertInstanceOf(PrivateChannel::class, $channel);
         $this->assertEquals('private-faction-loyalty-automation-warning-123', $channel->name);
-    }
-
-    private function user(): User
-    {
-        $user = new User();
-        $user->id = 123;
-
-        return $user;
     }
 }
