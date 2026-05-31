@@ -5,6 +5,7 @@ namespace App\Game\Automation\Jobs;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomation;
+use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\FactionLoyaltyNpc;
 use App\Game\Automation\Coordinators\FactionLoyaltyAutomationActionCoordinator;
 use App\Game\Automation\Coordinators\FactionLoyaltyNpcTaskCoordinator;
@@ -312,8 +313,22 @@ class AutomatedFactionLoyalty implements ShouldQueue
             $factionLoyaltyAutomationAction = $this->getBountyFightActionFromCurrentNpc();
 
             if (is_null($factionLoyaltyAutomationAction)) {
+                $factionLoyaltyAutomationLog = $this->factionLoyaltyAutomation->refresh()->log;
+                $craftingLogs = $factionLoyaltyAutomationLog?->crafting_logs ?? [];
+
+                FactionLoyaltyAutomationWarning::create([
+                    'character_id' => $this->character->id,
+                    'faction_loyalty_automation_id' => $this->factionLoyaltyAutomation->id,
+                    'faction_loyalty_automation_log_id' => $factionLoyaltyAutomationLog?->id,
+                    'faction_loyalty_npc_id' => $this->factionLoyaltyNpc->id,
+                    'log_type' => 'crafting_logs',
+                    'log_entry_id' => $this->getLatestLogEntryId($craftingLogs),
+                    'type' => AutomatedCraftingResultType::NOT_ENOUGH_GOLD->value,
+                    'message' => 'Not enough gold to craft and no bounty remains for this NPC. Automation has ended.',
+                ]);
+
                 $this->sendOutEventLogUpdate(
-                    $this->factionLoyaltyNpc->npc->real_name . ' does not like poor people who cannot craft for them.',
+                    'Not enough gold to craft and no bounty remains for this NPC. Automation has ended.',
                     true
                 );
 
@@ -479,7 +494,54 @@ class AutomatedFactionLoyalty implements ShouldQueue
             return;
         }
 
+        if (in_array($automatedFightResult->getResultType(), [
+            AutomatedFightResultType::NO_TRAINING_MONSTER_FOUND,
+            AutomatedFightResultType::DIED_DURING_TRAINING,
+            AutomatedFightResultType::DIED_TO_BOUNTY_AFTER_TRAINING,
+        ], true)) {
+            $warningMessage = 'You died fighting the bounty after recovery training. Automation has ended.';
+
+            if ($automatedFightResult->getResultType() === AutomatedFightResultType::NO_TRAINING_MONSTER_FOUND) {
+                $warningMessage = 'No recovery monster found. Automation has ended.';
+            }
+
+            if ($automatedFightResult->getResultType() === AutomatedFightResultType::DIED_DURING_TRAINING) {
+                $warningMessage = 'You died during recovery training. Automation has ended.';
+            }
+
+            $factionLoyaltyAutomationLog = $this->factionLoyaltyAutomation->refresh()->log;
+            $fightLogs = $factionLoyaltyAutomationLog?->fight_logs ?? [];
+
+            FactionLoyaltyAutomationWarning::create([
+                'character_id' => $this->character->id,
+                'faction_loyalty_automation_id' => $this->factionLoyaltyAutomation->id,
+                'faction_loyalty_automation_log_id' => $factionLoyaltyAutomationLog?->id,
+                'faction_loyalty_npc_id' => $this->factionLoyaltyNpc?->id,
+                'log_type' => 'fight_logs',
+                'log_entry_id' => $this->getLatestLogEntryId($fightLogs),
+                'type' => $automatedFightResult->getResultType()->value,
+                'message' => $warningMessage,
+            ]);
+        }
+
         $this->endAutomation($characterCacheData, false);
+    }
+
+    /**
+     * Get the latest automation log entry id.
+     *
+     * @param array $logs
+     * @return string|null
+     */
+    private function getLatestLogEntryId(array $logs): ?string
+    {
+        $latestLog = end($logs);
+
+        if (! is_array($latestLog)) {
+            return null;
+        }
+
+        return $latestLog['log_entry_id'] ?? null;
     }
 
     /**

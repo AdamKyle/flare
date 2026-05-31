@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Models\FactionLoyaltyAutomationLog;
+use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\GameMap;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
@@ -19,13 +20,14 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateFactionLoyalty;
+use Tests\Traits\CreateFactionLoyaltyAutomationWarning;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateNpc;
 
 class FactionLoyaltyServiceTest extends TestCase
 {
-    use CreateEvent, CreateFactionLoyalty, CreateItem, CreateMonster, CreateNpc, RefreshDatabase;
+    use CreateEvent, CreateFactionLoyalty, CreateFactionLoyaltyAutomationWarning, CreateItem, CreateMonster, CreateNpc, RefreshDatabase;
 
     private ?Character $character = null;
 
@@ -132,28 +134,49 @@ class FactionLoyaltyServiceTest extends TestCase
             'faction_loyalty_npc_id' => $factionNpc->id,
         ]);
 
-        FactionLoyaltyAutomationLog::factory()->create([
+        $automationLog = FactionLoyaltyAutomationLog::factory()->create([
             'faction_loyalty_automation_id' => $automation->id,
             'fight_logs' => [
                 [
+                    'log_entry_id' => 'warning-log-entry',
                     'warning_notice' => [
-                        'message' => 'Warning message.',
+                        'message' => 'Log warning message.',
                         'read' => false,
                     ],
                 ],
             ],
+        ]);
+        $this->createFactionLoyaltyAutomationWarning([
+            'character_id' => $this->character->id,
+            'faction_loyalty_automation_id' => $automation->id,
+            'faction_loyalty_automation_log_id' => $automationLog->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'log_type' => 'fight_logs',
+            'log_entry_id' => 'warning-log-entry',
+            'type' => 'bounty',
+            'message' => 'Older warning message.',
+        ]);
+        $this->createFactionLoyaltyAutomationWarning([
+            'character_id' => $this->character->id,
+            'faction_loyalty_automation_id' => $automation->id,
+            'faction_loyalty_automation_log_id' => $automationLog->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'log_type' => 'fight_logs',
+            'log_entry_id' => 'warning-log-entry',
+            'type' => 'crafting',
+            'message' => 'Latest warning message.',
         ]);
 
         $result = $this->factionLoyaltyService->getLoyaltyInfoForPlane($this->character->refresh());
         $warningNotice = $result['faction_loyalty']->factionLoyaltyNpcs->first()->faction_loyalty_warning_notice;
 
         $this->assertEquals([
-            'message' => 'Warning message.',
-            'read' => false,
+            'type' => 'crafting',
+            'message' => 'Latest warning message.',
         ], $warningNotice);
     }
 
-    public function testMarkLatestWarningNoticeReadUpdatesFightLogNotice(): void
+    public function testDismissLatestWarningNoticeDeletesLatestWarningNoticeAndReferencedLogEntry(): void
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -188,17 +211,70 @@ class FactionLoyaltyServiceTest extends TestCase
             'faction_loyalty_automation_id' => $automation->id,
             'fight_logs' => [
                 [
+                    'log_entry_id' => 'older-log-entry',
+                    'outcome' => 'older_warning',
+                    'monster_id' => 10,
+                ],
+                [
+                    'log_entry_id' => 'latest-log-entry',
+                    'outcome' => 'latest_warning',
+                    'monster_id' => 20,
                     'warning_notice' => [
-                        'message' => 'Warning message.',
+                        'message' => 'Log warning message.',
                         'read' => false,
                     ],
                 ],
+                [
+                    'log_entry_id' => 'unrelated-log-entry',
+                    'outcome' => 'unrelated_warning',
+                    'monster_id' => 30,
+                ],
             ],
         ]);
+        $olderWarning = $this->createFactionLoyaltyAutomationWarning([
+            'character_id' => $this->character->id,
+            'faction_loyalty_automation_id' => $automation->id,
+            'faction_loyalty_automation_log_id' => $automationLog->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'log_type' => 'fight_logs',
+            'log_entry_id' => 'older-log-entry',
+            'type' => 'bounty',
+            'message' => 'Older warning message.',
+        ]);
+        $latestWarning = $this->createFactionLoyaltyAutomationWarning([
+            'character_id' => $this->character->id,
+            'faction_loyalty_automation_id' => $automation->id,
+            'faction_loyalty_automation_log_id' => $automationLog->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'log_type' => 'fight_logs',
+            'log_entry_id' => 'latest-log-entry',
+            'type' => 'crafting',
+            'message' => 'Latest warning message.',
+        ]);
 
-        $this->factionLoyaltyService->markLatestWarningNoticeRead($this->character);
+        $this->factionLoyaltyService->dismissLatestWarningNotice($this->character);
 
-        $this->assertTrue($automationLog->refresh()->fight_logs[0]['warning_notice']['read']);
+        $this->assertNotNull($olderWarning->refresh());
+        $this->assertNull($latestWarning->fresh());
+        $this->assertEquals([
+            [
+                'log_entry_id' => 'older-log-entry',
+                'outcome' => 'older_warning',
+                'monster_id' => 10,
+            ],
+            [
+                'log_entry_id' => 'unrelated-log-entry',
+                'outcome' => 'unrelated_warning',
+                'monster_id' => 30,
+            ],
+        ], $automationLog->refresh()->fight_logs);
+    }
+
+    public function testDismissLatestWarningNoticeDoesNothingWhenNoWarningExists(): void
+    {
+        $this->factionLoyaltyService->dismissLatestWarningNotice($this->character);
+
+        $this->assertEquals(0, FactionLoyaltyAutomationWarning::where('character_id', $this->character->id)->count());
     }
 
     public function testHasPlaneLoyaltyForNpcCurrentlyHelping()

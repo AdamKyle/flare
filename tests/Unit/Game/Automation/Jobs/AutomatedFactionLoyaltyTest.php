@@ -5,6 +5,7 @@ namespace Tests\Unit\Game\Automation\Jobs;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomation;
+use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\FactionLoyaltyNpc;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
@@ -425,7 +426,13 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->craftingHandler->shouldReceive('setUp')->once()->andReturnSelf();
         $this->craftingHandler->shouldReceive('setCraftForNpc')->once()->andReturnSelf();
         $this->craftingHandler->shouldReceive('setFactionLoyaltyNpc')->once()->andReturnSelf();
-        $this->craftingHandler->shouldReceive('handle')->once()->andReturn($craftingResult);
+        $this->craftingHandler->shouldReceive('handle')->once()->andReturnUsing(function () use ($craftingResult): AutomatedCraftingResult {
+            resolve(FactionLoyaltyAutomationCraftingLogger::class)
+                ->setUp($this->factionLoyaltyAutomation)
+                ->log($craftingResult);
+
+            return $craftingResult;
+        });
 
         $job = new AutomatedFactionLoyalty(
             $this->character->id,
@@ -469,7 +476,13 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->craftingHandler->shouldReceive('setUp')->once()->andReturnSelf();
         $this->craftingHandler->shouldReceive('setCraftForNpc')->once()->andReturnSelf();
         $this->craftingHandler->shouldReceive('setFactionLoyaltyNpc')->once()->andReturnSelf();
-        $this->craftingHandler->shouldReceive('handle')->once()->andReturn($craftingResult);
+        $this->craftingHandler->shouldReceive('handle')->once()->andReturnUsing(function () use ($craftingResult): AutomatedCraftingResult {
+            resolve(FactionLoyaltyAutomationCraftingLogger::class)
+                ->setUp($this->factionLoyaltyAutomation)
+                ->log($craftingResult);
+
+            return $craftingResult;
+        });
 
         $job = new AutomatedFactionLoyalty(
             $this->character->id,
@@ -742,8 +755,19 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNull($this->characterAutomation->fresh());
         $this->assertNotNull($this->factionLoyaltyAutomation->refresh()->completed_at);
         Event::assertDispatched(AutomationLogUpdate::class, function (AutomationLogUpdate $event): bool {
-            return $event->message === $this->factionLoyaltyNpc->npc->real_name . ' does not like poor people who cannot craft for them.';
+            return $event->message === 'Not enough gold to craft and no bounty remains for this NPC. Automation has ended.';
         });
+        $warning = FactionLoyaltyAutomationWarning::where('faction_loyalty_automation_id', $this->factionLoyaltyAutomation->id)->first();
+
+        $this->assertNotNull($warning);
+        $this->assertEquals($this->character->id, $warning->character_id);
+        $this->assertEquals($this->factionLoyaltyNpc->id, $warning->faction_loyalty_npc_id);
+        $this->assertEquals($this->factionLoyaltyAutomation->log->id, $warning->faction_loyalty_automation_log_id);
+        $this->assertEquals('crafting_logs', $warning->log_type);
+        $this->assertNotNull($warning->log_entry_id);
+        $this->assertEquals($this->factionLoyaltyAutomation->refresh()->log->crafting_logs[0]['log_entry_id'], $warning->log_entry_id);
+        $this->assertEquals(AutomatedCraftingResultType::NOT_ENOUGH_GOLD->value, $warning->type);
+        $this->assertEquals('Not enough gold to craft and no bounty remains for this NPC. Automation has ended.', $warning->message);
     }
 
     public function testHandleEndsAutomationWhenCraftingResultCannotContinue(): void
@@ -1082,6 +1106,184 @@ class AutomatedFactionLoyaltyTest extends TestCase
         );
 
         Queue::assertPushed(AutomatedFactionLoyalty::class);
+        $this->assertNull(FactionLoyaltyAutomationWarning::query()->first());
+    }
+
+    public function testHandleCreatesWarningWhenNoTrainingMonsterFoundEndsAutomation(): void
+    {
+        Event::fake();
+
+        $bountyTask = collect($this->factionLoyaltyNpc->factionLoyaltyNpcTasks->fame_tasks)
+            ->first(fn (array $task): bool => ($task['type'] ?? null) === 'bounty');
+        $fightResult = (new AutomatedFightResult)
+            ->setUp(AutomatedFightResultType::NO_TRAINING_MONSTER_FOUND)
+            ->setMonsterId($bountyTask['monster_id']);
+
+        $this->npcTaskCoordinator->shouldReceive('setUp')->once()->andReturnSelf();
+        $this->npcTaskCoordinator->shouldReceive('resolveNpc')->once()->andReturn($this->factionLoyaltyNpc);
+        $this->npcTaskCoordinator->shouldReceive('shouldEndAutomation')->once()->andReturnFalse();
+        $this->actionCoordinator->shouldReceive('setUp')->once()->andReturnSelf();
+        $this->actionCoordinator->shouldReceive('resolveAction')->once()->andReturn([
+            'type' => FactionLoyaltyCoordinatorAction::FIGHT->value,
+            'task' => $bountyTask,
+        ]);
+        $this->fightLogger->shouldReceive('setUp')->once()->andReturn($this->fightLogger);
+        $this->fightHandler->shouldReceive('setUp')->once()->andReturnSelf();
+        $this->fightHandler->shouldReceive('handle')->once()->andReturnUsing(function () use ($fightResult): AutomatedFightResult {
+            resolve(FactionLoyaltyAutomationFightLogger::class)
+                ->setUp($this->factionLoyaltyAutomation)
+                ->log($fightResult);
+
+            return $fightResult;
+        });
+
+        $job = new AutomatedFactionLoyalty(
+            $this->character->id,
+            $this->characterAutomation->id,
+            $this->factionLoyaltyAutomation->id,
+            1
+        );
+
+        $job->handle(
+            $this->characterCacheData,
+            $this->npcTaskCoordinator,
+            $this->actionCoordinator,
+            $this->craftingHandler,
+            $this->craftingLogger,
+            $this->fightHandler,
+            $this->fightLogger
+        );
+
+        $warning = FactionLoyaltyAutomationWarning::where('faction_loyalty_automation_id', $this->factionLoyaltyAutomation->id)->first();
+
+        $this->assertNull($this->characterAutomation->fresh());
+        $this->assertNotNull($warning);
+        $this->assertEquals($this->character->id, $warning->character_id);
+        $this->assertEquals($this->factionLoyaltyNpc->id, $warning->faction_loyalty_npc_id);
+        $this->assertEquals($this->factionLoyaltyAutomation->log->id, $warning->faction_loyalty_automation_log_id);
+        $this->assertEquals('fight_logs', $warning->log_type);
+        $this->assertNotNull($warning->log_entry_id);
+        $this->assertEquals($this->factionLoyaltyAutomation->refresh()->log->fight_logs[0]['log_entry_id'], $warning->log_entry_id);
+        $this->assertEquals(AutomatedFightResultType::NO_TRAINING_MONSTER_FOUND->value, $warning->type);
+        $this->assertEquals('No recovery monster found. Automation has ended.', $warning->message);
+    }
+
+    public function testHandleCreatesWarningWhenDiedDuringTrainingEndsAutomation(): void
+    {
+        Event::fake();
+
+        $bountyTask = collect($this->factionLoyaltyNpc->factionLoyaltyNpcTasks->fame_tasks)
+            ->first(fn (array $task): bool => ($task['type'] ?? null) === 'bounty');
+        $fightResult = (new AutomatedFightResult)
+            ->setUp(AutomatedFightResultType::DIED_DURING_TRAINING)
+            ->setMonsterId($bountyTask['monster_id']);
+
+        $this->npcTaskCoordinator->shouldReceive('setUp')->once()->andReturnSelf();
+        $this->npcTaskCoordinator->shouldReceive('resolveNpc')->once()->andReturn($this->factionLoyaltyNpc);
+        $this->npcTaskCoordinator->shouldReceive('shouldEndAutomation')->once()->andReturnFalse();
+        $this->actionCoordinator->shouldReceive('setUp')->once()->andReturnSelf();
+        $this->actionCoordinator->shouldReceive('resolveAction')->once()->andReturn([
+            'type' => FactionLoyaltyCoordinatorAction::FIGHT->value,
+            'task' => $bountyTask,
+        ]);
+        $this->fightLogger->shouldReceive('setUp')->once()->andReturn($this->fightLogger);
+        $this->fightHandler->shouldReceive('setUp')->once()->andReturnSelf();
+        $this->fightHandler->shouldReceive('handle')->once()->andReturnUsing(function () use ($fightResult): AutomatedFightResult {
+            resolve(FactionLoyaltyAutomationFightLogger::class)
+                ->setUp($this->factionLoyaltyAutomation)
+                ->log($fightResult);
+
+            return $fightResult;
+        });
+
+        $job = new AutomatedFactionLoyalty(
+            $this->character->id,
+            $this->characterAutomation->id,
+            $this->factionLoyaltyAutomation->id,
+            1
+        );
+
+        $job->handle(
+            $this->characterCacheData,
+            $this->npcTaskCoordinator,
+            $this->actionCoordinator,
+            $this->craftingHandler,
+            $this->craftingLogger,
+            $this->fightHandler,
+            $this->fightLogger
+        );
+
+        $warning = FactionLoyaltyAutomationWarning::where('faction_loyalty_automation_id', $this->factionLoyaltyAutomation->id)->first();
+
+        $this->assertNull($this->characterAutomation->fresh());
+        $this->assertNotNull($warning);
+        $this->assertEquals($this->character->id, $warning->character_id);
+        $this->assertEquals($this->factionLoyaltyNpc->id, $warning->faction_loyalty_npc_id);
+        $this->assertEquals($this->factionLoyaltyAutomation->log->id, $warning->faction_loyalty_automation_log_id);
+        $this->assertEquals('fight_logs', $warning->log_type);
+        $this->assertNotNull($warning->log_entry_id);
+        $this->assertEquals($this->factionLoyaltyAutomation->refresh()->log->fight_logs[0]['log_entry_id'], $warning->log_entry_id);
+        $this->assertEquals(AutomatedFightResultType::DIED_DURING_TRAINING->value, $warning->type);
+        $this->assertEquals('You died during recovery training. Automation has ended.', $warning->message);
+    }
+
+    public function testHandleCreatesWarningWhenDiedToBountyAfterTrainingEndsAutomation(): void
+    {
+        Event::fake();
+
+        $bountyTask = collect($this->factionLoyaltyNpc->factionLoyaltyNpcTasks->fame_tasks)
+            ->first(fn (array $task): bool => ($task['type'] ?? null) === 'bounty');
+        $fightResult = (new AutomatedFightResult)
+            ->setUp(AutomatedFightResultType::DIED_TO_BOUNTY_AFTER_TRAINING)
+            ->setMonsterId($bountyTask['monster_id']);
+
+        $this->npcTaskCoordinator->shouldReceive('setUp')->once()->andReturnSelf();
+        $this->npcTaskCoordinator->shouldReceive('resolveNpc')->once()->andReturn($this->factionLoyaltyNpc);
+        $this->npcTaskCoordinator->shouldReceive('shouldEndAutomation')->once()->andReturnFalse();
+        $this->actionCoordinator->shouldReceive('setUp')->once()->andReturnSelf();
+        $this->actionCoordinator->shouldReceive('resolveAction')->once()->andReturn([
+            'type' => FactionLoyaltyCoordinatorAction::FIGHT->value,
+            'task' => $bountyTask,
+        ]);
+        $this->fightLogger->shouldReceive('setUp')->once()->andReturn($this->fightLogger);
+        $this->fightHandler->shouldReceive('setUp')->once()->andReturnSelf();
+        $this->fightHandler->shouldReceive('handle')->once()->andReturnUsing(function () use ($fightResult): AutomatedFightResult {
+            resolve(FactionLoyaltyAutomationFightLogger::class)
+                ->setUp($this->factionLoyaltyAutomation)
+                ->log($fightResult);
+
+            return $fightResult;
+        });
+
+        $job = new AutomatedFactionLoyalty(
+            $this->character->id,
+            $this->characterAutomation->id,
+            $this->factionLoyaltyAutomation->id,
+            1
+        );
+
+        $job->handle(
+            $this->characterCacheData,
+            $this->npcTaskCoordinator,
+            $this->actionCoordinator,
+            $this->craftingHandler,
+            $this->craftingLogger,
+            $this->fightHandler,
+            $this->fightLogger
+        );
+
+        $warning = FactionLoyaltyAutomationWarning::where('faction_loyalty_automation_id', $this->factionLoyaltyAutomation->id)->first();
+
+        $this->assertNull($this->characterAutomation->fresh());
+        $this->assertNotNull($warning);
+        $this->assertEquals($this->character->id, $warning->character_id);
+        $this->assertEquals($this->factionLoyaltyNpc->id, $warning->faction_loyalty_npc_id);
+        $this->assertEquals($this->factionLoyaltyAutomation->log->id, $warning->faction_loyalty_automation_log_id);
+        $this->assertEquals('fight_logs', $warning->log_type);
+        $this->assertNotNull($warning->log_entry_id);
+        $this->assertEquals($this->factionLoyaltyAutomation->refresh()->log->fight_logs[0]['log_entry_id'], $warning->log_entry_id);
+        $this->assertEquals(AutomatedFightResultType::DIED_TO_BOUNTY_AFTER_TRAINING->value, $warning->type);
+        $this->assertEquals('You died fighting the bounty after recovery training. Automation has ended.', $warning->message);
     }
 
     public function testHandleHandlesBountyStalledRetryAndRecallsTheJob(): void

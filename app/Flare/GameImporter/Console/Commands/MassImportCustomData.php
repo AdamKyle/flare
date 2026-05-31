@@ -53,6 +53,7 @@ class MassImportCustomData extends Command
 
         Artisan::call('import:game-data Monsters');
         Artisan::call('import:game-data Kingdoms');
+        Artisan::call('faction-loyalty:strip-fight-data');
 
         $this->importInformationSection();
 

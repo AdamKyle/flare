@@ -6,6 +6,7 @@ use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Models\FactionLoyaltyAutomationLog;
 use App\Game\Automation\Contracts\AutomatedCraftingLogger;
 use App\Game\Automation\Values\AutomatedCraftingResult;
+use Illuminate\Support\Str;
 
 class FactionLoyaltyAutomationCraftingLogger implements AutomatedCraftingLogger
 {
@@ -45,6 +46,7 @@ class FactionLoyaltyAutomationCraftingLogger implements AutomatedCraftingLogger
         $craftingLogs = $factionLoyaltyAutomationLog->crafting_logs ?? [];
 
         $craftingLogs[] = [
+            'log_entry_id' => (string) Str::uuid(),
             'result' => $automatedCraftingResult->getResultType()->value,
             'target_item_id' => $automatedCraftingResult->getTargetItemId(),
             'crafted_item_id' => $automatedCraftingResult->getCraftedItemId(),

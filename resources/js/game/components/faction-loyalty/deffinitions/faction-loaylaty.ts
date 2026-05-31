@@ -33,8 +33,9 @@ export interface FactionLoyaltyNpc {
 }
 
 export interface FactionLoyaltyWarningNotice {
+    type: string;
     message: string;
-    read: boolean;
+    read?: boolean;
 }
 
 export interface FactionLoyaltyNpcTask {

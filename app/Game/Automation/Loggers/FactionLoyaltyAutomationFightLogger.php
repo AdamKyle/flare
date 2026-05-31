@@ -5,6 +5,7 @@ namespace App\Game\Automation\Loggers;
 use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Models\FactionLoyaltyAutomationLog;
 use App\Game\Automation\Values\AutomatedFightResult;
+use Illuminate\Support\Str;
 
 class FactionLoyaltyAutomationFightLogger
 {
@@ -44,6 +45,7 @@ class FactionLoyaltyAutomationFightLogger
         $fightLogs = $factionLoyaltyAutomationLog->fight_logs ?? [];
 
         $fightLogs[] = [
+            'log_entry_id' => (string) Str::uuid(),
             'outcome' => $automatedFightResult->getResultType()->value,
             'monster_id' => $automatedFightResult->getMonsterId(),
             'monster_name' => $automatedFightResult->getMonsterName(),
@@ -60,7 +62,6 @@ class FactionLoyaltyAutomationFightLogger
             'total_faction_points' => $automatedFightResult->getTotalFactionPoints(),
             'character_died' => $automatedFightResult->hasCharacterDied(),
             'ended_automation' => $automatedFightResult->hasEndedAutomation(),
-            'fight_data' => $automatedFightResult->getFightData(),
             'stalled_attempt' => $automatedFightResult->getStalledAttempt(),
             'warning_notice' => $automatedFightResult->getWarningNotice(),
             'created_at' => now()->toDateTimeString(),

@@ -345,7 +345,7 @@ export default class FactionNpcTasks extends React.Component<
                     .setRoute(
                         "faction-loyalty-automation/" +
                             this.props.character_id +
-                            "/warning-notice/read",
+                            "/warning/dismiss",
                     )
                     .doAjaxCall(
                         "post",
@@ -382,16 +382,23 @@ export default class FactionNpcTasks extends React.Component<
         }
 
         return (
-            <WarningAlert additional_css={"my-2"}>
-                <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
-                    <span>{warningNotice.message}</span>
-                    <DangerOutlineButton
-                        button_label={"Dismiss"}
-                        on_click={this.dismissWarningNotice.bind(this)}
+            <WarningAlert additional_css={"my-3 w-full"}>
+                <div className="flex items-start justify-between gap-3">
+                    <h4 className="text-sm font-semibold">
+                        Faction loyalty automation stopped
+                    </h4>
+                    <button
+                        type="button"
+                        className="shrink-0 text-sm font-semibold text-yellow-900 hover:text-yellow-700 dark:text-yellow-100 dark:hover:text-yellow-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
+                        onClick={this.dismissWarningNotice.bind(this)}
                         disabled={this.state.dismissing_warning_notice}
-                        additional_css={"w-full sm:w-auto"}
-                    />
+                        aria-label="Dismiss warning"
+                        title="Dismiss warning"
+                    >
+                        X
+                    </button>
                 </div>
+                <p className="mt-2 text-sm">{warningNotice.message}</p>
             </WarningAlert>
         );
     }
@@ -431,6 +438,7 @@ export default class FactionNpcTasks extends React.Component<
 
         return (
             <div className="mt-3 w-full" aria-live="polite">
+                {this.renderWarningNotice()}
                 <button
                     type="button"
                     className="w-full py-2 px-3 text-xs border-blue-500 border-2 font-medium text-center text-gray-900 dark:text-gray-200 hover:text-gray-200 dark:hover:text-gray-300 hover:bg-blue-600 rounded-sm focus:ring-4 focus:ring-blue-300 dark:hover:bg-blue-600 dark:focus:ring-blue-800 disabled:bg-blue-600 disabled:bg-opacity-75 dark:disabled:bg-opacity-50 dark:disabled:bg-blue-500 disabled:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-200 dark:focus-visible:ring-white focus-visible:ring-opacity-75"
@@ -465,7 +473,6 @@ export default class FactionNpcTasks extends React.Component<
             <div>
                 <div>
                     <h3 className="my-2"> Bounties </h3>
-                    {this.renderWarningNotice()}
                     {this.props.character_map_id !==
                     this.props.faction_loyalty_npc.npc.game_map_id ? (
                         <WarningAlert additional_css={"my-2"}>

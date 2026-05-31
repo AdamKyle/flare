@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Console\AfterDevelopment\StripFactionLoyaltyFightData;
 use App\Console\AfterDeployment\CleanUpInvalidBrokenQueues;
 use App\Console\AfterDeployment\CleanOrphanedBuildingExpansionQueues;
 use App\Console\AfterDeployment\CreateLocationDataCache;
@@ -107,6 +108,7 @@ class AppServiceProvider extends ServiceProvider
             CleanOrphanedBuildingExpansionQueues::class,
             RebuildKingdomCache::class,
             FixInvalidProgressionLevels::class,
+            StripFactionLoyaltyFightData::class,
 
             // Development Commands:
             CreateCharacter::class,
