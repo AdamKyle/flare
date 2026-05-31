@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Models\FactionLoyaltyAutomationLog;
+use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\FactionLoyaltyNpc;
 use App\Flare\Models\GameMap;
 use App\Flare\Values\AttackTypeValue;
@@ -336,20 +337,41 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
             'faction_loyalty_automation_id' => $factionLoyaltyAutomation->id,
             'fight_logs' => [
                 [
-                    'warning_notice' => [
-                        'message' => 'Warning message.',
-                        'read' => false,
-                    ],
+                    'log_entry_id' => 'matching-log-entry',
+                    'outcome' => 'warning_outcome',
+                    'monster_id' => 10,
+                ],
+                [
+                    'log_entry_id' => 'unrelated-log-entry',
+                    'outcome' => 'unrelated_outcome',
+                    'monster_id' => 20,
                 ],
             ],
         ]);
+        $warning = FactionLoyaltyAutomationWarning::create([
+            'character_id' => $this->character->id,
+            'faction_loyalty_automation_id' => $factionLoyaltyAutomation->id,
+            'faction_loyalty_automation_log_id' => $factionLoyaltyAutomationLog->id,
+            'faction_loyalty_npc_id' => $this->factionLoyaltyNpc->id,
+            'log_type' => 'fight_logs',
+            'log_entry_id' => 'matching-log-entry',
+            'type' => 'bounty_stalled_max_attempts_reached',
+            'message' => 'Warning message.',
+        ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/warning-notice/read', [
+            ->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/warning/dismiss', [
                 '_token' => csrf_token(),
             ]);
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertTrue($factionLoyaltyAutomationLog->refresh()->fight_logs[0]['warning_notice']['read']);
+        $this->assertNull($warning->fresh());
+        $this->assertEquals([
+            [
+                'log_entry_id' => 'unrelated-log-entry',
+                'outcome' => 'unrelated_outcome',
+                'monster_id' => 20,
+            ],
+        ], $factionLoyaltyAutomationLog->refresh()->fight_logs);
     }
 }

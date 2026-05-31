@@ -211,6 +211,11 @@ class FactionLoyaltyAutomationCraftingLoggerTest extends TestCase
                 'created_at' => $now->toDateTimeString(),
             ],
         ], $factionLoyaltyAutomationLog->crafting_logs);
+
+        $factionLoyaltyAutomation = $this->factionLoyaltyAutomation->refresh();
+
+        $this->assertEquals('craft', $factionLoyaltyAutomation->last_automation_action);
+        $this->assertEquals($now->toDateTimeString(), $factionLoyaltyAutomation->last_automation_action_at->toDateTimeString());
     }
 
     public function testLogUsesEmptyCraftingLogsWhenExistingCraftingLogsAreNull(): void

@@ -241,6 +241,17 @@ class FactionLoyaltyAutomationFightLoggerTest extends TestCase
             ],
         ], $factionLoyaltyAutomationLog->fight_logs);
         $this->assertArrayNotHasKey('fight_data', $factionLoyaltyAutomationLog->fight_logs[0]);
+
+        $factionLoyaltyAutomation = $this->factionLoyaltyAutomation->refresh();
+
+        $this->assertEquals('fight', $factionLoyaltyAutomation->last_automation_action);
+        $this->assertEquals($now->toDateTimeString(), $factionLoyaltyAutomation->last_automation_action_at->toDateTimeString());
+        $this->assertEquals(400, $factionLoyaltyAutomation->last_fight_monster_id);
+        $this->assertEquals(AutomatedFightResultType::DIED_TO_BOUNTY_AFTER_TRAINING->value, $factionLoyaltyAutomation->last_fight_outcome);
+        $this->assertTrue($factionLoyaltyAutomation->last_fight_was_bounty_target);
+        $this->assertTrue($factionLoyaltyAutomation->last_fight_was_training);
+        $this->assertEquals(10, $factionLoyaltyAutomation->last_fight_stalled_attempt);
+        $this->assertEquals(401, $factionLoyaltyAutomation->trained_failed_bounty_monster_id);
     }
 
     public function testLogUsesEmptyFightLogsWhenExistingFightLogsAreNull(): void

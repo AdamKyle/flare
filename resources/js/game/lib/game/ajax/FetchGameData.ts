@@ -105,6 +105,10 @@ export default class FetchGameData {
                     is_silenced: result.data.sheet.is_silenced,
                 },
                 fame_action_tasks: result.data.sheet.current_fame_tasks,
+                has_faction_loyalty_warning:
+                    result.data.sheet.has_faction_loyalty_warning ?? false,
+                faction_loyalty_warning_notices:
+                    result.data.sheet.faction_loyalty_warning_notices ?? [],
             },
             () => {
                 this.component.setCharacterPosition(

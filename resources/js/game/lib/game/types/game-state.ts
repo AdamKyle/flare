@@ -8,7 +8,10 @@ import RaidMonsterType from "./actions/monster/raid-monster-type";
 import QuestType from "./quests/quest-type";
 import KingdomDetails from "../../../components/kingdoms/deffinitions/kingdom-details";
 import KingdomLogDetails from "../../../components/kingdoms/deffinitions/kingdom-log-details";
-import { FameTasks } from "../../../components/faction-loyalty/deffinitions/faction-loaylaty";
+import {
+    FactionLoyaltyWarningNotice,
+    FameTasks,
+} from "../../../components/faction-loyalty/deffinitions/faction-loaylaty";
 
 export type GameActionState = {
     monsters: MonsterType[];
@@ -62,6 +65,10 @@ export default interface GameState {
     map_data: MapState | null;
 
     fame_action_tasks: FameTasks[] | null;
+
+    has_faction_loyalty_warning: boolean;
+
+    faction_loyalty_warning_notices: FactionLoyaltyWarningNotice[];
 
     show_guide_quest_completed: boolean;
 

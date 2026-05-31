@@ -1,4 +1,7 @@
-import { FactionLoyaltyNpc } from "../deffinitions/faction-loaylaty";
+import {
+    FactionLoyaltyNpc,
+    FactionLoyaltyWarningNotice,
+} from "../deffinitions/faction-loaylaty";
 
 export default interface FactionNpcSectionProps {
     character_id: number;
@@ -14,7 +17,12 @@ export default interface FactionNpcSectionProps {
     is_delve_running?: boolean;
     automation_time_out?: number;
     is_automation_processing?: boolean;
+    warning_notices?: FactionLoyaltyWarningNotice[];
     show_automation_screen?: () => void;
     stop_automation?: () => void;
     update_automation_timer?: (timeLeft: number) => void;
+    update_warning_notices?: (
+        hasWarning: boolean,
+        warningNotices: FactionLoyaltyWarningNotice[],
+    ) => void;
 }

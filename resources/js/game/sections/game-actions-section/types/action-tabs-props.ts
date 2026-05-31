@@ -1,5 +1,8 @@
 import React from "react";
-import { FameTasks } from "../../../components/faction-loyalty/deffinitions/faction-loaylaty";
+import {
+    FactionLoyaltyWarningNotice,
+    FameTasks,
+} from "../../../components/faction-loyalty/deffinitions/faction-loaylaty";
 
 export default interface ActionTabsProps {
     children: React.ReactNode;
@@ -23,4 +26,19 @@ export default interface ActionTabsProps {
     is_faction_loyalty_automation_running: boolean;
 
     is_delve_running: boolean;
+
+    has_faction_loyalty_warning: boolean;
+
+    faction_loyalty_warning_notices: FactionLoyaltyWarningNotice[];
+
+    update_faction_loyalty_warning: (
+        hasWarning: boolean,
+        warningNotices?: FactionLoyaltyWarningNotice[],
+    ) => void;
+}
+
+export interface ActionTab {
+    key: string;
+    name: string;
+    has_warning?: boolean;
 }

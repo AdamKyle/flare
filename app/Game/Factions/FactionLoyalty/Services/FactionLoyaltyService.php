@@ -17,6 +17,7 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MapNameValue;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Events\Values\EventType;
+use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyAutomationWarningState;
 use Exception;
 
 class FactionLoyaltyService
@@ -54,10 +55,12 @@ class FactionLoyaltyService
             ];
         })->toArray();
 
-        $warningNotice = $this->getLatestUnreadWarningNotice($character);
+        $warningNotices = $this->getUnreadWarningNotices($character);
+        $warningNotice = $warningNotices[0] ?? null;
 
-        $factionLoyalty->factionLoyaltyNpcs->each(function (FactionLoyaltyNpc $factionLoyaltyNpc) use ($warningNotice) {
+        $factionLoyalty->factionLoyaltyNpcs->each(function (FactionLoyaltyNpc $factionLoyaltyNpc) use ($warningNotice, $warningNotices) {
             $factionLoyaltyNpc->setAttribute('faction_loyalty_warning_notice', $warningNotice);
+            $factionLoyaltyNpc->setAttribute('faction_loyalty_warning_notices', $warningNotices);
         });
 
         return $this->successResult([
@@ -74,31 +77,40 @@ class FactionLoyaltyService
      */
     public function getLatestUnreadWarningNotice(Character $character): ?array
     {
-        $warning = FactionLoyaltyAutomationWarning::where('character_id', $character->id)
+        return $this->getUnreadWarningNotices($character)[0] ?? null;
+    }
+
+    /**
+     * Get all unread faction loyalty automation warning notices.
+     */
+    public function getUnreadWarningNotices(Character $character): array
+    {
+        return FactionLoyaltyAutomationWarning::where('character_id', $character->id)
             ->orderByDesc('id')
-            ->first();
-
-        if (is_null($warning)) {
-            return null;
-        }
-
-        return [
-            'type' => $warning->type,
-            'message' => $warning->message,
-        ];
+            ->get()
+            ->map(function (FactionLoyaltyAutomationWarning $warning): array {
+                return [
+                    'id' => $warning->id,
+                    'type' => $warning->type,
+                    'message' => $warning->message,
+                ];
+            })
+            ->values()
+            ->toArray();
     }
 
     /**
      * Dismiss the latest faction loyalty automation warning notice.
      */
-    public function dismissLatestWarningNotice(Character $character): void
+    public function dismissLatestWarningNotice(Character $character, ?int $warningId = null): array
     {
-        $warning = FactionLoyaltyAutomationWarning::where('character_id', $character->id)
-            ->orderByDesc('id')
-            ->first();
+        $warningQuery = FactionLoyaltyAutomationWarning::where('character_id', $character->id);
+        $warning = is_null($warningId)
+            ? $warningQuery->orderByDesc('id')->first()
+            : $warningQuery->where('id', $warningId)->first();
 
         if (is_null($warning)) {
-            return;
+            return $this->automationWarningState($character);
         }
 
         if (! is_null($warning->faction_loyalty_automation_log_id) && in_array($warning->log_type, ['fight_logs', 'crafting_logs'], true) && ! is_null($warning->log_entry_id)) {
@@ -119,6 +131,29 @@ class FactionLoyaltyService
         }
 
         $warning->delete();
+
+        return $this->automationWarningState($character);
+    }
+
+    /**
+     * Build and dispatch the faction loyalty automation warning state.
+     *
+     * @param Character $character
+     * @return array
+     */
+    private function automationWarningState(Character $character): array
+    {
+        $warningNotices = $this->getUnreadWarningNotices($character);
+        $warningNotice = $warningNotices[0] ?? null;
+        $hasWarning = count($warningNotices) > 0;
+
+        event(new FactionLoyaltyAutomationWarningState($character->user, $hasWarning, $warningNotices));
+
+        return [
+            'has_warning' => $hasWarning,
+            'warning_notices' => $warningNotices,
+            'warning_notice' => $warningNotice,
+        ];
     }
 
     /**

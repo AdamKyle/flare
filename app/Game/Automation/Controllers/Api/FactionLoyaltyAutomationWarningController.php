@@ -21,8 +21,8 @@ class FactionLoyaltyAutomationWarningController
      */
     public function dismiss(FactionLoyaltyAutomationWarningRequest $request, Character $character): JsonResponse
     {
-        $this->factionLoyaltyAutomationWarningService->dismissLatestWarning($character);
+        $warningId = $request->has('warning_id') ? $request->integer('warning_id') : null;
 
-        return response()->json();
+        return response()->json($this->factionLoyaltyAutomationWarningService->dismissLatestWarning($character, $warningId));
     }
 }

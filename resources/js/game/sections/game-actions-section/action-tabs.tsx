@@ -2,17 +2,15 @@ import React from "react";
 import FactionFame from "../../components/faction-loyalty/faction-fame";
 import TabPanel from "../../components/ui/tabs/tab-panel";
 import Tabs from "../../components/ui/tabs/tabs";
-import ActionTabsProps from "./types/action-tabs-props";
-
-type TabDefinition = { key: string; name: string }[];
+import ActionTabsProps, { ActionTab } from "./types/action-tabs-props";
 
 export default class ActionTabs extends React.Component<ActionTabsProps, {}> {
-    private tabs: TabDefinition;
-
     constructor(props: ActionTabsProps) {
         super(props);
+    }
 
-        this.tabs = [
+    buildTabs(): ActionTab[] {
+        return [
             {
                 key: "actions",
                 name: "Actions",
@@ -20,13 +18,18 @@ export default class ActionTabs extends React.Component<ActionTabsProps, {}> {
             {
                 key: "faction-loyalty",
                 name: "Faction Loyalty",
+                has_warning: this.props.has_faction_loyalty_warning,
             },
         ];
     }
 
     render() {
         return this.props.use_tabs ? (
-            <Tabs tabs={this.tabs} disabled={false}>
+            <Tabs
+                tabs={this.buildTabs()}
+                disabled={false}
+                icon_key={"has_warning"}
+            >
                 <TabPanel key={"actions"}>{this.props.children}</TabPanel>
                 <TabPanel key={"faction-loyalty"}>
                     <FactionFame
@@ -43,6 +46,15 @@ export default class ActionTabs extends React.Component<ActionTabsProps, {}> {
                             this.props.is_faction_loyalty_automation_running
                         }
                         is_delve_running={this.props.is_delve_running}
+                        has_faction_loyalty_warning={
+                            this.props.has_faction_loyalty_warning
+                        }
+                        faction_loyalty_warning_notices={
+                            this.props.faction_loyalty_warning_notices
+                        }
+                        update_faction_loyalty_warning={
+                            this.props.update_faction_loyalty_warning
+                        }
                     />
                 </TabPanel>
             </Tabs>

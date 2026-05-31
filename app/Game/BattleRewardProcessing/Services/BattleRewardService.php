@@ -40,7 +40,7 @@ class BattleRewardService
     /**
      * @var array $context
      */
-    private array $context;
+    private array $context = [];
 
     /**
      * @param BattleMessageHandler $battleMessageHandler
@@ -228,7 +228,7 @@ class BattleRewardService
 
             $this->character = $this->character->refresh();
 
-            event(new FactionLoyaltyUpdate($this->character->user, $this->factionLoyaltyService->getLoyaltyInfoForPlane($this->character)));
+            $this->sendFactionLoyaltyUpdateEvent();
 
             return;
         }
@@ -238,6 +238,20 @@ class BattleRewardService
         $this->factionLoyaltyBountyHandler->handleBounty($this->character, $this->monster, $totalCreatures);
 
         $this->character = $this->character->refresh();
+
+        $this->sendFactionLoyaltyUpdateEvent();
+    }
+
+    /**
+     * Send the faction loyalty update event.
+     *
+     * @return void
+     */
+    private function sendFactionLoyaltyUpdateEvent(): void
+    {
+        if ($this->context['skip_faction_loyalty_update_event'] ?? false) {
+            return;
+        }
 
         event(new FactionLoyaltyUpdate($this->character->user, $this->factionLoyaltyService->getLoyaltyInfoForPlane($this->character)));
     }

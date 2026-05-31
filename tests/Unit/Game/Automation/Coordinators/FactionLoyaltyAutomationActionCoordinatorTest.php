@@ -201,13 +201,9 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
 
     public function testResolveActionReturnsFightWhenLastActionWasCrafting(): void
     {
-        $this->factionLoyaltyAutomation->log()->update([
-            'crafting_logs' => [
-                [
-                    'created_at' => now()->toDateTimeString(),
-                ],
-            ],
-            'fight_logs' => [],
+        $this->factionLoyaltyAutomation->update([
+            'last_automation_action' => FactionLoyaltyCoordinatorAction::CRAFT->value,
+            'last_automation_action_at' => now(),
         ]);
 
         $result = $this->coordinator
@@ -219,13 +215,9 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
 
     public function testResolveActionReturnsCraftWhenLastActionWasFighting(): void
     {
-        $this->factionLoyaltyAutomation->log()->update([
-            'crafting_logs' => [],
-            'fight_logs' => [
-                [
-                    'created_at' => now()->toDateTimeString(),
-                ],
-            ],
+        $this->factionLoyaltyAutomation->update([
+            'last_automation_action' => FactionLoyaltyCoordinatorAction::FIGHT->value,
+            'last_automation_action_at' => now(),
         ]);
 
         $result = $this->coordinator
@@ -235,19 +227,11 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
         $this->assertEquals(FactionLoyaltyCoordinatorAction::CRAFT->value, $result['type']);
     }
 
-    public function testResolveActionReturnsFightWhenCraftingLogIsNewerThanFightLog(): void
+    public function testResolveActionReturnsFightWhenCompactStateLastActionIsCraft(): void
     {
-        $this->factionLoyaltyAutomation->log()->update([
-            'crafting_logs' => [
-                [
-                    'created_at' => now()->toDateTimeString(),
-                ],
-            ],
-            'fight_logs' => [
-                [
-                    'created_at' => now()->subMinute()->toDateTimeString(),
-                ],
-            ],
+        $this->factionLoyaltyAutomation->update([
+            'last_automation_action' => FactionLoyaltyCoordinatorAction::CRAFT->value,
+            'last_automation_action_at' => now(),
         ]);
 
         $result = $this->coordinator
@@ -257,19 +241,11 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
         $this->assertEquals(FactionLoyaltyCoordinatorAction::FIGHT->value, $result['type']);
     }
 
-    public function testResolveActionReturnsCraftWhenFightLogIsNewerThanCraftingLog(): void
+    public function testResolveActionReturnsCraftWhenCompactStateLastActionIsFight(): void
     {
-        $this->factionLoyaltyAutomation->log()->update([
-            'crafting_logs' => [
-                [
-                    'created_at' => now()->subMinute()->toDateTimeString(),
-                ],
-            ],
-            'fight_logs' => [
-                [
-                    'created_at' => now()->toDateTimeString(),
-                ],
-            ],
+        $this->factionLoyaltyAutomation->update([
+            'last_automation_action' => FactionLoyaltyCoordinatorAction::FIGHT->value,
+            'last_automation_action_at' => now(),
         ]);
 
         $result = $this->coordinator

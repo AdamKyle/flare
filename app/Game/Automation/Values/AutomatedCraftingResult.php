@@ -34,6 +34,8 @@ class AutomatedCraftingResult
 
     private int $successfulTrainingCrafts = 0;
 
+    private ?string $logEntryId = null;
+
     /**
      * Set up the result.
      *
@@ -57,6 +59,7 @@ class AutomatedCraftingResult
         $this->goldSpent = 0;
         $this->successfulTargetCrafts = 0;
         $this->successfulTrainingCrafts = 0;
+        $this->logEntryId = null;
 
         return $this;
     }
@@ -218,6 +221,19 @@ class AutomatedCraftingResult
     }
 
     /**
+     * Set the automation log entry id.
+     *
+     * @param string $logEntryId
+     * @return AutomatedCraftingResult
+     */
+    public function setLogEntryId(string $logEntryId): AutomatedCraftingResult
+    {
+        $this->logEntryId = $logEntryId;
+
+        return $this;
+    }
+
+    /**
      * Get the result type.
      *
      * @return AutomatedCraftingResultType
@@ -355,5 +371,15 @@ class AutomatedCraftingResult
     public function getSuccessfulTrainingCrafts(): int
     {
         return $this->successfulTrainingCrafts;
+    }
+
+    /**
+     * Get the automation log entry id.
+     *
+     * @return string|null
+     */
+    public function getLogEntryId(): ?string
+    {
+        return $this->logEntryId;
     }
 }

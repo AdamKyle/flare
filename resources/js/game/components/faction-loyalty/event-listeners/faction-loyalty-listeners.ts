@@ -3,6 +3,16 @@ import { inject, injectable } from "tsyringe";
 import CoreEventListener from "../../../lib/game/event-listeners/core-event-listener";
 import FactionLoyaltyListener from "./faction-loyalty-listener";
 import FactionFame from "../faction-fame";
+import { FactionLoyalty } from "../deffinitions/faction-loaylaty";
+import { FactionLoyaltyNpcListItem } from "../types/faction-loyalty-state";
+
+interface FactionLoyaltyUpdateEvent {
+    factionLoyalty: {
+        npcs: FactionLoyaltyNpcListItem[];
+        map_name: string;
+        faction_loyalty: FactionLoyalty;
+    };
+}
 
 @injectable()
 export default class FactionLoyaltyListeners implements FactionLoyaltyListener {
@@ -29,8 +39,8 @@ export default class FactionLoyaltyListeners implements FactionLoyaltyListener {
             this.factionLoyaltyUpdate = echo.private(
                 "faction-loyalty-update-" + this.userId,
             );
-        } catch (e: any | unknown) {
-            throw new Error(e);
+        } catch (error: unknown) {
+            throw new Error(String(error));
         }
     }
 
@@ -45,7 +55,7 @@ export default class FactionLoyaltyListeners implements FactionLoyaltyListener {
 
         this.factionLoyaltyUpdate.listen(
             "Game.Factions.FactionLoyalty.Events.FactionLoyaltyUpdate",
-            (event: any) => {
+            (event: FactionLoyaltyUpdateEvent) => {
                 if (!this.component) {
                     return;
                 }

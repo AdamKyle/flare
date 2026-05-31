@@ -42,9 +42,7 @@ export default class FactionNpcTasks extends React.Component<
             error_message: null,
             must_revive: false,
             attack_type_selected: this.props.attack_type ?? "attack",
-            warning_notice:
-                this.props.faction_loyalty_npc.faction_loyalty_warning_notice ??
-                null,
+            warning_notices: this.getWarningNoticesFromNpc(),
             dismissing_warning_notice: false,
         };
 
@@ -62,14 +60,39 @@ export default class FactionNpcTasks extends React.Component<
 
         if (
             previousProps.faction_loyalty_npc.faction_loyalty_warning_notice !==
-            this.props.faction_loyalty_npc.faction_loyalty_warning_notice
+                this.props.faction_loyalty_npc.faction_loyalty_warning_notice ||
+            previousProps.faction_loyalty_npc
+                .faction_loyalty_warning_notices !==
+                this.props.faction_loyalty_npc
+                    .faction_loyalty_warning_notices ||
+            previousProps.warning_notices !== this.props.warning_notices
         ) {
             this.setState({
-                warning_notice:
-                    this.props.faction_loyalty_npc
-                        .faction_loyalty_warning_notice ?? null,
+                warning_notices: this.getWarningNoticesFromNpc(),
             });
         }
+    }
+
+    getWarningNoticesFromNpc(): FactionLoyaltyWarningNotice[] {
+        if (typeof this.props.warning_notices !== "undefined") {
+            return this.props.warning_notices;
+        }
+
+        const warningNotices =
+            this.props.faction_loyalty_npc.faction_loyalty_warning_notices;
+
+        if (typeof warningNotices !== "undefined" && warningNotices !== null) {
+            return warningNotices;
+        }
+
+        const warningNotice =
+            this.props.faction_loyalty_npc.faction_loyalty_warning_notice;
+
+        if (typeof warningNotice === "undefined" || warningNotice === null) {
+            return [];
+        }
+
+        return [warningNotice];
     }
 
     bountyTask(monsterId?: number) {
@@ -334,7 +357,7 @@ export default class FactionNpcTasks extends React.Component<
         }
     }
 
-    dismissWarningNotice() {
+    dismissWarningNotice(warningNotice?: FactionLoyaltyWarningNotice) {
         this.setState(
             {
                 dismissing_warning_notice: true,
@@ -347,13 +370,32 @@ export default class FactionNpcTasks extends React.Component<
                             this.props.character_id +
                             "/warning/dismiss",
                     )
+                    .setParameters(
+                        typeof warningNotice === "undefined"
+                            ? {}
+                            : { warning_id: warningNotice.id },
+                    )
                     .doAjaxCall(
                         "post",
-                        (_result: AxiosResponse) => {
+                        (result: AxiosResponse) => {
+                            const warningNotices =
+                                result.data.warning_notices ?? [];
+
                             this.setState({
-                                warning_notice: null,
+                                warning_notices: warningNotices,
                                 dismissing_warning_notice: false,
                             });
+
+                            if (
+                                typeof this.props.update_warning_notices !==
+                                "undefined"
+                            ) {
+                                this.props.update_warning_notices(
+                                    result.data.has_warning ??
+                                        warningNotices.length > 0,
+                                    warningNotices,
+                                );
+                            }
                         },
                         (error: AxiosError) => {
                             this.setState({
@@ -374,32 +416,56 @@ export default class FactionNpcTasks extends React.Component<
     }
 
     renderWarningNotice(): ReactNode {
-        const warningNotice: FactionLoyaltyWarningNotice | null =
-            this.state.warning_notice;
+        const warningNotices: FactionLoyaltyWarningNotice[] =
+            this.state.warning_notices ?? [];
 
-        if (warningNotice === null) {
+        if (warningNotices.length === 0) {
             return null;
         }
 
         return (
-            <WarningAlert additional_css={"my-3 w-full"}>
-                <div className="flex items-start justify-between gap-3">
-                    <h4 className="text-sm font-semibold">
-                        Faction loyalty automation stopped
-                    </h4>
-                    <button
-                        type="button"
-                        className="shrink-0 text-sm font-semibold text-yellow-900 hover:text-yellow-700 dark:text-yellow-100 dark:hover:text-yellow-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
-                        onClick={this.dismissWarningNotice.bind(this)}
-                        disabled={this.state.dismissing_warning_notice}
-                        aria-label="Dismiss warning"
-                        title="Dismiss warning"
-                    >
-                        X
-                    </button>
-                </div>
-                <p className="mt-2 text-sm">{warningNotice.message}</p>
-            </WarningAlert>
+            <>
+                {warningNotices.map(
+                    (warningNotice: FactionLoyaltyWarningNotice) => {
+                        return (
+                            <WarningAlert
+                                key={
+                                    warningNotice.id ??
+                                    warningNotice.type +
+                                        "-" +
+                                        warningNotice.message
+                                }
+                                additional_css={"mb-2 w-full"}
+                            >
+                                <div className="flex w-full items-start gap-3">
+                                    <h4 className="flex-1 text-sm font-semibold">
+                                        Faction loyalty automation stopped
+                                    </h4>
+                                    <button
+                                        type="button"
+                                        className="ml-auto shrink-0 text-sm font-semibold text-yellow-900 hover:text-yellow-700 dark:text-yellow-100 dark:hover:text-yellow-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500"
+                                        onClick={() =>
+                                            this.dismissWarningNotice(
+                                                warningNotice,
+                                            )
+                                        }
+                                        disabled={
+                                            this.state.dismissing_warning_notice
+                                        }
+                                        aria-label="Dismiss warning"
+                                        title="Dismiss warning"
+                                    >
+                                        X
+                                    </button>
+                                </div>
+                                <p className="mt-2 text-sm">
+                                    {warningNotice.message}
+                                </p>
+                            </WarningAlert>
+                        );
+                    },
+                )}
+            </>
         );
     }
 

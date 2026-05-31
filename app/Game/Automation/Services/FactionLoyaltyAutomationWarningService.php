@@ -14,10 +14,11 @@ class FactionLoyaltyAutomationWarningService
 
     /**
      * @param Character $character
-     * @return void
+     * @param int|null $warningId
+     * @return array
      */
-    public function dismissLatestWarning(Character $character): void
+    public function dismissLatestWarning(Character $character, ?int $warningId = null): array
     {
-        $this->factionLoyaltyService->dismissLatestWarningNotice($character);
+        return $this->factionLoyaltyService->dismissLatestWarningNotice($character, $warningId);
     }
 }

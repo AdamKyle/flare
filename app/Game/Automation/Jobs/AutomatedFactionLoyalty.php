@@ -23,6 +23,7 @@ use App\Game\Automation\Values\AutomatedCraftingResult;
 use App\Game\Automation\Values\AutomatedFightResult;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyAutomationWarningState;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -314,7 +315,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
             if (is_null($factionLoyaltyAutomationAction)) {
                 $factionLoyaltyAutomationLog = $this->factionLoyaltyAutomation->refresh()->log;
-                $craftingLogs = $factionLoyaltyAutomationLog?->crafting_logs ?? [];
 
                 FactionLoyaltyAutomationWarning::create([
                     'character_id' => $this->character->id,
@@ -322,10 +322,11 @@ class AutomatedFactionLoyalty implements ShouldQueue
                     'faction_loyalty_automation_log_id' => $factionLoyaltyAutomationLog?->id,
                     'faction_loyalty_npc_id' => $this->factionLoyaltyNpc->id,
                     'log_type' => 'crafting_logs',
-                    'log_entry_id' => $this->getLatestLogEntryId($craftingLogs),
+                    'log_entry_id' => $automatedCraftingResult->getLogEntryId(),
                     'type' => AutomatedCraftingResultType::NOT_ENOUGH_GOLD->value,
                     'message' => 'Not enough gold to craft and no bounty remains for this NPC. Automation has ended.',
                 ]);
+                $this->dispatchWarningState();
 
                 $this->sendOutEventLogUpdate(
                     'Not enough gold to craft and no bounty remains for this NPC. Automation has ended.',
@@ -510,7 +511,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
             }
 
             $factionLoyaltyAutomationLog = $this->factionLoyaltyAutomation->refresh()->log;
-            $fightLogs = $factionLoyaltyAutomationLog?->fight_logs ?? [];
 
             FactionLoyaltyAutomationWarning::create([
                 'character_id' => $this->character->id,
@@ -518,30 +518,41 @@ class AutomatedFactionLoyalty implements ShouldQueue
                 'faction_loyalty_automation_log_id' => $factionLoyaltyAutomationLog?->id,
                 'faction_loyalty_npc_id' => $this->factionLoyaltyNpc?->id,
                 'log_type' => 'fight_logs',
-                'log_entry_id' => $this->getLatestLogEntryId($fightLogs),
+                'log_entry_id' => $automatedFightResult->getLogEntryId(),
                 'type' => $automatedFightResult->getResultType()->value,
                 'message' => $warningMessage,
             ]);
+            $this->dispatchWarningState();
         }
 
         $this->endAutomation($characterCacheData, false);
     }
 
     /**
-     * Get the latest automation log entry id.
+     * Dispatch faction loyalty automation warning state.
      *
-     * @param array $logs
-     * @return string|null
+     * @return void
      */
-    private function getLatestLogEntryId(array $logs): ?string
+    private function dispatchWarningState(): void
     {
-        $latestLog = end($logs);
+        $warningNotices = FactionLoyaltyAutomationWarning::where('character_id', $this->character->id)
+            ->orderByDesc('id')
+            ->get()
+            ->map(function (FactionLoyaltyAutomationWarning $warning): array {
+                return [
+                    'id' => $warning->id,
+                    'type' => $warning->type,
+                    'message' => $warning->message,
+                ];
+            })
+            ->values()
+            ->toArray();
 
-        if (! is_array($latestLog)) {
-            return null;
-        }
-
-        return $latestLog['log_entry_id'] ?? null;
+        event(new FactionLoyaltyAutomationWarningState(
+            $this->character->user,
+            count($warningNotices) > 0,
+            $warningNotices
+        ));
     }
 
     /**
@@ -572,6 +583,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
     {
         $this->factionLoyaltyAutomation->update([
             'failed_bounty_monster_id' => null,
+            'trained_failed_bounty_monster_id' => null,
         ]);
 
         $this->factionLoyaltyAutomation = $this->factionLoyaltyAutomation->refresh();

@@ -15,7 +15,9 @@ export default class WarningAlert extends React.Component<AlertProps, {}> {
                 }
             >
                 <div className="flex justify-between">
-                    <span className="self-center">{this.props.children}</span>
+                    <span className="self-center flex-1">
+                        {this.props.children}
+                    </span>
 
                     {typeof this.props.close_alert !== "undefined" ? (
                         <strong

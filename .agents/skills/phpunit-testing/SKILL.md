@@ -1,10 +1,9 @@
 ---
+name: phpunit-testing
+description: Use this skill when writing, reviewing, or refactoring PHPUnit tests in this repository.
+---
 
-name: back-end-conventions
-description: Use this skill when writing, reviewing, or refactoring PHP/Laravel app code in this repository. Applies to services, handlers, controllers, requests, jobs, commands, events, listeners, models, value objects, enums, migrations, module providers, routes, middleware, and app code under app/Game. Do not use this skill for PHPUnit test standards; use the phpunit-testing skill for tests.
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-# Back End Conventions
+# PHPUnit Testing
 
 ## Scope
 

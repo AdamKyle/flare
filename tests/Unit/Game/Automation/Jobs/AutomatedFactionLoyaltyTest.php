@@ -26,6 +26,7 @@ use App\Game\Automation\Values\AutomatedCraftingResult;
 use App\Game\Automation\Values\AutomatedFightResult;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyAutomationWarningState;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -526,7 +527,13 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->craftingHandler->shouldReceive('setUp')->once()->andReturnSelf();
         $this->craftingHandler->shouldReceive('setCraftForNpc')->once()->andReturnSelf();
         $this->craftingHandler->shouldReceive('setFactionLoyaltyNpc')->once()->andReturnSelf();
-        $this->craftingHandler->shouldReceive('handle')->once()->andReturn($craftingResult);
+        $this->craftingHandler->shouldReceive('handle')->once()->andReturnUsing(function () use ($craftingResult): AutomatedCraftingResult {
+            resolve(FactionLoyaltyAutomationCraftingLogger::class)
+                ->setUp($this->factionLoyaltyAutomation)
+                ->log($craftingResult);
+
+            return $craftingResult;
+        });
 
         $job = new AutomatedFactionLoyalty(
             $this->character->id,
@@ -733,7 +740,13 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->craftingHandler->shouldReceive('setUp')->once()->andReturnSelf();
         $this->craftingHandler->shouldReceive('setCraftForNpc')->once()->andReturnSelf();
         $this->craftingHandler->shouldReceive('setFactionLoyaltyNpc')->once()->andReturnSelf();
-        $this->craftingHandler->shouldReceive('handle')->once()->andReturn($craftingResult);
+        $this->craftingHandler->shouldReceive('handle')->once()->andReturnUsing(function () use ($craftingResult): AutomatedCraftingResult {
+            resolve(FactionLoyaltyAutomationCraftingLogger::class)
+                ->setUp($this->factionLoyaltyAutomation)
+                ->log($craftingResult);
+
+            return $craftingResult;
+        });
 
         $job = new AutomatedFactionLoyalty(
             $this->character->id,
@@ -768,6 +781,13 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertEquals($this->factionLoyaltyAutomation->refresh()->log->crafting_logs[0]['log_entry_id'], $warning->log_entry_id);
         $this->assertEquals(AutomatedCraftingResultType::NOT_ENOUGH_GOLD->value, $warning->type);
         $this->assertEquals('Not enough gold to craft and no bounty remains for this NPC. Automation has ended.', $warning->message);
+        Event::assertDispatched(FactionLoyaltyAutomationWarningState::class, function (FactionLoyaltyAutomationWarningState $event): bool {
+            return $event->has_warning &&
+                $event->warning_notice === [
+                    'type' => AutomatedCraftingResultType::NOT_ENOUGH_GOLD->value,
+                    'message' => 'Not enough gold to craft and no bounty remains for this NPC. Automation has ended.',
+                ];
+        });
     }
 
     public function testHandleEndsAutomationWhenCraftingResultCannotContinue(): void

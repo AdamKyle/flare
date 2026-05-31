@@ -201,32 +201,19 @@ class FactionLoyaltyAutomationActionCoordinator
      */
     private function getLastAction(): ?FactionLoyaltyCoordinatorAction
     {
-        $log = $this->factionLoyaltyAutomation->log;
-
-        if (is_null($log)) {
+        if (is_null($this->factionLoyaltyAutomation->last_automation_action)) {
             return null;
         }
 
-        $lastCraftingLog = collect($log->crafting_logs ?? [])->last();
-        $lastFightLog = collect($log->fight_logs ?? [])->last();
-
-        if (is_null($lastCraftingLog) && is_null($lastFightLog)) {
-            return null;
-        }
-
-        if (is_null($lastFightLog)) {
+        if ($this->factionLoyaltyAutomation->last_automation_action === FactionLoyaltyCoordinatorAction::CRAFT->value) {
             return FactionLoyaltyCoordinatorAction::CRAFT;
         }
 
-        if (is_null($lastCraftingLog)) {
+        if ($this->factionLoyaltyAutomation->last_automation_action === FactionLoyaltyCoordinatorAction::FIGHT->value) {
             return FactionLoyaltyCoordinatorAction::FIGHT;
         }
 
-        if (($lastCraftingLog['created_at'] ?? null) > ($lastFightLog['created_at'] ?? null)) {
-            return FactionLoyaltyCoordinatorAction::CRAFT;
-        }
-
-        return FactionLoyaltyCoordinatorAction::FIGHT;
+        return null;
     }
 
     /**

@@ -1,5 +1,6 @@
 import { AxiosError, AxiosResponse } from "axios";
 import React from "react";
+import { Channel } from "laravel-echo";
 import DangerAlert from "../../components/ui/alerts/simple-alerts/danger-alert";
 import SuccessAlert from "../../components/ui/alerts/simple-alerts/success-alert";
 import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
@@ -13,6 +14,7 @@ import { updateTimers } from "../../lib/ajax/update-timers";
 import {
     FactionLoyalty,
     FactionLoyaltyNpc,
+    FactionLoyaltyWarningNotice,
     FameTasks,
 } from "./deffinitions/faction-loaylaty";
 import FactionNpcSection from "./faction-npc-section";
@@ -25,7 +27,13 @@ import FactionLoyaltyState, {
 import FactionLoyaltyListeners from "./event-listeners/faction-loyalty-listeners";
 import { serviceContainer } from "../../lib/containers/core-container";
 
-declare const Echo: any;
+declare const Echo: {
+    private: (channel: string) => Channel;
+};
+
+interface AutomationTimeOutEvent {
+    forLength: number;
+}
 
 export default class FactionFame extends React.Component<
     FactionLoyaltyProps,
@@ -33,7 +41,7 @@ export default class FactionFame extends React.Component<
 > {
     private factionLoyaltyListeners: FactionLoyaltyListeners;
 
-    private automationTimeOut: any;
+    private automationTimeOut: Channel;
 
     constructor(props: FactionLoyaltyProps) {
         super(props);
@@ -106,7 +114,7 @@ export default class FactionFame extends React.Component<
         this.factionLoyaltyListeners.listen();
         this.automationTimeOut.listen(
             "Game.Automation.Events.AutomationTimeOut",
-            (event: any) => {
+            (event: AutomationTimeOutEvent) => {
                 this.setState({
                     automation_time_out: event.forLength,
                 });
@@ -127,6 +135,15 @@ export default class FactionFame extends React.Component<
                 is_faction_loyalty_automation_running:
                     this.props.is_faction_loyalty_automation_running,
             });
+        }
+
+        if (
+            previousProps.faction_loyalty_warning_notices !==
+            this.props.faction_loyalty_warning_notices
+        ) {
+            this.applyWarningNotices(
+                this.props.faction_loyalty_warning_notices,
+            );
         }
     }
 
@@ -186,6 +203,8 @@ export default class FactionFame extends React.Component<
         factionLoyalty: FactionLoyalty,
         npcs: FactionLoyaltyNpcListItem[],
     ) {
+        const hasWarning = this.hasWarningNotice(factionLoyalty);
+        const warningNotices = this.getWarningNotices(factionLoyalty);
         let helpingNpc = factionLoyalty.faction_loyalty_npcs.filter(
             (factionLoyaltyNpc: FactionLoyaltyNpc) => {
                 return factionLoyaltyNpc.currently_helping;
@@ -205,6 +224,10 @@ export default class FactionFame extends React.Component<
             });
 
             this.props.update_faction_action_tasks(null);
+            this.props.update_faction_loyalty_warning(
+                hasWarning,
+                warningNotices,
+            );
 
             return;
         }
@@ -217,6 +240,7 @@ export default class FactionFame extends React.Component<
             })[0],
             selected_faction_loyalty_npc: factionLoyaltyNpcHelping,
         });
+        this.props.update_faction_loyalty_warning(hasWarning, warningNotices);
 
         this.props.update_faction_action_tasks(
             factionLoyaltyNpcHelping.faction_loyalty_npc_tasks.fame_tasks.filter(
@@ -229,7 +253,111 @@ export default class FactionFame extends React.Component<
         return helpingNpc[0];
     }
 
-    buildNpcList(handler: (npc: any) => void) {
+    updateWarningNotice(
+        hasWarning: boolean,
+        warningNotices: FactionLoyaltyWarningNotice[],
+    ): void {
+        this.applyWarningNotices(warningNotices);
+        this.props.update_faction_loyalty_warning(hasWarning, warningNotices);
+    }
+
+    applyWarningNotices(warningNotices: FactionLoyaltyWarningNotice[]): void {
+        if (
+            !this.state.faction_loyalty ||
+            !this.state.selected_faction_loyalty_npc
+        ) {
+            return;
+        }
+
+        const selectedFactionLoyaltyNpcId =
+            this.state.selected_faction_loyalty_npc.id;
+        const updatedFactionLoyalty = {
+            ...this.state.faction_loyalty,
+            faction_loyalty_npcs:
+                this.state.faction_loyalty.faction_loyalty_npcs.map(
+                    (factionLoyaltyNpc: FactionLoyaltyNpc) => {
+                        return {
+                            ...factionLoyaltyNpc,
+                            faction_loyalty_warning_notice:
+                                warningNotices[0] ?? null,
+                            faction_loyalty_warning_notices: warningNotices,
+                        };
+                    },
+                ),
+        };
+        const selectedFactionLoyaltyNpc =
+            updatedFactionLoyalty.faction_loyalty_npcs.find(
+                (factionLoyaltyNpc: FactionLoyaltyNpc) => {
+                    return factionLoyaltyNpc.id === selectedFactionLoyaltyNpcId;
+                },
+            ) ?? null;
+
+        this.setState({
+            faction_loyalty: updatedFactionLoyalty,
+            selected_faction_loyalty_npc: selectedFactionLoyaltyNpc,
+        });
+    }
+
+    hasWarningNotice(factionLoyalty: FactionLoyalty): boolean {
+        if (this.props.has_faction_loyalty_warning) {
+            return true;
+        }
+
+        return this.getWarningNotices(factionLoyalty).length > 0;
+    }
+
+    getWarningNotices(
+        factionLoyalty: FactionLoyalty,
+    ): FactionLoyaltyWarningNotice[] {
+        if (this.props.faction_loyalty_warning_notices.length > 0) {
+            return this.props.faction_loyalty_warning_notices;
+        }
+
+        const factionLoyaltyNpc = factionLoyalty.faction_loyalty_npcs.find(
+            (factionLoyaltyNpc: FactionLoyaltyNpc) => {
+                if (
+                    typeof factionLoyaltyNpc.faction_loyalty_warning_notices !==
+                        "undefined" &&
+                    factionLoyaltyNpc.faction_loyalty_warning_notices !== null
+                ) {
+                    return (
+                        factionLoyaltyNpc.faction_loyalty_warning_notices
+                            .length > 0
+                    );
+                }
+
+                return (
+                    factionLoyaltyNpc.faction_loyalty_warning_notice !== null &&
+                    typeof factionLoyaltyNpc.faction_loyalty_warning_notice !==
+                        "undefined"
+                );
+            },
+        );
+
+        if (typeof factionLoyaltyNpc === "undefined") {
+            return [];
+        }
+
+        if (
+            typeof factionLoyaltyNpc.faction_loyalty_warning_notices !==
+                "undefined" &&
+            factionLoyaltyNpc.faction_loyalty_warning_notices !== null
+        ) {
+            return factionLoyaltyNpc.faction_loyalty_warning_notices;
+        }
+
+        if (
+            factionLoyaltyNpc.faction_loyalty_warning_notice !== null &&
+            typeof factionLoyaltyNpc.faction_loyalty_warning_notice !==
+                "undefined"
+        ) {
+            return [factionLoyaltyNpc.faction_loyalty_warning_notice];
+        }
+
+        return [];
+    }
+
+    buildNpcList(handler: (npc: FactionLoyaltyNpcListItem) => void) {
         return this.state.npcs.map((npc: FactionLoyaltyNpcListItem) => {
             return {
                 name: npc.name,
@@ -254,15 +382,21 @@ export default class FactionFame extends React.Component<
             return;
         }
 
+        const selectedFactionLoyaltyNpc =
+            this.state.faction_loyalty.faction_loyalty_npcs.filter(
+                (factionLoyaltyNpc: FactionLoyaltyNpc) => {
+                    return factionLoyaltyNpc.npc_id === npc.id;
+                },
+            )[0];
+
         this.setState({
             selected_npc: npc,
-            selected_faction_loyalty_npc:
-                this.state.faction_loyalty.faction_loyalty_npcs.filter(
-                    (factionLoyaltyNpc: FactionLoyaltyNpc) => {
-                        return factionLoyaltyNpc.npc_id === npc.id;
-                    },
-                )[0],
+            selected_faction_loyalty_npc: selectedFactionLoyaltyNpc,
         });
+        this.props.update_faction_loyalty_warning(
+            this.hasWarningNotice(this.state.faction_loyalty),
+            this.getWarningNotices(this.state.faction_loyalty),
+        );
     }
 
     isAssisting(): boolean {
@@ -490,7 +624,12 @@ export default class FactionFame extends React.Component<
         return (
             <div>
                 <div className="py-4">
-                    <h2>{this.state.game_map_name} Loyalty</h2>
+                    <h2>
+                        {this.state.game_map_name} Loyalty{" "}
+                        {this.hasWarningNotice(this.state.faction_loyalty) ? (
+                            <i className="fas fa-exclamation-triangle text-yellow-600 dark:text-yellow-400"></i>
+                        ) : null}
+                    </h2>
                     <p className="my-4">
                         Below you can select an NPC to assist. Each NPC will
                         have it's own set of tasks to complete. Crafting tasks
@@ -611,11 +750,17 @@ export default class FactionFame extends React.Component<
                                 is_automation_processing={
                                     this.state.is_processing
                                 }
+                                warning_notices={
+                                    this.props.faction_loyalty_warning_notices
+                                }
                                 show_automation_screen={this.showAutomationScreen.bind(
                                     this,
                                 )}
                                 stop_automation={this.stopAutomation.bind(this)}
                                 update_automation_timer={this.updateAutomationTimer.bind(
+                                    this,
+                                )}
+                                update_warning_notices={this.updateWarningNotice.bind(
                                     this,
                                 )}
                             />

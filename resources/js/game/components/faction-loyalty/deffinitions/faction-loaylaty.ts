@@ -30,9 +30,11 @@ export interface FactionLoyaltyNpc {
     npc: NPC;
     faction_loyalty_npc_tasks: FactionLoyaltyNpcTask;
     faction_loyalty_warning_notice?: FactionLoyaltyWarningNotice | null;
+    faction_loyalty_warning_notices?: FactionLoyaltyWarningNotice[] | null;
 }
 
 export interface FactionLoyaltyWarningNotice {
+    id: number;
     type: string;
     message: string;
     read?: boolean;

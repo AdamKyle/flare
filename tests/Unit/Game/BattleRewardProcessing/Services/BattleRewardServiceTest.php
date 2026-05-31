@@ -11,12 +11,14 @@ use App\Game\BattleRewardProcessing\Jobs\Events\WinterEventChristmasGiftHandler;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Events\Values\EventType;
+use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
 use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\FactionLoyalty\FactionLoyaltyFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateGameMap;
@@ -505,6 +507,37 @@ class BattleRewardServiceTest extends TestCase
 
         $faction = $character->factions()->where('game_map_id', $character->map->game_map_id)->first();
         $this->assertEquals(5, $faction->current_points);
+    }
+
+    public function testProcessRewardsCanSkipFactionLoyaltyUpdateEventForBatchAutomationRewards(): void
+    {
+        $character = $this->characterFactory->getCharacter();
+        $factionLoyaltyFactory = (new FactionLoyaltyFactory)
+            ->setUp($character);
+
+        $character = $factionLoyaltyFactory->getCharacter();
+        $factionLoyaltyNpc = $factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
+        $monster = $factionLoyaltyFactory->getBountyMonstersForNpc($factionLoyaltyNpc)[0];
+
+        Event::fake();
+        Queue::fake();
+
+        $this->battleRewardService
+            ->setUp($character->id, $monster->id)
+            ->setContext([
+                'total_creatures' => 1,
+                'total_xp' => 10,
+                'total_skill_xp' => 0,
+                'total_faction_points' => 0,
+                'skip_faction_loyalty_update_event' => true,
+            ])
+            ->processRewards();
+
+        $matchingTask = collect($factionLoyaltyNpc->refresh()->factionLoyaltyNpcTasks->fame_tasks)
+            ->first(fn (array $task): bool => ($task['monster_id'] ?? null) === $monster->id);
+
+        $this->assertEquals(1, $matchingTask['current_amount']);
+        Event::assertNotDispatched(FactionLoyaltyUpdate::class);
     }
 
     public function testNoFactionRewardsGivenWhenCharacterIsAutoBattling(): void

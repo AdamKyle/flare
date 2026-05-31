@@ -1,7 +1,13 @@
 import React from "react";
 
+export interface TabDefinition {
+    key: string;
+    name: string;
+    [key: string]: string | boolean | undefined;
+}
+
 export default interface TabProperties {
-    tabs: { key: string; name: string }[];
+    tabs: TabDefinition[];
 
     full_width?: boolean;
 

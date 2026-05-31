@@ -1,10 +1,16 @@
 import React, { Fragment } from "react";
 import { Tab } from "@headlessui/react";
-import TabProperties from "../../../lib/ui/types/tabs/tabs-properties";
+import TabProperties, {
+    TabDefinition,
+} from "../../../lib/ui/types/tabs/tabs-properties";
 import clsx from "clsx";
 import { isEqual } from "lodash";
 
-export default class Tabs extends React.Component<TabProperties, any> {
+interface TabsState {
+    tabs: TabDefinition[];
+}
+
+export default class Tabs extends React.Component<TabProperties, TabsState> {
     constructor(props: TabProperties) {
         super(props);
 
@@ -27,10 +33,20 @@ export default class Tabs extends React.Component<TabProperties, any> {
         }
     }
 
-    renderIcon(
-        tab: { [key: string]: string | boolean; key: string; name: string },
-        selected: boolean,
-    ) {
+    renderIcon(tab: TabDefinition, selected: boolean) {
+        if (this.props.icon_key === "has_warning") {
+            if (tab[this.props.icon_key]) {
+                return (
+                    <span>
+                        <i className="fas fa-exclamation-triangle text-yellow-600 dark:text-yellow-400"></i>{" "}
+                        {tab.name}
+                    </span>
+                );
+            }
+
+            return tab.name;
+        }
+
         if (typeof this.props.icon_key !== "undefined" && !selected) {
             if (this.props.icon_key === "has_logs") {
                 if (tab[this.props.icon_key]) {
@@ -86,7 +102,7 @@ export default class Tabs extends React.Component<TabProperties, any> {
     }
 
     renderEachTab() {
-        return this.state.tabs.map((tab: any) => {
+        return this.state.tabs.map((tab: TabDefinition) => {
             return (
                 <Tab key={tab.key} as={Fragment}>
                     {({ selected }) => (

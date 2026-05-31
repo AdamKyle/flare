@@ -4,3 +4,7 @@
 Broadcast::channel('faction-loyalty-update-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;
 });
+
+Broadcast::channel('faction-loyalty-automation-warning-{userId}', function ($user, $userId) {
+    return $user->id === (int) $userId;
+});

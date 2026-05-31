@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import React, { Fragment } from "react";
+import { Channel } from "laravel-echo";
 import KingdomsList from "./components/kingdoms/kingdoms-list";
 import SuccessAlert from "./components/ui/alerts/simple-alerts/success-alert";
 import WarningAlert from "./components/ui/alerts/simple-alerts/warning-alert";
@@ -32,7 +33,10 @@ import MapState from "./sections/map/types/map-state";
 import PositionType from "./sections/map/types/map/position-type";
 import ScreenRefresh from "./sections/screen-refresh/screen-refresh";
 import KingdomLogDetails from "./components/kingdoms/deffinitions/kingdom-log-details";
-import { FameTasks } from "./components/faction-loyalty/deffinitions/faction-loaylaty";
+import {
+    FactionLoyaltyWarningNotice,
+    FameTasks,
+} from "./components/faction-loyalty/deffinitions/faction-loaylaty";
 import IsTabletInPortraitDisplayAlert from "./components/ui/alerts/tablet-portrait-detector/is-tablet-in-portrait-display-alert";
 import OrangeButton from "./components/ui/buttons/orange-button";
 import SuggestionsAndBugs from "./components/suggestions/suggestions-and-bugs";
@@ -41,10 +45,22 @@ import TurnOffUserIntroFlag from "./lib/game/ajax/turn-off-user-intro-flag";
 import SurveyComponent from "./components/survey/survey-component";
 import PrimaryButton from "./components/ui/buttons/primary-button";
 
+declare const Echo: {
+    private: (channel: string) => Channel;
+};
+
+interface FactionLoyaltyAutomationWarningStateEvent {
+    has_warning: boolean;
+    warning_notices?: FactionLoyaltyWarningNotice[];
+    warning_notice?: FactionLoyaltyWarningNotice | null;
+}
+
 export default class Game extends React.Component<GameProps, GameState> {
     private gameEventListener?: GameEventListeners;
 
     private turnOffIntroFlagAjax: TurnOffUserIntroFlag;
+
+    private factionLoyaltyAutomationWarning: Channel;
 
     constructor(props: GameProps) {
         super(props);
@@ -74,6 +90,8 @@ export default class Game extends React.Component<GameProps, GameState> {
             action_data: null,
             map_data: null,
             fame_action_tasks: null,
+            has_faction_loyalty_warning: false,
+            faction_loyalty_warning_notices: [],
             show_guide_quest_completed: false,
             hide_donation_alert: false,
             show_map: true,
@@ -106,6 +124,10 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         this.turnOffIntroFlagAjax =
             serviceContainer().fetch(TurnOffUserIntroFlag);
+
+        this.factionLoyaltyAutomationWarning = Echo.private(
+            "faction-loyalty-automation-warning-" + this.props.userId,
+        );
     }
 
     componentDidMount() {
@@ -148,11 +170,37 @@ export default class Game extends React.Component<GameProps, GameState> {
             this.gameEventListener.listenToEvents();
         }
 
+        this.listenForFactionLoyaltyAutomationWarnings();
+
         if (localStorage.getItem("hide-dontainion") !== null) {
             this.setState({
                 hide_donation_alert: true,
             });
         }
+    }
+
+    listenForFactionLoyaltyAutomationWarnings(): void {
+        this.factionLoyaltyAutomationWarning.listen(
+            "Game.Factions.FactionLoyalty.Events.FactionLoyaltyAutomationWarningState",
+            (event: FactionLoyaltyAutomationWarningStateEvent) => {
+                this.updateFactionLoyaltyWarning(
+                    event.has_warning,
+                    event.warning_notices ??
+                        (event.warning_notice ? [event.warning_notice] : []),
+                );
+            },
+        );
+    }
+
+    updateFactionLoyaltyWarning(
+        hasWarning: boolean,
+        warningNotices?: FactionLoyaltyWarningNotice[],
+    ): void {
+        this.setState({
+            has_faction_loyalty_warning: hasWarning,
+            faction_loyalty_warning_notices:
+                warningNotices ?? this.state.faction_loyalty_warning_notices,
+        });
     }
 
     componentDidUpdate() {
@@ -608,6 +656,17 @@ export default class Game extends React.Component<GameProps, GameState> {
                                             this.state.character
                                                 .is_delve_running
                                         }
+                                        has_faction_loyalty_warning={
+                                            this.state
+                                                .has_faction_loyalty_warning
+                                        }
+                                        faction_loyalty_warning_notices={
+                                            this.state
+                                                .faction_loyalty_warning_notices
+                                        }
+                                        update_faction_loyalty_warning={this.updateFactionLoyaltyWarning.bind(
+                                            this,
+                                        )}
                                     >
                                         <ActionSection
                                             character={this.state.character}

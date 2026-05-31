@@ -1,4 +1,5 @@
 import PositionType from "../../../sections/map/types/map/position-type";
+import { FactionLoyaltyWarningNotice } from "../../../components/faction-loyalty/deffinitions/faction-loaylaty";
 import AttackTypes from "./attack-types";
 import ExtraActionType from "./extra-action-type";
 import InventoryType from "./inventory-type";
@@ -241,6 +242,10 @@ export interface CharacterType {
     can_see_pledge_tab: boolean;
 
     pledged_to_faction_id: number | null;
+
+    has_faction_loyalty_warning: boolean;
+
+    faction_loyalty_warning_notices: FactionLoyaltyWarningNotice[];
 
     is_showing_survey: boolean;
 

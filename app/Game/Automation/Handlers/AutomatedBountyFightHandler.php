@@ -419,21 +419,8 @@ class AutomatedBountyFightHandler
      */
     private function hasCompletedTrainingForFailedBounty(Monster $bountyMonster): bool
     {
-        if ($this->factionLoyaltyAutomation->failed_bounty_monster_id !== $bountyMonster->id) {
-            return false;
-        }
-
-        $fightLogs = $this->factionLoyaltyAutomation->log?->fight_logs ?? [];
-
-        $lastRelevantFightLog = collect($fightLogs)->reverse()->first(function (array $fightLog) use ($bountyMonster): bool {
-            return ($fightLog['failed_bounty_monster_id'] ?? null) === $bountyMonster->id;
-        });
-
-        if (is_null($lastRelevantFightLog)) {
-            return false;
-        }
-
-        return ($lastRelevantFightLog['outcome'] ?? null) === AutomatedFightResultType::TRAINING_BATCH_COMPLETED->value;
+        return $this->factionLoyaltyAutomation->failed_bounty_monster_id === $bountyMonster->id &&
+            $this->factionLoyaltyAutomation->trained_failed_bounty_monster_id === $bountyMonster->id;
     }
 
     /**
@@ -443,18 +430,9 @@ class AutomatedBountyFightHandler
      */
     private function shouldRetryTrainingStalledFight(): bool
     {
-        $fightLogs = $this->factionLoyaltyAutomation->log?->fight_logs ?? [];
-
-        $lastRelevantFightLog = collect($fightLogs)->reverse()->first(function (array $fightLog): bool {
-            return ($fightLog['is_training'] ?? false) === true;
-        });
-
-        if (is_null($lastRelevantFightLog)) {
-            return false;
-        }
-
-        return ($lastRelevantFightLog['outcome'] ?? null) === AutomatedFightResultType::TRAINING_STALLED_RETRY->value &&
-            (int) ($lastRelevantFightLog['stalled_attempt'] ?? 0) < self::MAX_STALLED_ATTEMPTS;
+        return $this->factionLoyaltyAutomation->last_fight_was_training &&
+            $this->factionLoyaltyAutomation->last_fight_outcome === AutomatedFightResultType::TRAINING_STALLED_RETRY->value &&
+            $this->factionLoyaltyAutomation->last_fight_stalled_attempt < self::MAX_STALLED_ATTEMPTS;
     }
 
     /**
@@ -467,22 +445,14 @@ class AutomatedBountyFightHandler
      */
     private function shouldRetryStalledFight(Monster $monster, bool $bountyTarget, bool $training): bool
     {
-        $fightLogs = $this->factionLoyaltyAutomation->log?->fight_logs ?? [];
-
-        $lastRelevantFightLog = collect($fightLogs)->reverse()->first(function (array $fightLog) use ($monster, $bountyTarget, $training): bool {
-            return ($fightLog['monster_id'] ?? null) === $monster->id &&
-                ($fightLog['is_bounty_target'] ?? false) === $bountyTarget &&
-                ($fightLog['is_training'] ?? false) === $training;
-        });
-
-        if (is_null($lastRelevantFightLog)) {
+        if (! $this->lastFightMatches($monster, $bountyTarget, $training)) {
             return false;
         }
 
-        return in_array($lastRelevantFightLog['outcome'] ?? null, [
+        return in_array($this->factionLoyaltyAutomation->last_fight_outcome, [
             AutomatedFightResultType::BOUNTY_STALLED_RETRY->value,
             AutomatedFightResultType::TRAINING_STALLED_RETRY->value,
-        ], true) && (int) ($lastRelevantFightLog['stalled_attempt'] ?? 0) < self::MAX_STALLED_ATTEMPTS;
+        ], true) && $this->factionLoyaltyAutomation->last_fight_stalled_attempt < self::MAX_STALLED_ATTEMPTS;
     }
 
     /**
@@ -526,14 +496,26 @@ class AutomatedBountyFightHandler
      */
     private function getStalledAttemptCount(Monster $monster, bool $bountyTarget, bool $training): int
     {
-        $fightLogs = $this->factionLoyaltyAutomation->log?->fight_logs ?? [];
+        if (! $this->lastFightMatches($monster, $bountyTarget, $training)) {
+            return 0;
+        }
 
-        return collect($fightLogs)->filter(function (array $fightLog) use ($monster, $bountyTarget, $training): bool {
-            return ($fightLog['monster_id'] ?? null) === $monster->id &&
-                ($fightLog['is_bounty_target'] ?? false) === $bountyTarget &&
-                ($fightLog['is_training'] ?? false) === $training &&
-                (int) ($fightLog['stalled_attempt'] ?? 0) > 0;
-        })->count();
+        return $this->factionLoyaltyAutomation->last_fight_stalled_attempt;
+    }
+
+    /**
+     * Does the last fight state match this monster and phase?
+     *
+     * @param Monster $monster
+     * @param bool $bountyTarget
+     * @param bool $training
+     * @return bool
+     */
+    private function lastFightMatches(Monster $monster, bool $bountyTarget, bool $training): bool
+    {
+        return $this->factionLoyaltyAutomation->last_fight_monster_id === $monster->id &&
+            $this->factionLoyaltyAutomation->last_fight_was_bounty_target === $bountyTarget &&
+            $this->factionLoyaltyAutomation->last_fight_was_training === $training;
     }
 
     /**
@@ -594,6 +576,7 @@ class AutomatedBountyFightHandler
             'total_xp' => $this->batchTotalXp,
             'total_faction_points' => 0,
             'total_skill_xp' => $this->batchTotalSkillXp,
+            'skip_faction_loyalty_update_event' => true,
         ]);
     }
 
