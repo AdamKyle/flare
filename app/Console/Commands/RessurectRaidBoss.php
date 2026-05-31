@@ -7,6 +7,7 @@ use App\Flare\Models\Event;
 use App\Flare\Models\Location;
 use App\Flare\Models\RaidBoss;
 use App\Flare\Models\RaidBossParticipation;
+use App\Flare\Models\ScheduledEvent;
 use App\Game\Maps\Services\UpdateRaidMonsters;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Console\Command;
@@ -25,7 +26,7 @@ class RessurectRaidBoss extends Command
      *
      * @var string
      */
-    protected $description = 'Ressurects Raid Boss once an hour after death.';
+    protected $description = 'Ressurects Raid Boss once a week after death.';
 
     /**
      * Execute the console command.
@@ -33,16 +34,24 @@ class RessurectRaidBoss extends Command
     public function handle(UpdateRaidMonsters $updateRaidMonsters)
     {
 
-        $events = Event::whereNotNull('raid_id')->get();
+        $events = Event::whereNotNull('raid_id')->with('raid')->get();
 
         foreach ($events as $event) {
-            $raidBoss = RaidBoss::where('raid_boss_id', $event->raid->raid_boss_id)->first();
+            if (! $this->hasRunningScheduledRaid($event)) {
+                continue;
+            }
+
+            $raidBoss = RaidBoss::where('raid_id', $event->raid_id)->first();
+
+            if (is_null($raidBoss) || ! $this->isRaidBossDead($raidBoss)) {
+                continue;
+            }
 
             $raidBoss->update([
                 'boss_current_hp' => $raidBoss->boss_max_hp,
             ]);
 
-            RaidBossParticipation::truncate();
+            RaidBossParticipation::where('raid_id', $event->raid_id)->delete();
 
             $locationOfRaidBoss = Location::find($event->raid->raid_boss_location_id);
 
@@ -70,5 +79,23 @@ class RessurectRaidBoss extends Command
                 }
             }
         }
+    }
+
+    private function hasRunningScheduledRaid(Event $event): bool
+    {
+        return ScheduledEvent::where('raid_id', $event->raid_id)
+            ->where('currently_running', true)
+            ->exists();
+    }
+
+    private function isRaidBossDead(RaidBoss $raidBoss): bool
+    {
+        if (! is_null($raidBoss->boss_current_hp) && $raidBoss->boss_current_hp <= 0) {
+            return true;
+        }
+
+        return RaidBossParticipation::where('raid_id', $raidBoss->raid_id)
+            ->where('killed_boss', true)
+            ->exists();
     }
 }
