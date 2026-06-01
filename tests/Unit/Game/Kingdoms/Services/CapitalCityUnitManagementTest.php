@@ -15,9 +15,12 @@ use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityRequestResourcesHa
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessUnitRequestHandler;
 use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest;
 use App\Game\Kingdoms\Jobs\CapitalCityUnitRequestMovement;
+use App\Game\Kingdoms\Values\BuildingCosts;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
+use App\Game\Kingdoms\Values\UnitNames;
+use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -106,7 +109,66 @@ class CapitalCityUnitManagementTest extends TestCase
             resolve(\App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessUnitRequestHandler::class)
         );
 
-        Queue::assertPushed(CapitalCityResourceRequest::class);
+        Queue::assertPushed(CapitalCityResourceRequest::class, function (CapitalCityResourceRequest $job) {
+            return $job->connection === 'long_running' && $job->queue === 'default_long';
+        });
+    }
+
+    public function testCapitalCityUnitResourceDispatchUsesLongRunningConnection(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $characterFactory
+            ->passiveSkillManagement()
+            ->assignPassiveSkill(PassiveSkillTypeValue::RESOURCE_REQUEST_TIME_REDUCTION, 0, [
+                'name' => 'Resource Request Time Reduction',
+                'resource_request_time_reduction' => 0.0,
+                'max_level' => 5,
+            ]);
+        $requestingKingdom = $characterFactory->kingdomManagement()->assignKingdom([
+            'current_wood' => 0,
+            'current_population' => 1000,
+            'x_position' => 16,
+            'y_position' => 16,
+        ])->assignBuilding(['name' => BuildingCosts::MARKET_PLACE], ['level' => 5])->getKingdom();
+        $providingKingdom = $characterFactory->kingdomManagement()->assignKingdom([
+            'current_wood' => 1000,
+            'current_population' => 1000,
+            'x_position' => 32,
+            'y_position' => 16,
+        ])->assignBuilding(['name' => BuildingCosts::MARKET_PLACE], ['level' => 5])->assignUnits(['name' => UnitNames::SPEARMEN], 75)->getKingdom();
+        $character = $characterFactory->getCharacter();
+        $capitalCityUnitQueue = CapitalCityUnitQueue::create([
+            'character_id' => $character->id,
+            'kingdom_id' => $requestingKingdom->id,
+            'requested_kingdom' => $providingKingdom->id,
+            'unit_request_data' => [[
+                'name' => UnitNames::SETTLER,
+                'amount' => 1,
+                'costs' => ['wood' => 100],
+                'missing_costs' => ['wood' => 100],
+                'secondary_status' => CapitalCityQueueStatus::REQUESTING,
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::PROCESSING,
+            'started_at' => now(),
+            'completed_at' => now(),
+        ]);
+
+        resolve(CapitalCityRequestResourcesHandler::class)->handleResourceRequests(
+            $capitalCityUnitQueue,
+            $character,
+            ['wood' => 100],
+            $capitalCityUnitQueue->unit_request_data,
+            $requestingKingdom,
+            CapitalCityResourceRequestType::UNIT_QUEUE,
+        );
+
+        Queue::assertPushed(CapitalCityResourceRequest::class, function (CapitalCityResourceRequest $job) {
+            return $job->connection === 'long_running' && $job->queue === 'default_long';
+        });
     }
 
     public function testMissingCapitalCityResourceRequestRowDoesNotLeaveQueueStuck(): void

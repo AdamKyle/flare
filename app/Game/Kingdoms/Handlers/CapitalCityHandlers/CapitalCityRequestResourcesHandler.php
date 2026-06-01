@@ -199,7 +199,7 @@ class CapitalCityRequestResourcesHandler
 
         $delayJobTime = $timeToKingdom >= 15 ? $startTime->clone()->addMinutes(15) : $timeTillFinished;
         Log::channel('capital_city_building_upgrades')->info('Dispatching Resource Requests');
-        CapitalCityResourceRequestJob::dispatch($queue->id, $resourceRequest->id, $type)->delay($delayJobTime);
+        CapitalCityResourceRequestJob::dispatch($queue->id, $resourceRequest->id, $type)->onConnection('long_running')->onQueue('default_long')->delay($delayJobTime);
 
         $this->resourceTransferService->sendOffBasicUnitMovement($requestingKingdom, $requestingFromKingdom, $missingResources);
     }

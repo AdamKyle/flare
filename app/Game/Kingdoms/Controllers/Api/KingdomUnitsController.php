@@ -47,6 +47,7 @@ class KingdomUnitsController extends Controller
 
         $hasActiveManualQueue = UnitInQueue::where('kingdom_id', $kingdom->id)
             ->where('game_unit_id', $gameUnit->id)
+            ->where('completed_at', '>', now())
             ->exists();
 
         $hasActiveCapitalCityQueue = CapitalCityUnitQueue::where('kingdom_id', $kingdom->id)

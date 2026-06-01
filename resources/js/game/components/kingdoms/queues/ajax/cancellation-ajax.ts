@@ -16,6 +16,10 @@ export default class CancellationAjax {
         queueData: BaseQueue,
         characterId: number,
     ): void {
+        if (queueData.is_capital_city_managed) {
+            return;
+        }
+
         const route = this.getRoute(cancellationType, queueData, characterId);
 
         this.ajax

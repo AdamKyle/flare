@@ -10,6 +10,7 @@ use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
@@ -51,7 +52,7 @@ class CapitalCityBuildingRequest implements ShouldQueue
                 // @codeCoverageIgnoreStart
                 CapitalCityBuildingRequest::dispatch(
                     $this->capitalCityQueueId,
-                )->delay($time);
+                )->onConnection('long_running')->onQueue('default_long')->delay($time);
 
                 return;
                 // @codeCoverageIgnoreEnd
@@ -83,6 +84,19 @@ class CapitalCityBuildingRequest implements ShouldQueue
             }
 
             $building = $kingdom->buildings()->find($requestData['building_id']);
+
+            if (is_null($building)) {
+                Log::warning('Capital city building request rejected because the queued building is missing.', [
+                    'queue_id' => $queueData->id,
+                    'kingdom_id' => $kingdom->id,
+                    'building_id' => $requestData['building_id'],
+                    'request_type' => $requestData['type'],
+                ]);
+
+                $buildingRequestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
+                continue;
+            }
 
             if ($requestData['type'] === 'upgrade') {
                 if ($this->isInvalidUpgradeRequest($building, $requestData)) {
@@ -142,7 +156,7 @@ class CapitalCityBuildingRequest implements ShouldQueue
     private function handleRebuildingBuilding(KingdomBuilding $building): void
     {
         $building->update([
-            'current_durability' => $this->building->max_durability,
+            'current_durability' => $building->max_durability,
         ]);
 
         $building = $building->refresh();
@@ -150,7 +164,7 @@ class CapitalCityBuildingRequest implements ShouldQueue
 
         if ($building->morale_increase > 0) {
 
-            $newMorale = $kingdom->current_morale + $this->building->morale_increase;
+            $newMorale = $kingdom->current_morale + $building->morale_increase;
 
             if ($newMorale > 1) {
                 $newMorale = 1;

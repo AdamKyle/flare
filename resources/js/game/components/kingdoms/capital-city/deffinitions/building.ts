@@ -29,6 +29,8 @@ export default interface Building {
     stone_increase: number;
     iron_increase: number;
     max_level: number;
+    can_be_repaired: boolean;
+    can_be_upgraded: boolean;
     units_for_building: UnitForBuilding[] | [];
     passive_required_for_building: BuildingPassiveSkill | null;
 }

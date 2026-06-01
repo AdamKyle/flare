@@ -3,8 +3,10 @@
 namespace Tests\Feature\Game\Kingdoms\Controllers\Api;
 
 use App\Flare\Models\BuildingInQueue;
+use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Values\AutomationType;
 use App\Game\Kingdoms\Values\BuildingQueueType;
+use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
@@ -195,6 +197,168 @@ class KingdomBuildingsControllerTest extends TestCase
         $this->assertSame(2000, $kingdom->refresh()->current_clay);
         $this->assertSame(2000, $kingdom->refresh()->current_stone);
         $this->assertSame(2000, $kingdom->refresh()->current_iron);
+    }
+
+    public function testManualUpgradeReturnsValidationErrorWhenCapitalCityQueueExistsForBuilding(): void
+    {
+        Queue::fake();
+
+        $characterFactory = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation();
+        $capitalCity = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom([
+                'is_capital' => true,
+            ])
+            ->getKingdom();
+        $kingdomManagement = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 2000,
+                'current_clay' => 2000,
+                'current_stone' => 2000,
+                'current_iron' => 2000,
+                'current_population' => 2000,
+            ])
+            ->assignBuilding();
+        $character = $kingdomManagement->getCharacter();
+        $kingdom = $kingdomManagement->getKingdom();
+        $building = $kingdom->buildings()->first();
+
+        CapitalCityBuildingQueue::create([
+            'character_id' => $character->id,
+            'kingdom_id' => $kingdom->id,
+            'requested_kingdom' => $capitalCity->id,
+            'building_request_data' => [[
+                'building_id' => $building->id,
+                'building_name' => $building->name,
+                'type' => 'upgrade',
+                'missing_costs' => [],
+                'secondary_status' => CapitalCityQueueStatus::BUILDING,
+                'from_level' => $building->level,
+                'to_level' => $building->level + 1,
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::BUILDING,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdoms/' . $character->id . '/upgrade-building/' . $building->id, [
+                'to_level' => $building->level + 1,
+            ]);
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'message' => 'Building is already in the process of upgrading.',
+        ]);
+        $this->assertSame(0, BuildingInQueue::where('kingdom_id', $kingdom->id)
+            ->where('building_id', $building->id)
+            ->count());
+        $this->assertSame(2000, $kingdom->refresh()->current_wood);
+    }
+
+    public function testManualRepairReturnsValidationErrorWhenCapitalCityQueueExistsForBuilding(): void
+    {
+        Queue::fake();
+
+        $characterFactory = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation();
+        $capitalCity = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom([
+                'is_capital' => true,
+            ])
+            ->getKingdom();
+        $kingdomManagement = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 2000,
+                'current_clay' => 2000,
+                'current_stone' => 2000,
+                'current_iron' => 2000,
+                'current_population' => 2000,
+            ])
+            ->assignBuilding([], [
+                'current_durability' => 1,
+                'max_durability' => 100,
+            ]);
+        $character = $kingdomManagement->getCharacter();
+        $kingdom = $kingdomManagement->getKingdom();
+        $building = $kingdom->buildings()->first();
+
+        CapitalCityBuildingQueue::create([
+            'character_id' => $character->id,
+            'kingdom_id' => $kingdom->id,
+            'requested_kingdom' => $capitalCity->id,
+            'building_request_data' => [[
+                'building_id' => $building->id,
+                'building_name' => $building->name,
+                'type' => 'repair',
+                'missing_costs' => [],
+                'secondary_status' => CapitalCityQueueStatus::REPAIRING,
+                'from_level' => null,
+                'to_level' => null,
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::REPAIRING,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdoms/' . $character->id . '/rebuild-building/' . $building->id);
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'message' => 'Building is already in the process of upgrading.',
+        ]);
+        $this->assertSame(0, BuildingInQueue::where('kingdom_id', $kingdom->id)
+            ->where('building_id', $building->id)
+            ->count());
+        $this->assertSame(2000, $kingdom->refresh()->current_wood);
+    }
+
+    public function testManualUpgradeReturnsValidationErrorWhenBuildingIsDamaged(): void
+    {
+        Queue::fake();
+
+        $characterFactory = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation();
+        $kingdomManagement = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 2000,
+                'current_clay' => 2000,
+                'current_stone' => 2000,
+                'current_iron' => 2000,
+                'current_population' => 2000,
+            ])
+            ->assignBuilding([], [
+                'current_durability' => 99,
+                'max_durability' => 100,
+            ]);
+        $character = $kingdomManagement->getCharacter();
+        $kingdom = $kingdomManagement->getKingdom();
+        $building = $kingdom->buildings()->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdoms/' . $character->id . '/upgrade-building/' . $building->id, [
+                'to_level' => $building->level + 1,
+            ]);
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'message' => 'Building must be repaired before it can be upgraded.',
+        ]);
+        $this->assertSame(0, BuildingInQueue::where('kingdom_id', $kingdom->id)
+            ->where('building_id', $building->id)
+            ->count());
+        $this->assertSame(2000, $kingdom->refresh()->current_wood);
     }
 
     public function testRawAuthenticatedJsonRequestRejectsDuplicateManualUpgradeQueue(): void

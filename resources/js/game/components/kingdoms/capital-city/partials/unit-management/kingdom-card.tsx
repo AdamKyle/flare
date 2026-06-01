@@ -111,7 +111,7 @@ export default class KingdomCard extends React.Component<KingdomCardProps> {
                         </div>
 
                         {this.props
-                            .fetch_units_to_show()
+                            .fetch_units_to_show(kingdom)
                             .map((unitType: string) => (
                                 <div
                                     key={unitType}

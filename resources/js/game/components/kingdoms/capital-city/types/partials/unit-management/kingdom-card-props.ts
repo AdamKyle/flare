@@ -13,7 +13,7 @@ export default interface KingdomCardProps {
         kingdomId: number,
     ) => void;
     is_bulk_queue_disabled: () => boolean;
-    fetch_units_to_show: () => any[] | [];
+    fetch_units_to_show: (kingdom?: UnitManagementKingdoms) => any[] | [];
     get_unit_amount: (kingdomId: number, unitType: string) => number | string;
     handle_unit_amount_change: (
         kingdomId: number,

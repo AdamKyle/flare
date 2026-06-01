@@ -47,7 +47,7 @@ class CapitalCityUnitRequest implements ShouldQueue
                 CapitalCityUnitRequest::dispatch(
                     $this->capitalCityQueueId,
                     $this->totalCosts
-                )->delay($time);
+                )->onConnection('long_running')->onQueue('default_long')->delay($time);
 
                 return;
                 // @codeCoverageIgnoreEnd

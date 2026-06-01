@@ -3,6 +3,7 @@ import UnitMovementDetails from "../deffinitions/unit-movement-details";
 export interface BaseQueue {
     name: string;
     id: number;
+    is_capital_city_managed?: boolean;
 }
 
 export interface BuildingQueue extends BaseQueue {
@@ -15,6 +16,7 @@ export interface BuildingQueue extends BaseQueue {
 export interface UnitQueue extends BaseQueue {
     recruit_amount: number;
     time_remaining: number;
+    type?: string;
 }
 
 export interface BuildingExpansionQueue extends BaseQueue {

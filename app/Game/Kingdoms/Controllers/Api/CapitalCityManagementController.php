@@ -102,7 +102,7 @@ class CapitalCityManagementController extends Controller
             '$kingdom' => $kingdom->id,
         ]);
 
-        CapitalCityQueueUpBuildingRequests::dispatch($character->id, $kingdom->id, $buildingUpgradeRequestsRequest->request_data, $buildingUpgradeRequestsRequest->request_type)->onQueue('default_long')->delay(now()->addSecond());
+        CapitalCityQueueUpBuildingRequests::dispatch($character->id, $kingdom->id, $buildingUpgradeRequestsRequest->request_data, $buildingUpgradeRequestsRequest->request_type)->onConnection('long_running')->onQueue('default_long')->delay(now()->addSecond());
 
         return response()->json([]);
     }
@@ -159,6 +159,13 @@ class CapitalCityManagementController extends Controller
                     ->where('game_unit_id', $gameUnit->id)
                     ->where('completed_at', '>', now())
                     ->sum('amount');
+
+                if ($activeManualQueueAmount > 0) {
+                    return response()->json([
+                        'message' => 'One or more units are already queued for recruitment.',
+                    ], 422);
+                }
+
                 $activeCapitalCityQueueAmount = CapitalCityUnitQueue::where('kingdom_id', $targetKingdom->id)
                     ->whereNotIn('status', [
                         CapitalCityQueueStatus::FINISHED,
@@ -181,6 +188,12 @@ class CapitalCityManagementController extends Controller
                             ->sum('amount');
                     });
 
+                if ($activeCapitalCityQueueAmount > 0) {
+                    return response()->json([
+                        'message' => 'One or more units are already queued for recruitment.',
+                    ], 422);
+                }
+
                 if ($ownedAmount + $activeManualQueueAmount + $activeCapitalCityQueueAmount + $requestedAmounts[$key] > KingdomMaxValue::MAX_UNIT) {
                     return response()->json([
                         'message' => 'One or more unit requests exceed the maximum allowed units.',
@@ -195,7 +208,7 @@ class CapitalCityManagementController extends Controller
             '$kingdom' => $kingdom->id,
         ]);
 
-        CapitalCityQueueUpUnitRequests::dispatch($character->id, $kingdom->id, $recruitUnitRequestsRequest->request_data)->onQueue('default_long')->delay(now()->addSecond());
+        CapitalCityQueueUpUnitRequests::dispatch($character->id, $kingdom->id, $recruitUnitRequestsRequest->request_data)->onConnection('long_running')->onQueue('default_long')->delay(now()->addSecond());
 
         return response()->json([]);
     }

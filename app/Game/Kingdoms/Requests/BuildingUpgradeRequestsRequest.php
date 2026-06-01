@@ -5,7 +5,6 @@ namespace App\Game\Kingdoms\Requests;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\KingdomBuilding;
-use App\Game\Kingdoms\Values\BuildingQueueType;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
@@ -41,10 +40,6 @@ class BuildingUpgradeRequestsRequest extends FormRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator) {
-            if ($this->input('request_type') !== 'upgrade') {
-                return;
-            }
-
             foreach ($this->input('request_data', []) as $request) {
                 if (! is_array($request) || ! array_key_exists('kingdomId', $request) || ! array_key_exists('buildingIds', $request)) {
                     continue;
@@ -56,29 +51,36 @@ class BuildingUpgradeRequestsRequest extends FormRequest
                     ->with('gameBuilding')
                     ->get();
 
-                if ($buildings->contains(fn(KingdomBuilding $building) => $building->level >= $building->gameBuilding->max_level)) {
+                if ($this->input('request_type') === 'upgrade' && $buildings->contains(fn(KingdomBuilding $building) => $building->level >= $building->gameBuilding->max_level)) {
                     $validator->errors()->add('request_data', 'One or more buildings are already max level.');
                 }
 
-                if ($this->hasActiveManualUpgradeQueue((int) $request['kingdomId'], $request['buildingIds']) ||
-                    $this->hasActiveCapitalCityUpgradeQueue((int) $request['kingdomId'], $request['buildingIds'])
+                if ($this->input('request_type') === 'upgrade' && $buildings->contains(fn(KingdomBuilding $building) => $building->current_durability < $building->max_durability)) {
+                    $validator->errors()->add('request_data', 'One or more buildings must be repaired before they can be upgraded.');
+                }
+
+                if ($this->hasActiveManualBuildingQueue((int) $request['kingdomId'], $request['buildingIds']) ||
+                    $this->hasActiveCapitalCityBuildingQueue((int) $request['kingdomId'], $request['buildingIds'])
                 ) {
-                    $validator->errors()->add('request_data', 'One or more buildings are already queued for upgrade.');
+                    if ($this->input('request_type') === 'upgrade') {
+                        $validator->errors()->add('request_data', 'One or more buildings are already queued for upgrade.');
+                    } else {
+                        $validator->errors()->add('request_data', 'One or more buildings are already queued.');
+                    }
                 }
             }
         });
     }
 
-    private function hasActiveManualUpgradeQueue(int $kingdomId, array $buildingIds): bool
+    private function hasActiveManualBuildingQueue(int $kingdomId, array $buildingIds): bool
     {
         return BuildingInQueue::query()
             ->where('kingdom_id', $kingdomId)
             ->whereIn('building_id', $buildingIds)
-            ->where('type', BuildingQueueType::UPGRADE)
             ->exists();
     }
 
-    private function hasActiveCapitalCityUpgradeQueue(int $kingdomId, array $buildingIds): bool
+    private function hasActiveCapitalCityBuildingQueue(int $kingdomId, array $buildingIds): bool
     {
         return CapitalCityBuildingQueue::query()
             ->where('kingdom_id', $kingdomId)
@@ -91,8 +93,7 @@ class BuildingUpgradeRequestsRequest extends FormRequest
             ->contains(function (CapitalCityBuildingQueue $queue) use ($buildingIds) {
                 return collect($queue->building_request_data)
                     ->contains(function (array $request) use ($buildingIds) {
-                        return $request['type'] === 'upgrade' &&
-                            in_array((int) $request['building_id'], $buildingIds, true) &&
+                        return in_array((int) $request['building_id'], $buildingIds, true) &&
                             ! in_array($request['secondary_status'], [
                                 CapitalCityQueueStatus::REJECTED,
                                 CapitalCityQueueStatus::FINISHED,

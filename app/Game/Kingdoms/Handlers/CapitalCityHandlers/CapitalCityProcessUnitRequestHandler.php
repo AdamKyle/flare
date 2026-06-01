@@ -378,7 +378,7 @@ class CapitalCityProcessUnitRequestHandler
                 '$totalTimeInSeconds' => $totalTimeInSeconds,
             ]);
 
-            CapitalCityUnitRequest::dispatch($capitalCityUnitQueue->id, $totalCosts)->delay(
+            CapitalCityUnitRequest::dispatch($capitalCityUnitQueue->id, $totalCosts)->onConnection('long_running')->onQueue('default_long')->delay(
                 now()->addSeconds($totalTimeInSeconds)
             );
 
@@ -501,7 +501,7 @@ class CapitalCityProcessUnitRequestHandler
 
         $delayJobTime = $timeToKingdom >= 15 ? $startTime->clone()->addMinutes(15) : $timeTillFinished;
 
-        CapitalCityResourceRequestJob::dispatch($capitalCityUnitQueue->id, $resourceRequest->id, CapitalCityResourceRequestType::UNIT_QUEUE)->delay($delayJobTime);
+        CapitalCityResourceRequestJob::dispatch($capitalCityUnitQueue->id, $resourceRequest->id, CapitalCityResourceRequestType::UNIT_QUEUE)->onConnection('long_running')->onQueue('default_long')->delay($delayJobTime);
     }
 
     /**

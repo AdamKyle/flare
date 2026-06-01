@@ -4,9 +4,13 @@ namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Models\BuildingExpansionQueue;
 use App\Flare\Models\BuildingInQueue;
+use App\Flare\Models\CapitalCityBuildingQueue;
+use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;
 use App\Flare\Models\UnitMovementQueue;
+use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityKingdomLogHandler;
+use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Transformers\UnitMovementTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
 use Illuminate\Support\Facades\Log;
@@ -21,14 +25,19 @@ class KingdomQueueService
 
     private UnitMovementTransformer $unitMovementTransformer;
 
-    public function __construct(Manager $manager, UnitMovementTransformer $unitMovementTransformer)
-    {
+    public function __construct(
+        Manager $manager,
+        UnitMovementTransformer $unitMovementTransformer,
+        private readonly CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler,
+    ) {
         $this->manager = $manager;
         $this->unitMovementTransformer = $unitMovementTransformer;
     }
 
     public function fetchKingdomQueues(Kingdom $kingdom): array
     {
+        $this->cleanOverdueCapitalCityQueues($kingdom);
+
         return [
             'building_queues' => $this->fetchBuildingQueues($kingdom),
             'unit_recruitment_queues' => $this->fetchUnitRecruitmentQueues($kingdom),
@@ -42,7 +51,7 @@ class KingdomQueueService
 
         $buildingQueues = BuildingInQueue::where('kingdom_id', $kingdom->id)->get();
 
-        return $buildingQueues->map(function ($buildingQueue) {
+        $manualQueues = $buildingQueues->map(function ($buildingQueue) {
             return [
                 'name' => $buildingQueue->building->gameBuilding->name,
                 'id' => $buildingQueue->id,
@@ -50,8 +59,45 @@ class KingdomQueueService
                 'to_level' => $buildingQueue->getType()->isUpgrading() ? $buildingQueue->to_level : null,
                 'type' => $buildingQueue->type_name,
                 'time_remaining' => now()->diffInSeconds($buildingQueue->completed_at),
+                'is_capital_city_managed' => ! is_null($buildingQueue->capital_city_building_queue_id),
+                'capital_city_queue_id' => $buildingQueue->capital_city_building_queue_id,
             ];
-        })->toArray();
+        });
+
+        $capitalCityQueues = CapitalCityBuildingQueue::query()
+            ->where('kingdom_id', $kingdom->id)
+            ->whereNotIn('status', [
+                CapitalCityQueueStatus::REJECTED,
+                CapitalCityQueueStatus::FINISHED,
+                CapitalCityQueueStatus::CANCELLED,
+                CapitalCityQueueStatus::CANCELLATION_REJECTED,
+            ])
+            ->get()
+            ->flatMap(function (CapitalCityBuildingQueue $capitalCityBuildingQueue) {
+                return collect($capitalCityBuildingQueue->building_request_data)
+                    ->reject(function (array $request) {
+                        return in_array($request['secondary_status'] ?? null, [
+                            CapitalCityQueueStatus::REJECTED,
+                            CapitalCityQueueStatus::FINISHED,
+                            CapitalCityQueueStatus::CANCELLED,
+                            CapitalCityQueueStatus::CANCELLATION_REJECTED,
+                        ], true);
+                    })
+                    ->map(function (array $request) use ($capitalCityBuildingQueue) {
+                        return [
+                            'name' => $request['building_name'],
+                            'id' => $capitalCityBuildingQueue->id,
+                            'from_level' => $request['from_level'],
+                            'to_level' => $request['to_level'],
+                            'type' => $request['type'] === 'repair' ? 'Capital City Repair' : 'Capital City Upgrade',
+                            'time_remaining' => now()->diffInSeconds($capitalCityBuildingQueue->completed_at),
+                            'is_capital_city_managed' => true,
+                            'capital_city_queue_id' => $capitalCityBuildingQueue->id,
+                        ];
+                    });
+            });
+
+        return $manualQueues->toBase()->merge($capitalCityQueues)->values()->toArray();
     }
 
     protected function fetchBuildingExpansionQueues(Kingdom $kingdom): array
@@ -104,14 +150,50 @@ class KingdomQueueService
     {
         $unitsInQueue = UnitInQueue::where('kingdom_id', $kingdom->id)->get();
 
-        return $unitsInQueue->map(function ($unitInQueue) {
+        $manualQueues = $unitsInQueue->map(function ($unitInQueue) {
             return [
                 'name' => $unitInQueue->unit->name,
                 'id' => $unitInQueue->id,
                 'recruit_amount' => $unitInQueue->amount,
                 'time_remaining' => now()->diffInSeconds($unitInQueue->completed_at),
+                'is_capital_city_managed' => ! is_null($unitInQueue->capital_city_unit_queue_id),
+                'capital_city_queue_id' => $unitInQueue->capital_city_unit_queue_id,
             ];
-        })->toArray();
+        });
+
+        $capitalCityQueues = CapitalCityUnitQueue::query()
+            ->where('kingdom_id', $kingdom->id)
+            ->whereNotIn('status', [
+                CapitalCityQueueStatus::REJECTED,
+                CapitalCityQueueStatus::FINISHED,
+                CapitalCityQueueStatus::CANCELLED,
+                CapitalCityQueueStatus::CANCELLATION_REJECTED,
+            ])
+            ->get()
+            ->flatMap(function (CapitalCityUnitQueue $capitalCityUnitQueue) {
+                return collect($capitalCityUnitQueue->unit_request_data)
+                    ->reject(function (array $request) {
+                        return in_array($request['secondary_status'] ?? null, [
+                            CapitalCityQueueStatus::REJECTED,
+                            CapitalCityQueueStatus::FINISHED,
+                            CapitalCityQueueStatus::CANCELLED,
+                            CapitalCityQueueStatus::CANCELLATION_REJECTED,
+                        ], true);
+                    })
+                    ->map(function (array $request) use ($capitalCityUnitQueue) {
+                        return [
+                            'name' => $request['name'],
+                            'id' => $capitalCityUnitQueue->id,
+                            'recruit_amount' => $request['amount'],
+                            'time_remaining' => now()->diffInSeconds($capitalCityUnitQueue->completed_at),
+                            'is_capital_city_managed' => true,
+                            'capital_city_queue_id' => $capitalCityUnitQueue->id,
+                            'type' => 'Capital City Recruitment',
+                        ];
+                    });
+            });
+
+        return $manualQueues->toBase()->merge($capitalCityQueues)->values()->toArray();
     }
 
     protected function fetchUnitMovementQueues(Kingdom $kingdom): array
@@ -121,5 +203,91 @@ class KingdomQueueService
         return $this->manager->createData(
             new Collection($unitMovementQueues, $this->unitMovementTransformer)
         )->toArray();
+    }
+
+    private function cleanOverdueCapitalCityQueues(Kingdom $kingdom): void
+    {
+        $activeStatuses = [
+            CapitalCityQueueStatus::TRAVELING,
+            CapitalCityQueueStatus::BUILDING,
+            CapitalCityQueueStatus::REPAIRING,
+            CapitalCityQueueStatus::RECRUITING,
+        ];
+
+        CapitalCityBuildingQueue::query()
+            ->where('kingdom_id', $kingdom->id)
+            ->whereIn('status', $activeStatuses)
+            ->where('completed_at', '<', now())
+            ->get()
+            ->each(function (CapitalCityBuildingQueue $queue): void {
+                $this->rejectOverdueBuildingQueue($queue);
+            });
+
+        CapitalCityUnitQueue::query()
+            ->where('kingdom_id', $kingdom->id)
+            ->whereIn('status', $activeStatuses)
+            ->where('completed_at', '<', now())
+            ->get()
+            ->each(function (CapitalCityUnitQueue $queue): void {
+                $this->rejectOverdueUnitQueue($queue);
+            });
+    }
+
+    private function rejectOverdueBuildingQueue(CapitalCityBuildingQueue $queue): void
+    {
+        Log::warning('Rejected overdue capital city queue.', [
+            'queue_id' => $queue->id,
+            'status' => $queue->status,
+            'type' => 'building',
+        ]);
+
+        $requestData = collect($queue->building_request_data)->map(function (array $request): array {
+            if (! in_array($request['secondary_status'] ?? null, [
+                CapitalCityQueueStatus::FINISHED,
+                CapitalCityQueueStatus::REJECTED,
+                CapitalCityQueueStatus::CANCELLED,
+                CapitalCityQueueStatus::CANCELLATION_REJECTED,
+            ], true)) {
+                $request['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+            }
+
+            return $request;
+        })->toArray();
+
+        $queue->update([
+            'building_request_data' => $requestData,
+            'status' => CapitalCityQueueStatus::REJECTED,
+        ]);
+
+        $this->capitalCityKingdomLogHandler->possiblyCreateLogForBuildingQueue($queue->refresh());
+    }
+
+    private function rejectOverdueUnitQueue(CapitalCityUnitQueue $queue): void
+    {
+        Log::warning('Rejected overdue capital city queue.', [
+            'queue_id' => $queue->id,
+            'status' => $queue->status,
+            'type' => 'unit',
+        ]);
+
+        $requestData = collect($queue->unit_request_data)->map(function (array $request): array {
+            if (! in_array($request['secondary_status'] ?? null, [
+                CapitalCityQueueStatus::FINISHED,
+                CapitalCityQueueStatus::REJECTED,
+                CapitalCityQueueStatus::CANCELLED,
+                CapitalCityQueueStatus::CANCELLATION_REJECTED,
+            ], true)) {
+                $request['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+            }
+
+            return $request;
+        })->toArray();
+
+        $queue->update([
+            'unit_request_data' => $requestData,
+            'status' => CapitalCityQueueStatus::REJECTED,
+        ]);
+
+        $this->capitalCityKingdomLogHandler->possiblyCreateLogForUnitQueue($queue->refresh());
     }
 }

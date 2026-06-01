@@ -59,7 +59,7 @@ class CapitalCityResourceRequest implements ShouldQueue
                     $this->capitalCityQueueId,
                     $this->resourceRequestId,
                     $this->type
-                )->delay($time);
+                )->onConnection('long_running')->onQueue('default_long')->delay($time);
 
                 return;
                 // @codeCoverageIgnoreEnd
@@ -87,7 +87,7 @@ class CapitalCityResourceRequest implements ShouldQueue
                 $this->capitalCityQueueId,
                 $this->resourceRequestId,
                 $this->type
-            )->delay($time);
+            )->onConnection('long_running')->onQueue('default_long')->delay($time);
 
             return;
         }

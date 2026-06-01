@@ -90,8 +90,13 @@ class KingdomBuildingService
                             CapitalCityQueueStatus::CANCELLATION_REJECTED,
                         ], true);
                     })
-                    ->contains(fn (array $request) => ($request['name'] ?? $request['building_name'] ?? null) === $building->name);
+                    ->contains(fn (array $request) => (int) $request['building_id'] === $building->id);
             });
+    }
+
+    public function isBuildingDamaged(KingdomBuilding $building): bool
+    {
+        return $building->current_durability < $building->max_durability;
     }
 
     public function cannotUpgradePastMaxLevel(KingdomBuilding $building, int $toLevel): bool

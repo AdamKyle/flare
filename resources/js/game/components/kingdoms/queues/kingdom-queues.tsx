@@ -108,6 +108,10 @@ export default class KingdomQueues extends React.Component<
             return;
         }
 
+        if (this.state.queues[queueKey][queueIndex].is_capital_city_managed) {
+            return;
+        }
+
         this.cancellationAjax.doAjaxCall(
             this,
             cancellationType,
@@ -123,6 +127,28 @@ export default class KingdomQueues extends React.Component<
 
         const buildingQueues = this.state.queues.building_queues
             .map((buildingQueue: BuildingQueue, index: number) => {
+                if (buildingQueue.is_capital_city_managed) {
+                    return (
+                        <BasicCard additionalClasses={"my-2"}>
+                            <div className="bold my-4 text-gray-800 dark:text-gray-300">
+                                {buildingQueue.type} {buildingQueue.name}
+                            </div>
+                            <TimerProgressBar
+                                time_out_label={
+                                    buildingQueue.from_level !== null &&
+                                    buildingQueue.to_level !== null
+                                        ? "From Level: " +
+                                          buildingQueue.from_level +
+                                          " To Level: " +
+                                          buildingQueue.to_level
+                                        : buildingQueue.type
+                                }
+                                time_remaining={buildingQueue.time_remaining}
+                            />
+                        </BasicCard>
+                    );
+                }
+
                 if (buildingQueue.type === "upgrading") {
                     return (
                         <BasicCard additionalClasses={"my-2"}>
@@ -197,27 +223,32 @@ export default class KingdomQueues extends React.Component<
                 return (
                     <BasicCard additionalClasses={"my-2"}>
                         <div className="bold my-2">
-                            Recruiting {unitRecruitmentQueue.name}
+                            {unitRecruitmentQueue.is_capital_city_managed
+                                ? unitRecruitmentQueue.type
+                                : "Recruiting"}{" "}
+                            {unitRecruitmentQueue.name}
                         </div>
                         <TimerProgressBar
                             time_out_label={
-                                "Rectuiting: " +
+                                "Recruiting: " +
                                 unitRecruitmentQueue.recruit_amount
                             }
                             time_remaining={unitRecruitmentQueue.time_remaining}
                         />
-                        <DangerOutlineButton
-                            button_label={"Cancel"}
-                            on_click={() => {
-                                this.cancelQueue(
-                                    CancellationType.UNIT_RECRUITMENT,
-                                    index,
-                                    QueueTypes.UNIT_RECRUITMENT_QUEUES,
-                                );
-                            }}
-                            additional_css={"my-2"}
-                            disabled={this.props.is_automation_locked}
-                        />
+                        {!unitRecruitmentQueue.is_capital_city_managed ? (
+                            <DangerOutlineButton
+                                button_label={"Cancel"}
+                                on_click={() => {
+                                    this.cancelQueue(
+                                        CancellationType.UNIT_RECRUITMENT,
+                                        index,
+                                        QueueTypes.UNIT_RECRUITMENT_QUEUES,
+                                    );
+                                }}
+                                additional_css={"my-2"}
+                                disabled={this.props.is_automation_locked}
+                            />
+                        ) : null}
                     </BasicCard>
                 );
             },

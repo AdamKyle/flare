@@ -70,15 +70,20 @@ export default class BuildingToUpgradeService {
 
         const openKingdomIds = new Set<number>();
 
-        let filteredBuildingData = this.component.state.building_data.filter(
-            (kingdom: Kingdom) => {
+        let filteredBuildingData = this.component.state.building_data
+            .map((kingdom: Kingdom) => ({
+                ...kingdom,
+                buildings: kingdom.buildings.filter((building: Building) =>
+                    this.isBuildingAllowedForCurrentTab(building),
+                ),
+            }))
+            .filter((kingdom: Kingdom) => {
                 return (
                     (kingdom.kingdom_name.toLowerCase().includes(searchTerm) ||
                         kingdom.map_name.toLowerCase().includes(searchTerm)) &&
                     kingdom.buildings.length > 0
                 );
-            },
-        );
+            });
 
         if (filteredBuildingData.length <= 0 && searchTerm.length > 0) {
             filteredBuildingData = this.component.state.building_data
@@ -89,6 +94,7 @@ export default class BuildingToUpgradeService {
 
                     const matchingBuildings = kingdom.buildings.filter(
                         (building: Building) =>
+                            this.isBuildingAllowedForCurrentTab(building) &&
                             building.name.toLowerCase().includes(searchTerm),
                     );
 
@@ -106,18 +112,22 @@ export default class BuildingToUpgradeService {
                 .filter((kingdom: Kingdom | null) => kingdom !== null);
         }
 
-        const sortedData = filteredBuildingData.map((kingdom: Kingdom) => ({
-            ...kingdom,
-            buildings: kingdom.buildings.sort((a: Building, b: Building) => {
-                if (!this.component) {
-                    return a.level;
-                }
+        const sortedData = filteredBuildingData
+            .filter((kingdom: Kingdom) => kingdom.buildings.length > 0)
+            .map((kingdom: Kingdom) => ({
+                ...kingdom,
+                buildings: kingdom.buildings.sort(
+                    (a: Building, b: Building) => {
+                        if (!this.component) {
+                            return a.level;
+                        }
 
-                return this.component.state.sort_direction === "asc"
-                    ? a.level - b.level
-                    : b.level - a.level;
-            }),
-        }));
+                        return this.component.state.sort_direction === "asc"
+                            ? a.level - b.level
+                            : b.level - a.level;
+                    },
+                ),
+            }));
 
         this.component.setState({
             filtered_building_data: sortedData,
@@ -300,6 +310,7 @@ export default class BuildingToUpgradeService {
 
         if (
             !foundBuilding ||
+            !this.isBuildingAllowedForCurrentTab(foundBuilding) ||
             (foundBuilding.passive_required_for_building &&
                 !foundBuilding.passive_required_for_building.is_trained)
         ) {
@@ -307,6 +318,18 @@ export default class BuildingToUpgradeService {
         }
 
         return true;
+    }
+
+    private isBuildingAllowedForCurrentTab(building: Building): boolean {
+        if (!this.component) {
+            return false;
+        }
+
+        if (this.component.props.repair) {
+            return building.can_be_repaired;
+        }
+
+        return building.can_be_upgraded;
     }
 
     handlePageChange(pageNumber: number) {

@@ -383,7 +383,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(KingdomQueueService::class, function ($app) {
             return new KingdomQueueService(
                 $app->make(Manager::class),
-                $app->make(UnitMovementTransformer::class)
+                $app->make(UnitMovementTransformer::class),
+                $app->make(CapitalCityKingdomLogHandler::class),
             );
         });
 

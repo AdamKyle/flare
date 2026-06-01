@@ -5,6 +5,7 @@ namespace Tests\Feature\Game\Kingdoms\Controllers\Api;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityUnitQueue;
+use App\Flare\Models\GameUnit;
 use App\Flare\Models\UnitInQueue;
 use App\Flare\Values\AutomationType;
 use App\Game\Kingdoms\Jobs\CapitalCityQueueUpBuildingRequests;
@@ -273,29 +274,6 @@ class CapitalCityManagementControllerTest extends TestCase
         $character = $characterFactory->getCharacter();
         $gameUnit = $targetKingdom->units()->first()->gameUnit;
 
-        UnitInQueue::factory()->create([
-            'character_id' => $character->id,
-            'kingdom_id' => $targetKingdom->id,
-            'game_unit_id' => $gameUnit->id,
-            'amount' => 5,
-            'started_at' => now(),
-            'completed_at' => now()->addHour(),
-        ]);
-        CapitalCityUnitQueue::create([
-            'character_id' => $character->id,
-            'kingdom_id' => $targetKingdom->id,
-            'requested_kingdom' => $capitalCity->id,
-            'unit_request_data' => [[
-                'name' => $gameUnit->name,
-                'amount' => 3,
-                'secondary_status' => CapitalCityQueueStatus::TRAVELING,
-            ]],
-            'messages' => [],
-            'status' => CapitalCityQueueStatus::TRAVELING,
-            'started_at' => now(),
-            'completed_at' => now()->addHour(),
-        ]);
-
         $this->actingAs($character->user);
         $response = $this->call(
             'POST',
@@ -313,11 +291,7 @@ class CapitalCityManagementControllerTest extends TestCase
                     'unit_requests' => [
                         [
                             'unit_name' => $gameUnit->name,
-                            'unit_amount' => 2,
-                        ],
-                        [
-                            'unit_name' => $gameUnit->name,
-                            'unit_amount' => 1,
+                            'unit_amount' => 11,
                         ],
                     ],
                 ]],
@@ -329,7 +303,7 @@ class CapitalCityManagementControllerTest extends TestCase
             'message' => 'One or more unit requests exceed the maximum allowed units.',
         ]);
         Queue::assertNotPushed(CapitalCityQueueUpUnitRequests::class);
-        $this->assertSame(1, CapitalCityUnitQueue::where('kingdom_id', $targetKingdom->id)->count());
+        $this->assertSame(0, CapitalCityUnitQueue::where('kingdom_id', $targetKingdom->id)->count());
     }
 
     public function testCapitalCityBuildingQueueRejectsDuringAutomation(): void
@@ -519,5 +493,92 @@ class CapitalCityManagementControllerTest extends TestCase
 
         $response->assertStatus(422);
         $this->assertNotNull(CapitalCityUnitQueue::find($capitalCityUnitQueue->id));
+    }
+
+    public function testCapitalCityBuildingRequestDispatchesOnLongRunningConnection(): void
+    {
+        Queue::fake();
+
+        $characterFactory = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation();
+        $capitalCity = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom([
+                'is_capital' => true,
+                'x_position' => 16,
+                'y_position' => 16,
+            ])
+            ->getKingdom();
+        $targetKingdom = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom([
+                'x_position' => 32,
+                'y_position' => 16,
+            ])
+            ->assignBuilding([
+                'max_level' => 5,
+            ], [
+                'level' => 1,
+            ])
+            ->getKingdom();
+        $character = $characterFactory->getCharacter();
+        $building = $targetKingdom->buildings()->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id, [
+                'request_type' => 'upgrade',
+                'request_data' => [[
+                    'kingdomId' => $targetKingdom->id,
+                    'buildingIds' => [$building->id],
+                ]],
+            ]);
+
+        $response->assertOk();
+        Queue::assertPushed(CapitalCityQueueUpBuildingRequests::class, function (CapitalCityQueueUpBuildingRequests $job) {
+            return $job->connection === 'long_running' && $job->queue === 'default_long';
+        });
+    }
+
+    public function testCapitalCityUnitRequestDispatchesOnLongRunningConnection(): void
+    {
+        Queue::fake();
+
+        $characterFactory = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation();
+        $capitalCity = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom([
+                'is_capital' => true,
+                'x_position' => 16,
+                'y_position' => 16,
+            ])
+            ->getKingdom();
+        $targetKingdom = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom([
+                'x_position' => 32,
+                'y_position' => 16,
+            ])
+            ->getKingdom();
+        $character = $characterFactory->getCharacter();
+        $gameUnit = GameUnit::factory()->create();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/recruit-unit-requests/' . $character->id . '/' . $capitalCity->id, [
+                'request_data' => [[
+                    'kingdom_id' => $targetKingdom->id,
+                    'unit_requests' => [[
+                        'unit_name' => $gameUnit->name,
+                        'unit_amount' => 1,
+                    ]],
+                ]],
+            ]);
+
+        $response->assertOk();
+        Queue::assertPushed(CapitalCityQueueUpUnitRequests::class, function (CapitalCityQueueUpUnitRequests $job) {
+            return $job->connection === 'long_running' && $job->queue === 'default_long';
+        });
     }
 }

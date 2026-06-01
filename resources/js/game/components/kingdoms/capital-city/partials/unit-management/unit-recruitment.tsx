@@ -260,14 +260,17 @@ export default class UnitRecruitment extends React.Component<any, any> {
         return unitRequest ? unitRequest.unit_amount : "";
     }
 
-    fetchUnitsToShow() {
+    fetchUnitsToShow(kingdom?: any) {
+        const unitTypes =
+            kingdom?.available_unit_types ?? Object.values(UnitTypes);
+
         if (Object.values(UnitTypes).includes(this.state.search_term)) {
-            return Object.values(UnitTypes).filter((type: string) => {
+            return unitTypes.filter((type: string) => {
                 return type === this.state.search_term;
             });
         }
 
-        return Object.values(UnitTypes);
+        return unitTypes;
     }
 
     isBulkQueueDisabled() {
@@ -298,7 +301,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
         );
 
         if (kingdom) {
-            Object.values(UnitTypes).forEach((unitType: string) => {
+            this.fetchUnitsToShow(kingdom).forEach((unitType: string) => {
                 this.handleUnitAmountChange(
                     kingdom.id,
                     unitType,
@@ -340,7 +343,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
                 unit_requests: [],
             };
 
-            this.fetchUnitsToShow().forEach((unitType: string) => {
+            this.fetchUnitsToShow(kingdom).forEach((unitType: string) => {
                 queueData.unit_requests.push({
                     unit_name: unitType,
                     unit_amount: bulkAmount,

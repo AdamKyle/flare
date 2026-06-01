@@ -4,4 +4,5 @@ export default interface UnitManagementKingdoms {
     id: number;
     name: string;
     time_to_kingdom: number;
+    available_unit_types?: string[];
 }

@@ -5,12 +5,14 @@ namespace Tests\Unit\Game\Kingdoms\Services;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\KingdomLog;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityRequestResourcesHandler;
+use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Values\BuildingCosts;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use App\Game\Skills\Values\SkillTypeValue;
+use App\Game\Kingdoms\Values\UnitNames;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -334,6 +336,117 @@ class CapitalCityBuildingManagementTest extends TestCase
 
         $this->assertSame(CapitalCityQueueStatus::REJECTED, $capitalCityBuildingQueue->status);
         $this->assertSame(CapitalCityQueueStatus::REJECTED, $capitalCityBuildingQueue->building_request_data[0]['secondary_status']);
+    }
+
+    public function testCapitalCityBuildingResourceDispatchUsesLongRunningConnection(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $character = $this->character->getCharacter();
+        $this->character
+            ->passiveSkillManagement()
+            ->assignPassiveSkill(PassiveSkillTypeValue::RESOURCE_REQUEST_TIME_REDUCTION, 0, [
+                'name' => 'Resource Request Time Reduction',
+                'resource_request_time_reduction' => 0.0,
+                'max_level' => 5,
+            ]);
+        $requestingKingdom = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_stone' => 0,
+                'x_position' => 16,
+                'y_position' => 16,
+            ])
+            ->assignBuilding(['name' => BuildingCosts::MARKET_PLACE], ['level' => 5])
+            ->getKingdom();
+        $providingKingdom = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_stone' => 500,
+                'current_population' => 100,
+                'x_position' => 32,
+                'y_position' => 16,
+            ])
+            ->assignBuilding(['name' => BuildingCosts::MARKET_PLACE], ['level' => 5])
+            ->assignUnits(['name' => UnitNames::SPEARMEN], 75)
+            ->getKingdom();
+        $building = $requestingKingdom->buildings->first();
+        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+            'character_id' => $character->id,
+            'kingdom_id' => $requestingKingdom->id,
+            'requested_kingdom' => $providingKingdom->id,
+            'building_request_data' => [[
+                'building_id' => $building->id,
+                'building_name' => $building->name,
+                'missing_costs' => ['stone' => 100],
+                'secondary_status' => CapitalCityQueueStatus::REQUESTING,
+                'from_level' => 1,
+                'to_level' => 2,
+                'type' => 'upgrade',
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::PROCESSING,
+            'started_at' => now(),
+            'completed_at' => now(),
+        ]);
+
+        resolve(CapitalCityRequestResourcesHandler::class)->handleResourceRequests(
+            $capitalCityBuildingQueue,
+            $character,
+            ['stone' => 100],
+            $capitalCityBuildingQueue->building_request_data,
+            $requestingKingdom,
+            CapitalCityResourceRequestType::BUILDING_QUEUE,
+        );
+
+        Queue::assertPushed(CapitalCityResourceRequest::class, function (CapitalCityResourceRequest $job) {
+            return $job->connection === 'long_running' && $job->queue === 'default_long';
+        });
+    }
+
+    public function testCapitalCityResourceRequestRedispatchesWhenQueueIsWaitingOnLongRunningConnection(): void
+    {
+        Queue::fake();
+
+        $character = $this->character->getCharacter();
+        $kingdom = $this->character
+            ->kingdomManagement()
+            ->assignKingdom()
+            ->assignBuilding()
+            ->getKingdom();
+        $building = $kingdom->buildings->first();
+        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+            'character_id' => $character->id,
+            'kingdom_id' => $kingdom->id,
+            'requested_kingdom' => $kingdom->id,
+            'building_request_data' => [[
+                'building_id' => $building->id,
+                'building_name' => $building->name,
+                'missing_costs' => ['stone' => 100],
+                'secondary_status' => CapitalCityQueueStatus::REQUESTING,
+                'from_level' => 1,
+                'to_level' => 2,
+                'type' => 'upgrade',
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::REQUESTING,
+            'started_at' => now(),
+            'completed_at' => now()->addMinutes(10),
+        ]);
+
+        (new CapitalCityResourceRequest(
+            $capitalCityBuildingQueue->id,
+            999,
+            CapitalCityResourceRequestType::BUILDING_QUEUE,
+        ))->handle(
+            resolve(\App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessBuildingRequestHandler::class),
+            resolve(\App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessUnitRequestHandler::class),
+        );
+
+        Queue::assertPushed(CapitalCityResourceRequest::class, function (CapitalCityResourceRequest $job) {
+            return $job->connection === 'long_running' && $job->queue === 'default_long';
+        });
     }
 
     public function testMixedValidAndMaxLevelBuildingRequestSkipsMaxLevelWithoutSpendingForIt(): void

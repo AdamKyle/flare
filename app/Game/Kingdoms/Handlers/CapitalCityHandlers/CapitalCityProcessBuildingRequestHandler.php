@@ -188,6 +188,7 @@ class CapitalCityProcessBuildingRequestHandler
     private function isInvalidUpgradeRequest(KingdomBuilding $building, array $buildingUpgradeRequest): bool
     {
         return $building->level >= $building->gameBuilding->max_level ||
+            $building->current_durability < $building->max_durability ||
             (int) $buildingUpgradeRequest['to_level'] > $building->gameBuilding->max_level ||
             (int) $buildingUpgradeRequest['from_level'] !== $building->level;
     }
