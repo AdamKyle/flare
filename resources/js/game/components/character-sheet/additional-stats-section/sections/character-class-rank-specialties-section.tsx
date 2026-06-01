@@ -260,6 +260,10 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
     }
 
     unequipSpecial(specialId: number) {
+        if (this.isAutomationRunning()) {
+            return;
+        }
+
         this.setState(
             {
                 equipping: true,
@@ -322,6 +326,10 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
     }
 
     equipSpecial(specialId: number) {
+        if (this.isAutomationRunning()) {
+            return;
+        }
+
         this.setState(
             {
                 equipping: true,
@@ -378,6 +386,18 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
                         },
                     );
             },
+        );
+    }
+
+    isAutomationRunning(): boolean {
+        if (this.props.character === null) {
+            return false;
+        }
+
+        return (
+            this.props.character.is_automation_running ||
+            this.props.character.is_delve_running ||
+            this.props.character.is_faction_loyalty_automation_running
         );
     }
 
@@ -570,7 +590,10 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
                                     )
                                 }
                                 on_click={() => this.unequipSpecial(row.id)}
-                                disabled={this.state.equipping}
+                                disabled={
+                                    this.state.equipping ||
+                                    this.isAutomationRunning()
+                                }
                             />
                         )}
                     </Fragment>
@@ -581,6 +604,10 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
 
     isEquipButtonDisabled(requiredLevel: number, classId: number): boolean {
         if (this.state.equipping) {
+            return true;
+        }
+
+        if (this.isAutomationRunning()) {
             return true;
         }
 

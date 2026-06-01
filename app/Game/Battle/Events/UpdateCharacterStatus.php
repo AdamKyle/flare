@@ -48,9 +48,16 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
             'can_engage_celestials' => $character->can_engage_celestials,
             'can_engage_celestials_again_at' => now()->diffInSeconds($character->can_engage_celestials_again_at),
             'is_dead' => $character->is_dead,
-            'is_automation_running' => $character->currentAutomations()->where('character_id', $character->id)->get()->isNotEmpty(),
+            'is_automation_running' => $character->currentAutomations()
+                ->where('character_id', $character->id)
+                ->where('completed_at', '>', now())
+                ->exists(),
             'is_faction_loyalty_automation_running' => $character->isFactionLoyaltyAutomationRunning(),
-            'is_delve_running' => $character->currentAutomations()->where('character_id', $character->id)->where('type', AutomationType::DELVE)->get()->isNotEmpty(),
+            'is_delve_running' => $character->currentAutomations()
+                ->where('character_id', $character->id)
+                ->where('type', AutomationType::DELVE)
+                ->where('completed_at', '>', now())
+                ->exists(),
             'active_automation' => $this->activeAutomation($character),
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
             'is_silenced' => $character->is_silenced,

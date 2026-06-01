@@ -83,9 +83,16 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'can_attack_again_at' => now()->diffInSeconds($character->can_attack_again_at),
             'can_craft_again_at' => now()->diffInSeconds($character->can_craft_again_at),
             'can_spin_again_at' => now()->diffInSeconds($character->can_spin_again_at),
-            'is_automation_running' => $character->currentAutomations()->where('character_id', $character->id)->get()->isNotEmpty(),
+            'is_automation_running' => $character->currentAutomations()
+                ->where('character_id', $character->id)
+                ->where('completed_at', '>', now())
+                ->exists(),
             'is_faction_loyalty_automation_running' => $character->isFactionLoyaltyAutomationRunning(),
-            'is_delve_running' => $character->currentAutomations()->where('character_id', $character->id)->where('type', AutomationType::DELVE)->get()->isNotEmpty(),
+            'is_delve_running' => $character->currentAutomations()
+                ->where('character_id', $character->id)
+                ->where('type', AutomationType::DELVE)
+                ->where('completed_at', '>', now())
+                ->exists(),
             'can_set_delve_pack' => $this->canSetPactOptionsForDelve($character),
             'active_automation' => $this->activeAutomation($character),
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),

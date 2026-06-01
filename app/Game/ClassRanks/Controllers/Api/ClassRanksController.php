@@ -30,12 +30,6 @@ class ClassRanksController extends Controller
 
     public function getCharacterClassRanks(Character $character): JsonResponse
     {
-        $restriction = $this->automationRestrictionJsonResponse($character);
-
-        if (! is_null($restriction)) {
-            return $restriction;
-        }
-
         $response = $this->classRankService->getClassRanks($character);
         $status = $response['status'];
 
@@ -46,12 +40,6 @@ class ClassRanksController extends Controller
 
     public function getCharacterClassSpecialties(Character $character): JsonResponse
     {
-        $restriction = $this->automationRestrictionJsonResponse($character);
-
-        if (! is_null($restriction)) {
-            return $restriction;
-        }
-
         return response()->json($this->classRankService->getSpecials($character));
     }
 

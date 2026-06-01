@@ -63,6 +63,10 @@ export default class CharacterClassRanks extends React.Component<
     }
 
     switchClass(classId: number) {
+        if (this.isAutomationRunning()) {
+            return;
+        }
+
         this.setState(
             {
                 switching_class: true,
@@ -102,6 +106,18 @@ export default class CharacterClassRanks extends React.Component<
                         },
                     );
             },
+        );
+    }
+
+    isAutomationRunning(): boolean {
+        if (this.props.character === null) {
+            return false;
+        }
+
+        return (
+            this.props.character.is_automation_running ||
+            this.props.character.is_delve_running ||
+            this.props.character.is_faction_loyalty_automation_running
         );
     }
 
@@ -156,7 +172,11 @@ export default class CharacterClassRanks extends React.Component<
                         <PrimaryButton
                             button_label={"Switch To"}
                             on_click={() => this.switchClass(row.game_class_id)}
-                            disabled={row.is_active || row.is_locked}
+                            disabled={
+                                row.is_active ||
+                                row.is_locked ||
+                                this.isAutomationRunning()
+                            }
                         />
                     </span>
                 ),

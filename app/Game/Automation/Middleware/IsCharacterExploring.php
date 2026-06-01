@@ -17,7 +17,10 @@ class IsCharacterExploring
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        $isTooBusy = auth()->user()->character->currentAutomations->where('type', AutomationType::EXPLORING)->isNotEmpty();
+        $isTooBusy = auth()->user()->character->currentAutomations()
+            ->where('type', AutomationType::EXPLORING)
+            ->where('completed_at', '>', now())
+            ->exists();
 
         if ($request->wantsJson()) {
             if ($isTooBusy) {

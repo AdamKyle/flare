@@ -169,6 +169,32 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         $this->assertEquals(0, $data['automation_completed_at']);
     }
 
+    public function testTransformSetsAutomationRunningFalseForExpiredAutomation(): void
+    {
+        $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::EXPLORING,
+            'completed_at' => now()->subSecond(),
+        ]);
+
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character);
+
+        $this->assertFalse($data['is_automation_running']);
+    }
+
+    public function testTransformSetsDelveRunningFalseForExpiredDelve(): void
+    {
+        $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::DELVE,
+            'completed_at' => now()->subSecond(),
+        ]);
+
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character);
+
+        $this->assertFalse($data['is_delve_running']);
+    }
+
     public function testTransformAllowsQueenOfHeartsInHellWithQuestItem(): void
     {
         $hell = $this->createGameMap([
