@@ -49,6 +49,32 @@ export default class SmallBuildingsSection extends React.Component<
         );
     }
 
+    isCapitalCityManagedQueue() {
+        if (this.state.view_building === null) {
+            return false;
+        }
+
+        if (this.props.kingdom.building_queue.length === 0) {
+            return false;
+        }
+
+        const self = this;
+
+        const queuedBuilding = this.props.kingdom.building_queue.filter(
+            (queue: BuildingInQueueDetails) => {
+                if (self.state.view_building !== null) {
+                    return queue.building_id === self.state.view_building.id;
+                }
+            },
+        );
+
+        if (queuedBuilding.length === 0) {
+            return false;
+        }
+
+        return queuedBuilding[0].is_capital_city_managed === true;
+    }
+
     render() {
         return (
             <Fragment>
@@ -82,6 +108,7 @@ export default class SmallBuildingsSection extends React.Component<
                         }
                         character_id={this.props.kingdom.character_id}
                         is_in_queue={this.isInQueue()}
+                        is_capital_city_managed_queue={this.isCapitalCityManagedQueue()}
                         character_gold={this.props.character_gold}
                         user_id={this.props.user_id}
                         is_automation_locked={this.props.is_automation_locked}

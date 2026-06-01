@@ -76,7 +76,12 @@ export const buildBuildingsColumns = (
                             time_out_label={"Building"}
                             useSmallTimer={viewPort < 800}
                         />
-                        {fetchTimeRemaining(row.id, buildingsInQueue) > 0 ? (
+                        {isCapitalCityManaged(row.id, buildingsInQueue) ? (
+                            <div className="mb-2 mt-4 text-sm text-gray-700 dark:text-gray-300">
+                                Managed by Capital City. Cannot be cancelled
+                                here.
+                            </div>
+                        ) : fetchTimeRemaining(row.id, buildingsInQueue) > 0 ? (
                             <div className="mb-2 mt-4">
                                 <button
                                     className={
@@ -128,6 +133,23 @@ const findBuildingInQueue = (
     }
 
     return null;
+};
+
+const isCapitalCityManaged = (
+    buildingId: number,
+    buildingsInQueue: BuildingInQueueDetails[] | [],
+) => {
+    const foundBuilding = buildingsInQueue.filter(
+        (building: BuildingInQueueDetails) => {
+            return building.building_id === buildingId;
+        },
+    );
+
+    if (foundBuilding.length > 0) {
+        return foundBuilding[0].is_capital_city_managed === true;
+    }
+
+    return false;
 };
 
 const fetchTimeRemaining = (

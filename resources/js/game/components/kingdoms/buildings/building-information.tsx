@@ -406,6 +406,13 @@ export default class BuildingInformation extends React.Component<
                             {this.props.building.is_maxed &&
                             !this.buildingNeedsToBeRepaired() ? (
                                 <p>Building is already max level.</p>
+                            ) : this.props.is_capital_city_managed_queue ? (
+                                <p>
+                                    This building is managed by Capital City and
+                                    cannot be upgraded or repaired here. Click
+                                    the red minus at the top to return to the
+                                    list.
+                                </p>
                             ) : this.props.is_in_queue ? (
                                 <p>
                                     Building is currently in queue. Click the

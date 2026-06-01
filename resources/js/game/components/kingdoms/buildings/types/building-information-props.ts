@@ -11,4 +11,6 @@ export default interface BuildingInformationProps extends InformationPropsBase {
     character_gold: number;
 
     kingdom_building_time_reduction: number;
+
+    is_capital_city_managed_queue: boolean;
 }

@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Transformers;
 
+use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Quest;
@@ -9,6 +10,7 @@ use App\Flare\Models\SmeltingProgress;
 use App\Flare\Models\UnitMovementQueue;
 use App\Flare\Values\FeatureTypes;
 use App\Game\Kingdoms\Values\BuildingActions;
+use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use League\Fractal\Resource\Collection;
 use League\Fractal\TransformerAbstract;
@@ -56,7 +58,7 @@ class KingdomTransformer extends TransformerAbstract
             'max_morale' => $kingdom->max_morale,
             'treasury' => $kingdom->treasury,
             'gold_bars' => $kingdom->gold_bars,
-            'building_queue' => $kingdom->buildingsQueue,
+            'building_queue' => $this->buildingQueue($kingdom),
             'unit_queue' => $kingdom->unitsQueue,
             'unit_movement' => $kingdom->unitsMovementQueue,
             'treasury_defence' => $kingdom->treasury / KingdomMaxValue::MAX_TREASURY,
@@ -88,6 +90,40 @@ class KingdomTransformer extends TransformerAbstract
             'small_council_data' => $this->getSmallCouncilData($kingdom),
             'estimated_hourly_production' => $this->kingdomResourceHourlyProductionTransformer->transform($kingdom),
         ];
+    }
+
+    private function buildingQueue(Kingdom $kingdom)
+    {
+        $capitalCityBuildingQueues = CapitalCityBuildingQueue::query()
+            ->where('kingdom_id', $kingdom->id)
+            ->whereNotIn('status', [
+                CapitalCityQueueStatus::REJECTED,
+                CapitalCityQueueStatus::FINISHED,
+                CapitalCityQueueStatus::CANCELLED,
+                CapitalCityQueueStatus::CANCELLATION_REJECTED,
+            ])
+            ->get()
+            ->flatMap(function (CapitalCityBuildingQueue $capitalCityBuildingQueue) {
+                return collect($capitalCityBuildingQueue->building_request_data)
+                    ->reject(function (array $request) {
+                        return in_array($request['secondary_status'] ?? null, [
+                            CapitalCityQueueStatus::REJECTED,
+                            CapitalCityQueueStatus::FINISHED,
+                            CapitalCityQueueStatus::CANCELLED,
+                            CapitalCityQueueStatus::CANCELLATION_REJECTED,
+                        ], true);
+                    })
+                    ->map(function (array $request) use ($capitalCityBuildingQueue) {
+                        return [
+                            'building_id' => $request['building_id'],
+                            'started_at' => $capitalCityBuildingQueue->started_at,
+                            'completed_at' => $capitalCityBuildingQueue->completed_at,
+                            'is_capital_city_managed' => true,
+                        ];
+                    });
+            });
+
+        return $kingdom->buildingsQueue->toBase()->merge($capitalCityBuildingQueues)->values();
     }
 
     public function includeBuildings(Kingdom $kingdom): Collection

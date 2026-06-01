@@ -41,4 +41,5 @@ export default interface KingdomQueueState {
     error_message: string | null;
     success_message: string | null;
     queues: queues | null;
+    queue_page: number;
 }

@@ -9,6 +9,8 @@ export default interface BuildingInQueueDetails {
 
     id: number;
 
+    is_capital_city_managed?: boolean;
+
     kingdom_id: number;
 
     paid_amount: number;
