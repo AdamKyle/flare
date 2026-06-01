@@ -91,7 +91,7 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
                 CapitalCityUnitRequestCancellationMovement::dispatch(
                     $this->capitalCityQueueId,
                     $this->characterId
-                )->delay($time);
+                )->onConnection('long_running')->onQueue('default_long')->delay($time);
 
                 return true;
                 // @codeCoverageIgnoreEnd

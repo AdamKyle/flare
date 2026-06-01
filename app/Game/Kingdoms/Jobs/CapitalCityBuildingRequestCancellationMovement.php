@@ -86,7 +86,7 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
                     $this->capitalCityQueueId,
                     $this->characterId,
                     $this->dataForCancellation
-                )->delay($time);
+                )->onConnection('long_running')->onQueue('default_long')->delay($time);
 
                 return true;
                 // @codeCoverageIgnoreEnd
