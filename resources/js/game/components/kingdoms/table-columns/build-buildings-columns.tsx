@@ -73,7 +73,10 @@ export const buildBuildingsColumns = (
                                 row.id,
                                 buildingsInQueue,
                             )}
-                            time_out_label={"Building"}
+                            time_out_label={fetchTimerLabel(
+                                row.id,
+                                buildingsInQueue,
+                            )}
                             useSmallTimer={viewPort < 800}
                         />
                         {isCapitalCityManaged(row.id, buildingsInQueue) ? (
@@ -120,7 +123,7 @@ const findBuildingInQueue = (
     buildingId: number,
     buildingsInQueue: BuildingInQueueDetails[] | [],
 ) => {
-    let foundBuilding = buildingsInQueue.filter(
+    const foundBuilding = buildingsInQueue.filter(
         (building: BuildingInQueueDetails) => {
             return building.building_id === buildingId;
         },
@@ -152,11 +155,34 @@ const isCapitalCityManaged = (
     return false;
 };
 
+const fetchTimerLabel = (
+    buildingId: number,
+    buildingsInQueue: BuildingInQueueDetails[] | [],
+) => {
+    const foundBuilding = buildingsInQueue.filter(
+        (building: BuildingInQueueDetails) => {
+            return building.building_id === buildingId;
+        },
+    );
+
+    if (foundBuilding.length === 0) {
+        return "Building";
+    }
+
+    const buildingInQueue: BuildingInQueueDetails = foundBuilding[0];
+
+    if (buildingInQueue.is_capital_city_managed !== true) {
+        return "Building";
+    }
+
+    return buildingInQueue.phase_timer_label ?? "Building";
+};
+
 const fetchTimeRemaining = (
     buildingId: number,
     buildingsInQueue: BuildingInQueueDetails[] | [],
 ) => {
-    let foundBuilding = buildingsInQueue.filter(
+    const foundBuilding = buildingsInQueue.filter(
         (building: BuildingInQueueDetails) => {
             return building.building_id === buildingId;
         },

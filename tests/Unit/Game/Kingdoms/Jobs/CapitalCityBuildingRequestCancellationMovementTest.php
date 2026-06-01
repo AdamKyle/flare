@@ -3,8 +3,6 @@
 namespace Tests\Unit\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\BuildingInQueue;
-use App\Flare\Models\CapitalCityBuildingCancellation;
-use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequestCancellationMovement;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityKingdomLogHandler;
 use App\Game\Kingdoms\Service\KingdomBuildingService;
@@ -20,19 +18,24 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testDelayedRedispatchPassesAllConstructorArguments(): void
+    public function testDelayedRedispatchPassesAllConstructorArgumentsAndUsesLongRunningQueue(): void
     {
         Queue::fake();
         Event::fake();
 
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->assignBuilding()->getKingdom();
+        $kingdomManagement = $characterFactory->kingdomManagement()
+            ->assignKingdom()
+            ->assignBuilding()
+            ->assignCapitalCityBuildingQueue()
+            ->assignCapitalCityBuildingCancellation();
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $kingdom->buildings()->first();
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
-            'character_id' => $character->id,
-            'kingdom_id' => $kingdom->id,
-            'requested_kingdom' => $kingdom->id,
+        $capitalCityBuildingQueue = $kingdomManagement->getCapitalCityBuildingQueue();
+        $capitalCityBuildingCancellation = $kingdomManagement->getCapitalCityBuildingCancellation();
+        $capitalCityBuildingQueue->update([
+            'status' => CapitalCityQueueStatus::BUILDING,
             'building_request_data' => [[
                 'building_id' => $building->id,
                 'building_name' => $building->name,
@@ -41,18 +44,11 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
                 'to_level' => 2,
                 'type' => 'upgrade',
             ]],
-            'messages' => [],
-            'status' => CapitalCityQueueStatus::BUILDING,
             'started_at' => now(),
             'completed_at' => now()->addMinutes(10),
         ]);
-        $capitalCityBuildingCancellation = CapitalCityBuildingCancellation::create([
-            'building_id' => $building->id,
-            'kingdom_id' => $kingdom->id,
-            'request_kingdom_id' => $kingdom->id,
-            'character_id' => $character->id,
+        $capitalCityBuildingCancellation->update([
             'capital_city_building_queue_id' => $capitalCityBuildingQueue->id,
-            'status' => CapitalCityQueueStatus::TRAVELING,
             'travel_time_completed_at' => now(),
         ]);
 
@@ -67,7 +63,9 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
         Queue::assertPushed(CapitalCityBuildingRequestCancellationMovement::class, function (CapitalCityBuildingRequestCancellationMovement $queuedJob) use ($capitalCityBuildingCancellation, $capitalCityBuildingQueue, $character, $building) {
             $serializedJob = serialize($queuedJob);
 
-            return str_contains($serializedJob, 'capitalCityCancellationQueueId";i:' . $capitalCityBuildingCancellation->id) &&
+            return $queuedJob->connection === 'long_running' &&
+                $queuedJob->queue === 'default_long' &&
+                str_contains($serializedJob, 'capitalCityCancellationQueueId";i:' . $capitalCityBuildingCancellation->id) &&
                 str_contains($serializedJob, 'capitalCityQueueId";i:' . $capitalCityBuildingQueue->id) &&
                 str_contains($serializedJob, 'characterId";i:' . $character->id) &&
                 str_contains($serializedJob, 'building_ids') &&
@@ -80,13 +78,18 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
         Event::fake();
 
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->assignBuilding()->getKingdom();
+        $kingdomManagement = $characterFactory->kingdomManagement()
+            ->assignKingdom()
+            ->assignBuilding()
+            ->assignCapitalCityBuildingQueue()
+            ->assignCapitalCityBuildingCancellation();
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $kingdom->buildings()->first();
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
-            'character_id' => $character->id,
-            'kingdom_id' => $kingdom->id,
-            'requested_kingdom' => $kingdom->id,
+        $capitalCityBuildingQueue = $kingdomManagement->getCapitalCityBuildingQueue();
+        $capitalCityBuildingCancellation = $kingdomManagement->getCapitalCityBuildingCancellation();
+        $capitalCityBuildingQueue->update([
+            'status' => CapitalCityQueueStatus::BUILDING,
             'building_request_data' => [[
                 'building_id' => $building->id,
                 'building_name' => $building->name,
@@ -95,18 +98,11 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
                 'to_level' => 2,
                 'type' => 'upgrade',
             ]],
-            'messages' => [],
-            'status' => CapitalCityQueueStatus::BUILDING,
             'started_at' => now()->subHour(),
             'completed_at' => now()->subMinute(),
         ]);
-        $capitalCityBuildingCancellation = CapitalCityBuildingCancellation::create([
-            'building_id' => $building->id,
-            'kingdom_id' => $kingdom->id,
-            'request_kingdom_id' => $kingdom->id,
-            'character_id' => $character->id,
+        $capitalCityBuildingCancellation->update([
             'capital_city_building_queue_id' => $capitalCityBuildingQueue->id,
-            'status' => CapitalCityQueueStatus::TRAVELING,
             'travel_time_completed_at' => now(),
         ]);
 
@@ -128,16 +124,17 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
         Event::fake();
 
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->assignBuilding()->getKingdom();
+        $kingdomManagement = $characterFactory->kingdomManagement()
+            ->assignKingdom()
+            ->assignBuilding()
+            ->assignCapitalCityBuildingQueue()
+            ->assignCapitalCityBuildingCancellation();
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $kingdom->buildings()->first();
-        $capitalCityBuildingCancellation = CapitalCityBuildingCancellation::create([
-            'building_id' => $building->id,
-            'kingdom_id' => $kingdom->id,
-            'request_kingdom_id' => $kingdom->id,
-            'character_id' => $character->id,
+        $capitalCityBuildingCancellation = $kingdomManagement->getCapitalCityBuildingCancellation();
+        $capitalCityBuildingCancellation->update([
             'capital_city_building_queue_id' => 999999,
-            'status' => CapitalCityQueueStatus::TRAVELING,
             'travel_time_completed_at' => now(),
         ]);
 
@@ -157,19 +154,23 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
         Event::fake();
 
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $kingdom = $characterFactory->kingdomManagement()->assignKingdom([
+        $kingdomManagement = $characterFactory->kingdomManagement()->assignKingdom([
             'current_wood' => 1500,
             'current_clay' => 1500,
             'current_stone' => 1500,
             'current_iron' => 1500,
             'current_population' => 1500,
-        ])->assignBuilding()->getKingdom();
+        ])
+            ->assignBuilding()
+            ->assignCapitalCityBuildingQueue()
+            ->assignCapitalCityBuildingCancellation();
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $kingdom->buildings()->first();
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
-            'character_id' => $character->id,
-            'kingdom_id' => $kingdom->id,
-            'requested_kingdom' => $kingdom->id,
+        $capitalCityBuildingQueue = $kingdomManagement->getCapitalCityBuildingQueue();
+        $capitalCityBuildingCancellation = $kingdomManagement->getCapitalCityBuildingCancellation();
+        $capitalCityBuildingQueue->update([
+            'status' => CapitalCityQueueStatus::BUILDING,
             'building_request_data' => [[
                 'building_id' => $building->id,
                 'building_name' => $building->name,
@@ -178,18 +179,11 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
                 'to_level' => 2,
                 'type' => 'upgrade',
             ]],
-            'messages' => [],
-            'status' => CapitalCityQueueStatus::BUILDING,
             'started_at' => now()->subHour(),
             'completed_at' => now()->subMinute(),
         ]);
-        $capitalCityBuildingCancellation = CapitalCityBuildingCancellation::create([
-            'building_id' => $building->id,
-            'kingdom_id' => $kingdom->id,
-            'request_kingdom_id' => $kingdom->id,
-            'character_id' => $character->id,
+        $capitalCityBuildingCancellation->update([
             'capital_city_building_queue_id' => $capitalCityBuildingQueue->id,
-            'status' => CapitalCityQueueStatus::TRAVELING,
             'travel_time_completed_at' => now(),
         ]);
         BuildingInQueue::factory()->create([
@@ -222,13 +216,18 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
         Event::fake();
 
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->assignBuilding()->getKingdom();
+        $kingdomManagement = $characterFactory->kingdomManagement()
+            ->assignKingdom()
+            ->assignBuilding()
+            ->assignCapitalCityBuildingQueue()
+            ->assignCapitalCityBuildingCancellation();
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $kingdom->buildings()->first();
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
-            'character_id' => $character->id,
-            'kingdom_id' => $kingdom->id,
-            'requested_kingdom' => $kingdom->id,
+        $capitalCityBuildingQueue = $kingdomManagement->getCapitalCityBuildingQueue();
+        $capitalCityBuildingCancellation = $kingdomManagement->getCapitalCityBuildingCancellation();
+        $capitalCityBuildingQueue->update([
+            'status' => CapitalCityQueueStatus::BUILDING,
             'building_request_data' => [[
                 'building_id' => $building->id,
                 'building_name' => $building->name,
@@ -237,18 +236,11 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
                 'to_level' => 2,
                 'type' => 'upgrade',
             ]],
-            'messages' => [],
-            'status' => CapitalCityQueueStatus::BUILDING,
             'started_at' => now()->subHour(),
             'completed_at' => now()->subMinute(),
         ]);
-        $capitalCityBuildingCancellation = CapitalCityBuildingCancellation::create([
-            'building_id' => $building->id,
-            'kingdom_id' => $kingdom->id,
-            'request_kingdom_id' => $kingdom->id,
-            'character_id' => $character->id,
+        $capitalCityBuildingCancellation->update([
             'capital_city_building_queue_id' => $capitalCityBuildingQueue->id,
-            'status' => CapitalCityQueueStatus::TRAVELING,
             'travel_time_completed_at' => now(),
         ]);
         BuildingInQueue::factory()->create([
@@ -275,6 +267,6 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
         );
 
         $this->assertNull(BuildingInQueue::where('building_id', $building->id)->first());
-        $this->assertNull(CapitalCityBuildingCancellation::find($capitalCityBuildingCancellation->id));
+        $this->assertNull($capitalCityBuildingCancellation->fresh());
     }
 }

@@ -138,13 +138,14 @@ export default class KingdomQueues extends React.Component<
                     </div>
                     <TimerProgressBar
                         time_out_label={
-                            buildingQueue.from_level !== null &&
+                            buildingQueue.phase_timer_label ??
+                            (buildingQueue.from_level !== null &&
                             buildingQueue.to_level !== null
                                 ? "From Level: " +
                                   buildingQueue.from_level +
                                   " To Level: " +
                                   buildingQueue.to_level
-                                : buildingQueue.type
+                                : buildingQueue.type)
                         }
                         time_remaining={buildingQueue.time_remaining}
                     />

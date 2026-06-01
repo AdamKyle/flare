@@ -4,6 +4,7 @@ namespace Tests\Setup\Character;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CapitalCityBuildingQueue;
+use App\Flare\Models\CapitalCityBuildingCancellation;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\User;
 use App\Game\Core\Traits\KingdomCache;
@@ -26,6 +27,10 @@ class KingdomManagement
     private CharacterFactory $characterFactory;
 
     private Kingdom $kingdom;
+
+    private ?CapitalCityBuildingQueue $capitalCityBuildingQueue = null;
+
+    private ?CapitalCityBuildingCancellation $capitalCityBuildingCancellation = null;
 
     public function __construct(Character $character, CharacterFactory $characterFactory)
     {
@@ -94,7 +99,7 @@ class KingdomManagement
 
         $building = $this->kingdom->buildings()->first();
 
-        CapitalCityBuildingQueue::factory()->create(array_merge([
+        $this->capitalCityBuildingQueue = CapitalCityBuildingQueue::factory()->create(array_merge([
             'character_id' => $this->character->id,
             'kingdom_id' => $this->kingdom->id,
             'requested_kingdom' => $this->kingdom->id,
@@ -114,6 +119,35 @@ class KingdomManagement
         ], $queueOptions));
 
         return $this;
+    }
+
+    public function getCapitalCityBuildingQueue(): ?CapitalCityBuildingQueue
+    {
+        return $this->capitalCityBuildingQueue?->refresh();
+    }
+
+    public function assignCapitalCityBuildingCancellation(array $options = []): KingdomManagement
+    {
+        if (is_null($this->kingdom)) {
+            throw new \Exception('You must create a kingdom first. Call createKingdom.');
+        }
+
+        $building = $this->kingdom->buildings()->first();
+
+        $this->capitalCityBuildingCancellation = CapitalCityBuildingCancellation::factory()->create(array_merge([
+            'building_id' => $building->id,
+            'kingdom_id' => $this->kingdom->id,
+            'request_kingdom_id' => $this->kingdom->id,
+            'character_id' => $this->character->id,
+            'capital_city_building_queue_id' => $this->capitalCityBuildingQueue?->id,
+        ], $options));
+
+        return $this;
+    }
+
+    public function getCapitalCityBuildingCancellation(): ?CapitalCityBuildingCancellation
+    {
+        return $this->capitalCityBuildingCancellation?->refresh();
     }
 
     /**

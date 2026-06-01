@@ -17,6 +17,8 @@ export default interface BuildingInQueueDetails {
 
     paid_with_gold: boolean;
 
+    phase_timer_label?: string;
+
     started_at: string;
 
     to_level: number;

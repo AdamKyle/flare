@@ -12,6 +12,7 @@ use App\Flare\Values\FeatureTypes;
 use App\Game\Kingdoms\Values\BuildingActions;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
+use Illuminate\Support\Collection as SupportCollection;
 use League\Fractal\Resource\Collection;
 use League\Fractal\TransformerAbstract;
 
@@ -92,7 +93,7 @@ class KingdomTransformer extends TransformerAbstract
         ];
     }
 
-    private function buildingQueue(Kingdom $kingdom)
+    private function buildingQueue(Kingdom $kingdom): SupportCollection
     {
         $capitalCityBuildingQueues = CapitalCityBuildingQueue::query()
             ->where('kingdom_id', $kingdom->id)
@@ -118,12 +119,23 @@ class KingdomTransformer extends TransformerAbstract
                             'building_id' => $request['building_id'],
                             'started_at' => $capitalCityBuildingQueue->started_at,
                             'completed_at' => $capitalCityBuildingQueue->completed_at,
+                            'phase_status' => $capitalCityBuildingQueue->status,
+                            'phase_timer_label' => $this->capitalCityBuildingPhaseTimerLabel($capitalCityBuildingQueue->status),
                             'is_capital_city_managed' => true,
                         ];
                     });
             });
 
         return $kingdom->buildingsQueue->toBase()->merge($capitalCityBuildingQueues)->values();
+    }
+
+    private function capitalCityBuildingPhaseTimerLabel(string $status): string
+    {
+        return match ($status) {
+            CapitalCityQueueStatus::TRAVELING => 'Traveling',
+            CapitalCityQueueStatus::REPAIRING => 'Repairing',
+            default => 'Building',
+        };
     }
 
     public function includeBuildings(Kingdom $kingdom): Collection

@@ -61,6 +61,7 @@ class KingdomTransformerTest extends TestCase
 
         $kingdomManagement->assignCapitalCityBuildingQueue([
             'requested_kingdom' => $capitalCity->id,
+            'status' => CapitalCityQueueStatus::BUILDING,
             'started_at' => $startedAt,
             'completed_at' => $completedAt,
         ], [
@@ -73,6 +74,8 @@ class KingdomTransformerTest extends TestCase
         $this->assertSame($building->id, $result['building_queue'][0]['building_id']);
         $this->assertSame($startedAt->toDateTimeString(), $result['building_queue'][0]['started_at']->toDateTimeString());
         $this->assertSame($completedAt->toDateTimeString(), $result['building_queue'][0]['completed_at']->toDateTimeString());
+        $this->assertSame(CapitalCityQueueStatus::BUILDING, $result['building_queue'][0]['phase_status']);
+        $this->assertSame('Building', $result['building_queue'][0]['phase_timer_label']);
         $this->assertTrue($result['building_queue'][0]['is_capital_city_managed']);
     }
 }

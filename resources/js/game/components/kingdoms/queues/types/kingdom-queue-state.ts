@@ -8,6 +8,8 @@ export interface BaseQueue {
 
 export interface BuildingQueue extends BaseQueue {
     from_level: number | null;
+    phase_status?: string;
+    phase_timer_label?: string;
     to_level: number | null;
     type: string;
     time_remaining: number;

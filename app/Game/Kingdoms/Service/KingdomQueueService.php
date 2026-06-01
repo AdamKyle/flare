@@ -115,6 +115,8 @@ class KingdomQueueService
                             'to_level' => $request['to_level'],
                             'type' => $request['type'] === 'repair' ? 'Capital City Repair' : 'Capital City Upgrade',
                             'time_remaining' => now()->diffInSeconds($capitalCityBuildingQueue->completed_at),
+                            'phase_status' => $capitalCityBuildingQueue->status,
+                            'phase_timer_label' => $this->capitalCityBuildingPhaseTimerLabel($capitalCityBuildingQueue->status),
                             'is_capital_city_managed' => true,
                             'capital_city_queue_id' => $capitalCityBuildingQueue->id,
                         ];
@@ -122,6 +124,15 @@ class KingdomQueueService
             });
 
         return $manualQueues->toBase()->merge($capitalCityQueues)->values()->toArray();
+    }
+
+    private function capitalCityBuildingPhaseTimerLabel(string $status): string
+    {
+        return match ($status) {
+            CapitalCityQueueStatus::TRAVELING => 'Traveling',
+            CapitalCityQueueStatus::REPAIRING => 'Repairing',
+            default => 'Building',
+        };
     }
 
     protected function fetchBuildingExpansionQueues(Kingdom $kingdom): array
