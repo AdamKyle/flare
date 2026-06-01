@@ -248,7 +248,12 @@ class KingdomQueueService
 
         CapitalCityUnitQueue::query()
             ->where('kingdom_id', $kingdom->id)
-            ->whereIn('status', $this->activeUnitStatuses())
+            ->whereIn('status', [
+                CapitalCityQueueStatus::TRAVELING,
+                CapitalCityQueueStatus::BUILDING,
+                CapitalCityQueueStatus::REPAIRING,
+                CapitalCityQueueStatus::RECRUITING,
+            ])
             ->where('completed_at', '<', now())
             ->get()
             ->each(function (CapitalCityUnitQueue $queue): void {
@@ -262,14 +267,6 @@ class KingdomQueueService
             CapitalCityQueueStatus::TRAVELING,
             CapitalCityQueueStatus::BUILDING,
             CapitalCityQueueStatus::REPAIRING,
-        ];
-    }
-
-    private function activeUnitStatuses(): array
-    {
-        return [
-            CapitalCityQueueStatus::TRAVELING,
-            CapitalCityQueueStatus::RECRUITING,
         ];
     }
 
