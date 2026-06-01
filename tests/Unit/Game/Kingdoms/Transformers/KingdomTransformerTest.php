@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Game\Kingdoms\Transformers;
 
-use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -48,47 +47,24 @@ class KingdomTransformerTest extends TestCase
 
     public function testTransformIncludesCapitalCityBuildingQueues(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $kingdom = $this->createKingdom([
-            'character_id' => $character->id,
-            'game_map_id' => $character->map->game_map_id,
-            'treasury' => 0,
-            'gold_bars' => 0,
-        ]);
-        $capitalCity = $this->createKingdom([
-            'character_id' => $character->id,
-            'game_map_id' => $character->map->game_map_id,
+        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $capitalCity = $characterFactory->kingdomManagement()->assignKingdom([
             'is_capital' => true,
-        ]);
-        $building = $kingdom->buildings()->create([
-            'game_building_id' => $this->createGameBuilding()->id,
-            'kingdom_id' => $kingdom->id,
-            'level' => 1,
-            'max_defence' => 100,
-            'max_durability' => 100,
-            'current_durability' => 100,
-            'current_defence' => 100,
-        ]);
+        ])->getKingdom();
+        $kingdomManagement = $characterFactory->kingdomManagement()
+            ->assignKingdom()
+            ->assignBuilding();
+        $kingdom = $kingdomManagement->getKingdom();
+        $building = $kingdom->buildings()->first();
         $startedAt = now()->subMinute();
         $completedAt = now()->addHour();
 
-        CapitalCityBuildingQueue::create([
-            'character_id' => $character->id,
-            'kingdom_id' => $kingdom->id,
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'requested_kingdom' => $capitalCity->id,
-            'building_request_data' => [[
-                'building_id' => $building->id,
-                'building_name' => $building->name,
-                'type' => 'upgrade',
-                'missing_costs' => [],
-                'secondary_status' => CapitalCityQueueStatus::BUILDING,
-                'from_level' => $building->level,
-                'to_level' => $building->level + 1,
-            ]],
-            'messages' => [],
-            'status' => CapitalCityQueueStatus::BUILDING,
             'started_at' => $startedAt,
             'completed_at' => $completedAt,
+        ], [
+            'secondary_status' => CapitalCityQueueStatus::BUILDING,
         ]);
 
         $result = resolve(KingdomTransformer::class)->transform($kingdom->refresh());

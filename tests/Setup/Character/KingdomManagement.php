@@ -3,9 +3,11 @@
 namespace Tests\Setup\Character;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\User;
 use App\Game\Core\Traits\KingdomCache;
+use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Tests\Traits\CreateGameBuilding;
 use Tests\Traits\CreateGameUnit;
 use Tests\Traits\CreateKingdom;
@@ -80,6 +82,36 @@ class KingdomManagement
             'game_building_id' => $gameBuilding->id,
             'kingdom_id' => $this->kingdom->id,
         ], $kingdomBuildingOptions));
+
+        return $this;
+    }
+
+    public function assignCapitalCityBuildingQueue(array $queueOptions = [], array $requestOptions = []): KingdomManagement
+    {
+        if (is_null($this->kingdom)) {
+            throw new \Exception('You must create a kingdom first. Call createKingdom.');
+        }
+
+        $building = $this->kingdom->buildings()->first();
+
+        CapitalCityBuildingQueue::factory()->create(array_merge([
+            'character_id' => $this->character->id,
+            'kingdom_id' => $this->kingdom->id,
+            'requested_kingdom' => $this->kingdom->id,
+            'building_request_data' => [array_merge([
+                'building_id' => $building->id,
+                'building_name' => $building->name,
+                'type' => 'upgrade',
+                'missing_costs' => [],
+                'secondary_status' => CapitalCityQueueStatus::BUILDING,
+                'from_level' => $building->level,
+                'to_level' => $building->level + 1,
+            ], $requestOptions)],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::BUILDING,
+            'started_at' => now()->subMinute(),
+            'completed_at' => now()->addHour(),
+        ], $queueOptions));
 
         return $this;
     }
