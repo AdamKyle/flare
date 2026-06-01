@@ -39,21 +39,6 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
-        Artisan::call('fix:kingdom-max-resources-based-on-passive-skill');
-        Artisan::call('assign:new-buildings-to-existing-kingdoms');
-        Artisan::call('clean:invalid-broken-queues');
-        Artisan::call('clean:orphaned-building-expansion-queues');
-        Artisan::call('characters:repair-stats', [
-            '--repair-reincarnation-bonus' => true,
-            '--apply' => true,
-        ]);
-        Artisan::call('kingdoms:repair-data', [
-            '--apply' => true,
-        ]);
-
-        Artisan::call('import:game-data Monsters');
-        Artisan::call('import:game-data Kingdoms');
-        Artisan::call('faction-loyalty:strip-fight-data');
 
         $this->importInformationSection();
 

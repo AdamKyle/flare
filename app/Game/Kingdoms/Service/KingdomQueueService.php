@@ -6,6 +6,7 @@ use App\Flare\Models\BuildingExpansionQueue;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityUnitQueue;
+use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;
 use App\Flare\Models\UnitMovementQueue;
@@ -44,6 +45,29 @@ class KingdomQueueService
             'unit_movement_queues' => $this->fetchUnitMovementQueues($kingdom),
             'building_expansion_queues' => $this->fetchBuildingExpansionQueues($kingdom),
         ];
+    }
+
+    public function cleanOverdueCapitalCityBuildingQueuesForCharacter(Character $character, ?Kingdom $kingdom = null): void
+    {
+        CapitalCityBuildingQueue::query()
+            ->where('character_id', $character->id)
+            ->when($kingdom, function ($query) use ($kingdom) {
+                return $query->whereHas('kingdom', function ($query) use ($kingdom) {
+                    $query->where('game_map_id', $kingdom->game_map_id);
+                })->where('kingdom_id', '!=', $kingdom->id);
+            })
+            ->whereIn('status', $this->activeBuildingStatuses())
+            ->where('completed_at', '<', now())
+            ->get()
+            ->each(function (CapitalCityBuildingQueue $queue): void {
+                $currentQueue = CapitalCityBuildingQueue::find($queue->id);
+
+                if (is_null($currentQueue)) {
+                    return;
+                }
+
+                $this->rejectOverdueBuildingQueue($currentQueue);
+            });
     }
 
     protected function fetchBuildingQueues(Kingdom $kingdom): array
@@ -207,30 +231,46 @@ class KingdomQueueService
 
     private function cleanOverdueCapitalCityQueues(Kingdom $kingdom): void
     {
-        $activeStatuses = [
-            CapitalCityQueueStatus::TRAVELING,
-            CapitalCityQueueStatus::BUILDING,
-            CapitalCityQueueStatus::REPAIRING,
-            CapitalCityQueueStatus::RECRUITING,
-        ];
-
         CapitalCityBuildingQueue::query()
             ->where('kingdom_id', $kingdom->id)
-            ->whereIn('status', $activeStatuses)
+            ->whereIn('status', $this->activeBuildingStatuses())
             ->where('completed_at', '<', now())
             ->get()
             ->each(function (CapitalCityBuildingQueue $queue): void {
-                $this->rejectOverdueBuildingQueue($queue);
+                $currentQueue = CapitalCityBuildingQueue::find($queue->id);
+
+                if (is_null($currentQueue)) {
+                    return;
+                }
+
+                $this->rejectOverdueBuildingQueue($currentQueue);
             });
 
         CapitalCityUnitQueue::query()
             ->where('kingdom_id', $kingdom->id)
-            ->whereIn('status', $activeStatuses)
+            ->whereIn('status', $this->activeUnitStatuses())
             ->where('completed_at', '<', now())
             ->get()
             ->each(function (CapitalCityUnitQueue $queue): void {
                 $this->rejectOverdueUnitQueue($queue);
             });
+    }
+
+    private function activeBuildingStatuses(): array
+    {
+        return [
+            CapitalCityQueueStatus::TRAVELING,
+            CapitalCityQueueStatus::BUILDING,
+            CapitalCityQueueStatus::REPAIRING,
+        ];
+    }
+
+    private function activeUnitStatuses(): array
+    {
+        return [
+            CapitalCityQueueStatus::TRAVELING,
+            CapitalCityQueueStatus::RECRUITING,
+        ];
     }
 
     private function rejectOverdueBuildingQueue(CapitalCityBuildingQueue $queue): void
