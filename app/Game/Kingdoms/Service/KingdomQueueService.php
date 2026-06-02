@@ -22,17 +22,16 @@ class KingdomQueueService
 {
     use ResponseBuilder;
 
-    private Manager $manager;
-
-    private UnitMovementTransformer $unitMovementTransformer;
-
+    /**
+     * @param Manager $manager
+     * @param UnitMovementTransformer $unitMovementTransformer
+     * @param CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler
+     */
     public function __construct(
-        Manager $manager,
-        UnitMovementTransformer $unitMovementTransformer,
+        private readonly Manager $manager,
+        private readonly UnitMovementTransformer $unitMovementTransformer,
         private readonly CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler,
     ) {
-        $this->manager = $manager;
-        $this->unitMovementTransformer = $unitMovementTransformer;
     }
 
     public function fetchKingdomQueues(Kingdom $kingdom): array
@@ -282,16 +281,17 @@ class KingdomQueueService
 
         CapitalCityUnitQueue::query()
             ->where('kingdom_id', $kingdom->id)
-            ->whereIn('status', [
-                CapitalCityQueueStatus::TRAVELING,
-                CapitalCityQueueStatus::BUILDING,
-                CapitalCityQueueStatus::REPAIRING,
-                CapitalCityQueueStatus::RECRUITING,
-            ])
+            ->whereIn('status', $this->activeUnitStatuses())
             ->where('completed_at', '<', now())
             ->get()
             ->each(function (CapitalCityUnitQueue $queue): void {
-                $this->rejectOverdueUnitQueue($queue);
+                $currentQueue = CapitalCityUnitQueue::find($queue->id);
+
+                if (is_null($currentQueue)) {
+                    return;
+                }
+
+                $this->rejectOverdueUnitQueue($currentQueue);
             });
     }
 
@@ -299,6 +299,8 @@ class KingdomQueueService
     {
         return [
             CapitalCityQueueStatus::TRAVELING,
+            CapitalCityQueueStatus::PROCESSING,
+            CapitalCityQueueStatus::REQUESTING,
             CapitalCityQueueStatus::BUILDING,
             CapitalCityQueueStatus::REPAIRING,
         ];
@@ -308,6 +310,8 @@ class KingdomQueueService
     {
         return [
             CapitalCityQueueStatus::TRAVELING,
+            CapitalCityQueueStatus::PROCESSING,
+            CapitalCityQueueStatus::REQUESTING,
             CapitalCityQueueStatus::RECRUITING,
         ];
     }

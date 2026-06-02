@@ -36,7 +36,8 @@ class CleanUpInvalidBrokenQueues extends Command
         CharacterAutomation::query()
             ->where(function ($query) {
                 $query->where('type', AutomationType::DELVE)
-                    ->orWhere('type', AutomationType::EXPLORING);
+                    ->orWhere('type', AutomationType::EXPLORING)
+                    ->orwhere('type', AutomationType::FACTION_LOYALTY);
             })
             ->where(function ($query) use ($startedAtCutoff, $completedAtCutoff) {
                 $query->where('started_at', '<=', $startedAtCutoff)

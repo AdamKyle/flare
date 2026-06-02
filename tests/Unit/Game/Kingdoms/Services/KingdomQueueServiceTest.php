@@ -5,7 +5,6 @@ namespace Tests\Unit\Game\Kingdoms\Services;
 use App\Flare\Models\BuildingExpansionQueue;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityUnitQueue;
-use App\Flare\Models\GameUnit;
 use App\Flare\Models\KingdomLog;
 use App\Game\Kingdoms\Service\KingdomQueueService;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
@@ -15,10 +14,11 @@ use Illuminate\Support\Facades\Log;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameBuilding;
+use Tests\Traits\CreateGameUnit;
 
 class KingdomQueueServiceTest extends TestCase
 {
-    use CreateGameBuilding, RefreshDatabase;
+    use CreateGameBuilding, CreateGameUnit, RefreshDatabase;
 
     public function testFetchKingdomQueuesIncludesActiveCapitalCityBuildingQueue(): void
     {
@@ -69,7 +69,7 @@ class KingdomQueueServiceTest extends TestCase
         $targetKingdomManagement = $characterFactory->kingdomManagement()->assignKingdom();
         $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
+        $unit = $this->createGameUnit(['name' => 'Spearmen']);
         $targetKingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
@@ -136,6 +136,44 @@ class KingdomQueueServiceTest extends TestCase
                 'building_name' => $building->name,
                 'type' => 'upgrade',
                 'missing_costs' => [],
+                'secondary_status' => CapitalCityQueueStatus::PROCESSING,
+                'from_level' => $building->level,
+                'to_level' => $building->level + 1,
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::PROCESSING,
+            'started_at' => now()->subHours(2),
+            'completed_at' => now()->subHour(),
+        ]);
+        $processingQueue = $targetKingdomManagement->getCapitalCityBuildingQueue();
+        $targetKingdomManagement->assignCapitalCityBuildingQueue([
+            'character_id' => $character->id,
+            'kingdom_id' => $targetKingdom->id,
+            'requested_kingdom' => $capitalCity->id,
+            'building_request_data' => [[
+                'building_id' => $building->id,
+                'building_name' => $building->name,
+                'type' => 'upgrade',
+                'missing_costs' => [],
+                'secondary_status' => CapitalCityQueueStatus::REQUESTING,
+                'from_level' => $building->level,
+                'to_level' => $building->level + 1,
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::REQUESTING,
+            'started_at' => now()->subHours(2),
+            'completed_at' => now()->subHour(),
+        ]);
+        $requestingQueue = $targetKingdomManagement->getCapitalCityBuildingQueue();
+        $targetKingdomManagement->assignCapitalCityBuildingQueue([
+            'character_id' => $character->id,
+            'kingdom_id' => $targetKingdom->id,
+            'requested_kingdom' => $capitalCity->id,
+            'building_request_data' => [[
+                'building_id' => $building->id,
+                'building_name' => $building->name,
+                'type' => 'upgrade',
+                'missing_costs' => [],
                 'secondary_status' => CapitalCityQueueStatus::BUILDING,
                 'from_level' => $building->level,
                 'to_level' => $building->level + 1,
@@ -174,6 +212,16 @@ class KingdomQueueServiceTest extends TestCase
             'type' => 'building',
         ]);
         Log::shouldHaveReceived('warning')->with('Rejected overdue capital city queue.', [
+            'queue_id' => $processingQueue->id,
+            'status' => CapitalCityQueueStatus::PROCESSING,
+            'type' => 'building',
+        ]);
+        Log::shouldHaveReceived('warning')->with('Rejected overdue capital city queue.', [
+            'queue_id' => $requestingQueue->id,
+            'status' => CapitalCityQueueStatus::REQUESTING,
+            'type' => 'building',
+        ]);
+        Log::shouldHaveReceived('warning')->with('Rejected overdue capital city queue.', [
             'queue_id' => $buildingQueue->id,
             'status' => CapitalCityQueueStatus::BUILDING,
             'type' => 'building',
@@ -185,9 +233,11 @@ class KingdomQueueServiceTest extends TestCase
         ]);
         $this->assertSame([], $result['building_queues']);
         $this->assertNull(CapitalCityBuildingQueue::find($travelingQueue->id));
+        $this->assertNull(CapitalCityBuildingQueue::find($processingQueue->id));
+        $this->assertNull(CapitalCityBuildingQueue::find($requestingQueue->id));
         $this->assertNull(CapitalCityBuildingQueue::find($buildingQueue->id));
         $this->assertNull(CapitalCityBuildingQueue::find($repairingQueue->id));
-        $this->assertSame(3, KingdomLog::where('character_id', $character->id)->count());
+        $this->assertSame(5, KingdomLog::where('character_id', $character->id)->count());
     }
 
     public function testFetchKingdomQueuesCleansOverdueActiveCapitalCityUnitQueues(): void
@@ -201,7 +251,7 @@ class KingdomQueueServiceTest extends TestCase
         $targetKingdomManagement = $characterFactory->kingdomManagement()->assignKingdom();
         $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
+        $unit = $this->createGameUnit(['name' => 'Spearmen']);
         $targetKingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
@@ -217,6 +267,36 @@ class KingdomQueueServiceTest extends TestCase
             'completed_at' => now()->subHour(),
         ]);
         $travelingQueue = $targetKingdomManagement->getCapitalCityUnitQueue();
+        $targetKingdomManagement->assignCapitalCityUnitQueue([
+            'character_id' => $character->id,
+            'kingdom_id' => $targetKingdom->id,
+            'requested_kingdom' => $capitalCity->id,
+            'unit_request_data' => [[
+                'name' => $unit->name,
+                'amount' => 10,
+                'secondary_status' => CapitalCityQueueStatus::PROCESSING,
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::PROCESSING,
+            'started_at' => now()->subHours(2),
+            'completed_at' => now()->subHour(),
+        ]);
+        $processingQueue = $targetKingdomManagement->getCapitalCityUnitQueue();
+        $targetKingdomManagement->assignCapitalCityUnitQueue([
+            'character_id' => $character->id,
+            'kingdom_id' => $targetKingdom->id,
+            'requested_kingdom' => $capitalCity->id,
+            'unit_request_data' => [[
+                'name' => $unit->name,
+                'amount' => 10,
+                'secondary_status' => CapitalCityQueueStatus::REQUESTING,
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::REQUESTING,
+            'started_at' => now()->subHours(2),
+            'completed_at' => now()->subHour(),
+        ]);
+        $requestingQueue = $targetKingdomManagement->getCapitalCityUnitQueue();
         $targetKingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
@@ -241,14 +321,26 @@ class KingdomQueueServiceTest extends TestCase
             'type' => 'unit',
         ]);
         Log::shouldHaveReceived('warning')->with('Rejected overdue capital city queue.', [
+            'queue_id' => $processingQueue->id,
+            'status' => CapitalCityQueueStatus::PROCESSING,
+            'type' => 'unit',
+        ]);
+        Log::shouldHaveReceived('warning')->with('Rejected overdue capital city queue.', [
+            'queue_id' => $requestingQueue->id,
+            'status' => CapitalCityQueueStatus::REQUESTING,
+            'type' => 'unit',
+        ]);
+        Log::shouldHaveReceived('warning')->with('Rejected overdue capital city queue.', [
             'queue_id' => $recruitingQueue->id,
             'status' => CapitalCityQueueStatus::RECRUITING,
             'type' => 'unit',
         ]);
         $this->assertSame([], $result['unit_recruitment_queues']);
         $this->assertNull(CapitalCityUnitQueue::find($travelingQueue->id));
+        $this->assertNull(CapitalCityUnitQueue::find($processingQueue->id));
+        $this->assertNull(CapitalCityUnitQueue::find($requestingQueue->id));
         $this->assertNull(CapitalCityUnitQueue::find($recruitingQueue->id));
-        $this->assertSame(2, KingdomLog::where('character_id', $character->id)->count());
+        $this->assertSame(4, KingdomLog::where('character_id', $character->id)->count());
     }
 
     public function testFetchKingdomQueuesIgnoresOverdueTerminalCapitalCityQueues(): void

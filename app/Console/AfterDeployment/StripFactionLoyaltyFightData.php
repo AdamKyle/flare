@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\AfterDevelopment;
+namespace App\Console\AfterDeployment;
 
 use App\Flare\Models\FactionLoyaltyAutomationLog;
 use Illuminate\Console\Command;

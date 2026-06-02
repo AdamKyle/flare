@@ -2,19 +2,6 @@
 
 namespace App\Providers;
 
-use App\Console\AfterDevelopment\StripFactionLoyaltyFightData;
-use App\Console\AfterDeployment\CleanUpInvalidBrokenQueues;
-use App\Console\AfterDeployment\CleanOrphanedBuildingExpansionQueues;
-use App\Console\AfterDeployment\CreateLocationDataCache;
-use App\Console\AfterDeployment\FixFactionLoyaltyCraftingTasks;
-use App\Console\AfterDeployment\FixInvalidProgressionLevels;
-use App\Console\AfterDeployment\FixKingdomMaxResourcesBasedOnPassiveSkill;
-use App\Console\AfterDeployment\FixWeaponMasteryTypes;
-use App\Console\AfterDeployment\RebuildKingdomCache;
-use App\Console\DevelopmentCommands\GivePlayerDelveLocationQuestItems;
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\ServiceProvider;
 use App\Console\AfterDeployment\AddHolyStacksToItems;
 use App\Console\AfterDeployment\AllowTraverseForMaps;
 use App\Console\AfterDeployment\AssignNewBuildingsToExistingKingdoms;
@@ -26,11 +13,18 @@ use App\Console\AfterDeployment\ChangePlayerWeapons;
 use App\Console\AfterDeployment\ChangeWeaponTypesForClassRanks;
 use App\Console\AfterDeployment\CleanInvalidWeapons;
 use App\Console\AfterDeployment\CleanMarketPlaceOfInvalidWeapons;
+use App\Console\AfterDeployment\CleanOrphanedBuildingExpansionQueues;
+use App\Console\AfterDeployment\CleanUpInvalidBrokenQueues;
 use App\Console\AfterDeployment\ClearInvalidCapitalCityQueues;
 use App\Console\AfterDeployment\ClearPlayersJobs;
 use App\Console\AfterDeployment\ClearPlayersKingdomJobs;
+use App\Console\AfterDeployment\CreateLocationDataCache;
 use App\Console\AfterDeployment\CreateMonsterCache;
 use App\Console\AfterDeployment\CreateQuestChainRelationships;
+use App\Console\AfterDeployment\FixFactionLoyaltyCraftingTasks;
+use App\Console\AfterDeployment\FixInvalidProgressionLevels;
+use App\Console\AfterDeployment\FixKingdomMaxResourcesBasedOnPassiveSkill;
+use App\Console\AfterDeployment\FixWeaponMasteryTypes;
 use App\Console\AfterDeployment\RebalanceBaseModifierAffixes;
 use App\Console\AfterDeployment\RebalanceIrresistableDamageAffixes;
 use App\Console\AfterDeployment\ReBalanceMonsters;
@@ -39,8 +33,10 @@ use App\Console\AfterDeployment\RebalanceSkillReductionAffixes;
 use App\Console\AfterDeployment\RebalanceStatBasedAffixes;
 use App\Console\AfterDeployment\RebalanceStatReducingAffixes;
 use App\Console\AfterDeployment\RebalanceTrinkets;
+use App\Console\AfterDeployment\RebuildKingdomCache;
 use App\Console\AfterDeployment\ReduceCharacterBaseModifiersForReincarnation;
 use App\Console\AfterDeployment\RemoveInvalidQuestItems;
+use App\Console\AfterDeployment\StripFactionLoyaltyFightData;
 use App\Console\AfterDeployment\UpdateCharacterFactionBounties;
 use App\Console\AfterDeployment\UpdateCharactersForClassRanks;
 use App\Console\AfterDeployment\UpdateWeaponsAndArmourWithNewStats;
@@ -50,6 +46,7 @@ use App\Console\DevelopmentCommands\CreateCharacter;
 use App\Console\DevelopmentCommands\CreateEventsForDevelopment;
 use App\Console\DevelopmentCommands\CreateTestCharacters;
 use App\Console\DevelopmentCommands\GivePlayerAncenstorItem;
+use App\Console\DevelopmentCommands\GivePlayerDelveLocationQuestItems;
 use App\Console\DevelopmentCommands\GivePlayerUniqueItem;
 use App\Console\DevelopmentCommands\LevelCharacter;
 use App\Console\DevelopmentCommands\ManageKingdomResources;
@@ -58,6 +55,9 @@ use App\Console\DevelopmentCommands\MaxOutCharactersPassiveSkills;
 use App\Console\DevelopmentCommands\ReincarnateCharacter;
 use App\Console\DevelopmentCommands\TestExploration;
 use App\Console\DevelopmentCommands\UpdateUsersForDevelopment;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
