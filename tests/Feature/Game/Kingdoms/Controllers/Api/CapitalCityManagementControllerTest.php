@@ -37,7 +37,7 @@ class CapitalCityManagementControllerTest extends TestCase
                 'y_position' => 16,
             ])
             ->getKingdom();
-        $targetKingdom = $characterFactory
+        $targetKingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom([
                 'current_wood' => 2000,
@@ -52,8 +52,8 @@ class CapitalCityManagementControllerTest extends TestCase
                 'max_level' => 1,
             ], [
                 'level' => 1,
-            ])
-            ->getKingdom();
+            ]);
+        $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $targetKingdom->buildings()->first();
 
@@ -94,7 +94,7 @@ class CapitalCityManagementControllerTest extends TestCase
                 'y_position' => 16,
             ])
             ->getKingdom();
-        $targetKingdom = $characterFactory
+        $targetKingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom([
                 'current_wood' => 2000,
@@ -109,8 +109,8 @@ class CapitalCityManagementControllerTest extends TestCase
                 'max_level' => 5,
             ], [
                 'level' => 1,
-            ])
-            ->getKingdom();
+            ]);
+        $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $targetKingdom->buildings()->first();
 
@@ -158,7 +158,7 @@ class CapitalCityManagementControllerTest extends TestCase
                 'y_position' => 16,
             ])
             ->getKingdom();
-        $targetKingdom = $characterFactory
+        $targetKingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom([
                 'current_wood' => 2000,
@@ -173,12 +173,12 @@ class CapitalCityManagementControllerTest extends TestCase
                 'max_level' => 5,
             ], [
                 'level' => 1,
-            ])
-            ->getKingdom();
+            ]);
+        $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $targetKingdom->buildings()->first();
 
-        CapitalCityBuildingQueue::create([
+        $targetKingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'requested_kingdom' => $capitalCity->id,
@@ -349,19 +349,19 @@ class CapitalCityManagementControllerTest extends TestCase
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
             ->givePlayerLocation();
-        $capitalCity = $characterFactory
+        $capitalCityManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom([
                 'is_capital' => true,
             ])
-            ->assignBuilding()
-            ->getKingdom();
+            ->assignBuilding();
+        $capitalCity = $capitalCityManagement->getKingdom();
         $characterFactory->assignAutomation([
             'type' => AutomationType::EXPLORING,
         ]);
         $character = $characterFactory->getCharacter();
         $building = $capitalCity->buildings()->first();
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+        $capitalCityManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $capitalCity->id,
             'requested_kingdom' => $capitalCity->id,
@@ -378,6 +378,7 @@ class CapitalCityManagementControllerTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
+        $capitalCityBuildingQueue = $capitalCityManagement->getCapitalCityBuildingQueue();
 
         $response = $this->actingAs($character->user)
             ->call('POST', '/api/kingdom/capital-city/cancel-building-request/' . $character->id . '/' . $capitalCity->id, [
@@ -393,19 +394,19 @@ class CapitalCityManagementControllerTest extends TestCase
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
             ->givePlayerLocation();
-        $capitalCity = $characterFactory
+        $capitalCityManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom([
                 'is_capital' => true,
             ])
-            ->assignUnits([], 1)
-            ->getKingdom();
+            ->assignUnits([], 1);
+        $capitalCity = $capitalCityManagement->getKingdom();
         $characterFactory->assignAutomation([
             'type' => AutomationType::EXPLORING,
         ]);
         $character = $characterFactory->getCharacter();
         $gameUnit = $capitalCity->units()->first()->gameUnit;
-        $capitalCityUnitQueue = CapitalCityUnitQueue::factory()->create([
+        $capitalCityManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $capitalCity->id,
             'requested_kingdom' => $capitalCity->id,
@@ -419,6 +420,7 @@ class CapitalCityManagementControllerTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
+        $capitalCityUnitQueue = $capitalCityManagement->getCapitalCityUnitQueue();
 
         $response = $this->actingAs($character->user)
             ->call('POST', '/api/kingdom/capital-city/cancel-unit-request/' . $character->id . '/' . $capitalCity->id, [

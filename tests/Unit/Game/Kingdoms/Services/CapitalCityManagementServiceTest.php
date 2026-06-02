@@ -142,7 +142,7 @@ class CapitalCityManagementServiceTest extends TestCase
                 'y_position' => 16,
             ])
             ->getKingdom();
-        $targetKingdom = $characterFactory
+        $targetKingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom([
                 'x_position' => 32,
@@ -151,12 +151,12 @@ class CapitalCityManagementServiceTest extends TestCase
             ->assignBuilding([], [
                 'current_durability' => 1,
                 'max_durability' => 100,
-            ])
-            ->getKingdom();
+            ]);
+        $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $targetKingdom->buildings()->first();
 
-        CapitalCityBuildingQueue::create([
+        $targetKingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'requested_kingdom' => $capitalCity->id,
@@ -192,15 +192,15 @@ class CapitalCityManagementServiceTest extends TestCase
                 'is_capital' => true,
             ])
             ->getKingdom();
-        $targetKingdom = $characterFactory
+        $targetKingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom()
-            ->assignBuilding()
-            ->getKingdom();
+            ->assignBuilding();
+        $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $targetKingdom->buildings()->first();
 
-        $travelingQueue = CapitalCityBuildingQueue::factory()->create([
+        $targetKingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'requested_kingdom' => $capitalCity->id,
@@ -218,7 +218,8 @@ class CapitalCityManagementServiceTest extends TestCase
             'started_at' => now()->subHours(2),
             'completed_at' => now()->subHour(),
         ]);
-        $buildingQueue = CapitalCityBuildingQueue::factory()->create([
+        $travelingQueue = $targetKingdomManagement->getCapitalCityBuildingQueue();
+        $targetKingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'requested_kingdom' => $capitalCity->id,
@@ -236,7 +237,8 @@ class CapitalCityManagementServiceTest extends TestCase
             'started_at' => now()->subHours(2),
             'completed_at' => now()->subHour(),
         ]);
-        $repairingQueue = CapitalCityBuildingQueue::factory()->create([
+        $buildingQueue = $targetKingdomManagement->getCapitalCityBuildingQueue();
+        $targetKingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'requested_kingdom' => $capitalCity->id,
@@ -254,6 +256,7 @@ class CapitalCityManagementServiceTest extends TestCase
             'started_at' => now()->subHours(2),
             'completed_at' => now()->subHour(),
         ]);
+        $repairingQueue = $targetKingdomManagement->getCapitalCityBuildingQueue();
 
         $result = resolve(CapitalCityManagementService::class)->fetchBuildingQueueData($character, $capitalCity);
 
@@ -275,13 +278,13 @@ class CapitalCityManagementServiceTest extends TestCase
                 'is_capital' => true,
             ])
             ->getKingdom();
-        $targetKingdom = $characterFactory
+        $targetKingdomManagement = $characterFactory
             ->kingdomManagement()
-            ->assignKingdom()
-            ->getKingdom();
+            ->assignKingdom();
+        $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
 
-        $travelingQueue = CapitalCityUnitQueue::factory()->create([
+        $targetKingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'requested_kingdom' => $capitalCity->id,
@@ -295,7 +298,8 @@ class CapitalCityManagementServiceTest extends TestCase
             'started_at' => now()->subHours(2),
             'completed_at' => now()->subHour(),
         ]);
-        $recruitingQueue = CapitalCityUnitQueue::factory()->create([
+        $travelingQueue = $targetKingdomManagement->getCapitalCityUnitQueue();
+        $targetKingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'requested_kingdom' => $capitalCity->id,
@@ -309,6 +313,7 @@ class CapitalCityManagementServiceTest extends TestCase
             'started_at' => now()->subHours(2),
             'completed_at' => now()->subHour(),
         ]);
+        $recruitingQueue = $targetKingdomManagement->getCapitalCityUnitQueue();
 
         $updateKingdom = $this->createMock(UpdateKingdom::class);
         $capitalCityKingdomLogHandler = new CapitalCityKingdomLogHandler($updateKingdom);
@@ -355,18 +360,18 @@ class CapitalCityManagementServiceTest extends TestCase
                 'y_position' => 16,
             ])
             ->getKingdom();
-        $targetKingdom = $characterFactory
+        $targetKingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom([
                 'x_position' => 32,
                 'y_position' => 16,
-            ])
-            ->getKingdom();
+            ]);
+        $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
         $availableUnit = GameUnit::factory()->create(['name' => 'Archers']);
 
-        CapitalCityUnitQueue::factory()->create([
+        $targetKingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'requested_kingdom' => $capitalCity->id,
@@ -491,27 +496,27 @@ class CapitalCityManagementServiceTest extends TestCase
                 'is_capital' => true,
             ])
             ->getKingdom();
-        $travelingKingdom = $characterFactory
+        $travelingKingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom()
-            ->assignBuilding()
-            ->getKingdom();
-        $buildingKingdom = $characterFactory
+            ->assignBuilding();
+        $travelingKingdom = $travelingKingdomManagement->getKingdom();
+        $buildingKingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom()
-            ->assignBuilding()
-            ->getKingdom();
-        $repairingKingdom = $characterFactory
+            ->assignBuilding();
+        $buildingKingdom = $buildingKingdomManagement->getKingdom();
+        $repairingKingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom()
-            ->assignBuilding()
-            ->getKingdom();
+            ->assignBuilding();
+        $repairingKingdom = $repairingKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $travelingBuilding = $travelingKingdom->buildings()->first();
         $building = $buildingKingdom->buildings()->first();
         $repairingBuilding = $repairingKingdom->buildings()->first();
 
-        $travelingQueue = CapitalCityBuildingQueue::factory()->create([
+        $travelingKingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $travelingKingdom->id,
             'requested_kingdom' => $capitalCity->id,
@@ -529,7 +534,8 @@ class CapitalCityManagementServiceTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
-        $buildingQueue = CapitalCityBuildingQueue::factory()->create([
+        $travelingQueue = $travelingKingdomManagement->getCapitalCityBuildingQueue();
+        $buildingKingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $buildingKingdom->id,
             'requested_kingdom' => $capitalCity->id,
@@ -547,7 +553,8 @@ class CapitalCityManagementServiceTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
-        $repairingQueue = CapitalCityBuildingQueue::factory()->create([
+        $buildingQueue = $buildingKingdomManagement->getCapitalCityBuildingQueue();
+        $repairingKingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $repairingKingdom->id,
             'requested_kingdom' => $capitalCity->id,
@@ -565,6 +572,7 @@ class CapitalCityManagementServiceTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
+        $repairingQueue = $repairingKingdomManagement->getCapitalCityBuildingQueue();
 
         $result = resolve(CapitalCityManagementService::class)->fetchBuildingQueueData($character, $capitalCity);
 
@@ -573,5 +581,86 @@ class CapitalCityManagementServiceTest extends TestCase
         $this->assertSame('Traveling', $phaseTimerLabelsByQueueId[$travelingQueue->id]);
         $this->assertSame('Building', $phaseTimerLabelsByQueueId[$buildingQueue->id]);
         $this->assertSame('Repairing', $phaseTimerLabelsByQueueId[$repairingQueue->id]);
+    }
+
+
+    public function testFetchBuildingQueueDataIncludesCancellationRejectedRequests(): void
+    {
+        $characterFactory = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation();
+        $capitalCity = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom([
+                'is_capital' => true,
+            ])
+            ->getKingdom();
+        $targetKingdomManagement = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom()
+            ->assignBuilding();
+        $targetKingdom = $targetKingdomManagement->getKingdom();
+        $character = $characterFactory->getCharacter();
+        $building = $targetKingdom->buildings()->first();
+
+        $targetKingdomManagement->assignCapitalCityBuildingQueue([
+            'character_id' => $character->id,
+            'kingdom_id' => $targetKingdom->id,
+            'requested_kingdom' => $capitalCity->id,
+            'building_request_data' => [[
+                'building_id' => $building->id,
+                'building_name' => $building->name,
+                'type' => 'upgrade',
+                'missing_costs' => [],
+                'secondary_status' => CapitalCityQueueStatus::CANCELLATION_REJECTED,
+                'from_level' => $building->level,
+                'to_level' => $building->level + 1,
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::BUILDING,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $result = resolve(CapitalCityManagementService::class)->fetchBuildingQueueData($character, $capitalCity);
+
+        $this->assertSame(CapitalCityQueueStatus::CANCELLATION_REJECTED, $result[0]['building_queue'][0]['secondary_status']);
+    }
+
+    public function testFetchUnitQueueDataIncludesCancellationRejectedRequests(): void
+    {
+        $characterFactory = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation();
+        $capitalCity = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom([
+                'is_capital' => true,
+            ])
+            ->getKingdom();
+        $targetKingdomManagement = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom();
+        $targetKingdom = $targetKingdomManagement->getKingdom();
+        $character = $characterFactory->getCharacter();
+
+        $targetKingdomManagement->assignCapitalCityUnitQueue([
+            'character_id' => $character->id,
+            'kingdom_id' => $targetKingdom->id,
+            'requested_kingdom' => $capitalCity->id,
+            'unit_request_data' => [[
+                'name' => 'Spearmen',
+                'amount' => 10,
+                'secondary_status' => CapitalCityQueueStatus::CANCELLATION_REJECTED,
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::RECRUITING,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $result = resolve(CapitalCityManagementService::class)->fetchUnitQueueData($character, $capitalCity);
+
+        $this->assertSame(CapitalCityQueueStatus::CANCELLATION_REJECTED, $result[0]['unit_requests'][0]['secondary_status']);
     }
 }

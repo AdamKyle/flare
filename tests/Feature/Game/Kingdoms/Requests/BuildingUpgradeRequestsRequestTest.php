@@ -3,7 +3,6 @@
 namespace Tests\Feature\Game\Kingdoms\Requests;
 
 use App\Flare\Models\BuildingInQueue;
-use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Game\Kingdoms\Jobs\CapitalCityQueueUpBuildingRequests;
 use App\Game\Kingdoms\Requests\BuildingUpgradeRequestsRequest;
 use App\Game\Kingdoms\Values\BuildingQueueType;
@@ -87,7 +86,7 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
                 'y_position' => 16,
             ])
             ->getKingdom();
-        $targetKingdom = $characterFactory
+        $targetKingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom([
                 'current_wood' => 2000,
@@ -101,8 +100,8 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
             ->assignBuilding([], [
                 'current_durability' => 1,
                 'max_durability' => 100,
-            ])
-            ->getKingdom();
+            ]);
+        $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $targetKingdom->buildings()->first();
 
@@ -147,7 +146,7 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
                 'y_position' => 16,
             ])
             ->getKingdom();
-        $targetKingdom = $characterFactory
+        $targetKingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom([
                 'current_wood' => 2000,
@@ -161,12 +160,12 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
             ->assignBuilding([], [
                 'current_durability' => 1,
                 'max_durability' => 100,
-            ])
-            ->getKingdom();
+            ]);
+        $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $targetKingdom->buildings()->first();
 
-        CapitalCityBuildingQueue::create([
+        $targetKingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'requested_kingdom' => $capitalCity->id,
@@ -200,6 +199,73 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
         ]);
         Queue::assertNotPushed(CapitalCityQueueUpBuildingRequests::class);
     }
+
+    public function testCapitalCityRepairAllowsCancellationRejectedCapitalCityQueuedBuilding(): void
+    {
+        Queue::fake();
+
+        $characterFactory = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation();
+        $capitalCity = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom([
+                'is_capital' => true,
+                'x_position' => 16,
+                'y_position' => 16,
+            ])
+            ->getKingdom();
+        $targetKingdomManagement = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 2000,
+                'current_clay' => 2000,
+                'current_stone' => 2000,
+                'current_iron' => 2000,
+                'current_population' => 2000,
+                'x_position' => 32,
+                'y_position' => 16,
+            ])
+            ->assignBuilding([], [
+                'current_durability' => 1,
+                'max_durability' => 100,
+            ]);
+        $targetKingdom = $targetKingdomManagement->getKingdom();
+        $character = $characterFactory->getCharacter();
+        $building = $targetKingdom->buildings()->first();
+
+        $targetKingdomManagement->assignCapitalCityBuildingQueue([
+            'character_id' => $character->id,
+            'kingdom_id' => $targetKingdom->id,
+            'requested_kingdom' => $capitalCity->id,
+            'building_request_data' => [[
+                'building_id' => $building->id,
+                'building_name' => $building->name,
+                'type' => 'repair',
+                'missing_costs' => [],
+                'secondary_status' => CapitalCityQueueStatus::CANCELLATION_REJECTED,
+                'from_level' => null,
+                'to_level' => null,
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::CANCELLATION_REJECTED,
+            'started_at' => now(),
+            'completed_at' => now()->subMinute(),
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id, [
+                'request_type' => 'repair',
+                'request_data' => [[
+                    'kingdomId' => $targetKingdom->id,
+                    'buildingIds' => [$building->id],
+                ]],
+            ]);
+
+        $response->assertOk();
+        Queue::assertPushed(CapitalCityQueueUpBuildingRequests::class);
+    }
+
 
     public function testCapitalCityValidNonQueuedUpgradeDispatchesRequest(): void
     {

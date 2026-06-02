@@ -185,6 +185,7 @@ class CapitalCityBuildingManagementRequestHandler
                 CapitalCityQueueStatus::REJECTED,
                 CapitalCityQueueStatus::FINISHED,
                 CapitalCityQueueStatus::CANCELLED,
+                CapitalCityQueueStatus::CANCELLATION_REJECTED,
             ])
             ->get()
             ->contains(function (CapitalCityBuildingQueue $queue) use ($building) {
@@ -195,6 +196,7 @@ class CapitalCityBuildingManagementRequestHandler
                                 CapitalCityQueueStatus::REJECTED,
                                 CapitalCityQueueStatus::FINISHED,
                                 CapitalCityQueueStatus::CANCELLED,
+                                CapitalCityQueueStatus::CANCELLATION_REJECTED,
                             ], true);
                     });
             });

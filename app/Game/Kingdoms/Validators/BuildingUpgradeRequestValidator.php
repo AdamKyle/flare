@@ -63,6 +63,7 @@ class BuildingUpgradeRequestValidator
                 CapitalCityQueueStatus::REJECTED,
                 CapitalCityQueueStatus::FINISHED,
                 CapitalCityQueueStatus::CANCELLED,
+                CapitalCityQueueStatus::CANCELLATION_REJECTED,
             ])
             ->get()
             ->contains(function (CapitalCityBuildingQueue $queue) use ($buildingIds) {
@@ -73,6 +74,7 @@ class BuildingUpgradeRequestValidator
                                 CapitalCityQueueStatus::REJECTED,
                                 CapitalCityQueueStatus::FINISHED,
                                 CapitalCityQueueStatus::CANCELLED,
+                                CapitalCityQueueStatus::CANCELLATION_REJECTED,
                             ], true);
                     });
             });

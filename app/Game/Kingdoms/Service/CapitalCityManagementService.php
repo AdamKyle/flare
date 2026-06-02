@@ -241,6 +241,7 @@ class CapitalCityManagementService
             CapitalCityQueueStatus::REPAIRING => 5,
             CapitalCityQueueStatus::CANCELLED => 6,
             CapitalCityQueueStatus::REJECTED => 7,
+            CapitalCityQueueStatus::CANCELLATION_REJECTED => 8,
         ];
 
         usort($requestData, function ($a, $b) use ($statusOrder) {
@@ -265,6 +266,7 @@ class CapitalCityManagementService
             CapitalCityQueueStatus::RECRUITING => 4,
             CapitalCityQueueStatus::CANCELLED => 5,
             CapitalCityQueueStatus::REJECTED => 6,
+            CapitalCityQueueStatus::CANCELLATION_REJECTED => 7,
         ];
 
         usort($requestData, function ($a, $b) use ($statusOrder) {

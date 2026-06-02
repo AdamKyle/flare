@@ -19,9 +19,10 @@ class CancelUnitRequestServiceTest extends TestCase
         Event::fake();
 
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
+        $kingdomManagement = $characterFactory->kingdomManagement()->assignKingdom();
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $capitalCityUnitQueue = CapitalCityUnitQueue::factory()->create([
+        $kingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -34,6 +35,7 @@ class CancelUnitRequestServiceTest extends TestCase
             'started_at' => now()->subHours(2),
             'completed_at' => now()->subHour(),
         ]);
+        $capitalCityUnitQueue = $kingdomManagement->getCapitalCityUnitQueue();
 
         $result = resolve(CancelUnitRequestService::class)->handleCancelRequest($character, $kingdom, [
             'queue_id' => $capitalCityUnitQueue->id,

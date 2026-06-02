@@ -226,7 +226,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
 
-        CapitalCityBuildingQueue::create([
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $capitalCity->id,
@@ -290,7 +290,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
 
-        CapitalCityBuildingQueue::create([
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $capitalCity->id,

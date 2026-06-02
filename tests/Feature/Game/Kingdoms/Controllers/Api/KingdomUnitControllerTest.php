@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Game\Kingdoms\Controllers\Api;
 
-use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\GameBuildingUnit;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\UnitInQueue;
@@ -25,16 +24,17 @@ class KingdomUnitControllerTest extends TestCase
         $capitalCity = $characterFactory->kingdomManagement()->assignKingdom([
             'is_capital' => true,
         ])->getKingdom();
-        $kingdom = $characterFactory->kingdomManagement()->assignKingdom([
+        $kingdomManagement = $characterFactory->kingdomManagement()->assignKingdom([
             'current_wood' => 1000,
             'current_clay' => 1000,
             'current_stone' => 1000,
             'current_iron' => 1000,
             'current_population' => 1000,
-        ])->getKingdom();
+        ]);
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        CapitalCityUnitQueue::factory()->create([
+        $kingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $capitalCity->id,

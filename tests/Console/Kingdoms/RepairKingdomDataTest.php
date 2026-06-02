@@ -3,10 +3,6 @@
 namespace Tests\Console\Kingdoms;
 
 use App\Flare\Models\BuildingInQueue;
-use App\Flare\Models\CapitalCityBuildingCancellation;
-use App\Flare\Models\CapitalCityBuildingQueue;
-use App\Flare\Models\CapitalCityUnitCancellation;
-use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\UnitInQueue;
 use App\Game\Kingdoms\Values\BuildingQueueType;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
@@ -254,7 +250,7 @@ class RepairKingdomDataTest extends TestCase
         $requestingKingdom = $character->kingdoms()->where('id', '!=', $kingdom->id)->first();
         $building = $kingdom->buildings()->first();
         $gameUnit = $kingdom->units()->first()->gameUnit;
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $requestingKingdom->id,
@@ -270,7 +266,8 @@ class RepairKingdomDataTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
-        $capitalCityUnitQueue = CapitalCityUnitQueue::factory()->create([
+        $capitalCityBuildingQueue = $kingdomManagement->getCapitalCityBuildingQueue();
+        $kingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $requestingKingdom->id,
@@ -284,7 +281,8 @@ class RepairKingdomDataTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
-        $buildingCancellation = CapitalCityBuildingCancellation::create([
+        $capitalCityUnitQueue = $kingdomManagement->getCapitalCityUnitQueue();
+        $kingdomManagement->assignCapitalCityBuildingCancellation([
             'building_id' => $building->id,
             'kingdom_id' => $kingdom->id,
             'request_kingdom_id' => $requestingKingdom->id,
@@ -293,7 +291,8 @@ class RepairKingdomDataTest extends TestCase
             'status' => CapitalCityQueueStatus::PROCESSING,
             'travel_time_completed_at' => now(),
         ]);
-        $unitCancellation = CapitalCityUnitCancellation::factory()->create([
+        $buildingCancellation = $kingdomManagement->getCapitalCityBuildingCancellation();
+        $kingdomManagement->assignCapitalCityUnitCancellation([
             'unit_id' => $gameUnit->id,
             'kingdom_id' => $kingdom->id,
             'request_kingdom_id' => $requestingKingdom->id,
@@ -302,6 +301,7 @@ class RepairKingdomDataTest extends TestCase
             'status' => CapitalCityQueueStatus::PROCESSING,
             'travel_time_completed_at' => now(),
         ]);
+        $unitCancellation = $kingdomManagement->getCapitalCityUnitCancellation();
 
         $this->assertEquals(0, Artisan::call('kingdoms:repair-data', [
             '--apply' => true,

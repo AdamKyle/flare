@@ -201,7 +201,7 @@ class KingdomAutomationRestrictionTest extends TestCase
                 'is_capital' => true,
             ])
             ->getKingdom();
-        $kingdom = $characterFactory
+        $kingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom([
                 'current_wood' => 2000,
@@ -214,12 +214,12 @@ class KingdomAutomationRestrictionTest extends TestCase
                 'max_level' => 5,
             ], [
                 'level' => 1,
-            ])
-            ->getKingdom();
+            ]);
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $kingdom->buildings()->first();
 
-        CapitalCityBuildingQueue::create([
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $capitalCity->id,

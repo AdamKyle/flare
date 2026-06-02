@@ -2,13 +2,17 @@
 
 namespace Tests\Setup\Character;
 
-use App\Flare\Models\Character;
-use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityBuildingCancellation;
+use App\Flare\Models\CapitalCityBuildingQueue;
+use App\Flare\Models\CapitalCityResourceRequest;
+use App\Flare\Models\CapitalCityUnitCancellation;
+use App\Flare\Models\CapitalCityUnitQueue;
+use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\User;
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
+use Tests\Traits\CreateCapitalCityQueue;
 use Tests\Traits\CreateGameBuilding;
 use Tests\Traits\CreateGameUnit;
 use Tests\Traits\CreateKingdom;
@@ -18,6 +22,7 @@ class KingdomManagement
 {
     use CreateGameBuilding,
         CreateGameUnit,
+        CreateCapitalCityQueue,
         CreateKingdom,
         CreateKingdomBuilding,
         KingdomCache;
@@ -31,6 +36,12 @@ class KingdomManagement
     private ?CapitalCityBuildingQueue $capitalCityBuildingQueue = null;
 
     private ?CapitalCityBuildingCancellation $capitalCityBuildingCancellation = null;
+
+    private ?CapitalCityUnitQueue $capitalCityUnitQueue = null;
+
+    private ?CapitalCityUnitCancellation $capitalCityUnitCancellation = null;
+
+    private ?CapitalCityResourceRequest $capitalCityResourceRequest = null;
 
     public function __construct(Character $character, CharacterFactory $characterFactory)
     {
@@ -99,7 +110,7 @@ class KingdomManagement
 
         $building = $this->kingdom->buildings()->first();
 
-        $this->capitalCityBuildingQueue = CapitalCityBuildingQueue::factory()->create(array_merge([
+        $this->capitalCityBuildingQueue = $this->createCapitalCityBuildingQueue(array_merge([
             'character_id' => $this->character->id,
             'kingdom_id' => $this->kingdom->id,
             'requested_kingdom' => $this->kingdom->id,
@@ -134,7 +145,7 @@ class KingdomManagement
 
         $building = $this->kingdom->buildings()->first();
 
-        $this->capitalCityBuildingCancellation = CapitalCityBuildingCancellation::factory()->create(array_merge([
+        $this->capitalCityBuildingCancellation = $this->createCapitalCityBuildingCancellation(array_merge([
             'building_id' => $building->id,
             'kingdom_id' => $this->kingdom->id,
             'request_kingdom_id' => $this->kingdom->id,
@@ -148,6 +159,108 @@ class KingdomManagement
     public function getCapitalCityBuildingCancellation(): ?CapitalCityBuildingCancellation
     {
         return $this->capitalCityBuildingCancellation?->refresh();
+    }
+
+    public function assignCapitalCityUnitQueue(array $queueOptions = [], array $requestOptions = []): KingdomManagement
+    {
+        if (is_null($this->kingdom)) {
+            throw new \Exception('You must create a kingdom first. Call createKingdom.');
+        }
+
+        $kingdomUnit = $this->kingdom->units()->first();
+
+        if (is_null($kingdomUnit)) {
+            $gameUnit = $this->createGameUnit();
+
+            $kingdomUnit = $this->createKingdomUnit([
+                'game_unit_id' => $gameUnit->id,
+                'kingdom_id' => $this->kingdom->id,
+                'amount' => 500,
+            ]);
+        }
+
+        $this->capitalCityUnitQueue = $this->createCapitalCityUnitQueue(array_merge([
+            'character_id' => $this->character->id,
+            'kingdom_id' => $this->kingdom->id,
+            'requested_kingdom' => $this->kingdom->id,
+            'unit_request_data' => [array_merge([
+                'name' => $kingdomUnit->gameUnit->name,
+                'amount' => 1,
+                'secondary_status' => CapitalCityQueueStatus::RECRUITING,
+            ], $requestOptions)],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::RECRUITING,
+            'started_at' => now()->subMinute(),
+            'completed_at' => now()->addHour(),
+        ], $queueOptions));
+
+        return $this;
+    }
+
+    public function getCapitalCityUnitQueue(): ?CapitalCityUnitQueue
+    {
+        return $this->capitalCityUnitQueue?->refresh();
+    }
+
+    public function assignCapitalCityUnitCancellation(array $options = []): KingdomManagement
+    {
+        if (is_null($this->kingdom)) {
+            throw new \Exception('You must create a kingdom first. Call createKingdom.');
+        }
+
+        $kingdomUnit = $this->kingdom->units()->first();
+
+        if (is_null($kingdomUnit)) {
+            $gameUnit = $this->createGameUnit();
+
+            $kingdomUnit = $this->createKingdomUnit([
+                'game_unit_id' => $gameUnit->id,
+                'kingdom_id' => $this->kingdom->id,
+                'amount' => 500,
+            ]);
+        }
+
+        $this->capitalCityUnitCancellation = $this->createCapitalCityUnitCancellation(array_merge([
+            'unit_id' => $kingdomUnit->game_unit_id,
+            'kingdom_id' => $this->kingdom->id,
+            'request_kingdom_id' => $this->kingdom->id,
+            'character_id' => $this->character->id,
+            'capital_city_unit_queue_id' => $this->capitalCityUnitQueue?->id,
+        ], $options));
+
+        return $this;
+    }
+
+    public function getCapitalCityUnitCancellation(): ?CapitalCityUnitCancellation
+    {
+        return $this->capitalCityUnitCancellation?->refresh();
+    }
+
+    public function assignCapitalCityResourceRequest(array $options = []): KingdomManagement
+    {
+        if (is_null($this->kingdom)) {
+            throw new \Exception('You must create a kingdom first. Call createKingdom.');
+        }
+
+        $this->capitalCityResourceRequest = $this->createCapitalCityResourceRequest(array_merge([
+            'kingdom_requesting_id' => $this->kingdom->id,
+            'request_from_kingdom_id' => $this->kingdom->id,
+            'resources' => [
+                'wood' => 0,
+                'clay' => 0,
+                'stone' => 0,
+                'iron' => 0,
+            ],
+            'started_at' => now()->subMinute(),
+            'completed_at' => now()->addHour(),
+        ], $options));
+
+        return $this;
+    }
+
+    public function getCapitalCityResourceRequest(): ?CapitalCityResourceRequest
+    {
+        return $this->capitalCityResourceRequest?->refresh();
     }
 
     /**

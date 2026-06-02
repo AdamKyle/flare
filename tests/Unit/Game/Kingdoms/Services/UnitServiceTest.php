@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Game\Kingdoms\Services;
 
-use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\KingdomUnit;
 use App\Flare\Models\UnitInQueue;
@@ -86,7 +85,8 @@ class UnitServiceTest extends TestCase
     public function testManualAndCapitalCityQueuedUnitsCountTowardMaximum(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
+        $kingdomManagement = $characterFactory->kingdomManagement()->assignKingdom();
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $unit = GameUnit::factory()->create();
         KingdomUnit::factory()->create([
@@ -102,7 +102,7 @@ class UnitServiceTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
-        CapitalCityUnitQueue::factory()->create([
+        $kingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -118,5 +118,36 @@ class UnitServiceTest extends TestCase
         ]);
 
         $this->assertFalse(resolve(UnitService::class)->canQueueUnits($kingdom, $unit, 1));
+    }
+
+    public function testCancellationRejectedCapitalCityQueuedUnitsDoNotCountTowardMaximum(): void
+    {
+        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $kingdomManagement = $characterFactory->kingdomManagement()->assignKingdom();
+        $kingdom = $kingdomManagement->getKingdom();
+        $character = $characterFactory->getCharacter();
+        $unit = GameUnit::factory()->create();
+
+        KingdomUnit::factory()->create([
+            'kingdom_id' => $kingdom->id,
+            'game_unit_id' => $unit->id,
+            'amount' => KingdomMaxValue::MAX_UNIT - 1,
+        ]);
+        $kingdomManagement->assignCapitalCityUnitQueue([
+            'character_id' => $character->id,
+            'kingdom_id' => $kingdom->id,
+            'requested_kingdom' => $kingdom->id,
+            'unit_request_data' => [[
+                'name' => $unit->name,
+                'amount' => 10,
+                'secondary_status' => CapitalCityQueueStatus::CANCELLATION_REJECTED,
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::CANCELLATION_REJECTED,
+            'started_at' => now()->subHour(),
+            'completed_at' => now()->subMinute(),
+        ]);
+
+        $this->assertTrue(resolve(UnitService::class)->canQueueUnits($kingdom, $unit, 1));
     }
 }

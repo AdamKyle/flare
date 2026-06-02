@@ -33,8 +33,8 @@ class UnitService
      * @param KingdomUnitResourceValidation $kingdomUnitResourceValidation
      */
     public function __construct(
-        private UpdateKingdomHandler $updateKingdomHandler,
-        private KingdomUnitResourceValidation $kingdomUnitResourceValidation
+        private readonly UpdateKingdomHandler $updateKingdomHandler,
+        private readonly KingdomUnitResourceValidation $kingdomUnitResourceValidation
     ) {}
 
     public function handlePayment(GameUnit $gameUnit, Kingdom $kingdom, int $amount): array
@@ -289,14 +289,24 @@ class UnitService
             ->sum('amount');
 
         $capitalCityQueuedAmount = CapitalCityUnitQueue::where('kingdom_id', $kingdom->id)
-            ->whereNotIn('status', [CapitalCityQueueStatus::FINISHED, CapitalCityQueueStatus::REJECTED, CapitalCityQueueStatus::CANCELLED])
+            ->whereNotIn('status', [
+                CapitalCityQueueStatus::FINISHED,
+                CapitalCityQueueStatus::REJECTED,
+                CapitalCityQueueStatus::CANCELLED,
+                CapitalCityQueueStatus::CANCELLATION_REJECTED,
+            ])
             ->when($excludedCapitalCityQueueId, function ($query) use ($excludedCapitalCityQueueId) {
                 return $query->where('id', '!=', $excludedCapitalCityQueueId);
             })
             ->get()
             ->sum(function (CapitalCityUnitQueue $queue) use ($gameUnit) {
                 return collect($queue->unit_request_data)
-                    ->reject(fn($request) => in_array($request['secondary_status'], [CapitalCityQueueStatus::FINISHED, CapitalCityQueueStatus::REJECTED, CapitalCityQueueStatus::CANCELLED]))
+                    ->reject(fn($request) => in_array($request['secondary_status'], [
+                        CapitalCityQueueStatus::FINISHED,
+                        CapitalCityQueueStatus::REJECTED,
+                        CapitalCityQueueStatus::CANCELLED,
+                        CapitalCityQueueStatus::CANCELLATION_REJECTED,
+                    ], true))
                     ->where('name', $gameUnit->name)
                     ->sum('amount');
             });

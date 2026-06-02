@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Game\Kingdoms\Requests;
 
-use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\UnitInQueue;
 use App\Game\Kingdoms\Jobs\CapitalCityQueueUpUnitRequests;
@@ -74,7 +73,7 @@ class CapitalCityUnitRequestTest extends TestCase
             'x_position' => 16,
             'y_position' => 16,
         ])->getKingdom();
-        $targetKingdom = $characterFactory->kingdomManagement()->assignKingdom([
+        $targetKingdomManagement = $characterFactory->kingdomManagement()->assignKingdom([
             'current_wood' => 1000,
             'current_clay' => 1000,
             'current_stone' => 1000,
@@ -82,10 +81,11 @@ class CapitalCityUnitRequestTest extends TestCase
             'current_population' => 1000,
             'x_position' => 32,
             'y_position' => 16,
-        ])->getKingdom();
+        ]);
+        $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        CapitalCityUnitQueue::factory()->create([
+        $targetKingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'requested_kingdom' => $capitalCity->id,

@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Game\Kingdoms\Transformers;
 
-use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\UnitInQueue;
 use App\Game\Kingdoms\Transformers\KingdomResourceHourlyProductionTransformer;
@@ -89,7 +88,8 @@ class KingdomTransformerTest extends TestCase
         $capitalCity = $characterFactory->kingdomManagement()->assignKingdom([
             'is_capital' => true,
         ])->getKingdom();
-        $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
+        $kingdomManagement = $characterFactory->kingdomManagement()->assignKingdom();
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $manualUnit = GameUnit::create([
             'name' => 'Spearmen',
@@ -129,7 +129,7 @@ class KingdomTransformerTest extends TestCase
             'started_at' => $startedAt,
             'completed_at' => $completedAt,
         ]);
-        $capitalCityQueue = CapitalCityUnitQueue::factory()->create([
+        $kingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $capitalCity->id,
@@ -143,7 +143,8 @@ class KingdomTransformerTest extends TestCase
             'started_at' => $startedAt,
             'completed_at' => $completedAt,
         ]);
-        CapitalCityUnitQueue::factory()->create([
+        $capitalCityQueue = $kingdomManagement->getCapitalCityUnitQueue();
+        $kingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $capitalCity->id,

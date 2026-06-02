@@ -42,17 +42,17 @@ class CapitalCityBuildingRequestTest extends TestCase
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
             ->givePlayerLocation();
-        $kingdom = $characterFactory
+        $kingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom()
             ->assignBuilding([], [
                 'current_durability' => 10,
                 'max_durability' => 300,
-            ])
-            ->getKingdom();
+            ]);
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $kingdom->buildings()->first();
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -70,6 +70,7 @@ class CapitalCityBuildingRequestTest extends TestCase
             'started_at' => now()->subHour(),
             'completed_at' => now()->subMinute(),
         ]);
+        $capitalCityBuildingQueue = $kingdomManagement->getCapitalCityBuildingQueue();
 
         $job = new CapitalCityBuildingRequest($capitalCityBuildingQueue->id);
         $job->handle(
@@ -91,7 +92,7 @@ class CapitalCityBuildingRequestTest extends TestCase
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
             ->givePlayerLocation();
-        $kingdom = $characterFactory
+        $kingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom([
                 'current_morale' => 0.98,
@@ -101,11 +102,11 @@ class CapitalCityBuildingRequestTest extends TestCase
             ], [
                 'current_durability' => 10,
                 'max_durability' => 300,
-            ])
-            ->getKingdom();
+            ]);
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $kingdom->buildings()->first();
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -123,6 +124,7 @@ class CapitalCityBuildingRequestTest extends TestCase
             'started_at' => now()->subHour(),
             'completed_at' => now()->subMinute(),
         ]);
+        $capitalCityBuildingQueue = $kingdomManagement->getCapitalCityBuildingQueue();
 
         $job = new CapitalCityBuildingRequest($capitalCityBuildingQueue->id);
         $job->handle(
@@ -141,14 +143,14 @@ class CapitalCityBuildingRequestTest extends TestCase
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
             ->givePlayerLocation();
-        $kingdom = $characterFactory
+        $kingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom()
-            ->assignBuilding()
-            ->getKingdom();
+            ->assignBuilding();
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $kingdom->buildings()->first();
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -166,6 +168,7 @@ class CapitalCityBuildingRequestTest extends TestCase
             'started_at' => now()->subHour(),
             'completed_at' => now()->subMinute(),
         ]);
+        $capitalCityBuildingQueue = $kingdomManagement->getCapitalCityBuildingQueue();
         $buildingName = $building->name;
         $buildingId = $building->id;
         $building->delete();
@@ -199,18 +202,18 @@ class CapitalCityBuildingRequestTest extends TestCase
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
             ->givePlayerLocation();
-        $kingdom = $characterFactory
+        $kingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom()
             ->assignBuilding([
                 'max_level' => 1,
             ], [
                 'level' => 1,
-            ])
-            ->getKingdom();
+            ]);
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $kingdom->buildings()->first();
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -228,6 +231,7 @@ class CapitalCityBuildingRequestTest extends TestCase
             'started_at' => now()->subHour(),
             'completed_at' => now()->subMinute(),
         ]);
+        $capitalCityBuildingQueue = $kingdomManagement->getCapitalCityBuildingQueue();
 
         $job = new CapitalCityBuildingRequest($capitalCityBuildingQueue->id);
         $job->handle(
@@ -249,18 +253,18 @@ class CapitalCityBuildingRequestTest extends TestCase
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
             ->givePlayerLocation();
-        $kingdom = $characterFactory
+        $kingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom()
             ->assignBuilding([
                 'max_level' => 5,
             ], [
                 'level' => 2,
-            ])
-            ->getKingdom();
+            ]);
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $kingdom->buildings()->first();
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -278,6 +282,7 @@ class CapitalCityBuildingRequestTest extends TestCase
             'started_at' => now()->subHour(),
             'completed_at' => now()->subMinute(),
         ]);
+        $capitalCityBuildingQueue = $kingdomManagement->getCapitalCityBuildingQueue();
 
         $job = new CapitalCityBuildingRequest($capitalCityBuildingQueue->id);
         $job->handle(
@@ -347,14 +352,14 @@ class CapitalCityBuildingRequestTest extends TestCase
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
             ->givePlayerLocation();
-        $kingdom = $characterFactory
+        $kingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom()
-            ->assignBuilding()
-            ->getKingdom();
+            ->assignBuilding();
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $kingdom->buildings()->first();
-        $queue = CapitalCityBuildingQueue::create([
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -372,6 +377,7 @@ class CapitalCityBuildingRequestTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
+        $queue = $kingdomManagement->getCapitalCityBuildingQueue();
 
         (new CapitalCityBuildingRequestMovement($queue->id))->handle(resolve(CapitalCityBuildingManagement::class));
 
@@ -387,14 +393,14 @@ class CapitalCityBuildingRequestTest extends TestCase
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
             ->givePlayerLocation();
-        $kingdom = $characterFactory
+        $kingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom()
-            ->assignBuilding()
-            ->getKingdom();
+            ->assignBuilding();
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $kingdom->buildings()->first();
-        $queue = CapitalCityBuildingQueue::create([
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -412,6 +418,7 @@ class CapitalCityBuildingRequestTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
+        $queue = $kingdomManagement->getCapitalCityBuildingQueue();
 
         (new CapitalCityBuildingRequest($queue->id))->handle(
             resolve(CapitalCityKingdomLogHandler::class),
