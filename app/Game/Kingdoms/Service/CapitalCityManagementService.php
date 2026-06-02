@@ -33,8 +33,7 @@ class CapitalCityManagementService
         private readonly CapitalCityUnitManagement $capitalCityUnitManagement,
         private readonly CapitalCityKingdomBuildingTransformer $capitalCityKingdomBuildingTransformer,
         private readonly UnitMovementService $unitMovementService,
-        private readonly Manager $manager,
-        private readonly KingdomQueueService $kingdomQueueService
+        private readonly Manager $manager
     ) {}
 
     public function makeCapitalCity(Kingdom $kingdom): array
@@ -89,8 +88,6 @@ class CapitalCityManagementService
     public function fetchBuildingQueueData(Character $character, ?Kingdom $kingdom = null): array
     {
         $currentTime = now();
-
-        $this->kingdomQueueService->cleanOverdueCapitalCityBuildingQueuesForCharacter($character, $kingdom);
 
         $queues = CapitalCityBuildingQueue::query()
             ->where('character_id', $character->id)
@@ -181,8 +178,6 @@ class CapitalCityManagementService
 
     public function fetchUnitQueueData(Character $character, ?Kingdom $kingdom = null): array
     {
-        $this->kingdomQueueService->cleanOverdueCapitalCityUnitQueuesForCharacter($character, $kingdom);
-
         $queues = CapitalCityUnitQueue::where('character_id', $character->id)
             ->when($kingdom, function ($query) use ($kingdom) {
                 return $query->whereHas('kingdom', function ($query) use ($kingdom) {

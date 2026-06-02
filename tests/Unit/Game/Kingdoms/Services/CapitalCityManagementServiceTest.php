@@ -6,17 +6,13 @@ use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\GameUnit;
-use App\Flare\Models\KingdomLog;
 use App\Flare\Models\UnitInQueue;
 use App\Flare\Transformers\CapitalCityKingdomBuildingTransformer;
-use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityKingdomLogHandler;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Service\CapitalCityManagementService;
 use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
-use App\Game\Kingdoms\Service\KingdomQueueService;
 use App\Game\Kingdoms\Service\UnitMovementService;
 use App\Game\Kingdoms\Service\UpdateKingdom;
-use App\Game\Kingdoms\Transformers\UnitMovementTransformer;
 use App\Game\Kingdoms\Values\BuildingQueueType;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
@@ -181,7 +177,7 @@ class CapitalCityManagementServiceTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function testFetchBuildingQueueDataCleansOverdueBuildingQueues(): void
+    public function testFetchBuildingQueueDataKeepsReadyActiveBuildingQueues(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -260,14 +256,13 @@ class CapitalCityManagementServiceTest extends TestCase
 
         $result = resolve(CapitalCityManagementService::class)->fetchBuildingQueueData($character, $capitalCity);
 
-        $this->assertSame([], $result);
-        $this->assertNull(CapitalCityBuildingQueue::find($travelingQueue->id));
-        $this->assertNull(CapitalCityBuildingQueue::find($buildingQueue->id));
-        $this->assertNull(CapitalCityBuildingQueue::find($repairingQueue->id));
-        $this->assertSame(3, KingdomLog::where('character_id', $character->id)->count());
+        $this->assertCount(3, $result);
+        $this->assertNotNull(CapitalCityBuildingQueue::find($travelingQueue->id));
+        $this->assertNotNull(CapitalCityBuildingQueue::find($buildingQueue->id));
+        $this->assertNotNull(CapitalCityBuildingQueue::find($repairingQueue->id));
     }
 
-    public function testFetchUnitQueueDataCleansOverdueUnitQueues(): void
+    public function testFetchUnitQueueDataKeepsReadyActiveUnitQueues(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -315,29 +310,11 @@ class CapitalCityManagementServiceTest extends TestCase
         ]);
         $recruitingQueue = $targetKingdomManagement->getCapitalCityUnitQueue();
 
-        $updateKingdom = $this->createMock(UpdateKingdom::class);
-        $capitalCityKingdomLogHandler = new CapitalCityKingdomLogHandler($updateKingdom);
-        $kingdomQueueService = new KingdomQueueService(
-            new Manager,
-            new UnitMovementTransformer,
-            $capitalCityKingdomLogHandler,
-        );
-        $capitalCityManagementService = new CapitalCityManagementService(
-            $updateKingdom,
-            $this->createMock(CapitalCityBuildingManagement::class),
-            $this->createMock(CapitalCityUnitManagement::class),
-            $this->createMock(CapitalCityKingdomBuildingTransformer::class),
-            $this->createMock(UnitMovementService::class),
-            new Manager,
-            $kingdomQueueService,
-        );
+        $result = resolve(CapitalCityManagementService::class)->fetchUnitQueueData($character, $capitalCity);
 
-        $result = $capitalCityManagementService->fetchUnitQueueData($character, $capitalCity);
-
-        $this->assertSame([], $result);
-        $this->assertNull(CapitalCityUnitQueue::find($travelingQueue->id));
-        $this->assertNull(CapitalCityUnitQueue::find($recruitingQueue->id));
-        $this->assertSame(2, KingdomLog::where('character_id', $character->id)->count());
+        $this->assertCount(2, $result);
+        $this->assertNotNull(CapitalCityUnitQueue::find($travelingQueue->id));
+        $this->assertNotNull(CapitalCityUnitQueue::find($recruitingQueue->id));
     }
 
     public function testFetchKingdomsForSelectionKeepsKingdomWithOtherAvailableUnitsWhenCapitalCityUnitIsQueued(): void

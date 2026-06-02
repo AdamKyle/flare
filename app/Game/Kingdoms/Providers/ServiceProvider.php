@@ -106,8 +106,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CapitalCityUnitManagement::class),
                 $app->make(CapitalCityKingdomBuildingTransformer::class),
                 $app->make(UnitMovementService::class),
-                $app->make(Manager::class),
-                $app->make(KingdomQueueService::class)
+                $app->make(Manager::class)
             );
         });
 
@@ -390,7 +389,6 @@ class ServiceProvider extends ApplicationServiceProvider
             return new KingdomQueueService(
                 $app->make(Manager::class),
                 $app->make(UnitMovementTransformer::class),
-                $app->make(CapitalCityKingdomLogHandler::class),
             );
         });
 
