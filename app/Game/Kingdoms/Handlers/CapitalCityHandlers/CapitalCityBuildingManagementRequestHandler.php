@@ -71,6 +71,7 @@ class CapitalCityBuildingManagementRequestHandler
                 'building_request_data' => $buildingQueueData,
                 'character_id' => $character->id,
                 'status' => CapitalCityQueueStatus::TRAVELING,
+                'messages' => [],
                 'started_at' => $currentTime,
                 'completed_at' => $travelTimeNeeded
             ]);

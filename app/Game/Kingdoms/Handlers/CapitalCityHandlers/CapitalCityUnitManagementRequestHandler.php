@@ -119,7 +119,7 @@ class CapitalCityUnitManagementRequestHandler
             'character_id' => $character->id,
             'kingdom_id' => $data['kingdom_id'],
             'status' => CapitalCityQueueStatus::TRAVELING,
-            'messages' => null,
+            'messages' => [],
             'started_at' => now(),
             'completed_at' => $minutes,
         ];

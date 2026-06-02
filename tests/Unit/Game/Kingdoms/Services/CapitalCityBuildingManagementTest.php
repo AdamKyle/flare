@@ -440,14 +440,13 @@ class CapitalCityBuildingManagementTest extends TestCase
         ]);
         $capitalCityBuildingQueue = $kingdomManagement->getCapitalCityBuildingQueue();
 
-        (new CapitalCityResourceRequest(
+        $job = new CapitalCityResourceRequest(
             $capitalCityBuildingQueue->id,
             999,
             CapitalCityResourceRequestType::BUILDING_QUEUE,
-        ))->handle(
-            resolve(\App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessBuildingRequestHandler::class),
-            resolve(\App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessUnitRequestHandler::class),
         );
+
+        $this->app->call([$job, 'handle']);
 
         Queue::assertPushed(CapitalCityResourceRequest::class, function (CapitalCityResourceRequest $job) {
             return $job->connection === 'long_running' && $job->queue === 'default_long';

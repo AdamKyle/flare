@@ -27,7 +27,10 @@ class CapitalCityProcessUnitRequestHandler
 
     use CanAffordPopulationCost;
 
-    const MAX_DAYS = 7;
+    /**
+     * @var int MAX_DAYS
+     */
+    const int MAX_DAYS = 7;
 
     /**
      * @var array $messages
@@ -78,7 +81,13 @@ class CapitalCityProcessUnitRequestHandler
                 ])
             ]);
 
-            $capitalCityUnitQueue = $capitalCityUnitQueue->refresh();
+            $updatedCapitalCityUnitQueue = $capitalCityUnitQueue->fresh();
+
+            if (is_null($updatedCapitalCityUnitQueue)) {
+                return;
+            }
+
+            $capitalCityUnitQueue = $updatedCapitalCityUnitQueue;
 
             $this->capitalCityKingdomLogHandler->possiblyCreateLogForUnitQueue($capitalCityUnitQueue);
 
@@ -91,7 +100,13 @@ class CapitalCityProcessUnitRequestHandler
             'unit_request_data' => $requestData,
         ]);
 
-        $capitalCityUnitQueue = $capitalCityUnitQueue->refresh();
+        $updatedCapitalCityUnitQueue = $capitalCityUnitQueue->fresh();
+
+        if (is_null($updatedCapitalCityUnitQueue)) {
+            return;
+        }
+
+        $capitalCityUnitQueue = $updatedCapitalCityUnitQueue;
 
         if (!empty($missingResources)) {
             Log::channel('capital_city_unit_recruitments')->info('Handling missing resources');
@@ -370,7 +385,13 @@ class CapitalCityProcessUnitRequestHandler
                 'unit_request_data' => $capitalCityUnitQueue->unit_request_data,
             ]);
 
-            $capitalCityUnitQueue = $capitalCityUnitQueue->refresh();
+            $updatedCapitalCityUnitQueue = $capitalCityUnitQueue->fresh();
+
+            if (is_null($updatedCapitalCityUnitQueue)) {
+                return;
+            }
+
+            $capitalCityUnitQueue = $updatedCapitalCityUnitQueue;
 
             Log::channel('capital_city_unit_recruitments')->info('dispatching request', [
                 '$capitalCityUnitQueue' => $capitalCityUnitQueue->id,
@@ -415,10 +436,16 @@ class CapitalCityProcessUnitRequestHandler
             'messages' => array_merge($messages, $this->messages),
         ]);
 
-        $capitalCityBuildingQueue = $capitalCityUnitQueue->refresh();
+        $updatedCapitalCityUnitQueue = $capitalCityUnitQueue->fresh();
+
+        if (is_null($updatedCapitalCityUnitQueue)) {
+            return;
+        }
+
+        $capitalCityUnitQueue = $updatedCapitalCityUnitQueue;
 
         $this->capitalCityKingdomLogHandler->possiblyCreateLogForUnitQueue($capitalCityUnitQueue);
-        $this->sendOffEvents($capitalCityBuildingQueue);
+        $this->sendOffEvents($capitalCityUnitQueue);
     }
 
     /**
@@ -497,7 +524,13 @@ class CapitalCityProcessUnitRequestHandler
             'completed_at' => $timeTillFinished,
         ]);
 
-        $capitalCityUnitQueue = $capitalCityUnitQueue->refresh();
+        $updatedCapitalCityUnitQueue = $capitalCityUnitQueue->fresh();
+
+        if (is_null($updatedCapitalCityUnitQueue)) {
+            return;
+        }
+
+        $capitalCityUnitQueue = $updatedCapitalCityUnitQueue;
 
         $delayJobTime = $timeToKingdom >= 15 ? $startTime->clone()->addMinutes(15) : $timeTillFinished;
 

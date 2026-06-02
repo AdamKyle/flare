@@ -254,8 +254,12 @@ export default class KingdomLogDetails extends React.Component<
         });
     }
 
+    getAdditionalCapitalCityMessages(): string[] {
+        return this.props.log.additional_details.messages ?? [];
+    }
+
     renderAdditionalCapitalCityMessages() {
-        const additionalMessages = this.props.log.additional_details.messages;
+        const additionalMessages = this.getAdditionalCapitalCityMessages();
 
         return additionalMessages.map((message: string) => {
             return <li className={"my-4"}>{message}</li>;
@@ -380,7 +384,7 @@ export default class KingdomLogDetails extends React.Component<
                                     "border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3 "
                                 }
                             ></div>
-                            {this.props.log.additional_details.messages.length >
+                            {this.getAdditionalCapitalCityMessages().length >
                             0 ? (
                                 <InfoAlert additional_css={"my-4"}>
                                     <p className="text-yellow-700 dark:text-yellow-600 mb-4">
@@ -439,7 +443,7 @@ export default class KingdomLogDetails extends React.Component<
                                     "border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3 "
                                 }
                             ></div>
-                            {this.props.log.additional_details.messages.length >
+                            {this.getAdditionalCapitalCityMessages().length >
                             0 ? (
                                 <InfoAlert additional_css={"my-4"}>
                                     <p className="text-yellow-700 dark:text-yellow-600 mb-4">

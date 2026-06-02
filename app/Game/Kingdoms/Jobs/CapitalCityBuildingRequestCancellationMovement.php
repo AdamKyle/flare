@@ -59,10 +59,14 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
             return;
         }
 
-        $this->updateQueueData($queueData, $responseData);
+        $updatedQueueData = $this->updateQueueData($queueData, $responseData);
 
-        event(new UpdateCapitalCityBuildingQueueTable($queueData->character));
-        $capitalCityKingdomLogHandler->possiblyCreateLogForBuildingQueue($queueData);
+        if (is_null($updatedQueueData)) {
+            return;
+        }
+
+        event(new UpdateCapitalCityBuildingQueueTable($updatedQueueData->character));
+        $capitalCityKingdomLogHandler->possiblyCreateLogForBuildingQueue($updatedQueueData);
 
         if (! collect($responseData)->contains(fn($response) => $response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED)) {
             $this->cleanupCancellationRecords();
@@ -144,7 +148,7 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
     /**
      * Update the queue data with the cancellation statuses.
      */
-    private function updateQueueData(CapitalCityBuildingQueue $queueData, array $responseData): void
+    private function updateQueueData(CapitalCityBuildingQueue $queueData, array $responseData): ?CapitalCityBuildingQueue
     {
         $responseLookup = collect($responseData)
             ->pluck('status', 'building_id')
@@ -159,14 +163,22 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
         })->toArray();
 
         $queueData->update(['building_request_data' => $buildingRequestData]);
-        $queueData->refresh();
+        $updatedQueueData = $queueData->fresh();
+
+        if (is_null($updatedQueueData)) {
+            return null;
+        }
 
         if (collect($responseData)->contains(fn($response) => $response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED)) {
-            $messages = $queueData->messages ?? [];
+            $messages = $updatedQueueData->messages ?? [];
             $messages[] = 'Cancellation request for one of your buildings was rejected (See the building that states Cancellation Rejected) because it was too close to being done. No need to waste resources child!';
 
-            $queueData->update(['messages' => $messages]);
+            $updatedQueueData->update(['messages' => $messages]);
+
+            return $updatedQueueData->fresh();
         }
+
+        return $updatedQueueData;
     }
 
     /**

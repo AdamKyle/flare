@@ -3,8 +3,9 @@
 namespace Tests\Unit\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\BuildingInQueue;
-use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequestCancellationMovement;
+use App\Flare\Models\KingdomLog;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityKingdomLogHandler;
+use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequestCancellationMovement;
 use App\Game\Kingdoms\Service\KingdomBuildingService;
 use App\Game\Kingdoms\Values\BuildingQueueType;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
@@ -114,9 +115,14 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
             resolve(KingdomBuildingService::class)
         );
 
-        $this->assertSame(CapitalCityQueueStatus::BUILDING, $capitalCityBuildingQueue->refresh()->status);
+        $kingdomLog = KingdomLog::where('character_id', $character->id)->latest('id')->first();
+        $buildingLogStatuses = collect($kingdomLog->additional_details['building_data'])
+            ->pluck('status')
+            ->toArray();
+
+        $this->assertNull($capitalCityBuildingQueue->fresh());
         $this->assertSame(CapitalCityQueueStatus::CANCELLATION_REJECTED, $capitalCityBuildingCancellation->refresh()->status);
-        $this->assertSame(CapitalCityQueueStatus::CANCELLATION_REJECTED, $capitalCityBuildingQueue->refresh()->building_request_data[0]['secondary_status']);
+        $this->assertContains(CapitalCityQueueStatus::REJECTED, $buildingLogStatuses);
     }
 
     public function testMissingSourceQueueMarksCancellationRejected(): void
@@ -205,19 +211,30 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
             resolve(KingdomBuildingService::class)
         );
 
-        $this->assertSame(CapitalCityQueueStatus::BUILDING, $capitalCityBuildingQueue->refresh()->status);
+        $kingdomLog = KingdomLog::where('character_id', $character->id)->latest('id')->first();
+        $buildingLogStatuses = collect($kingdomLog->additional_details['building_data'])
+            ->pluck('status')
+            ->toArray();
+
+        $this->assertNull($capitalCityBuildingQueue->fresh());
         $this->assertSame(CapitalCityQueueStatus::CANCELLATION_REJECTED, $capitalCityBuildingCancellation->refresh()->status);
-        $this->assertSame(CapitalCityQueueStatus::CANCELLATION_REJECTED, $capitalCityBuildingQueue->refresh()->building_request_data[0]['secondary_status']);
+        $this->assertContains(CapitalCityQueueStatus::REJECTED, $buildingLogStatuses);
         $this->assertSame(1500, $kingdom->refresh()->current_wood);
     }
 
-    public function testRetryIsIdempotentAfterSuccessfulCancellation(): void
+    public function testRetryAfterConsumedBuildingQueueLeavesCancellationRejected(): void
     {
         Event::fake();
 
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdomManagement = $characterFactory->kingdomManagement()
-            ->assignKingdom()
+            ->assignKingdom([
+                'current_wood' => 1500,
+                'current_clay' => 1500,
+                'current_stone' => 1500,
+                'current_iron' => 1500,
+                'current_population' => 1500,
+            ])
             ->assignBuilding()
             ->assignCapitalCityBuildingQueue()
             ->assignCapitalCityBuildingCancellation();
@@ -266,7 +283,9 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
             resolve(KingdomBuildingService::class)
         );
 
+        $updatedCancellation = $capitalCityBuildingCancellation->fresh();
+
         $this->assertNull(BuildingInQueue::where('building_id', $building->id)->first());
-        $this->assertNull($capitalCityBuildingCancellation->fresh());
+        $this->assertSame(CapitalCityQueueStatus::CANCELLATION_REJECTED, $updatedCancellation->status);
     }
 }

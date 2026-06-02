@@ -42,7 +42,7 @@ class CapitalCityKingdomLogHandler
                 'to_kingdom_id' => $kingdom->id,
                 'opened' => false,
                 'additional_details' => [
-                    'messages' => $capitalCityBuildingQueue->messages,
+                    'messages' => $capitalCityBuildingQueue->messages ?? [],
                     'building_data' => $buildingData,
                 ],
                 'status' => KingdomLogStatusValue::CAPITAL_CITY_BUILDING_REQUEST,
@@ -82,7 +82,7 @@ class CapitalCityKingdomLogHandler
                 'to_kingdom_id' => $kingdom->id,
                 'opened' => false,
                 'additional_details' => [
-                    'messages' => $capitalCityUnitQueue->messages,
+                    'messages' => $capitalCityUnitQueue->messages ?? [],
                     'unit_data' => $unitData,
                 ],
                 'status' => KingdomLogStatusValue::CAPITAL_CITY_UNIT_REQUEST,
@@ -111,6 +111,7 @@ class CapitalCityKingdomLogHandler
         foreach ($requestData as $data) {
             if (in_array($data['secondary_status'], [
                 CapitalCityQueueStatus::REJECTED,
+                CapitalCityQueueStatus::CANCELLATION_REJECTED,
                 CapitalCityQueueStatus::CANCELLED,
                 CapitalCityQueueStatus::FINISHED
             ])) {
@@ -128,8 +129,9 @@ class CapitalCityKingdomLogHandler
 
         $statusOrder = [
             CapitalCityQueueStatus::REJECTED => 1,
-            CapitalCityQueueStatus::CANCELLED => 2,
-            CapitalCityQueueStatus::FINISHED => 3,
+            CapitalCityQueueStatus::CANCELLATION_REJECTED => 2,
+            CapitalCityQueueStatus::CANCELLED => 3,
+            CapitalCityQueueStatus::FINISHED => 4,
         ];
 
         usort($buildingData, function ($a, $b) use ($statusOrder) {
@@ -146,6 +148,7 @@ class CapitalCityKingdomLogHandler
         foreach ($requestData as $data) {
             if (in_array($data['secondary_status'], [
                 CapitalCityQueueStatus::REJECTED,
+                CapitalCityQueueStatus::CANCELLATION_REJECTED,
                 CapitalCityQueueStatus::CANCELLED,
                 CapitalCityQueueStatus::FINISHED
             ])) {
@@ -160,7 +163,8 @@ class CapitalCityKingdomLogHandler
         $statusOrder = [
             CapitalCityQueueStatus::CANCELLED => 1,
             CapitalCityQueueStatus::REJECTED => 2,
-            CapitalCityQueueStatus::FINISHED => 3,
+            CapitalCityQueueStatus::CANCELLATION_REJECTED => 3,
+            CapitalCityQueueStatus::FINISHED => 4,
         ];
 
         usort($unitData, function ($a, $b) use ($statusOrder) {
