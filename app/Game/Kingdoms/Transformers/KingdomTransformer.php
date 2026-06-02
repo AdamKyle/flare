@@ -3,10 +3,12 @@
 namespace App\Game\Kingdoms\Transformers;
 
 use App\Flare\Models\CapitalCityBuildingQueue;
+use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Quest;
 use App\Flare\Models\SmeltingProgress;
+use App\Flare\Models\UnitInQueue;
 use App\Flare\Models\UnitMovementQueue;
 use App\Flare\Values\FeatureTypes;
 use App\Game\Kingdoms\Values\BuildingActions;
@@ -60,7 +62,7 @@ class KingdomTransformer extends TransformerAbstract
             'treasury' => $kingdom->treasury,
             'gold_bars' => $kingdom->gold_bars,
             'building_queue' => $this->buildingQueue($kingdom),
-            'unit_queue' => $kingdom->unitsQueue,
+            'unit_queue' => $this->unitQueue($kingdom),
             'unit_movement' => $kingdom->unitsMovementQueue,
             'treasury_defence' => $kingdom->treasury / KingdomMaxValue::MAX_TREASURY,
             'current_units' => $kingdom->units,
@@ -127,6 +129,64 @@ class KingdomTransformer extends TransformerAbstract
             });
 
         return $kingdom->buildingsQueue->toBase()->merge($capitalCityBuildingQueues)->values();
+    }
+
+    private function unitQueue(Kingdom $kingdom): SupportCollection
+    {
+        $manualQueues = UnitInQueue::query()
+            ->where('kingdom_id', $kingdom->id)
+            ->get()
+            ->map(function (UnitInQueue $unitInQueue) {
+            return [
+                'id' => $unitInQueue->id,
+                'character_id' => $unitInQueue->character_id,
+                'kingdom_id' => $unitInQueue->kingdom_id,
+                'game_unit_id' => $unitInQueue->game_unit_id,
+                'amount' => $unitInQueue->amount,
+                'gold_paid' => $unitInQueue->gold_paid,
+                'started_at' => $unitInQueue->started_at,
+                'completed_at' => $unitInQueue->completed_at,
+                'is_capital_city_managed' => ! is_null($unitInQueue->capital_city_unit_queue_id),
+                'capital_city_unit_queue_id' => $unitInQueue->capital_city_unit_queue_id,
+            ];
+        });
+
+        $capitalCityUnitQueues = CapitalCityUnitQueue::query()
+            ->where('kingdom_id', $kingdom->id)
+            ->whereNotIn('status', [
+                CapitalCityQueueStatus::REJECTED,
+                CapitalCityQueueStatus::FINISHED,
+                CapitalCityQueueStatus::CANCELLED,
+                CapitalCityQueueStatus::CANCELLATION_REJECTED,
+            ])
+            ->get()
+            ->flatMap(function (CapitalCityUnitQueue $capitalCityUnitQueue) {
+                return collect($capitalCityUnitQueue->unit_request_data)
+                    ->reject(function (array $request) {
+                        return in_array($request['secondary_status'] ?? null, [
+                            CapitalCityQueueStatus::REJECTED,
+                            CapitalCityQueueStatus::FINISHED,
+                            CapitalCityQueueStatus::CANCELLED,
+                            CapitalCityQueueStatus::CANCELLATION_REJECTED,
+                        ], true);
+                    })
+                    ->map(function (array $request) use ($capitalCityUnitQueue) {
+                        return [
+                            'id' => $capitalCityUnitQueue->id,
+                            'character_id' => $capitalCityUnitQueue->character_id,
+                            'kingdom_id' => $capitalCityUnitQueue->kingdom_id,
+                            'game_unit_id' => GameUnit::where('name', $request['name'])->first()?->id,
+                            'amount' => $request['amount'],
+                            'gold_paid' => 0,
+                            'started_at' => $capitalCityUnitQueue->started_at,
+                            'completed_at' => $capitalCityUnitQueue->completed_at,
+                            'is_capital_city_managed' => true,
+                            'capital_city_unit_queue_id' => $capitalCityUnitQueue->id,
+                        ];
+                    });
+            });
+
+        return $manualQueues->toBase()->merge($capitalCityUnitQueues)->values();
     }
 
     private function capitalCityBuildingPhaseTimerLabel(string $status): string

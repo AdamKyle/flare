@@ -34,7 +34,7 @@ class KingdomUnitControllerTest extends TestCase
         ])->getKingdom();
         $character = $characterFactory->getCharacter();
         $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        CapitalCityUnitQueue::create([
+        CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $capitalCity->id,

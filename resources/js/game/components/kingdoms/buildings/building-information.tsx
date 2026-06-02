@@ -72,6 +72,10 @@ export default class BuildingInformation extends React.Component<
             return;
         }
 
+        if (type === "upgrade" && this.buildingNeedsToBeRepaired()) {
+            return;
+        }
+
         this.setState({
             upgrade_section: type,
         });
@@ -178,6 +182,10 @@ export default class BuildingInformation extends React.Component<
     renderSelectedSection() {
         switch (this.state.upgrade_section) {
             case "upgrade":
+                if (this.buildingNeedsToBeRepaired()) {
+                    return null;
+                }
+
                 return (
                     <UpgradeWithResources
                         character_id={this.props.character_id}
@@ -312,6 +320,39 @@ export default class BuildingInformation extends React.Component<
         );
     }
 
+    renderActionButtons() {
+        if (this.buildingNeedsToBeRepaired()) {
+            return (
+                <PrimaryButton
+                    button_label={"Repair"}
+                    on_click={() => this.showSelectedForm("repair-building")}
+                    disabled={this.props.is_automation_locked}
+                />
+            );
+        }
+
+        return (
+            <Fragment>
+                <PrimaryButton
+                    button_label={"Upgrade"}
+                    on_click={() => this.showSelectedForm("upgrade")}
+                    additional_css={"mr-2"}
+                    disabled={this.props.is_automation_locked}
+                />
+                <PrimaryButton
+                    button_label={"Repair"}
+                    on_click={() => this.showSelectedForm("repair-building")}
+                    disabled={this.props.is_automation_locked}
+                />
+                {this.props.building.is_special ? (
+                    <p className="my-4 text-sm">
+                        This building cannot be upgraded with gold.
+                    </p>
+                ) : null}
+            </Fragment>
+        );
+    }
+
     render() {
         return (
             <Fragment>
@@ -424,44 +465,12 @@ export default class BuildingInformation extends React.Component<
                                 <Fragment>
                                     {this.renderCosts()}
 
-                                    {this.state.upgrade_section !== null ? (
-                                        this.renderSelectedSection()
-                                    ) : !this.props.is_in_queue &&
-                                      !this.props.building.is_locked ? (
-                                        <Fragment>
-                                            <PrimaryButton
-                                                button_label={"Upgrade"}
-                                                on_click={() =>
-                                                    this.showSelectedForm(
-                                                        "upgrade",
-                                                    )
-                                                }
-                                                additional_css={"mr-2"}
-                                                disabled={
-                                                    this.props
-                                                        .is_automation_locked
-                                                }
-                                            />
-                                            <PrimaryButton
-                                                button_label={"Repair"}
-                                                on_click={() =>
-                                                    this.showSelectedForm(
-                                                        "repair-building",
-                                                    )
-                                                }
-                                                disabled={
-                                                    this.props
-                                                        .is_automation_locked
-                                                }
-                                            />
-                                            {this.props.building.is_special ? (
-                                                <p className="my-4 text-sm">
-                                                    This building cannot be
-                                                    upgraded with gold.
-                                                </p>
-                                            ) : null}
-                                        </Fragment>
-                                    ) : null}
+                                    {this.state.upgrade_section !== null
+                                        ? this.renderSelectedSection()
+                                        : !this.props.is_in_queue &&
+                                            !this.props.building.is_locked
+                                          ? this.renderActionButtons()
+                                          : null}
                                 </Fragment>
                             )}
                         </div>

@@ -270,7 +270,7 @@ class RepairKingdomDataTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
-        $capitalCityUnitQueue = CapitalCityUnitQueue::create([
+        $capitalCityUnitQueue = CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $requestingKingdom->id,
@@ -293,7 +293,7 @@ class RepairKingdomDataTest extends TestCase
             'status' => CapitalCityQueueStatus::PROCESSING,
             'travel_time_completed_at' => now(),
         ]);
-        $unitCancellation = CapitalCityUnitCancellation::create([
+        $unitCancellation = CapitalCityUnitCancellation::factory()->create([
             'unit_id' => $gameUnit->id,
             'kingdom_id' => $kingdom->id,
             'request_kingdom_id' => $requestingKingdom->id,

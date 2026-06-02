@@ -38,7 +38,7 @@ class CapitalCityUnitManagementTest extends TestCase
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
         $character = $characterFactory->getCharacter();
-        $capitalCityUnitQueue = CapitalCityUnitQueue::create([
+        $capitalCityUnitQueue = CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -77,7 +77,7 @@ class CapitalCityUnitManagementTest extends TestCase
         $requestingKingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
         $providingKingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
         $character = $characterFactory->getCharacter();
-        $capitalCityUnitQueue = CapitalCityUnitQueue::create([
+        $capitalCityUnitQueue = CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $requestingKingdom->id,
             'requested_kingdom' => $providingKingdom->id,
@@ -92,7 +92,7 @@ class CapitalCityUnitManagementTest extends TestCase
             'started_at' => now(),
             'completed_at' => now(),
         ]);
-        $resourceRequest = CapitalCityResourceRequestModel::create([
+        $resourceRequest = CapitalCityResourceRequestModel::factory()->create([
             'kingdom_requesting_id' => $requestingKingdom->id,
             'request_from_kingdom_id' => $providingKingdom->id,
             'resources' => ['stone' => 100],
@@ -140,7 +140,7 @@ class CapitalCityUnitManagementTest extends TestCase
             'y_position' => 16,
         ])->assignBuilding(['name' => BuildingCosts::MARKET_PLACE], ['level' => 5])->assignUnits(['name' => UnitNames::SPEARMEN], 75)->getKingdom();
         $character = $characterFactory->getCharacter();
-        $capitalCityUnitQueue = CapitalCityUnitQueue::create([
+        $capitalCityUnitQueue = CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $requestingKingdom->id,
             'requested_kingdom' => $providingKingdom->id,
@@ -176,7 +176,7 @@ class CapitalCityUnitManagementTest extends TestCase
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
         $character = $characterFactory->getCharacter();
-        $capitalCityUnitQueue = CapitalCityUnitQueue::create([
+        $capitalCityUnitQueue = CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -211,7 +211,7 @@ class CapitalCityUnitManagementTest extends TestCase
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
         $character = $characterFactory->getCharacter();
-        $capitalCityUnitQueue = CapitalCityUnitQueue::create([
+        $capitalCityUnitQueue = CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -234,7 +234,7 @@ class CapitalCityUnitManagementTest extends TestCase
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
         $character = $characterFactory->getCharacter();
-        $capitalCityUnitQueue = CapitalCityUnitQueue::create([
+        $capitalCityUnitQueue = CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -281,7 +281,7 @@ class CapitalCityUnitManagementTest extends TestCase
             'game_building_id' => $gameBuilding->id,
             'level' => 1,
         ]);
-        $capitalCityUnitQueue = CapitalCityUnitQueue::create([
+        $capitalCityUnitQueue = CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -345,7 +345,7 @@ class CapitalCityUnitManagementTest extends TestCase
             'game_unit_id' => $gameUnit->id,
             'amount' => KingdomMaxValue::MAX_UNIT - 5,
         ]);
-        $capitalCityUnitQueue = CapitalCityUnitQueue::create([
+        $capitalCityUnitQueue = CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,

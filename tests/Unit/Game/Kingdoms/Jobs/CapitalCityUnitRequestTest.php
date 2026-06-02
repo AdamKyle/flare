@@ -43,7 +43,7 @@ class CapitalCityUnitRequestTest extends TestCase
             'game_unit_id' => $unit->id,
             'amount' => KingdomMaxValue::MAX_UNIT,
         ]);
-        $queue = CapitalCityUnitQueue::create([
+        $queue = CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -79,7 +79,7 @@ class CapitalCityUnitRequestTest extends TestCase
         ])->getKingdom();
         $character = $characterFactory->getCharacter();
         $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        $queue = CapitalCityUnitQueue::create([
+        $queue = CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -128,7 +128,7 @@ class CapitalCityUnitRequestTest extends TestCase
             'game_unit_id' => $unit->id,
             'amount' => KingdomMaxValue::MAX_UNIT - 5,
         ]);
-        $queue = CapitalCityUnitQueue::create([
+        $queue = CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -213,7 +213,7 @@ class CapitalCityUnitRequestTest extends TestCase
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
         $character = $characterFactory->getCharacter();
         $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        $queue = CapitalCityUnitQueue::create([
+        $queue = CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -243,7 +243,7 @@ class CapitalCityUnitRequestTest extends TestCase
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
         $character = $characterFactory->getCharacter();
         $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        $queue = CapitalCityUnitQueue::create([
+        $queue = CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,

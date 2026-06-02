@@ -171,6 +171,7 @@ class CapitalCityManagementService
                 'status' => $queue->status,
                 'building_queue' => $buildingRequests,
                 'total_time' => $queueTimeLeftInSeconds,
+                'phase_timer_label' => $this->capitalCityBuildingPhaseTimerLabel($queue->status),
                 'queue_id' => $queue->id,
             ];
         });
@@ -180,6 +181,7 @@ class CapitalCityManagementService
 
     public function fetchUnitQueueData(Character $character, ?Kingdom $kingdom = null): array
     {
+        $this->kingdomQueueService->cleanOverdueCapitalCityUnitQueuesForCharacter($character, $kingdom);
 
         $queues = CapitalCityUnitQueue::where('character_id', $character->id)
             ->when($kingdom, function ($query) use ($kingdom) {
@@ -236,8 +238,9 @@ class CapitalCityManagementService
             CapitalCityQueueStatus::TRAVELING => 2,
             CapitalCityQueueStatus::REQUESTING => 3,
             CapitalCityQueueStatus::BUILDING => 4,
-            CapitalCityQueueStatus::CANCELLED => 5,
-            CapitalCityQueueStatus::REJECTED => 6,
+            CapitalCityQueueStatus::REPAIRING => 5,
+            CapitalCityQueueStatus::CANCELLED => 6,
+            CapitalCityQueueStatus::REJECTED => 7,
         ];
 
         usort($requestData, function ($a, $b) use ($statusOrder) {
@@ -652,5 +655,14 @@ class CapitalCityManagementService
             $characterPassiveSkillsBySkillId,
             $characterId
         );
+    }
+
+    private function capitalCityBuildingPhaseTimerLabel(string $status): string
+    {
+        return match ($status) {
+            CapitalCityQueueStatus::TRAVELING => 'Traveling',
+            CapitalCityQueueStatus::REPAIRING => 'Repairing',
+            default => 'Building',
+        };
     }
 }

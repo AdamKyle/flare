@@ -392,21 +392,10 @@ class KingdomBuildingsControllerTest extends TestCase
             'completed_at' => now()->addMinutes(10),
         ]);
 
-        $this->actingAs($character->user);
-        $response = $this->call(
-            'POST',
-            '/api/kingdoms/' . $character->id . '/upgrade-building/' . $building->id,
-            [],
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_ACCEPT' => 'application/json',
-            ],
-            json_encode([
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdoms/' . $character->id . '/upgrade-building/' . $building->id, [
                 'to_level' => $building->level + 1,
-            ])
-        );
+            ]);
 
         $response->assertStatus(422);
         $response->assertJson([
@@ -537,21 +526,10 @@ class KingdomBuildingsControllerTest extends TestCase
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
 
-        $this->actingAs($character->user);
-        $response = $this->call(
-            'POST',
-            '/api/kingdoms/' . $character->id . '/upgrade-building/' . $building->id,
-            [],
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_ACCEPT' => 'application/json',
-            ],
-            json_encode([
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdoms/' . $character->id . '/upgrade-building/' . $building->id, [
                 'to_level' => 2,
-            ])
-        );
+            ]);
 
         $response->assertStatus(422);
         $response->assertJson([
@@ -715,22 +693,11 @@ class KingdomBuildingsControllerTest extends TestCase
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
 
-        $this->actingAs($character->user);
-        $response = $this->call(
-            'POST',
-            '/api/kingdoms/' . $character->id . '/upgrade-building/' . $building->id,
-            [],
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_ACCEPT' => 'application/json',
-            ],
-            json_encode([
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdoms/' . $character->id . '/upgrade-building/' . $building->id, [
                 'from_level' => 2,
                 'to_level' => 4,
-            ])
-        );
+            ]);
 
         $response->assertStatus(422);
         $response->assertJson([

@@ -247,7 +247,11 @@ export default class KingdomQueues extends React.Component<
                         additional_css={"my-2"}
                         disabled={this.props.is_automation_locked}
                     />
-                ) : null}
+                ) : (
+                    <div className="mb-2 mt-4 text-sm text-gray-700 dark:text-gray-300">
+                        Managed by Capital City. Cannot be cancelled here.
+                    </div>
+                )}
             </BasicCard>
         );
     }

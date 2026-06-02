@@ -21,7 +21,7 @@ class CancelUnitRequestServiceTest extends TestCase
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
         $character = $characterFactory->getCharacter();
-        $capitalCityUnitQueue = CapitalCityUnitQueue::create([
+        $capitalCityUnitQueue = CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,

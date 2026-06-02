@@ -352,7 +352,9 @@ export default class BuildingsInQueue extends React.Component<
                                 </div>
                                 <TimerProgressBar
                                     time_remaining={queueGroup.total_time}
-                                    time_out_label={"Total Time Left"}
+                                    time_out_label={
+                                        queueGroup.phase_timer_label
+                                    }
                                 />
                             </div>
                             {this.state.open_kingdom_ids.has(

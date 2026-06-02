@@ -57,25 +57,14 @@ class CapitalCityManagementControllerTest extends TestCase
         $character = $characterFactory->getCharacter();
         $building = $targetKingdom->buildings()->first();
 
-        $this->actingAs($character->user);
-        $response = $this->call(
-            'POST',
-            '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id,
-            [],
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_ACCEPT' => 'application/json',
-            ],
-            json_encode([
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id, [
                 'request_type' => 'upgrade',
                 'request_data' => [[
                     'kingdomId' => $targetKingdom->id,
                     'buildingIds' => [$building->id],
                 ]],
-            ])
-        );
+            ]);
 
         $response->assertStatus(422);
         $response->assertJson([
@@ -136,25 +125,14 @@ class CapitalCityManagementControllerTest extends TestCase
             'completed_at' => now()->addMinutes(10),
         ]);
 
-        $this->actingAs($character->user);
-        $response = $this->call(
-            'POST',
-            '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id,
-            [],
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_ACCEPT' => 'application/json',
-            ],
-            json_encode([
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id, [
                 'request_type' => 'upgrade',
                 'request_data' => [[
                     'kingdomId' => $targetKingdom->id,
                     'buildingIds' => [$building->id],
                 ]],
-            ])
-        );
+            ]);
 
         $response->assertStatus(422);
         $response->assertJson([
@@ -219,25 +197,14 @@ class CapitalCityManagementControllerTest extends TestCase
             'completed_at' => now()->addMinutes(10),
         ]);
 
-        $this->actingAs($character->user);
-        $response = $this->call(
-            'POST',
-            '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id,
-            [],
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_ACCEPT' => 'application/json',
-            ],
-            json_encode([
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id, [
                 'request_type' => 'upgrade',
                 'request_data' => [[
                     'kingdomId' => $targetKingdom->id,
                     'buildingIds' => [$building->id],
                 ]],
-            ])
-        );
+            ]);
 
         $response->assertStatus(422);
         $response->assertJson([
@@ -274,18 +241,8 @@ class CapitalCityManagementControllerTest extends TestCase
         $character = $characterFactory->getCharacter();
         $gameUnit = $targetKingdom->units()->first()->gameUnit;
 
-        $this->actingAs($character->user);
-        $response = $this->call(
-            'POST',
-            '/api/kingdom/capital-city/recruit-unit-requests/' . $character->id . '/' . $capitalCity->id,
-            [],
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_ACCEPT' => 'application/json',
-            ],
-            json_encode([
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/recruit-unit-requests/' . $character->id . '/' . $capitalCity->id, [
                 'request_data' => [[
                     'kingdom_id' => $targetKingdom->id,
                     'unit_requests' => [
@@ -295,8 +252,7 @@ class CapitalCityManagementControllerTest extends TestCase
                         ],
                     ],
                 ]],
-            ])
-        );
+            ]);
 
         $response->assertStatus(422);
         $response->assertJson([
@@ -334,25 +290,14 @@ class CapitalCityManagementControllerTest extends TestCase
         $character = $characterFactory->getCharacter();
         $building = $targetKingdom->buildings()->first();
 
-        $this->actingAs($character->user);
-        $response = $this->call(
-            'POST',
-            '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id,
-            [],
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_ACCEPT' => 'application/json',
-            ],
-            json_encode([
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id, [
                 'request_type' => 'upgrade',
                 'request_data' => [[
                     'kingdomId' => $targetKingdom->id,
                     'buildingIds' => [$building->id],
                 ]],
-            ])
-        );
+            ]);
 
         $response->assertStatus(422);
         Queue::assertNotPushed(CapitalCityQueueUpBuildingRequests::class);
@@ -383,18 +328,8 @@ class CapitalCityManagementControllerTest extends TestCase
         $character = $characterFactory->getCharacter();
         $gameUnit = $targetKingdom->units()->first()->gameUnit;
 
-        $this->actingAs($character->user);
-        $response = $this->call(
-            'POST',
-            '/api/kingdom/capital-city/recruit-unit-requests/' . $character->id . '/' . $capitalCity->id,
-            [],
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_ACCEPT' => 'application/json',
-            ],
-            json_encode([
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/recruit-unit-requests/' . $character->id . '/' . $capitalCity->id, [
                 'request_data' => [[
                     'kingdom_id' => $targetKingdom->id,
                     'unit_requests' => [[
@@ -402,8 +337,7 @@ class CapitalCityManagementControllerTest extends TestCase
                         'unit_amount' => 1,
                     ]],
                 ]],
-            ])
-        );
+            ]);
 
         $response->assertStatus(422);
         Queue::assertNotPushed(CapitalCityQueueUpUnitRequests::class);
@@ -471,7 +405,7 @@ class CapitalCityManagementControllerTest extends TestCase
         ]);
         $character = $characterFactory->getCharacter();
         $gameUnit = $capitalCity->units()->first()->gameUnit;
-        $capitalCityUnitQueue = CapitalCityUnitQueue::create([
+        $capitalCityUnitQueue = CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $capitalCity->id,
             'requested_kingdom' => $capitalCity->id,

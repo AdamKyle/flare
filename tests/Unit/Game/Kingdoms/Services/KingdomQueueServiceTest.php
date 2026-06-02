@@ -67,7 +67,7 @@ class KingdomQueueServiceTest extends TestCase
         $targetKingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
         $character = $characterFactory->getCharacter();
         $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        $capitalCityUnitQueue = CapitalCityUnitQueue::create([
+        $capitalCityUnitQueue = CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'requested_kingdom' => $capitalCity->id,
@@ -193,7 +193,7 @@ class KingdomQueueServiceTest extends TestCase
         $targetKingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
         $character = $characterFactory->getCharacter();
         $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        $travelingQueue = CapitalCityUnitQueue::create([
+        $travelingQueue = CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'requested_kingdom' => $capitalCity->id,
@@ -207,7 +207,7 @@ class KingdomQueueServiceTest extends TestCase
             'started_at' => now()->subHours(2),
             'completed_at' => now()->subHour(),
         ]);
-        $recruitingQueue = CapitalCityUnitQueue::create([
+        $recruitingQueue = CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'requested_kingdom' => $capitalCity->id,

@@ -8,5 +8,6 @@ export default interface KingddomBuildingQueue {
     status: QueueStatus;
     building_queue: BuildingInQueue[];
     total_time: number;
+    phase_timer_label: string;
     queue_id: number;
 }

@@ -22,6 +22,7 @@ use App\Game\Kingdoms\Service\CapitalCityGoldBarManagementService;
 use App\Game\Kingdoms\Service\CapitalCityManagementService;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
+use App\Game\Kingdoms\Validators\BuildingUpgradeRequestValidator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -34,6 +35,7 @@ class CapitalCityManagementController extends Controller
         private readonly CancelUnitRequestService $cancelUnitRequestService,
         private readonly CapitalCityGoldBarManagementService $capitalCityGoldBarManagementService,
         private readonly AutomationRestrictionService $automationRestrictionService,
+        private readonly BuildingUpgradeRequestValidator $buildingUpgradeRequestValidator,
     ) {}
 
     public function makeCapitalCity(Kingdom $kingdom, Character $character): JsonResponse
@@ -94,6 +96,17 @@ class CapitalCityManagementController extends Controller
 
         if (! is_null($restriction)) {
             return $restriction;
+        }
+
+        $validationMessage = $this->buildingUpgradeRequestValidator->validate(
+            $buildingUpgradeRequestsRequest->request_data,
+            $buildingUpgradeRequestsRequest->request_type
+        );
+
+        if (! is_null($validationMessage)) {
+            return response()->json([
+                'message' => $validationMessage,
+            ], 422);
         }
 
         Log::channel('capital_city_building_upgrades')->info('upgradeBuildings endpoint called', [

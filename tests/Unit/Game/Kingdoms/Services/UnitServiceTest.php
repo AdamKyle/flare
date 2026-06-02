@@ -102,7 +102,7 @@ class UnitServiceTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
-        CapitalCityUnitQueue::create([
+        CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,

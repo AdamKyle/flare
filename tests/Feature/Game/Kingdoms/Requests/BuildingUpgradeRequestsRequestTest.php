@@ -5,6 +5,7 @@ namespace Tests\Feature\Game\Kingdoms\Requests;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Game\Kingdoms\Jobs\CapitalCityQueueUpBuildingRequests;
+use App\Game\Kingdoms\Requests\BuildingUpgradeRequestsRequest;
 use App\Game\Kingdoms\Values\BuildingQueueType;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -15,6 +16,11 @@ use Tests\TestCase;
 class BuildingUpgradeRequestsRequestTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function testRequestDoesNotHaveBusinessValidation(): void
+    {
+        $this->assertFalse(method_exists(BuildingUpgradeRequestsRequest::class, 'withValidator'));
+    }
 
     public function testCapitalCityUpgradeRejectsDamagedBuilding(): void
     {
@@ -50,25 +56,14 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
         $character = $characterFactory->getCharacter();
         $building = $targetKingdom->buildings()->first();
 
-        $this->actingAs($character->user);
-        $response = $this->call(
-            'POST',
-            '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id,
-            [],
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_ACCEPT' => 'application/json',
-            ],
-            json_encode([
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id, [
                 'request_type' => 'upgrade',
                 'request_data' => [[
                     'kingdomId' => $targetKingdom->id,
                     'buildingIds' => [$building->id],
                 ]],
-            ])
-        );
+            ]);
 
         $response->assertStatus(422);
         $response->assertJson([
@@ -121,25 +116,14 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
             'completed_at' => now()->addMinutes(10),
         ]);
 
-        $this->actingAs($character->user);
-        $response = $this->call(
-            'POST',
-            '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id,
-            [],
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_ACCEPT' => 'application/json',
-            ],
-            json_encode([
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id, [
                 'request_type' => 'repair',
                 'request_data' => [[
                     'kingdomId' => $targetKingdom->id,
                     'buildingIds' => [$building->id],
                 ]],
-            ])
-        );
+            ]);
 
         $response->assertStatus(422);
         $response->assertJson([
@@ -201,25 +185,14 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
             'completed_at' => now()->addMinutes(10),
         ]);
 
-        $this->actingAs($character->user);
-        $response = $this->call(
-            'POST',
-            '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id,
-            [],
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_ACCEPT' => 'application/json',
-            ],
-            json_encode([
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id, [
                 'request_type' => 'repair',
                 'request_data' => [[
                     'kingdomId' => $targetKingdom->id,
                     'buildingIds' => [$building->id],
                 ]],
-            ])
-        );
+            ]);
 
         $response->assertStatus(422);
         $response->assertJson([

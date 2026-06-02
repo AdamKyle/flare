@@ -46,18 +46,8 @@ class CapitalCityUnitRequestTest extends TestCase
             'completed_at' => now()->addHour(),
         ]);
 
-        $this->actingAs($character->user);
-        $response = $this->call(
-            'POST',
-            '/api/kingdom/capital-city/recruit-unit-requests/' . $character->id . '/' . $capitalCity->id,
-            [],
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_ACCEPT' => 'application/json',
-            ],
-            json_encode([
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/recruit-unit-requests/' . $character->id . '/' . $capitalCity->id, [
                 'request_data' => [[
                     'kingdom_id' => $targetKingdom->id,
                     'unit_requests' => [[
@@ -65,8 +55,7 @@ class CapitalCityUnitRequestTest extends TestCase
                         'unit_amount' => 1,
                     ]],
                 ]],
-            ])
-        );
+            ]);
 
         $response->assertStatus(422);
         $response->assertJson([
@@ -96,7 +85,7 @@ class CapitalCityUnitRequestTest extends TestCase
         ])->getKingdom();
         $character = $characterFactory->getCharacter();
         $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        CapitalCityUnitQueue::create([
+        CapitalCityUnitQueue::factory()->create([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'requested_kingdom' => $capitalCity->id,
@@ -111,18 +100,8 @@ class CapitalCityUnitRequestTest extends TestCase
             'completed_at' => now()->addHour(),
         ]);
 
-        $this->actingAs($character->user);
-        $response = $this->call(
-            'POST',
-            '/api/kingdom/capital-city/recruit-unit-requests/' . $character->id . '/' . $capitalCity->id,
-            [],
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_ACCEPT' => 'application/json',
-            ],
-            json_encode([
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/recruit-unit-requests/' . $character->id . '/' . $capitalCity->id, [
                 'request_data' => [[
                     'kingdom_id' => $targetKingdom->id,
                     'unit_requests' => [[
@@ -130,8 +109,7 @@ class CapitalCityUnitRequestTest extends TestCase
                         'unit_amount' => 1,
                     ]],
                 ]],
-            ])
-        );
+            ]);
 
         $response->assertStatus(422);
         $response->assertJson([

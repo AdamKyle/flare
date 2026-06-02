@@ -78,34 +78,32 @@ export default class CapitalCityBuildingUpgradeRepairTableEvent
                                 map_name: kingdom.map_name,
                                 buildings: kingdom.buildings
                                     .filter(
-                                        (building) =>
-                                            building.current_durability <
-                                            building.max_durability,
+                                        (building) => building.can_be_repaired,
                                     )
                                     .sort((a, b) => a.level - b.level),
                             }),
                         )
                         .filter((kingdom: any) => kingdom.buildings.length > 0);
                 } else {
-                    data = data.map(
-                        (kingdom: {
-                            map_name: any;
-                            kingdom_name: any;
-                            kingdom_id: number;
-                            buildings: any[];
-                        }) => ({
-                            kingdom_name: kingdom.kingdom_name,
-                            map_name: kingdom.map_name,
-                            kingdom_id: kingdom.kingdom_id,
-                            buildings: kingdom.buildings
-                                .filter(
-                                    (building) =>
-                                        building.current_durability >=
-                                        building.max_durability,
-                                )
-                                .sort((a, b) => a.level - b.level),
-                        }),
-                    );
+                    data = data
+                        .map(
+                            (kingdom: {
+                                map_name: any;
+                                kingdom_name: any;
+                                kingdom_id: number;
+                                buildings: any[];
+                            }) => ({
+                                kingdom_name: kingdom.kingdom_name,
+                                map_name: kingdom.map_name,
+                                kingdom_id: kingdom.kingdom_id,
+                                buildings: kingdom.buildings
+                                    .filter(
+                                        (building) => building.can_be_upgraded,
+                                    )
+                                    .sort((a, b) => a.level - b.level),
+                            }),
+                        )
+                        .filter((kingdom: any) => kingdom.buildings.length > 0);
                 }
 
                 this.component.setState({

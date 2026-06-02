@@ -70,6 +70,29 @@ class KingdomQueueService
             });
     }
 
+    public function cleanOverdueCapitalCityUnitQueuesForCharacter(Character $character, ?Kingdom $kingdom = null): void
+    {
+        CapitalCityUnitQueue::query()
+            ->where('character_id', $character->id)
+            ->when($kingdom, function ($query) use ($kingdom) {
+                return $query->whereHas('kingdom', function ($query) use ($kingdom) {
+                    $query->where('game_map_id', $kingdom->game_map_id);
+                })->where('kingdom_id', '!=', $kingdom->id);
+            })
+            ->whereIn('status', $this->activeUnitStatuses())
+            ->where('completed_at', '<', now())
+            ->get()
+            ->each(function (CapitalCityUnitQueue $queue): void {
+                $currentQueue = CapitalCityUnitQueue::find($queue->id);
+
+                if (is_null($currentQueue)) {
+                    return;
+                }
+
+                $this->rejectOverdueUnitQueue($currentQueue);
+            });
+    }
+
     protected function fetchBuildingQueues(Kingdom $kingdom): array
     {
 
@@ -281,6 +304,14 @@ class KingdomQueueService
         ];
     }
 
+    private function activeUnitStatuses(): array
+    {
+        return [
+            CapitalCityQueueStatus::TRAVELING,
+            CapitalCityQueueStatus::RECRUITING,
+        ];
+    }
+
     private function rejectOverdueBuildingQueue(CapitalCityBuildingQueue $queue): void
     {
         Log::warning('Rejected overdue capital city queue.', [
@@ -336,6 +367,12 @@ class KingdomQueueService
             'status' => CapitalCityQueueStatus::REJECTED,
         ]);
 
-        $this->capitalCityKingdomLogHandler->possiblyCreateLogForUnitQueue($queue->refresh());
+        $updatedQueue = $queue->fresh();
+
+        if (is_null($updatedQueue)) {
+            return;
+        }
+
+        $this->capitalCityKingdomLogHandler->possiblyCreateLogForUnitQueue($updatedQueue);
     }
 }
