@@ -69,7 +69,7 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
         $capitalCityKingdomLogHandler->possiblyCreateLogForBuildingQueue($updatedQueueData);
 
         if (! collect($responseData)->contains(fn($response) => $response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED)) {
-            $this->cleanupCancellationRecords();
+            $this->cleanupCancellationRecords($updatedQueueData);
         }
     }
 
@@ -138,6 +138,10 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
 
             $result = $kingdomBuildingService->cancelKingdomBuildingUpgrade($buildingInQueue);
 
+            if (! $result) {
+                CapitalCityBuildingCancellation::where('id', $this->capitalCityCancellationQueueId)->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
+            }
+
             return [
                 'building_id' => $buildingInQueue->building_id,
                 'status' => $result ? CapitalCityQueueStatus::CANCELLED : CapitalCityQueueStatus::CANCELLATION_REJECTED,
@@ -184,7 +188,7 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
     /**
      * Cleanup cancellation records based on the response data.
      */
-    private function cleanupCancellationRecords(): void
+    private function cleanupCancellationRecords(CapitalCityBuildingQueue $queueData): void
     {
         $capitalCityBuildingCancellationQueue = CapitalCityBuildingCancellation::where('id', $this->capitalCityCancellationQueueId)->first();
 
@@ -193,6 +197,14 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
         }
 
         $character = $capitalCityBuildingCancellationQueue->character;
+
+        if (is_null($queueData->fresh())) {
+            $capitalCityBuildingCancellationQueue->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
+
+            event(new UpdateCapitalCityBuildingQueueTable($character));
+
+            return;
+        }
 
         $capitalCityBuildingCancellationQueue->delete();
 

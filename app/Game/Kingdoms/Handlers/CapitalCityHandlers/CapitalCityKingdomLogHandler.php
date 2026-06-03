@@ -116,13 +116,16 @@ class CapitalCityKingdomLogHandler
                 CapitalCityQueueStatus::FINISHED
             ])) {
                 $building = KingdomBuilding::where('kingdom_id', $kingdom->id)->where('id', $data['building_id'])->first();
+                $status = $data['secondary_status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED
+                    ? CapitalCityQueueStatus::REJECTED
+                    : $data['secondary_status'];
 
                 $buildingData[] = [
                     'building_name' => $building?->name ?? $data['building_name'],
                     'from_level' => $data['from_level'],
                     'to_level' => $data['to_level'],
                     'type' => $data['type'],
-                    'status' => $data['secondary_status'],
+                    'status' => $status,
                 ];
             }
         }
