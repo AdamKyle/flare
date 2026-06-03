@@ -19,6 +19,7 @@ import MonsterActions from "./components/small-actions/monster-actions";
 import Shop from "./components/specialty-shops/shop";
 import ActionsProps from "./types/actions-props";
 import ActionsState from "./types/actions-state";
+import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
 
 export default class Actions extends React.Component<
     ActionsProps,
@@ -303,7 +304,7 @@ export default class Actions extends React.Component<
 
     automationRestrictionMessage(): string {
         if (this.isFactionLoyaltyAutomationRunning()) {
-            return "Faction Loyalty Automation is running. You cannot craft items while it is running.";
+            return "Faction Loyalty Automation is running. You cannot Delve, Explore, manually Fight, or craft items while it is running.";
         }
 
         if (this.isDelveRunning()) {
@@ -361,21 +362,25 @@ export default class Actions extends React.Component<
 
     renderAutomationBlockedNotice() {
         return (
-            <div className="my-4 text-left" aria-live="polite">
-                <p className="my-2">{this.automationRestrictionMessage()}</p>
-                {this.isFactionLoyaltyAutomationRunning() ? (
+            <div aria-live="polite">
+                <WarningAlert additional_css={"mt-4"}>
                     <p className="my-2">
-                        Enchanting, alchemy, trinketry, gem crafting, and other
-                        crafting-menu actions are still allowed.
+                        {this.automationRestrictionMessage()}
                     </p>
-                ) : null}
-                <p className="my-2">Would you like to stop it?</p>
-                <DangerOutlineButton
-                    button_label={"Stop " + this.automationName()}
-                    on_click={this.stopRunningAutomation.bind(this)}
-                    disabled={this.state.loading}
-                    additional_css={""}
-                />
+                    {this.isFactionLoyaltyAutomationRunning() ? (
+                        <p className="my-2">
+                            Enchanting, alchemy, trinketry, gem crafting, and
+                            other crafting-menu actions are still allowed.
+                        </p>
+                    ) : null}
+                    <p className="my-2">Would you like to stop it?</p>
+                    <DangerOutlineButton
+                        button_label={"Stop " + this.automationName()}
+                        on_click={this.stopRunningAutomation.bind(this)}
+                        disabled={this.state.loading}
+                        additional_css={""}
+                    />
+                </WarningAlert>
             </div>
         );
     }
@@ -393,6 +398,10 @@ export default class Actions extends React.Component<
     }
 
     createMonster() {
+        if (this.isAnyAutomationRunning()) {
+            return this.renderAutomationBlockedNotice();
+        }
+
         if (this.state.raid_monsters.length > 0) {
             return (
                 <RaidSection

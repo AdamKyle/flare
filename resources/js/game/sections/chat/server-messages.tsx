@@ -1,9 +1,7 @@
 import React, { Fragment } from "react";
 import Messages from "./components/messages";
-import ItemComparison from "./modals/item-comparison";
 import ServerMessagesComponentProps from "./types/components/server-messages-component-props";
 import ServerMessagesComponentState from "./types/components/server-messages-component-state";
-import { viewPortWatcher } from "../../lib/view-port-watcher";
 import ItemDetailsModal from "../../components/modals/item-details/item-details-modal";
 
 export default class ServerMessages extends React.Component<
@@ -36,6 +34,7 @@ export default class ServerMessages extends React.Component<
                         className="text-pink-400 my-2 break-word lg:break-normal"
                         key={message.id}
                     >
+                        <span>[{message.time_stamp}] </span>
                         <button
                             type="button"
                             className="italic underline hover:text-pink-300"
@@ -57,7 +56,7 @@ export default class ServerMessages extends React.Component<
                     className="text-pink-400 my-2 break-word lg:break-normal"
                     key={message.id}
                 >
-                    {message.message}
+                    [{message.time_stamp}] {message.message}
                 </li>
             );
         });

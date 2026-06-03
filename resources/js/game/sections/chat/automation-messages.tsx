@@ -1,8 +1,8 @@
 import React from "react";
+import clsx from "clsx";
 import Messages from "./components/messages";
 import AutomationMessagesComponentProps from "./types/components/automation-messages-component-props";
 import ExplorationMessageType from "./types/deffinitions/automation-message-type";
-import clsx from "clsx";
 
 export default class AutomationMessages extends React.Component<
     AutomationMessagesComponentProps,
@@ -29,7 +29,7 @@ export default class AutomationMessages extends React.Component<
                             )}
                             key={message.id}
                         >
-                            {message.message}
+                            [{message.time_stamp}] {message.message}
                         </li>
                     );
                 }
@@ -45,7 +45,7 @@ export default class AutomationMessages extends React.Component<
                         )}
                         key={message.id}
                     >
-                        {message.message}
+                        [{message.time_stamp}] {message.message}
                     </li>
                 );
             },

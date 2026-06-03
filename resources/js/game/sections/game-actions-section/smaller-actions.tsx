@@ -333,23 +333,27 @@ export default class SmallerActions extends React.Component<
 
     renderAutomationBlockedNotice(isCrafting: boolean) {
         return (
-            <div className="my-4 text-center" aria-live="polite">
-                <p className="my-2">{this.automationRestrictionMessage()}</p>
-                {isCrafting && this.isFactionLoyaltyAutomationRunning() ? (
+            <div aria-live="polite">
+                <WarningAlert additional_css={"mb-4"}>
                     <p className="my-2">
-                        While Faction Loyalty Automation is running, you cannot
-                        craft items. Enchanting, alchemy, trinketry, gem
-                        crafting, and other crafting-menu actions are still
-                        allowed.
+                        {this.automationRestrictionMessage()}
                     </p>
-                ) : null}
-                <p className="my-2">Would you like to stop it?</p>
-                <DangerOutlineButton
-                    button_label={"Stop " + this.automationName()}
-                    on_click={this.stopRunningAutomation.bind(this)}
-                    disabled={this.state.loading}
-                    additional_css={""}
-                />
+                    {isCrafting && this.isFactionLoyaltyAutomationRunning() ? (
+                        <p className="my-2">
+                            While Faction Loyalty Automation is running, you
+                            cannot craft items. Enchanting, alchemy, trinketry,
+                            gem crafting, and other crafting-menu actions are
+                            still allowed.
+                        </p>
+                    ) : null}
+                    <p className="my-2">Would you like to stop it?</p>
+                    <DangerOutlineButton
+                        button_label={"Stop " + this.automationName()}
+                        on_click={this.stopRunningAutomation.bind(this)}
+                        disabled={this.state.loading}
+                        additional_css={""}
+                    />
+                </WarningAlert>
             </div>
         );
     }
@@ -377,6 +381,10 @@ export default class SmallerActions extends React.Component<
     }
 
     createMonster() {
+        if (this.isAnyAutomationRunning()) {
+            return this.renderAutomationBlockedNotice(false);
+        }
+
         if (this.state.raid_monsters.length > 0) {
             return (
                 <RaidSection

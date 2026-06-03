@@ -25,6 +25,8 @@ class AutomationLogUpdate implements ShouldBroadcast
 
     public bool $isReward;
 
+    public string $timeStamp;
+
     /**
      * @param int $userId
      * @param string $message
@@ -37,6 +39,7 @@ class AutomationLogUpdate implements ShouldBroadcast
         $this->message = $message;
         $this->makeItalic = $makeItalic;
         $this->isReward = $isReward;
+        $this->timeStamp = now()->toJSON();
     }
 
     /**

@@ -6,4 +6,6 @@ export default interface AutomationMessageType {
     make_italic: boolean;
 
     is_reward: boolean;
+
+    time_stamp: string;
 }

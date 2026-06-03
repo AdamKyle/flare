@@ -17,6 +17,7 @@ use App\Flare\Services\CharacterRewardService;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Automation\Events\AutomationLogUpdate;
@@ -42,6 +43,8 @@ class Exploration implements ShouldQueue
     private CharacterCacheData $characterCacheData;
 
     private ExplorationCreatureCountCalculator $explorationCreatureCountCalculator;
+
+    private FactionHandler $factionHandler;
 
     private ?Monster $monster = null;
 
@@ -75,6 +78,7 @@ class Exploration implements ShouldQueue
         CharacterRewardService $characterRewardService,
         SkillService $skillService,
         ExplorationCreatureCountCalculator $explorationCreatureCountCalculator,
+        FactionHandler $factionHandler,
     ): void {
 
         $this->characterRewardService = $characterRewardService;
@@ -86,6 +90,8 @@ class Exploration implements ShouldQueue
         $this->characterCacheData = $characterCacheData;
 
         $this->explorationCreatureCountCalculator = $explorationCreatureCountCalculator;
+
+        $this->factionHandler = $factionHandler;
 
         $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
 
@@ -166,6 +172,7 @@ class Exploration implements ShouldQueue
 
         $totalXpToReward = 0;
         $totalSkillXpToReward = 0;
+        $factionPointsPerKill = $this->factionHandler->getFactionPointsPerKill($this->character);
         $characterRewardService = $this->characterRewardService->setCharacter($this->character);
         $characterSkillService = $this->skillService->setSkillInTraining($this->character);
 
@@ -182,7 +189,7 @@ class Exploration implements ShouldQueue
         $delta = [
             'total_creatures' => $enemies,
             'total_xp' => $totalXpToReward,
-            'total_faction_points' => 0,
+            'total_faction_points' => $factionPointsPerKill * $enemies,
             'total_skill_xp' => $totalSkillXpToReward,
         ];
 

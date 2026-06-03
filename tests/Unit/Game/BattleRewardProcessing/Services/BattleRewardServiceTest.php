@@ -573,6 +573,47 @@ class BattleRewardServiceTest extends TestCase
         $this->assertEquals(0, $faction->current_points);
     }
 
+    public function testProcessRewardsAwardsBatchFactionPointsWhenCharacterIsAutoBattling(): void
+    {
+        $character = $this->characterFactory
+            ->assignFactionSystem()
+            ->getCharacter();
+
+        $character->currentAutomations()->create([
+            'character_id' => $character->id,
+            'monster_id' => $this->createMonster()->id,
+            'type' => 0,
+            'started_at' => now(),
+            'completed_at' => now()->addDay(),
+            'move_down_monster_list_every' => null,
+            'previous_level' => 10,
+            'current_level' => 20,
+            'attack_type' => 'attack',
+        ]);
+
+        $character = $character->refresh();
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'xp' => 1,
+        ]);
+
+        $this->battleRewardService
+            ->setUp($character->id, $monster->id)
+            ->setContext([
+                'total_creatures' => 1,
+                'total_xp' => 10,
+                'total_skill_xp' => 0,
+                'total_faction_points' => 5,
+            ])
+            ->processRewards();
+
+        $character = $character->refresh();
+
+        $faction = $character->factions()->where('game_map_id', $character->map->game_map_id)->first();
+        $this->assertEquals(5, $faction->current_points);
+    }
+
     public function testShouldUpdateGlobalEventParticipationUsesContextKillCount(): void
     {
 

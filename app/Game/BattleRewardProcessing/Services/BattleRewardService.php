@@ -192,11 +192,11 @@ class BattleRewardService
             return;
         }
 
-        if ($this->character->is_auto_battling) {
-            return;
-        }
-
         if (!isset($this->context['total_faction_points'])) {
+            if ($this->character->is_auto_battling) {
+                return;
+            }
+
             $this->factionHandler->handleFaction($this->character, $this->monster);
 
             $this->character = $this->character->refresh();

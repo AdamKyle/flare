@@ -180,6 +180,9 @@ export default class GameChat extends React.Component<
                     message: event.message,
                     make_italic: event.makeItalic,
                     is_reward: event.isReward,
+                    time_stamp: DateTime.fromISO(
+                        event.timeStamp,
+                    ).toLocaleString(DateTime.DATETIME_MED),
                 });
 
                 this.setState(
@@ -219,6 +222,9 @@ export default class GameChat extends React.Component<
                         (Math.random() + 1).toString(36).substring(7),
                     message: event.message,
                     event_id: event.id,
+                    time_stamp: DateTime.fromISO(
+                        event.timeStamp,
+                    ).toLocaleString(DateTime.DATETIME_MED),
                 });
 
                 this.setState(
