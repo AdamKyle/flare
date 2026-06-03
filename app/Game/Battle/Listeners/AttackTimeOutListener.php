@@ -28,22 +28,24 @@ class AttackTimeOutListener
         $time = $event->character->is_dead ? 20 : 10;
 
         if ($time === 10) {
-            $time = $time - ($time * $this->characterStatBuilder->setCharacter($event->character)->buildTimeOutModifier('fight_time_out'));
+            $time = $time - (5 * $this->characterStatBuilder->setCharacter($event->character)->buildTimeOutModifier('fight_time_out'));
         }
 
         if ($time < 5) {
             $time = 5;
         }
 
+        $timeInMilliseconds = (int) round($time * 1000);
+
         $event->character->update([
             'can_attack' => false,
-            'can_attack_again_at' => now()->addSeconds($time),
+            'can_attack_again_at' => now()->addMilliseconds($timeInMilliseconds),
         ]);
 
         event(new UpdateCharacterStatus($event->character));
 
         event(new ShowTimeOutEvent($event->character->user, $time));
 
-        AttackTimeOutJob::dispatch($event->character)->delay(now()->addSeconds($time));
+        AttackTimeOutJob::dispatch($event->character)->delay(now()->addMilliseconds($timeInMilliseconds));
     }
 }

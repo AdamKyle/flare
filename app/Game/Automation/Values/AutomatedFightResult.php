@@ -44,6 +44,8 @@ class AutomatedFightResult
 
     private ?array $warningNotice = null;
 
+    private ?string $logEntryId = null;
+
     /**
      * Set up the result.
      */
@@ -68,6 +70,7 @@ class AutomatedFightResult
         $this->fightData = [];
         $this->stalledAttempt = 0;
         $this->warningNotice = null;
+        $this->logEntryId = null;
 
         return $this;
     }
@@ -253,6 +256,19 @@ class AutomatedFightResult
     }
 
     /**
+     * Set the automation log entry id.
+     *
+     * @param string $logEntryId
+     * @return AutomatedFightResult
+     */
+    public function setLogEntryId(string $logEntryId): AutomatedFightResult
+    {
+        $this->logEntryId = $logEntryId;
+
+        return $this;
+    }
+
+    /**
      * Get the result type.
      */
     public function getResultType(): AutomatedFightResultType
@@ -402,5 +418,15 @@ class AutomatedFightResult
     public function getWarningNotice(): ?array
     {
         return $this->warningNotice;
+    }
+
+    /**
+     * Get the automation log entry id.
+     *
+     * @return string|null
+     */
+    public function getLogEntryId(): ?string
+    {
+        return $this->logEntryId;
     }
 }

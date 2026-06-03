@@ -6,6 +6,7 @@ use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
+use App\Flare\Models\UnitInQueue;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitRecruitments;
@@ -97,7 +98,7 @@ class CapitalCityUnitManagementRequestHandler
             'character_id' => $character->id,
             'kingdom_id' => $data['kingdom_id'],
             'status' => CapitalCityQueueStatus::TRAVELING,
-            'messages' => null,
+            'messages' => [],
             'started_at' => now(),
             'completed_at' => $minutes,
         ];
@@ -108,7 +109,16 @@ class CapitalCityUnitManagementRequestHandler
      */
     private function prepareUnitRequests(array $unitRequestsData, ?Kingdom $toKingdom): array
     {
-        return collect($unitRequestsData)->map(function ($unitRequest) use ($toKingdom) {
+        return collect($unitRequestsData)->filter(function ($unitRequest) use ($toKingdom) {
+            $unit = GameUnit::where('name', $unitRequest['unit_name'])->first();
+
+            if (is_null($unit) || is_null($toKingdom)) {
+                return false;
+            }
+
+            return ! $this->hasActiveManualUnitQueue($toKingdom, $unit) &&
+                ! $this->hasActiveCapitalCityUnitQueue($toKingdom, $unit);
+        })->map(function ($unitRequest) use ($toKingdom) {
             $unit = GameUnit::where('name', $unitRequest['unit_name'])->first();
 
             return [
@@ -120,6 +130,40 @@ class CapitalCityUnitManagementRequestHandler
         })->toArray();
     }
 
+    private function hasActiveManualUnitQueue(Kingdom $kingdom, GameUnit $unit): bool
+    {
+        return UnitInQueue::query()
+            ->where('kingdom_id', $kingdom->id)
+            ->where('game_unit_id', $unit->id)
+            ->where('completed_at', '>', now())
+            ->exists();
+    }
+
+    private function hasActiveCapitalCityUnitQueue(Kingdom $kingdom, GameUnit $unit): bool
+    {
+        return CapitalCityUnitQueue::query()
+            ->where('kingdom_id', $kingdom->id)
+            ->whereNotIn('status', [
+                CapitalCityQueueStatus::FINISHED,
+                CapitalCityQueueStatus::REJECTED,
+                CapitalCityQueueStatus::CANCELLED,
+                CapitalCityQueueStatus::CANCELLATION_REJECTED,
+            ])
+            ->get()
+            ->contains(function (CapitalCityUnitQueue $queue) use ($unit) {
+                return collect($queue->unit_request_data)
+                    ->reject(function (array $request) {
+                        return in_array($request['secondary_status'] ?? null, [
+                            CapitalCityQueueStatus::FINISHED,
+                            CapitalCityQueueStatus::REJECTED,
+                            CapitalCityQueueStatus::CANCELLED,
+                            CapitalCityQueueStatus::CANCELLATION_REJECTED,
+                        ], true);
+                    })
+                    ->contains(fn (array $request) => ($request['name'] ?? null) === $unit->name);
+            });
+    }
+
     /**
      * Trigger events and dispatch jobs related to the unit queue.
      */
@@ -128,7 +172,7 @@ class CapitalCityUnitManagementRequestHandler
         event(new UpdateCapitalCityUnitRecruitments($character, $kingdom));
         event(new UpdateCapitalCityUnitQueueTable($character, $kingdom));
 
-        CapitalCityUnitRequestMovement::dispatch($queue->id, $character->id)->delay(now()->addMinutes($time));
+        CapitalCityUnitRequestMovement::dispatch($queue->id, $character->id)->onConnection('long_running')->onQueue('default_long')->delay(now()->addMinutes($time));
     }
 
     /**

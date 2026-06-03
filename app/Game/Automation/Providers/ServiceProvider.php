@@ -14,6 +14,7 @@ use App\Game\Automation\Services\DelveExplorationAutomationService;
 use App\Game\Automation\Services\ExplorationAutomationService;
 use App\Game\Automation\Services\ExplorationCreatureCountCalculator;
 use App\Game\Automation\Services\FactionLoyaltyAutomationService;
+use App\Game\Automation\Services\FactionLoyaltyAutomationWarningService;
 use App\Game\Automation\Values\AutomatedCraftingAttemptTracker;
 use App\Game\Automation\Values\AutomatedCraftingResult;
 use App\Game\Automation\Values\AutomatedFightResult;
@@ -54,6 +55,12 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(FactionLoyaltyAutomationService::class, function ($app) {
             return new FactionLoyaltyAutomationService(
                 $app->make(CharacterCacheData::class)
+            );
+        });
+
+        $this->app->bind(FactionLoyaltyAutomationWarningService::class, function ($app) {
+            return new FactionLoyaltyAutomationWarningService(
+                $app->make(FactionLoyaltyService::class)
             );
         });
 

@@ -101,6 +101,6 @@ class DelveExplorationAutomationService
 
     protected function startAutomation(Character $character, Location $location, int $automationId, int $delveAutomationId, array $params)
     {
-        DelveExplorationProcessing::dispatch($character->id, $location->id, $automationId, $delveAutomationId, $params, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
+        DelveExplorationProcessing::dispatch($character->id, $location->id, $automationId, $delveAutomationId, $params, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onConnection('long_running')->onQueue('default_long');
     }
 }

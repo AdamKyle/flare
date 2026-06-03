@@ -3,10 +3,12 @@
 namespace Tests\Unit\Game\Kingdoms\Services;
 
 use App\Flare\Models\CapitalCityBuildingQueue;
+use App\Flare\Models\CapitalCityResourceRequest;
 use App\Flare\Models\CapitalCityUnitQueue;
 use App\Game\Kingdoms\Service\CapitalCityQueueCleanupService;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 
@@ -17,9 +19,10 @@ class CapitalCityQueueCleanupServiceTest extends TestCase
     public function test_broken_stale_building_queue_cleanup_removes_only_broken_stale_rows(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
+        $kingdomManagement = $characterFactory->kingdomManagement()->assignKingdom()->assignBuilding();
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $staleQueue = CapitalCityBuildingQueue::create([
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -32,7 +35,8 @@ class CapitalCityQueueCleanupServiceTest extends TestCase
             'started_at' => now()->subHours(2),
             'completed_at' => now()->subHour(),
         ]);
-        $validQueue = CapitalCityBuildingQueue::create([
+        $staleQueue = $kingdomManagement->getCapitalCityBuildingQueue();
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -45,6 +49,7 @@ class CapitalCityQueueCleanupServiceTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
+        $validQueue = $kingdomManagement->getCapitalCityBuildingQueue();
 
         resolve(CapitalCityQueueCleanupService::class)->clean();
 
@@ -55,9 +60,10 @@ class CapitalCityQueueCleanupServiceTest extends TestCase
     public function test_broken_stale_unit_queue_cleanup_removes_only_broken_stale_rows(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
+        $kingdomManagement = $characterFactory->kingdomManagement()->assignKingdom();
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $staleQueue = CapitalCityUnitQueue::create([
+        $kingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -70,7 +76,8 @@ class CapitalCityQueueCleanupServiceTest extends TestCase
             'started_at' => now()->subHours(2),
             'completed_at' => now()->subHour(),
         ]);
-        $validQueue = CapitalCityUnitQueue::create([
+        $staleQueue = $kingdomManagement->getCapitalCityUnitQueue();
+        $kingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -83,6 +90,7 @@ class CapitalCityQueueCleanupServiceTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
+        $validQueue = $kingdomManagement->getCapitalCityUnitQueue();
 
         resolve(CapitalCityQueueCleanupService::class)->clean();
 
@@ -93,9 +101,10 @@ class CapitalCityQueueCleanupServiceTest extends TestCase
     public function test_valid_future_queues_are_not_removed(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
+        $kingdomManagement = $characterFactory->kingdomManagement()->assignKingdom()->assignBuilding();
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $buildingQueue = CapitalCityBuildingQueue::create([
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -108,7 +117,8 @@ class CapitalCityQueueCleanupServiceTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
-        $unitQueue = CapitalCityUnitQueue::create([
+        $buildingQueue = $kingdomManagement->getCapitalCityBuildingQueue();
+        $kingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -121,10 +131,44 @@ class CapitalCityQueueCleanupServiceTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
+        $unitQueue = $kingdomManagement->getCapitalCityUnitQueue();
 
         resolve(CapitalCityQueueCleanupService::class)->clean();
 
         $this->assertNotNull(CapitalCityBuildingQueue::find($buildingQueue->id));
         $this->assertNotNull(CapitalCityUnitQueue::find($unitQueue->id));
+    }
+
+    public function testStaleCapitalCityResourceRequestCleanupRemovesOnlyCompletedRows(): void
+    {
+        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $kingdomManagement = $characterFactory->kingdomManagement()->assignKingdom();
+        $kingdomManagement->assignCapitalCityResourceRequest([
+            'kingdom_requesting_id' => 1,
+            'request_from_kingdom_id' => 1,
+            'resources' => [],
+            'started_at' => now()->subHours(2),
+            'completed_at' => now()->subHour(),
+        ]);
+        $staleRequest = $kingdomManagement->getCapitalCityResourceRequest();
+        $kingdomManagement->assignCapitalCityResourceRequest([
+            'kingdom_requesting_id' => 1,
+            'request_from_kingdom_id' => 1,
+            'resources' => [],
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+        $futureRequest = $kingdomManagement->getCapitalCityResourceRequest();
+
+        Log::shouldReceive('warning')
+            ->once()
+            ->with('Deleted stale capital city resource request.', [
+                'resource_request_id' => $staleRequest->id,
+            ]);
+
+        (new CapitalCityQueueCleanupService)->clean();
+
+        $this->assertNull(CapitalCityResourceRequest::find($staleRequest->id));
+        $this->assertNotNull(CapitalCityResourceRequest::find($futureRequest->id));
     }
 }

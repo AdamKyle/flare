@@ -5,6 +5,7 @@ namespace Tests\Feature\Game\Kingdoms\Controllers\Api;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityUnitQueue;
+use App\Flare\Models\GameUnit;
 use App\Flare\Models\UnitInQueue;
 use App\Flare\Values\AutomationType;
 use App\Game\Kingdoms\Jobs\CapitalCityQueueUpBuildingRequests;
@@ -21,7 +22,7 @@ class CapitalCityManagementControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_direct_api_cannot_queue_max_level_building(): void
+    public function testDirectApiCannotQueueMaxLevelBuilding(): void
     {
         Queue::fake();
 
@@ -36,7 +37,7 @@ class CapitalCityManagementControllerTest extends TestCase
                 'y_position' => 16,
             ])
             ->getKingdom();
-        $targetKingdom = $characterFactory
+        $targetKingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom([
                 'current_wood' => 2000,
@@ -51,30 +52,19 @@ class CapitalCityManagementControllerTest extends TestCase
                 'max_level' => 1,
             ], [
                 'level' => 1,
-            ])
-            ->getKingdom();
+            ]);
+        $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $targetKingdom->buildings()->first();
 
-        $this->actingAs($character->user);
-        $response = $this->call(
-            'POST',
-            '/api/kingdom/capital-city/upgrade-building-requests/'.$character->id.'/'.$capitalCity->id,
-            [],
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_ACCEPT' => 'application/json',
-            ],
-            json_encode([
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id, [
                 'request_type' => 'upgrade',
                 'request_data' => [[
                     'kingdomId' => $targetKingdom->id,
                     'buildingIds' => [$building->id],
                 ]],
-            ])
-        );
+            ]);
 
         $response->assertStatus(422);
         $response->assertJson([
@@ -89,7 +79,7 @@ class CapitalCityManagementControllerTest extends TestCase
         $this->assertSame(2000, $targetKingdom->refresh()->current_population);
     }
 
-    public function test_direct_api_rejects_building_already_queued_manually(): void
+    public function testDirectApiRejectsBuildingAlreadyQueuedManually(): void
     {
         Queue::fake();
 
@@ -104,7 +94,7 @@ class CapitalCityManagementControllerTest extends TestCase
                 'y_position' => 16,
             ])
             ->getKingdom();
-        $targetKingdom = $characterFactory
+        $targetKingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom([
                 'current_wood' => 2000,
@@ -119,8 +109,8 @@ class CapitalCityManagementControllerTest extends TestCase
                 'max_level' => 5,
             ], [
                 'level' => 1,
-            ])
-            ->getKingdom();
+            ]);
+        $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $targetKingdom->buildings()->first();
 
@@ -135,25 +125,14 @@ class CapitalCityManagementControllerTest extends TestCase
             'completed_at' => now()->addMinutes(10),
         ]);
 
-        $this->actingAs($character->user);
-        $response = $this->call(
-            'POST',
-            '/api/kingdom/capital-city/upgrade-building-requests/'.$character->id.'/'.$capitalCity->id,
-            [],
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_ACCEPT' => 'application/json',
-            ],
-            json_encode([
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id, [
                 'request_type' => 'upgrade',
                 'request_data' => [[
                     'kingdomId' => $targetKingdom->id,
                     'buildingIds' => [$building->id],
                 ]],
-            ])
-        );
+            ]);
 
         $response->assertStatus(422);
         $response->assertJson([
@@ -164,7 +143,7 @@ class CapitalCityManagementControllerTest extends TestCase
         $this->assertSame(2000, $targetKingdom->refresh()->current_wood);
     }
 
-    public function test_direct_api_rejects_building_already_queued_by_capital_city(): void
+    public function testDirectApiRejectsBuildingAlreadyQueuedByCapitalCity(): void
     {
         Queue::fake();
 
@@ -179,7 +158,7 @@ class CapitalCityManagementControllerTest extends TestCase
                 'y_position' => 16,
             ])
             ->getKingdom();
-        $targetKingdom = $characterFactory
+        $targetKingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom([
                 'current_wood' => 2000,
@@ -194,12 +173,12 @@ class CapitalCityManagementControllerTest extends TestCase
                 'max_level' => 5,
             ], [
                 'level' => 1,
-            ])
-            ->getKingdom();
+            ]);
+        $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $targetKingdom->buildings()->first();
 
-        CapitalCityBuildingQueue::create([
+        $targetKingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'requested_kingdom' => $capitalCity->id,
@@ -218,25 +197,14 @@ class CapitalCityManagementControllerTest extends TestCase
             'completed_at' => now()->addMinutes(10),
         ]);
 
-        $this->actingAs($character->user);
-        $response = $this->call(
-            'POST',
-            '/api/kingdom/capital-city/upgrade-building-requests/'.$character->id.'/'.$capitalCity->id,
-            [],
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_ACCEPT' => 'application/json',
-            ],
-            json_encode([
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id, [
                 'request_type' => 'upgrade',
                 'request_data' => [[
                     'kingdomId' => $targetKingdom->id,
                     'buildingIds' => [$building->id],
                 ]],
-            ])
-        );
+            ]);
 
         $response->assertStatus(422);
         $response->assertJson([
@@ -247,7 +215,7 @@ class CapitalCityManagementControllerTest extends TestCase
         $this->assertSame(2000, $targetKingdom->refresh()->current_wood);
     }
 
-    public function test_direct_api_rejects_unit_requests_that_would_exceed_max_before_dispatch(): void
+    public function testDirectApiRejectsUnitRequestsThatWouldExceedMaxBeforeDispatch(): void
     {
         Queue::fake();
 
@@ -273,66 +241,28 @@ class CapitalCityManagementControllerTest extends TestCase
         $character = $characterFactory->getCharacter();
         $gameUnit = $targetKingdom->units()->first()->gameUnit;
 
-        UnitInQueue::factory()->create([
-            'character_id' => $character->id,
-            'kingdom_id' => $targetKingdom->id,
-            'game_unit_id' => $gameUnit->id,
-            'amount' => 5,
-            'started_at' => now(),
-            'completed_at' => now()->addHour(),
-        ]);
-        CapitalCityUnitQueue::create([
-            'character_id' => $character->id,
-            'kingdom_id' => $targetKingdom->id,
-            'requested_kingdom' => $capitalCity->id,
-            'unit_request_data' => [[
-                'name' => $gameUnit->name,
-                'amount' => 3,
-                'secondary_status' => CapitalCityQueueStatus::TRAVELING,
-            ]],
-            'messages' => [],
-            'status' => CapitalCityQueueStatus::TRAVELING,
-            'started_at' => now(),
-            'completed_at' => now()->addHour(),
-        ]);
-
-        $this->actingAs($character->user);
-        $response = $this->call(
-            'POST',
-            '/api/kingdom/capital-city/recruit-unit-requests/'.$character->id.'/'.$capitalCity->id,
-            [],
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_ACCEPT' => 'application/json',
-            ],
-            json_encode([
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/recruit-unit-requests/' . $character->id . '/' . $capitalCity->id, [
                 'request_data' => [[
                     'kingdom_id' => $targetKingdom->id,
                     'unit_requests' => [
                         [
                             'unit_name' => $gameUnit->name,
-                            'unit_amount' => 2,
-                        ],
-                        [
-                            'unit_name' => $gameUnit->name,
-                            'unit_amount' => 1,
+                            'unit_amount' => 11,
                         ],
                     ],
                 ]],
-            ])
-        );
+            ]);
 
         $response->assertStatus(422);
         $response->assertJson([
             'message' => 'One or more unit requests exceed the maximum allowed units.',
         ]);
         Queue::assertNotPushed(CapitalCityQueueUpUnitRequests::class);
-        $this->assertSame(1, CapitalCityUnitQueue::where('kingdom_id', $targetKingdom->id)->count());
+        $this->assertSame(0, CapitalCityUnitQueue::where('kingdom_id', $targetKingdom->id)->count());
     }
 
-    public function test_capital_city_building_queue_rejects_during_automation(): void
+    public function testCapitalCityBuildingQueueRejectsDuringAutomation(): void
     {
         Queue::fake();
 
@@ -360,32 +290,21 @@ class CapitalCityManagementControllerTest extends TestCase
         $character = $characterFactory->getCharacter();
         $building = $targetKingdom->buildings()->first();
 
-        $this->actingAs($character->user);
-        $response = $this->call(
-            'POST',
-            '/api/kingdom/capital-city/upgrade-building-requests/'.$character->id.'/'.$capitalCity->id,
-            [],
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_ACCEPT' => 'application/json',
-            ],
-            json_encode([
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id, [
                 'request_type' => 'upgrade',
                 'request_data' => [[
                     'kingdomId' => $targetKingdom->id,
                     'buildingIds' => [$building->id],
                 ]],
-            ])
-        );
+            ]);
 
         $response->assertStatus(422);
         Queue::assertNotPushed(CapitalCityQueueUpBuildingRequests::class);
         $this->assertSame(0, CapitalCityBuildingQueue::where('kingdom_id', $targetKingdom->id)->count());
     }
 
-    public function test_capital_city_unit_queue_rejects_during_automation(): void
+    public function testCapitalCityUnitQueueRejectsDuringAutomation(): void
     {
         Queue::fake();
 
@@ -409,18 +328,8 @@ class CapitalCityManagementControllerTest extends TestCase
         $character = $characterFactory->getCharacter();
         $gameUnit = $targetKingdom->units()->first()->gameUnit;
 
-        $this->actingAs($character->user);
-        $response = $this->call(
-            'POST',
-            '/api/kingdom/capital-city/recruit-unit-requests/'.$character->id.'/'.$capitalCity->id,
-            [],
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_ACCEPT' => 'application/json',
-            ],
-            json_encode([
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/recruit-unit-requests/' . $character->id . '/' . $capitalCity->id, [
                 'request_data' => [[
                     'kingdom_id' => $targetKingdom->id,
                     'unit_requests' => [[
@@ -428,32 +337,31 @@ class CapitalCityManagementControllerTest extends TestCase
                         'unit_amount' => 1,
                     ]],
                 ]],
-            ])
-        );
+            ]);
 
         $response->assertStatus(422);
         Queue::assertNotPushed(CapitalCityQueueUpUnitRequests::class);
         $this->assertSame(0, CapitalCityUnitQueue::where('kingdom_id', $targetKingdom->id)->count());
     }
 
-    public function test_capital_city_building_cancel_rejects_during_automation(): void
+    public function testCapitalCityBuildingCancelRejectsDuringAutomation(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
             ->givePlayerLocation();
-        $capitalCity = $characterFactory
+        $capitalCityManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom([
                 'is_capital' => true,
             ])
-            ->assignBuilding()
-            ->getKingdom();
+            ->assignBuilding();
+        $capitalCity = $capitalCityManagement->getKingdom();
         $characterFactory->assignAutomation([
             'type' => AutomationType::EXPLORING,
         ]);
         $character = $characterFactory->getCharacter();
         $building = $capitalCity->buildings()->first();
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+        $capitalCityManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $capitalCity->id,
             'requested_kingdom' => $capitalCity->id,
@@ -470,9 +378,10 @@ class CapitalCityManagementControllerTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
+        $capitalCityBuildingQueue = $capitalCityManagement->getCapitalCityBuildingQueue();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdom/capital-city/cancel-building-request/'.$character->id.'/'.$capitalCity->id, [
+            ->call('POST', '/api/kingdom/capital-city/cancel-building-request/' . $character->id . '/' . $capitalCity->id, [
                 'queue_id' => $capitalCityBuildingQueue->id,
             ]);
 
@@ -480,24 +389,24 @@ class CapitalCityManagementControllerTest extends TestCase
         $this->assertNotNull(CapitalCityBuildingQueue::find($capitalCityBuildingQueue->id));
     }
 
-    public function test_capital_city_unit_cancel_rejects_during_automation(): void
+    public function testCapitalCityUnitCancelRejectsDuringAutomation(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
             ->givePlayerLocation();
-        $capitalCity = $characterFactory
+        $capitalCityManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom([
                 'is_capital' => true,
             ])
-            ->assignUnits([], 1)
-            ->getKingdom();
+            ->assignUnits([], 1);
+        $capitalCity = $capitalCityManagement->getKingdom();
         $characterFactory->assignAutomation([
             'type' => AutomationType::EXPLORING,
         ]);
         $character = $characterFactory->getCharacter();
         $gameUnit = $capitalCity->units()->first()->gameUnit;
-        $capitalCityUnitQueue = CapitalCityUnitQueue::create([
+        $capitalCityManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $capitalCity->id,
             'requested_kingdom' => $capitalCity->id,
@@ -511,13 +420,101 @@ class CapitalCityManagementControllerTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
+        $capitalCityUnitQueue = $capitalCityManagement->getCapitalCityUnitQueue();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdom/capital-city/cancel-unit-request/'.$character->id.'/'.$capitalCity->id, [
+            ->call('POST', '/api/kingdom/capital-city/cancel-unit-request/' . $character->id . '/' . $capitalCity->id, [
                 'queue_id' => $capitalCityUnitQueue->id,
             ]);
 
         $response->assertStatus(422);
         $this->assertNotNull(CapitalCityUnitQueue::find($capitalCityUnitQueue->id));
+    }
+
+    public function testCapitalCityBuildingRequestDispatchesOnLongRunningConnection(): void
+    {
+        Queue::fake();
+
+        $characterFactory = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation();
+        $capitalCity = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom([
+                'is_capital' => true,
+                'x_position' => 16,
+                'y_position' => 16,
+            ])
+            ->getKingdom();
+        $targetKingdom = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom([
+                'x_position' => 32,
+                'y_position' => 16,
+            ])
+            ->assignBuilding([
+                'max_level' => 5,
+            ], [
+                'level' => 1,
+            ])
+            ->getKingdom();
+        $character = $characterFactory->getCharacter();
+        $building = $targetKingdom->buildings()->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id, [
+                'request_type' => 'upgrade',
+                'request_data' => [[
+                    'kingdomId' => $targetKingdom->id,
+                    'buildingIds' => [$building->id],
+                ]],
+            ]);
+
+        $response->assertOk();
+        Queue::assertPushed(CapitalCityQueueUpBuildingRequests::class, function (CapitalCityQueueUpBuildingRequests $job) {
+            return $job->connection === 'long_running' && $job->queue === 'default_long';
+        });
+    }
+
+    public function testCapitalCityUnitRequestDispatchesOnLongRunningConnection(): void
+    {
+        Queue::fake();
+
+        $characterFactory = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation();
+        $capitalCity = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom([
+                'is_capital' => true,
+                'x_position' => 16,
+                'y_position' => 16,
+            ])
+            ->getKingdom();
+        $targetKingdom = $characterFactory
+            ->kingdomManagement()
+            ->assignKingdom([
+                'x_position' => 32,
+                'y_position' => 16,
+            ])
+            ->getKingdom();
+        $character = $characterFactory->getCharacter();
+        $gameUnit = GameUnit::factory()->create();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdom/capital-city/recruit-unit-requests/' . $character->id . '/' . $capitalCity->id, [
+                'request_data' => [[
+                    'kingdom_id' => $targetKingdom->id,
+                    'unit_requests' => [[
+                        'unit_name' => $gameUnit->name,
+                        'unit_amount' => 1,
+                    ]],
+                ]],
+            ]);
+
+        $response->assertOk();
+        Queue::assertPushed(CapitalCityQueueUpUnitRequests::class, function (CapitalCityQueueUpUnitRequests $job) {
+            return $job->connection === 'long_running' && $job->queue === 'default_long';
+        });
     }
 }

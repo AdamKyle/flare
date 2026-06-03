@@ -71,7 +71,9 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
 
         $capitalCityUnitManagement->possiblyCreateKingdomLog($queueData);
 
-        CapitalCityUnitCancellation::where('id', $this->capitalCityCancellationQueueId)->delete();
+        if (! collect($responseData)->contains(fn ($response) => $response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED)) {
+            CapitalCityUnitCancellation::where('id', $this->capitalCityCancellationQueueId)->delete();
+        }
 
         event(new UpdateCapitalCityUnitQueueTable($queueData->character));
     }
@@ -89,9 +91,11 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
 
                 // @codeCoverageIgnoreStart
                 CapitalCityUnitRequestCancellationMovement::dispatch(
+                    $this->capitalCityCancellationQueueId,
                     $this->capitalCityQueueId,
-                    $this->characterId
-                )->delay($time);
+                    $this->characterId,
+                    $this->dataForCancellation
+                )->onConnection('long_running')->onQueue('default_long')->delay($time);
 
                 return true;
                 // @codeCoverageIgnoreEnd
@@ -119,7 +123,7 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
 
             if (is_null($unitQueue)) {
 
-                CapitalCityUnitQueue::where('id', $this->capitalCityCancellationQueueId)->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
+                CapitalCityUnitCancellation::where('id', $this->capitalCityCancellationQueueId)->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
 
                 $messages[] = 'Failed to cancel unit recruitment. Seems it must already be done for unit: '.$gameUnit->name;
 
@@ -127,7 +131,10 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
 
                 event(new UpdateCapitalCityUnitQueueTable($queueData->character));
 
-                return [];
+                return [
+                    'unit_id' => $unitId,
+                    'status' => CapitalCityQueueStatus::CANCELLATION_REJECTED,
+                ];
             }
 
             $unitService->cancelRecruit($unitQueue);
@@ -146,7 +153,6 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
     {
 
         $responseLookup = collect($responseData)
-            ->reject(fn ($response) => $response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED)
             ->pluck('status', 'unit_id')
             ->toArray();
 
@@ -154,7 +160,7 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
             $gameUnit = GameUnit::where('name', $request['name'])->first();
 
             if (isset($responseLookup[$gameUnit->id])) {
-                $request['secondary_status'] = CapitalCityQueueStatus::CANCELLED;
+                $request['secondary_status'] = $responseLookup[$gameUnit->id];
             }
 
             return $request;

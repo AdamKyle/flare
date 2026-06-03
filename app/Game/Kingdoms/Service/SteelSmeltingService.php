@@ -113,7 +113,7 @@ class SteelSmeltingService
             'amount_to_smelt' => $originalAmount,
         ]);
 
-        SmeltSteel::dispatch($smeltingJob->id)->delay(now()->addMinutes($time))->onQueue('default_long');
+        SmeltSteel::dispatch($smeltingJob->id)->delay(now()->addMinutes($time))->onConnection('long_running')->onQueue('default_long');
 
         $this->updateKingdom->updateKingdom($kingdom);
     }

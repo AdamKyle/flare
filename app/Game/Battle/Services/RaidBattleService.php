@@ -234,7 +234,7 @@ class RaidBattleService
             return $this->successResult($resultData);
         }
 
-        BattleAttackHandler::dispatch($character->id, $monsterId);
+        BattleAttackHandler::dispatch($character->id, $monsterId)->onQueue('battle_reward_processing')->onConnection('battle_reward_processing');
 
         return $this->successResult($resultData);
     }
@@ -316,7 +316,8 @@ class RaidBattleService
 
             if (is_null($raid)) {
                 BattleAttackHandler::dispatch($character->id, $this->monsterPlayerFight->getMonster()['id'])
-                    ->onQueue('default_long')
+                    ->onQueue('battle_reward_processing')
+                    ->onConnection('battle_reward_processing')
                     ->delay(now()->addSeconds(2));
 
                 return $this->successResult([
@@ -327,7 +328,8 @@ class RaidBattleService
             }
 
             RaidBossRewardHandler::dispatch($character->id, $monsterId, $raid->id)
-                ->onQueue('default_long')
+                ->onQueue('battle_reward_processing')
+                ->onConnection('battle_reward_processing')
                 ->delay(now()->addSeconds(2));
 
             return $this->successResult([

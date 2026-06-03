@@ -61,6 +61,7 @@ use App\Game\Kingdoms\Transformers\SelectedKingdom;
 use App\Game\Kingdoms\Transformers\UnitMovementTransformer;
 use App\Game\Kingdoms\Validation\KingdomBuildingResourceValidation;
 use App\Game\Kingdoms\Validation\KingdomUnitResourceValidation;
+use App\Game\Kingdoms\Validators\BuildingUpgradeRequestValidator;
 use App\Game\Kingdoms\Validators\MoveUnitsValidator;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Maps\Services\LocationService;
@@ -237,6 +238,10 @@ class ServiceProvider extends ApplicationServiceProvider
             return new MoveUnitsValidator;
         });
 
+        $this->app->bind(BuildingUpgradeRequestValidator::class, function () {
+            return new BuildingUpgradeRequestValidator;
+        });
+
         $this->app->bind(UnitService::class, function ($app) {
             return new UnitService(
                 $app->make(UpdateKingdomHandler::class),
@@ -381,7 +386,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(KingdomQueueService::class, function ($app) {
             return new KingdomQueueService(
                 $app->make(Manager::class),
-                $app->make(UnitMovementTransformer::class)
+                $app->make(UnitMovementTransformer::class),
             );
         });
 

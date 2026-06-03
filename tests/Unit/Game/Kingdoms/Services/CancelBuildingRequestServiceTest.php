@@ -19,10 +19,11 @@ class CancelBuildingRequestServiceTest extends TestCase
         Event::fake();
 
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->assignBuilding()->getKingdom();
+        $kingdomManagement = $characterFactory->kingdomManagement()->assignKingdom()->assignBuilding();
+        $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings->first();
         $character = $characterFactory->getCharacter();
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -39,6 +40,7 @@ class CancelBuildingRequestServiceTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHours(2),
         ]);
+        $capitalCityBuildingQueue = $kingdomManagement->getCapitalCityBuildingQueue();
 
         $result = resolve(CancelBuildingRequestService::class)->handleCancelRequest($character, $kingdom, [
             'queue_id' => $capitalCityBuildingQueue->id,
@@ -52,9 +54,10 @@ class CancelBuildingRequestServiceTest extends TestCase
         Event::fake();
 
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
+        $kingdomManagement = $characterFactory->kingdomManagement()->assignKingdom()->assignBuilding();
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -68,6 +71,7 @@ class CancelBuildingRequestServiceTest extends TestCase
             'started_at' => now()->subHours(2),
             'completed_at' => now()->subHour(),
         ]);
+        $capitalCityBuildingQueue = $kingdomManagement->getCapitalCityBuildingQueue();
 
         $result = resolve(CancelBuildingRequestService::class)->handleCancelRequest($character, $kingdom, [
             'queue_id' => $capitalCityBuildingQueue->id,

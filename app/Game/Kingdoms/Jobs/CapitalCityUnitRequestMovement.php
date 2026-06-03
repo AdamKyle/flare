@@ -41,7 +41,7 @@ class CapitalCityUnitRequestMovement implements ShouldQueue
                 CapitalCityUnitRequestMovement::dispatch(
                     $this->capitalCityQueueId,
                     $this->characterId,
-                )->delay($time);
+                )->onConnection('long_running')->onQueue('default_long')->delay($time);
 
                 return;
                 // @codeCoverageIgnoreEnd

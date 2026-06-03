@@ -13,7 +13,6 @@ use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingUpgrades;
 use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequestMovement;
 use App\Game\Kingdoms\Service\KingdomBuildingService;
 use App\Game\Kingdoms\Service\UnitMovementService;
-use App\Game\Kingdoms\Values\BuildingQueueType;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Carbon\Carbon;
@@ -22,8 +21,13 @@ use Illuminate\Support\Facades\Log;
 
 class CapitalCityBuildingManagementRequestHandler
 {
+
     use ResponseBuilder;
 
+    /**
+     * @param KingdomBuildingService $kingdomBuildingService
+     * @param UnitMovementService $unitMovementService
+     */
     public function __construct(
         private readonly KingdomBuildingService $kingdomBuildingService,
         private readonly UnitMovementService $unitMovementService,
@@ -33,6 +37,12 @@ class CapitalCityBuildingManagementRequestHandler
      * Create the requests based on the kingdoms and their requests.
      *
      * Each request is an object of kingdom id and an array of building ids.
+     *
+     * @param Character $character
+     * @param Kingdom $kingdom
+     * @param array $requests
+     * @param string $type
+     * @return array
      */
     public function createRequestQueue(Character $character, Kingdom $kingdom, array $requests, string $type): array
     {
@@ -61,8 +71,9 @@ class CapitalCityBuildingManagementRequestHandler
                 'building_request_data' => $buildingQueueData,
                 'character_id' => $character->id,
                 'status' => CapitalCityQueueStatus::TRAVELING,
+                'messages' => [],
                 'started_at' => $currentTime,
-                'completed_at' => $travelTimeNeeded,
+                'completed_at' => $travelTimeNeeded
             ]);
 
             $dispatchTime = $travelTimeNeeded;
@@ -92,6 +103,10 @@ class CapitalCityBuildingManagementRequestHandler
 
     /**
      * Find buildings for a kingdom based off the array of ids.
+     *
+     * @param int $kingdomId
+     * @param array $buildingIds
+     * @return Collection
      */
     private function getBuildingsForRequest(int $kingdomId, array $buildingIds): Collection
     {
@@ -101,9 +116,10 @@ class CapitalCityBuildingManagementRequestHandler
     /**
      * Calculate the time required for unit movement.
      *
-     * @param  Character  $character  The character initiating the request.
-     * @param  Kingdom  $toKingdom  The target kingdom for the movement.
-     * @param  int  $kingdomId  The ID of the originating kingdom.
+     * @param Character $character The character initiating the request.
+     * @param Kingdom $toKingdom The target kingdom for the movement.
+     * @param int $kingdomId The ID of the originating kingdom.
+     *
      * @return int The time required for the movement in minutes.
      */
     private function calculateTravelTime(Character $character, Kingdom $toKingdom, int $kingdomId): int
@@ -119,18 +135,24 @@ class CapitalCityBuildingManagementRequestHandler
     /**
      * Build the queue data for creating a new building upgrade request.
      *
-     * @param  Collection  $buildings  The collection of buildings to be upgraded.
-     * @param  string  $type  The type of request ('upgrade' or otherwise).
+     * @param Collection $buildings The collection of buildings to be upgraded.
+     * @param string $type The type of request ('upgrade' or otherwise).
+     *
      * @return array The queue data for the bbuildQueueDatauilding upgrade request.
      */
     private function buildQueueData(Collection $buildings, string $type): array
     {
         return $buildings->filter(function ($building) use ($type) {
-            return $type !== 'upgrade' || (
-                $building->level < $building->gameBuilding->max_level &&
-                ! $this->hasActiveManualUpgradeQueue($building) &&
-                ! $this->hasActiveCapitalCityUpgradeQueue($building)
-            );
+            if ($this->hasActiveManualBuildingQueue($building) || $this->hasActiveCapitalCityBuildingQueue($building)) {
+                return false;
+            }
+
+            if ($type === 'upgrade') {
+                return $building->level < $building->gameBuilding->max_level &&
+                    $building->current_durability >= $building->max_durability;
+            }
+
+            return true;
         })->map(function ($building) use ($type) {
             $fromLevel = $type === 'upgrade' ? $building->level : null;
             $toLevel = $type === 'upgrade' ? $building->level + 1 : null;
@@ -148,16 +170,15 @@ class CapitalCityBuildingManagementRequestHandler
         })->toArray();
     }
 
-    private function hasActiveManualUpgradeQueue(KingdomBuilding $building): bool
+    private function hasActiveManualBuildingQueue(KingdomBuilding $building): bool
     {
         return BuildingInQueue::query()
             ->where('kingdom_id', $building->kingdom_id)
             ->where('building_id', $building->id)
-            ->where('type', BuildingQueueType::UPGRADE)
             ->exists();
     }
 
-    private function hasActiveCapitalCityUpgradeQueue(KingdomBuilding $building): bool
+    private function hasActiveCapitalCityBuildingQueue(KingdomBuilding $building): bool
     {
         return CapitalCityBuildingQueue::query()
             ->where('kingdom_id', $building->kingdom_id)
@@ -165,17 +186,18 @@ class CapitalCityBuildingManagementRequestHandler
                 CapitalCityQueueStatus::REJECTED,
                 CapitalCityQueueStatus::FINISHED,
                 CapitalCityQueueStatus::CANCELLED,
+                CapitalCityQueueStatus::CANCELLATION_REJECTED,
             ])
             ->get()
             ->contains(function (CapitalCityBuildingQueue $queue) use ($building) {
                 return collect($queue->building_request_data)
                     ->contains(function (array $request) use ($building) {
-                        return $request['type'] === 'upgrade' &&
-                            (int) $request['building_id'] === $building->id &&
+                        return (int) $request['building_id'] === $building->id &&
                             ! in_array($request['secondary_status'], [
                                 CapitalCityQueueStatus::REJECTED,
                                 CapitalCityQueueStatus::FINISHED,
                                 CapitalCityQueueStatus::CANCELLED,
+                                CapitalCityQueueStatus::CANCELLATION_REJECTED,
                             ], true);
                     });
             });
@@ -184,18 +206,22 @@ class CapitalCityBuildingManagementRequestHandler
     /**
      * Dispatch the queue movement job.
      *
-     * @param  CapitalCityBuildingQueue  $queue  The created building queue.
+     * @param CapitalCityBuildingQueue $queue The created building queue.
+     * @param Carbon $dispatchTime
+     * @return void
      */
     private function dispatchQueueMovement(CapitalCityBuildingQueue $queue, Carbon $dispatchTime): void
     {
-        CapitalCityBuildingRequestMovement::dispatch($queue->id)->delay($dispatchTime)->onQueue('default_long');
+        CapitalCityBuildingRequestMovement::dispatch($queue->id)->onConnection('long_running')->onQueue('default_long')->delay($dispatchTime);
     }
 
     /**
      * Trigger events for updating capital city building upgrades and queue table.
      *
-     * @param  Character  $character  The character initiating the request.
-     * @param  Kingdom  $kingdom  The kingdom from which the request is made.
+     * @param Character $character The character initiating the request.
+     * @param Kingdom $kingdom The kingdom from which the request is made.
+     *
+     * @return void
      */
     private function sendOffEvents(Character $character, Kingdom $kingdom): void
     {

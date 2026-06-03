@@ -81,7 +81,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('process:scheduled-events')->everyFiveMinutes()->timezone(config('app.timezone'));
 
         // Process ressurecting a raid boss.
-        $schedule->command('ressurect:raid-boss')->hourly()->timezone(config('app.timezone'));
+        $schedule->command('ressurect:raid-boss')->weekly()->timezone(config('app.timezone'));
 
         // End scheduled events
         $schedule->command('end:scheduled-event')->everyFiveMinutes()->timezone(config('app.timezone'));

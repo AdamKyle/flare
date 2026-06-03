@@ -220,6 +220,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
                 'total_xp' => 10,
                 'total_faction_points' => 0,
                 'total_skill_xp' => 5,
+                'skip_faction_loyalty_update_event' => true,
             ]);
 
         $result = $this->handler
@@ -328,17 +329,12 @@ class AutomatedBountyFightHandlerTest extends TestCase
             ],
         ];
 
-        $this->factionLoyaltyAutomation->log()->update([
-            'fight_logs' => [
-                [
-                    'outcome' => AutomatedFightResultType::BOUNTY_STALLED_RETRY->value,
-                    'monster_id' => $bountyMonster->id,
-                    'monster_name' => $bountyMonster->name,
-                    'is_bounty_target' => true,
-                    'is_training' => false,
-                    'stalled_attempt' => 1,
-                ],
-            ],
+        $this->factionLoyaltyAutomation->update([
+            'last_fight_outcome' => AutomatedFightResultType::BOUNTY_STALLED_RETRY->value,
+            'last_fight_monster_id' => $bountyMonster->id,
+            'last_fight_was_bounty_target' => true,
+            'last_fight_was_training' => false,
+            'last_fight_stalled_attempt' => 1,
         ]);
 
         $this->monsterFightService
@@ -380,21 +376,12 @@ class AutomatedBountyFightHandlerTest extends TestCase
                 'current_monster_health' => 5,
             ],
         ];
-        $fightLogs = [];
-
-        for ($i = 1; $i <= 9; $i++) {
-            $fightLogs[] = [
-                'outcome' => AutomatedFightResultType::BOUNTY_STALLED_RETRY->value,
-                'monster_id' => $bountyMonster->id,
-                'monster_name' => $bountyMonster->name,
-                'is_bounty_target' => true,
-                'is_training' => false,
-                'stalled_attempt' => $i,
-            ];
-        }
-
-        $this->factionLoyaltyAutomation->log()->update([
-            'fight_logs' => $fightLogs,
+        $this->factionLoyaltyAutomation->update([
+            'last_fight_outcome' => AutomatedFightResultType::BOUNTY_STALLED_RETRY->value,
+            'last_fight_monster_id' => $bountyMonster->id,
+            'last_fight_was_bounty_target' => true,
+            'last_fight_was_training' => false,
+            'last_fight_stalled_attempt' => 9,
         ]);
 
         $this->monsterFightService
@@ -729,6 +716,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
                 'total_xp' => 500,
                 'total_faction_points' => 0,
                 'total_skill_xp' => 250,
+                'skip_faction_loyalty_update_event' => true,
             ]);
 
         $result = $this->handler
@@ -759,14 +747,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
 
         $this->factionLoyaltyAutomation->update([
             'failed_bounty_monster_id' => $bountyMonster->id,
-        ]);
-        $this->factionLoyaltyAutomation->log()->update([
-            'fight_logs' => [
-                [
-                    'failed_bounty_monster_id' => $bountyMonster->id,
-                    'outcome' => AutomatedFightResultType::TRAINING_BATCH_COMPLETED->value,
-                ],
-            ],
+            'trained_failed_bounty_monster_id' => $bountyMonster->id,
         ]);
 
         $this->monsterFightService

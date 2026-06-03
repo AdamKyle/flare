@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
+use Exception;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityResourceRequest as CapitalCityResourceRequestModel;
 use App\Flare\Models\CapitalCityUnitQueue;
@@ -11,7 +12,6 @@ use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessBuildingReq
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessUnitRequestHandler;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
-use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -45,7 +45,7 @@ class CapitalCityResourceRequest implements ShouldQueue
         }
 
         if (! $queueData->completed_at->lessThanOrEqualTo(now())) {
-            $timeLeft = $queueData->completed_at->diffInMinutes(now());
+            $timeLeft = now()->diffInMinutes($queueData->completed_at);
 
             if ($timeLeft >= 1) {
                 if ($timeLeft <= 15) {
@@ -59,7 +59,7 @@ class CapitalCityResourceRequest implements ShouldQueue
                     $this->capitalCityQueueId,
                     $this->resourceRequestId,
                     $this->type
-                )->delay($time);
+                )->onConnection('long_running')->onQueue('default_long')->delay($time);
 
                 return;
                 // @codeCoverageIgnoreEnd
@@ -75,7 +75,7 @@ class CapitalCityResourceRequest implements ShouldQueue
         }
 
         if (! $capitalCityResourceRequestData->completed_at->lessThanOrEqualTo(now())) {
-            $timeLeft = $capitalCityResourceRequestData->completed_at->diffInMinutes(now());
+            $timeLeft = now()->diffInMinutes($capitalCityResourceRequestData->completed_at);
 
             if ($timeLeft <= 15) {
                 $time = now()->addMinutes($timeLeft);
@@ -87,7 +87,7 @@ class CapitalCityResourceRequest implements ShouldQueue
                 $this->capitalCityQueueId,
                 $this->resourceRequestId,
                 $this->type
-            )->delay($time);
+            )->onConnection('long_running')->onQueue('default_long')->delay($time);
 
             return;
         }
@@ -97,13 +97,13 @@ class CapitalCityResourceRequest implements ShouldQueue
         $requestingKingdom = $capitalCityResourceRequestData->requestingKingdom;
 
         foreach ($resourcesForKingdom as $resourceName => $resourceAmount) {
-            $newAmount = $requestingKingdom->{'current_'.$resourceName} + $resourceAmount;
+            $newAmount = $requestingKingdom->{'current_' . $resourceName} + $resourceAmount;
 
-            if ($newAmount > $requestingKingdom->{'max_'.$resourceName}) {
-                $newAmount = $requestingKingdom->{'max_'.$resourceName};
+            if ($newAmount > $requestingKingdom->{'max_' . $resourceName}) {
+                $newAmount = $requestingKingdom->{'max_' . $resourceName};
             }
 
-            $requestingKingdom->{'current_'.$resourceName} = $newAmount;
+            $requestingKingdom->{'current_' . $resourceName} = $newAmount;
         }
 
         $requestingKingdom->save();
@@ -147,6 +147,7 @@ class CapitalCityResourceRequest implements ShouldQueue
 
                 return $buildingData;
             });
+
 
             $queueData->update([
                 'building_request_data' => $updatedBuildingRequestData,

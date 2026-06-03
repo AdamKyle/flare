@@ -77,8 +77,13 @@ class FactionLoyaltyAutomationCraftingLoggerTest extends TestCase
         $this->assertNotNull($factionLoyaltyAutomationLog);
         $this->assertEquals($this->factionLoyaltyAutomation->id, $factionLoyaltyAutomationLog->faction_loyalty_automation_id);
         $this->assertEquals([], $factionLoyaltyAutomationLog->fight_logs);
+        $this->assertNotNull($factionLoyaltyAutomationLog->crafting_logs[0]['log_entry_id']);
+
+        $logEntryId = $factionLoyaltyAutomationLog->crafting_logs[0]['log_entry_id'];
+
         $this->assertEquals([
             [
+                'log_entry_id' => $logEntryId,
                 'result' => AutomatedCraftingResultType::ITEM_NOT_FOUND->value,
                 'target_item_id' => 123,
                 'crafted_item_id' => null,
@@ -182,8 +187,13 @@ class FactionLoyaltyAutomationCraftingLoggerTest extends TestCase
 
         $factionLoyaltyAutomationLog = $this->factionLoyaltyAutomation->log()->first();
 
+        $this->assertNotNull($factionLoyaltyAutomationLog->crafting_logs[0]['log_entry_id']);
+
+        $logEntryId = $factionLoyaltyAutomationLog->crafting_logs[0]['log_entry_id'];
+
         $this->assertEquals([
             [
+                'log_entry_id' => $logEntryId,
                 'result' => AutomatedCraftingResultType::CRAFTED_TARGET_ITEM->value,
                 'target_item_id' => 200,
                 'crafted_item_id' => 201,
@@ -201,6 +211,11 @@ class FactionLoyaltyAutomationCraftingLoggerTest extends TestCase
                 'created_at' => $now->toDateTimeString(),
             ],
         ], $factionLoyaltyAutomationLog->crafting_logs);
+
+        $factionLoyaltyAutomation = $this->factionLoyaltyAutomation->refresh();
+
+        $this->assertEquals('craft', $factionLoyaltyAutomation->last_automation_action);
+        $this->assertEquals($now->toDateTimeString(), $factionLoyaltyAutomation->last_automation_action_at->toDateTimeString());
     }
 
     public function test_log_uses_empty_crafting_logs_when_existing_crafting_logs_are_null(): void

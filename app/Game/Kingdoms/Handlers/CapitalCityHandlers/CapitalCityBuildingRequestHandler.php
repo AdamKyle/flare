@@ -137,6 +137,7 @@ class CapitalCityBuildingRequestHandler
     private function isInvalidUpgradeRequest(KingdomBuilding $building, array $buildingRequest): bool
     {
         return $building->level >= $building->gameBuilding->max_level ||
+            $building->current_durability < $building->max_durability ||
             (int) $buildingRequest['to_level'] > $building->gameBuilding->max_level ||
             (int) $buildingRequest['from_level'] !== $building->level;
     }
@@ -178,7 +179,7 @@ class CapitalCityBuildingRequestHandler
                 $timeTillFinished = 1;
             }
 
-            CapitalCityBuildingRequest::dispatch($capitalCityBuildingQueue->id)->delay(
+            CapitalCityBuildingRequest::dispatch($capitalCityBuildingQueue->id)->onConnection('long_running')->onQueue('default_long')->delay(
                 ($timeTillFinished >= 15 ? $timeToStart->clone()->addMinutes(15) : $timeToStart->clone()->addMinutes($timeTillFinished))
             );
 

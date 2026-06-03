@@ -5,12 +5,14 @@ namespace Tests\Unit\Game\Kingdoms\Services;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\KingdomLog;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityRequestResourcesHandler;
+use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Values\BuildingCosts;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use App\Game\Skills\Values\SkillTypeValue;
+use App\Game\Kingdoms\Values\UnitNames;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -25,7 +27,7 @@ class CapitalCityBuildingManagementTest extends TestCase
 
     private ?CapitalCityBuildingManagement $capitalCityBuildingManagement;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -83,7 +85,7 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->capitalCityBuildingManagement = resolve(CapitalCityBuildingManagement::class);
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         parent::tearDown();
 
@@ -91,7 +93,7 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->capitalCityBuildingManagement = null;
     }
 
-    public function test_it_consumes_discounted_resource_costs_for_one_capital_city_building_upgrade_when_the_building_management_passive_is_partially_trained(): void
+    public function testItConsumesDiscountedResourceCostsForOneCapitalCityBuildingUpgradeWhenTheBuildingManagementPassiveIsPartiallyTrained(): void
     {
         Event::fake();
 
@@ -138,7 +140,7 @@ class CapitalCityBuildingManagementTest extends TestCase
         $targetKingdom = $targetKingdomManagement->getKingdom();
         $building = $targetKingdom->buildings()->first();
 
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+        $targetKingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'requested_kingdom' => $capitalCity->id,
@@ -164,6 +166,7 @@ class CapitalCityBuildingManagementTest extends TestCase
             'started_at' => now(),
             'completed_at' => now(),
         ]);
+        $capitalCityBuildingQueue = $targetKingdomManagement->getCapitalCityBuildingQueue();
 
         $this->capitalCityBuildingManagement->processBuildingRequest($capitalCityBuildingQueue);
 
@@ -176,7 +179,7 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->assertSame(9720, $targetKingdom->current_population);
     }
 
-    public function test_it_consumes_discounted_resource_costs_for_multiple_capital_city_building_upgrades_when_the_building_management_passive_is_partially_trained(): void
+    public function testItConsumesDiscountedResourceCostsForMultipleCapitalCityBuildingUpgradesWhenTheBuildingManagementPassiveIsPartiallyTrained(): void
     {
         Event::fake();
 
@@ -237,7 +240,7 @@ class CapitalCityBuildingManagementTest extends TestCase
         $firstBuilding = $buildings->first();
         $secondBuilding = $buildings->last();
 
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+        $targetKingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'requested_kingdom' => $capitalCity->id,
@@ -279,6 +282,7 @@ class CapitalCityBuildingManagementTest extends TestCase
             'started_at' => now(),
             'completed_at' => now(),
         ]);
+        $capitalCityBuildingQueue = $targetKingdomManagement->getCapitalCityBuildingQueue();
 
         $this->capitalCityBuildingManagement->processBuildingRequest($capitalCityBuildingQueue);
 
@@ -291,18 +295,18 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->assertSame(9440, $targetKingdom->current_population);
     }
 
-    public function test_capital_city_building_resource_rejection_updates_building_request_data_and_top_level_status(): void
+    public function testCapitalCityBuildingResourceRejectionUpdatesBuildingRequestDataAndTopLevelStatus(): void
     {
         Event::fake();
 
         $character = $this->character->getCharacter();
-        $kingdom = $this->character
+        $kingdomManagement = $this->character
             ->kingdomManagement()
             ->assignKingdom()
-            ->assignBuilding()
-            ->getKingdom();
+            ->assignBuilding();
+        $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings->first();
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -320,6 +324,7 @@ class CapitalCityBuildingManagementTest extends TestCase
             'started_at' => now(),
             'completed_at' => now(),
         ]);
+        $capitalCityBuildingQueue = $kingdomManagement->getCapitalCityBuildingQueue();
 
         resolve(CapitalCityRequestResourcesHandler::class)->handleResourceRequests(
             $capitalCityBuildingQueue,
@@ -336,7 +341,119 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->assertSame(CapitalCityQueueStatus::REJECTED, $capitalCityBuildingQueue->building_request_data[0]['secondary_status']);
     }
 
-    public function test_mixed_valid_and_max_level_building_request_skips_max_level_without_spending_for_it(): void
+    public function testCapitalCityBuildingResourceDispatchUsesLongRunningConnection(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $character = $this->character->getCharacter();
+        $this->character
+            ->passiveSkillManagement()
+            ->assignPassiveSkill(PassiveSkillTypeValue::RESOURCE_REQUEST_TIME_REDUCTION, 0, [
+                'name' => 'Resource Request Time Reduction',
+                'resource_request_time_reduction' => 0.0,
+                'max_level' => 5,
+            ]);
+        $requestingKingdomManagement = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_stone' => 0,
+                'x_position' => 16,
+                'y_position' => 16,
+            ])
+            ->assignBuilding(['name' => BuildingCosts::MARKET_PLACE], ['level' => 5]);
+        $requestingKingdom = $requestingKingdomManagement->getKingdom();
+        $providingKingdom = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_stone' => 500,
+                'current_population' => 100,
+                'x_position' => 32,
+                'y_position' => 16,
+            ])
+            ->assignBuilding(['name' => BuildingCosts::MARKET_PLACE], ['level' => 5])
+            ->assignUnits(['name' => UnitNames::SPEARMEN], 75)
+            ->getKingdom();
+        $building = $requestingKingdom->buildings->first();
+        $requestingKingdomManagement->assignCapitalCityBuildingQueue([
+            'character_id' => $character->id,
+            'kingdom_id' => $requestingKingdom->id,
+            'requested_kingdom' => $providingKingdom->id,
+            'building_request_data' => [[
+                'building_id' => $building->id,
+                'building_name' => $building->name,
+                'missing_costs' => ['stone' => 100],
+                'secondary_status' => CapitalCityQueueStatus::REQUESTING,
+                'from_level' => 1,
+                'to_level' => 2,
+                'type' => 'upgrade',
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::PROCESSING,
+            'started_at' => now(),
+            'completed_at' => now(),
+        ]);
+        $capitalCityBuildingQueue = $requestingKingdomManagement->getCapitalCityBuildingQueue();
+
+        resolve(CapitalCityRequestResourcesHandler::class)->handleResourceRequests(
+            $capitalCityBuildingQueue,
+            $character,
+            ['stone' => 100],
+            $capitalCityBuildingQueue->building_request_data,
+            $requestingKingdom,
+            CapitalCityResourceRequestType::BUILDING_QUEUE,
+        );
+
+        Queue::assertPushed(CapitalCityResourceRequest::class, function (CapitalCityResourceRequest $job) {
+            return $job->connection === 'long_running' && $job->queue === 'default_long';
+        });
+    }
+
+    public function testCapitalCityResourceRequestRedispatchesWhenQueueIsWaitingOnLongRunningConnection(): void
+    {
+        Queue::fake();
+
+        $character = $this->character->getCharacter();
+        $kingdomManagement = $this->character
+            ->kingdomManagement()
+            ->assignKingdom()
+            ->assignBuilding();
+        $kingdom = $kingdomManagement->getKingdom();
+        $building = $kingdom->buildings->first();
+        $kingdomManagement->assignCapitalCityBuildingQueue([
+            'character_id' => $character->id,
+            'kingdom_id' => $kingdom->id,
+            'requested_kingdom' => $kingdom->id,
+            'building_request_data' => [[
+                'building_id' => $building->id,
+                'building_name' => $building->name,
+                'missing_costs' => ['stone' => 100],
+                'secondary_status' => CapitalCityQueueStatus::REQUESTING,
+                'from_level' => 1,
+                'to_level' => 2,
+                'type' => 'upgrade',
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::REQUESTING,
+            'started_at' => now(),
+            'completed_at' => now()->addMinutes(10),
+        ]);
+        $capitalCityBuildingQueue = $kingdomManagement->getCapitalCityBuildingQueue();
+
+        $job = new CapitalCityResourceRequest(
+            $capitalCityBuildingQueue->id,
+            999,
+            CapitalCityResourceRequestType::BUILDING_QUEUE,
+        );
+
+        $this->app->call([$job, 'handle']);
+
+        Queue::assertPushed(CapitalCityResourceRequest::class, function (CapitalCityResourceRequest $job) {
+            return $job->connection === 'long_running' && $job->queue === 'default_long';
+        });
+    }
+
+    public function testMixedValidAndMaxLevelBuildingRequestSkipsMaxLevelWithoutSpendingForIt(): void
     {
         Event::fake();
         Queue::fake();
@@ -406,12 +523,85 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->assertSame(5000, $targetKingdom->refresh()->current_population);
     }
 
-    public function test_no_resources_are_spent_for_rejected_max_level_buildings_during_processing(): void
+
+    public function testCancellationRejectedCapitalCityBuildingQueueDoesNotBlockNewRequest(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $character = $this->character->getCharacter();
+        $capitalCity = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'is_capital' => true,
+                'x_position' => 16,
+                'y_position' => 16,
+            ])
+            ->getKingdom();
+        $targetKingdomManagement = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 5000,
+                'current_clay' => 5000,
+                'current_stone' => 5000,
+                'current_iron' => 5000,
+                'current_population' => 5000,
+                'x_position' => 32,
+                'y_position' => 16,
+            ])
+            ->assignBuilding([
+                'name' => BuildingCosts::KEEP,
+                'max_level' => 5,
+                'stone_cost' => 100,
+                'clay_cost' => 100,
+                'wood_cost' => 100,
+                'iron_cost' => 100,
+                'steel_cost' => 0,
+                'required_population' => 10,
+            ], [
+                'level' => 1,
+            ]);
+        $targetKingdom = $targetKingdomManagement->getKingdom();
+        $building = $targetKingdom->buildings()->first();
+
+        $targetKingdomManagement->assignCapitalCityBuildingQueue([
+            'character_id' => $character->id,
+            'kingdom_id' => $targetKingdom->id,
+            'requested_kingdom' => $capitalCity->id,
+            'building_request_data' => [[
+                'building_id' => $building->id,
+                'building_name' => $building->name,
+                'type' => 'upgrade',
+                'missing_costs' => [],
+                'secondary_status' => CapitalCityQueueStatus::CANCELLATION_REJECTED,
+                'from_level' => 1,
+                'to_level' => 2,
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::CANCELLATION_REJECTED,
+            'started_at' => now()->subHour(),
+            'completed_at' => now()->subMinute(),
+        ]);
+
+        $this->capitalCityBuildingManagement->createBuildingUpgradeRequestQueue($character, $capitalCity, [[
+            'kingdomId' => $targetKingdom->id,
+            'buildingIds' => [$building->id],
+        ]], 'upgrade');
+
+        $capitalCityBuildingQueue = CapitalCityBuildingQueue::where('kingdom_id', $targetKingdom->id)
+            ->where('status', CapitalCityQueueStatus::TRAVELING)
+            ->first();
+
+        $this->assertNotNull($capitalCityBuildingQueue);
+        $this->assertSame($building->id, $capitalCityBuildingQueue->building_request_data[0]['building_id']);
+    }
+
+    public function testNoResourcesAreSpentForRejectedMaxLevelBuildingsDuringProcessing(): void
     {
         Event::fake();
 
         $character = $this->character->getCharacter();
-        $kingdom = $this->character
+        $kingdomManagement = $this->character
             ->kingdomManagement()
             ->assignKingdom([
                 'current_wood' => 5000,
@@ -430,10 +620,10 @@ class CapitalCityBuildingManagementTest extends TestCase
                 'required_population' => 100,
             ], [
                 'level' => 1,
-            ])
-            ->getKingdom();
+            ]);
+        $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -459,6 +649,7 @@ class CapitalCityBuildingManagementTest extends TestCase
             'started_at' => now(),
             'completed_at' => now(),
         ]);
+        $capitalCityBuildingQueue = $kingdomManagement->getCapitalCityBuildingQueue();
 
         $this->capitalCityBuildingManagement->processBuildingRequest($capitalCityBuildingQueue);
 
@@ -473,12 +664,12 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->assertSame(5000, $kingdom->refresh()->current_population);
     }
 
-    public function test_stale_processing_path_rejects_and_does_not_spend_resources(): void
+    public function testStaleProcessingPathRejectsAndDoesNotSpendResources(): void
     {
         Event::fake();
 
         $character = $this->character->getCharacter();
-        $kingdom = $this->character
+        $kingdomManagement = $this->character
             ->kingdomManagement()
             ->assignKingdom([
                 'current_wood' => 5000,
@@ -497,10 +688,10 @@ class CapitalCityBuildingManagementTest extends TestCase
                 'required_population' => 100,
             ], [
                 'level' => 2,
-            ])
-            ->getKingdom();
+            ]);
+        $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -526,6 +717,7 @@ class CapitalCityBuildingManagementTest extends TestCase
             'started_at' => now(),
             'completed_at' => now(),
         ]);
+        $capitalCityBuildingQueue = $kingdomManagement->getCapitalCityBuildingQueue();
 
         $this->capitalCityBuildingManagement->processBuildingRequest($capitalCityBuildingQueue);
 
@@ -541,12 +733,12 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->assertSame(5000, $kingdom->refresh()->current_population);
     }
 
-    public function test_over_max_queue_data_rejects_during_processing_without_spending_or_mutating(): void
+    public function testOverMaxQueueDataRejectsDuringProcessingWithoutSpendingOrMutating(): void
     {
         Event::fake();
 
         $character = $this->character->getCharacter();
-        $kingdom = $this->character
+        $kingdomManagement = $this->character
             ->kingdomManagement()
             ->assignKingdom([
                 'current_wood' => 5000,
@@ -565,10 +757,10 @@ class CapitalCityBuildingManagementTest extends TestCase
                 'required_population' => 100,
             ], [
                 'level' => 1,
-            ])
-            ->getKingdom();
+            ]);
+        $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $kingdom->id,
@@ -594,6 +786,7 @@ class CapitalCityBuildingManagementTest extends TestCase
             'started_at' => now(),
             'completed_at' => now(),
         ]);
+        $capitalCityBuildingQueue = $kingdomManagement->getCapitalCityBuildingQueue();
 
         $this->capitalCityBuildingManagement->processBuildingRequest($capitalCityBuildingQueue);
 

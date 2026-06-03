@@ -6,7 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\Faction;
 use App\Flare\Models\FactionLoyalty;
-use App\Flare\Models\FactionLoyaltyAutomation;
+use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\FactionLoyaltyNpc;
 use App\Flare\Models\FactionLoyaltyNpcTask;
 use App\Flare\Models\GameMap;
@@ -17,6 +17,7 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MapNameValue;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Events\Values\EventType;
+use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyAutomationWarningState;
 use Exception;
 
 class FactionLoyaltyService
@@ -54,10 +55,12 @@ class FactionLoyaltyService
             ];
         })->toArray();
 
-        $warningNotice = $this->getLatestUnreadWarningNotice($character);
+        $warningNotices = $this->getUnreadWarningNotices($character);
+        $warningNotice = $warningNotices[0] ?? null;
 
-        $factionLoyalty->factionLoyaltyNpcs->each(function (FactionLoyaltyNpc $factionLoyaltyNpc) use ($warningNotice) {
+        $factionLoyalty->factionLoyaltyNpcs->each(function (FactionLoyaltyNpc $factionLoyaltyNpc) use ($warningNotice, $warningNotices) {
             $factionLoyaltyNpc->setAttribute('faction_loyalty_warning_notice', $warningNotice);
+            $factionLoyaltyNpc->setAttribute('faction_loyalty_warning_notices', $warningNotices);
         });
 
         return $this->successResult([
@@ -74,61 +77,83 @@ class FactionLoyaltyService
      */
     public function getLatestUnreadWarningNotice(Character $character): ?array
     {
-        $factionLoyaltyAutomations = FactionLoyaltyAutomation::where('character_id', $character->id)
-            ->with('log')
-            ->orderByDesc('id')
-            ->get();
-
-        foreach ($factionLoyaltyAutomations as $factionLoyaltyAutomation) {
-            $fightLogs = $factionLoyaltyAutomation->log?->fight_logs ?? [];
-
-            foreach (array_reverse($fightLogs) as $fightLog) {
-                $warningNotice = $fightLog['warning_notice'] ?? null;
-
-                if (is_array($warningNotice) && ($warningNotice['read'] ?? true) === false) {
-                    return $warningNotice;
-                }
-            }
-        }
-
-        return null;
+        return $this->getUnreadWarningNotices($character)[0] ?? null;
     }
 
     /**
-     * Mark the latest unread faction loyalty automation warning notice as read.
+     * Get all unread faction loyalty automation warning notices.
      */
-    public function markLatestWarningNoticeRead(Character $character): void
+    public function getUnreadWarningNotices(Character $character): array
     {
-        $factionLoyaltyAutomations = FactionLoyaltyAutomation::where('character_id', $character->id)
-            ->with('log')
+        return FactionLoyaltyAutomationWarning::where('character_id', $character->id)
             ->orderByDesc('id')
-            ->get();
+            ->get()
+            ->map(function (FactionLoyaltyAutomationWarning $warning): array {
+                return [
+                    'id' => $warning->id,
+                    'type' => $warning->type,
+                    'message' => $warning->message,
+                ];
+            })
+            ->values()
+            ->toArray();
+    }
 
-        foreach ($factionLoyaltyAutomations as $factionLoyaltyAutomation) {
-            $factionLoyaltyAutomationLog = $factionLoyaltyAutomation->log;
+    /**
+     * Dismiss the latest faction loyalty automation warning notice.
+     */
+    public function dismissLatestWarningNotice(Character $character, ?int $warningId = null): array
+    {
+        $warningQuery = FactionLoyaltyAutomationWarning::where('character_id', $character->id);
+        $warning = is_null($warningId)
+            ? $warningQuery->orderByDesc('id')->first()
+            : $warningQuery->where('id', $warningId)->first();
 
-            if (is_null($factionLoyaltyAutomationLog)) {
-                continue;
-            }
+        if (is_null($warning)) {
+            return $this->automationWarningState($character);
+        }
 
-            $fightLogs = $factionLoyaltyAutomationLog->fight_logs ?? [];
+        if (! is_null($warning->faction_loyalty_automation_log_id) && in_array($warning->log_type, ['fight_logs', 'crafting_logs'], true) && ! is_null($warning->log_entry_id)) {
+            $factionLoyaltyAutomationLog = $warning->factionLoyaltyAutomationLog;
 
-            foreach (array_reverse($fightLogs, true) as $index => $fightLog) {
-                $warningNotice = $fightLog['warning_notice'] ?? null;
+            if (! is_null($factionLoyaltyAutomationLog)) {
+                $logs = $factionLoyaltyAutomationLog->{$warning->log_type} ?? [];
+                $filteredLogs = array_values(array_filter($logs, function (array $log) use ($warning): bool {
+                    return ($log['log_entry_id'] ?? null) !== $warning->log_entry_id;
+                }));
 
-                if (! is_array($warningNotice) || ($warningNotice['read'] ?? true) !== false) {
-                    continue;
+                if ($filteredLogs !== $logs) {
+                    $factionLoyaltyAutomationLog->update([
+                        $warning->log_type => $filteredLogs,
+                    ]);
                 }
-
-                $fightLogs[$index]['warning_notice']['read'] = true;
-
-                $factionLoyaltyAutomationLog->update([
-                    'fight_logs' => array_values($fightLogs),
-                ]);
-
-                return;
             }
         }
+
+        $warning->delete();
+
+        return $this->automationWarningState($character);
+    }
+
+    /**
+     * Build and dispatch the faction loyalty automation warning state.
+     *
+     * @param Character $character
+     * @return array
+     */
+    private function automationWarningState(Character $character): array
+    {
+        $warningNotices = $this->getUnreadWarningNotices($character);
+        $warningNotice = $warningNotices[0] ?? null;
+        $hasWarning = count($warningNotices) > 0;
+
+        event(new FactionLoyaltyAutomationWarningState($character->user, $hasWarning, $warningNotices));
+
+        return [
+            'has_warning' => $hasWarning,
+            'warning_notices' => $warningNotices,
+            'warning_notice' => $warningNotice,
+        ];
     }
 
     /**

@@ -6,10 +6,11 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Models\FactionLoyaltyAutomationLog;
+use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\GameMap;
-use App\Flare\Models\Monster;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
+use App\Flare\Models\Monster;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MapNameValue;
 use App\Game\Events\Values\EventType;
@@ -19,19 +20,20 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateFactionLoyalty;
+use Tests\Traits\CreateFactionLoyaltyAutomationWarning;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateNpc;
 
 class FactionLoyaltyServiceTest extends TestCase
 {
-    use CreateEvent, CreateFactionLoyalty, CreateItem, CreateMonster, CreateNpc, RefreshDatabase;
+    use CreateEvent, CreateFactionLoyalty, CreateFactionLoyaltyAutomationWarning, CreateItem, CreateMonster, CreateNpc, RefreshDatabase;
 
     private ?Character $character = null;
 
     private ?FactionLoyaltyService $factionLoyaltyService = null;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -39,7 +41,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->factionLoyaltyService = resolve(FactionLoyaltyService::class);
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         parent::tearDown();
 
@@ -48,7 +50,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->factionLoyaltyService = null;
     }
 
-    public function test_get_no_faction_loyalty_for_plane()
+    public function testGetNoFactionLoyaltyForPlane()
     {
         $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -59,7 +61,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertEquals('You have not pledged to a faction.', $result['message']);
     }
 
-    public function test_has_plane_loyalty()
+    public function testHasPlaneLoyalty()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -95,7 +97,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertEquals($this->character->map->gameMap->name, $result['map_name']);
     }
 
-    public function test_get_loyalty_info_for_plane_includes_latest_unread_warning_notice(): void
+    public function testGetLoyaltyInfoForPlaneIncludesLatestUnreadWarningNotice(): void
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -132,28 +134,62 @@ class FactionLoyaltyServiceTest extends TestCase
             'faction_loyalty_npc_id' => $factionNpc->id,
         ]);
 
-        FactionLoyaltyAutomationLog::factory()->create([
+        $automationLog = FactionLoyaltyAutomationLog::factory()->create([
             'faction_loyalty_automation_id' => $automation->id,
             'fight_logs' => [
                 [
+                    'log_entry_id' => 'warning-log-entry',
                     'warning_notice' => [
-                        'message' => 'Warning message.',
+                        'message' => 'Log warning message.',
                         'read' => false,
                     ],
                 ],
             ],
         ]);
+        $olderWarning = $this->createFactionLoyaltyAutomationWarning([
+            'character_id' => $this->character->id,
+            'faction_loyalty_automation_id' => $automation->id,
+            'faction_loyalty_automation_log_id' => $automationLog->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'log_type' => 'fight_logs',
+            'log_entry_id' => 'warning-log-entry',
+            'type' => 'bounty',
+            'message' => 'Older warning message.',
+        ]);
+        $latestWarning = $this->createFactionLoyaltyAutomationWarning([
+            'character_id' => $this->character->id,
+            'faction_loyalty_automation_id' => $automation->id,
+            'faction_loyalty_automation_log_id' => $automationLog->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'log_type' => 'fight_logs',
+            'log_entry_id' => 'warning-log-entry',
+            'type' => 'crafting',
+            'message' => 'Latest warning message.',
+        ]);
 
         $result = $this->factionLoyaltyService->getLoyaltyInfoForPlane($this->character->refresh());
-        $warningNotice = $result['faction_loyalty']->factionLoyaltyNpcs->first()->faction_loyalty_warning_notice;
+        $factionLoyaltyNpc = $result['faction_loyalty']->factionLoyaltyNpcs->first();
 
         $this->assertEquals([
-            'message' => 'Warning message.',
-            'read' => false,
-        ], $warningNotice);
+            'id' => $latestWarning->id,
+            'type' => 'crafting',
+            'message' => 'Latest warning message.',
+        ], $factionLoyaltyNpc->faction_loyalty_warning_notice);
+        $this->assertEquals([
+            [
+                'id' => $latestWarning->id,
+                'type' => 'crafting',
+                'message' => 'Latest warning message.',
+            ],
+            [
+                'id' => $olderWarning->id,
+                'type' => 'bounty',
+                'message' => 'Older warning message.',
+            ],
+        ], $factionLoyaltyNpc->faction_loyalty_warning_notices);
     }
 
-    public function test_mark_latest_warning_notice_read_updates_fight_log_notice(): void
+    public function testDismissLatestWarningNoticeDeletesLatestWarningNoticeAndReferencedLogEntry(): void
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -188,20 +224,73 @@ class FactionLoyaltyServiceTest extends TestCase
             'faction_loyalty_automation_id' => $automation->id,
             'fight_logs' => [
                 [
+                    'log_entry_id' => 'older-log-entry',
+                    'outcome' => 'older_warning',
+                    'monster_id' => 10,
+                ],
+                [
+                    'log_entry_id' => 'latest-log-entry',
+                    'outcome' => 'latest_warning',
+                    'monster_id' => 20,
                     'warning_notice' => [
-                        'message' => 'Warning message.',
+                        'message' => 'Log warning message.',
                         'read' => false,
                     ],
                 ],
+                [
+                    'log_entry_id' => 'unrelated-log-entry',
+                    'outcome' => 'unrelated_warning',
+                    'monster_id' => 30,
+                ],
             ],
         ]);
+        $olderWarning = $this->createFactionLoyaltyAutomationWarning([
+            'character_id' => $this->character->id,
+            'faction_loyalty_automation_id' => $automation->id,
+            'faction_loyalty_automation_log_id' => $automationLog->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'log_type' => 'fight_logs',
+            'log_entry_id' => 'older-log-entry',
+            'type' => 'bounty',
+            'message' => 'Older warning message.',
+        ]);
+        $latestWarning = $this->createFactionLoyaltyAutomationWarning([
+            'character_id' => $this->character->id,
+            'faction_loyalty_automation_id' => $automation->id,
+            'faction_loyalty_automation_log_id' => $automationLog->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'log_type' => 'fight_logs',
+            'log_entry_id' => 'latest-log-entry',
+            'type' => 'crafting',
+            'message' => 'Latest warning message.',
+        ]);
 
-        $this->factionLoyaltyService->markLatestWarningNoticeRead($this->character);
+        $this->factionLoyaltyService->dismissLatestWarningNotice($this->character);
 
-        $this->assertTrue($automationLog->refresh()->fight_logs[0]['warning_notice']['read']);
+        $this->assertNotNull($olderWarning->refresh());
+        $this->assertNull($latestWarning->fresh());
+        $this->assertEquals([
+            [
+                'log_entry_id' => 'older-log-entry',
+                'outcome' => 'older_warning',
+                'monster_id' => 10,
+            ],
+            [
+                'log_entry_id' => 'unrelated-log-entry',
+                'outcome' => 'unrelated_warning',
+                'monster_id' => 30,
+            ],
+        ], $automationLog->refresh()->fight_logs);
     }
 
-    public function test_has_plane_loyalty_for_npc_currently_helping()
+    public function testDismissLatestWarningNoticeDoesNothingWhenNoWarningExists(): void
+    {
+        $this->factionLoyaltyService->dismissLatestWarningNotice($this->character);
+
+        $this->assertEquals(0, FactionLoyaltyAutomationWarning::where('character_id', $this->character->id)->count());
+    }
+
+    public function testHasPlaneLoyaltyForNpcCurrentlyHelping()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -258,7 +347,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertEquals($this->character->map->gameMap->name, $result['map_name']);
     }
 
-    public function test_cannot_pledge_with_another_characters_faction()
+    public function testCannotPledgeWithAnotherCharactersFaction()
     {
 
         $secondCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignFactionSystem()->getCharacter();
@@ -268,14 +357,14 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertEquals('Nope. Not allowed.', $result['message']);
     }
 
-    public function test_cannot_pledge_to_faction_when_not_maxed()
+    public function testCannotPledgeToFactionWhenNotMaxed()
     {
         $result = $this->factionLoyaltyService->pledgeLoyalty($this->character, $this->character->factions->first());
 
         $this->assertEquals('You must level the faction to level 5 before being able to assist the fine people of this plane with their tasks.', $result['message']);
     }
 
-    public function test_pledge_loyalty()
+    public function testPledgeLoyalty()
     {
 
         $this->character->factions()->update(['maxed' => true]);
@@ -293,8 +382,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->createMultipleMonsters(
             [
                 'game_map_id' => $this->character->map->game_map_id,
-            ],
-            10
+            ], 10
         );
 
         $this->createItem([
@@ -372,8 +460,7 @@ class FactionLoyaltyServiceTest extends TestCase
             $this->createMultipleMonsters(
                 [
                     'game_map_id' => $gameMap->id,
-                ],
-                10
+                ], 10
             );
 
             $character->refresh();
@@ -386,7 +473,7 @@ class FactionLoyaltyServiceTest extends TestCase
         }
     }
 
-    public function test_pledge_to_existing_loyalty()
+    public function testPledgeToExistingLoyalty()
     {
         $this->character->factions()->first()->update(['maxed' => true]);
 
@@ -448,7 +535,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertTrue($factionLoyalty->is_pledged);
     }
 
-    public function test_remove_pledge()
+    public function testRemovePledge()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -507,7 +594,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertFalse($factionLoyalty->is_pledged);
     }
 
-    public function test_fail_to_remove_pledged()
+    public function testFailToRemovePledged()
     {
         $character = $this->character->refresh();
 
@@ -516,7 +603,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertEquals('Failed to find the faction you are pledged to.', $result['message']);
     }
 
-    public function test_create_new_tasks_for_npc_loyalty_tasks()
+    public function testCreateNewTasksForNpcLoyaltyTasks()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -586,7 +673,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertNotEquals($oldTasks, $newNPCtask->fame_tasks);
     }
 
-    public function test_create_new_tasks_for_npc_loyalty_tasks_when_on_event_plane_with_out_purgatory_item()
+    public function testCreateNewTasksForNpcLoyaltyTasksWhenOnEventPlaneWithOutPurgatoryItem()
     {
 
         $this->createEvent([
@@ -708,7 +795,7 @@ class FactionLoyaltyServiceTest extends TestCase
         }
     }
 
-    public function test_create_new_tasks_for_npc_loyalty_tasks_when_on_event_plane_with_purgatory_item()
+    public function testCreateNewTasksForNpcLoyaltyTasksWhenOnEventPlaneWithPurgatoryItem()
     {
 
         $this->createEvent([
@@ -842,7 +929,7 @@ class FactionLoyaltyServiceTest extends TestCase
         }
     }
 
-    public function test_fail_to_assist_npc_that_does_not_belong_to_character()
+    public function testFailToAssistNpcThatDoesNotBelongToCharacter()
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignFactionSystem()->getCharacter();
 
@@ -870,7 +957,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertEquals('Nope. Not allowed.', $result['message']);
     }
 
-    public function test_assist_npc()
+    public function testAssistNpc()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -905,7 +992,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertEquals('You are now assisting '.$factionNpc->npc->real_name.' with their tasks!', $result['message']);
     }
 
-    public function test_fail_to_stop_assisting_npc_character_does_not_own()
+    public function testFailToStopAssistingNpcCharacterDoesNotOwn()
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignFactionSystem()->getCharacter();
 
@@ -933,7 +1020,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertEquals('Nope. Not allowed.', $result['message']);
     }
 
-    public function test_stop_assisting_npc()
+    public function testStopAssistingNpc()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,

@@ -122,4 +122,30 @@ class UpdateCharacterStatusTest extends TestCase
         $this->assertNull($event->characterStatuses['active_automation']);
         $this->assertEquals(0, $event->characterStatuses['automation_completed_at']);
     }
+
+    public function testPayloadSetsAutomationRunningFalseForExpiredAutomation(): void
+    {
+        $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::EXPLORING,
+            'completed_at' => now()->subSecond(),
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character);
+
+        $this->assertFalse($event->characterStatuses['is_automation_running']);
+    }
+
+    public function testPayloadSetsDelveRunningFalseForExpiredDelve(): void
+    {
+        $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::DELVE,
+            'completed_at' => now()->subSecond(),
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character);
+
+        $this->assertFalse($event->characterStatuses['is_delve_running']);
+    }
 }

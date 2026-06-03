@@ -201,7 +201,7 @@ class KingdomAutomationRestrictionTest extends TestCase
                 'is_capital' => true,
             ])
             ->getKingdom();
-        $kingdom = $characterFactory
+        $kingdomManagement = $characterFactory
             ->kingdomManagement()
             ->assignKingdom([
                 'current_wood' => 2000,
@@ -214,23 +214,26 @@ class KingdomAutomationRestrictionTest extends TestCase
                 'max_level' => 5,
             ], [
                 'level' => 1,
-            ])
-            ->getKingdom();
+            ]);
+        $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $kingdom->buildings()->first();
 
-        CapitalCityBuildingQueue::create([
+        $kingdomManagement->assignCapitalCityBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'requested_kingdom' => $capitalCity->id,
-            'building_request_data' => [[
-                'building_name' => $building->name,
-                'secondary_status' => CapitalCityQueueStatus::TRAVELING,
-            ]],
             'messages' => [],
             'status' => CapitalCityQueueStatus::TRAVELING,
             'started_at' => now(),
             'completed_at' => now()->addMinutes(10),
+        ], [
+            'building_id' => $building->id,
+            'building_name' => $building->name,
+            'secondary_status' => CapitalCityQueueStatus::TRAVELING,
+            'from_level' => $building->level,
+            'to_level' => $building->level + 1,
+            'type' => 'upgrade',
         ]);
 
         $response = $this->actingAs($character->user)

@@ -4,6 +4,7 @@ namespace App\Flare\Transformers;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\FactionLoyalty;
+use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\Item;
 use App\Flare\Models\Survey;
@@ -38,6 +39,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         $characterStatBuilder = $this->characterStatBuilder->setCharacter($character, $this->ignoreReductions);
         $gameClass = GameClass::find($character->game_class_id);
         $factionLoyalty = $character->factionLoyalties()->where('is_pledged', '=', true)->first();
+        $factionLoyaltyWarningNotices = $this->getFactionLoyaltyWarningNotices($character);
 
         return [
             'id' => $character->id,
@@ -81,9 +83,16 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'can_attack_again_at' => now()->diffInSeconds($character->can_attack_again_at),
             'can_craft_again_at' => now()->diffInSeconds($character->can_craft_again_at),
             'can_spin_again_at' => now()->diffInSeconds($character->can_spin_again_at),
-            'is_automation_running' => $character->currentAutomations()->where('character_id', $character->id)->get()->isNotEmpty(),
+            'is_automation_running' => $character->currentAutomations()
+                ->where('character_id', $character->id)
+                ->where('completed_at', '>', now())
+                ->exists(),
             'is_faction_loyalty_automation_running' => $character->isFactionLoyaltyAutomationRunning(),
-            'is_delve_running' => $character->currentAutomations()->where('character_id', $character->id)->where('type', AutomationType::DELVE)->get()->isNotEmpty(),
+            'is_delve_running' => $character->currentAutomations()
+                ->where('character_id', $character->id)
+                ->where('type', AutomationType::DELVE)
+                ->where('completed_at', '>', now())
+                ->exists(),
             'can_set_delve_pack' => $this->canSetPactOptionsForDelve($character),
             'active_automation' => $this->activeAutomation($character),
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
@@ -102,10 +111,28 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'can_see_pledge_tab' => ! is_null($factionLoyalty),
             'pledged_to_faction_id' => ! is_null($factionLoyalty) ? $factionLoyalty->faction_id : null,
             'current_fame_tasks' => $this->getFactionTasks($factionLoyalty),
+            'has_faction_loyalty_warning' => count($factionLoyaltyWarningNotices) > 0,
+            'faction_loyalty_warning_notices' => $factionLoyaltyWarningNotices,
             'resurrection_chance' => $characterStatBuilder->buildResurrectionChance(),
             'is_showing_survey' => $character->user->is_showing_survey,
             'survey_id' => $character->user->is_showing_survey ? Survey::latest()->first()->id : null,
         ];
+    }
+
+    private function getFactionLoyaltyWarningNotices(Character $character): array
+    {
+        return FactionLoyaltyAutomationWarning::where('character_id', $character->id)
+            ->orderByDesc('id')
+            ->get()
+            ->map(function (FactionLoyaltyAutomationWarning $warning): array {
+                return [
+                    'id' => $warning->id,
+                    'type' => $warning->type,
+                    'message' => $warning->message,
+                ];
+            })
+            ->values()
+            ->toArray();
     }
 
     public function includeInventoryCount(Character $character)

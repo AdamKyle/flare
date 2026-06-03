@@ -46,6 +46,12 @@ class KingdomBuildingsController extends Controller
         $fromLevel = $request->has('from_level') ? (int) $request->from_level : null;
         $toLevel = (int) $request->to_level;
 
+        if ($this->kingdomBuildingService->isBuildingDamaged($building)) {
+            return response()->json([
+                'message' => 'Building must be repaired before it can be upgraded.',
+            ], 422);
+        }
+
         if ($this->kingdomBuildingService->cannotUpgradePastMaxLevel($building, $toLevel)) {
             return response()->json([
                 'message' => 'Building is already max level.',

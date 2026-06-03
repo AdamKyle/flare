@@ -66,6 +66,8 @@ class CapitalCityKingdomBuildingTransformer extends TransformerAbstract
             'stone_increase' => $building->increase_in_stone,
             'iron_increase' => $building->increase_in_iron,
             'max_level' => $building->gameBuilding->max_level,
+            'can_be_repaired' => $building->current_durability < $building->max_durability,
+            'can_be_upgraded' => $building->current_durability >= $building->max_durability && $building->level < $building->gameBuilding->max_level,
             'units_for_building' => $this->getUnitDetailsForBuilding($building),
             'passive_required_for_building' => $this->fetchPassiveNameRequiredForBuilding($building),
         ];

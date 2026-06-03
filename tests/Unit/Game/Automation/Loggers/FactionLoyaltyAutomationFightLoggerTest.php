@@ -26,7 +26,7 @@ class FactionLoyaltyAutomationFightLoggerTest extends TestCase
 
     private ?FactionLoyaltyAutomationFightLogger $fightLogger = null;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -45,7 +45,7 @@ class FactionLoyaltyAutomationFightLoggerTest extends TestCase
             ->setUp($this->factionLoyaltyAutomation);
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         Carbon::setTestNow();
 
@@ -57,7 +57,7 @@ class FactionLoyaltyAutomationFightLoggerTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_log_creates_faction_loyalty_automation_log_row_when_none_exists(): void
+    public function testLogCreatesFactionLoyaltyAutomationLogRowWhenNoneExists(): void
     {
         $this->factionLoyaltyAutomation->log()->delete();
 
@@ -77,8 +77,13 @@ class FactionLoyaltyAutomationFightLoggerTest extends TestCase
         $this->assertNotNull($factionLoyaltyAutomationLog);
         $this->assertEquals($this->factionLoyaltyAutomation->id, $factionLoyaltyAutomationLog->faction_loyalty_automation_id);
         $this->assertEquals([], $factionLoyaltyAutomationLog->crafting_logs);
+        $this->assertNotNull($factionLoyaltyAutomationLog->fight_logs[0]['log_entry_id']);
+
+        $logEntryId = $factionLoyaltyAutomationLog->fight_logs[0]['log_entry_id'];
+
         $this->assertEquals([
             [
+                'log_entry_id' => $logEntryId,
                 'outcome' => AutomatedFightResultType::MONSTER_NOT_FOUND->value,
                 'monster_id' => null,
                 'monster_name' => null,
@@ -95,7 +100,6 @@ class FactionLoyaltyAutomationFightLoggerTest extends TestCase
                 'total_faction_points' => 0,
                 'character_died' => false,
                 'ended_automation' => false,
-                'fight_data' => [],
                 'stalled_attempt' => 0,
                 'warning_notice' => null,
                 'created_at' => $now->toDateTimeString(),
@@ -103,7 +107,7 @@ class FactionLoyaltyAutomationFightLoggerTest extends TestCase
         ], $factionLoyaltyAutomationLog->fight_logs);
     }
 
-    public function test_log_appends_fight_log_when_log_row_already_exists(): void
+    public function testLogAppendsFightLogWhenLogRowAlreadyExists(): void
     {
         $existingFightLog = [
             'outcome' => AutomatedFightResultType::INVALID_TASK->value,
@@ -131,7 +135,7 @@ class FactionLoyaltyAutomationFightLoggerTest extends TestCase
         $this->assertEquals('Training Monster', $factionLoyaltyAutomationLog->fight_logs[1]['monster_name']);
     }
 
-    public function test_log_preserves_existing_crafting_logs_when_adding_fight_logs(): void
+    public function testLogPreservesExistingCraftingLogsWhenAddingFightLogs(): void
     {
         $existingCraftingLogs = [
             [
@@ -157,7 +161,7 @@ class FactionLoyaltyAutomationFightLoggerTest extends TestCase
         $this->assertCount(1, $factionLoyaltyAutomationLog->fight_logs);
     }
 
-    public function test_log_stores_every_fight_payload_field(): void
+    public function testLogStoresFightSummaryWithoutFullFightData(): void
     {
         $now = Carbon::parse('2026-04-05 06:07:08');
 
@@ -205,8 +209,13 @@ class FactionLoyaltyAutomationFightLoggerTest extends TestCase
 
         $factionLoyaltyAutomationLog = $this->factionLoyaltyAutomation->log()->first();
 
+        $this->assertNotNull($factionLoyaltyAutomationLog->fight_logs[0]['log_entry_id']);
+
+        $logEntryId = $factionLoyaltyAutomationLog->fight_logs[0]['log_entry_id'];
+
         $this->assertEquals([
             [
+                'log_entry_id' => $logEntryId,
                 'outcome' => AutomatedFightResultType::DIED_TO_BOUNTY_AFTER_TRAINING->value,
                 'monster_id' => 400,
                 'monster_name' => 'Bounty Monster',
@@ -223,7 +232,6 @@ class FactionLoyaltyAutomationFightLoggerTest extends TestCase
                 'total_faction_points' => 45,
                 'character_died' => true,
                 'ended_automation' => true,
-                'fight_data' => $fightData,
                 'stalled_attempt' => 10,
                 'warning_notice' => [
                     'message' => 'Warning message.',
@@ -232,9 +240,21 @@ class FactionLoyaltyAutomationFightLoggerTest extends TestCase
                 'created_at' => $now->toDateTimeString(),
             ],
         ], $factionLoyaltyAutomationLog->fight_logs);
+        $this->assertArrayNotHasKey('fight_data', $factionLoyaltyAutomationLog->fight_logs[0]);
+
+        $factionLoyaltyAutomation = $this->factionLoyaltyAutomation->refresh();
+
+        $this->assertEquals('fight', $factionLoyaltyAutomation->last_automation_action);
+        $this->assertEquals($now->toDateTimeString(), $factionLoyaltyAutomation->last_automation_action_at->toDateTimeString());
+        $this->assertEquals(400, $factionLoyaltyAutomation->last_fight_monster_id);
+        $this->assertEquals(AutomatedFightResultType::DIED_TO_BOUNTY_AFTER_TRAINING->value, $factionLoyaltyAutomation->last_fight_outcome);
+        $this->assertTrue($factionLoyaltyAutomation->last_fight_was_bounty_target);
+        $this->assertTrue($factionLoyaltyAutomation->last_fight_was_training);
+        $this->assertEquals(10, $factionLoyaltyAutomation->last_fight_stalled_attempt);
+        $this->assertEquals(401, $factionLoyaltyAutomation->trained_failed_bounty_monster_id);
     }
 
-    public function test_log_uses_empty_fight_logs_when_existing_fight_logs_are_null(): void
+    public function testLogUsesEmptyFightLogsWhenExistingFightLogsAreNull(): void
     {
         $this->factionLoyaltyFactory->getFactionLoyaltyAutomationLog()->update([
             'fight_logs' => null,

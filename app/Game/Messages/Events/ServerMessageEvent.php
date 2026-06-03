@@ -23,6 +23,8 @@ class ServerMessageEvent implements ShouldBroadcastNow
 
     public ?int $id;
 
+    public string $timeStamp;
+
     /**
      * ServerMessageEvent constructor.
      */
@@ -31,6 +33,7 @@ class ServerMessageEvent implements ShouldBroadcastNow
         $this->user = $user;
         $this->message = $message;
         $this->id = $id;
+        $this->timeStamp = now()->toJSON();
     }
 
     /**

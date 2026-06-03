@@ -22,6 +22,7 @@ use App\Game\Kingdoms\Service\CapitalCityGoldBarManagementService;
 use App\Game\Kingdoms\Service\CapitalCityManagementService;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
+use App\Game\Kingdoms\Validators\BuildingUpgradeRequestValidator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -34,6 +35,7 @@ class CapitalCityManagementController extends Controller
         private readonly CancelUnitRequestService $cancelUnitRequestService,
         private readonly CapitalCityGoldBarManagementService $capitalCityGoldBarManagementService,
         private readonly AutomationRestrictionService $automationRestrictionService,
+        private readonly BuildingUpgradeRequestValidator $buildingUpgradeRequestValidator,
     ) {}
 
     public function makeCapitalCity(Kingdom $kingdom, Character $character): JsonResponse
@@ -96,13 +98,24 @@ class CapitalCityManagementController extends Controller
             return $restriction;
         }
 
+        $validationMessage = $this->buildingUpgradeRequestValidator->validate(
+            $buildingUpgradeRequestsRequest->request_data,
+            $buildingUpgradeRequestsRequest->request_type
+        );
+
+        if (! is_null($validationMessage)) {
+            return response()->json([
+                'message' => $validationMessage,
+            ], 422);
+        }
+
         Log::channel('capital_city_building_upgrades')->info('upgradeBuildings endpoint called', [
             '$buildingUpgradeRequestsRequest' => $buildingUpgradeRequestsRequest->all(),
             '$character' => $character->id,
             '$kingdom' => $kingdom->id,
         ]);
 
-        CapitalCityQueueUpBuildingRequests::dispatch($character->id, $kingdom->id, $buildingUpgradeRequestsRequest->request_data, $buildingUpgradeRequestsRequest->request_type)->onQueue('default_long')->delay(now()->addSecond());
+        CapitalCityQueueUpBuildingRequests::dispatch($character->id, $kingdom->id, $buildingUpgradeRequestsRequest->request_data, $buildingUpgradeRequestsRequest->request_type)->onConnection('long_running')->onQueue('default_long')->delay(now()->addSecond());
 
         return response()->json([]);
     }
@@ -159,6 +172,13 @@ class CapitalCityManagementController extends Controller
                     ->where('game_unit_id', $gameUnit->id)
                     ->where('completed_at', '>', now())
                     ->sum('amount');
+
+                if ($activeManualQueueAmount > 0) {
+                    return response()->json([
+                        'message' => 'One or more units are already queued for recruitment.',
+                    ], 422);
+                }
+
                 $activeCapitalCityQueueAmount = CapitalCityUnitQueue::where('kingdom_id', $targetKingdom->id)
                     ->whereNotIn('status', [
                         CapitalCityQueueStatus::FINISHED,
@@ -181,6 +201,12 @@ class CapitalCityManagementController extends Controller
                             ->sum('amount');
                     });
 
+                if ($activeCapitalCityQueueAmount > 0) {
+                    return response()->json([
+                        'message' => 'One or more units are already queued for recruitment.',
+                    ], 422);
+                }
+
                 if ($ownedAmount + $activeManualQueueAmount + $activeCapitalCityQueueAmount + $requestedAmounts[$key] > KingdomMaxValue::MAX_UNIT) {
                     return response()->json([
                         'message' => 'One or more unit requests exceed the maximum allowed units.',
@@ -195,7 +221,7 @@ class CapitalCityManagementController extends Controller
             '$kingdom' => $kingdom->id,
         ]);
 
-        CapitalCityQueueUpUnitRequests::dispatch($character->id, $kingdom->id, $recruitUnitRequestsRequest->request_data)->onQueue('default_long')->delay(now()->addSecond());
+        CapitalCityQueueUpUnitRequests::dispatch($character->id, $kingdom->id, $recruitUnitRequestsRequest->request_data)->onConnection('long_running')->onQueue('default_long')->delay(now()->addSecond());
 
         return response()->json([]);
     }

@@ -11,12 +11,14 @@ use App\Game\BattleRewardProcessing\Jobs\Events\WinterEventChristmasGiftHandler;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Events\Values\EventType;
+use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
 use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\FactionLoyalty\FactionLoyaltyFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateGameMap;
@@ -27,13 +29,13 @@ use Tests\Traits\CreateMonster;
 
 class BattleRewardServiceTest extends TestCase
 {
-    use CreateEvent, CreateGameMap, CreateGlobalEventGoal, CreateItem, CreateItemAffix, CreateMonster, RefreshDatabase;
+    use CreateEvent, CreateGameMap, CreateGlobalEventGoal, CreateMonster, RefreshDatabase, CreateItem, CreateItemAffix;
 
     private ?BattleRewardService $battleRewardService;
 
     private ?CharacterFactory $characterFactory;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -52,7 +54,7 @@ class BattleRewardServiceTest extends TestCase
         $this->characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         if (ModelsEvent::count() > 0) {
             foreach (ModelsEvent::all() as $event) {
@@ -67,7 +69,7 @@ class BattleRewardServiceTest extends TestCase
         $this->characterFactory = null;
     }
 
-    public function test_should_not_update_character_currencies_when_not_logged_in(): void
+    public function testShouldNotUpdateCharacterCurrenciesWhenNotLoggedIn(): void
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -83,7 +85,7 @@ class BattleRewardServiceTest extends TestCase
         Event::assertNotDispatched(UpdateCharacterCurrenciesEvent::class);
     }
 
-    public function test_should_receive_less_xp_when_training_a_skill(): void
+    public function testShouldReceiveLessXpWhenTrainingASkill(): void
     {
         $character = $this->characterFactory->getCharacter();
         $initialXp = $character->xp;
@@ -123,7 +125,7 @@ class BattleRewardServiceTest extends TestCase
         $this->assertLessThan($monster->xp, $character->xp - $initialXp);
     }
 
-    public function test_should_receive_full_xp_when_training_a_skill_that_is_max_level(): void
+    public function testShouldReceiveFullXpWhenTrainingASkillThatIsMaxLevel(): void
     {
         $character = $this->characterFactory->getCharacter();
         $initialXp = $character->xp;
@@ -165,7 +167,7 @@ class BattleRewardServiceTest extends TestCase
         $this->assertEquals($monster->xp, $character->xp - $initialXp);
     }
 
-    public function test_should_update_character_currencies_when_logged_in(): void
+    public function testShouldUpdateCharacterCurrenciesWhenLoggedIn(): void
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -192,7 +194,7 @@ class BattleRewardServiceTest extends TestCase
         Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
     }
 
-    public function test_battle_rewards_pass_actual_gold_gained_into_gold_rush(): void
+    public function testBattleRewardsPassActualGoldGainedIntoGoldRush(): void
     {
         GoldRushCheckCalculator::shouldReceive('fetchGoldRushChance')->once()->andReturnTrue();
 
@@ -214,7 +216,7 @@ class BattleRewardServiceTest extends TestCase
         $this->assertEquals(101050, $character->refresh()->gold);
     }
 
-    public function test_should_get_faction_points(): void
+    public function testShouldGetFactionPoints(): void
     {
         $character = $this->characterFactory->assignFactionSystem()->getCharacter();
 
@@ -236,7 +238,7 @@ class BattleRewardServiceTest extends TestCase
         $this->assertGreaterThan(0, $faction->current_points);
     }
 
-    public function test_process_rewards_does_not_award_faction_points_when_batch_context_passes_zero(): void
+    public function testProcessRewardsDoesNotAwardFactionPointsWhenBatchContextPassesZero(): void
     {
         $character = $this->characterFactory->assignFactionSystem()->getCharacter();
 
@@ -263,7 +265,8 @@ class BattleRewardServiceTest extends TestCase
         $this->assertEquals(0, $faction->current_points);
     }
 
-    public function test_should_not_update_global_event_participation_when_no_event_is_running(): void
+
+    public function testShouldNotUpdateGlobalEventParticipationWhenNoEventIsRunning(): void
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -281,7 +284,7 @@ class BattleRewardServiceTest extends TestCase
         $this->assertNull($character->globalEventParticipation);
     }
 
-    public function test_should_not_update_global_event_participation_when_no_global_event_is_running(): void
+    public function testShouldNotUpdateGlobalEventParticipationWhenNoGlobalEventIsRunning(): void
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -303,7 +306,7 @@ class BattleRewardServiceTest extends TestCase
         $this->assertNull($character->globalEventParticipation);
     }
 
-    public function test_should_update_global_event_participation(): void
+    public function testShouldUpdateGlobalEventParticipation(): void
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -340,7 +343,7 @@ class BattleRewardServiceTest extends TestCase
         $this->assertNotNull($character->globalEventParticipation);
     }
 
-    public function test_should_update_global_event_participation_when_participation_exists(): void
+    public function testShouldUpdateGlobalEventParticipationWhenParticipationExists(): void
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -391,7 +394,7 @@ class BattleRewardServiceTest extends TestCase
         $this->assertEquals(2, $character->globalEventKills->kills);
     }
 
-    public function test_no_faction_rewards_given_when_character_is_in_purgatory(): void
+    public function testNoFactionRewardsGivenWhenCharacterIsInPurgatory(): void
     {
         $character = $this->characterFactory->assignFactionSystem()->getCharacter();
 
@@ -419,7 +422,7 @@ class BattleRewardServiceTest extends TestCase
         }
     }
 
-    public function test_winter_event_christmas_gift_handler_is_dispatched_when_included(): void
+    public function testWinterEventChristmasGiftHandlerIsDispatchedWhenIncluded(): void
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -434,7 +437,7 @@ class BattleRewardServiceTest extends TestCase
         Queue::assertPushed(WinterEventChristmasGiftHandler::class);
     }
 
-    public function test_process_rewards_returns_early_when_character_cannot_be_found(): void
+    public function testProcessRewardsReturnsEarlyWhenCharacterCannotBeFound(): void
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -451,7 +454,7 @@ class BattleRewardServiceTest extends TestCase
         Event::assertNotDispatched(UpdateCharacterCurrenciesEvent::class);
     }
 
-    public function test_process_rewards_returns_early_when_monster_cannot_be_found(): void
+    public function testProcessRewardsReturnsEarlyWhenMonsterCannotBeFound(): void
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -464,7 +467,7 @@ class BattleRewardServiceTest extends TestCase
         Event::assertNotDispatched(UpdateCharacterCurrenciesEvent::class);
     }
 
-    public function test_process_rewards_uses_context_to_process_batch_rewards(): void
+    public function testProcessRewardsUsesContextToProcessBatchRewards(): void
     {
         $character = $this->characterFactory->assignFactionSystem()->getCharacter();
 
@@ -506,7 +509,38 @@ class BattleRewardServiceTest extends TestCase
         $this->assertEquals(5, $faction->current_points);
     }
 
-    public function test_no_faction_rewards_given_when_character_is_auto_battling(): void
+    public function testProcessRewardsCanSkipFactionLoyaltyUpdateEventForBatchAutomationRewards(): void
+    {
+        $character = $this->characterFactory->getCharacter();
+        $factionLoyaltyFactory = (new FactionLoyaltyFactory)
+            ->setUp($character);
+
+        $character = $factionLoyaltyFactory->getCharacter();
+        $factionLoyaltyNpc = $factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
+        $monster = $factionLoyaltyFactory->getBountyMonstersForNpc($factionLoyaltyNpc)[0];
+
+        Event::fake();
+        Queue::fake();
+
+        $this->battleRewardService
+            ->setUp($character->id, $monster->id)
+            ->setContext([
+                'total_creatures' => 1,
+                'total_xp' => 10,
+                'total_skill_xp' => 0,
+                'total_faction_points' => 0,
+                'skip_faction_loyalty_update_event' => true,
+            ])
+            ->processRewards();
+
+        $matchingTask = collect($factionLoyaltyNpc->refresh()->factionLoyaltyNpcTasks->fame_tasks)
+            ->first(fn (array $task): bool => ($task['monster_id'] ?? null) === $monster->id);
+
+        $this->assertEquals(1, $matchingTask['current_amount']);
+        Event::assertNotDispatched(FactionLoyaltyUpdate::class);
+    }
+
+    public function testNoFactionRewardsGivenWhenCharacterIsAutoBattling(): void
     {
         $character = $this->characterFactory
             ->assignFactionSystem()
@@ -539,7 +573,48 @@ class BattleRewardServiceTest extends TestCase
         $this->assertEquals(0, $faction->current_points);
     }
 
-    public function test_should_update_global_event_participation_uses_context_kill_count(): void
+    public function testProcessRewardsAwardsBatchFactionPointsWhenCharacterIsAutoBattling(): void
+    {
+        $character = $this->characterFactory
+            ->assignFactionSystem()
+            ->getCharacter();
+
+        $character->currentAutomations()->create([
+            'character_id' => $character->id,
+            'monster_id' => $this->createMonster()->id,
+            'type' => 0,
+            'started_at' => now(),
+            'completed_at' => now()->addDay(),
+            'move_down_monster_list_every' => null,
+            'previous_level' => 10,
+            'current_level' => 20,
+            'attack_type' => 'attack',
+        ]);
+
+        $character = $character->refresh();
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'xp' => 1,
+        ]);
+
+        $this->battleRewardService
+            ->setUp($character->id, $monster->id)
+            ->setContext([
+                'total_creatures' => 1,
+                'total_xp' => 10,
+                'total_skill_xp' => 0,
+                'total_faction_points' => 5,
+            ])
+            ->processRewards();
+
+        $character = $character->refresh();
+
+        $faction = $character->factions()->where('game_map_id', $character->map->game_map_id)->first();
+        $this->assertEquals(5, $faction->current_points);
+    }
+
+    public function testShouldUpdateGlobalEventParticipationUsesContextKillCount(): void
     {
 
         $character = $this->characterFactory->getCharacter();
@@ -594,4 +669,6 @@ class BattleRewardServiceTest extends TestCase
         $this->assertEquals(3, $character->globalEventParticipation->current_kills);
         $this->assertEquals(3, $character->globalEventKills->kills);
     }
+
+
 }

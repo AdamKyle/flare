@@ -24,7 +24,7 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
 
     private Character $character;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -36,14 +36,14 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
             ->getCharacter();
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         Carbon::setTestNow();
 
         parent::tearDown();
     }
 
-    public function test_transform_contains_exploration_active_automation_metadata(): void
+    public function testTransformContainsExplorationActiveAutomationMetadata(): void
     {
         $this->createCharacterAutomation([
             'character_id' => $this->character->id,
@@ -60,7 +60,7 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         ], $data['active_automation']);
     }
 
-    public function test_transform_contains_delve_active_automation_metadata(): void
+    public function testTransformContainsDelveActiveAutomationMetadata(): void
     {
         $this->createCharacterAutomation([
             'character_id' => $this->character->id,
@@ -77,7 +77,7 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         ], $data['active_automation']);
     }
 
-    public function test_transform_contains_faction_loyalty_active_automation_metadata(): void
+    public function testTransformContainsFactionLoyaltyActiveAutomationMetadata(): void
     {
         $this->createCharacterAutomation([
             'character_id' => $this->character->id,
@@ -94,7 +94,7 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         ], $data['active_automation']);
     }
 
-    public function test_transform_has_null_active_automation_when_no_automation_is_running(): void
+    public function testTransformHasNullActiveAutomationWhenNoAutomationIsRunning(): void
     {
         $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character);
 
@@ -102,7 +102,7 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         $this->assertEquals(0, $data['automation_completed_at']);
     }
 
-    public function test_transform_contains_zero_timeout_modifier_bonuses(): void
+    public function testTransformContainsZeroTimeoutModifierBonuses(): void
     {
         $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character);
 
@@ -110,7 +110,7 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         $this->assertEquals(0.0, $data['movement_time_out_mod_bonus']);
     }
 
-    public function test_transform_contains_timeout_modifier_bonuses(): void
+    public function testTransformContainsTimeoutModifierBonuses(): void
     {
         $skill = $this->character->skills()->whereHas('baseSkill', function ($query) {
             $query->where('name', 'Fighters Timeout');
@@ -126,7 +126,7 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         $this->assertEquals(0.2, $data['movement_time_out_mod_bonus']);
     }
 
-    public function test_transform_treats_null_timeout_modifier_bonuses_as_zero(): void
+    public function testTransformTreatsNullTimeoutModifierBonusesAsZero(): void
     {
         $skill = $this->character->skills()->whereHas('baseSkill', function ($query) {
             $query->where('name', 'Fighters Timeout');
@@ -142,7 +142,7 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         $this->assertEquals(0.0, $data['movement_time_out_mod_bonus']);
     }
 
-    public function test_transform_does_not_display_exploration_for_unknown_automation_type(): void
+    public function testTransformDoesNotDisplayExplorationForUnknownAutomationType(): void
     {
         $this->createCharacterAutomation([
             'character_id' => $this->character->id,
@@ -155,7 +155,7 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         $this->assertNull($data['active_automation']);
     }
 
-    public function test_transform_has_null_active_automation_when_automation_is_completed(): void
+    public function testTransformHasNullActiveAutomationWhenAutomationIsCompleted(): void
     {
         $this->createCharacterAutomation([
             'character_id' => $this->character->id,
@@ -169,7 +169,33 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         $this->assertEquals(0, $data['automation_completed_at']);
     }
 
-    public function test_transform_allows_queen_of_hearts_in_hell_with_quest_item(): void
+    public function testTransformSetsAutomationRunningFalseForExpiredAutomation(): void
+    {
+        $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::EXPLORING,
+            'completed_at' => now()->subSecond(),
+        ]);
+
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character);
+
+        $this->assertFalse($data['is_automation_running']);
+    }
+
+    public function testTransformSetsDelveRunningFalseForExpiredDelve(): void
+    {
+        $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::DELVE,
+            'completed_at' => now()->subSecond(),
+        ]);
+
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character);
+
+        $this->assertFalse($data['is_delve_running']);
+    }
+
+    public function testTransformAllowsQueenOfHeartsInHellWithQuestItem(): void
     {
         $hell = $this->createGameMap([
             'name' => MapNameValue::HELL,
@@ -192,7 +218,7 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         $this->assertTrue($data['can_access_queen']);
     }
 
-    public function test_transform_does_not_allow_queen_of_hearts_outside_hell_with_quest_item(): void
+    public function testTransformDoesNotAllowQueenOfHeartsOutsideHellWithQuestItem(): void
     {
         $queenQuestItem = $this->createItem([
             'type' => 'quest',
@@ -210,7 +236,7 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         $this->assertFalse($data['can_access_queen']);
     }
 
-    public function test_transform_does_not_allow_queen_of_hearts_in_hell_without_quest_item(): void
+    public function testTransformDoesNotAllowQueenOfHeartsInHellWithoutQuestItem(): void
     {
         $hell = $this->createGameMap([
             'name' => MapNameValue::HELL,

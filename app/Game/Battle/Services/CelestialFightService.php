@@ -187,7 +187,7 @@ class CelestialFightService
 
         $this->giveShards($character, $celestialFight);
 
-        BattleAttackHandler::dispatch($character->id, $celestialFight->monster_id)->onQueue('default_long')->delay(now()->addSeconds(2));
+        BattleAttackHandler::dispatch($character->id, $celestialFight->monster_id)->onQueue('battle_reward_processing')->onConnection('battle_reward_processing')->delay(now()->addSeconds(2));
 
         $celestialFightType = new CelestialConjureType($celestialFight->type);
 

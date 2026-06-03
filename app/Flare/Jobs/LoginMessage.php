@@ -32,7 +32,7 @@ class LoginMessage implements ShouldQueue
         $this->character = $character;
     }
 
-    public function handle()
+    public function handle(FactionLoyaltyService $factionLoyaltyService): void
     {
 
         $user = $this->character->user;
@@ -49,7 +49,7 @@ class LoginMessage implements ShouldQueue
             event(new ServerMessageEvent($user, 'Celestials have been set free till tomorrow at: '.$endTime.'. All you have to do is move around to watch them spawn (80% chance). Celestials Drop Valuable shards for Alchemy crafting!'));
         }
 
-        $warningNotice = resolve(FactionLoyaltyService::class)->getLatestUnreadWarningNotice($this->character);
+        $warningNotice = $factionLoyaltyService->getLatestUnreadWarningNotice($this->character);
 
         if (! is_null($warningNotice)) {
             event(new ServerMessageEvent($user, $warningNotice['message']));

@@ -2,6 +2,7 @@
 
 namespace App\Game\Automation\Events;
 
+use App\Flare\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -15,18 +16,30 @@ class AutomationLogUpdate implements ShouldBroadcast
 
     private int $userId;
 
+    /**
+     * @var string
+     */
     public string $message;
 
     public bool $makeItalic;
 
     public bool $isReward;
 
+    public string $timeStamp;
+
+    /**
+     * @param int $userId
+     * @param string $message
+     * @param bool $makeItalic
+     * @param bool $isReward
+     */
     public function __construct(int $userId, string $message, bool $makeItalic = false, bool $isReward = false)
     {
         $this->userId = $userId;
         $this->message = $message;
         $this->makeItalic = $makeItalic;
         $this->isReward = $isReward;
+        $this->timeStamp = now()->toJSON();
     }
 
     /**

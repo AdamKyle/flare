@@ -104,7 +104,7 @@ class ExplorationAutomationService
 
     protected function startAutomation(Character $character, int $automationId, string $attackType): void
     {
-        Exploration::dispatch($character, $automationId, $attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
+        Exploration::dispatch($character, $automationId, $attackType, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onConnection('long_running')->onQueue('default_long');
     }
 
     private function startedInSpecialLocation(Character $character): bool
