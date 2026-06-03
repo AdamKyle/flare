@@ -1085,17 +1085,21 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
 
     renderSpecialties() {
         return (
-            <Fragment>
+            <div className={"mb-2"}>
                 {this.state.equipping ? <LoadingProgressBar /> : null}
                 {this.state.success_message !== null ? (
-                    <SuccessAlert>{this.state.success_message}</SuccessAlert>
+                    <SuccessAlert additional_css={"mb-2"}>
+                        {this.state.success_message}
+                    </SuccessAlert>
                 ) : null}
 
                 {this.state.error_message !== null ? (
-                    <DangerAlert>{this.state.error_message}</DangerAlert>
+                    <DangerAlert additional_css={"mb-2"}>
+                        {this.state.error_message}
+                    </DangerAlert>
                 ) : null}
                 {this.renderSelectedType()}
-            </Fragment>
+            </div>
         );
     }
 

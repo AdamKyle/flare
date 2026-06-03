@@ -9,9 +9,8 @@ export default class Table extends React.Component<DataTableProps, any> {
 
     render() {
         return (
-            <div className="h-full flex flex-col">
+            <div>
                 <DataTable
-                    className="h-full flex flex-col"
                     columns={this.props.columns}
                     data={this.props.data}
                     theme={this.props.dark_table ? "dark" : "default"}
@@ -20,13 +19,6 @@ export default class Table extends React.Component<DataTableProps, any> {
                             ? []
                             : this.props.conditional_row_styles
                     }
-                    customStyles={{
-                        tableWrapper: {
-                            style: {
-                                flex: "1 1 auto",
-                            },
-                        },
-                    }}
                     pagination
                     paginationPerPage={this.props.pagination_per_page}
                     paginationRowsPerPageOptions={
