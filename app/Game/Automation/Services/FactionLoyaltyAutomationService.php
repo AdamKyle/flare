@@ -64,7 +64,7 @@ class FactionLoyaltyAutomationService
 
         event(new AutomationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
 
-        AutomatedFactionLoyalty::dispatch($character->id, $automation->id, $factionLoyaltyAutomation->id, self::TIME_DELAY)->delay(now()->addMinutes(self::TIME_DELAY))->onQueue('default_long');;
+        AutomatedFactionLoyalty::dispatch($character->id, $automation->id, $factionLoyaltyAutomation->id, self::TIME_DELAY)->delay(now()->addMinutes(self::TIME_DELAY))->onConnection('long_running')->onQueue('default_long');;
     }
 
     /**

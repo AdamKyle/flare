@@ -622,7 +622,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
             $this->automationId,
             $this->factionLoyaltyAutomationId,
             $this->timeDelay
-        )->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
+        )->delay(now()->addMinutes($this->timeDelay))->onConnection('long_running')->onQueue('default_long');
     }
 
     /**

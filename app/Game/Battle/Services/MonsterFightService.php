@@ -192,7 +192,7 @@ class MonsterFightService
         }
 
         Cache::delete('monster-fight-' . $character->id);
-        BattleAttackHandler::dispatch($character->id, $this->monsterPlayerFight->getMonster()['id'])->onQueue('default_long')->delay(now()->addSeconds(2));
+        BattleAttackHandler::dispatch($character->id, $this->monsterPlayerFight->getMonster()['id'])->onQueue('battle_reward_processing')->onConnection('battle_reward_processing')->delay(now()->addSeconds(2));
 
         return $this->successResult($cache);
     }

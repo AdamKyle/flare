@@ -149,7 +149,7 @@ class DelveExploration implements ShouldQueue
 
             $params['selected_monster_id'] = $this->monster?->id ?? $delveAutomation->monster_id;
 
-            DelveExploration::dispatch($this->character->id, $this->location->id, $this->automationId, $this->delveAutomationId, $params, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onQueue('default_long');
+            DelveExploration::dispatch($this->character->id, $this->location->id, $this->automationId, $this->delveAutomationId, $params, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onConnection('long_running')->onQueue('default_long');
 
             return;
         }

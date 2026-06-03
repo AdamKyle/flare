@@ -133,7 +133,7 @@ class Exploration implements ShouldQueue
                 'total_skill_xp' => $this->battleData['total_skill_xp'],
             ]);
 
-            Exploration::dispatch($this->character, $this->automationId, $this->attackType, 1)->delay(now()->addMinute())->onQueue('default_long');
+            Exploration::dispatch($this->character, $this->automationId, $this->attackType, 1)->delay(now()->addMinute())->onConnection('long_running')->onQueue('default_long');
 
             return;
         }
