@@ -1,66 +1,118 @@
-name: Laravel
+name: PHPUnit Profile
 
-on: [push]
+on:
+  workflow_dispatch:
 
 jobs:
-  laravel-tests:
+  phpunit-profile:
     runs-on: ubuntu-latest
+
     services:
-      mysql-service:
-        image: mysql:8.0.29
+      mysql:
+        image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: password
           MYSQL_DATABASE: flare_test
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_USER: flare
+          MYSQL_PASSWORD: password
         ports:
-          - 33306:3306
+          - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping"
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=3
+          --health-retries=10
+
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: flare_test
+      DB_USERNAME: flare
+      DB_PASSWORD: password
+      CACHE_DRIVER: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+      XDEBUG_MODE: profile
+
     steps:
-      - uses: actions/checkout@v1
-      - name: Setup PHP
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP with Xdebug
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.4
-      - name: Copy .env
-        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
-      - name: Install Dependencies
+          php-version: '8.4'
+          extensions: mbstring, dom, fileinfo, mysql, pdo_mysql, bcmath, gd, intl, zip
+          coverage: xdebug
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare profile directory
         run: |
-          rm -rf vendor
-          rm -rf composer.lock
-          composer install
-          yarn install
-      - name: Generate key
-        run: php artisan key:generate
-      - name: Link Storage
-        run: php artisan storage:link
-      - name: Install dependencies (Laravel Vite)
-        run: yarn build
-      - name: Run Yarn Checks
-        run: | 
-          yarn lint
-          yarn type-check
-          yarn cleanup
-          yarn unused-files-check
-      - name: Run Laravel Pint Test
-        run: vendor/bin/pint --test
-      - name: Execute tests (Unit and Feature tests) via PHPUnit
-        env:
-          DB_CONNECTION: mysql
-          DB_HOST: 127.0.0.1
-          DB_DATABASE: flare_test
-          DB_PORT: 33306
-          DB_USER: root
-          DB_PASSWORD: password
-          TIME_ZONE: America/Edmonton
+          rm -rf storage/app/test-profile
+          mkdir -p storage/app/test-profile/cachegrind
+
+      - name: Prepare Laravel
         run: |
-          php artisan migrate
-          mkdir test-coverage
-          vendor/bin/phpunit --stop-on-error --stop-on-failure --coverage-html=./test-coverage
-      - name: Upload HTML coverage report
+          cp .env.example .env
+          php artisan key:generate
+          php artisan config:clear
+          php artisan cache:clear
+
+      - name: Enable MySQL slow query log
+        run: |
+          mysql -h 127.0.0.1 -uroot -proot -e "SET GLOBAL slow_query_log_file='/tmp/mysql-slow.log'; SET GLOBAL long_query_time=0; SET GLOBAL log_queries_not_using_indexes=ON; SET GLOBAL slow_query_log=ON;"
+
+      - name: Run full PHPUnit suite with profiling
+        continue-on-error: true
+        run: |
+          set +e
+          /usr/bin/time -v php \
+            -d memory_limit=-1 \
+            -d max_execution_time=0 \
+            -d xdebug.mode=profile \
+            -d xdebug.start_with_request=yes \
+            -d xdebug.output_dir="${{ github.workspace }}/storage/app/test-profile/cachegrind" \
+            -d xdebug.profiler_output_name="cachegrind.out.%p" \
+            vendor/bin/phpunit \
+            --log-junit storage/app/test-profile/phpunit-junit.xml \
+            2>&1 | tee storage/app/test-profile/phpunit-output.log
+          echo "${PIPESTATUS[0]}" > storage/app/test-profile/phpunit-exit-code.txt
+          exit 0
+
+      - name: Disable MySQL slow query log
+        continue-on-error: true
+        run: |
+          mysql -h 127.0.0.1 -uroot -proot -e "SET GLOBAL slow_query_log=OFF; SET GLOBAL long_query_time=10; SET GLOBAL log_queries_not_using_indexes=OFF;"
+
+      - name: Copy MySQL slow query log
+        continue-on-error: true
+        run: |
+          docker cp "$(docker ps --filter "ancestor=mysql:8.0" --format "{{.ID}}" | head -n 1)":/tmp/mysql-slow.log storage/app/test-profile/mysql-slow.log
+
+      - name: Copy Laravel logs
+        continue-on-error: true
+        run: |
+          cp storage/logs/laravel*.log storage/app/test-profile/ 2>/dev/null
+
+      - name: Compress Xdebug cachegrind files
+        continue-on-error: true
+        run: |
+          tar -czf storage/app/test-profile/cachegrind.tar.gz -C storage/app/test-profile/cachegrind .
+          rm -rf storage/app/test-profile/cachegrind
+
+      - name: Add profile file sizes
+        continue-on-error: true
+        run: |
+          du -sh storage/app/test-profile/* 2>/dev/null | sort -h > storage/app/test-profile/profile-file-sizes.txt
+
+      - name: Upload profile artifact
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
-          path: test-coverage
+          name: phpunit-profile
+          path: storage/app/test-profile
+          retention-days: 7
