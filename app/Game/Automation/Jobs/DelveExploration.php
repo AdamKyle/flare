@@ -546,7 +546,7 @@ class DelveExploration implements ShouldQueue
         $start = $delveExploration->started_at;
         $end = $delveExploration->completed_at;
 
-        $timeElapsedInHours = $end->diffInHours($start);
+        $timeElapsedInHours = $start->diffInHours($end);
 
         $cosmicItem = null;
         $mythicItem = null;

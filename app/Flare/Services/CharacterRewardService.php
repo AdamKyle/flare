@@ -112,9 +112,9 @@ class CharacterRewardService
     public function getSpecialGearDrop(int $amountPaid): ItemModel
     {
         return match ($amountPaid) {
+            RandomAffixDetails::LEGENDARY => $this->buildUniqueItem->fetchUniqueItem($this->character),
             RandomAffixDetails::MYTHIC => $this->buildMythicItem->fetchMythicItem($this->character),
             RandomAffixDetails::COSMIC => $this->buildCosmicItem->fetchCosmicItem($this->character),
-            default => $this->buildUniqueItem->fetchUniqueItem($this->character),
         };
     }
 }

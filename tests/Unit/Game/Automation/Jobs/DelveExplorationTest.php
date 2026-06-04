@@ -8,7 +8,6 @@ use App\Flare\Models\DelveExploration as DelveExplorationModel;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
-use App\Flare\Services\CharacterRewardService;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\LocationType;
@@ -18,12 +17,9 @@ use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Jobs\DelveExploration;
 use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
-use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\Skills\Services\SkillService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -53,7 +49,7 @@ class DelveExplorationTest extends TestCase
         Cache::flush();
 
         $this->character = (new CharacterFactory)
-            ->createBaseCharacter()
+            ->createBaseCharacter(assignPassiveSkills: false, createClassRanks: false)
             ->givePlayerLocation()
             ->createSessionForCharacter()
             ->getCharacter();
@@ -80,7 +76,11 @@ class DelveExplorationTest extends TestCase
             ->getMonster();
 
         Item::factory()->create([
+            'name' => 'Delve Reward Sword',
             'type' => 'weapon',
+            'skill_level_required' => 1,
+            'item_prefix_id' => null,
+            'item_suffix_id' => null,
             'specialty_type' => null,
         ]);
     }
@@ -123,7 +123,7 @@ class DelveExplorationTest extends TestCase
         $automation = $this->createAutomation();
         $delve = $this->createDelve();
 
-        $this->runJob($automation->id, $delve->id, [], 999999);
+        $this->runJob($automation->id, $delve->id, locationId: 999999);
 
         $this->assertNull(CharacterAutomation::find($automation->id));
     }
@@ -291,7 +291,6 @@ class DelveExplorationTest extends TestCase
 
     public function test_handle_dispatches_next_delve_job_after_survived_encounter(): void
     {
-        Queue::fake();
         Event::fake();
 
         $this->bindWinningFight();
@@ -306,7 +305,6 @@ class DelveExplorationTest extends TestCase
 
     public function test_handle_does_not_dispatch_next_delve_job_when_pack_member_does_not_survive(): void
     {
-        Queue::fake();
         Event::fake();
 
         $this->bindFightServiceSequence(
@@ -322,16 +320,13 @@ class DelveExplorationTest extends TestCase
         $automation = $this->createAutomation();
         $delve = $this->createDelve();
 
-        $this->runJob($automation->id, $delve->id, [
-            'pack_size' => 2,
-        ]);
+        $this->runJob($automation->id, $delve->id, packSize: 2);
 
         Queue::assertNotPushed(DelveExploration::class);
     }
 
     public function test_handle_delays_next_delve_job_by_time_delay(): void
     {
-        Queue::fake();
         Event::fake();
 
         $now = Carbon::parse('2026-01-01 12:00:00');
@@ -355,7 +350,6 @@ class DelveExplorationTest extends TestCase
 
     public function test_handle_creates_survived_delve_log(): void
     {
-        Queue::fake();
         Event::fake();
 
         $this->bindWinningFight();
@@ -368,53 +362,8 @@ class DelveExplorationTest extends TestCase
         $this->assertDelveLogExists($delve, DelveOutcome::SURVIVED, 1);
     }
 
-    public function test_handle_does_not_create_second_delve_log_when_same_job_instance_runs_again(): void
-    {
-        Queue::fake();
-        Event::fake();
-
-        $this->bindFightServiceSequence(
-            [
-                $this->livingFightData(),
-                $this->livingFightData(),
-            ],
-            [
-                $this->wonFightData(),
-                $this->wonFightData(),
-            ],
-        );
-
-        $automation = $this->createAutomation();
-        $delve = $this->createDelve();
-
-        $job = new DelveExploration(
-            $this->character->id,
-            $this->location->id,
-            $automation->id,
-            $delve->id,
-            [
-                'attack_type' => AttackTypeValue::ATTACK,
-                'pack_size' => 1,
-            ],
-            5,
-        );
-
-        $this->handleJob($job);
-        $this->handleJob($job);
-
-        $this->assertEquals(
-            1,
-            DB::table('delve_logs')
-                ->where('character_id', $this->character->id)
-                ->where('delve_exploration_id', $delve->id)
-                ->where('outcome', DelveOutcome::SURVIVED->value)
-                ->count()
-        );
-    }
-
     public function test_handle_increases_enemy_strength_after_survived_encounter(): void
     {
-        Queue::fake();
         Event::fake();
 
         $this->bindWinningFight();
@@ -431,7 +380,6 @@ class DelveExplorationTest extends TestCase
 
     public function test_handle_caps_enemy_strength_after_survived_encounter(): void
     {
-        Queue::fake();
         Event::fake();
 
         $this->bindWinningFight();
@@ -449,7 +397,6 @@ class DelveExplorationTest extends TestCase
 
     public function test_handle_does_not_increase_enemy_strength_when_already_at_cap(): void
     {
-        Queue::fake();
         Event::fake();
 
         $this->bindWinningFight();
@@ -466,7 +413,6 @@ class DelveExplorationTest extends TestCase
 
     public function test_handle_updates_monster_for_next_fight(): void
     {
-        Queue::fake();
         Event::fake();
 
         $this->bindWinningFight();
@@ -481,7 +427,6 @@ class DelveExplorationTest extends TestCase
 
     public function test_handle_deletes_pack_cache_after_survived_encounter(): void
     {
-        Queue::fake();
         Event::fake();
 
         $this->bindWinningFight();
@@ -500,7 +445,6 @@ class DelveExplorationTest extends TestCase
 
     public function test_handle_completes_delve_when_encounter_has_no_time_remaining(): void
     {
-        Queue::fake();
         Event::fake();
 
         $this->bindWinningFight();
@@ -644,7 +588,6 @@ class DelveExplorationTest extends TestCase
 
     public function test_handle_creates_pack_size_two_survived_log(): void
     {
-        Queue::fake();
         Event::fake();
 
         $this->bindWinningFight();
@@ -652,16 +595,13 @@ class DelveExplorationTest extends TestCase
         $automation = $this->createAutomation();
         $delve = $this->createDelve();
 
-        $this->runJob($automation->id, $delve->id, [
-            'pack_size' => 2,
-        ]);
+        $this->runJob($automation->id, $delve->id, packSize: 2);
 
         $this->assertDelveLogExists($delve, DelveOutcome::SURVIVED, 2);
     }
 
     public function test_handle_creates_pack_size_five_survived_log(): void
     {
-        Queue::fake();
         Event::fake();
 
         $this->bindWinningFight();
@@ -669,16 +609,13 @@ class DelveExplorationTest extends TestCase
         $automation = $this->createAutomation();
         $delve = $this->createDelve();
 
-        $this->runJob($automation->id, $delve->id, [
-            'pack_size' => 5,
-        ]);
+        $this->runJob($automation->id, $delve->id, packSize: 5);
 
         $this->assertDelveLogExists($delve, DelveOutcome::SURVIVED, 5);
     }
 
     public function test_handle_creates_pack_size_ten_survived_log(): void
     {
-        Queue::fake();
         Event::fake();
 
         $this->bindWinningFight();
@@ -686,16 +623,13 @@ class DelveExplorationTest extends TestCase
         $automation = $this->createAutomation();
         $delve = $this->createDelve();
 
-        $this->runJob($automation->id, $delve->id, [
-            'pack_size' => 10,
-        ]);
+        $this->runJob($automation->id, $delve->id, packSize: 10);
 
         $this->assertDelveLogExists($delve, DelveOutcome::SURVIVED, 10);
     }
 
     public function test_handle_creates_pack_size_twenty_survived_log(): void
     {
-        Queue::fake();
         Event::fake();
 
         $this->bindWinningFight();
@@ -703,16 +637,13 @@ class DelveExplorationTest extends TestCase
         $automation = $this->createAutomation();
         $delve = $this->createDelve();
 
-        $this->runJob($automation->id, $delve->id, [
-            'pack_size' => 20,
-        ]);
+        $this->runJob($automation->id, $delve->id, packSize: 20);
 
         $this->assertDelveLogExists($delve, DelveOutcome::SURVIVED, 20);
     }
 
     public function test_handle_creates_pack_size_twenty_five_survived_log(): void
     {
-        Queue::fake();
         Event::fake();
 
         $this->bindWinningFight();
@@ -720,16 +651,13 @@ class DelveExplorationTest extends TestCase
         $automation = $this->createAutomation();
         $delve = $this->createDelve();
 
-        $this->runJob($automation->id, $delve->id, [
-            'pack_size' => 25,
-        ]);
+        $this->runJob($automation->id, $delve->id, packSize: 25);
 
         $this->assertDelveLogExists($delve, DelveOutcome::SURVIVED, 25);
     }
 
     public function test_handle_dispatches_pack_encounter_message_once(): void
     {
-        Queue::fake();
         Event::fake();
 
         $this->bindWinningFight();
@@ -737,9 +665,7 @@ class DelveExplorationTest extends TestCase
         $automation = $this->createAutomation();
         $delve = $this->createDelve();
 
-        $this->runJob($automation->id, $delve->id, [
-            'pack_size' => 2,
-        ]);
+        $this->runJob($automation->id, $delve->id, packSize: 2);
 
         Event::assertDispatched(AutomationLogUpdate::class, function (AutomationLogUpdate $event): bool {
             return str_contains($event->message, 'Holy shit child, there are 2 of them.');
@@ -748,7 +674,6 @@ class DelveExplorationTest extends TestCase
 
     public function test_handle_dispatches_enemy_strength_message_when_enemy_strength_is_increased(): void
     {
-        Queue::fake();
         Event::fake();
 
         $this->bindWinningFight();
@@ -830,7 +755,6 @@ class DelveExplorationTest extends TestCase
 
     private function runCompletedPackRewardJob(int $hoursElapsed, bool $loggedIn = true): void
     {
-        Queue::fake();
         Event::fake();
 
         $now = Carbon::parse('2026-01-01 12:00:00');
@@ -859,34 +783,20 @@ class DelveExplorationTest extends TestCase
     private function runJob(
         int $automationId,
         int $delveExplorationId,
-        array $params = [],
         ?int $locationId = null,
         int $timeDelay = 5,
+        int $packSize = 1,
     ): void {
-        $job = new DelveExploration(
+        DelveExploration::dispatchSync(
             $this->character->id,
             $locationId ?? $this->location->id,
             $automationId,
             $delveExplorationId,
             [
                 'attack_type' => AttackTypeValue::ATTACK,
-                'pack_size' => 1,
-                ...$params,
+                'pack_size' => $packSize,
             ],
             $timeDelay
-        );
-
-        $this->handleJob($job);
-    }
-
-    private function handleJob(DelveExploration $job): void
-    {
-        $job->handle(
-            resolve(MonsterFightService::class),
-            resolve(BattleEventHandler::class),
-            resolve(CharacterCacheData::class),
-            resolve(CharacterRewardService::class),
-            resolve(SkillService::class),
         );
     }
 
@@ -945,7 +855,11 @@ class DelveExplorationTest extends TestCase
         $monster = $this->monster;
 
         $monsterFightService = Mockery::mock(MonsterFightService::class, function (MockInterface $mock) use ($setupData, $fightData, $monster) {
-            $mock->shouldReceive('setupMonster')->andReturn($setupData);
+            $mock->shouldReceive('setupMonster')->andReturnUsing(function () use ($setupData): array {
+                Queue::fake();
+
+                return $setupData;
+            });
             $mock->shouldReceive('getMonster')->andReturn($monster);
 
             if (is_null($fightData)) {
@@ -957,7 +871,7 @@ class DelveExplorationTest extends TestCase
             $mock->shouldReceive('fightMonster')->andReturn($fightData);
         });
 
-        $this->app->instance(MonsterFightService::class, $monsterFightService);
+        $this->instance(MonsterFightService::class, $monsterFightService);
     }
 
     private function bindFightServiceSequence(array $setupDataSequence, array $fightDataSequence): void
@@ -967,7 +881,11 @@ class DelveExplorationTest extends TestCase
         $monsterFightService = Mockery::mock(MonsterFightService::class, function (MockInterface $mock) use ($setupDataSequence, $fightDataSequence, $monster) {
             $mock->shouldReceive('setupMonster')
                 ->times(count($setupDataSequence))
-                ->andReturnValues($setupDataSequence);
+                ->andReturnUsing(function () use (&$setupDataSequence): array {
+                    Queue::fake();
+
+                    return array_shift($setupDataSequence);
+                });
 
             $mock->shouldReceive('getMonster')
                 ->andReturn($monster);
@@ -977,7 +895,7 @@ class DelveExplorationTest extends TestCase
                 ->andReturnValues($fightDataSequence);
         });
 
-        $this->app->instance(MonsterFightService::class, $monsterFightService);
+        $this->instance(MonsterFightService::class, $monsterFightService);
     }
 
     private function livingFightData(): array

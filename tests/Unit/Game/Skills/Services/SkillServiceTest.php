@@ -160,6 +160,7 @@ class SkillServiceTest extends TestCase
         $skill->update([
             'currently_training' => true,
             'xp_towards' => 0.10,
+            'xp_max' => 1000,
         ]);
 
         $character = $character->refresh();

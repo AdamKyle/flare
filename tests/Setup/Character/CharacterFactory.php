@@ -92,7 +92,7 @@ class CharacterFactory
      * - Core inventory - empty.
      * - Base Skills: Accuracy, Looting and Dodge.
      */
-    public function createBaseCharacter(array $raceOptions = [], array|GameClass $classOptions = [], bool $assignBaseSkill = true, bool $assignPassiveSkills = true): CharacterFactory
+    public function createBaseCharacter(array $raceOptions = [], array|GameClass $classOptions = [], bool $assignBaseSkill = true, bool $assignPassiveSkills = true, bool $createClassRanks = true): CharacterFactory
     {
 
         $race = $this->createRace($raceOptions);
@@ -131,7 +131,9 @@ class CharacterFactory
             $this->assignPassiveSkills();
         }
 
-        $this->createClassRanks();
+        if ($createClassRanks) {
+            $this->createClassRanks();
+        }
 
         $character = $this->character->refresh();
 
