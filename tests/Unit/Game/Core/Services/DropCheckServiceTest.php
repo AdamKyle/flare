@@ -159,6 +159,13 @@ class DropCheckServiceTest extends TestCase
             })
             ->andReturnFalse();
 
+        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
+            ->once()
+            ->withArgs(function ($chance) {
+                return abs($chance - 0.15) < 0.00001;
+            })
+            ->andReturnFalse();
+
         $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
         $character = $this->setLootingToBonus($characterFactory->getCharacter(), 0.45);
 

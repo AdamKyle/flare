@@ -79,7 +79,8 @@ use App\Game\Character\Builders\AttackBuilders\AttackDetails\CharacterAttackBuil
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ClassRanksWeaponMasteriesBuilder;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
-use App\Game\Character\CharacterCreation\Services\CharacterBuilderService;
+use App\Game\Character\CharacterCreation\Pipeline\CharacterCreationPipeline;
+use App\Game\Character\CharacterCreation\State\CharacterBuildState;
 use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
@@ -88,7 +89,6 @@ use App\Game\Kingdoms\Transformers\KingdomBuildingTransformer;
 use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Transformers\OtherKingdomTransformer;
 use App\Game\Kingdoms\Transformers\UnitTransformer;
-use App\Game\Monsters\Services\MonsterListService;
 use App\Game\Monsters\Transformers\MonsterTransformer;
 use App\Game\Quests\Services\BuildQuestCacheService;
 use App\Game\Quests\Transformers\QuestTransformer;
@@ -442,7 +442,6 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(MonsterPlayerFight::class, function ($app) {
             return new MonsterPlayerFight(
                 $app->make(BuildMonster::class),
-                $app->make(MonsterListService::class),
                 $app->make(CharacterCacheData::class),
                 $app->make(DelveMonsterService::class),
                 $app->make(Voidance::class),
@@ -454,7 +453,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(CharacterDeletion::class, function ($app) {
             return new CharacterDeletion(
                 $app->make(GiveKingdomsToNpcHandler::class),
-                $app->make(CharacterBuilderService::class),
+                $app->make(CharacterCreationPipeline::class),
+                $app->make(CharacterBuildState::class),
             );
         });
 

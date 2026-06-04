@@ -6,6 +6,7 @@ use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityKingdomLogHandler;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessUnitRequestHandler;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityUnitManagementRequestHandler;
 
@@ -16,6 +17,7 @@ class CapitalCityUnitManagement
     public function __construct(
         private readonly CapitalCityUnitManagementRequestHandler $capitalCityUnitManagementRequestHandler,
         private readonly CapitalCityProcessUnitRequestHandler $capitalCityProcessUnitRequestHandler,
+        private readonly CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler,
     ) {}
 
     public function createUnitRequests(Character $character, Kingdom $kingdom, array $requestData): array
@@ -26,5 +28,10 @@ class CapitalCityUnitManagement
     public function processUnitRequest(CapitalCityUnitQueue $capitalCityUnitQueue): void
     {
         $this->capitalCityProcessUnitRequestHandler->handleUnitRequests($capitalCityUnitQueue);
+    }
+
+    public function possiblyCreateKingdomLog(CapitalCityUnitQueue $capitalCityUnitQueue): void
+    {
+        $this->capitalCityKingdomLogHandler->possiblyCreateLogForUnitQueue($capitalCityUnitQueue);
     }
 }

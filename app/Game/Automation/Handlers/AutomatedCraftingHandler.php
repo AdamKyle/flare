@@ -10,7 +10,7 @@ use App\Game\Automation\Contracts\AutomatedCraftingLogger;
 use App\Game\Automation\Enums\AutomatedCraftingResultType;
 use App\Game\Automation\Values\AutomatedCraftingAttemptTracker;
 use App\Game\Automation\Values\AutomatedCraftingResult;
-use App\Game\Character\CharacterInventory\Values\ItemType;
+use App\Flare\Items\Values\ItemType;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\CraftingService;
 

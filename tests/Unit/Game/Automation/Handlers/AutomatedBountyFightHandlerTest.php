@@ -91,6 +91,8 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->characterRewardService = null;
         $this->skillService = null;
 
+        Mockery::close();
+
         parent::tearDown();
     }
 

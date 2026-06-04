@@ -32,7 +32,7 @@ class CancelUnitRequestService
             return $this->errorResult('What are you trying to cancel child?');
         }
 
-        if ($queue->completed_at->diffInSeconds(now()) <= 60) {
+        if ($queue->completed_at->greaterThan(now()) && now()->diffInSeconds($queue->completed_at) <= 60) {
             return $this->errorResult('You cannot cancel this request because it is on the doorstep of: '.$queue->kingdom->name);
         }
 

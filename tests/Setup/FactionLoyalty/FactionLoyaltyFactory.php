@@ -16,7 +16,7 @@ use App\Flare\Models\Npc;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\MapNameValue;
-use App\Game\Character\CharacterInventory\Values\ItemType;
+use App\Flare\Items\Values\ItemType;
 use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateFactionLoyalty;
 use Tests\Traits\CreateFactionLoyaltyAutomation;

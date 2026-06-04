@@ -15,7 +15,7 @@ use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Services\CelestialFightService;
 use App\Game\Battle\Services\MonsterFightService;
 use App\Game\Battle\Values\CelestialConjureType;
-use App\Game\Character\CharacterInventory\Values\ItemType;
+use App\Flare\Items\Values\ItemType;
 use App\Game\Maps\Services\MovementService;
 use App\Game\Maps\Services\PctService;
 use App\Game\Maps\Services\SetSailService;

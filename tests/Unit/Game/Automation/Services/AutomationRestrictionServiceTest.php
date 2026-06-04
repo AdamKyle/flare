@@ -6,7 +6,6 @@ use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Location;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
-use App\Flare\Values\LocationEffectValue;
 use App\Flare\Values\LocationType;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -623,7 +622,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => null,
-            'enemy_strength_type' => null,
+            'enemy_strength_increase' => null,
         ]);
 
         CharacterAutomation::factory()->create([
@@ -662,7 +661,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => null,
-            'enemy_strength_type' => null,
+            'enemy_strength_increase' => null,
             'is_port' => false,
         ]);
 
@@ -686,7 +685,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'x' => 48,
             'y' => 16,
             'type' => null,
-            'enemy_strength_type' => null,
+            'enemy_strength_increase' => null,
             'is_port' => true,
         ]);
 
@@ -710,7 +709,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => LocationType::GOLD_MINES,
-            'enemy_strength_type' => null,
+            'enemy_strength_increase' => null,
         ]);
 
         CharacterAutomation::factory()->create([
@@ -733,7 +732,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => LocationType::PURGATORY_DUNGEONS,
-            'enemy_strength_type' => null,
+            'enemy_strength_increase' => null,
         ]);
 
         CharacterAutomation::factory()->create([
@@ -756,7 +755,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => LocationType::PURGATORY_SMITH_HOUSE,
-            'enemy_strength_type' => null,
+            'enemy_strength_increase' => null,
         ]);
 
         CharacterAutomation::factory()->create([
@@ -779,7 +778,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => null,
-            'enemy_strength_type' => LocationEffectValue::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY,
+            'enemy_strength_increase' => 0.30,
         ]);
 
         CharacterAutomation::factory()->create([

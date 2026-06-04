@@ -6,7 +6,8 @@ use App\Flare\Models\GameClass;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\User;
-use App\Game\Character\CharacterCreation\Services\CharacterBuilderService;
+use App\Game\Character\CharacterCreation\Pipeline\CharacterCreationPipeline;
+use App\Game\Character\CharacterCreation\State\CharacterBuildState;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
@@ -30,7 +31,7 @@ class CreateCharacter extends Command
     /**
      * Execute the console command.
      */
-    public function handle(CharacterBuilderService $characterBuilder)
+    public function handle(CharacterCreationPipeline $characterCreationPipeline)
     {
         $map = GameMap::where('default', true)->first();
 
@@ -50,12 +51,16 @@ class CreateCharacter extends Command
 
         event(new Registered($user));
 
-        $characterBuilder->setRace($race)
+        $characterBuildState = new CharacterBuildState;
+        $characterBuildState
+            ->setUser($user)
+            ->setRace($race)
             ->setClass($class)
-            ->createCharacter($user, $map, $this->argument('characterName'))
-            ->assignSkills()
-            ->assignPassiveSkills()
-            ->buildCharacterCache();
+            ->setMap($map)
+            ->setCharacterName($this->argument('characterName'))
+            ->setNow(now());
+
+        $characterCreationPipeline->run($characterBuildState);
 
         $this->line('Character '.$this->argument('characterName').' has been created!');
     }

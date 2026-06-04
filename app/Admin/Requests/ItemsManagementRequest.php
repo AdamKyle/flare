@@ -72,9 +72,6 @@ class ItemsManagementRequest extends FormRequest
             'focus_mod' => 'nullable',
             'effect' => 'nullable',
             'fight_time_out_mod_bonus' => 'nullable',
-            'base_damage_mod_bonus' => 'nullable',
-            'base_healing_mod_bonus' => 'nullable',
-            'base_ac_mod_bonus' => 'nullable',
             'move_time_out_mod_bonus' => 'nullable',
         ];
     }

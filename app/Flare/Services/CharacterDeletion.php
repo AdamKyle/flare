@@ -10,22 +10,19 @@ use App\Flare\Models\GemBag;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Models\User;
-use App\Game\Character\CharacterCreation\Services\CharacterBuilderService;
+use App\Game\Character\CharacterCreation\Pipeline\CharacterCreationPipeline;
+use App\Game\Character\CharacterCreation\State\CharacterBuildState;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class CharacterDeletion
 {
-    private GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler;
-
-    private CharacterBuilderService $characterBuilder;
-
-    public function __construct(GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler, CharacterBuilderService $characterBuilder)
-    {
-        $this->giveKingdomsToNpcHandler = $giveKingdomsToNpcHandler;
-        $this->characterBuilder = $characterBuilder;
-    }
+    public function __construct(
+        private readonly GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler,
+        private readonly CharacterCreationPipeline $characterCreationPipeline,
+        private readonly CharacterBuildState $characterBuildState,
+    ) {}
 
     public function deleteCharacterFromUser(Character $character, array $params = [])
     {
@@ -62,12 +59,15 @@ class CharacterDeletion
         $class = GameClass::find($params['class_id']);
         $map = GameMap::where('default', true)->first();
 
-        $this->characterBuilder->setRace($race)
+        $this->characterBuildState
+            ->setUser($user)
+            ->setRace($race)
             ->setClass($class)
-            ->createCharacter($user, $map, $params['name'])
-            ->assignSkills()
-            ->assignPassiveSkills()
-            ->buildCharacterCache();
+            ->setMap($map)
+            ->setCharacterName($params['name'])
+            ->setNow(now());
+
+        $this->characterCreationPipeline->run($this->characterBuildState);
 
         $user->refresh()->update([
             'guide_enabled' => $params['guide'],

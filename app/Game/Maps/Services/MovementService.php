@@ -8,7 +8,7 @@ use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
 use App\Flare\Transformers\CharacterAttackTransformer;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Events\UpdateCharacterStatus;

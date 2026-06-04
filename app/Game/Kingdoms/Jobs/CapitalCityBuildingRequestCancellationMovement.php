@@ -79,7 +79,7 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
     private function shouldDelayCancellation(CapitalCityBuildingQueue $queueData): bool
     {
         if (! $queueData->completed_at->lessThanOrEqualTo(now())) {
-            $timeLeft = $queueData->completed_at->diffInMinutes(now());
+            $timeLeft = now()->diffInMinutes($queueData->completed_at);
 
             if ($timeLeft >= 1) {
                 $time = now()->addMinutes($timeLeft <= 15 ? $timeLeft : 15);

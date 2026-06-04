@@ -5,7 +5,7 @@ namespace App\Game\Events\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Game\Core\Values\FactionLevel;
-use App\Game\Exploration\Services\ExplorationAutomationService;
+use App\Game\Automation\Services\ExplorationAutomationService;;
 use App\Game\Maps\Services\TraverseService;
 use Illuminate\Database\Eloquent\Collection;
 

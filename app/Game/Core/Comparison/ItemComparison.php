@@ -6,7 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Traits\IsItemUnique;
 use App\Game\Character\CharacterInventory\Values\ArmourType;
-use App\Game\Character\CharacterInventory\Values\ItemType;
+use App\Flare\Items\Values\ItemType;
 use Illuminate\Database\Eloquent\Collection;
 
 class ItemComparison

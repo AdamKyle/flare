@@ -845,19 +845,15 @@ class DelveExplorationTest extends TestCase
             $this->assertFalse($this->character->refresh()->isLoggedIn());
         }
 
-        $this->bindWinningFight();
-
         $automation = $this->createAutomation([
-            'completed_at' => $now->copy()->addSeconds(30),
+            'completed_at' => $now->copy()->subSeconds(1),
         ]);
 
         $delve = $this->createDelve([
             'started_at' => $now->copy()->subHours($hoursElapsed),
         ]);
 
-        $this->runJob($automation->id, $delve->id, [
-            'pack_size' => 2,
-        ]);
+        $this->runJob($automation->id, $delve->id);
     }
 
     private function runJob(

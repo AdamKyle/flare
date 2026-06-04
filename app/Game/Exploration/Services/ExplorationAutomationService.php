@@ -7,10 +7,10 @@ use App\Flare\Models\CharacterAutomation;
 use App\Flare\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
-use App\Game\Exploration\Events\ExplorationLogUpdate;
-use App\Game\Exploration\Events\ExplorationStatus;
-use App\Game\Exploration\Events\ExplorationTimeOut;
-use App\Game\Exploration\Jobs\Exploration;
+use App\Game\Automation\Events\AutomationLogUpdate;
+use App\Game\Automation\Events\AutomationStatus;
+use App\Game\Automation\Events\AutomationTimeOut;
+use App\Game\Automation\Jobs\Exploration;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Support\Facades\Cache;
 
@@ -41,9 +41,9 @@ class ExplorationAutomationService
 
         event(new UpdateCharacterStatus($character));
 
-        event(new ExplorationLogUpdate($character->user->id, 'The exploration will begin in '.$this->timeDelay.' minutes. Every '.$this->timeDelay.' minutes you will encounter the enemy up to a maximum of 50 times in a single "encounter"'));
+        event(new AutomationLogUpdate($character->user->id, 'The exploration will begin in '.$this->timeDelay.' minutes. Every '.$this->timeDelay.' minutes you will encounter the enemy up to a maximum of 50 times in a single "encounter"'));
 
-        event(new ExplorationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
+        event(new AutomationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
 
         $this->startAutomation($character, $automation->id, $params['attack_type']);
     }
@@ -66,10 +66,10 @@ class ExplorationAutomationService
 
         Cache::delete('can-character-survive-'.$character->id);
 
-        event(new ExplorationTimeOut($character->user, 0));
-        event(new ExplorationStatus($character->user, false));
+        event(new AutomationTimeOut($character->user, 0));
+        event(new AutomationStatus($character->user, false));
         event(new UpdateCharacterStatus($character));
-        event(new ExplorationLogUpdate($character->user->id, 'Exploration has been stopped at player request.'));
+        event(new AutomationLogUpdate($character->user->id, 'Exploration has been stopped at player request.'));
     }
 
     public function getTimeDelay(): int

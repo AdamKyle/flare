@@ -84,7 +84,7 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
     private function shouldDelayCancellation(CapitalCityUnitQueue $queueData): bool
     {
         if (! $queueData->completed_at->lessThanOrEqualTo(now())) {
-            $timeLeft = $queueData->completed_at->diffInMinutes(now());
+            $timeLeft = now()->diffInMinutes($queueData->completed_at);
 
             if ($timeLeft >= 1) {
                 $time = now()->addMinutes($timeLeft <= 15 ? $timeLeft : 15);
@@ -125,7 +125,9 @@ class CapitalCityUnitRequestCancellationMovement implements ShouldQueue
 
                 CapitalCityUnitCancellation::where('id', $this->capitalCityCancellationQueueId)->update(['status' => CapitalCityQueueStatus::CANCELLATION_REJECTED]);
 
-                $messages[] = 'Failed to cancel unit recruitment. Seems it must already be done for unit: '.$gameUnit->name;
+                $unitName = is_null($gameUnit) ? 'Unknown Unit' : $gameUnit->name;
+
+                $messages[] = 'Failed to cancel unit recruitment. Seems it must already be done for unit: '.$unitName;
 
                 $queueData->update(['messages' => $messages]);
 

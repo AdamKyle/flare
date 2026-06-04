@@ -17,6 +17,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
+use App\Game\Core\Services\CharacterPassiveSkills;
 
 class TrainPassiveSkill implements ShouldQueue
 {
@@ -41,7 +42,8 @@ class TrainPassiveSkill implements ShouldQueue
         Manager $manager,
         KingdomTransformer $kingdomTransformer,
         KingdomMaxResourceRecalculationService $kingdomMaxResourceRecalculationService,
-        KingdomBuildingUnlockSyncService $kingdomBuildingUnlockSyncService
+        KingdomBuildingUnlockSyncService $kingdomBuildingUnlockSyncService,
+        CharacterPassiveSkills $characterPassiveSkills
     ) {
 
         if (is_null($this->characterPassiveSkill->started_at)) {

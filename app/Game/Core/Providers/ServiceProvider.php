@@ -2,7 +2,7 @@
 
 namespace App\Game\Core\Providers;
 
-use App\Flare\Builders\BuildMythicItem;
+use App\Flare\Items\Builders\BuildMythicItem;
 use App\Flare\Values\BaseStatValue;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Core\Services\CharacterPassiveSkills;

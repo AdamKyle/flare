@@ -26,6 +26,9 @@ class EndScheduledEvent extends Command
     protected $description = 'End all scheduled events';
 
     /**
+     * @param EventEnderRegistry $registry
+     * @param ScheduleEventFinalizerService $finalizer
+     * @return void
      * @throws Exception
      */
     public function handle(
@@ -55,99 +58,8 @@ class EndScheduledEvent extends Command
 
             $eventType = new EventType($scheduledEvent->event_type);
 
-            if ($eventType->isRaidEvent()) {
-                try {
-                    $this->endRaid($event, $locationService, $updateRaidMonsters);
-
-                    $buildQuestCacheService->buildRaidQuestCache(true);
-                } finally {
-                    $event->update([
-                        'currently_running' => false,
-                    ]);
-
-                    event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
-                }
-            }
-
-            if ($eventType->isWeeklyCurrencyDrops()) {
-                try {
-                    $this->endWeeklyCurrencyDrops($currentEvent);
-                } finally {
-                    $event->update([
-                        'currently_running' => false,
-                    ]);
-
-                    event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
-                }
-            }
-
-            if ($eventType->isWeeklyCelestials()) {
-                try {
-                    $this->endWeeklySpawnEvent($currentEvent);
-                } finally {
-                    $event->update([
-                        'currently_running' => false,
-                    ]);
-
-                    event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
-                }
-            }
-
-            if ($eventType->isWeeklyFactionLoyaltyEvent()) {
-                try {
-                    $this->endWeeklyFactionLoyaltyEvent($currentEvent);
-                } finally {
-                    $event->update([
-                        'currently_running' => false,
-                    ]);
-
-                    event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
-                }
-            }
-
-            if ($eventType->isWinterEvent()) {
-                try {
-                    $this->endWinterEvent($kingdomEventService, $traverseService, $explorationAutomationService, $factionLoyaltyService, $currentEvent);
-
-                    $buildQuestCacheService->buildQuestCache(true);
-                    $buildQuestCacheService->buildRaidQuestCache(true);
-                } finally {
-                    $event->update([
-                        'currently_running' => false,
-                    ]);
-
-                    event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
-                }
-            }
-
-            if ($eventType->isDelusionalMemoriesEvent()) {
-                try {
-                    $this->endDelusionalEvent($kingdomEventService, $traverseService, $explorationAutomationService, $factionLoyaltyService, $currentEvent);
-
-                    $buildQuestCacheService->buildQuestCache(true);
-                    $buildQuestCacheService->buildRaidQuestCache(true);
-                } finally {
-                    $event->update([
-                        'currently_running' => false,
-                    ]);
-
-                    event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
-                }
-            }
-
-            if ($eventType->isFeedbackEvent()) {
-                try {
-                    $this->endFeedBackEvent($createSurveySnapshot);
-                } finally {
-                    $event->update([
-                        'currently_running' => false,
-                    ]);
-
-                    event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
-                }
-            }
-
-            $this->cleanUpEvent($currentEvent);
+            $registry->end($eventType, $scheduledEvent, $currentEvent);
+            $finalizer->markNotRunningAndBroadcast($scheduledEvent);
         }
     }
 

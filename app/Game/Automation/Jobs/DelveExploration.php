@@ -541,6 +541,7 @@ class DelveExploration implements ShouldQueue
      */
     private function rewardPlayer(Character $character, DelveExplorationModel $delveExploration): void
     {
+        $this->characterRewardService->setCharacter($character);
 
         $start = $delveExploration->started_at;
         $end = $delveExploration->completed_at;

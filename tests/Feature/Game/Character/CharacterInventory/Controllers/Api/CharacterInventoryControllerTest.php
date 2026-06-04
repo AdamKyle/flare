@@ -3,7 +3,7 @@
 namespace Tests\Feature\Game\Character\CharacterInventory\Controllers\Api;
 
 use App\Flare\Values\WeaponTypes;
-use App\Game\Character\CharacterInventory\Values\ItemType;
+use App\Flare\Items\Values\ItemType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
@@ -63,11 +63,11 @@ class CharacterInventoryControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/'.$character->id.'/inventory');
+            ->call('GET', '/api/character/'.$character->id.'/equipped_items');
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertGreaterThan(0, $jsonData['equipped'][0]['healing']);
+        $this->assertGreaterThan(0, $jsonData['equipped']['data'][0]['raw_healing']);
     }
 
     public function test_fail_to_get_api_item_details()

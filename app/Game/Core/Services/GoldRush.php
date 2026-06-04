@@ -4,7 +4,7 @@ namespace App\Game\Core\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
-use App\Flare\Values\LocationEffectValue;
+use Facades\App\Game\Maps\Calculations\LocationBasedEnemyDropChanceBonus;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
@@ -84,7 +84,7 @@ class GoldRush
     {
         $map = $character->map;
 
-        $location = Location::whereNotNull('enemy_strength_type')
+        $location = Location::whereNotNull('enemy_strength_increase')
             ->where('x', $map->character_position_x)
             ->where('y', $map->character_position_y)
             ->where('game_map_id', $map->game_map_id)
@@ -94,6 +94,6 @@ class GoldRush
             return 0.0;
         }
 
-        return (new LocationEffectValue($location->enemy_strength_type))->fetchDropRate();
+        return LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent($location->enemy_strength_increase);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Game\Character\CharacterSheet\Controllers\Api;
 
-use App\Game\Character\CharacterInventory\Values\ItemType;
+use App\Flare\Items\Values\ItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -32,6 +32,6 @@ class CharacterSheetControllerTest extends TestCase
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertGreaterThan(0, $jsonData['sheet']['heal_for']);
+        $this->assertGreaterThan(0, $jsonData['data']['healing_amount']);
     }
 }

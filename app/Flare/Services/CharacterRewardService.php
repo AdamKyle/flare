@@ -8,6 +8,7 @@ use App\Flare\Items\Builders\BuildUniqueItem;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item as ItemModel;
 use App\Flare\Models\Monster;
+use App\Flare\Values\RandomAffixDetails;
 use App\Game\Skills\Services\SkillService;
 use Exception;
 
@@ -110,11 +111,10 @@ class CharacterRewardService
      */
     public function getSpecialGearDrop(int $amountPaid): ItemModel
     {
-        return Location::whereNotNull('enemy_strength_increase')
-            ->where('x', $map->character_position_x)
-            ->where('y', $map->character_position_y)
-            ->where('game_map_id', $map->game_map_id)
-            ->where('type', LocationType::PURGATORY_DUNGEONS)
-            ->first();
+        return match ($amountPaid) {
+            RandomAffixDetails::MYTHIC => $this->buildMythicItem->fetchMythicItem($this->character),
+            RandomAffixDetails::COSMIC => $this->buildCosmicItem->fetchCosmicItem($this->character),
+            default => $this->buildUniqueItem->fetchUniqueItem($this->character),
+        };
     }
 }

@@ -26,7 +26,7 @@ use App\Game\Events\Services\WeeklyCelestialEventEnderService;
 use App\Game\Events\Services\WeeklyCurrencyEventEnderService;
 use App\Game\Events\Services\WeeklyFactionLoyaltyEnderService;
 use App\Game\Events\Services\WinterEventEnderService;
-use App\Game\Exploration\Services\ExplorationAutomationService;
+use App\Game\Automation\Services\ExplorationAutomationService;;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\TraverseService;

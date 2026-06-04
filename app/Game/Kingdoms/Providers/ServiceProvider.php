@@ -152,6 +152,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CapitalCityUnitManagement(
                 $app->make(CapitalCityUnitManagementRequestHandler::class),
                 $app->make(CapitalCityProcessUnitRequestHandler::class),
+                $app->make(CapitalCityKingdomLogHandler::class),
             );
         });
 

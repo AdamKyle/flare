@@ -3,8 +3,10 @@
 namespace Tests;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Vite;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\HtmlString;
 use Laravel\BrowserKitTesting\TestCase as BaseTestCase;
 use Tests\Setup\AttackDataCacheSetUp;
 
@@ -22,6 +24,12 @@ abstract class TestCase extends BaseTestCase
     {
 
         parent::setUp();
+
+        $this->app->instance(Vite::class, new class extends Vite {
+            public function __invoke($entrypoints, $buildDirectory = null): HtmlString {
+                return new HtmlString('');
+            }
+        });
 
         if ($this->useMockForAttackDataCache) {
             $this->attackDataCacheSetUp = new AttackDataCacheSetUp;

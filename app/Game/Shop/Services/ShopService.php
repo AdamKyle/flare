@@ -114,6 +114,25 @@ class ShopService
         }
     }
 
+    public function sellSpecificItem(Character $character, int $inventorySlotId): void
+    {
+        $inventory = Inventory::where('character_id', $character->id)->first();
+
+        if (is_null($inventory)) {
+            return;
+        }
+
+        $inventorySlot = InventorySlot::where('inventory_id', $inventory->id)
+            ->where('id', $inventorySlotId)
+            ->first();
+
+        if (is_null($inventorySlot)) {
+            return;
+        }
+
+        event(new SellItemEvent($inventorySlot, $character));
+    }
+
     /**
      * Sell Item.
      */

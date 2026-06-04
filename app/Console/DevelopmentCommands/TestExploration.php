@@ -9,7 +9,8 @@ use App\Flare\Models\GameRace;
 use App\Flare\Models\Monster;
 use App\Flare\Models\User;
 use App\Game\Automation\Services\ExplorationAutomationService;
-use App\Game\Character\CharacterCreation\Services\CharacterBuilderService;
+use App\Game\Character\CharacterCreation\Pipeline\CharacterCreationPipeline;
+use App\Game\Character\CharacterCreation\State\CharacterBuildState;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
@@ -35,14 +36,14 @@ class TestExploration extends Command
     /**
      * Execute the console command.
      */
-    public function handle(CharacterBuilderService $characterBuilder, ExplorationAutomationService $explorationAutomationService)
+    public function handle(CharacterCreationPipeline $characterCreationPipeline, ExplorationAutomationService $explorationAutomationService)
     {
         ini_set('memory_limit', '3G');
 
         $numberOfCharacters = $this->argument('numberOfCharacters');
         $characterToIgnore = $this->argument('characterToIgnore');
 
-        $characters = $this->getTheCharacters($characterBuilder, $numberOfCharacters, $characterToIgnore);
+        $characters = $this->getTheCharacters($characterCreationPipeline, $numberOfCharacters, $characterToIgnore);
 
         $this->line('Starting explorations for 1 hour, using default attack type, killing the first surface monster ...');
 
@@ -75,7 +76,7 @@ class TestExploration extends Command
      * - Will create a specific amount to match the number of characters we want to use for exploration.
      * - Will ignore a specific character from the list to return.
      */
-    protected function getTheCharacters(CharacterBuilderService $characterBuilder, int $numberOfCharacters, ?string $characterToIgnore): Collection
+    protected function getTheCharacters(CharacterCreationPipeline $characterCreationPipeline, int $numberOfCharacters, ?string $characterToIgnore): Collection
     {
         $characters = Character::query();
 
@@ -88,11 +89,11 @@ class TestExploration extends Command
 
             $this->line('Creating character amount: '.$charactersToCreate);
 
-            $this->createTheCharacters($characterBuilder, $charactersToCreate);
+            $this->createTheCharacters($characterCreationPipeline, $charactersToCreate);
 
             $this->line('Characters created.');
 
-            return $this->getTheCharacters($characterBuilder, $numberOfCharacters, $characterToIgnore);
+            return $this->getTheCharacters($characterCreationPipeline, $numberOfCharacters, $characterToIgnore);
         }
 
         return $characters->take($numberOfCharacters)->get();
@@ -105,7 +106,7 @@ class TestExploration extends Command
      *
      * @throws Exception
      */
-    protected function createTheCharacters(CharacterBuilderService $characterBuilder, int $charactersToCreate)
+    protected function createTheCharacters(CharacterCreationPipeline $characterCreationPipeline, int $charactersToCreate)
     {
         for ($i = 0; $i <= $charactersToCreate; $i++) {
             $user = $this->createUser();
@@ -114,7 +115,7 @@ class TestExploration extends Command
             $gameClass = GameClass::inRandomOrder()->first();
             $gameRace = GameRace::inRandomOrder()->first();
 
-            $this->createCharacter($characterBuilder, $user, $surfaceMap, $gameClass, $gameRace);
+            $this->createCharacter($characterCreationPipeline, $user, $surfaceMap, $gameClass, $gameRace);
         }
     }
 
@@ -137,16 +138,19 @@ class TestExploration extends Command
      *
      * @throws Exception
      */
-    protected function createCharacter(CharacterBuilderService $characterBuilder, User $user, GameMap $map, GameClass $class, GameRace $race): Character
+    protected function createCharacter(CharacterCreationPipeline $characterCreationPipeline, User $user, GameMap $map, GameClass $class, GameRace $race): Character
     {
-
-        $characterBuilder->setRace($race)
+        $characterBuildState = new CharacterBuildState;
+        $characterBuildState
+            ->setUser($user)
+            ->setRace($race)
             ->setClass($class)
-            ->createCharacter($user, $map, Str::random(4).str_replace(' ', '', $class->name))
-            ->assignSkills()
-            ->assignPassiveSkills()
-            ->buildCharacterCache();
+            ->setMap($map)
+            ->setCharacterName(Str::random(4).str_replace(' ', '', $class->name))
+            ->setNow(now());
 
-        return $characterBuilder->character();
+        $characterCreationPipeline->run($characterBuildState);
+
+        return $characterBuildState->getCharacter();
     }
 }

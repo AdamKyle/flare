@@ -67,7 +67,7 @@ class CapitalCityUnitRequestCancellationMovementTest extends TestCase
 
         $capitalCityUnitManagement = $this->getMockBuilder(CapitalCityUnitManagement::class)
             ->disableOriginalConstructor()
-            ->addMethods(['possiblyCreateKingdomLog'])
+            ->onlyMethods(['possiblyCreateKingdomLog'])
             ->getMock();
 
         $capitalCityUnitManagement->expects($this->once())

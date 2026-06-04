@@ -40,7 +40,7 @@ class CapitalCityBuildingRequest implements ShouldQueue
         }
 
         if (!$queueData->completed_at->lessThanOrEqualTo(now())) {
-            $timeLeft = $queueData->completed_at->diffInMinutes(now());
+            $timeLeft = now()->diffInMinutes($queueData->completed_at);
 
             if ($timeLeft >= 1) {
                 if ($timeLeft <= 15) {

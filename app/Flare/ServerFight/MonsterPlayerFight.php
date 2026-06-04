@@ -415,7 +415,7 @@ class MonsterPlayerFight
 
         $mapName = $map->gameMap->name;
 
-        $monsters = Cache::get('celestials')[$mapName];
+        $monsters = Cache::get('celestials')[$mapName]['data'];
 
         foreach ($monsters as $monster) {
             if ($monster['id'] === $monsterId) {

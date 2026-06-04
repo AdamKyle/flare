@@ -80,6 +80,7 @@ class MonsterTransformer extends TransformerAbstract
             'name' => $monster->name,
             'map_name' => $monster->gameMap->name,
             'damage_stat' => $monster->damage_stat,
+            'to_hit_base' => $this->applyPercentToIntegerStat($monster->{$monster->damage_stat}, $enemyIncrease),
 
             'str' => $this->applyPercentToIntegerStat($monster->str, $enemyIncrease),
             'dur' => $this->applyPercentToIntegerStat($monster->dur, $enemyIncrease),

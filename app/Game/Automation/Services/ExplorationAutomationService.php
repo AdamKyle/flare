@@ -118,6 +118,6 @@ class ExplorationAutomationService
             return false;
         }
 
-        return ! is_null($location->type) || ! is_null($location->enemy_strength_type);
+        return ! is_null($location->type) || ! is_null($location->enemy_strength_increase);
     }
 }

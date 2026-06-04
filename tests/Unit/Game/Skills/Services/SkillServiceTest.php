@@ -458,7 +458,7 @@ class SkillServiceTest extends TestCase
 
         $boon = $this->createItem([
             'name' => 'Stacked Base Damage Boon',
-            'base_damage_mod_bonus' => 0.15,
+            'base_damage_mod' => 0.15,
             'can_stack' => true,
         ]);
 

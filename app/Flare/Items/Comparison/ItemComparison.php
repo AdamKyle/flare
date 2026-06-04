@@ -102,6 +102,10 @@ class ItemComparison
             return EquippablePositionType::values([EquippablePositionType::LEFT_HAND, EquippablePositionType::RIGHT_HAND]);
         }
 
+        if ($typeEnum === ItemType::TRINKET) {
+            return ['trinket'];
+        }
+
         $armourPositionsMap = ArmourType::getArmourPositions();
         $armourPositions = $armourPositionsMap[$item->type] ?? null;
 

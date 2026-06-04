@@ -35,7 +35,7 @@ class KingdomAutomationRestrictionTest extends TestCase
             ->call('GET', '/api/player-kingdom/'.$character->id.'/'.$kingdom->id);
 
         $response->assertOk();
-        $response->assertJsonPath('kingdom.id', $kingdom->id);
+        $response->assertJsonPath('kingdom.data.id', $kingdom->id);
     }
 
     public function test_kingdom_list_can_be_fetched_during_exploration(): void
@@ -77,7 +77,7 @@ class KingdomAutomationRestrictionTest extends TestCase
             ->call('GET', '/api/player-kingdom/'.$character->id.'/'.$kingdom->id);
 
         $response->assertOk();
-        $response->assertJsonPath('kingdom.id', $kingdom->id);
+        $response->assertJsonPath('kingdom.data.id', $kingdom->id);
     }
 
     public function test_kingdom_details_can_be_fetched_during_faction_loyalty(): void
@@ -99,7 +99,7 @@ class KingdomAutomationRestrictionTest extends TestCase
             ->call('GET', '/api/player-kingdom/'.$character->id.'/'.$kingdom->id);
 
         $response->assertOk();
-        $response->assertJsonPath('kingdom.id', $kingdom->id);
+        $response->assertJsonPath('kingdom.data.id', $kingdom->id);
     }
 
     public function test_kingdom_mutation_rejects_during_automation(): void

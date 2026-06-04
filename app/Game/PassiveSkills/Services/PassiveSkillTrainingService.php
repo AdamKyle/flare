@@ -4,6 +4,7 @@ namespace App\Game\PassiveSkills\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterPassiveSkill;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\PassiveSkills\Jobs\TrainPassiveSkill;
 
@@ -55,7 +56,7 @@ class PassiveSkillTrainingService
 
         TrainPassiveSkill::dispatch($character, $skill)->delay($delayTime);
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterBaseDetailsEvent($character));
 
         return true;
     }

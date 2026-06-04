@@ -11,7 +11,7 @@ use App\Game\Automation\Handlers\AutomatedCraftingHandler;
 use App\Game\Automation\Loggers\FactionLoyaltyAutomationCraftingLogger;
 use App\Game\Automation\Values\AutomatedCraftingAttemptTracker;
 use App\Game\Automation\Values\AutomatedCraftingResult;
-use App\Game\Character\CharacterInventory\Values\ItemType;
+use App\Flare\Items\Values\ItemType;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\SkillCheckService;
@@ -97,6 +97,8 @@ class AutomatedCraftingHandlerTest extends TestCase
         $this->craftingService = null;
         $this->shopService = null;
         $this->weaponCraftingSkill = null;
+
+        Mockery::close();
 
         parent::tearDown();
     }

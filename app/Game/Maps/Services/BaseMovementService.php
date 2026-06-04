@@ -196,7 +196,7 @@ class BaseMovementService
             return false;
         }
 
-        if (! is_null($location->enemy_strength_type) && $character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty()) {
+        if (! is_null($location->enemy_strength_increase) && $character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty()) {
 
             if (! is_null($location->type)) {
                 $locationType = new LocationType($location->type);

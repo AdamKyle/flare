@@ -491,7 +491,7 @@ class CapitalCityManagementService
     private function formatKingdomBuildingData(Kingdom $capitalCityKingdom, Kingdom $kingdomForRequest, SupportCollection $buildings): array
     {
         $buildings = new Collection($buildings, $this->capitalCityKingdomBuildingTransformer);
-        $buildings = $this->manager->createData($buildings)->toArray();
+        $buildings = $this->manager->createData($buildings)->toArray()['data'] ?? [];
 
         $character = $capitalCityKingdom->character;
 

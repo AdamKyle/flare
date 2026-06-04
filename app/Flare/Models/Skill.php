@@ -169,13 +169,13 @@ class Skill extends Model
             return 0.0;
         }
 
-        $itemBonus = $this->getItemBonuses($this->baseSkill, 'base_damage_mod_bonus', true);
+        $itemBonus = $this->getItemBonuses($this->baseSkill, 'base_damage_mod', true);
 
         $baseBonus = (
             $value * $this->level
         );
 
-        $baseBonus += $this->getCharacterBoonsBonus('base_damage_mod_bonus');
+        $baseBonus += $this->getCharacterBoonsBonus('base_damage_mod');
 
         return $itemBonus + $baseBonus;
     }
@@ -188,13 +188,13 @@ class Skill extends Model
             return 0.0;
         }
 
-        $itemBonus = $this->getItemBonuses($this->baseSkill, 'base_damage_mod_bonus', true);
+        $itemBonus = $this->getItemBonuses($this->baseSkill, 'base_healing_mod', true);
 
         $baseBonus = (
             $value * $this->level
         );
 
-        $baseBonus += $this->getCharacterBoonsBonus('base_healing_mod_bonus');
+        $baseBonus += $this->getCharacterBoonsBonus('base_healing_mod');
 
         return $itemBonus + $baseBonus;
     }
@@ -207,13 +207,13 @@ class Skill extends Model
             return 0.0;
         }
 
-        $itemBonus = $this->getItemBonuses($this->baseSkill, 'base_ac_mod_bonus', true);
+        $itemBonus = $this->getItemBonuses($this->baseSkill, 'base_ac_mod', true);
 
         $baseBonus = (
             $this->baseSkill->base_ac_mod_bonus_per_level * $this->level
         );
 
-        $baseBonus += $this->getCharacterBoonsBonus('base_ac_mod_bonus');
+        $baseBonus += $this->getCharacterBoonsBonus('base_ac_mod');
 
         return $itemBonus + $baseBonus;
     }
