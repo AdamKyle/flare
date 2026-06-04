@@ -19,7 +19,7 @@ class KingdomQueueServiceTest extends TestCase
 {
     use CreateGameBuilding, CreateGameUnit, RefreshDatabase;
 
-    public function testFetchKingdomQueuesIncludesActiveCapitalCityBuildingQueue(): void
+    public function test_fetch_kingdom_queues_includes_active_capital_city_building_queue(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $capitalCity = $characterFactory->kingdomManagement()->assignKingdom([
@@ -59,7 +59,7 @@ class KingdomQueueServiceTest extends TestCase
         $this->assertArrayHasKey('time_remaining', $result['building_queues'][0]);
     }
 
-    public function testFetchKingdomQueuesIncludesActiveCapitalCityUnitQueue(): void
+    public function test_fetch_kingdom_queues_includes_active_capital_city_unit_queue(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $capitalCity = $characterFactory->kingdomManagement()->assignKingdom([
@@ -95,7 +95,7 @@ class KingdomQueueServiceTest extends TestCase
         $this->assertArrayHasKey('time_remaining', $result['unit_recruitment_queues'][0]);
     }
 
-    public function testFetchKingdomQueuesKeepsReadyActiveCapitalCityBuildingQueues(): void
+    public function test_fetch_kingdom_queues_keeps_ready_active_capital_city_building_queues(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $capitalCity = $characterFactory->kingdomManagement()->assignKingdom([
@@ -211,7 +211,7 @@ class KingdomQueueServiceTest extends TestCase
         $this->assertNotNull(CapitalCityBuildingQueue::find($repairingQueue->id));
     }
 
-    public function testFetchKingdomQueuesKeepsReadyActiveCapitalCityUnitQueues(): void
+    public function test_fetch_kingdom_queues_keeps_ready_active_capital_city_unit_queues(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $capitalCity = $characterFactory->kingdomManagement()->assignKingdom([
@@ -291,7 +291,7 @@ class KingdomQueueServiceTest extends TestCase
         $this->assertNotNull(CapitalCityUnitQueue::find($recruitingQueue->id));
     }
 
-    public function testFetchKingdomQueuesDoesNotRenderTerminalCapitalCityQueues(): void
+    public function test_fetch_kingdom_queues_does_not_render_terminal_capital_city_queues(): void
     {
         Log::spy();
 

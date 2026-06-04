@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Flare\Values;
 
-use App\Flare\Values\ClassAttackValue;
 use App\Flare\Items\Values\ItemType;
+use App\Flare\Values\ClassAttackValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;

@@ -2,7 +2,6 @@
 
 namespace App\Game\Kingdoms\Service;
 
-use Carbon\Carbon;
 use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameUnit;
@@ -18,20 +17,14 @@ use App\Game\Kingdoms\Validation\KingdomUnitResourceValidation;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Skills\Values\SkillTypeValue;
+use Carbon\Carbon;
 
 class UnitService
 {
     use ResponseBuilder;
 
-    /**
-     * @var float $totalResources
-     */
     private float $totalResources;
 
-    /**
-     * @param UpdateKingdomHandler $updateKingdomHandler
-     * @param KingdomUnitResourceValidation $kingdomUnitResourceValidation
-     */
     public function __construct(
         private readonly UpdateKingdomHandler $updateKingdomHandler,
         private readonly KingdomUnitResourceValidation $kingdomUnitResourceValidation
@@ -54,12 +47,6 @@ class UnitService
 
     /**
      * Start recruting a sset of units.
-     *
-     * @param Kingdom $kingdom
-     * @param GameUnit $gameUnit
-     * @param integer $amount
-     * @param integer|null $capitalCityQueueId
-     * @return void
      */
     public function recruitUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount, ?int $capitalCityQueueId = null): void
     {
@@ -89,11 +76,6 @@ class UnitService
 
     /**
      * Get the total time for the unit recruitment
-     *
-     * @param Character $character
-     * @param GameUnit $gameUnit
-     * @param integer $amount
-     * @return integer|float
      */
     public function getTotalTimeForUnitRecruitment(Character $character, GameUnit $gameUnit, int $amount): int|float
     {
@@ -104,11 +86,6 @@ class UnitService
 
     /**
      * Update kingdom resources when paying for a recruitment order for a unit.
-     *
-     * @param Kingdom $kingdom
-     * @param GameUnit $gameUnit
-     * @param integer $amount
-     * @return Kingdom
      */
     public function updateKingdomResources(Kingdom $kingdom, GameUnit $gameUnit, int $amount): Kingdom
     {
@@ -124,26 +101,21 @@ class UnitService
             'current_population' => $kingdom->current_population,
         ];
 
-
         foreach ($costs as $type => $cost) {
-            if ($newResources['current_' . strtolower($type)] < $cost) {
+            if ($newResources['current_'.strtolower($type)] < $cost) {
                 return $kingdom->refresh();
             }
 
-            $newResources['current_' . strtolower($type)] -= $cost;
+            $newResources['current_'.strtolower($type)] -= $cost;
         }
 
-        $kingdom->update(array_map(fn($value) => max($value, 0), $newResources));
+        $kingdom->update(array_map(fn ($value) => max($value, 0), $newResources));
 
         return $kingdom->refresh();
     }
 
     /**
      * Update the kingdoms resources based off the total costs for a set of units.
-     *
-     * @param Kingdom $kingdom
-     * @param array $totalCosts
-     * @return Kingdom
      */
     public function updateKingdomResourcesForTotalCost(Kingdom $kingdom, array $totalCosts): Kingdom
     {
@@ -157,23 +129,20 @@ class UnitService
         ];
 
         foreach ($totalCosts as $type => $cost) {
-            if ($newResources['current_' . strtolower($type)] < $cost) {
+            if ($newResources['current_'.strtolower($type)] < $cost) {
                 return $kingdom->refresh();
             }
 
-            $newResources['current_' . strtolower($type)] -= $cost;
+            $newResources['current_'.strtolower($type)] -= $cost;
         }
 
-        $kingdom->update(array_map(fn($value) => max($value, 0), $newResources));
+        $kingdom->update(array_map(fn ($value) => max($value, 0), $newResources));
 
         return $kingdom->refresh();
     }
 
     /**
      * Attempt to cancel a recruitment order
-     *
-     * @param UnitInQueue $queue
-     * @return Kingdom|null
      */
     public function cancelRecruit(UnitInQueue $queue): ?Kingdom
     {
@@ -198,9 +167,6 @@ class UnitService
 
     /**
      * Determine amount of resoources to give back.
-     *
-     * @param UnitInQueue $queue
-     * @return void
      */
     protected function resourceCalculation(UnitInQueue $queue): void
     {
@@ -221,9 +187,6 @@ class UnitService
 
     /**
      * Fetch the time reduction
-     *
-     * @param Character $character
-     * @return Skill
      */
     public function fetchTimeReduction(Character $character): Skill
     {
@@ -234,11 +197,6 @@ class UnitService
 
     /**
      * Give some of the resources back
-     *
-     * @param Kingdom $kingdom
-     * @param GameUnit $unit
-     * @param UnitInQueue $queue
-     * @return Kingdom
      */
     protected function updateKingdomAfterCancellation(Kingdom $kingdom, GameUnit $unit, UnitInQueue $queue): Kingdom
     {
@@ -301,7 +259,7 @@ class UnitService
             ->get()
             ->sum(function (CapitalCityUnitQueue $queue) use ($gameUnit) {
                 return collect($queue->unit_request_data)
-                    ->reject(fn($request) => in_array($request['secondary_status'], [
+                    ->reject(fn ($request) => in_array($request['secondary_status'], [
                         CapitalCityQueueStatus::FINISHED,
                         CapitalCityQueueStatus::REJECTED,
                         CapitalCityQueueStatus::CANCELLED,

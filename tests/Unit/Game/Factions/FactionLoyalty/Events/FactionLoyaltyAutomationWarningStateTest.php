@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 class FactionLoyaltyAutomationWarningStateTest extends TestCase
 {
-    public function testConstructorSetsWarningPayload(): void
+    public function test_constructor_sets_warning_payload(): void
     {
         $user = new User();
         $user->id = 123;
@@ -28,7 +28,7 @@ class FactionLoyaltyAutomationWarningStateTest extends TestCase
         $this->assertEquals($warningNotices[0], $event->warning_notice);
     }
 
-    public function testConstructorSetsClearedPayload(): void
+    public function test_constructor_sets_cleared_payload(): void
     {
         $user = new User();
         $user->id = 123;
@@ -40,7 +40,7 @@ class FactionLoyaltyAutomationWarningStateTest extends TestCase
         $this->assertNull($event->warning_notice);
     }
 
-    public function testBroadcastOnReturnsPrivateFactionLoyaltyAutomationWarningChannel(): void
+    public function test_broadcast_on_returns_private_faction_loyalty_automation_warning_channel(): void
     {
         $user = new User();
         $user->id = 123;

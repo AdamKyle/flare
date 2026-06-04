@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Game\Character\CharacterInventory\Controllers\Api;
 
-use App\Flare\Values\WeaponTypes;
 use App\Flare\Items\Values\ItemType;
+use App\Flare\Values\WeaponTypes;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;

@@ -25,11 +25,11 @@ class BuildingUpgradeRequestValidator
                 ->with('gameBuilding')
                 ->get();
 
-            if ($requestType === 'upgrade' && $buildings->contains(fn(KingdomBuilding $building) => $building->level >= $building->gameBuilding->max_level)) {
+            if ($requestType === 'upgrade' && $buildings->contains(fn (KingdomBuilding $building) => $building->level >= $building->gameBuilding->max_level)) {
                 return 'One or more buildings are already max level.';
             }
 
-            if ($requestType === 'upgrade' && $buildings->contains(fn(KingdomBuilding $building) => $building->current_durability < $building->max_durability)) {
+            if ($requestType === 'upgrade' && $buildings->contains(fn (KingdomBuilding $building) => $building->current_durability < $building->max_durability)) {
                 return 'One or more buildings must be repaired before they can be upgraded.';
             }
 

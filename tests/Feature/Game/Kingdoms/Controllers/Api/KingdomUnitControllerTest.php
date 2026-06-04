@@ -16,7 +16,7 @@ class KingdomUnitControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testManualRecruitRejectsCapitalCityQueuedUnit(): void
+    public function test_manual_recruit_rejects_capital_city_queued_unit(): void
     {
         Queue::fake();
 
@@ -50,7 +50,7 @@ class KingdomUnitControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdoms/' . $kingdom->id . '/recruit-units/' . $unit->id, [
+            ->call('POST', '/api/kingdoms/'.$kingdom->id.'/recruit-units/'.$unit->id, [
                 'amount' => 1,
             ]);
 
@@ -61,7 +61,7 @@ class KingdomUnitControllerTest extends TestCase
         $this->assertSame(0, UnitInQueue::where('kingdom_id', $kingdom->id)->count());
     }
 
-    public function testManualRecruitValidNonQueuedUnitWorks(): void
+    public function test_manual_recruit_valid_non_queued_unit_works(): void
     {
         Queue::fake();
 
@@ -86,7 +86,7 @@ class KingdomUnitControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdoms/' . $kingdom->id . '/recruit-units/' . $unit->id, [
+            ->call('POST', '/api/kingdoms/'.$kingdom->id.'/recruit-units/'.$unit->id, [
                 'amount' => 1,
             ]);
 
@@ -96,7 +96,7 @@ class KingdomUnitControllerTest extends TestCase
             ->count());
     }
 
-    public function testManualRecruitIgnoresExpiredManualQueuedUnit(): void
+    public function test_manual_recruit_ignores_expired_manual_queued_unit(): void
     {
         Queue::fake();
 
@@ -129,7 +129,7 @@ class KingdomUnitControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdoms/' . $kingdom->id . '/recruit-units/' . $unit->id, [
+            ->call('POST', '/api/kingdoms/'.$kingdom->id.'/recruit-units/'.$unit->id, [
                 'amount' => 1,
             ]);
 

@@ -17,7 +17,7 @@ class StripFactionLoyaltyFightDataCommandTest extends TestCase
 
     private ?FactionLoyaltyFactory $factionLoyaltyFactory = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -31,7 +31,7 @@ class StripFactionLoyaltyFightDataCommandTest extends TestCase
             ->createAutomation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->character = null;
         $this->factionLoyaltyFactory = null;
@@ -39,7 +39,7 @@ class StripFactionLoyaltyFightDataCommandTest extends TestCase
         parent::tearDown();
     }
 
-    public function testCommandStripsFightDataFromExistingFactionLoyaltyFightLogs(): void
+    public function test_command_strips_fight_data_from_existing_faction_loyalty_fight_logs(): void
     {
         $factionLoyaltyAutomationLog = $this->factionLoyaltyFactory->getFactionLoyaltyAutomationLog();
 

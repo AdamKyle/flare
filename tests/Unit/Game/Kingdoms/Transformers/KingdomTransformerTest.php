@@ -48,7 +48,7 @@ class KingdomTransformerTest extends TestCase
         ], $result['estimated_hourly_production']);
     }
 
-    public function testTransformIncludesCapitalCityBuildingQueues(): void
+    public function test_transform_includes_capital_city_building_queues(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $capitalCity = $characterFactory->kingdomManagement()->assignKingdom([
@@ -82,7 +82,7 @@ class KingdomTransformerTest extends TestCase
         $this->assertTrue($result['building_queue'][0]['is_capital_city_managed']);
     }
 
-    public function testTransformIncludesCapitalCityUnitQueues(): void
+    public function test_transform_includes_capital_city_unit_queues(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $capitalCity = $characterFactory->kingdomManagement()->assignKingdom([

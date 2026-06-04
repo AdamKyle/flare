@@ -24,7 +24,7 @@ class CapitalCityBuildingRequestTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testMissingQueueIdReturnsWithoutException(): void
+    public function test_missing_queue_id_returns_without_exception(): void
     {
         $job = new CapitalCityBuildingRequest(999999);
         $job->handle(
@@ -35,7 +35,7 @@ class CapitalCityBuildingRequestTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testRepairSetsDurabilityToMaxFinishesLogsAndDeletesQueue(): void
+    public function test_repair_sets_durability_to_max_finishes_logs_and_deletes_queue(): void
     {
         Event::fake();
 
@@ -84,11 +84,11 @@ class CapitalCityBuildingRequestTest extends TestCase
         $this->assertNull(CapitalCityBuildingQueue::find($capitalCityBuildingQueue->id));
         $this->assertSame(CapitalCityQueueStatus::FINISHED, $kingdomLog->additional_details['building_data'][0]['status']);
         $this->assertSame([
-            $building->name . ' has been restored to its former glory!',
+            $building->name.' has been restored to its former glory!',
         ], $kingdomLog->additional_details['messages']);
     }
 
-    public function testRepairMoraleCapsAtOne(): void
+    public function test_repair_morale_caps_at_one(): void
     {
         Event::fake();
 
@@ -138,7 +138,7 @@ class CapitalCityBuildingRequestTest extends TestCase
         $this->assertSame(1.0, $kingdom->refresh()->current_morale);
     }
 
-    public function testMissingBuildingRejectsLogsErrorCreatesKingdomLogAndDeletesQueue(): void
+    public function test_missing_building_rejects_logs_error_creates_kingdom_log_and_deletes_queue(): void
     {
         Event::fake();
         Log::spy();
@@ -199,11 +199,11 @@ class CapitalCityBuildingRequestTest extends TestCase
         $this->assertSame($buildingName, $kingdomLog->additional_details['building_data'][0]['building_name']);
         $this->assertSame(CapitalCityQueueStatus::REJECTED, $kingdomLog->additional_details['building_data'][0]['status']);
         $this->assertSame([
-            $buildingName . ' does not seem to exist in this kingdom. If this is a bug screenshot it and submit a bug report with the name of your kingdom.',
+            $buildingName.' does not seem to exist in this kingdom. If this is a bug screenshot it and submit a bug report with the name of your kingdom.',
         ], $kingdomLog->additional_details['messages']);
     }
 
-    public function testCompletionRejectsAlreadyMaxLevelAndAddsMessage(): void
+    public function test_completion_rejects_already_max_level_and_adds_message(): void
     {
         Event::fake();
 
@@ -253,11 +253,11 @@ class CapitalCityBuildingRequestTest extends TestCase
         $this->assertNull(CapitalCityBuildingQueue::find($capitalCityBuildingQueue->id));
         $this->assertSame(CapitalCityQueueStatus::REJECTED, $kingdomLog->additional_details['building_data'][0]['status']);
         $this->assertSame([
-            $building->name . ' has been rejected: Building is already max level.',
+            $building->name.' has been rejected: Building is already max level.',
         ], $kingdomLog->additional_details['messages']);
     }
 
-    public function testCompletionRejectsToLevelOverMaxAndAddsMessage(): void
+    public function test_completion_rejects_to_level_over_max_and_adds_message(): void
     {
         Event::fake();
 
@@ -307,11 +307,11 @@ class CapitalCityBuildingRequestTest extends TestCase
         $this->assertNull(CapitalCityBuildingQueue::find($capitalCityBuildingQueue->id));
         $this->assertSame(CapitalCityQueueStatus::REJECTED, $kingdomLog->additional_details['building_data'][0]['status']);
         $this->assertSame([
-            $building->name . ' has been rejected: Requested level is over max level.',
+            $building->name.' has been rejected: Requested level is over max level.',
         ], $kingdomLog->additional_details['messages']);
     }
 
-    public function testStaleCompletionWhereCurrentLevelDiffersFromFromLevelRejectsLogsErrorAndAddsMessage(): void
+    public function test_stale_completion_where_current_level_differs_from_from_level_rejects_logs_error_and_adds_message(): void
     {
         Event::fake();
         Log::spy();
@@ -375,11 +375,11 @@ class CapitalCityBuildingRequestTest extends TestCase
         $this->assertNull(CapitalCityBuildingQueue::find($capitalCityBuildingQueue->id));
         $this->assertSame(CapitalCityQueueStatus::REJECTED, $kingdomLog->additional_details['building_data'][0]['status']);
         $this->assertSame([
-            'Something is wrong for ' . $building->name . ', the level to advance from no longer matches the current building level. Please screen shot this and report a bug and include your kingdom name.',
+            'Something is wrong for '.$building->name.', the level to advance from no longer matches the current building level. Please screen shot this and report a bug and include your kingdom name.',
         ], $kingdomLog->additional_details['messages']);
     }
 
-    public function testUpgradeFinishesWithoutAddingMessage(): void
+    public function test_upgrade_finishes_without_adding_message(): void
     {
         Event::fake();
 
@@ -431,7 +431,7 @@ class CapitalCityBuildingRequestTest extends TestCase
         $this->assertSame([], $kingdomLog->additional_details['messages']);
     }
 
-    public function testQueueUpBuildingRequestDispatchesMovementOnLongRunningConnection(): void
+    public function test_queue_up_building_request_dispatches_movement_on_long_running_connection(): void
     {
         Event::fake();
         Queue::fake();
@@ -479,7 +479,7 @@ class CapitalCityBuildingRequestTest extends TestCase
         });
     }
 
-    public function testBuildingMovementRedispatchesContinuationOnLongRunningConnection(): void
+    public function test_building_movement_redispatches_continuation_on_long_running_connection(): void
     {
         Queue::fake();
 
@@ -520,7 +520,7 @@ class CapitalCityBuildingRequestTest extends TestCase
         });
     }
 
-    public function testBuildingRequestRedispatchesContinuationOnLongRunningConnection(): void
+    public function test_building_request_redispatches_continuation_on_long_running_connection(): void
     {
         Queue::fake();
 

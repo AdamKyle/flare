@@ -9,16 +9,8 @@ use Illuminate\Http\JsonResponse;
 
 class FactionLoyaltyAutomationWarningController
 {
-    /**
-     * @param FactionLoyaltyAutomationWarningService $factionLoyaltyAutomationWarningService
-     */
     public function __construct(private readonly FactionLoyaltyAutomationWarningService $factionLoyaltyAutomationWarningService) {}
 
-    /**
-     * @param FactionLoyaltyAutomationWarningRequest $request
-     * @param Character $character
-     * @return JsonResponse
-     */
     public function dismiss(FactionLoyaltyAutomationWarningRequest $request, Character $character): JsonResponse
     {
         $warningId = $request->has('warning_id') ? $request->integer('warning_id') : null;

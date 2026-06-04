@@ -52,7 +52,7 @@ class StripFactionLoyaltyFightData extends Command
                 }
             });
 
-        $this->info('Updated ' . $updatedLogs . ' faction loyalty automation logs.');
+        $this->info('Updated '.$updatedLogs.' faction loyalty automation logs.');
 
         return 0;
     }

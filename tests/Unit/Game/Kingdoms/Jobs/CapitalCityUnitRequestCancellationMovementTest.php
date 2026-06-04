@@ -16,7 +16,7 @@ class CapitalCityUnitRequestCancellationMovementTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testMissingUnitQueueRejectionMarksCancellationAndUnitRequestRejected(): void
+    public function test_missing_unit_queue_rejection_marks_cancellation_and_unit_request_rejected(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdomManagement = $characterFactory->kingdomManagement()->assignKingdom([
@@ -90,7 +90,7 @@ class CapitalCityUnitRequestCancellationMovementTest extends TestCase
         );
     }
 
-    public function testDelayedRedispatchPassesAllConstructorArgumentsAndUsesLongRunningQueue(): void
+    public function test_delayed_redispatch_passes_all_constructor_arguments_and_uses_long_running_queue(): void
     {
         Queue::fake();
 

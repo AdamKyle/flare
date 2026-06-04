@@ -13,14 +13,14 @@ class ServerMessageEventTest extends TestCase
 {
     use CreateUser, RefreshDatabase;
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Carbon::setTestNow();
 
         parent::tearDown();
     }
 
-    public function testConstructorSetsPayloadValues(): void
+    public function test_constructor_sets_payload_values(): void
     {
         $user = $this->createUser();
 
@@ -30,7 +30,7 @@ class ServerMessageEventTest extends TestCase
         $this->assertEquals(456, $event->id);
     }
 
-    public function testConstructorSetsTimeStamp(): void
+    public function test_constructor_sets_time_stamp(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-06-03 14:45:00', 'UTC'));
 
@@ -41,7 +41,7 @@ class ServerMessageEventTest extends TestCase
         $this->assertEquals(now()->toJSON(), $event->timeStamp);
     }
 
-    public function testBroadcastOnReturnsPrivateServerMessageChannel(): void
+    public function test_broadcast_on_returns_private_server_message_channel(): void
     {
         $user = $this->createUser();
 

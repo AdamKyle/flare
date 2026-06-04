@@ -2,6 +2,7 @@
 
 namespace App\Game\Automation\Handlers;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\FactionLoyaltyNpc;
 use App\Flare\Models\Item;
@@ -10,7 +11,6 @@ use App\Game\Automation\Contracts\AutomatedCraftingLogger;
 use App\Game\Automation\Enums\AutomatedCraftingResultType;
 use App\Game\Automation\Values\AutomatedCraftingAttemptTracker;
 use App\Game\Automation\Values\AutomatedCraftingResult;
-use App\Flare\Items\Values\ItemType;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\CraftingService;
 

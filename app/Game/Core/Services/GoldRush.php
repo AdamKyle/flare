@@ -4,12 +4,12 @@ namespace App\Game\Core\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
-use Facades\App\Game\Maps\Calculations\LocationBasedEnemyDropChanceBonus;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
 use Exception;
 use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
+use Facades\App\Game\Maps\Calculations\LocationBasedEnemyDropChanceBonus;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class GoldRush

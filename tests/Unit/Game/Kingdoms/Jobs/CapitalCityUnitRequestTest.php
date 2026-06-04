@@ -167,7 +167,7 @@ class CapitalCityUnitRequestTest extends TestCase
         $this->assertSame(90, $kingdom->refresh()->current_wood);
     }
 
-    public function testQueueUpUnitRequestDispatchesMovementOnLongRunningConnection(): void
+    public function test_queue_up_unit_request_dispatches_movement_on_long_running_connection(): void
     {
         Event::fake();
         Queue::fake();
@@ -211,7 +211,7 @@ class CapitalCityUnitRequestTest extends TestCase
         });
     }
 
-    public function testUnitMovementRedispatchesContinuationOnLongRunningConnection(): void
+    public function test_unit_movement_redispatches_continuation_on_long_running_connection(): void
     {
         Queue::fake();
 
@@ -243,7 +243,7 @@ class CapitalCityUnitRequestTest extends TestCase
         });
     }
 
-    public function testUnitRequestRedispatchesContinuationOnLongRunningConnection(): void
+    public function test_unit_request_redispatches_continuation_on_long_running_connection(): void
     {
         Queue::fake();
 

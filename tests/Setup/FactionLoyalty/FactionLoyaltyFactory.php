@@ -2,6 +2,7 @@
 
 namespace Tests\Setup\FactionLoyalty;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Faction;
@@ -16,7 +17,6 @@ use App\Flare\Models\Npc;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\MapNameValue;
-use App\Flare\Items\Values\ItemType;
 use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateFactionLoyalty;
 use Tests\Traits\CreateFactionLoyaltyAutomation;

@@ -7,17 +7,11 @@ use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\UnitInQueue;
-use App\Flare\Transformers\CapitalCityKingdomBuildingTransformer;
-use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Service\CapitalCityManagementService;
-use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
-use App\Game\Kingdoms\Service\UnitMovementService;
-use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\BuildingQueueType;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use League\Fractal\Manager;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 
@@ -25,7 +19,7 @@ class CapitalCityManagementServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testFetchBuildingsForRepairsIncludesDamagedNonQueuedBuildings(): void
+    public function test_fetch_buildings_for_repairs_includes_damaged_non_queued_buildings(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -67,7 +61,7 @@ class CapitalCityManagementServiceTest extends TestCase
         $this->assertFalse($result[0]['buildings'][0]['can_be_upgraded']);
     }
 
-    public function testFetchBuildingsForRepairsExcludesManuallyQueuedBuildings(): void
+    public function test_fetch_buildings_for_repairs_excludes_manually_queued_buildings(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -118,7 +112,7 @@ class CapitalCityManagementServiceTest extends TestCase
         $this->assertSame([], $result[0]['buildings']);
     }
 
-    public function testFetchBuildingsForRepairsExcludesCapitalCityQueuedBuildings(): void
+    public function test_fetch_buildings_for_repairs_excludes_capital_city_queued_buildings(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -177,7 +171,7 @@ class CapitalCityManagementServiceTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function testFetchBuildingQueueDataKeepsReadyActiveBuildingQueues(): void
+    public function test_fetch_building_queue_data_keeps_ready_active_building_queues(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -262,7 +256,7 @@ class CapitalCityManagementServiceTest extends TestCase
         $this->assertNotNull(CapitalCityBuildingQueue::find($repairingQueue->id));
     }
 
-    public function testFetchUnitQueueDataKeepsReadyActiveUnitQueues(): void
+    public function test_fetch_unit_queue_data_keeps_ready_active_unit_queues(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -317,7 +311,7 @@ class CapitalCityManagementServiceTest extends TestCase
         $this->assertNotNull(CapitalCityUnitQueue::find($recruitingQueue->id));
     }
 
-    public function testFetchKingdomsForSelectionKeepsKingdomWithOtherAvailableUnitsWhenCapitalCityUnitIsQueued(): void
+    public function test_fetch_kingdoms_for_selection_keeps_kingdom_with_other_available_units_when_capital_city_unit_is_queued(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -370,7 +364,7 @@ class CapitalCityManagementServiceTest extends TestCase
         $this->assertNotContains($unit->name, $result[0]['available_unit_types']);
     }
 
-    public function testFetchKingdomsForSelectionExcludesActiveManuallyQueuedUnitType(): void
+    public function test_fetch_kingdoms_for_selection_excludes_active_manually_queued_unit_type(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -417,7 +411,7 @@ class CapitalCityManagementServiceTest extends TestCase
         $this->assertNotContains($unit->name, $result[0]['available_unit_types']);
     }
 
-    public function testFetchKingdomsForSelectionKeepsExpiredManualQueuedUnitType(): void
+    public function test_fetch_kingdoms_for_selection_keeps_expired_manual_queued_unit_type(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -462,7 +456,7 @@ class CapitalCityManagementServiceTest extends TestCase
         $this->assertContains($unit->name, $result[0]['available_unit_types']);
     }
 
-    public function testFetchBuildingQueueDataIncludesPhaseTimerLabels(): void
+    public function test_fetch_building_queue_data_includes_phase_timer_labels(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -560,8 +554,7 @@ class CapitalCityManagementServiceTest extends TestCase
         $this->assertSame('Repairing', $phaseTimerLabelsByQueueId[$repairingQueue->id]);
     }
 
-
-    public function testFetchBuildingQueueDataIncludesCancellationRejectedRequests(): void
+    public function test_fetch_building_queue_data_includes_cancellation_rejected_requests(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
@@ -604,7 +597,7 @@ class CapitalCityManagementServiceTest extends TestCase
         $this->assertSame(CapitalCityQueueStatus::CANCELLATION_REJECTED, $result[0]['building_queue'][0]['secondary_status']);
     }
 
-    public function testFetchUnitQueueDataIncludesCancellationRejectedRequests(): void
+    public function test_fetch_unit_queue_data_includes_cancellation_rejected_requests(): void
     {
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()

@@ -86,10 +86,6 @@ class FactionLoyaltyAutomationFightLogger
 
     /**
      * Append a fight log entry without hydrating the full JSON log.
-     *
-     * @param int $factionLoyaltyAutomationLogId
-     * @param array $fightLog
-     * @return void
      */
     private function appendFightLog(int $factionLoyaltyAutomationLogId, array $fightLog): void
     {

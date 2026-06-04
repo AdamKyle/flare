@@ -257,9 +257,6 @@ class AutomatedFightResult
 
     /**
      * Set the automation log entry id.
-     *
-     * @param string $logEntryId
-     * @return AutomatedFightResult
      */
     public function setLogEntryId(string $logEntryId): AutomatedFightResult
     {
@@ -422,8 +419,6 @@ class AutomatedFightResult
 
     /**
      * Get the automation log entry id.
-     *
-     * @return string|null
      */
     public function getLogEntryId(): ?string
     {

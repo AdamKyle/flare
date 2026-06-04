@@ -9,9 +9,9 @@ use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;
 use App\Flare\Models\UnitMovementQueue;
-use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
-use App\Game\Kingdoms\Transformers\UnitMovementTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Kingdoms\Transformers\UnitMovementTransformer;
+use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use Illuminate\Support\Facades\Log;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
@@ -20,15 +20,10 @@ class KingdomQueueService
 {
     use ResponseBuilder;
 
-    /**
-     * @param Manager $manager
-     * @param UnitMovementTransformer $unitMovementTransformer
-     */
     public function __construct(
         private readonly Manager $manager,
         private readonly UnitMovementTransformer $unitMovementTransformer,
-    ) {
-    }
+    ) {}
 
     public function fetchKingdomQueues(Kingdom $kingdom): array
     {
@@ -209,5 +204,4 @@ class KingdomQueueService
             new Collection($unitMovementQueues, $this->unitMovementTransformer)
         )->toArray();
     }
-
 }

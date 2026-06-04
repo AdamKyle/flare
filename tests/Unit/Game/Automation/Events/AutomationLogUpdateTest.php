@@ -13,14 +13,14 @@ class AutomationLogUpdateTest extends TestCase
 {
     use CreateUser, RefreshDatabase;
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Carbon::setTestNow();
 
         parent::tearDown();
     }
 
-    public function testConstructorSetsDefaultPayloadValues(): void
+    public function test_constructor_sets_default_payload_values(): void
     {
         $user = $this->createUser();
 
@@ -31,7 +31,7 @@ class AutomationLogUpdateTest extends TestCase
         $this->assertFalse($event->isReward);
     }
 
-    public function testConstructorSetsCustomPayloadValues(): void
+    public function test_constructor_sets_custom_payload_values(): void
     {
         $user = $this->createUser();
 
@@ -42,7 +42,7 @@ class AutomationLogUpdateTest extends TestCase
         $this->assertTrue($event->isReward);
     }
 
-    public function testConstructorSetsTimeStamp(): void
+    public function test_constructor_sets_time_stamp(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-06-03 14:45:00', 'UTC'));
 
@@ -53,7 +53,7 @@ class AutomationLogUpdateTest extends TestCase
         $this->assertEquals(now()->toJSON(), $event->timeStamp);
     }
 
-    public function testBroadcastOnReturnsPrivateAutomationLogUpdateChannel(): void
+    public function test_broadcast_on_returns_private_automation_log_update_channel(): void
     {
         $user = $this->createUser();
 

@@ -21,10 +21,6 @@ class FactionLoyaltyAutomationWarningState implements ShouldBroadcastNow
 
     /**
      * Create a new event instance.
-     *
-     * @param User $user
-     * @param bool $hasWarning
-     * @param array $warningNotices
      */
     public function __construct(private readonly User $user, bool $hasWarning, array $warningNotices)
     {
@@ -35,8 +31,6 @@ class FactionLoyaltyAutomationWarningState implements ShouldBroadcastNow
 
     /**
      * Get the channels the event should broadcast on.
-     *
-     * @return PrivateChannel
      */
     public function broadcastOn(): PrivateChannel
     {

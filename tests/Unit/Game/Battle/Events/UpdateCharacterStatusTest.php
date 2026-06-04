@@ -123,7 +123,7 @@ class UpdateCharacterStatusTest extends TestCase
         $this->assertEquals(0, $event->characterStatuses['automation_completed_at']);
     }
 
-    public function testPayloadSetsAutomationRunningFalseForExpiredAutomation(): void
+    public function test_payload_sets_automation_running_false_for_expired_automation(): void
     {
         $this->createCharacterAutomation([
             'character_id' => $this->character->id,
@@ -136,7 +136,7 @@ class UpdateCharacterStatusTest extends TestCase
         $this->assertFalse($event->characterStatuses['is_automation_running']);
     }
 
-    public function testPayloadSetsDelveRunningFalseForExpiredDelve(): void
+    public function test_payload_sets_delve_running_false_for_expired_delve(): void
     {
         $this->createCharacterAutomation([
             'character_id' => $this->character->id,

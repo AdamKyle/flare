@@ -3,8 +3,8 @@
 namespace App\Console\AfterDeployment;
 
 use App\Flare\Models\CharacterAutomation;
-use App\Game\Kingdoms\Service\CapitalCityQueueCleanupService;
 use App\Flare\Values\AutomationType;
+use App\Game\Kingdoms\Service\CapitalCityQueueCleanupService;
 use Illuminate\Console\Command;
 
 class CleanUpInvalidBrokenQueues extends Command

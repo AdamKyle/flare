@@ -18,21 +18,21 @@ class ClassRanksControllerTest extends TestCase
 
     private ?CharacterFactory $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testGetCharacterClassRanks()
+    public function test_get_character_class_ranks()
     {
 
         $character = $this->character->getCharacter();
@@ -45,7 +45,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertCount(1, $jsonData['class_ranks']);
     }
 
-    public function testExplorationAllowsClassRankList(): void
+    public function test_exploration_allows_class_rank_list(): void
     {
         $character = $this->character->getCharacter();
         CharacterAutomation::factory()->create([
@@ -63,7 +63,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertCount(1, $jsonData['class_ranks']);
     }
 
-    public function testDelveAllowsClassRankList(): void
+    public function test_delve_allows_class_rank_list(): void
     {
         $character = $this->character->getCharacter();
         CharacterAutomation::factory()->create([
@@ -81,7 +81,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertCount(1, $jsonData['class_ranks']);
     }
 
-    public function testFactionLoyaltyAllowsClassRankList(): void
+    public function test_faction_loyalty_allows_class_rank_list(): void
     {
         $character = $this->character->getCharacter();
         CharacterAutomation::factory()->create([
@@ -99,7 +99,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertCount(1, $jsonData['class_ranks']);
     }
 
-    public function testGetCharacterClassSpecials()
+    public function test_get_character_class_specials()
     {
 
         $character = $this->character->getCharacter();
@@ -119,7 +119,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertCount(0, $jsonData['other_class_specials']);
     }
 
-    public function testExplorationAllowsCharacterClassSpecials(): void
+    public function test_exploration_allows_character_class_specials(): void
     {
         $character = $this->character->getCharacter();
         CharacterAutomation::factory()->create([
@@ -142,7 +142,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertCount(1, $jsonData['class_specialties']);
     }
 
-    public function testDelveAllowsCharacterClassSpecials(): void
+    public function test_delve_allows_character_class_specials(): void
     {
         $character = $this->character->getCharacter();
         CharacterAutomation::factory()->create([
@@ -165,7 +165,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertCount(1, $jsonData['class_specialties']);
     }
 
-    public function testFactionLoyaltyAllowsCharacterClassSpecials(): void
+    public function test_faction_loyalty_allows_character_class_specials(): void
     {
         $character = $this->character->getCharacter();
         CharacterAutomation::factory()->create([
@@ -188,7 +188,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertCount(1, $jsonData['class_specialties']);
     }
 
-    public function testEquipSpecial()
+    public function test_equip_special()
     {
 
         $character = $this->character->getCharacter();
@@ -207,7 +207,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertEquals('Equipped class special: '.$classSpecial->name, $jsonData['message']);
     }
 
-    public function testExplorationBlocksSwitchClassAndDoesNotChangeClass(): void
+    public function test_exploration_blocks_switch_class_and_does_not_change_class(): void
     {
         $character = $this->character->getCharacter();
         $initialClassId = $character->game_class_id;
@@ -227,7 +227,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertEquals($initialClassId, $character->refresh()->game_class_id);
     }
 
-    public function testDelveBlocksSwitchClassAndDoesNotChangeClass(): void
+    public function test_delve_blocks_switch_class_and_does_not_change_class(): void
     {
         $character = $this->character->getCharacter();
         $initialClassId = $character->game_class_id;
@@ -247,7 +247,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertEquals($initialClassId, $character->refresh()->game_class_id);
     }
 
-    public function testFactionLoyaltyBlocksSwitchClassAndDoesNotChangeClass(): void
+    public function test_faction_loyalty_blocks_switch_class_and_does_not_change_class(): void
     {
         $character = $this->character->getCharacter();
         $initialClassId = $character->game_class_id;
@@ -267,7 +267,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertEquals($initialClassId, $character->refresh()->game_class_id);
     }
 
-    public function testExplorationBlocksEquipSpecialAndDoesNotEquip(): void
+    public function test_exploration_blocks_equip_special_and_does_not_equip(): void
     {
         $character = $this->character->getCharacter();
         $classSpecial = $this->createGameClassSpecial([
@@ -288,7 +288,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertCount(0, $character->refresh()->classSpecialsEquipped);
     }
 
-    public function testDelveBlocksEquipSpecialAndDoesNotEquip(): void
+    public function test_delve_blocks_equip_special_and_does_not_equip(): void
     {
         $character = $this->character->getCharacter();
         $classSpecial = $this->createGameClassSpecial([
@@ -309,7 +309,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertCount(0, $character->refresh()->classSpecialsEquipped);
     }
 
-    public function testFactionLoyaltyBlocksEquipSpecialAndDoesNotEquip(): void
+    public function test_faction_loyalty_blocks_equip_special_and_does_not_equip(): void
     {
         $character = $this->character->getCharacter();
         $classSpecial = $this->createGameClassSpecial([
@@ -330,7 +330,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertCount(0, $character->refresh()->classSpecialsEquipped);
     }
 
-    public function testExpiredExplorationDoesNotBlockEquipSpecial(): void
+    public function test_expired_exploration_does_not_block_equip_special(): void
     {
         $character = $this->character->getCharacter();
         $classSpecial = $this->createGameClassSpecial([
@@ -351,7 +351,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertCount(1, $character->refresh()->classSpecialsEquipped);
     }
 
-    public function testExpiredDelveDoesNotBlockEquipSpecial(): void
+    public function test_expired_delve_does_not_block_equip_special(): void
     {
         $character = $this->character->getCharacter();
         $classSpecial = $this->createGameClassSpecial([
@@ -372,7 +372,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertCount(1, $character->refresh()->classSpecialsEquipped);
     }
 
-    public function testExpiredFactionLoyaltyDoesNotBlockEquipSpecial(): void
+    public function test_expired_faction_loyalty_does_not_block_equip_special(): void
     {
         $character = $this->character->getCharacter();
         $classSpecial = $this->createGameClassSpecial([
@@ -393,7 +393,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertCount(1, $character->refresh()->classSpecialsEquipped);
     }
 
-    public function testExpiredExplorationDoesNotBlockSwitchClass(): void
+    public function test_expired_exploration_does_not_block_switch_class(): void
     {
         $character = $this->character->getCharacter();
         $skill = $this->createGameSkill(['name' => 'Class Skill', 'game_class_id' => $character->game_class_id]);
@@ -417,7 +417,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertEquals($gameClass->id, $character->refresh()->game_class_id);
     }
 
-    public function testExpiredDelveDoesNotBlockSwitchClass(): void
+    public function test_expired_delve_does_not_block_switch_class(): void
     {
         $character = $this->character->getCharacter();
         $skill = $this->createGameSkill(['name' => 'Class Skill', 'game_class_id' => $character->game_class_id]);
@@ -441,7 +441,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertEquals($gameClass->id, $character->refresh()->game_class_id);
     }
 
-    public function testExpiredFactionLoyaltyDoesNotBlockSwitchClass(): void
+    public function test_expired_faction_loyalty_does_not_block_switch_class(): void
     {
         $character = $this->character->getCharacter();
         $skill = $this->createGameSkill(['name' => 'Class Skill', 'game_class_id' => $character->game_class_id]);
@@ -465,7 +465,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertEquals($gameClass->id, $character->refresh()->game_class_id);
     }
 
-    public function testUnequipSpecial()
+    public function test_unequip_special()
     {
         $character = $this->character->getCharacter();
 
@@ -497,7 +497,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertEquals('Unequipped class special: '.$classSpecial->name, $jsonData['message']);
     }
 
-    public function testExplorationBlocksUnequipSpecialAndDoesNotUnequip(): void
+    public function test_exploration_blocks_unequip_special_and_does_not_unequip(): void
     {
         $character = $this->character->getCharacter();
 
@@ -532,7 +532,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertTrue($specialtyEquipped->refresh()->equipped);
     }
 
-    public function testDelveBlocksUnequipSpecialAndDoesNotUnequip(): void
+    public function test_delve_blocks_unequip_special_and_does_not_unequip(): void
     {
         $character = $this->character->getCharacter();
 
@@ -567,7 +567,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertTrue($specialtyEquipped->refresh()->equipped);
     }
 
-    public function testFactionLoyaltyBlocksUnequipSpecialAndDoesNotUnequip(): void
+    public function test_faction_loyalty_blocks_unequip_special_and_does_not_unequip(): void
     {
         $character = $this->character->getCharacter();
 
@@ -602,7 +602,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertTrue($specialtyEquipped->refresh()->equipped);
     }
 
-    public function testExpiredExplorationDoesNotBlockUnequipSpecial(): void
+    public function test_expired_exploration_does_not_block_unequip_special(): void
     {
         $character = $this->character->getCharacter();
 
@@ -637,7 +637,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertFalse($specialtyEquipped->refresh()->equipped);
     }
 
-    public function testExpiredDelveDoesNotBlockUnequipSpecial(): void
+    public function test_expired_delve_does_not_block_unequip_special(): void
     {
         $character = $this->character->getCharacter();
 
@@ -672,7 +672,7 @@ class ClassRanksControllerTest extends TestCase
         $this->assertFalse($specialtyEquipped->refresh()->equipped);
     }
 
-    public function testExpiredFactionLoyaltyDoesNotBlockUnequipSpecial(): void
+    public function test_expired_faction_loyalty_does_not_block_unequip_special(): void
     {
         $character = $this->character->getCharacter();
 

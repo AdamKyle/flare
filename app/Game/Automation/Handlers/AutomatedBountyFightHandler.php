@@ -440,11 +440,6 @@ class AutomatedBountyFightHandler
 
     /**
      * Does the last fight state match this monster and phase?
-     *
-     * @param Monster $monster
-     * @param bool $bountyTarget
-     * @param bool $training
-     * @return bool
      */
     private function lastFightMatches(Monster $monster, bool $bountyTarget, bool $training): bool
     {

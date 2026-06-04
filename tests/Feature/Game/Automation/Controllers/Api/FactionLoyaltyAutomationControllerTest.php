@@ -28,7 +28,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
 
     private ?FactionLoyaltyNpc $factionLoyaltyNpc = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -44,7 +44,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         $this->factionLoyaltyNpc = $this->factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->character = null;
         $this->factionLoyaltyFactory = null;
@@ -53,13 +53,13 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         parent::tearDown();
     }
 
-    public function testBeginStartsFactionLoyaltyAutomationSuccessfully(): void
+    public function test_begin_starts_faction_loyalty_automation_successfully(): void
     {
         Queue::fake();
         Event::fake();
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/start', [
+            ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
                 'attack_type' => AttackTypeValue::ATTACK,
             ]);
@@ -69,20 +69,20 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals(
-            'You have now begun automation to help out: ' . $this->factionLoyaltyNpc->npc->real_name . ' This will automatically end in 8 hours. You can manually end it at any time. Crafting has been disabled while faction loyalty automation is running. Keep an eye on the Automation tab to see your progress.',
+            'You have now begun automation to help out: '.$this->factionLoyaltyNpc->npc->real_name.' This will automatically end in 8 hours. You can manually end it at any time. Crafting has been disabled while faction loyalty automation is running. Keep an eye on the Automation tab to see your progress.',
             $jsonData['message']
         );
         $this->assertEquals($this->character->id, $factionLoyaltyAutomation->character_id);
         $this->assertEquals($this->factionLoyaltyNpc->id, $factionLoyaltyAutomation->faction_loyalty_npc_id);
     }
 
-    public function testBeginReturns422ForInvalidAttackType(): void
+    public function test_begin_returns422_for_invalid_attack_type(): void
     {
         Queue::fake();
         Event::fake();
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/start', [
+            ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
                 'attack_type' => 'invalid',
             ]);
@@ -93,13 +93,13 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         $this->assertEquals('Invalid attack type was selected. Please select from the drop down.', $jsonData['message']);
     }
 
-    public function testBeginReturnsValidationErrorWhenAttackTypeIsMissing(): void
+    public function test_begin_returns_validation_error_when_attack_type_is_missing(): void
     {
         Queue::fake();
         Event::fake();
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/start', [
+            ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
             ], [], [], [
                 'HTTP_ACCEPT' => 'application/json',
@@ -111,7 +111,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         $this->assertEquals('Invalid input.', $jsonData['message']);
     }
 
-    public function testBeginReturns422WhenAnotherAutomationIsAlreadyRunning(): void
+    public function test_begin_returns422_when_another_automation_is_already_running(): void
     {
         Queue::fake();
         Event::fake();
@@ -125,7 +125,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/start', [
+            ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
                 'attack_type' => AttackTypeValue::ATTACK,
             ]);
@@ -136,7 +136,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         $this->assertEquals('You cannot do that while Faction Loyalty automation is running. Cancel it first.', $jsonData['message']);
     }
 
-    public function testBeginReturns422WhenExplorationIsRunning(): void
+    public function test_begin_returns422_when_exploration_is_running(): void
     {
         Queue::fake();
         Event::fake();
@@ -150,7 +150,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/start', [
+            ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
                 'attack_type' => AttackTypeValue::ATTACK,
             ]);
@@ -162,7 +162,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         $this->assertNull(FactionLoyaltyAutomation::query()->latest('id')->first());
     }
 
-    public function testBeginReturns422WhenDelveIsRunning(): void
+    public function test_begin_returns422_when_delve_is_running(): void
     {
         Queue::fake();
         Event::fake();
@@ -176,7 +176,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/start', [
+            ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
                 'attack_type' => AttackTypeValue::ATTACK,
             ]);
@@ -188,7 +188,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         $this->assertNull(FactionLoyaltyAutomation::query()->latest('id')->first());
     }
 
-    public function testBeginReturns422WhenCharacterIsNotPledgedToAFaction(): void
+    public function test_begin_returns422_when_character_is_not_pledged_to_a_faction(): void
     {
         Queue::fake();
         Event::fake();
@@ -198,7 +198,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/start', [
+            ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
                 'attack_type' => AttackTypeValue::ATTACK,
             ]);
@@ -209,7 +209,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         $this->assertEquals('You must be pledged to a faction before automating faction loyalty.', $jsonData['message']);
     }
 
-    public function testBeginReturns422WhenCharacterIsNotAssistingAnNpc(): void
+    public function test_begin_returns422_when_character_is_not_assisting_an_npc(): void
     {
         Queue::fake();
         Event::fake();
@@ -219,7 +219,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/start', [
+            ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
                 'attack_type' => AttackTypeValue::ATTACK,
             ]);
@@ -230,7 +230,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         $this->assertEquals('You must be assisting an NPC before automating faction loyalty.', $jsonData['message']);
     }
 
-    public function testBeginReturns422WhenCharacterIsNotOnTheNpcMap(): void
+    public function test_begin_returns422_when_character_is_not_on_the_npc_map(): void
     {
         Queue::fake();
         Event::fake();
@@ -246,7 +246,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/start', [
+            ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
                 'attack_type' => AttackTypeValue::ATTACK,
             ]);
@@ -257,7 +257,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         $this->assertEquals('You must be on the same map as the NPC you are assisting.', $jsonData['message']);
     }
 
-    public function testBeginReturns422WhenNpcHasNoIncompleteTasks(): void
+    public function test_begin_returns422_when_npc_has_no_incomplete_tasks(): void
     {
         Queue::fake();
         Event::fake();
@@ -273,7 +273,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/start', [
+            ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
                 'attack_type' => AttackTypeValue::ATTACK,
             ]);
@@ -284,14 +284,14 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         $this->assertEquals('This NPC does not have any incomplete tasks for you to automate.', $jsonData['message']);
     }
 
-    public function testStopStopsFactionLoyaltyAutomationSuccessfully(): void
+    public function test_stop_stops_faction_loyalty_automation_successfully(): void
     {
         Event::fake();
 
         $this->factionLoyaltyFactory->createAutomation();
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/stop', [
+            ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/stop', [
                 '_token' => csrf_token(),
             ]);
 
@@ -302,12 +302,12 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         $this->assertEquals(0, $this->character->currentAutomations()->count());
     }
 
-    public function testStopReturnsControllerServiceErrorResponseWhenNoFactionLoyaltyAutomationExists(): void
+    public function test_stop_returns_controller_service_error_response_when_no_faction_loyalty_automation_exists(): void
     {
         Event::fake();
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/stop', [
+            ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/stop', [
                 '_token' => csrf_token(),
             ]);
 
@@ -317,7 +317,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         $this->assertEquals('Nope. You don\'t own that.', $jsonData['message']);
     }
 
-    public function testMarkWarningNoticeReadUpdatesLatestUnreadNotice(): void
+    public function test_mark_warning_notice_read_updates_latest_unread_notice(): void
     {
         Event::fake();
 
@@ -360,7 +360,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/warning/dismiss', [
+            ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/warning/dismiss', [
                 '_token' => csrf_token(),
             ]);
 

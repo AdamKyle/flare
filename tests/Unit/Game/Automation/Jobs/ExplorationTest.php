@@ -1153,7 +1153,7 @@ class ExplorationTest extends TestCase
         Event::assertDispatched(AutomationTimeOut::class);
     }
 
-    public function testHandlePassesBatchedFactionPointsForExplorationKills(): void
+    public function test_handle_passes_batched_faction_points_for_exploration_kills(): void
     {
         Event::fake();
 
@@ -1228,7 +1228,7 @@ class ExplorationTest extends TestCase
         $this->assertNotNull(CharacterAutomation::find($automation->id));
     }
 
-    public function testHandlePassesZeroBatchedFactionPointsWhenNoFactionPointsAreAvailable(): void
+    public function test_handle_passes_zero_batched_faction_points_when_no_faction_points_are_available(): void
     {
         Event::fake();
 

@@ -27,7 +27,7 @@ class FactionLoyaltyAutomationWarningServiceTest extends TestCase
 
     private ?FactionLoyaltyAutomationWarningService $service = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -46,7 +46,7 @@ class FactionLoyaltyAutomationWarningServiceTest extends TestCase
         $this->service = resolve(FactionLoyaltyAutomationWarningService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->character = null;
         $this->factionLoyaltyFactory = null;
@@ -57,7 +57,7 @@ class FactionLoyaltyAutomationWarningServiceTest extends TestCase
         parent::tearDown();
     }
 
-    public function testDismissLatestWarningDeletesWarningAndReferencedLogEntry(): void
+    public function test_dismiss_latest_warning_deletes_warning_and_referenced_log_entry(): void
     {
         $this->factionLoyaltyAutomationLog->update([
             'fight_logs' => [
@@ -119,7 +119,7 @@ class FactionLoyaltyAutomationWarningServiceTest extends TestCase
         ], $this->factionLoyaltyAutomationLog->refresh()->fight_logs);
     }
 
-    public function testDismissLatestWarningDoesNothingWhenNoWarningExists(): void
+    public function test_dismiss_latest_warning_does_nothing_when_no_warning_exists(): void
     {
         $this->service->dismissLatestWarning($this->character);
 

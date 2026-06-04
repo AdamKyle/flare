@@ -22,7 +22,7 @@ class AttackTimeOutListenerTest extends TestCase
 
     private ?Character $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -32,7 +32,7 @@ class AttackTimeOutListenerTest extends TestCase
             ->getCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
 
@@ -43,7 +43,7 @@ class AttackTimeOutListenerTest extends TestCase
         parent::tearDown();
     }
 
-    public function testFortyNinePointNineFivePercentFightTimeoutModifierWaitsAboutSevenPointFiveSeconds(): void
+    public function test_forty_nine_point_nine_five_percent_fight_timeout_modifier_waits_about_seven_point_five_seconds(): void
     {
         Event::fake();
         Queue::fake();
@@ -75,7 +75,7 @@ class AttackTimeOutListenerTest extends TestCase
         });
     }
 
-    public function testOneHundredPercentFightTimeoutModifierWaitsFiveSeconds(): void
+    public function test_one_hundred_percent_fight_timeout_modifier_waits_five_seconds(): void
     {
         Event::fake();
         Queue::fake();
@@ -104,7 +104,7 @@ class AttackTimeOutListenerTest extends TestCase
         });
     }
 
-    public function testDeadCharacterWaitsTwentySeconds(): void
+    public function test_dead_character_waits_twenty_seconds(): void
     {
         Event::fake();
         Queue::fake();

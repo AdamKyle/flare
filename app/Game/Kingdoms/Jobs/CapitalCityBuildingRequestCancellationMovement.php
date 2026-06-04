@@ -68,7 +68,7 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
         event(new UpdateCapitalCityBuildingQueueTable($updatedQueueData->character));
         $capitalCityKingdomLogHandler->possiblyCreateLogForBuildingQueue($updatedQueueData);
 
-        if (! collect($responseData)->contains(fn($response) => $response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED)) {
+        if (! collect($responseData)->contains(fn ($response) => $response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED)) {
             $this->cleanupCancellationRecords($updatedQueueData);
         }
     }
@@ -126,7 +126,7 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
 
                 $buildingName = is_null($building) ? 'Unknown Building' : $building->name;
 
-                $queueDataMessages[] = 'Failed to cancel the request for building: ' . $buildingName . '. The building finished before the cancellation could arrive.';
+                $queueDataMessages[] = 'Failed to cancel the request for building: '.$buildingName.'. The building finished before the cancellation could arrive.';
 
                 $queueData->update(['messages' => $queueDataMessages]);
 
@@ -173,7 +173,7 @@ class CapitalCityBuildingRequestCancellationMovement implements ShouldQueue
             return null;
         }
 
-        if (collect($responseData)->contains(fn($response) => $response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED)) {
+        if (collect($responseData)->contains(fn ($response) => $response['status'] === CapitalCityQueueStatus::CANCELLATION_REJECTED)) {
             $messages = $updatedQueueData->messages ?? [];
             $messages[] = 'Cancellation request for one of your buildings was rejected (See the building that states Cancellation Rejected) because it was too close to being done. No need to waste resources child!';
 

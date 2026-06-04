@@ -137,9 +137,6 @@ class FactionLoyaltyService
 
     /**
      * Build and dispatch the faction loyalty automation warning state.
-     *
-     * @param Character $character
-     * @return array
      */
     private function automationWarningState(Character $character): array
     {

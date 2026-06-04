@@ -20,9 +20,9 @@ use Tests\Traits\CreateKingdomBuilding;
 
 class KingdomManagement
 {
-    use CreateGameBuilding,
+    use CreateCapitalCityQueue,
+        CreateGameBuilding,
         CreateGameUnit,
-        CreateCapitalCityQueue,
         CreateKingdom,
         CreateKingdomBuilding,
         KingdomCache;

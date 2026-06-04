@@ -27,7 +27,7 @@ class FactionLoyaltyAutomationWarningControllerTest extends TestCase
 
     private ?FactionLoyaltyAutomationLog $factionLoyaltyAutomationLog = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -45,7 +45,7 @@ class FactionLoyaltyAutomationWarningControllerTest extends TestCase
         $this->factionLoyaltyAutomationLog = $this->factionLoyaltyFactory->getFactionLoyaltyAutomationLog();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->character = null;
         $this->factionLoyaltyFactory = null;
@@ -55,7 +55,7 @@ class FactionLoyaltyAutomationWarningControllerTest extends TestCase
         parent::tearDown();
     }
 
-    public function testDismissWarningUsesRequestAndDeletesLatestWarningWithReferencedLogEntry(): void
+    public function test_dismiss_warning_uses_request_and_deletes_latest_warning_with_referenced_log_entry(): void
     {
         Event::fake();
 
@@ -101,7 +101,7 @@ class FactionLoyaltyAutomationWarningControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/warning/dismiss', [
+            ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/warning/dismiss', [
                 '_token' => csrf_token(),
             ]);
 
@@ -153,7 +153,7 @@ class FactionLoyaltyAutomationWarningControllerTest extends TestCase
         });
     }
 
-    public function testDismissWarningReturnsAndDispatchesClearedWarningState(): void
+    public function test_dismiss_warning_returns_and_dispatches_cleared_warning_state(): void
     {
         Event::fake();
 
@@ -179,7 +179,7 @@ class FactionLoyaltyAutomationWarningControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/warning/dismiss', [
+            ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/warning/dismiss', [
                 '_token' => csrf_token(),
             ]);
 
@@ -198,9 +198,9 @@ class FactionLoyaltyAutomationWarningControllerTest extends TestCase
         });
     }
 
-    public function testDismissWarningRequiresAuthentication(): void
+    public function test_dismiss_warning_requires_authentication(): void
     {
-        $response = $this->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/warning/dismiss', [
+        $response = $this->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/warning/dismiss', [
             '_token' => csrf_token(),
         ], [], [], [
             'HTTP_ACCEPT' => 'application/json',
@@ -209,7 +209,7 @@ class FactionLoyaltyAutomationWarningControllerTest extends TestCase
         $this->assertEquals(401, $response->getStatusCode());
     }
 
-    public function testWarningRequestAuthorizesAndHasNoValidationRules(): void
+    public function test_warning_request_authorizes_and_has_no_validation_rules(): void
     {
         $request = new FactionLoyaltyAutomationWarningRequest();
 

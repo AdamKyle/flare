@@ -15,7 +15,7 @@ class CapitalCityUnitRequestTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testCapitalCityRecruitRejectsManuallyQueuedUnit(): void
+    public function test_capital_city_recruit_rejects_manually_queued_unit(): void
     {
         Queue::fake();
 
@@ -46,7 +46,7 @@ class CapitalCityUnitRequestTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdom/capital-city/recruit-unit-requests/' . $character->id . '/' . $capitalCity->id, [
+            ->call('POST', '/api/kingdom/capital-city/recruit-unit-requests/'.$character->id.'/'.$capitalCity->id, [
                 'request_data' => [[
                     'kingdom_id' => $targetKingdom->id,
                     'unit_requests' => [[
@@ -63,7 +63,7 @@ class CapitalCityUnitRequestTest extends TestCase
         Queue::assertNotPushed(CapitalCityQueueUpUnitRequests::class);
     }
 
-    public function testCapitalCityRecruitRejectsCapitalCityQueuedUnit(): void
+    public function test_capital_city_recruit_rejects_capital_city_queued_unit(): void
     {
         Queue::fake();
 
@@ -101,7 +101,7 @@ class CapitalCityUnitRequestTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdom/capital-city/recruit-unit-requests/' . $character->id . '/' . $capitalCity->id, [
+            ->call('POST', '/api/kingdom/capital-city/recruit-unit-requests/'.$character->id.'/'.$capitalCity->id, [
                 'request_data' => [[
                     'kingdom_id' => $targetKingdom->id,
                     'unit_requests' => [[
@@ -118,7 +118,7 @@ class CapitalCityUnitRequestTest extends TestCase
         Queue::assertNotPushed(CapitalCityQueueUpUnitRequests::class);
     }
 
-    public function testCapitalCityValidNonQueuedRecruitmentDispatchesRequest(): void
+    public function test_capital_city_valid_non_queued_recruitment_dispatches_request(): void
     {
         Queue::fake();
 
@@ -141,7 +141,7 @@ class CapitalCityUnitRequestTest extends TestCase
         $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdom/capital-city/recruit-unit-requests/' . $character->id . '/' . $capitalCity->id, [
+            ->call('POST', '/api/kingdom/capital-city/recruit-unit-requests/'.$character->id.'/'.$capitalCity->id, [
                 'request_data' => [[
                     'kingdom_id' => $targetKingdom->id,
                     'unit_requests' => [[
@@ -155,7 +155,7 @@ class CapitalCityUnitRequestTest extends TestCase
         Queue::assertPushed(CapitalCityQueueUpUnitRequests::class);
     }
 
-    public function testCapitalCityRecruitIgnoresExpiredManualQueuedUnit(): void
+    public function test_capital_city_recruit_ignores_expired_manual_queued_unit(): void
     {
         Queue::fake();
 
@@ -186,7 +186,7 @@ class CapitalCityUnitRequestTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdom/capital-city/recruit-unit-requests/' . $character->id . '/' . $capitalCity->id, [
+            ->call('POST', '/api/kingdom/capital-city/recruit-unit-requests/'.$character->id.'/'.$capitalCity->id, [
                 'request_data' => [[
                     'kingdom_id' => $targetKingdom->id,
                     'unit_requests' => [[

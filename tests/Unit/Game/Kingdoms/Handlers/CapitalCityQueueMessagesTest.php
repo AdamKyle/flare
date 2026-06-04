@@ -22,9 +22,9 @@ use Tests\Traits\CreateGameBuildingUnit;
 
 class CapitalCityQueueMessagesTest extends TestCase
 {
-    use RefreshDatabase, CreateGameBuildingUnit;
+    use CreateGameBuildingUnit, RefreshDatabase;
 
-    public function testBuildingQueueLogUsesEmptyMessagesWhenQueueMessagesAreNull(): void
+    public function test_building_queue_log_uses_empty_messages_when_queue_messages_are_null(): void
     {
         Event::fake();
 
@@ -66,7 +66,7 @@ class CapitalCityQueueMessagesTest extends TestCase
         $this->assertSame([], $kingdomLog->additional_details['messages']);
     }
 
-    public function testUnitQueueLogUsesEmptyMessagesWhenQueueMessagesAreNull(): void
+    public function test_unit_queue_log_uses_empty_messages_when_queue_messages_are_null(): void
     {
         Event::fake();
 
@@ -104,7 +104,7 @@ class CapitalCityQueueMessagesTest extends TestCase
         $this->assertSame([], $kingdomLog->additional_details['messages']);
     }
 
-    public function testBuildingRequestQueueStartsWithEmptyMessages(): void
+    public function test_building_request_queue_starts_with_empty_messages(): void
     {
         Queue::fake();
         Event::fake();
@@ -153,7 +153,7 @@ class CapitalCityQueueMessagesTest extends TestCase
         $this->assertSame([], $capitalCityBuildingQueue->messages);
     }
 
-    public function testUnitRequestQueueStartsWithEmptyMessages(): void
+    public function test_unit_request_queue_starts_with_empty_messages(): void
     {
         Queue::fake();
         Event::fake();

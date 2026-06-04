@@ -4,6 +4,7 @@ namespace App\Game\PassiveSkills\Jobs;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterPassiveSkill;
+use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Game\Kingdoms\Service\KingdomBuildingUnlockSyncService;
 use App\Game\Kingdoms\Service\KingdomMaxResourceRecalculationService;
@@ -17,7 +18,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
-use App\Game\Core\Services\CharacterPassiveSkills;
 
 class TrainPassiveSkill implements ShouldQueue
 {

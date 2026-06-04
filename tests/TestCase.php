@@ -25,8 +25,10 @@ abstract class TestCase extends BaseTestCase
 
         parent::setUp();
 
-        $this->app->instance(Vite::class, new class extends Vite {
-            public function __invoke($entrypoints, $buildDirectory = null): HtmlString {
+        $this->app->instance(Vite::class, new class extends Vite
+        {
+            public function __invoke($entrypoints, $buildDirectory = null): HtmlString
+            {
                 return new HtmlString('');
             }
         });

@@ -19,7 +19,7 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testDelayedRedispatchPassesAllConstructorArgumentsAndUsesLongRunningQueue(): void
+    public function test_delayed_redispatch_passes_all_constructor_arguments_and_uses_long_running_queue(): void
     {
         Queue::fake();
         Event::fake();
@@ -66,15 +66,15 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
 
             return $queuedJob->connection === 'long_running' &&
                 $queuedJob->queue === 'default_long' &&
-                str_contains($serializedJob, 'capitalCityCancellationQueueId";i:' . $capitalCityBuildingCancellation->id) &&
-                str_contains($serializedJob, 'capitalCityQueueId";i:' . $capitalCityBuildingQueue->id) &&
-                str_contains($serializedJob, 'characterId";i:' . $character->id) &&
+                str_contains($serializedJob, 'capitalCityCancellationQueueId";i:'.$capitalCityBuildingCancellation->id) &&
+                str_contains($serializedJob, 'capitalCityQueueId";i:'.$capitalCityBuildingQueue->id) &&
+                str_contains($serializedJob, 'characterId";i:'.$character->id) &&
                 str_contains($serializedJob, 'building_ids') &&
-                str_contains($serializedJob, 'i:' . $building->id);
+                str_contains($serializedJob, 'i:'.$building->id);
         });
     }
 
-    public function testMissingBuildingInQueueUpdatesCancellationRecordInsteadOfSourceQueue(): void
+    public function test_missing_building_in_queue_updates_cancellation_record_instead_of_source_queue(): void
     {
         Event::fake();
 
@@ -125,7 +125,7 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
         $this->assertContains(CapitalCityQueueStatus::REJECTED, $buildingLogStatuses);
     }
 
-    public function testMissingSourceQueueMarksCancellationRejected(): void
+    public function test_missing_source_queue_marks_cancellation_rejected(): void
     {
         Event::fake();
 
@@ -155,7 +155,7 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
         $this->assertSame(CapitalCityQueueStatus::CANCELLATION_REJECTED, $capitalCityBuildingCancellation->refresh()->status);
     }
 
-    public function testCompletedBuildingInQueueMarksCancellationRejectedWithoutCorruptingSourceQueue(): void
+    public function test_completed_building_in_queue_marks_cancellation_rejected_without_corrupting_source_queue(): void
     {
         Event::fake();
 
@@ -222,7 +222,7 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
         $this->assertSame(1500, $kingdom->refresh()->current_wood);
     }
 
-    public function testRetryAfterConsumedBuildingQueueLeavesCancellationRejected(): void
+    public function test_retry_after_consumed_building_queue_leaves_cancellation_rejected(): void
     {
         Event::fake();
 

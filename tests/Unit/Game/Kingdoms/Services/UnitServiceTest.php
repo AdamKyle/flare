@@ -120,7 +120,7 @@ class UnitServiceTest extends TestCase
         $this->assertFalse(resolve(UnitService::class)->canQueueUnits($kingdom, $unit, 1));
     }
 
-    public function testCancellationRejectedCapitalCityQueuedUnitsDoNotCountTowardMaximum(): void
+    public function test_cancellation_rejected_capital_city_queued_units_do_not_count_toward_maximum(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdomManagement = $characterFactory->kingdomManagement()->assignKingdom();

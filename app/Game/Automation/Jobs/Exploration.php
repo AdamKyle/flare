@@ -2,7 +2,21 @@
 
 namespace App\Game\Automation\Jobs;
 
+use App\Flare\Models\Character;
+use App\Flare\Models\CharacterAutomation;
+use App\Flare\Models\Monster;
+use App\Flare\Services\CharacterRewardService;
+use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Automation\Events\AutomationLogUpdate;
+use App\Game\Automation\Events\AutomationTimeOut;
+use App\Game\Automation\Services\ExplorationCreatureCountCalculator;
+use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
+use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Skills\Services\SkillService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -10,20 +24,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use App\Flare\Models\Character;
-use App\Flare\Models\CharacterAutomation;
-use App\Flare\Models\Monster;
-use App\Flare\Services\CharacterRewardService;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Battle\Handlers\BattleEventHandler;
-use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
-use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
-use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
-use App\Game\Automation\Events\AutomationLogUpdate;
-use App\Game\Automation\Events\AutomationTimeOut;
-use App\Game\Automation\Services\ExplorationCreatureCountCalculator;
-use App\Game\Skills\Services\SkillService;
 use Psr\SimpleCache\InvalidArgumentException;
 
 class Exploration implements ShouldQueue
@@ -60,7 +60,7 @@ class Exploration implements ShouldQueue
         'total_creatures' => 0,
         'total_xp' => 0,
         'total_skill_xp' => 0,
-        'total_faction_points' => 0
+        'total_faction_points' => 0,
     ];
 
     public function __construct(Character $character, int $automationId, string $attackType, int $timeDelay)
@@ -102,7 +102,7 @@ class Exploration implements ShouldQueue
         if ($this->shouldBail($automation)) {
             $this->endAutomation($automation, $characterCacheData);
 
-            Cache::delete('can-character-survive-' . $this->character->id);
+            Cache::delete('can-character-survive-'.$this->character->id);
 
             return;
         }
@@ -154,10 +154,6 @@ class Exploration implements ShouldQueue
     /**
      * Handle an encounter.
      *
-     * @param CharacterAutomation $automation
-     * @param array $params
-     * @param int $timeDelay
-     * @return bool
      * @throws InvalidArgumentException
      */
     private function encounter(CharacterAutomation $automation, array $params, int $timeDelay): bool
@@ -167,7 +163,7 @@ class Exploration implements ShouldQueue
 
         $enemies = $this->explorationCreatureCountCalculator->calculate($this->character);
 
-        $this->sendOutEventLogUpdate('"Chirst, child there are: ' . $enemies . ' of them ..."
+        $this->sendOutEventLogUpdate('"Chirst, child there are: '.$enemies.' of them ..."
         The Guide hisses at you from the shadows. You ignore his words and prepare for battle. One right after the other ...', true);
 
         $totalXpToReward = 0;
@@ -199,7 +195,7 @@ class Exploration implements ShouldQueue
 
         $this->sendOutEventLogUpdate('The last of the enemies fall. Covered in blood, exhausted, you look around for any signs of more of their friends. The area is silent. "Another day, another battle.
         We managed to survive." The Guide states as he walks from the shadows. The pair of you set off in search of the next adventure ...
-        (Exploration will begin again in ' . $timeDelay . ' minutes)', true);
+        (Exploration will begin again in '.$timeDelay.' minutes)', true);
 
         return true;
     }
@@ -207,9 +203,6 @@ class Exploration implements ShouldQueue
     /**
      * Fight monster through automation.
      *
-     * @param CharacterAutomation $automation
-     * @param array $params
-     * @return bool
      * @throws InvalidArgumentException
      */
     private function fightAutomationMonster(CharacterAutomation $automation, array $params): bool
@@ -256,12 +249,9 @@ class Exploration implements ShouldQueue
 
     /**
      * Handle when a character dies in automation.
-     *
-     * @param CharacterAutomation $automation
-     * @param array $data
-     * @return bool
      */
-    private function handleWhenCharacterDies(CharacterAutomation $automation, array $data): bool {
+    private function handleWhenCharacterDies(CharacterAutomation $automation, array $data): bool
+    {
         if ($data['health']['current_character_health'] <= 0) {
             $this->cancelAutomation($automation, 'You died during exploration. Exploration has ended.');
 
@@ -271,7 +261,8 @@ class Exploration implements ShouldQueue
         return false;
     }
 
-    private function shouldAttackAgain(array $data): bool {
+    private function shouldAttackAgain(array $data): bool
+    {
 
         if (! $this->hasRequiredHealthData($data)) {
             return false;
@@ -313,9 +304,6 @@ class Exploration implements ShouldQueue
 
     /**
      * Should we bail?
-     *
-     * @param CharacterAutomation $automation
-     * @return bool
      */
     private function shouldBail(CharacterAutomation $automation): bool
     {
@@ -328,9 +316,6 @@ class Exploration implements ShouldQueue
 
     /**
      * Update automation to select the next monster if that option is available.
-     *
-     * @param CharacterAutomation $automation
-     * @return CharacterAutomation
      */
     private function updateAutomation(CharacterAutomation $automation): CharacterAutomation
     {
@@ -362,10 +347,6 @@ class Exploration implements ShouldQueue
 
     /**
      * End automation.
-     *
-     * @param CharacterAutomation $automation
-     * @param CharacterCacheData $characterCacheData
-     * @return void
      */
     private function endAutomation(CharacterAutomation $automation, CharacterCacheData $characterCacheData): void
     {
@@ -373,7 +354,7 @@ class Exploration implements ShouldQueue
 
         $characterCacheData->deleteCharacterSheet($this->character);
 
-        Cache::delete('can-character-survive-' . $this->character->id);
+        Cache::delete('can-character-survive-'.$this->character->id);
 
         $this->sendOutEventLogUpdate('"Phew, child! I did not think we would survive all of your shenanigans.
             So many times I could have died! Do you ever think about anyone other than yourself? No? Didn\'t think so." The Guide storms off and you follow him in silence.', true);
@@ -390,16 +371,10 @@ class Exploration implements ShouldQueue
 
         event(new AutomationTimeOut($character->user, 0));
 
-        return;
     }
-
 
     /**
      * Cancel automation without rewarding the player.
-     *
-     * @param CharacterAutomation $automation
-     * @param string|null $message
-     * @return void
      */
     private function cancelAutomation(CharacterAutomation $automation, ?string $message = null): void
     {
@@ -407,7 +382,7 @@ class Exploration implements ShouldQueue
 
         $this->characterCacheData->deleteCharacterSheet($this->character);
 
-        Cache::delete('can-character-survive-' . $this->character->id);
+        Cache::delete('can-character-survive-'.$this->character->id);
 
         if (! is_null($message)) {
             $this->sendOutEventLogUpdate($message);
@@ -423,21 +398,20 @@ class Exploration implements ShouldQueue
     /**
      * Set up the fight its self.
      *
-     * @param array $params
-     * @return array
      * @throws InvalidArgumentException
      */
-    private function setUpFightForMonster(array $params): array {
+    private function setUpFightForMonster(array $params): array
+    {
         return $this->monsterFightService->setupMonster($this->character, $params, true);
     }
 
     /**
      * Fight the monster.
      *
-     * @return array
      * @throws InvalidArgumentException
      */
-    private function fightMonster(): array {
+    private function fightMonster(): array
+    {
         $data = $this->monsterFightService->fightMonster($this->character, $this->attackType, false, true);
 
         if ($this->shouldAttackAgain($data) && $this->attempts >= self::MAX_ATTEMPTS) {
@@ -457,11 +431,6 @@ class Exploration implements ShouldQueue
 
     /**
      * Send out event log updates
-     *
-     * @param string $message
-     * @param bool $makeItalic
-     * @param bool $isReward
-     * @return void
      */
     private function sendOutEventLogUpdate(string $message, bool $makeItalic = false, bool $isReward = false): void
     {
@@ -472,9 +441,6 @@ class Exploration implements ShouldQueue
 
     /**
      * Reward the player for automation completion.
-     *
-     * @param Character $character
-     * @return void
      */
     private function rewardPlayer(Character $character): void
     {

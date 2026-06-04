@@ -16,12 +16,12 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testRequestDoesNotHaveBusinessValidation(): void
+    public function test_request_does_not_have_business_validation(): void
     {
         $this->assertFalse(method_exists(BuildingUpgradeRequestsRequest::class, 'withValidator'));
     }
 
-    public function testCapitalCityUpgradeRejectsDamagedBuilding(): void
+    public function test_capital_city_upgrade_rejects_damaged_building(): void
     {
         Queue::fake();
 
@@ -56,7 +56,7 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
         $building = $targetKingdom->buildings()->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id, [
+            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/'.$character->id.'/'.$capitalCity->id, [
                 'request_type' => 'upgrade',
                 'request_data' => [[
                     'kingdomId' => $targetKingdom->id,
@@ -71,7 +71,7 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
         Queue::assertNotPushed(CapitalCityQueueUpBuildingRequests::class);
     }
 
-    public function testCapitalCityRepairRejectsManuallyQueuedBuilding(): void
+    public function test_capital_city_repair_rejects_manually_queued_building(): void
     {
         Queue::fake();
 
@@ -116,7 +116,7 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id, [
+            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/'.$character->id.'/'.$capitalCity->id, [
                 'request_type' => 'repair',
                 'request_data' => [[
                     'kingdomId' => $targetKingdom->id,
@@ -131,7 +131,7 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
         Queue::assertNotPushed(CapitalCityQueueUpBuildingRequests::class);
     }
 
-    public function testCapitalCityRepairRejectsCapitalCityQueuedBuilding(): void
+    public function test_capital_city_repair_rejects_capital_city_queued_building(): void
     {
         Queue::fake();
 
@@ -185,7 +185,7 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id, [
+            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/'.$character->id.'/'.$capitalCity->id, [
                 'request_type' => 'repair',
                 'request_data' => [[
                     'kingdomId' => $targetKingdom->id,
@@ -200,7 +200,7 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
         Queue::assertNotPushed(CapitalCityQueueUpBuildingRequests::class);
     }
 
-    public function testCapitalCityRepairAllowsCancellationRejectedCapitalCityQueuedBuilding(): void
+    public function test_capital_city_repair_allows_cancellation_rejected_capital_city_queued_building(): void
     {
         Queue::fake();
 
@@ -254,7 +254,7 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id, [
+            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/'.$character->id.'/'.$capitalCity->id, [
                 'request_type' => 'repair',
                 'request_data' => [[
                     'kingdomId' => $targetKingdom->id,
@@ -266,8 +266,7 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
         Queue::assertPushed(CapitalCityQueueUpBuildingRequests::class);
     }
 
-
-    public function testCapitalCityValidNonQueuedUpgradeDispatchesRequest(): void
+    public function test_capital_city_valid_non_queued_upgrade_dispatches_request(): void
     {
         Queue::fake();
 
@@ -299,7 +298,7 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
         $building = $targetKingdom->buildings()->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id, [
+            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/'.$character->id.'/'.$capitalCity->id, [
                 'request_type' => 'upgrade',
                 'request_data' => [[
                     'kingdomId' => $targetKingdom->id,
@@ -311,7 +310,7 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
         Queue::assertPushed(CapitalCityQueueUpBuildingRequests::class);
     }
 
-    public function testCapitalCityValidNonQueuedRepairDispatchesRequest(): void
+    public function test_capital_city_valid_non_queued_repair_dispatches_request(): void
     {
         Queue::fake();
 
@@ -346,7 +345,7 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
         $building = $targetKingdom->buildings()->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/' . $character->id . '/' . $capitalCity->id, [
+            ->call('POST', '/api/kingdom/capital-city/upgrade-building-requests/'.$character->id.'/'.$capitalCity->id, [
                 'request_type' => 'repair',
                 'request_data' => [[
                     'kingdomId' => $targetKingdom->id,

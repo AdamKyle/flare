@@ -10,9 +10,9 @@ use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Values\BuildingCosts;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\CapitalCityResourceRequestType;
+use App\Game\Kingdoms\Values\UnitNames;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use App\Game\Skills\Values\SkillTypeValue;
-use App\Game\Kingdoms\Values\UnitNames;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -27,7 +27,7 @@ class CapitalCityBuildingManagementTest extends TestCase
 
     private ?CapitalCityBuildingManagement $capitalCityBuildingManagement;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -85,7 +85,7 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->capitalCityBuildingManagement = resolve(CapitalCityBuildingManagement::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -93,7 +93,7 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->capitalCityBuildingManagement = null;
     }
 
-    public function testItConsumesDiscountedResourceCostsForOneCapitalCityBuildingUpgradeWhenTheBuildingManagementPassiveIsPartiallyTrained(): void
+    public function test_it_consumes_discounted_resource_costs_for_one_capital_city_building_upgrade_when_the_building_management_passive_is_partially_trained(): void
     {
         Event::fake();
 
@@ -179,7 +179,7 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->assertSame(9720, $targetKingdom->current_population);
     }
 
-    public function testItConsumesDiscountedResourceCostsForMultipleCapitalCityBuildingUpgradesWhenTheBuildingManagementPassiveIsPartiallyTrained(): void
+    public function test_it_consumes_discounted_resource_costs_for_multiple_capital_city_building_upgrades_when_the_building_management_passive_is_partially_trained(): void
     {
         Event::fake();
 
@@ -295,7 +295,7 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->assertSame(9440, $targetKingdom->current_population);
     }
 
-    public function testCapitalCityBuildingResourceRejectionUpdatesBuildingRequestDataAndTopLevelStatus(): void
+    public function test_capital_city_building_resource_rejection_updates_building_request_data_and_top_level_status(): void
     {
         Event::fake();
 
@@ -341,7 +341,7 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->assertSame(CapitalCityQueueStatus::REJECTED, $capitalCityBuildingQueue->building_request_data[0]['secondary_status']);
     }
 
-    public function testCapitalCityBuildingResourceDispatchUsesLongRunningConnection(): void
+    public function test_capital_city_building_resource_dispatch_uses_long_running_connection(): void
     {
         Event::fake();
         Queue::fake();
@@ -409,7 +409,7 @@ class CapitalCityBuildingManagementTest extends TestCase
         });
     }
 
-    public function testCapitalCityResourceRequestRedispatchesWhenQueueIsWaitingOnLongRunningConnection(): void
+    public function test_capital_city_resource_request_redispatches_when_queue_is_waiting_on_long_running_connection(): void
     {
         Queue::fake();
 
@@ -453,7 +453,7 @@ class CapitalCityBuildingManagementTest extends TestCase
         });
     }
 
-    public function testMixedValidAndMaxLevelBuildingRequestSkipsMaxLevelWithoutSpendingForIt(): void
+    public function test_mixed_valid_and_max_level_building_request_skips_max_level_without_spending_for_it(): void
     {
         Event::fake();
         Queue::fake();
@@ -523,8 +523,7 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->assertSame(5000, $targetKingdom->refresh()->current_population);
     }
 
-
-    public function testCancellationRejectedCapitalCityBuildingQueueDoesNotBlockNewRequest(): void
+    public function test_cancellation_rejected_capital_city_building_queue_does_not_block_new_request(): void
     {
         Event::fake();
         Queue::fake();
@@ -596,7 +595,7 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->assertSame($building->id, $capitalCityBuildingQueue->building_request_data[0]['building_id']);
     }
 
-    public function testNoResourcesAreSpentForRejectedMaxLevelBuildingsDuringProcessing(): void
+    public function test_no_resources_are_spent_for_rejected_max_level_buildings_during_processing(): void
     {
         Event::fake();
 
@@ -664,7 +663,7 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->assertSame(5000, $kingdom->refresh()->current_population);
     }
 
-    public function testStaleProcessingPathRejectsAndDoesNotSpendResources(): void
+    public function test_stale_processing_path_rejects_and_does_not_spend_resources(): void
     {
         Event::fake();
 
@@ -733,7 +732,7 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->assertSame(5000, $kingdom->refresh()->current_population);
     }
 
-    public function testOverMaxQueueDataRejectsDuringProcessingWithoutSpendingOrMutating(): void
+    public function test_over_max_queue_data_rejects_during_processing_without_spending_or_mutating(): void
     {
         Event::fake();
 

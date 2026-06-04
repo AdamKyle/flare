@@ -21,13 +21,8 @@ use Illuminate\Support\Facades\Log;
 
 class CapitalCityBuildingManagementRequestHandler
 {
-
     use ResponseBuilder;
 
-    /**
-     * @param KingdomBuildingService $kingdomBuildingService
-     * @param UnitMovementService $unitMovementService
-     */
     public function __construct(
         private readonly KingdomBuildingService $kingdomBuildingService,
         private readonly UnitMovementService $unitMovementService,
@@ -37,12 +32,6 @@ class CapitalCityBuildingManagementRequestHandler
      * Create the requests based on the kingdoms and their requests.
      *
      * Each request is an object of kingdom id and an array of building ids.
-     *
-     * @param Character $character
-     * @param Kingdom $kingdom
-     * @param array $requests
-     * @param string $type
-     * @return array
      */
     public function createRequestQueue(Character $character, Kingdom $kingdom, array $requests, string $type): array
     {
@@ -73,7 +62,7 @@ class CapitalCityBuildingManagementRequestHandler
                 'status' => CapitalCityQueueStatus::TRAVELING,
                 'messages' => [],
                 'started_at' => $currentTime,
-                'completed_at' => $travelTimeNeeded
+                'completed_at' => $travelTimeNeeded,
             ]);
 
             $dispatchTime = $travelTimeNeeded;
@@ -103,10 +92,6 @@ class CapitalCityBuildingManagementRequestHandler
 
     /**
      * Find buildings for a kingdom based off the array of ids.
-     *
-     * @param int $kingdomId
-     * @param array $buildingIds
-     * @return Collection
      */
     private function getBuildingsForRequest(int $kingdomId, array $buildingIds): Collection
     {
@@ -116,10 +101,9 @@ class CapitalCityBuildingManagementRequestHandler
     /**
      * Calculate the time required for unit movement.
      *
-     * @param Character $character The character initiating the request.
-     * @param Kingdom $toKingdom The target kingdom for the movement.
-     * @param int $kingdomId The ID of the originating kingdom.
-     *
+     * @param  Character  $character  The character initiating the request.
+     * @param  Kingdom  $toKingdom  The target kingdom for the movement.
+     * @param  int  $kingdomId  The ID of the originating kingdom.
      * @return int The time required for the movement in minutes.
      */
     private function calculateTravelTime(Character $character, Kingdom $toKingdom, int $kingdomId): int
@@ -135,9 +119,8 @@ class CapitalCityBuildingManagementRequestHandler
     /**
      * Build the queue data for creating a new building upgrade request.
      *
-     * @param Collection $buildings The collection of buildings to be upgraded.
-     * @param string $type The type of request ('upgrade' or otherwise).
-     *
+     * @param  Collection  $buildings  The collection of buildings to be upgraded.
+     * @param  string  $type  The type of request ('upgrade' or otherwise).
      * @return array The queue data for the bbuildQueueDatauilding upgrade request.
      */
     private function buildQueueData(Collection $buildings, string $type): array
@@ -206,9 +189,7 @@ class CapitalCityBuildingManagementRequestHandler
     /**
      * Dispatch the queue movement job.
      *
-     * @param CapitalCityBuildingQueue $queue The created building queue.
-     * @param Carbon $dispatchTime
-     * @return void
+     * @param  CapitalCityBuildingQueue  $queue  The created building queue.
      */
     private function dispatchQueueMovement(CapitalCityBuildingQueue $queue, Carbon $dispatchTime): void
     {
@@ -218,10 +199,8 @@ class CapitalCityBuildingManagementRequestHandler
     /**
      * Trigger events for updating capital city building upgrades and queue table.
      *
-     * @param Character $character The character initiating the request.
-     * @param Kingdom $kingdom The kingdom from which the request is made.
-     *
-     * @return void
+     * @param  Character  $character  The character initiating the request.
+     * @param  Kingdom  $kingdom  The kingdom from which the request is made.
      */
     private function sendOffEvents(Character $character, Kingdom $kingdom): void
     {

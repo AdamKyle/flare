@@ -137,19 +137,19 @@ class KingdomTransformer extends TransformerAbstract
             ->where('kingdom_id', $kingdom->id)
             ->get()
             ->map(function (UnitInQueue $unitInQueue) {
-            return [
-                'id' => $unitInQueue->id,
-                'character_id' => $unitInQueue->character_id,
-                'kingdom_id' => $unitInQueue->kingdom_id,
-                'game_unit_id' => $unitInQueue->game_unit_id,
-                'amount' => $unitInQueue->amount,
-                'gold_paid' => $unitInQueue->gold_paid,
-                'started_at' => $unitInQueue->started_at,
-                'completed_at' => $unitInQueue->completed_at,
-                'is_capital_city_managed' => ! is_null($unitInQueue->capital_city_unit_queue_id),
-                'capital_city_unit_queue_id' => $unitInQueue->capital_city_unit_queue_id,
-            ];
-        });
+                return [
+                    'id' => $unitInQueue->id,
+                    'character_id' => $unitInQueue->character_id,
+                    'kingdom_id' => $unitInQueue->kingdom_id,
+                    'game_unit_id' => $unitInQueue->game_unit_id,
+                    'amount' => $unitInQueue->amount,
+                    'gold_paid' => $unitInQueue->gold_paid,
+                    'started_at' => $unitInQueue->started_at,
+                    'completed_at' => $unitInQueue->completed_at,
+                    'is_capital_city_managed' => ! is_null($unitInQueue->capital_city_unit_queue_id),
+                    'capital_city_unit_queue_id' => $unitInQueue->capital_city_unit_queue_id,
+                ];
+            });
 
         $capitalCityUnitQueues = CapitalCityUnitQueue::query()
             ->where('kingdom_id', $kingdom->id)

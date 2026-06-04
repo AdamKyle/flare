@@ -139,7 +139,7 @@ class CapitalCityQueueCleanupServiceTest extends TestCase
         $this->assertNotNull(CapitalCityUnitQueue::find($unitQueue->id));
     }
 
-    public function testStaleCapitalCityResourceRequestCleanupRemovesOnlyCompletedRows(): void
+    public function test_stale_capital_city_resource_request_cleanup_removes_only_completed_rows(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdomManagement = $characterFactory->kingdomManagement()->assignKingdom();

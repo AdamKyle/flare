@@ -22,7 +22,7 @@ class RessurectRaidBossTest extends TestCase
 {
     use CreateEvent, CreateGameMap, CreateItem, CreateLocation, CreateMonster, CreateRaid, CreateScheduledEvent, RefreshDatabase;
 
-    public function testRevivesDeadRaidBossForRunningScheduledRaidAndDeletesOnlyThatRaidParticipation(): void
+    public function test_revives_dead_raid_boss_for_running_scheduled_raid_and_deletes_only_that_raid_participation(): void
     {
         Event::fake();
 
@@ -97,7 +97,7 @@ class RessurectRaidBossTest extends TestCase
         Event::assertDispatched(GlobalMessageEvent::class);
     }
 
-    public function testDoesNotReviveAliveDamagedRaidBoss(): void
+    public function test_does_not_revive_alive_damaged_raid_boss(): void
     {
         Event::fake();
 
@@ -150,7 +150,7 @@ class RessurectRaidBossTest extends TestCase
         Event::assertNotDispatched(GlobalMessageEvent::class);
     }
 
-    public function testDoesNotReviveDeadRaidBossWhenScheduledRaidIsNotRunning(): void
+    public function test_does_not_revive_dead_raid_boss_when_scheduled_raid_is_not_running(): void
     {
         Event::fake();
 

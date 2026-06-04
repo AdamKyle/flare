@@ -20,31 +20,15 @@ class DisenchantService
 {
     use ResponseBuilder;
 
-    /**
-     * @var EnchantingService $enchantingService
-     */
     private EnchantingService $enchantingService;
 
-    /**
-     * @var Character $character
-     */
     private Character $character;
 
-    /**
-     * @var Skill $disenchantingSkill
-     */
     private Skill $disenchantingSkill;
 
-    /**
-     * @var InventorySlot|null $questSlot
-     */
     private ?InventorySlot $questSlot = null;
 
-    /**
-     * @param SkillCheckService $skillCheckService
-     */
-    public function __construct(private readonly SkillCheckService $skillCheckService)
-    {}
+    public function __construct(private readonly SkillCheckService $skillCheckService) {}
 
     /**
      * Set up the service.

@@ -4,6 +4,7 @@ namespace App\Game\Events\Providers;
 
 use App\Flare\Services\CreateSurveySnapshot;
 use App\Flare\Services\EventSchedulerService;
+use App\Game\Automation\Services\ExplorationAutomationService;
 use App\Game\Events\Console\Commands\EndScheduledEvent;
 use App\Game\Events\Console\Commands\ProcessScheduledEvents;
 use App\Game\Events\Console\Commands\RestartGlobalEventGoal;
@@ -26,7 +27,6 @@ use App\Game\Events\Services\WeeklyCelestialEventEnderService;
 use App\Game\Events\Services\WeeklyCurrencyEventEnderService;
 use App\Game\Events\Services\WeeklyFactionLoyaltyEnderService;
 use App\Game\Events\Services\WinterEventEnderService;
-use App\Game\Automation\Services\ExplorationAutomationService;;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\TraverseService;

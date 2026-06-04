@@ -26,9 +26,6 @@ class EndScheduledEvent extends Command
     protected $description = 'End all scheduled events';
 
     /**
-     * @param EventEnderRegistry $registry
-     * @param ScheduleEventFinalizerService $finalizer
-     * @return void
      * @throws Exception
      */
     public function handle(

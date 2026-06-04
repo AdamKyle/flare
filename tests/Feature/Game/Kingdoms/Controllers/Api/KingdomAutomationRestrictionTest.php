@@ -3,7 +3,6 @@
 namespace Tests\Feature\Game\Kingdoms\Controllers\Api;
 
 use App\Flare\Models\BuildingInQueue;
-use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\UnitInQueue;
 use App\Flare\Values\AutomationType;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;

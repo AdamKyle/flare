@@ -30,8 +30,7 @@ class CapitalCityBuildingRequest implements ShouldQueue
     public function handle(
         CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler,
         KingdomMaxResourceRecalculationService $kingdomMaxResourceRecalculationService
-    ): void
-    {
+    ): void {
 
         $queueData = CapitalCityBuildingQueue::find($this->capitalCityQueueId);
 
@@ -39,7 +38,7 @@ class CapitalCityBuildingRequest implements ShouldQueue
             return;
         }
 
-        if (!$queueData->completed_at->lessThanOrEqualTo(now())) {
+        if (! $queueData->completed_at->lessThanOrEqualTo(now())) {
             $timeLeft = now()->diffInMinutes($queueData->completed_at);
 
             if ($timeLeft >= 1) {
@@ -66,8 +65,7 @@ class CapitalCityBuildingRequest implements ShouldQueue
         CapitalCityBuildingQueue $queueData,
         CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler,
         KingdomMaxResourceRecalculationService $kingdomMaxResourceRecalculationService
-    ): void
-    {
+    ): void {
         $buildingRequestData = $queueData->building_request_data;
         $messages = $queueData->messages ?? [];
         $kingdom = $queueData->kingdom;
@@ -96,7 +94,7 @@ class CapitalCityBuildingRequest implements ShouldQueue
                     'request_type' => $requestData['type'],
                 ]);
 
-                $messages[] = $requestData['building_name'] . ' does not seem to exist in this kingdom. If this is a bug screenshot it and submit a bug report with the name of your kingdom.';
+                $messages[] = $requestData['building_name'].' does not seem to exist in this kingdom. If this is a bug screenshot it and submit a bug report with the name of your kingdom.';
                 $buildingRequestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
 
                 continue;
@@ -123,7 +121,7 @@ class CapitalCityBuildingRequest implements ShouldQueue
             if ($requestData['type'] === 'repair') {
                 $this->handleRebuildingBuilding($building);
 
-                $messages[] = $building->name . ' has been restored to its former glory!';
+                $messages[] = $building->name.' has been restored to its former glory!';
                 $buildingRequestData[$index]['secondary_status'] = CapitalCityQueueStatus::FINISHED;
             }
         }
@@ -131,7 +129,7 @@ class CapitalCityBuildingRequest implements ShouldQueue
         $queueData->update([
             'building_request_data' => $buildingRequestData,
             'messages' => $messages,
-            'status' => CapitalCityQueueStatus::FINISHED
+            'status' => CapitalCityQueueStatus::FINISHED,
         ]);
 
         $queueData = $queueData->refresh();
@@ -147,10 +145,10 @@ class CapitalCityBuildingRequest implements ShouldQueue
         $building = $building->refresh();
 
         $building->update([
-            'current_defence'    => $building->defence,
+            'current_defence' => $building->defence,
             'current_durability' => $building->durability,
-            'max_defence'        => $building->defence,
-            'max_durability'     => $building->durability,
+            'max_defence' => $building->defence,
+            'max_durability' => $building->durability,
         ]);
 
     }
@@ -159,14 +157,13 @@ class CapitalCityBuildingRequest implements ShouldQueue
         CapitalCityBuildingQueue $queueData,
         KingdomBuilding $building,
         array $requestData
-    ): ?string
-    {
+    ): ?string {
         if ($building->level >= $building->gameBuilding->max_level) {
-            return $building->name . ' has been rejected: Building is already max level.';
+            return $building->name.' has been rejected: Building is already max level.';
         }
 
         if ((int) $requestData['to_level'] > $building->gameBuilding->max_level) {
-            return $building->name . ' has been rejected: Requested level is over max level.';
+            return $building->name.' has been rejected: Requested level is over max level.';
         }
 
         if ((int) $requestData['from_level'] !== $building->level) {
@@ -181,7 +178,7 @@ class CapitalCityBuildingRequest implements ShouldQueue
                 'to_level' => $requestData['to_level'],
             ]);
 
-            return 'Something is wrong for ' . $building->name . ', the level to advance from no longer matches the current building level. Please screen shot this and report a bug and include your kingdom name.';
+            return 'Something is wrong for '.$building->name.', the level to advance from no longer matches the current building level. Please screen shot this and report a bug and include your kingdom name.';
         }
 
         return null;

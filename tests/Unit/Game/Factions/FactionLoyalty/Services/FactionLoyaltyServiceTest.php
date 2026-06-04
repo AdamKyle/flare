@@ -8,9 +8,9 @@ use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Models\FactionLoyaltyAutomationLog;
 use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\GameMap;
+use App\Flare\Models\Monster;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
-use App\Flare\Models\Monster;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MapNameValue;
 use App\Game\Events\Values\EventType;
@@ -33,7 +33,7 @@ class FactionLoyaltyServiceTest extends TestCase
 
     private ?FactionLoyaltyService $factionLoyaltyService = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -41,7 +41,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->factionLoyaltyService = resolve(FactionLoyaltyService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -50,7 +50,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->factionLoyaltyService = null;
     }
 
-    public function testGetNoFactionLoyaltyForPlane()
+    public function test_get_no_faction_loyalty_for_plane()
     {
         $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -61,7 +61,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertEquals('You have not pledged to a faction.', $result['message']);
     }
 
-    public function testHasPlaneLoyalty()
+    public function test_has_plane_loyalty()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -97,7 +97,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertEquals($this->character->map->gameMap->name, $result['map_name']);
     }
 
-    public function testGetLoyaltyInfoForPlaneIncludesLatestUnreadWarningNotice(): void
+    public function test_get_loyalty_info_for_plane_includes_latest_unread_warning_notice(): void
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -189,7 +189,7 @@ class FactionLoyaltyServiceTest extends TestCase
         ], $factionLoyaltyNpc->faction_loyalty_warning_notices);
     }
 
-    public function testDismissLatestWarningNoticeDeletesLatestWarningNoticeAndReferencedLogEntry(): void
+    public function test_dismiss_latest_warning_notice_deletes_latest_warning_notice_and_referenced_log_entry(): void
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -283,14 +283,14 @@ class FactionLoyaltyServiceTest extends TestCase
         ], $automationLog->refresh()->fight_logs);
     }
 
-    public function testDismissLatestWarningNoticeDoesNothingWhenNoWarningExists(): void
+    public function test_dismiss_latest_warning_notice_does_nothing_when_no_warning_exists(): void
     {
         $this->factionLoyaltyService->dismissLatestWarningNotice($this->character);
 
         $this->assertEquals(0, FactionLoyaltyAutomationWarning::where('character_id', $this->character->id)->count());
     }
 
-    public function testHasPlaneLoyaltyForNpcCurrentlyHelping()
+    public function test_has_plane_loyalty_for_npc_currently_helping()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -347,7 +347,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertEquals($this->character->map->gameMap->name, $result['map_name']);
     }
 
-    public function testCannotPledgeWithAnotherCharactersFaction()
+    public function test_cannot_pledge_with_another_characters_faction()
     {
 
         $secondCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignFactionSystem()->getCharacter();
@@ -357,14 +357,14 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertEquals('Nope. Not allowed.', $result['message']);
     }
 
-    public function testCannotPledgeToFactionWhenNotMaxed()
+    public function test_cannot_pledge_to_faction_when_not_maxed()
     {
         $result = $this->factionLoyaltyService->pledgeLoyalty($this->character, $this->character->factions->first());
 
         $this->assertEquals('You must level the faction to level 5 before being able to assist the fine people of this plane with their tasks.', $result['message']);
     }
 
-    public function testPledgeLoyalty()
+    public function test_pledge_loyalty()
     {
 
         $this->character->factions()->update(['maxed' => true]);
@@ -473,7 +473,7 @@ class FactionLoyaltyServiceTest extends TestCase
         }
     }
 
-    public function testPledgeToExistingLoyalty()
+    public function test_pledge_to_existing_loyalty()
     {
         $this->character->factions()->first()->update(['maxed' => true]);
 
@@ -535,7 +535,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertTrue($factionLoyalty->is_pledged);
     }
 
-    public function testRemovePledge()
+    public function test_remove_pledge()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -594,7 +594,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertFalse($factionLoyalty->is_pledged);
     }
 
-    public function testFailToRemovePledged()
+    public function test_fail_to_remove_pledged()
     {
         $character = $this->character->refresh();
 
@@ -603,7 +603,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertEquals('Failed to find the faction you are pledged to.', $result['message']);
     }
 
-    public function testCreateNewTasksForNpcLoyaltyTasks()
+    public function test_create_new_tasks_for_npc_loyalty_tasks()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -673,7 +673,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertNotEquals($oldTasks, $newNPCtask->fame_tasks);
     }
 
-    public function testCreateNewTasksForNpcLoyaltyTasksWhenOnEventPlaneWithOutPurgatoryItem()
+    public function test_create_new_tasks_for_npc_loyalty_tasks_when_on_event_plane_with_out_purgatory_item()
     {
 
         $this->createEvent([
@@ -795,7 +795,7 @@ class FactionLoyaltyServiceTest extends TestCase
         }
     }
 
-    public function testCreateNewTasksForNpcLoyaltyTasksWhenOnEventPlaneWithPurgatoryItem()
+    public function test_create_new_tasks_for_npc_loyalty_tasks_when_on_event_plane_with_purgatory_item()
     {
 
         $this->createEvent([
@@ -929,7 +929,7 @@ class FactionLoyaltyServiceTest extends TestCase
         }
     }
 
-    public function testFailToAssistNpcThatDoesNotBelongToCharacter()
+    public function test_fail_to_assist_npc_that_does_not_belong_to_character()
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignFactionSystem()->getCharacter();
 
@@ -957,7 +957,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertEquals('Nope. Not allowed.', $result['message']);
     }
 
-    public function testAssistNpc()
+    public function test_assist_npc()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
@@ -992,7 +992,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertEquals('You are now assisting '.$factionNpc->npc->real_name.' with their tasks!', $result['message']);
     }
 
-    public function testFailToStopAssistingNpcCharacterDoesNotOwn()
+    public function test_fail_to_stop_assisting_npc_character_does_not_own()
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignFactionSystem()->getCharacter();
 
@@ -1020,7 +1020,7 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertEquals('Nope. Not allowed.', $result['message']);
     }
 
-    public function testStopAssistingNpc()
+    public function test_stop_assisting_npc()
     {
         $npc = $this->createNpc([
             'game_map_id' => $this->character->map->game_map_id,
