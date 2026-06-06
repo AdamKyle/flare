@@ -9,7 +9,6 @@ use App\Flare\Values\MapNameValue;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -108,10 +107,6 @@ class ImportGameData extends Command
         // Due to the way quests are ordered, and their dependencies on other quests we have to double import to make
         // sure all relationships are properly setup.
         $this->import($excelMapper, $files['Quests'], 'Quests');
-
-        $this->info('Creating location cache for maps ...');
-
-        Artisan::call('create:location-data-cache');
 
         $this->line('Importing Information section ...');
 

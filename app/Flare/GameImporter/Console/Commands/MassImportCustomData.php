@@ -40,7 +40,6 @@ class MassImportCustomData extends Command
     {
 
         Artisan::call('import:game-data Skills');
-        Artisan::call('clear:expired-character-boons');
 
         $this->importInformationSection();
 
@@ -51,7 +50,7 @@ class MassImportCustomData extends Command
     }
 
     /**
-     * Import the information section balance:monsters
+     * Import the information section
      *
      * @return void
      */
