@@ -1,7 +1,10 @@
 import { CharacterType } from "../../../lib/game/character/character-type";
 import CharacterStatusType from "../../../lib/game/character/character-status-type";
 import PositionType from "../../map/types/map/position-type";
-import { GameActionState } from "../../../lib/game/types/game-state";
+import {
+    GameActionState,
+    ExplorationOutputType,
+} from "../../../lib/game/types/game-state";
 import { FameTasks } from "../../../components/faction-loyalty/deffinitions/faction-loaylaty";
 
 export default interface ActionsProps {
@@ -30,4 +33,6 @@ export default interface ActionsProps {
     can_access_purgatory_chains_shop: boolean;
 
     can_access_twisted_earth_shop: boolean;
+
+    exploration_output: ExplorationOutputType | null;
 }

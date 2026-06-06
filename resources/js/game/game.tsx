@@ -8,13 +8,18 @@ import BasicCard from "./components/ui/cards/basic-card";
 import ManualProgressBar from "./components/ui/progress-bars/manual-progress-bar";
 import TabPanel from "./components/ui/tabs/tab-panel";
 import Tabs from "./components/ui/tabs/tabs";
+import Ajax from "./lib/ajax/ajax";
+import { AxiosError, AxiosResponse } from "axios";
 import { serviceContainer } from "./lib/containers/core-container";
 import FetchGameData from "./lib/game/ajax/FetchGameData";
 import CharacterCurrenciesType from "./lib/game/character/character-currencies-type";
 import GameEventListeners from "./lib/game/event-listeners/game-event-listeners";
 import { removeCommas } from "./lib/game/format-number";
 import GameProps from "./lib/game/types/game-props";
-import GameState, { GameActionState } from "./lib/game/types/game-state";
+import GameState, {
+    ExplorationOutputType,
+    GameActionState,
+} from "./lib/game/types/game-state";
 import QuestType from "./lib/game/types/quests/quest-type";
 import CharacterSheet from "./sections/character-sheet/character-sheet";
 import CharacterTopSection from "./sections/character-top-section/character-top-section";
@@ -49,6 +54,17 @@ declare const Echo: {
     private: (channel: string) => Channel;
 };
 
+interface ExplorationWarningStateEvent {
+    has_warning: boolean;
+    warnings: { id: number; type: string; message: string }[];
+    warning: { id: number; type: string; message: string } | null;
+}
+
+interface ExplorationOutputUpdatedEvent {
+    type: "active" | "warning" | null;
+    output: Record<string, any> | null;
+}
+
 interface FactionLoyaltyAutomationWarningStateEvent {
     has_warning: boolean;
     warning_notices?: FactionLoyaltyWarningNotice[];
@@ -61,6 +77,10 @@ export default class Game extends React.Component<GameProps, GameState> {
     private turnOffIntroFlagAjax: TurnOffUserIntroFlag;
 
     private factionLoyaltyAutomationWarning: Channel;
+
+    private explorationOutputChannel: Channel;
+
+    private explorationWarningChannel: Channel;
 
     constructor(props: GameProps) {
         super(props);
@@ -101,6 +121,8 @@ export default class Game extends React.Component<GameProps, GameState> {
             show_survey_button: false,
             open_survey_modal: false,
             survey_success_message: null,
+            exploration_output_loading: false,
+            exploration_output: null,
             tabs: [
                 {
                     key: "game",
@@ -127,6 +149,14 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         this.factionLoyaltyAutomationWarning = Echo.private(
             "faction-loyalty-automation-warning-" + this.props.userId,
+        );
+
+        this.explorationOutputChannel = Echo.private(
+            "exploration-output-" + this.props.userId,
+        );
+
+        this.explorationWarningChannel = Echo.private(
+            "exploration-warning-" + this.props.userId,
         );
     }
 
@@ -172,6 +202,10 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         this.listenForFactionLoyaltyAutomationWarnings();
 
+        this.fetchExplorationOutput();
+
+        this.listenForExplorationUpdates();
+
         if (localStorage.getItem("hide-dontainion") !== null) {
             this.setState({
                 hide_donation_alert: true,
@@ -188,6 +222,64 @@ export default class Game extends React.Component<GameProps, GameState> {
                     event.warning_notices ??
                         (event.warning_notice ? [event.warning_notice] : []),
                 );
+            },
+        );
+    }
+
+    fetchExplorationOutput(): void {
+        this.setState({
+            exploration_output_loading: true,
+            exploration_output: this.state.exploration_output ?? {
+                type: null,
+                output: null,
+                loading: true,
+            },
+        });
+
+        new Ajax()
+            .setRoute("exploration/" + this.props.characterId + "/output")
+            .doAjaxCall(
+                "get",
+                (result: AxiosResponse) => {
+                    this.setState({
+                        exploration_output:
+                            result.data as ExplorationOutputType,
+                        exploration_output_loading: false,
+                    });
+                },
+                (error: AxiosError) => {
+                    this.setState({
+                        exploration_output_loading: false,
+                        exploration_output: this.state.exploration_output
+                            ? {
+                                  ...this.state.exploration_output,
+                                  loading: false,
+                              }
+                            : null,
+                    });
+                    console.error(error);
+                },
+            );
+    }
+
+    listenForExplorationUpdates(): void {
+        this.explorationWarningChannel.listen(
+            "Game.Automation.Events.ExplorationWarningState",
+            (_event: ExplorationWarningStateEvent) => {
+                this.fetchExplorationOutput();
+            },
+        );
+
+        this.explorationOutputChannel.listen(
+            "Game.Automation.Events.ExplorationOutputUpdated",
+            (event: ExplorationOutputUpdatedEvent) => {
+                this.setState({
+                    exploration_output_loading: false,
+                    exploration_output: {
+                        type: event.type,
+                        output: event.output,
+                    },
+                });
             },
         );
     }
@@ -576,9 +668,9 @@ export default class Game extends React.Component<GameProps, GameState> {
                                         {this.state.survey_success_message}
                                     </SuccessAlert>
                                 ) : null}
-                                <div className="flex justify-center items-center space-x-4">
+                                <div className="flex w-full min-w-0 flex-wrap justify-center items-center gap-4">
                                     <div
-                                        className={clsx({
+                                        className={clsx("w-full min-w-0", {
                                             hidden: this.state.view_port > 932,
                                         })}
                                     >
@@ -586,6 +678,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                             character_id={
                                                 this.props.characterId
                                             }
+                                            user_id={this.props.userId}
                                             update_is_showing_boons={this.updateIsShowingActiveBoons.bind(
                                                 this,
                                             )}
@@ -632,6 +725,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                             this.state.character
                                                 .can_see_pledge_tab
                                         }
+                                        view_port={this.state.view_port}
                                         user_id={this.props.userId}
                                         character_id={this.props.characterId}
                                         can_attack={
@@ -659,6 +753,10 @@ export default class Game extends React.Component<GameProps, GameState> {
                                         has_faction_loyalty_warning={
                                             this.state
                                                 .has_faction_loyalty_warning
+                                        }
+                                        has_exploration_warning={
+                                            this.state.exploration_output
+                                                ?.type === "warning"
                                         }
                                         faction_loyalty_warning_notices={
                                             this.state
@@ -721,6 +819,9 @@ export default class Game extends React.Component<GameProps, GameState> {
                                             can_access_twisted_earth_shop={
                                                 this.state.map_data
                                                     .can_access_twisted_earth_shop
+                                            }
+                                            exploration_output={
+                                                this.state.exploration_output
                                             }
                                         />
                                     </ActionTabs>

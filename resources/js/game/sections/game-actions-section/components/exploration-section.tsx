@@ -1,4 +1,5 @@
 import React, { Fragment } from "react";
+import ExplorationOutputSection from "./exploration-output-section";
 import DangerButton from "../../../components/ui/buttons/danger-button";
 import Select from "react-select";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
@@ -564,6 +565,11 @@ export default class ExplorationSection extends React.Component<any, any> {
             return (
                 <Fragment>
                     {this.state.loading ? <LoadingProgressBar /> : null}
+
+                    <ExplorationOutputSection
+                        character_id={this.props.character.id}
+                        exploration_output={this.props.exploration_output}
+                    />
 
                     <div className="flex flex-wrap justify-center items-start gap-2 mt-4">
                         <DangerButton

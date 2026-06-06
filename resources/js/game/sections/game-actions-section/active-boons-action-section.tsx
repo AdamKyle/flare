@@ -33,7 +33,7 @@ export default class ActiveBoonsActionSection extends React.Component<
 
     render() {
         return (
-            <>
+            <div className="w-full min-w-0 max-w-full">
                 <div className={"mb-4 mt-[20px] text-center"}>
                     {!this.state.viewing_active_boons ? (
                         <OrangeButton
@@ -49,14 +49,19 @@ export default class ActiveBoonsActionSection extends React.Component<
                 </div>
 
                 {this.state.viewing_active_boons ? (
-                    <BasicCard additionalClasses={"mb-4"}>
+                    <BasicCard
+                        additionalClasses={
+                            "mb-4 w-full max-w-full min-w-0 overflow-hidden"
+                        }
+                    >
                         <CharacterActiveBoons
                             character_id={this.props.character_id}
+                            user_id={this.props.user_id}
                             finished_loading={true}
                         />
                     </BasicCard>
                 ) : null}
-            </>
+            </div>
         );
     }
 }

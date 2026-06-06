@@ -10,6 +10,7 @@ import Revive from "./components/fight-section/revive";
 import GamblingSection from "./components/gambling-section";
 import RaidSection from "./components/raid-section";
 import MonsterActions from "./components/small-actions/monster-actions";
+import ExplorationOutputSection from "./components/exploration-output-section";
 import SmallExplorationSection from "./components/small-actions/small-exploration-section";
 import SmallerSpecialtyShop from "./components/small-actions/smaller-specialty-shop";
 import SmallActionsProps from "./types/small-actions-props";
@@ -428,15 +429,12 @@ export default class SmallerActions extends React.Component<
             return this.renderAutomationBlockedNotice(false);
         }
 
-        return (
-            <SmallExplorationSection
-                close_exploration_section={this.closeExplorationSection.bind(
-                    this,
-                )}
-                character={this.props.character}
-                monsters={this.state.monsters}
-            />
-        );
+        return React.createElement(SmallExplorationSection as any, {
+            close_exploration_section: this.closeExplorationSection.bind(this),
+            character: this.props.character,
+            monsters: this.state.monsters,
+            exploration_output: this.props.exploration_output,
+        });
     }
 
     showMapMovement() {
@@ -560,6 +558,13 @@ export default class SmallerActions extends React.Component<
                         />
                     </Fragment>
                 )}
+
+                {this.state.selected_action !== "explore" ? (
+                    <ExplorationOutputSection
+                        character_id={this.props.character.id}
+                        exploration_output={this.props.exploration_output}
+                    />
+                ) : null}
 
                 <div className="mt-4 mb-4">
                     <div className="relative bottom-4">

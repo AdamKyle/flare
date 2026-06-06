@@ -12,6 +12,7 @@ import { AxiosError, AxiosResponse } from "axios";
 import ActionsManager from "../../lib/game/actions/actions-manager";
 import { GameActionState } from "../../lib/game/types/game-state";
 import CelestialFight from "./components/celestial-fight";
+import ExplorationOutputSection from "./components/exploration-output-section";
 import ExplorationSection from "./components/exploration-section";
 import GamblingSection from "./components/gambling-section";
 import RaidSection from "./components/raid-section";
@@ -561,16 +562,26 @@ export default class Actions extends React.Component<
 
     renderActionContent() {
         const celestialFight = this.renderCelestialFight();
-        const fightContent = this.state.show_exploration ? (
-            this.renderExploration()
-        ) : celestialFight === null ? (
-            this.createMonster()
-        ) : (
-            <div className="grid gap-4">
-                {this.renderActionSlot()}
-                {celestialFight}
-            </div>
-        );
+        const actionSlot = this.renderActionSlot();
+        let fightContent = null;
+
+        if (this.state.show_exploration) {
+            fightContent = this.renderExploration();
+        } else if (
+            this.isAnyAutomationRunning() &&
+            (actionSlot !== null || this.state.show_gambling_section)
+        ) {
+            fightContent = actionSlot;
+        } else if (celestialFight === null) {
+            fightContent = this.createMonster();
+        } else {
+            fightContent = (
+                <div className="grid gap-4">
+                    {actionSlot}
+                    {celestialFight}
+                </div>
+            );
+        }
 
         return (
             <div className="grid gap-4">
@@ -585,6 +596,12 @@ export default class Actions extends React.Component<
                             is_small={false}
                         />
                     </div>
+                ) : null}
+                {!this.state.show_exploration ? (
+                    <ExplorationOutputSection
+                        character_id={this.props.character.id}
+                        exploration_output={this.props.exploration_output}
+                    />
                 ) : null}
             </div>
         );
@@ -604,6 +621,7 @@ export default class Actions extends React.Component<
                 manage_exploration={this.manageExploration.bind(this)}
                 character={this.props.character}
                 monsters={this.state.monsters}
+                exploration_output={this.props.exploration_output}
             />
         );
     }

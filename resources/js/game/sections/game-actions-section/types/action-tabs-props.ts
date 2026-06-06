@@ -15,6 +15,8 @@ export default interface ActionTabsProps {
 
     use_tabs: boolean;
 
+    view_port: number;
+
     update_faction_action_tasks: (fameTasks: FameTasks[] | null) => void;
 
     can_attack: boolean;
@@ -28,6 +30,8 @@ export default interface ActionTabsProps {
     is_delve_running: boolean;
 
     has_faction_loyalty_warning: boolean;
+
+    has_exploration_warning?: boolean;
 
     faction_loyalty_warning_notices: FactionLoyaltyWarningNotice[];
 

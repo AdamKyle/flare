@@ -116,7 +116,9 @@ export default class FetchGameData {
                 );
 
                 if (result.data.sheet.is_in_timeout) {
-                    new Ajax().initiateGlobalTimeOut();
+                    this.component.setState({
+                        show_global_timeout: true,
+                    });
                 }
             },
         );

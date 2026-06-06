@@ -5,14 +5,22 @@ import { watchForDarkModeTableChange } from "../../../lib/game/dark-mode-watcher
 import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
 import { DateTime } from "luxon";
 import Table from "../../../components/ui/data-tables/table";
-import { formatNumber } from "../../../lib/game/format-number";
 import InventoryUseDetails from "./modals/inventory-use-details";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import DangerButton from "../../../components/ui/buttons/danger-button";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
+import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";
+import PrimaryButton from "../../../components/ui/buttons/primary-button";
+import { Channel } from "laravel-echo";
+
+declare const Echo: {
+    private: (channel: string) => Channel;
+};
 
 export default class CharacterActiveBoons extends React.Component<any, any> {
+    private boonsUpdate?: Channel;
+
     constructor(props: any) {
         super(props);
 
@@ -23,6 +31,7 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
             show_usable_details: false,
             item_to_use: null,
             removing_boon: false,
+            filling_boon_id: null,
             error_message: null,
             success_message: null,
         };
@@ -31,6 +40,19 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
     componentDidMount() {
         watchForDarkModeTableChange(this);
 
+        this.fetchActiveBoons();
+        this.listenForBoonUpdates();
+    }
+
+    componentWillUnmount() {
+        if (this.boonsUpdate) {
+            this.boonsUpdate.stopListening(
+                "Game.Character.CharacterInventory.Events.CharacterBoonsUpdateBroadcastEvent",
+            );
+        }
+    }
+
+    fetchActiveBoons() {
         if (this.props.finished_loading && this.props.character_id !== null) {
             new Ajax()
                 .setRoute(
@@ -51,6 +73,24 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
                     },
                 );
         }
+    }
+
+    listenForBoonUpdates() {
+        if (
+            this.props.user_id === null ||
+            typeof this.props.user_id === "undefined"
+        ) {
+            return;
+        }
+
+        this.boonsUpdate = Echo.private("update-boons-" + this.props.user_id);
+
+        this.boonsUpdate.listen(
+            "Game.Character.CharacterInventory.Events.CharacterBoonsUpdateBroadcastEvent",
+            () => {
+                this.fetchActiveBoons();
+            },
+        );
     }
 
     manageBoon(row?: any) {
@@ -105,15 +145,63 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
         );
     }
 
+    fillUpBoon(boonId: number) {
+        this.setState(
+            {
+                filling_boon_id: boonId,
+                success_message: null,
+                error_message: null,
+            },
+            () => {
+                new Ajax()
+                    .setRoute(
+                        "character-sheet/" +
+                            this.props.character_id +
+                            "/fill-up-boon/" +
+                            boonId,
+                    )
+                    .doAjaxCall(
+                        "post",
+                        (result: AxiosResponse) => {
+                            this.setState({
+                                filling_boon_id: null,
+                                boons: result.data.boons,
+                                success_message: result.data.message,
+                            });
+                        },
+                        (error: AxiosError) => {
+                            let message = "UNKNOWN ERROR - CHECK CONSOLE!";
+
+                            if (error.response !== undefined) {
+                                const response: AxiosResponse = error.response;
+
+                                message = response.data.message;
+                            }
+
+                            this.setState({
+                                filling_boon_id: null,
+                                error_message: message,
+                            });
+
+                            console.error(error.response);
+                        },
+                    );
+            },
+        );
+    }
+
     buildColumns() {
         return [
             {
-                name: "Name",
+                name: <span title="Name">Name</span>,
                 selector: (row: { boon_applied: { name: string } }) =>
                     row.boon_applied.name,
                 sortable: true,
+                grow: 2,
+                minWidth: "120px",
                 cell: (row: { id: number; boon_applied: { name: string } }) => (
                     <span
+                        className="whitespace-normal break-words"
                         key={
                             row.id +
                             "-" +
@@ -130,43 +218,77 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
                 ),
             },
             {
-                name: "Amount Used",
+                name: <span title="Amount Used">Amount Used</span>,
                 selector: (row: { amount_used: number }) => row.amount_used,
                 sortable: true,
+                minWidth: "90px",
             },
             {
-                name: "Time Remaining",
-                selector: (row: { started: string; completed: string }) =>
-                    row.started,
+                name: <span title="Completed In">Completed In</span>,
+                selector: (row: { complete: string }) => row.complete,
                 sortable: true,
-                cell: (row: { started: string; complete: string }) => (
-                    <span
+                grow: 3,
+                minWidth: "160px",
+                cell: (row: { id: number; complete: string }) => (
+                    <div
+                        className="w-full min-w-0 md:min-w-[240px]"
                         key={
-                            row.started +
+                            row.id +
                             "-" +
                             (Math.random() + 1).toString(36).substring(7)
                         }
                     >
-                        {this.getLabel(row.started, row.complete)}
-                    </span>
+                        <TimerProgressBar
+                            time_remaining={this.getSecondsRemaining(
+                                row.complete,
+                            )}
+                            time_out_label={""}
+                            additional_css={"w-full"}
+                        />
+                    </div>
                 ),
             },
             {
-                name: "Actions",
+                name: <span title="Amount Left">Amount Left</span>,
+                selector: (row: { amount_left: number }) => row.amount_left,
+                sortable: true,
+                minWidth: "100px",
+            },
+            {
+                name: <span title="Actions">Actions</span>,
                 selector: (row: { id: number; boon_applied: { id: number } }) =>
                     row.boon_applied.id,
                 sortable: true,
-                cell: (row: { id: number; boon_applied: { id: number } }) => (
+                minWidth: "230px",
+                cell: (row: {
+                    id: number;
+                    amount_left: number;
+                    boon_applied: { id: number };
+                }) => (
                     <span
+                        className="flex flex-wrap gap-2"
                         key={
                             row.boon_applied.id +
                             "-" +
                             (Math.random() + 1).toString(36).substring(7)
                         }
                     >
+                        <PrimaryButton
+                            button_label={"Fill Up"}
+                            on_click={() => this.fillUpBoon(row.id)}
+                            disabled={
+                                row.amount_left === 0 ||
+                                this.state.filling_boon_id === row.id ||
+                                this.state.removing_boon
+                            }
+                        />
                         <DangerButton
                             button_label={"Remove Boon"}
                             on_click={() => this.removeBoon(row.id)}
+                            disabled={
+                                this.state.filling_boon_id === row.id ||
+                                this.state.removing_boon
+                            }
                         />
                     </span>
                 ),
@@ -174,25 +296,18 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
         ];
     }
 
-    getLabel(startedAt: string, completedAt: string): string {
-        let label = "seconds";
-
-        const started = DateTime.now();
+    getSecondsRemaining(completedAt: string): number {
         const completed = DateTime.fromISO(completedAt);
 
-        let time = completed.diff(started, ["seconds"]).toObject().seconds;
+        const time = completed
+            .diff(DateTime.now(), ["seconds"])
+            .toObject().seconds;
 
         if (typeof time === "undefined") {
-            return "Error";
+            return 0;
         }
 
-        if (time / 3600 >= 1) {
-            label = formatNumber(time / 3600) + " hour(s)";
-        } else if (time / 60 >= 1) {
-            label = formatNumber(time / 60) + " minute(s)";
-        }
-
-        return label;
+        return Math.max(0, Math.floor(time));
     }
 
     render() {
@@ -202,7 +317,7 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
 
         return (
             <Fragment>
-                <div className="my-5">
+                <div className="my-5 w-full min-w-0 max-w-full">
                     {this.state.boons.length > 0 ? (
                         <InfoAlert>
                             This tab does not update in real time. You can
@@ -210,6 +325,9 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
                         </InfoAlert>
                     ) : null}
                     {this.state.removing_boon ? <LoadingProgressBar /> : null}
+                    {this.state.filling_boon_id !== null ? (
+                        <LoadingProgressBar />
+                    ) : null}
                     {this.state.success_message !== null ? (
                         <SuccessAlert additional_css={"my-4"}>
                             <p>{this.state.success_message}</p>
@@ -227,7 +345,7 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
                         </a>
                     </p>
                     {this.state.boons.length > 0 ? (
-                        <div className="max-w-[390px] md:max-w-full overflow-x-hidden">
+                        <div className="w-full min-w-0 max-w-full overflow-x-auto">
                             <Table
                                 columns={this.buildColumns()}
                                 data={this.state.boons}

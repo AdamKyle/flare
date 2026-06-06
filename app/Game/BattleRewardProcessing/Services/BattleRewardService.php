@@ -19,6 +19,8 @@ use App\Game\Core\Services\GoldRush;
 use App\Game\Events\Values\EventType;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
+use App\Flare\Models\ExplorationLog;
+use App\Game\Automation\Services\ExplorationLogService;
 use App\Game\Skills\Services\SkillService;
 use Exception;
 use Illuminate\Support\Facades\Cache;
@@ -41,6 +43,8 @@ class BattleRewardService
      * @var array $context
      */
     private array $context = [];
+
+    private array $earnedCurrencies = [];
 
     /**
      * @param BattleMessageHandler $battleMessageHandler
@@ -83,6 +87,7 @@ class BattleRewardService
 
         $this->character = Character::find($characterId);
         $this->monster = Monster::find($monsterId);
+        $this->earnedCurrencies = [];
 
         return $this;
     }
@@ -110,6 +115,12 @@ class BattleRewardService
             return;
         }
 
+        $beforeSnapshot = null;
+
+        if (isset($this->context['exploration_log_id'])) {
+            $beforeSnapshot = $this->explorationRewardSnapshot();
+        }
+
         $this->handleAwardingXP();
         $this->handleAwardSkillPoints();
         $this->handleFactionPoints();
@@ -121,9 +132,59 @@ class BattleRewardService
         $this->handleSecondaryRewards();
         $this->handleGlobalEventParticipation();
 
+        if (! is_null($beforeSnapshot)) {
+            $log = ExplorationLog::find($this->context['exploration_log_id']);
+
+            if (! is_null($log)) {
+                $character = $this->character->refresh();
+
+                ExplorationLogService::applyRewardContext(
+                    $log,
+                    $character,
+                    $this->explorationRewardSnapshotWithEarnedCurrencies($beforeSnapshot, $character),
+                    $this->context
+                );
+            }
+        }
+
         if ($includeWinterEvent) {
             WinterEventChristmasGiftHandler::dispatch($this->character->id)->onConnection('event_battle_reward')->onQueue('event_battle_reward')->delay(now()->addSeconds(2));
         }
+    }
+
+    private function explorationRewardSnapshot(): array
+    {
+        $trainingSkill = $this->character->skills()->where('currently_training', true)->first();
+        $gameMapId = $this->character->map?->game_map_id;
+        $faction = ! is_null($gameMapId)
+            ? $this->character->factions()->where('game_map_id', $gameMapId)->first()
+            : null;
+
+        return [
+            'xp' => $this->character->xp,
+            'skill_id' => $trainingSkill?->id,
+            'skill_xp' => $trainingSkill?->xp ?? 0,
+            'faction_id' => $faction?->id,
+            'faction_points' => $faction?->current_points ?? 0,
+            'level' => $this->character->level,
+            'gold' => $this->character->gold,
+            'gold_dust' => $this->character->gold_dust,
+            'shards' => $this->character->shards,
+            'copper_coins' => $this->character->copper_coins,
+        ];
+    }
+
+    private function explorationRewardSnapshotWithEarnedCurrencies(array $beforeSnapshot, Character $character): array
+    {
+        foreach ($this->earnedCurrencies as $currency => $amount) {
+            if ($amount <= 0) {
+                continue;
+            }
+
+            $beforeSnapshot[$currency] = $character->getAttribute($currency) - $amount;
+        }
+
+        return $beforeSnapshot;
     }
 
     /**
@@ -271,7 +332,7 @@ class BattleRewardService
 
         $goldBeforeReward = $this->character->gold;
 
-        $this->characterRewardService->setCharacter($this->character)->giveCurrencies($this->monster, $totalKills);
+        $this->earnedCurrencies = $this->characterRewardService->setCharacter($this->character)->giveCurrencies($this->monster, $totalKills);
 
         $character = $this->character->refresh();
         $goldGained = $character->gold - $goldBeforeReward;
@@ -293,7 +354,15 @@ class BattleRewardService
             $totalKills = $this->context['total_creatures'];
         }
 
-        $this->battleLocationRewardService->setContext($this->character, $this->monster)->handleLocationSpecificRewards($totalKills);
+        $earnedLocationCurrencies = $this->battleLocationRewardService
+            ->setContext($this->character, $this->monster)
+            ->handleLocationSpecificRewards($totalKills);
+
+        foreach ($earnedLocationCurrencies as $currency => $amount) {
+            if ($amount > 0) {
+                $this->earnedCurrencies[$currency] = ($this->earnedCurrencies[$currency] ?? 0) + $amount;
+            }
+        }
     }
 
     /**
@@ -313,7 +382,9 @@ class BattleRewardService
 
         if ($totalKills > 1) {
             for ($i = 0; $i < $totalKills; $i++) {
-                $this->dropCheckService->process($this->character, $this->monster, $lootingChance);
+                $this->addDropRewardTotals(
+                    $this->dropCheckService->process($this->character, $this->monster, $lootingChance)
+                );
 
                 $this->character = $this->character->refresh();
             }
@@ -321,7 +392,20 @@ class BattleRewardService
             return;
         }
 
-        $this->dropCheckService->process($this->character, $this->monster, $lootingChance);
+        $this->addDropRewardTotals(
+            $this->dropCheckService->process($this->character, $this->monster, $lootingChance)
+        );
+    }
+
+    private function addDropRewardTotals(array $dropRewardTotals): void
+    {
+        $autoSoldGold = $dropRewardTotals['auto_sold_gold'] ?? 0;
+
+        if ($autoSoldGold <= 0) {
+            return;
+        }
+
+        $this->earnedCurrencies['gold'] = ($this->earnedCurrencies['gold'] ?? 0) + $autoSoldGold;
     }
 
     /**

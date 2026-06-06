@@ -195,6 +195,11 @@ class MonsterPlayerFight
         return $this->attack->getMonsterHealth();
     }
 
+    public function getMonsterLastRolledAttack(): int
+    {
+        return $this->attack->getMonsterLastRolledAttack();
+    }
+
     /**
      * Base Fight Setup.
      */

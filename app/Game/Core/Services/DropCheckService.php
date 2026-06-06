@@ -42,7 +42,7 @@ class DropCheckService
      *
      * @throws Exception
      */
-    public function process(Character $character, Monster $monster, ?float $lootingChance = null): void
+    public function process(Character $character, Monster $monster, ?float $lootingChance = null): array
     {
         $this->gameMapBonus = 0.0;
 
@@ -61,7 +61,8 @@ class DropCheckService
         $this->battleDrop = $this->battleDrop->setMonster($this->monster)
             ->setSpecialLocation($this->locationWithEffect)
             ->setGameMapBonus($this->gameMapBonus)
-            ->setLootingChance($this->lootingChance);
+            ->setLootingChance($this->lootingChance)
+            ->resetRewardTotals();
 
         $this->handleDropChance($character);
 
@@ -70,11 +71,11 @@ class DropCheckService
         }
 
         if (is_null($this->locationWithEffect)) {
-            return;
+            return $this->battleDrop->rewardTotals();
         }
 
         if (is_null($this->locationWithEffect->type)) {
-            return;
+            return $this->battleDrop->rewardTotals();
         }
 
         $locationType = new LocationType($this->locationWithEffect->type);
@@ -82,6 +83,8 @@ class DropCheckService
         if ($locationType->isPurgatoryDungeons() && $character->currentAutomations->isEmpty()) {
             $this->handleMythicDrop($character);
         }
+
+        return $this->battleDrop->rewardTotals();
     }
 
     /**

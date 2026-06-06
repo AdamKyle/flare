@@ -21,14 +21,20 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
+use App\Flare\Models\ExplorationLog;
+use App\Flare\Models\ExplorationWarning;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Monster\MonsterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterAutomation;
+use Tests\Traits\CreateExplorationLog;
+use Tests\Traits\CreateExplorationWarning;
 
 class ExplorationAutomationServiceTest extends TestCase
 {
     use CreateCharacterAutomation;
+    use CreateExplorationLog;
+    use CreateExplorationWarning;
     use RefreshDatabase;
 
     private ExplorationAutomationService $service;
@@ -424,5 +430,97 @@ class ExplorationAutomationServiceTest extends TestCase
         });
 
         Carbon::setTestNow();
+    }
+
+    public function testBeginAutomationCreatesExplorationLog(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $automation = CharacterAutomation::query()->latest('id')->first();
+        $log = ExplorationLog::where('character_id', $this->character->id)->first();
+
+        $this->assertNotNull($log);
+        $this->assertNull($log->ended_at);
+        $this->assertEquals($automation->id, $log->character_automation_id);
+        $this->assertEquals($this->monster->id, $log->monster_id);
+        $this->assertEquals(AttackTypeValue::ATTACK, $log->attack_type);
+    }
+
+    public function testBeginAutomationClearsOldExplorationWarningAndLog(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $oldLog = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'ended_at' => now(),
+        ]);
+
+        $oldWarning = $this->createExplorationWarning([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'exploration_log_id' => $oldLog->id,
+            'type' => 'fight',
+            'message' => 'Old warning.',
+        ]);
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $this->assertNull($oldWarning->fresh());
+        $this->assertNull(ExplorationLog::find($oldLog->id));
+    }
+
+    public function testStopExplorationFinalizesLogWithPlayerStop(): void
+    {
+        Event::fake();
+
+        $log = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'character_automation_id' => $this->automation->id,
+            'monster_id' => $this->monster->id,
+            'attack_type' => AttackTypeValue::ATTACK,
+            'ended_at' => null,
+        ]);
+
+        $this->service->stopExploration($this->character);
+
+        $log->refresh();
+
+        $this->assertTrue($log->stopped_by_player);
+        $this->assertEquals('player_stopped', $log->stopped_reason);
+        $this->assertNotNull($log->ended_at);
+    }
+
+    public function testStopExplorationDoesNotCreateExplorationWarning(): void
+    {
+        Event::fake();
+
+        $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'character_automation_id' => $this->automation->id,
+            'monster_id' => $this->monster->id,
+            'attack_type' => AttackTypeValue::ATTACK,
+            'ended_at' => null,
+        ]);
+
+        $this->service->stopExploration($this->character);
+
+        $this->assertEquals(0, ExplorationWarning::where('character_id', $this->character->id)->count());
     }
 }

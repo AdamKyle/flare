@@ -87,13 +87,12 @@ class CharacterRewardService
     /**
      * Give currencies.
      *
+     * @return array
      * @throws Exception
      */
-    public function giveCurrencies(Monster $monster, $totalKills = 1): CharacterRewardService
+    public function giveCurrencies(Monster $monster, $totalKills = 1): array
     {
-        $this->characterCurrencyRewardService->setCharacter($this->character)->giveCurrencies($monster, $totalKills);
-
-        return $this;
+        return $this->characterCurrencyRewardService->setCharacter($this->character)->giveCurrencies($monster, $totalKills);
     }
 
     /**

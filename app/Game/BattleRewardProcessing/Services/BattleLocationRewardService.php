@@ -51,13 +51,27 @@ class BattleLocationRewardService {
      * Handle specific location rewards.
      *
      * @param int $killCount
-     * @return Character
+     * @return array
      */
-    public function handleLocationSpecificRewards(int $killCount = 1): Character {
+    public function handleLocationSpecificRewards(int $killCount = 1): array {
         $this->character = $this->purgatorySmithHouseRewardHandler->handleFightingAtPurgatorySmithHouse($this->character, $this->monster, $killCount);
 
         $this->character = $this->goldMinesRewardHandler->handleFightingAtGoldMines($this->character, $this->monster, $killCount);
 
-        return $this->theOldChurchRewardHandler->handleFightingAtTheOldChurch($this->character, $this->monster, $killCount);
+        $this->character = $this->theOldChurchRewardHandler->handleFightingAtTheOldChurch($this->character, $this->monster, $killCount);
+
+        $earnedCurrencies = [];
+
+        foreach ([
+            $this->purgatorySmithHouseRewardHandler->getEarnedCurrencies(),
+            $this->goldMinesRewardHandler->getEarnedCurrencies(),
+            $this->theOldChurchRewardHandler->getEarnedCurrencies(),
+        ] as $handlerCurrencies) {
+            foreach ($handlerCurrencies as $currency => $amount) {
+                $earnedCurrencies[$currency] = ($earnedCurrencies[$currency] ?? 0) + $amount;
+            }
+        }
+
+        return $earnedCurrencies;
     }
 }

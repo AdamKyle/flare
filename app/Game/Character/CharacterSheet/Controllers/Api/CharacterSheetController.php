@@ -24,6 +24,7 @@ use App\Game\Core\Requests\StatDetailsRequest;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\Events\Values\EventType;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
@@ -166,22 +167,8 @@ class CharacterSheetController extends Controller
 
     public function activeBoons(Character $character, UsableItemTransformer $usableItemTransformer, Manager $manager)
     {
-        $characterBoons = $character->boons->load('itemUsed');
-
-        $characterBoons = $characterBoons->transform(function ($boon) use ($usableItemTransformer) {
-            $item = new Item($boon->itemUsed, $usableItemTransformer);
-            $item = (new Manager)->createData($item)->toArray();
-
-            $item = $item['data'];
-            $item['name'] = $boon->itemUsed->name;
-
-            $boon->boon_applied = $item;
-
-            return $boon;
-        });
-
         return response()->json([
-            'active_boons' => $characterBoons,
+            'active_boons' => $this->activeBoonRows($character, $usableItemTransformer),
         ]);
     }
 
@@ -265,9 +252,35 @@ class CharacterSheetController extends Controller
 
         $character = $character->refresh();
 
+        return response()->json(['message' => 'Boon has been deleted', 'boons' => $this->activeBoonRows($character, $usableItemTransformer)], 200);
+    }
+
+    public function fillUpBoon(Character $character, CharacterBoon $boon, UseItemService $useItemService, UsableItemTransformer $usableItemTransformer): JsonResponse
+    {
+        if ($character->id !== $boon->character_id) {
+            return response()->json(['message' => 'You cannot do that.'], 422);
+        }
+
+        $result = $useItemService->fillUpBoon($character, $boon);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        if ($status !== 200) {
+            return response()->json($result, $status);
+        }
+
+        return response()->json([
+            'message' => $result['message'],
+            'boons' => $this->activeBoonRows($character->refresh(), $usableItemTransformer),
+        ], $status);
+    }
+
+    private function activeBoonRows(Character $character, UsableItemTransformer $usableItemTransformer)
+    {
         $characterBoons = $character->boons->load('itemUsed');
 
-        $characterBoons = $characterBoons->transform(function ($boon) use ($usableItemTransformer) {
+        return $characterBoons->transform(function ($boon) use ($character, $usableItemTransformer) {
             $item = new Item($boon->itemUsed, $usableItemTransformer);
             $item = (new Manager)->createData($item)->toArray();
 
@@ -275,10 +288,11 @@ class CharacterSheetController extends Controller
             $item['name'] = $boon->itemUsed->name;
 
             $boon->boon_applied = $item;
+            $boon->amount_left = $character->inventory->slots()
+                ->where('item_id', $boon->item_id)
+                ->count();
 
             return $boon;
         });
-
-        return response()->json(['message' => 'Boon has been deleted', 'boons' => $characterBoons], 200);
     }
 }

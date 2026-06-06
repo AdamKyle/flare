@@ -94,6 +94,11 @@ export default class SmallActionsManager {
         );
     }
 
+    explorationLabel(): string {
+        const props = this.component.props;
+        return props.character.is_at_delve_location ? "Delve" : "Exploration";
+    }
+
     /**
      * Build Selectable options.
      */
@@ -111,9 +116,7 @@ export default class SmallActionsManager {
             !props.character.is_delve_running
         ) {
             options.push({
-                label: props.character.is_at_delve_location
-                    ? "Delve"
-                    : "Exploration",
+                label: this.explorationLabel(),
                 value: "explore",
             });
         }
@@ -185,10 +188,7 @@ export default class SmallActionsManager {
             if (state.selected_action === "explore") {
                 return [
                     {
-                        label: this.component.props.character
-                            .is_at_delve_location
-                            ? "Delve"
-                            : "Exploration",
+                        label: this.explorationLabel(),
                         value: state.selected_action,
                     },
                 ];

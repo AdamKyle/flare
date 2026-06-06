@@ -9,6 +9,7 @@ use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Values\SkillTypeValue;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -70,6 +71,7 @@ class UseItemServiceTest extends TestCase
 
         Event::assertDispatched(UpdateCharacterAttackEvent::class);
         Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertDispatched(CharacterBoonsUpdateBroadcastEvent::class);
 
         $this->assertNotEmpty($character->boons);
         $this->assertNull($character->inventory->slots->where('item.type', 'alchemy')->first());
@@ -113,6 +115,7 @@ class UseItemServiceTest extends TestCase
 
         Event::assertNotDispatched(UpdateCharacterAttackEvent::class);
         Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(CharacterBoonsUpdateBroadcastEvent::class);
 
         $this->assertNotEmpty($character->boons);
         $this->assertNotNull($character->inventory->slots->where('item.type', 'alchemy')->first());
@@ -141,7 +144,7 @@ class UseItemServiceTest extends TestCase
             'character_id' => $character->id,
             'item_id' => $item->id,
             'started' => now(),
-            'complete' => now()->addHours(2),
+            'complete' => now()->addHours(8),
             'amount_used' => 1,
             'last_for_minutes' => 8 * 60,
         ]);
@@ -160,6 +163,52 @@ class UseItemServiceTest extends TestCase
 
         $this->assertNotEmpty($character->boons);
         $this->assertNotNull($character->inventory->slots->where('item.type', 'alchemy')->first());
+    }
+
+    public function testStackableBoonRefillsToEightHoursWhenTimeHasPassed()
+    {
+        Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
+
+        Event::fake();
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 120,
+            'type' => 'alchemy',
+            'affects_skill_type' => SkillTypeValue::TRAINING->value,
+            'can_stack' => true,
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+
+        $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now()->subHours(2),
+            'complete' => now()->addHours(6),
+            'amount_used' => 1,
+            'last_for_minutes' => 8 * 60,
+        ]);
+
+        $character = $character->refresh();
+
+        $result = $this->useItemService->useSingleItemFromInventory($character, $character->inventory->slots->where('item.type', 'alchemy')->first()->item);
+
+        $character = $character->refresh();
+        $boon = $character->boons->first();
+
+        Carbon::setTestNow();
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Used selected item.', $result['message']);
+        $this->assertEquals(480, $boon->last_for_minutes);
+        $this->assertEquals('2026-01-01 20:00:00', $boon->complete->toDateTimeString());
+        $this->assertNull($character->inventory->slots->where('item.type', 'alchemy')->first());
     }
 
     public function testDoNotUseItemWhenItemDoesNotStack()

@@ -22,7 +22,9 @@ class ExplorationAutomationService
 
     public function __construct(
         private readonly CharacterCacheData $characterCacheData,
-        private readonly ExplorationCreatureCountCalculator $explorationCreatureCountCalculator
+        private readonly ExplorationCreatureCountCalculator $explorationCreatureCountCalculator,
+        private readonly ExplorationLogService $explorationLogService,
+        private readonly ExplorationWarningService $explorationWarningService,
     ) {}
 
     public function beginAutomation(Character $character, array $params)
@@ -55,6 +57,9 @@ class ExplorationAutomationService
             'started_in_special_location' => $this->startedInSpecialLocation($character),
         ]);
 
+        $this->explorationWarningService->dismiss($character);
+        $this->explorationLogService->start($character, $automation);
+
         $this->setTimeDelay();
 
         event(new UpdateCharacterStatus($character));
@@ -78,6 +83,8 @@ class ExplorationAutomationService
             ], 422);
         }
 
+        $activeLog = $this->explorationLogService->activeForCharacter($character);
+
         $characterAutomation->delete();
 
         $this->characterCacheData->deleteCharacterSheet($character);
@@ -85,6 +92,12 @@ class ExplorationAutomationService
         $character = $character->refresh();
 
         Cache::delete('can-character-survive-' . $character->id);
+
+        if (! is_null($activeLog)) {
+            $this->explorationLogService->finalize($activeLog, 'player_stopped', true);
+        }
+
+        $this->explorationWarningService->getState($character);
 
         event(new AutomationTimeOut($character->user, 0));
         event(new AutomationStatus($character->user, false));

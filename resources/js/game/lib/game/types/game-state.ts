@@ -13,6 +13,21 @@ import {
     FameTasks,
 } from "../../../components/faction-loyalty/deffinitions/faction-loaylaty";
 
+export type ExplorationWarningType = {
+    id: number;
+    character_id: number;
+    user_id: number;
+    exploration_log_id: number | null;
+    type: string;
+    message: string;
+};
+
+export type ExplorationOutputType = {
+    type: "active" | "warning" | null;
+    output: Record<string, any> | null;
+    loading?: boolean;
+};
+
 export type GameActionState = {
     monsters: MonsterType[];
     raid_monsters: RaidMonsterType[] | [];
@@ -87,4 +102,8 @@ export default interface GameState {
     open_survey_modal: boolean;
 
     survey_success_message: string | null;
+
+    exploration_output_loading: boolean;
+
+    exploration_output: ExplorationOutputType | null;
 }

@@ -47,7 +47,7 @@ export default class CraftingActionButtons extends React.Component<
                 <DangerButton
                     button_label={"Close"}
                     on_click={this.props.clear_crafting}
-                    additional_css={""}
+                    additional_css={"mb-2"}
                     disabled={this.props.can_close}
                 />
                 <a

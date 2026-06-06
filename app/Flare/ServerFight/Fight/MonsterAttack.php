@@ -12,6 +12,8 @@ use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
 class MonsterAttack extends BattleBase
 {
+    private int $lastRolledAttack = 0;
+
     private PlayerHealing $playerHealing;
 
     private Entrance $entrance;
@@ -25,6 +27,11 @@ class MonsterAttack extends BattleBase
         $this->entrance = $entrance;
         $this->canHit = $canHit;
         $this->playerHealing = $playerHealing;
+    }
+
+    public function getLastRolledAttack(): int
+    {
+        return $this->lastRolledAttack;
     }
 
     public function setIsCharacterVoided(bool $isVoided): MonsterAttack
@@ -207,6 +214,8 @@ class MonsterAttack extends BattleBase
 
             $attack *= 2;
         }
+
+        $this->lastRolledAttack = $attack;
 
         $playerCachedDefence = $this->characterCacheData->getCharacterDefenceAc($character);
 

@@ -348,6 +348,14 @@ class CharacterFactory
     }
 
     /**
+     * Fetch the automation management class.
+     */
+    public function automationManagement(): AutomationManagement
+    {
+        return new AutomationManagement($this->character, $this);
+    }
+
+    /**
      * Fetches inventory management.
      *
      * Use existing instantiation if it exists.

@@ -23,6 +23,13 @@ class CharacterCurrencyRewardService
 {
     private Character $character;
 
+    private array $earnedCurrencies = [
+        'gold' => 0,
+        'gold_dust' => 0,
+        'shards' => 0,
+        'copper_coins' => 0,
+    ];
+
     /**
      * @param BattleMessageHandler $battleMessageHandler
      */
@@ -40,6 +47,12 @@ class CharacterCurrencyRewardService
     public function setCharacter(Character $character): CharacterCurrencyRewardService
     {
         $this->character = $character;
+        $this->earnedCurrencies = [
+            'gold' => 0,
+            'gold_dust' => 0,
+            'shards' => 0,
+            'copper_coins' => 0,
+        ];
 
         return $this;
     }
@@ -49,9 +62,9 @@ class CharacterCurrencyRewardService
      *
      * @param Monster $monster
      * @param int $killCount
-     * @return CharacterCurrencyRewardService
+     * @return array
      */
-    public function giveCurrencies(Monster $monster, int $killCount = 1): CharacterCurrencyRewardService
+    public function giveCurrencies(Monster $monster, int $killCount = 1): array
     {
 
         $this->distributeGold($monster, $killCount);
@@ -64,7 +77,7 @@ class CharacterCurrencyRewardService
             event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
         }
 
-        return $this;
+        return $this->earnedCurrencies;
     }
 
     /**
@@ -89,11 +102,15 @@ class CharacterCurrencyRewardService
 
             $goldDust = rand(1, 375) * $killCount;
 
+            $this->earnedCurrencies['shards'] += $shards;
+            $this->earnedCurrencies['gold_dust'] += $goldDust;
+
             $characterShards = $this->character->shards + $shards;
             $characterGoldDust = $this->character->gold_dust + $goldDust;
 
             if ($canHaveCopperCoins) {
                 $copperCoins = rand(1, 115) * $killCount;
+                $this->earnedCurrencies['copper_coins'] += $copperCoins;
 
                 $characterCopperCoins = $this->character->copper_coins + $copperCoins;
             } else {
@@ -155,6 +172,7 @@ class CharacterCurrencyRewardService
     private function distributeGold(Monster $monster, int $killCount): void
     {
         $goldToReward = $monster->gold * $killCount;
+        $this->earnedCurrencies['gold'] += $goldToReward;
 
         $newGold = $this->character->gold + $goldToReward;
 
@@ -209,6 +227,7 @@ class CharacterCurrencyRewardService
                 }
 
                 $coins = $coins + $coins * $mercenarySlotBonus;
+                $this->earnedCurrencies['copper_coins'] += $coins;
 
                 $newCoins = $this->character->copper_coins + $coins;
 

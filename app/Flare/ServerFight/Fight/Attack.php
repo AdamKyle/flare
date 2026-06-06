@@ -101,6 +101,11 @@ class Attack
         return $this->monsterHealth;
     }
 
+    public function getMonsterLastRolledAttack(): int
+    {
+        return $this->monsterAttack->getLastRolledAttack();
+    }
+
     public function attack(Character $character, ServerMonster $serverMonster, string $attackType, string $whoAttacks)
     {
         if ($this->characterHealth <= 0) {

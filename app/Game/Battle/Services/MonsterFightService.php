@@ -176,6 +176,7 @@ class MonsterFightService
         $cache['health']['current_character_health'] = $characterHealth;
         $cache['health']['current_monster_health'] = $monsterHealth;
         $cache['messages'] = $this->monsterPlayerFight->getBattleMessages();
+        $cache['attack_damage'] = $this->monsterPlayerFight->getMonsterLastRolledAttack();
 
         if ($monsterHealth > 0) {
             Cache::put('monster-fight-' . $character->id, $cache, 900);

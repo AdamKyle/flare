@@ -48,6 +48,7 @@ export default class CharacterTabs extends React.Component<
                     <TabPanel key={"active-boons"}>
                         <CharacterActiveBoons
                             character_id={this.props.character?.id}
+                            user_id={this.props.character?.user_id}
                             finished_loading={this.props.finished_loading}
                         />
                     </TabPanel>

@@ -47,6 +47,7 @@ export default class ActionSection extends React.Component<
                         can_access_twisted_earth_shop={
                             this.props.can_access_twisted_earth_shop
                         }
+                        exploration_output={this.props.exploration_output}
                     />
                 ) : (
                     <Actions
@@ -73,6 +74,7 @@ export default class ActionSection extends React.Component<
                         can_access_twisted_earth_shop={
                             this.props.can_access_twisted_earth_shop
                         }
+                        exploration_output={this.props.exploration_output}
                     />
                 )}
             </Fragment>

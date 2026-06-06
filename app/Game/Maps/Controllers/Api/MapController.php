@@ -60,7 +60,7 @@ class MapController extends Controller
     public function move(MoveRequest $request, Character $character): JsonResponse
     {
         if (! $character->can_move) {
-            return response()->json(['invalid input'], 429);
+            return response()->json(['invalid input'], 422);
         }
 
         if ($character->currentAutomations()
@@ -98,7 +98,7 @@ class MapController extends Controller
     public function traverse(TraverseRequest $request, Character $character, MovementService $movementService): JsonResponse
     {
         if (! $character->can_move) {
-            return response()->json(['invalid input'], 429);
+            return response()->json(['invalid input'], 422);
         }
 
         $response = $movementService->updateCharacterPlane($request->map_id, $character);
@@ -116,7 +116,7 @@ class MapController extends Controller
     public function teleport(TeleportRequest $request, Character $character): JsonResponse
     {
         if (! $character->can_move) {
-            return response()->json(['invalid input'], 429);
+            return response()->json(['invalid input'], 422);
         }
 
         $this->teleportService->setCoordinatesToTravelTo($request->x, $request->y)
@@ -136,7 +136,7 @@ class MapController extends Controller
     public function setSail(SetSailValidation $request, Character $character): JsonResponse
     {
         if (! $character->can_move) {
-            return response()->json(['invalid input'], 429);
+            return response()->json(['invalid input'], 422);
         }
 
         $this->setSail->setCoordinatesToTravelTo($request->x, $request->y)

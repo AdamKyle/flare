@@ -3,11 +3,13 @@
 namespace App\Game\Character\CharacterInventory\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\CharacterBoon;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Flare\Values\AutomationType;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\CharacterInventory\Events\CharacterBoonsUpdateBroadcastEvent;
@@ -51,6 +53,8 @@ class UseItemService
 
     public function useManyItemsFromInventory(Character $character, array $itemsToUse): array
     {
+        $automation = $this->activeAutomation($character);
+
         $currentBoonCount = $character->boons->sum('amount_used');
 
         if ($currentBoonCount >= self::MAX_AMOUNT) {
@@ -72,6 +76,12 @@ class UseItemService
             return $this->errorResult('Could not find the selected items you wanted to use in your inventory. Are you sure you have them?');
         }
 
+        if (! is_null($automation) && $slots->contains(function (InventorySlot $slot): bool {
+            return ! $this->isAlchemyBoonItem($slot->item);
+        })) {
+            return $this->errorResult($this->automationItemUseMessage($automation));
+        }
+
         foreach ($slots as $slot) {
             if (! $this->useItem($slot, $character)) {
                 $removedSomeItems = true;
@@ -86,6 +96,8 @@ class UseItemService
         event(new UpdateTopBarEvent($character));
 
         event(new UpdateCharacterInventoryCountEvent($character));
+
+        $this->broadcastCharacterBoons($character);
 
         $inventory = $this->characterInventoryService->setCharacter($character);
 
@@ -102,6 +114,12 @@ class UseItemService
      */
     public function useSingleItemFromInventory(Character $character, Item $item): array
     {
+        $automation = $this->activeAutomation($character);
+
+        if (! is_null($automation) && ! $this->isAlchemyBoonItem($item)) {
+            return $this->errorResult($this->automationItemUseMessage($automation));
+        }
+
         $currentBoonCount = $character->boons->sum('amount_used');
 
         if ($currentBoonCount >= self::MAX_AMOUNT) {
@@ -128,6 +146,8 @@ class UseItemService
         event(new UpdateTopBarEvent($character));
 
         event(new UpdateCharacterInventoryCountEvent($character));
+
+        $this->broadcastCharacterBoons($character);
 
         $inventory = $this->characterInventoryService->setCharacter($character);
 
@@ -159,17 +179,18 @@ class UseItemService
                 return false;
             }
 
-            $newLastsForMinutes = $foundBoon->last_for_minutes + $slot->item->lasts_for;
+            $minutesLeft = $foundBoon->complete->lessThanOrEqualTo(now()) ? 0 : (int) ceil(now()->diffInSeconds($foundBoon->complete) / 60);
+            $newLastsForMinutes = min(self::MAX_TIME, $minutesLeft + $slot->item->lasts_for);
 
-            if ($newLastsForMinutes > self::MAX_TIME) {
+            if ($newLastsForMinutes <= $minutesLeft) {
                 return false;
             }
 
-            $timeStamp = $foundBoon->complete->addMinutes($slot->item->lasts_for);
+            $timeStamp = now()->addMinutes($newLastsForMinutes);
             $amountUsed = min(self::MAX_AMOUNT, $foundBoon->amount_used + 1);
 
             $foundBoon->update([
-                'last_for_minutes' => min(self::MAX_TIME, $foundBoon->last_for_minutes + $slot->item->lasts_for),
+                'last_for_minutes' => $newLastsForMinutes,
                 'complete' => $timeStamp,
                 'amount_used' => $amountUsed,
             ]);
@@ -195,6 +216,90 @@ class UseItemService
         $slot->delete();
 
         return true;
+    }
+
+    public function fillUpBoon(Character $character, CharacterBoon $boon): array
+    {
+        $slots = $character->inventory->slots()
+            ->where('item_id', $boon->item_id)
+            ->get();
+
+        if ($slots->isEmpty()) {
+            return $this->errorResult('You do not have any more of that item.');
+        }
+
+        $item = Item::find($boon->item_id);
+        $minutesLeft = $boon->complete->lessThanOrEqualTo(now()) ? 0 : (int) ceil(now()->diffInSeconds($boon->complete) / 60);
+        $missing = self::MAX_TIME - $minutesLeft;
+
+        if ($missing <= 0) {
+            return $this->errorResult(
+                'Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours. Non stacking items cannot be used more then once, while another one is running.'
+            );
+        }
+
+        $needed = (int) ceil($missing / $item->lasts_for);
+        $available = $slots->count();
+        $used = min($needed, $available);
+        $timeAdded = min($missing, $used * $item->lasts_for);
+
+        $slots->take($used)->each(function (InventorySlot $slot): void {
+            $slot->delete();
+        });
+
+        $boon->update([
+            'complete' => $boon->complete->addMinutes($timeAdded),
+            'last_for_minutes' => $minutesLeft + $timeAdded,
+            'amount_used' => min((int) ceil(self::MAX_TIME / $item->lasts_for), $boon->amount_used + $used),
+        ]);
+
+        return $this->successResult([
+            'message' => $item->name . ' filled up using ' . $used . ' item(s), adding ' . $timeAdded . ' minutes.',
+            'boons' => $character->refresh()->boons,
+        ]);
+    }
+
+    private function activeAutomation(Character $character): ?CharacterAutomation
+    {
+        return $character->currentAutomations()
+            ->where('completed_at', '>', now())
+            ->orderByDesc('started_at')
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    private function isAlchemyBoonItem(Item $item): bool
+    {
+        return $item->type === 'alchemy'
+            && $item->usable
+            && $item->lasts_for > 0
+            && ! $item->damages_kingdoms
+            && ! $item->can_use_on_other_items;
+    }
+
+    private function automationItemUseMessage(CharacterAutomation $automation): string
+    {
+        return 'No you are busy, you can use Alchemy items that apply boons to your character. Please cancel your: ' . $this->automationName($automation) . ', if you want to use this.';
+    }
+
+    private function automationName(CharacterAutomation $automation): string
+    {
+        $automationType = new AutomationType($automation->type);
+
+        if ($automationType->isExploring()) {
+            return 'Exploration';
+        }
+
+        if ($automationType->isDelve()) {
+            return 'Delve';
+        }
+
+        return 'Faction Loyalty';
+    }
+
+    private function broadcastCharacterBoons(Character $character): void
+    {
+        event(new CharacterBoonsUpdateBroadcastEvent($character->user, $character->refresh()->boons->toArray()));
     }
 
     /**

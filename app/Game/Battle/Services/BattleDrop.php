@@ -34,6 +34,10 @@ class BattleDrop
 
     private float $lootingChance;
 
+    private array $rewardTotals = [
+        'auto_sold_gold' => 0,
+    ];
+
     /**
      * @param RandomItemDropBuilder $randomItemDropBuilder
      * @param DisenchantService $disenchantService
@@ -82,6 +86,20 @@ class BattleDrop
         $this->lootingChance = $lootingChance;
 
         return $this;
+    }
+
+    public function resetRewardTotals(): BattleDrop
+    {
+        $this->rewardTotals = [
+            'auto_sold_gold' => 0,
+        ];
+
+        return $this;
+    }
+
+    public function rewardTotals(): array
+    {
+        return $this->rewardTotals;
     }
 
     /**
@@ -407,6 +425,8 @@ class BattleDrop
 
         if ($character->user->auto_sell_item) {
             if ($maxCurrenciesValue->canNotGiveCurrency()) {
+                $this->rewardTotals['auto_sold_gold'] += SellItemCalculator::fetchSalePriceWithAffixes($item);
+
                 $this->shopService->autoSellItem($character, $item);
 
                 return;

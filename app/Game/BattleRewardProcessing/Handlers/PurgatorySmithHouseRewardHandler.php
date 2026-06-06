@@ -24,10 +24,19 @@ use Illuminate\Support\Facades\Cache;
 
 class PurgatorySmithHouseRewardHandler
 {
+    private array $earnedCurrencies = [];
+
     public function __construct(private RandomAffixGenerator $randomAffixGenerator, private BattleMessageHandler $battleMessageHandler) {}
+
+    public function getEarnedCurrencies(): array
+    {
+        return $this->earnedCurrencies;
+    }
 
     public function handleFightingAtPurgatorySmithHouse(Character $character, Monster $monster, int $killCount = 1): Character
     {
+        $this->earnedCurrencies = [];
+
         $location = Location::where('x', $character->map->character_position_x)
             ->where('y', $character->map->character_position_y)
             ->where('game_map_id', $character->map->game_map_id)
@@ -103,6 +112,12 @@ class PurgatorySmithHouseRewardHandler
         if ($hasItemForCopperCoins) {
             $copperCoinsToGain = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount) * $killCount;
         }
+
+        $this->earnedCurrencies = [
+            'gold_dust' => $goldDustToGain,
+            'shards' => $shardsToGain,
+            'copper_coins' => $copperCoinsToGain,
+        ];
 
         $goldDust = $character->gold_dust + $goldDustToGain;
         $shards = $character->shards + $shardsToGain;

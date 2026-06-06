@@ -27,10 +27,6 @@ export default class Ajax implements AjaxInterface {
                         if (response.status === 401) {
                             window.location.reload();
                         }
-
-                        if (response.status === 429) {
-                            this.initiateGlobalTimeOut();
-                        }
                     }
 
                     return errorCallBack(error);
@@ -46,10 +42,6 @@ export default class Ajax implements AjaxInterface {
 
                         if (response.status === 401) {
                             window.location.reload();
-                        }
-
-                        if (response.status === 429) {
-                            this.initiateGlobalTimeOut();
                         }
                     }
 
