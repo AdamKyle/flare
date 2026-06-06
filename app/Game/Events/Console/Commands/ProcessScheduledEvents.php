@@ -4,7 +4,6 @@ namespace App\Game\Events\Console\Commands;
 
 use App\Flare\Models\ScheduledEvent;
 use App\Game\Events\Jobs\InitiateDelusionalMemoriesEvent;
-use App\Game\Events\Jobs\InitiateFeedbackEvent;
 use App\Game\Events\Jobs\InitiateWeeklyCelestialSpawnEvent;
 use App\Game\Events\Jobs\InitiateWeeklyCurrencyDropEvent;
 use App\Game\Events\Jobs\InitiateWeeklyFactionLoyaltyEvent;
@@ -75,10 +74,6 @@ class ProcessScheduledEvents extends Command
 
                 if ($eventType->isWeeklyFactionLoyaltyEvent()) {
                     InitiateWeeklyFactionLoyaltyEvent::dispatch($event->id)->delay($now->copy()->addMinutes(5));
-                }
-
-                if ($eventType->isFeedbackEvent()) {
-                    InitiateFeedbackEvent::dispatch($event->id)->delay($now->copy()->addMinutes(5));
                 }
             } catch (Throwable $throwable) {
                 Cache::forget($cacheKey);

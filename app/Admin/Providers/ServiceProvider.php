@@ -15,7 +15,6 @@ use App\Admin\Services\LocationService;
 use App\Admin\Services\QuestService;
 use App\Admin\Services\SiteStatisticsService;
 use App\Admin\Services\SuggestionAndBugsService;
-use App\Admin\Services\SurveyService;
 use App\Admin\Services\UpdateCharacterStatsService;
 use App\Admin\Services\UserService;
 use App\Flare\Cache\CoordinatesCache;
@@ -68,9 +67,6 @@ class ServiceProvider extends ApplicationServiceProvider
             return new SuggestionAndBugsService;
         });
 
-        $this->app->bind(SurveyService::class, function() {
-            return new SurveyService;
-        });
 
         $this->app->bind(FeedbackService::class, function() {
             return new FeedbackService;

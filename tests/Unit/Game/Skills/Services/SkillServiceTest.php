@@ -4,7 +4,6 @@ namespace Tests\Unit\Game\Skills\Services;
 
 use App\Flare\Events\SkillLeveledUpServerMessageEvent;
 use App\Flare\Models\GameSkill;
-use App\Game\Events\Values\EventType;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -15,11 +14,10 @@ use Tests\Traits\CreateClass;
 use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
-use Tests\Traits\CreateScheduledEvent;
 
 class SkillServiceTest extends TestCase
 {
-    use CreateClass, CreateGameSkill, CreateEvent, CreateScheduledEvent, CreateItem, RefreshDatabase;
+    use CreateClass, CreateGameSkill, CreateEvent, CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -171,32 +169,6 @@ class SkillServiceTest extends TestCase
         $this->assertGreaterThan(10, $skill->xp);
     }
 
-    public function testAssignXpToSkillWhenEventIsRunning()
-    {
-        $this->createScheduledEvent([
-            'event_type' => EventType::FEEDBACK_EVENT,
-            'start_date' => now()->addMinutes(5),
-            'currently_running' => true,
-        ]);
-
-        $character = $this->character->getCharacter();
-
-        $skill = $character->skills->first();
-
-        $skill->update([
-            'currently_training' => true,
-            'xp_towards' => 0.10,
-        ]);
-
-        $character = $character->refresh();
-
-        $this->skillService->setSkillInTraining($character)->assignXPToTrainingSkill($character, 10);
-
-        $skill = $character->refresh()->skills->where('currently_training', true)->first();
-
-        $this->assertGreaterThan(10, $skill->xp);
-    }
-
     public function testLevelSkill()
     {
         Event::fake();
@@ -259,49 +231,6 @@ class SkillServiceTest extends TestCase
         $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
 
         $this->assertEquals(0, $skill->refresh()->xp);
-    }
-
-    public function testAssignXpToCraftingSkillWhenFeedBackEventIsRunning()
-    {
-        $this->createScheduledEvent([
-            'event_type' => EventType::FEEDBACK_EVENT,
-            'start_date' => now()->addMinutes(5),
-            'currently_running' => true,
-        ]);
-
-        $craftingSkill = $this->createGameSkill([
-            'type' => SkillTypeValue::CRAFTING->value,
-            'name' => 'Weapon Crafting',
-            'max_level' => 400,
-        ]);
-
-        $character = $this->character->assignSkill($craftingSkill, 1)->getCharacter();
-        $skill = $character->skills->where('game_skill_id', $craftingSkill->id)->first();
-
-        $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
-
-        $this->assertGreaterThan(0, $skill->refresh()->xp);
-    }
-
-    public function testAssignXpToRegularSkillWhenFeedBackEventIsRunning()
-    {
-        $this->createScheduledEvent([
-            'event_type' => EventType::FEEDBACK_EVENT,
-            'start_date' => now()->addMinutes(5),
-            'currently_running' => true,
-        ]);
-
-        $regularSkill = $this->createGameSkill([
-            'type' => SkillTypeValue::TRAINING->value,
-            'name' => 'Accuracy',
-        ]);
-
-        $character = $this->character->assignSkill($regularSkill, 1)->getCharacter();
-        $skill = $character->skills->where('game_skill_id', $regularSkill->id)->first();
-
-        $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
-
-        $this->assertGreaterThan(0, $skill->refresh()->xp);
     }
 
     public function testAssignXpToRegularSkillAndLevelItUp()

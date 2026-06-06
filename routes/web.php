@@ -36,9 +36,6 @@ Route::group(['middleware' => 'update.player-activity'], function () {
     Route::post('/delete-account/{user}', ['as' => 'delete.account', 'uses' => 'AccountDeletionController@deleteAccount']);
     Route::post('/reset-account/{user}', ['as' => 'reset.account', 'uses' => 'AccountDeletionController@resetAccount']);
 
-    Route::post('/survey-responses', ['as' => 'survey.question-response', 'uses' => 'SurveyStatsController@getResponseDataForQuestion']);
-    Route::get('/survey-stats', ['as' => 'survey.stats', 'uses' => 'SurveyStatsController@getLatestSurveyData']);
-    Route::get('/survey-stats/creators-response', ['as' => 'survey.creator-response', 'uses' => 'SurveyStatsController@getCreatorResponse']);
 });
 
 Auth::routes();

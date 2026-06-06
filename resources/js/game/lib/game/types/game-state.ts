@@ -97,12 +97,6 @@ export default interface GameState {
 
     show_intro_page: boolean;
 
-    show_survey_button: boolean;
-
-    open_survey_modal: boolean;
-
-    survey_success_message: string | null;
-
     exploration_output_loading: boolean;
 
     exploration_output: ExplorationOutputType | null;
