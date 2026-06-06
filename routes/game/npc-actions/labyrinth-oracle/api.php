@@ -1,6 +1,7 @@
 <?php
 
 Route::group(['middleware' => [
+    'auth',
     'is.character.who.they.say.they.are',
     'is.character.dead',
     'is.character.exploring'],

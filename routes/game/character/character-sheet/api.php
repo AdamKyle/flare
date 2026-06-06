@@ -1,8 +1,10 @@
 <?php
 
-Route::post('/character-timeout', ['uses' => 'Api\CharacterSheetController@globalTimeout']);
+Route::middleware(['auth'])->group(function () {
+    Route::post('/character-timeout', ['uses' => 'Api\CharacterSheetController@globalTimeout']);
+});
 
-Route::group(['middleware' => ['is.character.who.they.say.they.are']], function () {
+Route::group(['middleware' => ['auth', 'is.character.who.they.say.they.are']], function () {
     Route::get('/character-sheet/{character}', ['uses' => 'Api\CharacterSheetController@sheet']);
     Route::get('/character-sheet/{character}/active-boons', ['uses' => 'Api\CharacterSheetController@activeBoons']);
     Route::get('/character-sheet/{character}/factions', ['uses' => 'Api\CharacterSheetController@factions']);
