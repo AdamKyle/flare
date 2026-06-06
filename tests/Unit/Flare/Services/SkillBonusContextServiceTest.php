@@ -4,6 +4,7 @@ namespace Tests\Unit\Flare\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Skill;
+use App\Flare\Services\CharacterXPService;
 use App\Flare\Services\SkillBonusContextService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -301,6 +302,76 @@ class SkillBonusContextServiceTest extends TestCase
         $this->assertTrue($boonsFirstCall->every(function ($boon) {
             return $boon->relationLoaded('itemUsed') && ! is_null($boon->itemUsed);
         }));
+    }
+
+    public function testExpiredBoonsDoNotAffectSkillTrainingBonus(): void
+    {
+        $activeItem = $this->createItem([
+            'increase_skill_training_bonus_by' => 0.15,
+        ]);
+
+        $expiredItem = $this->createItem([
+            'increase_skill_training_bonus_by' => 0.75,
+        ]);
+
+        $this->character->boons()->create([
+            'character_id' => $this->character->id,
+            'item_id' => $activeItem->id,
+            'last_for_minutes' => 10,
+            'amount_used' => 1,
+            'started' => now(),
+            'complete' => now()->addMinutes(10),
+        ]);
+
+        $this->character->boons()->create([
+            'character_id' => $this->character->id,
+            'item_id' => $expiredItem->id,
+            'last_for_minutes' => 10,
+            'amount_used' => 1,
+            'started' => now()->subMinutes(10),
+            'complete' => now(),
+        ]);
+
+        $skill = Skill::query()
+            ->whereKey($this->skill->id)
+            ->with(['baseSkill', 'character.boons.itemUsed'])
+            ->firstOrFail();
+
+        $this->assertEqualsWithDelta(0.15, $skill->skill_training_bonus, 0.00001);
+    }
+
+    public function testExpiredBoonsDoNotAffectXpBonus(): void
+    {
+        $activeItem = $this->createItem([
+            'xp_bonus' => 0.20,
+        ]);
+
+        $expiredItem = $this->createItem([
+            'xp_bonus' => 0.80,
+        ]);
+
+        $this->character->boons()->create([
+            'character_id' => $this->character->id,
+            'item_id' => $activeItem->id,
+            'last_for_minutes' => 10,
+            'amount_used' => 1,
+            'started' => now(),
+            'complete' => now()->addMinutes(10),
+        ]);
+
+        $this->character->boons()->create([
+            'character_id' => $this->character->id,
+            'item_id' => $expiredItem->id,
+            'last_for_minutes' => 10,
+            'amount_used' => 1,
+            'started' => now()->subMinutes(10),
+            'complete' => now(),
+        ]);
+
+        $character = $this->characterFactory->givePlayerLocation()->getCharacter()->refresh();
+        $xp = resolve(CharacterXPService::class)->determineXPToAward($character, 100);
+
+        $this->assertSame(120, $xp);
     }
 
     public function testGetBoonsWithItemUsedFallsBackToQueryWhenBoonsLoadedButItemUsedNotLoaded(): void

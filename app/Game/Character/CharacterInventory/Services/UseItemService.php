@@ -55,7 +55,7 @@ class UseItemService
     {
         $automation = $this->activeAutomation($character);
 
-        $currentBoonCount = $character->boons->sum('amount_used');
+        $currentBoonCount = $character->boons()->active()->sum('amount_used');
 
         if ($currentBoonCount >= self::MAX_AMOUNT) {
             return $this->errorResult('You can only have a maximum of ten boons applied. Check active boons to see which ones you have. You can always cancel one by clicking on the row.');
@@ -120,7 +120,7 @@ class UseItemService
             return $this->errorResult($this->automationItemUseMessage($automation));
         }
 
-        $currentBoonCount = $character->boons->sum('amount_used');
+        $currentBoonCount = $character->boons()->active()->sum('amount_used');
 
         if ($currentBoonCount >= self::MAX_AMOUNT) {
             return $this->errorResult('You can only have a maximum of ten boons applied. Check active boons to see which ones you have. You can always cancel one by clicking on the row.');
@@ -165,6 +165,7 @@ class UseItemService
     public function useItem(InventorySlot $slot, Character $character): bool
     {
         $foundBoon = $character->boons()
+            ->active()
             ->where('item_id', $slot->item_id)
             ->where('last_for_minutes', '<=', self::MAX_TIME)
             ->orderBy('created_at', 'desc')
@@ -220,6 +221,12 @@ class UseItemService
 
     public function fillUpBoon(Character $character, CharacterBoon $boon): array
     {
+        $boon = $character->boons()->active()->find($boon->id);
+
+        if (is_null($boon)) {
+            return $this->errorResult('This boon is no longer active.');
+        }
+
         $slots = $character->inventory->slots()
             ->where('item_id', $boon->item_id)
             ->get();
@@ -255,7 +262,7 @@ class UseItemService
 
         return $this->successResult([
             'message' => $item->name . ' filled up using ' . $used . ' item(s), adding ' . $timeAdded . ' minutes.',
-            'boons' => $character->refresh()->boons,
+            'boons' => $character->boons()->active()->get(),
         ]);
     }
 
@@ -299,7 +306,7 @@ class UseItemService
 
     private function broadcastCharacterBoons(Character $character): void
     {
-        event(new CharacterBoonsUpdateBroadcastEvent($character->user, $character->refresh()->boons->toArray()));
+        event(new CharacterBoonsUpdateBroadcastEvent($character->user, $character->boons()->active()->get()->toArray()));
     }
 
     /**
@@ -332,7 +339,7 @@ class UseItemService
             event(new ServerMessageEvent($character->user, 'You used: ' . $item->name));
         }
 
-        $boons = $character->boons->toArray();
+        $boons = $character->boons()->active()->get()->toArray();
 
         foreach ($boons as $key => $boon) {
             $item = Item::find($boon['item_id']);

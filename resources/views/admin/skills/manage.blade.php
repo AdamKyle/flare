@@ -26,7 +26,7 @@
                             <div>
                                 <h3 class="mb-3">Character Modifiers</h3>
                                 <x-core.forms.input :model="$skill" label="Base Damage Modifier % (per level):" modelKey="base_damage_mod_bonus_per_level" name="base_damage_mod_bonus_per_level" />
-                                <x-core.forms.input :model="$skill" label="Base Healing Modifier % (per level):" modelKey="base_healing_mod_per_level" name="base_healing_mod_per_level" />
+                                <x-core.forms.input :model="$skill" label="Base Healing Modifier % (per level):" modelKey="base_healing_mod_bonus_per_level" name="base_healing_mod_bonus_per_level" />
                                 <x-core.forms.input :model="$skill" label="Base AC Modifier % (per level):" modelKey="base_ac_mod_bonus_per_level" name="base_ac_mod_bonus_per_level" />
 
                                 <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>

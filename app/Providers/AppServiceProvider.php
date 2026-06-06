@@ -15,6 +15,7 @@ use App\Console\AfterDeployment\CleanInvalidWeapons;
 use App\Console\AfterDeployment\CleanMarketPlaceOfInvalidWeapons;
 use App\Console\AfterDeployment\CleanOrphanedBuildingExpansionQueues;
 use App\Console\AfterDeployment\CleanUpInvalidBrokenQueues;
+use App\Console\AfterDeployment\ClearExpiredCharacterBoons;
 use App\Console\AfterDeployment\ClearInvalidCapitalCityQueues;
 use App\Console\AfterDeployment\ClearPlayersJobs;
 use App\Console\AfterDeployment\ClearPlayersKingdomJobs;
@@ -91,6 +92,7 @@ class AppServiceProvider extends ServiceProvider
             RebalanceTrinkets::class,
             ClearPlayersJobs::class,
             ClearPlayersKingdomJobs::class,
+            ClearExpiredCharacterBoons::class,
             ClearInvalidCapitalCityQueues::class,
             UpdateCharacterFactionBounties::class,
             ChangePlayerWeapons::class,

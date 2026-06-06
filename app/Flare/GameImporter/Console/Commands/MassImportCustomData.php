@@ -40,7 +40,8 @@ class MassImportCustomData extends Command
     public function handle()
     {
 
-        Artisan::call('clean:invalid-broken-queues');
+        Artisan::call('import:game-data Skills');
+        Artisan::call('clear:expired-character-boons');
 
         $this->importInformationSection();
 
