@@ -47,7 +47,6 @@ import OrangeButton from "./components/ui/buttons/orange-button";
 import SuggestionsAndBugs from "./components/suggestions/suggestions-and-bugs";
 import IntroSlides from "./components/intro-section/intro-slides";
 import TurnOffUserIntroFlag from "./lib/game/ajax/turn-off-user-intro-flag";
-import SurveyComponent from "./components/survey/survey-component";
 import PrimaryButton from "./components/ui/buttons/primary-button";
 
 declare const Echo: {
@@ -118,9 +117,6 @@ export default class Game extends React.Component<GameProps, GameState> {
             show_suggestions_and_bugs: false,
             is_showing_active_boons: false,
             show_intro_page: false,
-            show_survey_button: false,
-            open_survey_modal: false,
-            survey_success_message: null,
             exploration_output_loading: false,
             exploration_output: null,
             tabs: [
@@ -295,51 +291,6 @@ export default class Game extends React.Component<GameProps, GameState> {
         });
     }
 
-    componentDidUpdate() {
-        if (
-            this.state.show_survey_button &&
-            this.state.survey_success_message !== null
-        ) {
-            const character = JSON.parse(JSON.stringify(this.state.character));
-
-            character.is_showing_survey = false;
-            character.survey_id = null;
-
-            this.setState({
-                show_survey_button: false,
-                character: character,
-            });
-        }
-    }
-
-    showSurveyButton(showSurvey: boolean, surveyId: number | null) {
-        if (this.state.character === null) {
-            return;
-        }
-
-        const character = JSON.parse(JSON.stringify(this.state.character));
-
-        character.is_showing_survey = showSurvey;
-        character.survey_id = surveyId;
-
-        this.setState({
-            show_survey_button: showSurvey,
-            character: character,
-        });
-    }
-
-    manageSurveyModal() {
-        this.setState({
-            open_survey_modal: true,
-        });
-    }
-
-    closeSurveyModal() {
-        this.setState({
-            open_survey_modal: false,
-        });
-    }
-
     resetShowIntroPage() {
         this.setState(
             {
@@ -472,12 +423,6 @@ export default class Game extends React.Component<GameProps, GameState> {
         });
     }
 
-    setSurveySuccessMessage(message: string | null) {
-        this.setState({
-            survey_success_message: message,
-        });
-    }
-
     renderLoading() {
         return (
             <div className="flex h-screen justify-center items-center max-w-md m-auto mt-[-150px]">
@@ -569,18 +514,6 @@ export default class Game extends React.Component<GameProps, GameState> {
             <div>
                 <ScreenRefresh user_id={this.state.character.user_id} />
 
-                <SurveyComponent
-                    user_id={this.state.character.user_id}
-                    character_id={this.state.character.id}
-                    survey_id={this.state.character.survey_id}
-                    show_survey_button={this.showSurveyButton.bind(this)}
-                    open_survey={this.state.open_survey_modal}
-                    close_survey={this.closeSurveyModal.bind(this)}
-                    set_success_message={this.setSurveySuccessMessage.bind(
-                        this,
-                    )}
-                />
-
                 <IsTabletInPortraitDisplayAlert />
 
                 <Tabs
@@ -658,16 +591,6 @@ export default class Game extends React.Component<GameProps, GameState> {
                                         your rewards and move on to the next!
                                     </SuccessAlert>
                                 ) : null}
-                                {this.state.survey_success_message !== null ? (
-                                    <SuccessAlert
-                                        additional_css={"mb-4 mt-[15px]"}
-                                        close_alert={() => {
-                                            this.setSurveySuccessMessage(null);
-                                        }}
-                                    >
-                                        {this.state.survey_success_message}
-                                    </SuccessAlert>
-                                ) : null}
                                 <div className="flex w-full min-w-0 flex-wrap justify-center items-center gap-4">
                                     <div
                                         className={clsx("w-full min-w-0", {
@@ -690,24 +613,6 @@ export default class Game extends React.Component<GameProps, GameState> {
                                                 "Submit Bug/Suggestions"
                                             }
                                             on_click={this.manageBugsAndSuggestions.bind(
-                                                this,
-                                            )}
-                                            additional_css={clsx({
-                                                "relative top-[10px]":
-                                                    this.state.view_port > 932,
-                                                "mt-[5px]":
-                                                    this.state.view_port <= 932,
-                                            })}
-                                        />
-                                    ) : null}
-                                    {this.state.show_survey_button ||
-                                    (this.state.character.is_showing_survey &&
-                                        this.state.character.survey_id !==
-                                            null &&
-                                        !this.state.is_showing_active_boons) ? (
-                                        <PrimaryButton
-                                            button_label={"Complete survey"}
-                                            on_click={this.manageSurveyModal.bind(
                                                 this,
                                             )}
                                             additional_css={clsx({

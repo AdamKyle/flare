@@ -31,7 +31,6 @@ class AnnouncementHandler
             EventType::THE_OLD_CHURCH => 'the_old_chur',
             EventType::DELUSIONAL_MEMORIES_EVENT => 'delusional_memory',
             EventType::WEEKLY_FACTION_LOYALTY_EVENT => 'weekly_faction_loyalty_event',
-            EventType::FEEDBACK_EVENT => 'tlessas_feedback_event',
             default => null,
         };
     }
@@ -48,7 +47,6 @@ class AnnouncementHandler
             'the_old_church' => $this->buildTheOldChurchMessage(),
             'delusional_memories_event' => $this->buildDelusionalMemoriesMessage($event),
             'weekly_faction_loyalty_event' => $this->buildWeeklyFactionLoyaltyEvent($event),
-            'tlessas_feedback_event' => $this->buildFeedbackAnnouncement($event),
             default => throw new Exception('Cannot determine announcement type'),
         };
     }
@@ -261,26 +259,4 @@ class AnnouncementHandler
         event(new AnnouncementMessageEvent($message, $announcement->id));
     }
 
-    private function buildFeedbackAnnouncement(?Event $event = null): void
-    {
-        if (is_null($event)) {
-            throw new Exception('Cannot create message for Feedback event, when no event exists.');
-        }
-
-        $endTime = Carbon::parse($event->ends_at)->setTimezone(env('TIME_ZONE'))->format('g A T');
-
-        $message = 'From now until: ' . $endTime . ' ' .
-            'Players who are new and old will gain 75 more xp per kill under level 1,000, 150 more xp under level 5000 and for those who have reincarnated, you will gain 500 more xp per kill.' . ' ' .
-            'Players will also gain +150 XP in training skills and in crafting skills, including alchemy and enchanting, they will also see a raise of +175xp per craft/enchant!' . ' ' .
-            'After 6 hours of combined (does NOT need to be consecutive) - players of all skill types and play times will be asked to participate in a survey to help Tlessa become a better game. Once you complete the survey you will be rewarded with a mythical item!' . ' ' .
-            'These items, for newer players, will carry them to rough mid game start of end game, depending on how their stats are rolled. These items can be re-rolled later at The Queen of Hearts in Hell!';
-
-        $announcement = Announcement::create([
-            'message' => $message,
-            'expires_at' => $event->ends_at,
-            'event_id' => $event->id,
-        ]);
-
-        event(new AnnouncementMessageEvent($message, $announcement->id));
-    }
 }

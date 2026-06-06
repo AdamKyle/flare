@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
-use App\Flare\Models\Survey;
 use App\Flare\Values\MapNameValue;
 
 class MassImportCustomData extends Command
@@ -49,7 +48,6 @@ class MassImportCustomData extends Command
             $this->importGameMaps();
         }
 
-        $this->importSurveys();
     }
 
     /**
@@ -90,24 +88,6 @@ class MassImportCustomData extends Command
         } else {
             $this->error('Failed to copy the information images directory over. You can do this manually from the resources/backup/information-sections-images. Copy the entire directory to app/public');
         }
-    }
-
-    /**
-     * Import surveys.
-     *
-     * @return void
-     */
-    private function importSurveys(): void
-    {
-        $data = Storage::disk('data-imports')->get('Admin Section/surveys.json');
-
-        $data = json_decode(trim($data), true);
-
-        foreach ($data as $modelEntry) {
-            Survey::updateOrCreate(['id' => $modelEntry['id']], $modelEntry);
-        }
-
-        $this->line('Surveys have been imported!');
     }
 
     /**

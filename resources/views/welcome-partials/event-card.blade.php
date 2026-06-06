@@ -57,10 +57,6 @@
         $href = route('event.type', ['event_type' => 'labyrinth-monster-raid']);
     }
 
-    if ($eventRunning->getTitleOfEvent() === 'Tlessa\'s Feedback Event') {
-        $href = route('event.type', ['event_type' => 'tlessas-feedback-event']);
-        $icon = 'ra-campfire';
-    }
 @endphp
 
 <x-core.cards.feature-card>
@@ -129,10 +125,6 @@
         @if ($eventRunning->getTitleOfEvent() === 'Corrupted Bishop')
             Join the Corrupted Bishop raid! head down to the Delusional Memories Federation Controlled Town to band together!
             The Player who kills him gets a new Ancestral item!
-        @endif
-
-        @if ($eventRunning->getTitleOfEvent() === 'Tlessa\'s Feedback Event')
-            Tlessa wants your feedback! We offer increased XP, 80% drop rate for everyone! and a Mythical item for taking a survey!
         @endif
 
 

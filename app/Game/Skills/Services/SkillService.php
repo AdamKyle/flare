@@ -5,14 +5,12 @@ namespace App\Game\Skills\Services;
 use App\Flare\Events\SkillLeveledUpServerMessageEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
-use App\Flare\Models\ScheduledEvent;
 use App\Flare\Models\Skill;
 use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\SkillsTransformer;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Events\Values\EventType;
 use Exception;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
@@ -219,8 +217,6 @@ class SkillService
      */
     public function getXpForSkillIntraining(Character $character, int $xp): int
     {
-        $event = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
-
         if (is_null($this->skillInTraining)) {
             return 0;
         }
@@ -239,10 +235,6 @@ class SkillService
         $skillXp = $xp + ($xp * $this->skillInTraining->xp_towards);
         $skillXp = $skillXp + $skillXp * ($this->skillInTraining->skill_training_bonus + $character->map->gameMap->skill_training_bonus);
         $skillXp += 5;
-
-        if (!is_null($event)) {
-            $skillXp += 150;
-        }
 
         return $skillXp;
     }
@@ -302,18 +294,6 @@ class SkillService
         $xp = $xp + $xp * ($skill->skill_training_bonus + $gameMap->skill_training_bonus);
 
         $newXp = $skill->xp + $xp;
-
-        $event = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)
-            ->where('currently_running', true)
-            ->first();
-
-        if (!is_null($event)) {
-            if ($skill->type()->isEnchanting() || $skill->type()->isCrafting() || $skill->type()->isAlchemy() || $skill->type()->isGemCrafting()) {
-                $newXp += 175;
-            } else {
-                $newXp += 150;
-            }
-        }
 
         while ($newXp >= $skill->xp_max) {
             $skill->update(['xp' => $skill->xp_max]);

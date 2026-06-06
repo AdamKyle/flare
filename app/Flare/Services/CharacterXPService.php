@@ -10,7 +10,6 @@ use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Models\Monster;
-use App\Flare\Models\ScheduledEvent;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Battle\Values\MaxLevel;
@@ -19,7 +18,6 @@ use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBui
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Services\CharacterService;
-use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
 use App\Game\Skills\Services\SkillService;
@@ -188,8 +186,6 @@ class CharacterXPService
      */
     public function fetchXpForMonster(Monster $monster): int
     {
-        $addBonus = true;
-
         if (! $this->canCharacterGainXP($this->character)) {
             $this->character = $this->normalizeCharacterMaxLevel($this->character);
 
@@ -200,27 +196,9 @@ class CharacterXPService
 
         if ($this->character->level >= $monster->max_level && $this->character->user->show_monster_to_low_level_message) {
             ServerMessageHandler::sendBasicMessage($this->character->user, $monster->name . ' has a max level of: ' . number_format($monster->max_level) . '. You are only getting 1/3rd of: ' . number_format($monster->xp) . ' XP before all bonuses. Move down the list child.');
-
-            $addBonus = false;
         }
 
         $xp = $this->skillService->setSkillInTraining($this->character)->getCharacterXpWithSkillTrainingReduction($this->character, $xp);
-
-        $event = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
-
-        if (is_null($event)) {
-            $addBonus = false;
-        }
-
-        if ($addBonus) {
-            if ($this->character->times_reincarnated > 0) {
-                $xp += 500;
-            } else if ($this->character->level > 1000 && $this->character->level <= 5000) {
-                $xp += 150;
-            } else {
-                $xp += 75;
-            }
-        }
 
         if ($xp === 0) {
             return 0;

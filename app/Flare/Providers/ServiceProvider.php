@@ -60,7 +60,6 @@ use App\Flare\Services\CharacterCurrencyRewardService;
 use App\Flare\Services\CharacterDeletion;
 use App\Flare\Services\CharacterRewardService;
 use App\Flare\Services\CharacterXPService;
-use App\Flare\Services\CreateSurveySnapshot;
 use App\Flare\Services\DailyGoldDustService;
 use App\Flare\Services\DelveMonsterService;
 use App\Flare\Services\EventSchedulerService;
@@ -108,9 +107,6 @@ class ServiceProvider extends ApplicationServiceProvider
     public function register()
     {
 
-        $this->app->bind(CreateSurveySnapshot::class, function () {
-            return new CreateSurveySnapshot;
-        });
 
         $this->app->bind(BaseStatValue::class, function () {
             return new BaseStatValue;

@@ -6,12 +6,10 @@ use App\Flare\Events\SkillLeveledUpServerMessageEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Monster;
-use App\Flare\Models\ScheduledEvent;
 use App\Flare\Models\Skill;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
-use App\Game\Events\Values\EventType;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -76,18 +74,6 @@ class UpdateSkillListener
         }
 
         $newXp = $skill->xp + $skillXP;
-
-        $event = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
-
-        if (!is_null($event)) {
-
-            if ($skill->type()->isEnchanting() || $skill->type()->isCrafting() || $skill->type()->isAlchemy() || $skill->type()->isGemCrafting()) {
-                $newXp += 175;
-            } else {
-                $newXp += 150;
-            }
-        }
-
 
         while ($newXp >= $skill->xp_max) {
             $level = min($skill->level + 1, $skill->baseSkill->max_level);

@@ -116,7 +116,6 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapReincarnateApiRoutes();
         $this->mapClassRanksApiRoutes();
         $this->mapFactionLoyaltyApiRoutes();
-        $this->mapSurveyApiRoutes();
     }
 
     /**
@@ -411,11 +410,4 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/factions/faction-loyalty/api.php'));
     }
 
-    protected function mapSurveyApiRoutes()
-    {
-        Route::prefix('api')
-            ->middleware(['web', 'update.player-activity'])
-            ->namespace('App\Game\Survey\Controllers')
-            ->group(base_path('routes/game/survey/api.php'));
-    }
 }

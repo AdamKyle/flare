@@ -246,8 +246,4 @@ export interface CharacterType {
     has_faction_loyalty_warning: boolean;
 
     faction_loyalty_warning_notices: FactionLoyaltyWarningNotice[];
-
-    is_showing_survey: boolean;
-
-    survey_id: number | null;
 }

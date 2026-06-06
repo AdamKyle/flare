@@ -60,22 +60,6 @@
                 <span class="far fa-lightbulb"></span>
                 Suggestions
             </a>
-            <hr />
-            <h6 class="uppercase">Survey Builder</h6>
-            <a href="{{route('admin.surveys')}}">
-                <span class="fas fa-poll-h"></span>
-                Surveys
-            </a>
-            <a href="{{route('admin.survey-builder.create-survey')}}">
-                <span class="fas fa-poll"></span>
-                Survey Builder (Create)
-            </a>
-            @if (SurveyStats::canShowSurveyMenuOption())
-                <a href="{{ route('survey.stats') }}" >
-                    <span class="fas fa-poll"></span>
-                    Latest Survey Stats
-                </a>
-            @endif
         </div>
     </div>
 
