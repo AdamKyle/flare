@@ -5,6 +5,7 @@ on: [push]
 jobs:
   laravel-tests:
     runs-on: ubuntu-latest
+
     services:
       mysql-service:
         image: mysql:8.0.29
@@ -18,29 +19,37 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
+
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.3
+
       - name: Copy .env
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
       - name: Install Dependencies
         run: |
           rm -rf vendor
-          rm -rf composer.lock
-          composer install
+          composer install --no-interaction --prefer-dist --no-progress
           yarn install
+
       # TODO: There is an issue with the way we use resizable box, commented for now to fix that later
       # - name: Type Check
       #   run: yarn type-check
+
       - name: Generate key
         run: php artisan key:generate
+
       - name: Link Storage
         run: php artisan storage:link
+
       - name: Install dependencies (Laravel Vite)
         run: yarn build
+
       - name: Execute tests (Unit and Feature tests) via PHPUnit
         env:
           DB_CONNECTION: mysql
@@ -54,6 +63,7 @@ jobs:
           php artisan migrate
           mkdir test-coverage
           vendor/bin/phpunit --stop-on-error --stop-on-failure --coverage-html=./test-coverage
+
       - name: Upload HTML coverage report
         uses: actions/upload-artifact@v4
         with:
