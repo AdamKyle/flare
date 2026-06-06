@@ -1,5 +1,7 @@
 <?php
 
+Route::group(['middleware' => ['auth', 'is.character.who.they.say.they.are']], function () {
+
 Route::get('/character/{character}/inventory', ['uses' => 'Api\CharacterInventoryController@inventory']);
 Route::get('/character/{character}/inventory/comparison', ['uses' => 'Api\ItemComparisonController@compareItem']);
 Route::get('/character/{character}/inventory/comparison-from-chat', ['uses' => 'Api\ItemComparisonController@compareItemFromChat']);
@@ -39,4 +41,6 @@ Route::group(['middleware' => ['is.character.dead']], function () {
     Route::post('/character/{character}/inventory/disenchant-selected', ['uses' => 'Api\CharacterInventoryMultiController@disenchantSelected']);
     Route::post('/character/{character}/inventory/move-selected', ['uses' => 'Api\CharacterInventoryMultiController@moveSelected']);
     Route::post('/character/{character}/inventory/sell-selected', ['uses' => 'Api\CharacterInventoryMultiController@sellSelected']);
+});
+
 });

@@ -4,7 +4,7 @@ Route::group(['middleware' => ['auth', 'update.player-activity']], function () {
     Route::get('/calendar/events', ['uses' => 'Api\EventCalendarController@loadEvents']);
 });
 
-Route::group(['middleware' => ['is.character.who.they.say.they.are', 'update.player-activity']], function () {
+Route::group(['middleware' => ['auth', 'is.character.who.they.say.they.are', 'update.player-activity']], function () {
     Route::get('/update-character-timers/{character}', ['uses' => 'Api\TimersController@updateTimersForCharacter']);
 
     Route::post('/suggestions-and-bugs/{character}', ['uses' => 'Api\SuggestionsAndBugsController@submitEntry']);
