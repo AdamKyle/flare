@@ -138,7 +138,11 @@ class SettingsController extends Controller
             return redirect()->back()->with('error', 'Missing required quest completion for that action.');
         }
 
-        $user->update($request->all());
+        $user->update($request->safe()->only([
+            'chat_text_color',
+            'chat_is_bold',
+            'chat_is_italic',
+        ]));
 
         return redirect()->back()->with('success', 'Updated Cosmetic Text options');
     }
@@ -158,7 +162,9 @@ class SettingsController extends Controller
             return redirect()->back()->with('error', 'No such name tag.');
         }
 
-        $user->update($request->all());
+        $user->update([
+            'name_tag' => $request->validated('name_tag'),
+        ]);
 
         return redirect()->back()->with('success', 'Updated Name Tag options');
     }

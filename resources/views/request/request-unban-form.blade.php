@@ -8,12 +8,9 @@
                 <h4 class="uppercase">Request Form</h4>
             </div>
 
-            <x-core.cards.form-card css="mt-5 p-5 md:p-10" method="POST"  action="{{ route('un.ban.request.submit', ['user' => $user])}}">
+            <x-core.cards.form-card css="mt-5 p-5 md:p-10" method="POST"  action="{{ route('un.ban.request.submit')}}">
                 @csrf
-
-                <div class="mb-4 mt-4">
-                    <strong>Reason you were banned:</strong> {{$user->banned_reason}}
-                </div>
+                <input type="hidden" name="token" value="{{ $token }}">
 
                 <div class="mb-5">
                     <label for="unban-message" class="label block mb-2">Reason</label>

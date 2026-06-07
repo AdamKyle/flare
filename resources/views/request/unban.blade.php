@@ -8,6 +8,13 @@
                 <h2 class="uppercase">Unban Request</h2>
                 <h4 class="uppercase">Email Verification Form</h4>
             </div>
+            @if (session('unban_request_token'))
+                <div class="mt-5 mx-5 md:mx-10">
+                    <a href="{{ route('un.ban.request.form', ['token' => session('unban_request_token')]) }}">
+                        Continue
+                    </a>
+                </div>
+            @endif
             <x-core.cards.form-card css="mt-5 p-5 md:p-10" method="POST" action="{{ route('un.ban.request.email') }}">
                 @csrf
 

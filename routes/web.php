@@ -5,9 +5,9 @@ Route::get('/game-event-info', ['as' => 'event.type', 'uses' => 'WelcomeControll
 Route::get('/game-event-calendar', ['as' => 'event.calendar', 'uses' => 'WelcomeController@showEventCalendar']);
 
 Route::get('/un-ban-request', ['as' => 'un.ban.request', 'uses' => 'UnbanRequestController@unbanRequest']);
-Route::get('/un-ban/request-form/{user}', ['as' => 'un.ban.request.form', 'uses' => 'UnbanRequestController@requestForm']);
+Route::get('/un-ban/request-form/{token}', ['as' => 'un.ban.request.form', 'uses' => 'UnbanRequestController@requestForm']);
 Route::post('/request-email', ['as' => 'un.ban.request.email', 'uses' => 'UnbanRequestController@findUser']);
-Route::post('/request-submit/{user}', ['as' => 'un.ban.request.submit', 'uses' => 'UnbanRequestController@submitRequest']);
+Route::post('/request-submit', ['as' => 'un.ban.request.submit', 'uses' => 'UnbanRequestController@submitRequest']);
 
 Route::group(['middleware' => 'update.player-activity'], function () {
     Route::get('/information/search', ['as' => 'info.search', 'uses' => 'InfoPageController@search']);

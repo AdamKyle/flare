@@ -19,6 +19,8 @@ class QuestsController extends Controller
 
     public function show(Character $character, QuestsCompleted $questsCompleted)
     {
+        abort_unless($questsCompleted->character_id === $character->id, 404);
+
         $skill = null;
 
         if ($questsCompleted->quest->unlocks_skill) {
