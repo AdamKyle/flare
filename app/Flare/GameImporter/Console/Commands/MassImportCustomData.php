@@ -38,6 +38,8 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
+        Artisan::call('cleanup:dangling-character-data --apply');
+
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
