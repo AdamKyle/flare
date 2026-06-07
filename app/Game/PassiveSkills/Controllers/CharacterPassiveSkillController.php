@@ -11,6 +11,10 @@ class CharacterPassiveSkillController extends Controller
 {
     public function viewSkill(CharacterPassiveSkill $characterPassiveSkill, Character $character)
     {
+        if ($characterPassiveSkill->character_id !== $character->id) {
+            return redirect()->route('game')->with('error', 'You do not own that.');
+        }
+
         return view('game.passive-skills.skill', [
             'skill' => $characterPassiveSkill,
             'character' => $character,

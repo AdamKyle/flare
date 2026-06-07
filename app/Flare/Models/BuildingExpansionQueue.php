@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\BuildingExpansionQueueFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -45,5 +46,10 @@ class BuildingExpansionQueue extends Model
     public function kingdom()
     {
         return $this->belongsTo(Kingdom::class);
+    }
+
+    protected static function newFactory(): BuildingExpansionQueueFactory
+    {
+        return BuildingExpansionQueueFactory::new();
     }
 }

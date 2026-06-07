@@ -33,8 +33,10 @@ Route::group(['middleware' => 'update.player-activity'], function () {
     Route::get('/features', ['as' => 'game.features', 'uses' => 'MarketingPagesController@features']);
     Route::get('/whos-playing', ['as' => 'game.whos-playing', 'uses' => 'MarketingPagesController@whosPlaying']);
 
-    Route::post('/delete-account/{user}', ['as' => 'delete.account', 'uses' => 'AccountDeletionController@deleteAccount']);
-    Route::post('/reset-account/{user}', ['as' => 'reset.account', 'uses' => 'AccountDeletionController@resetAccount']);
+    Route::middleware('auth')->group(function () {
+        Route::post('/delete-account/{user}', ['as' => 'delete.account', 'uses' => 'AccountDeletionController@deleteAccount']);
+        Route::post('/reset-account/{user}', ['as' => 'reset.account', 'uses' => 'AccountDeletionController@resetAccount']);
+    });
 
 });
 

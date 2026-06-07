@@ -24,6 +24,10 @@ class AccountDeletionController extends Controller
 
     public function resetAccount(Request $request, User $user, CharacterDeletion $characterDeletion)
     {
+        if (auth()->user()->id !== $user->id) {
+            return redirect()->back()->with('error', 'You cannot do that.');
+        }
+
         $character = $user->character;
 
         $data = [

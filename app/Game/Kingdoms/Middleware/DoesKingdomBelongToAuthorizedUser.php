@@ -15,17 +15,25 @@ class DoesKingdomBelongToAuthorizedUser
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        $kingdom = $request->has('kingdom') ? $request->kingdom : null;
+        $kingdom = $request->route('kingdom');
 
         if (is_null($kingdom)) {
-            $building = $request->has('building') ? $request->building : null;
+            $building = $request->route('building');
 
             if (! is_null($building)) {
                 $kingdom = $building->kingdom;
             }
         }
 
-        $character = $request->has('character') ? $request->character : null;
+        if (is_null($kingdom)) {
+            $kingdomBuilding = $request->route('kingdomBuilding');
+
+            if (! is_null($kingdomBuilding)) {
+                $kingdom = $kingdomBuilding->kingdom;
+            }
+        }
+
+        $character = $request->route('character');
         $message = null;
 
         if (! is_null($kingdom)) {
@@ -37,7 +45,7 @@ class DoesKingdomBelongToAuthorizedUser
                 }
             } else {
                 // No character was passed in:
-                if (auth()->user()->character->id !== $kingdom->id) {
+                if (auth()->user()->character->id !== $kingdom->character_id) {
                     $message = 'Nope. Not allowed to do that.';
                 }
             }

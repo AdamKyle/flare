@@ -2,9 +2,13 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\SuggestionAndBugsFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SuggestionAndBugs extends Model {
+
+    use HasFactory;
 
     protected $table = 'suggestion_and_bugs';
 
@@ -37,5 +41,10 @@ class SuggestionAndBugs extends Model {
 
     public function character() {
         return $this->belongsTo(Character::class, 'character_id', 'id');
+    }
+
+    protected static function newFactory(): SuggestionAndBugsFactory
+    {
+        return SuggestionAndBugsFactory::new();
     }
 }

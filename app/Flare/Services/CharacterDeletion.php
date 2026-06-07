@@ -2,18 +2,32 @@
 
 namespace App\Flare\Services;
 
+use App\Flare\Models\BuildingExpansionQueue;
+use App\Flare\Models\CapitalCityBuildingCancellation;
+use App\Flare\Models\CapitalCityBuildingQueue;
+use App\Flare\Models\CapitalCityUnitCancellation;
+use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Character;
+use App\Flare\Models\CharacterInCelestialFight;
+use App\Flare\Models\DelveExploration;
+use App\Flare\Models\DelveLog;
+use App\Flare\Models\ExplorationLog;
+use App\Flare\Models\ExplorationWarning;
+use App\Flare\Models\FactionLoyaltyAutomation;
+use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GemBag;
+use App\Flare\Models\GlobalEventCraftingInventory;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\MarketBoard;
+use App\Flare\Models\RaidBossParticipation;
+use App\Flare\Models\SmeltingProgress;
 use App\Flare\Models\User;
 use App\Game\Character\CharacterCreation\Services\CharacterBuilderService;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 
 class CharacterDeletion
 {
@@ -122,7 +136,39 @@ class CharacterDeletion
 
     protected function deleteCharacter(Character $character): void
     {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        CharacterInCelestialFight::where('character_id', $character->id)->delete();
+
+        ExplorationLog::where('character_id', $character->id)->delete();
+        ExplorationWarning::where('character_id', $character->id)->delete();
+
+        DelveLog::where('character_id', $character->id)->delete();
+        DelveExploration::where('character_id', $character->id)->delete();
+
+        RaidBossParticipation::where('character_id', $character->id)->delete();
+
+        $this->deleteRaidParticipations($character);
+
+        $character->globalEventKills()->delete();
+        $character->globalEventCrafts()->delete();
+        $character->globalEventEnchants()->delete();
+        $character->globalEventParticipation()->delete();
+
+        $this->deleteGlobalEventCraftingInventories($character);
+
+        SmeltingProgress::where('character_id', $character->id)->delete();
+
+        $character->weeklyBattleFights()->delete();
+
+        BuildingExpansionQueue::where('character_id', $character->id)->delete();
+
+        CapitalCityBuildingCancellation::where('character_id', $character->id)->delete();
+        CapitalCityBuildingQueue::where('character_id', $character->id)->delete();
+
+        CapitalCityUnitCancellation::where('character_id', $character->id)->delete();
+        CapitalCityUnitQueue::where('character_id', $character->id)->delete();
+
+        FactionLoyaltyAutomationWarning::where('character_id', $character->id)->delete();
+        $this->deleteFactionLoyaltyAutomations($character);
 
         $character->skills()->delete();
 
@@ -161,8 +207,6 @@ class CharacterDeletion
         $character->map()->delete();
 
         $character->delete();
-
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 
     protected function deleteClassRanks(Character $character): void
@@ -171,5 +215,32 @@ class CharacterDeletion
             $classRank->weaponMasteries()->delete();
             $classRank->delete();
         }
+    }
+
+    protected function deleteRaidParticipations(Character $character): void
+    {
+        \DB::table('raid_participations')->where('character_id', $character->id)->delete();
+    }
+
+    protected function deleteGlobalEventCraftingInventories(Character $character): void
+    {
+        GlobalEventCraftingInventory::where('character_id', $character->id)
+            ->chunkById(100, function ($inventories) {
+                foreach ($inventories as $inventory) {
+                    $inventory->craftingSlots()->delete();
+                    $inventory->delete();
+                }
+            });
+    }
+
+    protected function deleteFactionLoyaltyAutomations(Character $character): void
+    {
+        FactionLoyaltyAutomation::where('character_id', $character->id)
+            ->chunkById(100, function ($automations) {
+                foreach ($automations as $automation) {
+                    $automation->log()->delete();
+                    $automation->delete();
+                }
+            });
     }
 }

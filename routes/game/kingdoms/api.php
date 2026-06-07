@@ -32,7 +32,7 @@ Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.
     Route::post('/kingdoms/{character}/purchase-npc-kingdom', ['as' => 'kingdoms.purchase.npc.kingdom', 'uses' => 'Api\NpcKingdomController@purchase']);
 });
 
-Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.are', 'kingdom.automation.blocked'])->group(function () {
+Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.are', 'character.owns.kingdom', 'kingdom.automation.blocked'])->group(function () {
     Route::post('/kingdoms/{character}/upgrade-building/{building}', ['as' => 'kingdoms.building.upgrade', 'uses' => 'Api\KingdomBuildingsController@upgradeKingdomBuilding']);
     Route::post('/kingdoms/building-upgrade/cancel', ['as' => 'kingdoms.building.queue.delete', 'uses' => 'Api\KingdomBuildingsController@removeKingdomBuildingFromQueue']);
     Route::post('/kingdoms/{character}/rebuild-building/{building}', ['as' => 'kingdoms.building.rebuild', 'uses' => 'Api\KingdomBuildingsController@rebuildKingdomBuilding']);
