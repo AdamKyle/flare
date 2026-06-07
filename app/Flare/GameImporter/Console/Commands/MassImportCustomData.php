@@ -39,8 +39,8 @@ class MassImportCustomData extends Command
     public function handle()
     {
 
-        Artisan::call('import:game-data Skills');
-        Artisan::call('clear:expired-character-boons');
+        Artisan::call('import:game-data Quests');
+        Artisan::call('create:quest-cache');
 
         $this->importInformationSection();
 
