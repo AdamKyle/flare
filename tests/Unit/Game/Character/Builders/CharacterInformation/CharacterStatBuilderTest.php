@@ -377,7 +377,7 @@ class CharacterStatBuilderTest extends TestCase
             'character_id' => $character->id,
             'item_id' => $boonAffectsAllStats->id,
             'started' => now(),
-            'complete' => now(),
+            'complete' => now()->addMinutes(10),
             'last_for_minutes' => 10,
             'amount_used' => 1,
         ]);
@@ -386,7 +386,7 @@ class CharacterStatBuilderTest extends TestCase
             'character_id' => $character->id,
             'item_id' => $boonAffectsStrStat->id,
             'started' => now(),
-            'complete' => now(),
+            'complete' => now()->addMinutes(10),
             'last_for_minutes' => 10,
             'amount_used' => 1,
         ]);
@@ -417,7 +417,7 @@ class CharacterStatBuilderTest extends TestCase
             'character_id' => $character->id,
             'item_id' => $boonAffectsAllStats->id,
             'started' => now(),
-            'complete' => now(),
+            'complete' => now()->addMinutes(10),
             'last_for_minutes' => 10,
             'amount_used' => 1,
         ]);
@@ -426,7 +426,7 @@ class CharacterStatBuilderTest extends TestCase
             'character_id' => $character->id,
             'item_id' => $boonAffectsStrStat->id,
             'started' => now(),
-            'complete' => now(),
+            'complete' => now()->addMinutes(10),
             'last_for_minutes' => 10,
             'amount_used' => 1,
         ]);

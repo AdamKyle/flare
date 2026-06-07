@@ -38,9 +38,6 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
-
-        Artisan::call('import:game-data Skills');
-
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
