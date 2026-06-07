@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Console\AfterDeployment\AddHolyStacksToItems;
 use App\Console\AfterDeployment\AllowTraverseForMaps;
 use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
+use App\Console\AfterDeployment\CreateLocationDataCache;
 use App\Console\AfterDeployment\CreateMonsterCache;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
 use App\Console\DevelopmentCommands\CompleteGuideQuestForCharacter;
@@ -40,6 +41,7 @@ class AppServiceProvider extends ServiceProvider
             AllowTraverseForMaps::class,
             AssignNewNpcsToFactionLoyalty::class,
             CreateMonsterCache::class,
+            CreateLocationDataCache::class,
 
             // Development Commands:
             CreateCharacter::class,
