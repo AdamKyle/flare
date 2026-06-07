@@ -491,7 +491,7 @@ class BattleDropTest extends TestCase
         ])->refresh();
 
         SellItemCalculator::shouldReceive('fetchSalePriceWithAffixes')
-            ->once()
+            ->twice()
             ->andReturn(1);
 
         $randomItemDropBuilder = Mockery::mock(RandomItemDropBuilder::class);
@@ -508,6 +508,7 @@ class BattleDropTest extends TestCase
 
         $this->assertNull($battleDrop->handleDrop($character, true, false));
         $this->assertSame(0, $character->refresh()->inventory->slots()->count());
+        $this->assertEquals(1, $battleDrop->rewardTotals()['auto_sold_gold']);
     }
 
     public function testHandleDropAutoDisenchantDoesNothingWhenAmountIsUnknown(): void
