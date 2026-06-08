@@ -76,7 +76,6 @@ class CharacterRewardService
     /**
      * Give currencies.
      *
-     * @return array
      * @throws Exception
      */
     public function giveCurrencies(Monster $monster, $totalKills = 1): array

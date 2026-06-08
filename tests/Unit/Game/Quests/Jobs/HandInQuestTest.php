@@ -41,7 +41,7 @@ class HandInQuestTest extends TestCase
 
         $this->assertEquals(1, $character->fresh()->questsCompleted()->where('quest_id', $quest->id)->count());
         Event::assertDispatched(GlobalMessageEvent::class, function (GlobalMessageEvent $event) use ($character, $quest, $npc): bool {
-            return $event->message === $character->name . ' Has completed a quest (' . $quest->name . ') for: ' . $npc->real_name . ' and been rewarded with a godly gift!';
+            return $event->message === $character->name.' Has completed a quest ('.$quest->name.') for: '.$npc->real_name.' and been rewarded with a godly gift!';
         });
     }
 

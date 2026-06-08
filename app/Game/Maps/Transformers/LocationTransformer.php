@@ -27,7 +27,7 @@ class LocationTransformer extends TransformerAbstract
             'is_port' => $location->is_port,
             'can_players_enter' => $location->can_players_enter,
             'increases_enemy_stats_by' => is_null($location->enemy_strength_type) ? null : LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type),
-            'increase_enemy_percentage_by' => is_null($location->enemy_strength_type) ? null :  LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type),
+            'increase_enemy_percentage_by' => is_null($location->enemy_strength_type) ? null : LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type),
             'can_auto_battle' => $location->can_auto_battle,
             'x' => $location->x,
             'y' => $location->y,
@@ -43,7 +43,8 @@ class LocationTransformer extends TransformerAbstract
         ];
     }
 
-    private function getLocationTypeName(Location $location): ?string {
+    private function getLocationTypeName(Location $location): ?string
+    {
 
         if (is_null($location->type)) {
             return null;
@@ -82,7 +83,8 @@ class LocationTransformer extends TransformerAbstract
         return null;
     }
 
-    private function getRequiredItemName(Location $location): ?string {
+    private function getRequiredItemName(Location $location): ?string
+    {
         if (is_null($location->required_quest_item_id)) {
             return null;
         }

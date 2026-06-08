@@ -9,12 +9,12 @@ use App\Flare\Models\Location;
 use App\Flare\Models\Raid;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Models\ScheduledEventConfiguration;
-use App\Game\Messages\Events\DeleteAnnouncementEvent;
-use App\Game\Raids\Values\RaidType;
-use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Events\Values\EventType;
+use App\Game\Messages\Events\DeleteAnnouncementEvent;
+use App\Game\Raids\Values\RaidType;
 use Carbon\Carbon;
+use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 
 class EventSchedulerService
 {
@@ -76,7 +76,7 @@ class EventSchedulerService
             $gameMapIds = $this->getGameMapIdsForRaid($raid);
             $raidIdsOnSameMaps = $this->getRaidIdsOnSameMaps($gameMapIds);
 
-            $hasOverlap = !empty($raidIdsOnSameMaps) && ScheduledEvent::query()
+            $hasOverlap = ! empty($raidIdsOnSameMaps) && ScheduledEvent::query()
                 ->whereIn('raid_id', $raidIdsOnSameMaps)
                 ->where('id', '!=', $scheduledEvent->id)
                 ->where('start_date', '<', $childEndDate)
@@ -113,9 +113,9 @@ class EventSchedulerService
         if ($scheduledEvent->currently_running) {
             $event = Event::where('type', $params['selected_event_type'])->first();
 
-            if (!is_null($event)) {
+            if (! is_null($event)) {
                 $event->update([
-                    'ends_at' => $params['selected_end_date']
+                    'ends_at' => $params['selected_end_date'],
                 ]);
 
                 $announcement = Announcement::where('event_id', $event->id)->first();
@@ -193,7 +193,7 @@ class EventSchedulerService
         event(new UpdateScheduledEvents($this->fetchEvents()));
     }
 
-    public function generateFutureRaid(ScheduledEvent $scheduledRaidEvent, Carbon $futureDate = null): void
+    public function generateFutureRaid(ScheduledEvent $scheduledRaidEvent, ?Carbon $futureDate = null): void
     {
 
         $raid = $scheduledRaidEvent->raid;
@@ -216,27 +216,29 @@ class EventSchedulerService
         $raidIdsOnSameMaps = $this->getRaidIdsOnSameMaps($gameMapIds);
 
         if ($raidEvents->isEmpty()) {
-            $hasSameMapRaidInWindow = !empty($raidIdsOnSameMaps) && ScheduledEvent::query()
+            $hasSameMapRaidInWindow = ! empty($raidIdsOnSameMaps) && ScheduledEvent::query()
                 ->whereIn('raid_id', $raidIdsOnSameMaps)
                 ->where('start_date', '<', $endDate)
                 ->where('end_date', '>', $startDate)
                 ->exists();
 
-            if (!$hasSameMapRaidInWindow) {
+            if (! $hasSameMapRaidInWindow) {
                 $params = [
                     'selected_event_type' => $scheduledRaidEvent->event_type,
                     'selected_start_date' => $startDate,
                     'selected_raid' => $raid->id,
                     'selected_end_date' => $endDate,
                     'event_description' => $scheduledRaidEvent->description,
-                    'raids_for_event' => $scheduledRaidEvent->raids_for_event
+                    'raids_for_event' => $scheduledRaidEvent->raids_for_event,
                 ];
 
                 $this->createEvent($params);
+
                 return;
             }
 
             $this->generateFutureRaid($scheduledRaidEvent, $endDate->copy());
+
             return;
         }
 
@@ -246,7 +248,7 @@ class EventSchedulerService
             $shiftedLastRaidStartDate = $lastRaidEvent->end_date->copy()->addHour();
             $shiftedLastRaidEndDate = $shiftedLastRaidStartDate->copy()->addMonth();
 
-            $hasRaidInShiftedWindow = !empty($raidIdsOnSameMaps) && ScheduledEvent::query()
+            $hasRaidInShiftedWindow = ! empty($raidIdsOnSameMaps) && ScheduledEvent::query()
                 ->whereIn('raid_id', $raidIdsOnSameMaps)
                 ->where('start_date', '<', $shiftedLastRaidEndDate)
                 ->where('end_date', '>', $shiftedLastRaidStartDate)
@@ -259,14 +261,16 @@ class EventSchedulerService
                     'selected_raid' => $scheduledRaidEvent->raid_id,
                     'selected_end_date' => $shiftedLastRaidEndDate,
                     'event_description' => $scheduledRaidEvent->description,
-                    'raids_for_event' => $scheduledRaidEvent->raids_for_event
+                    'raids_for_event' => $scheduledRaidEvent->raids_for_event,
                 ];
 
                 $this->createEvent($params);
+
                 return;
             }
 
             $this->generateFutureRaid($scheduledRaidEvent, $shiftedLastRaidStartDate->copy()->addMonth());
+
             return;
         }
 
@@ -275,7 +279,7 @@ class EventSchedulerService
         $shiftedStartDate = $existingRaidEvent->end_date->copy()->addHour();
         $shiftedEndDate = $shiftedStartDate->copy()->addMonth();
 
-        $hasRaidInShiftedWindow = !empty($raidIdsOnSameMaps) && ScheduledEvent::query()
+        $hasRaidInShiftedWindow = ! empty($raidIdsOnSameMaps) && ScheduledEvent::query()
             ->whereIn('raid_id', $raidIdsOnSameMaps)
             ->where('start_date', '<', $shiftedEndDate)
             ->where('end_date', '>', $shiftedStartDate)
@@ -288,7 +292,7 @@ class EventSchedulerService
                 'selected_raid' => $scheduledRaidEvent->raid_id,
                 'selected_end_date' => $shiftedEndDate,
                 'event_description' => $scheduledRaidEvent->description,
-                'raids_for_event' => $scheduledRaidEvent->raids_for_event
+                'raids_for_event' => $scheduledRaidEvent->raids_for_event,
             ];
 
             $this->createEvent($params);
@@ -329,7 +333,7 @@ class EventSchedulerService
         }
 
         if ($type->isWeeklyCurrencyDrops()) {
-            return 'For the next 24 hours you just have to kill creatures for Gold Dust,' .
+            return 'For the next 24 hours you just have to kill creatures for Gold Dust,'.
                 'Shards and Copper Coins (provided you have the quest item) will drop at a rate of 1-50 per kill! How fun!';
         }
 

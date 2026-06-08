@@ -14,7 +14,7 @@ class CompletedQuestControllerTest extends TestCase
 {
     use CreateItem, CreateNpc, CreateQuest, RefreshDatabase;
 
-    public function testOwnerCanViewCompletedQuest(): void
+    public function test_owner_can_view_completed_quest(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $completedQuest = $this->completedQuestFor($character->id);
@@ -28,7 +28,7 @@ class CompletedQuestControllerTest extends TestCase
         $response->assertSee($completedQuest->quest->name);
     }
 
-    public function testCharacterCannotViewAnotherCharactersCompletedQuest(): void
+    public function test_character_cannot_view_another_characters_completed_quest(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $otherCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();

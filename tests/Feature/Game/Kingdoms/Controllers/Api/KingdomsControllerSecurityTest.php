@@ -10,7 +10,7 @@ class KingdomsControllerSecurityTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testOwnerRenameUpdatesOnlyKingdomName(): void
+    public function test_owner_rename_updates_only_kingdom_name(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom([

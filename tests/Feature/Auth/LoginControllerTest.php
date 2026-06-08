@@ -10,7 +10,7 @@ class LoginControllerTest extends TestCase
 {
     use CreateUser, RefreshDatabase;
 
-    public function testLoginPasswordInputUsesCurrentPasswordAutocomplete(): void
+    public function test_login_password_input_uses_current_password_autocomplete(): void
     {
         $response = $this->call('GET', '/login');
 
@@ -18,7 +18,7 @@ class LoginControllerTest extends TestCase
         $response->assertDontSee('<input id="password" type="password" class="form-control" name="password" required autocomplete="new-password" autofocus>', false);
     }
 
-    public function testExistingUserCanLoginWithCorrectPassword(): void
+    public function test_existing_user_can_login_with_correct_password(): void
     {
         $user = $this->createUser([
             'email' => 'login-test@example.com',
@@ -33,7 +33,7 @@ class LoginControllerTest extends TestCase
         $this->seeIsAuthenticatedAs($user);
     }
 
-    public function testUserMarkedForDeletionCanLoginAndDeletionFlagIsCleared(): void
+    public function test_user_marked_for_deletion_can_login_and_deletion_flag_is_cleared(): void
     {
         $user = $this->createUser([
             'email' => 'login-test@example.com',
@@ -50,7 +50,7 @@ class LoginControllerTest extends TestCase
         $this->assertFalse($user->refresh()->will_be_deleted);
     }
 
-    public function testExistingUserCannotLoginWithWrongPassword(): void
+    public function test_existing_user_cannot_login_with_wrong_password(): void
     {
         $this->createUser([
             'email' => 'login-test@example.com',

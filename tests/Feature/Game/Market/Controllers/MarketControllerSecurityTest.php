@@ -16,7 +16,7 @@ class MarketControllerSecurityTest extends TestCase
 {
     use CreateItem, RefreshDatabase;
 
-    public function testFailedPurchaseForFullInventoryUnlocksListing(): void
+    public function test_failed_purchase_for_full_inventory_unlocks_listing(): void
     {
         [$buyer, $listing] = $this->marketScenario([
             'gold' => 1000,
@@ -32,7 +32,7 @@ class MarketControllerSecurityTest extends TestCase
         $this->assertFalse($listing->refresh()->is_locked);
     }
 
-    public function testFailedPurchaseForLowGoldUnlocksListing(): void
+    public function test_failed_purchase_for_low_gold_unlocks_listing(): void
     {
         [$buyer, $listing] = $this->marketScenario([
             'gold' => 0,
@@ -48,7 +48,7 @@ class MarketControllerSecurityTest extends TestCase
         $this->assertFalse($listing->refresh()->is_locked);
     }
 
-    public function testFailedBuyAndReplaceForFullInventoryUnlocksListing(): void
+    public function test_failed_buy_and_replace_for_full_inventory_unlocks_listing(): void
     {
         [$buyer, $listing] = $this->marketScenario([
             'gold' => 1000,
@@ -65,7 +65,7 @@ class MarketControllerSecurityTest extends TestCase
         $this->assertFalse($listing->refresh()->is_locked);
     }
 
-    public function testFailedBuyAndReplaceForLowGoldUnlocksListing(): void
+    public function test_failed_buy_and_replace_for_low_gold_unlocks_listing(): void
     {
         [$buyer, $listing] = $this->marketScenario([
             'gold' => 0,
@@ -82,7 +82,7 @@ class MarketControllerSecurityTest extends TestCase
         $this->assertFalse($listing->refresh()->is_locked);
     }
 
-    public function testFailedBuyAndReplaceRollsBackPurchaseAndUnlocksListing(): void
+    public function test_failed_buy_and_replace_rolls_back_purchase_and_unlocks_listing(): void
     {
         [$buyer, $listing] = $this->marketScenario([
             'gold' => 1000,

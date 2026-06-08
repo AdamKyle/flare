@@ -38,9 +38,6 @@ class RestartGlobalEventGoal extends Command
 
     /**
      * Handle restarting the global event.
-     *
-     * @param EventGoalsService $eventGoalsService
-     * @return void
      */
     public function handle(EventGoalsService $eventGoalsService): void
     {
@@ -93,11 +90,6 @@ class RestartGlobalEventGoal extends Command
 
     /**
      * Update the characters global map events
-     *
-     * @param EventGoalsService $eventGoalsService
-     * @param GlobalEventGoal $globalEventGoal
-     * @param array $characterIds
-     * @return void
      */
     private function updateCharactersGlobalMapEvents(EventGoalsService $eventGoalsService, GlobalEventGoal $globalEventGoal, array $characterIds): void
     {
@@ -122,9 +114,6 @@ class RestartGlobalEventGoal extends Command
 
     /**
      * Handle regular global event
-     *
-     * @param GlobalEventGoal $globalEventGoal
-     * @return void
      */
     private function handleRegularGlobalEvent(GlobalEventGoal $globalEventGoal): void
     {
@@ -138,16 +127,13 @@ class RestartGlobalEventGoal extends Command
         $globalEvent->globalEventKills()->truncate();
 
         event(new GlobalMessageEvent(
-            'Global Event Goal for: ' . $globalEvent->eventType()->getNameForEvent() . ' Players can now participate again and earn
+            'Global Event Goal for: '.$globalEvent->eventType()->getNameForEvent().' Players can now participate again and earn
             Rewards for meeting the various phases! How exciting!'
         ));
     }
 
     /**
      * USet up the base global event
-     *
-     * @param Event $event
-     * @return void
      */
     private function handleStepBaseGlobalEvent(Event $event): void
     {
@@ -193,20 +179,16 @@ class RestartGlobalEventGoal extends Command
 
         $gameMap = GameMap::where('only_during_event_type', $event->type)->first();
 
-        event(new GlobalMessageEvent('Global Event Goal for: ' . $globalEventGoal->eventType()->getNameForEvent() .
-            ' Players can now participate in the new step: ' . strtoupper($newStep) . '! How exciting!'));
-        event(new GlobalMessageEvent('Players can participate by going to the map: ' . $gameMap->name .
-            ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile)' . ' ' .
-            'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items.' .
+        event(new GlobalMessageEvent('Global Event Goal for: '.$globalEventGoal->eventType()->getNameForEvent().
+            ' Players can now participate in the new step: '.strtoupper($newStep).'! How exciting!'));
+        event(new GlobalMessageEvent('Players can participate by going to the map: '.$gameMap->name.
+            ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile)'.' '.
+            'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items.'.
             ' You can see the event goal for the map specified by being on the map and clicking the Event Goal tab from the map.'));
     }
 
     /**
      * Setup delusional memories additional event goals.
-     *
-     * @param string $newStep
-     * @param array $globalEventGoalData
-     * @return array
      */
     private function setUpDelusionalMemoriesAdditionalEventGoals(string $newStep, array $globalEventGoalData): array
     {

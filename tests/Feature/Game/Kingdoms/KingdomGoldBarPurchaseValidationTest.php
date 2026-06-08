@@ -18,7 +18,7 @@ class KingdomGoldBarPurchaseValidationTest extends TestCase
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->assignBuilding(['name' => BuildingCosts::GOBLIN_COIN_BANK], ['level' => 5])->getKingdom();
         $character = $characterFactory->getCharacter();
 
-        $response = $this->actingAs($character->user)->call('POST', '/api/kingdoms/purchase-gold-bars/' . $kingdom->id, [
+        $response = $this->actingAs($character->user)->call('POST', '/api/kingdoms/purchase-gold-bars/'.$kingdom->id, [
             'amount_to_purchase' => -1,
         ]);
 
@@ -31,7 +31,7 @@ class KingdomGoldBarPurchaseValidationTest extends TestCase
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->assignBuilding(['name' => BuildingCosts::GOBLIN_COIN_BANK], ['level' => 5])->getKingdom();
         $character = $characterFactory->getCharacter();
 
-        $response = $this->actingAs($character->user)->call('POST', '/api/kingdoms/purchase-gold-bars/' . $kingdom->id, [
+        $response = $this->actingAs($character->user)->call('POST', '/api/kingdoms/purchase-gold-bars/'.$kingdom->id, [
             'amount_to_purchase' => 0,
         ]);
 
@@ -44,7 +44,7 @@ class KingdomGoldBarPurchaseValidationTest extends TestCase
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->assignBuilding(['name' => BuildingCosts::GOBLIN_COIN_BANK], ['level' => 5])->getKingdom();
         $character = $characterFactory->getCharacter();
 
-        $this->actingAs($character->user)->call('POST', '/api/kingdoms/purchase-gold-bars/' . $kingdom->id, [
+        $this->actingAs($character->user)->call('POST', '/api/kingdoms/purchase-gold-bars/'.$kingdom->id, [
             'amount_to_purchase' => -1,
         ]);
 
@@ -60,7 +60,7 @@ class KingdomGoldBarPurchaseValidationTest extends TestCase
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->assignBuilding(['name' => BuildingCosts::GOBLIN_COIN_BANK], ['level' => 5])->getKingdom();
         $character = $characterFactory->getCharacter();
 
-        $response = $this->actingAs($character->user)->call('POST', '/api/kingdoms/purchase-gold-bars/' . $kingdom->id, [
+        $response = $this->actingAs($character->user)->call('POST', '/api/kingdoms/purchase-gold-bars/'.$kingdom->id, [
             'amount_to_purchase' => 1,
         ]);
 

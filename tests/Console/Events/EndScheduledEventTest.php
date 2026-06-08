@@ -41,17 +41,17 @@ class EndScheduledEventTest extends TestCase
         CreateScheduledEvent,
         RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
 
-    public function testSetScheduledEventCurrentlyRunningAsFalseWhenNoEventExistsForIt()
+    public function test_set_scheduled_event_currently_running_as_false_when_no_event_exists_for_it()
     {
         $this->deleteOtherGameMaps();
 
@@ -93,7 +93,7 @@ class EndScheduledEventTest extends TestCase
         $this->assertFalse($scheduledEvent->refresh()->currently_running);
     }
 
-    public function testEndRaidEvent()
+    public function test_end_raid_event()
     {
         $this->deleteOtherGameMaps();
 
@@ -146,7 +146,7 @@ class EndScheduledEventTest extends TestCase
         $this->assertFalse($scheduledEvent->refresh()->currently_running);
     }
 
-    public function testEndWeeklyCurrencyEvent()
+    public function test_end_weekly_currency_event()
     {
         $this->deleteOtherGameMaps();
 
@@ -173,7 +173,7 @@ class EndScheduledEventTest extends TestCase
         $this->assertFalse($scheduledEvent->refresh()->currently_running);
     }
 
-    public function testEndWeeklyCelestialEvent()
+    public function test_end_weekly_celestial_event()
     {
         $this->deleteOtherGameMaps();
 
@@ -200,7 +200,7 @@ class EndScheduledEventTest extends TestCase
         $this->assertFalse($scheduledEvent->refresh()->currently_running);
     }
 
-    public function testEndWeeklyFactionLoyaltyEvent()
+    public function test_end_weekly_faction_loyalty_event()
     {
         $this->deleteOtherGameMaps();
 
@@ -227,7 +227,7 @@ class EndScheduledEventTest extends TestCase
         $this->assertFalse($scheduledEvent->refresh()->currently_running);
     }
 
-    public function testEndsEventsRunningWhenNoScheduledEventsAreRunning()
+    public function test_ends_events_running_when_no_scheduled_events_are_running()
     {
         $this->deleteOtherGameMaps();
 
@@ -254,7 +254,7 @@ class EndScheduledEventTest extends TestCase
         $this->assertEquals(0, Announcement::count());
     }
 
-    public function testEndWinterEvent()
+    public function test_end_winter_event()
     {
         $this->deleteOtherGameMaps();
 
@@ -322,7 +322,7 @@ class EndScheduledEventTest extends TestCase
         $this->assertEmpty(Announcement::all());
     }
 
-    public function testEndDelusionalMemoriesEvent()
+    public function test_end_delusional_memories_event()
     {
         $this->deleteOtherGameMaps();
 
@@ -390,7 +390,7 @@ class EndScheduledEventTest extends TestCase
         $this->assertEmpty(Announcement::all());
     }
 
-    public function testEndWinterEventWhilePledgedToFactionAndHelpingNPc()
+    public function test_end_winter_event_while_pledged_to_faction_and_helping_n_pc()
     {
         $this->deleteOtherGameMaps();
 
@@ -498,7 +498,7 @@ class EndScheduledEventTest extends TestCase
         $this->assertEmpty(Announcement::all());
     }
 
-    public function testWinterEventClearsPledgeStateForCharacterNotOnEventMap(): void
+    public function test_winter_event_clears_pledge_state_for_character_not_on_event_map(): void
     {
         $this->deleteOtherGameMaps();
 
@@ -572,7 +572,7 @@ class EndScheduledEventTest extends TestCase
         $this->assertFalse($scheduledEvent->refresh()->currently_running);
     }
 
-    public function testEndWinterEventWhileNFactionLoayltyExists()
+    public function test_end_winter_event_while_n_faction_loaylty_exists()
     {
         $this->deleteOtherGameMaps();
 

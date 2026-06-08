@@ -16,7 +16,7 @@ class WalkingServiceAdjacentMovementTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Cache::forget('celestial-spawn-rate');
         Cache::forget('monsters');
@@ -25,7 +25,7 @@ class WalkingServiceAdjacentMovementTest extends TestCase
         parent::tearDown();
     }
 
-    public function testPlayerCanMoveOneValidAdjacentTile(): void
+    public function test_player_can_move_one_valid_adjacent_tile(): void
     {
         $this->instance(
             MapTileValue::class,
@@ -51,7 +51,7 @@ class WalkingServiceAdjacentMovementTest extends TestCase
         $this->assertEquals(32, $character->refresh()->map->character_position_x);
     }
 
-    public function testPlayerCannotPostFarCoordinatesOnSameMap(): void
+    public function test_player_cannot_post_far_coordinates_on_same_map(): void
     {
         $this->instance(
             MapTileValue::class,
@@ -76,7 +76,7 @@ class WalkingServiceAdjacentMovementTest extends TestCase
         $this->assertEquals(422, $response['status']);
     }
 
-    public function testRejectedFarMovementDoesNotChangeCharacterMapPosition(): void
+    public function test_rejected_far_movement_does_not_change_character_map_position(): void
     {
         $this->instance(
             MapTileValue::class,
@@ -101,7 +101,7 @@ class WalkingServiceAdjacentMovementTest extends TestCase
         $this->assertEquals(16, $character->refresh()->map->character_position_y);
     }
 
-    public function testBlockedInvalidTerrainRemainsBlocked(): void
+    public function test_blocked_invalid_terrain_remains_blocked(): void
     {
         $this->instance(
             MapTileValue::class,

@@ -69,7 +69,7 @@ class NpcQuestRewardHandlerTest extends TestCase
             return $event->message === 'You have unlocked access to Capital Cities.';
         });
         Event::assertDispatched(GlobalMessageEvent::class, function (GlobalMessageEvent $event) use ($character): bool {
-            return $event->message === $character->name . ' has unlocked access to Capital Cities!';
+            return $event->message === $character->name.' has unlocked access to Capital Cities!';
         });
         $this->assertEquals(0, $character->fresh()->questsCompleted()->where('quest_id', $quest->id)->count());
     }
@@ -97,7 +97,7 @@ class NpcQuestRewardHandlerTest extends TestCase
             return $event->message === 'You have unlocked Gold Bar management for your Capital City.';
         });
         Event::assertDispatched(GlobalMessageEvent::class, function (GlobalMessageEvent $event) use ($character): bool {
-            return $event->message === $character->name . ' has unlocked Capital City Gold Bar management!';
+            return $event->message === $character->name.' has unlocked Capital City Gold Bar management!';
         });
         $this->assertEquals(0, $character->fresh()->questsCompleted()->where('quest_id', $quest->id)->count());
     }

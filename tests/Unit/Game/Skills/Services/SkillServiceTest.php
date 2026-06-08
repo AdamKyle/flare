@@ -17,7 +17,7 @@ use Tests\Traits\CreateItem;
 
 class SkillServiceTest extends TestCase
 {
-    use CreateClass, CreateGameSkill, CreateEvent, CreateItem, RefreshDatabase;
+    use CreateClass, CreateEvent, CreateGameSkill, CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -25,7 +25,7 @@ class SkillServiceTest extends TestCase
 
     private ?GameSkill $skill;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -42,7 +42,7 @@ class SkillServiceTest extends TestCase
         $this->skillService = resolve(SkillService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -51,19 +51,19 @@ class SkillServiceTest extends TestCase
         $this->skillService = null;
     }
 
-    public function testGetSkills()
+    public function test_get_skills()
     {
         $this->assertNotEmpty($this->skillService->getSkills($this->character->getCharacter(), [
             $this->skill->id,
         ]));
     }
 
-    public function testGetSpecificSkill()
+    public function test_get_specific_skill()
     {
         $this->assertNotEmpty($this->skillService->getSkill($this->character->getCharacter()->skills->first()));
     }
 
-    public function testFailToTrainSkillThatDoesntExist()
+    public function test_fail_to_train_skill_that_doesnt_exist()
     {
         $character = $this->character->getCharacter();
 
@@ -73,7 +73,7 @@ class SkillServiceTest extends TestCase
         $this->assertEquals('Invalid Input.', $result['message']);
     }
 
-    public function testTrainSkill()
+    public function test_train_skill()
     {
         $character = $this->character->getCharacter();
         $skillToTrain = $character->skills->first();
@@ -86,10 +86,10 @@ class SkillServiceTest extends TestCase
         $this->assertTrue($skillToTrain->currently_training);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('You are now training: ' . $skillToTrain->name, $result['message']);
+        $this->assertEquals('You are now training: '.$skillToTrain->name, $result['message']);
     }
 
-    public function testSwitchTrainingSkills()
+    public function test_switch_training_skills()
     {
         $secondarySkill = $this->createGameSkill([
             'name' => 'skill',
@@ -117,10 +117,10 @@ class SkillServiceTest extends TestCase
         $this->assertFalse($secondarySkillTraining->currently_training);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('You are now training: ' . $skillToTrain->name, $result['message']);
+        $this->assertEquals('You are now training: '.$skillToTrain->name, $result['message']);
     }
 
-    public function testDoNotAssignXpToASkillThatDoesntExist()
+    public function test_do_not_assign_xp_to_a_skill_that_doesnt_exist()
     {
         $character = $this->character->getCharacter();
 
@@ -131,7 +131,7 @@ class SkillServiceTest extends TestCase
         $this->assertNotEquals(10, $skill->xp);
     }
 
-    public function testDoNotAssignXpToMaxLevelSkill()
+    public function test_do_not_assign_xp_to_max_level_skill()
     {
         $character = $this->character->getCharacter();
 
@@ -149,7 +149,7 @@ class SkillServiceTest extends TestCase
         $this->assertNotEquals(10, $skill->xp);
     }
 
-    public function testAssignXpToSkill()
+    public function test_assign_xp_to_skill()
     {
         $character = $this->character->getCharacter();
 
@@ -169,7 +169,7 @@ class SkillServiceTest extends TestCase
         $this->assertGreaterThan(10, $skill->xp);
     }
 
-    public function testLevelSkill()
+    public function test_level_skill()
     {
         Event::fake();
 
@@ -193,7 +193,7 @@ class SkillServiceTest extends TestCase
         Event::assertDispatched(SkillLeveledUpServerMessageEvent::class);
     }
 
-    public function testLevelSkillWhereSkillBonusWillNotGoAboveOne()
+    public function test_level_skill_where_skill_bonus_will_not_go_above_one()
     {
         Event::fake();
 
@@ -218,7 +218,7 @@ class SkillServiceTest extends TestCase
         Event::assertDispatched(SkillLeveledUpServerMessageEvent::class);
     }
 
-    public function testCraftSkillDoesNotGetXpBecauseItsMaxLevel()
+    public function test_craft_skill_does_not_get_xp_because_its_max_level()
     {
         $craftingSkill = $this->createGameSkill([
             'type' => SkillTypeValue::CRAFTING->value,
@@ -233,7 +233,7 @@ class SkillServiceTest extends TestCase
         $this->assertEquals(0, $skill->refresh()->xp);
     }
 
-    public function testAssignXpToRegularSkillAndLevelItUp()
+    public function test_assign_xp_to_regular_skill_and_level_it_up()
     {
         $craftingSkill = $this->createGameSkill([
             'type' => SkillTypeValue::TRAINING->value,
@@ -250,7 +250,7 @@ class SkillServiceTest extends TestCase
         $this->assertGreaterThan(1, $skill->refresh()->level);
     }
 
-    public function testAssignXpToRegularSkillAndDoNotLevelItUpWhenMaxed()
+    public function test_assign_xp_to_regular_skill_and_do_not_level_it_up_when_maxed()
     {
         $craftingSkill = $this->createGameSkill([
             'type' => SkillTypeValue::TRAINING->value,
@@ -269,7 +269,7 @@ class SkillServiceTest extends TestCase
         $this->assertEquals(0, $skill->refresh()->xp);
     }
 
-    public function testAssignXpToRegularSkillAndDoNotLevelItBeyondLevel400()
+    public function test_assign_xp_to_regular_skill_and_do_not_level_it_beyond_level400()
     {
         $craftingSkill = $this->createGameSkill([
             'type' => SkillTypeValue::TRAINING->value,
@@ -288,7 +288,7 @@ class SkillServiceTest extends TestCase
         $this->assertEquals(0, $skill->refresh()->xp);
     }
 
-    public function testGetSkillUsesClampedLevelWhenSkillIsAboveMaxLevel()
+    public function test_get_skill_uses_clamped_level_when_skill_is_above_max_level()
     {
         $character = $this->character->getCharacter();
 
@@ -309,7 +309,7 @@ class SkillServiceTest extends TestCase
         $this->assertSame(1.0, $result['skill_bonus']);
     }
 
-    public function testGetSkillStacksBoonSkillBonusByAmountUsed()
+    public function test_get_skill_stacks_boon_skill_bonus_by_amount_used()
     {
         $character = $this->character->getCharacter();
 
@@ -345,7 +345,7 @@ class SkillServiceTest extends TestCase
         $this->assertEqualsWithDelta(0.60, $result['skill_bonus'], 0.00001);
     }
 
-    public function testGetSkillStacksBoonSkillTrainingBonusByAmountUsed()
+    public function test_get_skill_stacks_boon_skill_training_bonus_by_amount_used()
     {
         $character = $this->character->getCharacter();
 
@@ -371,7 +371,7 @@ class SkillServiceTest extends TestCase
         $this->assertEqualsWithDelta(0.60, $result['skill_xp_bonus'], 0.00001);
     }
 
-    public function testGetSkillStacksBoonBaseDamageModByAmountUsed()
+    public function test_get_skill_stacks_boon_base_damage_mod_by_amount_used()
     {
         $character = $this->character->getCharacter();
 

@@ -710,7 +710,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $this->assertSame(2000, $kingdom->refresh()->current_wood);
     }
 
-    public function testNonOwnerCannotUpgradeBuildingThatBelongsToAnotherCharacter(): void
+    public function test_non_owner_cannot_upgrade_building_that_belongs_to_another_character(): void
     {
         Queue::fake();
 
@@ -740,7 +740,7 @@ class KingdomBuildingsControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($nonOwner->user)
-            ->call('POST', '/api/kingdoms/' . $nonOwner->id . '/upgrade-building/' . $building->id, [
+            ->call('POST', '/api/kingdoms/'.$nonOwner->id.'/upgrade-building/'.$building->id, [
                 'to_level' => 2,
             ], [], [], ['HTTP_ACCEPT' => 'application/json']);
 
@@ -755,7 +755,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $this->assertSame(2000, $kingdom->refresh()->current_population);
     }
 
-    public function testNonOwnerCannotRebuildBuildingThatBelongsToAnotherCharacter(): void
+    public function test_non_owner_cannot_rebuild_building_that_belongs_to_another_character(): void
     {
         Queue::fake();
 
@@ -784,7 +784,7 @@ class KingdomBuildingsControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($nonOwner->user)
-            ->call('POST', '/api/kingdoms/' . $nonOwner->id . '/rebuild-building/' . $building->id,
+            ->call('POST', '/api/kingdoms/'.$nonOwner->id.'/rebuild-building/'.$building->id,
                 [], [], [], ['HTTP_ACCEPT' => 'application/json']
             );
 
@@ -799,7 +799,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $this->assertSame(2000, $kingdom->refresh()->current_population);
     }
 
-    public function testNonOwnerCannotCancelAnotherCharactersQueueEntry(): void
+    public function test_non_owner_cannot_cancel_another_characters_queue_entry(): void
     {
         $ownerFactory = (new CharacterFactory)
             ->createBaseCharacter()

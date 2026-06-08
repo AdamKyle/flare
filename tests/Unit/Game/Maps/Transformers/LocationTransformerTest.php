@@ -13,7 +13,7 @@ class LocationTransformerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testTransformIncludesQuestRewardItem(): void
+    public function test_transform_includes_quest_reward_item(): void
     {
         $gameMap = GameMap::factory()->create();
         $questRewardItem = Item::factory()->create([
@@ -32,7 +32,7 @@ class LocationTransformerTest extends TestCase
         ], $result['quest_reward_item']);
     }
 
-    public function testTransformIncludesNullQuestRewardItem(): void
+    public function test_transform_includes_null_quest_reward_item(): void
     {
         $gameMap = GameMap::factory()->create();
         $location = Location::factory()->create([
@@ -45,7 +45,7 @@ class LocationTransformerTest extends TestCase
         $this->assertNull($result['quest_reward_item']);
     }
 
-    public function testTransformIncludesGameMapName(): void
+    public function test_transform_includes_game_map_name(): void
     {
         $gameMap = GameMap::factory()->create([
             'name' => 'Test Map',

@@ -43,6 +43,7 @@ use App\Flare\Models\User;
 use App\Flare\Models\UserLoginDuration;
 use App\Flare\Models\WeeklyMonsterFight;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class CleanDanglingCharacterData extends Command
@@ -157,10 +158,11 @@ class CleanDanglingCharacterData extends Command
             ->whereNotIn('character_id', $existingCharacterIds)
             ->count();
 
-        $label = (new SuggestionAndBugs)->getTable() . '.character_id → null';
+        $label = (new SuggestionAndBugs)->getTable().'.character_id → null';
 
         if ($orphanCount === 0) {
             $this->line(sprintf('  %-60s %d', $label, 0));
+
             return;
         }
 
@@ -175,13 +177,13 @@ class CleanDanglingCharacterData extends Command
 
     private function cleanOrphanedRows(string $modelClass, string $foreignKey, array $existingIds, bool $apply): void
     {
-        /** @var \Illuminate\Database\Eloquent\Model $model */
+        /** @var Model $model */
         $model = new $modelClass;
         $table = $model->getTable();
 
         $orphanCount = $modelClass::whereNotIn($foreignKey, $existingIds)->count();
 
-        $label = $table . '.' . $foreignKey;
+        $label = $table.'.'.$foreignKey;
         $this->line(sprintf('  %-60s %d', $label, $orphanCount));
 
         if ($apply && $orphanCount > 0) {
@@ -199,11 +201,11 @@ class CleanDanglingCharacterData extends Command
             ->whereNotExists(function ($query) use ($table, $foreignKey, $parentTable) {
                 $query->selectRaw('1')
                     ->from($parentTable)
-                    ->whereColumn($parentTable . '.id', $table . '.' . $foreignKey);
+                    ->whereColumn($parentTable.'.id', $table.'.'.$foreignKey);
             });
 
         $orphanCount = $query->count();
-        $this->line(sprintf('  %-60s %d', $table . '.' . $foreignKey, $orphanCount));
+        $this->line(sprintf('  %-60s %d', $table.'.'.$foreignKey, $orphanCount));
 
         if ($apply && $orphanCount > 0) {
             $query->delete();

@@ -19,11 +19,10 @@ use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Shop\Events\SellItemEvent;
 use Facades\App\Flare\Calculators\SellItemCalculator;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\DB;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 class ShopService
 {
@@ -190,12 +189,8 @@ class ShopService
         return $totalSoldFor;
     }
 
-    /**
-     * @param Character $character
-     * @param Item $item
-     * @return Character
-     */
-    public function autoSellItem(Character $character, Item $item): Character {
+    public function autoSellItem(Character $character, Item $item): Character
+    {
         $totalSoldFor = SellItemCalculator::fetchSalePriceWithAffixes($item);
 
         $newGold = $character->gold + $totalSoldFor;
@@ -203,9 +198,9 @@ class ShopService
         if ($newGold > MaxCurrenciesValue::MAX_GOLD) {
             $newGold = MaxCurrenciesValue::MAX_GOLD;
 
-            event(new ServerMessageEvent($character->user, 'You are Gold Dust Capped so the item: ' . $item->affix_name . ' auto sold for: ' . number_format($totalSoldFor) . ' Gold. You are now gold capped at: ' . number_format($newGold) . ' Gold. Go spend some of it, or buy Gold Bars for your kingdoms.'));
+            event(new ServerMessageEvent($character->user, 'You are Gold Dust Capped so the item: '.$item->affix_name.' auto sold for: '.number_format($totalSoldFor).' Gold. You are now gold capped at: '.number_format($newGold).' Gold. Go spend some of it, or buy Gold Bars for your kingdoms.'));
         } else {
-            event(new ServerMessageEvent($character->user, 'You are Gold Dust Capped so the item: ' . $item->affix_name . ' auto sold for: ' . number_format($totalSoldFor) . ' Gold. You now have total amount of gold: ' . number_format($newGold) . ' Gold.'));
+            event(new ServerMessageEvent($character->user, 'You are Gold Dust Capped so the item: '.$item->affix_name.' auto sold for: '.number_format($totalSoldFor).' Gold. You now have total amount of gold: '.number_format($newGold).' Gold.'));
         }
 
         $character->update([
@@ -245,7 +240,8 @@ class ShopService
         return floor($cost - ($cost * 0.05));
     }
 
-    private function fetchItemsForShopBasedOnCharacterClass(Character $character, ?string $type, ?string $searchText): EloquentCollection {
+    private function fetchItemsForShopBasedOnCharacterClass(Character $character, ?string $type, ?string $searchText): EloquentCollection
+    {
         $className = $character->class->name;
 
         $types = is_null($type) ? ItemTypeMapping::getForClass($className) : $type;
@@ -256,7 +252,7 @@ class ShopService
             ->whereNull('item_prefix_id')
             ->whereNull('specialty_type');
 
-        if (!is_null($types)) {
+        if (! is_null($types)) {
             if (is_array($types)) {
                 $items = $items->whereIn('type', $types);
             } else {
@@ -264,8 +260,8 @@ class ShopService
             }
         }
 
-        if (!is_null($searchText)) {
-            $items = $items->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($searchText) . '%']);
+        if (! is_null($searchText)) {
+            $items = $items->whereRaw('LOWER(name) LIKE ?', ['%'.strtolower($searchText).'%']);
         }
 
         return $items
@@ -273,5 +269,4 @@ class ShopService
             ->orderBy('cost', 'asc')
             ->get();
     }
-
 }

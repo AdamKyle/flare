@@ -20,21 +20,21 @@ class EventSchedulerServiceTest extends TestCase
 
     private ?EventSchedulerService $eventSchedulerService = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->eventSchedulerService = resolve(EventSchedulerService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->eventSchedulerService = null;
     }
 
-    public function testReversedRaidRescheduleDatesAreFixed(): void
+    public function test_reversed_raid_reschedule_dates_are_fixed(): void
     {
         $futureDate = now()->addMonths(3);
 
@@ -68,7 +68,7 @@ class EventSchedulerServiceTest extends TestCase
         $this->assertTrue($newEvent->start_date->lt($newEvent->end_date));
     }
 
-    public function testDifferentMapRaidsMayOverlap(): void
+    public function test_different_map_raids_may_overlap(): void
     {
         $mapOne = $this->createGameMap(['name' => 'MapOne', 'default' => false]);
         $mapTwo = $this->createGameMap(['name' => 'MapTwo', 'default' => false]);
@@ -125,7 +125,7 @@ class EventSchedulerServiceTest extends TestCase
         );
     }
 
-    public function testSameMapRaidsMayNotOverlap(): void
+    public function test_same_map_raids_may_not_overlap(): void
     {
         $mapOne = $this->createGameMap(['name' => 'MapOne', 'default' => false]);
 
@@ -180,7 +180,7 @@ class EventSchedulerServiceTest extends TestCase
         );
     }
 
-    public function testFutureSameRaidCannotOverlapItself(): void
+    public function test_future_same_raid_cannot_overlap_itself(): void
     {
         $mapOne = $this->createGameMap(['name' => 'MapOne', 'default' => false]);
         $locationA = $this->createLocation(['game_map_id' => $mapOne->id]);
@@ -228,7 +228,7 @@ class EventSchedulerServiceTest extends TestCase
         );
     }
 
-    public function testChildRaidOutsideParentWindowNotCreated(): void
+    public function test_child_raid_outside_parent_window_not_created(): void
     {
         $parentStart = now()->addMonth();
         $parentEnd = $parentStart->copy()->addMonths(2);
@@ -262,7 +262,7 @@ class EventSchedulerServiceTest extends TestCase
         $this->assertEquals(0, ScheduledEvent::where('raid_id', $raid->id)->count());
     }
 
-    public function testSameMapChildRaidOverlapIsPrevented(): void
+    public function test_same_map_child_raid_overlap_is_prevented(): void
     {
         $parentStart = now()->addMonth();
         $parentEnd = $parentStart->copy()->addMonths(2);
@@ -311,7 +311,7 @@ class EventSchedulerServiceTest extends TestCase
         $this->assertEquals(0, ScheduledEvent::where('raid_id', $raidA->id)->count());
     }
 
-    public function testDifferentMapChildRaidOverlapIsAllowed(): void
+    public function test_different_map_child_raid_overlap_is_allowed(): void
     {
         $parentStart = now()->addMonth();
         $parentEnd = $parentStart->copy()->addMonths(2);
@@ -361,7 +361,7 @@ class EventSchedulerServiceTest extends TestCase
         $this->assertEquals(1, ScheduledEvent::where('raid_id', $raidA->id)->count());
     }
 
-    public function testSyncDoesNotDeleteUnrelatedManualRaidSchedules(): void
+    public function test_sync_does_not_delete_unrelated_manual_raid_schedules(): void
     {
         $gameMap = $this->createGameMap(['name' => 'TestMap3', 'default' => false]);
         $location = $this->createLocation(['game_map_id' => $gameMap->id]);
@@ -412,7 +412,7 @@ class EventSchedulerServiceTest extends TestCase
         $this->assertNotNull(ScheduledEvent::find($manualRaidEvent->id));
     }
 
-    public function testUpdatingRaidsForEventPersistsButDoesNotCreateChildRaids(): void
+    public function test_updating_raids_for_event_persists_but_does_not_create_child_raids(): void
     {
         $gameMap = $this->createGameMap(['name' => 'TestMap4', 'default' => false]);
         $location = $this->createLocation(['game_map_id' => $gameMap->id]);
@@ -458,7 +458,7 @@ class EventSchedulerServiceTest extends TestCase
         $this->assertEquals($raid->id, $refreshed->raids_for_event[0]['selected_raid']);
     }
 
-    public function testUpdateEventDoesNotDeleteManualRaidInsideParentWindow(): void
+    public function test_update_event_does_not_delete_manual_raid_inside_parent_window(): void
     {
         $gameMap = $this->createGameMap(['name' => 'TestMapInner', 'default' => false]);
         $location = $this->createLocation(['game_map_id' => $gameMap->id]);
@@ -509,7 +509,7 @@ class EventSchedulerServiceTest extends TestCase
         $this->assertNotNull(ScheduledEvent::find($manualRaidEvent->id));
     }
 
-    public function testCreateRaidEventsForScheduledEventWithCreatesAllCurrentChildRaids(): void
+    public function test_create_raid_events_for_scheduled_event_with_creates_all_current_child_raids(): void
     {
         $parentStart = now()->addMonth();
         $parentEnd = $parentStart->copy()->addMonths(2);
@@ -560,7 +560,7 @@ class EventSchedulerServiceTest extends TestCase
         $this->assertEquals(1, ScheduledEvent::where('raid_id', $raidB->id)->count());
     }
 
-    public function testSameMapOverlapIsBlockedWhenOtherRaidSharesMapThroughCorruptedLocations(): void
+    public function test_same_map_overlap_is_blocked_when_other_raid_shares_map_through_corrupted_locations(): void
     {
         $parentStart = now()->addMonth();
         $parentEnd = $parentStart->copy()->addMonths(2);

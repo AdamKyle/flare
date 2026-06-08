@@ -17,7 +17,7 @@ class ShopPurchaseValidationTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $item = $this->createItem(['cost' => 100]);
 
-        $response = $this->actingAs($character->user)->call('POST', '/api/shop/purchase/multiple/' . $character->id, [
+        $response = $this->actingAs($character->user)->call('POST', '/api/shop/purchase/multiple/'.$character->id, [
             'item_id' => $item->id,
             'amount' => -1,
         ]);
@@ -30,7 +30,7 @@ class ShopPurchaseValidationTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $item = $this->createItem(['cost' => 100]);
 
-        $response = $this->actingAs($character->user)->call('POST', '/api/shop/purchase/multiple/' . $character->id, [
+        $response = $this->actingAs($character->user)->call('POST', '/api/shop/purchase/multiple/'.$character->id, [
             'item_id' => $item->id,
             'amount' => 0,
         ]);
@@ -44,7 +44,7 @@ class ShopPurchaseValidationTest extends TestCase
         $character->update(['gold' => 1000]);
         $item = $this->createItem(['cost' => 100]);
 
-        $this->actingAs($character->user)->call('POST', '/api/shop/purchase/multiple/' . $character->id, [
+        $this->actingAs($character->user)->call('POST', '/api/shop/purchase/multiple/'.$character->id, [
             'item_id' => $item->id,
             'amount' => -2,
         ]);
@@ -60,7 +60,7 @@ class ShopPurchaseValidationTest extends TestCase
         $character->update(['gold' => 1000]);
         $item = $this->createItem(['cost' => 100]);
 
-        $response = $this->actingAs($character->user)->call('POST', '/api/shop/purchase/multiple/' . $character->id, [
+        $response = $this->actingAs($character->user)->call('POST', '/api/shop/purchase/multiple/'.$character->id, [
             'item_id' => $item->id,
             'amount' => 2,
         ]);

@@ -17,14 +17,14 @@ class ShopBuyAndReplaceControllerTest extends TestCase
 
     private ?Character $character = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
 
@@ -33,7 +33,7 @@ class ShopBuyAndReplaceControllerTest extends TestCase
         parent::tearDown();
     }
 
-    public function testBuyAndReplaceReturnsGenericErrorWhenReplaceItemFails(): void
+    public function test_buy_and_replace_returns_generic_error_when_replace_item_fails(): void
     {
         $item = $this->createItem(['type' => 'shield', 'cost' => 100]);
         $this->character->update(['gold' => 50000]);
@@ -46,7 +46,7 @@ class ShopBuyAndReplaceControllerTest extends TestCase
         $this->instance(EquipItemService::class, $equipItemService);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/shop/buy-and-replace/' . $this->character->id, [
+            ->call('POST', '/api/shop/buy-and-replace/'.$this->character->id, [
                 'item_id_to_buy' => $item->id,
                 'position' => 'left-hand',
                 'slot_id' => 1,

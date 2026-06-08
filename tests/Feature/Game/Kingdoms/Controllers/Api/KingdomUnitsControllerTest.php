@@ -86,7 +86,7 @@ class KingdomUnitsControllerTest extends TestCase
         $this->assertNotNull(UnitInQueue::find($queue->id));
     }
 
-    public function testNonOwnerCannotRecruitUnitsInAnotherCharactersKingdom(): void
+    public function test_non_owner_cannot_recruit_units_in_another_characters_kingdom(): void
     {
         Queue::fake();
 
@@ -106,7 +106,7 @@ class KingdomUnitsControllerTest extends TestCase
         $nonOwner = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $response = $this->actingAs($nonOwner->user)
-            ->call('POST', '/api/kingdoms/' . $kingdom->id . '/recruit-units/' . $gameUnit->id, [
+            ->call('POST', '/api/kingdoms/'.$kingdom->id.'/recruit-units/'.$gameUnit->id, [
                 'amount' => 1,
                 'recruitment_type' => 'resources',
             ], [], [], ['HTTP_ACCEPT' => 'application/json']);
@@ -121,7 +121,7 @@ class KingdomUnitsControllerTest extends TestCase
         $this->assertSame(2000, $kingdom->refresh()->current_population);
     }
 
-    public function testNonOwnerCannotCancelAnotherCharactersUnitQueue(): void
+    public function test_non_owner_cannot_cancel_another_characters_unit_queue(): void
     {
         $ownerFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $ownerFactory->kingdomManagement()->assignKingdom([

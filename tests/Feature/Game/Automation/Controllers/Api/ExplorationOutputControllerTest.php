@@ -17,7 +17,7 @@ class ExplorationOutputControllerTest extends TestCase
 
     private Character $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -27,12 +27,12 @@ class ExplorationOutputControllerTest extends TestCase
             ->getCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
 
-    public function testOutputReturnsActiveExplorationLog(): void
+    public function test_output_returns_active_exploration_log(): void
     {
         $log = $this->createExplorationLog([
             'character_id' => $this->character->id,
@@ -41,7 +41,7 @@ class ExplorationOutputControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('GET', '/api/exploration/' . $this->character->id . '/output');
+            ->call('GET', '/api/exploration/'.$this->character->id.'/output');
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('active', $response->json('type'));
@@ -49,7 +49,7 @@ class ExplorationOutputControllerTest extends TestCase
         $this->assertEquals($this->character->id, $response->json('output.character_id'));
     }
 
-    public function testOutputReturnsEndedWarningOutput(): void
+    public function test_output_returns_ended_warning_output(): void
     {
         $log = $this->createExplorationLog([
             'character_id' => $this->character->id,
@@ -66,7 +66,7 @@ class ExplorationOutputControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('GET', '/api/exploration/' . $this->character->id . '/output');
+            ->call('GET', '/api/exploration/'.$this->character->id.'/output');
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('warning', $response->json('type'));
@@ -76,17 +76,17 @@ class ExplorationOutputControllerTest extends TestCase
         $this->assertEquals('Something went wrong.', $response->json('output.message'));
     }
 
-    public function testOutputReturnsNullStateWhenNeitherExists(): void
+    public function test_output_returns_null_state_when_neither_exists(): void
     {
         $response = $this->actingAs($this->character->user)
-            ->call('GET', '/api/exploration/' . $this->character->id . '/output');
+            ->call('GET', '/api/exploration/'.$this->character->id.'/output');
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertNull($response->json('type'));
         $this->assertNull($response->json('output'));
     }
 
-    public function testOutputRejectsWrongCharacter(): void
+    public function test_output_rejects_wrong_character(): void
     {
         $otherCharacter = (new CharacterFactory)
             ->createBaseCharacter()
@@ -94,7 +94,7 @@ class ExplorationOutputControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($otherCharacter->user)
-            ->call('GET', '/api/exploration/' . $this->character->id . '/output', [], [], [], [
+            ->call('GET', '/api/exploration/'.$this->character->id.'/output', [], [], [], [
                 'HTTP_ACCEPT' => 'application/json',
             ]);
 

@@ -11,7 +11,7 @@ class OnlineUsersControllerSecurityTest extends TestCase
 {
     use CreateUserLoginDuration, RefreshDatabase;
 
-    public function testPublicCharactersOnlinePayloadExcludesActivityDetails(): void
+    public function test_public_characters_online_payload_excludes_activity_details(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $this->createUserLoginDuration([
@@ -31,7 +31,7 @@ class OnlineUsersControllerSecurityTest extends TestCase
         $response->assertJsonMissing(['email' => $character->user->email]);
     }
 
-    public function testPublicAggregateActivityEndpointsExcludeAccountData(): void
+    public function test_public_aggregate_activity_endpoints_exclude_account_data(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 

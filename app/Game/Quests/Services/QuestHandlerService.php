@@ -6,7 +6,6 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
-use App\Game\Quests\Jobs\HandInQuest;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\UpdateMap;
@@ -16,9 +15,9 @@ use App\Game\Maps\Validation\CanTravelToMap;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Quests\Handlers\NpcQuestsHandler;
+use App\Game\Quests\Jobs\HandInQuest;
 use App\Game\Quests\Traits\QuestDetails;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
 class QuestHandlerService
 {
@@ -184,7 +183,7 @@ class QuestHandlerService
         $character = $character->refresh();
 
         if ($oldMapDetails->gameMap->id !== $character->map->gameMap->id) {
-            event(new ServerMessageEvent($character->user, 'You were moved (at no gold cost or time out) from: ' . $oldMapDetails->gameMap->name . ' to: ' . $character->map->gameMap->name . ' in order to hand in the quest.'));
+            event(new ServerMessageEvent($character->user, 'You were moved (at no gold cost or time out) from: '.$oldMapDetails->gameMap->name.' to: '.$character->map->gameMap->name.' in order to hand in the quest.'));
         }
 
         $this->updateMapDetails($character);

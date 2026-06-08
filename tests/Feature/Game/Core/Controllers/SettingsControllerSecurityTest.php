@@ -3,8 +3,8 @@
 namespace Tests\Feature\Game\Core\Controllers;
 
 use App\Flare\Models\QuestsCompleted;
-use App\Flare\Values\NameTags;
 use App\Flare\Values\FeatureTypes;
+use App\Flare\Values\NameTags;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -16,7 +16,7 @@ class SettingsControllerSecurityTest extends TestCase
 {
     use CreateItem, CreateNpc, CreateQuest, RefreshDatabase;
 
-    public function testCosmeticTextUpdatesOnlyValidatedCosmeticFields(): void
+    public function test_cosmetic_text_updates_only_validated_cosmetic_fields(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $quest = $this->createQuest([
@@ -60,7 +60,7 @@ class SettingsControllerSecurityTest extends TestCase
         $this->assertFalse($user->will_be_deleted);
     }
 
-    public function testCosmeticNameTagUpdatesOnlyValidatedNameTagField(): void
+    public function test_cosmetic_name_tag_updates_only_validated_name_tag_field(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $quest = $this->createQuest([

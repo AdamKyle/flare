@@ -11,7 +11,7 @@ class KingdomLogsSecurityTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testOwnerCanDeleteOwnKingdomLog(): void
+    public function test_owner_can_delete_own_kingdom_log(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $log = KingdomLog::factory()->create([
@@ -23,14 +23,14 @@ class KingdomLogsSecurityTest extends TestCase
 
         $this->actingAs($character->user);
         $this->call('POST', route('game.kingdom.delete-log', [
-                'character' => $character->id,
-                'kingdomLog' => $log->id,
-            ]));
+            'character' => $character->id,
+            'kingdomLog' => $log->id,
+        ]));
 
         $this->assertNull(KingdomLog::find($log->id));
     }
 
-    public function testCharacterCannotDeleteAnotherCharactersKingdomLog(): void
+    public function test_character_cannot_delete_another_characters_kingdom_log(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $otherCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
@@ -43,14 +43,14 @@ class KingdomLogsSecurityTest extends TestCase
 
         $this->actingAs($character->user);
         $this->call('POST', route('game.kingdom.delete-log', [
-                'character' => $character->id,
-                'kingdomLog' => $log->id,
-            ]));
+            'character' => $character->id,
+            'kingdomLog' => $log->id,
+        ]));
 
         $this->assertNotNull(KingdomLog::find($log->id));
     }
 
-    public function testMixedBatchDeletesOnlyOwnedKingdomLogs(): void
+    public function test_mixed_batch_deletes_only_owned_kingdom_logs(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $otherCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
@@ -69,10 +69,10 @@ class KingdomLogsSecurityTest extends TestCase
 
         $this->actingAs($character->user);
         $this->call('POST', route('game.kingdom.batch-delete-logs', [
-                'character' => $character->id,
-            ]), [
-                'logs' => [$ownedLog->id, $otherLog->id],
-            ]);
+            'character' => $character->id,
+        ]), [
+            'logs' => [$ownedLog->id, $otherLog->id],
+        ]);
 
         $this->assertNull(KingdomLog::find($ownedLog->id));
         $this->assertNotNull(KingdomLog::find($otherLog->id));

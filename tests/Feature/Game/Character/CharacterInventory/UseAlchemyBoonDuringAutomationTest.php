@@ -17,7 +17,7 @@ class UseAlchemyBoonDuringAutomationTest extends TestCase
     use CreateItem;
     use RefreshDatabase;
 
-    public function testBoonUseSucceedsDuringAutomation(): void
+    public function test_boon_use_succeeds_during_automation(): void
     {
         Queue::fake();
 
@@ -53,7 +53,7 @@ class UseAlchemyBoonDuringAutomationTest extends TestCase
         $this->assertNotEmpty($character->refresh()->boons);
     }
 
-    public function testNonBoonUseDuringAutomationReturnsUnprocessable(): void
+    public function test_non_boon_use_during_automation_returns_unprocessable(): void
     {
         Queue::fake();
 

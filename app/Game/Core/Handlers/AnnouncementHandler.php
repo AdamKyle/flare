@@ -70,10 +70,10 @@ class AnnouncementHandler
 
         $endTime = Carbon::parse($event->ends_at)->setTimezone(env('TIME_ZONE'))->format('g A T');
 
-        $message = 'There is a raid (' . $raid->name . ') currently running that ends on: ' . $endTime .
-            '. Corrupted location are at: ' . implode(', ', $locationNames) . ' on the planes: ' . implode(', ', $gameMapNames) .
-            '. While the boss (' . $raid->raidBoss->name . ') is at: ' . $locationOfRaidBoss->name . ' At (X/Y): ' . $locationOfRaidBoss->x .
-            '/' . $locationOfRaidBoss->y . ' on plane: ' . $locationOfRaidBoss->map->name . '.';
+        $message = 'There is a raid ('.$raid->name.') currently running that ends on: '.$endTime.
+            '. Corrupted location are at: '.implode(', ', $locationNames).' on the planes: '.implode(', ', $gameMapNames).
+            '. While the boss ('.$raid->raidBoss->name.') is at: '.$locationOfRaidBoss->name.' At (X/Y): '.$locationOfRaidBoss->x.
+            '/'.$locationOfRaidBoss->y.' on plane: '.$locationOfRaidBoss->map->name.'.';
 
         $announcement = Announcement::create([
             'message' => $message,
@@ -94,8 +94,8 @@ class AnnouncementHandler
 
         $endTime = Carbon::parse($event->ends_at)->setTimezone(env('TIME_ZONE'))->format('g A T');
 
-        $message = 'From now until: ' . $endTime . ' ' .
-            'Players who are in The Gold Mines will have double chance to get unique gear. ' .
+        $message = 'From now until: '.$endTime.' '.
+            'Players who are in The Gold Mines will have double chance to get unique gear. '.
             'Players will also get 2x the amount of Gold Dust, Shards and Gold from critters.';
 
         $announcement = Announcement::create([
@@ -117,8 +117,8 @@ class AnnouncementHandler
 
         $endTime = Carbon::parse($event->ends_at)->setTimezone(env('TIME_ZONE'))->format('g A T');
 
-        $message = 'From now until: ' . $endTime . ' ' .
-            'Players who are in The Old Church will have double chance to get a unique Corrupted Ice gear. ' .
+        $message = 'From now until: '.$endTime.' '.
+            'Players who are in The Old Church will have double chance to get a unique Corrupted Ice gear. '.
             'Players will also get 2x the amount of Gold Dust, Shards and Gold from critters.';
 
         $announcement = Announcement::create([
@@ -138,8 +138,8 @@ class AnnouncementHandler
 
         $endTime = Carbon::parse($event->ends_at)->setTimezone(env('TIME_ZONE'))->format('g A T');
 
-        $message = 'Celestials have been unleashed across the lands and various planes! All you have to do, for the next 24 hours ' .
-            'ending at: ' . $endTime . ' players just have to move around the map and there is a 80% ' .
+        $message = 'Celestials have been unleashed across the lands and various planes! All you have to do, for the next 24 hours '.
+            'ending at: '.$endTime.' players just have to move around the map and there is a 80% '.
             'chance for Celestial Entities that you would otherwise have to pay to conjure, will spawn! Kill em all child and get those pretty shards for alchemy!';
 
         $announcement = Announcement::create([
@@ -159,7 +159,7 @@ class AnnouncementHandler
 
         $endTime = Carbon::parse($event->ends_at)->setTimezone(env('TIME_ZONE'))->format('g A T');
 
-        $message = 'For one day only, ending: ' . $endTime . ' ' .
+        $message = 'For one day only, ending: '.$endTime.' '.
             'Players can get 1-50 of each type of currency, Gold Dust, Crystal Shards, Copper Coins (if you have the appropriate quest item). ';
 
         $announcement = Announcement::create([
@@ -179,8 +179,8 @@ class AnnouncementHandler
 
         $endTime = Carbon::parse($event->ends_at)->setTimezone(env('TIME_ZONE'))->format('g A T');
 
-        $message = 'For one day only, ending: ' . $endTime . ' ' .
-            'Players will get two points in their faction loyalty tasks when completing a task. When an NPC task list refreshes from gaining a level,' . ' ' .
+        $message = 'For one day only, ending: '.$endTime.' '.
+            'Players will get two points in their faction loyalty tasks when completing a task. When an NPC task list refreshes from gaining a level,'.' '.
             'it will half the required amount of each task.';
 
         $announcement = Announcement::create([
@@ -200,9 +200,9 @@ class AnnouncementHandler
 
         $endTime = Carbon::parse($event->ends_at)->setTimezone(env('TIME_ZONE'))->format('g A T');
 
-        $message = 'From now until: ' . $endTime . ' ' .
-            'Players can enter, with no item requirements, The Ice Plane and fight fearsome creatures as well as take on The Ice Queen her self.' . ' ' .
-            'You will find the creatures down here to be much more powerful then even Purgatory! Prepare your self child, the chill of death awaits.' . ' ' .
+        $message = 'From now until: '.$endTime.' '.
+            'Players can enter, with no item requirements, The Ice Plane and fight fearsome creatures as well as take on The Ice Queen her self.'.' '.
+            'You will find the creatures down here to be much more powerful then even Purgatory! Prepare your self child, the chill of death awaits.'.' '.
             'All you have to do is use the traverse feature to move from your current plane to The Ice Plane where rewards are bountiful!';
 
         $announcement = Announcement::create([
@@ -222,9 +222,9 @@ class AnnouncementHandler
 
         $endTime = Carbon::parse($event->ends_at)->setTimezone(env('TIME_ZONE'))->format('g A T');
 
-        $message = 'From now until: ' . $endTime . ' ' .
-            'Players can enter, with no item requirements, The Delusional Memories Plane and fight fearsome creatures and take on the Jester of Time who twist and deludes his own memories. ' .
-            'All you have to is Traverse to participate in new quests, new raid, new gear and new global events where all players come ' .
+        $message = 'From now until: '.$endTime.' '.
+            'Players can enter, with no item requirements, The Delusional Memories Plane and fight fearsome creatures and take on the Jester of Time who twist and deludes his own memories. '.
+            'All you have to is Traverse to participate in new quests, new raid, new gear and new global events where all players come '.
             'together to help the Red Hawks push back an enemy from a time long forgotten!';
 
         $announcement = Announcement::create([
@@ -246,8 +246,8 @@ class AnnouncementHandler
 
         $endTime = Carbon::parse($event->ends_at)->setTimezone(env('TIME_ZONE'))->format('g A T');
 
-        $message = 'From now until: ' . $endTime . ' ' .
-            'Players who are in The Purgatory Smiths House will have double chance to get LEGENDARY uniques and MYTHICAL gear. ' .
+        $message = 'From now until: '.$endTime.' '.
+            'Players who are in The Purgatory Smiths House will have double chance to get LEGENDARY uniques and MYTHICAL gear. '.
             'Players will also get 2x the amount of Gold Dust, Copper Coins and Shards from critters.';
 
         $announcement = Announcement::create([
@@ -258,5 +258,4 @@ class AnnouncementHandler
 
         event(new AnnouncementMessageEvent($message, $announcement->id));
     }
-
 }

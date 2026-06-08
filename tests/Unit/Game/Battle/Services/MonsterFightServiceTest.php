@@ -23,7 +23,7 @@ class MonsterFightServiceTest extends TestCase
 
     private ?Monster $monster = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -40,7 +40,7 @@ class MonsterFightServiceTest extends TestCase
             ->getMonster();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
 
@@ -50,9 +50,9 @@ class MonsterFightServiceTest extends TestCase
         parent::tearDown();
     }
 
-    public function testSetupMonsterDeletesCharacterSheetCacheByDefault(): void
+    public function test_setup_monster_deletes_character_sheet_cache_by_default(): void
     {
-        Cache::put('character-sheet-' . $this->character->id, ['level' => 1]);
+        Cache::put('character-sheet-'.$this->character->id, ['level' => 1]);
 
         $monsterPlayerFight = Mockery::mock(MonsterPlayerFight::class);
         $monsterPlayerFight->shouldReceive('setUpFight')->andReturn([]);
@@ -68,12 +68,12 @@ class MonsterFightServiceTest extends TestCase
 
         $service->setupMonster($this->character, ['selected_monster_id' => $this->monster->id], true, false, false);
 
-        $this->assertFalse(Cache::has('character-sheet-' . $this->character->id));
+        $this->assertFalse(Cache::has('character-sheet-'.$this->character->id));
     }
 
-    public function testSetupMonsterPreservesCharacterSheetCacheWhenFlagIsTrue(): void
+    public function test_setup_monster_preserves_character_sheet_cache_when_flag_is_true(): void
     {
-        Cache::put('character-sheet-' . $this->character->id, ['level' => 1]);
+        Cache::put('character-sheet-'.$this->character->id, ['level' => 1]);
 
         $monsterPlayerFight = Mockery::mock(MonsterPlayerFight::class);
         $monsterPlayerFight->shouldReceive('setUpFight')->andReturn([]);
@@ -89,6 +89,6 @@ class MonsterFightServiceTest extends TestCase
 
         $service->setupMonster($this->character, ['selected_monster_id' => $this->monster->id], true, false, true);
 
-        $this->assertTrue(Cache::has('character-sheet-' . $this->character->id));
+        $this->assertTrue(Cache::has('character-sheet-'.$this->character->id));
     }
 }

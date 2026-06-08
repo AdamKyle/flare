@@ -12,7 +12,7 @@ class BroadcastChannelAuthorizationTest extends TestCase
 {
     use CreateUser, RefreshDatabase;
 
-    public function testUpdateMarketChannelDoesNotReturnFullUserModel(): void
+    public function test_update_market_channel_does_not_return_full_user_model(): void
     {
         $user = $this->createUser();
 
@@ -22,7 +22,7 @@ class BroadcastChannelAuthorizationTest extends TestCase
         $this->assertNotInstanceOf(User::class, $result);
     }
 
-    public function testUpdateMarketChannelReturnsOnlySafeMemberData(): void
+    public function test_update_market_channel_returns_only_safe_member_data(): void
     {
         $user = $this->createUser();
 
@@ -32,7 +32,7 @@ class BroadcastChannelAuthorizationTest extends TestCase
         $this->assertSame(['id' => $user->id], $result);
     }
 
-    public function testChatChannelReturnsOnlySafeMemberData(): void
+    public function test_chat_channel_returns_only_safe_member_data(): void
     {
         $user = $this->createUser();
 
@@ -42,7 +42,7 @@ class BroadcastChannelAuthorizationTest extends TestCase
         $this->assertSame(['id' => $user->id], $result);
     }
 
-    public function testAuthenticatedUserCanAuthorizeUpdateMarketChannel(): void
+    public function test_authenticated_user_can_authorize_update_market_channel(): void
     {
         $user = $this->createUser();
 

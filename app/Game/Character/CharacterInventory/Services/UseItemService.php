@@ -102,7 +102,7 @@ class UseItemService
         $inventory = $this->characterInventoryService->setCharacter($character);
 
         return $this->successResult([
-            'message' => 'Used selected items.' . ($removedSomeItems ? ' Some items were not able to be used because of the amount of boons you have. You can check your usable items section to see which ones are left.' : ''),
+            'message' => 'Used selected items.'.($removedSomeItems ? ' Some items were not able to be used because of the amount of boons you have. You can check your usable items section to see which ones are left.' : ''),
             'inventory' => [
                 'usable_items' => $inventory->getInventoryForType('usable_items'),
             ],
@@ -261,7 +261,7 @@ class UseItemService
         ]);
 
         return $this->successResult([
-            'message' => $item->name . ' filled up using ' . $used . ' item(s), adding ' . $timeAdded . ' minutes.',
+            'message' => $item->name.' filled up using '.$used.' item(s), adding '.$timeAdded.' minutes.',
             'boons' => $character->boons()->active()->get(),
         ]);
     }
@@ -286,7 +286,7 @@ class UseItemService
 
     private function automationItemUseMessage(CharacterAutomation $automation): string
     {
-        return 'No you are busy, you can use Alchemy items that apply boons to your character. Please cancel your: ' . $this->automationName($automation) . ', if you want to use this.';
+        return 'No you are busy, you can use Alchemy items that apply boons to your character. Please cancel your: '.$this->automationName($automation).', if you want to use this.';
     }
 
     private function automationName(CharacterAutomation $automation): string
@@ -336,7 +336,7 @@ class UseItemService
         event(new UpdateTopBarEvent($character));
 
         if (! is_null($item)) {
-            event(new ServerMessageEvent($character->user, 'You used: ' . $item->name));
+            event(new ServerMessageEvent($character->user, 'You used: '.$item->name));
         }
 
         $boons = $character->boons()->active()->get()->toArray();

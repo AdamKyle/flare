@@ -4,6 +4,8 @@ namespace Tests\Unit\Game\Automation\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
+use App\Flare\Models\ExplorationLog;
+use App\Flare\Models\ExplorationWarning;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Values\AttackTypeValue;
@@ -21,8 +23,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
-use App\Flare\Models\ExplorationLog;
-use App\Flare\Models\ExplorationWarning;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Monster\MonsterFactory;
 use Tests\TestCase;
@@ -45,7 +45,7 @@ class ExplorationAutomationServiceTest extends TestCase
 
     private CharacterAutomation $automation;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -72,14 +72,14 @@ class ExplorationAutomationServiceTest extends TestCase
         ]);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Carbon::setTestNow();
 
         parent::tearDown();
     }
 
-    public function testBeginAutomationCreatesExplorationAutomation(): void
+    public function test_begin_automation_creates_exploration_automation(): void
     {
         Queue::fake();
         Event::fake();
@@ -98,7 +98,7 @@ class ExplorationAutomationServiceTest extends TestCase
         $this->assertEquals(AutomationType::EXPLORING, $automation->type);
     }
 
-    public function testBeginAutomationDispatchesUpdateCharacterStatus(): void
+    public function test_begin_automation_dispatches_update_character_status(): void
     {
         Queue::fake();
         Event::fake();
@@ -113,7 +113,7 @@ class ExplorationAutomationServiceTest extends TestCase
         Event::assertDispatched(UpdateCharacterStatus::class);
     }
 
-    public function testBeginAutomationDispatchesAutomationLogUpdate(): void
+    public function test_begin_automation_dispatches_automation_log_update(): void
     {
         Queue::fake();
         Event::fake();
@@ -130,7 +130,7 @@ class ExplorationAutomationServiceTest extends TestCase
         });
     }
 
-    public function testBeginAutomationLogUpdateIncludesExactCreatureCountAndNoOldCopy(): void
+    public function test_begin_automation_log_update_includes_exact_creature_count_and_no_old_copy(): void
     {
         Queue::fake();
         Event::fake();
@@ -150,7 +150,7 @@ class ExplorationAutomationServiceTest extends TestCase
         });
     }
 
-    public function testBeginAutomationDispatchesAutomationTimeOut(): void
+    public function test_begin_automation_dispatches_automation_time_out(): void
     {
         Queue::fake();
         Event::fake();
@@ -165,7 +165,7 @@ class ExplorationAutomationServiceTest extends TestCase
         Event::assertDispatched(AutomationTimeOut::class);
     }
 
-    public function testBeginAutomationDispatchesExplorationJob(): void
+    public function test_begin_automation_dispatches_exploration_job(): void
     {
         Queue::fake();
         Event::fake();
@@ -180,7 +180,7 @@ class ExplorationAutomationServiceTest extends TestCase
         Queue::assertPushed(Exploration::class);
     }
 
-    public function testBeginAutomationDispatchesExplorationJobOnExplorationQueueWithLongRunningConnection(): void
+    public function test_begin_automation_dispatches_exploration_job_on_exploration_queue_with_long_running_connection(): void
     {
         Queue::fake();
         Event::fake();
@@ -197,7 +197,7 @@ class ExplorationAutomationServiceTest extends TestCase
         });
     }
 
-    public function testStopExplorationDeletesExplorationAutomation(): void
+    public function test_stop_exploration_deletes_exploration_automation(): void
     {
         Event::fake();
 
@@ -210,7 +210,7 @@ class ExplorationAutomationServiceTest extends TestCase
         );
     }
 
-    public function testStopExplorationReturns422WhenNoAutomationExists(): void
+    public function test_stop_exploration_returns422_when_no_automation_exists(): void
     {
         Event::fake();
 
@@ -221,18 +221,18 @@ class ExplorationAutomationServiceTest extends TestCase
         $this->assertEquals(422, $response->getStatusCode());
     }
 
-    public function testStopExplorationClearsCharacterSurvivalCache(): void
+    public function test_stop_exploration_clears_character_survival_cache(): void
     {
         Event::fake();
 
-        Cache::put('can-character-survive-' . $this->character->id, true);
+        Cache::put('can-character-survive-'.$this->character->id, true);
 
         $this->service->stopExploration($this->character);
 
-        $this->assertFalse(Cache::has('can-character-survive-' . $this->character->id));
+        $this->assertFalse(Cache::has('can-character-survive-'.$this->character->id));
     }
 
-    public function testStopExplorationDispatchesAutomationStatus(): void
+    public function test_stop_exploration_dispatches_automation_status(): void
     {
         Event::fake();
 
@@ -241,14 +241,14 @@ class ExplorationAutomationServiceTest extends TestCase
         Event::assertDispatched(AutomationStatus::class);
     }
 
-    public function testSetTimeDelaySetsDefaultDelay(): void
+    public function test_set_time_delay_sets_default_delay(): void
     {
         $this->service->setTimeDelay();
 
         $this->assertEquals(1, $this->service->getTimeDelay());
     }
 
-    public function testBeginAutomationSetsCompletedAtFromAutoAttackLength(): void
+    public function test_begin_automation_sets_completed_at_from_auto_attack_length(): void
     {
         Queue::fake();
         Event::fake();
@@ -271,7 +271,7 @@ class ExplorationAutomationServiceTest extends TestCase
         Carbon::setTestNow();
     }
 
-    public function testBeginAutomationPersistsAttackType(): void
+    public function test_begin_automation_persists_attack_type(): void
     {
         Queue::fake();
         Event::fake();
@@ -288,7 +288,7 @@ class ExplorationAutomationServiceTest extends TestCase
         $this->assertEquals(AttackTypeValue::CAST, $automation->attack_type);
     }
 
-    public function testBeginAutomationPersistsMoveDownMonsterListEvery(): void
+    public function test_begin_automation_persists_move_down_monster_list_every(): void
     {
         Queue::fake();
         Event::fake();
@@ -305,7 +305,7 @@ class ExplorationAutomationServiceTest extends TestCase
         $this->assertEquals(25, $automation->move_down_monster_list_every);
     }
 
-    public function testBeginAutomationPersistsPreviousAndCurrentLevel(): void
+    public function test_begin_automation_persists_previous_and_current_level(): void
     {
         Queue::fake();
         Event::fake();
@@ -329,7 +329,7 @@ class ExplorationAutomationServiceTest extends TestCase
         $this->assertEquals(10, $automation->current_level);
     }
 
-    public function testBeginAutomationPersistsSpecialStartContext(): void
+    public function test_begin_automation_persists_special_start_context(): void
     {
         Queue::fake();
         Event::fake();
@@ -355,7 +355,7 @@ class ExplorationAutomationServiceTest extends TestCase
         $this->assertTrue($automation->started_in_special_location);
     }
 
-    public function testBeginAutomationPersistsRegularStartContext(): void
+    public function test_begin_automation_persists_regular_start_context(): void
     {
         Queue::fake();
         Event::fake();
@@ -372,7 +372,7 @@ class ExplorationAutomationServiceTest extends TestCase
         $this->assertFalse($automation->started_in_special_location);
     }
 
-    public function testStopExplorationDispatchesAutomationTimeOut(): void
+    public function test_stop_exploration_dispatches_automation_time_out(): void
     {
         Event::fake();
 
@@ -381,7 +381,7 @@ class ExplorationAutomationServiceTest extends TestCase
         Event::assertDispatched(AutomationTimeOut::class);
     }
 
-    public function testStopExplorationDispatchesUpdateCharacterStatus(): void
+    public function test_stop_exploration_dispatches_update_character_status(): void
     {
         Event::fake();
 
@@ -390,7 +390,7 @@ class ExplorationAutomationServiceTest extends TestCase
         Event::assertDispatched(UpdateCharacterStatus::class);
     }
 
-    public function testStopExplorationDispatchesAutomationLogUpdate(): void
+    public function test_stop_exploration_dispatches_automation_log_update(): void
     {
         Event::fake();
 
@@ -399,36 +399,36 @@ class ExplorationAutomationServiceTest extends TestCase
         Event::assertDispatched(AutomationLogUpdate::class);
     }
 
-    public function testStopExplorationClearsCharacterSheetCache(): void
+    public function test_stop_exploration_clears_character_sheet_cache(): void
     {
         Event::fake();
 
-        Cache::put('character-sheet-' . $this->character->id, ['level' => 1]);
+        Cache::put('character-sheet-'.$this->character->id, ['level' => 1]);
 
         $this->service->stopExploration($this->character);
 
-        $this->assertFalse(Cache::has('character-sheet-' . $this->character->id));
+        $this->assertFalse(Cache::has('character-sheet-'.$this->character->id));
     }
 
-    public function testStopExplorationClearsCharacterDefenceCache(): void
+    public function test_stop_exploration_clears_character_defence_cache(): void
     {
         Event::fake();
 
-        Cache::put('character-defence-' . $this->character->id, 100);
+        Cache::put('character-defence-'.$this->character->id, 100);
 
         $this->service->stopExploration($this->character);
 
-        $this->assertFalse(Cache::has('character-defence-' . $this->character->id));
+        $this->assertFalse(Cache::has('character-defence-'.$this->character->id));
     }
 
-    public function testSetTimeDelayIsAlwaysOneMinute(): void
+    public function test_set_time_delay_is_always_one_minute(): void
     {
         $this->service->setTimeDelay($this->character);
 
         $this->assertEquals(1, $this->service->getTimeDelay());
     }
 
-    public function testBeginAutomationDispatchesExplorationJobAfterOneMinute(): void
+    public function test_begin_automation_dispatches_exploration_job_after_one_minute(): void
     {
         Queue::fake();
         Event::fake();
@@ -449,7 +449,7 @@ class ExplorationAutomationServiceTest extends TestCase
         Carbon::setTestNow();
     }
 
-    public function testBeginAutomationCreatesExplorationLog(): void
+    public function test_begin_automation_creates_exploration_log(): void
     {
         Queue::fake();
         Event::fake();
@@ -471,7 +471,7 @@ class ExplorationAutomationServiceTest extends TestCase
         $this->assertEquals(AttackTypeValue::ATTACK, $log->attack_type);
     }
 
-    public function testBeginAutomationClearsOldExplorationWarningAndLog(): void
+    public function test_begin_automation_clears_old_exploration_warning_and_log(): void
     {
         Queue::fake();
         Event::fake();
@@ -501,7 +501,7 @@ class ExplorationAutomationServiceTest extends TestCase
         $this->assertNull(ExplorationLog::find($oldLog->id));
     }
 
-    public function testStopExplorationFinalizesLogWithPlayerStop(): void
+    public function test_stop_exploration_finalizes_log_with_player_stop(): void
     {
         Event::fake();
 
@@ -523,7 +523,7 @@ class ExplorationAutomationServiceTest extends TestCase
         $this->assertNotNull($log->ended_at);
     }
 
-    public function testStopExplorationDoesNotCreateExplorationWarning(): void
+    public function test_stop_exploration_does_not_create_exploration_warning(): void
     {
         Event::fake();
 

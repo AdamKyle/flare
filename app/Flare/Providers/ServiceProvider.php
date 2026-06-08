@@ -105,7 +105,6 @@ class ServiceProvider extends ApplicationServiceProvider
     public function register()
     {
 
-
         $this->app->bind(BaseStatValue::class, function () {
             return new BaseStatValue;
         });

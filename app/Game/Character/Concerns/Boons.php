@@ -24,11 +24,11 @@ trait Boons
     public function additionalLevelsToGain(Character $character): int
     {
         return CharacterBoon::active()->where('character_id', $character->id)
-                ->join('items', function ($join) {
-                    $join->on('items.id', '=', 'character_boons.item_id');
-                })
-                ->where('items.gains_additional_level', true)
-                ->sum('character_boons.amount_used') + 1;
+            ->join('items', function ($join) {
+                $join->on('items.id', '=', 'character_boons.item_id');
+            })
+            ->where('items.gains_additional_level', true)
+            ->sum('character_boons.amount_used') + 1;
     }
 
     public function fetchXpBonus(Character $character): float

@@ -21,7 +21,7 @@ class ShopServiceTest extends TestCase
 
     private ?ShopService $shopService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -33,7 +33,7 @@ class ShopServiceTest extends TestCase
         $this->shopService = resolve(ShopService::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -43,7 +43,7 @@ class ShopServiceTest extends TestCase
         $this->shopService = null;
     }
 
-    public function testSellAllItems()
+    public function test_sell_all_items()
     {
         $trinket = $this->createItem(['type' => 'trinket']);
         $alchemy = $this->createItem(['type' => 'alchemy']);
@@ -70,7 +70,7 @@ class ShopServiceTest extends TestCase
         }
     }
 
-    public function testSellAllItemsWithNoItems()
+    public function test_sell_all_items_with_no_items()
     {
         $trinket = $this->createItem(['type' => 'trinket']);
         $alchemy = $this->createItem(['type' => 'alchemy']);
@@ -95,7 +95,7 @@ class ShopServiceTest extends TestCase
         }
     }
 
-    public function testBuyAndReplaceItem()
+    public function test_buy_and_replace_item()
     {
         $shield = $this->createItem(['type' => 'shield']);
 
@@ -117,7 +117,7 @@ class ShopServiceTest extends TestCase
         $this->assertNotNull($inventorySlot);
     }
 
-    public function testBuyMultipleItems()
+    public function test_buy_multiple_items()
     {
         $shield = $this->createItem(['type' => 'shield']);
 
@@ -133,7 +133,7 @@ class ShopServiceTest extends TestCase
         $this->assertCount(75, $character->inventory->slots->toArray());
     }
 
-    public function testSellItem()
+    public function test_sell_item()
     {
         $shield = $this->createItem(['type' => 'shield']);
         $character = $this->character->inventoryManagement()->giveItem($shield)->getCharacter();
@@ -150,7 +150,7 @@ class ShopServiceTest extends TestCase
         $this->assertGreaterThan(0, $character->gold);
     }
 
-    public function testBuyAndReplaceRollsBackGoldOnReplaceFailure(): void
+    public function test_buy_and_replace_rolls_back_gold_on_replace_failure(): void
     {
         $shield = $this->createItem(['type' => 'shield', 'cost' => 1000]);
         $character = $this->character->getCharacter();
@@ -173,7 +173,7 @@ class ShopServiceTest extends TestCase
         $this->assertEquals(50000, $character->refresh()->gold);
     }
 
-    public function testBuyAndReplaceRollsBackInventorySlotOnReplaceFailure(): void
+    public function test_buy_and_replace_rolls_back_inventory_slot_on_replace_failure(): void
     {
         $shield = $this->createItem(['type' => 'shield', 'cost' => 1000]);
         $character = $this->character->getCharacter();
@@ -197,7 +197,7 @@ class ShopServiceTest extends TestCase
         $this->assertEquals($initialSlotCount, $character->refresh()->inventory->slots()->count());
     }
 
-    public function testSellItemDoNotGoAboveMaxGold()
+    public function test_sell_item_do_not_go_above_max_gold()
     {
         $shield = $this->createItem(['type' => 'shield']);
         $character = $this->character->inventoryManagement()->giveItem($shield)->getCharacter();

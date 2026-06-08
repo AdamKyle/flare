@@ -20,31 +20,18 @@ class SkillService
 {
     use ResponseBuilder;
 
-    /**
-     * @var Skill|null $skillInTraining
-     */
     private ?Skill $skillInTraining;
 
-    /**
-     * @param Manager $manager
-     * @param BasicSkillsTransformer $basicSkillsTransformer
-     * @param SkillsTransformer $skillsTransformer
-     * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
-     * @param BattleMessageHandler $battleMessageHandler
-     */
     public function __construct(
-        private readonly Manager                           $manager,
-        private readonly BasicSkillsTransformer            $basicSkillsTransformer,
-        private readonly SkillsTransformer                 $skillsTransformer,
+        private readonly Manager $manager,
+        private readonly BasicSkillsTransformer $basicSkillsTransformer,
+        private readonly SkillsTransformer $skillsTransformer,
         private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
-        private readonly BattleMessageHandler              $battleMessageHandler,
+        private readonly BattleMessageHandler $battleMessageHandler,
     ) {}
 
     /**
      * Set the current skill in training
-     *
-     * @param Character $character
-     * @return SkillService
      */
     public function setSkillInTraining(Character $character): SkillService
     {
@@ -55,10 +42,6 @@ class SkillService
 
     /**
      * Gets the skills for a player.
-     *
-     * @param Character $character
-     * @param array $gameSkillIds
-     * @return array
      */
     public function getSkills(Character $character, array $gameSkillIds): array
     {
@@ -71,9 +54,6 @@ class SkillService
 
     /**
      * Fetch Skill Info.
-     *
-     * @param Skill $skill
-     * @return array
      */
     public function getSkill(Skill $skill): array
     {
@@ -86,11 +66,6 @@ class SkillService
      * Sets a skill to training.
      *
      * If a skill is in training, remove it from training.
-     *
-     * @param Character $character
-     * @param int $skillId
-     * @param float $xpPercentage
-     * @return array
      */
     public function trainSkill(Character $character, int $skillId, float $xpPercentage): array
     {
@@ -133,16 +108,13 @@ class SkillService
         ]);
 
         return $this->successResult([
-            'message' => 'You are now training: ' . $skill->name,
+            'message' => 'You are now training: '.$skill->name,
         ]);
     }
 
     /**
      * Assign XP to a training skill.trainSkill
      *
-     * @param Character $character
-     * @param int $xp
-     * @return void
      * @throws Exception
      */
     public function assignXPToTrainingSkill(Character $character, int $xp): void
@@ -176,10 +148,6 @@ class SkillService
 
     /**
      * Give a specific amount of xp to a skill in training
-     *
-     * @param Character $character
-     * @param integer $totalXpToGive
-     * @return void
      */
     public function giveXpToTrainingSkill(Character $character, int $totalXpToGive): void
     {
@@ -210,10 +178,6 @@ class SkillService
 
     /**
      * Get the xp for the skill in training
-     *
-     * @param Character $character
-     * @param integer $xp
-     * @return integer
      */
     public function getXpForSkillIntraining(Character $character, int $xp): int
     {
@@ -241,10 +205,6 @@ class SkillService
 
     /**
      * Get the XP after being reduced from any skill in training.
-     *
-     * @param Character $character
-     * @param integer $xp
-     * @return integer
      */
     public function getCharacterXpWithSkillTrainingReduction(Character $character, int $xp): int
     {
@@ -273,8 +233,6 @@ class SkillService
      * - Applies skill training bonuses
      * - Applies Game Map Bonuses
      *
-     * @param GameMap $gameMap
-     * @param Skill $skill
      * @throws Exception
      */
     public function assignXpToCraftingSkill(GameMap $gameMap, Skill $skill): void
@@ -315,9 +273,6 @@ class SkillService
     /**
      * Handle possibly leveling up the skill.
      *
-     * @param Skill $skillInTraining
-     * @param integer $newXp
-     * @return void
      * @throws Exception
      */
     private function handlePossibleLevelUpForSkill(Skill $skillInTraining, int $newXp): void
@@ -366,8 +321,6 @@ class SkillService
     /**
      * Level a skill.
      *
-     * @param Skill $skill
-     * @return Skill
      * @throws Exception
      */
     private function levelUpSkill(Skill $skill): Skill

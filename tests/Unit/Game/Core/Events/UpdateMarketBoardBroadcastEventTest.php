@@ -11,7 +11,7 @@ class UpdateMarketBoardBroadcastEventTest extends TestCase
 {
     use CreateUser, RefreshDatabase;
 
-    public function testMarketListingsAndCharacterGoldAreInBroadcastPayload(): void
+    public function test_market_listings_and_character_gold_are_in_broadcast_payload(): void
     {
         $user = $this->createUser();
         $event = new UpdateMarketBoardBroadcastEvent($user, [['item' => 'sword']], 500);
@@ -22,7 +22,7 @@ class UpdateMarketBoardBroadcastEventTest extends TestCase
         $this->assertArrayHasKey('characterGold', $payload);
     }
 
-    public function testUserIsNotInBroadcastPayload(): void
+    public function test_user_is_not_in_broadcast_payload(): void
     {
         $user = $this->createUser();
         $event = new UpdateMarketBoardBroadcastEvent($user, [], 0);
@@ -32,7 +32,7 @@ class UpdateMarketBoardBroadcastEventTest extends TestCase
         $this->assertArrayNotHasKey('user', $payload);
     }
 
-    public function testMarketListingsIsPublicProperty(): void
+    public function test_market_listings_is_public_property(): void
     {
         $user = $this->createUser();
         $listings = [['item' => 'sword']];
@@ -41,7 +41,7 @@ class UpdateMarketBoardBroadcastEventTest extends TestCase
         $this->assertSame($listings, $event->marketListings);
     }
 
-    public function testCharacterGoldIsPublicProperty(): void
+    public function test_character_gold_is_public_property(): void
     {
         $user = $this->createUser();
         $event = new UpdateMarketBoardBroadcastEvent($user, [], 250);

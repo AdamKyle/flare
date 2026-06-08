@@ -22,7 +22,7 @@ use Tests\Traits\CreateScheduledEvent;
 
 class InitiateDelusionalMemoriesEventTest extends TestCase
 {
-    use CreateGameMap, CreateScheduledEvent, RefreshDatabase, CreateRaid, CreateItem, CreateLocation, CreateMonster;
+    use CreateGameMap, CreateItem, CreateLocation, CreateMonster, CreateRaid, CreateScheduledEvent, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -68,7 +68,7 @@ class InitiateDelusionalMemoriesEventTest extends TestCase
         $this->assertNotEmpty(GlobalEventGoal::all());
     }
 
-    public function testDelusionalStartCreatesCurrentChildRaidsOnly(): void
+    public function test_delusional_start_creates_current_child_raids_only(): void
     {
         $this->createGameMap([
             'name' => MapNameValue::DELUSIONAL_MEMORIES,
@@ -118,7 +118,7 @@ class InitiateDelusionalMemoriesEventTest extends TestCase
         $this->assertCount(0, $nextYearChildRaids);
     }
 
-    public function testDelusionalStartReschedulesOnlyParentForNextYear(): void
+    public function test_delusional_start_reschedules_only_parent_for_next_year(): void
     {
         $this->createGameMap([
             'name' => MapNameValue::DELUSIONAL_MEMORIES,

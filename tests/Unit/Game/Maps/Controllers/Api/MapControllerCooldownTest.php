@@ -3,8 +3,8 @@
 namespace Tests\Unit\Game\Maps\Controllers\Api;
 
 use App\Flare\Models\Character;
-use App\Game\Maps\Controllers\Api\MapController;
 use App\Game\Maps\Calculations\DistanceCalculation;
+use App\Game\Maps\Controllers\Api\MapController;
 use App\Game\Maps\Requests\MoveRequest;
 use App\Game\Maps\Requests\SetSailValidation;
 use App\Game\Maps\Requests\TeleportRequest;
@@ -23,7 +23,7 @@ class MapControllerCooldownTest extends TestCase
 
     private Character $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -36,7 +36,7 @@ class MapControllerCooldownTest extends TestCase
         ]);
     }
 
-    public function testMoveReturnsUnprocessableWhenCharacterCannotMove(): void
+    public function test_move_returns_unprocessable_when_character_cannot_move(): void
     {
         $response = $this->controller()->move(new MoveRequest, $this->character->refresh());
 
@@ -44,7 +44,7 @@ class MapControllerCooldownTest extends TestCase
         $this->assertEquals(['invalid input'], $response->getData(true));
     }
 
-    public function testTraverseReturnsUnprocessableWhenCharacterCannotMove(): void
+    public function test_traverse_returns_unprocessable_when_character_cannot_move(): void
     {
         $response = $this->controller()->traverse(
             new TraverseRequest,
@@ -56,7 +56,7 @@ class MapControllerCooldownTest extends TestCase
         $this->assertEquals(['invalid input'], $response->getData(true));
     }
 
-    public function testTeleportReturnsUnprocessableWhenCharacterCannotMove(): void
+    public function test_teleport_returns_unprocessable_when_character_cannot_move(): void
     {
         $response = $this->controller()->teleport(new TeleportRequest, $this->character->refresh());
 
@@ -64,7 +64,7 @@ class MapControllerCooldownTest extends TestCase
         $this->assertEquals(['invalid input'], $response->getData(true));
     }
 
-    public function testSetSailReturnsUnprocessableWhenCharacterCannotMove(): void
+    public function test_set_sail_returns_unprocessable_when_character_cannot_move(): void
     {
         $response = $this->controller()->setSail(new SetSailValidation, $this->character->refresh());
 

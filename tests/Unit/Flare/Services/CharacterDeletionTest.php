@@ -4,6 +4,7 @@ namespace Tests\Unit\Flare\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterInCelestialFight;
+use App\Flare\Models\CharacterPassiveSkill;
 use App\Flare\Models\DelveExploration;
 use App\Flare\Models\ExplorationLog;
 use App\Flare\Models\ExplorationWarning;
@@ -57,7 +58,7 @@ class CharacterDeletionTest extends TestCase
 
     private ?CharacterDeletion $characterDeletion;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -79,7 +80,7 @@ class CharacterDeletionTest extends TestCase
         $this->characterDeletion = resolve(CharacterDeletion::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -209,7 +210,7 @@ class CharacterDeletionTest extends TestCase
 
         $this->characterDeletion->deleteCharacterFromUser($character);
 
-        $this->assertEquals(0, \App\Flare\Models\CharacterPassiveSkill::where('character_id', $characterId)->count());
+        $this->assertEquals(0, CharacterPassiveSkill::where('character_id', $characterId)->count());
     }
 
     public function test_base_static_game_records_remain_after_character_deletion(): void

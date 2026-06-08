@@ -18,7 +18,7 @@ class PurchasePeopleValidationTest extends TestCase
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
         $character = $characterFactory->getCharacter();
 
-        $response = $this->actingAs($character->user)->call('POST', '/api/kingdoms/purchase-people/' . $kingdom->id, [
+        $response = $this->actingAs($character->user)->call('POST', '/api/kingdoms/purchase-people/'.$kingdom->id, [
             'amount_to_purchase' => -1,
         ]);
 
@@ -31,7 +31,7 @@ class PurchasePeopleValidationTest extends TestCase
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
         $character = $characterFactory->getCharacter();
 
-        $response = $this->actingAs($character->user)->call('POST', '/api/kingdoms/purchase-people/' . $kingdom->id, [
+        $response = $this->actingAs($character->user)->call('POST', '/api/kingdoms/purchase-people/'.$kingdom->id, [
             'amount_to_purchase' => 0,
         ]);
 

@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Game\Maps\Controllers\Api;
 
-use Carbon\Carbon;
 use App\Flare\Values\MapNameValue;
 use App\Game\Maps\Values\MapTileValue;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
@@ -17,14 +17,14 @@ class TeleportControllerSecurityTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Carbon::setTestNow();
 
         parent::tearDown();
     }
 
-    public function testTeleportIgnoresClientCostAndTimeout(): void
+    public function test_teleport_ignores_client_cost_and_timeout(): void
     {
         $this->instance(
             MapTileValue::class,

@@ -27,7 +27,7 @@ class AccountDeletionControllerTest extends TestCase
 
     private $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -61,14 +61,14 @@ class AccountDeletionControllerTest extends TestCase
         Queue::fake();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function testCanDeleteCharacter()
+    public function test_can_delete_character()
     {
         $user = $this->character->user;
 
@@ -79,7 +79,7 @@ class AccountDeletionControllerTest extends TestCase
         Queue::assertPushed(AccountDeletionJob::class);
     }
 
-    public function testGuestCannotDeleteAccount(): void
+    public function test_guest_cannot_delete_account(): void
     {
         $user = $this->character->user;
 
@@ -92,7 +92,7 @@ class AccountDeletionControllerTest extends TestCase
         Queue::assertNotPushed(AccountDeletionJob::class);
     }
 
-    public function testAjaxGuestCannotDeleteAccount(): void
+    public function test_ajax_guest_cannot_delete_account(): void
     {
         $user = $this->character->user;
 
@@ -112,7 +112,7 @@ class AccountDeletionControllerTest extends TestCase
         Queue::assertNotPushed(AccountDeletionJob::class);
     }
 
-    public function testCannotDeleteCharacter()
+    public function test_cannot_delete_character()
     {
         $user = $this->character->user;
 
@@ -125,7 +125,7 @@ class AccountDeletionControllerTest extends TestCase
         $response->assertSessionHas('error', 'You cannot do that.');
     }
 
-    public function testUnauthenticatedCannotResetAccount(): void
+    public function test_unauthenticated_cannot_reset_account(): void
     {
         $user = $this->character->user;
 
@@ -135,7 +135,7 @@ class AccountDeletionControllerTest extends TestCase
         $this->assertStringContainsString('/login', $response->headers->get('Location'));
     }
 
-    public function testAuthenticatedUserCannotResetAnotherUsersAccount(): void
+    public function test_authenticated_user_cannot_reset_another_users_account(): void
     {
         $user = $this->character->user;
         $anotherUser = $this->createUser();
@@ -147,7 +147,7 @@ class AccountDeletionControllerTest extends TestCase
         $response->assertSessionHas('error', 'You cannot do that.');
     }
 
-    public function testAuthenticatedUserCanResetOwnAccount(): void
+    public function test_authenticated_user_can_reset_own_account(): void
     {
         $user = $this->character->user;
         $characterId = $this->character->id;

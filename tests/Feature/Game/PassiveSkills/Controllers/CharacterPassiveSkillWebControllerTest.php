@@ -10,7 +10,7 @@ class CharacterPassiveSkillWebControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testCannotViewAnotherCharactersPassiveSkill(): void
+    public function test_cannot_view_another_characters_passive_skill(): void
     {
         $owner = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $ownerSkill = $owner->passiveSkills()->first();
@@ -25,5 +25,4 @@ class CharacterPassiveSkillWebControllerTest extends TestCase
 
         $this->assertSessionHas('error', 'You do not own that.');
     }
-
 }

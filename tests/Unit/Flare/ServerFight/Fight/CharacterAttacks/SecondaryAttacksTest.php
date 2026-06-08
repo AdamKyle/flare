@@ -17,11 +17,11 @@ class SecondaryAttacksTest extends TestCase
 {
     use CreateMonster, RefreshDatabase;
 
-    public function testNormalMonsterLifeStealingResistanceReducesDamageHealsAndCapsPlayerHealth(): void
+    public function test_normal_monster_life_stealing_resistance_reduces_damage_heals_and_caps_player_health(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        Cache::put('character-sheet-' . $character->id, [
+        Cache::put('character-sheet-'.$character->id, [
             'level' => $character->level,
             'health' => 1000,
         ]);
@@ -60,7 +60,7 @@ class SecondaryAttacksTest extends TestCase
         ], $secondaryAttacks->getMessages());
     }
 
-    public function testVampireAtUnderwaterCavesCanLifeStealSeventyFivePercent(): void
+    public function test_vampire_at_underwater_caves_can_life_steal_seventy_five_percent(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter([], [
             'name' => 'Vampire',
@@ -80,7 +80,7 @@ class SecondaryAttacksTest extends TestCase
             'type' => LocationType::UNDERWATER_CAVES,
         ]);
 
-        Cache::put('character-sheet-' . $character->id, [
+        Cache::put('character-sheet-'.$character->id, [
             'level' => $character->level,
             'health' => 1000,
         ]);
@@ -115,11 +115,11 @@ class SecondaryAttacksTest extends TestCase
         $this->assertEquals(1000, $secondaryAttacks->getCharacterHealth());
     }
 
-    public function testMonsterWithZeroLifeStealingResistanceDoesNotAddResistanceMessage(): void
+    public function test_monster_with_zero_life_stealing_resistance_does_not_add_resistance_message(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        Cache::put('character-sheet-' . $character->id, [
+        Cache::put('character-sheet-'.$character->id, [
             'level' => $character->level,
             'health' => 1000,
         ]);
@@ -158,11 +158,11 @@ class SecondaryAttacksTest extends TestCase
         ], $secondaryAttacks->getMessages());
     }
 
-    public function testPlayerElementalDamageDoesNotFireWhenMonsterHasNoAtonement(): void
+    public function test_player_elemental_damage_does_not_fire_when_monster_has_no_atonement(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        Cache::put('character-sheet-' . $character->id, [
+        Cache::put('character-sheet-'.$character->id, [
             'level' => $character->level,
             'health' => 1000,
             'elemental_atonement' => [
@@ -203,11 +203,11 @@ class SecondaryAttacksTest extends TestCase
         $this->assertEmpty($secondaryAttacks->getMessages());
     }
 
-    public function testPlayerElementalDamageUsesCorrectDamageSourceForAttackTypes(): void
+    public function test_player_elemental_damage_uses_correct_damage_source_for_attack_types(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        Cache::put('character-sheet-' . $character->id, [
+        Cache::put('character-sheet-'.$character->id, [
             'level' => $character->level,
             'health' => 1000,
             'elemental_atonement' => [
@@ -293,11 +293,11 @@ class SecondaryAttacksTest extends TestCase
         $this->assertEquals(975, $secondaryAttacks->getMonsterHealth());
     }
 
-    public function testPlayerElementalDamageDoesNotFireWhenDefending(): void
+    public function test_player_elemental_damage_does_not_fire_when_defending(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        Cache::put('character-sheet-' . $character->id, [
+        Cache::put('character-sheet-'.$character->id, [
             'level' => $character->level,
             'health' => 1000,
             'elemental_atonement' => [

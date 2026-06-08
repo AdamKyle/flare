@@ -34,7 +34,7 @@ class ExplorationLogServiceTest extends TestCase
 
     private ExplorationLogService $service;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -58,14 +58,14 @@ class ExplorationLogServiceTest extends TestCase
         $this->service = new ExplorationLogService();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Carbon::setTestNow();
 
         parent::tearDown();
     }
 
-    public function testStartCreatesExplorationLog(): void
+    public function test_start_creates_exploration_log(): void
     {
         $log = $this->service->start($this->character, $this->automation);
 
@@ -80,7 +80,7 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertEquals(1, ExplorationLog::count());
     }
 
-    public function testRecordFightTotalsAggregatesMultipleCalls(): void
+    public function test_record_fight_totals_aggregates_multiple_calls(): void
     {
         $log = $this->service->start($this->character, $this->automation);
 
@@ -118,7 +118,7 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertEquals(['gold' => 150, 'gold_dust' => 20], $log->currencies_gained);
     }
 
-    public function testFinalizeStoresEndedAtReasonAndSummary(): void
+    public function test_finalize_stores_ended_at_reason_and_summary(): void
     {
         $log = $this->service->start($this->character, $this->automation);
 
@@ -141,7 +141,7 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertEquals(500, $log->summary['xp_gained']);
     }
 
-    public function testLatestForCharacterReturnsNewestLog(): void
+    public function test_latest_for_character_returns_newest_log(): void
     {
         $this->createExplorationLog([
             'character_id' => $this->character->id,
@@ -167,7 +167,7 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertEquals($newer->id, $result->id);
     }
 
-    public function testOutputReturnsActiveExplorationShapeAndBroadcastsAfterStart(): void
+    public function test_output_returns_active_exploration_shape_and_broadcasts_after_start(): void
     {
         Event::fake();
         Carbon::setTestNow(now());
@@ -195,7 +195,7 @@ class ExplorationLogServiceTest extends TestCase
         });
     }
 
-    public function testOutputReturnsUpdatedExplorationShapeAndBroadcastsAfterTotals(): void
+    public function test_output_returns_updated_exploration_shape_and_broadcasts_after_totals(): void
     {
         Event::fake();
 
@@ -270,7 +270,7 @@ class ExplorationLogServiceTest extends TestCase
         });
     }
 
-    public function testOutputExposesCurrentRoundCreaturesFromSummaryWithoutChangingCompletedFights(): void
+    public function test_output_exposes_current_round_creatures_from_summary_without_changing_completed_fights(): void
     {
         Event::fake();
 
@@ -296,7 +296,7 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertEquals(8, $output['output']['totals']['kills']);
     }
 
-    public function testOutputPrefersRuntimeMonsterSnapshotCombatStatAliases(): void
+    public function test_output_prefers_runtime_monster_snapshot_combat_stat_aliases(): void
     {
         Event::fake();
 
@@ -349,7 +349,7 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertEquals(46, $output['output']['monster']['stats']['max_level']);
     }
 
-    public function testOutputReturnsWarningShapeAndBroadcastsAfterFinalize(): void
+    public function test_output_returns_warning_shape_and_broadcasts_after_finalize(): void
     {
         Event::fake();
 
@@ -389,7 +389,7 @@ class ExplorationLogServiceTest extends TestCase
         });
     }
 
-    public function testBaseOutputShowsBaseMonsterHealthRangeAndAttackRangeWithNoSnapshot(): void
+    public function test_base_output_shows_base_monster_health_range_and_attack_range_with_no_snapshot(): void
     {
         Event::fake();
 
@@ -408,7 +408,7 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertEquals('10-40', $output['output']['monster']['stats']['attack_range']);
     }
 
-    public function testOutputIncludesAttackDamageKeyInStatsWhenSnapshotHasIt(): void
+    public function test_output_includes_attack_damage_key_in_stats_when_snapshot_has_it(): void
     {
         Event::fake();
 
@@ -434,7 +434,7 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertEquals(42, $output['output']['monster']['stats']['attack_damage']);
     }
 
-    public function testOutputIncludesHealthKeyInStatsWhenSnapshotHasIt(): void
+    public function test_output_includes_health_key_in_stats_when_snapshot_has_it(): void
     {
         Event::fake();
 
@@ -460,7 +460,7 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertEquals(500, $output['output']['monster']['stats']['health']);
     }
 
-    public function testOutputExcludesAttackDamageAndHealthKeysWhenSnapshotLacksThem(): void
+    public function test_output_excludes_attack_damage_and_health_keys_when_snapshot_lacks_them(): void
     {
         Event::fake();
 
@@ -487,7 +487,7 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertArrayNotHasKey('health', $output['output']['monster']['stats']);
     }
 
-    public function testRecordFightTotalsBroadcastsByDefault(): void
+    public function test_record_fight_totals_broadcasts_by_default(): void
     {
         Event::fake();
 
@@ -498,7 +498,7 @@ class ExplorationLogServiceTest extends TestCase
         Event::assertDispatched(ExplorationOutputUpdated::class);
     }
 
-    public function testRecordFightTotalsDoesNotBroadcastWhenBroadcastIsFalse(): void
+    public function test_record_fight_totals_does_not_broadcast_when_broadcast_is_false(): void
     {
         Event::fake();
 
@@ -511,7 +511,7 @@ class ExplorationLogServiceTest extends TestCase
         Event::assertNotDispatched(ExplorationOutputUpdated::class);
     }
 
-    public function testRecordMonsterSnapshotBroadcastsByDefault(): void
+    public function test_record_monster_snapshot_broadcasts_by_default(): void
     {
         Event::fake();
 
@@ -522,7 +522,7 @@ class ExplorationLogServiceTest extends TestCase
         Event::assertDispatched(ExplorationOutputUpdated::class);
     }
 
-    public function testRecordMonsterSnapshotDoesNotBroadcastWhenBroadcastIsFalse(): void
+    public function test_record_monster_snapshot_does_not_broadcast_when_broadcast_is_false(): void
     {
         Event::fake();
 
@@ -535,7 +535,7 @@ class ExplorationLogServiceTest extends TestCase
         Event::assertNotDispatched(ExplorationOutputUpdated::class);
     }
 
-    public function testRecordCurrentRoundCreaturesBroadcastsByDefault(): void
+    public function test_record_current_round_creatures_broadcasts_by_default(): void
     {
         Event::fake();
 
@@ -546,7 +546,7 @@ class ExplorationLogServiceTest extends TestCase
         Event::assertDispatched(ExplorationOutputUpdated::class);
     }
 
-    public function testRecordCurrentRoundCreaturesDoesNotBroadcastWhenBroadcastIsFalse(): void
+    public function test_record_current_round_creatures_does_not_broadcast_when_broadcast_is_false(): void
     {
         Event::fake();
 
@@ -559,7 +559,7 @@ class ExplorationLogServiceTest extends TestCase
         Event::assertNotDispatched(ExplorationOutputUpdated::class);
     }
 
-    public function testOutputReturnsNullShapeAndBroadcastsAfterClear(): void
+    public function test_output_returns_null_shape_and_broadcasts_after_clear(): void
     {
         Event::fake();
 

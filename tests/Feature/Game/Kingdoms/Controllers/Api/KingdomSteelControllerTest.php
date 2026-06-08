@@ -12,7 +12,7 @@ class KingdomSteelControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testOwnerCanSmeltSteelInOwnKingdom(): void
+    public function test_owner_can_smelt_steel_in_own_kingdom(): void
     {
         Queue::fake();
 
@@ -28,7 +28,7 @@ class KingdomSteelControllerTest extends TestCase
         $character = $characterFactory->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdoms/smelt-iron/' . $kingdom->id, [
+            ->call('POST', '/api/kingdoms/smelt-iron/'.$kingdom->id, [
                 'amount_to_smelt' => 1,
             ]);
 
@@ -37,7 +37,7 @@ class KingdomSteelControllerTest extends TestCase
         $this->assertSame(1, SmeltingProgress::where('kingdom_id', $kingdom->id)->count());
     }
 
-    public function testOwnerCanCancelSmeltingInOwnKingdom(): void
+    public function test_owner_can_cancel_smelting_in_own_kingdom(): void
     {
         Queue::fake();
 
@@ -59,14 +59,14 @@ class KingdomSteelControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdoms/cancel-smelting/' . $kingdom->id);
+            ->call('POST', '/api/kingdoms/cancel-smelting/'.$kingdom->id);
 
         $response->assertOk();
         $this->assertNull(SmeltingProgress::find($queue->id));
         $this->assertGreaterThan(1000, $kingdom->refresh()->current_iron);
     }
 
-    public function testNonOwnerCannotSmeltSteelInAnotherCharactersKingdom(): void
+    public function test_non_owner_cannot_smelt_steel_in_another_characters_kingdom(): void
     {
         Queue::fake();
 
@@ -83,7 +83,7 @@ class KingdomSteelControllerTest extends TestCase
         $nonOwner = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $response = $this->actingAs($nonOwner->user)
-            ->call('POST', '/api/kingdoms/smelt-iron/' . $kingdom->id, [
+            ->call('POST', '/api/kingdoms/smelt-iron/'.$kingdom->id, [
                 'amount_to_smelt' => 1,
             ], [], [], ['HTTP_ACCEPT' => 'application/json']);
 
@@ -93,7 +93,7 @@ class KingdomSteelControllerTest extends TestCase
         $this->assertSame(0, SmeltingProgress::where('kingdom_id', $kingdom->id)->count());
     }
 
-    public function testNonOwnerCannotCancelSmeltingInAnotherCharactersKingdom(): void
+    public function test_non_owner_cannot_cancel_smelting_in_another_characters_kingdom(): void
     {
         Queue::fake();
 
@@ -115,7 +115,7 @@ class KingdomSteelControllerTest extends TestCase
         $nonOwner = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $response = $this->actingAs($nonOwner->user)
-            ->call('POST', '/api/kingdoms/cancel-smelting/' . $kingdom->id,
+            ->call('POST', '/api/kingdoms/cancel-smelting/'.$kingdom->id,
                 [], [], [], ['HTTP_ACCEPT' => 'application/json']
             );
 

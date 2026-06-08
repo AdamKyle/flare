@@ -19,7 +19,7 @@ class TimersControllerTest extends TestCase
 
     private Character $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -30,14 +30,14 @@ class TimersControllerTest extends TestCase
             ->getCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Carbon::setTestNow();
 
         parent::tearDown();
     }
 
-    public function testExpiredAutomationOnlyBroadcastsZeroAutomationTimer(): void
+    public function test_expired_automation_only_broadcasts_zero_automation_timer(): void
     {
         Event::fake();
 
@@ -54,7 +54,7 @@ class TimersControllerTest extends TestCase
         });
     }
 
-    public function testExpiredOlderAutomationAndActiveLatestAutomationBroadcastsActiveTimer(): void
+    public function test_expired_older_automation_and_active_latest_automation_broadcasts_active_timer(): void
     {
         Event::fake();
 

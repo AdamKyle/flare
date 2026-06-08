@@ -24,7 +24,7 @@ class ExplorationWarningServiceTest extends TestCase
 
     private ExplorationWarningService $service;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -36,12 +36,12 @@ class ExplorationWarningServiceTest extends TestCase
         $this->service = new ExplorationWarningService();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
 
-    public function testCreateWarningReturnsState(): void
+    public function test_create_warning_returns_state(): void
     {
         Event::fake();
 
@@ -63,7 +63,7 @@ class ExplorationWarningServiceTest extends TestCase
         });
     }
 
-    public function testGetStateReturnsOnlyTheNewestWarning(): void
+    public function test_get_state_returns_only_the_newest_warning(): void
     {
         Event::fake();
 
@@ -110,7 +110,7 @@ class ExplorationWarningServiceTest extends TestCase
         });
     }
 
-    public function testDismissLatestDeletesWarningAndLinkedLogAndBroadcastsClearedState(): void
+    public function test_dismiss_latest_deletes_warning_and_linked_log_and_broadcasts_cleared_state(): void
     {
         Event::fake();
 
@@ -139,7 +139,7 @@ class ExplorationWarningServiceTest extends TestCase
         });
     }
 
-    public function testDismissSelectedDeletesWarningAndLinkedLogAndBroadcastsClearedState(): void
+    public function test_dismiss_selected_deletes_warning_and_linked_log_and_broadcasts_cleared_state(): void
     {
         Event::fake();
 
@@ -168,7 +168,7 @@ class ExplorationWarningServiceTest extends TestCase
         });
     }
 
-    public function testDismissLatestDoesNothingWhenNoWarningExists(): void
+    public function test_dismiss_latest_does_nothing_when_no_warning_exists(): void
     {
         Event::fake();
 

@@ -2,20 +2,14 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
-use App\Flare\Models\Announcement;
-use App\Flare\Models\CapitalCityUnitQueue;
-use App\Flare\Models\Character;
-use App\Flare\Models\Item;
-use App\Flare\Models\Monster;
-use App\Flare\Models\UnitInQueue;
+use App\Flare\Models\GameMap;
+use App\Flare\Models\InfoPage;
+use App\Flare\Values\MapNameValue;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\InfoPage;
-use App\Flare\Values\MapNameValue;
 
 class MassImportCustomData extends Command
 {
@@ -52,8 +46,6 @@ class MassImportCustomData extends Command
 
     /**
      * Import the information section
-     *
-     * @return void
      */
     private function importInformationSection(): void
     {
@@ -71,7 +63,7 @@ class MassImportCustomData extends Command
         $sourceDirectory = resource_path('backup/info-sections-images');
         $destinationDirectory = storage_path('app/public');
 
-        $deleteCommand = 'rm -rf ' . escapeshellarg($destinationDirectory) . './info-sections-images';
+        $deleteCommand = 'rm -rf '.escapeshellarg($destinationDirectory).'./info-sections-images';
         exec($deleteCommand, $output, $exitCode);
 
         if ($exitCode !== 0) {
@@ -80,7 +72,7 @@ class MassImportCustomData extends Command
             return;
         }
 
-        $command = 'cp -R ' . escapeshellarg($sourceDirectory) . ' ' . escapeshellarg($destinationDirectory);
+        $command = 'cp -R '.escapeshellarg($sourceDirectory).' '.escapeshellarg($destinationDirectory);
         exec($command, $output, $exitCode);
 
         if ($exitCode === 0) {
@@ -93,7 +85,6 @@ class MassImportCustomData extends Command
     /**
      * Import the game maps
      *
-     * @return void
      * @throws Exception
      */
     private function importGameMaps(): void
@@ -123,7 +114,7 @@ class MassImportCustomData extends Command
         foreach ($files as $file) {
             $fileName = pathinfo($file, PATHINFO_FILENAME);
 
-            $path = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps') . '/' . $file));
+            $path = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps').'/'.$file));
 
             $mapValue = new MapNameValue($fileName);
 

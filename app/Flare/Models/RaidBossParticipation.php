@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class RaidBossParticipation extends Model
 {
     use HasFactory;
+
     /**
      * The attributes that are mass assignable.
      *

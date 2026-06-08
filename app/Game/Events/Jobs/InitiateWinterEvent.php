@@ -90,7 +90,7 @@ class InitiateWinterEvent implements ShouldQueue
         $raidsForEvent = $scheduledEvent->raids_for_event;
         $shiftedRaidsForEvent = null;
 
-        if (!is_null($raidsForEvent)) {
+        if (! is_null($raidsForEvent)) {
             $shiftedRaidsForEvent = array_map(function ($raidForEvent) {
                 return array_merge($raidForEvent, [
                     'start_date' => Carbon::parse($raidForEvent['start_date'])->addYear()->format('Y-m-d\TH:i:s.u\Z'),

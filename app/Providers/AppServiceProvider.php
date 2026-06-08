@@ -3,11 +3,8 @@
 namespace App\Providers;
 
 use App\Console\AfterDeployment\AddHolyStacksToItems;
-use App\Console\AfterDeployment\AllowTraverseForMaps;
 use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
 use App\Console\AfterDeployment\CleanDanglingCharacterData;
-use App\Console\AfterDeployment\CreateLocationDataCache;
-use App\Console\AfterDeployment\CreateMonsterCache;
 use App\Console\AfterDeployment\RepairQuestFeatureRewards;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
 use App\Console\DevelopmentCommands\CompleteGuideQuestForCharacter;
@@ -18,7 +15,6 @@ use App\Console\DevelopmentCommands\GivePlayerAncenstorItem;
 use App\Console\DevelopmentCommands\GivePlayerDelveLocationQuestItems;
 use App\Console\DevelopmentCommands\GivePlayerUniqueItem;
 use App\Console\DevelopmentCommands\LevelCharacter;
-use App\Console\DevelopmentCommands\ManageKingdomResources;
 use App\Console\DevelopmentCommands\MaxOutCharacter;
 use App\Console\DevelopmentCommands\MaxOutCharactersPassiveSkills;
 use App\Console\DevelopmentCommands\ReincarnateCharacter;
@@ -40,11 +36,8 @@ class AppServiceProvider extends ServiceProvider
         $this->commands([
             // After Deployment Commands
             AddHolyStacksToItems::class,
-            AllowTraverseForMaps::class,
             AssignNewNpcsToFactionLoyalty::class,
             CleanDanglingCharacterData::class,
-            CreateMonsterCache::class,
-            CreateLocationDataCache::class,
             RepairQuestFeatureRewards::class,
 
             // Development Commands:
@@ -81,7 +74,7 @@ class AppServiceProvider extends ServiceProvider
 
             $headers = [
                 'Content-type' => 'text/json',
-                'Content-Disposition' => 'attachment; filename=' . $fileName . '.json',
+                'Content-Disposition' => 'attachment; filename='.$fileName.'.json',
             ];
 
             return \Response::make($content, 200, $headers);

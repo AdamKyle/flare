@@ -55,7 +55,6 @@ class Kernel extends ConsoleKernel
         // Determine if we should alert on new guide quest.
         $schedule->command('check:for-complete-guide-quests')->everySecond();
 
-
         // See if we have inactive sessions that need to be filled out.
         $schedule->command('check:inactive-sessions')->everyFifteenMinutes();
 

@@ -5,19 +5,9 @@ namespace Tests\Unit\Flare\Jobs;
 use App\Flare\Jobs\AccountDeletionJob;
 use App\Flare\Mail\GenericMail;
 use App\Flare\Models\Character;
-use App\Flare\Models\GameBuilding;
-use App\Flare\Models\GameClass;
 use App\Flare\Models\GameMap;
-use App\Flare\Models\GameRace;
-use App\Flare\Models\GameUnit;
-use App\Flare\Models\GlobalEventGoal;
-use App\Flare\Models\Inventory;
-use App\Flare\Models\InventorySlot;
-use App\Flare\Models\Item;
 use App\Flare\Models\Kingdom;
-use App\Flare\Models\Monster;
-use App\Flare\Models\PassiveSkill;
-use App\Flare\Models\Quest;
+use App\Flare\Models\SuggestionAndBugs;
 use App\Flare\Models\User;
 use App\Flare\Models\UserSiteAccessStatistics;
 use App\Flare\Services\CharacterDeletion;
@@ -57,7 +47,7 @@ class AccountDeletionJobTest extends TestCase
 
     private ?CharacterFactory $characterFactory;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -88,7 +78,7 @@ class AccountDeletionJobTest extends TestCase
         Event::fake();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -138,7 +128,7 @@ class AccountDeletionJobTest extends TestCase
 
         AccountDeletionJob::dispatch($user);
 
-        $this->assertNotNull(\App\Flare\Models\SuggestionAndBugs::find($suggestion->id));
+        $this->assertNotNull(SuggestionAndBugs::find($suggestion->id));
     }
 
     public function test_kingdoms_are_transferred_not_deleted(): void

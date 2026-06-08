@@ -49,6 +49,7 @@ class RepairQuestFeatureRewards extends Command
 
             if ($setCount >= 20) {
                 $skipped++;
+
                 continue;
             }
 
@@ -93,6 +94,7 @@ class RepairQuestFeatureRewards extends Command
 
             if ($character->inventory_max >= 150) {
                 $skipped++;
+
                 continue;
             }
 

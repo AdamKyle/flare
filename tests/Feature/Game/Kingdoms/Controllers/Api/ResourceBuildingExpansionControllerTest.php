@@ -14,7 +14,7 @@ class ResourceBuildingExpansionControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testOwnerCanStartOwnResourceBuildingExpansion(): void
+    public function test_owner_can_start_own_resource_building_expansion(): void
     {
         Queue::fake();
 
@@ -41,7 +41,7 @@ class ResourceBuildingExpansionControllerTest extends TestCase
         $building = $kingdom->buildings()->first();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdom/building-expansion/expand/' . $building->id . '/' . $character->id);
+            ->call('POST', '/api/kingdom/building-expansion/expand/'.$building->id.'/'.$character->id);
 
         $response->assertOk();
         $this->assertSame(1, BuildingExpansionQueue::where('building_id', $building->id)->count());
@@ -52,7 +52,7 @@ class ResourceBuildingExpansionControllerTest extends TestCase
         $this->assertSame(0, $kingdom->refresh()->current_steel);
     }
 
-    public function testOwnerCanCancelOwnResourceBuildingExpansion(): void
+    public function test_owner_can_cancel_own_resource_building_expansion(): void
     {
         Queue::fake();
 
@@ -93,14 +93,14 @@ class ResourceBuildingExpansionControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/kingdom/building-expansion/cancel-expand/' . $building->id . '/' . $character->id);
+            ->call('POST', '/api/kingdom/building-expansion/cancel-expand/'.$building->id.'/'.$character->id);
 
         $response->assertOk();
         $this->assertNull(BuildingExpansionQueue::find($queue->id));
         $this->assertGreaterThan(1000, $kingdom->refresh()->current_wood);
     }
 
-    public function testNonOwnerCannotExpandAnotherCharactersResourceBuilding(): void
+    public function test_non_owner_cannot_expand_another_characters_resource_building(): void
     {
         Queue::fake();
 
@@ -120,7 +120,7 @@ class ResourceBuildingExpansionControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($nonOwner->user)
-            ->call('POST', '/api/kingdom/building-expansion/expand/' . $building->id . '/' . $nonOwner->id,
+            ->call('POST', '/api/kingdom/building-expansion/expand/'.$building->id.'/'.$nonOwner->id,
                 [], [], [], ['HTTP_ACCEPT' => 'application/json']
             );
 
@@ -134,7 +134,7 @@ class ResourceBuildingExpansionControllerTest extends TestCase
         $this->assertSame($kingdom->current_steel, $kingdom->refresh()->current_steel);
     }
 
-    public function testNonOwnerCannotCancelAnotherCharactersResourceBuildingExpansion(): void
+    public function test_non_owner_cannot_cancel_another_characters_resource_building_expansion(): void
     {
         Queue::fake();
 
@@ -172,7 +172,7 @@ class ResourceBuildingExpansionControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($nonOwner->user)
-            ->call('POST', '/api/kingdom/building-expansion/cancel-expand/' . $building->id . '/' . $nonOwner->id,
+            ->call('POST', '/api/kingdom/building-expansion/cancel-expand/'.$building->id.'/'.$nonOwner->id,
                 [], [], [], ['HTTP_ACCEPT' => 'application/json']
             );
 

@@ -13,7 +13,7 @@ class IsAdminMiddlewareTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testUnauthenticatedJsonRequestReturns401(): void
+    public function test_unauthenticated_json_request_returns401(): void
     {
         $request = Request::create('/test', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
 
@@ -22,7 +22,7 @@ class IsAdminMiddlewareTest extends TestCase
         $this->assertEquals(401, $response->getStatusCode());
     }
 
-    public function testAuthenticatedNonAdminJsonRequestReturns403(): void
+    public function test_authenticated_non_admin_json_request_returns403(): void
     {
         $user = User::factory()->create();
         $request = Request::create('/test', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
@@ -33,7 +33,7 @@ class IsAdminMiddlewareTest extends TestCase
         $this->assertEquals(403, $response->getStatusCode());
     }
 
-    public function testAuthenticatedAdminRequestPassesThrough(): void
+    public function test_authenticated_admin_request_passes_through(): void
     {
         $role = Role::firstOrCreate(['name' => 'Admin']);
         $user = User::factory()->create();

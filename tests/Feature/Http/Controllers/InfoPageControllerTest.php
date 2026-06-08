@@ -10,7 +10,7 @@ class InfoPageControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testPublicInformationSearchReturnsMatchingPages(): void
+    public function test_public_information_search_returns_matching_pages(): void
     {
         InfoPage::create([
             'page_name' => 'combat-guide',
@@ -28,7 +28,7 @@ class InfoPageControllerTest extends TestCase
         $response->assertSee('Combat guide');
     }
 
-    public function testMaliciousInformationSearchCannotAlterOrBreakQuery(): void
+    public function test_malicious_information_search_cannot_alter_or_break_query(): void
     {
         InfoPage::create([
             'page_name' => 'secret-page',
@@ -46,7 +46,7 @@ class InfoPageControllerTest extends TestCase
         $response->assertDontSee('Secret Page');
     }
 
-    public function testSearchHighlightingStillWorksForNormalQuery(): void
+    public function test_search_highlighting_still_works_for_normal_query(): void
     {
         InfoPage::create([
             'page_name' => 'combat-guide',
@@ -64,7 +64,7 @@ class InfoPageControllerTest extends TestCase
         $response->assertSee('<strong>strikes</strong>', false);
     }
 
-    public function testDotStarQueryDoesNotHighlightEntireSnippet(): void
+    public function test_dot_star_query_does_not_highlight_entire_snippet(): void
     {
         InfoPage::create([
             'page_name' => 'combat-guide',
@@ -82,7 +82,7 @@ class InfoPageControllerTest extends TestCase
         $response->assertDontSee('<strong>Use', false);
     }
 
-    public function testUnclosedParenthesisQueryDoesNotDropSnippet(): void
+    public function test_unclosed_parenthesis_query_does_not_drop_snippet(): void
     {
         InfoPage::create([
             'page_name' => 'combat-guide',

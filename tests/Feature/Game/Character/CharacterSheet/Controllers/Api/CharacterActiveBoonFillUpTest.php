@@ -20,14 +20,14 @@ class CharacterActiveBoonFillUpTest extends TestCase
     use CreateItem;
     use RefreshDatabase;
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Carbon::setTestNow();
 
         parent::tearDown();
     }
 
-    public function testActiveBoonRowsIncludeAmountLeft(): void
+    public function test_active_boon_rows_include_amount_left(): void
     {
         $item = $this->createBoonItem();
 
@@ -56,7 +56,7 @@ class CharacterActiveBoonFillUpTest extends TestCase
         $this->assertEquals(2, $jsonData['active_boons'][0]['amount_left']);
     }
 
-    public function testFillUpBoonConsumesItemAndExtendsBoon(): void
+    public function test_fill_up_boon_consumes_item_and_extends_boon(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
         Queue::fake();
@@ -91,7 +91,7 @@ class CharacterActiveBoonFillUpTest extends TestCase
         $this->assertEquals(0, $jsonData['boons'][0]['amount_left']);
     }
 
-    public function testFillUpBoonWithoutItemReturnsUnprocessable(): void
+    public function test_fill_up_boon_without_item_returns_unprocessable(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
         Queue::fake();
@@ -125,7 +125,7 @@ class CharacterActiveBoonFillUpTest extends TestCase
     /**
      * @dataProvider activeAutomationTypes
      */
-    public function testFillUpBoonSucceedsDuringActiveAutomation(int $automationType): void
+    public function test_fill_up_boon_succeeds_during_active_automation(int $automationType): void
     {
         Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
         Queue::fake();
@@ -172,7 +172,7 @@ class CharacterActiveBoonFillUpTest extends TestCase
         ];
     }
 
-    public function testFillUpBoonUsesTwoItemsWhenTwoAvailable(): void
+    public function test_fill_up_boon_uses_two_items_when_two_available(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
         Queue::fake();
@@ -207,7 +207,7 @@ class CharacterActiveBoonFillUpTest extends TestCase
         $this->assertEquals(0, $character->refresh()->inventory->slots()->where('item_id', $item->id)->count());
     }
 
-    public function testFillUpBoonUsesFourItemsWhenEightAvailable(): void
+    public function test_fill_up_boon_uses_four_items_when_eight_available(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
         Queue::fake();
@@ -248,7 +248,7 @@ class CharacterActiveBoonFillUpTest extends TestCase
         $this->assertEquals(4, $character->refresh()->inventory->slots()->where('item_id', $item->id)->count());
     }
 
-    public function testFillUpBoonUsesFourItemsWhenFourAvailable(): void
+    public function test_fill_up_boon_uses_four_items_when_four_available(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
         Queue::fake();
@@ -285,7 +285,7 @@ class CharacterActiveBoonFillUpTest extends TestCase
         $this->assertEquals(0, $character->refresh()->inventory->slots()->where('item_id', $item->id)->count());
     }
 
-    public function testFillUpBoonCapsAmountUsedAtMaxStackCount(): void
+    public function test_fill_up_boon_caps_amount_used_at_max_stack_count(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
         Queue::fake();
@@ -329,7 +329,7 @@ class CharacterActiveBoonFillUpTest extends TestCase
         $this->assertEquals(0, $character->refresh()->inventory->slots()->where('item_id', $item->id)->count());
     }
 
-    public function testNonStackingTwoHourBoonRefillCapsAtTwoHours(): void
+    public function test_non_stacking_two_hour_boon_refill_caps_at_two_hours(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
         Queue::fake();
@@ -367,7 +367,7 @@ class CharacterActiveBoonFillUpTest extends TestCase
         $this->assertEquals(1, $character->refresh()->inventory->slots()->where('item_id', $item->id)->count());
     }
 
-    public function testNonStackingTwoHourBoonWithBadAmountUsedRefillCapsAtTwoHours(): void
+    public function test_non_stacking_two_hour_boon_with_bad_amount_used_refill_caps_at_two_hours(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
         Queue::fake();
@@ -405,7 +405,7 @@ class CharacterActiveBoonFillUpTest extends TestCase
         $this->assertEquals(1, $character->refresh()->inventory->slots()->where('item_id', $item->id)->count());
     }
 
-    public function testStackingThreeSixtyMinuteBoonsRefillCapsAtOneHundredEightyMinutes(): void
+    public function test_stacking_three_sixty_minute_boons_refill_caps_at_one_hundred_eighty_minutes(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
         Queue::fake();
@@ -446,7 +446,7 @@ class CharacterActiveBoonFillUpTest extends TestCase
         $this->assertEquals(3, $character->refresh()->inventory->slots()->where('item_id', $item->id)->count());
     }
 
-    public function testStackingFourTwoHourBoonsRefillCapsAtFourHundredEightyMinutes(): void
+    public function test_stacking_four_two_hour_boons_refill_caps_at_four_hundred_eighty_minutes(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
         Queue::fake();
@@ -482,7 +482,7 @@ class CharacterActiveBoonFillUpTest extends TestCase
         $this->assertEquals(1, $character->refresh()->inventory->slots()->where('item_id', $item->id)->count());
     }
 
-    public function testRefillNeverChangesAmountUsed(): void
+    public function test_refill_never_changes_amount_used(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
         Queue::fake();
@@ -516,7 +516,7 @@ class CharacterActiveBoonFillUpTest extends TestCase
         $this->assertEquals(2, $boon->refresh()->amount_used);
     }
 
-    public function testCappedRefillConsumesNothingAndReturnsExistingError(): void
+    public function test_capped_refill_consumes_nothing_and_returns_existing_error(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
         Queue::fake();

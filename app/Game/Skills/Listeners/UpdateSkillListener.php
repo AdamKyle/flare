@@ -118,9 +118,6 @@ class UpdateSkillListener
 
     /**
      * Check to see if we should update the skill based on prefined skill properties.
-     *
-     * @param GameSkill $skill
-     * @return boolean
      */
     protected function shouldUpdateCharacterAttackData(GameSkill $skill): bool
     {
@@ -140,7 +137,6 @@ class UpdateSkillListener
 
         return false;
     }
-
 
     protected function updateCharacterAttackDataCache(Character $character)
     {

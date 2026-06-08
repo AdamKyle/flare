@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Game\Kingdoms\Middleware;
 
-use App\Game\Kingdoms\Middleware\DoesKingdomBelongToAuthorizedUser;
 use App\Flare\Models\Kingdom;
+use App\Game\Kingdoms\Middleware\DoesKingdomBelongToAuthorizedUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
@@ -14,7 +14,7 @@ class DoesKingdomBelongToAuthorizedUserTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testOwnerIsAllowedForOwnKingdom(): void
+    public function test_owner_is_allowed_for_own_kingdom(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
@@ -32,7 +32,7 @@ class DoesKingdomBelongToAuthorizedUserTest extends TestCase
         $this->assertSame(200, $response->getStatusCode());
     }
 
-    public function testRouteCharacterCannotOverrideAuthenticatedCharacterOwnership(): void
+    public function test_route_character_cannot_override_authenticated_character_ownership(): void
     {
         $ownerFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $ownerFactory->kingdomManagement()->assignKingdom()->getKingdom();
@@ -51,7 +51,7 @@ class DoesKingdomBelongToAuthorizedUserTest extends TestCase
         $this->assertSame(422, $response->getStatusCode());
     }
 
-    public function testMatchingKingdomAndCharacterIdsDoNotGrantOwnership(): void
+    public function test_matching_kingdom_and_character_ids_do_not_grant_ownership(): void
     {
         $ownerFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $owner = $ownerFactory->getCharacter();

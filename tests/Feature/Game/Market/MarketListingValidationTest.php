@@ -19,7 +19,7 @@ class MarketListingValidationTest extends TestCase
         $item = $this->createItem();
         $slot = $character->inventory->slots()->create(['item_id' => $item->id]);
 
-        $response = $this->actingAs($character->user)->call('POST', '/api/market-board/sell-item/' . $character->id, [
+        $response = $this->actingAs($character->user)->call('POST', '/api/market-board/sell-item/'.$character->id, [
             'slot_id' => $slot->id,
             'list_for' => -1,
         ]);
@@ -33,7 +33,7 @@ class MarketListingValidationTest extends TestCase
         $item = $this->createItem();
         $slot = $character->inventory->slots()->create(['item_id' => $item->id]);
 
-        $response = $this->actingAs($character->user)->call('POST', '/api/market-board/sell-item/' . $character->id, [
+        $response = $this->actingAs($character->user)->call('POST', '/api/market-board/sell-item/'.$character->id, [
             'slot_id' => $slot->id,
             'list_for' => 0,
         ]);
@@ -47,7 +47,7 @@ class MarketListingValidationTest extends TestCase
         $item = $this->createItem();
         $slot = $character->inventory->slots()->create(['item_id' => $item->id]);
 
-        $this->actingAs($character->user)->call('POST', '/api/market-board/sell-item/' . $character->id, [
+        $this->actingAs($character->user)->call('POST', '/api/market-board/sell-item/'.$character->id, [
             'slot_id' => $slot->id,
             'list_for' => -100,
         ]);
@@ -63,7 +63,7 @@ class MarketListingValidationTest extends TestCase
         $item = $this->createItem(['cost' => 100]);
         $slot = $character->inventory->slots()->create(['item_id' => $item->id]);
 
-        $response = $this->actingAs($character->user)->call('POST', '/api/market-board/sell-item/' . $character->id, [
+        $response = $this->actingAs($character->user)->call('POST', '/api/market-board/sell-item/'.$character->id, [
             'slot_id' => $slot->id,
             'list_for' => 1000,
         ]);

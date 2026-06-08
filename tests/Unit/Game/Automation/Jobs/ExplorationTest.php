@@ -49,7 +49,7 @@ class ExplorationTest extends TestCase
 
     private ?Monster $monster;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -71,7 +71,7 @@ class ExplorationTest extends TestCase
 
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
 
@@ -84,7 +84,7 @@ class ExplorationTest extends TestCase
         parent::tearDown();
     }
 
-    public function testHandleDoesNotDeleteCurrentAutomationWhenStaleAutomationDoesNotExist(): void
+    public function test_handle_does_not_delete_current_automation_when_stale_automation_does_not_exist(): void
     {
         Event::fake();
 
@@ -107,7 +107,7 @@ class ExplorationTest extends TestCase
         $this->assertEquals(AttackTypeValue::ATTACK, $automation->attack_type);
     }
 
-    public function testHandleMissingAutomationSafelyBailsWithoutCancellingCurrentAutomation(): void
+    public function test_handle_missing_automation_safely_bails_without_cancelling_current_automation(): void
     {
         Event::fake();
 
@@ -128,7 +128,7 @@ class ExplorationTest extends TestCase
         Event::assertNotDispatched(AutomationLogUpdate::class);
     }
 
-    public function testHandleEndsExpiredAutomation(): void
+    public function test_handle_ends_expired_automation(): void
     {
         Event::fake();
 
@@ -167,7 +167,7 @@ class ExplorationTest extends TestCase
         $this->assertNull(CharacterAutomation::find($automation->id));
     }
 
-    public function testHandleClearsSurvivalCacheWhenAutomationExpired(): void
+    public function test_handle_clears_survival_cache_when_automation_expired(): void
     {
         Event::fake();
 
@@ -203,10 +203,10 @@ class ExplorationTest extends TestCase
 
         Exploration::dispatchSync($this->character, $automation->id, AttackTypeValue::ATTACK, 5);
 
-        $this->assertFalse(Cache::has('can-character-survive-' . $this->character->id));
+        $this->assertFalse(Cache::has('can-character-survive-'.$this->character->id));
     }
 
-    public function testHandleRewardsGoldWhenAutomationEnds(): void
+    public function test_handle_rewards_gold_when_automation_ends(): void
     {
         Event::fake();
 
@@ -251,7 +251,7 @@ class ExplorationTest extends TestCase
         $this->assertEquals(10010, $this->character->refresh()->gold);
     }
 
-    public function testBeginExplorationAcceptsClearedSelectionsAndUsesDefaultValues(): void
+    public function test_begin_exploration_accepts_cleared_selections_and_uses_default_values(): void
     {
         Event::fake();
 
@@ -273,7 +273,7 @@ class ExplorationTest extends TestCase
         $this->assertTrue($automation->completed_at->greaterThan(now()));
     }
 
-    public function testHandleCapsGoldWhenAutomationRewardWouldExceedMaxGold(): void
+    public function test_handle_caps_gold_when_automation_reward_would_exceed_max_gold(): void
     {
         Event::fake();
 
@@ -318,7 +318,7 @@ class ExplorationTest extends TestCase
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD, $this->character->gold);
     }
 
-    public function testHandleDispatchesCurrencyUpdateWhenAutomationEnds(): void
+    public function test_handle_dispatches_currency_update_when_automation_ends(): void
     {
         Event::fake();
 
@@ -357,7 +357,7 @@ class ExplorationTest extends TestCase
         Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
     }
 
-    public function testHandleDispatchesUpdateCharacterStatusWhenAutomationEnds(): void
+    public function test_handle_dispatches_update_character_status_when_automation_ends(): void
     {
         Event::fake();
 
@@ -396,7 +396,7 @@ class ExplorationTest extends TestCase
         Event::assertDispatched(UpdateCharacterStatus::class);
     }
 
-    public function testHandleDispatchesAutomationTimeoutWhenAutomationEnds(): void
+    public function test_handle_dispatches_automation_timeout_when_automation_ends(): void
     {
         Event::fake();
 
@@ -435,7 +435,7 @@ class ExplorationTest extends TestCase
         Event::assertDispatched(AutomationTimeOut::class);
     }
 
-    public function testHandleDispatchesAutomationLogUpdateWhenCharacterIsLoggedIn(): void
+    public function test_handle_dispatches_automation_log_update_when_character_is_logged_in(): void
     {
         Event::fake();
 
@@ -474,7 +474,7 @@ class ExplorationTest extends TestCase
         Event::assertDispatched(AutomationLogUpdate::class);
     }
 
-    public function testHandleRecordsDerivedRuntimeAttackDamageFromBuiltMonsterAttackRange(): void
+    public function test_handle_records_derived_runtime_attack_damage_from_built_monster_attack_range(): void
     {
         Event::fake();
 
@@ -555,7 +555,7 @@ class ExplorationTest extends TestCase
         $this->assertEquals(12, $log->summary['monster']['stats']['attack_damage']);
     }
 
-    public function testHandleRecordsFightAttackDamageWhenFightProvidesPositiveValue(): void
+    public function test_handle_records_fight_attack_damage_when_fight_provides_positive_value(): void
     {
         Event::fake();
 
@@ -636,7 +636,7 @@ class ExplorationTest extends TestCase
         $this->assertEquals(99, $log->summary['monster']['stats']['attack_damage']);
     }
 
-    public function testHandleWithZeroFightTimeoutModifierFightsSixRealCreatures(): void
+    public function test_handle_with_zero_fight_timeout_modifier_fights_six_real_creatures(): void
     {
         Event::fake();
 
@@ -701,7 +701,7 @@ class ExplorationTest extends TestCase
         $this->assertNull(CharacterAutomation::find($automation->id));
     }
 
-    public function testHandleWithFullFightTimeoutModifierFightsTwelveRealCreatures(): void
+    public function test_handle_with_full_fight_timeout_modifier_fights_twelve_real_creatures(): void
     {
         Event::fake();
 
@@ -766,7 +766,7 @@ class ExplorationTest extends TestCase
         $this->assertNull(CharacterAutomation::find($automation->id));
     }
 
-    public function testHandleWithPartialFightTimeoutModifierRoundsCreatureCountDown(): void
+    public function test_handle_with_partial_fight_timeout_modifier_rounds_creature_count_down(): void
     {
         Event::fake();
 
@@ -831,7 +831,7 @@ class ExplorationTest extends TestCase
         $this->assertNull(CharacterAutomation::find($automation->id));
     }
 
-    public function testHandleCreatureCountIsNeverBelowSix(): void
+    public function test_handle_creature_count_is_never_below_six(): void
     {
         Event::fake();
 
@@ -896,7 +896,7 @@ class ExplorationTest extends TestCase
         $this->assertNull(CharacterAutomation::find($automation->id));
     }
 
-    public function testHandleCreatureCountIsNeverAboveTwelve(): void
+    public function test_handle_creature_count_is_never_above_twelve(): void
     {
         Event::fake();
 
@@ -961,7 +961,7 @@ class ExplorationTest extends TestCase
         $this->assertNull(CharacterAutomation::find($automation->id));
     }
 
-    public function testHandleUsesVisibleEncounterCreatureCountForRewardData(): void
+    public function test_handle_uses_visible_encounter_creature_count_for_reward_data(): void
     {
         Event::fake();
 
@@ -1015,7 +1015,7 @@ class ExplorationTest extends TestCase
         $this->assertNull(CharacterAutomation::find($automation->id));
     }
 
-    public function testHandleRecordsEncounterLogTotalsFromRewardsAndBattleMessages(): void
+    public function test_handle_records_encounter_log_totals_from_rewards_and_battle_messages(): void
     {
         Event::fake();
 
@@ -1209,7 +1209,7 @@ class ExplorationTest extends TestCase
         $this->assertEquals(25, $output['output']['monster']['stats']['max_level']);
     }
 
-    public function testHandleRecordsBaseSnapshotBeforeFightAndKeepsFirstRuntimeSnapshot(): void
+    public function test_handle_records_base_snapshot_before_fight_and_keeps_first_runtime_snapshot(): void
     {
         Event::fake();
 
@@ -1420,11 +1420,11 @@ class ExplorationTest extends TestCase
         $this->assertNull(CharacterAutomation::find($automation->id));
     }
 
-    public function testHandleDispatchesUpdateCharacterStatusWhenCharacterDiesDuringSetup(): void
+    public function test_handle_dispatches_update_character_status_when_character_dies_during_setup(): void
     {
         Event::fake();
 
-        Cache::put('can-character-survive-' . $this->character->id, true);
+        Cache::put('can-character-survive-'.$this->character->id, true);
 
         $monsterFightService = Mockery::mock(MonsterFightService::class);
         $monsterFightService->shouldReceive('setupMonster')->andReturn([
@@ -1457,12 +1457,12 @@ class ExplorationTest extends TestCase
         Exploration::dispatchSync($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
 
         $this->assertNull(CharacterAutomation::find($automation->id));
-        $this->assertFalse(Cache::has('can-character-survive-' . $this->character->id));
+        $this->assertFalse(Cache::has('can-character-survive-'.$this->character->id));
         Event::assertDispatched(UpdateCharacterStatus::class);
         Event::assertDispatched(AutomationTimeOut::class);
     }
 
-    public function testHandleDispatchesUpdateCharacterStatusWhenCharacterDiesDuringFight(): void
+    public function test_handle_dispatches_update_character_status_when_character_dies_during_fight(): void
     {
         Event::fake();
 
@@ -1510,7 +1510,7 @@ class ExplorationTest extends TestCase
         Event::assertDispatched(AutomationTimeOut::class);
     }
 
-    public function testHandleDispatchesUpdateCharacterStatusWhenSetupDataIsMissingHealthPayload(): void
+    public function test_handle_dispatches_update_character_status_when_setup_data_is_missing_health_payload(): void
     {
         Event::fake();
 
@@ -1554,7 +1554,7 @@ class ExplorationTest extends TestCase
         Event::assertDispatched(AutomationTimeOut::class);
     }
 
-    public function testHandleDispatchesUpdateCharacterStatusWhenFightDataIsMissingHealthPayload(): void
+    public function test_handle_dispatches_update_character_status_when_fight_data_is_missing_health_payload(): void
     {
         Event::fake();
 
@@ -1607,7 +1607,7 @@ class ExplorationTest extends TestCase
         Event::assertDispatched(AutomationTimeOut::class);
     }
 
-    public function testHandleDispatchesUpdateCharacterStatusWhenFightCannotBeProcessed(): void
+    public function test_handle_dispatches_update_character_status_when_fight_cannot_be_processed(): void
     {
         Event::fake();
 
@@ -1647,7 +1647,7 @@ class ExplorationTest extends TestCase
         Event::assertDispatched(AutomationTimeOut::class);
     }
 
-    public function testHandleDispatchesUpdateCharacterStatusWhenMaxAttemptsAreExceeded(): void
+    public function test_handle_dispatches_update_character_status_when_max_attempts_are_exceeded(): void
     {
         Event::fake();
 
@@ -1695,7 +1695,7 @@ class ExplorationTest extends TestCase
         Event::assertDispatched(AutomationTimeOut::class);
     }
 
-    public function testHandlePassesBatchedFactionPointsForExplorationKills(): void
+    public function test_handle_passes_batched_faction_points_for_exploration_kills(): void
     {
         Event::fake();
 
@@ -1759,7 +1759,7 @@ class ExplorationTest extends TestCase
         $this->assertNull(CharacterAutomation::find($automation->id));
     }
 
-    public function testEncounterUpdatesExplorationLogFightsKillsAndPassesLogIdToContext(): void
+    public function test_encounter_updates_exploration_log_fights_kills_and_passes_log_id_to_context(): void
     {
         Event::fake();
 
@@ -1824,7 +1824,7 @@ class ExplorationTest extends TestCase
         $this->assertGreaterThanOrEqual(6, $log->kills);
     }
 
-    public function testEncounterStoresCurrentRoundCreaturesFromCalculatedEnemiesWithoutChangingCompletedFights(): void
+    public function test_encounter_stores_current_round_creatures_from_calculated_enemies_without_changing_completed_fights(): void
     {
         Event::fake();
 
@@ -1898,7 +1898,7 @@ class ExplorationTest extends TestCase
         $this->assertEquals(5, $output['output']['totals']['kills']);
     }
 
-    public function testCharacterDeathFinalizesExplorationLogAndCreatesWarning(): void
+    public function test_character_death_finalizes_exploration_log_and_creates_warning(): void
     {
         Event::fake();
 
@@ -1943,7 +1943,7 @@ class ExplorationTest extends TestCase
         $this->assertEquals(1, ExplorationWarning::where('character_id', $this->character->id)->count());
     }
 
-    public function testTimeoutFinalizesExplorationLogAndCreatesWarning(): void
+    public function test_timeout_finalizes_exploration_log_and_creates_warning(): void
     {
         Event::fake();
 
@@ -1975,7 +1975,7 @@ class ExplorationTest extends TestCase
         $this->assertEquals(1, ExplorationWarning::where('character_id', $this->character->id)->count());
     }
 
-    public function testErrorFinalizesExplorationLogAndCreatesWarning(): void
+    public function test_error_finalizes_exploration_log_and_creates_warning(): void
     {
         Event::fake();
 
@@ -2017,7 +2017,7 @@ class ExplorationTest extends TestCase
         $this->assertEquals(1, ExplorationWarning::where('character_id', $this->character->id)->count());
     }
 
-    public function testNaturalEndFinalizesExplorationLogAndCreatesWarning(): void
+    public function test_natural_end_finalizes_exploration_log_and_creates_warning(): void
     {
         Event::fake();
 
@@ -2082,7 +2082,7 @@ class ExplorationTest extends TestCase
         $this->assertEquals(1, ExplorationWarning::where('character_id', $this->character->id)->count());
     }
 
-    public function testHandleCallsProcessMonsterDeathWithRewardContextWhenAutomationEndsNaturally(): void
+    public function test_handle_calls_process_monster_death_with_reward_context_when_automation_ends_naturally(): void
     {
         Event::fake();
 
@@ -2139,7 +2139,7 @@ class ExplorationTest extends TestCase
         $this->assertNull(CharacterAutomation::find($automation->id));
     }
 
-    public function testHandlePassesZeroBatchedFactionPointsWhenNoFactionPointsAreAvailable(): void
+    public function test_handle_passes_zero_batched_faction_points_when_no_faction_points_are_available(): void
     {
         Event::fake();
 
@@ -2203,7 +2203,7 @@ class ExplorationTest extends TestCase
         $this->assertNull(CharacterAutomation::find($automation->id));
     }
 
-    public function testHandleRecordsBuiltMonsterSnapshotFromSetupData(): void
+    public function test_handle_records_built_monster_snapshot_from_setup_data(): void
     {
         Event::fake();
 
@@ -2306,7 +2306,7 @@ class ExplorationTest extends TestCase
         $this->assertEquals(4321, $log->summary['monster']['stats']['attack_range']);
     }
 
-    public function testHandleRecordsBuiltMonsterSnapshotOnlyOncePerRound(): void
+    public function test_handle_records_built_monster_snapshot_only_once_per_round(): void
     {
         Event::fake();
 
@@ -2402,7 +2402,7 @@ class ExplorationTest extends TestCase
         $this->assertEquals(2222, $log->summary['monster']['stats']['attack_range']);
     }
 
-    public function testSnapshotDerivesAttackDamageFromAttackRangeWhenNoRolledAttack(): void
+    public function test_snapshot_derives_attack_damage_from_attack_range_when_no_rolled_attack(): void
     {
         Event::fake();
 
@@ -2487,7 +2487,7 @@ class ExplorationTest extends TestCase
         $this->assertLessThanOrEqual(40, $log->summary['monster']['stats']['attack_damage']);
     }
 
-    public function testSnapshotDerivesAttackDamageWhenAttackRangeMinEqualsMax(): void
+    public function test_snapshot_derives_attack_damage_when_attack_range_min_equals_max(): void
     {
         Event::fake();
 
@@ -2571,7 +2571,7 @@ class ExplorationTest extends TestCase
         $this->assertEquals(25, $log->summary['monster']['stats']['attack_damage']);
     }
 
-    public function testSnapshotAppliesIncreasesDamageByToAttackRangeDerivedDamage(): void
+    public function test_snapshot_applies_increases_damage_by_to_attack_range_derived_damage(): void
     {
         Event::fake();
 
@@ -2656,7 +2656,7 @@ class ExplorationTest extends TestCase
         $this->assertEquals(150, $log->summary['monster']['stats']['attack_damage']);
     }
 
-    public function testBuiltMonsterSnapshotIncludesAttackDamageAndHealthKeys(): void
+    public function test_built_monster_snapshot_includes_attack_damage_and_health_keys(): void
     {
         Event::fake();
 
@@ -2732,7 +2732,7 @@ class ExplorationTest extends TestCase
         $this->assertEquals(350, $log->summary['monster']['stats']['health']);
     }
 
-    public function testHandleRepeatDispatchUsesExplorationQueueWithLongRunningConnection(): void
+    public function test_handle_repeat_dispatch_uses_exploration_queue_with_long_running_connection(): void
     {
         Queue::fake();
         Event::fake();
@@ -2813,7 +2813,7 @@ class ExplorationTest extends TestCase
         });
     }
 
-    public function testHandleRepeatDispatchDelayIsBasedOnRoundStartNotJobFinish(): void
+    public function test_handle_repeat_dispatch_delay_is_based_on_round_start_not_job_finish(): void
     {
         Queue::fake();
         Event::fake();
@@ -2907,7 +2907,7 @@ class ExplorationTest extends TestCase
         });
     }
 
-    public function testHandleSetUpFightPreservesCharacterSheetCache(): void
+    public function test_handle_set_up_fight_preserves_character_sheet_cache(): void
     {
         Event::fake();
 

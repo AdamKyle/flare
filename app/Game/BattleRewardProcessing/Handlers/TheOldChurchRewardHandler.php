@@ -223,7 +223,7 @@ class TheOldChurchRewardHandler
             'item_id' => $newItem->id,
         ]);
 
-        event(new ServerMessageEvent($character->user, 'You found something unique, in The Old Church child: ' . $item->affix_name, $slot->id));
+        event(new ServerMessageEvent($character->user, 'You found something unique, in The Old Church child: '.$item->affix_name, $slot->id));
     }
 
     /**

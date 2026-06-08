@@ -5,12 +5,12 @@ namespace App\Game\Maps\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\Quest;
 use App\Flare\Values\AutomationType;
+use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Maps\Requests\MoveRequest;
 use App\Game\Maps\Requests\QuestDataRequest;
 use App\Game\Maps\Requests\SetSailValidation;
 use App\Game\Maps\Requests\TeleportRequest;
 use App\Game\Maps\Requests\TraverseRequest;
-use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\MovementService;
 use App\Game\Maps\Services\SetSailService;
@@ -69,12 +69,12 @@ class MapController extends Controller
         }
 
         if ($character->currentAutomations()
-                ->where('character_id', $character->id)
-                ->where('completed_at', '>', now())
-                ->where(function ($query) {
-                    $query->where('type', AutomationType::DELVE);
-                })
-                ->exists()
+            ->where('character_id', $character->id)
+            ->where('completed_at', '>', now())
+            ->where(function ($query) {
+                $query->where('type', AutomationType::DELVE);
+            })
+            ->exists()
         ) {
             return response()->json([
                 'message' => 'You cannot escape the shadows child. Cancel the Delve if you want to wonder around in the wild.',

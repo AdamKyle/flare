@@ -402,5 +402,4 @@ class RouteServiceProvider extends ServiceProvider
             ->namespace('App\Game\Factions\FactionLoyalty\Controllers')
             ->group(base_path('routes/game/factions/faction-loyalty/api.php'));
     }
-
 }

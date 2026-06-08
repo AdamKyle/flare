@@ -14,22 +14,22 @@ class FeedbackTitleEscapingTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testBugTitleLinkEscapesStoredHtml(): void
+    public function test_bug_title_link_escapes_stored_html(): void
     {
         $this->assertTitleIsEscaped(BugsList::class, FeedbackType::BUG);
     }
 
-    public function testSuggestionTitleLinkEscapesStoredHtml(): void
+    public function test_suggestion_title_link_escapes_stored_html(): void
     {
         $this->assertTitleIsEscaped(SuggestionsList::class, FeedbackType::SUGGESTION);
     }
 
-    public function testBugDetailTitleEscapesStoredHtml(): void
+    public function test_bug_detail_title_escapes_stored_html(): void
     {
         $this->assertDetailTitleIsEscaped('admin.feedback.bug', FeedbackType::BUG);
     }
 
-    public function testSuggestionDetailTitleEscapesStoredHtml(): void
+    public function test_suggestion_detail_title_escapes_stored_html(): void
     {
         $this->assertDetailTitleIsEscaped('admin.feedback.suggestion', FeedbackType::SUGGESTION);
     }

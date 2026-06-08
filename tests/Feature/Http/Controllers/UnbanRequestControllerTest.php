@@ -11,7 +11,7 @@ class UnbanRequestControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testPublicEmailLookupDoesNotRevealAccountOrBanState(): void
+    public function test_public_email_lookup_does_not_reveal_account_or_ban_state(): void
     {
         $user = (new CharacterFactory)->createBaseCharacter()->getCharacter()->user;
         $tempBannedUser = (new CharacterFactory)->createBaseCharacter()->banCharacter('Reason', null, now()->addDay())->getCharacter()->user;
@@ -32,7 +32,7 @@ class UnbanRequestControllerTest extends TestCase
         }
     }
 
-    public function testSubmitRejectsMissingOrInvalidFindUserToken(): void
+    public function test_submit_rejects_missing_or_invalid_find_user_token(): void
     {
         $user = (new CharacterFactory)->createBaseCharacter()->banCharacter('Reason')->getCharacter()->user;
 
@@ -49,7 +49,7 @@ class UnbanRequestControllerTest extends TestCase
         $this->assertNull($user->refresh()->un_ban_request);
     }
 
-    public function testSubmitAcceptsValidOneTimeFindUserToken(): void
+    public function test_submit_accepts_valid_one_time_find_user_token(): void
     {
         Role::create(['name' => 'Admin']);
 
@@ -65,7 +65,7 @@ class UnbanRequestControllerTest extends TestCase
         $this->assertSame('Please review.', $user->refresh()->un_ban_request);
     }
 
-    public function testValidFindUserTokenCanOnlyBeUsedOnce(): void
+    public function test_valid_find_user_token_can_only_be_used_once(): void
     {
         Role::create(['name' => 'Admin']);
 
@@ -86,7 +86,7 @@ class UnbanRequestControllerTest extends TestCase
         $this->assertSame('Please review.', $user->refresh()->un_ban_request);
     }
 
-    public function testIssuedIneligibleTokenDoesNotRevealAccountState(): void
+    public function test_issued_ineligible_token_does_not_reveal_account_state(): void
     {
         $token = $this->getContinuationToken('unknown@example.com');
 

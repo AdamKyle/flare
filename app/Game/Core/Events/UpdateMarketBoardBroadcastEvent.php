@@ -55,7 +55,7 @@ class UpdateMarketBoardBroadcastEvent implements ShouldBroadcastNow
     {
         return [
             'marketListings' => $this->marketListings,
-            'characterGold'  => $this->characterGold,
+            'characterGold' => $this->characterGold,
         ];
     }
 }

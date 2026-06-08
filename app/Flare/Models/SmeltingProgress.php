@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class SmeltingProgress extends Model
 {
     use HasFactory;
+
     protected $table = 'smelting_progress';
 
     /**

@@ -21,7 +21,7 @@ class ExplorationWarningControllerTest extends TestCase
 
     private Character $character;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -31,12 +31,12 @@ class ExplorationWarningControllerTest extends TestCase
             ->getCharacter();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
 
-    public function testDismissRemovesLatestWarningAndLinkedLog(): void
+    public function test_dismiss_removes_latest_warning_and_linked_log(): void
     {
         Event::fake();
 
@@ -55,7 +55,7 @@ class ExplorationWarningControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/exploration/' . $this->character->id . '/warning/dismiss', [
+            ->call('POST', '/api/exploration/'.$this->character->id.'/warning/dismiss', [
                 '_token' => csrf_token(),
             ]);
 
@@ -66,7 +66,7 @@ class ExplorationWarningControllerTest extends TestCase
         $this->assertNull(ExplorationLog::find($log->id));
     }
 
-    public function testDismissRemovesSelectedWarningByWarningId(): void
+    public function test_dismiss_removes_selected_warning_by_warning_id(): void
     {
         Event::fake();
 
@@ -99,7 +99,7 @@ class ExplorationWarningControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/exploration/' . $this->character->id . '/warning/dismiss', [
+            ->call('POST', '/api/exploration/'.$this->character->id.'/warning/dismiss', [
                 '_token' => csrf_token(),
                 'warning_id' => $olderWarning->id,
             ]);
@@ -111,7 +111,7 @@ class ExplorationWarningControllerTest extends TestCase
         $this->assertNotNull(ExplorationLog::find($newerLog->id));
     }
 
-    public function testDismissBroadcastsClearedWarningState(): void
+    public function test_dismiss_broadcasts_cleared_warning_state(): void
     {
         Event::fake();
 
@@ -130,7 +130,7 @@ class ExplorationWarningControllerTest extends TestCase
         ]);
 
         $this->actingAs($this->character->user)
-            ->call('POST', '/api/exploration/' . $this->character->id . '/warning/dismiss', [
+            ->call('POST', '/api/exploration/'.$this->character->id.'/warning/dismiss', [
                 '_token' => csrf_token(),
             ]);
 
@@ -139,7 +139,7 @@ class ExplorationWarningControllerTest extends TestCase
         });
     }
 
-    public function testDismissRejectsWrongCharacter(): void
+    public function test_dismiss_rejects_wrong_character(): void
     {
         $otherCharacter = (new CharacterFactory)
             ->createBaseCharacter()
@@ -147,7 +147,7 @@ class ExplorationWarningControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($otherCharacter->user)
-            ->call('POST', '/api/exploration/' . $this->character->id . '/warning/dismiss', [
+            ->call('POST', '/api/exploration/'.$this->character->id.'/warning/dismiss', [
                 '_token' => csrf_token(),
             ], [], [], ['HTTP_ACCEPT' => 'application/json']);
 

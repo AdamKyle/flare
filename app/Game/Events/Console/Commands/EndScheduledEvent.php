@@ -22,11 +22,11 @@ use App\Flare\Models\RaidBossParticipation;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Services\EventSchedulerService;
 use App\Flare\Values\MapNameValue;
+use App\Game\Automation\Services\ExplorationAutomationService;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\Events\Services\KingdomEventService;
 use App\Game\Events\Values\EventType;
-use App\Game\Automation\Services\ExplorationAutomationService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\TraverseService;
@@ -221,7 +221,7 @@ class EndScheduledEvent extends Command
 
         $raid = $event->raid;
 
-        event(new GlobalMessageEvent('The Raid: ' . $raid->name . ' is now ending! Don\'t worry, the raid will be back soon. Check the event calendar for the next time!'));
+        event(new GlobalMessageEvent('The Raid: '.$raid->name.' is now ending! Don\'t worry, the raid will be back soon. Check the event calendar for the next time!'));
 
         $this->unCorruptLocations($raid, $locationService);
 
@@ -328,7 +328,7 @@ class EndScheduledEvent extends Command
                 }
             });
 
-        if (!is_null($faction)) {
+        if (! is_null($faction)) {
             FactionLoyalty::where('faction_id', $faction->id)
                 ->where('is_pledged', true)
                 ->chunk(100, function ($pledgedLoyalties) use ($factionLoyaltyService, $faction) {
@@ -392,7 +392,7 @@ class EndScheduledEvent extends Command
                 }
             });
 
-        if (!is_null($faction)) {
+        if (! is_null($faction)) {
             FactionLoyalty::where('faction_id', $faction->id)
                 ->where('is_pledged', true)
                 ->chunk(100, function ($pledgedLoyalties) use ($factionLoyaltyService, $faction) {

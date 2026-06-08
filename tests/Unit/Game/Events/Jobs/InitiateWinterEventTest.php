@@ -148,7 +148,7 @@ class InitiateWinterEventTest extends TestCase
         $this->assertNotNull($eventForNextYear->raids_for_event);
     }
 
-    public function testWinterStartCreatesCurrentChildRaidsOnly(): void
+    public function test_winter_start_creates_current_child_raids_only(): void
     {
         $this->createGameMap([
             'name' => MapNameValue::ICE_PLANE,
@@ -198,7 +198,7 @@ class InitiateWinterEventTest extends TestCase
         $this->assertCount(0, $nextYearChildRaids);
     }
 
-    public function testWinterStartReschedulesOnlyParentForNextYear(): void
+    public function test_winter_start_reschedules_only_parent_for_next_year(): void
     {
         $this->createGameMap([
             'name' => MapNameValue::ICE_PLANE,
@@ -248,7 +248,7 @@ class InitiateWinterEventTest extends TestCase
         $this->assertCount(0, $nextYearChildRaids);
     }
 
-    public function testNextYearChildRaidsAreNotCreatedEarly(): void
+    public function test_next_year_child_raids_are_not_created_early(): void
     {
         $this->createGameMap([
             'name' => MapNameValue::ICE_PLANE,

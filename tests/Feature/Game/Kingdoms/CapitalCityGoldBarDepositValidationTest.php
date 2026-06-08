@@ -20,7 +20,7 @@ class CapitalCityGoldBarDepositValidationTest extends TestCase
         $capitalCity = $characterFactory->kingdomManagement()->assignKingdom(['is_capital' => true])->getKingdom();
         $character = $characterFactory->getCharacter();
 
-        $response = $this->actingAs($character->user)->call('POST', '/api/kingdom/capital-city/deposit-gold-bars/' . $character->id . '/' . $capitalCity->id, [
+        $response = $this->actingAs($character->user)->call('POST', '/api/kingdom/capital-city/deposit-gold-bars/'.$character->id.'/'.$capitalCity->id, [
             'amount_to_purchase' => -1,
         ]);
 
@@ -33,7 +33,7 @@ class CapitalCityGoldBarDepositValidationTest extends TestCase
         $capitalCity = $characterFactory->kingdomManagement()->assignKingdom(['is_capital' => true])->getKingdom();
         $character = $characterFactory->getCharacter();
 
-        $response = $this->actingAs($character->user)->call('POST', '/api/kingdom/capital-city/deposit-gold-bars/' . $character->id . '/' . $capitalCity->id, [
+        $response = $this->actingAs($character->user)->call('POST', '/api/kingdom/capital-city/deposit-gold-bars/'.$character->id.'/'.$capitalCity->id, [
             'amount_to_purchase' => 0,
         ]);
 

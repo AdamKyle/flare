@@ -104,7 +104,7 @@ return new class extends Migration
             ->whereNotExists(function ($query) use ($table, $foreignKey, $parentTable) {
                 $query->selectRaw('1')
                     ->from($parentTable)
-                    ->whereColumn($parentTable . '.id', $table . '.' . $foreignKey);
+                    ->whereColumn($parentTable.'.id', $table.'.'.$foreignKey);
             })
             ->delete();
     }
@@ -116,7 +116,7 @@ return new class extends Migration
             ->whereNotExists(function ($query) use ($table, $foreignKey, $parentTable) {
                 $query->selectRaw('1')
                     ->from($parentTable)
-                    ->whereColumn($parentTable . '.id', $table . '.' . $foreignKey);
+                    ->whereColumn($parentTable.'.id', $table.'.'.$foreignKey);
             })
             ->update([$foreignKey => null]);
     }
@@ -288,7 +288,7 @@ return new class extends Migration
             }
 
             Schema::table($table, function (Blueprint $blueprint) use ($table) {
-                $constraintName = $table . '_character_id_fk';
+                $constraintName = $table.'_character_id_fk';
                 $blueprint->foreign('character_id', $constraintName)
                     ->references('id')->on('characters')
                     ->cascadeOnDelete();
@@ -359,7 +359,7 @@ return new class extends Migration
 
         foreach ($newCascadeTables as $table) {
             Schema::table($table, function (Blueprint $blueprint) use ($table) {
-                $blueprint->dropForeign($table . '_character_id_fk');
+                $blueprint->dropForeign($table.'_character_id_fk');
             });
         }
 
