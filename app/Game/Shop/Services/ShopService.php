@@ -159,6 +159,10 @@ class ShopService
      */
     public function buyMultipleItems(Character $character, Item $item, int $cost, int $amount): void
     {
+        if ($amount < 1) {
+            return;
+        }
+
         $character->update([
             'gold' => $character->gold - $cost,
         ]);

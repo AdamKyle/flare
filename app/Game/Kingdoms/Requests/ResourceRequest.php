@@ -26,7 +26,7 @@ class ResourceRequest extends FormRequest
         return [
             'kingdom_requesting' => 'required|int',
             'kingdom_requesting_from' => 'required|int',
-            'amount_of_resources' => 'required|int',
+            'amount_of_resources' => 'required|integer|min:1',
             'use_air_ship' => 'nullable|boolean',
             'type_of_resource' => 'required|string|in:wood,clay,stone,iron,steel,all',
         ];

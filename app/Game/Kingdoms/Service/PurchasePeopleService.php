@@ -37,8 +37,17 @@ class PurchasePeopleService
      * - Updates the character gold
      * - Updates the kingdom population.
      */
-    public function purchasePeople(int $amountToPurchase): void
+    public function purchasePeople(int $amountToPurchase): bool
     {
+        if ($amountToPurchase < 1) {
+            return false;
+        }
+
+        $cost = (new UnitCosts(UnitCosts::PERSON))->fetchCost() * $amountToPurchase;
+
+        if ($cost > $this->kingdom->character->gold) {
+            return false;
+        }
 
         $character = $this->updateCharacterGold($amountToPurchase);
 
@@ -51,6 +60,8 @@ class PurchasePeopleService
         event(new UpdateTopBarEvent($character->refresh()));
 
         $this->updateKingdom->updateKingdom($this->kingdom->refresh());
+
+        return true;
     }
 
     protected function getAmountToPurchase(int $amountToPurchase): int

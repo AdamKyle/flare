@@ -24,7 +24,7 @@ class PurchaseGoldBarsRequest extends FormRequest
     public function rules()
     {
         return [
-            'amount_to_purchase' => 'required|integer',
+            'amount_to_purchase' => 'required|integer|min:1',
         ];
     }
 

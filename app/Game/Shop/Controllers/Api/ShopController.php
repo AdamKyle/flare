@@ -100,6 +100,12 @@ class ShopController extends Controller
         $item = Item::find($request->item_id);
         $amount = $request->amount;
 
+        if ($amount < 1) {
+            return response()->json([
+                'message' => 'Amount must be at least 1.',
+            ], 422);
+        }
+
         if ($amount > $character->inventory_max || $character->isInventoryFull()) {
             return redirect()->back()->with('error', 'You cannot purchase more then you have inventory space.');
         }

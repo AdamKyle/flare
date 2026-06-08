@@ -27,7 +27,19 @@ class MoveUnitsValidator
     public function isValid(Character $character, Kingdom $kingdomToMoveTo): bool
     {
         foreach ($this->unitsToMove as $unitsToMove) {
-            $kingdom = $character->kingdoms()->find($unitsToMove['kingdom_id']);
+            if (! isset($unitsToMove['kingdom_id'], $unitsToMove['unit_id'], $unitsToMove['amount'])) {
+                return false;
+            }
+
+            $kingdomId = filter_var($unitsToMove['kingdom_id'], FILTER_VALIDATE_INT);
+            $unitId = filter_var($unitsToMove['unit_id'], FILTER_VALIDATE_INT);
+            $amount = filter_var($unitsToMove['amount'], FILTER_VALIDATE_INT);
+
+            if ($kingdomId === false || $unitId === false || $amount === false || $amount < 1) {
+                return false;
+            }
+
+            $kingdom = $character->kingdoms()->find($kingdomId);
 
             if (is_null($kingdom)) {
                 return false;
@@ -37,13 +49,13 @@ class MoveUnitsValidator
                 return false;
             }
 
-            $unit = $kingdom->units()->find($unitsToMove['unit_id']);
+            $unit = $kingdom->units()->find($unitId);
 
             if (is_null($unit)) {
                 return false;
             }
 
-            if ($unit->amount < $unitsToMove['amount']) {
+            if ($unit->amount < $amount) {
                 return false;
             }
         }

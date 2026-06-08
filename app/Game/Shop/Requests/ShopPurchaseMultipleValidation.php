@@ -25,7 +25,7 @@ class ShopPurchaseMultipleValidation extends FormRequest
     {
         return [
             'item_id' => 'required|integer|exists:items,id',
-            'amount' => 'required|integer',
+            'amount' => 'required|integer|min:1',
         ];
     }
 

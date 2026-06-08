@@ -43,6 +43,9 @@ class ResourceTransferService
 
     public function sendOffResourceRequest(Character $character, array $params, ?int $capitalCityQueueId = null, ?int $buildingId = null, ?int $unitId = null): array
     {
+        if (! isset($params['amount_of_resources']) || filter_var($params['amount_of_resources'], FILTER_VALIDATE_INT) === false || (int) $params['amount_of_resources'] < 1) {
+            return $this->errorResult('Amount of resources must be at least 1.');
+        }
 
         $requestingKingdom = Kingdom::find($params['kingdom_requesting']);
         $requestingFromKingdom = Kingdom::find($params['kingdom_requesting_from']);
@@ -223,6 +226,9 @@ class ResourceTransferService
 
     private function sendOffRequestForResources(Kingdom $requestingKingdom, Kingdom $requestingFromKingdom, int $amount, string $type, bool $useAirShip, ?int $capitalCityQueueId = null, ?int $buildingId = null, ?int $unitId = null): void
     {
+        if ($amount < 1) {
+            return;
+        }
 
         $resources = ['wood', 'stone', 'clay', 'iron', 'steel'];
 

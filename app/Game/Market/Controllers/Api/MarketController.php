@@ -51,6 +51,9 @@ class MarketController extends Controller
 
     public function sellItem(ListPriceRequest $request, Character $character)
     {
+        if ($request->list_for < 1) {
+            return response()->json(['message' => 'Listing price must be at least 1 Gold.'], 422);
+        }
 
         $slot = $character->inventory->slots()->find($request->slot_id);
 
