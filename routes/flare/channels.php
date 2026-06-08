@@ -10,5 +10,5 @@ Broadcast::channel('update-character-inventory-{userId}', function ($user, $user
 });
 
 Broadcast::channel('update-event-schedule', function ($user) {
-    return $user;
+    return ['id' => $user->id];
 });

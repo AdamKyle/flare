@@ -42,12 +42,12 @@ Broadcast::channel('update-character-status-{userId}', function ($user, $userId)
 
 // When the raid bosses health updates.
 Broadcast::channel('update-raid-boss-health-attack', function ($user) {
-    return $user;
+    return ['id' => $user->id];
 });
 
 // When the Celestial Fight Details Change:
 Broadcast::channel('celestial-fight-changes', function ($user) {
-    return $user;
+    return ['id' => $user->id];
 });
 
 // When a character revives

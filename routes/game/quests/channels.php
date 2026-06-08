@@ -7,10 +7,10 @@ Broadcast::channel('unlock-skill-{userId}', function ($user, $userId) {
 
 // Updating Quests
 Broadcast::channel('update-quests', function ($user) {
-    return $user;
+    return ['id' => $user->id];
 });
 
 // Updating Raid Quests
 Broadcast::channel('update-raid-quests', function ($user) {
-    return $user;
+    return ['id' => $user->id];
 });

@@ -12,12 +12,12 @@ Broadcast::channel('update-notifications-{userId}', function ($user, $userId) {
 
 // When the market is updated.
 Broadcast::channel('update-market', function ($user) {
-    return $user;
+    return ['id' => $user->id];
 });
 
 // When locations become corrupt.
 Broadcast::channel('corrupt-locations', function ($user) {
-    return $user;
+    return ['id' => $user->id];
 });
 
 // When a user settles a kingdom, we want to show it for them only, on their map.
