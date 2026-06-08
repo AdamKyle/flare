@@ -34,10 +34,11 @@ class MonsterFightService
      * @param array $params
      * @param bool $returnData
      * @param bool $isDelve
+     * @param bool $preserveCharacterSheetCache
      * @return array
      * @throws InvalidArgumentException
      */
-    public function setupMonster(Character $character, array $params, bool $returnData = false, bool $isDelve = false): array
+    public function setupMonster(Character $character, array $params, bool $returnData = false, bool $isDelve = false, bool $preserveCharacterSheetCache = false): array
     {
         $restriction = $this->automationRestrictionErrorResult($character, AutomationRestrictionService::MANUAL_FIGHTING);
 
@@ -46,7 +47,10 @@ class MonsterFightService
         }
 
         Cache::delete('monster-fight-' . $character->id);
-        Cache::delete('character-sheet-' . $character->id);
+
+        if (! $preserveCharacterSheetCache) {
+            Cache::delete('character-sheet-' . $character->id);
+        }
 
         $params = $this->fetchPossibleDelveMonsterId($character, $params, $isDelve);
 

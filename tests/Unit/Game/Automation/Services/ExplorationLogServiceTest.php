@@ -487,6 +487,78 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertArrayNotHasKey('health', $output['output']['monster']['stats']);
     }
 
+    public function testRecordFightTotalsBroadcastsByDefault(): void
+    {
+        Event::fake();
+
+        $log = $this->service->start($this->character, $this->automation);
+
+        $this->service->recordFightTotals($log, ['fights' => 1, 'kills' => 1]);
+
+        Event::assertDispatched(ExplorationOutputUpdated::class);
+    }
+
+    public function testRecordFightTotalsDoesNotBroadcastWhenBroadcastIsFalse(): void
+    {
+        Event::fake();
+
+        $log = $this->service->start($this->character, $this->automation);
+
+        Event::fake();
+
+        $this->service->recordFightTotals($log, ['fights' => 1, 'kills' => 1], false);
+
+        Event::assertNotDispatched(ExplorationOutputUpdated::class);
+    }
+
+    public function testRecordMonsterSnapshotBroadcastsByDefault(): void
+    {
+        Event::fake();
+
+        $log = $this->service->start($this->character, $this->automation);
+
+        $this->service->recordMonsterSnapshot($log, ['id' => $this->monster->id, 'name' => $this->monster->name]);
+
+        Event::assertDispatched(ExplorationOutputUpdated::class);
+    }
+
+    public function testRecordMonsterSnapshotDoesNotBroadcastWhenBroadcastIsFalse(): void
+    {
+        Event::fake();
+
+        $log = $this->service->start($this->character, $this->automation);
+
+        Event::fake();
+
+        $this->service->recordMonsterSnapshot($log, ['id' => $this->monster->id, 'name' => $this->monster->name], false);
+
+        Event::assertNotDispatched(ExplorationOutputUpdated::class);
+    }
+
+    public function testRecordCurrentRoundCreaturesBroadcastsByDefault(): void
+    {
+        Event::fake();
+
+        $log = $this->service->start($this->character, $this->automation);
+
+        $this->service->recordCurrentRoundCreatures($log, 5);
+
+        Event::assertDispatched(ExplorationOutputUpdated::class);
+    }
+
+    public function testRecordCurrentRoundCreaturesDoesNotBroadcastWhenBroadcastIsFalse(): void
+    {
+        Event::fake();
+
+        $log = $this->service->start($this->character, $this->automation);
+
+        Event::fake();
+
+        $this->service->recordCurrentRoundCreatures($log, 5, false);
+
+        Event::assertNotDispatched(ExplorationOutputUpdated::class);
+    }
+
     public function testOutputReturnsNullShapeAndBroadcastsAfterClear(): void
     {
         Event::fake();

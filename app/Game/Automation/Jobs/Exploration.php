@@ -141,6 +141,8 @@ class Exploration implements ShouldQueue
             'attack_type' => $this->attackType,
         ];
 
+        $roundStartedAt = now();
+
         if ($this->encounter($automation, $params, $this->timeDelay)) {
 
             if (! is_null($this->explorationLog)) {
@@ -151,7 +153,7 @@ class Exploration implements ShouldQueue
                     'spell_damage' => $this->battleData['spell_damage'],
                     'healing_done' => $this->battleData['healing_done'],
                     'damage_blocked' => $this->battleData['damage_blocked'],
-                ]);
+                ], false);
             }
 
             $time = now()->diffInMinutes($automation->completed_at);
@@ -191,7 +193,8 @@ class Exploration implements ShouldQueue
             $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], $rewardContext);
 
             // @codeCoverageIgnoreStart
-            Exploration::dispatch($this->character, $this->automationId, $this->attackType, 1)->delay(now()->addMinute())->onConnection('long_running')->onQueue('default_long');
+            $delaySeconds = max(0, ($this->timeDelay * 60) - $roundStartedAt->diffInSeconds(now()));
+            Exploration::dispatch($this->character, $this->automationId, $this->attackType, $this->timeDelay)->delay(now()->addSeconds($delaySeconds))->onConnection('long_running')->onQueue('exploration');
             // @codeCoverageIgnoreEnd
 
             return;
@@ -227,7 +230,7 @@ class Exploration implements ShouldQueue
         $enemies = $this->explorationCreatureCountCalculator->calculate($this->character);
 
         if (! is_null($this->explorationLog)) {
-            $this->explorationLogService->recordCurrentRoundCreatures($this->explorationLog, $enemies);
+            $this->explorationLogService->recordCurrentRoundCreatures($this->explorationLog, $enemies, false);
         }
 
         $this->sendOutEventLogUpdate('"Chirst, child there are: ' . $enemies . ' of them ..."
@@ -510,7 +513,7 @@ class Exploration implements ShouldQueue
             $builtMonsterSnapshot = $this->builtMonsterSnapshot($snapshotData);
 
             if (! is_null($builtMonsterSnapshot)) {
-                $this->explorationLogService->recordMonsterSnapshot($this->explorationLog, $builtMonsterSnapshot);
+                $this->explorationLogService->recordMonsterSnapshot($this->explorationLog, $builtMonsterSnapshot, false);
             }
 
             $this->runtimeMonsterSnapshotRecorded = true;
@@ -712,7 +715,7 @@ class Exploration implements ShouldQueue
      * @throws InvalidArgumentException
      */
     private function setUpFightForMonster(array $params): array {
-        return $this->monsterFightService->setupMonster($this->character, $params, true);
+        return $this->monsterFightService->setupMonster($this->character, $params, true, false, true);
     }
 
     /**

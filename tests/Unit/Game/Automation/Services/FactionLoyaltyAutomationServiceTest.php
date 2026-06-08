@@ -237,7 +237,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         });
     }
 
-    public function testBeginAutomationDispatchesAutomatedFactionLoyaltyJobOnDefaultLongQueue(): void
+    public function testBeginAutomationDispatchesAutomatedFactionLoyaltyJobOnFactionLoyaltyQueueWithLongRunningConnection(): void
     {
         Queue::fake();
         Event::fake();
@@ -245,7 +245,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         $this->service->beginAutomation($this->character, $this->factionLoyaltyNpc, AttackTypeValue::ATTACK);
 
         Queue::assertPushed(AutomatedFactionLoyalty::class, function (AutomatedFactionLoyalty $job): bool {
-            return $job->queue === 'default_long';
+            return $job->queue === 'faction_loyalty' && $job->connection === 'long_running';
         });
     }
 

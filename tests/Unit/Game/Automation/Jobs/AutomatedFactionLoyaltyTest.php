@@ -1598,6 +1598,117 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNull($this->characterAutomation->fresh());
     }
 
+    public function testRecallJobDispatchesOnFactionLoyaltyQueueWithLongRunningConnection(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $craftingTask = collect($this->factionLoyaltyNpc->factionLoyaltyNpcTasks->fame_tasks)
+            ->first(fn (array $task): bool => isset($task['item_id']));
+        $craftingResult = (new AutomatedCraftingResult)
+            ->setUp(AutomatedCraftingResultType::CRAFTED_TARGET_ITEM, $craftingTask['item_id']);
+
+        $this->npcTaskCoordinator->shouldReceive('setUp')->once()->andReturnSelf();
+        $this->npcTaskCoordinator->shouldReceive('resolveNpc')->once()->andReturn($this->factionLoyaltyNpc);
+        $this->npcTaskCoordinator->shouldReceive('shouldEndAutomation')->once()->andReturnFalse();
+        $this->actionCoordinator->shouldReceive('setUp')->once()->andReturnSelf();
+        $this->actionCoordinator->shouldReceive('resolveAction')->once()->andReturn([
+            'type' => FactionLoyaltyCoordinatorAction::CRAFT->value,
+            'task' => $craftingTask,
+        ]);
+        $this->craftingLogger->shouldReceive('setUp')->once()->andReturn($this->craftingLogger);
+        $this->craftingHandler->shouldReceive('setUp')->once()->andReturnSelf();
+        $this->craftingHandler->shouldReceive('setCraftForNpc')->once()->andReturnSelf();
+        $this->craftingHandler->shouldReceive('setFactionLoyaltyNpc')->once()->andReturnSelf();
+        $this->craftingHandler->shouldReceive('handle')->once()->andReturnUsing(function () use ($craftingResult): AutomatedCraftingResult {
+            resolve(FactionLoyaltyAutomationCraftingLogger::class)
+                ->setUp($this->factionLoyaltyAutomation)
+                ->log($craftingResult);
+
+            return $craftingResult;
+        });
+
+        $job = new AutomatedFactionLoyalty(
+            $this->character->id,
+            $this->characterAutomation->id,
+            $this->factionLoyaltyAutomation->id,
+            1
+        );
+
+        $job->handle(
+            $this->characterCacheData,
+            $this->npcTaskCoordinator,
+            $this->actionCoordinator,
+            $this->craftingHandler,
+            $this->craftingLogger,
+            $this->fightHandler,
+            $this->fightLogger
+        );
+
+        Queue::assertPushed(AutomatedFactionLoyalty::class, function (AutomatedFactionLoyalty $job): bool {
+            return $job->queue === 'faction_loyalty' && $job->connection === 'long_running';
+        });
+    }
+
+    public function testRecallJobDelayIsBasedOnRoundStartNotJobFinish(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $now = Carbon::parse('2026-01-01 12:00:00');
+        Carbon::setTestNow($now);
+
+        $craftingTask = collect($this->factionLoyaltyNpc->factionLoyaltyNpcTasks->fame_tasks)
+            ->first(fn (array $task): bool => isset($task['item_id']));
+        $craftingResult = (new AutomatedCraftingResult)
+            ->setUp(AutomatedCraftingResultType::CRAFTED_TARGET_ITEM, $craftingTask['item_id']);
+
+        $this->npcTaskCoordinator->shouldReceive('setUp')->once()->andReturnSelf();
+        $this->npcTaskCoordinator->shouldReceive('resolveNpc')->once()->andReturn($this->factionLoyaltyNpc);
+        $this->npcTaskCoordinator->shouldReceive('shouldEndAutomation')->once()->andReturnFalse();
+        $this->actionCoordinator->shouldReceive('setUp')->once()->andReturnSelf();
+        $this->actionCoordinator->shouldReceive('resolveAction')->once()->andReturnUsing(function () use ($now, $craftingTask): array {
+            Carbon::setTestNow($now->copy()->addSeconds(30));
+
+            return [
+                'type' => FactionLoyaltyCoordinatorAction::CRAFT->value,
+                'task' => $craftingTask,
+            ];
+        });
+        $this->craftingLogger->shouldReceive('setUp')->once()->andReturn($this->craftingLogger);
+        $this->craftingHandler->shouldReceive('setUp')->once()->andReturnSelf();
+        $this->craftingHandler->shouldReceive('setCraftForNpc')->once()->andReturnSelf();
+        $this->craftingHandler->shouldReceive('setFactionLoyaltyNpc')->once()->andReturnSelf();
+        $this->craftingHandler->shouldReceive('handle')->once()->andReturnUsing(function () use ($craftingResult): AutomatedCraftingResult {
+            resolve(FactionLoyaltyAutomationCraftingLogger::class)
+                ->setUp($this->factionLoyaltyAutomation)
+                ->log($craftingResult);
+
+            return $craftingResult;
+        });
+
+        $job = new AutomatedFactionLoyalty(
+            $this->character->id,
+            $this->characterAutomation->id,
+            $this->factionLoyaltyAutomation->id,
+            1
+        );
+
+        $job->handle(
+            $this->characterCacheData,
+            $this->npcTaskCoordinator,
+            $this->actionCoordinator,
+            $this->craftingHandler,
+            $this->craftingLogger,
+            $this->fightHandler,
+            $this->fightLogger
+        );
+
+        Queue::assertPushed(AutomatedFactionLoyalty::class, function (AutomatedFactionLoyalty $pushedJob) use ($now): bool {
+            return $pushedJob->delay->toDateTimeString() === $now->copy()->addSeconds(60)->toDateTimeString();
+        });
+    }
+
     public function testHandleLogsAndEndsAutomationOnException(): void
     {
         Event::fake();

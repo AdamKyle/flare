@@ -30,6 +30,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Queue;
 use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Monster\MonsterFactory;
@@ -2728,5 +2729,241 @@ class ExplorationTest extends TestCase
         $this->assertEquals(55, $log->summary['monster']['stats']['attack_damage']);
         $this->assertArrayHasKey('health', $log->summary['monster']['stats']);
         $this->assertEquals(350, $log->summary['monster']['stats']['health']);
+    }
+
+    public function testHandleRepeatDispatchUsesExplorationQueueWithLongRunningConnection(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $setupData = [
+            'health' => [
+                'current_character_health' => 100,
+                'current_monster_health' => 0,
+                'max_monster_health' => 200,
+            ],
+            'monster' => [
+                'id' => $this->monster->id,
+                'name' => $this->monster->name,
+                'str' => 1, 'dur' => 1, 'dex' => 1, 'chr' => 1,
+                'int' => 1, 'agi' => 1, 'focus' => 1, 'ac' => 1,
+                'attack_damage' => 10, 'spell_damage' => 0, 'healing' => 0,
+                'xp' => 10, 'gold' => 10, 'max_level' => 5,
+            ],
+        ];
+
+        $fightData = [
+            'health' => [
+                'current_character_health' => 100,
+                'current_monster_health' => 0,
+            ],
+            'monster' => ['id' => $this->monster->id],
+        ];
+
+        $monsterFightService = Mockery::mock(MonsterFightService::class);
+        $monsterFightService->shouldReceive('setupMonster')->andReturn($setupData);
+        $monsterFightService->shouldReceive('fightMonster')->andReturn($fightData);
+        $monsterFightService->shouldReceive('getMonster')->andReturn($this->monster);
+
+        $battleEventHandler = Mockery::mock(BattleEventHandler::class);
+        $battleEventHandler->shouldReceive('processMonsterDeath')->once();
+
+        $characterRewardService = Mockery::mock(CharacterRewardService::class);
+        $characterRewardService->shouldReceive('setCharacter')->andReturnSelf();
+        $characterRewardService->shouldReceive('fetchXpForMonster')->andReturn(10);
+
+        $skillService = Mockery::mock(SkillService::class);
+        $skillService->shouldReceive('setSkillInTraining')->andReturnSelf();
+        $skillService->shouldReceive('getXpForSkillIntraining')->andReturn(0);
+
+        $factionHandler = Mockery::mock(FactionHandler::class);
+        $factionHandler->shouldReceive('getFactionPointsPerKill')->andReturn(0);
+
+        $explorationCreatureCountCalculator = Mockery::mock(ExplorationCreatureCountCalculator::class);
+        $explorationCreatureCountCalculator->shouldReceive('calculate')->andReturn(1);
+
+        $this->character = $this->characterFactory->automationManagement()->assignExplorationAutomation([
+            'monster_id' => $this->monster->id,
+            'move_down_monster_list_every' => 10,
+            'previous_level' => $this->character->level,
+            'current_level' => $this->character->level,
+        ])->getCharacter();
+
+        $automation = $this->character->currentAutomations()->first();
+        $automation->update(['completed_at' => now()->addHours(8)]);
+
+        $this->instance(MonsterFightService::class, $monsterFightService);
+        $this->instance(BattleEventHandler::class, $battleEventHandler);
+        $this->instance(CharacterRewardService::class, $characterRewardService);
+        $this->instance(SkillService::class, $skillService);
+        $this->instance(FactionHandler::class, $factionHandler);
+        $this->instance(ExplorationCreatureCountCalculator::class, $explorationCreatureCountCalculator);
+
+        Exploration::dispatchSync($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
+
+        Queue::assertPushed(Exploration::class, function (Exploration $job): bool {
+            return $job->queue === 'exploration' && $job->connection === 'long_running';
+        });
+    }
+
+    public function testHandleRepeatDispatchDelayIsBasedOnRoundStartNotJobFinish(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $now = Carbon::parse('2026-01-01 12:00:00');
+        Carbon::setTestNow($now);
+
+        $setupData = [
+            'health' => [
+                'current_character_health' => 100,
+                'current_monster_health' => 0,
+                'max_monster_health' => 200,
+            ],
+            'monster' => [
+                'id' => $this->monster->id,
+                'name' => $this->monster->name,
+                'str' => 1, 'dur' => 1, 'dex' => 1, 'chr' => 1,
+                'int' => 1, 'agi' => 1, 'focus' => 1, 'ac' => 1,
+                'attack_damage' => 10, 'spell_damage' => 0, 'healing' => 0,
+                'xp' => 10, 'gold' => 10, 'max_level' => 5,
+            ],
+        ];
+
+        $fightData = [
+            'health' => [
+                'current_character_health' => 100,
+                'current_monster_health' => 0,
+            ],
+            'monster' => ['id' => $this->monster->id],
+        ];
+
+        $monsterFightService = Mockery::mock(MonsterFightService::class);
+        $monsterFightService->shouldReceive('setupMonster')
+            ->andReturnUsing(function () use ($setupData, $now): array {
+                Carbon::setTestNow($now->copy()->addSeconds(30));
+
+                return $setupData;
+            });
+        $monsterFightService->shouldReceive('fightMonster')->andReturn($fightData);
+        $monsterFightService->shouldReceive('getMonster')->andReturn($this->monster);
+
+        $battleEventHandler = Mockery::mock(BattleEventHandler::class);
+        $battleEventHandler->shouldReceive('processMonsterDeath')->once();
+
+        $characterRewardService = Mockery::mock(CharacterRewardService::class);
+        $characterRewardService->shouldReceive('setCharacter')->andReturnSelf();
+        $characterRewardService->shouldReceive('fetchXpForMonster')->andReturn(10);
+
+        $skillService = Mockery::mock(SkillService::class);
+        $skillService->shouldReceive('setSkillInTraining')->andReturnSelf();
+        $skillService->shouldReceive('getXpForSkillIntraining')->andReturn(0);
+
+        $factionHandler = Mockery::mock(FactionHandler::class);
+        $factionHandler->shouldReceive('getFactionPointsPerKill')->andReturn(0);
+
+        $explorationCreatureCountCalculator = Mockery::mock(ExplorationCreatureCountCalculator::class);
+        $explorationCreatureCountCalculator->shouldReceive('calculate')->andReturn(1);
+
+        $this->character = $this->characterFactory->automationManagement()->assignExplorationAutomation([
+            'monster_id' => $this->monster->id,
+            'move_down_monster_list_every' => 10,
+            'previous_level' => $this->character->level,
+            'current_level' => $this->character->level,
+        ])->getCharacter();
+
+        $automation = $this->character->currentAutomations()->first();
+        $automation->update(['completed_at' => now()->addHours(8)]);
+
+        $this->instance(MonsterFightService::class, $monsterFightService);
+        $this->instance(BattleEventHandler::class, $battleEventHandler);
+        $this->instance(CharacterRewardService::class, $characterRewardService);
+        $this->instance(SkillService::class, $skillService);
+        $this->instance(FactionHandler::class, $factionHandler);
+        $this->instance(ExplorationCreatureCountCalculator::class, $explorationCreatureCountCalculator);
+
+        Exploration::dispatchSync($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
+
+        Queue::assertPushed(Exploration::class, function (Exploration $job) use ($now): bool {
+            return $job->delay->toDateTimeString() === $now->copy()->addSeconds(60)->toDateTimeString();
+        });
+    }
+
+    public function testHandleSetUpFightPreservesCharacterSheetCache(): void
+    {
+        Event::fake();
+
+        $setupData = [
+            'health' => [
+                'current_character_health' => 100,
+                'current_monster_health' => 0,
+                'max_monster_health' => 200,
+            ],
+            'monster' => [
+                'id' => $this->monster->id,
+                'name' => $this->monster->name,
+                'str' => 1, 'dur' => 1, 'dex' => 1, 'chr' => 1,
+                'int' => 1, 'agi' => 1, 'focus' => 1, 'ac' => 1,
+                'attack_damage' => 10, 'spell_damage' => 0, 'healing' => 0,
+                'xp' => 10, 'gold' => 10, 'max_level' => 5,
+            ],
+        ];
+
+        $fightData = [
+            'health' => [
+                'current_character_health' => 100,
+                'current_monster_health' => 0,
+            ],
+            'monster' => ['id' => $this->monster->id],
+        ];
+
+        $preserveCharacterSheetCachePassed = null;
+
+        $monsterFightService = Mockery::mock(MonsterFightService::class);
+        $monsterFightService->shouldReceive('setupMonster')
+            ->andReturnUsing(function ($char, $params, $arg3, $arg4, $preserveFlag) use (&$preserveCharacterSheetCachePassed, $setupData): array {
+                $preserveCharacterSheetCachePassed = $preserveFlag;
+
+                return $setupData;
+            });
+        $monsterFightService->shouldReceive('fightMonster')->andReturn($fightData);
+        $monsterFightService->shouldReceive('getMonster')->andReturn($this->monster);
+
+        $battleEventHandler = Mockery::mock(BattleEventHandler::class);
+        $battleEventHandler->shouldReceive('processMonsterDeath')->once();
+
+        $characterRewardService = Mockery::mock(CharacterRewardService::class);
+        $characterRewardService->shouldReceive('setCharacter')->andReturnSelf();
+        $characterRewardService->shouldReceive('fetchXpForMonster')->andReturn(10);
+
+        $skillService = Mockery::mock(SkillService::class);
+        $skillService->shouldReceive('setSkillInTraining')->andReturnSelf();
+        $skillService->shouldReceive('getXpForSkillIntraining')->andReturn(0);
+
+        $factionHandler = Mockery::mock(FactionHandler::class);
+        $factionHandler->shouldReceive('getFactionPointsPerKill')->andReturn(0);
+
+        $explorationCreatureCountCalculator = Mockery::mock(ExplorationCreatureCountCalculator::class);
+        $explorationCreatureCountCalculator->shouldReceive('calculate')->andReturn(1);
+
+        $this->character = $this->characterFactory->automationManagement()->assignExplorationAutomation([
+            'monster_id' => $this->monster->id,
+            'move_down_monster_list_every' => 10,
+            'previous_level' => $this->character->level,
+            'current_level' => $this->character->level,
+        ])->getCharacter();
+
+        $automation = $this->character->currentAutomations()->first();
+
+        $this->instance(MonsterFightService::class, $monsterFightService);
+        $this->instance(BattleEventHandler::class, $battleEventHandler);
+        $this->instance(CharacterRewardService::class, $characterRewardService);
+        $this->instance(SkillService::class, $skillService);
+        $this->instance(FactionHandler::class, $factionHandler);
+        $this->instance(ExplorationCreatureCountCalculator::class, $explorationCreatureCountCalculator);
+
+        Exploration::dispatchSync($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
+
+        $this->assertTrue($preserveCharacterSheetCachePassed);
     }
 }

@@ -180,6 +180,23 @@ class ExplorationAutomationServiceTest extends TestCase
         Queue::assertPushed(Exploration::class);
     }
 
+    public function testBeginAutomationDispatchesExplorationJobOnExplorationQueueWithLongRunningConnection(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        Queue::assertPushed(Exploration::class, function (Exploration $job): bool {
+            return $job->queue === 'exploration' && $job->connection === 'long_running';
+        });
+    }
+
     public function testStopExplorationDeletesExplorationAutomation(): void
     {
         Event::fake();

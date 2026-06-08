@@ -28,7 +28,7 @@ class ExplorationLogService
         return $log;
     }
 
-    public function recordFightTotals(ExplorationLog $log, array $totals): void
+    public function recordFightTotals(ExplorationLog $log, array $totals, bool $broadcast = true): void
     {
         $log->refresh();
 
@@ -65,10 +65,12 @@ class ExplorationLogService
 
         $log->update($updates);
 
-        $this->broadcastOutputForCharacter($log->character);
+        if ($broadcast) {
+            $this->broadcastOutputForCharacter($log->character);
+        }
     }
 
-    public function recordMonsterSnapshot(ExplorationLog $log, array $monster): void
+    public function recordMonsterSnapshot(ExplorationLog $log, array $monster, bool $broadcast = true): void
     {
         $log->refresh();
 
@@ -79,10 +81,12 @@ class ExplorationLogService
             'summary' => $summary,
         ]);
 
-        $this->broadcastOutputForCharacter($log->character);
+        if ($broadcast) {
+            $this->broadcastOutputForCharacter($log->character);
+        }
     }
 
-    public function recordCurrentRoundCreatures(ExplorationLog $log, int $currentRoundCreatures): void
+    public function recordCurrentRoundCreatures(ExplorationLog $log, int $currentRoundCreatures, bool $broadcast = true): void
     {
         $log->refresh();
 
@@ -93,7 +97,9 @@ class ExplorationLogService
             'summary' => $summary,
         ]);
 
-        $this->broadcastOutputForCharacter($log->character);
+        if ($broadcast) {
+            $this->broadcastOutputForCharacter($log->character);
+        }
     }
 
     public function finalize(ExplorationLog $log, ?string $stoppedReason = null, bool $stoppedByPlayer = false): void
