@@ -23,7 +23,7 @@ export default class DropDown extends React.Component<DropDownProps, any> {
                     {({ active }) => (
                         <button
                             className={clsx(
-                                "group flex rounded-sm items-center w-full py-2 text-sm",
+                                "group flex rounded-sm items-center w-full py-2 text-sm md:whitespace-nowrap",
                                 {
                                     "bg-blue-500 dark:bg-blue-600 text-white":
                                         active,
@@ -138,7 +138,7 @@ export default class DropDown extends React.Component<DropDownProps, any> {
                     >
                         <Menu.Items
                             className={clsx(
-                                "absolute left-0 z-50 w-full min-w-full mt-2 origin-top-left dark:bg-gray-700 " +
+                                "absolute left-0 z-50 w-full md:w-max min-w-full mt-2 origin-top-left dark:bg-gray-700 " +
                                     "bg-white divide-y dark:divide-gray-600 divide-gray-300 rounded-md shadow-lg ring-1 " +
                                     "ring-black ring-opacity-5 focus:outline-none",
                                 {
