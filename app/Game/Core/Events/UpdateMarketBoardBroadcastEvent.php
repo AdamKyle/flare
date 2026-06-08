@@ -27,7 +27,7 @@ class UpdateMarketBoardBroadcastEvent implements ShouldBroadcastNow
     /**
      * @param  User  $user
      */
-    public $user;
+    private $user;
 
     /**
      * Create a new event instance.
@@ -49,5 +49,13 @@ class UpdateMarketBoardBroadcastEvent implements ShouldBroadcastNow
     public function broadcastOn()
     {
         return new PresenceChannel('update-market');
+    }
+
+    public function broadcastWith(): array
+    {
+        return [
+            'marketListings' => $this->marketListings,
+            'characterGold'  => $this->characterGold,
+        ];
     }
 }

@@ -148,4 +148,11 @@ class GameRouteAuthenticationTest extends TestCase
 
         $this->assertEquals(401, $response->getStatusCode());
     }
+
+    public function testGuestJsonAccessToEventCalendarIsBlocked(): void
+    {
+        $response = $this->call('GET', '/game/event-calendar', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+
+        $this->assertEquals(401, $response->getStatusCode());
+    }
 }

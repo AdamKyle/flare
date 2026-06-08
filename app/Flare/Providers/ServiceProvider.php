@@ -12,7 +12,6 @@ use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Handlers\MessageThrottledHandler;
 use App\Flare\Middleware\IsCharacterDeadMiddleware;
-use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
 use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
 use App\Flare\Middleware\IsGloballyTimedOut;
 use App\Flare\Middleware\IsPlayerBannedMiddleware;
@@ -505,7 +504,6 @@ class ServiceProvider extends ApplicationServiceProvider
         $router->aliasMiddleware('is.character.dead', IsCharacterDeadMiddleware::class);
         $router->aliasMiddleware('is.player.banned', IsPlayerBannedMiddleware::class);
         $router->aliasMiddleware('is.character.who.they.say.they.are', IsCharacterWhoTheySayTheyAreMiddleware::class);
-        $router->aliasMiddleware('is.character.logged.in', IsCharacterLoggedInMiddleware::class);
         $router->aliasMiddleware('is.globally.timed.out', IsGloballyTimedOut::class);
         $router->aliasMiddleware('session.time.tracking', TrackSessionLifeMiddleware::class);
         $router->aliasMiddleware('update.player-activity', UpdatePlayerSessionActivity::class);
