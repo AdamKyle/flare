@@ -237,7 +237,8 @@ class UseItemService
 
         $item = Item::find($boon->item_id);
         $minutesLeft = $boon->complete->lessThanOrEqualTo(now()) ? 0 : (int) ceil(now()->diffInSeconds($boon->complete) / 60);
-        $missing = self::MAX_TIME - $minutesLeft;
+        $maxTime = $item->can_stack ? min(self::MAX_TIME, $boon->amount_used * $item->lasts_for) : $item->lasts_for;
+        $missing = $maxTime - $minutesLeft;
 
         if ($missing <= 0) {
             return $this->errorResult(
@@ -257,7 +258,6 @@ class UseItemService
         $boon->update([
             'complete' => $boon->complete->addMinutes($timeAdded),
             'last_for_minutes' => $minutesLeft + $timeAdded,
-            'amount_used' => min((int) ceil(self::MAX_TIME / $item->lasts_for), $boon->amount_used + $used),
         ]);
 
         return $this->successResult([
