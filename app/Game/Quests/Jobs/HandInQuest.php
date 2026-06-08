@@ -9,6 +9,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Quests\Handlers\NpcQuestsHandler;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -35,12 +36,17 @@ class HandInQuest implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(NpcQuestsHandler $npcQuestsHandler): void {
+    public function handle(NpcQuestsHandler $npcQuestsHandler): void
+    {
 
         try {
             $npcQuestsHandler->handleNpcQuest($this->character, $this->quest);
+            $npcQuestsHandler->questRewardHandler()->createquestQuestLog($this->character, $this->quest);
+            event(new GlobalMessageEvent($this->character->name . ' Has completed a quest (' . $this->quest->name . ') for: ' . $this->quest->npc->real_name . ' and been rewarded with a godly gift!'));
         } catch (Exception $e) {
             Log::error($e->getMessage());
+
+            throw $e;
         }
     }
 }

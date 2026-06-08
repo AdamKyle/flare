@@ -93,13 +93,19 @@ class FeatureTypes
         return $this->value === self::EXTEND_SETS;
     }
 
-    public function isExtendedBackpack(): bool {
+    public function isExtendedBackpack(): bool
+    {
         return $this->value === self::EXTENDED_BACKPACK;
     }
 
     public function isCapitalCities(): bool
     {
         return $this->value === self::CAPITAL_CITIES;
+    }
+
+    public function isCapitalCityGoldBars(): bool
+    {
+        return $this->value === self::CAPITAL_CITY_GOLD_BARS;
     }
 
     public function isCosmeticRaceChanger(): bool

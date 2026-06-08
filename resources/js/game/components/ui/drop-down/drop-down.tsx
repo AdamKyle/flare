@@ -140,7 +140,7 @@ export default class DropDown extends React.Component<DropDownProps, any> {
                             className={clsx(
                                 "absolute left-0 z-50 w-full md:w-max min-w-full mt-2 origin-top-left dark:bg-gray-700 " +
                                     "bg-white divide-y dark:divide-gray-600 divide-gray-300 rounded-md shadow-lg ring-1 " +
-                                    "ring-black ring-opacity-5 focus:outline-none",
+                                    "ring-black ring-opacity-5 focus:outline-none max-h-64 overflow-y-auto",
                                 {
                                     absolute: !this.props.use_relative,
                                     relative: this.props.use_relative,

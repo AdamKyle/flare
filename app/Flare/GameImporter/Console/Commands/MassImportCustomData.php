@@ -39,6 +39,7 @@ class MassImportCustomData extends Command
     public function handle()
     {
         Artisan::call('cleanup:dangling-character-data --apply');
+        Artisan::call('repair:quest-feature-rewards');
 
         $this->importInformationSection();
 

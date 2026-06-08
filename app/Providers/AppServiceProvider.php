@@ -8,6 +8,7 @@ use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
 use App\Console\AfterDeployment\CleanDanglingCharacterData;
 use App\Console\AfterDeployment\CreateLocationDataCache;
 use App\Console\AfterDeployment\CreateMonsterCache;
+use App\Console\AfterDeployment\RepairQuestFeatureRewards;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
 use App\Console\DevelopmentCommands\CompleteGuideQuestForCharacter;
 use App\Console\DevelopmentCommands\CreateCharacter;
@@ -44,6 +45,7 @@ class AppServiceProvider extends ServiceProvider
             CleanDanglingCharacterData::class,
             CreateMonsterCache::class,
             CreateLocationDataCache::class,
+            RepairQuestFeatureRewards::class,
 
             // Development Commands:
             CreateCharacter::class,

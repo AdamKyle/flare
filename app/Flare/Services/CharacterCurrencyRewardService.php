@@ -231,7 +231,7 @@ class CharacterCurrencyRewardService
 
                 $newCoins = $this->character->copper_coins + $coins;
 
-                if ($newCoins >= MaxCurrenciesValue::COPPER) {
+                if ($newCoins >= MaxCurrenciesValue::MAX_COPPER) {
                     $newCoins = MaxCurrenciesValue::MAX_COPPER;
                 }
 

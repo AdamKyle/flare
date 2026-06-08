@@ -1,0 +1,104 @@
+<?php
+
+namespace Tests\Unit\Game\Quests\Handlers;
+
+use App\Flare\Values\FeatureTypes;
+use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Quests\Handlers\NpcQuestRewardHandler;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
+use Tests\Setup\Character\CharacterFactory;
+use Tests\TestCase;
+use Tests\Traits\CreateNpc;
+use Tests\Traits\CreateQuest;
+
+class NpcQuestRewardHandlerTest extends TestCase
+{
+    use CreateNpc, CreateQuest, RefreshDatabase;
+
+    public function test_extend_sets_quest_grants_extra_sets_to_correct_character(): void
+    {
+        Event::fake();
+
+        $npc = $this->createNpc();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $initialSetCount = $character->inventorySets()->count();
+
+        $quest = $this->createQuest([
+            'npc_id' => $npc->id,
+            'unlocks_feature' => FeatureTypes::EXTEND_SETS,
+            'unlocks_skill' => false,
+            'reward_gold' => null,
+            'reward_gold_dust' => null,
+            'reward_shards' => null,
+            'reward_xp' => null,
+            'reward_item' => null,
+            'gold_cost' => 0,
+            'gold_dust_cost' => 0,
+            'shard_cost' => 0,
+        ]);
+
+        $handler = resolve(NpcQuestRewardHandler::class);
+        $handler->processReward($quest, $npc, $character);
+
+        $character = $character->refresh();
+        $this->assertEquals($initialSetCount + 10, $character->inventorySets()->count());
+    }
+
+    public function test_capital_cities_feature_reward_sends_unlock_messages_without_creating_stored_state(): void
+    {
+        Event::fake();
+
+        $npc = $this->createNpc();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $quest = $this->createQuest([
+            'npc_id' => $npc->id,
+            'unlocks_feature' => FeatureTypes::CAPITAL_CITIES,
+            'unlocks_skill' => false,
+            'reward_gold' => null,
+            'reward_gold_dust' => null,
+            'reward_shards' => null,
+            'reward_xp' => null,
+            'reward_item' => null,
+        ]);
+
+        resolve(NpcQuestRewardHandler::class)->processReward($quest, $npc, $character);
+
+        Event::assertDispatched(ServerMessageEvent::class, function (ServerMessageEvent $event): bool {
+            return $event->message === 'You have unlocked access to Capital Cities.';
+        });
+        Event::assertDispatched(GlobalMessageEvent::class, function (GlobalMessageEvent $event) use ($character): bool {
+            return $event->message === $character->name . ' has unlocked access to Capital Cities!';
+        });
+        $this->assertEquals(0, $character->fresh()->questsCompleted()->where('quest_id', $quest->id)->count());
+    }
+
+    public function test_capital_city_gold_bars_feature_reward_sends_unlock_messages_without_creating_stored_state(): void
+    {
+        Event::fake();
+
+        $npc = $this->createNpc();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $quest = $this->createQuest([
+            'npc_id' => $npc->id,
+            'unlocks_feature' => FeatureTypes::CAPITAL_CITY_GOLD_BARS,
+            'unlocks_skill' => false,
+            'reward_gold' => null,
+            'reward_gold_dust' => null,
+            'reward_shards' => null,
+            'reward_xp' => null,
+            'reward_item' => null,
+        ]);
+
+        resolve(NpcQuestRewardHandler::class)->processReward($quest, $npc, $character);
+
+        Event::assertDispatched(ServerMessageEvent::class, function (ServerMessageEvent $event): bool {
+            return $event->message === 'You have unlocked Gold Bar management for your Capital City.';
+        });
+        Event::assertDispatched(GlobalMessageEvent::class, function (GlobalMessageEvent $event) use ($character): bool {
+            return $event->message === $character->name . ' has unlocked Capital City Gold Bar management!';
+        });
+        $this->assertEquals(0, $character->fresh()->questsCompleted()->where('quest_id', $quest->id)->count());
+    }
+}

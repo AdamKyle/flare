@@ -14,7 +14,6 @@ use App\Game\Maps\Events\UpdateMonsterList;
 use App\Game\Maps\Events\UpdateRaidMonsters;
 use App\Game\Maps\Validation\CanTravelToMap;
 use App\Game\Maps\Values\MapTileValue;
-use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Quests\Handlers\NpcQuestsHandler;
 use App\Game\Quests\Traits\QuestDetails;
@@ -206,10 +205,6 @@ class QuestHandlerService
     {
 
         HandInQuest::dispatch($character, $quest);
-
-        event(new GlobalMessageEvent($character->name . ' Has completed a quest (' . $quest->name . ') for: ' . $quest->npc->real_name . ' and been rewarded with a godly gift!'));
-
-        $this->npcQuestsHandler()->questRewardHandler()->createquestQuestLog($character, $quest);
 
         $character = $character->refresh();
 

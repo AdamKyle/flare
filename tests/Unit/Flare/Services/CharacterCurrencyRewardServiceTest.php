@@ -438,7 +438,7 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         $this->assertEquals(0, $character->copper_coins);
     }
 
-    public function test_distribute_copper_coins_sets_to_max_when_slot_present_and_no_dungeon_and_no_merc()
+    public function test_distribute_copper_coins_increases_by_earned_amount_when_slot_present_and_no_dungeon_and_no_merc()
     {
         $purgatoryGameMap = $this->createGameMap([
             'name' => 'Purgatory',
@@ -479,7 +479,8 @@ class CharacterCurrencyRewardServiceTest extends TestCase
 
         $character = $this->characterCurrencyRewardService->getCharacter();
 
-        $this->assertEquals(MaxCurrenciesValue::MAX_COPPER, $character->copper_coins);
+        $this->assertGreaterThanOrEqual(5, $character->copper_coins);
+        $this->assertLessThanOrEqual(20, $character->copper_coins);
     }
 
     public function test_distribute_copper_coins_increases_negative_copper_coins_when_dungeon_and_merc_slot()
@@ -579,6 +580,95 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         $character = $this->characterCurrencyRewardService->getCharacter();
 
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD, $character->gold);
+    }
+
+    public function test_distribute_copper_coins_increases_by_exact_earned_amount_when_below_max(): void
+    {
+        $purgatoryGameMap = $this->createGameMap([
+            'name' => 'Purgatory',
+            'path' => 'purgatory',
+            'kingdom_color' => '#ffffff',
+        ]);
+
+        $copperCoinsItem = $this->createItem([
+            'effect' => ItemEffectsValue::GET_COPPER_COINS,
+            'type' => 'quest',
+        ]);
+
+        $this->createItem([
+            'effect' => ItemEffectsValue::MERCENARY_SLOT_BONUS,
+            'type' => 'quest',
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($copperCoinsItem)->getCharacter();
+        $character->update([
+            'gold' => 0,
+            'copper_coins' => 400000,
+        ]);
+
+        $character->map->update([
+            'game_map_id' => $purgatoryGameMap->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $monster = $this->createMonster([
+            'gold' => 0,
+            'game_map_id' => $purgatoryGameMap->id,
+        ]);
+
+        $this->characterCurrencyRewardService
+            ->setCharacter($character)
+            ->giveCurrencies($monster);
+
+        $character = $this->characterCurrencyRewardService->getCharacter();
+
+        $this->assertGreaterThan(400000, $character->copper_coins);
+        $this->assertLessThan(MaxCurrenciesValue::MAX_COPPER, $character->copper_coins);
+    }
+
+    public function test_distribute_copper_coins_caps_at_max_copper(): void
+    {
+        $purgatoryGameMap = $this->createGameMap([
+            'name' => 'Purgatory',
+            'path' => 'purgatory',
+            'kingdom_color' => '#ffffff',
+        ]);
+
+        $copperCoinsItem = $this->createItem([
+            'effect' => ItemEffectsValue::GET_COPPER_COINS,
+            'type' => 'quest',
+        ]);
+
+        $this->createItem([
+            'effect' => ItemEffectsValue::MERCENARY_SLOT_BONUS,
+            'type' => 'quest',
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($copperCoinsItem)->getCharacter();
+        $character->update([
+            'gold' => 0,
+            'copper_coins' => MaxCurrenciesValue::MAX_COPPER - 1,
+        ]);
+
+        $character->map->update([
+            'game_map_id' => $purgatoryGameMap->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $monster = $this->createMonster([
+            'gold' => 0,
+            'game_map_id' => $purgatoryGameMap->id,
+        ]);
+
+        $this->characterCurrencyRewardService
+            ->setCharacter($character)
+            ->giveCurrencies($monster);
+
+        $character = $this->characterCurrencyRewardService->getCharacter();
+
+        $this->assertEquals(MaxCurrenciesValue::MAX_COPPER, $character->copper_coins);
     }
 
     public function test_currency_event_reward_scales_shards_and_gold_dust_with_kill_count()

@@ -94,6 +94,24 @@ class NpcQuestRewardHandler
                 event(new GlobalMessageEvent($character->name . ' Has unlocked an epic gift! Name Tags! Their deeds have not gone unnoticed in the land of Tlessa!'));
             }
 
+            if ($quest->unlocksFeature()->isCosmeticRaceChanger()) {
+                event(new ServerMessageEvent($character->user, 'You can now change your character\'s cosmetic race from your settings page (Hover/Tap Top Right User Icon). This is purely cosmetic and does not affect your stats.'));
+
+                event(new GlobalMessageEvent($character->name . ' Has unlocked an epic gift! Cosmetic Race Changer! Their deeds have not gone unnoticed in the land of Tlessa!'));
+            }
+
+            if ($quest->unlocksFeature()->isCapitalCities()) {
+                event(new ServerMessageEvent($character->user, 'You have unlocked access to Capital Cities.'));
+
+                event(new GlobalMessageEvent($character->name . ' has unlocked access to Capital Cities!'));
+            }
+
+            if ($quest->unlocksFeature()->isCapitalCityGoldBars()) {
+                event(new ServerMessageEvent($character->user, 'You have unlocked Gold Bar management for your Capital City.'));
+
+                event(new GlobalMessageEvent($character->name . ' has unlocked Capital City Gold Bar management!'));
+            }
+
             if ($quest->unlocksFeature()->isExtendSets()) {
 
                 $this->giveAdditionalSetsToCharacter($character);
@@ -305,7 +323,7 @@ class NpcQuestRewardHandler
     {
         for ($i = 1; $i <= 10; $i++) {
             $character->inventorySets()->create([
-                'character_id' => $this->character->id,
+                'character_id' => $character->id,
                 'can_be_equipped' => true,
             ]);
 
