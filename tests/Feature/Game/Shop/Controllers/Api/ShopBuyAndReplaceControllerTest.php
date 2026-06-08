@@ -46,7 +46,7 @@ class ShopBuyAndReplaceControllerTest extends TestCase
         $this->instance(EquipItemService::class, $equipItemService);
 
         $response = $this->actingAs($this->character->user)
-            ->json('POST', '/api/shop/buy-and-replace/' . $this->character->id, [
+            ->call('POST', '/api/shop/buy-and-replace/' . $this->character->id, [
                 'item_id_to_buy' => $item->id,
                 'position' => 'left-hand',
                 'slot_id' => 1,

@@ -279,7 +279,7 @@ class RestartGlobalEventGoalTest extends TestCase
 
         $this->createGlobalEventParticipation([
             'global_event_goal_id' => $eventGoal->id,
-            'character_id' => $eventGoal->id,
+            'character_id' => $this->character->id,
             'current_enchants' => 1000,
         ]);
 
@@ -334,7 +334,7 @@ class RestartGlobalEventGoalTest extends TestCase
 
         $this->createGlobalEventParticipation([
             'global_event_goal_id' => $eventGoal->id,
-            'character_id' => $eventGoal->id,
+            'character_id' => $this->character->id,
             'current_enchants' => 1000,
         ]);
 
@@ -397,7 +397,7 @@ class RestartGlobalEventGoalTest extends TestCase
 
         $this->createGlobalEventParticipation([
             'global_event_goal_id' => $eventGoal->id,
-            'character_id' => $eventGoal->id,
+            'character_id' => $this->character->id,
             'current_enchants' => 1000,
         ]);
 
@@ -459,7 +459,7 @@ class RestartGlobalEventGoalTest extends TestCase
 
         $this->createGlobalEventParticipation([
             'global_event_goal_id' => $eventGoal->id,
-            'character_id' => $eventGoal->id,
+            'character_id' => $this->character->id,
             'current_crafts' => 1000,
         ]);
 
@@ -521,7 +521,7 @@ class RestartGlobalEventGoalTest extends TestCase
 
         $this->createGlobalEventParticipation([
             'global_event_goal_id' => $eventGoal->id,
-            'character_id' => $eventGoal->id,
+            'character_id' => $this->character->id,
             'current_kills' => 1000,
         ]);
 

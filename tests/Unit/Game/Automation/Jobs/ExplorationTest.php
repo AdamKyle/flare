@@ -17,6 +17,7 @@ use App\Game\Automation\Jobs\Exploration;
 use App\Game\Automation\Services\ExplorationAutomationService;
 use App\Game\Automation\Services\ExplorationCreatureCountCalculator;
 use App\Game\Automation\Services\ExplorationLogService;
+use App\Game\Automation\Services\ExplorationWarningService;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
@@ -2792,17 +2793,23 @@ class ExplorationTest extends TestCase
         $automation = $this->character->currentAutomations()->first();
         $automation->update(['completed_at' => now()->addHours(8)]);
 
-        $this->instance(MonsterFightService::class, $monsterFightService);
-        $this->instance(BattleEventHandler::class, $battleEventHandler);
-        $this->instance(CharacterRewardService::class, $characterRewardService);
-        $this->instance(SkillService::class, $skillService);
-        $this->instance(FactionHandler::class, $factionHandler);
-        $this->instance(ExplorationCreatureCountCalculator::class, $explorationCreatureCountCalculator);
-
-        Exploration::dispatchSync($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
+        $job = new Exploration($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
+        $job->handle(
+            $monsterFightService,
+            $battleEventHandler,
+            resolve(CharacterCacheData::class),
+            $characterRewardService,
+            $skillService,
+            $explorationCreatureCountCalculator,
+            $factionHandler,
+            resolve(ExplorationLogService::class),
+            resolve(ExplorationWarningService::class),
+        );
 
         Queue::assertPushed(Exploration::class, function (Exploration $job): bool {
-            return $job->queue === 'exploration' && $job->connection === 'long_running';
+            return $job->character->is($this->character)
+                && $job->queue === 'exploration'
+                && $job->connection === 'long_running';
         });
     }
 
@@ -2875,17 +2882,28 @@ class ExplorationTest extends TestCase
         $automation = $this->character->currentAutomations()->first();
         $automation->update(['completed_at' => now()->addHours(8)]);
 
-        $this->instance(MonsterFightService::class, $monsterFightService);
-        $this->instance(BattleEventHandler::class, $battleEventHandler);
-        $this->instance(CharacterRewardService::class, $characterRewardService);
-        $this->instance(SkillService::class, $skillService);
-        $this->instance(FactionHandler::class, $factionHandler);
-        $this->instance(ExplorationCreatureCountCalculator::class, $explorationCreatureCountCalculator);
-
-        Exploration::dispatchSync($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
+        $job = new Exploration($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
+        $job->handle(
+            $monsterFightService,
+            $battleEventHandler,
+            resolve(CharacterCacheData::class),
+            $characterRewardService,
+            $skillService,
+            $explorationCreatureCountCalculator,
+            $factionHandler,
+            resolve(ExplorationLogService::class),
+            resolve(ExplorationWarningService::class),
+        );
 
         Queue::assertPushed(Exploration::class, function (Exploration $job) use ($now): bool {
-            return $job->delay->toDateTimeString() === $now->copy()->addSeconds(60)->toDateTimeString();
+            if (is_null($job->delay)) {
+                return false;
+            }
+
+            return $job->character->is($this->character)
+                && $job->queue === 'exploration'
+                && $job->connection === 'long_running'
+                && $job->delay->toDateTimeString() === $now->copy()->addSeconds(60)->toDateTimeString();
         });
     }
 

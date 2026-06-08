@@ -169,8 +169,8 @@ class RestartGlobalEventGoal extends Command
         }
 
         if ($currentStep === GlobalEventSteps::ENCHANT) {
-            GlobalEventCraftingInventorySlot::truncate();
-            GlobalEventCraftingInventory::truncate();
+            GlobalEventCraftingInventorySlot::query()->delete();
+            GlobalEventCraftingInventory::query()->delete();
         }
 
         GlobalEventParticipation::truncate();

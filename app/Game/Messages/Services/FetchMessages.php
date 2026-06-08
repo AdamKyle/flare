@@ -53,15 +53,29 @@ class FetchMessages
 
         $user = $message->user;
 
+        if (is_null($user)) {
+            $message->name = 'Deleted Character';
+            $message->name_tag = null;
+
+            return $message;
+        }
+
         if ($user->hasRole('Admin')) {
             $message->name = 'The Creator';
 
             return $message;
         }
 
-        $nameTag = $message->user->name_tag;
+        if (is_null($user->character)) {
+            $message->name = 'Deleted Character';
+            $message->name_tag = null;
 
-        $message->name = $message->user->character->name;
+            return $message;
+        }
+
+        $nameTag = $user->name_tag;
+
+        $message->name = $user->character->name;
         $message->name_tag = is_null($nameTag) ? null : NameTags::$valueNames[$nameTag];
 
         return $message;
@@ -69,10 +83,19 @@ class FetchMessages
 
     protected function setUpCustomOverRides(Message $message): Message
     {
+        $user = $message->user;
 
-        $message->custom_class = $message->user->chat_text_color;
-        $message->is_chat_bold = $message->user->chat_is_bold;
-        $message->is_chat_italic = $message->user->chat_is_italic;
+        if (is_null($user)) {
+            $message->custom_class = null;
+            $message->is_chat_bold = false;
+            $message->is_chat_italic = false;
+
+            return $message;
+        }
+
+        $message->custom_class = $user->chat_text_color;
+        $message->is_chat_bold = $user->chat_is_bold;
+        $message->is_chat_italic = $user->chat_is_italic;
 
         return $message;
     }
