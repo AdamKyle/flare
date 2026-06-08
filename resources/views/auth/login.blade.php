@@ -30,7 +30,7 @@
                 </div>
                 <div class="mb-5">
                     <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Password') }}</label>
-                    <input id="password" type="password" class="form-control" name="password" required autocomplete="new-password" autofocus>
+                    <input id="password" type="password" class="form-control" name="password" required autocomplete="current-password" autofocus>
                     @error('password')
                     <div class="text-red-800 dark:text-red-500 pt-3" role="alert">
                         <strong>{{$message}}</strong>

@@ -27,7 +27,7 @@
         </a>
         <a href="{{ route('game.event.calendar') }}" class="link" data-toggle="tooltip-menu"
             data-tippy-content="Events">
-            <span class="icon far fa-calendar-alt"></span>
+            <span class="icon fas fa-calendar"></span>
             <span class="title">Event Calendar</span>
         </a>
         <a href="{{ route('tlessa.donations') }}" class="link" data-toggle="tooltip-menu"

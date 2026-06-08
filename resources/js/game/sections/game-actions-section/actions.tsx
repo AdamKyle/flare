@@ -405,19 +405,18 @@ export default class Actions extends React.Component<
 
         if (this.state.raid_monsters.length > 0) {
             return (
-                <>
+                <RaidSection
+                    raid_monsters={this.state.raid_monsters}
+                    character_id={this.props.character.id}
+                    can_attack={this.props.character.can_attack}
+                    is_dead={this.props.character.is_dead}
+                    is_small={false}
+                    character_name={this.props.character.name}
+                    user_id={this.props.character.user_id}
+                    character_current_health={this.props.character.health}
+                >
                     {actionSlot}
-                    <RaidSection
-                        raid_monsters={this.state.raid_monsters}
-                        character_id={this.props.character.id}
-                        can_attack={this.props.character.can_attack}
-                        is_dead={this.props.character.is_dead}
-                        is_small={false}
-                        character_name={this.props.character.name}
-                        user_id={this.props.character.user_id}
-                        character_current_health={this.props.character.health}
-                    />
-                </>
+                </RaidSection>
             );
         }
 
@@ -428,7 +427,7 @@ export default class Actions extends React.Component<
                 character_statuses={this.props.character_status}
                 is_small={false}
             >
-                {this.renderActionSlot()}
+                {actionSlot}
             </MonsterActions>
         );
     }

@@ -5,6 +5,7 @@ namespace Tests\Console;
 use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Models\DelveExploration;
 use App\Flare\Models\ExplorationLog;
+use App\Flare\Models\FactionLoyalty;
 use App\Flare\Models\FactionLoyaltyNpc;
 use App\Flare\Models\FactionLoyaltyNpcTask;
 use App\Flare\Models\GlobalEventCraftingInventorySlot;
@@ -360,5 +361,71 @@ class CleanDanglingCharacterDataTest extends TestCase
         $this->assertEquals(0, FactionLoyaltyNpc::where('faction_loyalty_id', self::ORPHAN_CHARACTER_ID)->count());
         $this->assertEquals(0, FactionLoyaltyNpcTask::where('faction_loyalty_npc_id', self::ORPHAN_CHARACTER_ID)->count());
         $this->assertEquals(0, GlobalEventCraftingInventorySlot::where('global_event_crafting_inventory_id', self::ORPHAN_CHARACTER_ID)->count());
+    }
+
+    public function test_apply_deletes_faction_loyalty_npc_tasks_with_missing_faction_loyalty(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $factionId = DB::table('factions')->insertGetId([
+            'character_id' => $character->id,
+            'game_map_id' => $character->map->game_map_id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $factionLoyalty = FactionLoyalty::factory()->create([
+            'character_id' => $character->id,
+            'faction_id' => $factionId,
+        ]);
+        $npcId = DB::table('npcs')->insertGetId([
+            'game_map_id' => $character->map->game_map_id,
+            'name' => 'Missing Faction Loyalty Test',
+            'real_name' => 'Missing Faction Loyalty Test',
+            'type' => 0,
+            'x_position' => 1,
+            'y_position' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $factionLoyaltyNpc = FactionLoyaltyNpc::factory()->create([
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npcId,
+        ]);
+
+        $this->withoutFkChecks(function () use ($factionLoyaltyNpc) {
+            FactionLoyaltyNpcTask::factory()->create([
+                'faction_loyalty_id' => self::ORPHAN_CHARACTER_ID,
+                'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            ]);
+        });
+
+        $this->assertEquals(0, $this->artisan('cleanup:dangling-character-data', ['--apply' => true]));
+
+        $this->assertEquals(0, FactionLoyaltyNpcTask::where('faction_loyalty_id', self::ORPHAN_CHARACTER_ID)->count());
+    }
+
+    public function test_apply_deletes_faction_loyalty_npc_tasks_with_missing_faction_loyalty_npc(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $factionId = DB::table('factions')->insertGetId([
+            'character_id' => $character->id,
+            'game_map_id' => $character->map->game_map_id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $factionLoyalty = FactionLoyalty::factory()->create([
+            'character_id' => $character->id,
+            'faction_id' => $factionId,
+        ]);
+
+        $this->withoutFkChecks(function () use ($factionLoyalty) {
+            FactionLoyaltyNpcTask::factory()->create([
+                'faction_loyalty_id' => $factionLoyalty->id,
+                'faction_loyalty_npc_id' => self::ORPHAN_CHARACTER_ID,
+            ]);
+        });
+
+        $this->assertEquals(0, $this->artisan('cleanup:dangling-character-data', ['--apply' => true]));
+
+        $this->assertEquals(0, FactionLoyaltyNpcTask::where('faction_loyalty_npc_id', self::ORPHAN_CHARACTER_ID)->count());
     }
 }

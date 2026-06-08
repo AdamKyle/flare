@@ -2,12 +2,14 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
+        $this->cleanOrphanedRowsBeforeAddingForeignKeys();
         $this->makeCharacterIdNullableOnSuggestions();
         $this->makeUserIdNullableOnMessages();
         $this->updateKingdomsFkToSetNull();
@@ -33,11 +35,90 @@ return new class extends Migration
     private function makeCharacterIdNullableOnSuggestions(): void
     {
         Schema::table('suggestion_and_bugs', function (Blueprint $table) {
-            $table->unsignedBigInteger('character_id')->nullable()->change();
             $table->foreign('character_id', 'sab_character_id_foreign')
                 ->references('id')->on('characters')
                 ->nullOnDelete();
         });
+    }
+
+    private function cleanOrphanedRowsBeforeAddingForeignKeys(): void
+    {
+        Schema::table('suggestion_and_bugs', function (Blueprint $table) {
+            $table->unsignedBigInteger('character_id')->nullable()->change();
+        });
+
+        $this->deleteOrphanedChildRows('inventory_slots', 'inventory_id', 'inventories');
+        $this->deleteOrphanedChildRows('set_slots', 'inventory_set_id', 'inventory_sets');
+        $this->deleteOrphanedChildRows('gem_bag_slots', 'gem_bag_id', 'gem_bags');
+        $this->deleteOrphanedChildRows('faction_loyalty_npc_tasks', 'faction_loyalty_id', 'faction_loyalties');
+        $this->deleteOrphanedChildRows('faction_loyalty_npcs', 'faction_loyalty_id', 'faction_loyalties');
+        $this->deleteOrphanedChildRows('faction_loyalty_npc_tasks', 'faction_loyalty_npc_id', 'faction_loyalty_npcs');
+        $this->deleteOrphanedChildRows(
+            'character_class_ranks_weapon_masteries',
+            'character_class_rank_id',
+            'character_class_ranks'
+        );
+
+        $characterTables = [
+            'delve_explorations',
+            'exploration_logs',
+            'exploration_warnings',
+            'faction_loyalty_automations',
+            'faction_loyalty_automation_warnings',
+            'global_event_crafting_inventories',
+            'global_event_participation',
+            'smelting_progress',
+            'weekly_monster_fights',
+            'building_expansion_queues',
+            'capital_city_building_queues',
+            'capital_city_building_cancellations',
+            'capital_city_unit_queues',
+            'capital_city_unit_cancellations',
+            'event_goal_participation_crafts',
+            'event_goal_participation_enchants',
+        ];
+
+        foreach ($characterTables as $table) {
+            $this->deleteOrphanedChildRows($table, 'character_id', 'characters');
+        }
+
+        $this->deleteOrphanedChildRows('delve_logs', 'delve_exploration_id', 'delve_explorations');
+        $this->deleteOrphanedChildRows(
+            'global_event_crafting_inventory_slots',
+            'global_event_crafting_inventory_id',
+            'global_event_crafting_inventories'
+        );
+        $this->deleteOrphanedChildRows(
+            'faction_loyalty_automation_logs',
+            'faction_loyalty_automation_id',
+            'faction_loyalty_automations'
+        );
+
+        $this->nullOrphanedChildRows('suggestion_and_bugs', 'character_id', 'characters');
+    }
+
+    private function deleteOrphanedChildRows(string $table, string $foreignKey, string $parentTable): void
+    {
+        DB::table($table)
+            ->whereNotNull($foreignKey)
+            ->whereNotExists(function ($query) use ($table, $foreignKey, $parentTable) {
+                $query->selectRaw('1')
+                    ->from($parentTable)
+                    ->whereColumn($parentTable . '.id', $table . '.' . $foreignKey);
+            })
+            ->delete();
+    }
+
+    private function nullOrphanedChildRows(string $table, string $foreignKey, string $parentTable): void
+    {
+        DB::table($table)
+            ->whereNotNull($foreignKey)
+            ->whereNotExists(function ($query) use ($table, $foreignKey, $parentTable) {
+                $query->selectRaw('1')
+                    ->from($parentTable)
+                    ->whereColumn($parentTable . '.id', $table . '.' . $foreignKey);
+            })
+            ->update([$foreignKey => null]);
     }
 
     private function makeUserIdNullableOnMessages(): void
