@@ -5,8 +5,8 @@ namespace App\Game\Events\Jobs;
 use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GlobalEventGoal;
-use App\Flare\Models\Raid;
 use App\Flare\Models\ScheduledEvent;
+use App\Flare\Services\EventSchedulerService;
 use App\Flare\Values\MapNameValue;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventForEventTypeValue;
@@ -35,7 +35,7 @@ class InitiateDelusionalMemoriesEvent implements ShouldQueue
         $this->eventId = $eventId;
     }
 
-    public function handle(BuildQuestCacheService $buildQuestCacheService): void
+    public function handle(BuildQuestCacheService $buildQuestCacheService, EventSchedulerService $eventSchedulerService): void
     {
         $event = ScheduledEvent::find($this->eventId);
 
@@ -71,6 +71,8 @@ class InitiateDelusionalMemoriesEvent implements ShouldQueue
 
         $buildQuestCacheService->buildQuestCache(true);
 
+        $eventSchedulerService->createRaidEventsForScheduledEventWith($event);
+
         $this->scheduleNextYearsEvent($event);
     }
 
@@ -96,51 +98,25 @@ class InitiateDelusionalMemoriesEvent implements ShouldQueue
 
     private function scheduleNextYearsEvent(ScheduledEvent $scheduledEvent): void
     {
-        $scheduledEvent = ScheduledEvent::create([
+        $raidsForEvent = $scheduledEvent->raids_for_event;
+        $shiftedRaidsForEvent = null;
+
+        if (!is_null($raidsForEvent)) {
+            $shiftedRaidsForEvent = array_map(function ($raidForEvent) {
+                return array_merge($raidForEvent, [
+                    'start_date' => Carbon::parse($raidForEvent['start_date'])->addYear()->format('Y-m-d\TH:i:s.u\Z'),
+                    'end_date' => Carbon::parse($raidForEvent['end_date'])->addYear()->format('Y-m-d\TH:i:s.u\Z'),
+                ]);
+            }, $raidsForEvent);
+        }
+
+        ScheduledEvent::create([
             'event_type' => $scheduledEvent->event_type,
             'raid_id' => $scheduledEvent->raid_id,
-            'start_date' => $scheduledEvent->start_date->addYear(),
-            'end_date' => $scheduledEvent->end_date->addYear(),
+            'start_date' => $scheduledEvent->start_date->copy()->addYear(),
+            'end_date' => $scheduledEvent->end_date->copy()->addYear(),
             'description' => $scheduledEvent->description,
-            'raids_for_event' => $scheduledEvent->raids_for_event,
-        ]);
-
-        $this->createRaidEventsForScheduledEventWith($scheduledEvent);
-    }
-
-    private function createRaidEventsForScheduledEventWith(ScheduledEvent $scheduledEvent): void
-    {
-        $raidsForEvent = $scheduledEvent->raids_for_event;
-
-        if (is_null($raidsForEvent)) {
-            return;
-        }
-
-        $newRaidForEventData = [];
-
-        foreach ($raidsForEvent as $raidForEvent) {
-            $raid = Raid::find($raidForEvent['selected_raid']);
-
-            $startDate = Carbon::parse($raidForEvent['start_date'])->addYear()->format('Y-m-d\TH:i:s.u\Z');
-            $endDate = Carbon::parse($raidForEvent['end_date'])->addYear()->format('Y-m-d\TH:i:s.u\Z');
-
-            ScheduledEvent::create([
-                'event_type' => EventType::RAID_EVENT,
-                'raid_id' => $raidForEvent['selected_raid'],
-                'start_date' => $startDate,
-                'end_date' => $endDate,
-                'description' => $raid->scheduled_event_description,
-            ]);
-
-            $newRaidForEventData[] = [
-                ...$raidForEvent,
-                'start_date' => $startDate,
-                'end_date' => $endDate,
-            ];
-        }
-
-        $scheduledEvent->update([
-            'raids_for_event' => $newRaidForEventData,
+            'raids_for_event' => $shiftedRaidsForEvent,
         ]);
     }
 }

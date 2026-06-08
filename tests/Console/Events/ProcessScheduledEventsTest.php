@@ -139,4 +139,32 @@ class ProcessScheduledEventsTest extends TestCase
         $this->assertGreaterThan(0, Event::count());
         $this->assertGreaterThan(0, Announcement::count());
     }
+
+    public function testDueUnstartedEventStartsWhenStartTimeIsAlreadyPast(): void
+    {
+        $this->createScheduledEvent([
+            'event_type' => EventType::WEEKLY_CELESTIALS,
+            'start_date' => now()->subMinutes(10),
+            'end_date' => now()->addHour(),
+            'currently_running' => false,
+        ]);
+
+        $this->artisan('process:scheduled-events');
+
+        $this->assertGreaterThan(0, Event::count());
+    }
+
+    public function testExpiredUnstartedEventIsNotStarted(): void
+    {
+        $this->createScheduledEvent([
+            'event_type' => EventType::WEEKLY_CELESTIALS,
+            'start_date' => now()->subHours(5),
+            'end_date' => now()->subHours(1),
+            'currently_running' => false,
+        ]);
+
+        $this->artisan('process:scheduled-events');
+
+        $this->assertEquals(0, Event::count());
+    }
 }

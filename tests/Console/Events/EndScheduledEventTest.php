@@ -498,6 +498,80 @@ class EndScheduledEventTest extends TestCase
         $this->assertEmpty(Announcement::all());
     }
 
+    public function testWinterEventClearsPledgeStateForCharacterNotOnEventMap(): void
+    {
+        $this->deleteOtherGameMaps();
+
+        $surfaceMap = $this->createGameMap([
+            'name' => MapNameValue::SURFACE,
+        ]);
+
+        $icePlane = $this->createGameMap([
+            'name' => MapNameValue::ICE_PLANE,
+            'default' => false,
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->assignFactionSystem()
+            ->givePlayerLocation(16, 16, $surfaceMap)
+            ->getCharacter();
+
+        $npc = $this->createNpc([
+            'game_map_id' => $icePlane->id,
+        ]);
+
+        $icePlaneFaction = $character->factions->where('game_map_id', $icePlane->id)->first();
+
+        $factionLoyalty = $this->createFactionLoyalty([
+            'faction_id' => $icePlaneFaction->id,
+            'character_id' => $character->id,
+            'is_pledged' => true,
+        ]);
+
+        $factionNpc = $this->createFactionLoyaltyNpc([
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
+        ]);
+
+        $this->createFactionLoyaltyNpcTask([
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'fame_tasks' => [],
+        ]);
+
+        $scheduledEvent = $this->createScheduledEvent([
+            'event_type' => EventType::WINTER_EVENT,
+            'start_date' => now()->addMinutes(5),
+            'currently_running' => true,
+        ]);
+
+        $event = $this->createEvent([
+            'type' => EventType::WINTER_EVENT,
+            'started_at' => now(),
+            'ends_at' => now()->subMinutes(10),
+        ]);
+
+        $this->createAnnouncement([
+            'event_id' => $event->id,
+        ]);
+
+        $this->createItem(['specialty_type' => ItemSpecialtyType::CORRUPTED_ICE, 'type' => WeaponTypes::HAMMER]);
+
+        $this->artisan('end:scheduled-event');
+
+        $character = $character->refresh();
+        $factionNpc = $factionNpc->refresh();
+
+        $this->assertEmpty($character->factionLoyalties()->where('is_pledged', true)->get());
+        $this->assertFalse($factionNpc->currently_helping);
+        $this->assertFalse($scheduledEvent->refresh()->currently_running);
+    }
+
     public function testEndWinterEventWhileNFactionLoayltyExists()
     {
         $this->deleteOtherGameMaps();

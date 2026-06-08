@@ -7,6 +7,7 @@ use App\Flare\Models\Announcement;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\Faction;
+use App\Flare\Models\FactionLoyalty;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GlobalEventCraft;
 use App\Flare\Models\GlobalEventCraftingInventorySlot;
@@ -327,6 +328,16 @@ class EndScheduledEvent extends Command
                 }
             });
 
+        if (!is_null($faction)) {
+            FactionLoyalty::where('faction_id', $faction->id)
+                ->where('is_pledged', true)
+                ->chunk(100, function ($pledgedLoyalties) use ($factionLoyaltyService, $faction) {
+                    foreach ($pledgedLoyalties as $pledgedLoyalty) {
+                        $this->unpledgeFromTheMapsFaction($pledgedLoyalty->character, $factionLoyaltyService, $faction);
+                    }
+                });
+        }
+
         event(new GlobalMessageEvent('The Queen of Ice calls forth her twisted memories and magics to seal the gates to her realm. "My son! You have stolen the memories of my son!" She bellows as she banishes you and others from her realm!'));
 
         $this->cleanUpEvent($event);
@@ -380,6 +391,16 @@ class EndScheduledEvent extends Command
                     $this->unpledgeFromTheMapsFaction($character, $factionLoyaltyService, $faction);
                 }
             });
+
+        if (!is_null($faction)) {
+            FactionLoyalty::where('faction_id', $faction->id)
+                ->where('is_pledged', true)
+                ->chunk(100, function ($pledgedLoyalties) use ($factionLoyaltyService, $faction) {
+                    foreach ($pledgedLoyalties as $pledgedLoyalty) {
+                        $this->unpledgeFromTheMapsFaction($pledgedLoyalty->character, $factionLoyaltyService, $faction);
+                    }
+                });
+        }
 
         event(new GlobalMessageEvent('The voice of Fliniguss echos in your ears: "Child, I grow weary of your games." The twisted mother laughs: Ooooh hooo hooo hoo. A chill falls in the air.'));
 
