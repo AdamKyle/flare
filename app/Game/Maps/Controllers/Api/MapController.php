@@ -10,6 +10,7 @@ use App\Game\Maps\Requests\QuestDataRequest;
 use App\Game\Maps\Requests\SetSailValidation;
 use App\Game\Maps\Requests\TeleportRequest;
 use App\Game\Maps\Requests\TraverseRequest;
+use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\MovementService;
 use App\Game\Maps\Services\SetSailService;
@@ -30,16 +31,20 @@ class MapController extends Controller
 
     private WalkingService $walkingService;
 
+    private DistanceCalculation $distanceCalculation;
+
     public function __construct(
         MovementService $movementService,
         TeleportService $teleportService,
         WalkingService $walkingService,
-        SetSailService $setSail
+        SetSailService $setSail,
+        DistanceCalculation $distanceCalculation
     ) {
         $this->movementService = $movementService;
         $this->teleportService = $teleportService;
         $this->walkingService = $walkingService;
         $this->setSail = $setSail;
+        $this->distanceCalculation = $distanceCalculation;
 
         $this->middleware('is.character.dead')->except(['mapInformation', 'fetchQuests']);
     }
@@ -119,9 +124,17 @@ class MapController extends Controller
             return response()->json(['invalid input'], 422);
         }
 
+        $distance = $this->distanceCalculation->calculatePixel(
+            $request->x,
+            $request->y,
+            $character->map->character_position_x,
+            $character->map->character_position_y
+        );
+        $timeout = $this->distanceCalculation->calculateMinutes($distance);
+
         $this->teleportService->setCoordinatesToTravelTo($request->x, $request->y)
-            ->setCost($request->cost)
-            ->setTimeOutValue($request->timeout);
+            ->setCost($timeout * 1000)
+            ->setTimeOutValue($timeout);
 
         $response = $this->teleportService
             ->teleport($character);

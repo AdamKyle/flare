@@ -43,6 +43,7 @@ class SettingsControllerSecurityTest extends TestCase
             'password' => 'compromised',
             'is_banned' => true,
             'is_silenced' => true,
+            'timeout_until' => now()->addYear(),
             'will_be_deleted' => true,
         ])->response;
 
@@ -55,6 +56,7 @@ class SettingsControllerSecurityTest extends TestCase
         $this->assertSame($originalPassword, $user->password);
         $this->assertFalse($user->is_banned);
         $this->assertFalse($user->is_silenced);
+        $this->assertNull($user->timeout_until);
         $this->assertFalse($user->will_be_deleted);
     }
 
@@ -83,6 +85,7 @@ class SettingsControllerSecurityTest extends TestCase
             'password' => 'compromised',
             'is_banned' => true,
             'is_silenced' => true,
+            'timeout_until' => now()->addYear(),
             'will_be_deleted' => true,
         ])->response;
 
@@ -93,6 +96,7 @@ class SettingsControllerSecurityTest extends TestCase
         $this->assertSame($originalPassword, $user->password);
         $this->assertFalse($user->is_banned);
         $this->assertFalse($user->is_silenced);
+        $this->assertNull($user->timeout_until);
         $this->assertFalse($user->will_be_deleted);
     }
 }

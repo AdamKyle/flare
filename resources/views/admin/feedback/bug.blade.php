@@ -3,7 +3,7 @@
 @section('content')
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
         <x-core.cards.card-with-title
-            title="{{$foundBug->title}}"
+            :title="e($foundBug->title)"
             buttons="true"
             backUrl="{{route('admin.feedback.bugs')}}"
         >

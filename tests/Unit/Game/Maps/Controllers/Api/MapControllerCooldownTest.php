@@ -4,6 +4,7 @@ namespace Tests\Unit\Game\Maps\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Game\Maps\Controllers\Api\MapController;
+use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Maps\Requests\MoveRequest;
 use App\Game\Maps\Requests\SetSailValidation;
 use App\Game\Maps\Requests\TeleportRequest;
@@ -77,7 +78,8 @@ class MapControllerCooldownTest extends TestCase
             $this->createMock(MovementService::class),
             $this->createMock(TeleportService::class),
             $this->createMock(WalkingService::class),
-            $this->createMock(SetSailService::class)
+            $this->createMock(SetSailService::class),
+            $this->createMock(DistanceCalculation::class)
         );
     }
 }

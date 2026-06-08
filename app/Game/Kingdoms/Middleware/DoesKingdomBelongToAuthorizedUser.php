@@ -40,7 +40,7 @@ class DoesKingdomBelongToAuthorizedUser
 
             // Character was passed in with the kingdom:
             if (! is_null($character)) {
-                if ($character->id !== $kingdom->character->id) {
+                if (auth()->user()->character->id !== $kingdom->character_id) {
                     $message = 'Nope. Not allowed to do that.';
                 }
             } else {

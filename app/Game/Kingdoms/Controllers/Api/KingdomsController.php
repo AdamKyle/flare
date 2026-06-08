@@ -43,7 +43,9 @@ class KingdomsController extends Controller
             ], 422);
         }
 
-        $kingdom->update($request->all());
+        $kingdom->update([
+            'name' => $request->validated('name'),
+        ]);
 
         $this->updateKingdom->updateKingdom($kingdom->refresh());
 

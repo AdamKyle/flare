@@ -69,14 +69,6 @@ class CharactersOnline
         $onlineCharacters = [];
 
         foreach ($onlineLogins as $login) {
-            $timeLoggedIn = $this->filterType > 0 ? $login->total_duration : 0;
-
-            if (!$this->filterType > 0) {
-                $lastActivity = $login->last_activity;
-                $lastHeartbeat = $login->last_heart_beat;
-                $timeLoggedIn = $lastActivity->gt($lastHeartbeat) ? $lastActivity->diffInSeconds($login->logged_in_at) : $lastHeartbeat->diffInSeconds($login->logged_in_at);
-            }
-
             if (is_null($login->user)) {
                 continue;
             }
@@ -86,8 +78,6 @@ class CharactersOnline
             if ($character) {
                 $onlineCharacters[] = [
                     'name' => $character->name,
-                    'duration' => $timeLoggedIn,
-                    'currently_exploring' => $this->filterType > 0 ? false : $character->is_auto_battling,
                 ];
             }
         }
