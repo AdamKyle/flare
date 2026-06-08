@@ -15,7 +15,12 @@ class LocationTransformer extends TransformerAbstract
             'id' => $location->id,
             'name' => $location->name,
             'game_map_id' => $location->game_map_id,
+            'game_map_name' => $location->map?->name,
             'quest_reward_item_id' => $location->quest_reward_item_id,
+            'quest_reward_item' => is_null($location->questRewardItem) ? null : [
+                'id' => $location->questRewardItem->id,
+                'affix_name' => $location->questRewardItem->affix_name,
+            ],
             'required_quest_item_id' => $location->required_quest_item_id,
             'required_quest_item_name' => $this->getRequiredItemName($location),
             'description' => $location->description,

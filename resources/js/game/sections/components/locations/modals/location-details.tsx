@@ -406,7 +406,9 @@ export default class LocationDetails extends React.Component<
                     this.renderWeeklyFightLocationDetails()
                 )}
 
-                {this.props.location.quest_reward_item_id !== null ? (
+                {this.props.location.quest_reward_item_id !== null &&
+                this.props.location.quest_reward_item !== null &&
+                this.props.location.quest_reward_item !== undefined ? (
                     <Fragment>
                         <dl className="mb-4">
                             <dt>Quest Item (Gained on visiting)</dt>
