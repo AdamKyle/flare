@@ -3,15 +3,14 @@
 namespace App\Game\Maps\Controllers\Api;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\Location;
 use App\Flare\Models\Quest;
-use App\Flare\Pagination\Requests\PaginationRequest;
 use App\Flare\Values\AutomationType;
 use App\Game\Maps\Requests\MoveRequest;
 use App\Game\Maps\Requests\QuestDataRequest;
 use App\Game\Maps\Requests\SetSailValidation;
 use App\Game\Maps\Requests\TeleportRequest;
 use App\Game\Maps\Requests\TraverseRequest;
+use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\MovementService;
 use App\Game\Maps\Services\SetSailService;
@@ -24,52 +23,58 @@ use Illuminate\Support\Facades\Cache;
 
 class MapController extends Controller
 {
+    private MovementService $movementService;
+
+    private SetSailService $setSail;
+
+    private TeleportService $teleportService;
+
+    private WalkingService $walkingService;
+
+    private DistanceCalculation $distanceCalculation;
+
     public function __construct(
-        private readonly LocationService $locationService,
-        private readonly MovementService $movementService,
-        private readonly TeleportService $teleportService,
-        private readonly WalkingService $walkingService,
-        private readonly SetSailService $setSail
+        MovementService $movementService,
+        TeleportService $teleportService,
+        WalkingService $walkingService,
+        SetSailService $setSail,
+        DistanceCalculation $distanceCalculation
     ) {
+        $this->movementService = $movementService;
+        $this->teleportService = $teleportService;
+        $this->walkingService = $walkingService;
+        $this->setSail = $setSail;
+        $this->distanceCalculation = $distanceCalculation;
 
         $this->middleware('is.character.dead')->except(['mapInformation', 'fetchQuests']);
     }
 
     public function mapInformation(Character $character, LocationService $locationService): JsonResponse
     {
-        return response()->json($this->locationService->getMapData($character));
+        return response()->json($locationService->getLocationData($character));
     }
 
     public function updateLocationActions(Character $character, LocationService $locationService): JsonResponse
     {
-        $this->locationService->locationBasedEvents($character);
-
-        return response()->json([]);
+        return response()->json($locationService->locationBasedEvents($character));
     }
 
-    public function getLocationInformation(Location $location): JsonResponse
-    {
-        return response()->json($this->locationService->getLocationData($location));
-    }
-
-    public function getLocationDroppableQuestItems(PaginationRequest $request, Location $location): JsonResponse
-    {
-        return response()->json($this->locationService->getDroppableItems($location, $request->per_page, $request->page, $request->search_text));
-    }
-
+    /**
+     * @throws Exception
+     */
     public function move(MoveRequest $request, Character $character): JsonResponse
     {
         if (! $character->can_move) {
-            return response()->json(['invalid input'], 429);
+            return response()->json(['invalid input'], 422);
         }
 
         if ($character->currentAutomations()
-            ->where('character_id', $character->id)
-            ->where('completed_at', '>', now())
-            ->where(function ($query) {
-                $query->where('type', AutomationType::DELVE);
-            })
-            ->exists()
+                ->where('character_id', $character->id)
+                ->where('completed_at', '>', now())
+                ->where(function ($query) {
+                    $query->where('type', AutomationType::DELVE);
+                })
+                ->exists()
         ) {
             return response()->json([
                 'message' => 'You cannot escape the shadows child. Cancel the Delve if you want to wonder around in the wild.',
@@ -98,7 +103,7 @@ class MapController extends Controller
     public function traverse(TraverseRequest $request, Character $character, MovementService $movementService): JsonResponse
     {
         if (! $character->can_move) {
-            return response()->json(['invalid input'], 429);
+            return response()->json(['invalid input'], 422);
         }
 
         $response = $movementService->updateCharacterPlane($request->map_id, $character);
@@ -110,25 +115,26 @@ class MapController extends Controller
         return response()->json($response, $status);
     }
 
-    public function fetchTeleportCoordinates(Character $character): JsonResponse
-    {
-        $teleportCoordinates = $this->locationService->getTeleportLocations($character);
-
-        return response()->json($teleportCoordinates);
-    }
-
     /**
      * @throws Exception
      */
     public function teleport(TeleportRequest $request, Character $character): JsonResponse
     {
         if (! $character->can_move) {
-            return response()->json(['invalid input'], 429);
+            return response()->json(['invalid input'], 422);
         }
 
+        $distance = $this->distanceCalculation->calculatePixel(
+            $request->x,
+            $request->y,
+            $character->map->character_position_x,
+            $character->map->character_position_y
+        );
+        $timeout = $this->distanceCalculation->calculateMinutes($distance);
+
         $this->teleportService->setCoordinatesToTravelTo($request->x, $request->y)
-            ->setCost($request->cost)
-            ->setTimeOutValue($request->timeout);
+            ->setCost($timeout * 1000)
+            ->setTimeOutValue($timeout);
 
         $response = $this->teleportService
             ->teleport($character);
@@ -143,7 +149,7 @@ class MapController extends Controller
     public function setSail(SetSailValidation $request, Character $character): JsonResponse
     {
         if (! $character->can_move) {
-            return response()->json(['invalid input'], 429);
+            return response()->json(['invalid input'], 422);
         }
 
         $this->setSail->setCoordinatesToTravelTo($request->x, $request->y)

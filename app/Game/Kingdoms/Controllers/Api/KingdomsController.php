@@ -43,7 +43,9 @@ class KingdomsController extends Controller
             ], 422);
         }
 
-        $kingdom->update($request->all());
+        $kingdom->update([
+            'name' => $request->validated('name'),
+        ]);
 
         $this->updateKingdom->updateKingdom($kingdom->refresh());
 
@@ -58,7 +60,11 @@ class KingdomsController extends Controller
             ], 422);
         }
 
-        $this->purchasePeopleService->setKingdom($kingdom)->purchasePeople($request->amount_to_purchase);
+        if (! $this->purchasePeopleService->setKingdom($kingdom)->purchasePeople($request->amount_to_purchase)) {
+            return response()->json([
+                'message' => 'Invalid amount or not enough gold.',
+            ], 422);
+        }
 
         return response()->json([], 200);
     }

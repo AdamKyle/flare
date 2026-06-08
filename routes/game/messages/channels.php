@@ -2,7 +2,7 @@
 
 // Public chat:
 Broadcast::channel('chat', function ($user) {
-    return $user;
+    return ['id' => $user->id];
 });
 
 // When generating a server message for that player.
@@ -22,15 +22,15 @@ Broadcast::channel('npc-message-{userId}', function ($user, $userId) {
 
 // When a global message is sent out.
 Broadcast::channel('global-message', function ($user) {
-    return $user;
+    return ['id' => $user->id];
 });
 
 // When a global message is sent out.
 Broadcast::channel('announcement-message', function ($user) {
-    return $user;
+    return ['id' => $user->id];
 });
 
 // When a global message is sent out.
 Broadcast::channel('delete-announcement-message', function ($user) {
-    return $user;
+    return ['id' => $user->id];
 });

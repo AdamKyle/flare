@@ -24,6 +24,7 @@ use App\Game\Automation\Values\AutomatedFightResult;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyAutomationWarningState;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -47,6 +48,8 @@ class AutomatedFactionLoyalty implements ShouldQueue
     private ?Character $character = null;
 
     private ?CharacterAutomation $characterAutomation = null;
+
+    private ?Carbon $roundStartedAt = null;
 
     private ?FactionLoyaltyAutomation $factionLoyaltyAutomation = null;
 
@@ -90,6 +93,8 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
             return;
         }
+
+        $this->roundStartedAt = now();
 
         try {
             $this->factionLoyaltyNpc = $this->resolveFactionLoyaltyNpc($factionLoyaltyNpcTaskCoordinator);
@@ -549,12 +554,14 @@ class AutomatedFactionLoyalty implements ShouldQueue
             return;
         }
 
+        $delaySeconds = max(0, ($this->timeDelay * 60) - $this->roundStartedAt->diffInSeconds(now()));
+
         AutomatedFactionLoyalty::dispatch(
             $this->characterId,
             $this->automationId,
             $this->factionLoyaltyAutomationId,
             $this->timeDelay
-        )->delay(now()->addMinutes($this->timeDelay))->onConnection('long_running')->onQueue('default_long');
+        )->delay(now()->addSeconds($delaySeconds))->onConnection('long_running')->onQueue('faction_loyalty');
     }
 
     /**

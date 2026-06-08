@@ -25,6 +25,9 @@ class MoveUnitsRequest extends FormRequest
     {
         return [
             'units_to_move' => 'required|array',
+            'units_to_move.*.kingdom_id' => 'required|integer|exists:kingdoms,id',
+            'units_to_move.*.unit_id' => 'required|integer|exists:kingdom_units,id',
+            'units_to_move.*.amount' => 'required|integer|min:1',
         ];
     }
 

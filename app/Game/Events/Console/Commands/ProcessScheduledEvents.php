@@ -4,7 +4,6 @@ namespace App\Game\Events\Console\Commands;
 
 use App\Flare\Models\ScheduledEvent;
 use App\Game\Events\Jobs\InitiateDelusionalMemoriesEvent;
-use App\Game\Events\Jobs\InitiateFeedbackEvent;
 use App\Game\Events\Jobs\InitiateWeeklyCelestialSpawnEvent;
 use App\Game\Events\Jobs\InitiateWeeklyCurrencyDropEvent;
 use App\Game\Events\Jobs\InitiateWeeklyFactionLoyaltyEvent;
@@ -39,14 +38,24 @@ class ProcessScheduledEvents extends Command
         $now = now();
         $targetEventStart = $now->copy()->addMinutes(5);
 
-        $scheduledEvents = ScheduledEvent::where('start_date', '>', $now)
-            ->where('start_date', '<=', $targetEventStart)
+        $scheduledEvents = ScheduledEvent::where('currently_running', false)
+            ->where(function ($query) use ($now, $targetEventStart) {
+                $query->where(function ($inner) use ($now, $targetEventStart) {
+                    $inner->where('start_date', '>', $now)
+                        ->where('start_date', '<=', $targetEventStart);
+                })->orWhere(function ($inner) use ($now) {
+                    $inner->where('start_date', '<=', $now)
+                        ->where('end_date', '>=', $now);
+                });
+            })
             ->get();
 
         foreach ($scheduledEvents as $event) {
             $cacheKey = 'scheduled-event-dispatch:'.$event->id;
 
-            if (! Cache::add($cacheKey, true, $event->start_date->copy()->addMinutes(10))) {
+            $cacheTtl = now()->addMinutes(10);
+
+            if (! Cache::add($cacheKey, true, $cacheTtl)) {
                 continue;
             }
 
@@ -75,10 +84,6 @@ class ProcessScheduledEvents extends Command
 
                 if ($eventType->isWeeklyFactionLoyaltyEvent()) {
                     InitiateWeeklyFactionLoyaltyEvent::dispatch($event->id)->delay($now->copy()->addMinutes(5));
-                }
-
-                if ($eventType->isFeedbackEvent()) {
-                    InitiateFeedbackEvent::dispatch($event->id)->delay($now->copy()->addMinutes(5));
                 }
             } catch (Throwable $throwable) {
                 Cache::forget($cacheKey);

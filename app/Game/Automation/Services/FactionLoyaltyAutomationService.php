@@ -17,6 +17,7 @@ use App\Game\Core\Traits\ResponseBuilder;
 
 class FactionLoyaltyAutomationService
 {
+
     use ResponseBuilder;
 
     /**
@@ -24,10 +25,19 @@ class FactionLoyaltyAutomationService
      */
     const int TIME_DELAY = 1;
 
-    public function __construct(private readonly CharacterCacheData $characterCacheData) {}
+    /**
+     * @param CharacterCacheData $characterCacheData
+     */
+    public function __construct( private readonly CharacterCacheData $characterCacheData) {
+    }
 
     /**
      * Begin the automation.
+     *
+     * @param Character $character
+     * @param FactionLoyaltyNpc $factionLoyaltyNpc
+     * @param string $attackType
+     * @return void
      */
     public function beginAutomation(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc, string $attackType): void
     {
@@ -50,18 +60,20 @@ class FactionLoyaltyAutomationService
 
         event(new UpdateCharacterStatus($character));
 
-        event(new AutomationLogUpdate($character->user->id, 'You have agreed to help the npc: '.$factionLoyaltyNpc->npc->real_name.', they are very happy with your choice and look forward to you starting in '.self::TIME_DELAY.' minute(s).'));
+        event(new AutomationLogUpdate($character->user->id, 'You have agreed to help the npc: ' . $factionLoyaltyNpc->npc->real_name . ', they are very happy with your choice and look forward to you starting in '.self::TIME_DELAY.' minute(s).'));
 
         event(new AutomationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
 
-        AutomatedFactionLoyalty::dispatch($character->id, $automation->id, $factionLoyaltyAutomation->id, self::TIME_DELAY)->delay(now()->addMinutes(self::TIME_DELAY))->onConnection('long_running')->onQueue('default_long');
+        AutomatedFactionLoyalty::dispatch($character->id, $automation->id, $factionLoyaltyAutomation->id, self::TIME_DELAY)->delay(now()->addMinutes(self::TIME_DELAY))->onConnection('long_running')->onQueue('faction_loyalty');
     }
 
     /**
      * Stop the automation.
+     *
+     * @param Character $character
+     * @return array
      */
-    public function stopAutomation(Character $character): array
-    {
+    public function stopAutomation(Character $character): array {
         $characterAutomation = CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::FACTION_LOYALTY)->first();
 
         if (is_null($characterAutomation)) {
@@ -88,6 +100,10 @@ class FactionLoyaltyAutomationService
 
     /**
      * Set whether the character can craft.
+     *
+     * @param Character $character
+     * @param bool $canCraft
+     * @return Character
      */
     private function setCharacterCanCraft(Character $character, bool $canCraft): Character
     {

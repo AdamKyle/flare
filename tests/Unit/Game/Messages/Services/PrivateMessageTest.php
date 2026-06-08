@@ -54,7 +54,16 @@ class PrivateMessageTest extends TestCase
 
         $this->privateMessageService->sendPrivateMessage($character->name, 'Test message');
 
-        $this->assertCount(1, Message::all());
+        $messages = Message::where('from_user', $character->user->id)
+            ->where('to_user', $character->user->id)
+            ->where('message', 'Test message')
+            ->get();
+
+        $this->assertCount(1, $messages);
+        $this->assertSame($character->user->id, $messages->first()->user_id);
+        $this->assertSame($character->user->id, $messages->first()->from_user);
+        $this->assertSame($character->user->id, $messages->first()->to_user);
+        $this->assertSame('Test message', $messages->first()->message);
     }
 
     public function test_send_message_to_conjurer_npc()

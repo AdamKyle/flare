@@ -126,6 +126,10 @@ class KingdomBuildingsController extends Controller
             return response()->json(['message' => 'Invalid Input.'], 422);
         }
 
+        if ($queue->character_id !== auth()->user()->character->id) {
+            return response()->json(['message' => 'You do not own that queue.'], 422);
+        }
+
         if (! is_null($queue->capital_city_building_queue_id)) {
             return response()->json(['message' => 'This queue is managed by your capital city. Cancel it from capital city management.'], 422);
         }

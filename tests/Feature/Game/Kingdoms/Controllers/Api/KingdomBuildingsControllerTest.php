@@ -709,4 +709,137 @@ class KingdomBuildingsControllerTest extends TestCase
         $this->assertSame(1, $building->refresh()->level);
         $this->assertSame(2000, $kingdom->refresh()->current_wood);
     }
+
+    public function testNonOwnerCannotUpgradeBuildingThatBelongsToAnotherCharacter(): void
+    {
+        Queue::fake();
+
+        $ownerFactory = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation();
+        $kingdomManagement = $ownerFactory
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 2000,
+                'current_clay' => 2000,
+                'current_stone' => 2000,
+                'current_iron' => 2000,
+                'current_population' => 2000,
+            ])
+            ->assignBuilding([
+                'max_level' => 5,
+            ], [
+                'level' => 1,
+            ]);
+        $kingdom = $kingdomManagement->getKingdom();
+        $building = $kingdom->buildings()->first();
+
+        $nonOwner = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $response = $this->actingAs($nonOwner->user)
+            ->call('POST', '/api/kingdoms/' . $nonOwner->id . '/upgrade-building/' . $building->id, [
+                'to_level' => 2,
+            ], [], [], ['HTTP_ACCEPT' => 'application/json']);
+
+        $response->assertStatus(422);
+        $response->assertJson(['error' => 'Nope. Not allowed to do that.']);
+        $this->assertSame(0, BuildingInQueue::where('kingdom_id', $kingdom->id)->count());
+        $this->assertSame(1, $building->refresh()->level);
+        $this->assertSame(2000, $kingdom->refresh()->current_wood);
+        $this->assertSame(2000, $kingdom->refresh()->current_clay);
+        $this->assertSame(2000, $kingdom->refresh()->current_stone);
+        $this->assertSame(2000, $kingdom->refresh()->current_iron);
+        $this->assertSame(2000, $kingdom->refresh()->current_population);
+    }
+
+    public function testNonOwnerCannotRebuildBuildingThatBelongsToAnotherCharacter(): void
+    {
+        Queue::fake();
+
+        $ownerFactory = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation();
+        $kingdomManagement = $ownerFactory
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 2000,
+                'current_clay' => 2000,
+                'current_stone' => 2000,
+                'current_iron' => 2000,
+                'current_population' => 2000,
+            ])
+            ->assignBuilding([], [
+                'current_durability' => 1,
+                'max_durability' => 100,
+            ]);
+        $kingdom = $kingdomManagement->getKingdom();
+        $building = $kingdom->buildings()->first();
+
+        $nonOwner = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $response = $this->actingAs($nonOwner->user)
+            ->call('POST', '/api/kingdoms/' . $nonOwner->id . '/rebuild-building/' . $building->id,
+                [], [], [], ['HTTP_ACCEPT' => 'application/json']
+            );
+
+        $response->assertStatus(422);
+        $response->assertJson(['error' => 'Nope. Not allowed to do that.']);
+        $this->assertSame(0, BuildingInQueue::where('kingdom_id', $kingdom->id)->count());
+        $this->assertSame(1, $building->refresh()->current_durability);
+        $this->assertSame(2000, $kingdom->refresh()->current_wood);
+        $this->assertSame(2000, $kingdom->refresh()->current_clay);
+        $this->assertSame(2000, $kingdom->refresh()->current_stone);
+        $this->assertSame(2000, $kingdom->refresh()->current_iron);
+        $this->assertSame(2000, $kingdom->refresh()->current_population);
+    }
+
+    public function testNonOwnerCannotCancelAnotherCharactersQueueEntry(): void
+    {
+        $ownerFactory = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation();
+        $kingdomManagement = $ownerFactory
+            ->kingdomManagement()
+            ->assignKingdom()
+            ->assignBuilding();
+        $owner = $kingdomManagement->getCharacter();
+        $kingdom = $kingdomManagement->getKingdom();
+        $building = $kingdom->buildings()->first();
+
+        $queue = BuildingInQueue::factory()->create([
+            'character_id' => $owner->id,
+            'kingdom_id' => $kingdom->id,
+            'building_id' => $building->id,
+            'to_level' => $building->level + 1,
+            'type' => BuildingQueueType::UPGRADE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $nonOwner = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $response = $this->actingAs($nonOwner->user)
+            ->call('POST', '/api/kingdoms/building-upgrade/cancel', [
+                'queue_id' => $queue->id,
+            ]);
+
+        $response->assertStatus(422);
+        $response->assertJson(['message' => 'You do not own that queue.']);
+        $this->assertNotNull(BuildingInQueue::find($queue->id));
+        $this->assertSame($building->level, $building->refresh()->level);
+        $this->assertSame($kingdom->current_wood, $kingdom->refresh()->current_wood);
+        $this->assertSame($kingdom->current_clay, $kingdom->refresh()->current_clay);
+        $this->assertSame($kingdom->current_stone, $kingdom->refresh()->current_stone);
+        $this->assertSame($kingdom->current_iron, $kingdom->refresh()->current_iron);
+        $this->assertSame($kingdom->current_population, $kingdom->refresh()->current_population);
+    }
 }

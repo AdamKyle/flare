@@ -6,6 +6,7 @@ use App\Admin\Mail\UnBanRequestMail;
 use App\Flare\Models\User;
 use Cache;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Monolog\Handler\MailHandler;
 
 class UnbanRequestController extends Controller
@@ -22,33 +23,57 @@ class UnbanRequestController extends Controller
         ]);
 
         $user = User::where('email', $request->email)->first();
+        $token = Str::random(64);
+        $userId = 0;
 
-        if (is_null($user)) {
-            return redirect()->back()->with('error', 'This email does not match our records.');
+        if (! is_null($user) && $user->is_banned && is_null($user->unbanned_at)) {
+            $userId = $user->id;
         }
 
-        if (! $user->is_banned) {
-            return redirect()->back()->with('error', 'You are not banned.');
-        }
+        Cache::put('unban-request-token-'.$token, $userId, now()->addMinutes(60));
 
-        if (! is_null($user->unbanned_at)) {
-            return redirect()->back()->with('error', 'You are not banned forever.');
-        }
+        return redirect()->route('un.ban.request')
+            ->with('success', 'If this account is eligible, you may continue with an unban request.')
+            ->with('unban_request_token', $token);
+    }
 
-        Cache::put('user-temp-'.$user->id, 'temp', now()->addMinutes(60));
+    public function requestForm(string $token)
+    {
+        if (! Cache::has('unban-request-token-'.$token)) {
+            return redirect()->route('un.ban.request')->with('error', 'Unable to submit that request.');
+        }
 
         return view('request.request-unban-form', [
-            'user' => $user,
+            'token' => $token,
         ]);
     }
 
-    public function submitRequest(Request $request, User $user)
+    public function submitRequest(Request $request)
     {
         $request->validate([
             'unban_message' => 'required',
         ]);
 
-        if (is_null($user->un_ban_request)) {
+        $submittedToken = $request->input('token');
+
+        if (! is_string($submittedToken)) {
+            return redirect()->back()->with('error', 'Unable to submit that request.');
+        }
+
+        $userId = Cache::pull('unban-request-token-'.$submittedToken);
+
+        if (is_null($userId)) {
+            return redirect()->back()->with('error', 'Unable to submit that request.');
+        }
+
+        $user = $userId ? User::find($userId) : null;
+
+        if (
+            ! is_null($user) &&
+            $user->is_banned &&
+            is_null($user->unbanned_at) &&
+            is_null($user->un_ban_request)
+        ) {
             $user->update([
                 'un_ban_request' => $request->unban_message,
             ]);
@@ -56,12 +81,8 @@ class UnbanRequestController extends Controller
             foreach (User::role('Admin')->get() as $adminUser) {
                 MailHandler::dispatch($adminUser->email, new UnBanRequestMail($user))->delay(now()->addMinutes(1));
             }
-
-            Cache::delete('user-temp-'.$user->id);
-
-            return redirect()->to('/')->with('success', 'Request submitted. We will contact you in the next 72 hours.');
         }
 
-        return redirect()->to('/')->with('error', 'You already submitted a request. Future requests are ignored.');
+        return redirect()->to('/')->with('success', 'Request submitted. We will contact you in the next 72 hours.');
     }
 }

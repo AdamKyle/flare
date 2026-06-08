@@ -2,15 +2,16 @@
 
 namespace App\Game\Quests\Jobs;
 
-use App\Flare\Models\Character;
 use App\Flare\Models\Quest;
-use App\Game\Quests\Handlers\NpcQuestsHandler;
-use Exception;
 use Illuminate\Bus\Queueable;
+use App\Flare\Models\Character;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
+use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Quests\Handlers\NpcQuestsHandler;
+use Exception;
 use Illuminate\Support\Facades\Log;
 
 class HandInQuest implements ShouldQueue
@@ -40,8 +41,12 @@ class HandInQuest implements ShouldQueue
 
         try {
             $npcQuestsHandler->handleNpcQuest($this->character, $this->quest);
+            $npcQuestsHandler->questRewardHandler()->createquestQuestLog($this->character, $this->quest);
+            event(new GlobalMessageEvent($this->character->name . ' Has completed a quest (' . $this->quest->name . ') for: ' . $this->quest->npc->real_name . ' and been rewarded with a godly gift!'));
         } catch (Exception $e) {
             Log::error($e->getMessage());
+
+            throw $e;
         }
     }
 }

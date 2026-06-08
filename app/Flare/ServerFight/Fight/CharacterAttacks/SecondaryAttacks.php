@@ -3,13 +3,11 @@
 namespace App\Flare\ServerFight\Fight\CharacterAttacks;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\Location;
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\Affixes;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\Traits\ElementAttackData;
 use App\Flare\Values\AttackTypeValue;
-use App\Flare\Values\LocationType;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
 class SecondaryAttacks extends BattleBase
@@ -139,10 +137,6 @@ class SecondaryAttacks extends BattleBase
 
         $this->affixes->clearMessages();
 
-        if ($lifeStealingDamage > 0.0 && $this->isAtRankedFightLocation($character)) {
-            $lifeStealingDamage = min($lifeStealingDamage, .50);
-        }
-
         if ($lifeStealingDamage > 0) {
             $this->monsterHealth -= $lifeStealingDamage;
             $this->characterHealth += $lifeStealingDamage;
@@ -196,17 +190,5 @@ class SecondaryAttacks extends BattleBase
         }
 
         return 0;
-    }
-
-    protected function isAtRankedFightLocation(Character $character): bool
-    {
-
-        $location = Location::where('x', $character->map->x_position)
-            ->where('y', $character->map->y_position)
-            ->where('game_map_id', $character->map->game_map_id)
-            ->where('type', LocationType::UNDERWATER_CAVES)
-            ->first();
-
-        return ! is_null($location) ** $character->classType()->isVampire();
     }
 }

@@ -1,6 +1,8 @@
 <?php
 
-Route::post('/character-timeout', ['uses' => 'Api\CharacterSheetController@globalTimeout']);
+Route::middleware(['auth'])->group(function () {
+    Route::post('/character-timeout', ['uses' => 'Api\CharacterSheetController@globalTimeout']);
+});
 
 Route::group(['middleware' => ['auth', 'is.character.who.they.say.they.are']], function () {
     Route::get('/character-sheet/{character}', ['uses' => 'Api\CharacterSheetController@sheet']);
@@ -16,6 +18,7 @@ Route::group(['middleware' => ['auth', 'is.character.who.they.say.they.are']], f
     Route::get('/character-location-data/{character}', ['uses' => 'Api\CharacterSheetController@basicLocationInformation']);
 
     Route::post('/character-sheet/{character}/name-change', ['uses' => 'Api\CharacterSheetController@nameChange']);
+    Route::post('/character-sheet/{character}/fill-up-boon/{boon}', ['uses' => 'Api\CharacterSheetController@fillUpBoon']);
 
     Route::middleware(['is.character.exploring'])->group(function () {
         Route::post('/character-sheet/{character}/remove-boon/{boon}', ['uses' => 'Api\CharacterSheetController@cancelBoon']);

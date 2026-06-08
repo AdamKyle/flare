@@ -103,6 +103,11 @@ class FeatureTypes
         return $this->value === self::CAPITAL_CITIES;
     }
 
+    public function isCapitalCityGoldBars(): bool
+    {
+        return $this->value === self::CAPITAL_CITY_GOLD_BARS;
+    }
+
     public function isCosmeticRaceChanger(): bool
     {
         return $this->value === self::COSMETIC_RACE_CHANGER;

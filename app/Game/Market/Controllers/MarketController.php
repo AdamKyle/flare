@@ -16,7 +16,9 @@ use Cache;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use League\Fractal\Manager;
+use Throwable;
 
 class MarketController extends Controller
 {
@@ -116,7 +118,15 @@ class MarketController extends Controller
             return redirect()->back()->with('error', 'Not enough gold. We add a 5% tax to the total price.');
         }
 
-        $this->marketBoardService->buyAndReplaceItem($request, $character, $listing, $totalPrice);
+        try {
+            DB::transaction(function () use ($request, $character, $listing, $totalPrice) {
+                $this->marketBoardService->buyAndReplaceItem($request, $character, $listing, $totalPrice);
+            });
+        } catch (Throwable) {
+            $listing->refresh()->update(['is_locked' => false]);
+
+            return redirect()->back()->with('error', 'Unable to replace that item.');
+        }
 
         return response()->redirectToRoute('game.market')->with('success', 'Item purchased and equipped!');
     }
@@ -140,6 +150,8 @@ class MarketController extends Controller
         }
 
         if ($character->isInventoryFull()) {
+            $listing->update(['is_locked' => false]);
+
             return response()->redirectToRoute('game.market')->with('error', 'Crap, your inventory is full. Don\'t worry it didn\'t cost you anything.');
         }
 
@@ -150,6 +162,8 @@ class MarketController extends Controller
         }
 
         if (! ($character->gold >= $totalPrice)) {
+            $listing->update(['is_locked' => false]);
+
             return response()->redirectToRoute('game.market')->with('error', 'Not enough gold. We add a 5% tax to the total price.');
         }
 

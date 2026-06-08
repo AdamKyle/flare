@@ -34,22 +34,22 @@ Broadcast::channel('update-plane-{userId}', function ($user, $userId) {
 
 // When the plane count of characters changes.
 Broadcast::channel('global-character-count-plane', function ($user) {
-    return $user;
+    return ['id' => $user->id];
 });
 
 // When a kingdom is settled.
 BroadCast::channel('global-map-update', function ($user) {
-    return $user;
+    return ['id' => $user->id];
 });
 
 // When the NPC Kingdoms update.
 Broadcast::channel('npc-kingdoms-update', function ($user) {
-    return $user;
+    return ['id' => $user->id];
 });
 
 // When a enemy kingdoms morale gets updated.
 broadCast::channel('enemy-kingdom-morale-update', function ($user) {
-    return $user;
+    return ['id' => $user->id];
 });
 
 // When we need to update crafting options based on location

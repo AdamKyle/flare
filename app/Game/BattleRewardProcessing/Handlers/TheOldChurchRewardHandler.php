@@ -2,7 +2,7 @@
 
 namespace App\Game\BattleRewardProcessing\Handlers;
 
-use App\Flare\Items\Builders\RandomAffixGenerator;
+use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\Item;
@@ -24,10 +24,19 @@ use Illuminate\Support\Facades\Cache;
 
 class TheOldChurchRewardHandler
 {
+    private array $earnedCurrencies = [];
+
     public function __construct(private RandomAffixGenerator $randomAffixGenerator, private BattleMessageHandler $battleMessageHandler) {}
+
+    public function getEarnedCurrencies(): array
+    {
+        return $this->earnedCurrencies;
+    }
 
     public function handleFightingAtTheOldChurch(Character $character, Monster $monster, int $killCount = 1): Character
     {
+        $this->earnedCurrencies = [];
+
         $location = Location::where('x', $character->map->character_position_x)
             ->where('y', $character->map->character_position_y)
             ->where('game_map_id', $character->map->game_map_id)
@@ -98,6 +107,12 @@ class TheOldChurchRewardHandler
         $goldDustToReward = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount) * $killCount;
         $shardsToReward = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount) * $killCount;
         $goldToReward = RandomNumberGenerator::generateRandomNumber(1, $maximumGold) * $killCount;
+
+        $this->earnedCurrencies = [
+            'gold' => $goldToReward,
+            'gold_dust' => $goldDustToReward,
+            'shards' => $shardsToReward,
+        ];
 
         $gold = $character->gold + $goldToReward;
         $goldDust = $character->gold_dust + $goldDustToReward;
@@ -208,7 +223,7 @@ class TheOldChurchRewardHandler
             'item_id' => $newItem->id,
         ]);
 
-        event(new ServerMessageEvent($character->user, 'You found something unique, in The Old Church child: '.$item->affix_name, $slot->id));
+        event(new ServerMessageEvent($character->user, 'You found something unique, in The Old Church child: ' . $item->affix_name, $slot->id));
     }
 
     /**

@@ -2,21 +2,7 @@
 
 namespace App\Game\Automation\Jobs;
 
-use App\Flare\Models\Character;
-use App\Flare\Models\CharacterAutomation;
-use App\Flare\Models\Monster;
-use App\Flare\Services\CharacterRewardService;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Automation\Events\AutomationLogUpdate;
-use App\Game\Automation\Events\AutomationTimeOut;
-use App\Game\Automation\Services\ExplorationCreatureCountCalculator;
-use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
-use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
-use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
-use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
-use App\Game\Skills\Services\SkillService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -24,6 +10,23 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use App\Flare\Models\Character;
+use App\Flare\Models\CharacterAutomation;
+use App\Flare\Models\Monster;
+use App\Flare\Services\CharacterRewardService;
+use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Automation\Events\AutomationLogUpdate;
+use App\Game\Automation\Events\AutomationTimeOut;
+use App\Game\Automation\Services\ExplorationCreatureCountCalculator;
+use App\Game\Automation\Services\ExplorationLogService;
+use App\Game\Automation\Services\ExplorationWarningService;
+use App\Flare\Models\ExplorationLog;
+use App\Game\Skills\Services\SkillService;
 use Psr\SimpleCache\InvalidArgumentException;
 
 class Exploration implements ShouldQueue
@@ -46,7 +49,15 @@ class Exploration implements ShouldQueue
 
     private FactionHandler $factionHandler;
 
+    private ExplorationLogService $explorationLogService;
+
+    private ExplorationWarningService $explorationWarningService;
+
     private ?Monster $monster = null;
+
+    private ?ExplorationLog $explorationLog = null;
+
+    private bool $runtimeMonsterSnapshotRecorded = false;
 
     private int $automationId;
 
@@ -56,11 +67,17 @@ class Exploration implements ShouldQueue
 
     private int $attempts = 0;
 
+    private array $lastFightData = [];
+
     private array $battleData = [
         'total_creatures' => 0,
         'total_xp' => 0,
         'total_skill_xp' => 0,
         'total_faction_points' => 0,
+        'weapon_damage' => 0,
+        'spell_damage' => 0,
+        'healing_done' => 0,
+        'damage_blocked' => 0,
     ];
 
     public function __construct(Character $character, int $automationId, string $attackType, int $timeDelay)
@@ -79,6 +96,8 @@ class Exploration implements ShouldQueue
         SkillService $skillService,
         ExplorationCreatureCountCalculator $explorationCreatureCountCalculator,
         FactionHandler $factionHandler,
+        ExplorationLogService $explorationLogService,
+        ExplorationWarningService $explorationWarningService,
     ): void {
 
         $this->characterRewardService = $characterRewardService;
@@ -93,6 +112,14 @@ class Exploration implements ShouldQueue
 
         $this->factionHandler = $factionHandler;
 
+        $this->explorationLogService = $explorationLogService;
+
+        $this->explorationWarningService = $explorationWarningService;
+
+        $this->explorationLog = ExplorationLog::where('character_automation_id', $this->automationId)
+            ->whereNull('ended_at')
+            ->first();
+
         $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
 
         if (is_null($automation)) {
@@ -102,7 +129,7 @@ class Exploration implements ShouldQueue
         if ($this->shouldBail($automation)) {
             $this->endAutomation($automation, $characterCacheData);
 
-            Cache::delete('can-character-survive-'.$this->character->id);
+            Cache::delete('can-character-survive-' . $this->character->id);
 
             return;
         }
@@ -114,26 +141,61 @@ class Exploration implements ShouldQueue
             'attack_type' => $this->attackType,
         ];
 
+        $roundStartedAt = now();
+
         if ($this->encounter($automation, $params, $this->timeDelay)) {
+
+            if (! is_null($this->explorationLog)) {
+                $this->explorationLogService->recordFightTotals($this->explorationLog, [
+                    'fights' => 1,
+                    'kills' => $this->battleData['total_creatures'],
+                    'weapon_damage' => $this->battleData['weapon_damage'],
+                    'spell_damage' => $this->battleData['spell_damage'],
+                    'healing_done' => $this->battleData['healing_done'],
+                    'damage_blocked' => $this->battleData['damage_blocked'],
+                ], false);
+            }
 
             $time = now()->diffInMinutes($automation->completed_at);
 
             $delay = $time >= $this->timeDelay ? $this->timeDelay : ($time > 1 ? $time : 0);
 
             if ($delay === 0) {
+                $rewardContext = [
+                    'total_creatures' => $this->battleData['total_creatures'],
+                    'total_xp' => $this->battleData['total_xp'],
+                    'total_faction_points' => $this->battleData['total_faction_points'],
+                    'total_skill_xp' => $this->battleData['total_skill_xp'],
+                ];
+
+                if (! is_null($this->explorationLog)) {
+                    $rewardContext['exploration_log_id'] = $this->explorationLog->id;
+                }
+
+                $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], $rewardContext);
+
                 $this->endAutomation($automation, $characterCacheData);
 
                 return;
             }
 
-            $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], [
+            $rewardContext = [
                 'total_creatures' => $this->battleData['total_creatures'],
                 'total_xp' => $this->battleData['total_xp'],
                 'total_faction_points' => $this->battleData['total_faction_points'],
                 'total_skill_xp' => $this->battleData['total_skill_xp'],
-            ]);
+            ];
 
-            Exploration::dispatch($this->character, $this->automationId, $this->attackType, 1)->delay(now()->addMinute())->onConnection('long_running')->onQueue('default_long');
+            if (! is_null($this->explorationLog)) {
+                $rewardContext['exploration_log_id'] = $this->explorationLog->id;
+            }
+
+            $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], $rewardContext);
+
+            // @codeCoverageIgnoreStart
+            $delaySeconds = max(0, ($this->timeDelay * 60) - $roundStartedAt->diffInSeconds(now()));
+            Exploration::dispatch($this->character, $this->automationId, $this->attackType, $this->timeDelay)->delay(now()->addSeconds($delaySeconds))->onConnection('long_running')->onQueue('exploration');
+            // @codeCoverageIgnoreEnd
 
             return;
         }
@@ -154,6 +216,10 @@ class Exploration implements ShouldQueue
     /**
      * Handle an encounter.
      *
+     * @param CharacterAutomation $automation
+     * @param array $params
+     * @param int $timeDelay
+     * @return bool
      * @throws InvalidArgumentException
      */
     private function encounter(CharacterAutomation $automation, array $params, int $timeDelay): bool
@@ -163,7 +229,11 @@ class Exploration implements ShouldQueue
 
         $enemies = $this->explorationCreatureCountCalculator->calculate($this->character);
 
-        $this->sendOutEventLogUpdate('"Chirst, child there are: '.$enemies.' of them ..."
+        if (! is_null($this->explorationLog)) {
+            $this->explorationLogService->recordCurrentRoundCreatures($this->explorationLog, $enemies, false);
+        }
+
+        $this->sendOutEventLogUpdate('"Chirst, child there are: ' . $enemies . ' of them ..."
         The Guide hisses at you from the shadows. You ignore his words and prepare for battle. One right after the other ...', true);
 
         $totalXpToReward = 0;
@@ -171,6 +241,11 @@ class Exploration implements ShouldQueue
         $factionPointsPerKill = $this->factionHandler->getFactionPointsPerKill($this->character);
         $characterRewardService = $this->characterRewardService->setCharacter($this->character);
         $characterSkillService = $this->skillService->setSkillInTraining($this->character);
+
+        $encounterWeaponDamage = 0;
+        $encounterSpellDamage = 0;
+        $encounterHealingDone = 0;
+        $encounterDamageBlocked = 0;
 
         for ($creatureCount = 1; $creatureCount <= $enemies; $creatureCount++) {
             if (! $this->fightAutomationMonster($automation, $params)) {
@@ -180,6 +255,18 @@ class Exploration implements ShouldQueue
             $this->attempts = 0;
             $totalXpToReward += $characterRewardService->fetchXpForMonster($this->monster);
             $totalSkillXpToReward += $characterSkillService->getXpForSkillIntraining($this->character, $this->monster->xp);
+
+            $encounterWeaponDamage += $this->lastFightData['weapon_damage'] ?? 0;
+            $encounterSpellDamage += $this->lastFightData['spell_damage'] ?? 0;
+            $encounterHealingDone += $this->lastFightData['healing_done'] ?? 0;
+            $encounterDamageBlocked += $this->lastFightData['damage_blocked'] ?? 0;
+
+            $messageTotals = $this->extractBattleMessageTotals($this->lastFightData);
+
+            $encounterWeaponDamage += $messageTotals['weapon_damage'];
+            $encounterSpellDamage += $messageTotals['spell_damage'];
+            $encounterHealingDone += $messageTotals['healing_done'];
+            $encounterDamageBlocked += $messageTotals['damage_blocked'];
         }
 
         $delta = [
@@ -193,30 +280,206 @@ class Exploration implements ShouldQueue
             $this->battleData[$key] += $value;
         }
 
+        $this->battleData['weapon_damage'] += $encounterWeaponDamage;
+        $this->battleData['spell_damage'] += $encounterSpellDamage;
+        $this->battleData['healing_done'] += $encounterHealingDone;
+        $this->battleData['damage_blocked'] += $encounterDamageBlocked;
+
         $this->sendOutEventLogUpdate('The last of the enemies fall. Covered in blood, exhausted, you look around for any signs of more of their friends. The area is silent. "Another day, another battle.
         We managed to survive." The Guide states as he walks from the shadows. The pair of you set off in search of the next adventure ...
-        (Exploration will begin again in '.$timeDelay.' minutes)', true);
+        (Exploration will begin again in ' . $timeDelay . ' minutes)', true);
 
         return true;
+    }
+
+    private function builtMonsterSnapshot(array $fightData): ?array
+    {
+        if (! isset($fightData['monster']) || ! is_array($fightData['monster'])) {
+            return null;
+        }
+
+        $builtMonster = $fightData['monster'];
+        $monsterId = $builtMonster['id'] ?? null;
+
+        if (is_null($monsterId)) {
+            return null;
+        }
+
+        $baseMonster = Monster::find($monsterId);
+
+        $maxMonsterHealth = $fightData['health']['max_monster_health'] ?? null;
+        $rolledAttack = (int) ($builtMonster['attack_damage'] ?? 0);
+
+        $stats = [
+            'str' => $this->builtMonsterStat($builtMonster, $baseMonster, 'str'),
+            'dur' => $this->builtMonsterStat($builtMonster, $baseMonster, 'dur'),
+            'dex' => $this->builtMonsterStat($builtMonster, $baseMonster, 'dex'),
+            'chr' => $this->builtMonsterStat($builtMonster, $baseMonster, 'chr'),
+            'int' => $this->builtMonsterStat($builtMonster, $baseMonster, 'int'),
+            'agi' => $this->builtMonsterStat($builtMonster, $baseMonster, 'agi'),
+            'focus' => $this->builtMonsterStat($builtMonster, $baseMonster, 'focus'),
+            'ac' => $this->builtMonsterStat($builtMonster, $baseMonster, 'ac'),
+            'health_range' => $this->builtMonsterStat($builtMonster, $baseMonster, 'health_range', 'health', $maxMonsterHealth),
+            'attack_range' => $this->builtMonsterStat($builtMonster, $baseMonster, 'attack_range', 'attack_damage'),
+            'max_spell_damage' => $this->builtMonsterStat($builtMonster, $baseMonster, 'max_spell_damage', 'spell_damage'),
+            'healing_percentage' => $this->builtMonsterStat($builtMonster, $baseMonster, 'healing_percentage', 'healing'),
+            'xp' => $this->builtMonsterStat($builtMonster, $baseMonster, 'xp'),
+            'gold' => $this->builtMonsterStat($builtMonster, $baseMonster, 'gold'),
+            'max_level' => $this->builtMonsterStat($builtMonster, $baseMonster, 'max_level'),
+        ];
+
+        if (! is_null($maxMonsterHealth) && $maxMonsterHealth > 0) {
+            $stats['health'] = $maxMonsterHealth;
+        }
+
+        if ($rolledAttack > 0) {
+            $attackDamage = $rolledAttack;
+        } else {
+            $attackRange = $builtMonster['attack_range'] ?? $baseMonster?->getAttribute('attack_range');
+            if (is_string($attackRange) && str_contains($attackRange, '-')) {
+                [$min, $max] = array_map('intval', explode('-', $attackRange, 2));
+                $attackDamage = ($min === $max) ? $min : rand(min($min, $max), max($min, $max));
+            } else {
+                $attackDamage = (int) ($attackRange ?? 0);
+            }
+            $increasesDamageBy = $builtMonster['increases_damage_by'] ?? null;
+            if (! is_null($increasesDamageBy)) {
+                $attackDamage = (int) ($attackDamage + $attackDamage * $increasesDamageBy);
+            }
+        }
+        $stats['attack_damage'] = $attackDamage;
+
+        return [
+            'id' => $monsterId,
+            'name' => $builtMonster['name'] ?? $baseMonster?->name,
+            'link' => '/monsters/'.$monsterId,
+            'stats' => $stats,
+        ];
+    }
+
+    private function builtMonsterStat(array $builtMonster, ?Monster $baseMonster, string $baseAttribute, ?string $runtimeAttribute = null, mixed $fightValue = null): mixed
+    {
+        foreach ([
+            $fightValue,
+            ! is_null($runtimeAttribute) ? $builtMonster[$runtimeAttribute] ?? null : null,
+            $builtMonster[$baseAttribute] ?? null,
+            ! is_null($runtimeAttribute) ? $baseMonster?->getAttribute($runtimeAttribute) : null,
+            $baseMonster?->getAttribute($baseAttribute),
+        ] as $value) {
+            if (! is_null($value) && $value !== 0) {
+                return $value;
+            }
+        }
+
+        return $builtMonster[$baseAttribute] ?? $baseMonster?->getAttribute($baseAttribute);
+    }
+
+    private function extractBattleMessageTotals(array $fightData): array
+    {
+        $totals = [
+            'weapon_damage' => 0,
+            'spell_damage' => 0,
+            'healing_done' => 0,
+            'damage_blocked' => 0,
+        ];
+
+        foreach ($fightData['messages'] ?? [] as $messageData) {
+            if (! is_array($messageData)) {
+                continue;
+            }
+
+            $message = $messageData['message'] ?? null;
+
+            if (! is_string($message)) {
+                continue;
+            }
+
+            $totals['weapon_damage'] += $this->extractWeaponDamageFromMessage($message);
+            $totals['spell_damage'] += $this->extractSpellDamageFromMessage($message);
+            $totals['healing_done'] += $this->extractHealingFromMessage($message);
+            $totals['damage_blocked'] += $this->extractBlockedFromMessage($message);
+        }
+
+        return $totals;
+    }
+
+    private function extractWeaponDamageFromMessage(string $message): int
+    {
+        $patterns = [
+            '/Your weapon hits .+ for: ([0-9,]+)/',
+            '/You hit for \(weapon - double attack\) ([0-9,]+)/',
+            '/You hit for \((?:Gunslingers Assassination!|Book Binders Fear|Hammer|Arcane Alchemist Ravenous Dream)\):? ([0-9,]+)/',
+            '/You slash, you thrash, you bash and you crash your way through! \(You dealt: ([0-9,]+)\)/',
+            '/You strike the enemy in an ambush doing: ([0-9,]+) damage!/',
+            '/Your class special: .+ fires off and you do: ([0-9,]+) damage to the enemy!/',
+        ];
+
+        return $this->extractMessageTotal($message, $patterns);
+    }
+
+    private function extractSpellDamageFromMessage(string $message): int
+    {
+        $patterns = [
+            '/Your damage spell\(s\) hits .+ for: ([0-9,]+)/',
+            '/Your spell\(s\) hits for: ([0-9,]+)/',
+            '/You hit for \(Arcane Alchemist Ravenous Dream\): ([0-9,]+)/',
+        ];
+
+        return $this->extractMessageTotal($message, $patterns);
+    }
+
+    private function extractHealingFromMessage(string $message): int
+    {
+        $patterns = [
+            '/gives you life: ([0-9,]+)/',
+            '/You healed for: ([0-9,]+)/',
+            '/You heal for: ([0-9,]+)/',
+        ];
+
+        return $this->extractMessageTotal($message, $patterns);
+    }
+
+    private function extractBlockedFromMessage(string $message): int
+    {
+        $patterns = [
+            '/You reduced the incoming \(Physical\) damage with your armour by: ([0-9,]+)/',
+            '/You block: ([0-9,]+) of the enemies special attack damage!/',
+        ];
+
+        return $this->extractMessageTotal($message, $patterns);
+    }
+
+    private function extractMessageTotal(string $message, array $patterns): int
+    {
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $message, $matches) === 1) {
+                return (int) str_replace(',', '', $matches[1]);
+            }
+        }
+
+        return 0;
     }
 
     /**
      * Fight monster through automation.
      *
+     * @param CharacterAutomation $automation
+     * @param array $params
+     * @return bool
      * @throws InvalidArgumentException
      */
     private function fightAutomationMonster(CharacterAutomation $automation, array $params): bool
     {
 
-        $data = $this->setUpFightForMonster($params);
+        $setupData = $this->setUpFightForMonster($params);
 
-        if (! $this->hasRequiredHealthData($data)) {
-            $this->logMalformedBattleData($automation, 'setupMonster', $data);
+        if (! $this->hasRequiredHealthData($setupData)) {
+            $this->logMalformedBattleData($automation, 'setupMonster', $setupData);
 
             return false;
         }
 
-        $endedAutomationDueToCharacterDeath = $this->handleWhenCharacterDies($automation, $data);
+        $endedAutomationDueToCharacterDeath = $this->handleWhenCharacterDies($automation, $setupData);
 
         if ($endedAutomationDueToCharacterDeath) {
             return false;
@@ -240,6 +503,22 @@ class Exploration implements ShouldQueue
             return false;
         }
 
+        if (! $this->runtimeMonsterSnapshotRecorded && ! is_null($this->explorationLog)) {
+            $snapshotData = $setupData;
+
+            if (isset($data['attack_damage']) && $data['attack_damage'] > 0 && isset($snapshotData['monster'])) {
+                $snapshotData['monster']['attack_damage'] = $data['attack_damage'];
+            }
+
+            $builtMonsterSnapshot = $this->builtMonsterSnapshot($snapshotData);
+
+            if (! is_null($builtMonsterSnapshot)) {
+                $this->explorationLogService->recordMonsterSnapshot($this->explorationLog, $builtMonsterSnapshot, false);
+            }
+
+            $this->runtimeMonsterSnapshotRecorded = true;
+        }
+
         if (is_null($this->monster)) {
             $this->monster = $this->monsterFightService->getMonster();
         }
@@ -249,11 +528,14 @@ class Exploration implements ShouldQueue
 
     /**
      * Handle when a character dies in automation.
+     *
+     * @param CharacterAutomation $automation
+     * @param array $data
+     * @return bool
      */
-    private function handleWhenCharacterDies(CharacterAutomation $automation, array $data): bool
-    {
+    private function handleWhenCharacterDies(CharacterAutomation $automation, array $data): bool {
         if ($data['health']['current_character_health'] <= 0) {
-            $this->cancelAutomation($automation, 'You died during exploration. Exploration has ended.');
+            $this->cancelAutomation($automation, 'You died during exploration. Exploration has ended.', 'character_died');
 
             return true;
         }
@@ -261,8 +543,7 @@ class Exploration implements ShouldQueue
         return false;
     }
 
-    private function shouldAttackAgain(array $data): bool
-    {
+    private function shouldAttackAgain(array $data): bool {
 
         if (! $this->hasRequiredHealthData($data)) {
             return false;
@@ -304,6 +585,9 @@ class Exploration implements ShouldQueue
 
     /**
      * Should we bail?
+     *
+     * @param CharacterAutomation $automation
+     * @return bool
      */
     private function shouldBail(CharacterAutomation $automation): bool
     {
@@ -316,6 +600,9 @@ class Exploration implements ShouldQueue
 
     /**
      * Update automation to select the next monster if that option is available.
+     *
+     * @param CharacterAutomation $automation
+     * @return CharacterAutomation
      */
     private function updateAutomation(CharacterAutomation $automation): CharacterAutomation
     {
@@ -347,6 +634,10 @@ class Exploration implements ShouldQueue
 
     /**
      * End automation.
+     *
+     * @param CharacterAutomation $automation
+     * @param CharacterCacheData $characterCacheData
+     * @return void
      */
     private function endAutomation(CharacterAutomation $automation, CharacterCacheData $characterCacheData): void
     {
@@ -354,7 +645,7 @@ class Exploration implements ShouldQueue
 
         $characterCacheData->deleteCharacterSheet($this->character);
 
-        Cache::delete('can-character-survive-'.$this->character->id);
+        Cache::delete('can-character-survive-' . $this->character->id);
 
         $this->sendOutEventLogUpdate('"Phew, child! I did not think we would survive all of your shenanigans.
             So many times I could have died! Do you ever think about anyone other than yourself? No? Didn\'t think so." The Guide storms off and you follow him in silence.', true);
@@ -365,30 +656,51 @@ class Exploration implements ShouldQueue
 
         $character = $this->character->refresh();
 
+        if (! is_null($this->explorationLog)) {
+            $this->explorationLogService->finalize($this->explorationLog, 'natural_end');
+            $this->explorationWarningService->createWarning($character, $this->explorationLog, 'natural_end', 'Exploration completed.');
+        }
+
         $this->rewardPlayer($character);
 
         event(new UpdateCharacterStatus($character));
 
         event(new AutomationTimeOut($character->user, 0));
 
+        return;
     }
+
 
     /**
      * Cancel automation without rewarding the player.
+     *
+     * @param CharacterAutomation $automation
+     * @param string|null $message
+     * @return void
      */
-    private function cancelAutomation(CharacterAutomation $automation, ?string $message = null): void
+    private function cancelAutomation(CharacterAutomation $automation, ?string $message = null, string $reason = 'error'): void
     {
         $automation->delete();
 
         $this->characterCacheData->deleteCharacterSheet($this->character);
 
-        Cache::delete('can-character-survive-'.$this->character->id);
+        Cache::delete('can-character-survive-' . $this->character->id);
 
         if (! is_null($message)) {
             $this->sendOutEventLogUpdate($message);
         }
 
         $character = $this->character->refresh();
+
+        if (! is_null($this->explorationLog)) {
+            $this->explorationLogService->finalize($this->explorationLog, $reason);
+            $this->explorationWarningService->createWarning(
+                $character,
+                $this->explorationLog,
+                $reason,
+                $message ?? 'Exploration was cancelled.',
+            );
+        }
 
         event(new UpdateCharacterStatus($character));
 
@@ -398,21 +710,24 @@ class Exploration implements ShouldQueue
     /**
      * Set up the fight its self.
      *
+     * @param array $params
+     * @return array
      * @throws InvalidArgumentException
      */
-    private function setUpFightForMonster(array $params): array
-    {
-        return $this->monsterFightService->setupMonster($this->character, $params, true);
+    private function setUpFightForMonster(array $params): array {
+        return $this->monsterFightService->setupMonster($this->character, $params, true, false, true);
     }
 
     /**
      * Fight the monster.
      *
+     * @return array
      * @throws InvalidArgumentException
      */
-    private function fightMonster(): array
-    {
+    private function fightMonster(): array {
         $data = $this->monsterFightService->fightMonster($this->character, $this->attackType, false, true);
+
+        $this->lastFightData = $data;
 
         if ($this->shouldAttackAgain($data) && $this->attempts >= self::MAX_ATTEMPTS) {
             $this->sendOutEventLogUpdate('The Guide is growing restless with how long it takes you to kill one monster. "I am bored child!" He grows agitated and decides to walk off. Guess your not strong enough? Either way, you make a run for it to live!', true);
@@ -431,6 +746,11 @@ class Exploration implements ShouldQueue
 
     /**
      * Send out event log updates
+     *
+     * @param string $message
+     * @param bool $makeItalic
+     * @param bool $isReward
+     * @return void
      */
     private function sendOutEventLogUpdate(string $message, bool $makeItalic = false, bool $isReward = false): void
     {
@@ -441,6 +761,9 @@ class Exploration implements ShouldQueue
 
     /**
      * Reward the player for automation completion.
+     *
+     * @param Character $character
+     * @return void
      */
     private function rewardPlayer(Character $character): void
     {

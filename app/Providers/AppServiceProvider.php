@@ -3,19 +3,12 @@
 namespace App\Providers;
 
 use App\Console\AfterDeployment\AddHolyStacksToItems;
-use App\Console\AfterDeployment\AssignNewBuildingsToExistingKingdoms;
+use App\Console\AfterDeployment\AllowTraverseForMaps;
 use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
-use App\Console\AfterDeployment\CleanInvalidWeapons;
-use App\Console\AfterDeployment\CleanMarketPlaceOfInvalidWeapons;
-use App\Console\AfterDeployment\CleanOrphanedBuildingExpansionQueues;
-use App\Console\AfterDeployment\CleanUpInvalidBrokenQueues;
-use App\Console\AfterDeployment\ClearInvalidCapitalCityQueues;
-use App\Console\AfterDeployment\CreateQuestChainRelationships;
-use App\Console\AfterDeployment\FixInvalidProgressionLevels;
-use App\Console\AfterDeployment\RebuildKingdomCache;
-use App\Console\AfterDeployment\RemoveInvalidQuestItems;
-use App\Console\AfterDeployment\StripFactionLoyaltyFightData;
-use App\Console\AfterDeployment\UpdateCharactersForClassRanks;
+use App\Console\AfterDeployment\CleanDanglingCharacterData;
+use App\Console\AfterDeployment\CreateLocationDataCache;
+use App\Console\AfterDeployment\CreateMonsterCache;
+use App\Console\AfterDeployment\RepairQuestFeatureRewards;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
 use App\Console\DevelopmentCommands\CompleteGuideQuestForCharacter;
 use App\Console\DevelopmentCommands\CreateCharacter;
@@ -47,20 +40,12 @@ class AppServiceProvider extends ServiceProvider
         $this->commands([
             // After Deployment Commands
             AddHolyStacksToItems::class,
-            UpdateCharactersForClassRanks::class,
-            RemoveInvalidQuestItems::class,
-            AssignNewBuildingsToExistingKingdoms::class,
+            AllowTraverseForMaps::class,
             AssignNewNpcsToFactionLoyalty::class,
-            ManageKingdomResources::class,
-            ClearInvalidCapitalCityQueues::class,
-            CleanInvalidWeapons::class,
-            CleanMarketPlaceOfInvalidWeapons::class,
-            CreateQuestChainRelationships::class,
-            CleanUpInvalidBrokenQueues::class,
-            CleanOrphanedBuildingExpansionQueues::class,
-            RebuildKingdomCache::class,
-            FixInvalidProgressionLevels::class,
-            StripFactionLoyaltyFightData::class,
+            CleanDanglingCharacterData::class,
+            CreateMonsterCache::class,
+            CreateLocationDataCache::class,
+            RepairQuestFeatureRewards::class,
 
             // Development Commands:
             CreateCharacter::class,
@@ -96,7 +81,7 @@ class AppServiceProvider extends ServiceProvider
 
             $headers = [
                 'Content-type' => 'text/json',
-                'Content-Disposition' => 'attachment; filename='.$fileName.'.json',
+                'Content-Disposition' => 'attachment; filename=' . $fileName . '.json',
             ];
 
             return \Response::make($content, 200, $headers);

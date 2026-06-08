@@ -5,12 +5,10 @@ namespace App\Flare\GameImporter\Console\Commands;
 use App\Flare\GameImporter\Values\ExcelMapper;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
-use App\Flare\Models\Survey;
 use App\Flare\Values\MapNameValue;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -50,10 +48,10 @@ class ImportGameData extends Command
 
             if (! isset($files[$dirNameForReImport])) {
 
-                return $this->error('No directory in data-imports for: '.$dirNameForReImport);
+                return $this->error('No directory in data-imports for: ' . $dirNameForReImport);
             }
 
-            $this->line('Re importing: '.$dirNameForReImport);
+            $this->line('Re importing: ' . $dirNameForReImport);
 
             $this->import($excelMapper, $files[$dirNameForReImport], $dirNameForReImport);
 
@@ -110,19 +108,12 @@ class ImportGameData extends Command
         // sure all relationships are properly setup.
         $this->import($excelMapper, $files['Quests'], 'Quests');
 
-        $this->info('Creating location cache for maps ...');
-
-        Artisan::call('create:location-data-cache');
-
         $this->line('Importing Information section ...');
 
         // Import the information wiki
         $this->importInformationSection();
 
-        $this->line('Importing Surveys ...');
 
-        // Import the surveys.
-        $this->importSurveys();
 
         $this->line('All done! :D - Enjoy!');
     }
@@ -164,7 +155,7 @@ class ImportGameData extends Command
     protected function import(ExcelMapper $excelMapper, array $files, string $directoryName): void
     {
         foreach ($files as $index => $path) {
-            $path = resource_path('data-imports').'/'.$path;
+            $path = resource_path('data-imports') . '/' . $path;
 
             $excelMapper->importFile($directoryName, $path, $index);
         }
@@ -186,7 +177,7 @@ class ImportGameData extends Command
         $sourceDirectory = resource_path('backup/info-sections-images');
         $destinationDirectory = storage_path('app/public');
 
-        $command = 'cp -R '.escapeshellarg($sourceDirectory).' '.escapeshellarg($destinationDirectory);
+        $command = 'cp -R ' . escapeshellarg($sourceDirectory) . ' ' . escapeshellarg($destinationDirectory);
         exec($command, $output, $exitCode);
 
         if ($exitCode === 0) {
@@ -194,22 +185,6 @@ class ImportGameData extends Command
         } else {
             $this->line('Failed to copy the information images directory over. You can do this manually from the resources/backup/information-sections-images. Copy the entire directory to app/public');
         }
-    }
-
-    /**
-     * Import surveys.
-     */
-    protected function importSurveys(): void
-    {
-        $data = Storage::disk('data-imports')->get('Admin Section/surveys.json');
-
-        $data = json_decode(trim($data), true);
-
-        foreach ($data as $modelEntry) {
-            Survey::updateOrCreate(['id' => $modelEntry['id']], $modelEntry);
-        }
-
-        $this->line('Surveys have been imported!');
     }
 
     /**
@@ -244,7 +219,7 @@ class ImportGameData extends Command
         foreach ($files as $file) {
             $fileName = pathinfo($file, PATHINFO_FILENAME);
 
-            $path = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps').'/'.$file));
+            $path = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps') . '/' . $file));
 
             $mapValue = new MapNameValue($fileName);
 

@@ -2,10 +2,13 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\SmeltingProgressFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SmeltingProgress extends Model
 {
+    use HasFactory;
     protected $table = 'smelting_progress';
 
     /**
@@ -40,5 +43,10 @@ class SmeltingProgress extends Model
     public function kingdom()
     {
         return $this->belongsTo(Kingdom::class, 'kingdom_id', 'id');
+    }
+
+    protected static function newFactory(): SmeltingProgressFactory
+    {
+        return SmeltingProgressFactory::new();
     }
 }

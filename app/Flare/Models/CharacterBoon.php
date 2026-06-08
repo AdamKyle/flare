@@ -3,6 +3,7 @@
 namespace App\Flare\Models;
 
 use Database\Factories\CharacterBoonFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -46,6 +47,11 @@ class CharacterBoon extends Model
     public function itemUsed()
     {
         return $this->belongsTo(Item::class, 'item_id', 'id');
+    }
+
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('complete', '>', now());
     }
 
     protected static function newFactory()

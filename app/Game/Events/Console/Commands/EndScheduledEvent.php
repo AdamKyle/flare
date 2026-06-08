@@ -2,61 +2,207 @@
 
 namespace App\Game\Events\Console\Commands;
 
+use App\Flare\Events\UpdateScheduledEvents;
+use App\Flare\Models\Announcement;
+use App\Flare\Models\Character;
 use App\Flare\Models\Event;
+use App\Flare\Models\Faction;
+use App\Flare\Models\FactionLoyalty;
+use App\Flare\Models\GameMap;
+use App\Flare\Models\GlobalEventCraft;
+use App\Flare\Models\GlobalEventCraftingInventorySlot;
+use App\Flare\Models\GlobalEventEnchant;
+use App\Flare\Models\GlobalEventGoal;
+use App\Flare\Models\GlobalEventKill;
+use App\Flare\Models\GlobalEventParticipation;
+use App\Flare\Models\Location;
+use App\Flare\Models\Raid;
+use App\Flare\Models\RaidBoss;
+use App\Flare\Models\RaidBossParticipation;
 use App\Flare\Models\ScheduledEvent;
-use App\Game\Automation\Services\ExplorationAutomationService;
-use App\Game\Events\Registry\EventEnderRegistry;
-use App\Game\Events\Services\ScheduleEventFinalizerService;
+use App\Flare\Services\EventSchedulerService;
+use App\Flare\Values\MapNameValue;
+use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Core\Values\FactionLevel;
+use App\Game\Events\Services\KingdomEventService;
 use App\Game\Events\Values\EventType;
+use App\Game\Automation\Services\ExplorationAutomationService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\TraverseService;
 use App\Game\Maps\Services\UpdateRaidMonsters;
 use App\Game\Messages\Events\DeleteAnnouncementEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Quests\Services\BuildQuestCacheService;
 use App\Game\Raids\Events\CorruptLocations;
-use App\Game\Survey\Events\ShowSurvey;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 
 class EndScheduledEvent extends Command
 {
-    protected $signature = 'end:scheduled-event';
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'end:scheduled-event {eventId?}';
 
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
     protected $description = 'End all scheduled events';
 
     /**
+     * @param  KingdomEventService  $kingdomEventService  ,
+     * @param  TraverseService  $traverseService  ,
+     *
      * @throws Exception
      */
     public function handle(
-        EventEnderRegistry $registry,
-        ScheduleEventFinalizerService $finalizer
+        LocationService $locationService,
+        UpdateRaidMonsters $updateRaidMonsters,
+        EventSchedulerService $eventSchedulerService,
+        KingdomEventService $kingdomEventService,
+        TraverseService $traverseService,
+        ExplorationAutomationService $explorationAutomationService,
+        BuildQuestCacheService $buildQuestCacheService,
+        FactionLoyaltyService $factionLoyaltyService,
     ): void {
-        $scheduled = ScheduledEvent::query()
-            ->where('end_date', '<=', now())
-            ->where('currently_running', true)
-            ->get();
+        $this->endScheduledEvent(
+            $locationService,
+            $updateRaidMonsters,
+            $eventSchedulerService,
+            $kingdomEventService,
+            $traverseService,
+            $explorationAutomationService,
+            $buildQuestCacheService,
+            $factionLoyaltyService,
+        );
+    }
 
-        if ($scheduled->isEmpty()) {
-            return;
+    /**
+     * End the scheduled events who are supposed to end.
+     *
+     * @throws Exception
+     */
+    protected function endScheduledEvent(
+        LocationService $locationService,
+        UpdateRaidMonsters $updateRaidMonsters,
+        EventSchedulerService $eventSchedulerService,
+        KingdomEventService $kingdomEventService,
+        TraverseService $traverseService,
+        ExplorationAutomationService $explorationAutomationService,
+        BuildQuestCacheService $buildQuestCacheService,
+        FactionLoyaltyService $factionLoyaltyService,
+    ): void {
+
+        $eventId = $this->argument('eventId');
+
+        if (is_null($eventId)) {
+            $scheduledEvents = ScheduledEvent::where('end_date', '<=', now())->where('currently_running', true)->get();
+        } else {
+            $scheduledEvents = ScheduledEvent::where('id', '=', $eventId)->where('currently_running', true)->get();
         }
 
-        foreach ($scheduled as $scheduledEvent) {
-            $currentEvent = Event::query()
-                ->where('type', $scheduledEvent->event_type)
-                ->where('ends_at', '<=', now())
-                ->first();
+        foreach ($scheduledEvents as $event) {
+
+            $currentEvent = Event::where('type', $event->event_type)->where('ends_at', '<=', now())->first();
 
             if (is_null($currentEvent)) {
-                $finalizer->markNotRunningAndBroadcast($scheduledEvent);
+
+                $event->update([
+                    'currently_running' => false,
+                ]);
 
                 continue;
             }
 
-            $eventType = new EventType($scheduledEvent->event_type);
+            $eventType = new EventType($event->event_type);
 
-            $registry->end($eventType, $scheduledEvent, $currentEvent);
-            $finalizer->markNotRunningAndBroadcast($scheduledEvent);
+            if ($eventType->isRaidEvent()) {
+                try {
+                    $this->endRaid($event, $locationService, $updateRaidMonsters);
+
+                    $buildQuestCacheService->buildRaidQuestCache(true);
+                } finally {
+                    $event->update([
+                        'currently_running' => false,
+                    ]);
+
+                    event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+                }
+            }
+
+            if ($eventType->isWeeklyCurrencyDrops()) {
+                try {
+                    $this->endWeeklyCurrencyDrops($currentEvent);
+                } finally {
+                    $event->update([
+                        'currently_running' => false,
+                    ]);
+
+                    event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+                }
+            }
+
+            if ($eventType->isWeeklyCelestials()) {
+                try {
+                    $this->endWeeklySpawnEvent($currentEvent);
+                } finally {
+                    $event->update([
+                        'currently_running' => false,
+                    ]);
+
+                    event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+                }
+            }
+
+            if ($eventType->isWeeklyFactionLoyaltyEvent()) {
+                try {
+                    $this->endWeeklyFactionLoyaltyEvent($currentEvent);
+                } finally {
+                    $event->update([
+                        'currently_running' => false,
+                    ]);
+
+                    event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+                }
+            }
+
+            if ($eventType->isWinterEvent()) {
+                try {
+                    $this->endWinterEvent($kingdomEventService, $traverseService, $explorationAutomationService, $factionLoyaltyService, $currentEvent);
+
+                    $buildQuestCacheService->buildQuestCache(true);
+                    $buildQuestCacheService->buildRaidQuestCache(true);
+                } finally {
+                    $event->update([
+                        'currently_running' => false,
+                    ]);
+
+                    event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+                }
+            }
+
+            if ($eventType->isDelusionalMemoriesEvent()) {
+                try {
+                    $this->endDelusionalEvent($kingdomEventService, $traverseService, $explorationAutomationService, $factionLoyaltyService, $currentEvent);
+
+                    $buildQuestCacheService->buildQuestCache(true);
+                    $buildQuestCacheService->buildRaidQuestCache(true);
+                } finally {
+                    $event->update([
+                        'currently_running' => false,
+                    ]);
+
+                    event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
+                }
+            }
+
+            $this->cleanUpEvent($currentEvent);
         }
     }
 
@@ -75,7 +221,7 @@ class EndScheduledEvent extends Command
 
         $raid = $event->raid;
 
-        event(new GlobalMessageEvent('The Raid: '.$raid->name.' is now ending! Don\'t worry, the raid will be back soon. Check the event calendar for the next time!'));
+        event(new GlobalMessageEvent('The Raid: ' . $raid->name . ' is now ending! Don\'t worry, the raid will be back soon. Check the event calendar for the next time!'));
 
         $this->unCorruptLocations($raid, $locationService);
 
@@ -182,6 +328,16 @@ class EndScheduledEvent extends Command
                 }
             });
 
+        if (!is_null($faction)) {
+            FactionLoyalty::where('faction_id', $faction->id)
+                ->where('is_pledged', true)
+                ->chunk(100, function ($pledgedLoyalties) use ($factionLoyaltyService, $faction) {
+                    foreach ($pledgedLoyalties as $pledgedLoyalty) {
+                        $this->unpledgeFromTheMapsFaction($pledgedLoyalty->character, $factionLoyaltyService, $faction);
+                    }
+                });
+        }
+
         event(new GlobalMessageEvent('The Queen of Ice calls forth her twisted memories and magics to seal the gates to her realm. "My son! You have stolen the memories of my son!" She bellows as she banishes you and others from her realm!'));
 
         $this->cleanUpEvent($event);
@@ -236,6 +392,16 @@ class EndScheduledEvent extends Command
                 }
             });
 
+        if (!is_null($faction)) {
+            FactionLoyalty::where('faction_id', $faction->id)
+                ->where('is_pledged', true)
+                ->chunk(100, function ($pledgedLoyalties) use ($factionLoyaltyService, $faction) {
+                    foreach ($pledgedLoyalties as $pledgedLoyalty) {
+                        $this->unpledgeFromTheMapsFaction($pledgedLoyalty->character, $factionLoyaltyService, $faction);
+                    }
+                });
+        }
+
         event(new GlobalMessageEvent('The voice of Fliniguss echos in your ears: "Child, I grow weary of your games." The twisted mother laughs: Ooooh hooo hooo hoo. A chill falls in the air.'));
 
         $this->cleanUpEvent($event);
@@ -243,32 +409,6 @@ class EndScheduledEvent extends Command
         $this->cleanUpEventGoals();
 
         $this->updateAllCharacterStatuses();
-    }
-
-    protected function endFeedBackEvent(CreateSurveySnapshot $createSurveySnapshot): void
-    {
-        event(new GlobalMessageEvent('The Creator thanks all his players for their valuable feedback. At this time the survey has closed! Feedback is being gathered as we speak'));
-
-        $createSurveySnapshot->createSnapShop();
-
-        SubmittedSurvey::truncate();
-
-        Character::chunkById(250, function ($characters) {
-            foreach ($characters as $character) {
-                $character->user()->update([
-                    'is_showing_survey' => false,
-                ]);
-
-                $character = $character->refresh();
-
-                event(new ShowSurvey($character->user));
-            }
-        });
-
-        event(new GlobalMessageEvent('Survey stats have been generated. The Creator has yet to leave a response. You can see these stats by
-        refreshing and clicking the left side bar, there will be a new menu option for the survey stats. Once The Creator has a chance to look
-        at them, you will find a button at the bottom called The Creators Response, this will be a detailed post about how the stats impact the
-        direction Tlessa goes in, in order for it be the best PBBG out there!'));
     }
 
     private function updateAllCharacterStatuses(): void

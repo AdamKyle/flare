@@ -7,7 +7,6 @@ use App\Flare\Models\FactionLoyalty;
 use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\Item;
-use App\Flare\Models\Survey;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\ClassAttackValue;
 use App\Flare\Values\ItemEffectsValue;
@@ -114,8 +113,6 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'has_faction_loyalty_warning' => count($factionLoyaltyWarningNotices) > 0,
             'faction_loyalty_warning_notices' => $factionLoyaltyWarningNotices,
             'resurrection_chance' => $characterStatBuilder->buildResurrectionChance(),
-            'is_showing_survey' => $character->user->is_showing_survey,
-            'survey_id' => $character->user->is_showing_survey ? Survey::latest()->first()->id : null,
         ];
     }
 

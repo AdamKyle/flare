@@ -5,8 +5,11 @@ Route::middleware([
     'is.player.banned',
     'is.character.who.they.say.they.are',
 ])->group(function () {
+    Route::get('/exploration/{character}/output', ['as' => 'exploration.output', 'uses' => 'Api\ExplorationOutputController@output']);
+
     Route::middleware(['throttle:150,2'])->group(function () {
         Route::post('/faction-loyalty-automation/{character}/warning/dismiss', ['as' => 'faction-loyalty-automation.warning.dismiss', 'uses' => 'Api\FactionLoyaltyAutomationWarningController@dismiss']);
+        Route::post('/exploration/{character}/warning/dismiss', ['as' => 'exploration.warning.dismiss', 'uses' => 'Api\ExplorationWarningController@dismiss']);
     });
 
     Route::middleware(['is.character.dead'])->group(function () {

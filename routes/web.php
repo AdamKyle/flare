@@ -5,9 +5,9 @@ Route::get('/game-event-info', ['as' => 'event.type', 'uses' => 'WelcomeControll
 Route::get('/game-event-calendar', ['as' => 'event.calendar', 'uses' => 'WelcomeController@showEventCalendar']);
 
 Route::get('/un-ban-request', ['as' => 'un.ban.request', 'uses' => 'UnbanRequestController@unbanRequest']);
-Route::get('/un-ban/request-form/{user}', ['as' => 'un.ban.request.form', 'uses' => 'UnbanRequestController@requestForm']);
+Route::get('/un-ban/request-form/{token}', ['as' => 'un.ban.request.form', 'uses' => 'UnbanRequestController@requestForm']);
 Route::post('/request-email', ['as' => 'un.ban.request.email', 'uses' => 'UnbanRequestController@findUser']);
-Route::post('/request-submit/{user}', ['as' => 'un.ban.request.submit', 'uses' => 'UnbanRequestController@submitRequest']);
+Route::post('/request-submit', ['as' => 'un.ban.request.submit', 'uses' => 'UnbanRequestController@submitRequest']);
 
 Route::group(['middleware' => 'update.player-activity'], function () {
     Route::get('/information/search', ['as' => 'info.search', 'uses' => 'InfoPageController@search']);
@@ -33,12 +33,11 @@ Route::group(['middleware' => 'update.player-activity'], function () {
     Route::get('/features', ['as' => 'game.features', 'uses' => 'MarketingPagesController@features']);
     Route::get('/whos-playing', ['as' => 'game.whos-playing', 'uses' => 'MarketingPagesController@whosPlaying']);
 
-    Route::post('/delete-account/{user}', ['as' => 'delete.account', 'uses' => 'AccountDeletionController@deleteAccount']);
-    Route::post('/reset-account/{user}', ['as' => 'reset.account', 'uses' => 'AccountDeletionController@resetAccount']);
+    Route::middleware('auth')->group(function () {
+        Route::post('/delete-account/{user}', ['as' => 'delete.account', 'uses' => 'AccountDeletionController@deleteAccount']);
+        Route::post('/reset-account/{user}', ['as' => 'reset.account', 'uses' => 'AccountDeletionController@resetAccount']);
+    });
 
-    Route::post('/survey-responses', ['as' => 'survey.question-response', 'uses' => 'SurveyStatsController@getResponseDataForQuestion']);
-    Route::get('/survey-stats', ['as' => 'survey.stats', 'uses' => 'SurveyStatsController@getLatestSurveyData']);
-    Route::get('/survey-stats/creators-response', ['as' => 'survey.creator-response', 'uses' => 'SurveyStatsController@getCreatorResponse']);
 });
 
 Auth::routes();

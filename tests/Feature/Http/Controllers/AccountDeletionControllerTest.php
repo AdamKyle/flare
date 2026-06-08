@@ -27,7 +27,7 @@ class AccountDeletionControllerTest extends TestCase
 
     private $character;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -61,14 +61,14 @@ class AccountDeletionControllerTest extends TestCase
         Queue::fake();
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         parent::tearDown();
 
         $this->character = null;
     }
 
-    public function test_can_delete_character()
+    public function testCanDeleteCharacter()
     {
         $user = $this->character->user;
 
@@ -79,7 +79,40 @@ class AccountDeletionControllerTest extends TestCase
         Queue::assertPushed(AccountDeletionJob::class);
     }
 
-    public function test_cannot_delete_character()
+    public function testGuestCannotDeleteAccount(): void
+    {
+        $user = $this->character->user;
+
+        $response = $this->call('POST', route('delete.account', [
+            'user' => $user->id,
+        ]));
+
+        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertStringContainsString('/login', $response->headers->get('Location'));
+        Queue::assertNotPushed(AccountDeletionJob::class);
+    }
+
+    public function testAjaxGuestCannotDeleteAccount(): void
+    {
+        $user = $this->character->user;
+
+        $response = $this->call(
+            'POST',
+            route('delete.account', ['user' => $user->id]),
+            [],
+            [],
+            [],
+            [
+                'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
+                'HTTP_ACCEPT' => 'application/json',
+            ]
+        );
+
+        $response->assertUnauthorized();
+        Queue::assertNotPushed(AccountDeletionJob::class);
+    }
+
+    public function testCannotDeleteCharacter()
     {
         $user = $this->character->user;
 
@@ -90,5 +123,45 @@ class AccountDeletionControllerTest extends TestCase
         ]))->response;
 
         $response->assertSessionHas('error', 'You cannot do that.');
+    }
+
+    public function testUnauthenticatedCannotResetAccount(): void
+    {
+        $user = $this->character->user;
+
+        $response = $this->call('POST', route('reset.account', ['user' => $user->id]));
+
+        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertStringContainsString('/login', $response->headers->get('Location'));
+    }
+
+    public function testAuthenticatedUserCannotResetAnotherUsersAccount(): void
+    {
+        $user = $this->character->user;
+        $anotherUser = $this->createUser();
+
+        $response = $this->actingAs($anotherUser)->post(route('reset.account', [
+            'user' => $user->id,
+        ]))->response;
+
+        $response->assertSessionHas('error', 'You cannot do that.');
+    }
+
+    public function testAuthenticatedUserCanResetOwnAccount(): void
+    {
+        $user = $this->character->user;
+        $characterId = $this->character->id;
+        $this->createItem([
+            'type' => 'sword',
+            'skill_level_required' => 1,
+        ]);
+
+        $response = $this->actingAs($user)->post(route('reset.account', [
+            'user' => $user->id,
+        ]))->response;
+
+        $response->assertRedirect(route('game'));
+        $response->assertSessionHas('success', 'Character has been re-rolled!');
+        $this->assertNotSame($characterId, $user->refresh()->character->id);
     }
 }

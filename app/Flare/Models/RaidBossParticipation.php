@@ -2,10 +2,13 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\RaidBossParticipationFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class RaidBossParticipation extends Model
 {
+    use HasFactory;
     /**
      * The attributes that are mass assignable.
      *
@@ -33,5 +36,10 @@ class RaidBossParticipation extends Model
     public function character()
     {
         return $this->hasOne(Character::class, 'id', 'character_id');
+    }
+
+    protected static function newFactory(): RaidBossParticipationFactory
+    {
+        return RaidBossParticipationFactory::new();
     }
 }

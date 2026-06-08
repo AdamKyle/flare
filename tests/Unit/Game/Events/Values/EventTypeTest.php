@@ -8,14 +8,14 @@ use Tests\TestCase;
 
 class EventTypeTest extends TestCase
 {
-    public function test_invalid_event_type()
+    public function testInvalidEventType()
     {
         $this->expectException(Exception::class);
 
         new EventType(905);
     }
 
-    public function test_get_options_for_select()
+    public function testGetOptionsForSelect()
     {
         $expected = [
             EventType::WEEKLY_CELESTIALS => 'Weekly Celestials',
@@ -27,55 +27,48 @@ class EventTypeTest extends TestCase
             EventType::THE_OLD_CHURCH => 'The Old Church',
             EventType::DELUSIONAL_MEMORIES_EVENT => 'Delusional Memories Event',
             EventType::WEEKLY_FACTION_LOYALTY_EVENT => 'Weekly Faction Loyalty Event',
-            EventType::FEEDBACK_EVENT => 'Tlessa\'s Feedback Event',
-
         ];
 
         $this->assertEquals($expected, EventType::getOptionsForSelect());
     }
 
-    public function test_is_weekly_celestials()
+    public function testIsWeeklyCelestials()
     {
         $this->assertTrue((new EventType(EventType::WEEKLY_CELESTIALS))->isWeeklyCelestials());
     }
 
-    public function test_is_weekly_currencies()
+    public function testIsWeeklyCurrencies()
     {
         $this->assertTrue((new EventType(EventType::WEEKLY_CURRENCY_DROPS))->isWeeklyCurrencyDrops());
     }
 
-    public function test_is_raid_event()
+    public function testIsRaidEvent()
     {
         $this->assertTrue((new EventType(EventType::RAID_EVENT))->isRaidEvent());
     }
 
-    public function test_is_winter_event()
+    public function testIsWinterEvent()
     {
         $this->assertTrue((new EventType(EventType::WINTER_EVENT))->isWinterEvent());
     }
 
-    public function test_is_purgatory_smiths_house()
+    public function testIsPurgatorySmithsHouse()
     {
         $this->assertTrue((new EventType(EventType::PURGATORY_SMITH_HOUSE))->isPurgatorySmithHouseEvent());
     }
 
-    public function test_is_gold_mines()
+    public function testIsGoldMines()
     {
         $this->assertTrue((new EventType(EventType::GOLD_MINES))->isGoldMinesEvent());
     }
 
-    public function test_is_the_old_church()
+    public function testIsTheOldChurch()
     {
         $this->assertTrue((new EventType(EventType::THE_OLD_CHURCH))->isTheOldChurchEvent());
     }
 
-    public function test_is_weekly_faction_loyalty_event()
+    public function testIsWeeklyFactionLoyaltyEvent()
     {
         $this->assertTrue((new EventType(EventType::WEEKLY_FACTION_LOYALTY_EVENT))->isWeeklyFactionLoyaltyEvent());
-    }
-
-    public function test_is_feed_back_event()
-    {
-        $this->assertTrue((new EventType(EventType::FEEDBACK_EVENT))->isFeedbackEvent());
     }
 }

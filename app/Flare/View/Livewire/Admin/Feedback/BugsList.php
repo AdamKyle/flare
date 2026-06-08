@@ -38,7 +38,7 @@ class BugsList extends DataTableComponent
             Column::make('Title')->sortable()->format(function ($value, $row) {
                 $feedback = SuggestionAndBugs::where('title', $row->title)->where('character_id', $row->character_id)->first();
 
-                return '<a href="/admin/feedback/bug/'.$feedback->id.'">'.$value.'</a>';
+                return '<a href="/admin/feedback/bug/'.$feedback->id.'">'.e($value).'</a>';
             })->html(),
 
             Column::make('Platform')->sortable()->format(function ($value) {

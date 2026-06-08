@@ -37,6 +37,12 @@ class KingdomGoldBarsController extends Controller
 
         $amountToBuy = $request->amount_to_purchase;
 
+        if ($amountToBuy < 1) {
+            return response()->json([
+                'message' => 'Amount to purchase must be at least 1.',
+            ], 422);
+        }
+
         $newAmount = $amountToBuy + $kingdom->gold_bars;
 
         if ($newAmount > KingdomMaxValue::MAX_GOLD_BARS) {

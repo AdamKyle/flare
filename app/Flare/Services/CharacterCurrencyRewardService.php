@@ -23,24 +23,48 @@ class CharacterCurrencyRewardService
 {
     private Character $character;
 
+    private array $earnedCurrencies = [
+        'gold' => 0,
+        'gold_dust' => 0,
+        'shards' => 0,
+        'copper_coins' => 0,
+    ];
+
+    /**
+     * @param BattleMessageHandler $battleMessageHandler
+     */
     public function __construct(
         private readonly BattleMessageHandler $battleMessageHandler,
-    ) {}
+    ) {
+    }
 
     /**
      * Set the character.
+     *
+     * @param Character $character
+     * @return CharacterCurrencyRewardService
      */
     public function setCharacter(Character $character): CharacterCurrencyRewardService
     {
         $this->character = $character;
+        $this->earnedCurrencies = [
+            'gold' => 0,
+            'gold_dust' => 0,
+            'shards' => 0,
+            'copper_coins' => 0,
+        ];
 
         return $this;
     }
 
     /**
      * Give currencies.
+     *
+     * @param Monster $monster
+     * @param int $killCount
+     * @return array
      */
-    public function giveCurrencies(Monster $monster, int $killCount = 1): CharacterCurrencyRewardService
+    public function giveCurrencies(Monster $monster, int $killCount = 1): array
     {
 
         $this->distributeGold($monster, $killCount);
@@ -53,11 +77,15 @@ class CharacterCurrencyRewardService
             event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
         }
 
-        return $this;
+        return $this->earnedCurrencies;
     }
 
     /**
      * Handles Currency Event Rewards when the event is running.
+     *
+     * @param Monster $monster
+     * @param int $killCount
+     * @return CharacterCurrencyRewardService
      */
     public function currencyEventReward(Monster $monster, int $killCount = 1): CharacterCurrencyRewardService
     {
@@ -74,11 +102,15 @@ class CharacterCurrencyRewardService
 
             $goldDust = rand(1, 375) * $killCount;
 
+            $this->earnedCurrencies['shards'] += $shards;
+            $this->earnedCurrencies['gold_dust'] += $goldDust;
+
             $characterShards = $this->character->shards + $shards;
             $characterGoldDust = $this->character->gold_dust + $goldDust;
 
             if ($canHaveCopperCoins) {
                 $copperCoins = rand(1, 115) * $killCount;
+                $this->earnedCurrencies['copper_coins'] += $copperCoins;
 
                 $characterCopperCoins = $this->character->copper_coins + $copperCoins;
             } else {
@@ -122,6 +154,8 @@ class CharacterCurrencyRewardService
 
     /**
      * Gets the character.
+     *
+     * @return Character
      */
     public function getCharacter(): Character
     {
@@ -130,10 +164,15 @@ class CharacterCurrencyRewardService
 
     /**
      * Gives gold to the player.
+     *
+     * @param Monster $monster
+     * @param int $killCount
+     * @return void
      */
     private function distributeGold(Monster $monster, int $killCount): void
     {
         $goldToReward = $monster->gold * $killCount;
+        $this->earnedCurrencies['gold'] += $goldToReward;
 
         $newGold = $this->character->gold + $goldToReward;
 
@@ -152,6 +191,10 @@ class CharacterCurrencyRewardService
 
     /**
      * Give copper coins only to those that have the quest item and are on purgatory.
+     *
+     * @param Monster $monster
+     * @param int $killCount
+     * @return void
      */
     private function distributeCopperCoins(Monster $monster, int $killCount): void
     {
@@ -184,10 +227,11 @@ class CharacterCurrencyRewardService
                 }
 
                 $coins = $coins + $coins * $mercenarySlotBonus;
+                $this->earnedCurrencies['copper_coins'] += $coins;
 
                 $newCoins = $this->character->copper_coins + $coins;
 
-                if ($newCoins >= MaxCurrenciesValue::COPPER) {
+                if ($newCoins >= MaxCurrenciesValue::MAX_COPPER) {
                     $newCoins = MaxCurrenciesValue::MAX_COPPER;
                 }
 
@@ -200,10 +244,13 @@ class CharacterCurrencyRewardService
 
     /**
      * Are we at a location with an effect (special location)?
+     *
+     * @param Map $map
+     * @return Location|null
      */
     private function purgatoryDungeons(Map $map): ?Location
     {
-        return Location::whereNotNull('enemy_strength_increase')
+        return Location::whereNotNull('enemy_strength_type')
             ->where('x', $map->character_position_x)
             ->where('y', $map->character_position_y)
             ->where('game_map_id', $map->game_map_id)

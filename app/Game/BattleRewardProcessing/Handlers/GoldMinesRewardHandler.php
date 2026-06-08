@@ -22,10 +22,19 @@ use Illuminate\Support\Facades\Cache;
 
 class GoldMinesRewardHandler
 {
+    private array $earnedCurrencies = [];
+
     public function __construct(private RandomAffixGenerator $randomAffixGenerator, private BattleMessageHandler $battleMessageHandler) {}
+
+    public function getEarnedCurrencies(): array
+    {
+        return $this->earnedCurrencies;
+    }
 
     public function handleFightingAtGoldMines(Character $character, Monster $monster, int $killCount = 1): Character
     {
+        $this->earnedCurrencies = [];
+
         $location = Location::where('x', $character->map->character_position_x)
             ->where('y', $character->map->character_position_y)
             ->where('game_map_id', $character->map->game_map_id)
@@ -87,6 +96,12 @@ class GoldMinesRewardHandler
         $goldDustToReward = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount) * $killCount;
         $shardsToReward = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount) * $killCount;
         $goldToReward = RandomNumberGenerator::generateRandomNumber(1, $maximumGold) * $killCount;
+
+        $this->earnedCurrencies = [
+            'gold' => $goldToReward,
+            'gold_dust' => $goldDustToReward,
+            'shards' => $shardsToReward,
+        ];
 
         $gold = $character->gold + $goldToReward;
         $goldDust = $character->gold_dust + $goldDustToReward;

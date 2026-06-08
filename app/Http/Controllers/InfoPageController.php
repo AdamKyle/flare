@@ -43,7 +43,10 @@ class InfoPageController extends Controller
             return response()->redirectToRoute('info.page', ['pageName' => 'home']);
         }
 
-        $searchResults = InfoPage::whereRaw("JSON_EXTRACT(page_sections, '$[*].content') LIKE '%".$request->info_search."%'")->get();
+        $searchResults = InfoPage::whereRaw(
+            "JSON_EXTRACT(page_sections, '$[*].content') LIKE ?",
+            ['%'.$request->info_search.'%']
+        )->get();
 
         return view('information.search-results', [
             'results' => $searchResults,

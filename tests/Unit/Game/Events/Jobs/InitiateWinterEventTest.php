@@ -147,4 +147,147 @@ class InitiateWinterEventTest extends TestCase
         $this->assertNotNull($eventForNextYear);
         $this->assertNotNull($eventForNextYear->raids_for_event);
     }
+
+    public function testWinterStartCreatesCurrentChildRaidsOnly(): void
+    {
+        $this->createGameMap([
+            'name' => MapNameValue::ICE_PLANE,
+            'only_during_event_type' => EventType::WINTER_EVENT,
+        ]);
+
+        $raidMap = $this->createGameMap(['name' => 'RaidMap', 'default' => false]);
+        $location = $this->createLocation(['game_map_id' => $raidMap->id]);
+        $monster = $this->createMonster();
+        $item = $this->createItem();
+        $raid = $this->createRaid([
+            'raid_boss_id' => $monster->id,
+            'artifact_item_id' => $item->id,
+            'raid_boss_location_id' => $location->id,
+            'scheduled_event_description' => 'test',
+        ]);
+
+        $now = now();
+        $parentEnd = $now->copy()->addMonths(2);
+
+        $event = $this->createScheduledEvent([
+            'event_type' => EventType::WINTER_EVENT,
+            'start_date' => $now,
+            'end_date' => $parentEnd,
+            'raids_for_event' => [[
+                'selected_raid' => $raid->id,
+                'start_date' => $now->copy()->addDays(5)->format('Y-m-d H:i:s'),
+                'end_date' => $now->copy()->addDays(10)->format('Y-m-d H:i:s'),
+            ]],
+        ]);
+
+        Event::fake();
+
+        InitiateWinterEvent::dispatch($event->id);
+
+        $currentChildRaids = ScheduledEvent::where('raid_id', $raid->id)
+            ->where('event_type', EventType::RAID_EVENT)
+            ->get();
+
+        $this->assertCount(1, $currentChildRaids);
+
+        $nextYearChildRaids = ScheduledEvent::where('raid_id', $raid->id)
+            ->where('event_type', EventType::RAID_EVENT)
+            ->where('start_date', '>=', $now->copy()->addYear())
+            ->get();
+
+        $this->assertCount(0, $nextYearChildRaids);
+    }
+
+    public function testWinterStartReschedulesOnlyParentForNextYear(): void
+    {
+        $this->createGameMap([
+            'name' => MapNameValue::ICE_PLANE,
+            'only_during_event_type' => EventType::WINTER_EVENT,
+        ]);
+
+        $raidMap = $this->createGameMap(['name' => 'RaidMap2', 'default' => false]);
+        $location = $this->createLocation(['game_map_id' => $raidMap->id]);
+        $monster = $this->createMonster();
+        $item = $this->createItem();
+        $raid = $this->createRaid([
+            'raid_boss_id' => $monster->id,
+            'artifact_item_id' => $item->id,
+            'raid_boss_location_id' => $location->id,
+            'scheduled_event_description' => 'test',
+        ]);
+
+        $now = now();
+
+        $event = $this->createScheduledEvent([
+            'event_type' => EventType::WINTER_EVENT,
+            'start_date' => $now,
+            'end_date' => $now->copy()->addMonths(2),
+            'raids_for_event' => [[
+                'selected_raid' => $raid->id,
+                'start_date' => $now->copy()->addDays(5)->format('Y-m-d H:i:s'),
+                'end_date' => $now->copy()->addDays(10)->format('Y-m-d H:i:s'),
+            ]],
+        ]);
+
+        Event::fake();
+
+        InitiateWinterEvent::dispatch($event->id);
+
+        $nextYearParent = ScheduledEvent::where('event_type', EventType::WINTER_EVENT)
+            ->where('id', '!=', $event->id)
+            ->first();
+
+        $this->assertNotNull($nextYearParent);
+        $this->assertNotNull($nextYearParent->raids_for_event);
+
+        $nextYearChildRaids = ScheduledEvent::where('raid_id', $raid->id)
+            ->where('event_type', EventType::RAID_EVENT)
+            ->where('start_date', '>=', $now->copy()->addYear())
+            ->get();
+
+        $this->assertCount(0, $nextYearChildRaids);
+    }
+
+    public function testNextYearChildRaidsAreNotCreatedEarly(): void
+    {
+        $this->createGameMap([
+            'name' => MapNameValue::ICE_PLANE,
+            'only_during_event_type' => EventType::WINTER_EVENT,
+        ]);
+
+        $raidMap = $this->createGameMap(['name' => 'RaidMap3', 'default' => false]);
+        $location = $this->createLocation(['game_map_id' => $raidMap->id]);
+        $monster = $this->createMonster();
+        $item = $this->createItem();
+        $raid = $this->createRaid([
+            'raid_boss_id' => $monster->id,
+            'artifact_item_id' => $item->id,
+            'raid_boss_location_id' => $location->id,
+            'scheduled_event_description' => 'test',
+        ]);
+
+        $now = now();
+
+        $event = $this->createScheduledEvent([
+            'event_type' => EventType::WINTER_EVENT,
+            'start_date' => $now,
+            'end_date' => $now->copy()->addMonths(2),
+            'raids_for_event' => [[
+                'selected_raid' => $raid->id,
+                'start_date' => $now->copy()->addDays(5)->format('Y-m-d H:i:s'),
+                'end_date' => $now->copy()->addDays(10)->format('Y-m-d H:i:s'),
+            ]],
+        ]);
+
+        Event::fake();
+
+        InitiateWinterEvent::dispatch($event->id);
+
+        $nextYearChildRaids = ScheduledEvent::where('raid_id', $raid->id)
+            ->where('event_type', EventType::RAID_EVENT)
+            ->where('start_date', '>=', $now->copy()->addYear())
+            ->get();
+
+        $this->assertCount(0, $nextYearChildRaids);
+    }
 }

@@ -8,7 +8,6 @@ use App\Admin\Middleware\IsAdminMiddleware;
 use App\Admin\Services\AssignSkillService;
 use App\Admin\Services\FeedbackService;
 use App\Admin\Services\GuideQuestService;
-use App\Admin\Services\ImageHandlerService;
 use App\Admin\Services\InfoPageService;
 use App\Admin\Services\ItemAffixService;
 use App\Admin\Services\ItemsService;
@@ -16,10 +15,8 @@ use App\Admin\Services\LocationService;
 use App\Admin\Services\QuestService;
 use App\Admin\Services\SiteStatisticsService;
 use App\Admin\Services\SuggestionAndBugsService;
-use App\Admin\Services\SurveyService;
 use App\Admin\Services\UpdateCharacterStatsService;
 use App\Admin\Services\UserService;
-use App\Admin\Transformers\GuideQuestTransformer;
 use App\Flare\Cache\CoordinatesCache;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
@@ -58,42 +55,28 @@ class ServiceProvider extends ApplicationServiceProvider
             return new InfoPageService;
         });
 
-        $this->app->bind(ImageHandlerService::class, function () {
-            return new ImageHandlerService;
-        });
-
-        $this->app->bind(GuideQuestService::class, function ($app) {
-            return new GuideQuestService(
-                $app->make(ImageHandlerService::class),
-            );
+        $this->app->bind(GuideQuestService::class, function () {
+            return new GuideQuestService;
         });
 
         $this->app->bind(LocationService::class, function ($app) {
             return new LocationService($app->make(CoordinatesCache::class));
         });
 
-        $this->app->bind(SuggestionAndBugsService::class, function () {
+        $this->app->bind(SuggestionAndBugsService::class, function() {
             return new SuggestionAndBugsService;
         });
 
-        $this->app->bind(SurveyService::class, function () {
-            return new SurveyService;
-        });
 
-        $this->app->bind(FeedbackService::class, function () {
+        $this->app->bind(FeedbackService::class, function() {
             return new FeedbackService;
         });
 
-        $this->app->bind(SiteStatisticsService::class, function () {
+        $this->app->bind(SiteStatisticsService::class, function() {
             return new SiteStatisticsService;
         });
 
-        $this->app->bind(GuideQuestTransformer::class, function () {
-            return new GuideQuestTransformer;
-        });
-
         $this->commands([CreateAdminAccount::class, GiveKingdomsToNpcs::class]);
-
     }
 
     /**

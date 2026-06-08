@@ -39,7 +39,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
 
     private ?FactionLoyaltyAutomation $factionLoyaltyAutomation = null;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -57,7 +57,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         $this->factionLoyaltyNpc = $this->factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         Carbon::setTestNow();
 
@@ -71,7 +71,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_begin_automation_creates_character_automation(): void
+    public function testBeginAutomationCreatesCharacterAutomation(): void
     {
         Queue::fake();
         Event::fake();
@@ -85,7 +85,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         $this->assertEquals(AttackTypeValue::ATTACK, $characterAutomation->attack_type);
     }
 
-    public function test_begin_automation_sets_completed_at_eight_hours_from_now(): void
+    public function testBeginAutomationSetsCompletedAtEightHoursFromNow(): void
     {
         Queue::fake();
         Event::fake();
@@ -101,7 +101,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         $this->assertEquals($now->copy()->addHours(8)->toDateTimeString(), $characterAutomation->completed_at->toDateTimeString());
     }
 
-    public function test_begin_automation_creates_faction_loyalty_automation(): void
+    public function testBeginAutomationCreatesFactionLoyaltyAutomation(): void
     {
         Queue::fake();
         Event::fake();
@@ -114,7 +114,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         $this->assertEquals($this->factionLoyaltyNpc->id, $factionLoyaltyAutomation->faction_loyalty_npc_id);
     }
 
-    public function test_begin_automation_links_faction_loyalty_automation_to_character_automation(): void
+    public function testBeginAutomationLinksFactionLoyaltyAutomationToCharacterAutomation(): void
     {
         Queue::fake();
         Event::fake();
@@ -127,7 +127,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         $this->assertEquals($characterAutomation->id, $factionLoyaltyAutomation->character_automation_id);
     }
 
-    public function test_begin_automation_disables_crafting(): void
+    public function testBeginAutomationDisablesCrafting(): void
     {
         Queue::fake();
         Event::fake();
@@ -137,7 +137,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         $this->assertFalse($this->character->refresh()->can_craft);
     }
 
-    public function test_begin_automation_clears_crafting_cooldown(): void
+    public function testBeginAutomationClearsCraftingCooldown(): void
     {
         Queue::fake();
         Event::fake();
@@ -151,7 +151,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         $this->assertNull($this->character->refresh()->can_craft_again_at);
     }
 
-    public function test_begin_automation_dispatches_update_character_status(): void
+    public function testBeginAutomationDispatchesUpdateCharacterStatus(): void
     {
         Queue::fake();
         Event::fake();
@@ -161,7 +161,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         Event::assertDispatched(UpdateCharacterStatus::class);
     }
 
-    public function test_begin_automation_dispatches_update_character_status_with_faction_loyalty_automation_running(): void
+    public function testBeginAutomationDispatchesUpdateCharacterStatusWithFactionLoyaltyAutomationRunning(): void
     {
         Queue::fake();
         Event::fake();
@@ -173,7 +173,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         });
     }
 
-    public function test_begin_automation_dispatches_automation_log_update(): void
+    public function testBeginAutomationDispatchesAutomationLogUpdate(): void
     {
         Queue::fake();
         Event::fake();
@@ -183,7 +183,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         Event::assertDispatched(AutomationLogUpdate::class);
     }
 
-    public function test_begin_automation_dispatches_automation_time_out(): void
+    public function testBeginAutomationDispatchesAutomationTimeOut(): void
     {
         Queue::fake();
         Event::fake();
@@ -193,7 +193,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         Event::assertDispatched(AutomationTimeOut::class);
     }
 
-    public function test_begin_automation_dispatches_automated_faction_loyalty_job(): void
+    public function testBeginAutomationDispatchesAutomatedFactionLoyaltyJob(): void
     {
         Queue::fake();
         Event::fake();
@@ -203,7 +203,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         Queue::assertPushed(AutomatedFactionLoyalty::class);
     }
 
-    public function test_begin_automation_dispatches_automated_faction_loyalty_job_with_expected_ids(): void
+    public function testBeginAutomationDispatchesAutomatedFactionLoyaltyJobWithExpectedIds(): void
     {
         Queue::fake();
         Event::fake();
@@ -221,7 +221,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         });
     }
 
-    public function test_begin_automation_delays_automated_faction_loyalty_job_by_time_delay(): void
+    public function testBeginAutomationDelaysAutomatedFactionLoyaltyJobByTimeDelay(): void
     {
         Queue::fake();
         Event::fake();
@@ -237,7 +237,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         });
     }
 
-    public function test_begin_automation_dispatches_automated_faction_loyalty_job_on_default_long_queue(): void
+    public function testBeginAutomationDispatchesAutomatedFactionLoyaltyJobOnFactionLoyaltyQueueWithLongRunningConnection(): void
     {
         Queue::fake();
         Event::fake();
@@ -245,11 +245,11 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         $this->service->beginAutomation($this->character, $this->factionLoyaltyNpc, AttackTypeValue::ATTACK);
 
         Queue::assertPushed(AutomatedFactionLoyalty::class, function (AutomatedFactionLoyalty $job): bool {
-            return $job->queue === 'default_long';
+            return $job->queue === 'faction_loyalty' && $job->connection === 'long_running';
         });
     }
 
-    public function test_stop_automation_deletes_character_automation(): void
+    public function testStopAutomationDeletesCharacterAutomation(): void
     {
         Event::fake();
 
@@ -262,7 +262,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         $this->assertNull($this->characterAutomation->fresh());
     }
 
-    public function test_stop_automation_completes_faction_loyalty_automation(): void
+    public function testStopAutomationCompletesFactionLoyaltyAutomation(): void
     {
         Event::fake();
 
@@ -275,7 +275,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         $this->assertNotNull($this->factionLoyaltyAutomation->refresh()->completed_at);
     }
 
-    public function test_stop_automation_re_enables_crafting(): void
+    public function testStopAutomationReEnablesCrafting(): void
     {
         Event::fake();
 
@@ -290,7 +290,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         $this->assertTrue($this->character->refresh()->can_craft);
     }
 
-    public function test_stop_automation_clears_crafting_cooldown(): void
+    public function testStopAutomationClearsCraftingCooldown(): void
     {
         Event::fake();
 
@@ -305,7 +305,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         $this->assertNull($this->character->refresh()->can_craft_again_at);
     }
 
-    public function test_stop_automation_returns_success_result(): void
+    public function testStopAutomationReturnsSuccessResult(): void
     {
         Event::fake();
 
@@ -316,7 +316,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         $this->assertEquals(200, $result['status']);
     }
 
-    public function test_stop_automation_returns_error_when_no_character_automation_exists(): void
+    public function testStopAutomationReturnsErrorWhenNoCharacterAutomationExists(): void
     {
         Event::fake();
 
@@ -325,33 +325,33 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         $this->assertEquals(422, $result['status']);
     }
 
-    public function test_stop_automation_clears_character_sheet_cache(): void
+    public function testStopAutomationClearsCharacterSheetCache(): void
     {
         Event::fake();
 
         $this->factionLoyaltyFactory->createAutomation();
 
-        Cache::put('character-sheet-'.$this->character->id, ['level' => 1]);
+        Cache::put('character-sheet-' . $this->character->id, ['level' => 1]);
 
         $this->service->stopAutomation($this->character);
 
-        $this->assertFalse(Cache::has('character-sheet-'.$this->character->id));
+        $this->assertFalse(Cache::has('character-sheet-' . $this->character->id));
     }
 
-    public function test_stop_automation_clears_character_defence_cache(): void
+    public function testStopAutomationClearsCharacterDefenceCache(): void
     {
         Event::fake();
 
         $this->factionLoyaltyFactory->createAutomation();
 
-        Cache::put('character-defence-'.$this->character->id, 100);
+        Cache::put('character-defence-' . $this->character->id, 100);
 
         $this->service->stopAutomation($this->character);
 
-        $this->assertFalse(Cache::has('character-defence-'.$this->character->id));
+        $this->assertFalse(Cache::has('character-defence-' . $this->character->id));
     }
 
-    public function test_stop_automation_dispatches_automation_time_out(): void
+    public function testStopAutomationDispatchesAutomationTimeOut(): void
     {
         Event::fake();
 
@@ -362,7 +362,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         Event::assertDispatched(AutomationTimeOut::class);
     }
 
-    public function test_stop_automation_dispatches_automation_status(): void
+    public function testStopAutomationDispatchesAutomationStatus(): void
     {
         Event::fake();
 
@@ -373,7 +373,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         Event::assertDispatched(AutomationStatus::class);
     }
 
-    public function test_stop_automation_dispatches_update_character_status(): void
+    public function testStopAutomationDispatchesUpdateCharacterStatus(): void
     {
         Event::fake();
 
@@ -384,7 +384,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         Event::assertDispatched(UpdateCharacterStatus::class);
     }
 
-    public function test_stop_automation_dispatches_update_character_status_without_faction_loyalty_automation_running(): void
+    public function testStopAutomationDispatchesUpdateCharacterStatusWithoutFactionLoyaltyAutomationRunning(): void
     {
         Event::fake();
 
@@ -397,7 +397,7 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         });
     }
 
-    public function test_stop_automation_dispatches_automation_log_update(): void
+    public function testStopAutomationDispatchesAutomationLogUpdate(): void
     {
         Event::fake();
 

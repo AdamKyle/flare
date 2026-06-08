@@ -15,11 +15,15 @@ class TimersController extends Controller
 {
     public function updateTimersForCharacter(Character $character): JsonResponse
     {
-        $characterAutomation = $character->currentAutomations()->first();
+        $now = now();
 
-        if ($characterAutomation) {
-            event(new AutomationTimeOut($character->user, now()->diffInSeconds($characterAutomation->completed_at)));
-        }
+        $characterAutomation = $character->currentAutomations()
+            ->where('completed_at', '>', $now)
+            ->orderByDesc('started_at')
+            ->orderByDesc('id')
+            ->first();
+
+        event(new AutomationTimeOut($character->user, $characterAutomation ? $now->diffInSeconds($characterAutomation->completed_at) : 0));
 
         if (! is_null($character->can_move_again_at)) {
             event(new ShowTimeOutEvent($character->user, true, false, now()->diffInSeconds($character->can_move_again_at)));

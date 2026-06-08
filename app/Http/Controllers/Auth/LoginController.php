@@ -100,6 +100,8 @@ class LoginController extends Controller
             return $this->sendLoginResponse($request);
         }
 
+        dump('Failed and now here?');
+
         // If the login attempt was unsuccessful we will increment the number of attempts
         // to login and redirect the user back to the login form. Of course, when this
         // user surpasses their maximum number of attempts they will get locked out.

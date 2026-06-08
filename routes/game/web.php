@@ -14,6 +14,7 @@ Route::middleware([
 });
 
 Route::middleware([
+    'auth',
     'is.player.banned',
     'is.character.who.they.say.they.are',
     'is.globally.timed.out',

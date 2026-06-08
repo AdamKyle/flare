@@ -3,8 +3,11 @@
 namespace Tests\Unit\Game\Shop\Services;
 
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
+use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Shop\Services\ShopService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameSkill;
@@ -18,7 +21,7 @@ class ShopServiceTest extends TestCase
 
     private ?ShopService $shopService;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -30,15 +33,17 @@ class ShopServiceTest extends TestCase
         $this->shopService = resolve(ShopService::class);
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         parent::tearDown();
+
+        Mockery::close();
 
         $this->character = null;
         $this->shopService = null;
     }
 
-    public function test_sell_all_items()
+    public function testSellAllItems()
     {
         $trinket = $this->createItem(['type' => 'trinket']);
         $alchemy = $this->createItem(['type' => 'alchemy']);
@@ -65,7 +70,7 @@ class ShopServiceTest extends TestCase
         }
     }
 
-    public function test_sell_all_items_with_no_items()
+    public function testSellAllItemsWithNoItems()
     {
         $trinket = $this->createItem(['type' => 'trinket']);
         $alchemy = $this->createItem(['type' => 'alchemy']);
@@ -90,7 +95,7 @@ class ShopServiceTest extends TestCase
         }
     }
 
-    public function test_buy_and_replace_item()
+    public function testBuyAndReplaceItem()
     {
         $shield = $this->createItem(['type' => 'shield']);
 
@@ -112,7 +117,7 @@ class ShopServiceTest extends TestCase
         $this->assertNotNull($inventorySlot);
     }
 
-    public function test_buy_multiple_items()
+    public function testBuyMultipleItems()
     {
         $shield = $this->createItem(['type' => 'shield']);
 
@@ -128,7 +133,7 @@ class ShopServiceTest extends TestCase
         $this->assertCount(75, $character->inventory->slots->toArray());
     }
 
-    public function test_sell_item()
+    public function testSellItem()
     {
         $shield = $this->createItem(['type' => 'shield']);
         $character = $this->character->inventoryManagement()->giveItem($shield)->getCharacter();
@@ -145,7 +150,54 @@ class ShopServiceTest extends TestCase
         $this->assertGreaterThan(0, $character->gold);
     }
 
-    public function test_sell_item_do_not_go_above_max_gold()
+    public function testBuyAndReplaceRollsBackGoldOnReplaceFailure(): void
+    {
+        $shield = $this->createItem(['type' => 'shield', 'cost' => 1000]);
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => 50000]);
+
+        $equipItemService = Mockery::mock(EquipItemService::class);
+        $equipItemService->shouldReceive('setRequest')->andReturnSelf();
+        $equipItemService->shouldReceive('setCharacter')->andReturnSelf();
+        $equipItemService->shouldReceive('replaceItem')->andThrow(new EquipItemException('cannot equip'));
+
+        $this->instance(EquipItemService::class, $equipItemService);
+        $shopService = resolve(ShopService::class);
+
+        try {
+            $shopService->buyAndReplace($shield, $character->refresh(), ['position' => 'left-hand']);
+        } catch (EquipItemException $e) {
+            // expected
+        }
+
+        $this->assertEquals(50000, $character->refresh()->gold);
+    }
+
+    public function testBuyAndReplaceRollsBackInventorySlotOnReplaceFailure(): void
+    {
+        $shield = $this->createItem(['type' => 'shield', 'cost' => 1000]);
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => 50000]);
+        $initialSlotCount = $character->inventory->slots()->count();
+
+        $equipItemService = Mockery::mock(EquipItemService::class);
+        $equipItemService->shouldReceive('setRequest')->andReturnSelf();
+        $equipItemService->shouldReceive('setCharacter')->andReturnSelf();
+        $equipItemService->shouldReceive('replaceItem')->andThrow(new EquipItemException('cannot equip'));
+
+        $this->instance(EquipItemService::class, $equipItemService);
+        $shopService = resolve(ShopService::class);
+
+        try {
+            $shopService->buyAndReplace($shield, $character->refresh(), ['position' => 'left-hand']);
+        } catch (EquipItemException $e) {
+            // expected
+        }
+
+        $this->assertEquals($initialSlotCount, $character->refresh()->inventory->slots()->count());
+    }
+
+    public function testSellItemDoNotGoAboveMaxGold()
     {
         $shield = $this->createItem(['type' => 'shield']);
         $character = $this->character->inventoryManagement()->giveItem($shield)->getCharacter();

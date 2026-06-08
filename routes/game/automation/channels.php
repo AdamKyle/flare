@@ -29,3 +29,11 @@ Broadcast::channel('automations-list-{userId}', function ($user, $userId) {
 Broadcast::channel('automation-log-update-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;
 });
+
+Broadcast::channel('exploration-output-{userId}', function ($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
+Broadcast::channel('exploration-warning-{userId}', function ($user, $userId) {
+    return $user->id === (int) $userId;
+});

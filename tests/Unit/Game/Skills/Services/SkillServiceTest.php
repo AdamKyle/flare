@@ -4,7 +4,6 @@ namespace Tests\Unit\Game\Skills\Services;
 
 use App\Flare\Events\SkillLeveledUpServerMessageEvent;
 use App\Flare\Models\GameSkill;
-use App\Game\Events\Values\EventType;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -15,11 +14,10 @@ use Tests\Traits\CreateClass;
 use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
-use Tests\Traits\CreateScheduledEvent;
 
 class SkillServiceTest extends TestCase
 {
-    use CreateClass, CreateEvent, CreateGameSkill, CreateItem, CreateScheduledEvent, RefreshDatabase;
+    use CreateClass, CreateGameSkill, CreateEvent, CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -27,7 +25,7 @@ class SkillServiceTest extends TestCase
 
     private ?GameSkill $skill;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -44,7 +42,7 @@ class SkillServiceTest extends TestCase
         $this->skillService = resolve(SkillService::class);
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         parent::tearDown();
 
@@ -53,19 +51,19 @@ class SkillServiceTest extends TestCase
         $this->skillService = null;
     }
 
-    public function test_get_skills()
+    public function testGetSkills()
     {
         $this->assertNotEmpty($this->skillService->getSkills($this->character->getCharacter(), [
             $this->skill->id,
         ]));
     }
 
-    public function test_get_specific_skill()
+    public function testGetSpecificSkill()
     {
         $this->assertNotEmpty($this->skillService->getSkill($this->character->getCharacter()->skills->first()));
     }
 
-    public function test_fail_to_train_skill_that_doesnt_exist()
+    public function testFailToTrainSkillThatDoesntExist()
     {
         $character = $this->character->getCharacter();
 
@@ -75,7 +73,7 @@ class SkillServiceTest extends TestCase
         $this->assertEquals('Invalid Input.', $result['message']);
     }
 
-    public function test_train_skill()
+    public function testTrainSkill()
     {
         $character = $this->character->getCharacter();
         $skillToTrain = $character->skills->first();
@@ -88,10 +86,10 @@ class SkillServiceTest extends TestCase
         $this->assertTrue($skillToTrain->currently_training);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('You are now training: '.$skillToTrain->name, $result['message']);
+        $this->assertEquals('You are now training: ' . $skillToTrain->name, $result['message']);
     }
 
-    public function test_switch_training_skills()
+    public function testSwitchTrainingSkills()
     {
         $secondarySkill = $this->createGameSkill([
             'name' => 'skill',
@@ -119,10 +117,10 @@ class SkillServiceTest extends TestCase
         $this->assertFalse($secondarySkillTraining->currently_training);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('You are now training: '.$skillToTrain->name, $result['message']);
+        $this->assertEquals('You are now training: ' . $skillToTrain->name, $result['message']);
     }
 
-    public function test_do_not_assign_xp_to_a_skill_that_doesnt_exist()
+    public function testDoNotAssignXpToASkillThatDoesntExist()
     {
         $character = $this->character->getCharacter();
 
@@ -133,7 +131,7 @@ class SkillServiceTest extends TestCase
         $this->assertNotEquals(10, $skill->xp);
     }
 
-    public function test_do_not_assign_xp_to_max_level_skill()
+    public function testDoNotAssignXpToMaxLevelSkill()
     {
         $character = $this->character->getCharacter();
 
@@ -151,35 +149,8 @@ class SkillServiceTest extends TestCase
         $this->assertNotEquals(10, $skill->xp);
     }
 
-    public function test_assign_xp_to_skill()
+    public function testAssignXpToSkill()
     {
-        $character = $this->character->getCharacter();
-
-        $skill = $character->skills->first();
-
-        $skill->update([
-            'currently_training' => true,
-            'xp_towards' => 0.10,
-            'xp_max' => 1000,
-        ]);
-
-        $character = $character->refresh();
-
-        $this->skillService->setSkillInTraining($character)->assignXPToTrainingSkill($character, 10);
-
-        $skill = $character->refresh()->skills->where('currently_training', true)->first();
-
-        $this->assertGreaterThan(10, $skill->xp);
-    }
-
-    public function test_assign_xp_to_skill_when_event_is_running()
-    {
-        $this->createScheduledEvent([
-            'event_type' => EventType::FEEDBACK_EVENT,
-            'start_date' => now()->addMinutes(5),
-            'currently_running' => true,
-        ]);
-
         $character = $this->character->getCharacter();
 
         $skill = $character->skills->first();
@@ -198,7 +169,7 @@ class SkillServiceTest extends TestCase
         $this->assertGreaterThan(10, $skill->xp);
     }
 
-    public function test_level_skill()
+    public function testLevelSkill()
     {
         Event::fake();
 
@@ -222,7 +193,7 @@ class SkillServiceTest extends TestCase
         Event::assertDispatched(SkillLeveledUpServerMessageEvent::class);
     }
 
-    public function test_level_skill_where_skill_bonus_will_not_go_above_one()
+    public function testLevelSkillWhereSkillBonusWillNotGoAboveOne()
     {
         Event::fake();
 
@@ -247,7 +218,7 @@ class SkillServiceTest extends TestCase
         Event::assertDispatched(SkillLeveledUpServerMessageEvent::class);
     }
 
-    public function test_craft_skill_does_not_get_xp_because_its_max_level()
+    public function testCraftSkillDoesNotGetXpBecauseItsMaxLevel()
     {
         $craftingSkill = $this->createGameSkill([
             'type' => SkillTypeValue::CRAFTING->value,
@@ -262,50 +233,7 @@ class SkillServiceTest extends TestCase
         $this->assertEquals(0, $skill->refresh()->xp);
     }
 
-    public function test_assign_xp_to_crafting_skill_when_feed_back_event_is_running()
-    {
-        $this->createScheduledEvent([
-            'event_type' => EventType::FEEDBACK_EVENT,
-            'start_date' => now()->addMinutes(5),
-            'currently_running' => true,
-        ]);
-
-        $craftingSkill = $this->createGameSkill([
-            'type' => SkillTypeValue::CRAFTING->value,
-            'name' => 'Weapon Crafting',
-            'max_level' => 400,
-        ]);
-
-        $character = $this->character->assignSkill($craftingSkill, 1)->getCharacter();
-        $skill = $character->skills->where('game_skill_id', $craftingSkill->id)->first();
-
-        $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
-
-        $this->assertGreaterThan(0, $skill->refresh()->xp);
-    }
-
-    public function test_assign_xp_to_regular_skill_when_feed_back_event_is_running()
-    {
-        $this->createScheduledEvent([
-            'event_type' => EventType::FEEDBACK_EVENT,
-            'start_date' => now()->addMinutes(5),
-            'currently_running' => true,
-        ]);
-
-        $regularSkill = $this->createGameSkill([
-            'type' => SkillTypeValue::TRAINING->value,
-            'name' => 'Accuracy',
-        ]);
-
-        $character = $this->character->assignSkill($regularSkill, 1)->getCharacter();
-        $skill = $character->skills->where('game_skill_id', $regularSkill->id)->first();
-
-        $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
-
-        $this->assertGreaterThan(0, $skill->refresh()->xp);
-    }
-
-    public function test_assign_xp_to_regular_skill_and_level_it_up()
+    public function testAssignXpToRegularSkillAndLevelItUp()
     {
         $craftingSkill = $this->createGameSkill([
             'type' => SkillTypeValue::TRAINING->value,
@@ -322,7 +250,7 @@ class SkillServiceTest extends TestCase
         $this->assertGreaterThan(1, $skill->refresh()->level);
     }
 
-    public function test_assign_xp_to_regular_skill_and_do_not_level_it_up_when_maxed()
+    public function testAssignXpToRegularSkillAndDoNotLevelItUpWhenMaxed()
     {
         $craftingSkill = $this->createGameSkill([
             'type' => SkillTypeValue::TRAINING->value,
@@ -341,7 +269,7 @@ class SkillServiceTest extends TestCase
         $this->assertEquals(0, $skill->refresh()->xp);
     }
 
-    public function test_assign_xp_to_regular_skill_and_do_not_level_it_beyond_level400()
+    public function testAssignXpToRegularSkillAndDoNotLevelItBeyondLevel400()
     {
         $craftingSkill = $this->createGameSkill([
             'type' => SkillTypeValue::TRAINING->value,
@@ -360,7 +288,7 @@ class SkillServiceTest extends TestCase
         $this->assertEquals(0, $skill->refresh()->xp);
     }
 
-    public function test_get_skill_uses_clamped_level_when_skill_is_above_max_level()
+    public function testGetSkillUsesClampedLevelWhenSkillIsAboveMaxLevel()
     {
         $character = $this->character->getCharacter();
 
@@ -381,7 +309,7 @@ class SkillServiceTest extends TestCase
         $this->assertSame(1.0, $result['skill_bonus']);
     }
 
-    public function test_get_skill_stacks_boon_skill_bonus_by_amount_used()
+    public function testGetSkillStacksBoonSkillBonusByAmountUsed()
     {
         $character = $this->character->getCharacter();
 
@@ -417,7 +345,7 @@ class SkillServiceTest extends TestCase
         $this->assertEqualsWithDelta(0.60, $result['skill_bonus'], 0.00001);
     }
 
-    public function test_get_skill_stacks_boon_skill_training_bonus_by_amount_used()
+    public function testGetSkillStacksBoonSkillTrainingBonusByAmountUsed()
     {
         $character = $this->character->getCharacter();
 
@@ -443,7 +371,7 @@ class SkillServiceTest extends TestCase
         $this->assertEqualsWithDelta(0.60, $result['skill_xp_bonus'], 0.00001);
     }
 
-    public function test_get_skill_stacks_boon_base_damage_mod_by_amount_used()
+    public function testGetSkillStacksBoonBaseDamageModByAmountUsed()
     {
         $character = $this->character->getCharacter();
 
@@ -459,7 +387,7 @@ class SkillServiceTest extends TestCase
 
         $boon = $this->createItem([
             'name' => 'Stacked Base Damage Boon',
-            'base_damage_mod' => 0.15,
+            'base_damage_mod_bonus' => 0.15,
             'can_stack' => true,
         ]);
 

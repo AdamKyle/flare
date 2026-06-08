@@ -24,8 +24,6 @@ class EventType
 
     const WEEKLY_FACTION_LOYALTY_EVENT = 8;
 
-    const FEEDBACK_EVENT = 9;
-
     private int $value;
 
     /**
@@ -41,7 +39,6 @@ class EventType
         6 => self::THE_OLD_CHURCH,
         7 => self::DELUSIONAL_MEMORIES_EVENT,
         8 => self::WEEKLY_FACTION_LOYALTY_EVENT,
-        9 => self::FEEDBACK_EVENT,
     ];
 
     protected static array $selection = [
@@ -54,7 +51,6 @@ class EventType
         6 => 'The Old Church',
         7 => 'Delusional Memories Event',
         8 => 'Weekly Faction Loyalty Event',
-        9 => 'Tlessa\'s Feedback Event',
     ];
 
     /**
@@ -65,7 +61,7 @@ class EventType
     public function __construct(int $value)
     {
         if (! in_array($value, self::$values)) {
-            throw new Exception($value.' does not exist.');
+            throw new Exception($value . ' does not exist.');
         }
 
         $this->value = $value;
@@ -157,13 +153,5 @@ class EventType
     public function isWeeklyFactionLoyaltyEvent(): bool
     {
         return $this->value === self::WEEKLY_FACTION_LOYALTY_EVENT;
-    }
-
-    /**
-     * Are we a feedback based event?
-     */
-    public function isFeedbackEvent(): bool
-    {
-        return $this->value === self::FEEDBACK_EVENT;
     }
 }

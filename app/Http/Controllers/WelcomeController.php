@@ -38,7 +38,7 @@ class WelcomeController extends Controller
 
         $eventType = $request->event_type;
         $raids = ['jester-of-time-raid', 'the-smugglers-are-back-raid', 'ice-queen-raid', 'the-frozen-king-raid', 'corrupted-bishop-raid', 'labyrinth-monster-raid'];
-        $events = ['delusional-memories', 'weekly-celestials', 'weekly-currency-drops', 'weekly-faction-loyalty', 'tlessas-feedback-event', 'the-winter-event'];
+        $events = ['delusional-memories', 'weekly-celestials', 'weekly-currency-drops', 'weekly-faction-loyalty', 'the-winter-event'];
 
         if (in_array($eventType, $raids)) {
 
@@ -114,10 +114,6 @@ class WelcomeController extends Controller
                     return view('events.weekly-faction-loyalty-event.event-page', [
                         'event' => $this->findScheduledEventForEventType($eventType),
                     ]);
-                case 'tlessas-feedback-event':
-                    return view('events.feedback-event.event-page', [
-                        'event' => $this->findScheduledEventForEventType($eventType),
-                    ]);
                 default:
                     return redirect()->to(route('welcome'));
             }
@@ -139,8 +135,6 @@ class WelcomeController extends Controller
                 return $this->findScheduledEvent(EventType::WEEKLY_CURRENCY_DROPS);
             case 'weekly-faction-loyalty':
                 return $this->findScheduledEvent(EventType::WEEKLY_FACTION_LOYALTY_EVENT);
-            case 'tlessas-feedback-event':
-                return $this->findScheduledEvent(EventType::FEEDBACK_EVENT);
             default:
                 return null;
         }

@@ -25,13 +25,7 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::post('/admin/delete-event', ['uses' => 'Api\EventScheduleController@deleteEvent']);
     Route::post('/admin/create-multiple-events', ['uses' => 'Api\EventScheduleController@createMultipleEvents']);
 
-    route::get('/admin/map-manager/{gameMap}', ['uses' => 'Api\MapManagerController@getMapData']);
-    route::post('/admin/map-manager/move/{gameMap}', ['uses' => 'Api\MapManagerController@moveLocation']);
+    route::get('admin/map-manager/{gameMap}', ['uses' => 'Api\MapManagerController@getMapData']);
+    route::post('admin/map-manager/move/{gameMap}', ['uses' => 'Api\MapManagerController@moveLocation']);
 
-    route::get('/admin/fetch-survey/{survey}', ['uses' => 'Api\SurveyController@fetchSurvey']);
-    route::post('/admin/create-new-survey', ['uses' => 'Api\SurveyController@createSurvey']);
-    route::post('/admin/save-survey/{survey}', ['uses' => 'Api\SurveyController@saveSurvey']);
-
-    route::get('/admin/manage-guide-quest', ['uses' => 'Api\GuideQuests\GuideQuestsController@guideQuest']);
-    route::post('/admin/store-guide-quest', ['uses' => 'Api\GuideQuests\GuideQuestsController@storeFormResponse']);
 });

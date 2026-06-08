@@ -2,45 +2,54 @@
 
 namespace App\Flare\Services;
 
+use Exception;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Models\Monster;
-use App\Flare\Models\ScheduledEvent;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Battle\Values\MaxLevel;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
-use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
-use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Services\CharacterService;
-use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
 use App\Game\Skills\Services\SkillService;
-use Exception;
 use Facades\App\Flare\Calculators\XPCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Database\Eloquent\Collection;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
 
 class CharacterXPService
 {
     private Character $character;
 
+    /**
+     * @param CharacterService $characterService
+     * @param SkillService $skillService
+     * @param Manager $manager
+     * @param CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer
+     * @param BattleMessageHandler $battleMessageHandler
+     */
     public function __construct(
         private readonly CharacterService $characterService,
         private readonly SkillService $skillService,
         private readonly Manager $manager,
         private readonly CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer,
         private readonly BattleMessageHandler $battleMessageHandler,
-    ) {}
+    ) {
+    }
 
     /**
      * Set the character.
+     *
+     * @param Character $character
+     * @return CharacterXPService
      */
     public function setCharacter(Character $character): CharacterXPService
     {
@@ -52,6 +61,8 @@ class CharacterXPService
     /**
      * Distribute the XP to the character based on the monster.
      *
+     * @param Monster $monster
+     * @return CharacterXPService
      * @throws Exception
      */
     public function distributeCharacterXP(Monster $monster): CharacterXPService
@@ -61,7 +72,7 @@ class CharacterXPService
         $this->handleLevelUp();
 
         if (! $this->character->isLoggedIn()) {
-            event(new UpdateCharacterBaseDetailsEvent($this->character->refresh()));
+            event(new UpdateTopBarEvent($this->character->refresh()));
         }
 
         return $this;
@@ -69,6 +80,9 @@ class CharacterXPService
 
     /**
      * Distribute a specific amount of XP
+     *
+     * @param integer $xp
+     * @return CharacterXPService
      */
     public function distributeSpecifiedXp(int $xp): CharacterXPService
     {
@@ -93,6 +107,8 @@ class CharacterXPService
      * Handle possible level up.
      *
      * Takes into account XP over flow.
+     *
+     * @return void
      */
     public function handleLevelUp(): void
     {
@@ -117,6 +133,8 @@ class CharacterXPService
 
     /**
      * Get the refreshed Character
+     *
+     * @return Character
      */
     public function getCharacter(): Character
     {
@@ -125,6 +143,10 @@ class CharacterXPService
 
     /**
      * Handle character level up.
+     *
+     * @param int $leftOverXP
+     * @param bool $shouldBuildCache
+     * @return void
      */
     public function handleCharacterLevelUp(int $leftOverXP, bool $shouldBuildCache = false): void
     {
@@ -158,11 +180,12 @@ class CharacterXPService
      * - Can return 0 if the xp we would gain is 0.
      * - Takes into account skills in training
      * - Takes into account Xp Bonuses such as items (Alchemy and quest)
+     *
+     * @param Monster $monster
+     * @return integer
      */
     public function fetchXpForMonster(Monster $monster): int
     {
-        $addBonus = true;
-
         if (! $this->canCharacterGainXP($this->character)) {
             $this->character = $this->normalizeCharacterMaxLevel($this->character);
 
@@ -172,28 +195,10 @@ class CharacterXPService
         $xp = XPCalculator::fetchXPFromMonster($monster, $this->character->level);
 
         if ($this->character->level >= $monster->max_level && $this->character->user->show_monster_to_low_level_message) {
-            ServerMessageHandler::sendBasicMessage($this->character->user, $monster->name.' has a max level of: '.number_format($monster->max_level).'. You are only getting 1/3rd of: '.number_format($monster->xp).' XP before all bonuses. Move down the list child.');
-
-            $addBonus = false;
+            ServerMessageHandler::sendBasicMessage($this->character->user, $monster->name . ' has a max level of: ' . number_format($monster->max_level) . '. You are only getting 1/3rd of: ' . number_format($monster->xp) . ' XP before all bonuses. Move down the list child.');
         }
 
         $xp = $this->skillService->setSkillInTraining($this->character)->getCharacterXpWithSkillTrainingReduction($this->character, $xp);
-
-        $event = ScheduledEvent::where('event_type', EventType::FEEDBACK_EVENT)->where('currently_running', true)->first();
-
-        if (is_null($event)) {
-            $addBonus = false;
-        }
-
-        if ($addBonus) {
-            if ($this->character->times_reincarnated > 0) {
-                $xp += 500;
-            } elseif ($this->character->level > 1000 && $this->character->level <= 5000) {
-                $xp += 150;
-            } else {
-                $xp += 75;
-            }
-        }
 
         if ($xp === 0) {
             return 0;
@@ -220,7 +225,7 @@ class CharacterXPService
         $canContinueLeveling = $this->canContinueLeveling($character);
 
         $xpBonusQuestSlots = $this->findAllItemsThatGiveXpBonus($character);
-        $boonBonus = $character->boons->sum(function ($boon): float {
+        $boonBonus = $character->boons()->active()->with('itemUsed')->get()->sum(function ($boon): float {
             $itemUsed = $boon->itemUsed;
 
             if (is_null($itemUsed) || is_null($itemUsed->xp_bonus)) {
@@ -324,6 +329,9 @@ class CharacterXPService
 
     /**
      * Assigns XP to the character.
+     *
+     * @param Monster $monster
+     * @return void
      */
     private function distributeXP(Monster $monster): void
     {
@@ -347,6 +355,9 @@ class CharacterXPService
 
     /**
      * Update the character stats.
+     *
+     * @param Character $character
+     * @return void
      */
     private function updateCharacterStats(Character $character): void
     {
@@ -361,6 +372,9 @@ class CharacterXPService
      *
      * - Applies Guide Quest XP (+10 while under level 2)
      * - Applies Addional bonuses from items and quest items.
+     *
+     * @param int $xp
+     * @return int
      */
     private function getXpWithBonuses(int $xp): int
     {

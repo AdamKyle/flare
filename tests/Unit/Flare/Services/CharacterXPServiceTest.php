@@ -5,18 +5,16 @@ namespace Tests\Unit\Flare\Services;
 use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Values\ItemEffectsValue;
-use App\Game\Events\Values\EventType;
 use Facades\App\Flare\Calculators\XPCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMonster;
-use Tests\Traits\CreateScheduledEvent;
 
 class CharacterXPServiceTest extends TestCase
 {
-    use CreateItem, CreateMonster, CreateScheduledEvent, RefreshDatabase;
+    use CreateItem, CreateMonster, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -527,107 +525,8 @@ class CharacterXPServiceTest extends TestCase
         $this->assertEquals(0, $xp);
     }
 
-    public function test_fetch_xp_for_monster_adds_reincarnation_bonus_when_event_running()
-    {
-        $this->createScheduledEvent([
-            'event_type' => EventType::FEEDBACK_EVENT,
-            'start_date' => now()->addMinutes(5),
-            'currently_running' => true,
-        ]);
-
-        $character = $this->character->getCharacter();
-
-        $character->update([
-            'times_reincarnated' => 1,
-            'level' => 10,
-        ]);
-
-        $character = $character->refresh();
-
-        $monster = $this->createMonster([
-            'xp' => 500,
-            'max_level' => 5000,
-        ]);
-
-        $xp = $this->characterXPService->setCharacter($character)->fetchXpForMonster($monster);
-
-        $this->assertGreaterThanOrEqual(500, $xp);
-    }
-
-    public function test_fetch_xp_for_monster_adds_high_level_bonus_when_event_running()
-    {
-        $this->createScheduledEvent([
-            'event_type' => EventType::FEEDBACK_EVENT,
-            'start_date' => now()->addMinutes(5),
-            'currently_running' => true,
-        ]);
-
-        MaxLevelConfiguration::create([
-            'max_level' => 3000,
-            'half_way' => 1500,
-            'three_quarters' => 2250,
-            'last_leg' => 2900,
-        ]);
-
-        $item = $this->createItem([
-            'type' => 'quest',
-            'effect' => ItemEffectsValue::CONTINUE_LEVELING,
-        ]);
-
-        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
-
-        $character->update([
-            'times_reincarnated' => 0,
-            'level' => 1500,
-        ]);
-
-        $monster = $this->createMonster([
-            'xp' => 1000,
-            'max_level' => 5000,
-        ]);
-
-        $xp = $this->characterXPService
-            ->setCharacter($character->refresh())
-            ->fetchXpForMonster($monster);
-
-        $this->assertGreaterThanOrEqual(150, $xp);
-    }
-
-    public function test_fetch_xp_for_monster_adds_default_bonus_when_event_running()
-    {
-        $this->createScheduledEvent([
-            'event_type' => EventType::FEEDBACK_EVENT,
-            'start_date' => now()->addMinutes(5),
-            'currently_running' => true,
-        ]);
-
-        $character = $this->character->getCharacter();
-
-        $character->update([
-            'times_reincarnated' => 0,
-            'level' => 10,
-        ]);
-
-        $character = $character->refresh();
-
-        $monster = $this->createMonster([
-            'xp' => 500,
-            'max_level' => 5000,
-        ]);
-
-        $xp = $this->characterXPService->setCharacter($character)->fetchXpForMonster($monster);
-
-        $this->assertGreaterThanOrEqual(75, $xp);
-    }
-
     public function test_fetch_xp_for_monster_triggers_low_level_monster_message_path()
     {
-        $this->createScheduledEvent([
-            'event_type' => EventType::FEEDBACK_EVENT,
-            'start_date' => now()->addMinutes(5),
-            'currently_running' => true,
-        ]);
-
         $character = $this->character->getCharacter();
 
         $character->user->update([

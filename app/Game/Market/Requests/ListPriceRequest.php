@@ -24,7 +24,7 @@ class ListPriceRequest extends FormRequest
     public function rules()
     {
         return [
-            'list_for' => 'integer|required|min:1|max:2000000000000',
+            'list_for' => 'required|integer|min:1',
             'slot_id' => 'integer|required',
         ];
     }

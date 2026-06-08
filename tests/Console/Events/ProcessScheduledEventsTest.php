@@ -20,17 +20,17 @@ class ProcessScheduledEventsTest extends TestCase
 {
     use CreateGameMap, CreateItem, CreateLocation, CreateMonster, CreateRaid, CreateScheduledEvent, RefreshDatabase;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         parent::tearDown();
     }
 
-    public function test_raid_event_triggers()
+    public function testRaidEventTriggers()
     {
         $gameMap = $this->createGameMap();
 
@@ -64,7 +64,7 @@ class ProcessScheduledEventsTest extends TestCase
         $this->assertGreaterThan(0, Announcement::count());
     }
 
-    public function test_weekly_currency_event_triggers()
+    public function testWeeklyCurrencyEventTriggers()
     {
         $this->createScheduledEvent([
             'event_type' => EventType::WEEKLY_CURRENCY_DROPS,
@@ -77,7 +77,7 @@ class ProcessScheduledEventsTest extends TestCase
         $this->assertGreaterThan(0, Announcement::count());
     }
 
-    public function test_weekly_celestial_event_triggers()
+    public function testWeeklyCelestialEventTriggers()
     {
         $this->createScheduledEvent([
             'event_type' => EventType::WEEKLY_CELESTIALS,
@@ -90,7 +90,7 @@ class ProcessScheduledEventsTest extends TestCase
         $this->assertGreaterThan(0, Announcement::count());
     }
 
-    public function test_winter_event()
+    public function testWinterEvent()
     {
         $this->createGameMap([
             'name' => MapNameValue::ICE_PLANE,
@@ -108,7 +108,7 @@ class ProcessScheduledEventsTest extends TestCase
         $this->assertGreaterThan(0, GlobalEventGoal::count());
     }
 
-    public function test_delusional_memories_event()
+    public function testDelusionalMemoriesEvent()
     {
         $this->createGameMap([
             'name' => MapNameValue::DELUSIONAL_MEMORIES,
@@ -126,7 +126,7 @@ class ProcessScheduledEventsTest extends TestCase
         $this->assertGreaterThan(0, GlobalEventGoal::count());
     }
 
-    public function test_weekly_faction_event()
+    public function testWeeklyFactionEvent()
     {
 
         $this->createScheduledEvent([
@@ -140,17 +140,31 @@ class ProcessScheduledEventsTest extends TestCase
         $this->assertGreaterThan(0, Announcement::count());
     }
 
-    public function test_weekly_feed_back_event_event()
+    public function testDueUnstartedEventStartsWhenStartTimeIsAlreadyPast(): void
     {
-
         $this->createScheduledEvent([
-            'event_type' => EventType::FEEDBACK_EVENT,
-            'start_date' => now()->addMinutes(5),
+            'event_type' => EventType::WEEKLY_CELESTIALS,
+            'start_date' => now()->subMinutes(10),
+            'end_date' => now()->addHour(),
+            'currently_running' => false,
         ]);
 
         $this->artisan('process:scheduled-events');
 
         $this->assertGreaterThan(0, Event::count());
-        $this->assertGreaterThan(0, Announcement::count());
+    }
+
+    public function testExpiredUnstartedEventIsNotStarted(): void
+    {
+        $this->createScheduledEvent([
+            'event_type' => EventType::WEEKLY_CELESTIALS,
+            'start_date' => now()->subHours(5),
+            'end_date' => now()->subHours(1),
+            'currently_running' => false,
+        ]);
+
+        $this->artisan('process:scheduled-events');
+
+        $this->assertEquals(0, Event::count());
     }
 }

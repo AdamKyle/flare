@@ -11,7 +11,6 @@ use App\Flare\Items\Builders\BuildUniqueItem;
 use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Items\Builders\RandomItemDropBuilder;
 use App\Flare\Middleware\IsCharacterDeadMiddleware;
-use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
 use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
 use App\Flare\Middleware\IsGloballyTimedOut;
 use App\Flare\Middleware\IsPlayerBannedMiddleware;
@@ -58,7 +57,6 @@ use App\Flare\Services\CharacterCurrencyRewardService;
 use App\Flare\Services\CharacterDeletion;
 use App\Flare\Services\CharacterRewardService;
 use App\Flare\Services\CharacterXPService;
-use App\Flare\Services\CreateSurveySnapshot;
 use App\Flare\Services\DailyGoldDustService;
 use App\Flare\Services\DelveMonsterService;
 use App\Flare\Services\EventSchedulerService;
@@ -107,9 +105,6 @@ class ServiceProvider extends ApplicationServiceProvider
     public function register()
     {
 
-        $this->app->bind(CreateSurveySnapshot::class, function () {
-            return new CreateSurveySnapshot;
-        });
 
         $this->app->bind(BaseStatValue::class, function () {
             return new BaseStatValue;
@@ -506,7 +501,6 @@ class ServiceProvider extends ApplicationServiceProvider
         $router->aliasMiddleware('is.character.dead', IsCharacterDeadMiddleware::class);
         $router->aliasMiddleware('is.player.banned', IsPlayerBannedMiddleware::class);
         $router->aliasMiddleware('is.character.who.they.say.they.are', IsCharacterWhoTheySayTheyAreMiddleware::class);
-        $router->aliasMiddleware('is.character.logged.in', IsCharacterLoggedInMiddleware::class);
         $router->aliasMiddleware('is.globally.timed.out', IsGloballyTimedOut::class);
         $router->aliasMiddleware('session.time.tracking', TrackSessionLifeMiddleware::class);
         $router->aliasMiddleware('update.player-activity', UpdatePlayerSessionActivity::class);

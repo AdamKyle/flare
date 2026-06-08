@@ -129,7 +129,9 @@ class SkillBonusContextService
         }
 
         if ($character->relationLoaded('boons')) {
-            $boons = $character->boons;
+            $boons = $character->boons->filter(function (CharacterBoon $boon) {
+                return $boon->complete->greaterThan(now());
+            })->values();
 
             $allItemUsedLoaded = $boons->every(function ($boon) {
                 return $boon->relationLoaded('itemUsed');
@@ -143,6 +145,7 @@ class SkillBonusContextService
         }
 
         $boons = CharacterBoon::query()
+            ->active()
             ->where('character_id', $characterId)
             ->with('itemUsed')
             ->get();

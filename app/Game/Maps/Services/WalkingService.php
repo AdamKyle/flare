@@ -39,6 +39,13 @@ class WalkingService extends BaseMovementService
      */
     public function movePlayerToNewLocation(Character $character): array
     {
+        $deltaX = abs($this->x - $character->map->character_position_x);
+        $deltaY = abs($this->y - $character->map->character_position_y);
+
+        if (! (($deltaX === 16 && $deltaY === 0) || ($deltaX === 0 && $deltaY === 16))) {
+            return $this->errorResult('Invalid movement.');
+        }
+
         $location = $this->getLocationForCoordinates($character);
 
         $restriction = $this->automationRestrictionErrorResult($character, AutomationRestrictionService::DIRECTIONAL_MOVEMENT, $location);

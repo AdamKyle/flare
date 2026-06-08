@@ -185,20 +185,32 @@ class UnitMovementService
         $removedUnits = [];
 
         foreach ($unitData as $unitData) {
-            $kingdom = Kingdom::find($unitData['kingdom_id']);
+            if (! isset($unitData['kingdom_id'], $unitData['unit_id'], $unitData['amount'])) {
+                continue;
+            }
+
+            $kingdomId = filter_var($unitData['kingdom_id'], FILTER_VALIDATE_INT);
+            $unitId = filter_var($unitData['unit_id'], FILTER_VALIDATE_INT);
+            $amount = filter_var($unitData['amount'], FILTER_VALIDATE_INT);
+
+            if ($kingdomId === false || $unitId === false || $amount === false || $amount < 1) {
+                continue;
+            }
+
+            $kingdom = Kingdom::find($kingdomId);
 
             if (is_null($kingdom)) {
                 continue;
             }
 
-            $unit = $kingdom->units()->find($unitData['unit_id']);
+            $unit = $kingdom->units()->find($unitId);
 
-            if (is_null($unit) || $unit->amount < $unitData['amount']) {
+            if (is_null($unit) || $unit->amount < $amount) {
                 continue;
             }
 
             $unit->update([
-                'amount' => $unit->amount - $unitData['amount'],
+                'amount' => $unit->amount - $amount,
             ]);
 
             $removedUnits[] = $unitData;

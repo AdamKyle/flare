@@ -99,6 +99,10 @@ class CapitalCityGoldBarManagementService
 
     public function depositGoldBars(Character $character, Kingdom $kingdom, int $amountToPurchase): array
     {
+        if ($amountToPurchase < 1) {
+            return $this->errorResult('Amount to purchase must be at least 1.');
+        }
+
         $cost = 2000000000 * $amountToPurchase;
 
         if ($cost > $character->gold) {

@@ -13,6 +13,8 @@ use App\Game\Automation\Middleware\IsCharacterExploring;
 use App\Game\Automation\Services\DelveExplorationAutomationService;
 use App\Game\Automation\Services\ExplorationAutomationService;
 use App\Game\Automation\Services\ExplorationCreatureCountCalculator;
+use App\Game\Automation\Services\ExplorationLogService;
+use App\Game\Automation\Services\ExplorationWarningService;
 use App\Game\Automation\Services\FactionLoyaltyAutomationService;
 use App\Game\Automation\Services\FactionLoyaltyAutomationWarningService;
 use App\Game\Automation\Values\AutomatedCraftingAttemptTracker;
@@ -42,7 +44,9 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(ExplorationAutomationService::class, function ($app) {
             return new ExplorationAutomationService(
                 $app->make(CharacterCacheData::class),
-                $app->make(ExplorationCreatureCountCalculator::class)
+                $app->make(ExplorationCreatureCountCalculator::class),
+                $app->make(ExplorationLogService::class),
+                $app->make(ExplorationWarningService::class)
             );
         });
 
