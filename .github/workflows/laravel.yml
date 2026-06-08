@@ -62,7 +62,7 @@ jobs:
         run: |
           php artisan migrate
           mkdir test-coverage
-          vendor/bin/phpunit --stop-on-error --stop-on-failure --coverage-html=./test-coverage
+          vendor/bin/phpunit --coverage-html=./test-coverage
 
       - name: Upload HTML coverage report
         uses: actions/upload-artifact@v4
