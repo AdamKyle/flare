@@ -3,8 +3,11 @@
 namespace Tests\Unit\Game\Shop\Services;
 
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
+use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Shop\Services\ShopService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameSkill;
@@ -33,6 +36,8 @@ class ShopServiceTest extends TestCase
     public function tearDown(): void
     {
         parent::tearDown();
+
+        Mockery::close();
 
         $this->character = null;
         $this->shopService = null;
@@ -143,6 +148,53 @@ class ShopServiceTest extends TestCase
 
         $this->assertNull($character->inventory->slots()->where('item_id', $shield->id)->first());
         $this->assertGreaterThan(0, $character->gold);
+    }
+
+    public function testBuyAndReplaceRollsBackGoldOnReplaceFailure(): void
+    {
+        $shield = $this->createItem(['type' => 'shield', 'cost' => 1000]);
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => 50000]);
+
+        $equipItemService = Mockery::mock(EquipItemService::class);
+        $equipItemService->shouldReceive('setRequest')->andReturnSelf();
+        $equipItemService->shouldReceive('setCharacter')->andReturnSelf();
+        $equipItemService->shouldReceive('replaceItem')->andThrow(new EquipItemException('cannot equip'));
+
+        $this->instance(EquipItemService::class, $equipItemService);
+        $shopService = resolve(ShopService::class);
+
+        try {
+            $shopService->buyAndReplace($shield, $character->refresh(), ['position' => 'left-hand']);
+        } catch (EquipItemException $e) {
+            // expected
+        }
+
+        $this->assertEquals(50000, $character->refresh()->gold);
+    }
+
+    public function testBuyAndReplaceRollsBackInventorySlotOnReplaceFailure(): void
+    {
+        $shield = $this->createItem(['type' => 'shield', 'cost' => 1000]);
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => 50000]);
+        $initialSlotCount = $character->inventory->slots()->count();
+
+        $equipItemService = Mockery::mock(EquipItemService::class);
+        $equipItemService->shouldReceive('setRequest')->andReturnSelf();
+        $equipItemService->shouldReceive('setCharacter')->andReturnSelf();
+        $equipItemService->shouldReceive('replaceItem')->andThrow(new EquipItemException('cannot equip'));
+
+        $this->instance(EquipItemService::class, $equipItemService);
+        $shopService = resolve(ShopService::class);
+
+        try {
+            $shopService->buyAndReplace($shield, $character->refresh(), ['position' => 'left-hand']);
+        } catch (EquipItemException $e) {
+            // expected
+        }
+
+        $this->assertEquals($initialSlotCount, $character->refresh()->inventory->slots()->count());
     }
 
     public function testSellItemDoNotGoAboveMaxGold()

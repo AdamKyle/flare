@@ -44,7 +44,7 @@
                             $endPos = min(strlen($content), $pos + 120 + strlen($query));
                             $snippet = htmlspecialchars(substr($content, $startPos, $endPos - $startPos)) . '...';
                             $snippet = htmlspecialchars_decode($snippet);
-                            $snippet = preg_replace("/($query)/i", '<strong>$1</strong>', $snippet);
+                            $snippet = preg_replace('/(' . preg_quote($query, '/') . ')/i', '<strong>$1</strong>', $snippet);
                         }
                     }
                 @endphp

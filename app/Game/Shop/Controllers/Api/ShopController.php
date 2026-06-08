@@ -4,6 +4,7 @@ namespace App\Game\Shop\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
+use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
 use App\Game\Shop\Events\BuyItemEvent;
@@ -151,7 +152,13 @@ class ShopController extends Controller
             ], 422);
         }
 
-        $this->shopService->buyAndReplace($item, $character, $request->all());
+        try {
+            $this->shopService->buyAndReplace($item, $character, $request->all());
+        } catch (EquipItemException $e) {
+            return response()->json([
+                'message' => 'Could not complete purchase.',
+            ], 422);
+        }
 
         $character = $character->refresh();
 

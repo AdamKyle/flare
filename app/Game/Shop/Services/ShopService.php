@@ -20,6 +20,7 @@ use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Shop\Events\SellItemEvent;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -134,21 +135,23 @@ class ShopService
      */
     public function buyAndReplace(Item $item, Character $character, array $requestData): void
     {
-        event(new BuyItemEvent($item, $character));
+        DB::transaction(function () use ($item, $character, $requestData): void {
+            event(new BuyItemEvent($item, $character));
 
-        $character = $character->refresh();
+            $character = $character->refresh();
 
-        $inventory = Inventory::where('character_id', $character->id)->first();
+            $inventory = Inventory::where('character_id', $character->id)->first();
 
-        $slot = InventorySlot::where('equipped', false)->where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
+            $slot = InventorySlot::where('equipped', false)->where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
 
-        $requestData['slot_id'] = $slot->id;
+            $requestData['slot_id'] = $slot->id;
 
-        $this->equipItemService->setRequest($requestData)
-            ->setCharacter($character)
-            ->replaceItem();
+            $this->equipItemService->setRequest($requestData)
+                ->setCharacter($character)
+                ->replaceItem();
 
-        CharacterAttackTypesCacheBuilder::dispatch($character);
+            CharacterAttackTypesCacheBuilder::dispatch($character);
+        });
     }
 
     /**

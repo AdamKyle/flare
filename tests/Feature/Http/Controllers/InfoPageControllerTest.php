@@ -45,4 +45,58 @@ class InfoPageControllerTest extends TestCase
         $response->assertOk();
         $response->assertDontSee('Secret Page');
     }
+
+    public function testSearchHighlightingStillWorksForNormalQuery(): void
+    {
+        InfoPage::create([
+            'page_name' => 'combat-guide',
+            'page_sections' => [[
+                'order' => 1,
+                'content' => 'Critical strikes deal additional damage.',
+            ]],
+        ]);
+
+        $response = $this->call('GET', route('info.search', [
+            'info_search' => 'strikes',
+        ]));
+
+        $response->assertOk();
+        $response->assertSee('<strong>strikes</strong>', false);
+    }
+
+    public function testDotStarQueryDoesNotHighlightEntireSnippet(): void
+    {
+        InfoPage::create([
+            'page_name' => 'combat-guide',
+            'page_sections' => [[
+                'order' => 1,
+                'content' => 'Use .* to match any character in patterns.',
+            ]],
+        ]);
+
+        $response = $this->call('GET', route('info.search', [
+            'info_search' => '.*',
+        ]));
+
+        $response->assertOk();
+        $response->assertDontSee('<strong>Use', false);
+    }
+
+    public function testUnclosedParenthesisQueryDoesNotDropSnippet(): void
+    {
+        InfoPage::create([
+            'page_name' => 'combat-guide',
+            'page_sections' => [[
+                'order' => 1,
+                'content' => 'Buying (special item) costs 1000 gold.',
+            ]],
+        ]);
+
+        $response = $this->call('GET', route('info.search', [
+            'info_search' => '(',
+        ]));
+
+        $response->assertOk();
+        $response->assertSee('Buying');
+    }
 }
