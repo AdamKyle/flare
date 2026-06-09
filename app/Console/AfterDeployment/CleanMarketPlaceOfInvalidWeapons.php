@@ -2,7 +2,6 @@
 
 namespace App\Console\AfterDeployment;
 
-
 use App\Flare\Models\MarketBoard;
 use App\Flare\Models\MarketHistory;
 use App\Flare\Values\MaxCurrenciesValue;
@@ -10,7 +9,6 @@ use Illuminate\Console\Command;
 
 class CleanMarketPlaceOfInvalidWeapons extends Command
 {
-
     const INVALID_TYPE = 'weapon';
 
     /**
@@ -39,7 +37,6 @@ class CleanMarketPlaceOfInvalidWeapons extends Command
 
     /**
      * Execute the console command.
-     *
      */
     public function handle(): void
     {
@@ -47,7 +44,8 @@ class CleanMarketPlaceOfInvalidWeapons extends Command
         $this->cleanMarketHistory();
     }
 
-    private function cleanMarketListings(): void {
+    private function cleanMarketListings(): void
+    {
         $marketEntries = MarketBoard::whereHas('item', function ($query) {
             $query->where('type', self::INVALID_TYPE);
         })->get();
@@ -73,7 +71,8 @@ class CleanMarketPlaceOfInvalidWeapons extends Command
         }
     }
 
-    private function cleanMarketHistory(): void {
+    private function cleanMarketHistory(): void
+    {
         $marketHistory = MarketHistory::whereHas('item', function ($query) {
             $query->where('type', self::INVALID_TYPE);
         })->get();
