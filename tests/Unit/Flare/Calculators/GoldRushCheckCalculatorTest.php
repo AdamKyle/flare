@@ -139,15 +139,9 @@ class GoldRushCheckCalculatorTest extends TestCase
     {
         Event::fake();
 
-        GoldRushCheckCalculatorFacade::shouldReceive('fetchGoldRushChance')->once()->with(0.0, 0.05)->andReturnFalse();
+        GoldRushCheckCalculatorFacade::shouldReceive('fetchGoldRushChance')->once()->with(0.0, 0.0)->andReturnFalse();
 
         $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $this->createLocation([
-            'game_map_id' => $character->map->game_map_id,
-            'x' => $character->map->character_position_x,
-            'y' => $character->map->character_position_y,
-            'enemy_strength_increase' => 0.30,
-        ]);
 
         resolve(GoldRush::class)->processPotentialGoldRush($character->refresh(), 1000);
 

@@ -89,7 +89,7 @@ class MonsterStatsServiceTest extends TestCase
             'x' => $position->character_position_x,
             'y' => $position->character_position_y,
             'game_map_id' => $position->game_map_id,
-            'enemy_strength_increase' => 2.0,
+
         ]);
 
         resolve(BuildMonsterCacheService::class)->buildCache();
@@ -124,7 +124,7 @@ class MonsterStatsServiceTest extends TestCase
             'x' => $position->character_position_x,
             'y' => $position->character_position_y,
             'game_map_id' => $position->game_map_id,
-            'enemy_strength_increase' => 2.0,
+
         ]);
 
         resolve(BuildMonsterCacheService::class)->buildCache();
@@ -245,7 +245,7 @@ class MonsterStatsServiceTest extends TestCase
             'x' => $position->character_position_x,
             'y' => $position->character_position_y,
             'game_map_id' => $position->game_map_id,
-            'enemy_strength_increase' => 2.0,
+
         ]);
 
         resolve(BuildMonsterCacheService::class)->buildCache();

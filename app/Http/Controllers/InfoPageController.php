@@ -25,7 +25,6 @@ use App\Flare\Traits\Controllers\MonstersShowInformation;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\LocationType;
 use App\Game\Core\Values\View\ClassBonusInformation;
-use Facades\App\Game\Maps\Calculations\LocationBasedEnemyDropChanceBonus;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Storage;
@@ -142,14 +141,7 @@ class InfoPageController extends Controller
 
     public function viewLocation(Request $request, Location $location)
     {
-        $increasesEnemyStrengthBy = null;
-        $increasesDropChanceBy = 0.0;
         $locationType = null;
-
-        if (! is_null($location->enemy_strength_increase)) {
-            $increasesEnemyStrengthBy = $location->enemy_strength_increase;
-            $increasesDropChanceBy = LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent($increasesEnemyStrengthBy);
-        }
 
         $questItemDetails = [];
 
@@ -163,8 +155,6 @@ class InfoPageController extends Controller
 
         return view('information.locations.location', array_merge([
             'location' => $location,
-            'increasesEnemyStrengthBy' => $increasesEnemyStrengthBy,
-            'increasesDropChanceBy' => $increasesDropChanceBy,
             'locationType' => $locationType,
         ], $questItemDetails));
     }

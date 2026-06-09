@@ -6,13 +6,9 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Game\Monsters\Transformers\MonsterTransformer;
-use Facades\App\Game\Maps\Calculations\LocationBasedEnemyDropChanceBonus;
-use Illuminate\Database\Eloquent\Collection as DBCollection;
-use Illuminate\Support\Collection as IlluminateCollection;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
-use Psr\SimpleCache\InvalidArgumentException;
 
 class BuildMonsterCacheService
 {
@@ -20,8 +16,6 @@ class BuildMonsterCacheService
 
     /**
      * Builds monster cache.
-     *
-     * @throws InvalidArgumentException
      */
     public function buildCache(): void
     {
@@ -58,15 +52,11 @@ class BuildMonsterCacheService
             $monstersCache[$gameMap->name] = $this->manager->createData($monsters)->toArray();
         }
 
-        $monstersCache = $monstersCache + $this->manageMonsters($monstersCache);
-
         Cache::put('monsters', $monstersCache);
     }
 
     /**
      * Builds raid monster cache.
-     *
-     * @throws InvalidArgumentException
      */
     public function buildRaidCache(): void
     {
@@ -98,8 +88,6 @@ class BuildMonsterCacheService
             $monstersCache[$gameMap->name] = $this->manager->createData($monsters)->toArray();
         }
 
-        $monstersCache = $monstersCache + $this->manageMonsters($monstersCache);
-
         Cache::put('raid-monsters', $monstersCache);
     }
 
@@ -114,15 +102,8 @@ class BuildMonsterCacheService
 
         foreach ($locations as $location) {
 
-            $locationEnemyIncrease = $location->enemy_strength_increase ?? 0.0;
-            $mapEnemyIncrease = $location->map->enemy_stat_bonus ?? 0.0;
-
-            $enemyIncrease = $locationEnemyIncrease + $mapEnemyIncrease;
-
-            $locationDropChanceIncrease = LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent($locationEnemyIncrease);
-            $mapDropChanceBonus = $location->map->drop_chance_bonus ?? 0.0;
-
-            $dropChanceIncrease = $locationDropChanceIncrease + $mapDropChanceBonus;
+            $enemyIncrease = $location->map->enemy_stat_bonus ?? 0.0;
+            $dropChanceIncrease = $location->map->drop_chance_bonus ?? 0.0;
 
             $transformer = $this->monster
                 ->setIsMonsterSpecial(true)
@@ -151,8 +132,6 @@ class BuildMonsterCacheService
 
     /**
      * Builds celestial cache.
-     *
-     * @throws InvalidArgumentException
      */
     public function buildCelesetialCache(): void
     {
@@ -214,65 +193,5 @@ class BuildMonsterCacheService
             'regular' => $this->manager->createData($monsters)->toArray(),
             'easier' => $this->manager->createData($easierMonsters)->toArray(),
         ];
-    }
-
-    /**
-     * Get monsters for special locations.
-     */
-    private function manageMonsters(array $monstersCache): array
-    {
-        foreach (Location::whereNotNull('enemy_strength_increase')->get() as $location) {
-            $monsters = Monster::where('is_celestial_entity', false)
-                ->where('game_map_id', $location->game_map_id)
-                ->where('is_raid_monster', false)
-                ->where('is_raid_boss', false)
-                ->whereNull('only_for_location_type')
-                ->get();
-
-            $monsters = $this->transformMonsterForLocation(
-                $monsters,
-                $location->enemy_strength_increase,
-                LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent($location->enemy_strength_increase),
-            );
-
-            $monsterTransformer = $this->monster->setIsMonsterSpecial(true);
-
-            $monsters = new Collection($monsters, $monsterTransformer);
-
-            $monstersCache[$location->name] = $this->manager->createData($monsters)->toArray();
-        }
-
-        return $monstersCache;
-    }
-
-    /**
-     * Transform monsters for special location.
-     */
-    private function transformMonsterForLocation(DBCollection $monsters, int $increaseStatsBy, float $increasePercentageBy): IlluminateCollection
-    {
-        return $monsters->transform(function ($monster) use ($increaseStatsBy, $increasePercentageBy) {
-            $monster->str += $increaseStatsBy;
-            $monster->dex += $increaseStatsBy;
-            $monster->agi += $increaseStatsBy;
-            $monster->dur += $increaseStatsBy;
-            $monster->chr += $increaseStatsBy;
-            $monster->int += $increaseStatsBy;
-            $monster->ac += $increaseStatsBy;
-            $monster->health_range = $this->createNewHealthRange($monster, $increaseStatsBy);
-            $monster->attack_range = $this->createNewAttackRange($monster, $increaseStatsBy);
-            $monster->spell_evasion += $increasePercentageBy;
-            $monster->artifact_annulment += $increasePercentageBy;
-            $monster->affix_resistance += $increasePercentageBy;
-            $monster->healing_percentage += $increasePercentageBy;
-            $monster->entrancing_chance += $increasePercentageBy;
-            $monster->devouring_light_chance += $increasePercentageBy;
-            $monster->devouring_darkness_chance += $increasePercentageBy;
-            $monster->accuracy += $increasePercentageBy;
-            $monster->casting_accuracy += $increasePercentageBy;
-            $monster->dodge += $increasePercentageBy;
-            $monster->criticality += $increasePercentageBy;
-
-            return $monster;
-        });
     }
 }

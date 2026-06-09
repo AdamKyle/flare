@@ -16,8 +16,6 @@ import { TeleportApiUrls } from '../teleport/api/enums/teleport-api-urls';
 import { useTeleportPlayerApi } from '../teleport/api/hooks/use-teleport-player-api';
 import { calculateCostOfTeleport } from '../util/calculate-cost-of-teleport';
 import { LocationInfoTypes } from './enums/location-info-types';
-import EnemyStrengthIncrease from './partials/enemy-strength-increase';
-import EnemyStrengthIncreaseInfo from './partials/enemy-strength-increase-info';
 import ItemMetaSection from '../../character-inventory/inventory-item/partials/item-view/item-meta-tsx';
 
 import { GameDataError } from 'game-data/components/game-data-error';
@@ -99,10 +97,6 @@ const LocationDetails = ({
     setLocationInfoType(type);
   };
 
-  const openItemsList = () => {
-    setShowQuestItems(true);
-  };
-
   const handelCloseInfo = () => {
     setLocationInfoType(null);
   };
@@ -141,46 +135,12 @@ const LocationDetails = ({
   }
 
   if (!isNil(locationInfoType)) {
-    return (
-      match(locationInfoType)
-        .with(LocationInfoTypes.ENEMY_STRENGTH_INCREASE, () => (
-          <EnemyStrengthIncreaseInfo
-            handel_close_info_section={handelCloseInfo}
-          />
-        ))
-        .with(LocationInfoTypes.CORRUPTED, () => (
-          <CorruptedLocationInfo handel_close_info_section={handelCloseInfo} />
-        ))
-        // If you’re certain you’ve handled every enum member:
-        .exhaustive()
-    );
+    return match(locationInfoType)
+      .with(LocationInfoTypes.CORRUPTED, () => (
+        <CorruptedLocationInfo handel_close_info_section={handelCloseInfo} />
+      ))
+      .exhaustive();
   }
-
-  const renderViewDroppableItems = () => {
-    if (isNil(data.enemy_strength_increase)) {
-      return null;
-    }
-
-    return (
-      <>
-        <Separator />
-        <div className={'prose dark:prose-dark dark:text-white'}>
-          <h3>Droppable Items</h3>
-          <p>
-            This location drops quest items when you are manually fighting
-            monsters here. Below you can open the list of quest items that can
-            drop.
-          </p>
-          <Button
-            on_click={openItemsList}
-            label={'Obtainable Quest Items'}
-            variant={ButtonVariant.PRIMARY}
-            additional_css={'w-full'}
-          />
-        </div>
-      </>
-    );
-  };
 
   const renderViewQuestItemReward = () => {
     if (!data?.quest_reward_item || isNil(data.quest_reward_item.data)) {
@@ -255,17 +215,12 @@ const LocationDetails = ({
       <Separator />
 
       <Dl>
-        <EnemyStrengthIncrease
-          enemy_strength_increase={data.enemy_strength_increase}
-          handle_on_info_click={handleOpenInfo}
-        />
         <CorruptedLocationDetails
           is_corrupted={data.is_corrupted}
           handle_on_info_click={handleOpenInfo}
         />
       </Dl>
 
-      {renderViewDroppableItems()}
       {renderViewQuestItemReward()}
     </div>
   );

@@ -222,8 +222,7 @@ class CharacterCurrencyRewardService
      */
     private function purgatoryDungeons(Map $map): ?Location
     {
-        return Location::whereNotNull('enemy_strength_type')
-            ->where('x', $map->character_position_x)
+        return Location::where('x', $map->character_position_x)
             ->where('y', $map->character_position_y)
             ->where('game_map_id', $map->game_map_id)
             ->where('type', LocationType::PURGATORY_DUNGEONS)

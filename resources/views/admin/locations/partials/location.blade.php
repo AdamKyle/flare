@@ -8,10 +8,6 @@
     <dd>{{ $location->map->name }}</dd>
     <dt>Is Port:</dt>
     <dd>{{ $location->is_port ? 'Yes' : 'No' }}</dd>
-    <dt>Increases Enemy Strength By:</dt>
-    <dd>{{ !is_null($increasesEnemyStrengthBy) ? $increasesEnemyStrengthBy : 'None.' }}</dd>
-    <dt>Increases Drop Rate By:</dt>
-    <dd>{{ $increasesDropChanceBy * 100 }}%</dd>
 </dl>
 
 @if (!is_null($location->required_quest_item_id))
@@ -92,8 +88,6 @@
         <dl class="mb-4">
             <dt>Time Between Fights</dt>
             <dd>{{$location->minutes_between_delve_fights}}</dd>
-            <dt>Enemy Increase % per Fight</dt>
-            <dd>{{$location->delve_enemy_strength_increase * 100}}%</dd>
             <dt>Hours until quest item(s) drops</dt>
             <dd>{{$location->hours_to_drop}}</dd>
         </dl>
@@ -129,21 +123,4 @@
     @endif
 @endif
 
-@if (!is_null($increasesEnemyStrengthBy))
-    <h3 class="mb-4">Items that can drop from this location.</h3>
-    <p class="mb-4">
-        Auto battle will not allow you to obtain these items. You must manually farm them. These have a 1/100 chance to
-        drop.
-        Looting Skill Bonus is capped at 45%.
-    </p>
-    <p class="mb-4">
-        If this location is on a plane that effects enemy stats (Shadow Plane, Hell and Purgatory) then those stat
-        modifications
-        will be taken into account along with the locations enemy modifications. Your gear, stats and level matter.
-    </p>
-    @livewire('admin.items.items-table', [
-        'type' => 'quest',
-        'locationId' => $location->id,
-    ])
-@endif
 

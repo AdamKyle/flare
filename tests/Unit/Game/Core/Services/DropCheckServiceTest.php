@@ -3,23 +3,18 @@
 namespace Tests\Unit\Game\Core\Services;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\Location;
-use App\Flare\Values\LocationType;
 use App\Game\Core\Services\DropCheckService;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
-use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
-use Tests\Traits\CreateLocation;
 use Tests\Traits\CreateMonster;
 
 class DropCheckServiceTest extends TestCase
 {
-    use CreateCharacterAutomation, CreateItem, CreateItemAffix, CreateLocation, CreateMonster, RefreshDatabase;
+    use CreateItem, CreateItemAffix, CreateMonster, RefreshDatabase;
 
     private ?DropCheckService $service;
 
@@ -113,79 +108,6 @@ class DropCheckServiceTest extends TestCase
         $this->assertEquals($beforeSlots, $afterSlots);
     }
 
-    public function test_process_uses_difficult_item_chance_when_at_special_location_and_clamps_looting_chance_at_point_four_five(): void
-    {
-        DropCheckCalculator::shouldReceive('fetchDropCheckChance')
-            ->never();
-
-        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
-            ->once()
-            ->withArgs(function ($chance, $maxRoll) {
-                return abs($chance - 0.45) < 0.00001 && $maxRoll === 100;
-            })
-            ->andReturnFalse();
-
-        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
-            ->once()
-            ->withAnyArgs()
-            ->andReturnFalse();
-
-        $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
-        $character = $this->setLootingToBonus($characterFactory->getCharacter(), 1.0);
-
-        $this->createSpecialLocation($character, null);
-
-        $monster = $this->createMonster([
-            'game_map_id' => $character->map->game_map_id,
-            'quest_item_id' => null,
-            'drop_check' => 1,
-        ]);
-
-        $beforeSlots = $character->inventory->slots()->count();
-
-        $this->service?->process($character->refresh(), $monster->refresh());
-
-        $afterSlots = $character->refresh()->inventory->slots()->count();
-
-        $this->assertEquals($beforeSlots, $afterSlots);
-    }
-
-    public function test_process_caps_special_location_chance_at_point_four_five_with_high_looting_and_monster_drop_check(): void
-    {
-        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
-            ->once()
-            ->withArgs(function ($chance, $maxRoll) {
-                return abs($chance - 0.45) < 0.00001 && $maxRoll === 100;
-            })
-            ->andReturnFalse();
-
-        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
-            ->once()
-            ->withArgs(function ($chance) {
-                return abs($chance - 0.15) < 0.00001;
-            })
-            ->andReturnFalse();
-
-        $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
-        $character = $this->setLootingToBonus($characterFactory->getCharacter(), 0.45);
-
-        $this->createSpecialLocation($character, null);
-
-        $monster = $this->createMonster([
-            'game_map_id' => $character->map->game_map_id,
-            'quest_item_id' => null,
-            'drop_check' => 2,
-        ]);
-
-        $beforeSlots = $character->inventory->slots()->count();
-
-        $this->service?->process($character->refresh(), $monster->refresh());
-
-        $afterSlots = $character->refresh()->inventory->slots()->count();
-
-        $this->assertEquals($beforeSlots, $afterSlots);
-    }
-
     public function test_process_handles_king_celestial_mythic_drop_and_clamps_looting_chance_at_point_one_five(): void
     {
         DropCheckCalculator::shouldReceive('fetchDropCheckChance')
@@ -246,146 +168,6 @@ class DropCheckServiceTest extends TestCase
         $this->assertEquals($beforeSlots, $afterSlots);
     }
 
-    public function test_process_awards_mythic_item_in_purgatory_dungeons_when_no_automations(): void
-    {
-        RandomNumberGenerator::shouldReceive('generateRandomNumber')->withAnyArgs()->zeroOrMoreTimes()->andReturn(1);
-        RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->withAnyArgs()->zeroOrMoreTimes()->andReturn(1);
-
-        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
-            ->once()
-            ->withArgs(function ($chance, $maxRoll) {
-                return abs($chance - 0.45) < 0.00001 && $maxRoll === 100;
-            })
-            ->andReturnFalse();
-
-        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
-            ->twice()
-            ->withAnyArgs()
-            ->andReturn(false, true);
-
-        $this->createItemAffix(['type' => 'prefix']);
-        $this->createItemAffix(['type' => 'suffix']);
-
-        $this->createItem([
-            'specialty_type' => null,
-            'item_prefix_id' => null,
-            'item_suffix_id' => null,
-            'type' => 'weapon',
-            'is_mythic' => false,
-        ]);
-
-        $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
-        $character = $this->setLootingToBonus($characterFactory->getCharacter(), 0.30);
-
-        $this->createSpecialLocation($character, LocationType::PURGATORY_DUNGEONS);
-
-        $monster = $this->createMonster([
-            'game_map_id' => $character->map->game_map_id,
-            'quest_item_id' => null,
-            'drop_check' => 1,
-        ]);
-
-        $beforeSlots = $character->inventory->slots()->count();
-
-        $this->service?->process($character->refresh(), $monster->refresh());
-
-        $character = $character->refresh();
-        $afterSlots = $character->inventory->slots()->count();
-
-        $this->assertEquals($beforeSlots + 1, $afterSlots);
-
-        $newItem = $character->inventory->slots()->latest('id')->first()->item;
-
-        $this->assertTrue($newItem->is_mythic);
-        $this->assertNotNull($newItem->item_prefix_id);
-        $this->assertNotNull($newItem->item_suffix_id);
-    }
-
-    public function test_process_does_not_award_mythic_item_in_purgatory_dungeons_when_automations_running(): void
-    {
-        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
-            ->once()
-            ->withArgs(function ($chance, $maxRoll) {
-                return abs($chance - 0.45) < 0.00001 && $maxRoll === 100;
-            })
-            ->andReturnFalse();
-
-        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
-            ->once()
-            ->withAnyArgs()
-            ->andReturnFalse();
-
-        $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
-        $character = $this->setLootingToBonus($characterFactory->getCharacter(), 0.30);
-
-        $this->createSpecialLocation($character, LocationType::PURGATORY_DUNGEONS);
-
-        $this->createCharacterAutomation([
-            'character_id' => $character->id,
-        ]);
-
-        $character = $character->refresh();
-
-        $monster = $this->createMonster([
-            'game_map_id' => $character->map->game_map_id,
-            'quest_item_id' => null,
-            'drop_check' => 1,
-        ]);
-
-        $beforeSlots = $character->inventory->slots()->count();
-
-        $this->service?->process($character->refresh(), $monster->refresh());
-
-        $afterSlots = $character->refresh()->inventory->slots()->count();
-
-        $this->assertEquals($beforeSlots, $afterSlots);
-    }
-
-    public function test_process_uses_cached_location_with_effect_when_key_does_not_change(): void
-    {
-        DropCheckCalculator::shouldReceive('fetchDropCheckChance')
-            ->never();
-
-        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
-            ->twice()
-            ->withArgs(function ($chance, $maxRoll = null) {
-                return is_null($maxRoll) && abs($chance - 0.10) < 0.00001;
-            })
-            ->andReturnFalse();
-
-        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
-            ->twice()
-            ->withArgs(function ($chance, $maxRoll) {
-                return abs($chance - 0.35) < 0.00001 && $maxRoll === 100;
-            })
-            ->andReturnFalse();
-
-        $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
-        $character = $this->setLootingToBonus($characterFactory->getCharacter(), 0.10);
-
-        $specialLocation = $this->createSpecialLocation($character, null);
-
-        $monster = $this->createMonster([
-            'game_map_id' => $character->map->game_map_id,
-            'quest_item_id' => null,
-            'drop_check' => 1,
-        ]);
-
-        $beforeSlots = $character->inventory->slots()->count();
-
-        $this->service?->process($character->refresh(), $monster->refresh());
-
-        $specialLocation->delete();
-
-        $character = $character->refresh()->load('skills.baseSkill', 'map.gameMap', 'currentAutomations');
-
-        $this->service?->process($character->refresh(), $monster->refresh());
-
-        $afterSlots = $character->refresh()->inventory->slots()->count();
-
-        $this->assertEquals($beforeSlots, $afterSlots);
-    }
-
     private function setLootingToBonus(Character $character, float $targetBonus): Character
     {
         $lootingSkill = $character->skills()->whereHas('baseSkill', function ($query) {
@@ -434,19 +216,5 @@ class DropCheckServiceTest extends TestCase
         }
 
         return $character;
-    }
-
-    private function createSpecialLocation(Character $character, ?int $type): Location
-    {
-        $map = $character->map->refresh();
-
-        return $this->createLocation([
-            'game_map_id' => $map->game_map_id,
-            'x' => $map->character_position_x,
-            'y' => $map->character_position_y,
-            'type' => $type,
-            'enemy_strength_increase' => 1.0000,
-            'name' => 'special_location_'.uniqid('', true),
-        ]);
     }
 }

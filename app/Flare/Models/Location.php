@@ -25,18 +25,18 @@ class Location extends Model
         'description',
         'is_port',
         'can_players_enter',
-        'enemy_strength_increase',
         'can_auto_battle',
         'x',
         'y',
         'type',
+        'enemy_strength_type',
+        'enemy_strength_increase',
         'raid_id',
         'has_raid_boss',
         'is_corrupted',
         'pin_css_class',
         'hours_to_drop',
         'minutes_between_delve_fights',
-        'delve_enemy_strength_increase',
     ];
 
     /**
@@ -48,19 +48,19 @@ class Location extends Model
         'y' => 'integer',
         'x' => 'integer',
         'type' => 'integer',
+        'enemy_strength_type' => 'integer',
+        'enemy_strength_increase' => 'float',
         'is_port' => 'boolean',
         'can_players_enter' => 'boolean',
         'can_auto_battle' => 'boolean',
         'game_map_id' => 'integer',
         'quest_reward_item_id' => 'integer',
         'required_quest_item_id' => 'integer',
-        'enemy_strength_increase' => 'float',
         'hours_to_drop' => 'integer',
         'raid_id' => 'integer',
         'has_raid_boss' => 'boolean',
         'is_corrupted' => 'boolean',
         'minutes_between_delve_fights' => 'integer',
-        'delve_enemy_strength_increase' => 'float',
     ];
 
     public function questRewardItem()

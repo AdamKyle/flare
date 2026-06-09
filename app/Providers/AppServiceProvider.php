@@ -20,6 +20,7 @@ use App\Console\DevelopmentCommands\MaxOutCharactersPassiveSkills;
 use App\Console\DevelopmentCommands\ReincarnateCharacter;
 use App\Console\DevelopmentCommands\TestExploration;
 use App\Console\DevelopmentCommands\UpdateUsersForDevelopment;
+use App\Game\Monsters\Console\Commands\CreateMonsterCache;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
@@ -39,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
             AssignNewNpcsToFactionLoyalty::class,
             CleanDanglingCharacterData::class,
             RepairQuestFeatureRewards::class,
+            CreateMonsterCache::class,
 
             // Development Commands:
             CreateCharacter::class,

@@ -15,12 +15,6 @@
     <x-core.dl.dd class="mb-2">
       {{ $location->is_port ? 'Yes' : 'No' }}
     </x-core.dl.dd>
-    <x-core.dl.dt class="font-medium">
-      Increases Enemy Strength By:
-    </x-core.dl.dt>
-    <x-core.dl.dd class="mb-2">
-      {{ ! is_null($location->enemy_strength_increase) ? $location->enemy_strength_increase : 'None.' }}
-    </x-core.dl.dd>
   </x-core.dl.dl>
 </div>
 
@@ -68,29 +62,3 @@
   </div>
 @endif
 
-@if (! is_null($location->enemy_strength_increase))
-  <div
-    class="mx-auto my-8 w-3/4 border-b border-gray-300 dark:border-gray-600"
-  ></div>
-  <h3 class="mb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">
-    Items that can drop from this location.
-  </h3>
-  <p class="mb-4 text-gray-700 dark:text-gray-300">
-    If this location is on a plane that effects enemy stats (Shadow Plane, Hell,
-    Purgatory, Twisted Memories, Ice Plane and Delusional Memories) then those
-    stat modifications will be taken into account along with the locations enemy
-    modifications. Your gear, stats and level matter.
-  </p>
-  <x-core.alerts.warning-alert title="ATTN!">
-    Exploration cannot be used here if you want the below rewards. You must
-    manually fight. Except for currencies. You can explore here to gain the
-    currencies.
-  </x-core.alerts.warning-alert>
-  @livewire(
-    'admin.items.items-table',
-    [
-      'type' => 'quest',
-      'locationId' => $location->id,
-    ]
-  )
-@endif

@@ -622,7 +622,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => null,
-            'enemy_strength_increase' => null,
+
         ]);
 
         CharacterAutomation::factory()->create([
@@ -661,7 +661,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => null,
-            'enemy_strength_increase' => null,
+
             'is_port' => false,
         ]);
 
@@ -685,7 +685,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'x' => 48,
             'y' => 16,
             'type' => null,
-            'enemy_strength_increase' => null,
+
             'is_port' => true,
         ]);
 
@@ -709,7 +709,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => LocationType::GOLD_MINES,
-            'enemy_strength_increase' => null,
+
         ]);
 
         CharacterAutomation::factory()->create([
@@ -732,7 +732,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => LocationType::PURGATORY_DUNGEONS,
-            'enemy_strength_increase' => null,
+
         ]);
 
         CharacterAutomation::factory()->create([
@@ -755,30 +755,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => LocationType::PURGATORY_SMITH_HOUSE,
-            'enemy_strength_increase' => null,
-        ]);
 
-        CharacterAutomation::factory()->create([
-            'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
-            'started_at' => now(),
-            'completed_at' => now()->addHour(),
-            'attack_type' => AttackTypeValue::ATTACK,
-            'started_in_special_location' => false,
-        ]);
-
-        $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::ENTER_LOCATION, $location));
-    }
-
-    public function test_exploration_started_in_regular_context_blocks_enemy_strength_modifying_location(): void
-    {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $location = Location::factory()->create([
-            'game_map_id' => $character->map->game_map_id,
-            'x' => 32,
-            'y' => 16,
-            'type' => null,
-            'enemy_strength_increase' => 0.30,
         ]);
 
         CharacterAutomation::factory()->create([

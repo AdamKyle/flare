@@ -60,7 +60,6 @@ class DelveExplorationTest extends TestCase
             'game_map_id' => $this->character->map->game_map_id,
             'type' => LocationType::CAVE_OF_MEMORIES,
             'minutes_between_delve_fights' => 5,
-            'delve_enemy_strength_increase' => 0.05,
         ]);
 
         $this->monster = (new MonsterFactory)

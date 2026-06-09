@@ -4,7 +4,6 @@ namespace Tests\Unit\Game\Monsters\Services;
 
 use App\Flare\Values\MapNameValue;
 use App\Game\Monsters\Services\BuildMonsterCacheService;
-use Facades\App\Game\Maps\Calculations\LocationBasedEnemyDropChanceBonus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
@@ -154,13 +153,6 @@ class BuildMonsterCacheServiceTest extends TestCase
             'only_for_location_type' => null,
         ]);
 
-        $location = $this->createLocation([
-            'name' => 'Thicket',
-            'game_map_id' => $map->id,
-            'enemy_strength_increase' => 1,
-            'type' => null,
-        ]);
-
         $this->service->buildRaidCache();
 
         $cache = Cache::get('raid-monsters');
@@ -168,9 +160,6 @@ class BuildMonsterCacheServiceTest extends TestCase
 
         $this->assertContains($add->id, $raidIds);
         $this->assertContains($boss->id, $raidIds);
-
-        $locIds = collect($cache[$location->name]['data'])->pluck('id')->all();
-        $this->assertContains($regular->id, $locIds);
     }
 
     public function test_special_location_monster_list_for_types()
@@ -253,68 +242,6 @@ class BuildMonsterCacheServiceTest extends TestCase
         $this->assertNotContains($nonCelestial->id, $ids);
     }
 
-    public function test_location_flat_increase_applies_to_integer_stats()
-    {
-        $surface = $this->createGameMap([
-            'name' => MapNameValue::SURFACE,
-            'default' => true,
-            'enemy_stat_bonus' => 0.0,
-            'only_during_event_type' => null,
-        ]);
-
-        $location = $this->createLocation([
-            'name' => 'Ruins',
-            'game_map_id' => $surface->id,
-            'enemy_strength_increase' => 1,
-            'type' => null,
-        ]);
-
-        $monster = $this->createMonster([
-            'game_map_id' => $surface->id,
-            'str' => 10,
-            'health_range' => '10-20',
-            'attack_range' => '1-3',
-        ]);
-
-        $this->service->buildCache();
-
-        $cache = Cache::get('monsters');
-        $row = collect($cache[$location->name]['data'])->firstWhere('id', $monster->id);
-
-        $this->assertSame(11, $row['str']);
-    }
-
-    public function test_location_flat_increase_shifts_ranges()
-    {
-        $surface = $this->createGameMap([
-            'name' => MapNameValue::SURFACE,
-            'default' => true,
-            'enemy_stat_bonus' => 0.0,
-            'only_during_event_type' => null,
-        ]);
-
-        $location = $this->createLocation([
-            'name' => 'Ruins',
-            'game_map_id' => $surface->id,
-            'enemy_strength_increase' => 1,
-            'type' => null,
-        ]);
-
-        $monster = $this->createMonster([
-            'game_map_id' => $surface->id,
-            'health_range' => '10-20',
-            'attack_range' => '1-3',
-        ]);
-
-        $this->service->buildCache();
-
-        $cache = Cache::get('monsters');
-        $row = collect($cache[$location->name]['data'])->firstWhere('id', $monster->id);
-
-        $this->assertSame('11-21', $row['health_range']);
-        $this->assertSame('2-4', $row['attack_range']);
-    }
-
     public function test_regular_map_ignores_map_enemy_stat_bonus()
     {
         $map = $this->createGameMap([
@@ -379,7 +306,6 @@ class BuildMonsterCacheServiceTest extends TestCase
             'name' => 'Lava Rift',
             'game_map_id' => $map->id,
             'type' => 77,
-            'enemy_strength_increase' => 2.0,
         ]);
 
         $monster = $this->createMonster([
@@ -393,7 +319,7 @@ class BuildMonsterCacheServiceTest extends TestCase
         $cache = Cache::get('special-location-monsters');
         $row = collect($cache['location-type-77']['data'])->firstWhere('id', $monster->id);
 
-        $this->assertSame(31, $row['str']);
+        $this->assertSame(11, $row['str']);
     }
 
     public function test_special_location_drop_chance_uses_map_and_location_bonuses()
@@ -410,7 +336,6 @@ class BuildMonsterCacheServiceTest extends TestCase
             'name' => 'Lava Rift',
             'game_map_id' => $map->id,
             'type' => 77,
-            'enemy_strength_increase' => 2.0,
         ]);
 
         $monster = $this->createMonster([
@@ -424,10 +349,7 @@ class BuildMonsterCacheServiceTest extends TestCase
         $cache = Cache::get('special-location-monsters');
         $row = collect($cache['location-type-77']['data'])->firstWhere('id', $monster->id);
 
-        $expected = 0.80 + 0.05 + LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent(2.0);
-        $expected = $expected > 1.0 ? 1.0 : $expected;
-
-        $this->assertEquals($expected, $row['drop_chance']);
+        $this->assertEqualsWithDelta(0.85, $row['drop_chance'], 1e-9);
     }
 
     public function test_regular_map_does_not_cap_entrancing()

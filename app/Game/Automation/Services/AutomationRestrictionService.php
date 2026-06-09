@@ -97,7 +97,7 @@ class AutomationRestrictionService
             return false;
         }
 
-        return ! is_null($location->type) || ! is_null($location->enemy_strength_increase);
+        return ! is_null($location->type);
     }
 
     private function automationBlocksAction(CharacterAutomation $automation, string $action, ?Location $destinationLocation = null): bool

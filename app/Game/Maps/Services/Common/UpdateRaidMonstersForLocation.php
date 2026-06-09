@@ -8,7 +8,6 @@ use App\Flare\Models\ScheduledEvent;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Maps\Events\UpdateMonsterList;
 use App\Game\Maps\Events\UpdateRaidMonsters;
-use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Monsters\Services\MonsterListService;
 use Illuminate\Support\Facades\Cache;
 
@@ -44,31 +43,6 @@ trait UpdateRaidMonstersForLocation
 
         if ($this->updateMonsterForLocationType($character, $location)) {
             return;
-        }
-
-        if (! is_null($location)) {
-            if (! is_null($location->enemy_strength_increase)) {
-
-                if (! $hasAccessToPurgatory && ! is_null($character->map->gameMap->only_during_event_type)) {
-                    event(new ServerMessageEvent(
-                        $character->user,
-                        'You have entered a special location in a place that is hostile and dangerous. Alas because you are so squishy,
-                        down here, at this location, you will only face regular critters. Fight on child! Become stronger! Special quest items can drop
-                        from this location only through manual fighting! You can automate here if you please, but no quest items will drop from here. You can see what quest
-                        items will drop by clicking or tapping View Location Details. Click or tap the help link and then click or tap special locations with in the help modal. Find this
-                        location in the list on the help docs and open it to see the quest items.'
-                    ));
-                } else {
-
-                    event(new ServerMessageEvent(
-                        $character->user,
-                        'You have entered a special location.
-                Special locations are places where only specific quest items can drop. You can click View Location Details
-                to read more about the location and click the relevant help docs link in the modal to read more about special locations.
-                Exploring here will NOT allow the location specific quest items to drop. Monsters here are stronger then outside the location.'
-                    ));
-                }
-            }
         }
 
         event(new UpdateMonsterList($monsters, $character->user));

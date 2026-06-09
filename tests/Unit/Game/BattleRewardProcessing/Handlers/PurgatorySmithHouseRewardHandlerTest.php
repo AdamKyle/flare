@@ -135,7 +135,6 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
             'x' => 12,
             'y' => 12,
             'type' => LocationType::PURGATORY_DUNGEONS,
-            'enemy_strength_increase' => 1,
             'name' => 'not_smith_house',
         ]);
 

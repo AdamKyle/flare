@@ -53,7 +53,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             'x' => 16,
             'y' => 16,
             'type' => LocationType::GOLD_MINES,
-            'enemy_strength_increase' => 0.30,
+
         ]);
         CharacterAutomation::factory()->create([
             'character_id' => $character->id,
@@ -96,7 +96,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             'x' => 16,
             'y' => 16,
             'type' => LocationType::PURGATORY_DUNGEONS,
-            'enemy_strength_increase' => 0.30,
+
         ]);
         CharacterAutomation::factory()->create([
             'character_id' => $character->id,
@@ -139,7 +139,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             'x' => 16,
             'y' => 16,
             'type' => LocationType::PURGATORY_SMITH_HOUSE,
-            'enemy_strength_increase' => 0.30,
+
         ]);
         CharacterAutomation::factory()->create([
             'character_id' => $character->id,
@@ -202,7 +202,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => null,
-            'enemy_strength_increase' => null,
+
             'is_port' => false,
         ]);
 
@@ -255,7 +255,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => null,
-            'enemy_strength_increase' => null,
+
             'is_port' => true,
         ]);
 
@@ -299,7 +299,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => LocationType::GOLD_MINES,
-            'enemy_strength_increase' => 0.30,
+
         ]);
 
         $walkingService = resolve(WalkingService::class);
@@ -342,7 +342,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => LocationType::PURGATORY_DUNGEONS,
-            'enemy_strength_increase' => 0.30,
+
         ]);
 
         $walkingService = resolve(WalkingService::class);
@@ -385,7 +385,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => LocationType::PURGATORY_SMITH_HOUSE,
-            'enemy_strength_increase' => 0.30,
+
         ]);
 
         $walkingService = resolve(WalkingService::class);
@@ -428,7 +428,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => LocationType::GOLD_MINES,
-            'enemy_strength_increase' => 0.30,
+
         ]);
         $walkingService = resolve(WalkingService::class);
         $walkingService->setCoordinatesToTravelTo(32, 16);
@@ -484,7 +484,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => LocationType::GOLD_MINES,
-            'enemy_strength_increase' => 0.30,
+
         ]);
         $walkingService = resolve(WalkingService::class);
         $walkingService->setCoordinatesToTravelTo(32, 16);
@@ -533,7 +533,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => null,
-            'enemy_strength_increase' => null,
+
             'is_port' => false,
         ]);
         $walkingService = resolve(WalkingService::class);

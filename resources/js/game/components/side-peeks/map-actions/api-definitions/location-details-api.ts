@@ -11,7 +11,6 @@ export default interface LocationDetailsApi {
   is_corrupted: boolean;
   quest_reward_item: { data: BaseQuestItemDefinition | null };
   required_quest_item: BaseQuestItemDefinition | null;
-  enemy_strength_increase: number | null;
   x: number;
   y: number;
 }

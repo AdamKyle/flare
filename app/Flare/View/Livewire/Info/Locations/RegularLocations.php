@@ -17,7 +17,7 @@ class RegularLocations extends DataTableComponent
 
     public function builder(): Builder
     {
-        return Location::whereNull('enemy_strength_increase');
+        return Location::whereNull('type');
     }
 
     public function columns(): array

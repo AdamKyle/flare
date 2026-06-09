@@ -9,7 +9,6 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Models\User;
-use App\Flare\Values\AutomationType;
 use App\Flare\Values\LocationType;
 use App\Flare\Values\MapNameValue;
 use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
@@ -192,21 +191,6 @@ class BaseMovementService
     protected function canPlayerEnterLocation(Character $character, Location $location): bool
     {
         if ($this->sendAutomationRestrictionMessage($character, AutomationRestrictionService::ENTER_LOCATION, $location)) {
-
-            return false;
-        }
-
-        if (! is_null($location->enemy_strength_increase) && $character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty()) {
-
-            if (! is_null($location->type)) {
-                $locationType = new LocationType($location->type);
-
-                if ($locationType->isGoldMines() || $locationType->isPurgatoryDungeons()) {
-                    return true;
-                }
-            }
-
-            event(new ServerMessageEvent($character->user, 'No. You are currently auto battling and the monsters here are different. Stop auto battling, then enter, then begin again.'));
 
             return false;
         }

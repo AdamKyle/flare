@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\HtmlString;
 use Laravel\BrowserKitTesting\TestCase as BaseTestCase;
+use Mockery;
 use Tests\Setup\AttackDataCacheSetUp;
 
 abstract class TestCase extends BaseTestCase
@@ -80,6 +81,8 @@ abstract class TestCase extends BaseTestCase
         $this->useMockForAttackDataCache = true;
 
         $this->cleanUp();
+
+        Mockery::close();
 
         parent::tearDown();
     }

@@ -10,7 +10,6 @@ use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
-use App\Flare\Values\LocationEffectValue;
 use App\Flare\Values\LocationType;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationStatus;
@@ -340,7 +339,6 @@ class ExplorationAutomationServiceTest extends TestCase
             'x' => $this->character->map->character_position_x,
             'y' => $this->character->map->character_position_y,
             'type' => LocationType::GOLD_MINES,
-            'enemy_strength_type' => LocationEffectValue::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY,
         ]);
 
         $this->service->beginAutomation($this->character, [

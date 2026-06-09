@@ -123,7 +123,6 @@ class LocationsControllerTest extends TestCase
     {
         $location = Location::factory()->create([
             'game_map_id' => $this->gameMap->id,
-            'enemy_strength_increase' => null,
             'type' => null,
             'quest_reward_item_id' => null,
         ]);

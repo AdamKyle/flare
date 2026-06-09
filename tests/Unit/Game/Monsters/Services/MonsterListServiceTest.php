@@ -86,48 +86,6 @@ class MonsterListServiceTest extends TestCase
         ], $data);
     }
 
-    public function test_location_with_effect_on_non_ice_plane_overrides_with_location_monsters()
-    {
-        $character = $this->characterFactory->getCharacter();
-
-        $mapName = $character->map->gameMap->name;
-
-        $this->seedMonstersCache([
-            $mapName => [
-                'data' => [
-                    ['id' => 1, 'name' => 'Map Base', 'max_level' => 10],
-                ],
-                'regular' => ['data' => [['id' => 21, 'name' => 'Map Regular', 'max_level' => 15]]],
-                'easier' => ['data' => [['id' => 11, 'name' => 'Map Easier', 'max_level' => 8]]],
-            ],
-            'Volcano' => [
-                'data' => [
-                    ['id' => 31, 'name' => 'Volcano Fiend', 'max_level' => 20],
-                ],
-            ],
-        ]);
-
-        $this->seedSpecialLocationCache([]);
-
-        $position = $character->map;
-
-        Location::factory()->create([
-            'name' => 'Volcano',
-            'x' => $position->character_position_x,
-            'y' => $position->character_position_y,
-            'game_map_id' => $position->game_map_id,
-            'enemy_strength_increase' => 0.10,
-        ]);
-
-        $response = $this->service->getMonstersForCharacter($character);
-
-        $data = $this->unwrap($response);
-
-        $this->assertEquals([
-            ['id' => 31, 'name' => 'Volcano Fiend', 'max_level' => 20],
-        ], $data);
-    }
-
     public function test_location_on_ice_plane_without_purgatory_uses_easier()
     {
         $character = $this->characterFactory->getCharacter();
@@ -146,22 +104,9 @@ class MonsterListServiceTest extends TestCase
                 'regular' => ['data' => [['id' => 21, 'name' => 'Ice Regular', 'max_level' => 15]]],
                 'easier' => ['data' => [['id' => 11, 'name' => 'Ice Easier', 'max_level' => 8]]],
             ],
-            'Frost Rift' => [
-                'data' => [['id' => 31, 'name' => 'Frost Rift Brute', 'max_level' => 20]],
-            ],
         ]);
 
         $this->seedSpecialLocationCache([]);
-
-        $position = $character->map;
-
-        Location::factory()->create([
-            'name' => 'Frost Rift',
-            'x' => $position->character_position_x,
-            'y' => $position->character_position_y,
-            'game_map_id' => $position->game_map_id,
-            'enemy_strength_increase' => 0.20,
-        ]);
 
         $response = $this->service->getMonstersForCharacter($character);
 
@@ -190,22 +135,9 @@ class MonsterListServiceTest extends TestCase
                 'regular' => ['data' => [['id' => 21, 'name' => 'Ice Regular', 'max_level' => 15]]],
                 'easier' => ['data' => [['id' => 11, 'name' => 'Ice Easier', 'max_level' => 8]]],
             ],
-            'Chilled Hollow' => [
-                'data' => [['id' => 31, 'name' => 'Chilled Wraith', 'max_level' => 22]],
-            ],
         ]);
 
         $this->seedSpecialLocationCache([]);
-
-        $position = $character->map;
-
-        Location::factory()->create([
-            'name' => 'Chilled Hollow',
-            'x' => $position->character_position_x,
-            'y' => $position->character_position_y,
-            'game_map_id' => $position->game_map_id,
-            'enemy_strength_increase' => 0.25,
-        ]);
 
         $response = $this->service->getMonstersForCharacter($character);
 

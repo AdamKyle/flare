@@ -38,6 +38,8 @@ class DelveExploration implements ShouldQueue
 
     const float MAX_INCREASE_PERCENTAGE = 1000.00;
 
+    const float DELVE_STRENGTH_INCREMENT = 0.05;
+
     public ?Character $character = null;
 
     public ?Location $location = null;
@@ -127,7 +129,7 @@ class DelveExploration implements ShouldQueue
 
             $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], $this->battleData);
 
-            $newStatIncreaseValue = $delveAutomation->increase_enemy_strength + $this->location->delve_enemy_strength_increase;
+            $newStatIncreaseValue = $delveAutomation->increase_enemy_strength + self::DELVE_STRENGTH_INCREMENT;
 
             if ($newStatIncreaseValue >= self::MAX_INCREASE_PERCENTAGE) {
                 $newStatIncreaseValue = self::MAX_INCREASE_PERCENTAGE;

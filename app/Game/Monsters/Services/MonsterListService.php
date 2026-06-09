@@ -62,12 +62,6 @@ class MonsterListService
 
         $characterMap = $character->map;
 
-        $locationWithEffect = $this->findLocationWithEffect(
-            $characterMap->character_position_x,
-            $characterMap->character_position_y,
-            $characterMap->game_map_id
-        );
-
         $locationWithType = $this->findLocationWithType(
             $characterMap->character_position_x,
             $characterMap->character_position_y,
@@ -85,15 +79,6 @@ class MonsterListService
         $monstersKey = $character->map->gameMap->name;
 
         $monsters = $this->baseMonsters($monstersCache, $monstersKey);
-
-        $monsters = $this->applyLocationEffectOverrides(
-            $monstersCache,
-            $monsters,
-            $locationWithEffect,
-            $isTheIcePlane,
-            $hasPurgatoryAccess,
-            $monstersKey
-        );
 
         $monsters = $this->applyMapTierOverrides(
             $monstersCache,
@@ -124,23 +109,6 @@ class MonsterListService
     }
 
     /*
-     * Find a location at the given coordinates that has an enemy strength effect.
-     *
-     * @param int $x
-     * @param int $y
-     * @param int $gameMapId
-     * @return Location|null
-     */
-    private function findLocationWithEffect(int $x, int $y, int $gameMapId): ?Location
-    {
-        return Location::whereNotNull('enemy_strength_increase')
-            ->where('x', $x)
-            ->where('y', $y)
-            ->where('game_map_id', $gameMapId)
-            ->first();
-    }
-
-    /*
      * Find a location at the given coordinates that has a special location type.
      *
      * @param int $x
@@ -167,39 +135,6 @@ class MonsterListService
     private function baseMonsters(array $monstersCache, string $monstersKey): array
     {
         return $monstersCache[$monstersKey] ?? ['data' => []];
-    }
-
-    /*
-     * Apply overrides from a location with an enemy strength effect, considering special map tiers.
-     *
-     * @param array $monstersCache
-     * @param array $current
-     * @param Location|null $locationWithEffect
-     * @param bool $isTheIcePlane
-     * @param bool $hasPurgatoryAccess
-     * @param string $monstersKey
-     * @return array
-     */
-    private function applyLocationEffectOverrides(
-        array $monstersCache,
-        array $current,
-        ?Location $locationWithEffect,
-        bool $isTheIcePlane,
-        bool $hasPurgatoryAccess,
-        string $monstersKey
-    ): array {
-        if (! is_null($locationWithEffect) && ! $isTheIcePlane) {
-            $current = $monstersCache[$locationWithEffect->name] ?? $current;
-        } elseif (! is_null($locationWithEffect) && $isTheIcePlane) {
-
-            if ($hasPurgatoryAccess) {
-                $current = $monstersCache[$locationWithEffect->name] ?? $current;
-            } else {
-                $current = $monstersCache[$monstersKey]['easier'] ?? $current;
-            }
-        }
-
-        return $current;
     }
 
     /*

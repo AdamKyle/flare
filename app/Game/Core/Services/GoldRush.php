@@ -3,13 +3,11 @@
 namespace App\Game\Core\Services;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\Location;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
 use Exception;
 use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
-use Facades\App\Game\Maps\Calculations\LocationBasedEnemyDropChanceBonus;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class GoldRush
@@ -29,7 +27,7 @@ class GoldRush
             return;
         }
 
-        if (GoldRushCheckCalculator::fetchGoldRushChance($this->getGameMapBonus($character), $this->getLocationBonus($character))) {
+        if (GoldRushCheckCalculator::fetchGoldRushChance($this->getGameMapBonus($character), 0.0)) {
             $this->giveGoldRush($character, $goldGained);
 
             if (! $character->is_auto_battling && $character->isLoggedIn()) {
@@ -78,22 +76,5 @@ class GoldRush
         }
 
         return $gameMap->drop_chance_bonus;
-    }
-
-    private function getLocationBonus(Character $character): float
-    {
-        $map = $character->map;
-
-        $location = Location::whereNotNull('enemy_strength_increase')
-            ->where('x', $map->character_position_x)
-            ->where('y', $map->character_position_y)
-            ->where('game_map_id', $map->game_map_id)
-            ->first();
-
-        if (is_null($location)) {
-            return 0.0;
-        }
-
-        return LocationBasedEnemyDropChanceBonus::calculateDropChanceBonusPercent($location->enemy_strength_increase);
     }
 }

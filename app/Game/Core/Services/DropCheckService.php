@@ -4,10 +4,7 @@ namespace App\Game\Core\Services;
 
 use App\Flare\Items\Builders\BuildMythicItem;
 use App\Flare\Models\Character;
-use App\Flare\Models\Location;
-use App\Flare\Models\Map;
 use App\Flare\Models\Monster;
-use App\Flare\Values\LocationType;
 use App\Game\Battle\Services\BattleDrop;
 use Exception;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
@@ -17,12 +14,6 @@ class DropCheckService
     private BattleDrop $battleDrop;
 
     private Monster $monster;
-
-    private ?Location $locationWithEffect = null;
-
-    private ?string $cachedLocationWithEffectKey = null;
-
-    private ?Location $cachedLocationWithEffect = null;
 
     private BuildMythicItem $buildMythicItem;
 
@@ -55,10 +46,8 @@ class DropCheckService
             $this->gameMapBonus = $gameMap->drop_chance_bonus;
         }
 
-        $this->findLocationWithEffect($characterMap);
-
         $this->battleDrop = $this->battleDrop->setMonster($this->monster)
-            ->setSpecialLocation($this->locationWithEffect)
+            ->setSpecialLocation(null)
             ->setGameMapBonus($this->gameMapBonus)
             ->setLootingChance($this->lootingChance)
             ->resetRewardTotals();
@@ -66,20 +55,6 @@ class DropCheckService
         $this->handleDropChance($character);
 
         $this->handleMythicDrop($character, true);
-
-        if (is_null($this->locationWithEffect)) {
-            return $this->battleDrop->rewardTotals();
-        }
-
-        if (is_null($this->locationWithEffect->type)) {
-            return $this->battleDrop->rewardTotals();
-        }
-
-        $locationType = new LocationType($this->locationWithEffect->type);
-
-        if ($locationType->isPurgatoryDungeons() && $character->currentAutomations->isEmpty()) {
-            $this->handleMythicDrop($character);
-        }
 
         return $this->battleDrop->rewardTotals();
     }
@@ -116,41 +91,6 @@ class DropCheckService
         $this->battleDrop->handleMonsterQuestDrop($character);
 
         $this->battleDrop->handleDelveLocationQuestItems($character);
-
-        if (! is_null($this->locationWithEffect)) {
-            $this->battleDrop->handleSpecialLocationQuestItem($character);
-        }
-    }
-
-    /**
-     * Are we at a location with an effect (special location)?
-     */
-    private function findLocationWithEffect(Map $map): void
-    {
-        $cacheKey = $this->makeLocationWithEffectCacheKey($map);
-
-        if ($this->cachedLocationWithEffectKey === $cacheKey) {
-            $this->locationWithEffect = $this->cachedLocationWithEffect;
-
-            return;
-        }
-
-        $this->locationWithEffect = Location::whereNotNull('enemy_strength_increase')
-            ->where('x', $map->character_position_x)
-            ->where('y', $map->character_position_y)
-            ->where('game_map_id', $map->game_map_id)
-            ->first();
-
-        $this->cachedLocationWithEffectKey = $cacheKey;
-        $this->cachedLocationWithEffect = $this->locationWithEffect;
-    }
-
-    /**
-     * Build a cache key for determining if we need to re-query the location effect.
-     */
-    private function makeLocationWithEffectCacheKey(Map $map): string
-    {
-        return $map->game_map_id.':'.$map->character_position_x.':'.$map->character_position_y;
     }
 
     /**
@@ -179,19 +119,6 @@ class DropCheckService
      */
     private function canHaveDrop(Character $character): bool
     {
-        if (! is_null($this->locationWithEffect)) {
-
-            $lootingBonus = $this->lootingChance;
-
-            if ($lootingBonus > 0.45) {
-                $lootingBonus = 0.45;
-            }
-
-            $chance = min($lootingBonus + ($this->monster->drop_check * 0.25), 0.45);
-
-            return DropCheckCalculator::fetchDifficultItemChance($chance, 100);
-        }
-
         return DropCheckCalculator::fetchDropCheckChance($this->monster, $character->level, $this->lootingChance, $this->gameMapBonus);
     }
 }

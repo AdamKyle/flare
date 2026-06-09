@@ -26,8 +26,6 @@ class LocationTransformer extends TransformerAbstract
             'description' => $location->description,
             'is_port' => $location->is_port,
             'can_players_enter' => $location->can_players_enter,
-            'increases_enemy_stats_by' => is_null($location->enemy_strength_type) ? null : LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type),
-            'increase_enemy_percentage_by' => is_null($location->enemy_strength_type) ? null : LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type),
             'can_auto_battle' => $location->can_auto_battle,
             'x' => $location->x,
             'y' => $location->y,
@@ -39,7 +37,12 @@ class LocationTransformer extends TransformerAbstract
             'pin_css_class' => $location->pin_css_class,
             'hours_to_drop' => $location->hours_to_drop,
             'minutes_between_delve_fights' => $location->minutes_between_delve_fights,
-            'delve_enemy_strength_increase' => $location->delve_enemy_strength_increase,
+            'increases_enemy_stats_by' => ! is_null($location->enemy_strength_type)
+                ? LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type)
+                : null,
+            'increase_enemy_percentage_by' => ! is_null($location->enemy_strength_type)
+                ? LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type)
+                : $location->enemy_strength_increase,
         ];
     }
 

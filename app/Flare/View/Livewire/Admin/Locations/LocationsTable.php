@@ -45,8 +45,6 @@ class LocationsTable extends DataTableComponent
                 ->options(LocationTableSelectOptions::getLabels())
                 ->filter(function (Builder $builder, string $value) {
                     return match ($value) {
-                        LocationTableSelectOptions::INCREASES_ENEMY_STRENGTH->value => $builder->whereNotNull('enemy_strength_increase'),
-                        LocationTableSelectOptions::REGULAR_LOCATIONS->value => $builder->whereNull('enemy_strength_increase'),
                         LocationTableSelectOptions::WEEKLY_FIGHT_LOCATIONS->value => $builder->whereIn('type', $this->weeklyFightLocations),
                         default => $builder,
                     };

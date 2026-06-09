@@ -69,7 +69,6 @@
           :options="$coordinates['y']"
         />
         <x-form-elements.input :model="$location" label="Time Between Delve Fights (Minutes):" modelKey="minutes_between_delve_fights" name="minutes_between_delve_fights" />
-        <x-form-elements.input :model="$location" label="Delve Enemy Increase Per Fight (%):" modelKey="delve_enemy_strength_increase" name="delve_enemy_strength_increase" />
       </x-form-wizard.step>
       <x-form-wizard.step stepTitle="Details (Optional)">
         <x-form-elements.key-value-select
@@ -78,12 +77,6 @@
           modelKey="type"
           name="type"
           :options="$locationTypes"
-        />
-        <x-form-elements.input
-          :model="$location"
-          label="Enemy Strength Increase %:"
-          modelKey="enemy_strength_increase"
-          name="enemy_strength_increase"
         />
         <x-form-elements.key-value-select
           :model="$location"
