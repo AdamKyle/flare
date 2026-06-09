@@ -3,6 +3,9 @@
 namespace App\Game\Exploration\Providers;
 
 use App\Game\Automation\Services\ExplorationAutomationService;
+use App\Game\Automation\Services\ExplorationCreatureCountCalculator;
+use App\Game\Automation\Services\ExplorationLogService;
+use App\Game\Automation\Services\ExplorationWarningService;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Exploration\Middleware\IsCharacterExploring;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -19,7 +22,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(ExplorationAutomationService::class, function ($app) {
             return new ExplorationAutomationService(
-                $app->make(CharacterCacheData::class)
+                $app->make(CharacterCacheData::class),
+                $app->make(ExplorationCreatureCountCalculator::class),
+                $app->make(ExplorationLogService::class),
+                $app->make(ExplorationWarningService::class),
             );
         });
     }

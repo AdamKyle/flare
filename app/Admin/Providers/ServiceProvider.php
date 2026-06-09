@@ -8,6 +8,7 @@ use App\Admin\Middleware\IsAdminMiddleware;
 use App\Admin\Services\AssignSkillService;
 use App\Admin\Services\FeedbackService;
 use App\Admin\Services\GuideQuestService;
+use App\Admin\Services\ImageHandlerService;
 use App\Admin\Services\InfoPageService;
 use App\Admin\Services\ItemAffixService;
 use App\Admin\Services\ItemsService;
@@ -55,8 +56,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new InfoPageService;
         });
 
-        $this->app->bind(GuideQuestService::class, function () {
-            return new GuideQuestService;
+        $this->app->bind(GuideQuestService::class, function ($app) {
+            return new GuideQuestService($app->make(ImageHandlerService::class));
         });
 
         $this->app->bind(LocationService::class, function ($app) {

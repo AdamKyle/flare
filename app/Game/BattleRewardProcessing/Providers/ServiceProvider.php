@@ -3,7 +3,6 @@
 namespace App\Game\BattleRewardProcessing\Providers;
 
 use App\Flare\Items\Builders\RandomAffixGenerator;
-use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\Services\CharacterRewardService;
 use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
@@ -48,12 +47,6 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(RandomAffixGenerator::class),
                 $app->make(FactionLoyaltyService::class),
                 $app->make(BattleMessageHandler::class),
-            );
-        });
-
-        $this->app->bind(GlobalEventParticipation::class, function ($app) {
-            return new GlobalEventParticipation(
-                $app->make(RandomAffixGenerator::class),
             );
         });
 

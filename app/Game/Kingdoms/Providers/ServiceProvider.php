@@ -296,14 +296,6 @@ class ServiceProvider extends ApplicationServiceProvider
             return new UnitReturnService;
         });
 
-        $this->app->bind(KingdomAttackService::class, function ($app) {
-            return new KingdomAttackService(
-                $app->make(SelectedKingdom::class),
-                $app->make(Manager::class),
-                $app->make(KingdomTransformer::class)
-            );
-        });
-
         $this->app->bind(GiveKingdomsToNpcHandler::class, function ($app) {
             return new GiveKingdomsToNpcHandler($app->make(LocationService::class));
         });

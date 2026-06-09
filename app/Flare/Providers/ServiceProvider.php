@@ -79,11 +79,12 @@ use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ClassRanks
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterCreation\Pipeline\CharacterCreationPipeline;
 use App\Game\Character\CharacterCreation\State\CharacterBuildState;
-use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 use App\Game\Kingdoms\Transformers\KingdomAttackLogsTransformer;
 use App\Game\Kingdoms\Transformers\KingdomBuildingTransformer;
+use App\Game\Kingdoms\Transformers\KingdomResourceHourlyProductionTransformer;
 use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Transformers\OtherKingdomTransformer;
 use App\Game\Kingdoms\Transformers\UnitTransformer;

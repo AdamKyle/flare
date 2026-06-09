@@ -4,7 +4,6 @@ namespace App\Game\Skills\Providers;
 
 use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Transformers\BasicSkillsTransformer;
-use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Flare\Transformers\SkillsTransformer;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
@@ -104,7 +103,6 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(SkillService::class, function ($app) {
             return new SkillService(
                 $app->make(Manager::class),
-                $app->make(PlainDataSerializer::class),
                 $app->make(BasicSkillsTransformer::class),
                 $app->make(SkillsTransformer::class),
                 $app->make(UpdateCharacterAttackTypesHandler::class),
