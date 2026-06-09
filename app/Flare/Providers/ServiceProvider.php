@@ -64,6 +64,7 @@ use App\Flare\Services\SiteAccessStatisticService;
 use App\Flare\Services\SkillBonusContextService;
 use App\Flare\Transformers\BasicKingdomTransformer;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Transformers\MarketItemsTransformer;
@@ -79,7 +80,6 @@ use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ClassRanks
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterCreation\Pipeline\CharacterCreationPipeline;
 use App\Game\Character\CharacterCreation\State\CharacterBuildState;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 use App\Game\Kingdoms\Transformers\KingdomAttackLogsTransformer;
