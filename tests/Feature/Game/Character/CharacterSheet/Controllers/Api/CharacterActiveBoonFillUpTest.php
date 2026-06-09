@@ -122,10 +122,7 @@ class CharacterActiveBoonFillUpTest extends TestCase
         $this->assertEquals('2026-01-01 12:30:00', $boon->refresh()->complete->toDateTimeString());
     }
 
-    /**
-     * @dataProvider activeAutomationTypes
-     */
-    public function test_fill_up_boon_succeeds_during_active_automation(int $automationType): void
+    public function test_fill_up_boon_succeeds_during_active_exploration(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
         Queue::fake();
@@ -149,7 +146,7 @@ class CharacterActiveBoonFillUpTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => $automationType,
+            'type' => AutomationType::EXPLORING,
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
@@ -163,13 +160,80 @@ class CharacterActiveBoonFillUpTest extends TestCase
         $this->assertEquals(0, $character->refresh()->inventory->slots()->where('item_id', $item->id)->count());
     }
 
-    public static function activeAutomationTypes(): array
+    public function test_fill_up_boon_succeeds_during_active_delve(): void
     {
-        return [
-            'exploration' => [AutomationType::EXPLORING],
-            'delve' => [AutomationType::DELVE],
-            'faction loyalty' => [AutomationType::FACTION_LOYALTY],
-        ];
+        Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
+        Queue::fake();
+
+        $item = $this->createBoonItem();
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+
+        $boon = $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(30),
+            'amount_used' => 2,
+            'last_for_minutes' => 30,
+        ]);
+
+        $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character-sheet/'.$character->id.'/fill-up-boon/'.$boon->id);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('2026-01-01 13:00:00', $boon->refresh()->complete->toDateTimeString());
+        $this->assertEquals(60, $boon->last_for_minutes);
+        $this->assertEquals(0, $character->refresh()->inventory->slots()->where('item_id', $item->id)->count());
+    }
+
+    public function test_fill_up_boon_succeeds_during_active_faction_loyalty(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
+        Queue::fake();
+
+        $item = $this->createBoonItem();
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+
+        $boon = $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(30),
+            'amount_used' => 2,
+            'last_for_minutes' => 30,
+        ]);
+
+        $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::FACTION_LOYALTY,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character-sheet/'.$character->id.'/fill-up-boon/'.$boon->id);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('2026-01-01 13:00:00', $boon->refresh()->complete->toDateTimeString());
+        $this->assertEquals(60, $boon->last_for_minutes);
+        $this->assertEquals(0, $character->refresh()->inventory->slots()->where('item_id', $item->id)->count());
     }
 
     public function test_fill_up_boon_uses_two_items_when_two_available(): void

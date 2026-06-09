@@ -8,6 +8,7 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\Skill;
 use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\SkillsTransformer;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -28,6 +29,7 @@ class SkillService
         private readonly SkillsTransformer $skillsTransformer,
         private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
         private readonly BattleMessageHandler $battleMessageHandler,
+        private readonly PlainDataSerializer $plainDataSerializer,
     ) {}
 
     /**
@@ -49,6 +51,8 @@ class SkillService
 
         $skills = new Collection($skills, $this->basicSkillsTransformer);
 
+        $this->manager->setSerializer($this->plainDataSerializer);
+
         return $this->manager->createData($skills)->toArray();
     }
 
@@ -58,6 +62,8 @@ class SkillService
     public function getSkill(Skill $skill): array
     {
         $skill = new Item($skill, $this->skillsTransformer);
+
+        $this->manager->setSerializer($this->plainDataSerializer);
 
         return $this->manager->createData($skill)->toArray();
     }

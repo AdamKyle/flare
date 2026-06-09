@@ -49,6 +49,9 @@
                     <a class="ml-2" href="{{ route('un.ban.request') }}">
                         {{ __('Banned Unfairly?') }}
                     </a>
+                    <a class="ml-2" href="{{ route('register') }}">
+                        {{ __('Register') }}
+                    </a>
                 </div>
             </x-core.cards.form-card>
         </div>

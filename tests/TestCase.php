@@ -69,6 +69,9 @@ abstract class TestCase extends BaseTestCase
             'queue.connections.battle_reward_item_handler' => [
                 'driver' => 'sync',
             ],
+            'queue.connections.long_running' => [
+                'driver' => 'sync',
+            ],
         ]);
 
     }

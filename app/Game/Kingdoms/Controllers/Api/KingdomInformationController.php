@@ -131,6 +131,19 @@ class KingdomInformationController extends Controller
         return response()->json();
     }
 
+    public function batchDeleteLogs(Character $character): JsonResponse
+    {
+        $logIds = request()->input('logs', []);
+
+        KingdomLog::where('character_id', $character->id)
+            ->whereIn('id', $logIds)
+            ->delete();
+
+        $this->updateKingdom->updateKingdomLogs($character->refresh());
+
+        return response()->json();
+    }
+
     public function deleteAllLogs(Character $character): JsonResponse
     {
         KingdomLog::where('character_id', $character->id)->delete();

@@ -4,6 +4,7 @@ namespace App\Game\Skills\Providers;
 
 use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Transformers\BasicSkillsTransformer;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Flare\Transformers\SkillsTransformer;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
@@ -107,6 +108,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(SkillsTransformer::class),
                 $app->make(UpdateCharacterAttackTypesHandler::class),
                 $app->make(BattleMessageHandler::class),
+                $app->make(PlainDataSerializer::class),
             );
         });
 

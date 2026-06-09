@@ -480,7 +480,7 @@ class EndScheduledEvent extends Command
             Cache::forget('map-locations-'.$gameMapId);
         }
 
-        event(new CorruptLocations($locationService->fetchCorruptedLocationData($raid)->toArray()));
+        event(new CorruptLocations($locationService->fetchCorruptedLocationData($raid)));
     }
 
     /**

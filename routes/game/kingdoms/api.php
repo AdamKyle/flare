@@ -20,7 +20,8 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are', 'character.owns
 
 Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:25,1'])->group(function () {
     Route::post('/kingdom/opened-log/{character}/{kingdomLog}', ['as' => 'kingdoms.update-log', 'uses' => 'Api\KingdomInformationController@updateLog']);
-    Route::post('/kingdom/delete-log/{character}/{kingdomLog}', ['as' => 'kingdoms.delete-log', 'uses' => 'Api\KingdomInformationController@deleteLog']);
+    Route::post('/kingdom/delete-log/{character}/{kingdomLog}', ['as' => 'game.kingdom.delete-log', 'uses' => 'Api\KingdomInformationController@deleteLog']);
+    Route::post('/kingdom/batch-delete-logs/{character}', ['as' => 'game.kingdom.batch-delete-logs', 'uses' => 'Api\KingdomInformationController@batchDeleteLogs']);
     Route::post('/kingdom/delete-all-logs/{character}', ['as' => 'kingdoms.delete-all-logs', 'uses' => 'Api\KingdomInformationController@deleteAllLogs']);
 });
 

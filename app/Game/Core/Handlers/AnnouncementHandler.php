@@ -81,7 +81,7 @@ class AnnouncementHandler
             'event_id' => $event->id,
         ]);
 
-        event(new AnnouncementMessageEvent($message, $announcement->id));
+        event(new AnnouncementMessageEvent($announcement));
     }
 
     private function buildTheGoldMinesMessage(): void
@@ -104,7 +104,7 @@ class AnnouncementHandler
             'event_id' => $event->id,
         ]);
 
-        event(new AnnouncementMessageEvent($message, $announcement->id));
+        event(new AnnouncementMessageEvent($announcement));
     }
 
     private function buildTheOldChurchMessage(): void
@@ -127,7 +127,7 @@ class AnnouncementHandler
             'event_id' => $event->id,
         ]);
 
-        event(new AnnouncementMessageEvent($message, $announcement->id));
+        event(new AnnouncementMessageEvent($announcement));
     }
 
     private function buildWeeklyCelestialMessage(?Event $event = null): void
@@ -148,7 +148,7 @@ class AnnouncementHandler
             'event_id' => $event->id,
         ]);
 
-        event(new AnnouncementMessageEvent($message, $announcement->id));
+        event(new AnnouncementMessageEvent($announcement));
     }
 
     private function buildWeeklyCurrencyDrop(?Event $event = null): void
@@ -168,7 +168,7 @@ class AnnouncementHandler
             'event_id' => $event->id,
         ]);
 
-        event(new AnnouncementMessageEvent($message, $announcement->id));
+        event(new AnnouncementMessageEvent($announcement));
     }
 
     public function buildWeeklyFactionLoyaltyEvent(?Event $event = null): void
@@ -189,7 +189,7 @@ class AnnouncementHandler
             'event_id' => $event->id,
         ]);
 
-        event(new AnnouncementMessageEvent($message, $announcement->id));
+        event(new AnnouncementMessageEvent($announcement));
     }
 
     private function buildWinterEventMessage(?Event $event = null): void
@@ -211,7 +211,7 @@ class AnnouncementHandler
             'event_id' => $event->id,
         ]);
 
-        event(new AnnouncementMessageEvent($message, $announcement->id));
+        event(new AnnouncementMessageEvent($announcement));
     }
 
     private function buildDelusionalMemoriesMessage(?Event $event = null): void
@@ -233,7 +233,7 @@ class AnnouncementHandler
             'event_id' => $event->id,
         ]);
 
-        event(new AnnouncementMessageEvent($message, $announcement->id));
+        event(new AnnouncementMessageEvent($announcement));
     }
 
     private function buildPurgatoryHouseMessage(): void
@@ -256,6 +256,6 @@ class AnnouncementHandler
             'event_id' => $event->id,
         ]);
 
-        event(new AnnouncementMessageEvent($message, $announcement->id));
+        event(new AnnouncementMessageEvent($announcement));
     }
 }
