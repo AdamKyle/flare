@@ -1,19 +1,48 @@
 import clsx from 'clsx';
 import React, {
+  FocusEvent,
+  KeyboardEvent,
+  MouseEvent,
+  UIEvent,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
   useRef,
   useState,
-  useEffect,
-  useMemo,
-  KeyboardEvent,
-  FocusEvent,
-  UIEvent,
-  MouseEvent,
 } from 'react';
+import { createPortal } from 'react-dom';
 import { match } from 'ts-pattern';
 
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import DropdownProps from 'ui/drop-down/types/drop-down-props';
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
+
+const filterDropdownItems = (
+  items: DropdownItem[],
+  searchTerm: string
+): DropdownItem[] => {
+  const normalizedSearchTerm = String(searchTerm ?? '')
+    .trim()
+    .toLowerCase();
+
+  if (normalizedSearchTerm === '') {
+    return items;
+  }
+
+  const startsWithMatches = items.filter((item) =>
+    String(item.label).toLowerCase().startsWith(normalizedSearchTerm)
+  );
+
+  const substringMatches = items.filter((item) => {
+    const labelText = String(item.label).toLowerCase();
+    return (
+      !labelText.startsWith(normalizedSearchTerm) &&
+      labelText.includes(normalizedSearchTerm)
+    );
+  });
+
+  return [...startsWithMatches, ...substringMatches];
+};
 
 const Dropdown = ({
   items,
@@ -29,39 +58,42 @@ const Dropdown = ({
   force_clear,
   disabled,
   focus_selected_on_open,
+  use_portal,
 }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string | number>('');
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [menuStyle, setMenuStyle] = useState<React.CSSProperties>({
+    position: 'fixed',
+    visibility: 'hidden',
+  });
 
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const prevForceClearRef = useRef<boolean | undefined>(undefined);
+  const portalMenuRef = useRef<HTMLDivElement>(null);
 
-  const displayItems: DropdownItem[] = useMemo(() => {
-    const baseSearchTerm: string = String(searchTerm ?? '');
-    const normalizedSearchTerm: string = baseSearchTerm.trim().toLowerCase();
+  const handlePortalOutsideClick = useRef<(event: Event) => void>((event) => {
+    const target = event.target as Node;
 
-    if (normalizedSearchTerm === '') {
-      return items;
+    if (containerRef.current?.contains(target)) {
+      return;
     }
 
-    const startsWithMatches = items.filter((item) => {
-      const labelText = String(item.label).toLowerCase();
-      return labelText.startsWith(normalizedSearchTerm);
-    });
+    if (portalMenuRef.current?.contains(target)) {
+      return;
+    }
 
-    const substringMatches = items.filter((item) => {
-      const labelText = String(item.label).toLowerCase();
-      return (
-        !labelText.startsWith(normalizedSearchTerm) &&
-        labelText.includes(normalizedSearchTerm)
-      );
-    });
+    setIsOpen(false);
+    setFocusedIndex(null);
+    setSearchTerm('');
+  });
 
-    return [...startsWithMatches, ...substringMatches];
-  }, [items, searchTerm]);
+  const displayItems: DropdownItem[] = useMemo(
+    () => filterDropdownItems(items, searchTerm),
+    [items, searchTerm]
+  );
 
   useEffect(() => {
     if (isOpen && focusedIndex !== null && listRef.current) {
@@ -99,8 +131,51 @@ const Dropdown = ({
     displayItems.length,
   ]);
 
+  useLayoutEffect(() => {
+    if (!use_portal || !isOpen || !containerRef.current) {
+      return;
+    }
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const estimatedMenuHeight = 320;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const flipUp =
+      spaceBelow < estimatedMenuHeight && rect.top > estimatedMenuHeight;
+
+    if (flipUp) {
+      setMenuStyle({
+        position: 'fixed',
+        bottom: window.innerHeight - rect.top + 8,
+        left: rect.left,
+        width: rect.width,
+        zIndex: 9999,
+      });
+    } else {
+      setMenuStyle({
+        position: 'fixed',
+        top: rect.bottom + 8,
+        left: rect.left,
+        width: rect.width,
+        zIndex: 9999,
+      });
+    }
+  }, [use_portal, isOpen]);
+
+  useEffect(() => {
+    if (!use_portal || !isOpen) {
+      return;
+    }
+
+    const handler = handlePortalOutsideClick.current;
+    document.addEventListener('mousedown', handler);
+
+    return () => {
+      document.removeEventListener('mousedown', handler);
+    };
+  }, [use_portal, isOpen]);
+
   const handleBlur = (event: FocusEvent<HTMLDivElement>) => {
-    if (!all_click_outside) {
+    if (!all_click_outside || use_portal) {
       return;
     }
 
@@ -291,6 +366,59 @@ const Dropdown = ({
         {renderItems()}
       </ul>
     );
+
+    if (use_portal) {
+      const portalContent = use_pagination ? (
+        <>
+          <div className="p-2">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search..."
+              aria-label="Search"
+              className="w-full rounded-sm border border-solid border-gray-500 bg-transparent px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-300 dark:text-gray-100 dark:placeholder-gray-400"
+            />
+          </div>
+          <InfiniteScroll
+            handle_scroll={onScroll}
+            additional_css={clsx(
+              'max-h-60',
+              additional_scroll_css,
+              'scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 scrollbar-thumb-rounded-md'
+            )}
+          >
+            {listMarkup}
+          </InfiniteScroll>
+        </>
+      ) : (
+        <>
+          <div className="p-2">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search..."
+              aria-label="Search"
+              className="my-2 w-full rounded-md border-1 border-gray-500 bg-transparent px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400"
+            />
+          </div>
+          {listMarkup}
+        </>
+      );
+
+      return createPortal(
+        <div
+          ref={portalMenuRef}
+          style={menuStyle}
+          onKeyDown={handleKeyDown}
+          className="rounded-md border border-gray-500 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+        >
+          {portalContent}
+        </div>,
+        document.body
+      );
+    }
 
     const wrapperClasses = clsx(
       'absolute w-full mt-2 border border-gray-500 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md',

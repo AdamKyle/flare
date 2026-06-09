@@ -9,6 +9,7 @@ export default interface DropdownProps {
   is_in_modal?: boolean;
   all_click_outside?: boolean;
   use_pagination?: boolean;
+  use_portal?: boolean;
   handle_scroll?: (e: React.UIEvent<HTMLDivElement>) => void;
   selection_placeholder?: string;
   additional_scroll_css?: string;

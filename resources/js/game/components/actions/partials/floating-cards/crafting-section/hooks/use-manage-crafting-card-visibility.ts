@@ -14,21 +14,25 @@ export const useManageCraftingCardVisibility =
 
     const [showCraftingCard, setShowCraftingCard] = useState<boolean>(false);
 
-    useEffect(() => {
-      const closeCardListener = (visible: boolean) =>
-        setShowCraftingCard(visible);
+    const closeCardListener = (visible: boolean) => {
+      setShowCraftingCard(visible);
+    };
 
+    const removeCloseCardListener = () => {
+      openCardEventEmitter.off(
+        ActionCardEvents.OPEN_CRATING_CARD,
+        closeCardListener
+      );
+    };
+
+    useEffect(() => {
       openCardEventEmitter.on(
         ActionCardEvents.OPEN_CRATING_CARD,
         closeCardListener
       );
 
-      return () => {
-        openCardEventEmitter.off(
-          ActionCardEvents.OPEN_CRATING_CARD,
-          closeCardListener
-        );
-      };
+      return removeCloseCardListener;
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [openCardEventEmitter]);
 
     const openCraftingCard = () => {

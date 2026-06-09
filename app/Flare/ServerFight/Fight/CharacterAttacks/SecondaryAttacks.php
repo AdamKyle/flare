@@ -84,7 +84,7 @@ class SecondaryAttacks extends BattleBase
 
     public function classSpecialtyDamage()
     {
-        $special = $this->attackData['special_damage'];
+        $special = $this->attackData['special_damage'] ?? null;
 
         if (empty($special)) {
             return;

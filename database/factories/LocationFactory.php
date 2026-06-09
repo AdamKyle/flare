@@ -32,6 +32,7 @@ class LocationFactory extends Factory
             'is_port' => false,
             'x' => 12,
             'y' => 12,
+            'enemy_strength_increase' => 2.0,
         ];
     }
 }

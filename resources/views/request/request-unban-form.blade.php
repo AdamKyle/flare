@@ -1,30 +1,58 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container flex items-center justify-center mt-20 py-10">
-        <div class="w-full md:w-1/2 xl:w-1/3">
-            <div class="mx-5 md:mx-10">
-                <h2 class="uppercase">Unban Request</h2>
-                <h4 class="uppercase">Request Form</h4>
-            </div>
+  <div class="flex min-h-screen items-start justify-center px-4 pt-16">
+    <div class="w-full max-w-md space-y-8">
+      <header class="text-center">
+        <h1 class="text-3xl font-extrabold text-gray-900 dark:text-gray-100">
+          Unban Request
+        </h1>
+        <p class="mt-2 text-sm text-gray-600 uppercase dark:text-gray-400">
+          Request Form
+        </p>
+      </header>
 
-            <x-core.cards.form-card css="mt-5 p-5 md:p-10" method="POST"  action="{{ route('un.ban.request.submit')}}">
-                @csrf
-                <input type="hidden" name="token" value="{{ $token }}">
+      <form
+        method="POST"
+        action="{{ route('un.ban.request.submit') }}"
+        class="space-y-6 rounded-lg bg-white p-8 shadow-lg dark:bg-gray-800"
+      >
+        @csrf
+        <input type="hidden" name="token" value="{{ $token }}" />
 
-                <div class="mb-5">
-                    <label for="unban-message" class="label block mb-2">Reason</label>
-                    <textarea class="form-control" id="unban-message" name="unban_message" value="{{old('unban_message')}}"></textarea>
-                </div>
-
-                <div class="flex">
-                    <x-core.buttons.primary-button css="ltr:ml-auto rtl:mr-auto" type="submit">
-                        Request to be unbanned
-                    </x-core.buttons.primary-button>
-                </div>
-            </x-core.cards.form-card>
-
-
+        <div>
+          <label
+            for="unban-message"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Reason
+          </label>
+          <textarea
+            id="unban-message"
+            name="unban_message"
+            required
+            aria-invalid="{{ $errors->has('unban_message') ? 'true' : 'false' }}"
+            aria-describedby="unban-message-error"
+            class="mt-1 block min-h-40 w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:focus:ring-blue-400"
+          >{{ old('unban_message') }}</textarea>
+          @error('unban_message')
+            <p
+              id="unban-message-error"
+              class="mt-2 text-sm text-red-600 dark:text-red-400"
+              role="alert"
+            >
+              {{ $message }}
+            </p>
+          @enderror
         </div>
+
+        <button
+          type="submit"
+          class="w-full rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+        >
+          Request to be unbanned
+        </button>
+      </form>
     </div>
+  </div>
 @endsection

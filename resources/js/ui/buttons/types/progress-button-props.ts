@@ -6,4 +6,6 @@ export default interface ProgressButtonProps {
   label: string;
   variant: ButtonVariant;
   additional_css?: string;
+  disabled?: boolean;
+  progress_fill_class?: string;
 }

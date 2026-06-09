@@ -1,39 +1,74 @@
 @extends('layouts.app')
 
 @section('content')
+  <div class="flex min-h-screen items-start justify-center px-4 pt-16">
+    <div class="w-full max-w-md space-y-8">
+      <header class="text-center">
+        <h1 class="text-3xl font-extrabold text-gray-900 dark:text-gray-100">
+          Unban Request
+        </h1>
+        <p class="mt-2 text-sm text-gray-600 uppercase dark:text-gray-400">
+          Email Verification Form
+        </p>
+      </header>
 
-    <div class="container flex items-center justify-center mt-20 py-10">
-        <div class="w-full md:w-1/2 xl:w-1/3">
-            <div class="mx-5 md:mx-10">
-                <h2 class="uppercase">Unban Request</h2>
-                <h4 class="uppercase">Email Verification Form</h4>
-            </div>
-            @if (session('unban_request_token'))
-                <div class="mt-5 mx-5 md:mx-10">
-                    <a href="{{ route('un.ban.request.form', ['token' => session('unban_request_token')]) }}">
-                        Continue
-                    </a>
-                </div>
-            @endif
-            <x-core.cards.form-card css="mt-5 p-5 md:p-10" method="POST" action="{{ route('un.ban.request.email') }}">
-                @csrf
-
-                <div class="mb-5">
-                    <label class="label block mb-2" for="name">{{ __('E-Mail Address') }}</label>
-                    <input id="name" type="email" class="form-control" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
-                    @error('email')
-                    <div class="text-red-800 dark:text-red-500 pt-3" role="alert">
-                        <strong>{{$message}}</strong>
-                    </div>
-                    @enderror
-                </div>
-
-                <div class="flex">
-                    <x-core.buttons.primary-button css="ltr:ml-auto rtl:mr-auto" type="submit">
-                        Next Step
-                    </x-core.buttons.primary-button>
-                </div>
-            </x-core.cards.form-card>
+      @if (session('unban_request_token'))
+        <div
+          class="rounded-lg bg-white p-6 text-center shadow-lg dark:bg-gray-800"
+        >
+          <a
+            href="{{ route('un.ban.request.form', ['token' => session('unban_request_token')]) }}"
+            class="text-danube-600 hover:underline"
+          >
+            Continue
+          </a>
         </div>
+      @endif
+
+      <form
+        method="POST"
+        action="{{ route('un.ban.request.email') }}"
+        class="space-y-6 rounded-lg bg-white p-8 shadow-lg dark:bg-gray-800"
+      >
+        @csrf
+
+        <div>
+          <label
+            for="email"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            {{ __('E-Mail Address') }}
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            value="{{ old('email') }}"
+            required
+            autocomplete="email"
+            autofocus
+            aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}"
+            aria-describedby="email-error"
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:focus:ring-blue-400"
+          />
+          @error('email')
+            <p
+              id="email-error"
+              class="mt-2 text-sm text-red-600 dark:text-red-400"
+              role="alert"
+            >
+              {{ $message }}
+            </p>
+          @enderror
+        </div>
+
+        <button
+          type="submit"
+          class="w-full rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+        >
+          Next Step
+        </button>
+      </form>
     </div>
+  </div>
 @endsection

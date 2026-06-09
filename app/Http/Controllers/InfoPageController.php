@@ -37,19 +37,26 @@ class InfoPageController extends Controller
 
     public function search(Request $request)
     {
-
         if (is_null($request->info_search)) {
             return response()->redirectToRoute('info.page', ['pageName' => 'home']);
         }
 
-        $searchResults = InfoPage::whereRaw(
-            "JSON_EXTRACT(page_sections, '$[*].content') LIKE ?",
-            ['%'.$request->info_search.'%']
-        )->get();
+        $query = $request->info_search;
+        $allPages = InfoPage::all();
+
+        $searchResults = $allPages->filter(function ($page) use ($query) {
+            foreach ($page->page_sections as $section) {
+                if (stripos($section['content'] ?? '', $query) !== false) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
 
         return view('information.search-results', [
             'results' => $searchResults,
-            'query' => $request->info_search,
+            'query' => $query,
         ]);
     }
 

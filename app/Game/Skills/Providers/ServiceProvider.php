@@ -3,6 +3,7 @@
 namespace App\Game\Skills\Providers;
 
 use App\Flare\Items\Builders\RandomAffixGenerator;
+use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Flare\Transformers\SkillsTransformer;
@@ -32,6 +33,7 @@ use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Services\TrinketCraftingService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
+use App\Game\Skills\Transformers\CraftableItemTransformer;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 
@@ -86,7 +88,9 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(SkillCheckService::class),
                 $app->make(UpdateCraftingTasksForFactionLoyalty::class),
                 $app->make(HandleUpdatingCraftingGlobalEventGoal::class),
-                $app->make(FactionLoyaltyService::class)
+                $app->make(FactionLoyaltyService::class),
+                $app->make(Pagination::class),
+                $app->make(CraftableItemTransformer::class),
             );
         });
 

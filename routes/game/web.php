@@ -22,6 +22,7 @@ Route::middleware([
 
     // Core routes for the game related stuff:
     Route::get('/game', ['as' => 'game', 'uses' => 'GameController@game']);
+    Route::get('/goblin-shop/{character}', ['as' => 'game.goblin-shop.shop', 'uses' => 'GameController@game']);
 
     Route::get('/game/character/sheet', ['as' => 'game.character.sheet', 'uses' => 'CharacterSheetController@index']);
 

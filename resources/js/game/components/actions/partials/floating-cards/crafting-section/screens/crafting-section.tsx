@@ -1,31 +1,32 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 
+import CraftItemsFlow from '../components/craft-items-flow';
+import CraftingIntroduction from '../components/crafting-introduction';
+import { useCraftingIntroduction } from '../hooks/use-crafting-introduction';
 import BaseSectionProps from './types/base-section-props';
 
-import Button from 'ui/buttons/button';
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
-
 const CraftingSection = ({ setActiveCraftingType }: BaseSectionProps) => {
+  const { introductionAcknowledged, acknowledgeIntroduction } =
+    useCraftingIntroduction();
+
   return (
-    <div className={'prose dark:prose-invert'}>
-      <h2>Crafting</h2>
-      <p>
-        Crafting items in Tlessa is vitally important to your own progression.
-      </p>
-      <p>
-        At first you might craft items you can get fro the shop. But as you
-        level up your crafting skill you will unlock weapons, armour, rings and
-        even spells beyond what the shop sells
-      </p>
-      <p>
-        High level items that you craft can then be traded later on for more
-        powerful gear.
-      </p>
-      <Button
-        on_click={() => {}}
-        label={'I understand'}
-        variant={ButtonVariant.PRIMARY}
-      />
+    <div className="relative overflow-hidden">
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={introductionAcknowledged ? 'craft-items' : 'introduction'}
+          initial={{ x: '100%' }}
+          animate={{ x: 0 }}
+          exit={{ x: '-100%' }}
+          transition={{ duration: 0.25 }}
+        >
+          {introductionAcknowledged ? (
+            <CraftItemsFlow setActiveCraftingType={setActiveCraftingType} />
+          ) : (
+            <CraftingIntroduction onAcknowledge={acknowledgeIntroduction} />
+          )}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 };

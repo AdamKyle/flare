@@ -175,7 +175,7 @@ class Skill extends Model
             $value * $this->level
         );
 
-        $baseBonus += $this->getCharacterBoonsBonus('base_damage_mod');
+        $baseBonus += $this->getCharacterBoonsBonus('base_damage_mod_bonus');
 
         return $itemBonus + $baseBonus;
     }
@@ -194,7 +194,7 @@ class Skill extends Model
             $value * $this->level
         );
 
-        $baseBonus += $this->getCharacterBoonsBonus('base_healing_mod');
+        $baseBonus += $this->getCharacterBoonsBonus('base_healing_mod_bonus');
 
         return $itemBonus + $baseBonus;
     }
@@ -213,7 +213,7 @@ class Skill extends Model
             $this->baseSkill->base_ac_mod_bonus_per_level * $this->level
         );
 
-        $baseBonus += $this->getCharacterBoonsBonus('base_ac_mod');
+        $baseBonus += $this->getCharacterBoonsBonus('base_ac_mod_bonus');
 
         return $itemBonus + $baseBonus;
     }

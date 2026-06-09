@@ -41,8 +41,9 @@ class PaginationRequest extends FormRequest
 
     public function prepareForValidation(): void
     {
-
         $this->merge([
+            'per_page' => $this->input('per_page') ?? 15,
+            'page' => $this->input('page') ?? 1,
             'search_text' => $this->has('search_text') && is_null($this->input('search_text'))
                 ? ''
                 : $this->input('search_text'),

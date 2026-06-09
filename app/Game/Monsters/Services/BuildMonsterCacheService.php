@@ -121,10 +121,7 @@ class BuildMonsterCacheService
 
             $monsters = $this->manager->createData($monsters)->toArray();
 
-            if (! empty($monsters)) {
-
-                $cache['location-type-'.$location->type] = $monsters;
-            }
+            $cache['location-type-'.$location->type] = $monsters;
         }
 
         Cache::put('special-location-monsters', $cache);

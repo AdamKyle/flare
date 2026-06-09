@@ -6,4 +6,5 @@ export default interface UseWebsocketParams<T> {
   type: ChannelType;
   channelName: string;
   onEvent: (data: T) => void;
+  enabled?: boolean;
 }

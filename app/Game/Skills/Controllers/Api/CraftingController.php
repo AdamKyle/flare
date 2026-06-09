@@ -27,6 +27,32 @@ class CraftingController extends Controller
      */
     public function fetchItemsToCraft(Request $request, Character $character): JsonResponse
     {
+        $perPage = $request->input('per_page');
+
+        if ($perPage !== null) {
+            $craftingParams = ['crafting_type' => $request->crafting_type];
+            $searchText = (string) ($request->input('search_text') ?? '');
+            $armourSubtype = (string) ($request->input('filters.armour_type') ?? '');
+            $page = (int) $request->input('page', 1);
+
+            $paginated = $this->craftingService->fetchPaginatedCraftableItems(
+                $character,
+                $craftingParams,
+                (int) $perPage,
+                $page,
+                $searchText,
+                $armourSubtype
+            );
+
+            return response()->json(array_merge($paginated, [
+                'items' => $paginated['data'],
+                'xp' => $this->craftingService->getCraftingXP($character, $request->crafting_type),
+                'show_craft_for_npc' => $this->showCraftForNpcButton($character, $request->crafting_type),
+                'show_craft_for_event' => $this->shouldShowCraftingEventButton($character),
+                'inventory_count' => $this->craftingService->getInventoryCount($character),
+            ]));
+        }
+
         return response()->json([
             'items' => $this->craftingService->fetchCraftableItems($character, $request->all()),
             'xp' => $this->craftingService->getCraftingXP($character, $request->crafting_type),
@@ -41,7 +67,6 @@ class CraftingController extends Controller
      */
     public function fetchItemsForClass(Request $request, Character $character): JsonResponse
     {
-
         if ($character->class->type()->isAlcoholic()) {
             return response()->json([
                 'message' => 'Your class doesn\'t generally use weapons. Please select a different type.',
@@ -54,18 +79,31 @@ class CraftingController extends Controller
             ], 422);
         }
 
-        $craftingTypes = ItemTypeMapping::getForClass($character->class->name);
-        $craftingTypes = is_array($craftingTypes) ? $craftingTypes : [$craftingTypes];
+        $craftingTypeForClass = $this->resolveCraftingTypeForClass($character);
+        $craftingParams = ['crafting_type' => $craftingTypeForClass];
 
-        $validWeapons = ItemType::validWeapons();
-        $filteredWeapons = array_values(array_filter($craftingTypes, fn ($type) => in_array($type, $validWeapons)));
+        $perPage = $request->input('per_page');
 
-        $craftingTypeForClass = count($filteredWeapons) === 1 ? $filteredWeapons[0] : $filteredWeapons;
+        if ($perPage !== null) {
+            $paginated = $this->craftingService->fetchPaginatedCraftableItems(
+                $character,
+                $craftingParams,
+                (int) $perPage,
+                (int) $request->input('page', 1),
+                (string) ($request->input('search_text') ?? '')
+            );
 
-        $params = ['crafting_type' => $craftingTypeForClass];
+            return response()->json(array_merge($paginated, [
+                'items' => $paginated['data'],
+                'xp' => $this->craftingService->getCraftingXP($character, $craftingTypeForClass),
+                'show_craft_for_npc' => $this->showCraftForNpcButton($character, $craftingTypeForClass),
+                'show_craft_for_event' => $this->shouldShowCraftingEventButton($character),
+                'inventory_count' => $this->craftingService->getInventoryCount($character),
+            ]));
+        }
 
         return response()->json([
-            'items' => $this->craftingService->fetchCraftableItems($character, $params),
+            'items' => $this->craftingService->fetchCraftableItems($character, $craftingParams),
             'xp' => $this->craftingService->getCraftingXP($character, $craftingTypeForClass),
             'show_craft_for_npc' => $this->showCraftForNpcButton($character, $craftingTypeForClass),
             'show_craft_for_event' => $this->shouldShowCraftingEventButton($character),
@@ -92,6 +130,33 @@ class CraftingController extends Controller
 
         $crafted = $craftingService->craft($character, $request->all());
 
+        $perPage = $request->input('per_page');
+
+        if ($perPage !== null) {
+            $craftingParams = ['crafting_type' => $request->type];
+            $searchText = (string) ($request->input('search_text') ?? '');
+            $armourSubtype = (string) ($request->input('filters.armour_type') ?? '');
+
+            $paginated = $this->craftingService->fetchPaginatedCraftableItems(
+                $character->refresh(),
+                $craftingParams,
+                (int) $perPage,
+                1,
+                $searchText,
+                $armourSubtype,
+                false
+            );
+
+            return response()->json(array_merge($paginated, [
+                'items' => $paginated['data'],
+                'xp' => $this->craftingService->getCraftingXP($character, $request->type),
+                'show_craft_for_event' => $this->shouldShowCraftingEventButton($character),
+                'show_craft_for_npc' => $this->showCraftForNpcButton($character, $request->type),
+                'inventory_count' => $this->craftingService->getInventoryCount($character),
+                'crafted_item' => $crafted,
+            ]), 200);
+        }
+
         return response()->json([
             'items' => $this->craftingService->fetchCraftableItems($character->refresh(), ['crafting_type' => $request->type], false),
             'xp' => $this->craftingService->getCraftingXP($character, $request->type),
@@ -100,5 +165,15 @@ class CraftingController extends Controller
             'inventory_count' => $this->craftingService->getInventoryCount($character),
             'crafted_item' => $crafted,
         ], 200);
+    }
+
+    private function resolveCraftingTypeForClass(Character $character): string|array
+    {
+        $craftingTypes = ItemTypeMapping::getForClass($character->class->name);
+        $craftingTypes = is_array($craftingTypes) ? $craftingTypes : [$craftingTypes];
+        $validWeapons = ItemType::validWeapons();
+        $filteredWeapons = array_values(array_filter($craftingTypes, fn ($type) => in_array($type, $validWeapons)));
+
+        return count($filteredWeapons) === 1 ? $filteredWeapons[0] : $filteredWeapons;
     }
 }

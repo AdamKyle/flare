@@ -6,7 +6,7 @@ import ResistanceInfoDefinition from 'game-data/api-data-definitions/character/r
 
 export default interface CharacterSheetDefinition {
   id: number;
-  user_id: number;
+  user_id?: number;
   game_map_id: number;
   name: string;
   class: string;
@@ -59,6 +59,16 @@ export default interface CharacterSheetDefinition {
   can_talk_again_at?: string | null;
   view_port?: number;
   is_automation_running?: boolean;
+  can_craft?: boolean;
+  can_craft_again_at?: number;
+  is_faction_loyalty_automation_running?: boolean;
+  current_fame_tasks?: Array<{
+    type?: string;
+    item_name?: string;
+    item_id?: number;
+    required_amount?: number;
+    current_amount?: number;
+  }>;
 
   map_name: string;
 }

@@ -7,6 +7,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
+use App\Flare\Pagination\Pagination;
 use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
@@ -22,6 +23,7 @@ use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
 use App\Game\Skills\Handlers\HandleUpdatingCraftingGlobalEventGoal;
 use App\Game\Skills\Handlers\UpdateCraftingTasksForFactionLoyalty;
 use App\Game\Skills\Services\Traits\UpdateCharacterCurrency;
+use App\Game\Skills\Transformers\CraftableItemTransformer;
 use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Database\Eloquent\Collection;
@@ -57,6 +59,8 @@ class CraftingService
         UpdateCraftingTasksForFactionLoyalty $updateCraftingTasksForFactionLoyalty,
         HandleUpdatingCraftingGlobalEventGoal $handleUpdatingCraftingGlobalEventGoal,
         private readonly FactionLoyaltyService $factionLoyaltyService,
+        private readonly Pagination $pagination,
+        private readonly CraftableItemTransformer $craftableItemTransformer,
     ) {
         $this->randomEnchantmentService = $randomEnchantmentService;
         $this->skillService = $skillService;
@@ -89,6 +93,58 @@ class CraftingService
         $skill = $this->fetchCraftingSkill($character, $craftingType);
 
         return $this->getItems($character, $skill, $params['crafting_type'], $merchantMessage);
+    }
+
+    /**
+     * Fetch paginated craftable items for a character.
+     *
+     * @throws Exception
+     */
+    public function fetchPaginatedCraftableItems(
+        Character $character,
+        array $craftingParams,
+        int $perPage,
+        int $page,
+        string $searchText = '',
+        string $armourSubtype = '',
+        bool $merchantMessage = true
+    ): array {
+        $reducedItems = $this->fetchCraftableItems($character, $craftingParams, $merchantMessage);
+
+        $costMap = $reducedItems->pluck('cost', 'id')->all();
+        $orderedIds = $reducedItems->pluck('id')->all();
+        $orderMap = array_flip($orderedIds);
+
+        $fullItems = Item::whereIn('id', $orderedIds)->get();
+
+        foreach ($fullItems as $item) {
+            if (isset($costMap[$item->id])) {
+                $item->cost = $costMap[$item->id];
+            }
+        }
+
+        $fullItems = $fullItems->sortBy(function (Item $item) use ($orderMap) {
+            return $orderMap[$item->id] ?? PHP_INT_MAX;
+        })->values();
+
+        if ($searchText !== '') {
+            $lowerSearch = mb_strtolower($searchText);
+            $fullItems = $fullItems->filter(function (Item $item) use ($lowerSearch) {
+                return str_contains(mb_strtolower($item->name), $lowerSearch)
+                    || str_contains(mb_strtolower($item->type ?? ''), $lowerSearch)
+                    || str_contains(mb_strtolower($item->crafting_type ?? ''), $lowerSearch);
+            })->values();
+        }
+
+        if ($armourSubtype !== '') {
+            $fullItems = $fullItems->filter(function (Item $item) use ($armourSubtype) {
+                return $item->type === $armourSubtype;
+            })->values();
+        }
+
+        $eloquentCollection = new Collection($fullItems->all());
+
+        return $this->pagination->buildPaginatedDate($eloquentCollection, $this->craftableItemTransformer, $perPage, $page);
     }
 
     /**

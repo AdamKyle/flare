@@ -785,3 +785,13 @@ yarn unused-files-check
 `yarn unused-files-check` runs `unimported`.
 
 Do not claim tests were run unless a test command exists and was actually run.
+
+## React hook function declarations
+
+Do not define functions inside `useEffect`, `useMemo`, `useCallback`, `useLayoutEffect`, or any other `useX` hook callback.
+
+Do not use `useMemo` or `useCallback` as a place to create helper functions, debounced functions, async request functions, event handlers, listeners, render helpers, or cleanup helpers.
+
+Functions used by hooks must be defined outside the hook callback body, either as component-scope functions, hook-scope functions, or top-level utilities.
+
+`useEffect` bodies may call existing functions and may return cleanup calls, but must not declare `const fn = () => {}`, `function fn() {}`, async functions, listener functions, debounce callbacks, or any other new function inside the effect body.

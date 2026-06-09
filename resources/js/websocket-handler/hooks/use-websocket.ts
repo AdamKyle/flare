@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
-import { useEchoInitializer } from './use-echo-initializer';
 import { ChannelType } from '../enums/channel-type';
 import { getUrl } from '../helpers/get-url';
 import UseWebsocketParams from './definition/use-websocket-params';
+import { useEchoInitializer } from './use-echo-initializer';
 
 export const useWebsocket = <T>({
   url,
@@ -11,41 +11,47 @@ export const useWebsocket = <T>({
   type,
   channelName,
   onEvent,
+  enabled = true,
 }: UseWebsocketParams<T>) => {
   const echoInitializer = useEchoInitializer();
 
+  const onEventRef = useRef(onEvent);
+  onEventRef.current = onEvent;
+
+  const listenerRef = useRef<(eventData: T) => void>((eventData) => {
+    onEventRef.current(eventData);
+  });
+
+  const resolvedUrl = getUrl(url, params);
+
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
     echoInitializer.echoInitialization.initialize();
 
     const echo = echoInitializer.echoInitialization.getEcho();
 
-    const chanelUrl = getUrl(url, params);
-
-    let channelListeningOn = null;
+    let channel = null;
 
     if (type === ChannelType.PRIVATE) {
-      channelListeningOn = echo.private(chanelUrl);
-
-      channelListeningOn.listen(channelName, (eventData: T) => {
-        onEvent(eventData);
-      });
+      channel = echo.private(resolvedUrl);
+      channel.listen(channelName, listenerRef.current);
     }
 
     if (type === ChannelType.PUBLIC) {
-      channelListeningOn = echo.join(chanelUrl);
-
-      channelListeningOn.listen(channelName, (eventData: T) => {
-        onEvent(eventData);
-      });
+      channel = echo.join(resolvedUrl);
+      channel.listen(channelName, listenerRef.current);
     }
 
     return () => {
-      if (!channelListeningOn) {
+      if (!channel) {
         return;
       }
 
-      channelListeningOn.unsubscribe();
+      channel.unsubscribe();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [url]);
+  }, [enabled, resolvedUrl, channelName, type]);
 };
