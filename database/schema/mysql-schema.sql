@@ -866,6 +866,7 @@ CREATE TABLE `game_maps` (
   `required_location_id` bigint unsigned DEFAULT NULL,
   `only_during_event_type` int DEFAULT NULL,
   `can_traverse` tinyint(1) NOT NULL DEFAULT '0',
+  `tile_map` json DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `game_maps_required_location_id_foreign` (`required_location_id`),
   CONSTRAINT `game_maps_required_location_id_foreign` FOREIGN KEY (`required_location_id`) REFERENCES `locations` (`id`)

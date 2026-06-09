@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Console\AfterDeployment\AddHolyStacksToItems;
 use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
 use App\Console\AfterDeployment\CleanDanglingCharacterData;
+use App\Console\AfterDeployment\CleanInvalidWeapons;
+use App\Console\AfterDeployment\CleanMarketPlaceOfInvalidWeapons;
 use App\Console\AfterDeployment\RepairQuestFeatureRewards;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
 use App\Console\DevelopmentCommands\CompleteGuideQuestForCharacter;
@@ -39,6 +41,8 @@ class AppServiceProvider extends ServiceProvider
             AddHolyStacksToItems::class,
             AssignNewNpcsToFactionLoyalty::class,
             CleanDanglingCharacterData::class,
+            CleanInvalidWeapons::class,
+            CleanMarketPlaceOfInvalidWeapons::class,
             RepairQuestFeatureRewards::class,
             CreateMonsterCache::class,
 
