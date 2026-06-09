@@ -21,7 +21,8 @@ use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackType
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Shop\Services\ShopService;
+use App\Game\Shop\Events\SellItemEvent;
+use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Game\Skills\Services\DisenchantService;
 use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
@@ -58,7 +59,6 @@ class CharacterInventoryService
         private readonly MassDisenchantService $massDisenchantService,
         private readonly UpdateCharacterSkillsService $updateCharacterSkillsService,
         private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler,
-        private readonly ShopService $shopService,
         private readonly DisenchantService $disenchantService,
         private readonly Pagination $pagination,
         private readonly Manager $manager,
@@ -833,7 +833,9 @@ class CharacterInventoryService
 
         $itemName = $slot->item->affix_name;
 
-        $totalSoldFor = $this->shopService->sellItem($slot, $this->character);
+        $totalSoldFor = SellItemCalculator::fetchSalePriceWithAffixes($slot->item);
+
+        event(new SellItemEvent($slot, $this->character));
 
         return $this->successResult([
             'message' => 'Sold '.$itemName.' for a total of '.number_format($totalSoldFor, 0).' gold.',

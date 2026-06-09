@@ -32,16 +32,17 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
-        Artisan::call('import:game-data Quests');
-        Artisan::call('cleanup:dangling-character-data --apply');
-        Artisan::call('repair:quest-feature-rewards');
-
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
             $this->importGameMaps();
         }
 
+        Artisan::call('import:game-data Locations');
+        Artisan::call('break:maps-into-pieces');
+        Artisan::call('import:game-data Armour');
+        Artisan::call('import:game-data Weapons');
+        Artisan::call('clean:invalid-weapons');
     }
 
     /**

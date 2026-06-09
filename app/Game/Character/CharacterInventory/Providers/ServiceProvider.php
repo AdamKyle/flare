@@ -79,7 +79,6 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(MassDisenchantService::class),
                 $app->make(UpdateCharacterSkillsService::class),
                 $app->make(UpdateCharacterAttackTypesHandler::class),
-                $app->make(ShopService::class),
                 $app->make(DisenchantService::class),
                 $app->make(Pagination::class),
                 $app->make(Manager::class)
