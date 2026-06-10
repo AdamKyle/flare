@@ -19,6 +19,29 @@ class CapitalCityGoldBarManagementService
 
     public function fetchGoldBarDetails(Character $character, Kingdom $kingdom, bool $returnResponse = true): array
     {
+        $allOtherKingdomsOnPlane = $character->kingdoms()
+            ->where('id', '!=', $kingdom->id)
+            ->where('game_map_id', $kingdom->game_map_id)
+            ->count();
+
+        if ($allOtherKingdomsOnPlane === 0) {
+            $data = [
+                'total_gold_bars' => 0,
+                'character_gold' => $character->gold,
+                'total_kingdoms' => 0,
+                'goblin_banks_level_five' => false,
+                'no_other_kingdoms' => true,
+                'no_other_kingdoms_message' => 'This capital city cannot deposit or withdraw Gold Bars because you do not own any other kingdoms on this plane. Gold Bar management only applies to your other kingdoms on the same plane, not this capital city.',
+            ];
+
+            if (! $returnResponse) {
+                return $data;
+            }
+
+            return $this->successResult([
+                'gold_bar_details' => $data,
+            ]);
+        }
 
         $goblinBank = GameBuilding::where('name', BuildingCosts::GOBLIN_COIN_BANK)->first();
 
@@ -41,6 +64,8 @@ class CapitalCityGoldBarManagementService
             'character_gold' => $character->gold,
             'total_kingdoms' => $kingdoms->count(),
             'goblin_banks_level_five' => $allBuildingsLevelFive,
+            'no_other_kingdoms' => false,
+            'no_other_kingdoms_message' => null,
         ];
 
         if (! $returnResponse) {
@@ -54,6 +79,15 @@ class CapitalCityGoldBarManagementService
 
     public function convertGoldBars(Character $character, Kingdom $kingdom, int $goldBars): array
     {
+        $allOtherKingdomsOnPlane = $character->kingdoms()
+            ->where('id', '!=', $kingdom->id)
+            ->where('game_map_id', $kingdom->game_map_id)
+            ->count();
+
+        if ($allOtherKingdomsOnPlane === 0) {
+            return $this->errorResult('This capital city cannot deposit or withdraw Gold Bars because you do not own any other kingdoms on this plane. Gold Bar management only applies to your other kingdoms on the same plane, not this capital city.');
+        }
+
         $kingdoms = $character->kingdoms()->where('game_map_id', $kingdom->game_map_id)
             ->where('id', '!=', $kingdom->id)
             ->whereRaw('(SELECT SUM(gold_bars) FROM kingdoms WHERE gold_bars > 0) >= ?', [$goldBars])
@@ -101,6 +135,15 @@ class CapitalCityGoldBarManagementService
     {
         if ($amountToPurchase < 1) {
             return $this->errorResult('Amount to purchase must be at least 1.');
+        }
+
+        $allOtherKingdomsOnPlane = $character->kingdoms()
+            ->where('id', '!=', $kingdom->id)
+            ->where('game_map_id', $kingdom->game_map_id)
+            ->count();
+
+        if ($allOtherKingdomsOnPlane === 0) {
+            return $this->errorResult('This capital city cannot deposit or withdraw Gold Bars because you do not own any other kingdoms on this plane. Gold Bar management only applies to your other kingdoms on the same plane, not this capital city.');
         }
 
         $cost = 2000000000 * $amountToPurchase;

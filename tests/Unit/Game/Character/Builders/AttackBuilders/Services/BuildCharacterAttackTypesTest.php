@@ -10,11 +10,12 @@ use Cache;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameClassSpecial;
 use Tests\Traits\CreateItem;
 
 class BuildCharacterAttackTypesTest extends TestCase
 {
-    use CreateItem, RefreshDatabase;
+    use CreateGameClassSpecial, CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -68,5 +69,86 @@ class BuildCharacterAttackTypesTest extends TestCase
         $this->assertNotNull(
             Cache::get('character-attack-data-'.$character->id)
         );
+    }
+
+    public function testBuildCharacterAttackTypesCalculatesDamageStatAmountFreshBeforeBuilding()
+    {
+        $character = $this->setUpCharacterForTests();
+
+        $classSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $character->game_class_id,
+            'specialty_damage' => 100,
+            'increase_specialty_damage_per_level' => 0,
+            'specialty_damage_uses_damage_stat_amount' => 1.0,
+        ]);
+
+        $character->classSpecialsEquipped()->create([
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 0,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        Cache::put('character-attack-data-'.$character->id, [
+            'damage_stat_amount' => 999999,
+            'attack_types' => [],
+        ]);
+
+        $liveStat = $character->getInformation()->statMod($character->damage_stat);
+        $expectedDamage = 100 + $liveStat * 1.0;
+
+        $cacheData = $this->buildCharacterAttackTypes->buildCache($character);
+
+        $this->assertEquals($liveStat, $cacheData['damage_stat_amount']);
+        $this->assertNotEquals(999999, $cacheData['damage_stat_amount']);
+        $this->assertEquals($expectedDamage, $cacheData['attack_types']['attack']['special_damage']['damage']);
+    }
+
+    public function testAttackCacheRebuildUpdatesClassSpecialtyDamageAfterCharacterStatChanges()
+    {
+        $character = $this->setUpCharacterForTests();
+
+        $classSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $character->game_class_id,
+            'specialty_damage' => 100,
+            'increase_specialty_damage_per_level' => 0,
+            'specialty_damage_uses_damage_stat_amount' => 1.0,
+        ]);
+
+        $character->classSpecialsEquipped()->create([
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 0,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $cacheData1 = $this->buildCharacterAttackTypes->buildCache($character);
+        $initialDamage = $cacheData1['attack_types']['attack']['special_damage']['damage'];
+
+        $damageStat = $character->damage_stat;
+        $character->update([
+            $damageStat => $character->{$damageStat} + 1000,
+        ]);
+        $character = $character->refresh();
+
+        Cache::put('character-attack-data-'.$character->id, [
+            'damage_stat_amount' => 1,
+            'attack_types' => [],
+        ]);
+
+        $cacheData2 = $this->buildCharacterAttackTypes->buildCache($character);
+        $updatedDamage = $cacheData2['attack_types']['attack']['special_damage']['damage'];
+
+        $this->assertGreaterThan($initialDamage, $updatedDamage);
+        $this->assertEquals(100 + $character->getInformation()->statMod($character->damage_stat), $updatedDamage);
+        $this->assertNotEquals(101, $updatedDamage);
     }
 }

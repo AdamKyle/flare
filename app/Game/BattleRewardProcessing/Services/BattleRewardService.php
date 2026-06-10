@@ -4,26 +4,24 @@ namespace App\Game\BattleRewardProcessing\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
-use App\Flare\Models\GameMap;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\Monster;
 use App\Flare\Services\CharacterRewardService;
-use App\Flare\Values\MapNameValue;
 use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
+use App\Game\Events\Values\EventType;
+use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
 use App\Game\BattleRewardProcessing\Jobs\Events\WinterEventChristmasGiftHandler;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
-use App\Game\Events\Values\EventType;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Flare\Models\ExplorationLog;
 use App\Game\Automation\Services\ExplorationLogService;
 use App\Game\Skills\Services\SkillService;
 use Exception;
-use Illuminate\Support\Facades\Cache;
 use Throwable;
 
 class BattleRewardService
@@ -450,51 +448,34 @@ class BattleRewardService
      * @throws Exception
      */
     private function handleGlobalEventParticipation(): void {
-        $cacheTtl = now()->addSeconds(15);
+        $gameMap = $this->character->map->gameMap;
+        $eventType = $gameMap->only_during_event_type;
 
-        $event = Cache::remember(
-            'battle_reward_service:active_event',
-            $cacheTtl,
-            static function (): ?Event {
-                return Event::whereIn('type', [
-                    EventType::WINTER_EVENT,
-                    EventType::DELUSIONAL_MEMORIES_EVENT,
-                ])->first();
-            }
-        );
+        if (is_null($eventType)) {
+            return;
+        }
+
+        $event = Event::where('type', $eventType)->first();
 
         if (is_null($event)) {
             return;
         }
 
-        $globalEventGoal = Cache::remember(
-            'battle_reward_service:global_event_goal:' . $event->type,
-            $cacheTtl,
-            static function () use ($event): ?GlobalEventGoal {
-                return GlobalEventGoal::where('event_type', $event->type)->first();
-            }
-        );
-
-        $gameMapArrays = Cache::remember(
-            'battle_reward_service:global_event_map_ids',
-            $cacheTtl,
-            static function (): array {
-                return GameMap::whereIn('name', [
-                    MapNameValue::ICE_PLANE,
-                    MapNameValue::DELUSIONAL_MEMORIES,
-                ])->pluck('id')->toArray();
-            }
-        );
-
-        if (is_null($globalEventGoal) || ! in_array($this->character->map->game_map_id, $gameMapArrays)) {
+        if ($eventType === EventType::DELUSIONAL_MEMORIES_EVENT && $event->current_event_goal_step !== GlobalEventSteps::BATTLE) {
             return;
         }
 
-        $totalKills = 1;
+        $globalEventGoal = GlobalEventGoal::where('event_type', $eventType)->first();
 
-        if (isset($this->context['total_creatures'])) {
-            $totalKills = $this->context['total_creatures'];
+        if (is_null($globalEventGoal)) {
+            return;
         }
+
+        if (is_null($globalEventGoal->max_kills)) {
+            return;
+        }
+
+        $totalKills = isset($this->context['total_creatures']) ? $this->context['total_creatures'] : 1;
 
         $this->battleGlobalEventParticipationHandler->handleGlobalEventParticipation($this->character, $globalEventGoal, $totalKills);
 

@@ -420,4 +420,24 @@ class CharacterReincarnationServiceTest extends TestCase
         $this->assertEquals(200, $result['status']);
         $this->assertSame(MaxReincarnationStats::MAX_STATS, $character->reincarnated_stat_increase);
     }
+
+    public function testReincarnationResetStoresCorrectXpNext(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $character->update([
+            'xp_penalty' => 0.0,
+            'copper_coins' => 100000,
+            'str' => 100,
+        ]);
+
+        $this->reincarnationService->doReincarnation($character->refresh());
+
+        $character = $character->refresh();
+
+        $expectedXpPenalty = 0.02;
+        $expectedXpNext = 100 + 100 * $expectedXpPenalty;
+
+        $this->assertEquals($expectedXpNext, $character->xp_next);
+    }
 }

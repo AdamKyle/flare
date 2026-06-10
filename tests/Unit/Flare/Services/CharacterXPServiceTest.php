@@ -5,6 +5,7 @@ namespace Tests\Unit\Flare\Services;
 use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Values\ItemEffectsValue;
+use App\Game\Core\Services\CharacterService;
 use Facades\App\Flare\Calculators\XPCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -631,5 +632,67 @@ class CharacterXPServiceTest extends TestCase
         $xp = $this->characterXPService->determineXPToAward($character->refresh(), 100);
 
         $this->assertEquals(160, $xp);
+    }
+
+    public function test_xp_next_is_100_when_leveling_to_999(): void
+    {
+        $character = $this->character->getCharacter();
+        $character->update(['level' => 998]);
+
+        $characterService = resolve(CharacterService::class);
+        $characterService->levelUpCharacter($character->refresh(), 0);
+
+        $this->assertEquals(100, $character->refresh()->xp_next);
+    }
+
+    public function test_xp_next_is_1000_when_leveling_to_1000(): void
+    {
+        $character = $this->character->getCharacter();
+        $character->update(['level' => 999]);
+
+        $characterService = resolve(CharacterService::class);
+        $characterService->levelUpCharacter($character->refresh(), 0);
+
+        $this->assertEquals(1000, $character->refresh()->xp_next);
+    }
+
+    public function test_xp_next_is_35000_when_leveling_to_4999(): void
+    {
+        $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        MaxLevelConfiguration::create([
+            'max_level' => 5000,
+            'half_way' => 2500,
+            'three_quarters' => 3750,
+            'last_leg' => 4800,
+        ]);
+
+        $character->update(['level' => 4998]);
+
+        $characterService = resolve(CharacterService::class);
+        $characterService->levelUpCharacter($character->refresh(), 0);
+
+        $this->assertEquals(35000, $character->refresh()->xp_next);
+    }
+
+    public function test_xp_next_with_reincarnation_penalty_when_leveling_to_4999(): void
+    {
+        $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        MaxLevelConfiguration::create([
+            'max_level' => 5000,
+            'half_way' => 2500,
+            'three_quarters' => 3750,
+            'last_leg' => 4800,
+        ]);
+
+        $character->update(['level' => 4998, 'xp_penalty' => 5.96]);
+
+        $characterService = resolve(CharacterService::class);
+        $characterService->levelUpCharacter($character->refresh(), 0);
+
+        $this->assertEquals(243600, $character->refresh()->xp_next);
     }
 }

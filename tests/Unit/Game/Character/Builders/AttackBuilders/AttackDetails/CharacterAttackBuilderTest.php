@@ -129,6 +129,69 @@ class CharacterAttackBuilderTest extends TestCase
         $this->assertEmpty($attack['special_damage']);
     }
 
+    public function testCharacterAttackBuilderUsesPassedDamageStatAmountForClassSpecialDamage()
+    {
+        $character = $this->setUpCharacterForTests();
+
+        $classSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $character->game_class_id,
+            'specialty_damage' => 100,
+            'increase_specialty_damage_per_level' => 0,
+            'specialty_damage_uses_damage_stat_amount' => 1.0,
+        ]);
+
+        $character->classSpecialsEquipped()->create([
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 0,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $attack = $this->characterAttackBuilder->setCharacter($character, false, 250.0)->buildAttack();
+
+        $this->assertEquals(350.0, $attack['special_damage']['damage']);
+    }
+
+    public function testCharacterAttackBuilderIgnoresStaleCacheWhenCalculatingClassSpecialDamage()
+    {
+        $character = $this->setUpCharacterForTests();
+
+        $classSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $character->game_class_id,
+            'specialty_damage' => 100,
+            'increase_specialty_damage_per_level' => 0,
+            'specialty_damage_uses_damage_stat_amount' => 1.0,
+        ]);
+
+        $character->classSpecialsEquipped()->create([
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 0,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        \Cache::put('character-attack-data-'.$character->id, [
+            'damage_stat_amount' => 999999,
+            'attack_types' => [],
+        ]);
+
+        $liveStat = $character->getInformation()->statMod($character->damage_stat);
+        $expectedDamage = 100 + $liveStat * 1.0;
+
+        $attack = $this->characterAttackBuilder->setCharacter($character)->buildAttack();
+
+        $this->assertEquals($expectedDamage, $attack['special_damage']['damage']);
+        $this->assertNotEquals(100 + 999999 * 1.0, $attack['special_damage']['damage']);
+    }
+
     private function setUpCharacterForTests(): Character
     {
         $item = $this->createItem([

@@ -5,16 +5,18 @@ namespace Tests\Feature\Game\Events\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Values\ItemSpecialtyType;
+use App\Flare\Values\MapNameValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Events\Values\EventType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGlobalEventGoal;
 
 class EventGoalsControllerTest extends TestCase
 {
-    use CreateGlobalEventGoal, RefreshDatabase;
+    use CreateGameMap, CreateGlobalEventGoal, RefreshDatabase;
 
     private ?Character $character = null;
 
@@ -59,8 +61,14 @@ class EventGoalsControllerTest extends TestCase
         $this->eventGoal = null;
     }
 
-    public function testGetGlobalEventGoal()
+    public function testGetGlobalEventGoal(): void
     {
+        $this->character->map()->update([
+            'game_map_id' => $this->createGameMap([
+                'name' => MapNameValue::ICE_PLANE,
+                'only_during_event_type' => EventType::WINTER_EVENT,
+            ])->id,
+        ]);
 
         $response = $this->actingAs($this->character->user)
             ->call('GET', '/api/global-event-goals/'.$this->character->id);
@@ -83,5 +91,55 @@ class EventGoalsControllerTest extends TestCase
             'total_crafts' => 0,
             'total_enchants' => 0,
         ], $jsonData['event_goals']);
+    }
+
+    public function testGetGlobalEventGoalReturnsNullWhenCharacterNotOnEventMap(): void
+    {
+        $response = $this->actingAs($this->character->user)
+            ->call('GET', '/api/global-event-goals/'.$this->character->id);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertNull($jsonData['event_goals']);
+    }
+
+    public function testGetGlobalEventGoalReturnsNullWhenNoGoalExistsForMap(): void
+    {
+        $this->character->map()->update([
+            'game_map_id' => $this->createGameMap([
+                'name' => MapNameValue::ICE_PLANE,
+                'only_during_event_type' => EventType::WINTER_EVENT,
+            ])->id,
+        ]);
+
+        $this->eventGoal->delete();
+
+        $response = $this->actingAs($this->character->user)
+            ->call('GET', '/api/global-event-goals/'.$this->character->id);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertNull($jsonData['event_goals']);
+    }
+
+    public function testGetGlobalEventGoalShowsZerosWhenCharacterHasNoParticipation(): void
+    {
+        $anotherCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $anotherCharacter->map()->update([
+            'game_map_id' => $this->createGameMap([
+                'name' => MapNameValue::ICE_PLANE,
+                'only_during_event_type' => EventType::WINTER_EVENT,
+            ])->id,
+        ]);
+
+        $response = $this->actingAs($anotherCharacter->user)
+            ->call('GET', '/api/global-event-goals/'.$anotherCharacter->id);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(0, $jsonData['event_goals']['current_kills']);
+        $this->assertEquals(0, $jsonData['event_goals']['current_crafts']);
+        $this->assertEquals(0, $jsonData['event_goals']['current_enchants']);
     }
 }

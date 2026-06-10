@@ -18,6 +18,7 @@ use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Events\Values\EventType;
+use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
 use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -323,6 +324,7 @@ class BattleRewardServiceTest extends TestCase
         $character->map()->update([
             'game_map_id' => $this->createGameMap([
                 'name' => MapNameValue::ICE_PLANE,
+                'only_during_event_type' => EventType::WINTER_EVENT,
             ])->id,
         ]);
 
@@ -360,6 +362,7 @@ class BattleRewardServiceTest extends TestCase
         $character->map()->update([
             'game_map_id' => $this->createGameMap([
                 'name' => MapNameValue::ICE_PLANE,
+                'only_during_event_type' => EventType::WINTER_EVENT,
             ])->id,
         ]);
 
@@ -1002,6 +1005,7 @@ class BattleRewardServiceTest extends TestCase
         $character->map()->update([
             'game_map_id' => $this->createGameMap([
                 'name' => MapNameValue::ICE_PLANE,
+                'only_during_event_type' => EventType::WINTER_EVENT,
             ])->id,
         ]);
 
@@ -1048,6 +1052,277 @@ class BattleRewardServiceTest extends TestCase
 
         $this->assertEquals(3, $character->globalEventParticipation->current_kills);
         $this->assertEquals(3, $character->globalEventKills->kills);
+    }
+
+    public function testShouldNotUpdateGlobalEventParticipationWhenCharacterNotOnEventMap(): void
+    {
+        $character = $this->characterFactory->getCharacter();
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+        ]);
+
+        $this->createEvent([
+            'type' => EventType::WINTER_EVENT,
+        ]);
+
+        $this->createGlobalEventGoal([
+            'max_kills' => 100,
+            'event_type' => EventType::WINTER_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        Event::fake();
+        Queue::fake();
+
+        $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
+
+        $character = $character->refresh();
+
+        $this->assertNull($character->globalEventParticipation);
+    }
+
+    public function testShouldUpdateGlobalEventParticipationForDelusionalMemoriesEvent(): void
+    {
+        $character = $this->characterFactory->getCharacter();
+
+        $character->map()->update([
+            'game_map_id' => $this->createGameMap([
+                'name' => MapNameValue::DELUSIONAL_MEMORIES,
+                'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            ])->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+        ]);
+
+        $this->createEvent([
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'current_event_goal_step' => GlobalEventSteps::BATTLE,
+        ]);
+
+        $this->createGlobalEventGoal([
+            'max_kills' => 100,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        Event::fake();
+        Queue::fake();
+
+        $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
+
+        $character = $character->refresh();
+
+        $this->assertNotNull($character->globalEventParticipation);
+    }
+
+    public function testManualBattleKillsOnEventMapCountForThatMapsEventGoal(): void
+    {
+        $character = $this->characterFactory->getCharacter();
+
+        $character->map()->update([
+            'game_map_id' => $this->createGameMap([
+                'name' => MapNameValue::ICE_PLANE,
+                'only_during_event_type' => EventType::WINTER_EVENT,
+            ])->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+        ]);
+
+        $this->createEvent([
+            'type' => EventType::WINTER_EVENT,
+        ]);
+
+        $this->createGlobalEventGoal([
+            'max_kills' => 100,
+            'event_type' => EventType::WINTER_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        Event::fake();
+        Queue::fake();
+
+        $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
+
+        $character = $character->refresh();
+
+        $this->assertNotNull($character->globalEventParticipation);
+        $this->assertEquals(1, $character->globalEventParticipation->current_kills);
+    }
+
+    public function testManualBattleKillsDoNotCountWhenMaxKillsIsNull(): void
+    {
+        $character = $this->characterFactory->getCharacter();
+
+        $character->map()->update([
+            'game_map_id' => $this->createGameMap([
+                'name' => MapNameValue::ICE_PLANE,
+                'only_during_event_type' => EventType::WINTER_EVENT,
+            ])->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+        ]);
+
+        $this->createEvent([
+            'type' => EventType::WINTER_EVENT,
+        ]);
+
+        $this->createGlobalEventGoal([
+            'max_kills' => null,
+            'event_type' => EventType::WINTER_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        Event::fake();
+        Queue::fake();
+
+        $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
+
+        $character = $character->refresh();
+
+        $this->assertNull($character->globalEventParticipation);
+    }
+
+    public function testDelusionalMemoriesKillsDoNotCountWhenCurrentStepIsCraft(): void
+    {
+        $character = $this->characterFactory->getCharacter();
+
+        $character->map()->update([
+            'game_map_id' => $this->createGameMap([
+                'name' => MapNameValue::DELUSIONAL_MEMORIES,
+                'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            ])->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+        ]);
+
+        $this->createEvent([
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'current_event_goal_step' => GlobalEventSteps::CRAFT,
+        ]);
+
+        $this->createGlobalEventGoal([
+            'max_kills' => 100,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        Event::fake();
+        Queue::fake();
+
+        $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
+
+        $character = $character->refresh();
+
+        $this->assertNull($character->globalEventParticipation);
+    }
+
+    public function testDelusionalMemoriesKillsDoNotCountWhenCurrentStepIsEnchant(): void
+    {
+        $character = $this->characterFactory->getCharacter();
+
+        $character->map()->update([
+            'game_map_id' => $this->createGameMap([
+                'name' => MapNameValue::DELUSIONAL_MEMORIES,
+                'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            ])->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+        ]);
+
+        $this->createEvent([
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'current_event_goal_step' => GlobalEventSteps::ENCHANT,
+        ]);
+
+        $this->createGlobalEventGoal([
+            'max_kills' => 100,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        Event::fake();
+        Queue::fake();
+
+        $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
+
+        $character = $character->refresh();
+
+        $this->assertNull($character->globalEventParticipation);
+    }
+
+    public function testEventKillCountingResolvesEventGoalFromCharactersCurrentMap(): void
+    {
+        $character = $this->characterFactory->getCharacter();
+
+        $winterMap = $this->createGameMap([
+            'name' => MapNameValue::ICE_PLANE,
+            'only_during_event_type' => EventType::WINTER_EVENT,
+        ]);
+
+        $character->map()->update([
+            'game_map_id' => $winterMap->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+        ]);
+
+        $this->createEvent([
+            'type' => EventType::WINTER_EVENT,
+        ]);
+
+        $winterGoal = $this->createGlobalEventGoal([
+            'max_kills' => 100,
+            'event_type' => EventType::WINTER_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        $this->createGlobalEventGoal([
+            'max_kills' => 100,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        Event::fake();
+        Queue::fake();
+
+        $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
+
+        $character = $character->refresh();
+
+        $this->assertNotNull($character->globalEventParticipation);
+        $this->assertEquals($winterGoal->id, $character->globalEventParticipation->global_event_goal_id);
     }
 
 

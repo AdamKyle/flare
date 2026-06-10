@@ -28,17 +28,20 @@ class CharacterService
      */
     protected function getXPForNextLevel(int $nextLevel): int
     {
-        if ($nextLevel > 999) {
-            $xpAtLevel1000 = 1000;
-
-            $baseXPFactor = (2000 - $xpAtLevel1000) / pow(1000, 3);
-
-            $xpRequired = $xpAtLevel1000 + $baseXPFactor * pow(($nextLevel - 1000), 3);
-            $xpRequired = min($xpRequired, 1000000);
-
-            return (int) $xpRequired;
+        if ($nextLevel <= 1000) {
+            return 100;
         }
 
-        return 100;
+        if ($nextLevel >= 5000) {
+            return 35000;
+        }
+
+        $startLevel = 1001;
+        $endLevel = 5000;
+        $startXP = 1000;
+        $maxXP = 35000;
+        $progress = ($nextLevel - $startLevel) / ($endLevel - $startLevel);
+
+        return (int) ($startXP + (($maxXP - $startXP) * pow($progress, 3)));
     }
 }

@@ -3,4 +3,6 @@ export default interface GoldBarData {
     character_gold: number;
     total_kingdoms: number;
     goblin_banks_level_five: boolean;
+    no_other_kingdoms: boolean;
+    no_other_kingdoms_message: string | null;
 }

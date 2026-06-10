@@ -168,6 +168,10 @@ export default class GoldBarManagement extends React.Component<
             return true;
         }
 
+        if (this.state.gold_bar_data.no_other_kingdoms) {
+            return true;
+        }
+
         if (!this.state.gold_bar_data.goblin_banks_level_five) {
             return true;
         }
@@ -242,7 +246,17 @@ export default class GoldBarManagement extends React.Component<
                     />
                 </div>
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-4"></div>
-                {!this.state.gold_bar_data.goblin_banks_level_five ? (
+                {this.state.gold_bar_data.no_other_kingdoms ? (
+                    <InfoAlert additional_css="my-4">
+                        {this.state.gold_bar_data.no_other_kingdoms_message}
+                        <p className="mt-2">
+                            Settle another kingdom on this plane before managing
+                            Gold Bars from this capital city.
+                        </p>
+                    </InfoAlert>
+                ) : null}
+                {!this.state.gold_bar_data.no_other_kingdoms &&
+                !this.state.gold_bar_data.goblin_banks_level_five ? (
                     <WarningAlert additional_css="my-4">
                         You cannot use this feature as every single kingdom on
                         this plane needs a level 5 Goblin Bank. You can unlock
@@ -300,7 +314,7 @@ export default class GoldBarManagement extends React.Component<
                             </div>
                         </div>
                         <dl className="my-4">
-                            <dt>Current Gold Bars</dt>
+                            <dt>Gold Bars in other kingdoms on this plane</dt>
                             <dd>
                                 {formatNumber(
                                     this.state.gold_bar_data.total_gold_bars,
@@ -319,6 +333,7 @@ export default class GoldBarManagement extends React.Component<
                             button_label={"Deposit Amount"}
                             on_click={this.deposit.bind(this)}
                             disabled={
+                                this.state.gold_bar_data.no_other_kingdoms ||
                                 (this.state
                                     .amount_of_gold_bars_to_buy as number) <=
                                     0 ||
@@ -352,7 +367,7 @@ export default class GoldBarManagement extends React.Component<
                             </div>
                         </div>
                         <dl className="my-4">
-                            <dt>Current Gold Bars</dt>
+                            <dt>Gold Bars in other kingdoms on this plane</dt>
                             <dd>
                                 {formatNumber(
                                     this.state.gold_bar_data.total_gold_bars,
@@ -365,6 +380,7 @@ export default class GoldBarManagement extends React.Component<
                             button_label={"Withdraw Amount"}
                             on_click={this.withdraw.bind(this)}
                             disabled={
+                                this.state.gold_bar_data.no_other_kingdoms ||
                                 (this.state
                                     .amount_of_gold_bars_to_sell as number) <=
                                     0 ||

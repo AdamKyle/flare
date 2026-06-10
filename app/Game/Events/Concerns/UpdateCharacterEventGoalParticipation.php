@@ -12,8 +12,9 @@ trait UpdateCharacterEventGoalParticipation
      */
     public function handleUpdatingParticipation(Character $character, GlobalEventGoal $globalEventGoal, string $attribute, int $amount = 1): void
     {
-
-        $globalEventParticipation = $character->globalEventParticipation;
+        $globalEventParticipation = $character->globalEventParticipation()
+            ->where('global_event_goal_id', $globalEventGoal->id)
+            ->first();
 
         if (is_null($globalEventParticipation)) {
 
@@ -51,35 +52,83 @@ trait UpdateCharacterEventGoalParticipation
         }
 
         if ($attribute === 'crafts') {
-            $character->globalEventParticipation()->update([
-                'current_crafts' => $character->globalEventParticipation->current_crafts + $amount,
-            ]);
+            $newTotal = $globalEventParticipation->current_crafts + $amount;
 
-            $character->globalEventCrafts()->update([
-                'crafts' => $character->globalEventCrafts->crafts + $amount,
-            ]);
+            $character->globalEventParticipation()
+                ->where('global_event_goal_id', $globalEventGoal->id)
+                ->update(['current_crafts' => $newTotal]);
+
+            $craftsRow = $character->globalEventCrafts()
+                ->where('global_event_goal_id', $globalEventGoal->id)
+                ->first();
+
+            if (is_null($craftsRow)) {
+                $character->globalEventCrafts()->create([
+                    'global_event_goal_id' => $globalEventGoal->id,
+                    'character_id' => $character->id,
+                    'crafts' => $newTotal,
+                ]);
+
+                return;
+            }
+
+            $character->globalEventCrafts()
+                ->where('global_event_goal_id', $globalEventGoal->id)
+                ->update(['crafts' => $newTotal]);
 
             return;
         }
 
         if ($attribute === 'enchants') {
-            $character->globalEventParticipation()->update([
-                'current_enchants' => $character->globalEventParticipation->current_enchants + $amount,
-            ]);
+            $newTotal = $globalEventParticipation->current_enchants + $amount;
 
-            $character->globalEventEnchants()->update([
-                'enchants' => $character->globalEventEnchants->enchants + $amount,
+            $character->globalEventParticipation()
+                ->where('global_event_goal_id', $globalEventGoal->id)
+                ->update(['current_enchants' => $newTotal]);
+
+            $enchantsRow = $character->globalEventEnchants()
+                ->where('global_event_goal_id', $globalEventGoal->id)
+                ->first();
+
+            if (is_null($enchantsRow)) {
+                $character->globalEventEnchants()->create([
+                    'global_event_goal_id' => $globalEventGoal->id,
+                    'character_id' => $character->id,
+                    'enchants' => $newTotal,
+                ]);
+
+                return;
+            }
+
+            $character->globalEventEnchants()
+                ->where('global_event_goal_id', $globalEventGoal->id)
+                ->update(['enchants' => $newTotal]);
+
+            return;
+        }
+
+        $newTotal = $globalEventParticipation->current_kills + $amount;
+
+        $character->globalEventParticipation()
+            ->where('global_event_goal_id', $globalEventGoal->id)
+            ->update(['current_kills' => $newTotal]);
+
+        $killsRow = $character->globalEventKills()
+            ->where('global_event_goal_id', $globalEventGoal->id)
+            ->first();
+
+        if (is_null($killsRow)) {
+            $character->globalEventKills()->create([
+                'global_event_goal_id' => $globalEventGoal->id,
+                'character_id' => $character->id,
+                'kills' => $newTotal,
             ]);
 
             return;
         }
 
-        $character->globalEventParticipation()->update([
-            'current_kills' => $character->globalEventParticipation->current_kills + $amount,
-        ]);
-
-        $character->globalEventKills()->update([
-            'kills' => $character->globalEventKills->kills + $amount,
-        ]);
+        $character->globalEventKills()
+            ->where('global_event_goal_id', $globalEventGoal->id)
+            ->update(['kills' => $newTotal]);
     }
 }
