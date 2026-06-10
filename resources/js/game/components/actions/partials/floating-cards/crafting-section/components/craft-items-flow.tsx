@@ -275,14 +275,20 @@ const CraftItemsFlow = ({
     );
   };
 
-  const renderMessages = () => (
-    <div className="min-h-[3rem]">
-      {error && <Alert variant={AlertVariant.DANGER}>{error}</Alert>}
-      {successMessage && (
-        <Alert variant={AlertVariant.SUCCESS}>{successMessage}</Alert>
-      )}
-    </div>
-  );
+  const renderMessages = () => {
+    if (!error && !successMessage) {
+      return null;
+    }
+
+    return (
+      <div className="my-4">
+        {error && <Alert variant={AlertVariant.DANGER}>{error}</Alert>}
+        {successMessage && (
+          <Alert variant={AlertVariant.SUCCESS}>{successMessage}</Alert>
+        )}
+      </div>
+    );
+  };
 
   const renderTimeoutMessage = () => {
     if (!isTimeoutActive) {
