@@ -311,6 +311,33 @@ class MonsterListServiceTest extends TestCase
         ], $data);
     }
 
+    public function test_listing_with_location_at_position_does_not_query_removed_columns()
+    {
+        $character = $this->characterFactory->getCharacter();
+
+        $mapName = $character->map->gameMap->name;
+
+        $position = $character->map;
+
+        Location::factory()->create([
+            'x' => $position->character_position_x,
+            'y' => $position->character_position_y,
+            'game_map_id' => $position->game_map_id,
+        ]);
+
+        $this->seedMonstersCache([
+            $mapName => [
+                'data' => [['id' => 99, 'name' => 'Cave Rat', 'max_level' => 5]],
+            ],
+        ]);
+
+        $this->seedSpecialLocationCache([]);
+
+        $response = $this->service->getMonstersForCharacter($character);
+
+        $this->assertTrue($response['success']);
+    }
+
     private function seedMonstersCache(array $payload): void
     {
         Cache::put('monsters', $payload, 60);

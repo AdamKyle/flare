@@ -1,19 +1,11 @@
 import clsx from 'clsx';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
-import CraftableItemDefinition from '../api/definitions/craftable-item-definition';
+import CraftItemListProps from '../types/craft-item-list-props';
 
 import { formatNumberWithCommas } from 'game-utils/format-number';
 
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
-
-interface CraftItemListProps {
-  items: CraftableItemDefinition[];
-  selectedItem: CraftableItemDefinition | null;
-  loadingMore: boolean;
-  onScroll: (event: React.UIEvent<HTMLDivElement>) => void;
-  onSelect: (item: CraftableItemDefinition) => void;
-}
 
 const CraftItemList = ({
   items,
@@ -21,7 +13,7 @@ const CraftItemList = ({
   loadingMore,
   onScroll,
   onSelect,
-}: CraftItemListProps) => {
+}: CraftItemListProps): ReactNode => {
   if (items.length === 0) {
     return (
       <p className="py-6 text-center text-sm text-gray-600 dark:text-gray-300">

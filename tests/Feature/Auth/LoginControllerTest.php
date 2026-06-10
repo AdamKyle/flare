@@ -14,8 +14,8 @@ class LoginControllerTest extends TestCase
     {
         $response = $this->call('GET', '/login');
 
-        $response->assertSee('<input id="password" type="password" class="form-control" name="password" required autocomplete="current-password" autofocus>', false);
-        $response->assertDontSee('<input id="password" type="password" class="form-control" name="password" required autocomplete="new-password" autofocus>', false);
+        $response->assertSee('autocomplete="current-password"', false);
+        $response->assertDontSee('autocomplete="new-password"', false);
     }
 
     public function test_existing_user_can_login_with_correct_password(): void

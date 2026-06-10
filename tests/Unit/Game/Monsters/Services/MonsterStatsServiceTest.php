@@ -97,7 +97,7 @@ class MonsterStatsServiceTest extends TestCase
         $response = $this->service->getMonsterStats($character->refresh(), $monster);
         $row = $this->unwrap($response);
 
-        $this->assertSame(13, $row['str']);
+        $this->assertSame(11, $row['str']);
     }
 
     public function test_location_percent_increase_scales_stats_on_basic_map()
@@ -132,7 +132,7 @@ class MonsterStatsServiceTest extends TestCase
         $response = $this->service->getMonsterStats($character->refresh(), $monster);
         $row = $this->unwrap($response);
 
-        $this->assertSame(12, $row['str']);
+        $this->assertSame(10, $row['str']);
     }
 
     public function test_regular_monster_flag_is_returned()

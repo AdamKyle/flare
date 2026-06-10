@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 
 import CraftItemList from './craft-item-list';
 import CraftableItemDefinition from '../api/definitions/craftable-item-definition';
@@ -34,8 +34,11 @@ const progressFillClass = (progress: number): string => {
   return 'bg-emerald-300 dark:bg-emerald-400';
 };
 
-const CraftItemsFlow = ({ setActiveCraftingType }: BaseSectionProps) => {
+const CraftItemsFlow = ({
+  setActiveCraftingType,
+}: BaseSectionProps): ReactNode => {
   const { gameData } = useGameData();
+
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [armourType, setArmourType] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] =
@@ -44,6 +47,7 @@ const CraftItemsFlow = ({ setActiveCraftingType }: BaseSectionProps) => {
   const [searchText, setSearchText] = useState('');
   const [craftForNpc, setCraftForNpc] = useState(false);
   const [craftForEvent, setCraftForEvent] = useState(false);
+
   const { isTimeoutActive, isCraftingDisabled, progress, formattedRemaining } =
     useCraftingTimeout(gameData?.character);
 
@@ -142,17 +146,21 @@ const CraftItemsFlow = ({ setActiveCraftingType }: BaseSectionProps) => {
 
   const canShowItems =
     selectedType !== null && (selectedType !== 'armour' || armourType !== null);
+
   const inventoryIsFull = Boolean(
     craftingData &&
     craftingData.inventory_count.current_count >=
       craftingData.inventory_count.max_inventory
   );
+
   const selectedTypeOption = craftTypeOptions.find(
     (option) => option.value === selectedType
   );
+
   const selectedArmourTypeOption = armourTypeOptions.find(
     (option) => option.value === armourType
   );
+
   const canCraftForNpc = Boolean(
     selectedItem &&
     craftingData?.show_craft_for_npc &&
@@ -160,9 +168,203 @@ const CraftItemsFlow = ({ setActiveCraftingType }: BaseSectionProps) => {
       (task) => task.item_id === selectedItem.id
     )
   );
+
   const canCraftForEvent = Boolean(
     selectedItem && craftingData?.show_craft_for_event
   );
+
+  const renderArmourTypeFieldset = () => {
+    if (selectedType !== 'armour') {
+      return null;
+    }
+
+    return (
+      <fieldset>
+        <legend className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+          Armour Type
+        </legend>
+        <Dropdown
+          items={armourTypeOptions}
+          on_select={handleArmourTypeChange}
+          selection_placeholder="Select an armour type"
+          pre_selected_item={selectedArmourTypeOption}
+          force_clear={armourType === null}
+          all_click_outside
+          use_portal
+        />
+      </fieldset>
+    );
+  };
+
+  const renderCraftingSummary = () => {
+    if (!craftingData) {
+      return null;
+    }
+
+    return (
+      <div className="grid grid-cols-2 gap-3 text-sm">
+        <div className="rounded-md bg-gray-100 p-3 dark:bg-gray-800">
+          <span className="block font-semibold">
+            {craftingData.xp.skill_name} level{' '}
+            {formatNumberWithCommas(craftingData.xp.level)}
+          </span>
+          <span>
+            XP: {formatNumberWithCommas(craftingData.xp.current_xp)} /{' '}
+            {formatNumberWithCommas(craftingData.xp.next_level_xp)}
+          </span>
+        </div>
+        <div className="rounded-md bg-gray-100 p-3 dark:bg-gray-800">
+          <span className="block font-semibold">Inventory</span>
+          <span>
+            {formatNumberWithCommas(craftingData.inventory_count.current_count)}{' '}
+            /{' '}
+            {formatNumberWithCommas(craftingData.inventory_count.max_inventory)}
+          </span>
+        </div>
+      </div>
+    );
+  };
+
+  const renderCraftItems = () => {
+    if (loading) {
+      return <InfiniteLoader />;
+    }
+
+    return (
+      <CraftItemList
+        items={items}
+        selectedItem={selectedItem}
+        loadingMore={isLoadingMore}
+        onScroll={handleScroll}
+        onSelect={handleSelectItem}
+      />
+    );
+  };
+
+  const renderCraftForNpcCheckbox = () => {
+    if (!canCraftForNpc) {
+      return null;
+    }
+
+    return (
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={craftForNpc}
+          onChange={handleCraftForNpcChange}
+        />
+        Craft for the faction loyalty NPC
+      </label>
+    );
+  };
+
+  const renderCraftForEventCheckbox = () => {
+    if (!canCraftForEvent) {
+      return null;
+    }
+
+    return (
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={craftForEvent}
+          onChange={handleCraftForEventChange}
+        />
+        Craft for the global event
+      </label>
+    );
+  };
+
+  const renderMessages = () => (
+    <div className="min-h-[3rem]">
+      {error && <Alert variant={AlertVariant.DANGER}>{error}</Alert>}
+      {successMessage && (
+        <Alert variant={AlertVariant.SUCCESS}>{successMessage}</Alert>
+      )}
+    </div>
+  );
+
+  const renderTimeoutMessage = () => {
+    if (!isTimeoutActive) {
+      return null;
+    }
+
+    return (
+      <p
+        className="text-mango-tango-700 dark:text-mango-tango-300 mt-2 text-sm"
+        role="status"
+        aria-live="polite"
+      >
+        You can craft again in {formattedRemaining}.
+      </p>
+    );
+  };
+
+  const renderInventoryFullMessage = () => {
+    if (!inventoryIsFull) {
+      return null;
+    }
+
+    return (
+      <p className="mt-2 text-sm text-rose-600 dark:text-rose-400">
+        Your inventory is full.
+      </p>
+    );
+  };
+
+  const renderSelectedItem = () => {
+    if (!selectedItem) {
+      return null;
+    }
+
+    return (
+      <div className="rounded-md border border-gray-400 p-3 dark:border-gray-600">
+        <p className="font-semibold">{selectedItem.name}</p>
+        <p className="text-sm">
+          Cost: {formatNumberWithCommas(selectedItem.cost)} gold
+        </p>
+        <ProgressButton
+          label={isCrafting ? 'Crafting...' : 'Craft Item'}
+          on_click={handleCraft}
+          variant={ButtonVariant.SUCCESS}
+          progress={progress}
+          disabled={isCrafting || isCraftingDisabled || inventoryIsFull}
+          additional_css="mt-3 w-full"
+          progress_fill_class={progressFillClass(progress)}
+        />
+        {renderTimeoutMessage()}
+        {renderInventoryFullMessage()}
+      </div>
+    );
+  };
+
+  const renderCraftingStep = () => {
+    if (!canShowItems) {
+      return null;
+    }
+
+    return (
+      <>
+        <fieldset>
+          <legend className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+            Search Items
+          </legend>
+          <Input
+            value={searchInput}
+            on_change={handleSearch}
+            place_holder="Search craftable items"
+            clearable
+          />
+        </fieldset>
+        {renderCraftingSummary()}
+        {renderCraftItems()}
+        {renderCraftForNpcCheckbox()}
+        {renderCraftForEventCheckbox()}
+        {renderMessages()}
+        {renderSelectedItem()}
+      </>
+    );
+  };
 
   return (
     <div className="space-y-4">
@@ -181,138 +383,9 @@ const CraftItemsFlow = ({ setActiveCraftingType }: BaseSectionProps) => {
         />
       </fieldset>
 
-      {selectedType === 'armour' && (
-        <fieldset>
-          <legend className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-            Armour Type
-          </legend>
-          <Dropdown
-            items={armourTypeOptions}
-            on_select={handleArmourTypeChange}
-            selection_placeholder="Select an armour type"
-            pre_selected_item={selectedArmourTypeOption}
-            force_clear={armourType === null}
-            all_click_outside
-            use_portal
-          />
-        </fieldset>
-      )}
+      {renderArmourTypeFieldset()}
 
-      {canShowItems && (
-        <>
-          <fieldset>
-            <legend className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-              Search Items
-            </legend>
-            <Input
-              value={searchInput}
-              on_change={handleSearch}
-              place_holder="Search craftable items"
-              clearable
-            />
-          </fieldset>
-
-          {craftingData && (
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div className="rounded-md bg-gray-100 p-3 dark:bg-gray-800">
-                <span className="block font-semibold">
-                  {craftingData.xp.skill_name} level{' '}
-                  {formatNumberWithCommas(craftingData.xp.level)}
-                </span>
-                <span>
-                  XP: {formatNumberWithCommas(craftingData.xp.current_xp)} /{' '}
-                  {formatNumberWithCommas(craftingData.xp.next_level_xp)}
-                </span>
-              </div>
-              <div className="rounded-md bg-gray-100 p-3 dark:bg-gray-800">
-                <span className="block font-semibold">Inventory</span>
-                <span>
-                  {formatNumberWithCommas(
-                    craftingData.inventory_count.current_count
-                  )}{' '}
-                  /{' '}
-                  {formatNumberWithCommas(
-                    craftingData.inventory_count.max_inventory
-                  )}
-                </span>
-              </div>
-            </div>
-          )}
-
-          {loading ? (
-            <InfiniteLoader />
-          ) : (
-            <CraftItemList
-              items={items}
-              selectedItem={selectedItem}
-              loadingMore={isLoadingMore}
-              onScroll={handleScroll}
-              onSelect={handleSelectItem}
-            />
-          )}
-
-          {canCraftForNpc && (
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={craftForNpc}
-                onChange={handleCraftForNpcChange}
-              />
-              Craft for the faction loyalty NPC
-            </label>
-          )}
-
-          {canCraftForEvent && (
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={craftForEvent}
-                onChange={handleCraftForEventChange}
-              />
-              Craft for the global event
-            </label>
-          )}
-
-          <div className="min-h-[3rem]">
-            {error && <Alert variant={AlertVariant.DANGER}>{error}</Alert>}
-            {successMessage && (
-              <Alert variant={AlertVariant.SUCCESS}>{successMessage}</Alert>
-            )}
-          </div>
-
-          {selectedItem && (
-            <div className="rounded-md border border-gray-400 p-3 dark:border-gray-600">
-              <p className="font-semibold">{selectedItem.name}</p>
-              <p className="text-sm">
-                Cost: {formatNumberWithCommas(selectedItem.cost)} gold
-              </p>
-              <ProgressButton
-                label={isCrafting ? 'Crafting...' : 'Craft Item'}
-                on_click={handleCraft}
-                variant={ButtonVariant.SUCCESS}
-                progress={progress}
-                disabled={isCrafting || isCraftingDisabled || inventoryIsFull}
-                additional_css="mt-3 w-full"
-                progress_fill_class={progressFillClass(progress)}
-              />
-              {isTimeoutActive && (
-                <p
-                  className="text-mango-tango-700 dark:text-mango-tango-300 mt-2 text-sm"
-                  role="status"
-                  aria-live="polite"
-                >
-                  You can craft again in {formattedRemaining}.
-                </p>
-              )}
-              {inventoryIsFull && (
-                <p className="mt-2 text-sm text-rose-600 dark:text-rose-400">
-                  Your inventory is full.
-                </p>
-              )}
-            </div>
-          )}
-        </>
-      )}
+      {renderCraftingStep()}
 
       <div className="grid grid-cols-2 gap-3">
         <Button

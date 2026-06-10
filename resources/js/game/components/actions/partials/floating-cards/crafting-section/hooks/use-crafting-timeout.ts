@@ -3,16 +3,11 @@ import { useEffect, useRef, useState } from 'react';
 
 import { CraftingApiUrls } from '../api/enums/crafting-api-urls';
 import { formatCraftingTimeout } from '../utils/format-crafting-timeout';
+import CraftingTimeoutState from './definitions/crafting-timeout-state';
 import UseCraftingTimeoutDefinition from './definitions/use-crafting-timeout-definition';
 import { useCraftingTimeoutWebsocket } from '../websockets/hooks/use-crafting-timeout-websocket';
 
 import CharacterSheetDefinition from 'game-data/api-data-definitions/character/character-sheet-definition';
-
-interface CraftingTimeoutState {
-  remainingSeconds: number;
-  totalSeconds: number;
-  canCraft: boolean;
-}
 
 let trackedCharacterId: number | null = null;
 let craftingTimeoutEndsAt: number | null = null;

@@ -89,16 +89,9 @@ class MonsterListService
             $monstersKey
         );
 
-        $monsters = $this->applySpecialLocationOverride(
+        return $this->applySpecialLocationOverride(
             $monsters,
             $locationWithType
-        );
-
-        return $this->applyLocationStrengthIncrease(
-            $monsters,
-            $characterMap->character_position_x,
-            $characterMap->character_position_y,
-            $characterMap->game_map_id
         );
     }
 
@@ -205,48 +198,6 @@ class MonsterListService
         }
 
         return $current;
-    }
-
-    /*
-     * Apply an absolute integer stat increase to all monsters based on a location's enemy_strength_increase.
-     *
-     * @param array $monsters
-     * @param int $x
-     * @param int $y
-     * @param int $gameMapId
-     * @return array
-     */
-    private function applyLocationStrengthIncrease(array $monsters, int $x, int $y, int $gameMapId): array
-    {
-        $location = Location::where('x', $x)
-            ->where('y', $y)
-            ->where('game_map_id', $gameMapId)
-            ->whereNotNull('enemy_strength_increase')
-            ->first();
-
-        if (is_null($location)) {
-            return $monsters;
-        }
-
-        $increase = (int) $location->enemy_strength_increase;
-
-        if ($increase <= 0) {
-            return $monsters;
-        }
-
-        $statFields = ['str', 'dur', 'dex', 'chr', 'int', 'agi', 'focus', 'ac', 'to_hit_base'];
-
-        $monsters['data'] = array_map(function (array $monster) use ($increase, $statFields) {
-            foreach ($statFields as $field) {
-                if (array_key_exists($field, $monster)) {
-                    $monster[$field] += $increase;
-                }
-            }
-
-            return $monster;
-        }, $monsters['data'] ?? []);
-
-        return $monsters;
     }
 
     /*

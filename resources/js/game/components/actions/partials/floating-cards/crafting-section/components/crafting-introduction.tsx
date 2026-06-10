@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
+
+import CraftingIntroductionProps from '../types/crafting-introduction-props';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 
-interface CraftingIntroductionProps {
-  onAcknowledge: () => void;
-}
-
-const CraftingIntroduction = ({ onAcknowledge }: CraftingIntroductionProps) => {
+const CraftingIntroduction = ({
+  onAcknowledge,
+}: CraftingIntroductionProps): ReactNode => {
   return (
     <div className="prose dark:prose-invert">
       <h2>Crafting</h2>

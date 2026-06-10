@@ -3,7 +3,6 @@
 namespace App\Game\Maps\Transformers;
 
 use App\Flare\Models\Location;
-use App\Flare\Values\LocationEffectValue;
 use App\Flare\Values\LocationType;
 use League\Fractal\TransformerAbstract;
 
@@ -37,12 +36,8 @@ class LocationTransformer extends TransformerAbstract
             'pin_css_class' => $location->pin_css_class,
             'hours_to_drop' => $location->hours_to_drop,
             'minutes_between_delve_fights' => $location->minutes_between_delve_fights,
-            'increases_enemy_stats_by' => ! is_null($location->enemy_strength_type)
-                ? LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type)
-                : null,
-            'increase_enemy_percentage_by' => ! is_null($location->enemy_strength_type)
-                ? LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type)
-                : $location->enemy_strength_increase,
+            'increases_enemy_stats_by' => null,
+            'increase_enemy_percentage_by' => null,
         ];
     }
 

@@ -3,11 +3,7 @@ import { useWebsocket } from '../../../../../../../../websocket-handler/hooks/us
 import { WebSocketChannels } from '../enums/web-socket-channels';
 import { WebsocketEventNames } from '../enums/websocket-event-names';
 import CraftingTimeoutEventDefinition from '../event-data-definitions/crafting-timeout-event-definition';
-
-interface UseCraftingTimeoutWebsocketParams {
-  userId: number;
-  onTimeoutUpdate: (timeout: number | null) => void;
-}
+import UseCraftingTimeoutWebsocketParams from './definitions/use-crafting-timeout-websocket-params';
 
 export const useCraftingTimeoutWebsocket = ({
   userId,

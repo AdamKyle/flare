@@ -12,15 +12,9 @@ import {
 import CraftingRequestDefinition from '../definitions/crafting-request-definition';
 import { CraftingApiUrls } from '../enums/crafting-api-urls';
 import UseCraftingApiDefinition from './definitions/use-crafting-api-definition';
+import UseCraftingApiParams from './definitions/use-crafting-api-params';
 
 const ITEMS_PER_PAGE = 10;
-
-interface UseCraftingApiParams {
-  characterId: number;
-  selectedType: string | null;
-  armourType: string | null;
-  searchText: string;
-}
 
 const getErrorMessage = (error: unknown): string => {
   if (error instanceof AxiosError) {
