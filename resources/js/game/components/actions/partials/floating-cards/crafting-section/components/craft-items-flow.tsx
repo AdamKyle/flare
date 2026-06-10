@@ -1,9 +1,14 @@
+import clsx from 'clsx';
 import React, { ReactNode, useState } from 'react';
 
 import CraftItemList from './craft-item-list';
 import CraftingInventoryProgress from './crafting-inventory-progress';
 import CraftingSkillXpProgress from './crafting-skill-xp-progress';
+import SelectedCraftableItemDetails from './selected-craftable-item-details';
+import { BaseItemDetails } from '../../../../../../api-definitions/items/base-item-details';
 import { useInfiniteScroll } from '../../../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
+import { planeTextItemColors } from '../../../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
+import { useOpenItemDetails } from '../../../../../chat-section/hooks/use-open-item-details';
 import CraftableItemDefinition from '../api/definitions/craftable-item-definition';
 import { useCraftItemApi } from '../api/hooks/use-craft-item-api';
 import { useCraftableItemsApi } from '../api/hooks/use-craftable-items-api';
@@ -14,13 +19,12 @@ import { armourTypeOptions, craftTypeOptions } from '../utils/crafting-options';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 
-import { formatNumberWithCommas } from 'game-utils/format-number';
-
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';
 import ProgressButton from 'ui/buttons/button-progress';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import { baseStyles } from 'ui/buttons/styles/link-buttons/base-styles';
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import Input from 'ui/input/input';
@@ -52,6 +56,8 @@ const CraftItemsFlow = ({
   const [craftForNpc, setCraftForNpc] = useState(false);
   const [craftForEvent, setCraftForEvent] = useState(false);
 
+  const { openServerMessageItem } = useOpenItemDetails();
+
   const { isTimeoutActive, isCraftingDisabled, progress, formattedRemaining } =
     useCraftingTimeout(gameData?.character);
 
@@ -74,6 +80,8 @@ const CraftItemsFlow = ({
     error,
     successMessage,
     craftingResponse,
+    craftedInventorySlotId,
+    craftedItemDetails,
     craftItem,
     clearMessages,
   } = useCraftItemApi({
@@ -265,6 +273,36 @@ const CraftItemsFlow = ({
     );
   };
 
+  const renderSuccessContent = (): ReactNode => {
+    if (!craftedInventorySlotId || !craftedItemDetails) {
+      return <span>{successMessage}</span>;
+    }
+
+    const itemColorClass = planeTextItemColors(
+      craftedItemDetails as unknown as BaseItemDetails
+    );
+
+    return (
+      <span>
+        {'You successfully crafted '}
+        <button
+          type="button"
+          aria-label={`View ${craftedItemDetails.name} details`}
+          className={clsx(baseStyles(), itemColorClass)}
+          onClick={() =>
+            openServerMessageItem(
+              gameData?.character?.id ?? 0,
+              craftedInventorySlotId
+            )
+          }
+        >
+          {craftedItemDetails.name}
+        </button>
+        {'.'}
+      </span>
+    );
+  };
+
   const renderMessageArea = () => {
     if (isCrafting) {
       return (
@@ -283,7 +321,7 @@ const CraftItemsFlow = ({
       <div>
         {error && <Alert variant={AlertVariant.DANGER}>{error}</Alert>}
         {successMessage && (
-          <Alert variant={AlertVariant.SUCCESS}>{successMessage}</Alert>
+          <Alert variant={AlertVariant.SUCCESS}>{renderSuccessContent()}</Alert>
         )}
       </div>
     );
@@ -344,10 +382,7 @@ const CraftItemsFlow = ({
 
     return (
       <div className="rounded-md border border-gray-400 p-3 dark:border-gray-600">
-        <p className="font-semibold">{selectedItem.name}</p>
-        <p className="text-sm">
-          Cost: {formatNumberWithCommas(selectedItem.cost)} gold
-        </p>
+        <SelectedCraftableItemDetails item={selectedItem} />
         <ProgressButton
           label={isCrafting ? 'Crafting...' : 'Craft Item'}
           on_click={handleCraft}

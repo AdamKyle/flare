@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import { normalizeCraftingType } from '../../utils/normalize-crafting-type';
 import CraftItemRequestDefinition from '../definitions/craft-item-request-definition';
+import CraftableItemDefinition from '../definitions/craftable-item-definition';
 import CraftingApiResponseDefinition from '../definitions/crafting-api-response-definition';
 import { CraftingApiUrls } from '../enums/crafting-api-urls';
 import UseCraftItemApiDefinition from './definitions/use-craft-item-api-definition';
@@ -29,6 +30,11 @@ export const useCraftItemApi = ({
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [craftingResponse, setCraftingResponse] =
     useState<CraftingApiResponseDefinition | null>(null);
+  const [craftedInventorySlotId, setCraftedInventorySlotId] = useState<
+    number | null
+  >(null);
+  const [craftedItemDetails, setCraftedItemDetails] =
+    useState<CraftableItemDefinition | null>(null);
 
   const craftItem = async (craftForNpc: boolean, craftForEvent: boolean) => {
     if (!selectedItem) {
@@ -39,6 +45,8 @@ export const useCraftItemApi = ({
     setError(null);
     setSuccessMessage(null);
     setCraftingResponse(null);
+    setCraftedInventorySlotId(null);
+    setCraftedItemDetails(null);
 
     const url = getUrl(CraftingApiUrls.CRAFT_ITEM, { character: characterId });
 
@@ -61,6 +69,8 @@ export const useCraftItemApi = ({
       >(url, request);
 
       setCraftingResponse(result);
+      setCraftedInventorySlotId(result.crafted_inventory_slot_id ?? null);
+      setCraftedItemDetails(result.crafted_item_details ?? null);
 
       if (result.crafted_item) {
         setSuccessMessage(`You successfully crafted ${selectedItem.name}.`);
@@ -78,6 +88,8 @@ export const useCraftItemApi = ({
     setError(null);
     setSuccessMessage(null);
     setCraftingResponse(null);
+    setCraftedInventorySlotId(null);
+    setCraftedItemDetails(null);
   };
 
   return {
@@ -85,6 +97,8 @@ export const useCraftItemApi = ({
     error,
     successMessage,
     craftingResponse,
+    craftedInventorySlotId,
+    craftedItemDetails,
     craftItem,
     clearMessages,
   };

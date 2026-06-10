@@ -4,6 +4,7 @@ namespace App\Game\Skills\Controllers\Api;
 
 use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
+use App\Flare\Models\Item;
 use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
@@ -11,6 +12,7 @@ use App\Game\Events\Concerns\ShouldShowCraftingEventButton;
 use App\Game\Factions\FactionLoyalty\Concerns\FactionLoyalty;
 use App\Game\Skills\Requests\CraftingValidation;
 use App\Game\Skills\Services\CraftingService;
+use App\Game\Skills\Transformers\CraftableItemTransformer;
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -130,6 +132,10 @@ class CraftingController extends Controller
 
         $crafted = $craftingService->craft($character, $request->all());
 
+        $craftedInventorySlotId = $craftingService->getLastCraftedInventorySlotId();
+        $craftedItem = Item::with(['itemPrefix', 'itemSuffix', 'appliedHolyStacks'])->find($request->item_to_craft);
+        $craftedItemDetails = $craftedItem ? (new CraftableItemTransformer)->transform($craftedItem) : null;
+
         $perPage = $request->input('per_page');
 
         if ($perPage !== null) {
@@ -154,6 +160,8 @@ class CraftingController extends Controller
                 'show_craft_for_npc' => $this->showCraftForNpcButton($character, $request->type),
                 'inventory_count' => $this->craftingService->getInventoryCount($character),
                 'crafted_item' => $crafted,
+                'crafted_inventory_slot_id' => $craftedInventorySlotId,
+                'crafted_item_details' => $craftedItemDetails,
             ]), 200);
         }
 
@@ -164,6 +172,8 @@ class CraftingController extends Controller
             'show_craft_for_npc' => $this->showCraftForNpcButton($character, $request->type),
             'inventory_count' => $this->craftingService->getInventoryCount($character),
             'crafted_item' => $crafted,
+            'crafted_inventory_slot_id' => $craftedInventorySlotId,
+            'crafted_item_details' => $craftedItemDetails,
         ], 200);
     }
 

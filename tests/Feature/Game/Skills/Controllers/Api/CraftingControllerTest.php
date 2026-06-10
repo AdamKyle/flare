@@ -511,6 +511,11 @@ class CraftingControllerTest extends TestCase
         $this->assertArrayHasKey('can_load_more', $jsonData['meta']);
         $this->assertArrayHasKey('pagination', $jsonData['meta']);
         $this->assertArrayHasKey('crafted_item', $jsonData);
+        $this->assertArrayHasKey('crafted_inventory_slot_id', $jsonData);
+        $this->assertArrayHasKey('crafted_item_details', $jsonData);
+        $this->assertNotNull($jsonData['crafted_inventory_slot_id']);
+        $this->assertNotNull($jsonData['crafted_item_details']);
+        $this->assertEquals($item->id, $jsonData['crafted_item_details']['id']);
         $this->assertSame($jsonData['data'], $jsonData['items']);
         $this->assertEquals($jsonData['items'][0]['id'], $item->id);
         $this->assertGreaterThan(0, $jsonData['xp']['current_xp']);

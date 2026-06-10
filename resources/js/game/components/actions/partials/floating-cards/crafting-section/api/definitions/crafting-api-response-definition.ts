@@ -12,4 +12,6 @@ export default interface CraftingApiResponseDefinition extends PaginatedApiRespo
   show_craft_for_event: boolean;
   inventory_count: CraftingInventoryCountDefinition;
   crafted_item?: boolean;
+  crafted_inventory_slot_id?: number | null;
+  crafted_item_details?: CraftableItemDefinition | null;
 }
