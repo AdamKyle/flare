@@ -1,6 +1,5 @@
-export default interface UseCraftingApiParams {
+export default interface UseCraftableItemsApiParams {
   characterId: number;
   selectedType: string | null;
   armourType: string | null;
-  searchText: string;
 }

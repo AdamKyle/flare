@@ -255,6 +255,28 @@ class ExplorationTest extends TestCase
     {
         Event::fake();
 
+        $successfulFightData = [
+            'health' => [
+                'current_character_health' => 100,
+                'current_monster_health' => 0,
+            ],
+            'monster' => [
+                'id' => $this->monster->id,
+                'attack_type' => AttackTypeValue::ATTACK,
+            ],
+        ];
+
+        $monsterFightService = Mockery::mock(MonsterFightService::class);
+        $monsterFightService->shouldReceive('setupMonster')->andReturn($successfulFightData);
+        $monsterFightService->shouldReceive('fightMonster')->andReturn($successfulFightData);
+        $monsterFightService->shouldReceive('getMonster')->andReturn($this->monster);
+
+        $battleEventHandler = Mockery::mock(BattleEventHandler::class);
+        $battleEventHandler->shouldReceive('processMonsterDeath');
+
+        $this->instance(MonsterFightService::class, $monsterFightService);
+        $this->instance(BattleEventHandler::class, $battleEventHandler);
+
         resolve(ExplorationAutomationService::class)->beginAutomation($this->character, [
             'auto_attack_length' => null,
             'move_down_the_list_every' => null,

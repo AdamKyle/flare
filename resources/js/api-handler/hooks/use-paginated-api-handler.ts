@@ -9,31 +9,52 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 const UsePaginatedApiHandler = <
   T,
   F extends Record<string, unknown> = Record<string, unknown>,
+  R = PaginatedApiResponseDefinition<T[]>,
 >(
   params: ApiParametersDefinitions,
   perPage = 10
-): PaginatedApiHandlerDefinition<T, F> => {
+): PaginatedApiHandlerDefinition<T, F, R> => {
   const { apiHandler, getUrl } = useApiHandler();
   const url = getUrl(params.url, params.urlParams);
+
+  const enabled = params.enabled !== false;
 
   const [data, setData] = useState<T[]>([]);
   const [error, setError] =
     useState<PaginatedApiHandlerDefinition<T, F>['error']>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(enabled);
   const [canLoadMore, setCanLoadMore] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState('');
   const [filters, setFilters] = useState<F>({} as F);
   const [refresh, setRefresh] = useState(false);
+  const [response, setResponse] = useState<R | null>(null);
 
   const previousSearchTextRef = useRef(searchText);
   const previousFiltersRef = useRef<F>(filters);
+  const previousAdditionalParamsRef = useRef<Record<string, unknown>>(
+    params.additionalParams ?? {}
+  );
 
   const fetchPaginatedData = useCallback(
     async () => {
+      if (!enabled) {
+        setData([]);
+        setError(null);
+        setLoading(false);
+        setCanLoadMore(false);
+        setIsLoadingMore(false);
+        setPage(1);
+        setResponse(null);
+
+        return;
+      }
+
       if (page > 1) {
         setIsLoadingMore(true);
+      } else {
+        setLoading(true);
       }
 
       try {
@@ -46,6 +67,7 @@ const UsePaginatedApiHandler = <
             page,
             search_text: searchText,
             filters,
+            ...(params.additionalParams ?? {}),
           },
         });
 
@@ -53,18 +75,19 @@ const UsePaginatedApiHandler = <
           page === 1 ? result.data : [...previousData, ...result.data]
         );
         setCanLoadMore(result.meta.can_load_more);
+        setResponse(result as unknown as R);
       } catch (errorInstance) {
         if (errorInstance instanceof AxiosError) {
-          const response = errorInstance.response;
+          const axiosResponse = errorInstance.response;
 
-          if (!response) {
+          if (!axiosResponse) {
             return;
           }
 
           /**
            * If we are not logged in, reload to put them back on the login screen.
            */
-          if (response.status === 401) {
+          if (axiosResponse.status === 401) {
             window.location.reload();
           }
 
@@ -78,7 +101,7 @@ const UsePaginatedApiHandler = <
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [apiHandler, url, page, perPage, refresh]
+    [apiHandler, url, page, perPage, refresh, enabled]
   );
 
   useEffect(() => {
@@ -87,20 +110,23 @@ const UsePaginatedApiHandler = <
 
   useEffect(() => {
     const isSameSearch = previousSearchTextRef.current === searchText;
-
     const isSameFilters = shallowEqual(previousFiltersRef.current, filters);
+    const isSameAdditionalParams = shallowEqual(
+      previousAdditionalParamsRef.current,
+      params.additionalParams ?? {}
+    );
 
-    if (isSameSearch && isSameFilters) {
+    if (isSameSearch && isSameFilters && isSameAdditionalParams) {
       return;
     }
 
     previousSearchTextRef.current = searchText;
-
     previousFiltersRef.current = filters;
+    previousAdditionalParamsRef.current = params.additionalParams ?? {};
 
     setPage(1);
     setRefresh((previousValue) => !previousValue);
-  }, [searchText, filters]);
+  }, [searchText, filters, params.additionalParams]);
 
   const onEndReached = () => {
     if (!canLoadMore || isLoadingMore) {
@@ -117,6 +143,7 @@ const UsePaginatedApiHandler = <
     canLoadMore,
     isLoadingMore,
     page,
+    response,
     onEndReached,
     setSearchText,
     setFilters,

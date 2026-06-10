@@ -1,8 +1,12 @@
 import React, { ReactNode, useState } from 'react';
 
 import CraftItemList from './craft-item-list';
+import CraftingInventoryProgress from './crafting-inventory-progress';
+import CraftingSkillXpProgress from './crafting-skill-xp-progress';
+import { useInfiniteScroll } from '../../../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
 import CraftableItemDefinition from '../api/definitions/craftable-item-definition';
-import { useCraftingApi } from '../api/hooks/use-crafting-api';
+import { useCraftItemApi } from '../api/hooks/use-craft-item-api';
+import { useCraftableItemsApi } from '../api/hooks/use-craftable-items-api';
 import { CraftingTypes } from '../enums/crafting-types';
 import { useCraftingTimeout } from '../hooks/use-crafting-timeout';
 import BaseSectionProps from '../screens/types/base-section-props';
@@ -20,7 +24,8 @@ import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import Input from 'ui/input/input';
-import InfiniteLoader from 'ui/loading-bar/infinite-loader';
+import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
+import IndeterminateProgressBar from 'ui/progress/indeterminate-progress-bar';
 
 const progressFillClass = (progress: number): string => {
   if (progress > 66) {
@@ -44,7 +49,6 @@ const CraftItemsFlow = ({
   const [selectedItem, setSelectedItem] =
     useState<CraftableItemDefinition | null>(null);
   const [searchInput, setSearchInput] = useState('');
-  const [searchText, setSearchText] = useState('');
   const [craftForNpc, setCraftForNpc] = useState(false);
   const [craftForEvent, setCraftForEvent] = useState(false);
 
@@ -56,23 +60,33 @@ const CraftItemsFlow = ({
     craftingData,
     loading,
     isLoadingMore,
-    isCrafting,
-    error,
-    successMessage,
-    loadMore,
-    craftItem,
-    clearMessages,
-  } = useCraftingApi({
+    canLoadMore,
+    onEndReached,
+    setSearchText,
+  } = useCraftableItemsApi({
     characterId: gameData?.character?.id ?? 0,
     selectedType,
     armourType,
-    searchText,
   });
 
-  const handleTypeChange = (item: DropdownItem) => {
-    const nextType = String(item.value);
+  const {
+    isCrafting,
+    error,
+    successMessage,
+    craftingResponse,
+    craftItem,
+    clearMessages,
+  } = useCraftItemApi({
+    characterId: gameData?.character?.id ?? 0,
+    selectedItem,
+  });
 
-    setSelectedType(nextType);
+  const { handleScroll } = useInfiniteScroll({ on_end_reached: onEndReached });
+
+  const displayedCraftingData = craftingResponse ?? craftingData;
+
+  const handleTypeChange = (item: DropdownItem) => {
+    setSelectedType(String(item.value));
     setArmourType(null);
     setSelectedItem(null);
     setSearchInput('');
@@ -128,29 +142,29 @@ const CraftItemsFlow = ({
     setActiveCraftingType(CraftingTypes.HOME);
   };
 
-  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
-    const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
-
-    if (scrollTop + clientHeight >= scrollHeight - 10) {
-      loadMore();
-    }
-  };
-
   const handleCraft = () => {
     if (!selectedItem || isCraftingDisabled || isCrafting) {
       return;
     }
 
-    craftItem(selectedItem, craftForNpc, craftForEvent);
+    craftItem(craftForNpc, craftForEvent);
+  };
+
+  const handleCraftItemsScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    if (loading || isLoadingMore || !canLoadMore) {
+      return;
+    }
+
+    handleScroll(event);
   };
 
   const canShowItems =
     selectedType !== null && (selectedType !== 'armour' || armourType !== null);
 
   const inventoryIsFull = Boolean(
-    craftingData &&
-    craftingData.inventory_count.current_count >=
-      craftingData.inventory_count.max_inventory
+    displayedCraftingData &&
+    displayedCraftingData.inventory_count.current_count >=
+      displayedCraftingData.inventory_count.max_inventory
   );
 
   const selectedTypeOption = craftTypeOptions.find(
@@ -163,14 +177,14 @@ const CraftItemsFlow = ({
 
   const canCraftForNpc = Boolean(
     selectedItem &&
-    craftingData?.show_craft_for_npc &&
+    displayedCraftingData?.show_craft_for_npc &&
     gameData?.character?.current_fame_tasks?.some(
       (task) => task.item_id === selectedItem.id
     )
   );
 
   const canCraftForEvent = Boolean(
-    selectedItem && craftingData?.show_craft_for_event
+    selectedItem && displayedCraftingData?.show_craft_for_event
   );
 
   const renderArmourTypeFieldset = () => {
@@ -196,38 +210,14 @@ const CraftItemsFlow = ({
     );
   };
 
-  const renderCraftingSummary = () => {
-    if (!craftingData) {
-      return null;
-    }
-
-    return (
-      <div className="grid grid-cols-2 gap-3 text-sm">
-        <div className="rounded-md bg-gray-100 p-3 dark:bg-gray-800">
-          <span className="block font-semibold">
-            {craftingData.xp.skill_name} level{' '}
-            {formatNumberWithCommas(craftingData.xp.level)}
-          </span>
-          <span>
-            XP: {formatNumberWithCommas(craftingData.xp.current_xp)} /{' '}
-            {formatNumberWithCommas(craftingData.xp.next_level_xp)}
-          </span>
-        </div>
-        <div className="rounded-md bg-gray-100 p-3 dark:bg-gray-800">
-          <span className="block font-semibold">Inventory</span>
-          <span>
-            {formatNumberWithCommas(craftingData.inventory_count.current_count)}{' '}
-            /{' '}
-            {formatNumberWithCommas(craftingData.inventory_count.max_inventory)}
-          </span>
-        </div>
-      </div>
-    );
-  };
-
   const renderCraftItems = () => {
     if (loading) {
-      return <InfiniteLoader />;
+      return (
+        <IndeterminateProgressBar
+          label="Loading items..."
+          variant={ProgressBarVariant.PRIMARY}
+        />
+      );
     }
 
     return (
@@ -235,7 +225,7 @@ const CraftItemsFlow = ({
         items={items}
         selectedItem={selectedItem}
         loadingMore={isLoadingMore}
-        onScroll={handleScroll}
+        handle_scroll={handleCraftItemsScroll}
         onSelect={handleSelectItem}
       />
     );
@@ -275,13 +265,22 @@ const CraftItemsFlow = ({
     );
   };
 
-  const renderMessages = () => {
+  const renderMessageArea = () => {
+    if (isCrafting) {
+      return (
+        <IndeterminateProgressBar
+          label="Crafting..."
+          variant={ProgressBarVariant.PRIMARY}
+        />
+      );
+    }
+
     if (!error && !successMessage) {
       return null;
     }
 
     return (
-      <div className="my-4">
+      <div>
         {error && <Alert variant={AlertVariant.DANGER}>{error}</Alert>}
         {successMessage && (
           <Alert variant={AlertVariant.SUCCESS}>{successMessage}</Alert>
@@ -318,6 +317,26 @@ const CraftItemsFlow = ({
     );
   };
 
+  const renderXpProgress = () => {
+    if (!displayedCraftingData) {
+      return null;
+    }
+
+    return <CraftingSkillXpProgress xp={displayedCraftingData.xp} />;
+  };
+
+  const renderInventoryProgress = () => {
+    if (!displayedCraftingData) {
+      return null;
+    }
+
+    return (
+      <CraftingInventoryProgress
+        inventory_count={displayedCraftingData.inventory_count}
+      />
+    );
+  };
+
   const renderSelectedItem = () => {
     if (!selectedItem) {
       return null;
@@ -333,10 +352,10 @@ const CraftItemsFlow = ({
           label={isCrafting ? 'Crafting...' : 'Craft Item'}
           on_click={handleCraft}
           variant={ButtonVariant.SUCCESS}
-          progress={progress}
+          progress={isCrafting ? 100 : progress}
           disabled={isCrafting || isCraftingDisabled || inventoryIsFull}
           additional_css="mt-3 w-full"
-          progress_fill_class={progressFillClass(progress)}
+          progress_fill_class={progressFillClass(isCrafting ? 100 : progress)}
         />
         {renderTimeoutMessage()}
         {renderInventoryFullMessage()}
@@ -352,9 +371,11 @@ const CraftItemsFlow = ({
     return (
       <>
         <fieldset>
-          <legend className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-            Search Items
-          </legend>
+          <p className="prose dark:prose-invert my-4">
+            You can search for items you want to craft or scroll the list below
+            and select an item to craft. Once you select the item the craft item
+            button will appear.
+          </p>
           <Input
             value={searchInput}
             on_change={handleSearch}
@@ -362,11 +383,14 @@ const CraftItemsFlow = ({
             clearable
           />
         </fieldset>
-        {renderCraftingSummary()}
         {renderCraftItems()}
         {renderCraftForNpcCheckbox()}
         {renderCraftForEventCheckbox()}
-        {renderMessages()}
+        {renderMessageArea()}
+        <div className="my-2 mb-4">
+          <div className="my-2">{renderXpProgress()}</div>
+          <div>{renderInventoryProgress()}</div>
+        </div>
         {renderSelectedItem()}
       </>
     );

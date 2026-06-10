@@ -1,7 +1,7 @@
 import {
   ArmourTypeOptionDefinition,
   CraftTypeOptionDefinition,
-} from '../types/craft-type-definition';
+} from '../components/definitions/craft-type-definition';
 
 export const craftTypeOptions: CraftTypeOptionDefinition[] = [
   { label: 'For my class', value: 'for-class' },

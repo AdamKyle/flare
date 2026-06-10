@@ -335,7 +335,11 @@ class MonsterListServiceTest extends TestCase
 
         $response = $this->service->getMonstersForCharacter($character);
 
-        $this->assertTrue($response['success']);
+        $this->assertEquals(200, $response['status']);
+
+        $data = $this->unwrap($response);
+
+        $this->assertEquals([['id' => 99, 'name' => 'Cave Rat', 'max_level' => 5]], $data);
     }
 
     private function seedMonstersCache(array $payload): void

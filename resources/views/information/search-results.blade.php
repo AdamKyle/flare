@@ -2,12 +2,13 @@
 
 @section('content')
     <x-core.layout.info-container>
-        <x-core.page-title
-            title="Search Results"
-            route="{{url()->previous()}}"
+        <x-core.page-title-slot
+            route="{{ url()->previous() }}"
             color="success"
             link="Back"
-        ></x-core.page-title>
+        >
+            Search Results
+        </x-core.page-title-slot>
 
         <form id="search-form" method="GET" action="{{ route('info.search') }}">
             @csrf
@@ -25,7 +26,7 @@
             @foreach ($results as $page)
                 @php
                     $matchingSections = array_filter($page->page_sections, function ($section) use ($query) {
-                        return stripos($section['content'], $query) !== false;
+                        return stripos($section['content'] ?? '', $query) !== false;
                     });
 
                     $snippet         = '';
@@ -33,7 +34,7 @@
                     $matchingSection = reset($matchingSections);
 
                     if ($matchingSection) {
-                        $content = strip_tags($matchingSection['content']);
+                        $content = strip_tags($matchingSection['content'] ?? '');
                         $content = preg_replace('/[[:^ascii:]]/', '', $content);
 
                         $pos     = stripos($content, $query);

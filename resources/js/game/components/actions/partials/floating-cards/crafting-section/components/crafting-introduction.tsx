@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 
-import CraftingIntroductionProps from '../types/crafting-introduction-props';
+import CraftingIntroductionProps from './types/crafting-introduction-props';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
